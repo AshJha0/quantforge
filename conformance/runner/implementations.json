@@ -1,0 +1,6 @@
+{
+  "java": {"command": ["java", "-jar", "java25/target/quantforge-cli.jar"], "cwd": "."},
+  "cpp": {"command": ["cpp26/build/quantforge"], "cwd": "."},
+  "python": {"command": ["uv", "run", "--project", "python", "quantforge"], "cwd": "."},
+  "rust": {"command": ["rust/target/release/quantforge"], "cwd": "."}
+}

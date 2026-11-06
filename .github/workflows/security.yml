@@ -1,0 +1,31 @@
+name: Security
+# One scan of the lockfiles, weekly and when a lockfile changes.
+on:
+  schedule:
+    - cron: '41 3 * * 1'
+  pull_request:
+    paths:
+      - 'rust/Cargo.lock'
+      - 'python/uv.lock'
+      - 'java25/pom.xml'
+      - '.github/workflows/security.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  osv-scan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: google/osv-scanner-action/osv-scanner-action@b1d267aea5211fa648d9d442fa64b90dbdcbdd36 # v2.7.0
+        with:
+          scan-args: |-
+            --lockfile=rust/Cargo.lock
+            --lockfile=python/uv.lock
+            --lockfile=java25/pom.xml

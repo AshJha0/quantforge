@@ -1,0 +1,385 @@
+{
+ "schema_version": "1.0",
+ "suite": "pde",
+ "spec": "specifications/01-core/pde.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stats_engines.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "pde-0001",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 100,
+    "time_steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.22845371253081,
+     "delta": 0.5870353970721611,
+     "gamma": 0.01895174971035595
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "absolute",
+     "limit": 0.0028964087535214844
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0002",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 200,
+    "time_steps": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.227369892140965,
+     "delta": 0.5868971808811311,
+     "gamma": 0.01895085410835975
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "absolute",
+     "limit": 0.0007287679738325892
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0003",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 400,
+    "time_steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.227096748428721,
+     "delta": 0.5868626530775896,
+     "gamma": 0.018950646525898278
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "absolute",
+     "limit": 0.00018248054934488778
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0004",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 800,
+    "time_steps": 400
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.22702832721411,
+     "delta": 0.5868540227614093,
+     "gamma": 0.018950595631281014
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "absolute",
+     "limit": 4.563812012392532e-05
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0005",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "option": "PUT",
+    "space_steps": 400,
+    "time_steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.330015534898183,
+     "delta": -0.3933434942485421,
+     "gamma": 0.018950675932086415
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 6.330080627549918,
+     "method": "absolute",
+     "limit": 0.005
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0006",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 80.0,
+    "r": 0.01,
+    "q": 0.0,
+    "sigma": 0.4,
+    "t": 0.5,
+    "option": "CALL",
+    "space_steps": 400,
+    "time_steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23.37995107490712,
+     "delta": 0.8284556157904747,
+     "gamma": 0.00899851647668498
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 23.37958738793615,
+     "method": "absolute",
+     "limit": 0.005
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0007",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "r": 0.03,
+    "q": 0.01,
+    "sigma": 0.15,
+    "t": 2.0,
+    "option": "PUT",
+    "space_steps": 400,
+    "time_steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 18.33170875015594,
+     "delta": -0.699744216908653,
+     "gamma": 0.01571438971377215
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 18.33153798797244,
+     "method": "absolute",
+     "limit": 0.005
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0008",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 103.7,
+    "r": -0.005,
+    "q": 0.0,
+    "sigma": 0.25,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 400,
+    "time_steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.185436541271038,
+     "delta": 0.48395261462713834,
+     "gamma": 0.01594476686318908
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 8.18539050243374,
+     "method": "absolute",
+     "limit": 0.005
+    }
+   ]
+  },
+  {
+   "case_id": "pde-0009",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 101,
+    "time_steps": 50
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "pde-0010",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 100,
+    "time_steps": 2,
+    "rannacher_steps": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "pde-0011",
+   "operation": "core.pde.bs_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": -0.2,
+    "t": 1.0,
+    "option": "CALL",
+    "space_steps": 100,
+    "time_steps": 50
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

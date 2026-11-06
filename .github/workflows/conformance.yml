@@ -1,0 +1,114 @@
+name: Conformance
+# Linux only, because CI minutes are capped. Each job builds one CLI and runs the neutral runner.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'java25/**'
+      - 'cpp26/**'
+      - 'python/**'
+      - 'rust/**'
+      - 'conformance/**'
+      - 'datasets/**'
+      - 'specifications/**'
+      - '.github/workflows/conformance.yml'
+  pull_request:
+    paths:
+      - 'java25/**'
+      - 'cpp26/**'
+      - 'python/**'
+      - 'rust/**'
+      - 'conformance/**'
+      - 'datasets/**'
+      - 'specifications/**'
+      - '.github/workflows/conformance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  runner-self-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: python3 conformance/runner/test_runner.py
+  java:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - run: mvn -B -DskipTests package
+        working-directory: java25
+      - run: python3 conformance/runner/runner.py --impl java
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: conformance-java
+          path: conformance/reports/
+  cpp:
+    runs-on: ubuntu-24.04
+    container: gcc:16.2
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: apt-get update && apt-get install -y cmake ninja-build python3
+      - run: cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+      - run: cmake --build cpp26/build --parallel
+      - run: python3 conformance/runner/runner.py --impl cpp
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: conformance-cpp
+          path: conformance/reports/
+  python:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - run: uv sync --locked --project python
+      - run: python3 conformance/runner/runner.py --impl python
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: conformance-python
+          path: conformance/reports/
+  rust:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            rust/target
+          key: conformance-rust-${{ hashFiles('rust/Cargo.lock', 'rust/rust-toolchain.toml') }}
+      - run: rustup show
+        working-directory: rust
+      - run: cargo build --release -p quantforge-cli
+        working-directory: rust
+      - run: python3 conformance/runner/runner.py --impl rust
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: conformance-rust
+          path: conformance/reports/

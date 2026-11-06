@@ -1,20 +1,53 @@
 # There is no global default: every conformance case must name one of these classes.
+# Comparison for absolute/relative classes: |a - e| <= absolute + relative * max(|a|, |e|).
+# Each class gives its reason, as ADR-0007 asks.
 classes:
   date_and_convention:
+    # Dates, booleans, integers, strings, flags. Nothing to round.
+    exact: true
+  bit_exact:
+    # Integer generators and exactly representable results (rng.md, sobol.md).
+    # Reals are compared as binary64 values, with no tolerance.
     exact: true
   simple_analytic:
+    # A few operations on well-conditioned values.
     absolute: 1.0e-12
     relative: 1.0e-10
   interpolation:
+    # A solve or several chained operations; rounding grows with knot count.
     absolute: 1.0e-10
     relative: 1.0e-8
+  root_finding:
+    # Default x_tol is 1e-12; allows for different iteration paths.
+    absolute: 1.0e-10
+    relative: 1.0e-10
+  quadrature:
+    # Fixed recipes agree to rounding. Adaptive cases set tolerance_limit from their tol.
+    absolute: 1.0e-11
+    relative: 1.0e-10
+  statistics:
+    # Stable sums over short series. The ill-conditioned 1e9-offset case stays inside this.
+    absolute: 1.0e-11
+    relative: 1.0e-10
+  numerical_scheme:
+    # The same grid recipe in another language: rounding through hundreds of tridiagonal solves.
+    absolute: 1.0e-8
+    relative: 1.0e-8
+  fourier:
+    # The same series; complex exp and log differ in the last bits over hundreds of terms.
+    absolute: 1.0e-9
+    relative: 1.0e-9
+  common_rng:
+    # Same draws (rng.md). Normals differ by a few ulps through log; means of many paths keep that small.
+    absolute: 1.0e-9
+    relative: 1.0e-9
   calibration:
     # Judged on repricing of the input quotes, not on fitted parameters,
     # because languages may use different proven solvers.
     judged_on: repricing_error
     per_case_target_required: true
   monte_carlo:
-    # Languages agree statistically unless a case fixes the common RNG in
-    # specifications/01-core/rng.md, written before Monte Carlo is coded.
+    # Against the true value: |a - e| <= z * reported stderr, z set per check (4 in stage A).
+    # With common draws fixed by specifications/01-core/rng.md, class common_rng applies as well.
     method: "confidence interval against the oracle value"
     common_rng_spec: "specifications/01-core/rng.md"

@@ -4,7 +4,7 @@
 1. Select an issue with explicit scope and acceptance criteria.
 2. Read the relevant domain specification and ADRs.
 3. Add or update tests before changing model behaviour.
-4. Implement independently in the target language.
+4. Implement independently in the target language, from the spec alone. No language is a reference, and golden values come only from `oracle/`.
 5. Run formatting, static analysis, unit tests and relevant conformance tests.
 6. Add benchmark evidence when performance is affected.
 7. Update documentation, limitations and changelog.
@@ -22,4 +22,4 @@
 - [ ] No licensed or sensitive market data committed without permission.
 
 ## Definition of done
-A feature is not complete merely because the happy-path example works. It must meet the domain-specific acceptance criteria and pass all applicable quality gates.
+A feature is not complete because the happy-path example works. It must meet its domain's acceptance criteria and `program/definition-of-done.md`.

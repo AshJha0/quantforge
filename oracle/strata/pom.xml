@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.quantforge.oracle</groupId>
+  <artifactId>strata-oracle</artifactId>
+  <version>0.1.0</version>
+  <properties>
+    <maven.compiler.release>25</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency><groupId>com.opengamma.strata</groupId><artifactId>strata-basics</artifactId><version>2.12.78</version></dependency>
+  </dependencies>
+</project>

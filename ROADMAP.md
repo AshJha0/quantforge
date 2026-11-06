@@ -1,6 +1,6 @@
 # Roadmap
 
-Eleven stages, one pull request and one tag each. Estimates are plan-weeks, not calendar weeks.
+Eleven stages, one pull request and one tag each. Estimates are plan-weeks, 106 in all, not calendar weeks, and are re-estimated after stage A.
 
 | Stage | Plan-weeks | Demo | Tag |
 |---|---|---|---|
@@ -17,3 +17,9 @@ Eleven stages, one pull request and one tag each. Estimates are plan-weeks, not 
 | K Platform and release | 12 | Clean-machine run of all examples | v1.0.0 |
 
 A stage exits when all four languages conform, the oracle named for its scope passes, its minimum test set runs and its docs are reviewed.
+
+Stage A is built on the `stage-a` branch and awaits its pull request; no tag exists yet. Stages B to K have not started, and each domain's real specs are written before its own stage. The use cases are defined in the project plan, which is kept outside this repository.
+
+## Not in the repository yet
+
+Planned, and absent today: `infra/`, `examples/`, benchmarks and any benchmark result, the docs site and its CI build, API docs per package, the eight-file spec sets and validation reports per model, per-domain flow diagrams, microstructure folders in the four implementations, and data and solutions for EX-004 to EX-012.

@@ -1,5 +1,33 @@
 # Financial mathematics and shared foundations
 
+## Stage A specifications
+
+Read `../cli-contract.md` first, then `rulings.md` and `limits.md`, which apply to every spec below. Golden cases are in `datasets/golden/core/`.
+
+| Spec | Golden suite | Clean-room status |
+|---|---|---|
+| `daycount.md` | `daycount` | Ready |
+| `calendars.md` | `calendar` | Ready |
+| `compounding.md` | `compounding` | Ready |
+| `snapshot-hash.md` | `snapshot` | Ready |
+| `rng.md` | `rng` | Ready |
+| `sobol.md` | `sobol` | Ready |
+| `root-finders.md`, `test-functions.md` | `root` | Ready |
+| `integration.md` | `integrate` | Ready |
+| `interpolation.md` | `interp` | Ready. Tension and monotone-convex have one source each |
+| `differentiation-and-linalg.md` | `diff_linalg` | Ready |
+| `statistics-and-time-series.md` | `stats` | Ready |
+| `pde.md` | `pde` | Ready |
+| `monte-carlo.md` | `monte_carlo` | Ready |
+| `cos.md` | `cos` | Ready |
+| `data-checks.md` | `data_checks` | Ready |
+| `timezone-and-cutoff.md` | `time` | Ready |
+| `rulings.md` | `rulings`, `store_rulings` | Ready |
+| `limits.md` | `limits`, `limit_order` | Ready |
+| `asof-store.md` | `store` | Ready. Hashes have one source |
+
+Not yet specified from this domain's list: typed units and money, and the convention registry.
+
 ## Purpose
 Define the scope and shared contract for the financial mathematics and shared foundations domain.
 

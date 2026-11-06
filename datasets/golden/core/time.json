@@ -1,0 +1,2472 @@
+{
+ "schema_version": "1.0",
+ "suite": "time",
+ "spec": "specifications/01-core/timezone-and-cutoff.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_data.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "time-0001",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0002",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T00:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0003",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0004",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T01:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0005",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0006",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T00:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0007",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0008",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T01:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0009",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0010",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T06:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0011",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0012",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T07:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0013",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0014",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T05:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0015",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0016",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T06:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0017",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0018",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2007-01-01T00:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0019",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0020",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2037-12-31T23:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0021",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0022",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T00:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0023",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0024",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T02:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0025",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0026",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T01:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0027",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0028",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T01:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0029",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0030",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T06:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0031",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0032",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T07:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0033",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0034",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T05:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0035",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0036",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T06:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0037",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0038",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2007-01-01T00:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0039",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 0
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0040",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/London",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2037-12-31T23:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0041",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0042",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T01:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0043",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 7200
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0044",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T03:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0045",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 7200
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0046",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T02:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0047",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0048",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T02:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0049",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0050",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T07:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0051",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0052",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T08:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0053",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0054",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T06:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0055",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0056",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T07:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0057",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0058",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2007-01-01T01:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0059",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 3600
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0060",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Europe/Berlin",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2038-01-01T00:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0061",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -14400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0062",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-30T20:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0063",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -14400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0064",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-30T21:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0065",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -14400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0066",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-26T20:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0067",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -14400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0068",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-26T21:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0069",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -18000
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0070",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T01:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0071",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -14400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0072",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T03:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0073",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -14400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0074",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T01:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0075",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -18000
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0076",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T01:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0077",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -18000
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0078",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2006-12-31T19:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0079",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": -18000
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0080",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "America/New_York",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2037-12-31T18:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0081",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0082",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-31T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T09:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0083",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0084",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-31T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-31T10:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0085",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0086",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-10-27T00:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T09:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0087",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0088",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-10-27T01:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-10-27T10:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0089",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0090",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-10T06:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T15:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0091",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0092",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-03-10T07:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-03-10T16:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0093",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0094",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-11-03T05:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T14:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0095",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0096",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2024-11-03T06:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2024-11-03T15:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0097",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0098",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2007-01-01T00:00:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2007-01-01T09:00:00"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0099",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "offset_seconds": 32400
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0100",
+   "operation": "core.time.to_local",
+   "inputs": {
+    "zone": "Asia/Tokyo",
+    "instant": "2037-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "local": "2038-01-01T08:59:59"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rules",
+    "zoneinfo"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0101",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "Europe/London",
+    "local": "2024-07-01T12:00:00"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instant": "2024-07-01T11:00:00Z"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0102",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "Europe/London",
+    "local": "2024-07-01T12:00:00",
+    "overlap": "LATER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instant": "2024-07-01T11:00:00Z"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0103",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "America/New_York",
+    "local": "2024-01-15T09:30:00"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instant": "2024-01-15T14:30:00Z"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0104",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "Europe/London",
+    "local": "2024-03-31T01:30:00"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NONEXISTENT_LOCAL_TIME"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "time-0105",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "America/New_York",
+    "local": "2024-03-10T02:30:00"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NONEXISTENT_LOCAL_TIME"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "time-0106",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "Europe/London",
+    "local": "2024-10-27T01:30:00"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_AMBIGUOUS_LOCAL_TIME"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "time-0107",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "Europe/London",
+    "local": "2024-10-27T01:30:00",
+    "overlap": "EARLIER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instant": "2024-10-27T00:30:00Z"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0108",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "Europe/London",
+    "local": "2024-10-27T01:30:00",
+    "overlap": "LATER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instant": "2024-10-27T01:30:00Z"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0109",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "America/New_York",
+    "local": "2024-11-03T01:30:00",
+    "overlap": "EARLIER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instant": "2024-11-03T05:30:00Z"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0110",
+   "operation": "core.time.to_instant",
+   "inputs": {
+    "zone": "America/New_York",
+    "local": "2024-11-03T01:30:00",
+    "overlap": "LATER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "instant": "2024-11-03T06:30:00Z"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0111",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-07-01T14:59:59Z",
+    "zone": "Europe/London",
+    "cutoff": "16:00",
+    "calendar": "GBLO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-01"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0112",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-07-01T15:00:00Z",
+    "zone": "Europe/London",
+    "cutoff": "16:00",
+    "calendar": "GBLO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-02"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0113",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-01-15T15:59:59Z",
+    "zone": "Europe/London",
+    "cutoff": "16:00",
+    "calendar": "GBLO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-01-15"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0114",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-01-15T16:00:00Z",
+    "zone": "Europe/London",
+    "cutoff": "16:00",
+    "calendar": "GBLO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-01-16"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0115",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-03-29T10:00:00Z",
+    "zone": "Europe/London",
+    "cutoff": "16:00",
+    "calendar": "GBLO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-04-02"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0116",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-07-06T10:00:00Z",
+    "zone": "Europe/London",
+    "cutoff": "16:00",
+    "calendar": "GBLO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-08"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0117",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-07-05T22:00:00Z",
+    "zone": "America/New_York",
+    "cutoff": "17:00",
+    "calendar": "USGS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-08"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0118",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-07-05T20:59:59Z",
+    "zone": "America/New_York",
+    "cutoff": "17:00",
+    "calendar": "USGS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-05"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0119",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-12-31T23:30:00Z",
+    "zone": "Asia/Tokyo",
+    "cutoff": "15:00",
+    "calendar": "EUTA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2025-01-02"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "time-0120",
+   "operation": "core.time.business_date",
+   "inputs": {
+    "instant": "2024-07-01T15:00:00Z",
+    "zone": "Europe/London",
+    "cutoff": "25:00",
+    "calendar": "GBLO"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "time-0121",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "Mars/Base",
+    "instant": "2024-07-01T15:00:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "time-0122",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2006-12-31T23:59:59Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "time-0123",
+   "operation": "core.time.utc_offset",
+   "inputs": {
+    "zone": "UTC",
+    "instant": "2024-07-01T15:00:00.5Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

@@ -1,7 +1,7 @@
-# Production infrastructure and governance
+# Platform and governance
 
 ## Purpose
-Define the scope and shared contract for the production infrastructure and governance domain.
+Define the scope and shared contract for the platform and governance domain.
 
 ## Capabilities
 - Stable APIs, command-line tools and service boundaries

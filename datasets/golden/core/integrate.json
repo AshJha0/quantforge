@@ -1,0 +1,2099 @@
+{
+ "schema_version": "1.0",
+ "suite": "integrate",
+ "spec": "specifications/01-core/integration.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_numerics.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "integrate-0001",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.8591409142295225
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0002",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7197134913893144
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0003",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182958653101799
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0004",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.718861151876593
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0005",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182827819248232
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0006",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182818285545043
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0007",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.6487212707001282
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0008",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.717896378007504
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0009",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182818284583914
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0010",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 16
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182818284590453
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0011",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "n": 64
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182818284590453
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0012",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182818284590453
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0013",
+   "operation": "core.integrate.adaptive_simpson",
+   "inputs": {
+    "function": "exp",
+    "a": 0,
+    "b": 1,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7182818284590453
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0014",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.21168001208980083
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0015",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9750451173791368
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0016",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.989846185815306
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0017",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 2.0655499772380423
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0018",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9900830148745408
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0019",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9899925055563712
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0020",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 2.9924849598121632
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0021",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.938709345544739
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0022",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9899925631381565
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0023",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 16
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9899924966004454
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0024",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "n": 64
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9899924966004454
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0025",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9899924966004454
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0026",
+   "operation": "core.integrate.adaptive_simpson",
+   "inputs": {
+    "function": "sin",
+    "a": 0,
+    "b": 3,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.9899924966004454
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0027",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.07692307692307693
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0028",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5512217194570136
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0029",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5493554733074437
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0030",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.358974358974359
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0031",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5698340874811463
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0032",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5493603053791556
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0033",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 2.0
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0034",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.21428571428571427
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0035",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.706947920390895
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0036",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 16
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5475831052363456
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0037",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "n": 64
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.549360306768728
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0038",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5493603067780063
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0039",
+   "operation": "core.integrate.adaptive_simpson",
+   "inputs": {
+    "function": "runge",
+    "a": -1,
+    "b": 1,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5493603067780063
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0040",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.5
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0041",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6605093417068174
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0042",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6664659447679552
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0043",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6380711874576983
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0044",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.664099589757421
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0045",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6665854820667237
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0046",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.7071067811865476
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0047",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6738873386790492
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0048",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6672967896945674
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0049",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 16
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6666896314994855
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0050",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "n": 64
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6666670503981843
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0051",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "sqrt",
+    "a": 0,
+    "b": 1,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.6666666666666666
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0052",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.14605703731281514
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0053",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9733901243847107
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0054",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9758752032883448
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0055",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.2222367683186033
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0056",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9758247980411241
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0057",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9758999634916864
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0058",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.7603266338214973
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0059",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.7900637401914733
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0060",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9761640668514778
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0061",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 16
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9758999700201912
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0062",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "n": 64
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9758999700201907
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0063",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9758999700201907
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0064",
+   "operation": "core.integrate.adaptive_simpson",
+   "inputs": {
+    "function": "normal_pdf",
+    "a": -3,
+    "b": 2,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.9758999700201907
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0065",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.11670216882133
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0066",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.01157100327842042
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0067",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.0008726868523807292
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0068",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.8455556073552497
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0069",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.014315196333566487
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0070",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.001032722345763109
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0071",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.7099823266222094
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0072",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.6237434271622274
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0073",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.0784395220627259
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0074",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 16
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.21492226851772767
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0075",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "n": 64
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.001016856873996497
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0076",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.001016856873996497
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0077",
+   "operation": "core.integrate.adaptive_simpson",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0,
+    "b": 2,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.001016856873996497
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0078",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 27.0
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0079",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.925475
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0080",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 101
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.504190571012695
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0081",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 9.5625
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0082",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.5081
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0083",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 100
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.50000081
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0084",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.84375
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0085",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 1.125
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0086",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.5
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0087",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 16
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.5
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0088",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "n": 64
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.5
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50-replay",
+    "numpy-leggauss"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "integrate-0089",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.5
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0090",
+   "operation": "core.integrate.adaptive_simpson",
+   "inputs": {
+    "function": "poly5",
+    "a": -1,
+    "b": 2,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 4.5
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "tol is 1e-10; the error estimate is not a bound"
+   }
+  },
+  {
+   "case_id": "integrate-0091",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "inv_sqrt",
+    "a": 0.0,
+    "b": 1.0,
+    "tol": 1e-10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 2.0
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "singular end point, tol 1e-10"
+   }
+  },
+  {
+   "case_id": "integrate-0092",
+   "operation": "core.integrate.trapezoid",
+   "inputs": {
+    "function": "exp",
+    "a": 1.0,
+    "b": 1.0,
+    "n": 4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "integrate-0093",
+   "operation": "core.integrate.simpson",
+   "inputs": {
+    "function": "exp",
+    "a": 0.0,
+    "b": 1.0,
+    "n": 3
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "integrate-0094",
+   "operation": "core.integrate.gauss_legendre",
+   "inputs": {
+    "function": "exp",
+    "a": 0.0,
+    "b": 1.0,
+    "n": 65
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "integrate-0095",
+   "operation": "core.integrate.gauss_kronrod",
+   "inputs": {
+    "function": "oscillatory",
+    "a": 0.0,
+    "b": 2.0,
+    "tol": 1e-13,
+    "max_intervals": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NO_CONVERGENCE"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,416 @@
+{
+ "schema_version": "1.0",
+ "suite": "snapshot",
+ "spec": "specifications/01-core/snapshot-hash.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_data.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "snapshot-0001",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{}",
+     "snapshot_id": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0002",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"b\":1,\"a\":[true,null,\"x\\n\"]}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":[true,null,\"x\\u000a\"],\"b\":#3ff0000000000000}",
+     "snapshot_id": "sha256:e2a9827c85ed6943e16cfd35b1d983b906af5257d9cccc10bb1a251300147cce"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0003",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":1.0}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":#3ff0000000000000}",
+     "snapshot_id": "sha256:ce2026fb8943ac280b045aeb4e7ec408c944e689d41d64e5958b0153f664630c"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0004",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":1}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":#3ff0000000000000}",
+     "snapshot_id": "sha256:ce2026fb8943ac280b045aeb4e7ec408c944e689d41d64e5958b0153f664630c"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0005",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":1e0}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":#3ff0000000000000}",
+     "snapshot_id": "sha256:ce2026fb8943ac280b045aeb4e7ec408c944e689d41d64e5958b0153f664630c"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0006",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":-0.0}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":#0000000000000000}",
+     "snapshot_id": "sha256:884acea93c77648685308880e089554696d0762d07bbe67f5e32479d2d093f53"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0007",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":0.1,\"b\":1e-320,\"c\":1.7976931348623157e308}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":#3fb999999999999a,\"b\":#00000000000007e8,\"c\":#7fefffffffffffff}",
+     "snapshot_id": "sha256:9fc808270f27628422a158354336e6460da1e449766d89857c323f6e18959b3d"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0008",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"é\":\"é\",\"z\":\"\\u00e9\",\"e\":\"e\\u0301\"}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"e\":\"é\",\"z\":\"é\",\"é\":\"é\"}",
+     "snapshot_id": "sha256:497bbfde2bdf4e4c29b97383e1b95fbf4d18f556634895d4d8b6c908c466153c"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0009",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"\\ud83d\\ude00\":\"😀\",\"\\uffff\":1,\"a\":\"\\u007f\"}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":\"\",\"￿\":#3ff0000000000000,\"😀\":\"😀\"}",
+     "snapshot_id": "sha256:775595cca6df9942414d8fbeebb2051ce27135b32ff1a29ac3e8fc3645985623"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0010",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"snapshot_id\":\"sha256:ignored\",\"x\":[{\"snapshot_id\":\"kept\"}]}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"x\":[{\"snapshot_id\":\"kept\"}]}",
+     "snapshot_id": "sha256:d99c663985ba05c693b3be3705130ab91d37f86003f75738f53cb8a2a789e84a"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0011",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"quotes\":[{\"instrument_id\":\"GBP-OIS-1Y\",\"bid\":0.0412,\"ask\":0.0414,\"bid_size\":null}],\"as_of\":\"2026-11-06T16:00:00Z\"}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"as_of\":\"2026-11-06T16:00:00Z\",\"quotes\":[{\"ask\":#3fa532617c1bda51,\"bid\":#3fa5182a9930be0e,\"bid_size\":null,\"instrument_id\":\"GBP-OIS-1Y\"}]}",
+     "snapshot_id": "sha256:7079ffac5b6049c6142ae433d4f0170a8460032879be6174320bf37a1978cbf9"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0012",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{ \"spaced\" : [ 1 , 2 ] }"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"spaced\":[#3ff0000000000000,#4000000000000000]}",
+     "snapshot_id": "sha256:23a3c90f83d0236de49107a02306b673a2a3541af7307b14b6a15f96a7b8aa9b"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0013",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"tab\":\"\\t\",\"quote\":\"\\\"\",\"back\":\"\\\\\",\"slash\":\"\\/\"}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"back\":\"\\\\\",\"quote\":\"\\\"\",\"slash\":\"/\",\"tab\":\"\\u0009\"}",
+     "snapshot_id": "sha256:4f539abd8cae17708352f602d70cd2e8fe3445a84d985b6de27a64a8a025f610"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0014",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":1e-400}"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "canonical": "{\"a\":#0000000000000000}",
+     "snapshot_id": "sha256:884acea93c77648685308880e089554696d0762d07bbe67f5e32479d2d093f53"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon",
+    "sha256-nist-abc"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "snapshot-0015",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_PARSE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "snapshot-0016",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":1,\"a\":2}"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_PARSE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "snapshot-0017",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":{\"b\":1,\"\\u0062\":2}}"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_PARSE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "snapshot-0018",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":1e400}"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "snapshot-0019",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":\"\\ud800\"}"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "snapshot-0020",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "[1]"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "snapshot-0021",
+   "operation": "core.snapshot.hash",
+   "inputs": {
+    "document_text": "{\"a\":NaN}"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_PARSE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

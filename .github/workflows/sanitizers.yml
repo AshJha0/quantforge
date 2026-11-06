@@ -1,0 +1,40 @@
+name: C++ sanitizers
+# ASan and UBSan over the unit tests and every golden case. Runs only when C++ or its inputs change.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cpp26/**'
+      - 'datasets/golden/**'
+      - 'conformance/runner/**'
+      - '.github/workflows/sanitizers.yml'
+  pull_request:
+    paths:
+      - 'cpp26/**'
+      - 'datasets/golden/**'
+      - 'conformance/runner/**'
+      - '.github/workflows/sanitizers.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  asan-ubsan:
+    runs-on: ubuntu-24.04
+    container:
+      image: gcc:16.2
+      options: --cap-add=SYS_PTRACE # LeakSanitizer needs ptrace inside a container
+    timeout-minutes: 25
+    env:
+      UBSAN_OPTIONS: print_stacktrace=1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: apt-get update && apt-get install -y cmake ninja-build python3
+      - run: cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQF_SANITIZE=address,undefined,float-cast-overflow
+      - run: cmake --build cpp26/build --parallel
+      - run: ctest --test-dir cpp26/build --output-on-failure
+      - run: python3 conformance/runner/runner.py --impl cpp

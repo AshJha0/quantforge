@@ -14,3 +14,6 @@ Implement ACT/360, ACT/365F and a clearly named 30/360 variant. Include leap-yea
 - Normal, boundary and invalid cases.
 - Expected output and independent verification method.
 - Complexity/performance note where relevant.
+
+## Data and solution
+Input: `data/ex-001-dates.csv`. Try it first, then see `solutions/EX-001.md`.

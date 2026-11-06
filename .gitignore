@@ -6,3 +6,9 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+oracle/strata/cp.txt
+conformance/reports/
+data/recorder/
+mutants/
+mutants.out*/
+.mutmut-cache

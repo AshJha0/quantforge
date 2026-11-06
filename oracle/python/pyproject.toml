@@ -1,0 +1,9 @@
+[project]
+name = "quantforge-oracle"
+version = "0.1.0"
+description = "Expected-result generators for QuantForge conformance. Tests only; never imported by an implementation."
+requires-python = "==3.12.*"
+dependencies = ["QuantLib==1.44", "mpmath", "numpy", "scipy", "jsonschema", "pyyaml", "tzdata"]
+
+[tool.uv]
+package = false
