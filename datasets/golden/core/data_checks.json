@@ -1,0 +1,1016 @@
+{
+ "schema_version": "1.0",
+ "suite": "data_checks",
+ "spec": "specifications/01-core/data-checks.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_data.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "data_checks-0001",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0002",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "INDICATIVE"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "INDICATIVE",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0003",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": null,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "MISSING",
+       "quality_flags": [
+        "MISSING_BID"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0004",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": null,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "MISSING",
+       "quality_flags": [
+        "MISSING_ASK"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0005",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": null,
+      "ask": null,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "MISSING",
+       "quality_flags": [
+        "MISSING_BID",
+        "MISSING_ASK"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0006",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.2,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "CROSSED",
+       "quality_flags": [
+        "CROSSED"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0007",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.1,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": [
+        "LOCKED"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0008",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:58:59Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "STALE",
+       "quality_flags": [
+        "STALE"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0009",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0010",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:58:59Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "INDICATIVE"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "STALE",
+       "quality_flags": [
+        "STALE"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0011",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:58:59Z",
+      "bid": 1.2,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "CROSSED",
+       "quality_flags": [
+        "CROSSED",
+        "STALE"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0012",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:58:59Z",
+      "bid": null,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "MISSING",
+       "quality_flags": [
+        "MISSING_BID"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0013",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": 1.2,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "max_relative_spread": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": [
+        "WIDE_SPREAD"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0014",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "max_relative_spread": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0015",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": -0.01,
+      "ask": -0.005,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0016",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": -0.01,
+      "ask": 0.5,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "positive_only": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": [
+        "NON_POSITIVE"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0017",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": null,
+      "ask": 0.0,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "positive_only": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "MISSING",
+       "quality_flags": [
+        "MISSING_BID",
+        "NON_POSITIVE"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0018",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "Z",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 101.3,
+      "ask": 101.5,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "history": {
+     "Z": [
+      100.0,
+      100.5,
+      99.5,
+      100.2,
+      99.8,
+      100.1,
+      99.9
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "Z",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0019",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "Z",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 101.5,
+      "ask": 101.7,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "history": {
+     "Z": [
+      100.0,
+      100.5,
+      99.5,
+      100.2,
+      99.8,
+      100.1,
+      99.9
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "Z",
+       "quote_status": "FIRM",
+       "quality_flags": [
+        "OUTLIER"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0020",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "Z",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 98.3,
+      "ask": 98.5,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "history": {
+     "Z": [
+      100.0,
+      100.5,
+      99.5,
+      100.2,
+      99.8,
+      100.1,
+      99.9
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "Z",
+       "quote_status": "FIRM",
+       "quality_flags": [
+        "OUTLIER"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0021",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "Z",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 150.0,
+      "ask": 149.0,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "history": {
+     "Z": [
+      100.0,
+      100.5,
+      99.5,
+      100.2,
+      99.8,
+      100.1,
+      99.9
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "Z",
+       "quote_status": "CROSSED",
+       "quality_flags": [
+        "CROSSED"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0022",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "Z",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 101.5,
+      "ask": 101.7,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "history": {
+     "Z": [
+      100.0,
+      100.5,
+      99.5,
+      100.2
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "Z",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0023",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "Z",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 200.0,
+      "ask": 201.0,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60,
+    "history": {
+     "Z": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "Z",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0024",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     },
+     {
+      "instrument_id": "B",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 2.0,
+      "ask": 1.0,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "results": [
+      {
+       "instrument_id": "A",
+       "quote_status": "FIRM",
+       "quality_flags": []
+      },
+      {
+       "instrument_id": "B",
+       "quote_status": "CROSSED",
+       "quality_flags": [
+        "CROSSED"
+       ]
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "data_checks-0025",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T16:00:01Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "FIRM"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "data_checks-0026",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [
+     {
+      "instrument_id": "A",
+      "event_time": "2026-11-06T15:59:00Z",
+      "bid": 1.0,
+      "ask": 1.1,
+      "quote_status": "STALE"
+     }
+    ],
+    "stale_after_seconds": 60
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "data_checks-0027",
+   "operation": "core.data.check_quotes",
+   "inputs": {
+    "as_of": "2026-11-06T16:00:00Z",
+    "quotes": [],
+    "stale_after_seconds": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

@@ -23,3 +23,13 @@ At least one expected-value source must be independent of the implementation und
 
 ## Report
 Report pass/fail counts, maximum absolute/relative error, skipped cases, implementation versions and fixture/spec versions.
+
+## Running
+
+The CLI contract is `specifications/cli-contract.md`. Golden cases are `datasets/golden/**/*.json`, written only by `oracle/`.
+
+```bash
+python conformance/runner/runner.py --impl rust
+```
+
+Commands per language are in `conformance/runner/implementations.json`; those paths are placeholders until each CLI exists. The runner uses only the Python standard library and holds no financial logic. It strips expected values before sending a case. `python conformance/runner/test_runner.py` tests it against `stub_cli.py`, which replays golden values and injects faults. A case an implementation does not support is reported as not implemented, and the run does not pass.

@@ -38,10 +38,16 @@
       "pattern": "^[A-Z]{3}$"
     },
     "bid": {
-      "type": "number"
+      "type": [
+        "number",
+        "null"
+      ]
     },
     "ask": {
-      "type": "number"
+      "type": [
+        "number",
+        "null"
+      ]
     },
     "bid_size": {
       "type": [
@@ -59,13 +65,29 @@
     },
     "quality_flags": {
       "type": "array",
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "enum": [
+          "MISSING_BID",
+          "MISSING_ASK",
+          "CROSSED",
+          "LOCKED",
+          "STALE",
+          "WIDE_SPREAD",
+          "NON_POSITIVE",
+          "OUTLIER"
+        ]
       }
     },
     "quote_status": {
-      "type": "string",
-      "minLength": 1
+      "enum": [
+        "FIRM",
+        "INDICATIVE",
+        "STALE",
+        "CROSSED",
+        "MISSING"
+      ],
+      "description": "See specifications/01-core/data-checks.md"
     },
     "unit": {
       "type": "string",
@@ -73,7 +95,15 @@
     },
     "snapshot_id": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "sha256: id of the snapshot holding this quote; see specifications/01-core/snapshot-hash.md"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "market_timestamp": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "additionalProperties": false

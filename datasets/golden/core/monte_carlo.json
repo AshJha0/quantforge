@@ -1,0 +1,481 @@
+{
+ "schema_version": "1.0",
+ "suite": "monte_carlo",
+ "spec": "specifications/01-core/monte-carlo.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_random.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "monte_carlo-0001",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 100000,
+    "steps": 1,
+    "method": "PLAIN"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.293665727288964,
+     "stderr": 0.043926925904411385
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0002",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "PUT",
+    "paths": 50000,
+    "steps": 1,
+    "method": "PLAIN"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.291901356352387,
+     "stderr": 0.040918723774645595
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 6.330080627549918,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0003",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 20000,
+    "steps": 4,
+    "method": "PLAIN"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.365804151095992,
+     "stderr": 0.09867412141168486
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0004",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 50000,
+    "steps": 1,
+    "method": "PLAIN",
+    "stream": 7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.145860451773775,
+     "stderr": 0.06143994281492128
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0005",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 50000,
+    "steps": 1,
+    "method": "ANTITHETIC"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.238424642631104,
+     "stderr": 0.032567018427824286
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0006",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 50000,
+    "steps": 1,
+    "method": "CONTROL_VARIATE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.232646866475639,
+     "stderr": 0.02541664244935303
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0007",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "PUT",
+    "paths": 50000,
+    "steps": 2,
+    "method": "CONTROL_VARIATE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.3269614049507545,
+     "stderr": 0.025404943533419436
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 6.330080627549918,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0008",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 65536,
+    "steps": 1,
+    "method": "SOBOL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.22590251754973,
+     "stderr": 0.0540098630273601
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "absolute",
+     "limit": 0.02
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0009",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 16384,
+    "steps": 4,
+    "method": "SOBOL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.219085095371907,
+     "stderr": 0.10791974971033469
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "absolute",
+     "limit": 0.02
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0010",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 130.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.35,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 50000,
+    "steps": 1,
+    "method": "PLAIN"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5.8815700723646875,
+     "stderr": 0.07682021452703149
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "independent-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 5.800637856066048,
+     "method": "confidence_interval",
+     "stderr_output": "stderr",
+     "z": 4.0
+    }
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0011",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 1,
+    "method": "PLAIN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0012",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.0,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 10,
+    "method": "PLAIN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "monte_carlo-0013",
+   "operation": "core.mc.gbm_european",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "sigma": 0.2,
+    "t": 1.0,
+    "seed": "20261106",
+    "option": "CALL",
+    "paths": 10,
+    "steps": 65,
+    "method": "SOBOL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

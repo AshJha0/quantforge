@@ -7,3 +7,6 @@
 
 ### Removed
 - 36-week roadmap, epics and generated manifest.
+
+## Stage A, spec and oracle (unreleased)
+- CLI contract, core specifications, schemas, oracle with golden cases, neutral runner tested on a stub CLI.

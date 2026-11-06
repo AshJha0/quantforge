@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QuantForge simulated order",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "order_id",
+    "instrument_id",
+    "event_time",
+    "side",
+    "order_type",
+    "quantity",
+    "currency",
+    "unit",
+    "status",
+    "simulated"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "order_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "instrument_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "event_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "receive_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "side": {
+      "enum": [
+        "BUY",
+        "SELL"
+      ]
+    },
+    "order_type": {
+      "enum": [
+        "MARKET",
+        "LIMIT"
+      ]
+    },
+    "limit_price": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "quantity": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "filled_quantity": {
+      "type": "number",
+      "minimum": 0
+    },
+    "time_in_force": {
+      "enum": [
+        "DAY",
+        "IOC",
+        "GTC"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "NEW",
+        "PARTIALLY_FILLED",
+        "FILLED",
+        "CANCELLED",
+        "REJECTED"
+      ]
+    },
+    "simulated": {
+      "const": true,
+      "description": "QuantForge has no live orders. This cannot be false."
+    },
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

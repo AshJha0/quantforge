@@ -1,0 +1,1104 @@
+{
+ "schema_version": "1.0",
+ "suite": "stats",
+ "spec": "specifications/01-core/statistics-and-time-series.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stats_engines.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "stats-0001",
+   "operation": "core.stats.normal",
+   "inputs": {
+    "x": [
+     -37.0,
+     -10.0,
+     -5.0,
+     -1.0,
+     -0.1,
+     0.0,
+     0.5,
+     1.96,
+     6.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pdf": [
+      2.1200065515246056e-298,
+      7.694598626706419e-23,
+      1.4867195147342977e-06,
+      0.24197072451914334,
+      0.39695254747701175,
+      0.3989422804014327,
+      0.35206532676429947,
+      0.05844094433345146,
+      6.075882849823285e-09
+     ],
+     "cdf": [
+      5.725571222524577e-300,
+      7.619853024160525e-24,
+      2.866515718791939e-07,
+      0.15865525393145705,
+      0.460172162722971,
+      0.5,
+      0.6914624612740131,
+      0.9750021048517795,
+      0.9999999990134123
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "relative": 1e-13,
+    "absolute": 0.0,
+    "reason": "tail values near 1e-300: relative accuracy is the point"
+   }
+  },
+  {
+   "case_id": "stats-0002",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "count": 12,
+     "mean": 2.9375,
+     "variance": 5.478693181818182,
+     "stdev": 2.3406608429711,
+     "skewness": 0.3013073109174942,
+     "excess_kurtosis": -0.015962277019199944,
+     "min": -1.25,
+     "max": 7.5
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "output_classes": {
+    "count": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "stats-0003",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "values": [
+      -1.25,
+      -1.0575,
+      1.875,
+      2.875,
+      6.025,
+      7.362500000000001,
+      7.5
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "numpy-type7"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0004",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     100.0,
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "count": 10,
+     "mean": 102.775,
+     "variance": 4.936805555555556,
+     "stdev": 2.221892336625597,
+     "skewness": 0.014634768322200552,
+     "excess_kurtosis": -0.7241377215637513,
+     "min": 99.25,
+     "max": 106.5
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "output_classes": {
+    "count": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "stats-0005",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     100.0,
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "values": [
+      99.25,
+      99.3175,
+      101.625,
+      102.875,
+      105.375,
+      106.3875,
+      106.5
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "numpy-type7"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0006",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     1000000001.0,
+     1000000002.0,
+     1000000004.0,
+     1000000003.0,
+     1000000007.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "count": 5,
+     "mean": 1000000003.4,
+     "variance": 5.3,
+     "stdev": 2.3021728866442674,
+     "skewness": 0.6927284074925394,
+     "excess_kurtosis": -0.717871128515486,
+     "min": 1000000001.0,
+     "max": 1000000007.0
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "output_classes": {
+    "count": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "stats-0007",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1000000001.0,
+     1000000002.0,
+     1000000004.0,
+     1000000003.0,
+     1000000007.0
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "values": [
+      1000000001.0,
+      1000000001.04,
+      1000000002.0,
+      1000000003.0,
+      1000000005.8,
+      1000000006.88,
+      1000000007.0
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "numpy-type7"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0008",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     2.0,
+     2.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "count": 3,
+     "mean": 2.0,
+     "variance": 0.0,
+     "stdev": 0.0,
+     "skewness": null,
+     "excess_kurtosis": null,
+     "min": 2.0,
+     "max": 2.0
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ],
+   "output_classes": {
+    "count": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "stats-0009",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0010",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1.0,
+     2.0
+    ],
+    "p": [
+     1.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0011",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
+    ],
+    "y": [
+     4.5,
+     5.0,
+     7.5,
+     6.0,
+     16.5,
+     -2.0,
+     9.5,
+     7.5,
+     5.5,
+     1.5,
+     14.0,
+     7.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "covariance": 11.559659090909092,
+     "correlation": 0.9957930194173149
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0012",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.0,
+     1.0
+    ],
+    "y": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "covariance": 0.0,
+     "correlation": null
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "stats-0013",
+   "operation": "core.stats.ols",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
+    ],
+    "y": [
+     4.5,
+     5.0,
+     7.5,
+     6.0,
+     16.5,
+     -2.0,
+     9.5,
+     7.5,
+     5.5,
+     1.5,
+     14.0,
+     7.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "alpha": 0.6770806326160228,
+     "beta": 2.1099299974073116,
+     "r_squared": 0.991603737520253,
+     "se_alpha": 0.2268427317701834,
+     "se_beta": 0.06139626791384821
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational",
+    "scipy-1.18.1"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0014",
+   "operation": "core.stats.ols",
+   "inputs": {
+    "x": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "y": [
+     1.0,
+     2.0,
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0015",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.0,
+     2.0
+    ],
+    "y": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0016",
+   "operation": "core.ts.returns",
+   "inputs": {
+    "prices": [
+     100.0,
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
+    ],
+    "kind": "SIMPLE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "returns": [
+      0.015,
+      -0.022167487684729065,
+      0.027707808564231738,
+      0.014705882352941176,
+      -0.007246376811594203,
+      0.012165450121654502,
+      0.01201923076923077,
+      -0.021377672209026127,
+      0.03398058252427184
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0017",
+   "operation": "core.ts.returns",
+   "inputs": {
+    "prices": [
+     100.0,
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
+    ],
+    "kind": "LOG"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "returns": [
+      0.014888612493750656,
+      -0.022416878914542228,
+      0.027330893716971286,
+      0.014598799421152683,
+      -0.007272759329079777,
+      0.012092045765028677,
+      0.011947573421118135,
+      -0.021609484332855027,
+      0.03341599691984403
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0018",
+   "operation": "core.ts.returns",
+   "inputs": {
+    "prices": [
+     1.0,
+     0.0
+    ],
+    "kind": "LOG"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0019",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     5.0
+    ],
+    "window": 3,
+    "statistic": "MEAN"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "values": [
+      null,
+      null,
+      33333334.333333332,
+      2.3333333333333335,
+      3.0,
+      4.0
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [],
+   "description": "the large first value must leave no residue"
+  },
+  {
+   "case_id": "stats-0020",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     5.0
+    ],
+    "window": 3,
+    "statistic": "STDEV"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "values": [
+      null,
+      null,
+      57735026.05293717,
+      1.5275252316519468,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [],
+   "description": "the large first value must leave no residue"
+  },
+  {
+   "case_id": "stats-0021",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     5.0
+    ],
+    "window": 1,
+    "statistic": "MEAN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0022",
+   "operation": "core.ts.ewma_variance",
+   "inputs": {
+    "returns": [
+     0.01,
+     -0.02,
+     0.015,
+     0.0,
+     -0.03
+    ],
+    "lambda": 0.94
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "variance": [
+      0.0001,
+      0.00011800000000000002,
+      0.00012442000000000003,
+      0.00011695480000000002,
+      0.00016393751200000005
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0023",
+   "operation": "core.ts.ewma_variance",
+   "inputs": {
+    "returns": [
+     0.01,
+     -0.02,
+     0.015,
+     0.0,
+     -0.03
+    ],
+    "lambda": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0024",
+   "operation": "core.ts.autocorrelation",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
+    ],
+    "max_lag": 4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "acf": [
+      -0.4672673061965258,
+      -0.043686803214933886,
+      0.03558465128338087,
+      0.09800362976406533
+     ]
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational",
+    "numpy"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0025",
+   "operation": "core.ts.ljung_box",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
+    ],
+    "max_lag": 4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "statistic": 3.592027309254196
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0026",
+   "operation": "core.ts.autocorrelation",
+   "inputs": {
+    "x": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_lag": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0027",
+   "operation": "core.ts.ar1",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "constant": 4.427937287495278,
+     "phi": -0.46741594257650176,
+     "sigma": 2.2327846595625465
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "scipy-1.18.1"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0028",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-29",
+     "2024-01-31",
+     "2024-02-01",
+     "2024-02-02",
+     "2024-02-05",
+     "2024-02-29",
+     "2024-03-01",
+     "2024-03-04"
+    ],
+    "values": [
+     1.0,
+     2.0,
+     null,
+     4.0,
+     null,
+     6.0,
+     7.0,
+     null
+    ],
+    "frequency": "MONTH"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dates": [
+      "2024-01-31",
+      "2024-02-29",
+      "2024-03-01"
+     ],
+     "values": [
+      2.0,
+      6.0,
+      7.0
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "stats-0029",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-29",
+     "2024-01-31",
+     "2024-02-01",
+     "2024-02-02",
+     "2024-02-05",
+     "2024-02-29",
+     "2024-03-01",
+     "2024-03-04"
+    ],
+    "values": [
+     1.0,
+     2.0,
+     null,
+     4.0,
+     null,
+     6.0,
+     7.0,
+     null
+    ],
+    "frequency": "WEEK"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dates": [
+      "2024-02-02",
+      "2024-03-01"
+     ],
+     "values": [
+      4.0,
+      7.0
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [],
+   "description": "weeks holding only nulls are dropped"
+  },
+  {
+   "case_id": "stats-0030",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-02",
+     "2024-01-01"
+    ],
+    "values": [
+     1.0,
+     2.0
+    ],
+    "frequency": "WEEK"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "stats-0031",
+   "operation": "core.ts.forward_fill",
+   "inputs": {
+    "values": [
+     null,
+     1.0,
+     null,
+     null,
+     null,
+     2.0,
+     null
+    ],
+    "limit": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "values": [
+      null,
+      1.0,
+      1.0,
+      1.0,
+      null,
+      2.0,
+      2.0
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  }
+ ]
+}

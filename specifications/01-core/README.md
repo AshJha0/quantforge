@@ -1,5 +1,31 @@
 # Financial mathematics and shared foundations
 
+## Stage A specifications
+
+Read `../cli-contract.md` first. Golden cases are in `datasets/golden/core/`.
+
+| Spec | Golden suite | Clean-room status |
+|---|---|---|
+| `daycount.md` | `daycount` | Ready |
+| `calendars.md` | `calendar` | Ready |
+| `compounding.md` | `compounding` | Ready |
+| `snapshot-hash.md` | `snapshot` | Ready |
+| `rng.md` | `rng` | Ready |
+| `sobol.md` | `sobol` | Ready |
+| `root-finders.md`, `test-functions.md` | `root` | Ready |
+| `integration.md` | `integrate` | Ready |
+| `interpolation.md` | `interp` | Ready. Tension and monotone-convex have one source each |
+| `differentiation-and-linalg.md` | `diff_linalg` | Ready |
+| `statistics-and-time-series.md` | `stats` | Ready |
+| `pde.md` | `pde` | Ready |
+| `monte-carlo.md` | `monte_carlo` | Ready |
+| `cos.md` | `cos` | Ready |
+| `data-checks.md` | `data_checks` | Ready |
+| `timezone-and-cutoff.md` | `time` | Ready |
+
+Not yet specified from this domain's list: typed units and money, the convention registry, the as-of store
+and replay.
+
 ## Purpose
 Define the scope and shared contract for the financial mathematics and shared foundations domain.
 

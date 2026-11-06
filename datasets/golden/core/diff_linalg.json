@@ -1,0 +1,512 @@
+{
+ "schema_version": "1.0",
+ "suite": "diff_linalg",
+ "spec": "specifications/01-core/differentiation-and-linalg.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_numerics.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "diff_linalg-0001",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "exp",
+    "x": 1.0,
+    "h": 1e-05,
+    "order": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 2.7182818285043497
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0002",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "exp",
+    "x": 1.0,
+    "h": 0.0001,
+    "order": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 2.71828183072428
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-07,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0003",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "sin",
+    "x": 0.7,
+    "h": 1e-05,
+    "order": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.7648421872717411
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0004",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "sin",
+    "x": 0.7,
+    "h": 0.0001,
+    "order": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.6442176867008429
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-07,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0005",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "poly5",
+    "x": 1.3,
+    "h": 1e-05,
+    "order": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 6.480500001690002
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0006",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "poly5",
+    "x": 1.3,
+    "h": 0.0001,
+    "order": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 37.94000013
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-07,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0007",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "normal_pdf",
+    "x": 0.4,
+    "h": 1e-05,
+    "order": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.14730805611435674
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0008",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "normal_pdf",
+    "x": 0.4,
+    "h": 0.0001,
+    "order": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.3093469172208759
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-07,
+    "reason": "rounding of about eps/h or eps/h^2"
+   }
+  },
+  {
+   "case_id": "diff_linalg-0009",
+   "operation": "core.diff.central",
+   "inputs": {
+    "function": "exp",
+    "x": 1.0,
+    "h": 0.0,
+    "order": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "diff_linalg-0010",
+   "operation": "core.linalg.solve",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      2.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ],
+    "b": [
+     1.0,
+     2.0,
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.3023255813953488,
+      0.7674418604651163,
+      0.7209302325581395
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "diff_linalg-0011",
+   "operation": "core.linalg.solve",
+   "inputs": {
+    "a": [
+     [
+      0.0,
+      2.0
+     ],
+     [
+      3.0,
+      1.0
+     ]
+    ],
+    "b": [
+     2.0,
+     4.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [],
+   "description": "needs pivoting"
+  },
+  {
+   "case_id": "diff_linalg-0012",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      2.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "l": [
+      [
+       2.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.5,
+       1.6583123951777,
+       0.0
+      ],
+      [
+       1.0,
+       -0.30151134457776363,
+       1.9771421064483223
+      ]
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "diff_linalg-0013",
+   "operation": "core.linalg.eigen_symmetric",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      2.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "values": [
+      1.8548973087995775,
+      3.476023602918134,
+      6.669079088282288
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "diff_linalg-0014",
+   "operation": "core.linalg.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      2.0
+     ],
+     [
+      2.0,
+      4.0
+     ]
+    ],
+    "b": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "diff_linalg-0015",
+   "operation": "core.linalg.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      2.0
+     ],
+     [
+      2.0
+     ]
+    ],
+    "b": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "diff_linalg-0016",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      2.0
+     ],
+     [
+      2.0,
+      1.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NOT_POSITIVE_DEFINITE"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "diff_linalg-0017",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      2.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

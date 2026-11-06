@@ -1,0 +1,591 @@
+{
+ "schema_version": "1.0",
+ "suite": "root",
+ "spec": "specifications/01-core/root-finders.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_numerics.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "root-0001",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "cubic_wallis",
+    "a": 2,
+    "b": 3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 2.0945514815423265
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0002",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "cubic_wallis",
+    "a": 2,
+    "b": 3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 2.0945514815423265
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0003",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "cubic_wallis",
+    "x0": 2.5,
+    "a": 2,
+    "b": 3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 2.0945514815423265
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0004",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "cos_minus_x",
+    "a": 0,
+    "b": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.7390851332151607
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0005",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "cos_minus_x",
+    "a": 0,
+    "b": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.7390851332151607
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0006",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "cos_minus_x",
+    "x0": 0.5,
+    "a": 0,
+    "b": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.7390851332151607
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0007",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "exp_minus_two",
+    "a": 0,
+    "b": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.6931471805599453
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0008",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "exp_minus_two",
+    "a": 0,
+    "b": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.6931471805599453
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0009",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "exp_minus_two",
+    "x0": 1.0,
+    "a": 0,
+    "b": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.6931471805599453
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0010",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "steep_atan",
+    "a": 0,
+    "b": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0011",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "steep_atan",
+    "a": 0,
+    "b": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0012",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "steep_atan",
+    "x0": 0.3001,
+    "a": 0,
+    "b": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0013",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "bs_vol_atm",
+    "a": 0.01,
+    "b": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.23974902736885317
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0014",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "bs_vol_atm",
+    "a": 0.01,
+    "b": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.23974902736885317
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0015",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "bs_vol_atm",
+    "x0": 0.3,
+    "a": 0.01,
+    "b": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.23974902736885317
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0016",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "cubic_wallis",
+    "x0": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 2.0945514815423265
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "root-0017",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "exp_minus_two",
+    "a": 0.0,
+    "b": 1.0,
+    "x_tol": 1e-06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.6931471805599453
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 2e-06,
+    "reason": "x_tol is 1e-6"
+   }
+  },
+  {
+   "case_id": "root-0018",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "triple_root",
+    "a": 0.0,
+    "b": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 1.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "reason": "f underflows to rounding noise within about 1e-5 of a triple root"
+   }
+  },
+  {
+   "case_id": "root-0019",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "triple_root",
+    "a": 0.0,
+    "b": 3.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 1.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "reason": "f underflows to rounding noise within about 1e-5 of a triple root"
+   }
+  },
+  {
+   "case_id": "root-0020",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "cubic_wallis",
+    "a": 2.0945514815423265,
+    "b": 2.0945514815423265
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "root-0021",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "no_real_root",
+    "a": -1.0,
+    "b": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NOT_BRACKETED"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "root-0022",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "no_real_root",
+    "a": -1.0,
+    "b": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NOT_BRACKETED"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "root-0023",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "square",
+    "x0": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "root": 0.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ],
+   "description": "f(x0) is exactly 0, so EXACT is reported before the derivative is looked at"
+  },
+  {
+   "case_id": "root-0024",
+   "operation": "core.root.newton",
+   "inputs": {
+    "function": "no_real_root",
+    "x0": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ZERO_DERIVATIVE"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "root-0025",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "cubic_wallis",
+    "a": 2.0,
+    "b": 3.0,
+    "max_iter": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NO_CONVERGENCE"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "root-0026",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "cubic_wallis",
+    "a": 2.0,
+    "b": 3.0,
+    "max_iter": 3
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NO_CONVERGENCE"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "root-0027",
+   "operation": "core.root.bisection",
+   "inputs": {
+    "function": "cubic_wallis",
+    "a": 2.0,
+    "b": 3.0,
+    "x_tol": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "root-0028",
+   "operation": "core.root.brent",
+   "inputs": {
+    "function": "not_registered",
+    "a": 2.0,
+    "b": 3.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

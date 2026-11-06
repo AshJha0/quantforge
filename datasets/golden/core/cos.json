@@ -1,0 +1,533 @@
+{
+ "schema_version": "1.0",
+ "suite": "cos",
+ "spec": "specifications/01-core/cos.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stats_engines.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "cos-0001",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "t": 1.0,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": 0.2
+    },
+    "terms": 256,
+    "truncation": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.227005508154049
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 9.227005508154049,
+     "method": "absolute",
+     "limit": 1e-10
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0002",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "PUT",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.05,
+    "q": 0.02,
+    "t": 1.0,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": 0.2
+    },
+    "terms": 256,
+    "truncation": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.330080627549918
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 6.330080627549918,
+     "method": "absolute",
+     "limit": 1e-10
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0003",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 80.0,
+    "r": 0.05,
+    "q": 0.02,
+    "t": 0.25,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": 0.3
+    },
+    "terms": 256,
+    "truncation": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 20.851826069619985
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 20.851826069619985,
+     "method": "absolute",
+     "limit": 1e-10
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0004",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "PUT",
+    "spot": 100.0,
+    "strike": 130.0,
+    "r": 0.05,
+    "q": 0.02,
+    "t": 2.0,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": 0.15
+    },
+    "terms": 256,
+    "truncation": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23.592248412940954
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 23.592248412940954,
+     "method": "absolute",
+     "limit": 1e-10
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0005",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 120.0,
+    "r": 0.05,
+    "q": 0.02,
+    "t": 5.0,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": 0.5
+    },
+    "terms": 256,
+    "truncation": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 37.50992189816732
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "analytic-mpmath-50"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 37.50992189816732,
+     "method": "absolute",
+     "limit": 1e-10
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0006",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.03,
+    "q": 0.01,
+    "t": 1.0,
+    "model": {
+     "name": "HESTON",
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "sigma": 0.3,
+     "rho": -0.7
+    },
+    "terms": 512,
+    "truncation": 16.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.54225699300518
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 8.54225699307293,
+     "method": "absolute",
+     "limit": 1e-07
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0007",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "PUT",
+    "spot": 100.0,
+    "strike": 90.0,
+    "r": 0.03,
+    "q": 0.01,
+    "t": 1.0,
+    "model": {
+     "name": "HESTON",
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "sigma": 0.3,
+     "rho": -0.7
+    },
+    "terms": 512,
+    "truncation": 16.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3.298405827398314
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 3.2984058274660746,
+     "method": "absolute",
+     "limit": 1e-07
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0008",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 120.0,
+    "r": 0.03,
+    "q": 0.01,
+    "t": 2.0,
+    "model": {
+     "name": "HESTON",
+     "v0": 0.09,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "sigma": 0.3,
+     "rho": -0.7
+    },
+    "terms": 512,
+    "truncation": 16.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.282338043826651
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 6.282338043835555,
+     "method": "absolute",
+     "limit": 1e-07
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0009",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "PUT",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.03,
+    "q": 0.01,
+    "t": 0.4986301369863014,
+    "model": {
+     "name": "HESTON",
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "sigma": 0.6,
+     "rho": -0.3
+    },
+    "terms": 512,
+    "truncation": 16.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.5773530319634546
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 4.577353037555937,
+     "method": "absolute",
+     "limit": 1e-07
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0010",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.02,
+    "q": 0.0,
+    "t": 1.0,
+    "model": {
+     "name": "HESTON",
+     "v0": 0.09,
+     "kappa": 2.0,
+     "theta": 0.04,
+     "sigma": 0.001,
+     "rho": 0.0
+    },
+    "terms": 512,
+    "truncation": 16.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10.801290410102501
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-50-replay",
+    "limit-case"
+   ],
+   "tags": [
+    "boundary"
+   ],
+   "extra_checks": [
+    {
+     "output": "price",
+     "expected": 10.80129252317083,
+     "method": "absolute",
+     "limit": 0.001
+    }
+   ]
+  },
+  {
+   "case_id": "cos-0011",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.0,
+    "q": 0.0,
+    "t": 1.0,
+    "terms": 64,
+    "truncation": 10.0,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": -0.1
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "cos-0012",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.0,
+    "q": 0.0,
+    "t": 1.0,
+    "terms": 64,
+    "truncation": 10.0,
+    "model": {
+     "name": "HESTON",
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "sigma": 0.3,
+     "rho": 1.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "cos-0013",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 100.0,
+    "r": 0.0,
+    "q": 0.0,
+    "t": 1.0,
+    "terms": 1,
+    "truncation": 10.0,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": 0.2
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "cos-0014",
+   "operation": "core.cos.european",
+   "inputs": {
+    "option": "CALL",
+    "spot": 100.0,
+    "strike": 1000.0,
+    "r": 0.0,
+    "q": 0.0,
+    "t": 1.0,
+    "terms": 64,
+    "truncation": 1.0,
+    "model": {
+     "name": "BLACK_SCHOLES",
+     "sigma": 0.2
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ],
+   "description": "range does not hold the strike"
+  }
+ ]
+}

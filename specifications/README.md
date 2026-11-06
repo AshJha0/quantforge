@@ -2,6 +2,8 @@
 
 Each domain specification is a living contract. Do not begin implementation of a non-trivial model until the equations, conventions, inputs, outputs, failure modes, validation cases and acceptance criteria are reviewed.
 
+The contract every implementation's CLI follows is `cli-contract.md`.
+
 Domains:
 1. `01-core` — financial mathematics and shared foundations
 2. `02-curves` — curves and term structures
