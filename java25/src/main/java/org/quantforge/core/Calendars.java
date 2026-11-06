@@ -227,7 +227,11 @@ public final class Calendars {
         }
         LocalDate target = date.plusMonths(unit == 'Y' ? 12L * n : n); // Clamps to the month's last day.
         checkRange(target);
-        if (endOfMonth && date.equals(lastBusinessDayOfMonth(cal, YearMonth.from(date)))) {
+        if (endOfMonth && c == Convention.UNADJUSTED) {
+            if (date.getDayOfMonth() == date.lengthOfMonth()) {
+                return YearMonth.from(target).atEndOfMonth();
+            }
+        } else if (endOfMonth && !date.isBefore(lastBusinessDayOfMonth(cal, YearMonth.from(date)))) {
             return lastBusinessDayOfMonth(cal, YearMonth.from(target));
         }
         return adjust(cal, target, c);

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -19,13 +18,6 @@ import org.quantforge.core.Json;
 /** Runs every oracle case through the CLI layer in process. The neutral runner stays the official check. */
 class GoldenSuiteTest {
     private static final Path GOLDEN = Path.of("..", "datasets", "golden", "core");
-
-    /** Cases that contradict the spec text; see SPEC_QUESTIONS.md. Each must still disagree, so a fix is noticed. */
-    private static final Set<String> DISPUTED = Set.of("daycount-1472",
-            "calendar-0056", "calendar-0057", "calendar-0061", "calendar-0084", "calendar-0107", "calendar-0148",
-            "calendar-0149", "calendar-0180", "calendar-0314", "calendar-0318", "calendar-0608", "calendar-0609",
-            "calendar-0613", "calendar-0636", "calendar-0659", "calendar-0700", "calendar-0701", "calendar-0732",
-            "calendar-0866", "calendar-0870");
 
     /** absolute, relative; null means exact. Mirrors conformance/tolerances/policy.yaml. */
     private static final Map<String, double[]> CLASSES = Map.of(
@@ -63,9 +55,8 @@ class GoldenSuiteTest {
             Json.write(b, envelope);
             Map<?, ?> result = map(Json.parse(Main.handle(b.toString()).json()).value());
             String problem = judge(c, result);
-            boolean disputed = DISPUTED.contains(c.get("case_id"));
-            if (disputed == (problem == null)) {
-                failures.add(c.get("case_id") + ": " + (disputed ? "disputed case now agrees" : problem));
+            if (problem != null) {
+                failures.add(c.get("case_id") + ": " + problem);
             }
         }
         assertTrue(failures.isEmpty(), () -> failures.size() + " failures, first: " + failures.getFirst());

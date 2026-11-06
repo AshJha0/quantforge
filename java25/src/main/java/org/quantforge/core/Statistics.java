@@ -38,22 +38,29 @@ public final class Statistics {
     }
 
     /**
-     * Deviations from the mean, corrected for the rounding of the mean itself. With values near 1e9 the
-     * rounded mean alone costs 1e-8 relative in the third moment.
+     * Deviations from the mean, by the spec's shift: y_i = x_i - x_0, which is exact for nearby values,
+     * then d_i = y_i - mean(y).
      */
     static double[] centered(double[] x) {
-        double m = mean(x);
+        double my = shiftMean(x);
         double[] d = new double[x.length];
-        double s = 0.0;
         for (int i = 0; i < x.length; i++) {
-            d[i] = x[i] - m;
-            s += d[i];
-        }
-        double c = s / x.length;
-        for (int i = 0; i < x.length; i++) {
-            d[i] -= c;
+            d[i] = (x[i] - x[0]) - my;
         }
         return d;
+    }
+
+    private static double shiftMean(double[] x) {
+        double s = 0.0;
+        for (double v : x) {
+            s += v - x[0];
+        }
+        return s / x.length;
+    }
+
+    /** The mean reported by the moment operations: x_0 + mean(y). */
+    static double shiftedMean(double[] x) {
+        return x[0] + shiftMean(x);
     }
 
     static double sumSquares(double[] d) {
@@ -77,7 +84,7 @@ public final class Statistics {
         if (n < 2) {
             throw new QfError("E_INPUT", "need at least 2 values", "x");
         }
-        double m = mean(x);
+        double m = shiftedMean(x);
         double s2 = 0.0;
         double s3 = 0.0;
         double s4 = 0.0;
@@ -137,8 +144,8 @@ public final class Statistics {
     /** Fits y = alpha + beta x. {@code dof} is the residual degrees of freedom. */
     static Ols fit(double[] x, double[] y, int dof) {
         int n = x.length;
-        double mx = mean(x);
-        double my = mean(y);
+        double mx = shiftedMean(x);
+        double my = shiftedMean(y);
         double[] dx = centered(x);
         double[] dy = centered(y);
         double sxx = sumSquares(dx);
