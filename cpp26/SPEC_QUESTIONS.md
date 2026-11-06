@@ -18,12 +18,7 @@ Written from the specs alone. Nothing here was changed to fit a golden file.
 - Every other gap this file listed: settled by `specifications/01-core/rulings.md`.
 - `document_text` breaking a limit and a parse rule together: rulings B1 and B2.
 
-## Open
-
-The general array limit needs each operation's `E_SCHEMA` checks to run first. Here the handler runs once and its
-result is dropped. `limits.md` now allows one linear pass and no work that grows with the limit, and this goes
-further than that on an oversized array: a sort in `quantile`, or `n` x `window` in `rolling`. The cost is bounded by the
-input already read. Other limits stop before any work. A schema-only pass per operation would close the gap.
+Array limit before work: closed by ruling B24. Each handler now reads its inputs, then calls `In::ready()`, then works.
 
 ## Stage B
 
@@ -33,4 +28,6 @@ non-business `as_of` (my reading was wrong, B0), `months` ranges, `FRA` end, emp
 order of swap legs (I had no check, B8, B9), `calib.fit` checks, `hedge.solve` order, `hedge_tenors`, solve method,
 19-digit sums, and shared bumped curves.
 
-Open: the ruling names no range for a `FRA`'s `start_months`. This build allows 0 to 1200.
+`start_months`: ruling B19, 0 to 1200, as built.
+
+Nothing is open.

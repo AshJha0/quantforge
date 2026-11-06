@@ -13,6 +13,7 @@ void op_units_convert(const In& in, Out& out) {
     static constexpr EnumTable<RateUnit> units = {{"DECIMAL", RateUnit::Decimal}, {"PERCENT", RateUnit::Percent}, {"BP", RateUnit::Bp}};
     const double v = in.real("value");
     const RateUnit from = in.choice("from", units), to = in.choice("to", units);
+    in.ready();
     out.key_real("value", convert_unit(v, from, to));
 }
 
@@ -37,6 +38,7 @@ void op_add_money(const In& in, Out& out) {
     if (av.kind != Kind::Object) schema("a", "expected an object");
     if (bv.kind != Kind::Object) schema("b", "expected an object");
     const MoneyInput a = money_of(In(av)), b = money_of(In(bv));
+    in.ready();
     limit_amount(a);
     limit_amount(b);
     if (a.currency != b.currency) throw Error("E_CURRENCY_MISMATCH", "currencies differ");
@@ -46,6 +48,7 @@ void op_add_money(const In& in, Out& out) {
 
 void op_round_money(const In& in, Out& out) {
     const MoneyInput m = money_of(in);
+    in.ready();
     limit_amount(m);
     out.key_string("amount", round_to_places(parse_amount(*m.amount), minor_units(m.currency)));
     out.key_string("currency", m.currency);
@@ -110,6 +113,7 @@ void op_schedule(const In& in, Out& out) {
     const Calendar c = in.choice("calendar", calendars);
     const bool eom = in.boolean("end_of_month");
     const long long lag = in.integer("payment_lag");
+    in.ready();
     limit_if(lag > 30000, "payment_lag");
     const auto periods = generate_schedule(start, end, f, c, eom, lag);
     out.values.key("periods");
@@ -159,6 +163,7 @@ std::vector<Date> dates_of(const In& in, string_view key) {
 void op_curve_discount(const In& in, Out& out) {
     const CurveInput ci = curve_of(in, "curve");
     const auto dates = dates_of(in, "dates");
+    in.ready();
     ci.limit();
     const Curve c = ci.build();
     Vec df;
@@ -183,6 +188,7 @@ void op_curve_forward(const In& in, Out& out) {
     const CurveInput ci = curve_of(in, "curve");
     const Date start = in.date("start"), end = in.date("end");
     const DayCount dc = in.choice("day_count", plain_day_counts);
+    in.ready();
     ci.limit();
     out.key_real("forward", simple_forward(ci.build(), start, end, dc));
 }
@@ -269,6 +275,7 @@ void op_ois_bootstrap(const In& in, Out& out) {
     const auto raw = quotes_of(in);
     const auto interpolation = in.choice("interpolation", curve_interpolations);
     const auto method = in.choice<SolveMethod>("method", {{"SEQUENTIAL", SolveMethod::Sequential}, {"GLOBAL", SolveMethod::Global}});
+    in.ready();
     const auto quotes = checked_quotes(raw);
     check_crossed(raw);
     const SolvedCurve s = ois_bootstrap(*c, as_of, quotes, interpolation, method);
@@ -284,6 +291,7 @@ void op_ois_compound(const In& in, Out& out) {
     for (const Value& v : d.items) days.push_back(to_integer(v, "days"));
     const long long denominator = in.integer("denominator");
     if (denominator != 360 && denominator != 365) schema("denominator", "must be 360 or 365");
+    in.ready();
     out.key_real("compounded_rate", ois_compound(rates, days, double(denominator)));
 }
 
@@ -303,6 +311,7 @@ void op_ois_pv(const In& in, Out& out) {
     const CurveInput ci = curve_of(in, "curve");
     const auto snapshot = snapshot_of_input(in);
     const OisTrade trade = ois_trade_of(in.need("trade"));
+    in.ready();
     ci.limit();
     const OisPrice p = ois_price(trade, ci.build(), snapshot);
     write_valuation(out, p.valuation);
@@ -328,6 +337,7 @@ void op_projection_bootstrap(const In& in, Out& out) {
         const long long months = q.integer(type == ProjectionQuoteType::Fra ? "start_months" : "months");
         quotes.push_back({type, months, q.real("rate")});
     }
+    in.ready();
     di.limit();
     limit_if(quotes.size() > max_quotes, "quotes");
     for (const ProjectionQuote& q : quotes)
@@ -347,6 +357,7 @@ void op_swap_pv(const In& in, Out& out) {
     const In t(tv);
     const SwapTrade trade{index_of(t.need("index"), "index"), t.integer("tenor_months"), t.real("fixed_rate"),
                           t.real("notional"), t.choice("side", fixed_sides)};
+    in.ready();
     di.limit();
     pi.limit();
     if (trade.tenor_months < 1 || trade.tenor_months > 1200) throw Error("E_INPUT", "tenor_months is out of range", "tenor_months");
@@ -363,6 +374,7 @@ void op_fra_pv(const In& in, Out& out) {
     const In t(tv);
     const FraTrade trade{index_of(t.need("index"), "index"), t.date("start"), t.real("fixed_rate"), t.real("notional"),
                          t.choice("side", fixed_sides)};
+    in.ready();
     di.limit();
     pi.limit();
     const FraPrice p = fra_price(trade, di.build(), pi.build(), snapshot);
@@ -374,6 +386,7 @@ void op_basis_spread(const In& in, Out& out) {
     const CurveInput di = curve_of(in, "discount"), pi = curve_of(in, "projection");
     const RateConvention* index = index_of(in.need("index"), "index");
     const long long months = in.integer("tenor_months");
+    in.ready();
     di.limit();
     pi.limit();
     if (months < 1 || months > 1200) throw Error("E_INPUT", "tenor_months is out of range", "tenor_months");
@@ -390,7 +403,9 @@ const FxPair* pair_of(const In& in) {
 
 void op_fx_spot_date(const In& in, Out& out) {
     const FxPair* p = pair_of(in);
-    out.key_string("spot_date", format_date(fx_spot_date(*p, in.date("trade_date"))));
+    const Date d = in.date("trade_date");
+    in.ready();
+    out.key_string("spot_date", format_date(fx_spot_date(*p, d)));
 }
 
 struct FxInput {
@@ -413,14 +428,15 @@ FxInput fx_input(const In& in) {
 template <class Use>
 auto with_market(const FxInput& f, Use&& use) {
     check_fx_market({f.pair, f.spot, f.as_of, nullptr, nullptr});
-    if (f.base.as_of != f.as_of || f.quote.as_of != f.as_of) throw Error("E_INPUT", "a curve's as_of differs");
     const Curve base = f.base.build(), quote = f.quote.build();
+    if (f.base.as_of != f.as_of || f.quote.as_of != f.as_of) throw Error("E_INPUT", "a curve's as_of differs");
     return use(FxMarket{f.pair, f.spot, f.as_of, &base, &quote});
 }
 
 void op_fx_outright(const In& in, Out& out) {
     const FxInput f = fx_input(in);
     const Date value_date = in.date("value_date");
+    in.ready();
     f.limit();
     const FxOutright r = with_market(f, [&](const FxMarket& m) { return fx_outright(m, value_date); });
     out.key_real("forward", r.forward);
@@ -437,6 +453,7 @@ void op_fx_forward_pv(const In& in, Out& out) {
     const FxInput f = fx_input(in);
     const auto snapshot = snapshot_of_input(in);
     const FxForwardTrade t = fx_trade_of(in.need("trade"), "trade");
+    in.ready();
     f.limit();
     FxPrice p = with_market(f, [&](const FxMarket& m) { return fx_forward_price(m, t); });
     p.valuation.data_version = snapshot;
@@ -452,6 +469,7 @@ void op_fx_swap_pv(const In& in, Out& out) {
     const FxSwapTrade trade{t.real("notional_base"), t.date("near_date"), t.real("near_rate"), t.date("far_date"),
                             t.real("far_rate"), t.choice("far_side", fx_sides)};
     const auto snapshot = snapshot_of_input(in);
+    in.ready();
     f.limit();
     FxPrice p = with_market(f, [&](const FxMarket& m) { return fx_swap_price(m, trade); });
     p.valuation.data_version = snapshot;
@@ -471,7 +489,9 @@ void op_fx_implied(const In& in, Out& out) {
         if (t.unit != 'M' && t.unit != 'Y') schema("tenor", "must be in months or years");
         points.push_back({t, p.real("points")});
     }
+    in.ready();
     f.limit();
+    limit_if(points.size() > max_quotes, "points");
     const auto nodes = with_market(f, [&](const FxMarket& m) { return fx_implied(m, points); });
     out.values.key("nodes");
     out.values.begin_array();
@@ -508,6 +528,7 @@ void op_calib_fit(const In& in, Out& out) {
     f.upper = maybe_vector(in, "upper");
     f.max_iter = in.integer("max_iter", 1000);
     const bool report = in.boolean("report_parameters", true);
+    in.ready();
     limit_if(f.start.size() > 20, "start");
     limit_if(f.max_iter > 100000, "max_iter");
     const FitResult r = fit(f);
@@ -525,6 +546,7 @@ void op_calib_fit(const In& in, Out& out) {
 
 void op_check_bid_ask(const In& in, Out& out) {
     const Vec fitted = in.reals("fitted"), bid = in.reals("bid"), ask = in.reals("ask");
+    in.ready();
     const auto breaches = check_bid_ask(fitted, bid, ask);
     out.values.key("breaches");
     out.values.begin_array();
@@ -543,6 +565,7 @@ void op_curve_report(const In& in, Out& out) {
     const Date as_of = in.date("as_of");
     const auto raw = quotes_of(in);
     const auto interpolation = in.choice("interpolation", curve_interpolations);
+    in.ready();
     const auto quotes = checked_quotes(raw);
     check_crossed(raw);
     const CurveReport r = curve_report(*c, as_of, quotes, interpolation);
@@ -574,6 +597,7 @@ void op_ois_dv01(const In& in, Out& out) {
     const auto raw = quotes_of(in);
     const auto interpolation = in.choice("interpolation", curve_interpolations);
     const OisTrade trade = ois_trade_of(in.need("trade"));
+    in.ready();
     const auto quotes = checked_quotes(raw);
     check_crossed(raw);
     const RateRisk r = rate_risk(trade, bumped_curves(*trade.convention, as_of, quotes, interpolation));
@@ -590,7 +614,9 @@ void op_cashflows(const In& in, Out& out) {
         const In c(v);
         flows.push_back({c.real("t"), c.real("amount")});
     }
-    const CashflowRisk r = cashflow_risk(flows, in.real("yield"));
+    const double yield = in.real("yield");
+    in.ready();
+    const CashflowRisk r = cashflow_risk(flows, yield);
     out.key_real("pv", r.pv);
     out.key_real("duration", r.duration);
     out.key_real("convexity", r.convexity);
@@ -602,6 +628,7 @@ void op_hedge_solve(const In& in, Out& out) {
     const Matrix a = in.matrix("a");
     const Vec b = in.reals("b"), weights = in.reals("weights"), costs = in.reals("costs");
     const double lambda = in.real("lambda");
+    in.ready();
     limit_if(!a.empty() && a[0].size() > 20, "a");
     const HedgeResult r = hedge_solve(a, b, weights, costs, lambda);
     out.key_reals("x", r.x);
@@ -611,6 +638,7 @@ void op_hedge_solve(const In& in, Out& out) {
 
 void op_spread_cost(const In& in, Out& out) {
     const Vec q = in.reals("quantities"), h = in.reals("half_spreads");
+    in.ready();
     out.key_real("cost", spread_cost(q, h));
 }
 
@@ -623,6 +651,7 @@ void op_usecase_fx(const In& in, Out& out) {
     std::vector<FxForwardTrade> trades;
     for (const Value& v : book.items) trades.push_back(fx_trade_of(v, "book"));
     const double half_spread = in.real("half_spread");
+    in.ready();
     f.limit();
     if (half_spread < 0.0) throw Error("E_DOMAIN", "half_spread is negative", "half_spread");
     double pv = 0.0, delta = 0.0;
@@ -652,6 +681,7 @@ void op_usecase_rates(const In& in, Out& out) {
     std::vector<Tenor> tenors;
     for (const Value& v : ht.items) tenors.push_back(parse_tenor(to_string(v, "hedge_tenors")));
     const double unit = in.real("hedge_unit_notional"), half_spread_bp = in.real("half_spread_bp");
+    in.ready();
     const auto quotes = checked_quotes(raw);
     limit_if(tenors.size() > 20, "hedge_tenors");
     check_crossed(raw);

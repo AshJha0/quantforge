@@ -7,14 +7,6 @@
 namespace quantforge {
 namespace {
 
-void check_frequency(const Compounding& c) {
-    if (c.kind != CompoundingKind::Periodic) return;
-    if (!c.frequency) throw Error("E_SCHEMA", "PERIODIC needs a frequency", "frequency");
-    const long long n = *c.frequency;
-    if (n != 1 && n != 2 && n != 3 && n != 4 && n != 6 && n != 12)
-        throw Error("E_SCHEMA", "frequency is not listed", "frequency");
-}
-
 void check_base(double rate, double t, const Compounding& c) {
     if (c.kind == CompoundingKind::Simple && 1.0 + rate * t <= 0.0)
         throw Error("E_DOMAIN", "1 + r t must be positive", "rate");
@@ -47,6 +39,14 @@ double rate_from(double d, double t, const Compounding& c) {
 }
 
 }  // namespace
+
+void check_frequency(const Compounding& c) {
+    if (c.kind != CompoundingKind::Periodic) return;
+    if (!c.frequency) throw Error("E_SCHEMA", "PERIODIC needs a frequency", "frequency");
+    const long long n = *c.frequency;
+    if (n != 1 && n != 2 && n != 3 && n != 4 && n != 6 && n != 12)
+        throw Error("E_SCHEMA", "frequency is not listed", "frequency");
+}
 
 double discount_factor(double rate, double t, const Compounding& c) {
     check_frequency(c);
