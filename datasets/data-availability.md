@@ -6,7 +6,7 @@ Per plan section 8, corrected by the stage B data survey of 2026-11-06, which is
 |---|---|---|---|
 | Overnight compounding, OIS floating leg accrual | Real | SONIA, SOFR, ESTR | Check against published compounded indices. An arithmetic check, not curve validation |
 | Interpolation leave-one-out | Real, fitted data | BoE, ECB, Treasury curve nodes | Fitted, not quotes. Errors measure their smoothing, so report as interpolation tests only |
-| FX spot series, spot-based hedging P&L | Real | ECB, Fed H.10; BoE spot for local use | H.10 needs a new route after the Fed's download tool goes |
+| FX spot series, spot-based hedging P&L | Real | ECB, Fed H.10; BoE spot for local use | H.10 is recorded from the release page's XML zip, which does not depend on the Fed's download tool |
 | GBP/USD covered parity and forward points, 1979 to mid-2021 | Real, conditional | BoE `XUDLDS*`, `XUDLDF*`, with same-period rates | Subject to the Bank's licence answer. Local only. Noisy at short tenors. Ends 30 Jun 2021. Fix a held-out range first. Do not call the inferred basis market basis |
 | Multi-instrument SOFR curve from one day of traded prices | Conditional, exploratory | Swap repository trades | Only if terms and access clear. Trade-derived, not quotes |
 | SONIA OIS global solve from quotes | Labelled synthetic | None free. BoE curve may give a realistic shape, with a label | Never treat BoE fitted curves as quotes |

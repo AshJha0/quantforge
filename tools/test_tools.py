@@ -57,7 +57,7 @@ class Recorder(unittest.TestCase):
         return p, log
 
     def source(self, url, **kw):
-        return {"id": "t", "url": url, "licence": "x", "licence_url": "x", "terms_checked": "x", "attribution": "x", "redistribute_raw": "no", "enabled": True, **kw}
+        return {"id": "t", "url": url, "licence": "x", "licence_url": "x", "terms_checked": "x", "attribution": "x", "redistribute_raw": "no", "notice": "keep me", "enabled": True, **kw}
 
     def test_records_hash_not_data(self):
         with tempfile.TemporaryDirectory() as d:
@@ -68,7 +68,8 @@ class Recorder(unittest.TestCase):
             self.assertEqual(fl.verify(log)[0], 1)
             text = log.read_text(encoding="utf-8")
             self.assertNotIn("secret-quote", text)
-            self.assertEqual(len(list((Path(d) / "data/t").iterdir())), 1)
+            self.assertEqual(len(list((Path(d) / "data/t").glob("*.raw"))), 1)
+            self.assertEqual((Path(d) / "data/t/NOTICE.txt").read_text(encoding="utf-8"), "keep me\n")
 
     def test_failure_is_logged_and_exit_is_1(self):
         with tempfile.TemporaryDirectory() as d:
@@ -82,6 +83,13 @@ class Recorder(unittest.TestCase):
             del s["licence"]
             p, _ = self.run_with(d, [s])
             self.assertNotEqual(p.returncode, 0)
+
+    def test_shipped_manifest_is_complete(self):
+        sources = json.loads((ROOT / "tools/recorder/sources.json").read_text(encoding="utf-8"))["sources"]
+        for s in sources:
+            for k in ("licence", "licence_url", "terms_checked", "attribution", "redistribute_raw", "notice"):
+                self.assertTrue(s[k], (s["id"], k))
+            self.assertNotIn("stlouisfed", s["url"])
 
     def test_disabled_source_is_skipped(self):
         with tempfile.TemporaryDirectory() as d:
