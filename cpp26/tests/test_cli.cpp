@@ -73,3 +73,34 @@ TEST_CASE("the store: corrections, withdrawals, the inclusive limit") {
     CHECK(has(run_case(wrap("core.store.chain", bad)).json, "E_INPUT"));
     CHECK(has(run_case(wrap("core.store.chain", R"({"records":[]})")).json, std::string(64, '0')));
 }
+
+TEST_CASE("limits come after schema and before rules") {
+    CHECK(has(run_case(wrap("core.integrate.simpson", R"({"function":"exp","a":0,"b":1,"n":10000001})")).json, "E_LIMIT"));
+    CHECK(has(run_case(wrap("core.integrate.simpson", R"({"function":"nope","a":0,"b":1,"n":10000001})")).json, "E_SCHEMA"));
+    CHECK(has(run_case(wrap("core.mc.gbm_european", R"({"option":"CALL","spot":-1,"strike":1,"r":0,"q":0,"sigma":1,"t":1,"paths":1000001,"seed":"1","method":"PLAIN"})")).json, "E_LIMIT"));
+    std::string big = "[0";
+    for (int i = 0; i < 100000; ++i) big += ",0";
+    big += "]";
+    CHECK(has(run_case(wrap("core.stats.quantile", R"({"x":)" + big + R"(,"p":[0.5]})")).json, "E_LIMIT"));
+    CHECK(has(run_case(wrap("core.stats.quantile", R"({"x":)" + big + "}")).json, "E_SCHEMA"));
+}
+
+TEST_CASE("a case nested above 80 levels stops before parsing") {
+    const auto r = run_case(wrap("a.b", std::string(81, '[')));
+    CHECK(has(r.json, "E_LIMIT"));
+    CHECK(has(r.json, R"("case_id":"unknown")"));
+}
+
+TEST_CASE("nesting limit covers every record key") {
+    const std::string deep = std::string(65, '[') + std::string(65, ']');
+    CHECK(has(run_case(wrap("core.store.chain", R"({"records":[{"sequence":1,"series_id":"S","event_time":"2024-01-01T00:00:00Z","knowledge_time":"2024-01-01T00:00:00Z","value":1,"extra":)" + deep + "}]}")).json, "E_LIMIT"));
+}
+
+TEST_CASE("splines take the largest legal knot count") {
+    std::string x = "[0", y = "[0";
+    for (int i = 1; i < 100000; ++i) {
+        x += "," + std::to_string(i);
+        y += ",1";
+    }
+    CHECK(run_case(wrap("core.interp.evaluate", R"({"method":"cubic_not_a_knot","x":)" + x + R"(],"y":)" + y + R"(],"at":[5.5]})")).ok);
+}

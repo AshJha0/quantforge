@@ -41,6 +41,11 @@ void check_log(const std::vector<StoreRecord>& log) {
             throw Error("E_INPUT", "knowledge_time must not fall", "records");
 }
 
+void check_store_instant(Instant i) {
+    const int y = year_of(date_of_seconds(i));
+    if (y < 1 || y > 9999) throw Error("E_DATE_RANGE", "instants must lie in years 1 to 9999");
+}
+
 std::vector<StoreRow> store_view(const std::vector<StoreRecord>& log, Instant as_of) {
     // std::string orders by unsigned bytes, shorter first, as the spec asks. Sequence rises through
     // the log, so the last record seen for a key is the one with the highest sequence.

@@ -9,12 +9,18 @@ Written from the specs alone. Nothing here was changed to fit a golden file.
 - Runner command on Windows: `runner.py` now resolves the path.
 - `start == end` is tested first in `daycount.md`, which also settles `BUS_252` outside the calendar range: 0.
 
+## Closed by rulings and limits
+
+- Log checks against `E_SCHEMA`: ruling A2, the contract's order holds.
+- `sequence < 1` and empty `series_id`: ruling A1, `E_SCHEMA`.
+- `skip` with no upper limit: `limits.md`.
+- `implementations.yaml` in the contract: corrected.
+- Every other gap this file listed: settled by `specifications/01-core/rulings.md`.
+- `document_text` breaking a limit and a parse rule together: rulings B1 and B2.
+
 ## Open
 
-`asof-store.md` says the log checks come "before anything else", while `cli-contract.md` puts all `E_SCHEMA` before
-rule checks. With an unordered log and a bad `as_of`, this build gives `E_INPUT`, as the store spec is the more exact.
-
-`asof-store.md` does not name a code for `sequence < 1` or an empty `series_id`. This build gives `E_SCHEMA`, reading
-both as a mistyped record.
-
-Every earlier gap in this file is settled by `specifications/01-core/rulings.md`.
+The general array limit needs each operation's `E_SCHEMA` checks to run first. Here the handler runs once and its
+result is dropped. `limits.md` now allows one linear pass and no work that grows with the limit, and this goes
+further than that on an oversized array: a sort in `quantile`, or `n` x `window` in `rolling`. The cost is bounded by the
+input already read. Other limits stop before any work. A schema-only pass per operation would close the gap.

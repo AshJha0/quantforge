@@ -12,7 +12,7 @@
 namespace quantforge::json {
 namespace {
 
-// Far beyond the 64 levels the spec needs, and well inside the stack.
+// A backstop for direct callers: the CLI runs the depth scan first.
 constexpr int max_depth = 1000;
 
 [[noreturn]] void fail(const std::string& why) { throw Error("E_PARSE", why); }
@@ -268,6 +268,25 @@ Parsed parse(std::string_view text) {
     Parsed result;
     Parser(text, result).run();
     return result;
+}
+
+bool deeper_than(std::string_view text, int limit) {
+    int depth = 0;
+    bool in_string = false;
+    for (std::size_t i = 0; i < text.size(); ++i) {
+        const char c = text[i];
+        if (in_string) {
+            if (c == '\\') ++i;
+            else if (c == '"') in_string = false;
+        } else if (c == '"') {
+            in_string = true;
+        } else if (c == '[' || c == '{') {
+            if (++depth > limit) return true;
+        } else if (c == ']' || c == '}') {
+            --depth;
+        }
+    }
+    return false;
 }
 
 std::string format_real(double v) {

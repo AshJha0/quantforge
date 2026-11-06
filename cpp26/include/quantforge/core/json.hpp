@@ -40,6 +40,9 @@ struct Parsed {
 /// Throws Error E_PARSE on anything that is not JSON. Rule breaks are flagged in the result.
 Parsed parse(std::string_view text);
 
+/// The lexical depth scan of limits.md B2: no syntax is checked, so it can run before parsing.
+bool deeper_than(std::string_view text, int limit);
+
 /// Shortest text that reads back to the same binary64. The value must be finite.
 std::string format_real(double v);
 void append_string(std::string& out, std::string_view s);

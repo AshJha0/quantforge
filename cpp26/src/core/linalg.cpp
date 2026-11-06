@@ -29,14 +29,14 @@ void check_symmetric(const Matrix& a) {
             if (std::fabs(a[i][j] - a[j][i]) > limit) throw Error("E_INPUT", "the matrix is not symmetric", "a");
 }
 
-// Eliminates in place. A negative threshold means no singularity test.
+// Eliminates in place.
 std::vector<double> lu(Matrix& a, std::vector<double>& b, double threshold) {
     const std::size_t n = a.size();
     for (std::size_t k = 0; k < n; ++k) {
         std::size_t p = k;
         for (std::size_t i = k + 1; i < n; ++i)
             if (std::fabs(a[i][k]) > std::fabs(a[p][k])) p = i;
-        if (threshold >= 0.0 && std::fabs(a[p][k]) <= threshold)
+        if (std::fabs(a[p][k]) <= threshold)
             throw Error("E_SINGULAR", "a pivot is below the threshold", "a");
         std::swap(a[k], a[p]);
         std::swap(b[k], b[p]);
@@ -56,8 +56,6 @@ std::vector<double> lu(Matrix& a, std::vector<double>& b, double threshold) {
 }
 
 }  // namespace
-
-std::vector<double> lu_solve_unchecked(Matrix a, std::vector<double> b) { return lu(a, b, -1.0); }
 
 std::vector<double> solve_linear(const Matrix& a, const std::vector<double>& b) {
     check_square(a);
