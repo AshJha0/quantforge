@@ -34,4 +34,4 @@ With `tau = (T - sp)/365`: `basis_bp = 10000 (-ln(implied_ratio)/tau + ln(A(T))/
 
 ## Acceptance
 
-Analytic: hand formulas. `fx_delta` is checked against a central bump. Spot dates against QuantLib `JointCalendar`.
+Hand formulas, with forward PV and `fx_delta` also checked against QuantLib `FxForward`, whose source uses the same spot-normalised forward. Spot dates against QuantLib `JointCalendar`.

@@ -162,7 +162,7 @@ def judge(case, res, classes):
 
 def run_batch(command, cwd, cases, timeout):
     lines = [json.dumps({"schema_version": "1.0", "case_id": c["case_id"], "operation": c["operation"], "inputs": c["inputs"]},
-                        ensure_ascii=False) for c in cases]
+                        ensure_ascii=True) for c in cases]  # escapes carry a lone surrogate, which UTF-8 cannot
     start = time.monotonic()
     try:
         p = subprocess.run(command, cwd=cwd, input=("\n".join(lines) + "\n").encode("utf-8"), capture_output=True, timeout=timeout)

@@ -37,9 +37,6 @@ changes of a stated choice were B0 (spot in OIS), B5, B7, B8, B9 and B10. B11 an
 - `fx.curve.implied` limit on `points`: confirmed by B21.
 - `newton` bracket with an exact zero at an end: confirmed by B23.
 
-## Known gap against B24
+## Closed on `stage-c-rust`
 
-Operations with work beyond a few linear passes stop at the limit before starting. The cheap array operations
-(`stats.summary`, `covariance`, `ols`, `normal`, `returns`, `ewma_variance` and the like) still make their few linear
-passes over an oversized array, and the result is then replaced by `E_LIMIT`. The output is right, and the time is
-linear in input already read, but it is more than B24's single pass.
+- B24: every operation that works on an array now stops at the limit after its typed reads, before any work.

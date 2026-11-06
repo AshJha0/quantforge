@@ -50,10 +50,12 @@ From a finite start, a trial point with a non-finite objective is a failed step:
 | `ois`, `ois_deep` | QuantLib curves and PVs; Strata pricer on PVs | Bid/ask mid, compounding (exact rationals) |
 | `projection`, `projection_deep` | QuantLib pillars, swaps, FRAs | Tenor basis. FRA in the first suite. Dates from a non-business `as_of` |
 | `risk`, `risk_deep` | QuantLib with bumped quotes (`risk_deep`) | `risk.cashflows`; `risk` |
-| `fx`, `fx_deep` | QuantLib calendars; `FxSwapRateHelper` for implied ratios | Forward, PV, delta, basis: analytic formulas |
+| `fx`, `fx_deep` | QuantLib calendars; `FxSwapRateHelper` for implied ratios; `FxForward` for PV and delta (`fx_deep`) | Outright points, FX swap, basis: analytic formulas |
 | `hedge`, `hedge_deep` | SciPy L-BFGS-B (`hedge_deep`) | Enumeration and first-order conditions |
 | `calibration` | SciPy, NumPy | Closed forms, known truth |
-| `usecases` | None directly | Replay of parts checked elsewhere |
+| `usecases` | QuantLib `FxForward` for use case 1's book | Hedge sums; use case 2 replay of parts checked elsewhere |
 | `rulings_b` | None | Hand, by nature |
 
 `oracle/MUTANTS.md` lists the deliberate convention errors. `gen_stage_b_deep.py` stops if a suite's tolerance would let one through. That proves each named error is caught, not that every plausible one is. `calibration`, `units`, `usecases` and `rulings_b` have no mutants. Stage B quotes are synthetic throughout, so an outside oracle here means agreement on method, not fit to a market.
+
+Every stage B suite except `units` carries the `synthetic` tag on all cases, as its inputs are constructed. `oracle/python/check_invariants.py` covers stage B.

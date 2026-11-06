@@ -23,7 +23,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "fx-0002",
@@ -42,7 +44,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "fx-0003",
@@ -61,7 +65,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "fx-0004",
@@ -80,7 +86,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "fx-0005",
@@ -1173,7 +1181,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -1310,7 +1319,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -1447,7 +1457,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ],
    "description": "before the spot date"
   }

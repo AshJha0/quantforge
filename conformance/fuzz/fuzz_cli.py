@@ -88,7 +88,10 @@ def mutate_case(rng, seeds):
         elif kind == 4 and isinstance(old, str) and old:
             at = rng.randrange(len(old))
             box[key] = old[:at] + rng.choice("0-9:TZé") + old[at + 1:]
-    return json.dumps(case, ensure_ascii=False, allow_nan=False).encode("utf-8")
+    try:
+        return json.dumps(case, ensure_ascii=False, allow_nan=False).encode("utf-8")
+    except UnicodeEncodeError:  # a lone surrogate can only travel as a JSON escape
+        return json.dumps(case, allow_nan=False).encode("utf-8")
 
 
 def mutate_bytes(rng, seeds):

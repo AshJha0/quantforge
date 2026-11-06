@@ -158,7 +158,8 @@ fn fx_market_input(i: &Inputs) -> Result<FxInput> {
 
 type FxInput = (FxPair, f64, Date, CurveInput, CurveInput, Option<String>);
 
-fn fx_market(m: FxInput) -> Result<FxMarket> {
+fn fx_market(i: &Inputs, m: FxInput) -> Result<FxMarket> {
+    i.gate()?;
     if m.1 <= 0.0 {
         return fail("E_DOMAIN", "spot must be positive");
     }
@@ -360,6 +361,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             if b != 360 && b != 365 {
                 return i.fail("denominator", "not listed");
             }
+            i.gate()?;
             plain(obj([(
                 "compounded_rate",
                 ois::compound(&r, &days, b)?.into(),
@@ -433,13 +435,13 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "fx.forward.outright" => {
             let m = fx_market_input(i)?;
             let v = i.date("value_date")?;
-            let (f, p) = fx_market(m)?.outright(v)?;
+            let (f, p) = fx_market(i, m)?.outright(v)?;
             plain(obj([("forward", f.into()), ("points", p.into())]))
         }
         "fx.forward.pv" => {
             let m = fx_market_input(i)?;
             let l = fx_leg(&sub(i, "trade")?)?;
-            let m = fx_market(m)?;
+            let m = fx_market(i, m)?;
             let (pv, delta) = m.leg(&l)?;
             let v = m.valuation(pv, "FX_FORWARD_DISCOUNTING");
             plain(obj([
@@ -463,7 +465,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 value_date: t.date("far_date")?,
                 buy: far_buy,
             };
-            let m = fx_market(m)?;
+            let m = fx_market(i, m)?;
             if near.value_date >= far.value_date {
                 return fail("E_DATE_ORDER", "near_date is not before far_date");
             }
@@ -484,7 +486,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 }
                 points.push((t, p.f64("points")?));
             }
-            let rows: Vec<Json> = fx_market(m)?
+            let rows: Vec<Json> = fx_market(i, m)?
                 .implied(&points)?
                 .into_iter()
                 .map(|(d, r, b)| {
@@ -500,6 +502,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "calib.fit" => calib_fit(i),
         "calib.check_bid_ask" => {
             let (f, b, a) = (i.reals("fitted")?, i.reals("bid")?, i.reals("ask")?);
+            i.gate()?;
             let rows: Vec<Json> = calib::check_bid_ask(&f, &b, &a)?
                 .into_iter()
                 .map(|(k, s, d)| {
@@ -546,7 +549,9 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             for c in items(i, "cashflows")? {
                 flows.push((c.f64("t")?, c.f64("amount")?));
             }
-            let (p, d, c) = risk::cashflows(&flows, i.f64("yield")?)?;
+            let y = i.f64("yield")?;
+            i.gate()?;
+            let (p, d, c) = risk::cashflows(&flows, y)?;
             plain(obj([
                 ("pv", p.into()),
                 ("duration", d.into()),
@@ -566,6 +571,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "hedge.spread_cost" => {
             let (q, h) = (i.reals("quantities")?, i.reals("half_spreads")?);
+            i.gate()?;
             plain(obj([("cost", hedge::spread_cost(&q, &h)?.into())]))
         }
         "usecase.fx_hedge" => {
@@ -575,7 +581,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 book.push(fx_leg(&t)?);
             }
             let s = i.f64("half_spread")?;
-            let [pv, delta, hedge, residual, cost] = fx::hedge_book(&fx_market(m)?, &book, s)?;
+            let [pv, delta, hedge, residual, cost] = fx::hedge_book(&fx_market(i, m)?, &book, s)?;
             plain(obj([
                 ("pv", pv.into()),
                 ("fx_delta", delta.into()),

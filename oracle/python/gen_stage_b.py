@@ -35,6 +35,10 @@ def S(name, spec):
 
 def write(s):
     keep = common.GOLDEN
+    if s.name != "units":  # every other stage B input is constructed, not observed
+        for c in s.cases:
+            if SYN not in c["tags"]:
+                c["tags"].append(SYN)
     common.GOLDEN = keep.parent / "stage_b"
     s.write()
     common.GOLDEN = keep
@@ -197,11 +201,11 @@ def ois():
             ix = ql.OvernightIndex(qindex(conv).name(), 0, qindex(conv).currency(), qindex(conv).fixingCalendar(), qindex(conv).dayCounter(), h)
             sw = ql.MakeOIS(qper(tenor), ix, k, settlementDays=c["spot_lag"], paymentLag=c["payment_lag"], nominal=N, swapType=ql.Swap.Payer if side == "PAY" else ql.Swap.Receiver,
                             pricingEngine=ql.DiscountingSwapEngine(h), telescopicValueDates=True)
-            assert abs(sw.NPV() - val) < 1e-3, (conv, tenor, sw.NPV(), val)
+            assert abs(sw.NPV() - val) < 1e-5, (conv, tenor, sw.NPV(), val)
             s.add(pv, {"curve": jc, "trade": {"convention": conv, "tenor": tenor, "fixed_rate": k, "notional": N, "side": side}, "snapshot_id": "sha256:" + "ab" * 32},
                   {"valuation": {"pv": val, "currency": c["currency"], "model": "OIS_DISCOUNTING", "data_version": "sha256:" + "ab" * 32, "conventions": conv, "as_of": str(AS_OF)}, "par_rate": fl / a, "annuity": a},
                   cls=I, verified=["independent-replay", "quantlib-1.44"], tags=[SYN], limit=PVLIM)
-    note("ois: swap PVs match QuantLib OvernightIndexedSwap within 1e-3 on 1e6, with and without payment lag")
+    note("ois: swap PVs match QuantLib OvernightIndexedSwap within 1e-5 on 1e6, with and without payment lag")
     # Payment lag: telescoping fails, and the spec's formula is what matches.
     cv, dfs, per = bootstrap_ois("SOFR", AS_OF, SOFR_Q)
     p = ois_periods("SOFR", AS_OF, "10Y")
@@ -298,10 +302,10 @@ def projection():
         v = (1 if side == "PAY" else -1) * N * (flt - k * ann)
         sw = ql.MakeVanillaSwap(ql.Period(yrs, ql.Years), idx2, k, ql.Period(0, ql.Days), nominal=N, fixedLegTenor=ql.Period(1, ql.Years), fixedLegDayCount=ql.Thirty360(ql.Thirty360.BondBasis),
                                 swapType=ql.Swap.Payer if side == "PAY" else ql.Swap.Receiver, pricingEngine=ql.DiscountingSwapEngine(dh))
-        assert abs(sw.NPV() - v) < 1e-2, (sw.NPV(), v)
+        assert abs(sw.NPV() - v) < 1e-5, (sw.NPV(), v)
         s.add("rates.swap.pv", {"discount": jc, "projection": jp, "trade": {"index": "USD-TERM-3M", "tenor_months": yrs * 12, "fixed_rate": k, "notional": N, "side": side}},
               {"valuation": {"pv": v, "currency": "USD", "model": "SWAP_DISCOUNTING", "data_version": None, "conventions": "USD-TERM-3M", "as_of": str(AS_OF)}, "par_rate": flt / ann}, cls=I, verified=["independent-replay", "quantlib-1.44"], tags=[SYN], limit=PVLIM)
-    note("projection: vanilla swap PVs match QuantLib within 1e-2 on 1e6")
+    note("projection: vanilla swap PVs match QuantLib within 1e-5 on 1e6")
     _, fl = term_periods(AS_OF, 60, 3)
     ann3 = sum(float(yf("ACT_360", a, b)) * cv.df(b) for a, b in zip(fl, fl[1:]))
     tp = sum((pc.df(a) / pc.df(b) - cv.df(a) / cv.df(b)) * cv.df(b) for a, b in zip(fl, fl[1:]))
@@ -562,6 +566,30 @@ def calib():
     write(s)
 
 
+def ql_fx_forward(base, quote, S0, N, K, T, side):
+    """QuantLib FxForward on the same curves, as (pv in quote currency, delta by central bump)."""
+    ql.Settings.instance().evaluationDate = Q(AS_OF)
+    bc = ql.YieldTermStructureHandle(base)
+    qc = ql.YieldTermStructureHandle(quote)
+    cal = ql.JointCalendar(ql.UnitedKingdom(ql.UnitedKingdom.Settlement), ql.UnitedStates(ql.UnitedStates.GovernmentBond), ql.JoinHolidays)
+    fwd = ql.FxForward(N, ql.GBPCurrency(), ql.USDCurrency(), K, Q(T), side != "BUY", 2, cal)
+    sq = ql.SimpleQuote(S0)
+    fwd.setPricingEngine(ql.DiscountingFxForwardEngine(bc, qc, ql.QuoteHandle(sq)))
+    pv = fwd.npvTargetCurrency()
+    h = 1e-6
+    sq.setValue(S0 + h)
+    up = fwd.npvTargetCurrency()
+    sq.setValue(S0 - h)
+    dn = fwd.npvTargetCurrency()
+    return pv, (up - dn) / (2 * h)
+
+
+def ql_curve(c):
+    q = ql.DiscountCurve([Q(c.as_of + timedelta(round(t * 365))) for t in c.t], c.d, ql.Actual365Fixed())
+    q.enableExtrapolation()
+    return q
+
+
 def usecases():
     s = S("usecases", "04-pricing/use-cases.md")
     # Use case 1: FX, spot to hedge.
@@ -570,17 +598,21 @@ def usecases():
     jg, ju = jcurve(gc, [p[-1][2] for p in gp], gd), jcurve(uc, [p[-1][2] for p in up], ud)
     sp, S0 = date(2026, 11, 10), 1.28
     book = [{"notional_base": 5e6, "strike": 1.27, "value_date": "2027-02-10", "side": "BUY"}, {"notional_base": 3e6, "strike": 1.285, "value_date": "2027-11-10", "side": "SELL"}]
-    pv = dl = 0.0
+    pv = dl = qpv = qdl = 0.0
     for t in book:
         T = date.fromisoformat(t["value_date"])
         sg = 1 if t["side"] == "BUY" else -1
         F = S0 * (gc.df(T) / gc.df(sp)) / (uc.df(T) / uc.df(sp))
         pv += sg * t["notional_base"] * (F - t["strike"]) * uc.df(T)
         dl += sg * t["notional_base"] * (F / S0) * uc.df(T)
+        qpv += ql_fx_forward(ql_curve(gc), ql_curve(uc), S0, t["notional_base"], t["strike"], T, t["side"])[0]
+        qdl += ql_fx_forward(ql_curve(gc), ql_curve(uc), S0, t["notional_base"], t["strike"], T, t["side"])[1]
+    note(f"use case 1: book PV {pv:.4f} and delta {dl:.4f}, QuantLib FxForward gap {abs(pv - qpv):.2e} and {abs(dl - qdl):.2e}")
+    assert abs(pv - qpv) < 1e-6 and abs(dl - qdl) < 1e-2
     hs = 0.00005
     hedge_n = -dl
     s.add("usecase.fx_hedge", {"pair": "GBPUSD", "spot": S0, "as_of": str(AS_OF), "base_curve": jg, "quote_curve": ju, "book": book, "half_spread": hs},
-          {"pv": pv, "fx_delta": dl, "hedge_spot_base": hedge_n, "residual_delta": 0.0, "hedge_cost": abs(hedge_n) * hs}, cls=I, verified=["hand"], tags=[SYN], limit=PVLIM)
+          {"pv": pv, "fx_delta": dl, "hedge_spot_base": hedge_n, "residual_delta": 0.0, "hedge_cost": abs(hedge_n) * hs}, cls=I, verified=["hand", "quantlib-1.44"], tags=[SYN], limit=PVLIM)
     # Use case 2: SONIA, curve to key-rate hedge.
     q = SONIA_Q
     trade = {"convention": "SONIA", "tenor": "6Y", "fixed_rate": .034, "notional": 1e7, "side": "PAY"}

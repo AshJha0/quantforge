@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased: evidence cleanup after v0.2
+
+### Changed
+- Swap and FRA checks against QuantLib now assert 1e-5 on a notional of 1,000,000. Use case 1 has an outside QuantLib check. The invariant checker covers stage B. Constructed inputs carry the `synthetic` tag. 4,737 golden cases; no golden value changed.
+- Rust checks array limits before work, closing its gap against ruling B24.
+- The recorder has six sources, each with its notice, and stores identical bytes once while still logging them.
+- All four CLIs report version 0.2.0.
+
 ## Unreleased: stage B, FX and rates slices (target v0.2)
 
 Not released. Stage B is at Implemented, not Validated: validation is self-assessment until the human review after the project. The figures below are one local run on Windows, 2026-11-06, at commit `13d9871`. The branch has not been pushed, so CI has not run it.

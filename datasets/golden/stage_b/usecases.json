@@ -157,7 +157,8 @@
    },
    "tolerance_class": "interpolation",
    "verified_by": [
-    "hand"
+    "hand",
+    "quantlib-1.44"
    ],
    "tags": [
     "synthetic"

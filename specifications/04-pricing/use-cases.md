@@ -25,4 +25,4 @@ The hedges must have key-rate exposure in the trade's buckets. In the golden cas
 
 ## Acceptance
 
-Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are checked against QuantLib. The use-case sums have no outside source. Trades, hedges and costs are calculations on synthetic data: nothing is traded. Real output is in `examples/README.md`.
+Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are checked against QuantLib. Use case 1's book PV and delta are checked against QuantLib `FxForward`. The hedge sums, and use case 2's, have no outside source. Trades, hedges and costs are calculations on synthetic data: nothing is traded. Real output is in `examples/README.md`.

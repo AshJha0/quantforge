@@ -62,17 +62,18 @@ suite store: 21 cases
 store: expected rows hand-written; hashes from the oracle canonical form, one source by nature
 limits: mc at limit, price 9.24164, stderr 0.01384
 suite limits: 61 cases
+suite store_a4: 6 cases
 suite limit_order: 15 cases
 suite store_rulings: 11 cases
 suite units: 26 cases
 suite schedule: 7 cases
 suite curve: 7 cases
 ois: replay matches QuantLib to 5e-12 at every pillar, SONIA and SOFR, both interpolations
-ois: swap PVs match QuantLib OvernightIndexedSwap within 1e-3 on 1e6, with and without payment lag
+ois: swap PVs match QuantLib OvernightIndexedSwap within 1e-5 on 1e6, with and without payment lag
 ois: with payment lag the telescoped form misses the leg by 1.13e-04 per unit notional on 10Y
 suite ois: 32 cases
 projection: replay against QuantLib, max pillar difference 1.09e-14
-projection: vanilla swap PVs match QuantLib within 1e-2 on 1e6
+projection: vanilla swap PVs match QuantLib within 1e-5 on 1e6
 suite projection: 6 cases
 suite fx: 14 cases
 risk: key-rate sums match the parallel DV01 to under 1e-5 relative at a 1 bp bump
@@ -80,6 +81,7 @@ suite risk: 6 cases
 suite hedge: 10 cases
 calibration: Nelson-Siegel objective LM 7.2e-35, BFGS 4.3e-15; Gauss-Newton and BFGS reach the exponential minima
 suite calibration: 25 cases
+use case 1: book PV 59903.6465 and delta 2054546.4912, QuantLib FxForward gap 9.90e-10 and 7.59e-04
 use case 2: DV01 5359.88 on 1e7, residual key-rate norm 0.02 against 3847.77 unhedged
 suite usecases: 2 cases
 schedule_deep: 48 cases against QuantLib, 48 also equal to Strata PeriodicSchedule
@@ -98,7 +100,21 @@ suite hedge_deep: 12 cases
 suite rulings_b: 46 cases
 mutants: 23 deliberate errors, all caught
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
-invariants: 4388 golden cases checked, none breaks a stated invariant
+invariants: 4394 golden cases checked, none breaks a stated invariant
+invariants: 343 stage B cases checked, none breaks one
+invariants:   FX delta sign follows side: 11
+invariants:   OIS PV equals notional x (par - fixed) x annuity: 26
+invariants:   discount factors positive: 10
+invariants:   hedge cuts key-rate risk: 1
+invariants:   hedge offsets delta: 1
+invariants:   key rates sum to DV01; payers gain: 9
+invariants:   objective not negative: 19
+invariants:   periods contiguous, ends on business days: 54
+invariants:   pillars increase, discount factors positive: 40
+invariants:   points equal forward minus spot: 11
+invariants:   residual, objective and first-order conditions: 17
+invariants:   spot after trade date: 20
+invariants:   valuation carries its snapshot: 57
 fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps
 fragility: integrate-0095 error estimate 1.52e-01 against tol 1e-13
 fragility: root-0025 needs 7 Brent steps against max_iter 2; root-0026 has width 0.125 after 3 bisections against x_tol 1e-12

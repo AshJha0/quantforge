@@ -1,34 +1,70 @@
 {
-  "note": "No source runs without these fields. terms_checked says what was actually read. Raw data is never committed, whatever redistribute_raw says, until the owner reviews a source.",
+  "note": "No source runs without these fields. terms_checked says what was actually read. notice is written beside the raw files and must go with any data published. Raw data is never committed, whatever redistribute_raw says, until the owner reviews a source. This is a reading of published terms, not legal advice.",
   "sources": [
     {
       "id": "us-treasury-par-yields",
       "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{year}/all?type=daily_treasury_yield_curve&field_tdr_date_value={year}&page&_format=csv",
       "licence": "US federal government work (17 USC 105)",
       "licence_url": "https://www.usa.gov/government-copyright",
-      "terms_checked": "2026-11-06: page reached, general rule only; Treasury's own site terms not read",
+      "terms_checked": "2026-11-06: usa.gov general rule read, which warns that not everything on a federal site is a government work. Treasury's own terms not found: the policy page opened has no copyright statement",
       "attribution": "US Department of the Treasury",
       "redistribute_raw": "believed yes, unconfirmed",
+      "notice": "Source: US Department of the Treasury.",
       "enabled": true
     },
     {
       "id": "boe-sonia",
       "url": "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp?csv.x=yes&Datefrom=01/Jan/{year}&Dateto=now&SeriesCodes=IUDSOIA&CSVF=TN&UsingCodes=Y&VPD=Y&VFD=N",
-      "licence": "UK Open Government Licence, per the Bank of England Database terms",
+      "licence": "Open Government Licence v3.0, per the Bank of England legal page",
       "licence_url": "https://www.bankofengland.co.uk/legal",
-      "terms_checked": "2026-11-06: legal page read. It carves out third-party data, naming LSEG; whether SONIA is affected was not settled",
-      "attribution": "Bank of England",
-      "redistribute_raw": "unconfirmed",
+      "terms_checked": "2026-11-06: legal page read. SONIA has its own OGL attribution line, so the LSEG carve-out does not catch it. Conflict not settled: the SONIA key features page (https://www.bankofengland.co.uk/markets/sonia-benchmark/sonia-key-features-and-policies) says a direct licence is needed to redistribute SONIA data to clients, and how that fits the OGL is not confirmed",
+      "attribution": "SONIA and/or SONIA Compounded Index data licensed under the Open Government Licence v3.0 and copyright the Governor and Company of the Bank of England. The trade marks \"Bank of England\" and \"SONIA\" are registered trade marks of the Bank of England.",
+      "redistribute_raw": "no: record locally only until the Bank answers (benchmarkadministration@bankofengland.co.uk; the owner sends that message)",
+      "notice": "SONIA and/or SONIA Compounded Index data licensed under the Open Government Licence v3.0 and copyright the Governor and Company of the Bank of England. The trade marks \"Bank of England\" and \"SONIA\" are registered trade marks of the Bank of England.",
       "enabled": true
     },
     {
       "id": "ecb-reference-rates",
       "url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml",
-      "licence": "Copyright European Central Bank; reuse terms not confirmed",
-      "licence_url": "https://www.ecb.europa.eu/services/disclaimer/html/index.en.html",
-      "terms_checked": "2026-11-06: page reached, copyright line read; reuse wording not found",
+      "licence": "ESCB statistics policy: free access and free reuse if the source is quoted and the statistics, including metadata, are not modified. Third-party data excluded",
+      "licence_url": "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",
+      "terms_checked": "2026-11-06: statistics reuse policy and copyright page (https://www.ecb.europa.eu/services/disclaimer/html/index.en.html) read. Reproduce accurately, cite the ECB, and state any modification",
       "attribution": "European Central Bank",
-      "redistribute_raw": "no, until confirmed",
+      "redistribute_raw": "yes, unchanged and cited; held back from git by the rule above",
+      "notice": "Source: ECB statistics. Any modification of this data must be stated.",
+      "enabled": true
+    },
+    {
+      "id": "nyfed-sofr",
+      "url": "https://markets.newyorkfed.org/api/rates/secured/sofr/search.json?startDate={year}-01-01&endDate={year}-12-31",
+      "licence": "New York Fed Terms of Use: non-exclusive licence to use, copy and distribute, with the reference rate notice",
+      "licence_url": "https://www.newyorkfed.org/privacy/termsofuse",
+      "terms_checked": "2026-11-06: Terms of Use read, including the reference rate notice, the DTCC Solutions line and automated access. API tested with no key",
+      "attribution": "Federal Reserve Bank of New York",
+      "redistribute_raw": "yes, with the notice and the same terms passed on; held back from git by the rule above",
+      "notice": "The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of the SOFR data by QuantForge, does not sanction or endorse any particular republication, and has no liability for your use. QuantForge is not affiliated with the New York Fed. The New York Fed does not sanction, endorse, or recommend any products or services offered by QuantForge. The Secured Overnight Financing Rate (SOFR) Data are calculated using data provided under a license granted to the New York Fed by DTCC Solutions LLC (\"Solutions\"), an affiliate of The Depository Trust & Clearing Corporation. Solutions, its affiliates, and third parties from which they obtained data have no liability for the content of this material.",
+      "enabled": true
+    },
+    {
+      "id": "ecb-estr",
+      "url": "https://data-api.ecb.europa.eu/service/data/EST/B.EU000A2X2A25.WT?format=csvdata&startPeriod={year}-01-01",
+      "licence": "ESCB statistics policy: free access and free reuse if the source is quoted and the statistics, including metadata, are not modified. Third-party data excluded. The ECB says it does not charge for the rate or license its use",
+      "licence_url": "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",
+      "terms_checked": "2026-11-06: statistics reuse policy and copyright page read; the rate's own page per the stage B survey. Data API tested with no key; the survey named the Data Portal, not this endpoint",
+      "attribution": "European Central Bank",
+      "redistribute_raw": "yes, unchanged and cited; held back from git by the rule above",
+      "notice": "Source: ECB statistics. Any modification of this data must be stated.",
+      "enabled": true
+    },
+    {
+      "id": "frb-h10",
+      "url": "https://www.federalreserve.gov/releases/h10/data/FRB_h10_xml.zip",
+      "licence": "Public domain unless otherwise indicated, citation requested; non-Board material excepted",
+      "licence_url": "https://www.federalreserve.gov/disclaimer.htm",
+      "terms_checked": "2026-11-06: Board disclaimer read. Direct route tested: the release page's XML zip, 2 MB, history from 1971, no key, separate from Build Your Package. The Board says history stays available as XML on release pages (https://www.federalreserve.gov/data/data-download-fred-information.htm). No third-party marking seen, but the origin of each series was not checked",
+      "attribution": "Board of Governors of the Federal Reserve System",
+      "redistribute_raw": "yes with citation, except any third-party series; held back from git by the rule above",
+      "notice": "Source: Board of Governors of the Federal Reserve System, H.10 Foreign Exchange Rates.",
       "enabled": true
     }
   ]

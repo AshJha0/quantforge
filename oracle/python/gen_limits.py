@@ -201,8 +201,23 @@ def store_rulings():
     s.write()
 
 
+def surrogates():
+    """Ruling A4. A lone surrogate can only travel as a JSON escape, so this suite is written in ASCII."""
+    s = Suite("store_a4", "specifications/01-core/rulings.md", G)
+    s.ascii_only = True
+    bad = "x\ud800y"
+    q = "core.store.query_as_of"
+    for op, inp in ((q, {"records": [rec(1, "A", K1, K1, bad)], "as_of": K1}), (q, {"records": [rec(1, bad, K1, K1, 1.0)], "as_of": K1}), (q, {"records": [rec(1, "A", K1, K1, {"k": [bad]})], "as_of": K1}),
+                    (q, {"records": [{**rec(1, "A", K1, K1, 1.0), "note": bad}], "as_of": K1}), ("core.store.chain", {"records": [rec(1, "A", K1, K1, bad)]})):
+        s.add(op, inp, error="E_SCHEMA", cls=E, tags=["invalid", "A4"])
+    good = [rec(1, "A", K1, K1, "\U0001f600")]  # a proper pair must still pass
+    s.add("core.store.chain", {"records": good}, {"head": chain(good)[0], "hashes": chain(good)[1]}, cls=E, verified=["oracle-canon"], tags=["A4"])
+    s.write()
+
+
 def main():
     limits()
+    surrogates()
     limit_order()
     store_rulings()
 
