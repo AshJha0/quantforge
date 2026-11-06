@@ -33,6 +33,24 @@ impl Bdc {
     }
 }
 
+/// `^[1-9][0-9]{0,3}[DWMY]$`, as a count and a unit.
+pub fn parse_tenor(s: &str) -> Option<(i64, char)> {
+    if !s.is_ascii() || s.is_empty() {
+        return None;
+    }
+    let (digits, unit) = s.split_at(s.len() - 1);
+    let valid = (1..=4).contains(&digits.len())
+        && digits.bytes().all(|b| b.is_ascii_digit())
+        && !digits.starts_with('0')
+        && "DWMY".contains(unit);
+    valid.then(|| {
+        (
+            digits.parse().unwrap_or(0),
+            unit.chars().next().unwrap_or('D'),
+        )
+    })
+}
+
 pub fn easter_sunday(y: i32) -> Date {
     let a = y % 19;
     let b = y / 100;
@@ -285,7 +303,7 @@ impl Calendar {
         Ok(count)
     }
 
-    fn last_business_day(&self, y: i32, m: u32) -> Result<Date> {
+    pub fn last_business_day(&self, y: i32, m: u32) -> Result<Date> {
         self.search(Date::new(y, m, days_in_month(y, m)), -1)
     }
 

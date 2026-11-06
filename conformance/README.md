@@ -43,4 +43,4 @@ Commands per language are in `conformance/runner/implementations.json`. Build th
 
 ## Mutation
 
-`conformance/mutation/cpp_mutants.py` is the C++ harness. It swaps operators in a private copy of `cpp26/` and uses the golden cases as the test. The other languages use PIT, mutmut and cargo-mutants, as described in the guide above.
+`conformance/mutation/cpp_mutants.py` is the C++ harness. It swaps operators in a private copy of `cpp26/` and uses the golden cases as the test. Java uses PIT. Python and Rust use mutmut and cargo-mutants, and `golden_mutants.py` scores a sample of their mutants against the golden cases too. The guide above has commands and measured scores.

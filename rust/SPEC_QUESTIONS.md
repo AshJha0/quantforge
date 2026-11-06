@@ -32,3 +32,13 @@ No golden case shows these to be wrong, but the other languages may read them di
 
 - `core.root.newton`: when `f(a)` is exactly 0, the bracket shrinks by the sign of `f(b)`, so the root at `a` stays
   inside it (ruling R3 leaves this step open).
+
+## Stage B, closed at `stage-b` ddf2b18
+
+`specifications/stage-b-rulings.md` settles the stage B readings listed here earlier, and the code follows it. The
+changes of a stated choice were B0 (spot in OIS), B5, B7, B8, B9 and B10. B11 and B12 also reordered `calib.fit`.
+`hedge.solve` now gives `E_NO_CONVERGENCE` if its result fails the first-order conditions (B13).
+
+## Stage B readings
+
+- `fx.curve.implied`: the 100 limit on quote lists (B5) is read as covering `points`.

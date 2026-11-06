@@ -9,16 +9,20 @@
 #include <utility>
 
 #include "quantforge/core/calendar.hpp"
+#include "quantforge/core/calibration.hpp"
 #include "quantforge/core/compounding.hpp"
 #include "quantforge/core/data_checks.hpp"
 #include "quantforge/core/dates.hpp"
 #include "quantforge/core/daycount.hpp"
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/fx.hpp"
 #include "quantforge/core/integrate.hpp"
 #include "quantforge/core/interp.hpp"
 #include "quantforge/core/json.hpp"
 #include "quantforge/core/linalg.hpp"
 #include "quantforge/core/models.hpp"
+#include "quantforge/core/money.hpp"
+#include "quantforge/core/rates.hpp"
 #include "quantforge/core/rng.hpp"
 #include "quantforge/core/snapshot.hpp"
 #include "quantforge/core/sobol.hpp"
@@ -947,12 +951,42 @@ void op_store_chain(const In& in, Out& out) {
     out.values.end_array();
 }
 
+#include "ops_stage_b.inc"
+
 // ---- dispatch ----
 
 using Handler = void (*)(const In&, Out&);
 
 const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
+        {"calib.check_bid_ask", op_check_bid_ask},
+        {"calib.curve_report", op_curve_report},
+        {"calib.fit", op_calib_fit},
+        {"core.conventions.lookup", op_conventions_lookup},
+        {"core.units.add_money", op_add_money},
+        {"core.units.convert", op_units_convert},
+        {"core.units.round_money", op_round_money},
+        {"fx.curve.implied", op_fx_implied},
+        {"fx.forward.outright", op_fx_outright},
+        {"fx.forward.pv", op_fx_forward_pv},
+        {"fx.spot_date", op_fx_spot_date},
+        {"fx.swap.pv", op_fx_swap_pv},
+        {"hedge.solve", op_hedge_solve},
+        {"hedge.spread_cost", op_spread_cost},
+        {"rates.basis.spread", op_basis_spread},
+        {"rates.curve.discount", op_curve_discount},
+        {"rates.curve.forward", op_curve_forward},
+        {"rates.fra.pv", op_fra_pv},
+        {"rates.ois.bootstrap", op_ois_bootstrap},
+        {"rates.ois.compound", op_ois_compound},
+        {"rates.ois.pv", op_ois_pv},
+        {"rates.projection.bootstrap", op_projection_bootstrap},
+        {"rates.schedule.generate", op_schedule},
+        {"rates.swap.pv", op_swap_pv},
+        {"risk.cashflows", op_cashflows},
+        {"risk.ois.dv01", op_ois_dv01},
+        {"usecase.fx_hedge", op_usecase_fx},
+        {"usecase.rates_hedge", op_usecase_rates},
         {"core.calendar.add_business_days", op_add_business_days},
         {"core.calendar.add_tenor", op_add_tenor},
         {"core.calendar.adjust", op_adjust},

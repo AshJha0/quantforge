@@ -188,7 +188,7 @@ def business_days_between(name: str, start: date, end: date) -> int:
     return count
 
 
-def _last_business_day(name: str, year: int, month: int) -> date:
+def last_business_day(name: str, year: int, month: int) -> date:
     return _search(name, date(year, month, _cal.monthrange(year, month)[1]), -_DAY)
 
 
@@ -213,6 +213,6 @@ def add_tenor(name: str, d: date, tenor: str, convention: str, end_of_month: boo
         if convention == "UNADJUSTED":
             if d.day == _cal.monthrange(d.year, d.month)[1]:
                 return date(year, month, target_last)
-        elif d >= _last_business_day(name, d.year, d.month):
-            return _last_business_day(name, year, month)
+        elif d >= last_business_day(name, d.year, d.month):
+            return last_business_day(name, year, month)
     return adjust(name, date(year, month, min(d.day, target_last)), convention)

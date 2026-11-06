@@ -103,9 +103,16 @@ Date plain_preceding(Calendar c, Date d) {
     return d;
 }
 
+}  // namespace
+
 Date last_business_day(Calendar c, int y, unsigned m) { return plain_preceding(c, last_of_month(y, m)); }
 
-}  // namespace
+Date add_months(Date d, int months) {
+    const int total = year_of(d) * 12 + int(month_of(d)) - 1 + months;
+    const int y = total / 12;
+    const unsigned m = unsigned(total % 12) + 1;
+    return make_date(y, m, std::min(day_of(d), day_of(last_of_month(y, m))));
+}
 
 void check_calendar_range(Date d) {
     const int y = year_of(d);

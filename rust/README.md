@@ -1,7 +1,6 @@
 # Rust implementation
 
-Stage A of QuantForge in Rust 1.99.1, edition 2024, written from `specifications/01-core/` and
-`specifications/cli-contract.md`. There are no third-party crates.
+Stages A and B of QuantForge in Rust 1.99.1, edition 2024, written from `specifications/` alone. There are no third-party crates.
 
 - `crates/quantforge-core`: the library, one module per spec.
 - `crates/quantforge-cli`: the `quantforge` executable and the test function registry.
