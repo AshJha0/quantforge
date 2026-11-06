@@ -27,8 +27,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 9.657277034801286e-10,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {
@@ -52,8 +52,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-07,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 3.862910813920514e-06,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {
@@ -77,8 +77,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 2.0954033500985374e-10,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {
@@ -102,8 +102,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-07,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 8.38161340039415e-07,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {
@@ -127,8 +127,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 3.2343159261927216e-09,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {
@@ -152,8 +152,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-07,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 1.2937263704770887e-05,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {
@@ -177,8 +177,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 7.588478516706499e-11,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {
@@ -202,8 +202,8 @@
    ],
    "tags": [],
    "tolerance_limit": {
-    "absolute": 1e-07,
-    "reason": "rounding of about eps/h or eps/h^2"
+    "absolute": 3.0353914066825995e-07,
+    "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"
    }
   },
   {

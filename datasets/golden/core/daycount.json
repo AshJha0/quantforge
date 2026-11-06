@@ -15470,7 +15470,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15494,7 +15495,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15543,7 +15545,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15567,7 +15570,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15591,7 +15595,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15640,7 +15645,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15664,7 +15670,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15688,7 +15695,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15712,7 +15720,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15736,7 +15745,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15760,7 +15770,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15784,7 +15795,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -15808,7 +15820,8 @@
    "tolerance_class": "simple_analytic",
    "verified_by": [
     "exact-rational",
-    "quantlib-1.44"
+    "quantlib-1.44",
+    "strata-2.12.78"
    ],
    "tags": []
   },
@@ -32213,14 +32226,12 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "year_fraction": -0.002777777777777778
+     "year_fraction": 0.0
     }
    },
    "tolerance_class": "simple_analytic",
    "verified_by": [
-    "exact-rational",
-    "quantlib-1.44",
-    "strata-2.12.78"
+    "exact-rational"
    ],
    "tags": []
   },
@@ -38079,6 +38090,346 @@
    ],
    "tags": [
     "invalid"
+   ]
+  },
+  {
+   "case_id": "daycount-1742",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-02-29",
+    "end": "2024-02-29",
+    "termination": "2024-02-29"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1743",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-02-29",
+    "end": "2024-02-29",
+    "termination": "2099-12-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1744",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_PLUS_360",
+    "start": "2024-02-29",
+    "end": "2024-02-29"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1745",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2023-02-28",
+    "end": "2023-02-28",
+    "termination": "2023-02-28"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1746",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2023-02-28",
+    "end": "2023-02-28",
+    "termination": "2099-12-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1747",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_PLUS_360",
+    "start": "2023-02-28",
+    "end": "2023-02-28"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1748",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-01-31",
+    "end": "2024-01-31",
+    "termination": "2024-01-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1749",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-01-31",
+    "end": "2024-01-31",
+    "termination": "2099-12-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1750",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_PLUS_360",
+    "start": "2024-01-31",
+    "end": "2024-01-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1751",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-03-31",
+    "end": "2024-03-31",
+    "termination": "2024-03-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1752",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-03-31",
+    "end": "2024-03-31",
+    "termination": "2099-12-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1753",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_PLUS_360",
+    "start": "2024-03-31",
+    "end": "2024-03-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1754",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-01-30",
+    "end": "2024-01-30",
+    "termination": "2024-01-30"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1755",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_360_ISDA",
+    "start": "2024-01-30",
+    "end": "2024-01-30",
+    "termination": "2099-12-31"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
+   ]
+  },
+  {
+   "case_id": "daycount-1756",
+   "operation": "core.daycount.year_fraction",
+   "inputs": {
+    "convention": "THIRTY_E_PLUS_360",
+    "start": "2024-01-30",
+    "end": "2024-01-30"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "year_fraction": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary"
    ]
   }
  ]

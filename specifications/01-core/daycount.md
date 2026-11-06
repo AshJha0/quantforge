@@ -27,7 +27,8 @@ Checks, in order:
    A long stub spans more than one notional period, so the caller splits it and adds the parts.
    Schedules that do this are a stage B item.
 
-`start == end` gives 0 for every convention.
+`start == end` gives 0 for every convention, including `ONE_ONE`. This test comes first, before any day-number
+adjustment: without it, `THIRTY_E_360_ISDA` on 2024-02-29 would give -1/360 and `THIRTY_E_PLUS_360` on a 31st 1/360.
 
 ## Definitions
 
@@ -65,8 +66,8 @@ Let `n` be the largest integer with `back(n) >= start`, and `e = back(n)` (`e = 
 The result is `n + (e - start) / d`, where `d` is 366 if a 29 February lies in `[start, e)`, else 365:
 the first day counts and the last does not.
 
-The first rule is the ISDA text on counting back from 28 February. QuantLib follows it and Strata
-does not, so Strata results differ for those dates (see "Known library differences").
+The first rule is the ISDA text on counting back from 28 February. QuantLib follows it. Strata rejects it on
+purpose (see "Known library differences").
 
 ### 30/360 family
 
@@ -102,12 +103,21 @@ checked against QuantLib and Strata wherever each has the convention.
 
 ## Known library differences
 
-Measured by `oracle/python/gen_dates.py` and recorded in `oracle/REPORT.md`:
-- Strata does not apply the 28 February rule in `ACT_ACT_AFB`.
-- Strata gives 1 for `ONE_ONE` when `start = end`. Here it is 0, like every other convention.
-- Strata differs on 13 tested `ACT_ACT_ICMA` periods, where QuantLib agrees with this file. The cause was not
-  investigated and may lie in how the oracle passes schedule data to Strata. Those cases list only the
-  sources that agree in `verified_by`.
+Measured by `oracle/python/gen_dates.py`, which stops if a difference appears that is not explained here. Results are in
+`oracle/REPORT.md`.
+
+- `ACT_ACT_AFB`, Strata, 11 tested pairs, all ending on 28 February. Strata's documentation says it does not follow
+  the ISDA clarification, as the rule gives one day two days' interest and the next none: 2004-02-28 to 2008-02-28
+  and to 2008-02-29 both give 4 + 1/366. It rolls back from 29 February instead. The oracle reproduces all 11 from
+  Strata's rule. This spec keeps the ISDA text, as QuantLib does.
+- `ONE_ONE`, Strata, 6 tested pairs, all with `start = end`. Strata documents 1/1 as always 1, which matches the bare
+  ISDA 4.16(a) wording. Here it is 0, so that an empty period accrues nothing.
+- `THIRTY_E_360_ISDA`, QuantLib 1.44 and Strata 2.12.78: with `start = end = termination` on 29 February both return -1/360. Here it is 0,
+  because a negative accrual on an empty period has no meaning.
+- QuantLib has no `ACT_365L`, `NL_365` or `THIRTY_E_PLUS_360`.
+
+An earlier report listed 13 `ACT_ACT_ICMA` differences. They came from the oracle passing Strata a maturity equal to the
+period end, which Strata reads as a final period counted forward from `start`. With that fixed, Strata agrees.
 
 ## Out of scope
 
