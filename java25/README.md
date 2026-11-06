@@ -1,5 +1,25 @@
 # Java 25 implementation
 
-Requires JDK 25 and Maven. Run `mvn test`.
+Stage A of QuantForge, written from `specifications/01-core/` and `specifications/cli-contract.md`. It uses JDK 25
+final features only, and has no runtime dependencies.
 
-Use primitive arrays and measured allocation-aware designs in numerical hot paths. Apply virtual threads or structured concurrency only where the workload benefits; do not assume they improve CPU-bound numerical kernels.
+```bash
+mvn -B test
+mvn -B package -DskipTests
+java -jar target/quantforge-cli.jar version
+```
+
+From the repository root, after packaging:
+
+```bash
+python conformance/runner/runner.py --impl java
+```
+
+`org.quantforge.core` holds the maths. `org.quantforge.cli` holds the JSON contract and the test-function registry.
+`SobolData.java` carries the direction numbers as code, because the CLI reads no file for its numbers.
+
+The conformance run does not fully pass: 21 golden cases contradict the spec text and are left failing. They are
+listed in `SPEC_QUESTIONS.md`. `GoldenSuiteTest` holds them by id, and fails if one of them starts to agree.
+
+Use primitive arrays and measured allocation-aware designs in numerical hot paths. Do not assume virtual threads
+improve CPU-bound numerical kernels.
