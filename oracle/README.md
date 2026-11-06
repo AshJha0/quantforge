@@ -35,6 +35,7 @@ the human review at the end of the project.
 | Monte Carlo | A | Analytic, independent replay | In use |
 | COS | A | Analytic, QuantLib Heston | In use |
 | Data checks, timezones | A | Hand cases, `zoneinfo` | In use |
+| As-of store, replay | A | Hand rows, own canonical form | In use. Single source |
 | Rates and vol curves, pricing | B-E | QuantLib, Strata | Planned |
 | CDS | D | ISDA CDS Standard Model | Planned; licence text to read first |
 | Exposure, xVA | G | Open Source Risk Engine | Planned; licence to verify |

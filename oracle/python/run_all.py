@@ -3,11 +3,12 @@ import check_invariants
 import gen_data
 import gen_dates
 import gen_numerics
+import gen_rulings_store
 import gen_random
 import gen_stats_engines
 from qf_oracle.common import REPORT, ROOT
 
-for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data):
+for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data, gen_rulings_store):
     g.main()
 check_invariants.main()
 head = ["# Oracle run report", "", "Written by `oracle/python/run_all.py`. Every line comes from that run.", "", "```"]

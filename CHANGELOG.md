@@ -10,3 +10,4 @@
 
 ## Stage A, spec and oracle (unreleased)
 - CLI contract, core specifications, schemas, oracle with golden cases, neutral runner tested on a stub CLI.
+- Rulings on silent spec points, as-of store spec, recorder and forward log, root documents, diagrams, exercises 1 to 3 with solutions, tickets W01 to W05, traceability table.

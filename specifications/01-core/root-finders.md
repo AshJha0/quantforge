@@ -34,7 +34,8 @@ bisection fallback, keeping the best point in `b` and a bracket `[b, c]`. Per it
 1. If `|f(c)| < |f(b)|`, swap `b` and `c`, and set `a` to the old `b`, so that `b` is the best point.
 2. Stop with `X_TOL` if `|xm| <= tol1`, with `EXACT` if `f(b) = 0`, with `F_TOL` if `|f(b)| <= f_tol`.
 3. If the last step was at least `tol1` and `|f(a)| > |f(b)|`, try a secant step (when `a = c`) or
-   inverse quadratic. Accept it only if `2|p| < min(3 |xm q| - |tol1 q|, |e q|)`. Otherwise bisect.
+   inverse quadratic, giving `p/q`. Make `p >= 0` by flipping the sign of `q` if needed, as Brent does. Accept the step only
+   if `2 p < min(3 xm q - |tol1 q|, |e q|)`, signed, so that a step the wrong way is rejected. Otherwise bisect.
 4. Move `b` by the step, or by `tol1` at least, in the direction of `xm`. Keep the sign change in `[b, c]`.
 
 `eps` is 2^-52. Return `b`.

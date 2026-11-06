@@ -150,6 +150,8 @@ def g_region(g0, g1, x):
             return g1 + (g0 - g1) * ((eta - x) / eta) ** 2, g1 * x + (g0 - g1) * (eta ** 3 - (eta - x) ** 3) / (3 * eta ** 2)
         return g1, g1 * x + (g0 - g1) * eta / 3
     eta = g1 / (g1 + g0)
+    if eta == 1 and x == 1:  # rulings.md P4
+        return g1, mp.mpf(0)
     A = -g0 * g1 / (g0 + g1)
     if x < eta:
         return A + (g0 - A) * ((eta - x) / eta) ** 2, A * x + (g0 - A) * (eta ** 3 - (eta - x) ** 3) / (3 * eta ** 2)

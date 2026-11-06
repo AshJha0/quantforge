@@ -14,3 +14,6 @@ Implement continuous and periodic compounding conversions and discount factors. 
 - Normal, boundary and invalid cases.
 - Expected output and independent verification method.
 - Complexity/performance note where relevant.
+
+## Data and solution
+Input: `data/ex-002-rates.csv`. Try it first, then see `solutions/EX-002.md`.

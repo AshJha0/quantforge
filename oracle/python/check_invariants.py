@@ -55,7 +55,7 @@ def check(c):
     elif op == "core.stats.covariance":
         assert o["correlation"] is None or abs(o["correlation"]) <= 1
     elif op == "core.stats.ols":
-        assert 0 <= o["r_squared"] <= 1
+        assert o["r_squared"] is None or 0 <= o["r_squared"] <= 1
     elif op == "core.ts.ewma_variance":
         assert all(v >= 0 for v in o["variance"])
     elif op in ("core.pde.bs_european", "core.cos.european", "core.mc.gbm_european"):

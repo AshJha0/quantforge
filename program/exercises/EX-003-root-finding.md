@@ -14,3 +14,6 @@ Implement bisection and a safeguarded Newton method. Return structured convergen
 - Normal, boundary and invalid cases.
 - Expected output and independent verification method.
 - Complexity/performance note where relevant.
+
+## Data and solution
+Input: `data/ex-003-functions.csv`. Try it first, then see `solutions/EX-003.md`.

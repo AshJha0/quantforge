@@ -57,6 +57,9 @@ suite snapshot: 21 cases
 suite data_checks: 27 cases
 time: rule table matches zoneinfo at 2717520 half-hour instants, 2007 to 2037, five zones
 suite time: 123 cases
+suite rulings: 39 cases
+suite store: 21 cases
+store: expected rows hand-written; hashes from the oracle canonical form, one source by nature
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
-invariants: 4241 golden cases checked, none breaks a stated invariant
+invariants: 4301 golden cases checked, none breaks a stated invariant
 ```

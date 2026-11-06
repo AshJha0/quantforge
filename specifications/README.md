@@ -17,3 +17,5 @@ Domains:
 10. `10-execution` — execution analytics
 11. `11-research` — systematic research and backtesting
 12. `12-platform` — production infrastructure and governance
+
+Domain 01 has real specs. Domains 02 to 12 hold capability lists only: their real specs are written before each later stage, with numeric targets first. `02-curves/stage-b-targets.md` is the first of these.

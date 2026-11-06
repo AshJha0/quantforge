@@ -1,6 +1,8 @@
 # CLI contract
 
-Version 1.0.0. Applies identically to the Java, C++, Python and Rust implementations.
+Version 1.1.0. `01-core/rulings.md` is part of this contract, and settles points it leaves silent.
+The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
+ Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
 runner in `conformance/` only ever sees that JSON. Nothing else about an implementation is part of
@@ -9,7 +11,7 @@ the contract.
 ## Invocation
 
 Each implementation builds one executable (or launcher) called `quantforge`. The runner learns how
-to start it from `conformance/runner/implementations.yaml`.
+to start it from `conformance/runner/implementations.json`.
 
 | Command | Behaviour |
 |---|---|
@@ -157,6 +159,7 @@ errors. Stage A:
 | `core.cos.*` | `01-core/cos.md` |
 | `core.data.*` | `01-core/data-checks.md` |
 | `core.time.*` | `01-core/timezone-and-cutoff.md` |
+| `core.store.*` | `01-core/asof-store.md` |
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.
