@@ -309,40 +309,40 @@ fn parameter_count(m: Model) -> usize {
 
 pub fn fit(i: &FitInputs) -> Result<Fit> {
     let n = parameter_count(i.model);
-    if i.x.len() != i.y.len() {
-        return fail("E_INPUT", "x and y differ in length");
+    let rosenbrock = i.model == Model::Rosenbrock;
+    let weights = match (&i.weights, rosenbrock) {
+        (Some(w), false) => w.clone(),
+        _ => vec![1.0; i.x.len()],
+    };
+    let prior = i.prior.clone().unwrap_or_else(|| vec![0.0; n]);
+    let lower = i
+        .lower
+        .clone()
+        .unwrap_or_else(|| vec![f64::NEG_INFINITY; n]);
+    let upper = i.upper.clone().unwrap_or_else(|| vec![f64::INFINITY; n]);
+    if i.x.len() != i.y.len()
+        || i.start.len() != n
+        || weights.len() != i.x.len()
+        || prior.len() != n
+        || lower.len() != n
+        || upper.len() != n
+    {
+        return fail("E_INPUT", "an input has the wrong length");
     }
-    if i.start.len() != n {
-        return fail("E_INPUT", "start has the wrong length");
+    if (i.lower.is_some() || i.upper.is_some()) && i.method != Method::LevenbergMarquardt {
+        return fail("E_INPUT", "bounds need LEVENBERG_MARQUARDT");
     }
-    let weights = i.weights.clone().unwrap_or_else(|| vec![1.0; i.x.len()]);
-    if weights.len() != i.x.len() {
-        return fail("E_INPUT", "weights have the wrong length");
+    if lower.iter().zip(&upper).any(|(a, b)| a > b) {
+        return fail("E_INPUT", "lower is above upper");
+    }
+    if i.max_iter < 1 {
+        return fail("E_INPUT", "max_iter must be at least 1");
     }
     if weights.iter().any(|w| *w < 0.0) {
         return fail("E_DOMAIN", "a weight is negative");
     }
     if i.regularisation < 0.0 {
         return fail("E_DOMAIN", "regularisation is negative");
-    }
-    let prior = i.prior.clone().unwrap_or_else(|| vec![0.0; n]);
-    if prior.len() != n {
-        return fail("E_INPUT", "prior has the wrong length");
-    }
-    let bounded = i.lower.is_some() || i.upper.is_some();
-    if bounded && i.method != Method::LevenbergMarquardt {
-        return fail("E_INPUT", "bounds need LEVENBERG_MARQUARDT");
-    }
-    let lower = i
-        .lower
-        .clone()
-        .unwrap_or_else(|| vec![f64::NEG_INFINITY; n]);
-    let upper = i.upper.clone().unwrap_or_else(|| vec![f64::INFINITY; n]);
-    if lower.len() != n || upper.len() != n || lower.iter().zip(&upper).any(|(a, b)| a > b) {
-        return fail("E_INPUT", "bounds are malformed");
-    }
-    if i.max_iter < 1 {
-        return fail("E_INPUT", "max_iter must be at least 1");
     }
     let q = Problem { i, weights, prior };
     let p = i.start.clone();

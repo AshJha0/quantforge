@@ -33,18 +33,12 @@ No golden case shows these to be wrong, but the other languages may read them di
 - `core.root.newton`: when `f(a)` is exactly 0, the bracket shrinks by the sign of `f(b)`, so the root at `a` stays
   inside it (ruling R3 leaves this step open).
 
+## Stage B, closed at `stage-b` ddf2b18
+
+`specifications/stage-b-rulings.md` settles the stage B readings listed here earlier, and the code follows it. The
+changes of a stated choice were B0 (spot in OIS), B5, B7, B8, B9 and B10. B11 and B12 also reordered `calib.fit`.
+`hedge.solve` now gives `E_NO_CONVERGENCE` if its result fails the first-order conditions (B13).
+
 ## Stage B readings
 
-No stage B golden case conflicted with a spec. These are points the specs leave open.
-
-- `rates.schedule.generate`: a negative `payment_lag` is `E_INPUT`.
-- `rates.projection.*`, `rates.swap.pv`, `rates.basis.spread`: schedules use `end_of_month` false, as the spec names
-  no end-of-month rule for them. `spot` is `as_of` plus 2 `USGS` business days, with no `FOLLOWING` step first.
-- `rates.curve.*`: an empty `pillars` is `E_INPUT`.
-- `fx.forward.pv`, `fx.swap.pv`: no `E_DATE_ORDER` on a value date before spot, as only `outright` names it.
-- `fx.curve.implied`: nodes out of order are `E_INPUT`. A tenor may use any unit `add_tenor` accepts.
-- `hedge.solve`: a non-positive weight is `E_DOMAIN`. Stage B's limits name quotes and pillars for `rates.*`, `risk.*`
-  and `usecase.*`, so `calib.curve_report` follows them too, and `fx.*` curves have only the general array limit.
-- `calib.fit`: `lower` above `upper`, a wrong-length `prior`, `weights` or bound, and `max_iter < 1` are `E_INPUT`.
-  `x` and `y` may be left out for `ROSENBROCK`.
-- `rates.ois.compound`: an empty `rates` is `E_INPUT`, and a `denominator` other than 360 or 365 is `E_SCHEMA` (G5).
+- `fx.curve.implied`: the 100 limit on quote lists (B5) is read as covering `points`.

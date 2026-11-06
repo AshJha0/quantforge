@@ -145,28 +145,34 @@ fn repricing(e: f64) -> Json {
     obj([("max_repricing_error", e.into())])
 }
 
-fn fx_market_input(i: &Inputs) -> Result<(FxPair, f64, Date, CurveInput, CurveInput)> {
+fn fx_market_input(i: &Inputs) -> Result<FxInput> {
     Ok((
         pair(i)?,
         i.f64("spot")?,
         i.date("as_of")?,
         curve_input(i, "base_curve")?,
         curve_input(i, "quote_curve")?,
+        snapshot_id(i)?,
     ))
 }
 
-type FxInput = (FxPair, f64, Date, CurveInput, CurveInput);
+type FxInput = (FxPair, f64, Date, CurveInput, CurveInput, Option<String>);
 
 fn fx_market(m: FxInput) -> Result<FxMarket> {
     if m.1 <= 0.0 {
         return fail("E_DOMAIN", "spot must be positive");
     }
+    let (base, quote) = (Curve::new(&m.3)?, Curve::new(&m.4)?);
+    if base.as_of != m.2 || quote.as_of != m.2 {
+        return fail("E_INPUT", "a curve's as_of differs");
+    }
     Ok(FxMarket {
         pair: m.0,
         spot: m.1,
         as_of: m.2,
-        base: Curve::new(&m.3)?,
-        quote: Curve::new(&m.4)?,
+        base,
+        quote,
+        data_version: m.5,
     })
 }
 
@@ -458,6 +464,9 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 buy: far_buy,
             };
             let m = fx_market(m)?;
+            if near.value_date >= far.value_date {
+                return fail("E_DATE_ORDER", "near_date is not before far_date");
+            }
             let ((a, b), (c, d)) = (m.leg(&near)?, m.leg(&far)?);
             let v = m.valuation(a + c, "FX_SWAP_DISCOUNTING");
             plain(obj([
@@ -469,7 +478,11 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let m = fx_market_input(i)?;
             let mut points = Vec::new();
             for p in items(i, "points")? {
-                points.push((tenor(&p, "tenor")?, p.f64("points")?));
+                let t = tenor(&p, "tenor")?;
+                if t.1 != 'M' && t.1 != 'Y' {
+                    return p.fail("tenor", "expected months or years");
+                }
+                points.push((t, p.f64("points")?));
             }
             let rows: Vec<Json> = fx_market(m)?
                 .implied(&points)?
@@ -504,14 +517,20 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let (t, q, m) = (i.date("as_of")?, ois_quotes(i)?, interpolation(i)?);
             i.gate()?;
             let r = risk::curve_report(&c, t, &q, m)?;
+            let tenors: Vec<String> = q
+                .iter()
+                .map(|x| format!("{}{}", x.tenor.0, x.tenor.1))
+                .collect();
             Ok(Outcome {
                 outputs: obj([
                     ("jacobian", r.jacobian.into()),
                     ("condition_number", r.condition_number.into()),
                 ]),
                 diagnostics: obj([
+                    ("inputs", tenors.into()),
                     ("status", "CONVERGED".into()),
                     ("max_repricing_error", r.max_repricing_error.into()),
+                    ("tolerance_breaches", Json::Arr(Vec::new())),
                 ]),
             })
         }

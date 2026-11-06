@@ -69,7 +69,7 @@ fn calendar(c: &Overnight) -> Calendar {
 impl OisLegs {
     pub fn new(c: &Overnight, as_of: Date, tenor: (i64, char)) -> Result<OisLegs> {
         let cal = calendar(c);
-        let spot = cal.add_business_days(cal.adjust(as_of, Bdc::Following)?, c.spot_lag)?;
+        let spot = cal.add_business_days(as_of, c.spot_lag)?;
         let (n, unit) = tenor;
         let months = match unit {
             'M' => n,

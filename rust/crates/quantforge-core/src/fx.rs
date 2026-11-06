@@ -35,6 +35,7 @@ pub struct FxMarket {
     pub as_of: Date,
     pub base: Curve,
     pub quote: Curve,
+    pub data_version: Option<String>,
 }
 
 /// Instrument: one forward leg.
@@ -78,6 +79,9 @@ impl FxMarket {
 
     /// Returns `(pv, fx_delta)` for one leg.
     pub fn leg(&self, l: &FxLeg) -> Result<(f64, f64)> {
+        if l.value_date < self.spot_settlement()? {
+            return fail("E_DATE_ORDER", "value_date is before spot");
+        }
         let f = self.forward(l.value_date)?;
         let d = self.quote.discount(l.value_date)?;
         let sign = if l.buy { 1.0 } else { -1.0 };
@@ -92,7 +96,7 @@ impl FxMarket {
             pv,
             currency: self.pair.quote.to_string(),
             model,
-            data_version: None,
+            data_version: self.data_version.clone(),
             conventions: self.pair.id.to_string(),
             as_of: self.as_of,
         }

@@ -19,6 +19,13 @@ fn alpha(day_count: &str, s: Date, e: Date) -> Result<f64> {
     year_fraction(day_count, s, e, &DayCountInputs::default())
 }
 
+fn check_months(months: i64) -> Result<()> {
+    if !(1..=1200).contains(&months) {
+        return fail("E_INPUT", "months must be 1 to 1200");
+    }
+    Ok(())
+}
+
 fn spot(as_of: Date) -> Result<Date> {
     calendar().add_business_days(as_of, TERM_SPOT_LAG)
 }
@@ -36,6 +43,7 @@ pub struct SwapLegs {
 
 impl SwapLegs {
     pub fn new(as_of: Date, months: i64) -> Result<SwapLegs> {
+        check_months(months)?;
         let (cal, s) = (calendar(), spot(as_of)?);
         let end = add_months(s, months);
         Ok(SwapLegs {
@@ -95,6 +103,7 @@ pub fn bootstrap(
     for q in quotes {
         let (item, rate, date) = match *q {
             ProjectionQuote::Deposit { months, rate } => {
+                check_months(months)?;
                 let e = plus_months(s, months)?;
                 (Instrument::Simple(s, e), rate, e)
             }

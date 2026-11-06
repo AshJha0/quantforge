@@ -142,6 +142,9 @@ pub fn solve_hedge(
             }
         }
     }
+    if !conditions_hold(&q, &c, &pen, &x) {
+        return fail("E_NO_CONVERGENCE", "first-order conditions do not hold");
+    }
     let residual: Vec<f64> = (0..rows)
         .map(|r| b[r] + (0..n).map(|i| a[r][i] * x[i]).sum::<f64>())
         .collect();
