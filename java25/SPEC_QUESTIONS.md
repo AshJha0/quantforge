@@ -36,6 +36,35 @@ code follows those rulings.
 
 None.
 
+## Stage B: closed by `stage-b-rulings.md` and the corrected specs (ddf2b18)
+
+| # | Point | Outcome |
+|---|---|---|
+| 14 | `end_of_month` on projection schedules | Closed: false, as built |
+| 15 | Spot on a non-business `as_of` | Closed: counts from `as_of` everywhere (B0). The OIS code changed |
+| 16 | FRA and deposit end dates | Closed: as built |
+| 17 | `snapshot_id` | Closed: optional wherever a `valuation` is returned (B10). The FX code changed |
+| 18 | FX dates before spot | Closed: `E_DATE_ORDER`, and `near_date >= far_date` too (B9). The code changed |
+| 19 | `fx.curve.implied` tenors | Closed: `M` and `Y` only (B7). The code changed |
+| 20 | FX curve `as_of` | Closed: `E_INPUT` (B8). The code changed |
+| 21 | `rates.curve.forward` `day_count` | Closed: `E_SCHEMA` (B4) |
+| 22 | `hedge.solve` order | Closed: as built (B13). A descent that fails is now `E_NO_CONVERGENCE` |
+| 23 | `payment_lag` | Closed: as built (B2) |
+| 24 | Empty `compound` arrays | Closed: as built (B6) |
+| 25 | `calib.fit` model and method | Closed: any pairing (B12). `x`, `y` may be left out for `ROSENBROCK`, and weights do not apply to it. The code changed |
+| 26 | `calib.fit` checks | Closed (B11). Length checks now come before domain checks, and `max_iter < 1` is `E_INPUT` |
+| 27 | `curve_report` inputs | Closed: tenors, and `tolerance_breaches` is an array (B17). The code changed |
+| 28 | Condition number accuracy | Closed: now from singular values by one-sided Jacobi (B17) |
+| 29 | `hedge_tenors` limit | Closed: as built (B14) |
+| 30 | Solve method | Closed: either (B16) |
+
+## Open points
+
+| # | Place | Choice |
+|---|---|---|
+| 31 | `projection-and-fra.md`, FRA `start_months` | The 1 to 1200 range names `months` and `tenor_months`. `start_months` is held to 0 to 1200, with `E_INPUT` outside |
+| 32 | `fx.md`, order of `spot`, curve checks and `as_of` match | `spot` `E_DOMAIN`, then the curves' own checks, then the `as_of` match, then value dates |
+
 ## Small document points
 
 - `Normal.java` does not use `erfc` (ruling S5 allows this). It works directly in `x`, because
