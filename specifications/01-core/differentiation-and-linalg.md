@@ -10,7 +10,10 @@ Output: `value`.
 - Order 1: `(f(x+h) - f(x-h)) / (2h)`
 - Order 2: `(f(x+h) - 2 f(x) + f(x-h)) / h^2`
 
-Rounding error grows as `h` shrinks, about `eps/h` and `eps/h^2`. Cases use `h` near `1e-5` and `1e-4`.
+Rounding error grows as `h` shrinks. Any correct way of writing `f` is accepted, such as `x*x*x*x*x` or `pow(x, 5)`, and
+these differ by a few ulps of the largest term. With `eps = 2^-52` and `M` the size of the largest terms in `f`, plus
+`|x f'(x)|` for the rounding of `x + h`, each case's limit is `8 eps M / h` for order 1 and `32 eps M / h^2` for
+order 2. For `poly5` at `x = 1.3`, `h = 1e-4`, that is about 1e-5. A wrong stencil misses by far more.
 
 ## Linear algebra
 
@@ -27,5 +30,5 @@ Eigenvectors are not compared, because their signs are arbitrary.
 
 ## Acceptance
 
-Class `quadrature` for differences, with oracle replay at 50 digits of the true derivative and a per-case
-limit. Class `interpolation` for linear algebra, against mpmath at 50 digits.
+Class `quadrature` for differences, with oracle replay of the stencil at 50 digits and the per-case limit
+above. Class `interpolation` for linear algebra, against mpmath at 50 digits.
