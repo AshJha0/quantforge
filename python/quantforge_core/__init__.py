@@ -1,1 +1,1 @@
-"""QuantForge shared Python reference primitives."""
+"""QuantForge Python implementation."""

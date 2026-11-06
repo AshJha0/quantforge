@@ -1,4 +1,9 @@
 # Changelog
 
 ## Unreleased
-- Initial QuantForge repository scaffold and 36-week implementation programme.
+
+### Changed
+- Reworked the starter scaffold: four equal implementations, oracle decision, full MIT text, pinned toolchains and actions, date-based Rust day counts, Catch2 tests for C++, tolerance policy with no global default.
+
+### Removed
+- 36-week roadmap, epics and generated manifest.

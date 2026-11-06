@@ -32,7 +32,7 @@ Define the scope and shared contract for the production infrastructure and gover
 - [ ] Domain contract reviewed and versioned.
 - [ ] Analytical/simple benchmark cases independently checked.
 - [ ] Normal, boundary, invalid and stress inputs covered.
-- [ ] Python reference and applicable production implementations conform.
+- [ ] All four implementations conform, and the named oracle passes.
 - [ ] Numerical diagnostics and failure modes are explicit.
 - [ ] Deterministic fixtures and provenance are recorded.
 - [ ] Performance baseline exists where relevant.

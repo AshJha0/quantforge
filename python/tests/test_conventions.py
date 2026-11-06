@@ -1,6 +1,9 @@
 from datetime import date
+
 import pytest
+
 from quantforge_core.conventions import act_360, act_365f
+
 
 def test_act_360():
     assert act_360(date(2025, 1, 1), date(2025, 1, 31)).value == pytest.approx(30 / 360)

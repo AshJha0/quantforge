@@ -1,7 +1,9 @@
-# Python reference implementation
+# Python implementation
 
-Install: `python -m pip install -e ".[dev]"`
+One of four equal implementations; it is not a reference for the others.
 
-Test: `python -m pytest`
+Install: `uv sync`
 
-CI tracks the latest stable Python 3.x release. For reproducible research, record the exact interpreter and dependency lock used for each published result.
+Test: `uv run pytest`
+
+The interpreter is pinned in `.python-version` and dependencies in `uv.lock`.

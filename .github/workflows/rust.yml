@@ -1,19 +1,25 @@
-name: Rust stable
+name: Rust
 on:
   push:
+    branches: [main]
+    paths: ['rust/**', '.github/workflows/rust.yml']
   pull_request:
+    paths: ['rust/**', '.github/workflows/rust.yml']
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: rust
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-          components: rustfmt, clippy
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup show
       - run: cargo fmt --all -- --check
-        working-directory: rust
       - run: cargo clippy --workspace --all-targets -- -D warnings
-        working-directory: rust
       - run: cargo test --workspace
-        working-directory: rust

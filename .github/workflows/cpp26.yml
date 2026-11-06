@@ -1,19 +1,35 @@
 name: C++26
 on:
   push:
+    branches: [main]
+    paths: ['cpp26/**', '.github/workflows/cpp26.yml']
   pull_request:
+    paths: ['cpp26/**', '.github/workflows/cpp26.yml']
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  gcc:
+    runs-on: ubuntu-24.04
+    container: gcc:16.2
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - name: Install compiler and CMake
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++-14
-      - name: Configure
-        run: cmake -S cpp26 -B build/cpp26 -G Ninja -DCMAKE_CXX_COMPILER=g++-14
-      - name: Build
-        run: cmake --build build/cpp26 --parallel
-      - name: Test
-        run: ctest --test-dir build/cpp26 --output-on-failure
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: apt-get update && apt-get install -y cmake ninja-build
+      - run: cmake -S cpp26 -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build --parallel
+      - run: ctest --test-dir build --output-on-failure
+  clang:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: |
+          wget -q https://apt.llvm.org/llvm.sh
+          sudo bash llvm.sh 23
+          sudo apt-get install -y ninja-build libc++-23-dev libc++abi-23-dev
+      - run: cmake -S cpp26 -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-23 -DCMAKE_CXX_FLAGS=-stdlib=libc++
+      - run: cmake --build build --parallel
+      - run: ctest --test-dir build --output-on-failure

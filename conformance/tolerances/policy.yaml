@@ -1,7 +1,4 @@
-default:
-  absolute: 1.0e-12
-  relative: 1.0e-10
-  note: "Illustrative defaults only; every production test class must define justified tolerances."
+# There is no global default: every conformance case must name one of these classes.
 classes:
   date_and_convention:
     exact: true
@@ -12,7 +9,12 @@ classes:
     absolute: 1.0e-10
     relative: 1.0e-8
   calibration:
-    absolute: 1.0e-8
-    relative: 1.0e-6
+    # Judged on repricing of the input quotes, not on fitted parameters,
+    # because languages may use different proven solvers.
+    judged_on: repricing_error
+    per_case_target_required: true
   monte_carlo:
-    method: "statistical confidence interval and fixed-seed reproducibility"
+    # Languages agree statistically unless a case fixes the common RNG in
+    # specifications/01-core/rng.md, written before Monte Carlo is coded.
+    method: "confidence interval against the oracle value"
+    common_rng_spec: "specifications/01-core/rng.md"
