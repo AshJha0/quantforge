@@ -62,7 +62,14 @@ public final class Projection {
         }
     }
 
+    private static void checkMonths(long months, long least) {
+        if (months < least || months > 1200) {
+            throw new QfError("E_INPUT", "months out of range");
+        }
+    }
+
     public static Swap swap(Conventions.RateIndex ix, LocalDate asOf, long months) {
+        checkMonths(months, 1);
         LocalDate spot = spot(ix, asOf);
         LocalDate end = spot.plusMonths(months);
         List<Schedule.Period> fixed = Schedule.generate(spot, end, ix.fixedMonths(), ix.calendar(), false, 0);
@@ -86,6 +93,7 @@ public final class Projection {
         List<ToDoubleFunction<Curve>> models = new ArrayList<>(n);
         for (int j = 0; j < n; j++) {
             Quote q = quotes.get(j);
+            checkMonths(q.months(), q.type() == QuoteType.FRA ? 0 : 1);
             target[j] = q.rate();
             if (q.type() == QuoteType.SWAP) {
                 Swap s = swap(ix, asOf, q.months());
@@ -107,6 +115,7 @@ public final class Projection {
 
     /** The amount added to an overnight leg to match the term leg, on the quarterly schedule. */
     public static double basisSpread(Curve d, Curve p, Conventions.RateIndex ix, long tenorMonths) {
+        checkMonths(tenorMonths, 1);
         LocalDate spot = spot(ix, d.asOf());
         double top = 0.0;
         double bottom = 0.0;

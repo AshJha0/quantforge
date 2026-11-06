@@ -250,15 +250,19 @@ final class StageB {
     }
 
     /** FX inputs as read; {@link #market()} applies the curves' rule checks. */
-    private record FxInput(Conventions.FxPair pair, double spot, LocalDate asOf, CurveInput base, CurveInput quote) {
+    private record FxInput(Conventions.FxPair pair, double spot, LocalDate asOf, CurveInput base, CurveInput quote,
+                           String snapshotId) {
         Pricing.FxMarket market() {
-            return new Pricing.FxMarket(pair, spot, asOf, base.build(), quote.build());
+            if (spot <= 0.0) {
+                throw new QfError("E_DOMAIN", "spot must be positive", "spot");
+            }
+            return new Pricing.FxMarket(pair, spot, asOf, base.build(), quote.build(), snapshotId);
         }
     }
 
     private static FxInput fxInput(In in) {
         return new FxInput(Conventions.pair(in.string("pair")), in.real("spot"), in.date("as_of"),
-                curve(in, "base_curve"), curve(in, "quote_curve"));
+                curve(in, "base_curve"), curve(in, "quote_curve"), in.has("snapshot_id") ? in.string("snapshot_id") : null);
     }
 
     private static Pricing.FxForward fxForward(In t) {
@@ -300,6 +304,9 @@ final class StageB {
             for (In p : in.objects("points")) {
                 String tenor = p.string("tenor");
                 Ois.checkTenor(tenor);
+                if (tenor.endsWith("D") || tenor.endsWith("W")) {
+                    throw new QfError("E_SCHEMA", "tenors are in M or Y", "points");
+                }
                 points.add(new Fx.Point(tenor, p.real("points")));
             }
             in.gate();
@@ -319,8 +326,9 @@ final class StageB {
     private static void calibration(Map<String, Function<In, Out>> table) {
         table.put("calib.fit", in -> {
             LeastSquares.Model model = in.choice("model", LeastSquares.Model.class);
-            double[] x = in.reals("x");
-            double[] y = in.reals("y");
+            boolean noData = model == LeastSquares.Model.ROSENBROCK;
+            double[] x = noData && !in.has("x") ? new double[0] : in.reals("x");
+            double[] y = noData && !in.has("y") ? new double[0] : in.reals("y");
             double[] start = in.reals("start");
             in.limit(start.length > 20, "start");
             LeastSquares.Method method = in.choice("method", LeastSquares.Method.class);
@@ -353,10 +361,11 @@ final class StageB {
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             in.gate();
             RatesRisk.CurveReport r = RatesRisk.curveReport(c, asOf, quotes, interp);
-            boolean breach = !(r.maxRepricingError() < 1e-13);
+            List<String> breaches = r.maxRepricingError() < 1e-13 ? List.of() : List.of("max_repricing_error");
             return new Out(Operations.out("jacobian", r.jacobian(), "condition_number", r.conditionNumber()).outputs(),
                     Operations.out("status", "OK", "max_repricing_error", r.maxRepricingError(),
-                            "tolerance_breach", breach, "inputs", quotes.size()).outputs());
+                            "tolerance_breaches", breaches, "inputs",
+                            quotes.stream().map(Ois.Quote::tenor).toList()).outputs());
         });
     }
 

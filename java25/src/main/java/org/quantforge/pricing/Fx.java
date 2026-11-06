@@ -8,7 +8,6 @@ import org.quantforge.core.Calendars;
 import org.quantforge.core.Conventions;
 import org.quantforge.core.QfError;
 import org.quantforge.curves.Curve;
-import org.quantforge.curves.Ois;
 import org.quantforge.pricing.Pricing.FxForward;
 import org.quantforge.pricing.Pricing.FxMarket;
 import org.quantforge.pricing.Pricing.FxResult;
@@ -45,9 +44,18 @@ public final class Fx {
         return d;
     }
 
-    private static void checkSpot(FxMarket m) {
+    private static void checkMarket(FxMarket m) {
         if (m.spot() <= 0.0) {
             throw new QfError("E_DOMAIN", "spot must be positive", "spot");
+        }
+        if (!m.base().asOf().equals(m.asOf()) || !m.quote().asOf().equals(m.asOf())) {
+            throw new QfError("E_INPUT", "a curve's as_of differs");
+        }
+    }
+
+    private static void checkValueDate(FxMarket m, LocalDate d) {
+        if (d.isBefore(spotDate(m.pair(), m.asOf()))) {
+            throw new QfError("E_DATE_ORDER", "value date is before spot");
         }
     }
 
@@ -61,10 +69,8 @@ public final class Fx {
     }
 
     public static Pricing.Forward outright(FxMarket m, LocalDate valueDate) {
-        checkSpot(m);
-        if (valueDate.isBefore(spotDate(m.pair(), m.asOf()))) {
-            throw new QfError("E_DATE_ORDER", "value_date is before spot", "value_date");
-        }
+        checkMarket(m);
+        checkValueDate(m, valueDate);
         double f = forwardAt(m, valueDate);
         return new Pricing.Forward(f, (f - m.spot()) / m.pair().pip());
     }
@@ -79,16 +85,22 @@ public final class Fx {
     }
 
     private static Valuation valuation(FxMarket m, double pv, String model) {
-        return new Valuation(pv, m.pair().quote(), model, null, m.pair().id(), m.asOf());
+        return new Valuation(pv, m.pair().quote(), model, m.snapshotId(), m.pair().id(), m.asOf());
     }
 
     public static FxResult forwardPv(FxMarket m, FxForward t) {
-        checkSpot(m);
+        checkMarket(m);
+        checkValueDate(m, t.valueDate());
         return leg(m, t, "FX_FORWARD_DISCOUNTING");
     }
 
     public static FxResult swapPv(FxMarket m, FxSwap t) {
-        checkSpot(m);
+        checkMarket(m);
+        checkValueDate(m, t.nearDate());
+        checkValueDate(m, t.farDate());
+        if (!t.nearDate().isBefore(t.farDate())) {
+            throw new QfError("E_DATE_ORDER", "near_date is not before far_date");
+        }
         FxSide near = t.farSide() == FxSide.BUY ? FxSide.SELL : FxSide.BUY;
         FxResult a = leg(m, new FxForward(t.notionalBase(), t.nearRate(), t.nearDate(), near), "");
         FxResult b = leg(m, new FxForward(t.notionalBase(), t.farRate(), t.farDate(), t.farSide()), "");
@@ -97,7 +109,7 @@ public final class Fx {
     }
 
     public static List<Node> implied(FxMarket m, List<Point> points) {
-        checkSpot(m);
+        checkMarket(m);
         Conventions.FxPair p = m.pair();
         LocalDate sp = spotDate(p, m.asOf());
         List<Node> nodes = new ArrayList<>();
@@ -116,14 +128,8 @@ public final class Fx {
     }
 
     private static LocalDate valueDate(Conventions.FxPair p, LocalDate sp, String tenor) {
-        Ois.checkTenor(tenor);
         int n = Integer.parseInt(tenor.substring(0, tenor.length() - 1));
-        LocalDate t = switch (tenor.charAt(tenor.length() - 1)) {
-            case 'D' -> sp.plusDays(n);
-            case 'W' -> sp.plusDays(7L * n);
-            case 'Y' -> sp.plusMonths(12L * n);
-            default -> sp.plusMonths(n);
-        };
+        LocalDate t = sp.plusMonths(tenor.endsWith("Y") ? 12L * n : n);
         t = Calendars.adjust(p.calendars().getFirst(), t, Calendars.Convention.MODIFIED_FOLLOWING);
         while (!jointBusinessDay(p, t)) {
             t = t.plusDays(1);

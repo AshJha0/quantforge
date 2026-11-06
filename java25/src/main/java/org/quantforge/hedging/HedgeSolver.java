@@ -12,7 +12,7 @@ public final class HedgeSolver {
 
     public record Solution(double[] x, double[] residual, double objective) {}
 
-    private static final int MAX_SWEEPS = 2_000_000;
+    private static final int MAX_SWEEPS = 200_000;
 
     public static Solution solve(double[][] a, double[] b, double[] weights, double[] costs, double lambda) {
         int rows = a.length;
@@ -56,10 +56,13 @@ public final class HedgeSolver {
         for (int i = 0; i < n; i++) {
             penalty[i] = lambda * costs[i] / 2.0;
         }
-        double[] x = descend(q, v, penalty);
+        boolean[] settled = new boolean[1];
+        double[] x = descend(q, v, penalty, settled);
         double[] exact = polish(q, v, penalty, x);
         if (exact != null) {
             x = exact;
+        } else if (!settled[0]) {
+            throw new QfError("E_NO_CONVERGENCE", "coordinate descent did not settle");
         }
         double[] residual = new double[rows];
         double objective = 0.0;
@@ -101,7 +104,7 @@ public final class HedgeSolver {
         }
     }
 
-    private static double[] descend(double[][] q, double[] v, double[] penalty) {
+    private static double[] descend(double[][] q, double[] v, double[] penalty, boolean[] settled) {
         int n = v.length;
         double[] x = new double[n];
         for (int sweep = 0; sweep < MAX_SWEEPS; sweep++) {
@@ -118,6 +121,7 @@ public final class HedgeSolver {
                 x[i] = next;
             }
             if (change <= 1e-13 * (1.0 + maxAbs(x))) {
+                settled[0] = true;
                 break;
             }
         }

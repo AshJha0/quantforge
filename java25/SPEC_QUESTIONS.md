@@ -36,29 +36,34 @@ code follows those rulings.
 
 None.
 
-## Stage B: choices where the spec is silent
+## Stage B: closed by `stage-b-rulings.md` and the corrected specs (ddf2b18)
 
-No golden conflict was found in stage B. No golden case is known to decide these.
+| # | Point | Outcome |
+|---|---|---|
+| 14 | `end_of_month` on projection schedules | Closed: false, as built |
+| 15 | Spot on a non-business `as_of` | Closed: counts from `as_of` everywhere (B0). The OIS code changed |
+| 16 | FRA and deposit end dates | Closed: as built |
+| 17 | `snapshot_id` | Closed: optional wherever a `valuation` is returned (B10). The FX code changed |
+| 18 | FX dates before spot | Closed: `E_DATE_ORDER`, and `near_date >= far_date` too (B9). The code changed |
+| 19 | `fx.curve.implied` tenors | Closed: `M` and `Y` only (B7). The code changed |
+| 20 | FX curve `as_of` | Closed: `E_INPUT` (B8). The code changed |
+| 21 | `rates.curve.forward` `day_count` | Closed: `E_SCHEMA` (B4) |
+| 22 | `hedge.solve` order | Closed: as built (B13). A descent that fails is now `E_NO_CONVERGENCE` |
+| 23 | `payment_lag` | Closed: as built (B2) |
+| 24 | Empty `compound` arrays | Closed: as built (B6) |
+| 25 | `calib.fit` model and method | Closed: any pairing (B12). `x`, `y` may be left out for `ROSENBROCK`, and weights do not apply to it. The code changed |
+| 26 | `calib.fit` checks | Closed (B11). Length checks now come before domain checks, and `max_iter < 1` is `E_INPUT` |
+| 27 | `curve_report` inputs | Closed: tenors, and `tolerance_breaches` is an array (B17). The code changed |
+| 28 | Condition number accuracy | Closed: now from singular values by one-sided Jacobi (B17) |
+| 29 | `hedge_tenors` limit | Closed: as built (B14) |
+| 30 | Solve method | Closed: either (B16) |
+
+## Open points
 
 | # | Place | Choice |
 |---|---|---|
-| 14 | Swap schedules in `projection-and-fra.md`, and `rates.basis.spread` | `end_of_month` false. `ois-curves.md` sets it from `spot`, but this page does not |
-| 15 | Projection `spot` | `as_of` plus 2 `USGS` business days, with no `FOLLOWING` step first, as the page says. `ois-curves.md` adjusts first, so the two differ when `as_of` is a holiday |
-| 16 | `DEPOSIT`, `FRA` and `rates.fra.pv` end dates | `MODIFIED_FOLLOWING` on the unadjusted month step, with no end-of-month rule. A `FRA` end steps from its adjusted start |
-| 17 | `snapshot_id` on `rates.swap.pv`, `rates.fra.pv` | Accepted as an optional input, as the text on `data_version` implies. FX valuations always give `null`, as `fx.md` lists no such input |
-| 18 | `fx.forward.pv`, `fx.swap.pv` with a date before `sp` | No error, as only `fx.forward.outright` lists `E_DATE_ORDER`. A date before `as_of` is `E_OUT_OF_RANGE` from the curve |
-| 19 | `fx.curve.implied` `points` out of order | `E_INPUT`. `D` and `W` tenors are accepted, though the spec says months |
-| 20 | `fx.*` `as_of` differing from a curve's `as_of` | Not checked |
-| 21 | `rates.curve.forward` `day_count` needing extra inputs (`BUS_252`, `ACT_365L`, `ACT_ACT_ICMA`, `THIRTY_E_360_ISDA`) | `E_SCHEMA`, as a needed input cannot be given |
-| 22 | `hedge.solve` order of checks | Length, then domain (`weights`, `costs`, `lambda`), then `E_SINGULAR`. Non-positive `weights` is `E_DOMAIN`; no code is named |
-| 23 | `schedule.generate`, negative `payment_lag` | `E_INPUT`. Above 30,000 is `E_LIMIT`, following `add_business_days` |
-| 24 | `rates.ois.compound` with empty arrays | `E_INPUT` |
-| 25 | `calib.fit`, `ROSENBROCK` with other methods, `NELSON_SIEGEL` with `GAUSS_NEWTON` | Allowed; the spec says only that they are not used. An all-empty problem has zero gradient and returns `start` |
-| 26 | `calib.fit`, `lower` above `upper`, or bounds of the wrong length | `E_INPUT` |
-| 27 | `calib.curve_report`, required diagnostic "inputs with their timestamps" | Reports the quote count only, as stage B quotes carry no timestamps |
-| 28 | `calib.curve_report`, condition number | From the eigenvalues of `J^T J`, so it loses accuracy above about 1e8 |
-| 29 | `usecase.*`, `hedge_tenors` length | Above 20 is `E_LIMIT`, following `hedge.solve` |
-| 30 | `risk.ois.dv01`, `calib.curve_report` and `usecase.rates_hedge` solve method | `SEQUENTIAL`, as these operations take no `method` |
+| 31 | `projection-and-fra.md`, FRA `start_months` | The 1 to 1200 range names `months` and `tenor_months`. `start_months` is held to 0 to 1200, with `E_INPUT` outside |
+| 32 | `fx.md`, order of `spot`, curve checks and `as_of` match | `spot` `E_DOMAIN`, then the curves' own checks, then the `as_of` match, then value dates |
 
 ## Small document points
 

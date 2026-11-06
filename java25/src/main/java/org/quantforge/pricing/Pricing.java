@@ -55,7 +55,8 @@ public final class Pricing {
     public record Forward(double forward, double points) {}
 
     /** FX market data, frozen. */
-    public record FxMarket(Conventions.FxPair pair, double spot, LocalDate asOf, Curve base, Curve quote) {}
+    public record FxMarket(Conventions.FxPair pair, double spot, LocalDate asOf, Curve base, Curve quote,
+                           String snapshotId) {}
 
     private static double sign(Side s) {
         return s == Side.PAY ? 1.0 : -1.0;

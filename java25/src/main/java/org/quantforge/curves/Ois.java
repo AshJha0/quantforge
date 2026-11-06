@@ -60,8 +60,7 @@ public final class Ois {
     }
 
     public static LocalDate spot(Conventions.RateIndex c, LocalDate asOf) {
-        LocalDate adjusted = Calendars.adjust(c.calendar(), asOf, Calendars.Convention.FOLLOWING);
-        return Calendars.addBusinessDays(c.calendar(), adjusted, c.spotLag());
+        return Calendars.addBusinessDays(c.calendar(), asOf, c.spotLag());
     }
 
     public static Legs legs(Conventions.RateIndex c, LocalDate asOf, String tenor) {

@@ -111,15 +111,7 @@ public final class RatesRisk {
                 jac[i][j] = (up[i] - down[i]) / (2.0 * REPORT_BUMP);
             }
         }
-        double[][] gram = new double[n][n];
-        for (double[] row : jac) {
-            for (int p = 0; p < n; p++) {
-                for (int q = 0; q < n; q++) {
-                    gram[p][q] += row[p] * row[q];
-                }
-            }
-        }
-        double[] eig = LinearAlgebra.eigenSymmetric(gram);
-        return new CurveReport(jac, Math.sqrt(eig[n - 1] / eig[0]), base.maxRepricingError());
+        double[] sigma = LinearAlgebra.singularValues(jac);
+        return new CurveReport(jac, sigma[0] / sigma[n - 1], base.maxRepricingError());
     }
 }

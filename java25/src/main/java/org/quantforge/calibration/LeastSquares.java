@@ -172,18 +172,12 @@ public final class LeastSquares {
         if (q.start().length != n) {
             throw new QfError("E_INPUT", "start has the wrong length", "start");
         }
-        if (q.weights() != null) {
-            if (q.weights().length != q.x().length) {
-                throw new QfError("E_INPUT", "weights have the wrong length", "weights");
-            }
-            for (double w : q.weights()) {
-                if (w < 0.0) {
-                    throw new QfError("E_DOMAIN", "negative weight", "weights");
-                }
-            }
+        boolean weighted = q.weights() != null && q.model() != Model.ROSENBROCK; // Weights do not apply to it.
+        if (weighted && q.weights().length != q.x().length) {
+            throw new QfError("E_INPUT", "weights have the wrong length", "weights");
         }
-        if (q.regularisation() < 0.0) {
-            throw new QfError("E_DOMAIN", "regularisation is negative", "regularisation");
+        if (q.maxIter() < 1) {
+            throw new QfError("E_INPUT", "max_iter must be at least 1", "max_iter");
         }
         if (q.prior() != null && q.prior().length != n) {
             throw new QfError("E_INPUT", "prior has the wrong length", "prior");
@@ -203,6 +197,16 @@ public final class LeastSquares {
                     throw new QfError("E_INPUT", "lower is above upper");
                 }
             }
+        }
+        if (weighted) {
+            for (double w : q.weights()) {
+                if (w < 0.0) {
+                    throw new QfError("E_DOMAIN", "negative weight", "weights");
+                }
+            }
+        }
+        if (q.regularisation() < 0.0) {
+            throw new QfError("E_DOMAIN", "regularisation is negative", "regularisation");
         }
     }
 
