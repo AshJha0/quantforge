@@ -28,6 +28,9 @@ TEST_CASE("day count worked examples from the spec") {
 
 TEST_CASE("day count edges") {
     CHECK(year_fraction(DayCount::OneOne, d("2024-01-01"), d("2024-01-01")) == 0.0);
+    const DayCountInputs term{{}, {}, {}, d("2024-02-29"), {}};
+    CHECK(year_fraction(DayCount::ThirtyE360Isda, d("2024-02-29"), d("2024-02-29"), term) == 0.0);
+    CHECK(year_fraction(DayCount::ThirtyEPlus360, d("2024-01-31"), d("2024-01-31")) == 0.0);
     CHECK(year_fraction(DayCount::Nl365, d("2024-02-28"), d("2024-03-01")) == Approx(1.0 / 365));
     CHECK(code_of([] { year_fraction(DayCount::Act360, d("2024-01-02"), d("2024-01-01")); }) == "E_DATE_ORDER");
     CHECK(code_of([] { year_fraction(DayCount::Act365L, d("2024-01-01"), d("2024-01-02")); }) == "E_SCHEMA");
@@ -46,6 +49,10 @@ TEST_CASE("calendar rules") {
     CHECK(business_days_between(Calendar::Gblo, d("2024-03-25"), d("2024-04-03")) == 5);
     CHECK(add_tenor(Calendar::Gblo, d("2024-01-31"), {1, 'M'}, Unadjusted, false) == d("2024-02-29"));
     CHECK(add_tenor(Calendar::Gblo, d("2024-02-29"), {1, 'M'}, Following, true) == d("2024-03-28"));
+    CHECK(add_tenor(Calendar::Gblo, d("2024-03-30"), {1, 'M'}, Following, true) == d("2024-04-30"));
+    CHECK(add_tenor(Calendar::Gblo, d("2024-03-27"), {1, 'M'}, Following, true) == d("2024-04-29"));
+    CHECK(add_tenor(Calendar::Gblo, d("2024-06-30"), {2, 'M'}, Unadjusted, true) == d("2024-08-31"));
+    CHECK(add_tenor(Calendar::Gblo, d("2024-03-29"), {1, 'M'}, Unadjusted, true) == d("2024-04-29"));
 }
 
 TEST_CASE("zones and cut-off") {

@@ -5,6 +5,13 @@
 
 namespace quantforge {
 
+/// Mean and deviations, shifted by the first value first, so that a large mean loses nothing.
+struct Centred {
+    double mean;
+    std::vector<double> d;
+};
+Centred centre(const std::vector<double>& x);
+
 double normal_pdf(double x);
 double normal_cdf(double x);
 

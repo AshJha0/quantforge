@@ -3,34 +3,27 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <utility>
 
 #include "quantforge/core/error.hpp"
 
 namespace quantforge {
 namespace {
 
-double mean_of(const std::vector<double>& x) {
-    double s = 0.0;
-    for (const double v : x) s += v;
-    return s / double(x.size());
-}
+}  // namespace
 
-// x - mean, with the rounding of the mean itself taken back out. Without this, data far from zero
-// (1e9 offsets) shift every deviation by the same few 1e-8, and third moments feel it.
-std::vector<double> deviations(const std::vector<double>& x, double m) {
+Centred centre(const std::vector<double>& x) {
     std::vector<double> d;
     d.reserve(x.size());
-    double residual = 0.0;
+    double m = 0.0;
     for (const double v : x) {
-        d.push_back(v - m);
-        residual += d.back();
+        d.push_back(v - x[0]);
+        m += d.back();
     }
-    residual /= double(x.size());
-    for (double& v : d) v -= residual;
-    return d;
+    m /= double(x.size());
+    for (double& v : d) v -= m;
+    return {x[0] + m, std::move(d)};
 }
-
-}  // namespace
 
 double normal_pdf(double x) { return std::exp(-x * x / 2.0) / std::sqrt(2.0 * std::numbers::pi); }
 
@@ -47,9 +40,10 @@ double normal_cdf(double x) {
 
 Summary summary(const std::vector<double>& x) {
     if (x.size() < 2) throw Error("E_INPUT", "at least 2 values are needed", "x");
-    const double n = double(x.size()), m = mean_of(x);
+    const double n = double(x.size());
+    const auto [m, dev] = centre(x);
     double s2 = 0.0, s3 = 0.0, s4 = 0.0;
-    for (const double d : deviations(x, m)) {
+    for (const double d : dev) {
         const double d2 = d * d;
         s2 += d2;
         s3 += d2 * d;
@@ -83,7 +77,7 @@ std::vector<double> quantiles(std::vector<double> x, const std::vector<double>& 
 
 Covariance covariance(const std::vector<double>& x, const std::vector<double>& y) {
     if (x.size() != y.size() || x.size() < 2) throw Error("E_INPUT", "x and y must have equal length of at least 2");
-    const auto dx = deviations(x, mean_of(x)), dy = deviations(y, mean_of(y));
+    const auto dx = centre(x).d, dy = centre(y).d;
     double sxy = 0.0, sxx = 0.0, syy = 0.0;
     for (std::size_t i = 0; i < x.size(); ++i) {
         const double a = dx[i], b = dy[i];
@@ -98,8 +92,9 @@ Covariance covariance(const std::vector<double>& x, const std::vector<double>& y
 
 Ols ols(const std::vector<double>& x, const std::vector<double>& y) {
     if (x.size() != y.size() || x.size() < 3) throw Error("E_INPUT", "x and y must have equal length of at least 3");
-    const double n = double(x.size()), mx = mean_of(x), my = mean_of(y);
-    const auto dx = deviations(x, mx), dy = deviations(y, my);
+    const double n = double(x.size());
+    const auto [mx, dx] = centre(x);
+    const auto [my, dy] = centre(y);
     double sxx = 0.0, sxy = 0.0, syy = 0.0;
     for (std::size_t i = 0; i < x.size(); ++i) {
         const double a = dx[i], b = dy[i];
@@ -111,7 +106,7 @@ Ols ols(const std::vector<double>& x, const std::vector<double>& y) {
     const double beta = sxy / sxx, alpha = my - beta * mx;
     double sse = 0.0;
     for (std::size_t i = 0; i < x.size(); ++i) {
-        const double e = y[i] - alpha - beta * x[i];
+        const double e = dy[i] - beta * dx[i];
         sse += e * e;
     }
     const double s2 = sse / (n - 2.0);

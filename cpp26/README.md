@@ -41,8 +41,6 @@ From the repository root:
 python conformance/runner/runner.py --impl cpp
 ```
 
-On Windows, pass `--config` with a file that gives the absolute path of `quantforge.exe` (see `SPEC_QUESTIONS.md`).
-
 ## Toolchains
 
 Checked with GCC 16.2 and Clang 23.1 on Windows (MinGW-w64 UCRT, libstdc++). Beyond C++20 the code relies on

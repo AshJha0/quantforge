@@ -186,7 +186,10 @@ Date add_tenor(Calendar c, Date d, Tenor tenor, BusinessDayConvention conv, bool
     const int y = total / 12;
     const unsigned m = unsigned(total % 12) + 1;
     if (y > 2099) throw Error("E_DATE_RANGE", "calendars cover 2000 to 2099");
-    if (end_of_month && d == last_business_day(c, year_of(d), month_of(d))) return last_business_day(c, y, m);
+    if (end_of_month && conv != BusinessDayConvention::Unadjusted && d >= last_business_day(c, year_of(d), month_of(d)))
+        return last_business_day(c, y, m);
+    if (end_of_month && conv == BusinessDayConvention::Unadjusted && d == last_of_month(year_of(d), month_of(d)))
+        return last_of_month(y, m);
     return adjust(c, make_date(y, m, std::min(day_of(d), day_of(last_of_month(y, m)))), conv);
 }
 

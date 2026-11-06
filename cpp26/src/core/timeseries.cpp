@@ -62,16 +62,14 @@ std::vector<double> ewma_variance(const std::vector<double>& r, double lambda) {
 
 std::vector<double> autocorrelation(const std::vector<double>& x, long long max_lag) {
     check_lag(x, max_lag);
-    double m = 0.0;
-    for (const double v : x) m += v;
-    m /= double(x.size());
+    const auto d = centre(x).d;
     double denominator = 0.0;
-    for (const double v : x) denominator += (v - m) * (v - m);
+    for (const double v : d) denominator += v * v;
     if (denominator == 0.0) throw Error("E_DOMAIN", "x has zero variance", "x");
     std::vector<double> acf;
     for (std::size_t k = 1; k <= std::size_t(max_lag); ++k) {
         double s = 0.0;
-        for (std::size_t t = k; t < x.size(); ++t) s += (x[t] - m) * (x[t - k] - m);
+        for (std::size_t t = k; t < x.size(); ++t) s += d[t] * d[t - k];
         acf.push_back(s / denominator);
     }
     return acf;
@@ -88,23 +86,18 @@ double ljung_box(const std::vector<double>& x, long long max_lag) {
 Ar1 ar1(const std::vector<double>& x) {
     if (x.size() < 4) throw Error("E_INPUT", "at least 4 values are needed", "x");
     const std::vector<double> lagged(x.begin(), x.end() - 1), current(x.begin() + 1, x.end());
-    double mx = 0.0, my = 0.0;
-    for (std::size_t i = 0; i < lagged.size(); ++i) {
-        mx += lagged[i];
-        my += current[i];
-    }
-    mx /= double(lagged.size());
-    my /= double(lagged.size());
+    const auto [mx, dx] = centre(lagged);
+    const auto [my, dy] = centre(current);
     double sxx = 0.0, sxy = 0.0;
-    for (std::size_t i = 0; i < lagged.size(); ++i) {
-        sxx += (lagged[i] - mx) * (lagged[i] - mx);
-        sxy += (lagged[i] - mx) * (current[i] - my);
+    for (std::size_t i = 0; i < dx.size(); ++i) {
+        sxx += dx[i] * dx[i];
+        sxy += dx[i] * dy[i];
     }
     if (sxx == 0.0) throw Error("E_SINGULAR", "x has zero variance", "x");
     const double phi = sxy / sxx, constant = my - phi * mx;
     double sse = 0.0;
-    for (std::size_t i = 0; i < lagged.size(); ++i) {
-        const double e = current[i] - constant - phi * lagged[i];
+    for (std::size_t i = 0; i < dx.size(); ++i) {
+        const double e = dy[i] - phi * dx[i];
         sse += e * e;
     }
     return {constant, phi, std::sqrt(sse / double(x.size() - 3))};

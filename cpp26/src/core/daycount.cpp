@@ -98,6 +98,7 @@ double year_fraction(DayCount c, Date start, Date end, const DayCountInputs& in)
     if (end < start) throw Error("E_DATE_ORDER", "end is before start", "end");
     if (c == DayCount::ActActIcma && (*in.ref_end <= *in.ref_start || start < *in.ref_start || end > *in.ref_end))
         throw Error("E_INPUT", "the accrual must lie inside the reference period");
+    if (start == end) return 0.0;  // before any day-number adjustment
     const double d = days_between(start, end);
     switch (c) {
         case DayCount::Act360: return d / 360.0;
