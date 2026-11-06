@@ -195,7 +195,7 @@ def projection():
             v = (1 if side == "PAY" else -1) * 1e6 * (flt - k * ann)
             sw = ql.MakeVanillaSwap(ql.Period(yrs, ql.Years), idx2, k, ql.Period(0, ql.Days), nominal=1e6, fixedLegTenor=ql.Period(1, ql.Years), fixedLegDayCount=ql.Thirty360(ql.Thirty360.BondBasis),
                                     swapType=ql.Swap.Payer if side == "PAY" else ql.Swap.Receiver, pricingEngine=ql.DiscountingSwapEngine(h))
-            assert abs(sw.NPV() - v) < 1e-2, (as_of, yrs, sw.NPV(), v)
+            assert abs(sw.NPV() - v) < 1e-5, (as_of, yrs, sw.NPV(), v)
             s.add("rates.swap.pv", {"discount": jc, "projection": jp, "trade": {"index": "USD-TERM-3M", "tenor_months": yrs * 12, "fixed_rate": k, "notional": 1e6, "side": side}},
                   {"valuation": {"pv": v, "currency": "USD", "model": "SWAP_DISCOUNTING", "data_version": None, "conventions": "USD-TERM-3M", "as_of": str(as_of)}, "par_rate": flt / ann}, cls=I, verified=["independent-replay", "quantlib-1.44"], tags=[SYN], limit=PVLIM)
         if as_of == AS_OF:
@@ -206,7 +206,7 @@ def projection():
         F = (pc.df(a) / pc.df(e) - 1) / al
         v = 1e6 * al * (F - .0385) / (1 + al * F) * cv.df(a)
         fra = ql.ForwardRateAgreement(idx2, Q(a), ql.Position.Long, .0385, 1e6, h)
-        assert abs(fra.NPV() - v) < 1e-2, (fra.NPV(), v)
+        assert abs(fra.NPV() - v) < 1e-5, (fra.NPV(), v)
         s.add("rates.fra.pv", {"discount": jc, "projection": jp, "trade": {"index": "USD-TERM-3M", "start": str(a), "fixed_rate": .0385, "notional": 1e6, "side": "PAY"}},
               {"valuation": {"pv": v, "currency": "USD", "model": "FRA_DISCOUNTING", "data_version": None, "conventions": "USD-TERM-3M", "as_of": str(as_of)}, "forward_rate": F}, cls=I, verified=["independent-replay", "quantlib-1.44"], tags=[SYN], limit=PVLIM)
     note("projection_deep: pillars, swaps and FRAs match QuantLib, including month-end spot, a holiday in the spot lag and negative rates")
@@ -310,8 +310,10 @@ def fx():
             s.add("fx.forward.outright", {**base, "value_date": str(T)}, {"forward": F, "points": (F - S0) / 1e-4}, cls=I, verified=["hand"], tags=[SYN] + tag)
             K = 1.27
             pv = 1e6 * (F - K) * uc.df(T)
+            qpv, qdl = b.ql_fx_forward(b.ql_curve(base_c), b.ql_curve(uc), S0, 1e6, K, T, "BUY")
+            assert abs(qpv - pv) < 1e-6 and abs(qdl - 1e6 * (F / S0) * uc.df(T)) < 1e-2, (T, qpv, pv)
             s.add("fx.forward.pv", {**base, "trade": {"notional_base": 1e6, "strike": K, "value_date": str(T), "side": "BUY"}},
-                  {"valuation": {"pv": pv, "currency": "USD", "model": "FX_FORWARD_DISCOUNTING", "data_version": None, "conventions": "GBPUSD", "as_of": str(AS_OF)}, "fx_delta": 1e6 * (F / S0) * uc.df(T)}, cls=I, verified=["hand"], tags=[SYN] + tag, limit=PVLIM)
+                  {"valuation": {"pv": pv, "currency": "USD", "model": "FX_FORWARD_DISCOUNTING", "data_version": None, "conventions": "GBPUSD", "as_of": str(AS_OF)}, "fx_delta": 1e6 * (F / S0) * uc.df(T)}, cls=I, verified=["hand", "quantlib-1.44"], tags=[SYN] + tag, limit=PVLIM)
     # Outside: QuantLib's FX swap helper builds the base curve from the same forward points.
     pts = [("3M", -18.5), ("6M", -36.0), ("1Y", -71.0), ("2Y", -140.0)]
     h = ql.YieldTermStructureHandle(uq)

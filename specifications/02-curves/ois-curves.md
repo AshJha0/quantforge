@@ -54,4 +54,4 @@ Inputs: `curve`, optional `snapshot_id`, `trade`: `{convention, tenor, fixed_rat
 
 ## Acceptance
 
-Targets are in `stage-b-targets.md`. Oracle: independent replay, QuantLib `OISRateHelper` and `OvernightIndexedSwap`. Measured: pillars within 2e-11 of QuantLib; swap PVs within 1e-3 on 1e6 against QuantLib, and through Strata's own swap pricer on the same curve (`oracle/REPORT.md`). No curve was built by Strata's calibrator.
+Targets are in `stage-b-targets.md`. Oracle: independent replay, QuantLib `OISRateHelper` and `OvernightIndexedSwap`. Measured: pillars within 2e-11 of QuantLib; swap PVs within 1e-5 on 1e6 against QuantLib, and through Strata's own swap pricer on the same curve (`oracle/REPORT.md`). No curve was built by Strata's calibrator.

@@ -28,7 +28,8 @@
     "hand"
    ],
    "tags": [
-    "B1"
+    "B1",
+    "synthetic"
    ]
   },
   {
@@ -52,7 +53,8 @@
    ],
    "tags": [
     "invalid",
-    "B2"
+    "B2",
+    "synthetic"
    ]
   },
   {
@@ -76,7 +78,8 @@
    ],
    "tags": [
     "invalid",
-    "B2"
+    "B2",
+    "synthetic"
    ]
   },
   {
@@ -102,7 +105,8 @@
    ],
    "tags": [
     "invalid",
-    "B3"
+    "B3",
+    "synthetic"
    ]
   },
   {
@@ -181,7 +185,8 @@
    ],
    "tags": [
     "invalid",
-    "B4"
+    "B4",
+    "synthetic"
    ]
   },
   {
@@ -612,7 +617,8 @@
    ],
    "tags": [
     "invalid",
-    "B5"
+    "B5",
+    "synthetic"
    ]
   },
   {
@@ -1102,7 +1108,8 @@
    ],
    "tags": [
     "invalid",
-    "B5"
+    "B5",
+    "synthetic"
    ]
   },
   {
@@ -1529,7 +1536,8 @@
    ],
    "tags": [
     "invalid",
-    "B5"
+    "B5",
+    "synthetic"
    ]
   },
   {
@@ -1550,7 +1558,8 @@
    ],
    "tags": [
     "invalid",
-    "B6"
+    "B6",
+    "synthetic"
    ]
   },
   {
@@ -1575,7 +1584,8 @@
    ],
    "tags": [
     "invalid",
-    "B6"
+    "B6",
+    "synthetic"
    ]
   },
   {
@@ -1718,7 +1728,8 @@
    ],
    "tags": [
     "invalid",
-    "B7"
+    "B7",
+    "synthetic"
    ]
   },
   {
@@ -1865,7 +1876,8 @@
    ],
    "tags": [
     "invalid",
-    "B7"
+    "B7",
+    "synthetic"
    ]
   },
   {
@@ -2003,7 +2015,8 @@
    ],
    "tags": [
     "invalid",
-    "B8"
+    "B8",
+    "synthetic"
    ]
   },
   {
@@ -2146,7 +2159,8 @@
    ],
    "tags": [
     "invalid",
-    "B9"
+    "B9",
+    "synthetic"
    ]
   },
   {
@@ -2291,7 +2305,8 @@
    ],
    "tags": [
     "invalid",
-    "B9"
+    "B9",
+    "synthetic"
    ]
   },
   {
@@ -2444,7 +2459,8 @@
     "hand"
    ],
    "tags": [
-    "B10"
+    "B10",
+    "synthetic"
    ],
    "tolerance_limit": {
     "absolute": 0.001,
@@ -2484,7 +2500,8 @@
    ],
    "tags": [
     "invalid",
-    "B11"
+    "B11",
+    "synthetic"
    ]
   },
   {
@@ -2526,7 +2543,8 @@
    ],
    "tags": [
     "invalid",
-    "B11"
+    "B11",
+    "synthetic"
    ]
   },
   {
@@ -2563,7 +2581,8 @@
    ],
    "tags": [
     "invalid",
-    "B11"
+    "B11",
+    "synthetic"
    ]
   },
   {
@@ -2603,7 +2622,8 @@
    ],
    "tags": [
     "invalid",
-    "B11"
+    "B11",
+    "synthetic"
    ]
   },
   {
@@ -2650,7 +2670,8 @@
     "hand"
    ],
    "tags": [
-    "B11"
+    "B11",
+    "synthetic"
    ],
    "tolerance_limit": {
     "absolute": 1e-06,
@@ -2687,7 +2708,8 @@
     "analytic"
    ],
    "tags": [
-    "B12"
+    "B12",
+    "synthetic"
    ],
    "tolerance_limit": {
     "absolute": 1e-05,
@@ -2733,7 +2755,8 @@
    ],
    "tags": [
     "invalid",
-    "B13"
+    "B13",
+    "synthetic"
    ]
   },
   {
@@ -2773,7 +2796,8 @@
    ],
    "tags": [
     "invalid",
-    "B13"
+    "B13",
+    "synthetic"
    ]
   },
   {
@@ -2799,7 +2823,8 @@
    ],
    "tags": [
     "invalid",
-    "B13"
+    "B13",
+    "synthetic"
    ]
   },
   {
@@ -2839,7 +2864,8 @@
    ],
    "tags": [
     "invalid",
-    "B13"
+    "B13",
+    "synthetic"
    ]
   },
   {
@@ -2945,7 +2971,8 @@
    ],
    "tags": [
     "invalid",
-    "B14"
+    "B14",
+    "synthetic"
    ]
   },
   {
@@ -3032,7 +3059,8 @@
    ],
    "tags": [
     "invalid",
-    "B14"
+    "B14",
+    "synthetic"
    ]
   },
   {
@@ -3060,7 +3088,8 @@
     "hand"
    ],
    "tags": [
-    "B15"
+    "B15",
+    "synthetic"
    ]
   },
   {
@@ -3244,7 +3273,8 @@
    ],
    "tags": [
     "invalid",
-    "B19"
+    "B19",
+    "synthetic"
    ]
   },
   {
@@ -3330,7 +3360,8 @@
    ],
    "tags": [
     "invalid",
-    "B19"
+    "B19",
+    "synthetic"
    ]
   },
   {
@@ -3416,7 +3447,8 @@
    ],
    "tags": [
     "invalid",
-    "B19"
+    "B19",
+    "synthetic"
    ]
   },
   {
@@ -3502,7 +3534,8 @@
    ],
    "tags": [
     "invalid",
-    "B19"
+    "B19",
+    "synthetic"
    ]
   },
   {
@@ -3640,7 +3673,8 @@
    ],
    "tags": [
     "invalid",
-    "B20"
+    "B20",
+    "synthetic"
    ]
   },
   {
@@ -3778,7 +3812,8 @@
    ],
    "tags": [
     "invalid",
-    "B20"
+    "B20",
+    "synthetic"
    ]
   },
   {
@@ -3868,7 +3903,8 @@
    ],
    "tags": [
     "invalid",
-    "B20"
+    "B20",
+    "synthetic"
    ]
   },
   {
@@ -4006,7 +4042,8 @@
    ],
    "tags": [
     "invalid",
-    "B20"
+    "B20",
+    "synthetic"
    ]
   },
   {
@@ -4549,7 +4586,8 @@
    ],
    "tags": [
     "invalid",
-    "B21"
+    "B21",
+    "synthetic"
    ]
   },
   {
@@ -4572,7 +4610,8 @@
     "hand"
    ],
    "tags": [
-    "B23"
+    "B23",
+    "synthetic"
    ],
    "tolerance_limit": {
     "absolute": 1e-09,
@@ -4601,7 +4640,8 @@
    ],
    "tags": [
     "invalid",
-    "B22"
+    "B22",
+    "synthetic"
    ]
   },
   {
@@ -4625,7 +4665,8 @@
    ],
    "tags": [
     "invalid",
-    "B22"
+    "B22",
+    "synthetic"
    ]
   },
   {
@@ -4649,7 +4690,8 @@
    ],
    "tags": [
     "invalid",
-    "B22"
+    "B22",
+    "synthetic"
    ]
   },
   {
@@ -4683,7 +4725,8 @@
    ],
    "tags": [
     "invalid",
-    "B22"
+    "B22",
+    "synthetic"
    ]
   },
   {
@@ -4717,7 +4760,8 @@
    ],
    "tags": [
     "invalid",
-    "B22"
+    "B22",
+    "synthetic"
    ]
   },
   {
@@ -4764,7 +4808,8 @@
     "hand"
    ],
    "tags": [
-    "B22"
+    "B22",
+    "synthetic"
    ],
    "tolerance_limit": {
     "absolute": 1e-06,

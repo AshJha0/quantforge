@@ -351,7 +351,9 @@
    "verified_by": [
     "hand"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "risk-0005",
@@ -369,7 +371,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -393,7 +396,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   }
  ]

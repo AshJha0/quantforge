@@ -1,0 +1,185 @@
+{
+ "schema_version": "1.0",
+ "suite": "store_a4",
+ "spec": "specifications/01-core/rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_limits.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "store_a4-0001",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "x\ud800y"
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A4"
+   ]
+  },
+  {
+   "case_id": "store_a4-0002",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "x\ud800y",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.0
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A4"
+   ]
+  },
+  {
+   "case_id": "store_a4-0003",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": {
+       "k": [
+        "x\ud800y"
+       ]
+      }
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A4"
+   ]
+  },
+  {
+   "case_id": "store_a4-0004",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.0,
+      "note": "x\ud800y"
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A4"
+   ]
+  },
+  {
+   "case_id": "store_a4-0005",
+   "operation": "core.store.chain",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "x\ud800y"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A4"
+   ]
+  },
+  {
+   "case_id": "store_a4-0006",
+   "operation": "core.store.chain",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "\ud83d\ude00"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "head": "682322b30fe14dcbe957dca054ad774aacf2be1387adac0c3f992155845a7634",
+     "hashes": [
+      "682322b30fe14dcbe957dca054ad774aacf2be1387adac0c3f992155845a7634"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon"
+   ],
+   "tags": [
+    "A4"
+   ]
+  }
+ ]
+}

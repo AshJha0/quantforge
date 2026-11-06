@@ -44,4 +44,4 @@ The floating forward runs on accrual dates, not on a separate index end date.
 
 ## Acceptance
 
-Oracle: replay against QuantLib `DepositRateHelper`, `FraRateHelper`, `SwapRateHelper` with exogenous discounting, and `MakeVanillaSwap`. Measured: pillars within 1e-10; swap and FRA PVs within 1e-2 on 1e6. Basis spread has hand replay only. On an `as_of` that is not a business day QuantLib disagrees with itself: `DepositRateHelper` counts from `as_of`, `SwapRateHelper` adjusts first. So those dates have no outside check here.
+Oracle: replay against QuantLib `DepositRateHelper`, `FraRateHelper`, `SwapRateHelper` with exogenous discounting, and `MakeVanillaSwap`. Measured: pillars within 1e-10; swap and FRA PVs about 1e-8 on 1e6, and the oracle asserts 1e-5. Basis spread has hand replay only. On an `as_of` that is not a business day QuantLib disagrees with itself: `DepositRateHelper` counts from `as_of`, `SwapRateHelper` adjusts first. So those dates have no outside check here.

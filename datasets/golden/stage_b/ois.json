@@ -2368,7 +2368,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -2399,7 +2400,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ],
    "description": "same pillar date twice"
   },
@@ -2422,7 +2424,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -2450,7 +2453,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ],
    "description": "crossed"
   },
@@ -2478,7 +2482,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -2507,7 +2512,9 @@
    "verified_by": [
     "exact-rational"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "ois-0025",
@@ -2533,7 +2540,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -2557,7 +2565,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {

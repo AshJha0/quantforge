@@ -60,6 +60,6 @@ Cases are in `datasets/golden/core/store_rulings.json`.
 | A1 | `sequence < 1`, or an empty `series_id` | `E_SCHEMA` | Yes |
 | A2 | Order of checks | The contract's order holds: all `E_SCHEMA` on any input, then `E_LIMIT`, then log checks 2 and 3, then the operation's other rule checks. "Before anything else" in the first version of `asof-store.md` was wrong, and is corrected | Yes |
 | A3 | Chain canonical form | Every key of the record as given, including unknown keys and a top-level `snapshot_id`: the exclusion belongs to the snapshot hash only. Instants stay as written. Unknown keys never reach `rows` | Yes |
-| A4 | A lone surrogate in any string of a record | `E_SCHEMA`, as in `snapshot-hash.md`: UTF-8 cannot carry it. No golden case yet, as the runner cannot send one (see `clean-room-followups.md`) | No |
+| A4 | A lone surrogate in any string of a record | `E_SCHEMA`, as in `snapshot-hash.md`: UTF-8 cannot carry it. Suite `store_a4`. The runner sends it as a JSON escape | Yes |
 | A5 | An instant that leaves years 1 to 9999 when moved to UTC | `E_DATE_RANGE`, as `Z` form cannot show it. Checked after log checks 2 and 3, on records first and then other inputs | Yes |
 | A6 | `head` in `replay` | The chain head of the whole log, whatever the checkpoints | Yes |

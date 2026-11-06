@@ -53,7 +53,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "schedule-0002",
@@ -102,7 +104,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "schedule-0003",
@@ -151,7 +155,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "schedule-0004",
@@ -235,7 +241,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "schedule-0005",
@@ -279,7 +287,9 @@
    "verified_by": [
     "quantlib-1.44"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "schedule-0006",
@@ -301,7 +311,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -324,7 +335,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   }
  ]

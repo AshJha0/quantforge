@@ -36,6 +36,10 @@ class StubTests(unittest.TestCase):
         code, rep, out = run("perturb", "compounding", 1e-13)
         self.assertEqual(rep["totals"]["fail"], 0, out)
 
+    def test_lone_surrogate_reaches_the_cli(self):
+        code, rep, out = run("replay", "store_a4")
+        self.assertEqual(code, 0, out)
+
     def test_noise_outside_tolerance_fails(self):
         code, rep, _ = run("perturb", "compounding", 1e-6)
         self.assertEqual(code, 1)

@@ -60,7 +60,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -116,7 +118,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -206,7 +210,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -272,7 +278,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -346,7 +354,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -407,7 +417,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -481,7 +493,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -549,7 +563,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -631,7 +647,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -687,7 +705,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -769,7 +789,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,
@@ -831,7 +853,9 @@
     "sign-enumeration",
     "scipy-1.18.1"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-08,
     "relative": 0.0,

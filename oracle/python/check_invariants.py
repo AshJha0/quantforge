@@ -77,6 +77,78 @@ def check(c):
                 assert abs(o["zero_rates"][i["at"].index(t)] - r) < 1e-12, c["case_id"]
 
 
+def dates_of(p):
+    return [date.fromisoformat(x["date"]) for x in p]
+
+
+def check_b(c, counts):
+    """Stage B invariants, from the specs. Counts how many each rule saw."""
+    op, i, e = c["operation"], c["inputs"], c["expected"]
+    if e["status"] != "ok":
+        return
+    o = e["outputs"]
+
+    def hit(k):
+        counts[k] = counts.get(k, 0) + 1
+    if "pillars" in o:
+        ds = dates_of(o["pillars"])
+        assert ds == sorted(set(ds)) and all(x["discount_factor"] > 0 for x in o["pillars"]), c["case_id"]
+        hit("pillars increase, discount factors positive")
+    if op == "rates.schedule.generate":
+        p = o["periods"]
+        for a, b2 in zip(p, p[1:]):
+            assert a["end"] == b2["start"]
+        for x in p:
+            assert x["start"] < x["end"] <= x["payment"]
+            assert is_business(i["calendar"], date.fromisoformat(x["end"]))
+        hit("periods contiguous, ends on business days")
+    if op == "rates.curve.discount":
+        assert all(v > 0 for v in o["discount_factors"])
+        hit("discount factors positive")
+    if "valuation" in o:
+        v = o["valuation"]
+        assert v["data_version"] == i.get("snapshot_id") and len(v["currency"]) == 3
+        hit("valuation carries its snapshot")
+    if op == "rates.ois.pv":
+        t = i["trade"]
+        sg = 1 if t["side"] == "PAY" else -1
+        assert abs(o["valuation"]["pv"] - sg * t["notional"] * (o["par_rate"] - t["fixed_rate"]) * o["annuity"]) < 1e-6
+        hit("OIS PV equals notional x (par - fixed) x annuity")
+    if op == "risk.ois.dv01":
+        assert abs(sum(o["key_rate"]) - o["dv01"]) < 1e-3 * abs(o["dv01"]) + 1e-3
+        assert (o["dv01"] > 0) == (i["trade"]["side"] == "PAY") or abs(o["dv01"]) < 50
+        hit("key rates sum to DV01; payers gain")
+    if op == "fx.spot_date":
+        assert o["spot_date"] > i["trade_date"]
+        hit("spot after trade date")
+    if op == "fx.forward.pv":
+        assert (o["fx_delta"] > 0) == (i["trade"]["side"] == "BUY")
+        hit("FX delta sign follows side")
+    if op == "fx.forward.outright":
+        assert abs(o["points"] * 1e-4 - (o["forward"] - i["spot"])) < 1e-10
+        hit("points equal forward minus spot")
+    if op == "hedge.solve":
+        A, b0, w = i["a"], i["b"], i["weights"]
+        r = [sum(p * q for p, q in zip(row, o["x"])) + v for row, v in zip(A, b0)]
+        assert max(abs(p - q) for p, q in zip(r, o["residual"])) < 1e-9
+        obj = sum(ww * p * p for ww, p in zip(w, r)) + i["lambda"] * sum(cc * abs(x) for cc, x in zip(i["costs"], o["x"]))
+        assert abs(obj - o["objective"]) < 1e-7
+        for j, x in enumerate(o["x"]):
+            g = 2 * sum(A[k][j] * w[k] * r[k] for k in range(len(A)))
+            lc = i["lambda"] * i["costs"][j]
+            assert (abs(g + lc * (1 if x > 0 else -1)) < 1e-7) if abs(x) > 1e-12 else abs(g) <= lc + 1e-7, c["case_id"]
+        hit("residual, objective and first-order conditions")
+    if op == "calib.fit":
+        assert o["objective"] >= 0
+        hit("objective not negative")
+    if op == "usecase.fx_hedge":
+        assert abs(o["hedge_spot_base"] + o["fx_delta"]) < 1e-9 and o["hedge_cost"] >= 0
+        hit("hedge offsets delta")
+    if op == "usecase.rates_hedge":
+        assert sum(x * x for x in o["residual_key_rate"]) < .04 * sum(x * x for x in o["key_rate"])
+        hit("hedge cuts key-rate risk")
+
+
 def main():
     sweep()
     n = 0
@@ -85,6 +157,14 @@ def main():
             check(c)
             n += 1
     note(f"invariants: {n} golden cases checked, none breaks a stated invariant")
+    counts, m = {}, 0
+    for p in sorted((GOLDEN.parent / "stage_b").glob("*.json")):
+        for c in json.loads(p.read_text(encoding="utf-8"))["cases"]:
+            check_b(c, counts)
+            m += 1
+    note(f"invariants: {m} stage B cases checked, none breaks one")
+    for k, v in sorted(counts.items()):
+        note(f"invariants:   {k}: {v}")
 
 
 if __name__ == "__main__":

@@ -869,7 +869,9 @@
    "verified_by": [
     "analytic"
    ],
-   "tags": [],
+   "tags": [
+    "synthetic"
+   ],
    "tolerance_limit": {
     "absolute": 1e-05,
     "relative": 0.0,
@@ -911,7 +913,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -953,7 +956,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -996,7 +1000,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -1040,7 +1045,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -1073,7 +1079,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -1117,7 +1124,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {
@@ -1156,7 +1164,9 @@
    "verified_by": [
     "hand"
    ],
-   "tags": []
+   "tags": [
+    "synthetic"
+   ]
   },
   {
    "case_id": "calibration-0024",
@@ -1181,7 +1191,8 @@
     "hand"
    ],
    "tags": [
-    "invalid"
+    "invalid",
+    "synthetic"
    ]
   },
   {

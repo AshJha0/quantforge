@@ -46,9 +46,9 @@ All four add these. They come from `limits.md` and rulings A1 to A6, and no buil
 | A5 instant outside years 1 to 9999 is `E_DATE_RANGE` | Not stated | Not stated | **Change**: `E_NON_FINITE` | Not stated |
 | A6 `head` is the whole log | ok | Not stated | Not stated | ok |
 
-## For the conformance stream
+## Ruling A4
 
-`runner.py` sends cases with `ensure_ascii=False`, then encodes strictly, so a golden case holding a lone surrogate would crash it. Sending with `ensure_ascii=True` would allow one. Ruling A4 has no case until then.
+The runner now sends ASCII JSON, so a lone surrogate arrives as an escape, and suite `store_a4` tests A4. A JSON parser that rejects such an escape itself must still give `E_SCHEMA`, not `E_PARSE`.
 
 ## Limit order rulings
 

@@ -45,5 +45,5 @@ class Suite:
         doc = {"schema_version": "1.0", "suite": self.name, "spec": self.spec, "spec_version": "1.0.0",
                "generator": self.generator, "reviewer": "none: self-assessment until the end-of-project human review",
                "cases": self.cases}
-        (GOLDEN / f"{self.name}.json").write_text(json.dumps(doc, indent=None if getattr(self, "compact", False) else 1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+        (GOLDEN / f"{self.name}.json").write_text(json.dumps(doc, indent=None if getattr(self, "compact", False) else 1, ensure_ascii=getattr(self, "ascii_only", False)) + "\n", encoding="utf-8", newline="\n")
         note(f"suite {self.name}: {len(self.cases)} cases")
