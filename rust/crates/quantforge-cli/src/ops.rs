@@ -305,7 +305,9 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             ]))
         }
         "core.stats.quantile" => {
-            let v = stats::quantile(&i.reals("x")?, &i.reals("p")?)?;
+            let (x, p) = (i.reals("x")?, i.reals("p")?);
+            i.gate()?;
+            let v = stats::quantile(&x, &p)?;
             plain(obj([("values", v.into())]))
         }
         "core.stats.summary" => {
@@ -564,7 +566,7 @@ fn data_check(i: &Inputs) -> Result<Outcome> {
             history.insert(k.clone(), mids);
         }
     }
-    let checked = check_quotes(&CheckInputs {
+    let inputs = CheckInputs {
         as_of: i.instant("as_of")?,
         quotes,
         stale_after_seconds: i.int("stale_after_seconds")?,
@@ -573,7 +575,9 @@ fn data_check(i: &Inputs) -> Result<Outcome> {
         outlier_threshold: i.f64_or("outlier_threshold", 5.0)?,
         outlier_min_history: i.int_or("outlier_min_history", 5)?,
         history,
-    })?;
+    };
+    i.gate()?;
+    let checked = check_quotes(&inputs)?;
     let rows: Vec<Json> = checked
         .into_iter()
         .map(|c| {

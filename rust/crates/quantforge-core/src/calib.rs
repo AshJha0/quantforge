@@ -130,6 +130,29 @@ fn small_step(step: &[f64], p: &[f64]) -> bool {
     norm(step) <= STEP_TOL * (1.0 + norm(p))
 }
 
+fn check_finite(g: &[f64]) -> Result<()> {
+    if g.iter().all(|v| v.is_finite()) {
+        Ok(())
+    } else {
+        fail("E_NON_FINITE", "the gradient is not finite")
+    }
+}
+
+/// The line search found no acceptable point: a stop if the last trial was already tiny.
+fn stalled(
+    step: &[f64],
+    scale: f64,
+    p: Vec<f64>,
+    it: i64,
+) -> Result<(Vec<f64>, i64, &'static str)> {
+    let last: Vec<f64> = step.iter().map(|s| s * scale).collect();
+    if small_step(&last, &p) {
+        Ok((p, it, "STEP"))
+    } else {
+        fail("E_NO_CONVERGENCE", "no acceptable step")
+    }
+}
+
 fn no_convergence<T>() -> Result<T> {
     fail("E_NO_CONVERGENCE", "max_iter reached")
 }
@@ -142,6 +165,7 @@ fn gauss_newton(
     for it in 1..=max_iter {
         let r = q.residuals(&p);
         let (h, g) = normal_equations(&q.jacobian(&p), &r);
+        check_finite(&g)?;
         if 2.0 * norm(&g) <= GRADIENT_TOL {
             return Ok((p, it - 1, "GRADIENT"));
         }
@@ -158,7 +182,7 @@ fn gauss_newton(
             scale /= 2.0;
         }
         let Some(t) = taken else {
-            return Ok((p, it, "STEP"));
+            return stalled(&step, scale, p, it);
         };
         let moved: Vec<f64> = t.iter().zip(&p).map(|(a, b)| a - b).collect();
         p = t;
@@ -188,6 +212,7 @@ fn levenberg_marquardt(
     for it in 1..=max_iter {
         let r = q.residuals(&p);
         let (h, g) = normal_equations(&q.jacobian(&p), &r);
+        check_finite(&g)?;
         // A bound with the gradient pushing outwards holds its parameter fixed.
         let free: Vec<usize> = (0..p.len())
             .filter(|&k| !((p[k] <= lower[k] && g[k] > 0.0) || (p[k] >= upper[k] && g[k] < 0.0)))
@@ -246,6 +271,7 @@ fn bfgs(q: &Problem, mut p: Vec<f64>, max_iter: i64) -> Result<(Vec<f64>, i64, &
     };
     let mut h = identity();
     let mut g = gradient(&p);
+    check_finite(&g)?;
     let mut f0 = q.objective(&p);
     for it in 1..=max_iter {
         if norm(&g) <= GRADIENT_TOL {
@@ -272,9 +298,10 @@ fn bfgs(q: &Problem, mut p: Vec<f64>, max_iter: i64) -> Result<(Vec<f64>, i64, &
             scale /= 2.0;
         }
         let Some((t, f1)) = taken else {
-            return Ok((p, it, "STEP"));
+            return stalled(&d, scale, p, it);
         };
         let g1 = gradient(&t);
+        check_finite(&g1)?;
         let s: Vec<f64> = t.iter().zip(&p).map(|(a, b)| a - b).collect();
         let y: Vec<f64> = g1.iter().zip(&g).map(|(a, b)| a - b).collect();
         let sy: f64 = s.iter().zip(&y).map(|(a, b)| a * b).sum();
@@ -345,7 +372,12 @@ pub fn fit(i: &FitInputs) -> Result<Fit> {
         return fail("E_DOMAIN", "regularisation is negative");
     }
     let q = Problem { i, weights, prior };
-    let p = i.start.clone();
+    let p: Vec<f64> = (0..n)
+        .map(|k| i.start[k].max(lower[k]).min(upper[k]))
+        .collect();
+    if !q.objective(&p).is_finite() {
+        return fail("E_NON_FINITE", "the objective at the start is not finite");
+    }
     let (parameters, iterations, status) = match i.method {
         Method::GaussNewton => gauss_newton(&q, p, i.max_iter)?,
         Method::LevenbergMarquardt => levenberg_marquardt(&q, p, &lower, &upper, i.max_iter)?,

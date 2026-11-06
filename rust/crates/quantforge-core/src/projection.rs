@@ -108,6 +108,9 @@ pub fn bootstrap(
                 (Instrument::Simple(s, e), rate, e)
             }
             ProjectionQuote::Fra { start_months, rate } => {
+                if !(0..=1200).contains(&start_months) {
+                    return fail("E_INPUT", "start_months must be 0 to 1200");
+                }
                 let start = plus_months(s, start_months)?;
                 let e = plus_months(start, TERM_MONTHS)?;
                 (Instrument::Simple(start, e), rate, e)
