@@ -168,6 +168,12 @@ TEST_CASE("the hedge meets its first-order conditions") {
     CHECK(code_of([] { hedge_solve({{1, 1}, {1, 1}}, {1, 2}, {1, 1}, {0, 0}, 0); }) == "E_SINGULAR");
 }
 
+TEST_CASE("spot counts from as_of itself") {
+    const auto p = ois_periods(*rate_convention("SOFR"), d("2026-11-07"), {1, 'W'});
+    CHECK(p[0].start == d("2026-11-10"));
+    CHECK(code_of([] { Curve(d("2026-01-01"), CurveInterpolation::LogLinearDf, std::vector<Pillar>{}); }) == "E_INPUT");
+}
+
 TEST_CASE("cashflow risk") {
     const auto r = cashflow_risk({{2.0, 100.0}}, 0.05);
     CHECK(r.duration == Approx(2.0));

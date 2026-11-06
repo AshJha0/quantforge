@@ -74,6 +74,7 @@ FxPrice fx_forward_price(const FxMarket& m, const FxForwardTrade& t) {
 FxPrice fx_swap_price(const FxMarket& m, const FxSwapTrade& t) {
     check_fx_market(m);
     const Date sp = fx_spot_date(*m.pair, m.as_of);
+    if (t.near_date >= t.far_date) throw Error("E_DATE_ORDER", "near_date must be before far_date", "near_date");
     const FxSide near = t.far_side == FxSide::Buy ? FxSide::Sell : FxSide::Buy;
     const Leg a = forward_leg(m, sp, {t.notional_base, t.near_rate, t.near_date, near});
     const Leg b = forward_leg(m, sp, {t.notional_base, t.far_rate, t.far_date, t.far_side});

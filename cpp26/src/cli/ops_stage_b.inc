@@ -110,6 +110,7 @@ void op_schedule(const In& in, Out& out) {
     const Calendar c = in.choice("calendar", calendars);
     const bool eom = in.boolean("end_of_month");
     const long long lag = in.integer("payment_lag");
+    limit_if(lag > 30000, "payment_lag");
     const auto periods = generate_schedule(start, end, f, c, eom, lag);
     out.values.key("periods");
     out.values.begin_array();
@@ -138,7 +139,7 @@ CurveInput curve_of(const In& in, string_view key) {
     const In c(v);
     CurveInput out{c.date("as_of"), c.choice("interpolation", curve_interpolations), {}};
     const Value& p = c.need("pillars");
-    if (p.kind != Kind::Array || p.items.empty()) schema("pillars", "expected at least one pillar");
+    if (p.kind != Kind::Array) schema("pillars", "expected an array");
     for (const Value& item : p.items) {
         if (item.kind != Kind::Object) schema("pillars", "expected an object");
         const In row(item);
@@ -330,7 +331,7 @@ void op_projection_bootstrap(const In& in, Out& out) {
     di.limit();
     limit_if(quotes.size() > max_quotes, "quotes");
     for (const ProjectionQuote& q : quotes)
-        if (q.months < 0 || q.months > 1200 || (q.months == 0 && q.type != ProjectionQuoteType::Fra))
+        if (q.months > 1200 || q.months < (q.type == ProjectionQuoteType::Fra ? 0 : 1))
             throw Error("E_INPUT", "months is out of range", "quotes");
     double error = 0.0;
     const Curve c = projection_bootstrap(di.build(), *index, as_of, quotes, interpolation, &error);
@@ -412,6 +413,7 @@ FxInput fx_input(const In& in) {
 template <class Use>
 auto with_market(const FxInput& f, Use&& use) {
     check_fx_market({f.pair, f.spot, f.as_of, nullptr, nullptr});
+    if (f.base.as_of != f.as_of || f.quote.as_of != f.as_of) throw Error("E_INPUT", "a curve's as_of differs");
     const Curve base = f.base.build(), quote = f.quote.build();
     return use(FxMarket{f.pair, f.spot, f.as_of, &base, &quote});
 }
@@ -433,9 +435,11 @@ FxForwardTrade fx_trade_of(const Value& v, string_view key) {
 
 void op_fx_forward_pv(const In& in, Out& out) {
     const FxInput f = fx_input(in);
+    const auto snapshot = snapshot_of_input(in);
     const FxForwardTrade t = fx_trade_of(in.need("trade"), "trade");
     f.limit();
-    const FxPrice p = with_market(f, [&](const FxMarket& m) { return fx_forward_price(m, t); });
+    FxPrice p = with_market(f, [&](const FxMarket& m) { return fx_forward_price(m, t); });
+    p.valuation.data_version = snapshot;
     write_valuation(out, p.valuation);
     out.key_real("fx_delta", p.fx_delta);
 }
@@ -447,8 +451,10 @@ void op_fx_swap_pv(const In& in, Out& out) {
     const In t(tv);
     const FxSwapTrade trade{t.real("notional_base"), t.date("near_date"), t.real("near_rate"), t.date("far_date"),
                             t.real("far_rate"), t.choice("far_side", fx_sides)};
+    const auto snapshot = snapshot_of_input(in);
     f.limit();
-    const FxPrice p = with_market(f, [&](const FxMarket& m) { return fx_swap_price(m, trade); });
+    FxPrice p = with_market(f, [&](const FxMarket& m) { return fx_swap_price(m, trade); });
+    p.valuation.data_version = snapshot;
     write_valuation(out, p.valuation);
     out.key_real("fx_delta", p.fx_delta);
 }
@@ -490,8 +496,8 @@ void op_calib_fit(const In& in, Out& out) {
     FitInputs f;
     f.model = in.choice<FitModel>("model", {{"LINEAR", FitModel::Linear}, {"EXPONENTIAL", FitModel::Exponential},
                                             {"NELSON_SIEGEL", FitModel::NelsonSiegel}, {"ROSENBROCK", FitModel::Rosenbrock}});
-    f.x = in.reals("x");
-    f.y = in.reals("y");
+    if (f.model != FitModel::Rosenbrock || in.find("x")) f.x = in.reals("x");
+    if (f.model != FitModel::Rosenbrock || in.find("y")) f.y = in.reals("y");
     f.start = in.reals("start");
     f.method = in.choice<FitMethod>("method", {{"GAUSS_NEWTON", FitMethod::GaussNewton},
                                                {"LEVENBERG_MARQUARDT", FitMethod::LevenbergMarquardt}, {"BFGS", FitMethod::Bfgs}});
@@ -550,7 +556,9 @@ void op_curve_report(const In& in, Out& out) {
     out.values.end_array();
     out.key_real("condition_number", r.condition_number);
     out.diagnostics.key("inputs");
-    out.diagnostics.value(in.need("quotes"));
+    out.diagnostics.begin_array();
+    for (const Value& q : in.need("quotes").items) out.diagnostics.string(q.find("tenor")->text);
+    out.diagnostics.end_array();
     out.diagnostics.key("status");
     out.diagnostics.string("OK");
     out.diagnostic("max_repricing_error", r.max_repricing_error);

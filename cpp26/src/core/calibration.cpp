@@ -329,15 +329,17 @@ FitResult fit(const FitInputs& in) {
     const std::size_t n = in.start.size();
     if (in.x.size() != in.y.size()) throw Error("E_INPUT", "x and y differ in length");
     if (n != parameter_count(in.model)) throw Error("E_INPUT", "start has the wrong length", "start");
-    if (in.weights && in.weights->size() != in.x.size()) throw Error("E_INPUT", "weights have the wrong length", "weights");
+    const bool data_fit = in.model != FitModel::Rosenbrock;  // weights do not apply to Rosenbrock
+    if (data_fit && in.weights && in.weights->size() != in.x.size())
+        throw Error("E_INPUT", "weights have the wrong length", "weights");
     if (in.prior && in.prior->size() != n) throw Error("E_INPUT", "prior has the wrong length", "prior");
-    if (in.weights && std::ranges::any_of(*in.weights, [](double w) { return w < 0.0; }))
+    if ((in.lower && in.lower->size() != n) || (in.upper && in.upper->size() != n))
+        throw Error("E_INPUT", "bounds have the wrong length");
+    if (data_fit && in.weights && std::ranges::any_of(*in.weights, [](double w) { return w < 0.0; }))
         throw Error("E_DOMAIN", "a weight is negative", "weights");
     if (in.regularisation < 0.0) throw Error("E_DOMAIN", "regularisation is negative", "regularisation");
     if ((in.lower || in.upper) && in.method != FitMethod::LevenbergMarquardt)
         throw Error("E_INPUT", "bounds need LEVENBERG_MARQUARDT");
-    if ((in.lower && in.lower->size() != n) || (in.upper && in.upper->size() != n))
-        throw Error("E_INPUT", "bounds have the wrong length");
     if (in.lower && in.upper)
         for (std::size_t k = 0; k < n; ++k)
             if ((*in.lower)[k] > (*in.upper)[k]) throw Error("E_INPUT", "lower is above upper");

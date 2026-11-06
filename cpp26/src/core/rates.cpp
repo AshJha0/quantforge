@@ -22,8 +22,7 @@ const RateConvention table[] = {
 double sign_of(FixedSide s) { return s == FixedSide::Pay ? 1.0 : -1.0; }
 
 Date spot_of(const RateConvention& c, Date as_of) {
-    const Date today = adjust(c.calendar, as_of, BusinessDayConvention::Following);
-    return c.spot_lag == 0 ? today : add_business_days(c.calendar, today, c.spot_lag);
+    return add_business_days(c.calendar, as_of, c.spot_lag);
 }
 
 Date plus_months(const RateConvention& c, Date d, long long months) {
@@ -169,6 +168,7 @@ Curve::Curve(Date as_of, CurveInterpolation interpolation)
 
 Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars)
     : Curve(as_of, interpolation) {
+    if (pillars.empty()) throw Error("E_INPUT", "no pillars", "pillars");
     Date previous = as_of;
     for (const Pillar& p : pillars) {
         if (p.date <= previous) throw Error("E_INPUT", "pillars must increase and follow as_of", "pillars");
