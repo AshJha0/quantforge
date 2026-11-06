@@ -211,6 +211,7 @@ final class Operations {
         DataChecks.Settings cfg = new DataChecks.Settings(asOf, in.integer("stale_after_seconds"),
                 in.realOrNull("max_relative_spread"), in.bool("positive_only", false),
                 in.real("outlier_threshold", 5.0), in.integer("outlier_min_history", 5), history);
+        in.gate();
         List<Map<String, Object>> results = new ArrayList<>();
         for (DataChecks.Checked c : DataChecks.check(quotes, cfg)) {
             results.add(out("instrument_id", c.instrumentId(), "quote_status", c.quoteStatus(),
@@ -358,7 +359,7 @@ final class Operations {
         TABLE.put("core.interp.evaluate", Operations::interpolate);
         TABLE.put("core.interp.monotone_convex", in -> {
             MonotoneConvex.Result r = MonotoneConvex.evaluate(in.reals("t"), in.reals("r"), in.reals("at"),
-                    in.bool("positive", false));
+                    in.gate(in.bool("positive", false)));
             return out("forwards", r.forwards(), "zero_rates", r.zeroRates());
         });
         TABLE.put("core.diff.central", in -> {
@@ -418,6 +419,7 @@ final class Operations {
         if (method == Interpolation.Method.TENSION) {
             tension = in.real("tension");
         }
+        in.gate();
         Interpolation.Result r = Interpolation.evaluate(method, x, y, at, new Interpolation.Params(start, end, tension));
         return r.derivatives() == null ? out("values", r.values()) : out("values", r.values(), "derivatives", r.derivatives());
     }
@@ -438,7 +440,7 @@ final class Operations {
             return out("count", s.count(), "mean", s.mean(), "variance", s.variance(), "stdev", s.stdev(),
                     "skewness", s.skewness(), "excess_kurtosis", s.excessKurtosis(), "min", s.min(), "max", s.max());
         });
-        TABLE.put("core.stats.quantile", in -> out("values", Statistics.quantile(in.reals("x"), in.reals("p"))));
+        TABLE.put("core.stats.quantile", in -> out("values", Statistics.quantile(in.reals("x"), in.gate(in.reals("p")))));
         TABLE.put("core.stats.covariance", in -> {
             Statistics.Covariance c = Statistics.covariance(in.reals("x"), in.reals("y"));
             return out("covariance", c.covariance(), "correlation", c.correlation());

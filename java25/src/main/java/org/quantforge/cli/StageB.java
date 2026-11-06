@@ -301,7 +301,9 @@ final class StageB {
         table.put("fx.curve.implied", in -> {
             FxInput f = fxInput(in);
             List<Fx.Point> points = new ArrayList<>();
-            for (In p : in.objects("points")) {
+            List<In> list = in.objects("points");
+            in.limit(list.size() > MAX_QUOTES, "points");
+            for (In p : list) {
                 String tenor = p.string("tenor");
                 Ois.checkTenor(tenor);
                 if (tenor.endsWith("D") || tenor.endsWith("W")) {

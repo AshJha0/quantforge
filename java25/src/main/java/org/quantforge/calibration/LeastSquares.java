@@ -231,6 +231,17 @@ public final class LeastSquares {
         return s;
     }
 
+    /**
+     * Backtracking ended. With finite trials the step shrank below the step test at rounding level, which is a stop.
+     * If every trial was non-finite no acceptable step exists (B22).
+     */
+    private static Fit stalled(Problem q, double[] p, int iterations, boolean finiteTrial) {
+        if (!finiteTrial) {
+            throw new QfError("E_NO_CONVERGENCE", "no acceptable step");
+        }
+        return finish(q, p, iterations, "STEP");
+    }
+
     private static Fit finish(Problem q, double[] p, int iterations, String status) {
         double objective = linearise(q, p).objective();
         double[] residuals = new double[q.x().length];
@@ -260,11 +271,17 @@ public final class LeastSquares {
             double[] step = LinearAlgebra.solve(s.normal(), rhs);
             double scale = 1.0;
             double f0 = s.objective();
-            while (scale > 1e-20 && !(linearise(q, plus(p, step, scale)).objective() < f0)) {
+            boolean finiteTrial = false;
+            while (scale > 1e-20) {
+                double trial = linearise(q, plus(p, step, scale)).objective();
+                finiteTrial |= Double.isFinite(trial);
+                if (trial < f0) {
+                    break;
+                }
                 scale /= 2.0;
             }
             if (scale <= 1e-20) {
-                return finish(q, p, it, "STEP");
+                return stalled(q, p, it, finiteTrial);
             }
             double[] next = plus(p, step, scale);
             double[] moved = plus(next, p, -1.0);
@@ -372,9 +389,11 @@ public final class LeastSquares {
             double step = 1.0;
             double[] next = null;
             double fNext = 0.0;
+            boolean finiteTrial = false;
             while (slope < 0.0 && step > 1e-20) {
                 next = plus(p, d, step);
                 fNext = linearise(q, next).objective();
+                finiteTrial |= Double.isFinite(fNext);
                 if (fNext <= f + 1e-4 * step * slope) {
                     break;
                 }
@@ -382,7 +401,7 @@ public final class LeastSquares {
             }
             if (!(slope < 0.0) || step <= 1e-20) {
                 if (fresh) {
-                    return finish(q, p, it, "STEP");
+                    return stalled(q, p, it, finiteTrial);
                 }
                 h = identity(n);
                 fresh = true;
