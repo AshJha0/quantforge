@@ -3,7 +3,7 @@ the core, which applies the rule checks in spec order. It returns (outputs, diag
 import inspect
 from collections.abc import Callable
 from datetime import date
-from types import ModuleType
+from types import ModuleType, SimpleNamespace
 from typing import Any
 
 from .. import (
@@ -25,6 +25,17 @@ from .. import (
     store,
     timezones,
 )
+from .. import calibration as _calibration
+from .. import conventions as _conventions
+from .. import curves as _curves
+from .. import fx as _fx
+from .. import hedging as _hedging
+from .. import money as _money
+from .. import ois as _ois
+from .. import projection as _projection
+from .. import schedules as _schedules
+from .. import sensitivities as _sensitivities
+from .. import usecases as _usecases
 from ..calendars import TENOR
 from ..daycount import check_conditional
 from ..errors import QfError
@@ -32,6 +43,7 @@ from ..snapshot import has_lone_surrogate
 from .functions import real_function, root_function
 from .inputs import Inputs, format_seconds, parse_instant, parse_u64
 from .limits import check_limits
+from .stage_b import handlers as _stage_b_handlers
 
 Result = dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]
 OPTIONS = ("CALL", "PUT")
@@ -74,6 +86,17 @@ integrate, interp, linalg, monte_carlo, pde = map(
 )
 rng, roots, snapshot, sobol, stats, store, timezones = map(
     _Core, (rng, roots, snapshot, sobol, stats, store, timezones)
+)
+
+
+_STAGE_B = SimpleNamespace(
+    **{
+        m.__name__.rsplit(".", 1)[-1]: _Core(m)
+        for m in (
+            _calibration, _conventions, _curves, _fx, _hedging, _money, _ois, _projection,
+            _schedules, _sensitivities, _usecases,
+        )
+    }
 )
 
 
@@ -596,3 +619,4 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
     "core.time.to_instant": _to_instant,
     "core.time.business_date": _business_date,
 }
+OPERATIONS.update(_stage_b_handlers(_STAGE_B))

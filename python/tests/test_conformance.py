@@ -8,7 +8,7 @@ import pytest
 from quantforge_core.cli.main import run_case
 
 ROOT = Path(__file__).resolve().parents[2]
-GOLDEN = sorted((ROOT / "datasets" / "golden" / "core").glob("*.json"))
+GOLDEN = sorted((ROOT / "datasets" / "golden").rglob("*.json"))
 
 
 def _load_runner():
