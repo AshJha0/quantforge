@@ -3,7 +3,7 @@
 Docs site: <https://ashjha0.github.io/quantforge/>
 ## Quantitative analytics and trading infrastructure
 
-QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Two stages are built so far: Foundation (released as v0.1) and the FX and rates slices (stage B, target v0.2). See Status below.
+QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Two stages are built so far: Foundation (released as v0.1) and the FX and rates slices (released as v0.2). See Status below.
 
 ### Toolchains
 - **Java 25:** JDK 25.0.5.
@@ -43,11 +43,12 @@ QuantForge is a quantitative library written four times, in Java, C++, Python an
 1. `LEARN.md` for a path through the maths, `COOKBOOK.md` for commands.
 2. `ARCHITECTURE.md`, then the ADRs in `architecture/decisions/`.
 3. `ROADMAP.md` for the stages, `GLOSSARY.md` for terms.
+4. [Curves gallery](docs/curves/README.md): every implemented curve, with charts from real CLI runs on synthetic inputs.
 
 ### Status
 Each capability moves through `Proposed → Specified → Implemented → Validated → Benchmarked → Operationally tested`. Stage A (domain 01) and the stage B slices of domains 02, 03, 04, 06 and 08 are at Implemented. Nothing is claimed as Validated, Benchmarked or Operationally tested. The rest of those domains, and domains 05, 07 and 09 to 12, are capability lists only.
 
-Stage B covers SONIA and minimal SOFR OIS curves, projection curves, FRAs, swaps, FX forwards and swaps, quote-driven basis, Gauss-Newton, Levenberg-Marquardt and BFGS fits, DV01 and key-rate risk, and hedges with a spread-based cost. It targets v0.2, which is not tagged. v0.1 was released on 2026-11-06.
+Stage B covers SONIA and minimal SOFR OIS curves, projection curves, FRAs, swaps, FX forwards and swaps, quote-driven basis, Gauss-Newton, Levenberg-Marquardt and BFGS fits, DV01 and key-rate risk, and hedges with a spread-based cost. It was released as v0.2, tag on `fe33b40`. v0.1 was released on 2026-11-06.
 
 What has run (observed, local): on 2026-11-06, after the evidence cleanup, all four implementations passed all 4,737 golden cases in 40 suites through the neutral runner, on one Windows machine. That is 4,388 cases in 21 stage A suites, and 343 cases in 18 stage B suites.
 

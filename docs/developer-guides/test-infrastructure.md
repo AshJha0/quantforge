@@ -11,7 +11,7 @@ CI minutes are capped at about 2,000 a month with a hard stop, so pull-request w
 | `sanitizers.yml` | Same, C++ paths only | Unit tests and golden cases under ASan and UBSan |
 | `fuzz.yml` | Monday, manual | Three minutes of fuzzing per language; C++ uses the sanitizer build |
 | `mutation.yml` | Manual only | One language and one target per run |
-| `docs.yml` | Markdown or site script change, manual | Builds the static site with `tools/build_site.py`, fails on a broken relative link, and keeps the site as a 7-day artifact. On a public repository, a push to `main` also deploys to GitHub Pages. |
+| `docs.yml` | Markdown, site script, gallery, example, Python or stage B golden change, manual | Reruns the Python CLI against the committed Curves gallery (`curves-gallery.md`), builds the static site with `tools/build_site.py`, fails on a broken relative link, and keeps the site as a 7-day artifact. On a public repository, a push to `main` also deploys to GitHub Pages. |
 | `security.yml` | Monday, lockfile change, manual | OSV scan of the Rust, Python and Java dependencies |
 
 Dependabot opens one grouped pull request per ecosystem each month. It does not track the Catch2 pin in `cpp26/CMakeLists.txt`, so update that by hand.
