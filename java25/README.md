@@ -18,8 +18,7 @@ python conformance/runner/runner.py --impl java
 `org.quantforge.core` holds the maths. `org.quantforge.cli` holds the JSON contract and the test-function registry.
 `SobolData.java` carries the direction numbers as code, because the CLI reads no file for its numbers.
 
-`GoldenSuiteTest` runs every golden case in process except `limits-0011`, which fails in the neutral runner. Its
-outcome depends on rounding, and it is question 13 in `SPEC_QUESTIONS.md`, with the other open questions.
+`GoldenSuiteTest` runs every golden case in process. Spec questions are in `SPEC_QUESTIONS.md`.
 
 Use primitive arrays and measured allocation-aware designs in numerical hot paths. Do not assume virtual threads
 improve CPU-bound numerical kernels.

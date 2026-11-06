@@ -25,6 +25,7 @@ public final class Main {
 
     private static final String CONTRACT = "1.0.0";
     private static final String VERSION = "0.1.0";
+    private static final int MAX_CASE_DEPTH = 80;
     private static final Set<String> ENVELOPE = Set.of("schema_version", "case_id", "operation", "inputs");
     private static final Pattern SCHEMA_VERSION = Pattern.compile("[0-9]+\\.[0-9]+");
     private static final Pattern OPERATION = Pattern.compile("[a-z0-9_]+(\\.[a-z0-9_]+)+");
@@ -126,6 +127,9 @@ public final class Main {
         try {
             if (text == null) {
                 throw new QfError("E_PARSE", "input is not UTF-8");
+            }
+            if (Json.nestsDeeperThan(text, MAX_CASE_DEPTH)) {
+                throw new QfError("E_LIMIT", "case is nested too deeply");
             }
             Json.Document doc = Json.parse(text);
             if (doc.value() instanceof Map<?, ?> m && m.get("case_id") instanceof String id && !id.isEmpty()) {

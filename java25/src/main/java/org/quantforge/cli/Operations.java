@@ -488,7 +488,9 @@ final class Operations {
                 throw new QfError("E_SCHEMA", "lone surrogate in a record", "records");
             }
             Object value = r.anyValue("value");
-            in.limit(Json.depth(value) > SnapshotHash.MAX_DEPTH, "value");
+            for (Object field : r.raw().values()) {
+                in.limit(Json.depth(field) > SnapshotHash.MAX_DEPTH, "records");
+            }
             log.add(new AsOfStore.Entry(sequence, series, r.instant("event_time"), r.instant("knowledge_time"),
                     value, r.bool("deleted", false), r.raw()));
         }

@@ -19,9 +19,6 @@ import org.quantforge.core.Json;
 class GoldenSuiteTest {
     private static final Path GOLDEN = Path.of("..", "datasets", "golden", "core");
 
-    /** Its outcome turns on the last bits of exp and cos, so it is left to the runner; see SPEC_QUESTIONS.md. */
-    private static final String ROUNDING_DEPENDENT = "limits-0011";
-
     /** absolute, relative; null means exact. Mirrors conformance/tolerances/policy.yaml. */
     private static final Map<String, double[]> CLASSES = Map.of(
             "date_and_convention", new double[0], "bit_exact", new double[0],
@@ -36,7 +33,7 @@ class GoldenSuiteTest {
         try (Stream<Path> s = Files.list(GOLDEN)) {
             files = s.sorted().toList();
         }
-        assertEquals(20, files.size());
+        assertEquals(21, files.size());
         return files.stream().map(p -> DynamicTest.dynamicTest(p.getFileName().toString(), () -> suite(p)));
     }
 
@@ -49,9 +46,6 @@ class GoldenSuiteTest {
         List<String> failures = new ArrayList<>();
         for (Object o : (List<?>) doc.get("cases")) {
             Map<?, ?> c = map(o);
-            if (ROUNDING_DEPENDENT.equals(c.get("case_id"))) {
-                continue;
-            }
             Map<String, Object> envelope = new LinkedHashMap<>();
             envelope.put("schema_version", "1.0");
             envelope.put("case_id", c.get("case_id"));

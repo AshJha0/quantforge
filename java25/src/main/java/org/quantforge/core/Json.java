@@ -19,30 +19,55 @@ public final class Json {
         }
     }
 
-    public record Document(Object value, boolean numberOverflow, boolean loneSurrogate, int maxDepth) {}
-
-    private static final int MAX_DEPTH = 2000;
+    public record Document(Object value, boolean numberOverflow, boolean loneSurrogate) {}
 
     private final String s;
     private int i;
     private boolean overflow;
     private boolean lone;
-    private int deepest;
 
     private Json(String s) {
         this.s = s;
     }
 
-    /** Parses a whole document. Throws E_PARSE on bad JSON or a duplicate key at any depth. */
+    /**
+     * The lexical depth scan of limits.md B2. It checks no syntax, and callers run it before parsing, which also
+     * keeps the recursive parser within its stack.
+     */
+    public static boolean nestsDeeperThan(String text, int limit) {
+        int depth = 0;
+        boolean inString = false;
+        for (int k = 0; k < text.length(); k++) {
+            char c = text.charAt(k);
+            if (inString) {
+                if (c == '\\') {
+                    k++;
+                } else if (c == '"') {
+                    inString = false;
+                }
+            } else if (c == '"') {
+                inString = true;
+            } else if (c == '[' || c == '{') {
+                if (++depth > limit) {
+                    return true;
+                }
+            } else if (c == ']' || c == '}') {
+                depth--;
+            }
+        }
+        return false;
+    }
+
+    /** Parses a whole document. Callers run {@link #nestsDeeperThan} first. Throws E_PARSE on bad JSON or a duplicate key at any depth. */
     public static Document parse(String text) {
         Json p = new Json(text);
         p.ws();
-        Object v = p.value(0);
+        Object v = p.value();
         p.ws();
         if (p.i != text.length()) {
             throw p.bad("trailing text");
         }
-        return new Document(v, p.overflow, p.lone, p.deepest);
+        return new Document(v, p.overflow, p.lone);
     }
 
     private QfError bad(String why) {
@@ -66,17 +91,10 @@ public final class Json {
         return s.charAt(i);
     }
 
-    private Object value(int depth) {
-        if (depth > MAX_DEPTH) {
-            // Far past the 64-level limit. The parser stops here to protect its stack.
-            throw new QfError("E_LIMIT", "nesting too deep");
-        }
-        if (peek() == '{' || peek() == '[') {
-            deepest = Math.max(deepest, depth + 1);
-        }
+    private Object value() {
         return switch (peek()) {
-            case '{' -> object(depth);
-            case '[' -> array(depth);
+            case '{' -> object();
+            case '[' -> array();
             case '"' -> string();
             case 't' -> literal("true", Boolean.TRUE);
             case 'f' -> literal("false", Boolean.FALSE);
@@ -93,7 +111,7 @@ public final class Json {
         return v;
     }
 
-    private Map<String, Object> object(int depth) {
+    private Map<String, Object> object() {
         Map<String, Object> m = new LinkedHashMap<>();
         i++;
         ws();
@@ -113,7 +131,7 @@ public final class Json {
             }
             i++;
             ws();
-            Object v = value(depth + 1);
+            Object v = value();
             if (m.containsKey(k)) {
                 throw bad("duplicate key");
             }
@@ -130,7 +148,7 @@ public final class Json {
         }
     }
 
-    private List<Object> array(int depth) {
+    private List<Object> array() {
         List<Object> a = new ArrayList<>();
         i++;
         ws();
@@ -140,7 +158,7 @@ public final class Json {
         }
         while (true) {
             ws();
-            a.add(value(depth + 1));
+            a.add(value());
             ws();
             char c = peek();
             if (c != ']' && c != ',') {
