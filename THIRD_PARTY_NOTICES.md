@@ -8,8 +8,8 @@ No raw market data is in this repository, so these notices apply to anyone who p
 
 - **SONIA:** "SONIA and/or SONIA Compounded Index data licensed under the Open Government Licence v3.0". The Bank's key features page also says a direct licence is needed for some activities, such as redistributing to clients, so raw SONIA data stays local until the Bank has answered.
 - **ECB:** cite the European Central Bank as the source, leave values unchanged, and state any modification.
-- **New York Fed:** SOFR data "is subject to the Terms of Use posted at newyorkfed.org", and the Bank has no liability. QuantForge is not affiliated with the Federal Reserve Bank of New York. SOFR is not recorded yet.
-- **Federal Reserve Board:** cite the Board for H.10 and H.15. Not recorded yet.
+- **New York Fed:** SOFR data "is subject to the Terms of Use posted at newyorkfed.org", and the Bank has no liability. QuantForge is not affiliated with the Federal Reserve Bank of New York. The full notice is in `tools/recorder/sources.json`.
+- **Federal Reserve Board:** cite the Board for H.10 and H.15. H.10 is recorded; H.15 is not.
 - **US Treasury:** cite the US Department of the Treasury.
 - **FRED:** not used. Its terms bar storing content.
 

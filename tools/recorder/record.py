@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Daily public-data recorder. Neutral tooling: standard library, no financial logic.
 
-Fetches each enabled source in sources.json, keeps the raw bytes under data/recorder/ (ignored by git, so no
+Fetches each enabled source in sources.json, keeps the raw bytes and the source's notice under data/recorder/ (ignored by git, so no
 source's data is ever committed), and writes the hash, size and time to the forward log. Identical bytes
 are still logged, because "nothing new today" is evidence too. Run it once a day:
 
@@ -24,8 +24,8 @@ spec = importlib.util.spec_from_file_location("forward_log", ROOT / "tools" / "f
 fl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(fl)
 
-USER_AGENT = "Mozilla/5.0 (compatible; quantforge-recorder/0.1)"
-REQUIRED = ("id", "url", "licence", "licence_url", "terms_checked", "attribution", "redistribute_raw", "enabled")
+USER_AGENT = "Mozilla/5.0 (compatible; quantforge-recorder/0.2)"
+REQUIRED = ("id", "url", "licence", "licence_url", "terms_checked", "attribution", "redistribute_raw", "notice", "enabled")
 
 
 def fetch(url, timeout):
@@ -63,6 +63,7 @@ def main():
             out = Path(a.data) / s["id"] / f"{now:%Y-%m-%d}-{digest[:12]}.raw"
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_bytes(raw)
+            (out.parent / "NOTICE.txt").write_text(s["notice"] + "\n", encoding="utf-8")
             value = {"kind": "recording", "url": url, "sha256": digest, "bytes": len(raw), "licence": s["licence"]}
             print(f"{s['id']}: {len(raw)} bytes {digest[:12]}")
         except (OSError, ValueError) as e:
