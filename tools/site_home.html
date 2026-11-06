@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantForge</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="hero">
+  <h1>QuantForge</h1>
+  <p>Quantitative analytics and trading infrastructure, written four times: in Java, C++, Python and Rust. Each language is built separately from the same specification, with no shared code. Expected results come from an independent oracle of hand cases, QuantLib and Strata. Trading is simulated only, and nothing here has been used on a live book.</p>
+  <div class="buttons">
+    <a href="ARCHITECTURE.html">Architecture</a>
+    <a href="docs/diagrams/README.html">Diagrams</a>
+    <a href="LEARN.html">Learn</a>
+    <a href="COOKBOOK.html">Cookbook</a>
+    <a href="GLOSSARY.html">Glossary</a>
+    <a href="ROADMAP.html">Roadmap</a>
+    <a href="all-pages.html">All pages</a>
+    <a class="quiet" href="https://github.com/AshJha0/quantforge">GitHub</a>
+  </div>
+</header>
+<div class="wrap">
+  <h2>Status</h2>
+  <p class="note">Released: v0.2. Stages A and B are at Implemented, not Validated. Validation is self-assessment until a human review at the end of the project. Most curve inputs are labelled synthetic, because free quote history does not exist for them.</p>
+  <div class="cards">
+    <div class="card"><b>4 languages</b><span>Java 25, C++26, Python 3.15, Rust 2024</span></div>
+    <div class="card"><b>4,737 golden cases</b><span>40 suites, each language passes all of them</span></div>
+    <div class="card"><b>12 domains</b><span>Delivered in 11 stages, A to K</span></div>
+    <div class="card"><b>Daily recorder</b><span>Six public sources, hashed into a forward log</span></div>
+  </div>
+
+  <h2>Stages</h2>
+  <table>
+    <thead><tr><th>Stage</th><th>Scope</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>A</td><td>Foundation: conventions, numerics, oracle, conformance</td><td>Released, v0.1</td></tr>
+      <tr><td>B</td><td>FX and rates slices: OIS, FX forwards, hedges</td><td>Released, v0.2</td></tr>
+      <tr><td>C</td><td>Equity volatility</td><td>Next</td></tr>
+      <tr><td>D to K</td><td>Curves, exotics, risk, xVA, execution, hedging, research, platform</td><td>Planned; see <a href="ROADMAP.html">Roadmap</a></td></tr>
+    </tbody>
+  </table>
+
+  <h2>How results are checked</h2>
+  <div class="cards">
+    <div class="card"><b>Oracle</b><span>Golden values never come from the four implementations. <a href="oracle/README.html">Oracle</a></span></div>
+    <div class="card"><b>Conformance</b><span>A neutral runner compares each CLI with the goldens. <a href="conformance/README.html">Conformance</a></span></div>
+    <div class="card"><b>Test infrastructure</b><span>Sanitizers, fuzzing and mutation testing. <a href="docs/developer-guides/test-infrastructure.html">Guide</a></span></div>
+  </div>
+
+  <h2>Quick start</h2>
+  <pre><code>git clone https://github.com/AshJha0/quantforge.git
+cd quantforge/rust
+cargo build --release
+cd ..
+python conformance/runner/runner.py --impl rust</code></pre>
+  <p>Agreement between languages does not prove correctness, and results on synthetic data test the method, not the market. See the <a href="README.html">README</a> for the full status and known issues.</p>
+</div>
+</body></html>

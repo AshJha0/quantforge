@@ -21,17 +21,29 @@ ROOT = Path(__file__).resolve().parents[1]
 LEFT_OUT = (".github/",)
 LINK = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)\)")
 FENCE = re.compile(r"^(```|~~~).*?^\1\s*$", re.M | re.S)
-CSS = """body{max-width:52rem;margin:0 auto;padding:1rem;font:16px/1.55 system-ui,sans-serif;color:#222}
-pre{background:#f4f4f4;padding:.7rem;overflow-x:auto}code{font-size:.92em}
-table{border-collapse:collapse;display:block;overflow-x:auto}th,td{border:1px solid #ccc;padding:.25rem .5rem}
-nav{border-bottom:1px solid #ccc;padding-bottom:.5rem;margin-bottom:1rem}
-@media(prefers-color-scheme:dark){body{background:#181818;color:#ddd}a{color:#8ab4f8}pre{background:#262626}}
+CSS = """:root{--bg:#f7f8fa;--ink:#1a1a2e;--brand:#16697a;--accent:#16a085;--line:#d9dee3;--panel:#fff;--code:#eef1f4;--link:#16697a}
+@media(prefers-color-scheme:dark){:root{--bg:#14181d;--ink:#e3e6ea;--brand:#16697a;--accent:#16a085;--line:#333b44;--panel:#1d232a;--code:#232a32;--link:#6fc7d6}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",Arial,sans-serif}
+a{color:var(--link)}.wrap{max-width:60rem;margin:0 auto;padding:1.5rem 1rem 3rem}
+.hero{background:var(--brand);color:#fff;padding:3rem 2rem}.hero h1{font-size:2.2rem;margin:0 0 .75rem}.hero p{max-width:50rem;margin:0 0 1.25rem}
+.buttons{display:flex;flex-wrap:wrap;gap:.6rem}.buttons a{background:var(--accent);color:#fff;padding:.55rem 1.1rem;border-radius:4px;text-decoration:none}
+.buttons a.quiet{background:rgba(255,255,255,.18)}.buttons a:hover{filter:brightness(1.1)}
+.bar{background:var(--brand);padding:.6rem 1rem;display:flex;flex-wrap:wrap;gap:1rem}.bar a{color:#fff;text-decoration:none}.bar a:first-child{font-weight:600}
+h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--line);padding-bottom:.3rem;margin-top:2rem}
+.note{background:var(--panel);border-left:4px solid var(--accent);padding:.7rem 1rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:.8rem 1rem}.card b{display:block}.card span{font-size:.92rem}
+pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em}
+table{border-collapse:collapse;display:block;overflow-x:auto;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
+.mermaid{background:#fff;border-radius:4px;padding:.5rem;overflow-x:auto}
 """
 PAGE = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} - QuantForge</title><link rel="stylesheet" href="{up}style.css"></head>
-<body><nav><a href="{up}index.html">Home</a> | <a href="{up}all-pages.html">All pages</a></nav>
+<body><nav class="bar"><a href="{up}index.html">QuantForge</a><a href="{up}LEARN.html">Learn</a><a href="{up}COOKBOOK.html">Cookbook</a><a href="{up}ARCHITECTURE.html">Architecture</a><a href="{up}docs/diagrams/README.html">Diagrams</a><a href="{up}all-pages.html">All pages</a></nav>
+<div class="wrap">
 {body}
+</div>
 </body></html>
 """
 
@@ -114,7 +126,7 @@ def main():
         up = "../" * page.count("/")
         target.write_text(PAGE.format(title=html.escape(title), up=up, body=body), encoding="utf-8")
         listing.append((page, title))
-    shutil.copy(out / "README.html", out / "index.html")
+    shutil.copy(ROOT / "tools" / "site_home.html", out / "index.html")
     rows = "\n".join(f'<li><a href="{p[:-3]}.html">{html.escape(p)}</a>: {html.escape(t)}</li>' for p, t in listing)
     (out / "all-pages.html").write_text(PAGE.format(title="All pages", up="", body=f"<h1>All pages</h1><ul>{rows}</ul>"),
                                         encoding="utf-8")
