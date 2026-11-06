@@ -142,6 +142,45 @@ pub fn eigen_symmetric(a: &Matrix) -> Result<Vec<f64>> {
     Ok(values)
 }
 
+/// Singular values by one-sided Jacobi rotations.
+pub fn singular_values(a: &Matrix) -> Vec<f64> {
+    let (rows, n) = (a.len(), a.first().map_or(0, Vec::len));
+    let mut m = a.clone();
+    for _ in 0..100 {
+        let mut rotated = false;
+        for p in 0..n {
+            for q in p + 1..n {
+                let (mut alpha, mut beta, mut gamma) = (0.0f64, 0.0f64, 0.0f64);
+                for r in 0..rows {
+                    alpha += m[r][p] * m[r][p];
+                    beta += m[r][q] * m[r][q];
+                    gamma += m[r][p] * m[r][q];
+                }
+                if gamma == 0.0 || gamma.abs() <= 1e-16 * f64::sqrt(alpha * beta) {
+                    continue;
+                }
+                rotated = true;
+                let zeta = (beta - alpha) / (2.0 * gamma);
+                let sign = if zeta < 0.0 { -1.0 } else { 1.0 };
+                let t = sign / (zeta.abs() + (1.0 + zeta * zeta).sqrt());
+                let c = 1.0 / (1.0 + t * t).sqrt();
+                let s = c * t;
+                for r in 0..rows {
+                    let (x, y) = (m[r][p], m[r][q]);
+                    m[r][p] = c * x - s * y;
+                    m[r][q] = s * x + c * y;
+                }
+            }
+        }
+        if !rotated {
+            break;
+        }
+    }
+    (0..n)
+        .map(|k| (0..rows).map(|r| m[r][k] * m[r][k]).sum::<f64>().sqrt())
+        .collect()
+}
+
 /// Thomas algorithm for a constant tridiagonal system. The solution replaces `rhs`.
 pub fn thomas(lower: f64, diag: f64, upper: f64, rhs: &mut [f64]) {
     let n = rhs.len();
