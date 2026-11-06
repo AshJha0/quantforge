@@ -43,7 +43,7 @@ jobs:
   cpp:
     if: inputs.language == 'cpp'
     runs-on: ubuntu-24.04
-    container: gcc:16.2
+    container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

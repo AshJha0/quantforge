@@ -13,7 +13,7 @@ concurrency:
 jobs:
   gcc:
     runs-on: ubuntu-24.04
-    container: gcc:16.2
+    container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -32,6 +32,7 @@ jobs:
           persist-credentials: false
       - run: |
           wget -q https://apt.llvm.org/llvm.sh
+          echo "03878e08f47b66cc95bc4b544b0db3c6d9ce8d60e6cf2492ae357984330a9eae  llvm.sh" | sha256sum -c -
           sudo bash llvm.sh 23
           sudo apt-get install -y ninja-build libc++-23-dev libc++abi-23-dev
       - run: cmake -S cpp26 -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-23 -DCMAKE_CXX_FLAGS=-stdlib=libc++

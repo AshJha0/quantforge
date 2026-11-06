@@ -39,7 +39,7 @@ jobs:
   cpp:
     runs-on: ubuntu-24.04
     container:
-      image: gcc:16.2
+      image: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
       options: --cap-add=SYS_PTRACE
     timeout-minutes: 20
     steps:
