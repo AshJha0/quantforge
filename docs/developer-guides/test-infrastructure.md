@@ -1,10 +1,13 @@
 # Test infrastructure
 
-CI minutes are capped at about 2,000 a month with a hard stop, so only conformance and the sanitizers run on pull requests, and only when their paths change. Everything runs on Linux.
+None of these workflows has run on GitHub yet: the remote had no commits when this was written, so every result so far is local, on Windows.
+
+CI minutes are capped at about 2,000 a month with a hard stop, so pull-request workflows run only when their paths change. Everything runs on Linux.
 
 | Workflow | Runs on | What it does |
 |---|---|---|
 | `conformance.yml` | Pull request, push to main, manual | Builds each CLI and runs all golden cases, and tests the runner itself |
+| `java25.yml`, `cpp26.yml`, `python.yml`, `rust.yml` | Pull request and push to main, own paths only | Each language's own build and unit tests. `cpp26.yml` has GCC and Clang jobs |
 | `sanitizers.yml` | Same, C++ paths only | Unit tests and golden cases under ASan and UBSan |
 | `fuzz.yml` | Monday, manual | Three minutes of fuzzing per language; C++ uses the sanitizer build |
 | `mutation.yml` | Manual only | One language and one target per run |

@@ -12,7 +12,7 @@ Stage A of QuantForge: every spec in `specifications/01-core/`, behind the CLI i
 | `tests/` | Catch2 tests, from the specs' worked examples and numeric targets |
 | `SPEC_QUESTIONS.md` | Golden cases that disagree with a spec, and gaps in the specs |
 
-There are no dependencies beyond the standard library, apart from Catch2 for tests. The Sobol table is compiled in
+The other folders in `include/quantforge/` are empty placeholders for later stages. There are no dependencies beyond the standard library, apart from Catch2 for tests. The Sobol table is compiled in
 with `#embed`, so no command reads a file.
 
 ## Build
@@ -30,7 +30,7 @@ Sanitizers, on Linux: add `-DQF_SANITIZE=address,undefined,float-cast-overflow`.
 Clang on Windows, using the WinLibs headers and libraries:
 
 ```bash
-cmake -S . -B build-clang -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_COMPILER_TARGET=x86_64-w64-mingw32 "-DCMAKE_CXX_FLAGS=--sysroot=<mingw64 folder>" -DCMAKE_CXX_STANDARD_LIBRARIES=-lwinpthread
+cmake -S . -B build-clang -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_COMPILER_TARGET=x86_64-w64-mingw32 "-DCMAKE_CXX_FLAGS=--sysroot=<mingw64 folder, as C:/...>" -DCMAKE_CXX_STANDARD_LIBRARIES=-lwinpthread
 ```
 
 ## Conformance

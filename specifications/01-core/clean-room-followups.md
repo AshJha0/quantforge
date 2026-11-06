@@ -2,6 +2,8 @@
 
 For the four language sessions. Rulings are in `rulings.md`; golden cases are in the `rulings` and `store` suites.
 
+Historical. These items have been applied: on 2026-11-06, at commit `ffa0585`, all four builds passed every suite named here. Lines saying no build was run describe the time of writing. Ruling A4 still has no golden case.
+
 ## All four
 
 - Add `core.store.query_as_of`, `latest`, `snapshot`, `replay`, `chain` from `asof-store.md`.

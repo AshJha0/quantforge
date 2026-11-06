@@ -1,13 +1,20 @@
 # Changelog
 
-## Unreleased
+## Unreleased: stage A, Foundation (target v0.1)
+
+Nothing is tagged yet. Validation is self-assessment until the human review after the project, and CI has not yet run on GitHub. The conformance figures below are one local run on Windows, 2026-11-06.
+
+### Added
+- Four equal implementations of domain 01, in Java 25, C++26, Python 3.15.2 and Rust 1.99.1, each behind the `quantforge` CLI.
+- Specifications for day counts, calendars, compounding, timezones and cut-off, data checks, snapshot hash, as-of store and replay, RNG, Sobol, root finders, integration, interpolation, differentiation and linear algebra, statistics and time series, PDE, Monte Carlo and COS, with rulings and input limits. CLI contract 1.2.0.
+- `oracle/`, using exact rationals, mpmath, QuantLib, Strata, NumPy and SciPy, hand cases and replay. 4,388 golden cases in 21 suites. All four builds passed all of them.
+- Neutral runner, CLI fuzz driver, mutation harnesses, and CI workflows, none of which has run on GitHub.
+- Public-data recorder with a licence manifest, and a hash-chained forward log. The recorder is built but not scheduled.
+- Schemas, tolerance policy with no global default, data-availability table, oracle map and licences, ADR-0009 and ADR-0010, numeric targets for stage B.
+- Root documents, diagrams, tickets W01 to W05, exercises 1 to 3 with data and solutions, traceability table.
 
 ### Changed
-- Reworked the starter scaffold: four equal implementations, oracle decision, full MIT text, pinned toolchains and actions, date-based Rust day counts, Catch2 tests for C++, tolerance policy with no global default.
+- Reworked the starter scaffold: four equal implementations, full MIT text, pinned toolchains and actions, date-based Rust day counts, Catch2 tests for C++.
 
 ### Removed
 - 36-week roadmap, epics and generated manifest.
-
-## Stage A, spec and oracle (unreleased)
-- CLI contract, core specifications, schemas, oracle with golden cases, neutral runner tested on a stub CLI.
-- Rulings on silent spec points, as-of store spec, recorder and forward log, root documents, diagrams, exercises 1 to 3 with solutions, tickets W01 to W05, traceability table.

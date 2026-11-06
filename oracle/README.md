@@ -10,7 +10,7 @@ To regenerate everything, compile `oracle/strata` with Maven, write its classpat
 cd oracle/python && uv run python -W ignore run_all.py
 ```
 
-This writes `datasets/golden/core/*.json` and `REPORT.md`. Generators stop with an error when sources disagree,
+This takes about three minutes and writes `datasets/golden/core/*.json` and `REPORT.md`. On Windows it also rewrites `oracle/strata/out/` with CRLF line endings, which git shows as changed; the content is the same. Generators stop with an error when sources disagree,
 apart from the differences recorded in the specs. Each case's `verified_by` lists the sources that agreed with it.
 The oracle runs on Python 3.12, pinned separately from the Python implementation.
 

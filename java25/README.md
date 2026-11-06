@@ -1,7 +1,7 @@
 # Java 25 implementation
 
 Stage A of QuantForge, written from `specifications/01-core/` and `specifications/cli-contract.md`. It uses JDK 25
-final features only, and has no runtime dependencies.
+final features only, and has no runtime dependencies; JUnit is for tests only.
 
 ```bash
 mvn -B test
@@ -20,5 +20,4 @@ python conformance/runner/runner.py --impl java
 
 `GoldenSuiteTest` runs every golden case in process. Spec questions are in `SPEC_QUESTIONS.md`.
 
-Use primitive arrays and measured allocation-aware designs in numerical hot paths. Do not assume virtual threads
-improve CPU-bound numerical kernels.
+The other packages under `org/quantforge/` are empty placeholders for later stages. No benchmark has been run.

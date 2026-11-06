@@ -51,5 +51,5 @@ Nesting up to 64 levels must work. Beyond that: `E_LIMIT`, as for text over the 
 
 ## Acceptance
 
-Class `date_and_convention`, exact on both outputs. Oracle: `oracle/python/qf_oracle/canon.py`, with
+Class `date_and_convention`, exact on both outputs. Oracle: `canon` in `oracle/python/gen_data.py`, with
 the SHA-256 checked against the NIST `abc` vector and against the system `sha256sum`.
