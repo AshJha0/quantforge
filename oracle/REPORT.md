@@ -3,11 +3,14 @@
 Written by `oracle/python/run_all.py`. Every line comes from that run.
 
 ```
-daycount difference strata ACT_ACT_ICMA: 13 of the tested pairs; first [('2024-01-01', '2024-01-31', 0.08152173913043478, 0.08241758241758242), ('2024-02-28', '2024-02-29', 0.002717391304347826, 0.0027472527472527475), ('2024-03-01', '2024-04-30', 0.16393442622950818, 0.16304347826086957)]
-daycount difference strata ACT_ACT_AFB: 11 of the tested pairs; first [('2020-02-29', '2028-02-28', 8.0, 7.997267759562842), ('2024-01-01', '2025-02-28', 1.1616438356164382, 1.158904109589041), ('2024-02-29', '2028-02-28', 4.0, 3.9972677595628414)]
-daycount difference strata ONE_ONE: 6 of the tested pairs; first [('2024-04-30', '2024-04-30', 0.0, 1.0), ('2024-01-01', '2024-01-01', 0.0, 1.0), ('2025-01-01', '2025-01-01', 0.0, 1.0)]
-suite daycount: 1741 cases
-suite calendar: 1154 cases
+daycount QuantLib THIRTY_E_360_ISDA: 1 difference, start = end = termination on 29 February, QuantLib gives -1/360; the spec gives 0
+daycount Strata ACT_ACT_AFB: 11 differences, all with end on 28 February, all reproduced by Strata's documented rule
+daycount Strata ONE_ONE: 6 differences, all start = end; Strata documents 1/1 as always 1
+daycount Strata THIRTY_E_360_ISDA: 1 difference, same case as QuantLib, -1/360; the spec gives 0
+daycount: no other difference from QuantLib or Strata, ACT_ACT_ICMA included
+suite daycount: 1756 cases
+add_tenor: text of calendars.md matches QuantLib on every day 2021 to 2026, two calendars, all conventions
+suite calendar: 1169 cases
 suite compounding: 846 cases
 rng: xoshiro256** and SplitMix64 match the published reference vectors
 rng: PPND16 worst relative error against 50-digit erfinv over 17 points: 3.40e-16
@@ -54,4 +57,6 @@ suite snapshot: 21 cases
 suite data_checks: 27 cases
 time: rule table matches zoneinfo at 2717520 half-hour instants, 2007 to 2037, five zones
 suite time: 123 cases
+invariants: 256620 day-count evaluations, none negative, all equal-date results 0
+invariants: 4241 golden cases checked, none breaks a stated invariant
 ```

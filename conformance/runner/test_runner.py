@@ -76,6 +76,38 @@ class StubTests(unittest.TestCase):
         self.assertIsNone(rep)
 
 
+class CommandTests(unittest.TestCase):
+    def test_relative_path_gains_suffix_and_root(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "build").mkdir()
+            (Path(d) / "build" / "quantforge.exe").write_text("")
+            argv, cwd = runner.resolve_command({"command": ["build/quantforge", "x"], "cwd": "."}, d, windows=True)
+            self.assertEqual(Path(argv[0]), (Path(d) / "build" / "quantforge.exe").resolve())
+            self.assertEqual(argv[1], "x")
+            self.assertEqual(Path(cwd), Path(d) / ".")
+
+    def test_no_suffix_added_off_windows(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "tool.exe").write_text("")
+            argv, _ = runner.resolve_command({"command": ["./tool"]}, d, windows=False)
+            self.assertEqual(argv[0], "./tool")
+
+    def test_bare_name_uses_path(self):
+        argv, _ = runner.resolve_command({"command": ["python"]}, ROOT)
+        self.assertTrue(Path(argv[0]).is_absolute())
+
+    @unittest.skipUnless(sys.platform == "win32", "needs a Windows launcher")
+    def test_end_to_end_relative_launcher_from_another_directory(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "bin").mkdir()
+            (Path(d) / "bin" / "qf.cmd").write_text(f'@"{sys.executable}" "{HERE / "stub_cli.py"}" %*\r\n')
+            cfg = Path(d) / "impl.json"
+            cfg.write_text(json.dumps({"stub": {"command": ["bin/qf"], "cwd": d}}))
+            p = subprocess.run([sys.executable, str(HERE / "runner.py"), "--impl", "stub", "--config", str(cfg), "--report", d, "--suite", "sobol"],
+                               capture_output=True, text=True, cwd=tempfile.gettempdir())
+            self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+
+
 class CompareTests(unittest.TestCase):
     cls = {"absolute": 1e-12, "relative": 1e-10}
 
