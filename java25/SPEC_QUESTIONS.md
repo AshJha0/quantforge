@@ -12,16 +12,29 @@ Written from the specs alone. Where a spec and a golden case disagree, this buil
 The choices once listed here for silent points are now settled by `specifications/01-core/rulings.md`, and the
 code follows those rulings.
 
+## Closed by rulings A1 to A6 and `limits.md` (3737bb5)
+
+| # | Point | Outcome |
+|---|---|---|
+| 4 | `sequence < 1` or empty `series_id` | Closed: `E_SCHEMA` (A1) |
+| 5 | "Before anything else" in the store's log checks | Closed: the contract's order holds (A2), and the code changed |
+| 6 | Chain keeps every record key | Closed: confirmed (A3) |
+| 7 | Lone surrogate in a record | Closed: `E_SCHEMA` (A4), and the code changed. No golden case yet, so this is untested by the runner |
+| 8 | `replay` `head` | Closed: confirmed (A6) |
+| 9 | `skip` near 2^53 | Closed: `E_LIMIT` above 10,000,000 in `rng` and `sobol` |
+
+## Closed by rulings B1 to B5 (bb663d6)
+
+| # | Point | Outcome |
+|---|---|---|
+| 10 | Nesting beyond the parser's threshold | Closed: a lexical scan runs before parsing (B2), and the parser's own limit is gone |
+| 11 | "No work is started" and the array limit | Closed: `limits.md` now allows one linear pass over input already read |
+| 12 | `document_text` over the byte limit | Closed: tested first, without parsing (B1), and the code changed |
+| 13 | limits-0011 depended on rounding | Closed: the case was replaced. The 10,000,000-call limit stays in the code as a backstop with no golden case |
+
 ## Open points
 
-| # | Place | Choice |
-|---|---|---|
-| 4 | `asof-store.md`, `sequence < 1` or empty `series_id` | `E_SCHEMA`, as a mistyped record under log check 1. The spec does not name a code |
-| 5 | `asof-store.md`, "before anything else" | Log checks run before all other inputs, so a log `E_INPUT` beats a malformed `as_of`, which differs from the contract's schema-first order |
-| 6 | `asof-store.md`, chain | "Canonical form of the record as given" keeps every key, including unknown ones. A top-level `snapshot_id` in a record is kept, as the exclusion belongs to the snapshot hash |
-| 7 | `asof-store.md`, lone surrogate inside `value` | Not rejected. `snapshot-hash.md` would make it `E_SCHEMA` on document text, and UTF-8 cannot carry it |
-| 8 | `core.store.replay` | `head` is the chain head of the whole log |
-| 9 | Ruling N1, `skip` | `rng` steps one draw at a time, so a skip near 2^53 is correct in principle but will not finish. `sobol` keeps its limit of indices below 2^32 |
+None.
 
 ## Small document points
 

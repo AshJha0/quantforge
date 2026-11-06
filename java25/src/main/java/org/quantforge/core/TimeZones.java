@@ -90,6 +90,11 @@ public final class TimeZones {
         }
     }
 
+    /** The UTC year of an instant. */
+    public static int utcYear(long instant) {
+        return utc(instant).getYear();
+    }
+
     /** An instant in Z form. */
     public static String formatInstant(long instant) {
         return FORMAT.format(utc(instant)) + "Z";

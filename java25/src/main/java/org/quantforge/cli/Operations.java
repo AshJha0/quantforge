@@ -17,6 +17,7 @@ import org.quantforge.core.CosPricer;
 import org.quantforge.core.DataChecks;
 import org.quantforge.core.DayCount;
 import org.quantforge.core.Integration;
+import org.quantforge.core.Json;
 import org.quantforge.core.Interpolation;
 import org.quantforge.core.LinearAlgebra;
 import org.quantforge.core.MonotoneConvex;
@@ -90,7 +91,10 @@ final class Operations {
         TABLE.put("core.calendar.add_business_days", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             LocalDate d = in.date("date");
-            return out("date", Calendars.addBusinessDays(cal, d, in.integer("days")).toString());
+            long days = in.integer("days");
+            in.limit(Math.abs(days) > 30_000, "days");
+            in.gate();
+            return out("date", Calendars.addBusinessDays(cal, d, days).toString());
         });
         TABLE.put("core.calendar.business_days_between", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
@@ -223,11 +227,11 @@ final class Operations {
     }
 
     private static int count(In in) {
-        long c = in.integer("count");
-        if (c < 1 || c > 100000) {
-            throw new QfError("E_SCHEMA", "count out of range", "count");
+        long c = in.atMost("count", 100_000);
+        if (c < 1) {
+            throw new QfError("E_SCHEMA", "count below 1", "count");
         }
-        return (int) c;
+        return (int) Math.min(c, 100_000);
     }
 
     /** Reads the common inputs of the seeded generators and positions a generator after {@code skip}. */
@@ -238,6 +242,8 @@ final class Operations {
         if (skip < 0) {
             throw new QfError("E_SCHEMA", "skip is negative", "skip");
         }
+        in.limit(skip > 10_000_000L, "skip");
+        in.gate();
         Rng rng = Rng.seeded(seed, stream);
         for (long i = 0; i < skip; i++) {
             rng.nextLong();
@@ -254,7 +260,10 @@ final class Operations {
     }
 
     private static RootFinders.Tolerances tolerances(In in) {
-        return new RootFinders.Tolerances(in.real("x_tol", 1e-12), in.real("f_tol", 0.0), in.integer("max_iter", 200));
+        RootFinders.Tolerances t = new RootFinders.Tolerances(in.real("x_tol", 1e-12), in.real("f_tol", 0.0),
+                in.atMost("max_iter", 200, 100_000));
+        in.gate();
+        return t;
     }
 
     private static Out rootOut(RootFinders.Result r) {
@@ -299,6 +308,7 @@ final class Operations {
         TABLE.put("core.rng.set_state_next_u64", in -> {
             long[] state = in.u64s("state", 4);
             int n = count(in);
+            in.gate();
             if ((state[0] | state[1] | state[2] | state[3]) == 0) {
                 throw new QfError("E_INPUT", "all-zero state", "state");
             }
@@ -323,11 +333,11 @@ final class Operations {
         });
         TABLE.put("core.integrate.trapezoid", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
-            return out("value", Integration.trapezoid(f, in.real("a"), in.real("b"), in.integer("n")));
+            return out("value", Integration.trapezoid(f, in.real("a"), in.real("b"), in.gate(in.atMost("n", 10_000_000))));
         });
         TABLE.put("core.integrate.simpson", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
-            return out("value", Integration.simpson(f, in.real("a"), in.real("b"), in.integer("n")));
+            return out("value", Integration.simpson(f, in.real("a"), in.real("b"), in.gate(in.atMost("n", 10_000_000))));
         });
         TABLE.put("core.integrate.gauss_legendre", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
@@ -336,12 +346,12 @@ final class Operations {
         TABLE.put("core.integrate.adaptive_simpson", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             return out("value", Integration.adaptiveSimpson(f, in.real("a"), in.real("b"), in.real("tol", 1e-10),
-                    in.integer("max_depth", 50)));
+                    in.gate(in.atMost("max_depth", 50, 60))));
         });
         TABLE.put("core.integrate.gauss_kronrod", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             Integration.Adaptive r = Integration.gaussKronrod(f, in.real("a"), in.real("b"), in.real("tol", 1e-10),
-                    in.integer("max_intervals", 500));
+                    in.gate(in.atMost("max_intervals", 500, 10_000)));
             return withDiagnostics(out("value", r.value()), "error_estimate", r.errorEstimate());
         });
         TABLE.put("core.interp.evaluate", Operations::interpolate);
@@ -366,17 +376,18 @@ final class Operations {
             return out("value", order == 1 ? (up - down) / (2.0 * h)
                     : (up - 2.0 * f.applyAsDouble(x) + down) / (h * h));
         });
-        TABLE.put("core.linalg.solve", in -> out("x", LinearAlgebra.solve(in.matrix("a"), in.reals("b"))));
-        TABLE.put("core.linalg.cholesky", in -> out("l", LinearAlgebra.cholesky(in.matrix("a"))));
-        TABLE.put("core.linalg.eigen_symmetric", in -> out("values", LinearAlgebra.eigenSymmetric(in.matrix("a"))));
+        TABLE.put("core.linalg.solve", in -> out("x", LinearAlgebra.solve(in.matrix("a"), in.gate(in.reals("b")))));
+        TABLE.put("core.linalg.cholesky", in -> out("l", LinearAlgebra.cholesky(in.gate(in.matrix("a")))));
+        TABLE.put("core.linalg.eigen_symmetric", in -> out("values", LinearAlgebra.eigenSymmetric(in.gate(in.matrix("a")))));
     }
 
     private static Out sobol(In in) {
         long dimensions = in.integer("dimensions");
         long count = in.integer("count");
         long skip = in.integer("skip", 0);
-        if (dimensions < 1 || dimensions > Sobol.MAX_DIMENSIONS || count < 1 || count > 1_000_000 || skip < 0
-                || skip + count >= (1L << 32)) {
+        in.limit(In.productOver(count, dimensions, 100_000) || skip > 10_000_000L, "count");
+        in.gate();
+        if (dimensions < 1 || dimensions > Sobol.MAX_DIMENSIONS || count < 1 || skip < 0) {
             throw new QfError("E_INPUT", "dimensions, count or skip out of range");
         }
         Sobol s = new Sobol((int) dimensions, skip);
@@ -442,12 +453,12 @@ final class Operations {
         });
         TABLE.put("core.ts.rolling", in -> {
             double[] x = in.reals("x");
-            long w = in.integer("window");
-            return out("values", TimeSeries.rolling(x, w, in.choice("statistic", TimeSeries.RollingStatistic.class)));
+            long w = in.atMost("window", 1000);
+            return out("values", TimeSeries.rolling(x, w, in.gate(in.choice("statistic", TimeSeries.RollingStatistic.class))));
         });
         TABLE.put("core.ts.ewma_variance", in -> out("variance", TimeSeries.ewmaVariance(in.reals("returns"), in.real("lambda"))));
-        TABLE.put("core.ts.autocorrelation", in -> out("acf", TimeSeries.autocorrelation(in.reals("x"), in.integer("max_lag"))));
-        TABLE.put("core.ts.ljung_box", in -> out("statistic", TimeSeries.ljungBox(in.reals("x"), in.integer("max_lag"))));
+        TABLE.put("core.ts.autocorrelation", in -> out("acf", TimeSeries.autocorrelation(in.reals("x"), in.gate(in.atMost("max_lag", 1000)))));
+        TABLE.put("core.ts.ljung_box", in -> out("statistic", TimeSeries.ljungBox(in.reals("x"), in.gate(in.atMost("max_lag", 1000)))));
         TABLE.put("core.ts.ar1", in -> {
             TimeSeries.Ar1 a = TimeSeries.ar1(in.reals("x"));
             return out("constant", a.constant(), "phi", a.phi(), "sigma", a.sigma());
@@ -464,7 +475,7 @@ final class Operations {
         });
     }
 
-    /** Reads and checks the log. The store spec runs this before anything else in the case. */
+    /** Reads the log. Limits and the log's rule checks wait until every input of the case has been read. */
     private static List<AsOfStore.Entry> log(In in) {
         List<AsOfStore.Entry> log = new ArrayList<>();
         for (In r : in.objects("records")) {
@@ -473,11 +484,24 @@ final class Operations {
             if (sequence < 1 || series.isEmpty()) {
                 throw new QfError("E_SCHEMA", "need sequence >= 1 and a non-empty series_id", "records");
             }
+            if (Json.hasLoneSurrogate(r.raw())) {
+                throw new QfError("E_SCHEMA", "lone surrogate in a record", "records");
+            }
+            Object value = r.anyValue("value");
+            for (Object field : r.raw().values()) {
+                in.limit(Json.depth(field) > SnapshotHash.MAX_DEPTH, "records");
+            }
             log.add(new AsOfStore.Entry(sequence, series, r.instant("event_time"), r.instant("knowledge_time"),
-                    r.anyValue("value"), r.bool("deleted", false), r.raw()));
+                    value, r.bool("deleted", false), r.raw()));
         }
-        AsOfStore.checkLog(log);
         return log;
+    }
+
+    /** Runs after all reads: limits, then log checks, then the year limit on records and on {@code others}. */
+    private static void checkStore(In in, List<AsOfStore.Entry> log, List<Long> others) {
+        in.gate();
+        AsOfStore.checkLog(log);
+        others.forEach(AsOfStore::checkInstant);
     }
 
     private static void store() {
@@ -487,6 +511,14 @@ final class Operations {
             String series = in.has("series_id") ? in.string("series_id") : null;
             Long from = in.has("event_from") ? in.instant("event_from") : null;
             Long to = in.has("event_to") ? in.instant("event_to") : null;
+            List<Long> others = new ArrayList<>(List.of(asOf));
+            if (from != null) {
+                others.add(from);
+            }
+            if (to != null) {
+                others.add(to);
+            }
+            checkStore(in, log, others);
             if (from != null && to != null && from > to) {
                 throw new QfError("E_DATE_ORDER", "event_from is after event_to", "event_to");
             }
@@ -503,6 +535,7 @@ final class Operations {
             List<AsOfStore.Entry> log = log(in);
             long asOf = in.instant("as_of");
             String series = in.string("series_id");
+            checkStore(in, log, List.of(asOf));
             AsOfStore.Entry last = null;
             for (AsOfStore.Entry e : AsOfStore.view(log, asOf)) {
                 if (series.equals(e.seriesId())) {
@@ -513,12 +546,16 @@ final class Operations {
         });
         TABLE.put("core.store.snapshot", in -> {
             List<AsOfStore.Entry> log = log(in);
-            SnapshotHash.Result r = AsOfStore.snapshot(log, in.instant("as_of"));
+            long asOf = in.instant("as_of");
+            checkStore(in, log, List.of(asOf));
+            SnapshotHash.Result r = AsOfStore.snapshot(log, asOf);
             return out("canonical", r.canonical(), "snapshot_id", r.snapshotId());
         });
         TABLE.put("core.store.replay", in -> {
             List<AsOfStore.Entry> log = log(in);
             List<Long> checkpoints = in.instants("checkpoints");
+            in.limit(checkpoints.size() > 1000 || In.productOver(log.size(), checkpoints.size(), 10_000_000L), "checkpoints");
+            checkStore(in, log, checkpoints);
             for (int i = 1; i < checkpoints.size(); i++) {
                 if (checkpoints.get(i) < checkpoints.get(i - 1)) {
                     throw new QfError("E_INPUT", "checkpoints out of order", "checkpoints");
@@ -532,7 +569,9 @@ final class Operations {
             return out("snapshots", snapshots, "head", AsOfStore.chain(log).head());
         });
         TABLE.put("core.store.chain", in -> {
-            AsOfStore.Chain c = AsOfStore.chain(log(in));
+            List<AsOfStore.Entry> log = log(in);
+            checkStore(in, log, List.of());
+            AsOfStore.Chain c = AsOfStore.chain(log);
             return out("head", c.head(), "hashes", c.hashes());
         });
     }
@@ -544,16 +583,22 @@ final class Operations {
     private static void engines() {
         TABLE.put("core.pde.bs_european", in -> {
             boolean call = in.choice("option", Option.class) == Option.CALL;
+            long space = in.integer("space_steps");
+            long time = in.integer("time_steps");
+            in.limit(In.productOver(space, time, 10_000_000L), "space_steps");
             PdeEngine.Result r = PdeEngine.solve(new PdeEngine.Inputs(call, in.real("spot"), in.real("strike"),
-                    in.real("r"), in.real("q"), in.real("sigma"), in.real("t"), in.integer("space_steps"),
-                    in.integer("time_steps"), in.real("width", 6.0), in.integer("rannacher_steps", 2)));
+                    in.real("r"), in.real("q"), in.real("sigma"), in.real("t"), space, time, in.real("width", 6.0),
+                    in.gate(in.integer("rannacher_steps", 2))));
             return withDiagnostics(out("price", r.price(), "delta", r.delta(), "gamma", r.gamma()), "grid_h", r.gridH());
         });
         TABLE.put("core.mc.gbm_european", in -> {
             boolean call = in.choice("option", Option.class) == Option.CALL;
+            long paths = in.integer("paths");
+            long steps = in.integer("steps", 1);
+            in.limit(In.productOver(paths, steps, 1_000_000L), "paths");
             MonteCarlo.Result r = MonteCarlo.price(new MonteCarlo.Inputs(call, in.real("spot"), in.real("strike"),
-                    in.real("r"), in.real("q"), in.real("sigma"), in.real("t"), in.integer("paths"),
-                    in.integer("steps", 1), in.u64("seed"), stream(in), in.choice("method", MonteCarlo.Method.class)));
+                    in.real("r"), in.real("q"), in.real("sigma"), in.real("t"), paths, steps, in.u64("seed"),
+                    stream(in), in.gate(in.choice("method", MonteCarlo.Method.class))));
             return out("price", r.price(), "stderr", r.stderr());
         });
         TABLE.put("core.cos.european", in -> {
@@ -563,7 +608,8 @@ final class Operations {
                     ? new CosPricer.BlackScholes(m.real("sigma"))
                     : new CosPricer.Heston(m.real("v0"), m.real("kappa"), m.real("theta"), m.real("sigma"), m.real("rho"));
             CosPricer.Result r = CosPricer.price(new CosPricer.Inputs(call, in.real("spot"), in.real("strike"),
-                    in.real("r"), in.real("q"), in.real("t"), model, in.integer("terms"), in.real("truncation")));
+                    in.real("r"), in.real("q"), in.real("t"), model, in.atMost("terms", 100_000),
+                    in.gate(in.real("truncation"))));
             return withDiagnostics(out("price", r.price()), "a", r.a(), "b", r.b());
         });
     }

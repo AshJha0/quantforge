@@ -10,6 +10,8 @@ public final class Integration {
 
     public record Adaptive(double value, double errorEstimate) {}
 
+    private static final long MAX_CALLS = 10_000_000L;
+
     private static void checkRange(double a, double b) {
         if (!(a < b)) {
             throw new QfError("E_INPUT", "need a < b");
@@ -91,6 +93,17 @@ public final class Integration {
         return (b - a) / 2.0 * sum;
     }
 
+    /** Stops a run at the fixed call limit of limits.md. */
+    private static DoubleUnaryOperator counted(DoubleUnaryOperator f) {
+        long[] calls = new long[1];
+        return x -> {
+            if (++calls[0] >= MAX_CALLS) {
+                throw new QfError("E_NO_CONVERGENCE", "function call limit reached");
+            }
+            return f.applyAsDouble(x);
+        };
+    }
+
     private static double finite(DoubleUnaryOperator f, double x) {
         double v = f.applyAsDouble(x);
         if (!Double.isFinite(v)) {
@@ -104,10 +117,11 @@ public final class Integration {
         if (!(tol > 0.0) || maxDepth < 1) {
             throw new QfError("E_INPUT", "need tol > 0 and max_depth >= 1");
         }
-        double fa = finite(f, a);
-        double fb = finite(f, b);
-        double fm = finite(f, (a + b) / 2.0);
-        return simpsonStep(f, a, b, fa, fm, fb, (b - a) / 6.0 * (fa + 4.0 * fm + fb), tol, 0, maxDepth);
+        DoubleUnaryOperator g = counted(f);
+        double fa = finite(g, a);
+        double fb = finite(g, b);
+        double fm = finite(g, (a + b) / 2.0);
+        return simpsonStep(g, a, b, fa, fm, fb, (b - a) / 6.0 * (fa + 4.0 * fm + fb), tol, 0, maxDepth);
     }
 
     private static double simpsonStep(DoubleUnaryOperator f, double l, double r, double fl, double fm, double fr,
@@ -155,7 +169,8 @@ public final class Integration {
         return new Piece(a, b, k * h, Math.abs(k - g) * h);
     }
 
-    public static Adaptive gaussKronrod(DoubleUnaryOperator f, double a, double b, double tol, long maxIntervals) {
+    public static Adaptive gaussKronrod(DoubleUnaryOperator raw, double a, double b, double tol, long maxIntervals) {
+        DoubleUnaryOperator f = counted(raw);
         checkRange(a, b);
         if (!(tol > 0.0) || maxIntervals < 1) {
             throw new QfError("E_INPUT", "need tol > 0 and max_intervals >= 1");

@@ -33,7 +33,7 @@ class GoldenSuiteTest {
         try (Stream<Path> s = Files.list(GOLDEN)) {
             files = s.sorted().toList();
         }
-        assertEquals(18, files.size());
+        assertEquals(21, files.size());
         return files.stream().map(p -> DynamicTest.dynamicTest(p.getFileName().toString(), () -> suite(p)));
     }
 

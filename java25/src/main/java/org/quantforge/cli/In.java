@@ -16,10 +16,70 @@ final class In {
     private static final Pattern U64 = Pattern.compile("[0-9]+");
     private static final double MAX_INTEGER = 0x1p53;
 
-    private final Map<?, ?> values;
+    private static final int MAX_ARRAY = 100_000;
+    private static final int MAX_MATRIX_ROWS = 200;
 
-    In(Map<?, ?> values) {
+    private final Map<?, ?> values;
+    /** The first E_LIMIT found, shared with nested objects. Held back so that E_SCHEMA on later inputs wins. */
+    private final QfError[] pending;
+
+    private In(Map<?, ?> values, QfError[] pending) {
         this.values = values;
+        this.pending = pending;
+    }
+
+    /** Wraps a case's inputs and notes any array over the general limit, used by the operation or not. */
+    In(Map<?, ?> values) {
+        this(values, new QfError[1]);
+        scanArrays(values);
+    }
+
+    private void scanArrays(Object v) {
+        if (v instanceof List<?> l) {
+            limit(l.size() > MAX_ARRAY, "array");
+            l.forEach(this::scanArrays);
+        } else if (v instanceof Map<?, ?> m) {
+            m.values().forEach(this::scanArrays);
+        }
+    }
+
+    /** Notes a limit breach, to be raised once every input has been read. */
+    void limit(boolean over, String key) {
+        if (over && pending[0] == null) {
+            pending[0] = new QfError("E_LIMIT", key + " is above its limit", key);
+        }
+    }
+
+    /** True if a x b is above max, for values that have both passed their minimum. */
+    static boolean productOver(long a, long b, long max) {
+        return a > 0 && b > 0 && (double) a * (double) b > max;
+    }
+
+    QfError pendingLimit() {
+        return pending[0];
+    }
+
+    /** Call once all inputs are read and before any work: raises a held E_LIMIT. */
+    void gate() {
+        if (pending[0] != null) {
+            throw pending[0];
+        }
+    }
+
+    /** {@link #gate()} as an expression, for the last input read in an argument list. */
+    <T> T gate(T lastInput) {
+        gate();
+        return lastInput;
+    }
+
+    long atMost(String key, long max) {
+        long v = integer(key);
+        limit(v > max, key);
+        return v;
+    }
+
+    long atMost(String key, long fallback, long max) {
+        return has(key) ? atMost(key, max) : fallback;
     }
 
     private static QfError schema(String key, String why) {
@@ -203,6 +263,7 @@ final class In {
 
     double[][] matrix(String key) {
         List<?> rows = list(key);
+        limit(rows.size() > MAX_MATRIX_ROWS, key);
         double[][] out = new double[rows.size()][];
         for (int i = 0; i < out.length; i++) {
             if (!(rows.get(i) instanceof List<?> row)) {
@@ -235,7 +296,7 @@ final class In {
 
     In object(String key) {
         if (need(key) instanceof Map<?, ?> m) {
-            return new In(m);
+            return new In(m, pending);
         }
         throw schema(key, "expected an object");
     }
@@ -246,7 +307,7 @@ final class In {
             if (!(v instanceof Map<?, ?> m)) {
                 throw schema(key, "expected an array of objects");
             }
-            out.add(new In(m));
+            out.add(new In(m, pending));
         }
         return out;
     }

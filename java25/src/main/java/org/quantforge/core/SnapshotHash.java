@@ -15,7 +15,16 @@ public final class SnapshotHash {
 
     public record Result(String canonical, String snapshotId) {}
 
+    public static final int MAX_DEPTH = 64;
+    private static final int MAX_BYTES = 1_048_576;
+
     public static Result hash(String documentText) {
+        if (documentText.getBytes(StandardCharsets.UTF_8).length > MAX_BYTES) {
+            throw new QfError("E_LIMIT", "document is too large", "document_text");
+        }
+        if (Json.nestsDeeperThan(documentText, MAX_DEPTH)) {
+            throw new QfError("E_LIMIT", "document is nested too deeply", "document_text");
+        }
         Json.Document doc = Json.parse(documentText);
         if (doc.numberOverflow()) {
             throw new QfError("E_SCHEMA", "number overflows binary64", "document_text");

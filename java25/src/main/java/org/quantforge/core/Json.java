@@ -21,8 +21,6 @@ public final class Json {
 
     public record Document(Object value, boolean numberOverflow, boolean loneSurrogate) {}
 
-    private static final int MAX_DEPTH = 2000;
-
     private final String s;
     private int i;
     private boolean overflow;
@@ -32,11 +30,39 @@ public final class Json {
         this.s = s;
     }
 
-    /** Parses a whole document. Throws E_PARSE on bad JSON or a duplicate key at any depth. */
+    /**
+     * The lexical depth scan of limits.md B2. It checks no syntax, and callers run it before parsing, which also
+     * keeps the recursive parser within its stack.
+     */
+    public static boolean nestsDeeperThan(String text, int limit) {
+        int depth = 0;
+        boolean inString = false;
+        for (int k = 0; k < text.length(); k++) {
+            char c = text.charAt(k);
+            if (inString) {
+                if (c == '\\') {
+                    k++;
+                } else if (c == '"') {
+                    inString = false;
+                }
+            } else if (c == '"') {
+                inString = true;
+            } else if (c == '[' || c == '{') {
+                if (++depth > limit) {
+                    return true;
+                }
+            } else if (c == ']' || c == '}') {
+                depth--;
+            }
+        }
+        return false;
+    }
+
+    /** Parses a whole document. Callers run {@link #nestsDeeperThan} first. Throws E_PARSE on bad JSON or a duplicate key at any depth. */
     public static Document parse(String text) {
         Json p = new Json(text);
         p.ws();
-        Object v = p.value(0);
+        Object v = p.value();
         p.ws();
         if (p.i != text.length()) {
             throw p.bad("trailing text");
@@ -65,13 +91,10 @@ public final class Json {
         return s.charAt(i);
     }
 
-    private Object value(int depth) {
-        if (depth > MAX_DEPTH) {
-            throw bad("nesting too deep");
-        }
+    private Object value() {
         return switch (peek()) {
-            case '{' -> object(depth);
-            case '[' -> array(depth);
+            case '{' -> object();
+            case '[' -> array();
             case '"' -> string();
             case 't' -> literal("true", Boolean.TRUE);
             case 'f' -> literal("false", Boolean.FALSE);
@@ -88,7 +111,7 @@ public final class Json {
         return v;
     }
 
-    private Map<String, Object> object(int depth) {
+    private Map<String, Object> object() {
         Map<String, Object> m = new LinkedHashMap<>();
         i++;
         ws();
@@ -108,7 +131,7 @@ public final class Json {
             }
             i++;
             ws();
-            Object v = value(depth + 1);
+            Object v = value();
             if (m.containsKey(k)) {
                 throw bad("duplicate key");
             }
@@ -125,7 +148,7 @@ public final class Json {
         }
     }
 
-    private List<Object> array(int depth) {
+    private List<Object> array() {
         List<Object> a = new ArrayList<>();
         i++;
         ws();
@@ -135,7 +158,7 @@ public final class Json {
         }
         while (true) {
             ws();
-            a.add(value(depth + 1));
+            a.add(value());
             ws();
             char c = peek();
             if (c != ']' && c != ',') {
@@ -252,6 +275,49 @@ public final class Json {
             overflow = true;
         }
         return new Number(v, text);
+    }
+
+    /** Levels of nesting in a parsed value. An object or array is one level; scalars add none. */
+    public static int depth(Object v) {
+        int inner = 0;
+        switch (v) {
+            case List<?> l -> {
+                for (Object e : l) {
+                    inner = Math.max(inner, depth(e));
+                }
+                return inner + 1;
+            }
+            case Map<?, ?> m -> {
+                for (Object e : m.values()) {
+                    inner = Math.max(inner, depth(e));
+                }
+                return inner + 1;
+            }
+            case null, default -> {
+                return 0;
+            }
+        }
+    }
+
+    /** True if any string or key in a parsed value holds a lone surrogate. */
+    public static boolean hasLoneSurrogate(Object v) {
+        switch (v) {
+            case String s -> {
+                Json j = new Json(s);
+                j.noteSurrogates(s);
+                return j.lone;
+            }
+            case List<?> l -> {
+                return l.stream().anyMatch(Json::hasLoneSurrogate);
+            }
+            case Map<?, ?> m -> {
+                return m.keySet().stream().anyMatch(Json::hasLoneSurrogate)
+                        || m.values().stream().anyMatch(Json::hasLoneSurrogate);
+            }
+            case null, default -> {
+                return false;
+            }
+        }
     }
 
     /** Writes a value as JSON. Accepts maps, lists, strings, booleans, boxed numbers and numeric arrays. */

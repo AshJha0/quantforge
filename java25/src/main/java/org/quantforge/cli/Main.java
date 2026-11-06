@@ -25,6 +25,7 @@ public final class Main {
 
     private static final String CONTRACT = "1.0.0";
     private static final String VERSION = "0.1.0";
+    private static final int MAX_CASE_DEPTH = 80;
     private static final Set<String> ENVELOPE = Set.of("schema_version", "case_id", "operation", "inputs");
     private static final Pattern SCHEMA_VERSION = Pattern.compile("[0-9]+\\.[0-9]+");
     private static final Pattern OPERATION = Pattern.compile("[a-z0-9_]+(\\.[a-z0-9_]+)+");
@@ -127,6 +128,9 @@ public final class Main {
             if (text == null) {
                 throw new QfError("E_PARSE", "input is not UTF-8");
             }
+            if (Json.nestsDeeperThan(text, MAX_CASE_DEPTH)) {
+                throw new QfError("E_LIMIT", "case is nested too deeply");
+            }
             Json.Document doc = Json.parse(text);
             if (doc.value() instanceof Map<?, ?> m && m.get("case_id") instanceof String id && !id.isEmpty()) {
                 caseId = id;
@@ -138,7 +142,7 @@ public final class Main {
                 throw new QfError("E_SCHEMA", "case is not an object");
             }
             Function<In, Operations.Out> op = checkEnvelope(envelope);
-            Operations.Out result = op.apply(new In((Map<?, ?>) envelope.get("inputs")));
+            Operations.Out result = apply(op, new In((Map<?, ?>) envelope.get("inputs")));
             if (!finite(result.outputs())) {
                 throw new QfError("E_NON_FINITE", "a result is NaN or infinite");
             }
@@ -156,6 +160,23 @@ public final class Main {
             Map<String, Object> r = header(caseId, "error");
             r.put("error", err);
             return new Reply(json(r), false);
+        }
+    }
+
+    /**
+     * Runs an operation. Those with limits on work gate themselves before starting. For the rest the general array
+     * limit is settled here: it outranks a rule error, but not E_SCHEMA.
+     */
+    private static Operations.Out apply(Function<In, Operations.Out> op, In in) {
+        try {
+            Operations.Out out = op.apply(in);
+            in.gate();
+            return out;
+        } catch (QfError e) {
+            if (in.pendingLimit() != null && !e.code().equals("E_SCHEMA") && !e.code().equals("E_PARSE")) {
+                throw in.pendingLimit();
+            }
+            throw e;
         }
     }
 
