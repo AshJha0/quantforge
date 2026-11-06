@@ -24,23 +24,24 @@ FENCE = re.compile(r"^(```|~~~).*?^\1\s*$", re.M | re.S)
 CSS = """:root{--bg:#f7f8fa;--ink:#1a1a2e;--brand:#16697a;--accent:#16a085;--line:#d9dee3;--panel:#fff;--code:#eef1f4;--link:#16697a}
 @media(prefers-color-scheme:dark){:root{--bg:#14181d;--ink:#e3e6ea;--brand:#16697a;--accent:#16a085;--line:#333b44;--panel:#1d232a;--code:#232a32;--link:#6fc7d6}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",Arial,sans-serif}
-a{color:var(--link)}.wrap{max-width:60rem;margin:0 auto;padding:1.5rem 1rem 3rem}
-.hero{background:var(--brand);color:#fff;padding:3rem 2rem}.hero h1{font-size:2.2rem;margin:0 0 .75rem}.hero p{max-width:50rem;margin:0 0 1.25rem}
+a{color:var(--link)}.inner,.wrap{max-width:68rem;margin:0 auto;padding-left:2rem;padding-right:2rem}.wrap{padding-top:1.5rem;padding-bottom:3rem}
+.hero{background:var(--brand);color:#fff;padding:3rem 0}.hero h1{font-size:2.2rem;margin:0 0 .75rem}.hero p{max-width:50rem;margin:0 0 1.25rem}
 .buttons{display:flex;flex-wrap:wrap;gap:.6rem}.buttons a{background:var(--accent);color:#fff;padding:.55rem 1.1rem;border-radius:4px;text-decoration:none}
 .buttons a.quiet{background:rgba(255,255,255,.18)}.buttons a:hover{filter:brightness(1.1)}
-.bar{background:var(--brand);padding:.6rem 1rem;display:flex;flex-wrap:wrap;gap:1rem}.bar a{color:#fff;text-decoration:none}.bar a:first-child{font-weight:600}
+.bar{background:var(--brand);padding:.6rem 0}.bar .inner{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem}.bar a{color:#fff;text-decoration:none}.bar a:first-child{font-weight:600;margin-right:auto}
 h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--line);padding-bottom:.3rem;margin-top:2rem}
 .note{background:var(--panel);border-left:4px solid var(--accent);padding:.7rem 1rem}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:.8rem 1rem}.card b{display:block}.card span{font-size:.92rem}
-pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em}
-table{border-collapse:collapse;display:block;overflow-x:auto;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
-.mermaid{background:#fff;border-radius:4px;padding:.5rem;overflow-x:auto}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem;margin:1rem 0}
+.card{background:var(--panel);border-radius:6px;padding:1rem 1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.12)}.card b{display:block}.card span{font-size:.92rem}
+pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal}
+table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
+.mermaid{background:#fff;border-radius:4px;padding:.5rem;overflow-x:auto;text-align:center}
+@media(max-width:48rem){.inner,.wrap{padding-left:1rem;padding-right:1rem}.hero{padding:2rem 0}table{display:block;overflow-x:auto}}
 """
 PAGE = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} - QuantForge</title><link rel="stylesheet" href="{up}style.css"></head>
-<body><nav class="bar"><a href="{up}index.html">QuantForge</a><a href="{up}LEARN.html">Learn</a><a href="{up}COOKBOOK.html">Cookbook</a><a href="{up}ARCHITECTURE.html">Architecture</a><a href="{up}docs/diagrams/README.html">Diagrams</a><a href="{up}all-pages.html">All pages</a></nav>
+<body><nav class="bar"><div class="inner"><a href="{up}index.html">QuantForge</a><a href="{up}LEARN.html">Learn</a><a href="{up}COOKBOOK.html">Cookbook</a><a href="{up}ARCHITECTURE.html">Architecture</a><a href="{up}docs/diagrams/README.html">Diagrams</a><a href="{up}all-pages.html">All pages</a></div></nav>
 <div class="wrap">
 {body}
 </div>
