@@ -69,6 +69,15 @@ class ContractTest {
     }
 
     @Test
+    void overflowedStartIsAnErrorForEveryMethod() {
+        for (String method : new String[] {"BFGS", "GAUSS_NEWTON", "LEVENBERG_MARQUARDT"}) {
+            String c = "{\"schema_version\":\"1.0\",\"case_id\":\"x\",\"operation\":\"calib.fit\",\"inputs\":"
+                    + "{\"model\":\"ROSENBROCK\",\"x\":[],\"y\":[],\"start\":[-1.2e+300,1.0],\"method\":\"" + method + "\"}}";
+            assertEquals("E_NON_FINITE", code(c));
+        }
+    }
+
+    @Test
     void nonFiniteResultIsReported() {
         String c = "{\"schema_version\":\"1.0\",\"case_id\":\"x\",\"operation\":\"core.integrate.trapezoid\","
                 + "\"inputs\":{\"function\":\"inv_sqrt\",\"a\":0,\"b\":1,\"n\":4}}";

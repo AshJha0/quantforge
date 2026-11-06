@@ -219,6 +219,18 @@ public final class LeastSquares {
         };
     }
 
+    /** Every method starts from here: an objective or gradient that has overflowed gives no descent to follow. */
+    private static Linearised finite(Linearised s) {
+        boolean ok = Double.isFinite(s.objective());
+        for (double g : s.gradient()) {
+            ok &= Double.isFinite(g);
+        }
+        if (!ok) {
+            throw new QfError("E_NON_FINITE", "objective or gradient is not finite");
+        }
+        return s;
+    }
+
     private static Fit finish(Problem q, double[] p, int iterations, String status) {
         double objective = linearise(q, p).objective();
         double[] residuals = new double[q.x().length];
@@ -233,7 +245,7 @@ public final class LeastSquares {
     private static Fit gaussNewton(Problem q) {
         double[] p = q.start().clone();
         for (int it = 0; ; it++) {
-            Linearised s = linearise(q, p);
+            Linearised s = finite(linearise(q, p));
             double[] g = s.gradient();
             if (norm(g) <= GRADIENT_TOL) {
                 return finish(q, p, it, "GRADIENT");
@@ -280,10 +292,10 @@ public final class LeastSquares {
             p[i] = clamp(q, i, q.start()[i]);
         }
         double mu = 1e-3;
-        Linearised s = linearise(q, p);
+        Linearised s = finite(linearise(q, p));
         double f0 = s.objective();
         for (int it = 0; ; it++) {
-            double[] g = s.gradient();
+            double[] g = finite(s).gradient();
             double[] projected = new double[n];
             int[] index = new int[n];
             int count = 0;
@@ -341,7 +353,7 @@ public final class LeastSquares {
         int n = q.start().length;
         double[] p = q.start().clone();
         double[][] h = identity(n);
-        Linearised s = linearise(q, p);
+        Linearised s = finite(linearise(q, p));
         double f = s.objective();
         double[] g = s.gradient();
         boolean fresh = true;
@@ -368,7 +380,7 @@ public final class LeastSquares {
                 }
                 step /= 2.0;
             }
-            if (slope >= 0.0 || step <= 1e-20) {
+            if (!(slope < 0.0) || step <= 1e-20) {
                 if (fresh) {
                     return finish(q, p, it, "STEP");
                 }
@@ -377,7 +389,7 @@ public final class LeastSquares {
                 continue;
             }
             double[] move = plus(next, p, -1.0);
-            double[] gNext = linearise(q, next).gradient();
+            double[] gNext = finite(linearise(q, next)).gradient();
             double[] y = plus(gNext, g, -1.0);
             double sy = dot(move, y);
             if (sy > 1e-14 * norm(move) * norm(y)) {
