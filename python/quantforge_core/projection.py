@@ -40,6 +40,11 @@ class FraTrade:
     side: str
 
 
+def _check_months(months: int) -> None:
+    if not 1 <= months <= 1200:
+        raise QfError("E_INPUT", "months must be 1 to 1200")
+
+
 def _spot(index: str, as_of: date) -> date:
     c = REGISTRY[index]
     return calendars.add_business_days(c["calendar"], as_of, c["spot_lag"])
@@ -89,6 +94,9 @@ def bootstrap(
     discount = curves.build(discount_data)
     if not quotes:
         raise QfError("E_INPUT", "no quotes", "quotes")
+    for q in quotes:
+        if q.kind != "FRA":
+            _check_months(q.months)
     spot = _spot(index, as_of)
     pillars: list[date] = []
     models: list[curves.Model] = []
@@ -128,6 +136,7 @@ def swap_pv(
     snapshot_id: str | None = None,
 ) -> tuple[dict[str, object], float]:
     discount, projection = curves.build(discount_data), curves.build(projection_data)
+    _check_months(trade.tenor_months)
     spot = _spot(trade.index, discount.as_of)
     fixed = _fixed_periods(trade.index, spot, trade.tenor_months)
     floating = _float_periods(trade.index, spot, trade.tenor_months)
@@ -162,6 +171,7 @@ def basis_spread(
     discount_data: CurveData, projection_data: CurveData, index: str, tenor_months: int
 ) -> float:
     d, p = curves.build(discount_data), curves.build(projection_data)
+    _check_months(tenor_months)
     ps = _float_periods(index, _spot(index, d.as_of), tenor_months)
     top = ordered_sum(
         (p.discount(x.start) / p.discount(x.end) - d.discount(x.start) / d.discount(x.end))

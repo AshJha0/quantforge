@@ -51,9 +51,7 @@ def valuation(
 def periods(convention: str, as_of: date, tenor: str) -> list[Period]:
     c = REGISTRY[convention]
     cal = c["calendar"]
-    spot = calendars.add_business_days(
-        cal, calendars.adjust(cal, as_of, "FOLLOWING"), c["spot_lag"]
-    )
+    spot = calendars.add_business_days(cal, as_of, c["spot_lag"])
     n, unit = int(tenor[:-1]), tenor[-1]
     months = n * 12 if unit == "Y" else n
     lag = c["payment_lag"]

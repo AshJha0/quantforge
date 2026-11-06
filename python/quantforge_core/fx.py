@@ -21,6 +21,7 @@ class FxMarket:
     as_of: date
     base: CurveData
     quote: CurveData
+    snapshot_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -62,7 +63,13 @@ class _Built:
         self.market = m
         self.base: Curve = curves.build(m.base)
         self.quote: Curve = curves.build(m.quote)
+        if self.base.as_of != m.as_of or self.quote.as_of != m.as_of:
+            raise QfError("E_INPUT", "a curve's as_of differs from as_of")
         self.sp = spot_date(m.pair, m.as_of)
+
+    def check_value_date(self, t: date) -> None:
+        if t < self.sp:
+            raise QfError("E_DATE_ORDER", f"value date {t} is before the spot date")
 
     def a(self, t: date) -> float:
         return self.base.discount(t) / self.base.discount(self.sp)
@@ -86,25 +93,28 @@ def _sign(side: str) -> int:
 
 def outright(m: FxMarket, value_date: date) -> tuple[float, float]:
     built = _Built(m)
-    if value_date < built.sp:
-        raise QfError("E_DATE_ORDER", "value_date is before the spot date", "value_date")
+    built.check_value_date(value_date)
     f = built.forward(value_date)
     return f, (f - m.spot) / REGISTRY[m.pair]["pip"]
 
 
 def _value(m: FxMarket, pv: float, model: str) -> dict[str, object]:
-    return valuation(pv, REGISTRY[m.pair]["quote"], model, None, m.pair, m.as_of)
+    return valuation(pv, REGISTRY[m.pair]["quote"], model, m.snapshot_id, m.pair, m.as_of)
 
 
 def forward_pv(m: FxMarket, trade: FxForward) -> tuple[dict[str, object], float]:
-    pv, delta = _Built(m).leg(
-        trade.notional_base, trade.strike, trade.value_date, _sign(trade.side)
-    )
+    built = _Built(m)
+    built.check_value_date(trade.value_date)
+    pv, delta = built.leg(trade.notional_base, trade.strike, trade.value_date, _sign(trade.side))
     return _value(m, pv, "FX_FORWARD_DISCOUNTING"), delta
 
 
 def swap_pv(m: FxMarket, trade: FxSwap) -> tuple[dict[str, object], float]:
     built = _Built(m)
+    built.check_value_date(trade.near_date)
+    built.check_value_date(trade.far_date)
+    if trade.near_date >= trade.far_date:
+        raise QfError("E_DATE_ORDER", "near_date is not before far_date")
     sign = _sign(trade.far_side)
     near = built.leg(trade.notional_base, trade.near_rate, trade.near_date, -sign)
     far = built.leg(trade.notional_base, trade.far_rate, trade.far_date, sign)

@@ -83,6 +83,11 @@ def _start_length(raw: Raw) -> None:
     _cap(raw, "max_iter", 100_000)
 
 
+def _hedge_tenors(raw: Raw) -> None:
+    if len(raw["hedge_tenors"]) > 20:
+        raise _over("hedge_tenors", 20)
+
+
 def _hedge(raw: Raw) -> None:
     if any(len(row) > 20 for row in raw["a"]):
         raise _over("a", 20)
@@ -126,6 +131,8 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.store.replay": _replay,
     "calib.fit": _start_length,
     "hedge.solve": _hedge,
+    "rates.schedule.generate": _caps(payment_lag=30_000),
+    "usecase.rates_hedge": _hedge_tenors,
 }
 
 
@@ -155,8 +162,7 @@ def _check_curve_sizes(raw: Raw) -> None:
 
 def check_limits(operation: str, raw: Raw) -> None:
     _check_arrays(raw)
-    if operation.startswith(("rates.", "risk.", "usecase.")) or operation == "calib.curve_report":
-        _check_curve_sizes(raw)
+    _check_curve_sizes(raw)
     specific = _BY_OPERATION.get(operation)
     if specific is not None:
         specific(raw)

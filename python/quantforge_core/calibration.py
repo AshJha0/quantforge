@@ -251,6 +251,8 @@ def fit(
         raise QfError("E_INPUT", "x and y differ in length")
     if len(start) != n:
         raise QfError("E_INPUT", f"start needs {n} values", "start")
+    if model == "ROSENBROCK":
+        weights = None
     if weights is not None and len(weights) != len(x):
         raise QfError("E_INPUT", "weights have the wrong length", "weights")
     if prior is not None and len(prior) != n:
@@ -262,6 +264,10 @@ def fit(
         raise QfError("E_INPUT", "bounds have the wrong length")
     if max_iter < 1:
         raise QfError("E_INPUT", "need max_iter >= 1", "max_iter")
+    if lower is not None and upper is not None and any(
+        lo > hi for lo, hi in zip(lower, upper, strict=True)
+    ):
+        raise QfError("E_INPUT", "lower is above upper")
     if weights is not None and any(w < 0 for w in weights):
         raise QfError("E_DOMAIN", "weights must not be negative", "weights")
     if regularisation < 0:

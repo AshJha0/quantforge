@@ -72,7 +72,7 @@ def _ois_trade(i: Inputs) -> OisTrade:
 def _market(i: Inputs) -> FxMarket:
     return FxMarket(
         i.enum("pair", conventions.PAIRS), i.real("spot"), i.date("as_of"),
-        _curve(i, "base_curve"), _curve(i, "quote_curve"),
+        _curve(i, "base_curve"), _curve(i, "quote_curve"), i.opt_string("snapshot_id"),
     )
 
 
@@ -88,6 +88,12 @@ def _money(m: Inputs) -> tuple[str, str]:
     if money.AMOUNT_FORM.fullmatch(amount) is None:
         raise QfError("E_SCHEMA", "bad amount", "amount")
     return amount, m.enum("currency", tuple(money.MINOR_UNITS))
+
+
+def _data(i: Inputs, model: str) -> tuple[list[float], list[float]]:
+    if model == "ROSENBROCK":
+        return (i.reals("x") if i.has("x") else []), (i.reals("y") if i.has("y") else [])
+    return i.reals("x"), i.reals("y")
 
 
 def _months(tenor: str) -> int:
@@ -227,7 +233,7 @@ def handlers(core: SimpleNamespace) -> dict[str, Callable[[Inputs], Result]]:
         report = i.opt_boolean("report_parameters", True)
         optional = {k: i.reals(k) for k in ("weights", "prior", "lower", "upper") if i.has(k)}
         result = core.calibration.fit(
-            model, i.reals("x"), i.reals("y"), i.reals("start"), i.enum("method", METHODS),
+            model, *_data(i, model), i.reals("start"), i.enum("method", METHODS),
             regularisation=i.opt_real("regularisation", 0.0),
             max_iter=i.opt_integer("max_iter", 1000), **optional,
         )
@@ -248,7 +254,7 @@ def handlers(core: SimpleNamespace) -> dict[str, Callable[[Inputs], Result]]:
             i.enum("interpolation", curves.INTERPOLATIONS),
         )
         diagnostics = {"inputs": [q.tenor for q in quotes], "status": "OK",
-                       "max_repricing_error": error, "tolerance_breach": None}
+                       "max_repricing_error": error, "tolerance_breaches": []}
         return {"jacobian": jacobian, "condition_number": condition}, diagnostics
 
     def dv01(i):
