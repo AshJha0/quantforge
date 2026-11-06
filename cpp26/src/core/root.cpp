@@ -110,13 +110,13 @@ RootResult brent(const Fn& f, double a0, double b0, const RootOptions& opt) {
 
 RootResult newton(const Fn& f, const Fn& df, double x0, std::optional<Bracket> bracket, const RootOptions& opt) {
     check_options(opt);
-    double lo = 0.0, hi = 0.0, flo = 0.0;
+    double lo = 0.0, hi = 0.0, flo = 0.0, fhi = 0.0;
     if (bracket) {
         lo = bracket->a;
         hi = bracket->b;
         if (!(lo < hi)) throw Error("E_INPUT", "a must be below b");
         flo = eval(f, lo);
-        const double fhi = eval(f, hi);
+        fhi = eval(f, hi);
         if (flo != 0.0 && fhi != 0.0 && same_sign(flo, fhi)) not_bracketed();
         if (x0 < lo || x0 > hi) throw Error("E_INPUT", "x0 must lie in [a, b]", "x0");
     }
@@ -126,12 +126,14 @@ RootResult newton(const Fn& f, const Fn& df, double x0, std::optional<Bracket> b
         const double dfx = eval(df, x);
         if (dfx == 0.0) throw Error("E_ZERO_DERIVATIVE", "the derivative is zero");
         if (bracket) {
-            // A zero at a stays bracketed: only a strict match of signs moves lo.
-            if ((flo > 0.0 && fx > 0.0) || (flo < 0.0 && fx < 0.0)) {
+            // An end with f exactly 0 stays; the other end moves, by its own sign.
+            const auto same = [](double u, double v) { return (u > 0.0 && v > 0.0) || (u < 0.0 && v < 0.0); };
+            if (flo != 0.0 && same(flo, fx)) {
                 lo = x;
                 flo = fx;
-            } else {
+            } else if (fhi != 0.0 && (flo != 0.0 || same(fhi, fx))) {
                 hi = x;
+                fhi = fx;
             }
         }
         double next = x - fx / dfx;

@@ -121,6 +121,12 @@ constexpr double gradient_stop = 1e-8, step_stop = 1e-12;
 
 bool small_step(const Vec& step, const Vec& p) { return norm(step) <= step_stop * (1.0 + norm(p)); }
 
+const Vec& finite_gradient(const Vec& g) {
+    for (const double v : g)
+        if (!std::isfinite(v)) throw Error("E_NON_FINITE", "the gradient is not finite");
+    return g;
+}
+
 [[noreturn]] void out_of_iterations() { throw Error("E_NO_CONVERGENCE", "max_iter reached"); }
 
 struct Run {
@@ -133,7 +139,7 @@ Run gauss_newton(const Problem& problem, Vec p, long long max_iter) {
     Matrix j;
     for (long long it = 1; it <= max_iter; ++it) {
         problem.evaluate(p, r, j);
-        const Vec g = Problem::gradient_of(r, j);
+        const Vec g = finite_gradient(Problem::gradient_of(r, j));
         if (norm(g) <= gradient_stop) return {p, it - 1};
         Vec rhs(g.size());
         for (std::size_t k = 0; k < g.size(); ++k) rhs[k] = -g[k] / 2.0;
@@ -169,7 +175,7 @@ Run levenberg_marquardt(const Problem& problem, Vec p, const FitInputs& in, long
     problem.evaluate(p, r, j);
     double f = dot(r, r);
     for (long long it = 1; it <= max_iter; ++it) {
-        Vec g = Problem::gradient_of(r, j);
+        Vec g = finite_gradient(Problem::gradient_of(r, j));
         std::vector<char> held(n, 0);
         for (std::size_t k = 0; k < n; ++k) {
             const bool at_low = in.lower && p[k] <= (*in.lower)[k] && g[k] > 0.0;
@@ -225,7 +231,7 @@ Run bfgs(const Problem& problem, Vec p, long long max_iter) {
     };
     reset();
     double f = problem.objective(p);
-    Vec g = problem.gradient(p);
+    Vec g = finite_gradient(problem.gradient(p));
     for (long long it = 1; it <= max_iter; ++it) {
         if (norm(g) <= gradient_stop) return {p, it - 1};
         Vec d(n, 0.0);
@@ -264,7 +270,7 @@ Run bfgs(const Problem& problem, Vec p, long long max_iter) {
                 bool identity = true;
                 for (std::size_t i = 0; i < n; ++i)
                     for (std::size_t k = 0; k < n; ++k) identity = identity && h[i][k] == (i == k ? 1.0 : 0.0);
-                if (identity) return {p, it};
+                if (identity) throw Error("E_NO_CONVERGENCE", "no acceptable step");
                 reset();
                 continue;
             }
@@ -277,7 +283,7 @@ Run bfgs(const Problem& problem, Vec p, long long max_iter) {
         }
         p = trial;
         f = ft;
-        g = gt;
+        g = finite_gradient(gt);
         if (small_step(s, p)) return {p, it};
         const double sy = dot(s, y);
         if (sy > 0.0) {
@@ -346,11 +352,17 @@ FitResult fit(const FitInputs& in) {
     if (in.max_iter < 1) throw Error("E_INPUT", "max_iter must be at least 1", "max_iter");
 
     const Problem problem(in);
+    Vec start = in.start;
+    for (std::size_t k = 0; k < n; ++k) {
+        if (in.lower) start[k] = std::max(start[k], (*in.lower)[k]);
+        if (in.upper) start[k] = std::min(start[k], (*in.upper)[k]);
+    }
+    if (!std::isfinite(problem.objective(start))) throw Error("E_NON_FINITE", "the objective at start is not finite");
     Run run;
     switch (in.method) {
-        case FitMethod::GaussNewton: run = gauss_newton(problem, in.start, in.max_iter); break;
-        case FitMethod::LevenbergMarquardt: run = levenberg_marquardt(problem, in.start, in, in.max_iter); break;
-        case FitMethod::Bfgs: run = bfgs(problem, in.start, in.max_iter); break;
+        case FitMethod::GaussNewton: run = gauss_newton(problem, start, in.max_iter); break;
+        case FitMethod::LevenbergMarquardt: run = levenberg_marquardt(problem, start, in, in.max_iter); break;
+        case FitMethod::Bfgs: run = bfgs(problem, start, in.max_iter); break;
     }
     Vec r;
     Matrix j;

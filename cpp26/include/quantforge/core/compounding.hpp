@@ -10,6 +10,8 @@ struct Compounding {
     std::optional<long long> frequency;  // needed by Periodic
 };
 
+/// E_SCHEMA when PERIODIC has no listed frequency.
+void check_frequency(const Compounding& c);
 double discount_factor(double rate, double t, const Compounding& c);
 double convert_rate(double rate, double t, const Compounding& from, const Compounding& to);
 

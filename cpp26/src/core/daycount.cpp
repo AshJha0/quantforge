@@ -75,7 +75,9 @@ double thirty_360(DayCount c, Date start, Date end, const DayCountInputs& in) {
     return double(360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)) / 360.0;
 }
 
-void check_needed(DayCount c, const DayCountInputs& in) {
+}  // namespace
+
+void check_day_count_inputs(DayCount c, const DayCountInputs& in) {
     const auto missing = [](const char* name) { throw Error("E_SCHEMA", std::string(name) + " is needed", name); };
     if (c == DayCount::ActActIcma || c == DayCount::Act365L) {
         if (!in.frequency) missing("frequency");
@@ -91,10 +93,8 @@ void check_needed(DayCount c, const DayCountInputs& in) {
     if (c == DayCount::Bus252 && !in.calendar) missing("calendar");
 }
 
-}  // namespace
-
 double year_fraction(DayCount c, Date start, Date end, const DayCountInputs& in) {
-    check_needed(c, in);
+    check_day_count_inputs(c, in);
     if (end < start) throw Error("E_DATE_ORDER", "end is before start", "end");
     if (c == DayCount::ActActIcma && (*in.ref_end <= *in.ref_start || start < *in.ref_start || end > *in.ref_end))
         throw Error("E_INPUT", "the accrual must lie inside the reference period");
