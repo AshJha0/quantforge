@@ -1,6 +1,6 @@
 # Rulings on silent spec points
 
-Spec version 1.1.0. Normative: this page is part of every stage A spec, and wins where it is more exact.
+Spec version 1.2.0. Normative: this page is part of every stage A spec, and wins where it is more exact.
 
 The first clean-room builds listed places where the specs were silent. Each is settled here. Golden cases are in
 `datasets/golden/core/rulings.json`, and "Case" says where one exists.
@@ -47,6 +47,19 @@ The first clean-room builds listed places where the specs were silent. Each is s
 | S5 | `normal` | Any method that meets the stated accuracy. `erfc` is a suggestion | No |
 | T1 | `to_instant`, `to_local` | Only the input is range-checked. A local time in 2007 whose instant falls in 2006 is allowed | Yes |
 | E1 | PDE with `R = 0` | The first step's old boundary values come from the boundary formula at `tau = 0`, not the cell averages | Yes |
-| N1 | `skip` | No upper limit. Negative: `E_SCHEMA` in `rng`, `E_INPUT` in `sobol`, as each spec's range rule says | Yes |
+| N1 | `skip` | Upper limit in `limits.md`: `E_LIMIT`. Negative: `E_SCHEMA` in `rng`, `E_INPUT` in `sobol`, as each spec's range rule says | Yes |
 | M1 | `monte-carlo`, `stream` out of range | `E_SCHEMA`, as in `rng.md` | Yes |
 | Q1 | `check_quotes`, order | Parameter checks first, including `outlier_min_history < 3`: `E_INPUT`. Then `event_time` after `as_of` | Yes |
+
+## As-of store
+
+Cases are in `datasets/golden/core/store_rulings.json`.
+
+| # | Point | Ruling | Case |
+|---|---|---|---|
+| A1 | `sequence < 1`, or an empty `series_id` | `E_SCHEMA` | Yes |
+| A2 | Order of checks | The contract's order holds: all `E_SCHEMA` on any input, then `E_LIMIT`, then log checks 2 and 3, then the operation's other rule checks. "Before anything else" in the first version of `asof-store.md` was wrong, and is corrected | Yes |
+| A3 | Chain canonical form | Every key of the record as given, including unknown keys and a top-level `snapshot_id`: the exclusion belongs to the snapshot hash only. Instants stay as written. Unknown keys never reach `rows` | Yes |
+| A4 | A lone surrogate in any string of a record | `E_SCHEMA`, as in `snapshot-hash.md`: UTF-8 cannot carry it. No golden case yet, as the runner cannot send one (see `clean-room-followups.md`) | No |
+| A5 | An instant that leaves years 1 to 9999 when moved to UTC | `E_DATE_RANGE`, as `Z` form cannot show it. Checked after log checks 2 and 3, on records first and then other inputs | Yes |
+| A6 | `head` in `replay` | The chain head of the whole log, whatever the checkpoints | Yes |

@@ -1,6 +1,6 @@
 # CLI contract
 
-Version 1.1.0. `01-core/rulings.md` is part of this contract, and settles points it leaves silent.
+Version 1.2.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
 The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
@@ -108,8 +108,9 @@ These are the same in all four languages. A case that expects an error passes on
 | `E_NONEXISTENT_LOCAL_TIME` | A local time falls in a daylight-saving gap |
 | `E_AMBIGUOUS_LOCAL_TIME` | A local time falls in a daylight-saving overlap and no choice was given |
 | `E_NON_FINITE` | A result would be NaN or infinite |
+| `E_LIMIT` | A size-like input is above its limit in `01-core/limits.md`. No work is started |
 
-Order of checks: `E_PARSE`, then `E_SCHEMA`, then the rule checks in the order the operation's spec
+Order of checks: `E_PARSE`, then `E_SCHEMA`, then `E_LIMIT`, then the rule checks in the order the operation's spec
 lists them. When one case breaks two rules, the first listed wins.
 
 ## Value encoding

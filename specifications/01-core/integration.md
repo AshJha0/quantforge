@@ -30,7 +30,7 @@ Results depend on the error estimate, so they are held to the requested accuracy
 `core.integrate.adaptive_simpson`. Extra inputs `tol` (> 0, default 1e-10), `max_depth` (default 50).
 Recursive Simpson with Richardson correction: on `[l, r]` with whole-interval estimate `S` and
 half-interval estimates `S1 + S2`, accept `S1 + S2 + (S1 + S2 - S)/15` when
-`|S1 + S2 - S| <= 15 tol_here`, and otherwise split, halving `tol_here`. Depth beyond `max_depth`: `E_NO_CONVERGENCE`.
+`|S1 + S2 - S| <= 15 tol_here`, and otherwise split, halving `tol_here`. The call limit in `limits.md` also applies. Depth beyond `max_depth`: `E_NO_CONVERGENCE`.
 
 `core.integrate.gauss_kronrod`. Extra inputs `tol` (> 0, default 1e-10), `max_intervals` (default 500).
 Globally adaptive G7-K15. Keep a list of intervals. Each gets the 15-point Kronrod value and the

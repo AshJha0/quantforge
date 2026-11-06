@@ -60,6 +60,9 @@ suite time: 123 cases
 suite rulings: 39 cases
 suite store: 21 cases
 store: expected rows hand-written; hashes from the oracle canonical form, one source by nature
+limits: mc at limit, price 9.24164, stderr 0.01384
+suite limits: 61 cases
+suite store_rulings: 11 cases
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
-invariants: 4301 golden cases checked, none breaks a stated invariant
+invariants: 4373 golden cases checked, none breaks a stated invariant
 ```

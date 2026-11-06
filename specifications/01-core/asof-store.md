@@ -23,12 +23,12 @@ keeps a log on disk is its own affair, and is not part of conformance.
 The key of a value is `(series_id, event_time)`. Several records may share a key: these are versions.
 
 Instants follow the contract, with any offset accepted and compared as instants. Output instants are written in `Z`
-form. Unlike `timezone-and-cutoff.md`, there is no year limit.
+form. Unlike `timezone-and-cutoff.md`, the year limit is only that of `Z` form, years 1 to 9999 (`rulings.md` A5).
 
 ## Log checks
 
-In this order, and before anything else:
-1. A record missing a key, or mistyped: `E_SCHEMA`.
+In this order, within the contract's order of checks (`rulings.md` A2):
+1. A record missing a key, or mistyped, including `sequence < 1` or an empty `series_id`: `E_SCHEMA`.
 2. `sequence` not strictly increasing: `E_INPUT`.
 3. `knowledge_time` lower than the previous record's: `E_INPUT`. A log is written in the order it was learned, so
    nothing can be learned in the past. Equal times are allowed.
@@ -61,7 +61,7 @@ inside it are written in `Z` form, so a log's offsets do not change the hash.
 
 **Chain.** Tamper evidence for an append-only log. `h_0` is 64 zeros. For record `i`, from 1,
 `h_i` is the hex SHA-256 of the UTF-8 bytes of `h_{i-1}`, then the canonical form of the record as given, with
-instants untouched. `hashes` lists `h_1..h_n`. `head` is `h_n`, or `h_0` for an empty log. The forward log in
+instants untouched. Every key of the record counts (`rulings.md` A3). `hashes` lists `h_1..h_n`. `head` is `h_n`, or `h_0` for an empty log. The forward log in
 `tools/forward-log/` uses the same chain.
 
 **Replay.** Checks that history is stable: it rebuilds each checkpoint from the log. Run twice, or after later records

@@ -2,7 +2,7 @@
 
 ## Stage A specifications
 
-Read `../cli-contract.md` first, then `rulings.md`, which settles silent points in every spec below. Golden cases are in `datasets/golden/core/`.
+Read `../cli-contract.md` first, then `rulings.md` and `limits.md`, which apply to every spec below. Golden cases are in `datasets/golden/core/`.
 
 | Spec | Golden suite | Clean-room status |
 |---|---|---|
@@ -22,7 +22,8 @@ Read `../cli-contract.md` first, then `rulings.md`, which settles silent points 
 | `cos.md` | `cos` | Ready |
 | `data-checks.md` | `data_checks` | Ready |
 | `timezone-and-cutoff.md` | `time` | Ready |
-| `rulings.md` | `rulings` | Ready |
+| `rulings.md` | `rulings`, `store_rulings` | Ready |
+| `limits.md` | `limits` | Ready |
 | `asof-store.md` | `store` | Ready. Hashes have one source |
 
 Not yet specified from this domain's list: typed units and money, and the convention registry.

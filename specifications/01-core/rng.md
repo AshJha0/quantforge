@@ -92,8 +92,8 @@ tested range of `p`.
 
 ## Operations
 
-`core.rng.next_u64`. Inputs: `seed` (u64 string), `stream` (integer), `count` (1 to 100000), optional
-`skip` (default 0, draws thrown away first). Output: `values`, u64 strings.
+`core.rng.next_u64`. Inputs: `seed` (u64 string), `stream` (integer), `count` (at least 1), optional
+`skip` (default 0, draws thrown away first). Upper limits are in `limits.md`. Output: `values`, u64 strings.
 
 `core.rng.uniforms`. Same inputs. Output: `values`, reals. Compared exactly (class `bit_exact`).
 
@@ -105,7 +105,7 @@ tested range of `p`.
 `core.rng.set_state_next_u64`. Inputs: `state`, four u64 strings, and `count`. Output: `values`. It
 exists so that the published reference vectors can be run directly. All-zero state is `E_INPUT`.
 
-A `seed` that is not a decimal u64 string, or a `stream` or `count` out of range, is `E_SCHEMA`.
+A `seed` that is not a decimal u64 string, or a `stream` out of range, or a `count` below 1, is `E_SCHEMA`.
 
 ## Acceptance
 

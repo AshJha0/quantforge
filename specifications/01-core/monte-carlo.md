@@ -10,7 +10,7 @@ are fixed by `rng.md`, so a case has one right answer up to rounding.
 Inputs: `option` (`CALL`/`PUT`), `spot`, `strike`, `r`, `q`, `sigma`, `t`, `paths` `N`, `steps` `m` (default 1),
 `seed` (u64 string), `stream` (default 0), `method`. Outputs: `price`, `stderr`.
 
-Checks: `spot`, `strike`, `sigma`, `t <= 0`: `E_DOMAIN`. `N < 2`, `N > 10000000` or `m < 1`: `E_INPUT`. `method`
+Checks: `spot`, `strike`, `sigma`, `t <= 0`: `E_DOMAIN`. `N < 2` or `m < 1`: `E_INPUT`. The limit on `N m` is in `limits.md`. `method`
 `SOBOL` with `m > 64`: `E_INPUT`.
 
 **Path.** `dt = t/m`, `drift = (r - q - sigma^2/2) dt`, `vol = sigma sqrt(dt)`.

@@ -1,0 +1,446 @@
+{
+ "schema_version": "1.0",
+ "suite": "store_rulings",
+ "spec": "specifications/01-core/rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_limits.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "store_rulings-0001",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 0,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.0
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A1"
+   ]
+  },
+  {
+   "case_id": "store_rulings-0002",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.0
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A1"
+   ]
+  },
+  {
+   "case_id": "store_rulings-0003",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 3.73
+     }
+    ],
+    "as_of": "not-an-instant"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A2"
+   ]
+  },
+  {
+   "case_id": "store_rulings-0004",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 3.73
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z",
+    "event_from": "2026-11-03T16:05:00Z",
+    "event_to": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A2"
+   ]
+  },
+  {
+   "case_id": "store_rulings-0005",
+   "operation": "core.store.chain",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.0,
+      "note": "kept",
+      "snapshot_id": "sha256:kept"
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "head": "01145149d7a9c8884771c1c11e822186d3912294a6077742907b1e4dfd3c9d0a",
+     "hashes": [
+      "01145149d7a9c8884771c1c11e822186d3912294a6077742907b1e4dfd3c9d0a"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon"
+   ],
+   "tags": [
+    "A3"
+   ]
+  },
+  {
+   "case_id": "store_rulings-0006",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T16:05:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.0,
+      "note": "kept",
+      "snapshot_id": "sha256:kept"
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "rows": [
+      {
+       "series_id": "A",
+       "event_time": "2026-11-02T16:05:00Z",
+       "knowledge_time": "2026-11-02T16:05:00Z",
+       "sequence": 1,
+       "value": 1.0
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "A3"
+   ],
+   "description": "unknown keys stay out of rows"
+  },
+  {
+   "case_id": "store_rulings-0007",
+   "operation": "core.store.chain",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "2026-11-02T17:00:00+01:00",
+      "knowledge_time": "2026-11-02T12:05:00-04:00",
+      "value": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "head": "4f9595778e649b266565f5b745153158b3d9cd6e2e299e413056366a75718b56",
+     "hashes": [
+      "4f9595778e649b266565f5b745153158b3d9cd6e2e299e413056366a75718b56"
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon"
+   ],
+   "tags": [
+    "A3"
+   ],
+   "description": "instants stay as given in the chain"
+  },
+  {
+   "case_id": "store_rulings-0008",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "A",
+      "event_time": "0001-01-01T00:00:00+01:00",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.0
+     }
+    ],
+    "as_of": "2026-11-02T16:05:00Z"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A5"
+   ]
+  },
+  {
+   "case_id": "store_rulings-0009",
+   "operation": "core.store.query_as_of",
+   "inputs": {
+    "records": [],
+    "as_of": "9999-12-31T23:00:00-02:00"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "A5"
+   ]
+  },
+  {
+   "case_id": "store_rulings-0010",
+   "operation": "core.store.replay",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 3.73
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "checkpoints": [
+     "2026-11-02T16:05:00Z"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "snapshots": [
+      {
+       "as_of": "2026-11-02T16:05:00Z",
+       "row_count": 2,
+       "snapshot_id": "sha256:83c53c24c0e17ff4a946a6703267798985061f31c024be6d6f55b06ef186ff38"
+      }
+     ],
+     "head": "8ddee788c59c8e72353d113e5fe66a47c48ec2a48090807766d31780158a2f4d"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "oracle-canon"
+   ],
+   "tags": [
+    "A6"
+   ],
+   "description": "head covers the whole log, past the last checkpoint"
+  },
+  {
+   "case_id": "store_rulings-0011",
+   "operation": "core.store.replay",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 3.73
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "checkpoints": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "snapshots": [],
+     "head": "8ddee788c59c8e72353d113e5fe66a47c48ec2a48090807766d31780158a2f4d"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "A6"
+   ]
+  }
+ ]
+}

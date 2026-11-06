@@ -34,11 +34,11 @@ maps to minus infinity under the inverse normal. There is no scrambling and no d
 
 ## Operation `core.sobol.points`
 
-Inputs: `dimensions` (1 to 64), `count` (1 to 1000000), optional `skip` (default 0: points thrown away
+Inputs: `dimensions` (1 to 64), `count` (at least 1), optional `skip` (default 0: points thrown away
 after index 0). Output: `points`, `count` arrays of `dimensions` reals. Indices used run
-`skip+1 .. skip+count`, and must stay below 2^32.
+`skip+1 .. skip+count`.
 
-Out-of-range values are `E_INPUT`.
+Upper limits on `count` and `skip` are in `limits.md`. Other out-of-range values are `E_INPUT`.
 
 ## Acceptance
 

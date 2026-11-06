@@ -41,7 +41,7 @@ Checks, in order:
 3. A lone surrogate escape such as `\ud800`: `E_SCHEMA`.
 4. The top level is not an object: `E_SCHEMA`.
 
-Deep nesting up to 64 levels must work. Beyond that the result is undefined by this spec.
+Nesting up to 64 levels must work. Beyond that: `E_LIMIT`, as for text over the size in `limits.md`.
 
 ## Worked example
 
