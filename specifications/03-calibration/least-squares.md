@@ -39,7 +39,7 @@ Methods:
 - `LEVENBERG_MARQUARDT`: damped Gauss-Newton. With bounds, steps are projected on the box, so the result meets the first-order conditions of the bounded problem.
 - `BFGS`: inverse-Hessian updates with a line search.
 
-Stop when the gradient norm is at most 1e-8, or the step is at most 1e-12 relative. Reaching `max_iter`: `E_NO_CONVERGENCE`. Jacobians may be analytic or numeric.
+Stop when the gradient norm is at most 1e-8, or the step is at most 1e-12 relative. Reaching `max_iter`: `E_NO_CONVERGENCE`. For non-finite values, see `../stage-b-rulings.md`, B22. Jacobians may be analytic or numeric.
 
 `ROSENBROCK` is used with `BFGS` only; `NELSON_SIEGEL` is not used with `GAUSS_NEWTON`, whose unsafeguarded steps suit it badly.
 

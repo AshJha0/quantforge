@@ -39,3 +39,16 @@ Run the new suites `schedule_deep`, `curve_deep`, `ois_deep`, `projection_deep`,
 | B8 curve `as_of` must match in `fx.*` | **Change** | **Change** | Not stated | Not stated |
 | B9 dates before spot, near after far are `E_DATE_ORDER` | **Change** | **Change** | **Change** | **Change** |
 | B10 `snapshot_id` in `fx.*` | **Change**: always `null` | Not stated | Not stated | Not stated |
+
+## Third round
+
+Run `rulings_b` again: it gains B19 to B22. No build has run these cases.
+
+| Ruling | Java | C++ | Python | Rust |
+|---|---|---|---|---|
+| B19 `start_months` from 0 to 1200 | ok | ok | **Change**: had no range | Not stated |
+| B20 `fx.*` order | ok | Not stated | Not stated | Not stated |
+| B21 limit on `points` | Not stated | Not stated | Not stated | ok |
+| B22 non-finite start is `E_NON_FINITE` | **Change**: crashes, being fixed | Not stated | Not stated | Not stated |
+| B23 Newton bracket with an exact zero | Not stated | Not stated | Not stated | ok |
+| B24 array limit before work | ok | **Change**: runs the handler first | Not stated | Not stated |

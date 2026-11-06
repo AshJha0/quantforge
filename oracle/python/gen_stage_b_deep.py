@@ -435,6 +435,36 @@ def rulings():
     err("usecase.rates_hedge", {**tq, "hedge_tenors": ["5Y"] * 21}, "E_LIMIT", "B14")
     err("usecase.rates_hedge", {**tq, "hedge_tenors": ["5Y", "5Y"]}, "E_SINGULAR", "B14")
     s.add("core.units.add_money", {"a": {"amount": "999999999999999999", "currency": "USD"}, "b": {"amount": "1", "currency": "USD"}}, {"amount": "1000000000000000000", "currency": "USD"}, cls=E, verified=["hand"], tags=["B15"])
+    # B19: FRA start_months.
+    cv2, d2, p2 = bootstrap_ois("SOFR", AS_OF, SOFR_Q)
+    jd = jcurve(cv2, [p[-1][2] for p in p2], d2)
+    pb = {"discount": jd, "index": "USD-TERM-3M", "as_of": str(AS_OF), "interpolation": "LOG_LINEAR_DF"}
+    q0 = [{"type": "FRA", "start_months": 0, "rate": .0395}]
+    pc, pd, pp = b.bootstrap_proj(cv2, AS_OF, q0, "LOG_LINEAR_DF")
+    s.add("rates.projection.bootstrap", {**pb, "quotes": q0}, {"pillars": [{"date": str(d), "discount_factor": v} for d, v in zip(pp, pd)]}, cls=I, verified=["independent-replay"], tags=["B19", SYN], limit=DFLIM)
+    err("rates.projection.bootstrap", {**pb, "quotes": [{"type": "FRA", "start_months": -1, "rate": .03}]}, "E_INPUT", "B19")
+    err("rates.projection.bootstrap", {**pb, "quotes": [{"type": "FRA", "start_months": 1201, "rate": .03}]}, "E_INPUT", "B19")
+    err("rates.projection.bootstrap", {**pb, "quotes": [{"type": "FRA", "start_months": 1200, "rate": .03}]}, "E_DATE_RANGE", "B19")
+    err("rates.projection.bootstrap", {**pb, "quotes": [{"type": "SWAP", "months": 1200, "rate": .03}]}, "E_DATE_RANGE", "B19")
+    # B20: order of checks in fx.*.
+    negc = {**jg, "pillars": [{"date": "2027-11-08", "discount_factor": -0.5}]}
+    late = {"value_date": "2026-11-09"}
+    err("fx.forward.outright", {**base, **late, "spot": -1.0, "as_of": "2026-11-09"}, "E_DOMAIN", "B20")
+    err("fx.forward.outright", {**base, **late, "spot": -1.0, "base_curve": {**jg, "pillars": list(reversed(jg["pillars"]))}}, "E_DOMAIN", "B20")
+    err("fx.forward.outright", {**base, **late, "base_curve": negc, "as_of": "2026-11-09"}, "E_DOMAIN", "B20")
+    err("fx.forward.outright", {**base, **late, "as_of": "2026-11-09"}, "E_INPUT", "B20")
+    # B21: points count as a quote list.
+    err("fx.curve.implied", {**base, "points": [{"tenor": f"{i + 1}M", "points": -1.0} for i in range(101)]}, "E_LIMIT", "B21")
+    s.add("core.root.newton", {"function": "square", "x0": 0.5, "a": 0.0, "b": 1.0}, {"root": 0.0}, cls="root_finding", verified=["hand"], tags=["B23"],
+          limit={"absolute": 1e-9, "relative": 0.0, "reason": "a double root: Newton halves its distance, stopping near x_tol"})
+    # B22: a start the objective cannot be evaluated at. These overflow in every correct build.
+    rb = {"model": "ROSENBROCK"}
+    for meth in ("BFGS", "GAUSS_NEWTON", "LEVENBERG_MARQUARDT"):
+        err("calib.fit", {**rb, "start": [-1.2e300, 1.0], "method": meth}, "E_NON_FINITE", "B22")
+    err("calib.fit", {"model": "LINEAR", "x": X, "y": y, "start": [1e308, 1e308], "method": "BFGS"}, "E_NON_FINITE", "B22")
+    err("calib.fit", {"model": "EXPONENTIAL", "x": X, "y": y, "start": [1.0, -1000.0], "method": "LEVENBERG_MARQUARDT"}, "E_NON_FINITE", "B22")
+    s.add("calib.fit", {**f, "start": [1e308, 1e308], "lower": [-100.0, -100.0], "upper": [100.0, 100.0]}, {"parameters": [0.0, 1.0], "objective": 0.0}, cls=I, verified=["hand"], tags=["B22"],
+          limit={"absolute": 1e-6, "relative": 0.0, "reason": "projected on the box first, so the start is finite"})
     write(s)
 
 

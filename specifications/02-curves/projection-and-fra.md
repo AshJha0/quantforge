@@ -4,7 +4,7 @@ Spec version 1.0.0. Status: Specified.
 
 Multi-curve means forecasting a rate on one curve and discounting on another. The index is `USD-TERM-3M`, which is synthetic (see `01-core/conventions.md`).
 
-Throughout: `spot` is `core.calendar.add_business_days(as_of, 2)` on `USGS`, as in `ois-curves.md`, and schedules and month steps use `end_of_month` false. A `FRA` end steps from its adjusted start. `months` and `tenor_months` run from 1 to 1200, else `E_INPUT`. No quotes: `E_INPUT`. These operations take an optional `snapshot_id`. `alpha` is `ACT_360` unless stated. Dates use `MODIFIED_FOLLOWING`.
+Throughout: `spot` is `core.calendar.add_business_days(as_of, 2)` on `USGS`, as in `ois-curves.md`, and schedules and month steps use `end_of_month` false. A `FRA` end steps from its adjusted start. `months` and `tenor_months` run from 1 to 1200, and `start_months` from 0 to 1200, else `E_INPUT`. No quotes: `E_INPUT`. These operations take an optional `snapshot_id`. `alpha` is `ACT_360` unless stated. Dates use `MODIFIED_FOLLOWING`.
 
 ## `rates.projection.bootstrap`
 
