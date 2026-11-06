@@ -101,8 +101,10 @@ Vec pchip_slopes(const Vec& x, const Vec& y) {
     }
     const auto end = [](double h0, double h1, double d0, double d1) {
         double s = ((2.0 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);
-        if (s * d0 < 0.0 || (s != 0.0 && d0 == 0.0)) s = 0.0;
-        else if (d0 * d1 < 0.0 && std::fabs(s) > 3.0 * std::fabs(d0)) s = 3.0 * d0;
+        // Three-valued signs: 0 differs from a non-zero value.
+        const auto sign = [](double v) { return (v > 0.0) - (v < 0.0); };
+        if (sign(s) != sign(d0)) s = 0.0;
+        else if (sign(d0) != sign(d1) && std::fabs(s) > 3.0 * std::fabs(d0)) s = 3.0 * d0;
         return s;
     };
     m[0] = end(h[0], h[1], d[0], d[1]);

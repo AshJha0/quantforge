@@ -51,8 +51,8 @@ double rate_from(double d, double t, const Compounding& c) {
 double discount_factor(double rate, double t, const Compounding& c) {
     check_frequency(c);
     if (t < 0.0) throw Error("E_DOMAIN", "t is negative", "t");
-    if (t == 0.0) return 1.0;
     check_base(rate, t, c);
+    if (t == 0.0) return 1.0;
     return factor(rate, t, c);
 }
 

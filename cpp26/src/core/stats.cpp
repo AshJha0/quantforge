@@ -25,6 +25,10 @@ Centred centre(const std::vector<double>& x) {
     return {x[0] + m, std::move(d)};
 }
 
+bool all_equal(const std::vector<double>& x) {
+    return std::ranges::all_of(x, [&](double v) { return v == x[0]; });
+}
+
 double normal_pdf(double x) { return std::exp(-x * x / 2.0) / std::sqrt(2.0 * std::numbers::pi); }
 
 double normal_cdf(double x) {
@@ -51,7 +55,7 @@ Summary summary(const std::vector<double>& x) {
     }
     Summary r{x.size(), m, s2 / (n - 1.0), std::sqrt(s2 / (n - 1.0)), {}, {}, *std::ranges::min_element(x),
               *std::ranges::max_element(x)};
-    if (s2 > 0.0) {
+    if (!all_equal(x)) {
         const double m2 = s2 / n, m3 = s3 / n, m4 = s4 / n;
         r.skewness = m3 / std::pow(m2, 1.5);
         r.excess_kurtosis = m4 / (m2 * m2) - 3.0;
@@ -86,7 +90,7 @@ Covariance covariance(const std::vector<double>& x, const std::vector<double>& y
         syy += b * b;
     }
     Covariance r{sxy / double(x.size() - 1), {}};
-    if (sxx > 0.0 && syy > 0.0) r.correlation = sxy / (std::sqrt(sxx) * std::sqrt(syy));
+    if (!all_equal(x) && !all_equal(y)) r.correlation = sxy / (std::sqrt(sxx) * std::sqrt(syy));
     return r;
 }
 
@@ -102,7 +106,7 @@ Ols ols(const std::vector<double>& x, const std::vector<double>& y) {
         sxy += a * b;
         syy += b * b;
     }
-    if (sxx == 0.0) throw Error("E_SINGULAR", "x has zero variance", "x");
+    if (all_equal(x)) throw Error("E_SINGULAR", "x has zero variance", "x");
     const double beta = sxy / sxx, alpha = my - beta * mx;
     double sse = 0.0;
     for (std::size_t i = 0; i < x.size(); ++i) {
@@ -110,7 +114,9 @@ Ols ols(const std::vector<double>& x, const std::vector<double>& y) {
         sse += e * e;
     }
     const double s2 = sse / (n - 2.0);
-    return {alpha, beta, 1.0 - sse / syy, std::sqrt(s2 * (1.0 / n + mx * mx / sxx)), std::sqrt(s2 / sxx)};
+    std::optional<double> r_squared;
+    if (!all_equal(y)) r_squared = 1.0 - sse / syy;
+    return {alpha, beta, r_squared, std::sqrt(s2 * (1.0 / n + mx * mx / sxx)), std::sqrt(s2 / sxx)};
 }
 
 }  // namespace quantforge

@@ -37,6 +37,7 @@ add_library(quantforge_core
   src/core/snapshot.cpp
   src/core/sobol.cpp
   src/core/stats.cpp
+  src/core/store.cpp
   src/core/timeseries.cpp
   src/core/timezone.cpp)
 target_include_directories(quantforge_core PUBLIC include)

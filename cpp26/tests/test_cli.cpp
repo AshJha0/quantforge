@@ -51,7 +51,25 @@ TEST_CASE("nulls, and diagnostics") {
 
 TEST_CASE("operations are sorted and all answer") {
     const auto ops = quantforge::cli::operations();
-    CHECK(ops.size() == 51);
+    CHECK(ops.size() == 56);
     CHECK(std::is_sorted(ops.begin(), ops.end()));
     for (const auto& op : ops) CHECK_FALSE(has(run_case(wrap(op, "{}")).json, "E_UNSUPPORTED_OPERATION"));
+}
+
+TEST_CASE("the store: corrections, withdrawals, the inclusive limit") {
+    const std::string records = R"({"records":[
+      {"sequence":1,"series_id":"S","event_time":"2024-01-01T00:00:00Z","knowledge_time":"2024-01-02T00:00:00Z","value":1},
+      {"sequence":2,"series_id":"S","event_time":"2024-01-01T01:00:00+01:00","knowledge_time":"2024-01-03T00:00:00Z","value":2},
+      {"sequence":3,"series_id":"S","event_time":"2024-01-01T00:00:00Z","knowledge_time":"2024-01-04T00:00:00Z","value":null,"deleted":true}],)";
+    const auto at = [&](const std::string& t) {
+        return run_case(wrap("core.store.latest", records + R"("series_id":"S","as_of":")" + t + R"("})")).json;
+    };
+    CHECK(has(at("2024-01-02T00:00:00Z"), R"("value":1)"));
+    CHECK(has(at("2024-01-03T00:00:00Z"), R"("value":2)"));
+    CHECK(has(at("2024-01-04T00:00:00Z"), R"("row":null)"));
+    CHECK(has(at("2024-01-01T23:59:59Z"), R"("row":null)"));
+    const auto bad = R"({"records":[{"sequence":2,"series_id":"S","event_time":"2024-01-01T00:00:00Z","knowledge_time":"2024-01-02T00:00:00Z","value":1},
+      {"sequence":2,"series_id":"S","event_time":"2024-01-01T00:00:00Z","knowledge_time":"2024-01-02T00:00:00Z","value":1}]})";
+    CHECK(has(run_case(wrap("core.store.chain", bad)).json, "E_INPUT"));
+    CHECK(has(run_case(wrap("core.store.chain", R"({"records":[]})")).json, std::string(64, '0')));
 }

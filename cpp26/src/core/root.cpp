@@ -83,7 +83,7 @@ RootResult brent(const Fn& f, double a0, double b0, const RootOptions& opt) {
             }
             if (p > 0.0) q = -q;
             p = std::fabs(p);
-            if (2.0 * p < std::min(3.0 * std::fabs(xm * q) - std::fabs(tol1 * q), std::fabs(e * q))) {
+            if (2.0 * p < std::min(3.0 * xm * q - std::fabs(tol1 * q), std::fabs(e * q))) {
                 e = d;
                 d = p / q;
             } else {
@@ -126,7 +126,8 @@ RootResult newton(const Fn& f, const Fn& df, double x0, std::optional<Bracket> b
         const double dfx = eval(df, x);
         if (dfx == 0.0) throw Error("E_ZERO_DERIVATIVE", "the derivative is zero");
         if (bracket) {
-            if (same_sign(flo, fx)) {
+            // A zero at a stays bracketed: only a strict match of signs moves lo.
+            if ((flo > 0.0 && fx > 0.0) || (flo < 0.0 && fx < 0.0)) {
                 lo = x;
                 flo = fx;
             } else {
