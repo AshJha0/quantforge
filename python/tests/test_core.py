@@ -27,6 +27,7 @@ from quantforge_core import (
     sobol,
     stats,
     store,
+    strictjson,
     timezones,
 )
 from quantforge_core._sobol_data import DIRECTION_DATA
@@ -365,3 +366,10 @@ def test_store_correction_withdrawal_and_inclusive_limit():
 
 def test_chain_of_an_empty_log_is_the_genesis_hash():
     assert store.replay([], [], str) == ([], "0" * 64)
+
+
+def test_depth_scan_skips_strings_and_ignores_syntax():
+    strictjson.check_depth('{"a":"[[[[\\"[[["}', 1)
+    with pytest.raises(QfError) as e:
+        snapshot.hash_document("[" * 65)
+    assert e.value.code == "E_LIMIT"

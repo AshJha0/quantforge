@@ -12,6 +12,7 @@ from .operations import OPERATIONS, execute
 
 CONTRACT_VERSION = "1.0.0"
 SCHEMA_VERSION = "1.0"
+MAX_CASE_DEPTH = 80
 _ENVELOPE_KEYS = {"schema_version", "case_id", "operation", "inputs"}
 _SCHEMA_VERSION = re.compile(r"[0-9]+\.[0-9]+")
 _OPERATION = re.compile(r"[a-z0-9_]+(\.[a-z0-9_]+)+")
@@ -57,6 +58,7 @@ def run_case(text: str) -> dict[str, Any]:
     """Runs one case document. A bug in the core is not caught here: it is exit code 70."""
     case_id = "unknown"
     try:
+        strictjson.check_depth(text, MAX_CASE_DEPTH)
         document, overflowed = strictjson.parse(text)
         if isinstance(document, dict):
             found = document.get("case_id")

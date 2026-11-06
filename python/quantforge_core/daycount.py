@@ -118,16 +118,15 @@ def _required(convention: str, **values: object) -> None:
             raise QfError("E_SCHEMA", f"{convention} needs {key}", key)
 
 
-def year_fraction(
+def check_conditional(
     convention: str,
-    start: date,
-    end: date,
     frequency: int | None = None,
     ref_start: date | None = None,
     ref_end: date | None = None,
     termination: date | None = None,
     calendar: str | None = None,
-) -> float:
+) -> None:
+    """Check 1 of the spec: the E_SCHEMA stage."""
     if convention not in CONVENTIONS:
         raise QfError("E_SCHEMA", f"unknown convention {convention}", "convention")
     if convention == "ACT_ACT_ICMA":
@@ -141,6 +140,19 @@ def year_fraction(
         calendars.check_calendar(calendar)
     if convention in ("ACT_ACT_ICMA", "ACT_365L") and frequency not in FREQUENCIES:
         raise QfError("E_SCHEMA", f"frequency {frequency} is not listed", "frequency")
+
+
+def year_fraction(
+    convention: str,
+    start: date,
+    end: date,
+    frequency: int | None = None,
+    ref_start: date | None = None,
+    ref_end: date | None = None,
+    termination: date | None = None,
+    calendar: str | None = None,
+) -> float:
+    check_conditional(convention, frequency, ref_start, ref_end, termination, calendar)
 
     if end < start:
         raise QfError("E_DATE_ORDER", "end is before start", "end")

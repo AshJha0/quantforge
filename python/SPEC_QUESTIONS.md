@@ -22,12 +22,12 @@ contract and `root-finders.md`. The code follows those rulings.
 - Q23, lone surrogate in a record: closed by A4, `E_SCHEMA`.
 - Q24, an instant outside years 1 to 9999: closed by A5, now `E_DATE_RANGE`.
 
-## Open
+## Closed by `limits.md` B1 to B5
 
-| # | Question | Choice made |
-|---|---|---|
-| Q25 | `limits.md` puts `E_LIMIT` after `E_PARSE`, but a text too deep for the JSON reader cannot be shown valid | `E_LIMIT`, including for a deep text that is also malformed, in the case and in `document_text` |
-| Q26 | Is `document_text` over the byte limit `E_LIMIT` even if malformed? | Yes: `E_LIMIT` is checked on its size, without parsing, so no work is started. `snapshot-hash.md` nesting and `E_SCHEMA` inside the text keep their order |
-| Q27 | A conditional daycount input missing, or `frequency` unlisted (`E_SCHEMA`), together with an unused over-long array | `E_LIMIT`, because those two checks sit in the core. Other enums are read before the limit stage |
-| Q28 | Nesting limit on a record's keys other than `value` | The limit is applied to every key of a record, since the chain hashes them all |
-| Q29 | Does A5 apply to `chain`, which leaves instants untouched? | Yes: the ruling names no exception |
+- Q25, text too deep: closed by B2. A lexical scan runs before parsing, limit 64 on `document_text` and 80 on a case.
+- Q26, `document_text` over the byte limit: closed by B1, `E_LIMIT` without parsing.
+- Q27, `E_SCHEMA` with an over-long array: closed by B3. Every `E_SCHEMA` check now runs before the limit stage.
+- Q28, nesting of record keys: closed by B4, every key.
+- Q29, A5 and `chain`: closed by B5, it applies.
+
+No question is open.

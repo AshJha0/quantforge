@@ -1,9 +1,25 @@
 """JSON reading with the contract's rules: no NaN, no duplicate keys, overflow reported."""
 import json
 import math
+import re
 from typing import Any
 
 from .errors import QfError
+
+_TOKENS = re.compile(r'"(?:[^"\\]|\\.)*"?|[\[\]{}]', re.DOTALL)
+
+
+def check_depth(text: str, limit: int) -> None:
+    """The lexical scan of limits.md B2: no syntax is checked, and strings are skipped."""
+    depth = 0
+    for token in _TOKENS.finditer(text):
+        ch = token[0]
+        if ch in "[{":
+            depth += 1
+            if depth > limit:
+                raise QfError("E_LIMIT", f"nesting beyond {limit} levels")
+        elif ch in "]}":
+            depth -= 1
 
 
 def parse(text: str) -> tuple[Any, bool]:
@@ -47,6 +63,4 @@ def parse(text: str) -> tuple[Any, bool]:
         )
     except json.JSONDecodeError as e:
         raise QfError("E_PARSE", f"not valid JSON: {e}") from None
-    except RecursionError:
-        raise QfError("E_LIMIT", "nesting is too deep to read") from None
     return value, overflow

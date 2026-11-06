@@ -83,6 +83,7 @@ def hash_value(value: Any) -> tuple[str, str]:
 
 def hash_document(text: str) -> tuple[str, str]:
     """Returns (canonical, snapshot_id). Both exclude a top-level snapshot_id."""
+    strictjson.check_depth(text, MAX_DEPTH)
     document, overflowed = strictjson.parse(text)
     if overflowed:
         raise QfError("E_SCHEMA", "a number overflows binary64", "document_text")
@@ -90,6 +91,4 @@ def hash_document(text: str) -> tuple[str, str]:
         raise QfError("E_SCHEMA", "lone surrogate in a string", "document_text")
     if not isinstance(document, dict):
         raise QfError("E_SCHEMA", "the top level is not an object", "document_text")
-    if nesting_depth(document) > MAX_DEPTH:
-        raise QfError("E_LIMIT", f"nesting beyond {MAX_DEPTH} levels", "document_text")
     return hash_value({k: v for k, v in document.items() if k != "snapshot_id"})

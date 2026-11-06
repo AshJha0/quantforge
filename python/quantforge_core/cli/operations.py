@@ -26,6 +26,7 @@ from .. import (
     timezones,
 )
 from ..calendars import TENOR
+from ..daycount import check_conditional
 from ..errors import QfError
 from ..snapshot import has_lone_surrogate
 from .functions import real_function, root_function
@@ -113,6 +114,7 @@ def _year_fraction(i: Inputs) -> Result:
         used["termination"] = i.opt_date("termination")
     if convention == "BUS_252":
         used["calendar"] = _opt_calendar(i)
+    check_conditional(convention, **used)
     return {"year_fraction": daycount.year_fraction(convention, start, end, **used)}
 
 
@@ -243,6 +245,8 @@ def _brent(i: Inputs) -> Result:
 
 def _newton(i: Inputs) -> Result:
     f, df = root_function(i.string("function"))
+    if i.has("a") != i.has("b"):
+        raise QfError("E_SCHEMA", "a and b must both be given or both absent")
     return _root_result(
         roots.newton(f, df, i.real("x0"), i.opt_real("a"), i.opt_real("b"), **_tolerances(i))
     )
@@ -429,7 +433,7 @@ def _quote(raw: Any) -> data_checks.Quote:
             raise QfError("E_SCHEMA", f"a quote has no {key}", "quotes")
     return data_checks.Quote(
         q.string("instrument_id"), parse_instant(raw.get("event_time"), "event_time"),
-        q.opt_real("bid"), q.opt_real("ask"), q.string("quote_status"),
+        q.opt_real("bid"), q.opt_real("ask"), q.enum("quote_status", ("FIRM", "INDICATIVE")),
     )
 
 
@@ -518,8 +522,12 @@ def _to_local(i: Inputs) -> Result:
     return {"local": format_seconds(timezones.to_local(i.enum("zone", timezones.ZONES), i.instant("instant")))}
 
 
+def _overlap(i: Inputs) -> str | None:
+    return i.enum("overlap", ("EARLIER", "LATER")) if i.has("overlap") else None
+
+
 def _to_instant(i: Inputs) -> Result:
-    instant = timezones.to_instant(i.enum("zone", timezones.ZONES), i.local("local"), i.opt_string("overlap"))
+    instant = timezones.to_instant(i.enum("zone", timezones.ZONES), i.local("local"), _overlap(i))
     return {"instant": format_seconds(instant, "Z")}
 
 
