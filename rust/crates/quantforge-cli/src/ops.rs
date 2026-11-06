@@ -12,7 +12,7 @@ use quantforge_core::mc::{self, McInputs};
 use quantforge_core::pde::{self, PdeInputs};
 use quantforge_core::rng::{Xoshiro, inverse_normal, ppnd16};
 use quantforge_core::root::{self, Controls, Root};
-use quantforge_core::store::Log;
+use quantforge_core::store::{Log, check_range};
 use quantforge_core::time::parse_instant;
 use quantforge_core::{integrate, linalg, snapshot, sobol, stats, time, ts};
 use std::collections::HashMap;
@@ -93,6 +93,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
         "core.calendar.add_business_days" => {
             let (c, d, n) = (i.calendar("calendar")?, i.date("date")?, i.int("days")?);
+            i.gate()?;
             plain(obj([(
                 "date",
                 c.add_business_days(d, n)?.to_string().into(),
@@ -120,8 +121,8 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "core.compounding.convert" => {
             let (r, t) = (i.f64("rate")?, i.f64("t")?);
-            let from = compounding_of(&Inputs(i.req("from")?))?;
-            let to = compounding_of(&Inputs(i.req("to")?))?;
+            let from = compounding_of(&Inputs::new(i.req("from")?))?;
+            let to = compounding_of(&Inputs::new(i.req("to")?))?;
             plain(obj([(
                 "rate",
                 compounding::convert(r, t, from, to)?.into(),
@@ -160,12 +161,14 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "core.integrate.adaptive_simpson" => {
             let (f, a, b) = integrand(i)?;
             let (tol, depth) = (i.f64_or("tol", 1e-10)?, i.int_or("max_depth", 50)?);
+            i.gate()?;
             let v = integrate::adaptive_simpson(&f, a, b, tol, depth)?;
             plain(obj([("value", v.into())]))
         }
         "core.integrate.gauss_kronrod" => {
             let (f, a, b) = integrand(i)?;
             let (tol, max) = (i.f64_or("tol", 1e-10)?, i.int_or("max_intervals", 500)?);
+            i.gate()?;
             let (v, e) = integrate::gauss_kronrod(&f, a, b, tol, max)?;
             Ok(Outcome {
                 outputs: obj([("value", v.into())]),
@@ -182,13 +185,20 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let (f, z) = interp::monotone_convex(&t, &r, &at, pos)?;
             plain(obj([("forwards", f.into()), ("zero_rates", z.into())]))
         }
-        "core.linalg.cholesky" => plain(obj([("l", linalg::cholesky(&i.matrix("a")?)?.into())])),
+        "core.linalg.cholesky" => {
+            let a = i.matrix("a")?;
+            i.gate()?;
+            plain(obj([("l", linalg::cholesky(&a)?.into())]))
+        }
         "core.linalg.eigen_symmetric" => {
-            let v = linalg::eigen_symmetric(&i.matrix("a")?)?;
+            let a = i.matrix("a")?;
+            i.gate()?;
+            let v = linalg::eigen_symmetric(&a)?;
             plain(obj([("values", v.into())]))
         }
         "core.linalg.solve" => {
             let (a, b) = (i.matrix("a")?, i.reals("b")?);
+            i.gate()?;
             plain(obj([("x", linalg::solve(&a, &b)?.into())]))
         }
         "core.mc.gbm_european" => monte_carlo(i),
@@ -213,11 +223,13 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "core.root.bisection" => {
             let (f, _, c) = root_inputs(i)?;
             let (a, b) = (i.f64("a")?, i.f64("b")?);
+            i.gate()?;
             root_result(root::bisection(&f, a, b, &c)?)
         }
         "core.root.brent" => {
             let (f, _, c) = root_inputs(i)?;
             let (a, b) = (i.f64("a")?, i.f64("b")?);
+            i.gate()?;
             root_result(root::brent(&f, a, b, &c)?)
         }
         "core.root.newton" => {
@@ -228,6 +240,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 (None, None) => None,
                 _ => return i.fail("a", "a and b must be given together"),
             };
+            i.gate()?;
             root_result(root::newton(&f, &df, x0, bracket, &c)?)
         }
         "core.snapshot.hash" => {
@@ -239,6 +252,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "core.sobol.points" => {
             let (d, n, s) = (i.int("dimensions")?, i.int("count")?, i.int_or("skip", 0)?);
+            i.gate()?;
             plain(obj([("points", sobol::points(d, n, s)?.into())]))
         }
         "core.stats.covariance" => {
@@ -279,25 +293,35 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             ]))
         }
         "core.store.chain" => {
-            let (head, hashes) = Log::parse(i.array("records")?)?.chain();
+            let log = Log::read(i.array("records")?)?;
+            i.gate()?;
+            log.check()?;
+            let (head, hashes) = log.chain();
             plain(obj([("head", head.into()), ("hashes", hashes.into())]))
         }
         "core.store.latest" => {
-            let log = Log::parse(i.array("records")?)?;
+            let log = Log::read(i.array("records")?)?;
             let (t, s) = (i.instant("as_of")?, i.str("series_id")?);
+            i.gate()?;
+            log.check()?;
+            check_range([t])?;
             plain(obj([("row", log.latest(t, s))]))
         }
         "core.store.query_as_of" => {
-            let log = Log::parse(i.array("records")?)?;
+            let log = Log::read(i.array("records")?)?;
             let t = i.instant("as_of")?;
             let s = i.opt("series_id").map(|_| i.str("series_id")).transpose()?;
             let from = i.opt("event_from").map(|_| i.instant("event_from"));
+            let from = from.transpose()?;
             let to = i.opt("event_to").map(|_| i.instant("event_to"));
-            let rows = log.query(t, s, from.transpose()?, to.transpose()?)?;
-            plain(obj([("rows", rows)]))
+            let to = to.transpose()?;
+            i.gate()?;
+            log.check()?;
+            check_range([Some(t), from, to].into_iter().flatten())?;
+            plain(obj([("rows", log.query(t, s, from, to)?)]))
         }
         "core.store.replay" => {
-            let log = Log::parse(i.array("records")?)?;
+            let log = Log::read(i.array("records")?)?;
             let mut points = Vec::new();
             for c in i.array("checkpoints")? {
                 match c.as_str().and_then(parse_instant) {
@@ -305,12 +329,19 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                     None => return i.fail("checkpoints", "expected instants"),
                 }
             }
+            i.gate()?;
+            log.check()?;
+            check_range(points.iter().copied())?;
             let (snapshots, head) = log.replay(&points)?;
             plain(obj([("snapshots", snapshots), ("head", head.into())]))
         }
         "core.store.snapshot" => {
-            let log = Log::parse(i.array("records")?)?;
-            let (canonical, id) = log.snapshot(i.instant("as_of")?);
+            let log = Log::read(i.array("records")?)?;
+            let t = i.instant("as_of")?;
+            i.gate()?;
+            log.check()?;
+            check_range([t])?;
+            let (canonical, id) = log.snapshot(t);
             plain(obj([
                 ("canonical", canonical.into()),
                 ("snapshot_id", id.into()),
@@ -353,6 +384,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "core.ts.autocorrelation" => {
             let (x, l) = (i.reals("x")?, i.int("max_lag")?);
+            i.gate()?;
             plain(obj([("acf", ts::autocorrelation(&x, l)?.into())]))
         }
         "core.ts.ewma_variance" => {
@@ -365,6 +397,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "core.ts.ljung_box" => {
             let (x, l) = (i.reals("x")?, i.int("max_lag")?);
+            i.gate()?;
             plain(obj([("statistic", ts::ljung_box(&x, l)?.into())]))
         }
         "core.ts.resample_last" => {
@@ -394,6 +427,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 "STDEV" => true,
                 _ => return i.fail("statistic", "unknown statistic"),
             };
+            i.gate()?;
             plain(obj([("values", ts::rolling(&x, w, stdev)?.into())]))
         }
         _ => fail(
@@ -440,7 +474,7 @@ fn compounding_of(i: &Inputs) -> Result<Compounding> {
 }
 
 fn cos_european(i: &Inputs) -> Result<Outcome> {
-    let m = Inputs(i.req("model")?);
+    let m = Inputs::new(i.req("model")?);
     let model = match m.str("name")? {
         "BLACK_SCHOLES" => Model::BlackScholes {
             sigma: m.f64("sigma")?,
@@ -454,7 +488,7 @@ fn cos_european(i: &Inputs) -> Result<Outcome> {
         },
         _ => return i.fail("model", "unknown model"),
     };
-    let (price, a, b) = cos::european(&CosInputs {
+    let p = CosInputs {
         call: i.option()?,
         spot: i.f64("spot")?,
         strike: i.f64("strike")?,
@@ -464,7 +498,9 @@ fn cos_european(i: &Inputs) -> Result<Outcome> {
         model,
         terms: i.int("terms")?,
         truncation: i.f64("truncation")?,
-    })?;
+    };
+    i.gate()?;
+    let (price, a, b) = cos::european(&p)?;
     Ok(Outcome {
         outputs: obj([("price", price.into())]),
         diagnostics: obj([("a", a.into()), ("b", b.into())]),
@@ -477,7 +513,7 @@ fn data_check(i: &Inputs) -> Result<Outcome> {
         if !matches!(raw, Json::Obj(_)) {
             return i.fail("quotes", "expected an object");
         }
-        let q = Inputs(raw);
+        let q = Inputs::new(raw);
         let side = |k: &str| -> Result<Option<f64>> {
             match raw.get(k) {
                 None => q.fail(k, "is required"),
@@ -569,6 +605,7 @@ type FixedRule = fn(&dyn Fn(f64) -> f64, f64, f64, i64) -> Result<f64>;
 fn fixed_rule(i: &Inputs, rule: FixedRule) -> Result<Outcome> {
     let (f, a, b) = integrand(i)?;
     let n = i.int("n")?;
+    i.gate()?;
     plain(obj([("value", rule(&f, a, b, n)?.into())]))
 }
 
@@ -587,6 +624,7 @@ fn interp_evaluate(i: &Inputs) -> Result<Outcome> {
         _ => return i.fail("method", "unknown method"),
     };
     let (x, y, at) = (i.reals("x")?, i.reals("y")?, i.reals("at")?);
+    i.gate()?;
     let e = interp::evaluate(method, &x, &y, &at)?;
     plain(match e.derivatives {
         Some(d) => obj([("values", e.values.into()), ("derivatives", d.into())]),
@@ -602,7 +640,7 @@ fn monte_carlo(i: &Inputs) -> Result<Outcome> {
         "SOBOL" => mc::Method::Sobol,
         _ => return i.fail("method", "unknown method"),
     };
-    let (price, stderr) = mc::gbm_european(&McInputs {
+    let p = McInputs {
         call: i.option()?,
         spot: i.f64("spot")?,
         strike: i.f64("strike")?,
@@ -615,12 +653,14 @@ fn monte_carlo(i: &Inputs) -> Result<Outcome> {
         seed: i.seed()?,
         stream: i.stream()?,
         method,
-    })?;
+    };
+    i.gate()?;
+    let (price, stderr) = mc::gbm_european(&p)?;
     plain(obj([("price", price.into()), ("stderr", stderr.into())]))
 }
 
 fn pde_european(i: &Inputs) -> Result<Outcome> {
-    let r = pde::bs_european(&PdeInputs {
+    let p = PdeInputs {
         call: i.option()?,
         spot: i.f64("spot")?,
         strike: i.f64("strike")?,
@@ -632,7 +672,9 @@ fn pde_european(i: &Inputs) -> Result<Outcome> {
         time_steps: i.int("time_steps")?,
         width: i.f64_or("width", 6.0)?,
         rannacher_steps: i.int_or("rannacher_steps", 2)?,
-    })?;
+    };
+    i.gate()?;
+    let r = pde::bs_european(&p)?;
     Ok(Outcome {
         outputs: obj([
             ("price", r.price.into()),
@@ -645,7 +687,7 @@ fn pde_european(i: &Inputs) -> Result<Outcome> {
 
 fn count(i: &Inputs) -> Result<i64> {
     let n = i.int("count")?;
-    if !(1..=100_000).contains(&n) {
+    if n < 1 {
         return i.fail("count", "out of range");
     }
     Ok(n)
@@ -657,6 +699,7 @@ fn generator(i: &Inputs) -> Result<(Xoshiro, i64)> {
     if skip < 0 {
         return i.fail("skip", "out of range");
     }
+    i.gate()?;
     let mut g = Xoshiro::seeded(seed, stream);
     for _ in 0..skip {
         g.next_u64();
@@ -674,6 +717,7 @@ fn set_state(i: &Inputs) -> Result<Outcome> {
         *w = parse_u64(v, "state")?;
     }
     let n = count(i)?;
+    i.gate()?;
     if s == [0; 4] {
         return fail("E_INPUT", "all-zero state");
     }

@@ -15,14 +15,20 @@ Nothing here was tuned to fit: the code follows the spec text.
 - The silent points listed here earlier are settled by `specifications/01-core/rulings.md`, and the code follows it.
   The one change of a stated choice was S2: `ols` on constant `y` now gives a `null` `r_squared`.
 
+## Closed at `stage-a` 3737bb5
+
+- `core.store.*` order of checks: ruling A2 replaced "before anything else", and the code follows it.
+- `core.store.*`, `sequence` below 1 is `E_SCHEMA`: confirmed by A1.
+- `core.store.replay`, `head` is the whole log: confirmed by A6.
+
+## Closed at `stage-a` bb663d6
+
+- `E_LIMIT` on `document_text`: B1 and B2 put size and a lexical depth scan before parsing, and the code follows them.
+- `dimensions` of 65 with a large `count` is `E_LIMIT`: confirmed by B3.
+
 ## Readings chosen where the spec is silent
 
 No golden case shows these to be wrong, but the other languages may read them differently.
 
-- `core.store.*`: "before anything else" is read literally, so all log checks run before the other inputs are
-  read. A bad `as_of` on a log that also breaks `sequence` order gives `E_INPUT`, not `E_SCHEMA`. This sits against
-  the contract's order of `E_SCHEMA` before rule checks.
-- `core.store.*`: a `sequence` below 1 counts as mistyped, so it is `E_SCHEMA`.
-- `core.store.replay`: `head` is the chain head of the whole log.
 - `core.root.newton`: when `f(a)` is exactly 0, the bracket shrinks by the sign of `f(b)`, so the root at `a` stays
   inside it (ruling R3 leaves this step open).

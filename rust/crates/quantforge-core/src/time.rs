@@ -144,6 +144,11 @@ fn format_clock(s: i64) -> String {
     format!("{d}T{:02}:{:02}:{:02}", t / 3600, t % 3600 / 60, t % 60)
 }
 
+/// True if `Z` form can show the instant: years 1 to 9999.
+pub fn in_z_range(s: i64) -> bool {
+    (1..=9999).contains(&split(s).0.y)
+}
+
 /// An instant in `Z` form.
 pub fn format_instant(s: i64) -> String {
     format!("{}Z", format_clock(s))

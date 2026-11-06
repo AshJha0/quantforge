@@ -99,7 +99,15 @@ struct Panel {
     whole: f64,
 }
 
-fn adaptive(f: F, p: Panel, tol: f64, depth: i64, max_depth: i64) -> Result<f64> {
+/// Function calls allowed in one run. `gauss_kronrod` cannot reach it: `max_intervals` is at most
+/// 10,000, which is 300,000 calls at most.
+const MAX_CALLS: i64 = 10_000_000;
+
+fn adaptive(f: F, p: Panel, tol: f64, depth: i64, max_depth: i64, calls: &mut i64) -> Result<f64> {
+    *calls += 2;
+    if *calls >= MAX_CALLS {
+        return fail("E_NO_CONVERGENCE", "function call limit reached");
+    }
     let m = p.l + (p.r - p.l) / 2.0;
     let flm = f(p.l + (m - p.l) / 2.0);
     let frm = f(m + (p.r - m) / 2.0);
@@ -131,8 +139,8 @@ fn adaptive(f: F, p: Panel, tol: f64, depth: i64, max_depth: i64) -> Result<f64>
         fr: p.fr,
         whole: s2,
     };
-    Ok(adaptive(f, left, tol / 2.0, depth + 1, max_depth)?
-        + adaptive(f, right, tol / 2.0, depth + 1, max_depth)?)
+    Ok(adaptive(f, left, tol / 2.0, depth + 1, max_depth, calls)?
+        + adaptive(f, right, tol / 2.0, depth + 1, max_depth, calls)?)
 }
 
 pub fn adaptive_simpson(f: F, a: f64, b: f64, tol: f64, max_depth: i64) -> Result<f64> {
@@ -151,7 +159,7 @@ pub fn adaptive_simpson(f: F, a: f64, b: f64, tol: f64, max_depth: i64) -> Resul
         fr,
         whole,
     };
-    adaptive(f, p, tol, 0, max_depth)
+    adaptive(f, p, tol, 0, max_depth, &mut 3)
 }
 
 const XK: [f64; 8] = [

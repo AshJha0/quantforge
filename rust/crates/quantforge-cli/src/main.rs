@@ -2,17 +2,19 @@
 
 mod functions;
 mod input;
+mod limits;
 mod ops;
 
 use input::Inputs;
 use ops::{OPERATIONS, dispatch};
 use quantforge_core::error::{QfError, err};
-use quantforge_core::json::{Flags, Json, obj, parse};
+use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
 use std::process::ExitCode;
 
 const CONTRACT: &str = "1.0.0";
 const SCHEMA: &str = "1.0";
+const MAX_CASE_NESTING: usize = 80;
 
 fn error_result(case_id: &str, e: &QfError) -> Json {
     let mut body = vec![
@@ -78,8 +80,27 @@ fn check_envelope(doc: &Json, flags: Flags) -> Result<(&str, &Json), QfError> {
     }
 }
 
+/// `E_SCHEMA` outranks `E_LIMIT`, and `E_LIMIT` outranks every rule check. Operations with costly
+/// work stop at `Inputs::gate`; the rest are cheap, so their outcome is simply replaced here.
+fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
+    let limit = OPERATIONS
+        .contains(&op)
+        .then(|| limits::check(op, inputs))
+        .flatten();
+    let result = dispatch(op, &Inputs(inputs, limit.clone()));
+    match (result, limit) {
+        (Err(e), _) if e.code == "E_SCHEMA" => Err(e),
+        (_, Some(l)) => Err(l),
+        (r, None) => r,
+    }
+}
+
 /// Returns the result document and whether its status is `ok`.
 fn run_case(bytes: &[u8]) -> (Json, bool) {
+    if nesting_exceeds(bytes, MAX_CASE_NESTING) {
+        let e = err("E_LIMIT", "the case is nested too deeply");
+        return (error_result("unknown", &e), false);
+    }
     let parsed = std::str::from_utf8(bytes)
         .map_err(|_| err("E_PARSE", "input is not UTF-8"))
         .and_then(parse);
@@ -92,8 +113,7 @@ fn run_case(bytes: &[u8]) -> (Json, bool) {
         .and_then(Json::as_str)
         .filter(|s| !s.is_empty())
         .unwrap_or("unknown");
-    let outcome =
-        check_envelope(&doc, flags).and_then(|(op, inputs)| dispatch(op, &Inputs(inputs)));
+    let outcome = check_envelope(&doc, flags).and_then(|(op, inputs)| run_operation(op, inputs));
     match outcome {
         Ok(o) if o.outputs.has_non_finite() => (
             error_result(case_id, &err("E_NON_FINITE", "a result is NaN or infinite")),
