@@ -1,7 +1,7 @@
 //! Time series (`statistics-and-time-series.md`).
 use crate::dates::Date;
 use crate::error::{Result, fail};
-use crate::stats::{is_constant, mean, ols, variance};
+use crate::stats::{centered, is_constant, mean, ols, variance};
 
 pub fn returns(prices: &[f64], log: bool) -> Result<Vec<f64>> {
     if prices.len() < 2 {
@@ -64,15 +64,10 @@ pub fn autocorrelation(x: &[f64], max_lag: i64) -> Result<Vec<f64>> {
     if is_constant(x) {
         return fail("E_DOMAIN", "zero variance");
     }
-    let m = mean(x);
-    let den: f64 = x.iter().map(|v| (v - m) * (v - m)).sum();
+    let d = centered(x).1;
+    let den: f64 = d.iter().map(|v| v * v).sum();
     Ok((1..=max_lag as usize)
-        .map(|k| {
-            (k..x.len())
-                .map(|t| (x[t] - m) * (x[t - k] - m))
-                .sum::<f64>()
-                / den
-        })
+        .map(|k| (k..d.len()).map(|t| d[t] * d[t - k]).sum::<f64>() / den)
         .collect())
 }
 

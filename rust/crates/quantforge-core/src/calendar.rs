@@ -312,10 +312,14 @@ impl Calendar {
                 let y = total.div_euclid(12) as i32;
                 let m = total.rem_euclid(12) as u32 + 1;
                 check_year(y)?;
-                if end_of_month && self.last_business_day(d.y, d.m)? == d {
+                let last_day = days_in_month(y, m);
+                if end_of_month && convention == Bdc::Unadjusted {
+                    let at_end = d.d == days_in_month(d.y, d.m);
+                    Date::new(y, m, if at_end { last_day } else { d.d.min(last_day) })
+                } else if end_of_month && d >= self.last_business_day(d.y, d.m)? {
                     self.last_business_day(y, m)?
                 } else {
-                    self.adjust(Date::new(y, m, d.d.min(days_in_month(y, m))), convention)?
+                    self.adjust(Date::new(y, m, d.d.min(last_day)), convention)?
                 }
             }
         };

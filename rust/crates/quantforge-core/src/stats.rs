@@ -10,6 +10,14 @@ pub fn is_constant(x: &[f64]) -> bool {
     x.iter().all(|v| *v == x[0])
 }
 
+/// The mean and deviations from it, by way of a shift to the first value. The shift is exact for
+/// nearby values, so a large offset does not reach the moments through a rounded mean.
+pub fn centered(x: &[f64]) -> (f64, Vec<f64>) {
+    let y: Vec<f64> = x.iter().map(|v| v - x[0]).collect();
+    let my = mean(&y);
+    (x[0] + my, y.iter().map(|v| v - my).collect())
+}
+
 /// Two-pass sample variance, divisor `n - 1`.
 pub fn variance(x: &[f64]) -> f64 {
     let m = mean(x);
@@ -144,14 +152,14 @@ pub fn summary(x: &[f64]) -> Result<Summary> {
         return fail("E_INPUT", "at least 2 values are needed");
     }
     let n = x.len() as f64;
-    let m = mean(x);
-    // Deviations from the first value are exact for nearby data, whereas `m` itself may round
-    // by an ulp of a large offset, which the third and fourth powers would amplify.
-    let shifted: Vec<f64> = x.iter().map(|v| v - x[0]).collect();
-    let ms = mean(&shifted);
-    let central = |k: i32| shifted.iter().map(|v| (v - ms).powi(k)).sum::<f64>() / n;
+    let (m, d) = centered(x);
+    let central = |k: i32| d.iter().map(|v| v.powi(k)).sum::<f64>() / n;
     let constant = is_constant(x);
-    let var = if constant { 0.0 } else { variance(x) };
+    let var = if constant {
+        0.0
+    } else {
+        d.iter().map(|v| v * v).sum::<f64>() / (n - 1.0)
+    };
     let (m2, m3, m4) = (central(2), central(3), central(4));
     Ok(Summary {
         count: x.len() as i64,
@@ -189,11 +197,8 @@ pub fn quantile(x: &[f64], p: &[f64]) -> Result<Vec<f64>> {
 }
 
 fn cross(x: &[f64], y: &[f64]) -> f64 {
-    let (mx, my) = (mean(x), mean(y));
-    x.iter()
-        .zip(y)
-        .map(|(a, b)| (a - mx) * (b - my))
-        .sum::<f64>()
+    let (dx, dy) = (centered(x).1, centered(y).1);
+    dx.iter().zip(&dy).map(|(a, b)| a * b).sum::<f64>()
 }
 
 pub fn covariance(x: &[f64], y: &[f64]) -> Result<(f64, Option<f64>)> {
@@ -224,7 +229,7 @@ pub fn ols(x: &[f64], y: &[f64]) -> Result<Ols> {
         return fail("E_SINGULAR", "x has zero variance");
     }
     let n = x.len() as f64;
-    let (mx, my) = (mean(x), mean(y));
+    let (mx, my) = (centered(x).0, centered(y).0);
     let sxx = cross(x, x);
     let beta = cross(x, y) / sxx;
     let alpha = my - beta * mx;
