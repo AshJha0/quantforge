@@ -95,7 +95,7 @@ fx_deep: implied ratios against QuantLib FxSwapRateHelper, worst difference 1.88
 suite fx_deep: 33 cases
 hedge_deep: exact enumeration against SciPy L-BFGS-B, worst difference 6.04e-10
 suite hedge_deep: 12 cases
-suite rulings_b: 29 cases
+suite rulings_b: 46 cases
 mutants: 23 deliberate errors, all caught
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4388 golden cases checked, none breaks a stated invariant

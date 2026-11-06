@@ -25,6 +25,18 @@ Spec version 1.0.0. Normative: this page is part of every stage B spec, and wins
 | B16 | Solve method where no `method` input exists | Either: both give one curve | No |
 | B17 | `curve_report` diagnostics | `inputs` lists tenors, as stage B quotes carry no timestamps. `tolerance_breaches` is an array. `condition_number` must hold to 1e-4 relative: eigenvalues of `J^T J` serve only below about 1e7 | No |
 | B18 | Order in `rates.ois.bootstrap` checks | All are `E_INPUT`, so order cannot be seen | No |
+| B19 | FRA `start_months` | Integer from 0 to 1200, else `E_INPUT`. 0 is a spot-starting FRA. Within range, a date past the calendar is `E_DATE_RANGE`, as for `months` and `tenor_months` | Yes |
+| B20 | Order of checks in `fx.*` | After `E_SCHEMA` and `E_LIMIT`: `spot`, each curve's own checks, the `as_of` match, then value dates | Yes |
+| B21 | `fx.curve.implied` `points` | A quote list, so the limit of 100 applies | Yes |
+| B22 | A non-finite objective in `calib.fit` | See below | Yes |
+| B23 | `newton` bracket when `f(a)` or `f(b)` is exactly 0 (completes R3) | An end point with `f` exactly 0 stays in the bracket: the bracket shrinks from the other end, by the sign of that end's `f` | Yes |
+| B24 | `E_LIMIT` and work already done | The array limit must be checked before an operation does work beyond one linear pass. Running the operation and dropping its result is not allowed: an oversized `rolling` costs `n` x `window`, and the input size has no bound. A build needs a schema pass, then the limit, then the work. Not visible in a result, only in time, so no golden case | No |
+
+## Non-finite values in `calib.fit`
+
+After input checks, project `start` on any bounds, then evaluate the objective there. If it is NaN or infinite, or an intermediate value overflows: `E_NON_FINITE`, at once, with no iteration. So BFGS, or any method, from `[-1.2e300, 1.0]` on `ROSENBROCK` is `E_NON_FINITE`. A language whose power operator raises on overflow must turn that into this code, not a crash.
+
+From a finite start, a trial point with a non-finite objective is a failed step: it is rejected and the step shortened. A non-finite gradient at an accepted point is `E_NON_FINITE`. If no acceptable step can be found: `E_NO_CONVERGENCE`. Which of these a run meets depends on its path, so golden cases cover only the non-finite start.
 
 ## Oracle coverage
 
