@@ -65,13 +65,26 @@ pub fn hash(document: &str) -> Result<(String, String)> {
     if flags.lone_surrogate {
         return fail("E_SCHEMA", "lone surrogate escape");
     }
-    let Json::Obj(mut top) = doc else {
+    if !matches!(doc, Json::Obj(_)) {
         return fail("E_SCHEMA", "top level is not an object");
-    };
-    top.retain(|(k, _)| k != "snapshot_id");
+    }
+    Ok(hash_value(doc))
+}
+
+/// The canonical bytes of a value, with nothing removed.
+pub fn canonical_bytes(v: &Json) -> Vec<u8> {
     let mut bytes = Vec::new();
-    canonical(&Json::Obj(top), &mut bytes);
+    canonical(v, &mut bytes);
+    bytes
+}
+
+/// Canonical text and snapshot id of an object, without its top-level `snapshot_id`.
+pub fn hash_value(mut doc: Json) -> (String, String) {
+    if let Json::Obj(top) = &mut doc {
+        top.retain(|(k, _)| k != "snapshot_id");
+    }
+    let bytes = canonical_bytes(&doc);
     let id = format!("sha256:{}", sha256_hex(&bytes));
     let text = String::from_utf8(bytes).expect("canonical form is UTF-8");
-    Ok((text, id))
+    (text, id)
 }

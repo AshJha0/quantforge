@@ -87,9 +87,10 @@ fn spline_slopes(x: &[f64], y: &[f64], method: Method) -> Result<Vec<f64>> {
 
 fn pchip_end(h0: f64, h1: f64, d0: f64, d1: f64) -> f64 {
     let m = ((2.0 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);
-    if m * d0 < 0.0 || (m != 0.0 && d0 == 0.0) {
+    let sign = |v: f64| (v > 0.0) as i8 - (v < 0.0) as i8;
+    if sign(m) != sign(d0) {
         0.0
-    } else if d0 * d1 < 0.0 && m.abs() > 3.0 * d0.abs() {
+    } else if sign(d0) != sign(d1) && m.abs() > 3.0 * d0.abs() {
         3.0 * d0
     } else {
         m

@@ -12,6 +12,8 @@ use quantforge_core::mc::{self, McInputs};
 use quantforge_core::pde::{self, PdeInputs};
 use quantforge_core::rng::{Xoshiro, inverse_normal, ppnd16};
 use quantforge_core::root::{self, Controls, Root};
+use quantforge_core::store::Log;
+use quantforge_core::time::parse_instant;
 use quantforge_core::{integrate, linalg, snapshot, sobol, stats, time, ts};
 use std::collections::HashMap;
 
@@ -68,6 +70,11 @@ pub const OPERATIONS: &[&str] = &[
     "core.stats.ols",
     "core.stats.quantile",
     "core.stats.summary",
+    "core.store.chain",
+    "core.store.latest",
+    "core.store.query_as_of",
+    "core.store.replay",
+    "core.store.snapshot",
     "core.time.business_date",
     "core.time.to_instant",
     "core.time.to_local",
@@ -130,16 +137,22 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "core.daycount.year_fraction" => {
             let conv = i.str("convention")?;
             let (s, e) = (i.date("start")?, i.date("end")?);
-            let extra = DayCountInputs {
-                frequency: i.opt_int("frequency")?,
-                ref_start: i.opt_date("ref_start")?,
-                ref_end: i.opt_date("ref_end")?,
-                termination: i.opt_date("termination")?,
-                calendar: i
-                    .opt("calendar")
-                    .map(|_| i.calendar("calendar"))
-                    .transpose()?,
-            };
+            // Keys a convention does not use are ignored, whatever they hold.
+            let icma = conv == "ACT_ACT_ICMA";
+            let mut extra = DayCountInputs::default();
+            if icma || conv == "ACT_365L" {
+                extra.frequency = i.opt_int("frequency")?;
+            }
+            if icma {
+                extra.ref_start = i.opt_date("ref_start")?;
+                extra.ref_end = i.opt_date("ref_end")?;
+            }
+            if conv == "THIRTY_E_360_ISDA" {
+                extra.termination = i.opt_date("termination")?;
+            }
+            if conv == "BUS_252" && i.opt("calendar").is_some() {
+                extra.calendar = Some(i.calendar("calendar")?);
+            }
             let y = year_fraction(conv, s, e, &extra)?;
             plain(obj([("year_fraction", y.into())]))
         }
@@ -263,6 +276,44 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("excess_kurtosis", s.excess_kurtosis.into()),
                 ("min", s.min.into()),
                 ("max", s.max.into()),
+            ]))
+        }
+        "core.store.chain" => {
+            let (head, hashes) = Log::parse(i.array("records")?)?.chain();
+            plain(obj([("head", head.into()), ("hashes", hashes.into())]))
+        }
+        "core.store.latest" => {
+            let log = Log::parse(i.array("records")?)?;
+            let (t, s) = (i.instant("as_of")?, i.str("series_id")?);
+            plain(obj([("row", log.latest(t, s))]))
+        }
+        "core.store.query_as_of" => {
+            let log = Log::parse(i.array("records")?)?;
+            let t = i.instant("as_of")?;
+            let s = i.opt("series_id").map(|_| i.str("series_id")).transpose()?;
+            let from = i.opt("event_from").map(|_| i.instant("event_from"));
+            let to = i.opt("event_to").map(|_| i.instant("event_to"));
+            let rows = log.query(t, s, from.transpose()?, to.transpose()?)?;
+            plain(obj([("rows", rows)]))
+        }
+        "core.store.replay" => {
+            let log = Log::parse(i.array("records")?)?;
+            let mut points = Vec::new();
+            for c in i.array("checkpoints")? {
+                match c.as_str().and_then(parse_instant) {
+                    Some(t) => points.push(t),
+                    None => return i.fail("checkpoints", "expected instants"),
+                }
+            }
+            let (snapshots, head) = log.replay(&points)?;
+            plain(obj([("snapshots", snapshots), ("head", head.into())]))
+        }
+        "core.store.snapshot" => {
+            let log = Log::parse(i.array("records")?)?;
+            let (canonical, id) = log.snapshot(i.instant("as_of")?);
+            plain(obj([
+                ("canonical", canonical.into()),
+                ("snapshot_id", id.into()),
             ]))
         }
         "core.time.business_date" => {

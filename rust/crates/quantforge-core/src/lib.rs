@@ -26,5 +26,6 @@ pub mod sha256;
 pub mod snapshot;
 pub mod sobol;
 pub mod stats;
+pub mod store;
 pub mod time;
 pub mod ts;

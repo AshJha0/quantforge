@@ -215,7 +215,7 @@ pub fn covariance(x: &[f64], y: &[f64]) -> Result<(f64, Option<f64>)> {
 pub struct Ols {
     pub alpha: f64,
     pub beta: f64,
-    pub r_squared: f64,
+    pub r_squared: Option<f64>,
     pub se_alpha: f64,
     pub se_beta: f64,
     pub rss: f64,
@@ -245,7 +245,7 @@ pub fn ols(x: &[f64], y: &[f64]) -> Result<Ols> {
     Ok(Ols {
         alpha,
         beta,
-        r_squared: 1.0 - rss / cross(y, y),
+        r_squared: (!is_constant(y)).then(|| 1.0 - rss / cross(y, y)),
         se_alpha: (s2 * (1.0 / n + mx * mx / sxx)).sqrt(),
         se_beta: (s2 / sxx).sqrt(),
         rss,
