@@ -836,8 +836,12 @@ int nesting(const Value& v) {
 
 // Runs once all schema checks are done: limits, then log checks 2 and 3, then the range of
 // instants, records first (rulings A2 and A5).
-void check_store(const std::vector<StoreRecord>& log, std::initializer_list<std::optional<Instant>> others) {
-    for (const StoreRecord& r : log) limit_if(nesting(r.value) > 64, "value");
+void check_store_nesting(const std::vector<StoreRecord>& log) {
+    for (const StoreRecord& r : log)
+        for (const auto& m : r.raw.members) limit_if(nesting(m.second) > 64, m.first);
+}
+
+void check_store(const std::vector<StoreRecord>& log, const std::vector<std::optional<Instant>>& others) {
     check_log(log);
     for (const StoreRecord& r : log) {
         check_store_instant(r.event_time);
@@ -869,6 +873,7 @@ void op_store_query(const In& in, Out& out) {
     const Instant as_of = in.instant("as_of");
     const string* series = in.find("series_id") ? &in.text("series_id") : nullptr;
     const auto from = maybe_instant(in, "event_from"), to = maybe_instant(in, "event_to");
+    check_store_nesting(log);
     check_store(log, {as_of, from, to});
     if (from && to && *from > *to) throw Error("E_DATE_ORDER", "event_from is after event_to", "event_from");
     out.values.key("rows");
@@ -885,6 +890,7 @@ void op_store_latest(const In& in, Out& out) {
     const auto log = log_of(in);
     const Instant as_of = in.instant("as_of");
     const string& series = in.text("series_id");
+    check_store_nesting(log);
     check_store(log, {as_of});
     std::optional<StoreRow> best;
     for (StoreRow& r : store_view(log, as_of))
@@ -897,6 +903,7 @@ void op_store_latest(const In& in, Out& out) {
 void op_store_snapshot(const In& in, Out& out) {
     const auto log = log_of(in);
     const Instant as_of = in.instant("as_of");
+    check_store_nesting(log);
     check_store(log, {as_of});
     const SnapshotHash h = store_snapshot(log, as_of);
     out.key_string("canonical", h.canonical);
@@ -911,13 +918,8 @@ void op_store_replay(const In& in, Out& out) {
     for (const Value& v : a.items) points.push_back(to_instant_value(v, "checkpoints"));
     limit_if(points.size() > 1000, "checkpoints");
     limit_if(product_above((long long)log.size(), (long long)points.size(), 10000000), "checkpoints");
-    for (const StoreRecord& r : log) limit_if(nesting(r.value) > 64, "value");
-    check_log(log);
-    for (const StoreRecord& r : log) {
-        check_store_instant(r.event_time);
-        check_store_instant(r.knowledge_time);
-    }
-    for (const Instant i : points) check_store_instant(i);
+    check_store_nesting(log);
+    check_store(log, std::vector<std::optional<Instant>>(points.begin(), points.end()));
     const auto replay = store_replay(log, points);
     out.values.key("snapshots");
     out.values.begin_array();
@@ -935,6 +937,7 @@ void op_store_replay(const In& in, Out& out) {
 
 void op_store_chain(const In& in, Out& out) {
     const auto log = log_of(in);
+    check_store_nesting(log);
     check_store(log, {});
     const Chain c = store_chain(log);
     out.key_string("head", c.head);
@@ -1081,12 +1084,13 @@ const Value& check_envelope(const json::Parsed& p, Handler& handler) {
 CaseResult run_case(string_view text) {
     string case_id = "unknown";
     try {
+        if (json::deeper_than(text, 80)) throw Error("E_LIMIT", "the case is nested above 80 levels");
         const json::Parsed parsed = json::parse(text);
         if (const Value* id = parsed.value.find("case_id"); id && id->kind == Kind::String && !id->text.empty())
             case_id = id->text;
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
-        if (parsed.too_deep || oversized(inputs)) {
+        if (oversized(inputs)) {
             // E_SCHEMA still outranks E_LIMIT, and only the handler knows its schema. Its work is
             // bounded here, as every other limit is checked first and the input is already in memory.
             try {
@@ -1095,7 +1099,7 @@ CaseResult run_case(string_view text) {
             } catch (const Error& e) {
                 if (e.code() == "E_SCHEMA") throw;
             }
-            throw Error("E_LIMIT", "an array or nesting in inputs is above its limit");
+            throw Error("E_LIMIT", "an array in inputs is above its limit");
         }
         Out out;
         out.values.begin_object();

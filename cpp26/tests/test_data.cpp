@@ -60,7 +60,8 @@ TEST_CASE("snapshot rejections rank as the spec lists them") {
     CHECK(code_of([&] { snapshot_hash(too_deep); }) == "E_LIMIT");
     const std::string absurd = "{\"a\":" + std::string(200000, '[') + std::string(200000, ']') + "}";
     CHECK(code_of([&] { snapshot_hash(absurd); }) == "E_LIMIT");
-    CHECK(code_of([&] { snapshot_hash("{\"a\":" + std::string(200000, '[')); }) == "E_PARSE");
+    CHECK(code_of([&] { snapshot_hash("{\"a\":" + std::string(200000, '[')); }) == "E_LIMIT");  // the scan checks no syntax
+    CHECK(code_of([] { snapshot_hash(R"({"a":")" + std::string(100, '[') + R"("})"); }) == "none");
     CHECK(code_of([] { snapshot_hash(std::string(1048577, ' ')); }) == "E_LIMIT");
 }
 

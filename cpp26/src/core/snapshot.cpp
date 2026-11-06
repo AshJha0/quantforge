@@ -115,12 +115,12 @@ std::array<std::uint8_t, 32> sha256(std::string_view bytes) {
 
 SnapshotHash snapshot_hash(std::string_view text) {
     if (text.size() > 1048576) throw Error("E_LIMIT", "document_text is above 1,048,576 bytes", "document_text");
+    if (json::deeper_than(text, 64)) throw Error("E_LIMIT", "nesting is above 64 levels", "document_text");
     const json::Parsed parsed = json::parse(text);
     if (parsed.duplicate_key) throw Error("E_PARSE", "duplicate key");
     if (parsed.number_overflow) throw Error("E_SCHEMA", "a number overflows binary64");
     if (parsed.lone_surrogate) throw Error("E_SCHEMA", "lone surrogate escape");
     if (parsed.value.kind != json::Kind::Object) throw Error("E_SCHEMA", "the top level must be an object");
-    if (parsed.depth > 64 || parsed.too_deep) throw Error("E_LIMIT", "nesting is above 64 levels", "document_text");
     return snapshot_of(parsed.value);
 }
 

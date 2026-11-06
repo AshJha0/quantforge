@@ -85,8 +85,15 @@ TEST_CASE("limits come after schema and before rules") {
     CHECK(has(run_case(wrap("core.stats.quantile", R"({"x":)" + big + "}")).json, "E_SCHEMA"));
 }
 
-TEST_CASE("a tiny tol stops at the call limit") {
-    CHECK(has(run_case(wrap("core.integrate.adaptive_simpson", R"({"function":"sqrt","a":0,"b":1,"tol":1e-300,"max_depth":60})")).json, "E_NO_CONVERGENCE"));
+TEST_CASE("a case nested above 80 levels stops before parsing") {
+    const auto r = run_case(wrap("a.b", std::string(81, '[')));
+    CHECK(has(r.json, "E_LIMIT"));
+    CHECK(has(r.json, R"("case_id":"unknown")"));
+}
+
+TEST_CASE("nesting limit covers every record key") {
+    const std::string deep = std::string(65, '[') + std::string(65, ']');
+    CHECK(has(run_case(wrap("core.store.chain", R"({"records":[{"sequence":1,"series_id":"S","event_time":"2024-01-01T00:00:00Z","knowledge_time":"2024-01-01T00:00:00Z","value":1,"extra":)" + deep + "}]}")).json, "E_LIMIT"));
 }
 
 TEST_CASE("splines take the largest legal knot count") {

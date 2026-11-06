@@ -16,14 +16,11 @@ Written from the specs alone. Nothing here was changed to fit a golden file.
 - `skip` with no upper limit: `limits.md`.
 - `implementations.yaml` in the contract: corrected.
 - Every other gap this file listed: settled by `specifications/01-core/rulings.md`.
+- `document_text` breaking a limit and a parse rule together: rulings B1 and B2.
 
 ## Open
 
-`document_text` that breaks a limit and a parse rule together. `limits.md` puts `E_LIMIT` before rule checks, while
-`snapshot-hash.md` lists invalid JSON first, and the contract's `E_PARSE` may mean the envelope only. This build:
-over 1,048,576 bytes is `E_LIMIT` without parsing; over 64 levels is `E_LIMIT` only once the text has passed every
-`snapshot-hash.md` check, as nesting has no meaning in text that is not JSON. A duplicate key below 1000 levels of
-nesting is not seen, so such a text gives `E_LIMIT` and not `E_PARSE`.
-
 The general array limit needs each operation's `E_SCHEMA` checks to run first. Here the handler runs once and its
-result is dropped, so "no work is started" holds only in that no result is produced. Other limits stop before any work.
+result is dropped. `limits.md` now allows one linear pass and no work that grows with the limit, and this goes
+further than that on an oversized array: a sort in `quantile`, or `n` x `window` in `rolling`. The cost is bounded by the
+input already read. Other limits stop before any work. A schema-only pass per operation would close the gap.
