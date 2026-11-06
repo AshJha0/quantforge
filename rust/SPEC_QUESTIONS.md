@@ -30,8 +30,6 @@ Nothing here was tuned to fit: the code follows the spec text.
 
 No golden case shows these to be wrong, but the other languages may read them differently.
 
-- `core.root.newton`: when `f(a)` is exactly 0, the bracket shrinks by the sign of `f(b)`, so the root at `a` stays
-  inside it (ruling R3 leaves this step open).
 
 ## Stage B, closed at `stage-b` ddf2b18
 
@@ -39,6 +37,14 @@ No golden case shows these to be wrong, but the other languages may read them di
 changes of a stated choice were B0 (spot in OIS), B5, B7, B8, B9 and B10. B11 and B12 also reordered `calib.fit`.
 `hedge.solve` now gives `E_NO_CONVERGENCE` if its result fails the first-order conditions (B13).
 
-## Stage B readings
+## Stage B, closed at `stage-b` 9615ef5
 
-- `fx.curve.implied`: the 100 limit on quote lists (B5) is read as covering `points`.
+- `fx.curve.implied` limit on `points`: confirmed by B21.
+- `newton` bracket with an exact zero at an end: confirmed by B23.
+
+## Known gap against B24
+
+Operations with work beyond a few linear passes stop at the limit before starting. The cheap array operations
+(`stats.summary`, `covariance`, `ols`, `normal`, `returns`, `ewma_variance` and the like) still make their few linear
+passes over an oversized array, and the result is then replaced by `E_LIMIT`. The output is right, and the time is
+linear in input already read, but it is more than B24's single pass.
