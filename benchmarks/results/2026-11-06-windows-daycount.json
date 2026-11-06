@@ -1,0 +1,102 @@
+{
+ "run_at": "2026-11-06T20:45:22+00:00",
+ "commit": "c95660400f35d97d1b26798c529c3edd2579b76b",
+ "machine": {
+  "os": "Windows-11-10.0.26200-SP0",
+  "machine": "AMD64",
+  "logical_cpus": 12,
+  "python": "3.12.10",
+  "cpu": "Intel(R) Core(TM) 5 120U",
+  "memory_gib": 15.6
+ },
+ "suite": "daycount",
+ "cases": 20000,
+ "distinct_cases": 1756,
+ "repeats": 5,
+ "results": [
+  {
+   "implementation": "cpp",
+   "version": {
+    "language": "cpp",
+    "implementation_version": "0.1.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "startup_seconds_median": 0.0818,
+   "batch_seconds": [
+    0.4644,
+    0.4734,
+    0.4112,
+    0.4449,
+    0.4119
+   ],
+   "batch_seconds_median": 0.4449,
+   "cases_per_second_median": 44958,
+   "small_batch_seconds_median": 0.1263,
+   "marginal_cases_per_second": 50220
+  },
+  {
+   "implementation": "java",
+   "version": {
+    "language": "java",
+    "implementation_version": "0.1.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "startup_seconds_median": 0.1484,
+   "batch_seconds": [
+    1.0854,
+    0.951,
+    1.0431,
+    0.9443,
+    0.8317
+   ],
+   "batch_seconds_median": 0.951,
+   "cases_per_second_median": 21032,
+   "small_batch_seconds_median": 0.3826,
+   "marginal_cases_per_second": 28150
+  },
+  {
+   "implementation": "python",
+   "version": {
+    "language": "python",
+    "implementation_version": "0.1.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "startup_seconds_median": 0.685,
+   "batch_seconds": [
+    1.4859,
+    1.4599,
+    1.4696,
+    1.4357,
+    1.3972
+   ],
+   "batch_seconds_median": 1.4599,
+   "cases_per_second_median": 13700,
+   "small_batch_seconds_median": 0.7918,
+   "marginal_cases_per_second": 23949
+  },
+  {
+   "implementation": "rust",
+   "version": {
+    "language": "rust",
+    "implementation_version": "0.1.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   },
+   "startup_seconds_median": 0.0339,
+   "batch_seconds": [
+    0.1676,
+    0.1841,
+    0.1732,
+    0.1758,
+    0.1719
+   ],
+   "batch_seconds_median": 0.1732,
+   "cases_per_second_median": 115488,
+   "small_batch_seconds_median": 0.0599,
+   "marginal_cases_per_second": 141251
+  }
+ ]
+}

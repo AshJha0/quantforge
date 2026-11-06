@@ -22,4 +22,4 @@ Stage A is built on the `stage-a` branch and awaits its pull request; no tag exi
 
 ## Not in the repository yet
 
-Planned, and absent today: `infra/`, `examples/`, benchmarks and any benchmark result, the docs site and its CI build, API docs per package, the eight-file spec sets and validation reports per model, per-domain flow diagrams, microstructure folders in the four implementations, and data and solutions for EX-004 to EX-012.
+Planned, and absent today: `infra/`, kernel-level benchmarks, API docs per package, the eight-file spec sets and validation reports per model, per-domain flow diagrams, microstructure folders in the four implementations, and data and solutions for EX-004 to EX-012.

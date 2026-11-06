@@ -17,6 +17,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: apt-get update && apt-get install -y cmake ninja-build
       - run: cmake -S cpp26 -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
       - run: cmake --build build --parallel
@@ -26,6 +28,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: |
           wget -q https://apt.llvm.org/llvm.sh
           sudo bash llvm.sh 23

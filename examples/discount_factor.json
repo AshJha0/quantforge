@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-discount","operation":"core.compounding.discount_factor","inputs":{"rate":0.05,"t":2.0,"compounding":"CONTINUOUS"}}
