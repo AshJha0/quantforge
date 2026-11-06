@@ -58,12 +58,20 @@ None.
 | 29 | `hedge_tenors` limit | Closed: as built (B14) |
 | 30 | Solve method | Closed: either (B16) |
 
+## Closed by rulings B19 to B24 (9615ef5)
+
+| # | Point | Outcome |
+|---|---|---|
+| 31 | FRA `start_months` | Closed: 0 to 1200 (B19), as built |
+| 32 | `fx.*` order of checks | Closed: as built (B20) |
+
+The table in `stage-b-followups.md` marks B24 as ok for Java, but `quantile`, `interp.evaluate`, `monotone_convex` and
+`check_quotes` could do more than one linear pass before the array limit was raised. They now gate first. Operations
+without a gate make one linear pass at most, as `limits.md` allows.
+
 ## Open points
 
-| # | Place | Choice |
-|---|---|---|
-| 31 | `projection-and-fra.md`, FRA `start_months` | The 1 to 1200 range names `months` and `tenor_months`. `start_months` is held to 0 to 1200, with `E_INPUT` outside |
-| 32 | `fx.md`, order of `spot`, curve checks and `as_of` match | `spot` `E_DOMAIN`, then the curves' own checks, then the `as_of` match, then value dates |
+None.
 
 ## Small document points
 

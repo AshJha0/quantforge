@@ -219,6 +219,29 @@ public final class LeastSquares {
         };
     }
 
+    /** Every method starts from here: an objective or gradient that has overflowed gives no descent to follow. */
+    private static Linearised finite(Linearised s) {
+        boolean ok = Double.isFinite(s.objective());
+        for (double g : s.gradient()) {
+            ok &= Double.isFinite(g);
+        }
+        if (!ok) {
+            throw new QfError("E_NON_FINITE", "objective or gradient is not finite");
+        }
+        return s;
+    }
+
+    /**
+     * Backtracking ended. With finite trials the step shrank below the step test at rounding level, which is a stop.
+     * If every trial was non-finite no acceptable step exists (B22).
+     */
+    private static Fit stalled(Problem q, double[] p, int iterations, boolean finiteTrial) {
+        if (!finiteTrial) {
+            throw new QfError("E_NO_CONVERGENCE", "no acceptable step");
+        }
+        return finish(q, p, iterations, "STEP");
+    }
+
     private static Fit finish(Problem q, double[] p, int iterations, String status) {
         double objective = linearise(q, p).objective();
         double[] residuals = new double[q.x().length];
@@ -233,7 +256,7 @@ public final class LeastSquares {
     private static Fit gaussNewton(Problem q) {
         double[] p = q.start().clone();
         for (int it = 0; ; it++) {
-            Linearised s = linearise(q, p);
+            Linearised s = finite(linearise(q, p));
             double[] g = s.gradient();
             if (norm(g) <= GRADIENT_TOL) {
                 return finish(q, p, it, "GRADIENT");
@@ -248,11 +271,17 @@ public final class LeastSquares {
             double[] step = LinearAlgebra.solve(s.normal(), rhs);
             double scale = 1.0;
             double f0 = s.objective();
-            while (scale > 1e-20 && !(linearise(q, plus(p, step, scale)).objective() < f0)) {
+            boolean finiteTrial = false;
+            while (scale > 1e-20) {
+                double trial = linearise(q, plus(p, step, scale)).objective();
+                finiteTrial |= Double.isFinite(trial);
+                if (trial < f0) {
+                    break;
+                }
                 scale /= 2.0;
             }
             if (scale <= 1e-20) {
-                return finish(q, p, it, "STEP");
+                return stalled(q, p, it, finiteTrial);
             }
             double[] next = plus(p, step, scale);
             double[] moved = plus(next, p, -1.0);
@@ -280,10 +309,10 @@ public final class LeastSquares {
             p[i] = clamp(q, i, q.start()[i]);
         }
         double mu = 1e-3;
-        Linearised s = linearise(q, p);
+        Linearised s = finite(linearise(q, p));
         double f0 = s.objective();
         for (int it = 0; ; it++) {
-            double[] g = s.gradient();
+            double[] g = finite(s).gradient();
             double[] projected = new double[n];
             int[] index = new int[n];
             int count = 0;
@@ -341,7 +370,7 @@ public final class LeastSquares {
         int n = q.start().length;
         double[] p = q.start().clone();
         double[][] h = identity(n);
-        Linearised s = linearise(q, p);
+        Linearised s = finite(linearise(q, p));
         double f = s.objective();
         double[] g = s.gradient();
         boolean fresh = true;
@@ -360,24 +389,26 @@ public final class LeastSquares {
             double step = 1.0;
             double[] next = null;
             double fNext = 0.0;
+            boolean finiteTrial = false;
             while (slope < 0.0 && step > 1e-20) {
                 next = plus(p, d, step);
                 fNext = linearise(q, next).objective();
+                finiteTrial |= Double.isFinite(fNext);
                 if (fNext <= f + 1e-4 * step * slope) {
                     break;
                 }
                 step /= 2.0;
             }
-            if (slope >= 0.0 || step <= 1e-20) {
+            if (!(slope < 0.0) || step <= 1e-20) {
                 if (fresh) {
-                    return finish(q, p, it, "STEP");
+                    return stalled(q, p, it, finiteTrial);
                 }
                 h = identity(n);
                 fresh = true;
                 continue;
             }
             double[] move = plus(next, p, -1.0);
-            double[] gNext = linearise(q, next).gradient();
+            double[] gNext = finite(linearise(q, next)).gradient();
             double[] y = plus(gNext, g, -1.0);
             double sy = dot(move, y);
             if (sy > 1e-14 * norm(move) * norm(y)) {

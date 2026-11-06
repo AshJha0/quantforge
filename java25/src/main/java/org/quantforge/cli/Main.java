@@ -164,8 +164,8 @@ public final class Main {
     }
 
     /**
-     * Runs an operation. Those with limits on work gate themselves before starting. For the rest the general array
-     * limit is settled here: it outranks a rule error, but not E_SCHEMA.
+     * Runs an operation. Any that does more than one linear pass gates itself before starting (ruling B24). For the
+     * rest the general array limit is settled here: it outranks a rule error, but not E_SCHEMA.
      */
     private static Operations.Out apply(Function<In, Operations.Out> op, In in) {
         try {
