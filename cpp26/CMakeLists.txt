@@ -21,17 +21,21 @@ add_compile_options(-ffp-contract=off -Wall -Wextra)
 
 add_library(quantforge_core
   src/core/calendar.cpp
+  src/core/calibration.cpp
   src/core/compounding.cpp
   src/core/cos.cpp
   src/core/data_checks.cpp
   src/core/dates.cpp
   src/core/daycount.cpp
+  src/core/fx.cpp
   src/core/integrate.cpp
   src/core/interp.cpp
   src/core/json.cpp
   src/core/linalg.cpp
   src/core/mc.cpp
+  src/core/money.cpp
   src/core/pde.cpp
+  src/core/rates.cpp
   src/core/rng.cpp
   src/core/root.cpp
   src/core/snapshot.cpp
@@ -65,7 +69,7 @@ if(BUILD_TESTING)
     GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024) # v3.16.1
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp)
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_stage_b.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   if(MINGW)
     target_link_options(quantforge_core_tests PRIVATE -static)
