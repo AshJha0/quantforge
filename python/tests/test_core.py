@@ -74,13 +74,20 @@ def test_calendar_range_at_the_edge():
     assert e.value.code == "E_DATE_RANGE"
 
 
-def test_end_of_month_needs_the_last_business_day_itself():
-    # 2024-03-29 is Good Friday, so it is not the last business day of March. SPEC_QUESTIONS.md Q1.
-    args = ("GBLO", date(2024, 3, 29), "1M", "MODIFIED_FOLLOWING")
-    assert calendars.add_tenor(*args, True) == date(2024, 4, 29)
-    assert calendars.add_tenor("GBLO", date(2024, 3, 28), "1M", "FOLLOWING", True) == date(
-        2024, 4, 30
-    )
+def test_end_of_month_from_on_or_after_the_last_business_day():
+    # The last business day of March 2024 is the 28th: the 29th is Good Friday.
+    for day in (28, 29, 30, 31):
+        result = calendars.add_tenor("GBLO", date(2024, 3, day), "1M", "FOLLOWING", True)
+        assert result == date(2024, 4, 30)
+    result = calendars.add_tenor("GBLO", date(2024, 3, 27), "1M", "FOLLOWING", True)
+    assert result == date(2024, 4, 29)  # the 27th is a Saturday
+
+
+def test_end_of_month_unadjusted_uses_calendar_month_ends():
+    add = calendars.add_tenor
+    assert add("GBLO", date(2024, 3, 31), "1M", "UNADJUSTED", True) == date(2024, 4, 30)
+    assert add("GBLO", date(2024, 4, 30), "1M", "UNADJUSTED", True) == date(2024, 5, 31)
+    assert add("GBLO", date(2024, 3, 29), "1M", "UNADJUSTED", True) == date(2024, 4, 29)
 
 
 def test_summary_at_a_large_offset():

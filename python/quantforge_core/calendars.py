@@ -208,7 +208,11 @@ def add_tenor(name: str, d: date, tenor: str, convention: str, end_of_month: boo
     year, month = months // 12, months % 12 + 1
     if year > MAX_YEAR:
         raise QfError("E_DATE_RANGE", f"{tenor} from {d} is after {MAX_YEAR}")
-    if end_of_month and d == _last_business_day(name, d.year, d.month):
-        return _last_business_day(name, year, month)
-    day = min(d.day, _cal.monthrange(year, month)[1])
-    return adjust(name, date(year, month, day), convention)
+    target_last = _cal.monthrange(year, month)[1]
+    if end_of_month:
+        if convention == "UNADJUSTED":
+            if d.day == _cal.monthrange(d.year, d.month)[1]:
+                return date(year, month, target_last)
+        elif d >= _last_business_day(name, d.year, d.month):
+            return _last_business_day(name, year, month)
+    return adjust(name, date(year, month, min(d.day, target_last)), convention)

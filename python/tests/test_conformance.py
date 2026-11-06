@@ -20,17 +20,6 @@ def _load_runner():
     return module
 
 
-# Golden cases that contradict the spec text. This code follows the spec, and these stay failing
-# until the owner rules: see SPEC_QUESTIONS.md, Q1 and Q2. The test fails if the set changes.
-DISPUTED = {
-    "calendar": {
-        f"calendar-{n:04d}"
-        for n in (56, 57, 61, 84, 107, 148, 149, 180, 314, 318,
-                  608, 609, 613, 636, 659, 700, 701, 732, 866, 870)
-    },
-    "daycount": {"daycount-1472"},
-}
-
 RUNNER = _load_runner()
 CLASSES = RUNNER.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
 
@@ -49,6 +38,4 @@ def test_golden_suite(path):
         status, messages = RUNNER.judge(case, result, CLASSES)
         if status != "pass":
             failures.append((case["case_id"], status, messages[:2]))
-    unexpected = [f for f in failures if f[0] not in DISPUTED.get(path.stem, set())]
-    assert not unexpected, unexpected[:10]
-    assert {f[0] for f in failures} == DISPUTED.get(path.stem, set())
+    assert not failures, failures[:10]
