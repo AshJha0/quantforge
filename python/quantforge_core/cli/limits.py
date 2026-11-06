@@ -154,7 +154,11 @@ def _check_curve_sizes(raw: Raw) -> None:
         item = stack.pop()
         if isinstance(item, dict):
             for key, value in item.items():
-                if key in ("quotes", "pillars") and len(value) > MAX_QUOTES:
+                if (
+                    key in ("quotes", "pillars", "points")
+                    and isinstance(value, list)
+                    and len(value) > MAX_QUOTES
+                ):
                     raise _over(key, MAX_QUOTES)
                 if isinstance(value, dict):
                     stack.append(value)

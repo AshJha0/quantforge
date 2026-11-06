@@ -97,6 +97,8 @@ def bootstrap(
     for q in quotes:
         if q.kind != "FRA":
             _check_months(q.months)
+        elif not 0 <= q.months <= 1200:
+            raise QfError("E_INPUT", "start_months must be 0 to 1200")
     spot = _spot(index, as_of)
     pillars: list[date] = []
     models: list[curves.Model] = []

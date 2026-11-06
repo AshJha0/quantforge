@@ -15,6 +15,7 @@ PARAMETERS = {"LINEAR": 2, "EXPONENTIAL": 2, "NELSON_SIEGEL": 4, "ROSENBROCK": 2
 METHODS = ("GAUSS_NEWTON", "LEVENBERG_MARQUARDT", "BFGS")
 _GRADIENT_TOL = 1e-8
 _STEP_TOL = 1e-12
+_SHORTEST_STEP = 2.0**-80
 
 
 @dataclass(frozen=True)
@@ -60,9 +61,10 @@ class _Problem:
     def objective(self, p: Floats) -> float:
         """A point where the model cannot be evaluated counts as infinitely bad."""
         try:
-            return math.fsum(r * r for r in self.residuals(p))
+            value = math.fsum(r * r for r in self.residuals(p))
         except (ArithmeticError, ValueError):
             return math.inf
+        return value if math.isfinite(value) else math.inf
 
     def jacobian(self, p: Floats) -> list[list[float]]:
         if self.model == "ROSENBROCK":
@@ -96,6 +98,8 @@ def _normal(jac: list[list[float]], r: Floats) -> tuple[list[list[float]], list[
     n = len(jac[0])
     jtj = [[math.fsum(row[i] * row[j] for row in jac) for j in range(n)] for i in range(n)]
     jtr = [math.fsum(row[i] * v for row, v in zip(jac, r, strict=True)) for i in range(n)]
+    if not all(math.isfinite(v) for v in jtr):
+        raise QfError("E_NON_FINITE", "the gradient is not finite")
     return jtj, jtr
 
 
@@ -105,6 +109,10 @@ def _norm(v: Floats) -> float:
 
 def _small_step(step: Floats, p: Floats) -> bool:
     return _norm(step) <= _STEP_TOL * (1 + _norm(p))
+
+
+def _no_step() -> QfError:
+    return QfError("E_NO_CONVERGENCE", "no acceptable step could be found")
 
 
 def _no_convergence(max_iter: int) -> QfError:
@@ -124,9 +132,11 @@ def _gauss_newton(problem: _Problem, start: Floats, max_iter: int) -> tuple[list
             trial_value = problem.objective(trial)
             if trial_value < value:
                 break
+            if _small_step(step, p):
+                return p, it, "STEP"
             step = [s / 2 for s in step]
         else:
-            return p, it, "STEP"
+            raise _no_step()
         p, value = trial, trial_value
         if _small_step(step, p):
             return p, it, "STEP"
@@ -162,9 +172,11 @@ def _levenberg_marquardt(
             if trial_value < value:
                 accepted = True
                 break
+            if _small_step([a - b for a, b in zip(trial, p, strict=True)], p):
+                return p, it, "STEP"
             mu *= 4
         if not accepted:
-            return p, it, "STEP"
+            raise _no_step()
         moved = [a - b for a, b in zip(trial, p, strict=True)]
         p, value = trial, trial_value
         mu = max(mu * 0.3, 1e-15)
@@ -215,7 +227,9 @@ def _bfgs(problem: _Problem, start: Floats, max_iter: int) -> tuple[list[float],
         found = _line_search(problem, p, value, g, d)
         if found is None:
             if first:
-                return p, it, "STEP"
+                if _small_step([v * _SHORTEST_STEP for v in d], p):
+                    return p, it, "STEP"
+                raise _no_step()
             h = [[float(i == j) for j in range(n)] for i in range(n)]
             first = True
             continue
@@ -277,15 +291,18 @@ def fit(
         model, x, y, weights if weights is not None else [1.0] * len(x), regularisation,
         prior if prior is not None else [0.0] * n,
     )
+    box_low = lower if lower is not None else [-math.inf] * n
+    box_high = upper if upper is not None else [math.inf] * n
+    start = [min(max(v, lo), hi) for v, lo, hi in zip(start, box_low, box_high, strict=True)]
+    if not math.isfinite(problem.objective(start)):
+        raise QfError("E_NON_FINITE", "the objective is not finite at start", "start")
     if method == "GAUSS_NEWTON":
         p, iterations, status = _gauss_newton(problem, start, max_iter)
     elif method == "BFGS":
         p, iterations, status = _bfgs(problem, start, max_iter)
     else:
         p, iterations, status = _levenberg_marquardt(
-            problem, start, max_iter,
-            lower if lower is not None else [-math.inf] * n,
-            upper if upper is not None else [math.inf] * n,
+            problem, start, max_iter, box_low, box_high
         )
     return Fit(p, problem.objective(p), iterations, status, problem.raw(p))
 
