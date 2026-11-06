@@ -25,7 +25,7 @@ ctest --test-dir build --output-on-failure
 
 The build sets `-ffp-contract=off`, as the contract requires. Never add `-ffast-math`.
 
-Sanitizers, on Linux: add `-DQF_SANITIZE=address,undefined`.
+Sanitizers, on Linux: add `-DQF_SANITIZE=address,undefined,float-cast-overflow`. The last one matters here, because `undefined` alone does not check a double converted to an integer that cannot hold it.
 
 Clang on Windows, using the WinLibs headers and libraries:
 

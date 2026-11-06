@@ -93,7 +93,7 @@ class CommandTests(unittest.TestCase):
             self.assertEqual(argv[0], "./tool")
 
     def test_bare_name_uses_path(self):
-        argv, _ = runner.resolve_command({"command": ["python"]}, ROOT)
+        argv, _ = runner.resolve_command({"command": [Path(sys.executable).name]}, ROOT)
         self.assertTrue(Path(argv[0]).is_absolute())
 
     @unittest.skipUnless(sys.platform == "win32", "needs a Windows launcher")

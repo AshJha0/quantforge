@@ -9,3 +9,6 @@ __pycache__/
 oracle/strata/cp.txt
 conformance/reports/
 data/recorder/
+mutants/
+mutants.out*/
+.mutmut-cache

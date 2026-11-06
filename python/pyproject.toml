@@ -25,3 +25,10 @@ addopts = "-ra"
 
 [tool.ruff]
 line-length = 100
+
+[tool.mutmut]
+source_paths = ["quantforge_core/"]
+# The other test files read files outside the copy of python/ that mutmut makes.
+tests_dir = ["tests/test_core.py"]
+pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
+do_not_mutate = ["quantforge_core/_sobol_data.py"]
