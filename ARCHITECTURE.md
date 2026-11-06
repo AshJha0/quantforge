@@ -9,7 +9,7 @@ QuantForge is one repository holding four isolated implementations and the neutr
 | `datasets/` | Schemas and golden files | Oracle output |
 | `conformance/` | Neutral runner and tolerances | Golden files and each CLI's JSON. No financial logic |
 | `java25/`, `cpp26/`, `python/`, `rust/` | Four equal implementations | Specs only. Never each other, never the oracle |
-| `tools/` | Recorder, forward log and docs site build | No financial logic |
+| `tools/` | Recorder, forward log, docs site build and Curves gallery | CLI output. No financial logic |
 
 ## Rules that shape it
 
@@ -27,4 +27,14 @@ Stage B adds the pricing framework (`specifications/04-pricing/pricing-framework
 
 Stage B calculations are pure functions of their inputs, so stage F can add AD (ADR-0010). Risk is bump and rebuild for now.
 
-Stage A built domain 01. Stage B built slices of domains 02, 03, 04, 06 and 08. Services, `infra/` and the other domains do not exist yet.
+## What each stage added
+
+Services, `infra/` and the other domains do not exist yet.
+
+### Stage A: Foundation
+
+Built domain 01, and the neutral parts: `oracle/`, the CLI contract (`specifications/cli-contract.md`), `conformance/`, and the recorder and forward log in `tools/`. Limits: many golden cases rest on hand or replay sources, and the recorder is not scheduled.
+
+### Stage B: FX and rates slices
+
+Built slices of domains 02, 03, 04, 06 and 08, on top of domain 01 in each language. Build order is overnight curve, then projection, then FX. The [Curves gallery](docs/curves/README.md) shows these curves from real CLI runs. It sits outside the four implementations and only reads CLI output. Limits: inputs are synthetic, risk is bump and rebuild with no AD, and hedges are calculations with no connection to a market.

@@ -18,7 +18,18 @@ Eleven stages, one pull request and one tag each. Estimates are plan-weeks, 106 
 
 A stage exits when all four languages conform, the oracle named for its scope passes, its minimum test set runs and its docs are reviewed.
 
-Stage A is released as v0.1. Stage B is built on the `stage-b` branch and awaits its pull request, targeting v0.2. Both are at Implemented, not Validated. Stages C to K have not started, and each domain's real specs are written before its own stage. Use cases 1 and 2 are defined in `specifications/04-pricing/use-cases.md`; use cases 3 to 6 are defined in the project plan, which is kept outside this repository.
+Use cases 1 and 2 are defined in `specifications/04-pricing/use-cases.md`; use cases 3 to 6 are defined in the project plan, which is kept outside this repository.
+
+## Stage status
+
+Done means built and passing locally through the neutral runner, at status Implemented, not Validated. Validation is self-assessment until the human review at the end of the project. Carried means left open by that stage and still owed.
+
+| Stage | Status | Done | Carried | Known limits |
+|---|---|---|---|---|
+| A Foundation | Done, tag `v0.1` | Domain 01 in four languages; oracle; CLI; neutral runner; fuzz and mutation harnesses; recorder and forward log | Scheduling the recorder; the end-of-project human review | Many golden cases have hand or replay sources only. The only benchmark is one laptop run of CLI batch throughput. Clang on Windows is blocked at times, so it relies on CI |
+| B FX and rates slices | Done, tag `v0.2` | SONIA and minimal SOFR OIS, projection curves, FRAs, swaps, FX forwards and swaps, quote-driven basis, calibration, DV01, key-rate risk, hedges, use cases 1 and 2. See the [Curves gallery](docs/curves/README.md) | To stage D: monotone-convex and spline curves on the curve object, full SOFR, ESTR, curves built from basis swaps. To stage F: AD, as risk is bump and rebuild (ADR-0010). No stage set: running Strata's calibrator; the licence questions in `oracle/LICENCES.md`. End of project: the human review | Almost all curve inputs are synthetic, so results show the method, not a market. `usecases` and `rulings_b` have no outside oracle, and `risk` is hand and self-consistency only (`specifications/stage-b-rulings.md`). Hedges are calculations: nothing is traded |
+| C Equity vol slice | Planned, next | Nothing yet | | |
+| D to K | Planned | Nothing yet. Each domain's real specs are written before its own stage | | |
 
 ## Not in the repository yet
 

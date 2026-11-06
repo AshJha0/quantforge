@@ -18,6 +18,10 @@ Sources are the US Treasury par yield curve, Bank of England SONIA, ECB referenc
 
 The manifest follows the stage B data survey of 2026-11-06; `oracle/LICENCES.md` has the same reading. Raw SONIA data stays local until the Bank answers on redistribution, and ECB data may be reused only unchanged and cited.
 
+## Curves gallery
+
+`tools/build_gallery.py` generates `docs/curves/` from real CLI runs, and `--check` reruns the Python CLI against it. See `docs/developer-guides/curves-gallery.md`.
+
 ## Forward log
 
 `tools/forward-log/log.jsonl` is append-only and hash-chained, using the records and chain in `specifications/01-core/asof-store.md`. Each entry carries a timestamp and the code commit.

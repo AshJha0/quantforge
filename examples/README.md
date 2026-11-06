@@ -72,6 +72,10 @@ All three inputs are synthetic and copied from golden cases. The outputs are cal
 {"schema_version":"1.0","case_id":"example-usecase-2","status":"ok","outputs":{"pv":4688.463457886704,"dv01":5359.884273971188,"key_rate":[0.0,0.0,0.0,0.0,0.0032343783204851206,0.006512847761314333,0.015018871840766224,2210.203389321763,3149.655767292203,0.0,0.0,0.0,0.0],"hedge_units":[-4.871268420002989,-5.123922256644436],"residual_key_rate":[0.0,0.0,0.0,0.0,0.0032343784231503134,0.006512848038736604,0.015018871147210547,0.0,0.0,0.0,0.0,0.0,0.0],"hedge_cost":1339.9647891535699},"diagnostics":{}}
 ```
 
+## Curves gallery examples
+
+Also synthetic, and copied from golden cases. `ois_bootstrap_sofr.json`, `projection_bootstrap.json` and `fx_curve_implied.json` are the inputs of `ois-0009`, `projection-0001` and `fx-0011`. `fx_forward_outright.json` uses the curves of `usecase_fx_hedge.json`, with a 2027-11-10 value date. The [Curves gallery](../docs/curves/README.md) shows their real output from all four builds.
+
 ## Where the languages differed
 
 Except where stated, none of these is compared by the runner, and each is allowed by the contract.
