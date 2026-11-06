@@ -5,7 +5,6 @@ from bisect import bisect_left, bisect_right
 from collections.abc import Sequence
 
 from .errors import QfError
-from .linalg import lu_solve
 from .numeric import thomas
 
 Floats = Sequence[float]
@@ -35,30 +34,34 @@ def _steps(x: Floats, y: Floats) -> tuple[list[float], list[float]]:
 def _spline_slopes(
     method: str, x: Floats, y: Floats, slope_start: float | None, slope_end: float | None
 ) -> list[float]:
-    """Knot slopes of a C2 cubic: one linear equation per knot."""
+    """Knot slopes of a C2 cubic: a tridiagonal system, one equation per knot."""
     n = len(x) - 1
     h, d = _steps(x, y)
-    a = [[0.0] * (n + 1) for _ in range(n + 1)]
+    lower = [0.0] * (n + 1)
+    diag = [0.0] * (n + 1)
+    upper = [0.0] * (n + 1)
     rhs = [0.0] * (n + 1)
     for i in range(1, n):
-        a[i][i - 1] = h[i]
-        a[i][i] = 2 * (h[i - 1] + h[i])
-        a[i][i + 1] = h[i - 1]
+        lower[i] = h[i]
+        diag[i] = 2 * (h[i - 1] + h[i])
+        upper[i] = h[i - 1]
         rhs[i] = 3 * (h[i] * d[i - 1] + h[i - 1] * d[i])
     if method == "cubic_natural":
-        a[0][0], a[0][1], rhs[0] = 2.0, 1.0, 3 * d[0]
-        a[n][n - 1], a[n][n], rhs[n] = 1.0, 2.0, 3 * d[n - 1]
+        diag[0], upper[0], rhs[0] = 2.0, 1.0, 3 * d[0]
+        lower[n], diag[n], rhs[n] = 1.0, 2.0, 3 * d[n - 1]
     elif method == "cubic_clamped":
-        a[0][0], rhs[0] = 1.0, slope_start
-        a[n][n], rhs[n] = 1.0, slope_end
+        diag[0], rhs[0] = 1.0, slope_start
+        diag[n], rhs[n] = 1.0, slope_end
     else:
-        h0, h1 = h[0] ** 2, h[1] ** 2
-        a[0][0], a[0][1], a[0][2] = h1, h1 - h0, -h0
-        rhs[0] = 2 * (h1 * d[0] - h0 * d[1])
-        g0, g1 = h[n - 2] ** 2, h[n - 1] ** 2
-        a[n][n - 2], a[n][n - 1], a[n][n] = g1, g1 - g0, -g0
-        rhs[n] = 2 * (g1 * d[n - 2] - g0 * d[n - 1])
-    return lu_solve(a, rhs)
+        # Equal third derivatives at x_1 and x_{n-1}, with the far unknown eliminated by the
+        # neighbouring row, so that the system stays tridiagonal.
+        p, q = h[0], h[1]
+        third = 2 * (q * q * d[0] - p * p * d[1])
+        diag[0], upper[0], rhs[0] = q, p + q, (third + p * rhs[1]) / (p + q)
+        p, q = h[n - 2], h[n - 1]
+        third = 2 * (q * q * d[n - 2] - p * p * d[n - 1])
+        lower[n], diag[n], rhs[n] = p + q, p, (q * rhs[n - 1] - third) / (p + q)
+    return thomas(lower, diag, upper, rhs)
 
 
 def _sign(v: float) -> int:

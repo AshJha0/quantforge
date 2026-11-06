@@ -34,8 +34,8 @@ def gbm_european(
     """Returns (price, stderr)."""
     if spot <= 0 or strike <= 0 or sigma <= 0 or t <= 0:
         raise QfError("E_DOMAIN", "spot, strike, sigma and t must be positive")
-    if paths < 2 or paths > 10_000_000 or steps < 1:
-        raise QfError("E_INPUT", "need 2 <= paths <= 10000000 and steps >= 1")
+    if paths < 2 or steps < 1:
+        raise QfError("E_INPUT", "need paths >= 2 and steps >= 1")
     if method == "SOBOL" and steps > sobol.MAX_DIMENSIONS:
         raise QfError("E_INPUT", "SOBOL allows at most 64 steps", "steps")
 

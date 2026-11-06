@@ -7,14 +7,23 @@ import hashlib
 import itertools
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from datetime import date
 from typing import Any
 
 from .errors import QfError
 from .snapshot import canonical, hash_value
+from .timezones import DAY, date_seconds
 
 Row = dict[str, Any]
 Format = Callable[[int], str]
 GENESIS = "0" * 64
+MIN_INSTANT = date_seconds(date.min)
+MAX_INSTANT = date_seconds(date.max) + DAY - 1
+
+
+def _check_year(instant: int) -> None:
+    if not MIN_INSTANT <= instant <= MAX_INSTANT:
+        raise QfError("E_DATE_RANGE", "an instant leaves years 1 to 9999 in UTC")
 
 
 @dataclass(frozen=True)
@@ -28,13 +37,20 @@ class Record:
     raw: dict[str, Any]
 
 
-def check_log(records: Sequence[Record]) -> None:
+def check_log(records: Sequence[Record], *instants: int | None) -> None:
+    """Log checks 2 and 3, then the Z-form year limit on records and on other input instants."""
     for a, b in itertools.pairwise(records):
         if b.sequence <= a.sequence:
             raise QfError("E_INPUT", "sequence must be strictly increasing", "records")
     for a, b in itertools.pairwise(records):
         if b.knowledge_time < a.knowledge_time:
             raise QfError("E_INPUT", "knowledge_time went backwards", "records")
+    for r in records:
+        _check_year(r.event_time)
+        _check_year(r.knowledge_time)
+    for instant in instants:
+        if instant is not None:
+            _check_year(instant)
 
 
 def view(records: Sequence[Record], as_of: int) -> list[Record]:

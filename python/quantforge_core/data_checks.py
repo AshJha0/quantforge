@@ -20,10 +20,9 @@ def _median(values: Sequence[float]) -> float:
     return s[n // 2] if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2
 
 
-def _is_outlier(mid: float, history: Sequence[float], threshold: float) -> bool:
+def _centre_and_spread(history: Sequence[float]) -> tuple[float, float]:
     med = _median(history)
-    mad = _median([abs(h - med) for h in history])
-    return mad != 0 and abs(mid - med) / (1.4826 * mad) > threshold
+    return med, _median([abs(h - med) for h in history])
 
 
 def _check_one(
@@ -33,8 +32,7 @@ def _check_one(
     max_spread: float | None,
     positive_only: bool,
     threshold: float,
-    min_history: int,
-    history: Mapping[str, Sequence[float]],
+    spreads: Mapping[str, tuple[float, float]],
 ) -> dict[str, object]:
     non_positive = positive_only and any(s is not None and s <= 0 for s in (q.bid, q.ask))
     if q.bid is None or q.ask is None:
@@ -51,7 +49,6 @@ def _check_one(
     crossed = q.bid > q.ask
     stale = as_of - q.event_time > stale_after
     mid = (q.bid + q.ask) / 2
-    past = history.get(q.instrument_id, ())
     flags = []
     if crossed:
         flags.append("CROSSED")
@@ -66,8 +63,10 @@ def _check_one(
         flags.append("WIDE_SPREAD")
     if non_positive:
         flags.append("NON_POSITIVE")
-    if not crossed and len(past) >= min_history and _is_outlier(mid, past, threshold):
-        flags.append("OUTLIER")
+    if not crossed and q.instrument_id in spreads:
+        med, mad = spreads[q.instrument_id]
+        if mad != 0 and abs(mid - med) / (1.4826 * mad) > threshold:
+            flags.append("OUTLIER")
 
     status = "CROSSED" if crossed else "STALE" if stale else q.quote_status
     return {"instrument_id": q.instrument_id, "quote_status": status, "quality_flags": flags}
@@ -96,10 +95,16 @@ def check_quotes(
         raise QfError("E_INPUT", "outlier_min_history must be at least 3", "outlier_min_history")
     if any(q.event_time > as_of for q in quotes):
         raise QfError("E_INPUT", "event_time is after as_of", "quotes")
+    quoted = {q.instrument_id for q in quotes}
+    spreads = {
+        key: _centre_and_spread(past)
+        for key, past in (history or {}).items()
+        if key in quoted and len(past) >= outlier_min_history
+    }
     return [
         _check_one(
             q, as_of, stale_after_seconds, max_relative_spread, positive_only,
-            outlier_threshold, outlier_min_history, history or {},
+            outlier_threshold, spreads,
         )
         for q in quotes
     ]

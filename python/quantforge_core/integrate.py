@@ -7,6 +7,7 @@ from .errors import QfError
 from .numeric import ordered_sum
 
 Fn = Callable[[float], float]
+MAX_CALLS = 10_000_000
 
 _KX = (0.991455371120812639206854697526329, 0.949107912342758524526189684047851,
        0.864864423359769072789712788640926, 0.741531185599394439863864773280788,
@@ -18,6 +19,20 @@ _WK = (0.022935322010529224963732008058970, 0.063092092629978553290700663189204,
        0.204432940075298892414161999234649, 0.209482141084727828012999174351914)
 _WG = (0.129484966168869693270611432679082, 0.279705391489276667901467771423780,
        0.381830050505118944950369775488975, 0.417959183673469387755102040816327)
+
+
+def _counted(f: Fn) -> Fn:
+    """Stops an adaptive rule at the fixed call limit in limits.md."""
+    calls = 0
+
+    def counted(x: float) -> float:
+        nonlocal calls
+        calls += 1
+        if calls > MAX_CALLS:
+            raise QfError("E_NO_CONVERGENCE", f"reached {MAX_CALLS} function calls")
+        return f(x)
+
+    return counted
 
 
 def _check_range(a: float, b: float) -> None:
@@ -97,6 +112,8 @@ def adaptive_simpson(
     if max_depth < 1:
         raise QfError("E_INPUT", "need max_depth >= 1", "max_depth")
 
+    f = _counted(f)
+
     def rule(width: float, fl: float, fm: float, fr: float) -> float:
         return width / 6 * (fl + 4 * fm + fr)
 
@@ -141,6 +158,7 @@ def gauss_kronrod(
         raise QfError("E_INPUT", "need tol > 0", "tol")
     if max_intervals < 1:
         raise QfError("E_INPUT", "need max_intervals >= 1", "max_intervals")
+    f = _counted(f)
     value, error = _kronrod(f, a, b)
     intervals = [(a, b, value, error)]
     while True:
