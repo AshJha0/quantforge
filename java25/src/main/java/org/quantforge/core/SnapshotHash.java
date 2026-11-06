@@ -26,6 +26,11 @@ public final class SnapshotHash {
         if (!(doc.value() instanceof Map<?, ?> top)) {
             throw new QfError("E_SCHEMA", "top level is not an object", "document_text");
         }
+        return ofDocument(top);
+    }
+
+    /** Hashes a parsed document whose top level is an object. */
+    static Result ofDocument(Map<?, ?> top) {
         StringBuilder b = new StringBuilder();
         object(b, top, true);
         String canonical = b.toString();
@@ -35,6 +40,13 @@ public final class SnapshotHash {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    /** The canonical form of a parsed value, excluding nothing. */
+    static String canonical(Object v) {
+        StringBuilder b = new StringBuilder();
+        value(b, v);
+        return b.toString();
     }
 
     private static void value(StringBuilder b, Object v) {

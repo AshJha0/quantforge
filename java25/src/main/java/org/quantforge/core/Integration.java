@@ -101,8 +101,8 @@ public final class Integration {
 
     public static double adaptiveSimpson(DoubleUnaryOperator f, double a, double b, double tol, long maxDepth) {
         checkRange(a, b);
-        if (!(tol > 0.0) || maxDepth < 0) {
-            throw new QfError("E_INPUT", "need tol > 0 and max_depth >= 0");
+        if (!(tol > 0.0) || maxDepth < 1) {
+            throw new QfError("E_INPUT", "need tol > 0 and max_depth >= 1");
         }
         double fa = finite(f, a);
         double fb = finite(f, b);

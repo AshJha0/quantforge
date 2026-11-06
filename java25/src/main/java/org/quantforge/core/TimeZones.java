@@ -90,6 +90,11 @@ public final class TimeZones {
         }
     }
 
+    /** An instant in Z form. */
+    public static String formatInstant(long instant) {
+        return FORMAT.format(utc(instant)) + "Z";
+    }
+
     private static LocalDateTime utc(long instant) {
         return LocalDateTime.ofEpochSecond(instant, 0, ZoneOffset.UTC);
     }
@@ -158,7 +163,7 @@ public final class TimeZones {
         } else {
             throw new QfError("E_NONEXISTENT_LOCAL_TIME", "local time falls in a gap", "local");
         }
-        return FORMAT.format(utc(instant)) + "Z";
+        return formatInstant(instant);
     }
 
     public static LocalDate businessDate(long instant, Zone z, String cutoff, Calendars.Id calendar) {

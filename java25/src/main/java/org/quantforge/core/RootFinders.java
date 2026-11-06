@@ -135,7 +135,7 @@ public final class RootFinders {
                     q = -q;
                 }
                 p = Math.abs(p);
-                if (2.0 * p < Math.min(3.0 * Math.abs(xm * q) - Math.abs(tol1 * q), Math.abs(e * q))) {
+                if (2.0 * p < Math.min(3.0 * xm * q - Math.abs(tol1 * q), Math.abs(e * q))) {
                     e = d;
                     d = p / q;
                 } else {

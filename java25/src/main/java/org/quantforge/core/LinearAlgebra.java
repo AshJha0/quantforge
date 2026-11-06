@@ -64,7 +64,7 @@ public final class LinearAlgebra {
                 }
             }
             double pivot = Math.abs(a[p][k]);
-            if (pivot < limit || pivot == 0.0) {
+            if (pivot <= limit) {
                 throw new QfError("E_SINGULAR", "pivot below limit");
             }
             double[] t = a[k];
