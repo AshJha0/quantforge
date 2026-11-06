@@ -42,6 +42,8 @@ def years_back(e, n):
 
 
 def yf(conv, s, e, *, ref_start=None, ref_end=None, frequency=None, termination=None, calendar=None):
+    if s == e:  # the rule in daycount.md comes before any convention's day adjustments
+        return Fr(0)
     days = (e - s).days
     if conv == "ACT_360":
         return Fr(days, 360)

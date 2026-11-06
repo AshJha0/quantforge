@@ -74,9 +74,16 @@ start date is not counted, and need not be a business day.
 `add_tenor`: `tenor` matches `^[1-9][0-9]{0,3}[DWMY]$`; anything else is `E_SCHEMA`.
 - `D` and `W` add calendar days (7 per `W`), then apply `convention`.
 - `M` and `Y` add months (12 per `Y`). If the day does not exist in the target month, use the month's
-  last day. If `end_of_month` is true and `date` is the last business day of its month, the
-  result is the last business day of the target month, and `convention` is not applied. Otherwise
-  apply `convention`.
+  last day. Call that `t`. Then:
+  - `end_of_month` true, `convention` not `UNADJUSTED`, and `date` is on or after the last business day of its
+    month: the result is the last business day of the target month. `date` itself need not be a business day, so
+    Saturday 30 March 2024 qualifies, as the last business day of that month is the 28th.
+  - `end_of_month` true, `convention` `UNADJUSTED`, and `date` is the last calendar day of its month: the result is
+    the last calendar day of the target month.
+  - Otherwise apply `convention` to `t`.
+
+  This is QuantLib's rule (`Calendar::advance` and `Calendar::isEndOfMonth`, version 1.44), checked on every day
+  from 2021 to 2026.
 
 ## Acceptance
 

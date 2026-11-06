@@ -24666,6 +24666,351 @@
    "tags": [
     "invalid"
    ]
+  },
+  {
+   "case_id": "calendar-1155",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-03-30",
+    "tenor": "1M",
+    "convention": "UNADJUSTED",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-04-30"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1156",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-03-30",
+    "tenor": "1M",
+    "convention": "PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-04-30"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1157",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-03-30",
+    "tenor": "1M",
+    "convention": "MODIFIED_PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-04-30"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1158",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-03-31",
+    "tenor": "1M",
+    "convention": "UNADJUSTED",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-04-30"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1159",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-03-31",
+    "tenor": "1M",
+    "convention": "PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-04-30"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1160",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-03-31",
+    "tenor": "1M",
+    "convention": "MODIFIED_PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-04-30"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1161",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-06-30",
+    "tenor": "1M",
+    "convention": "UNADJUSTED",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-31"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1162",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-06-30",
+    "tenor": "1M",
+    "convention": "PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-31"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1163",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-06-30",
+    "tenor": "1M",
+    "convention": "MODIFIED_PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-07-31"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1164",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-02-29",
+    "tenor": "1M",
+    "convention": "UNADJUSTED",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-03-31"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1165",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-02-29",
+    "tenor": "1M",
+    "convention": "PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-03-28"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1166",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-02-29",
+    "tenor": "1M",
+    "convention": "MODIFIED_PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-03-28"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1167",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-04-29",
+    "tenor": "1M",
+    "convention": "UNADJUSTED",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-05-29"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1168",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-04-29",
+    "tenor": "1M",
+    "convention": "PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-05-29"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calendar-1169",
+   "operation": "core.calendar.add_tenor",
+   "inputs": {
+    "calendar": "GBLO",
+    "date": "2024-04-29",
+    "tenor": "1M",
+    "convention": "MODIFIED_PRECEDING",
+    "end_of_month": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2024-05-29"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "rules"
+   ],
+   "tags": []
   }
  ]
 }

@@ -272,8 +272,12 @@ def diff_linalg():
         for order, h in ((1, 1e-5), (2, 1e-4)):
             H = mp.mpf(h)
             v = (fn(X + H) - fn(X - H)) / (2 * H) if order == 1 else (fn(X + H) - 2 * fn(X) + fn(X - H)) / H ** 2
+            terms = abs(X) ** 5 + 3 * X ** 2 + 1 if name == "poly5" else abs(fn(X))
+            M = terms + abs(X * mp.diff(fn, X))
+            eps = mp.mpf(2) ** -52
+            lim = 8 * eps * M / H if order == 1 else 32 * eps * M / H ** 2
             s.add("core.diff.central", {"function": name, "x": x, "h": h, "order": order}, {"value": f(v)}, cls="quadrature", verified=["mpmath-50"],
-                  limit={"absolute": 1e-9 if order == 1 else 1e-7, "reason": "rounding of about eps/h or eps/h^2"})
+                  limit={"absolute": f(lim), "reason": "rounding bound in differentiation-and-linalg.md; any correct form of f passes"})
     s.add("core.diff.central", {"function": "exp", "x": 1.0, "h": 0.0, "order": 1}, error="E_INPUT", tags=["invalid"])
     A = [[4.0, 1.0, 2.0], [1.0, 3.0, 0.0], [2.0, 0.0, 5.0]]
     b = [1.0, 2.0, 3.0]

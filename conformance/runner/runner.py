@@ -12,7 +12,9 @@ import argparse
 import datetime
 import json
 import math
+import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -49,6 +51,29 @@ def load_policy(path):
 def load_impls(path):
     """implementations.json: {"name": {"command": [...], "cwd": optional}}."""
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def resolve_command(cfg, root=ROOT, windows=None):
+    """Returns (argv, cwd). cwd is relative to the repo root, not the caller's directory.
+
+    Windows cannot start a relative path without its suffix, and resolves it against the parent's
+    directory, so a command holding a path separator becomes an absolute path to the real file.
+    A bare name such as "java" is left for the PATH search. Unresolved commands are returned as given.
+    """
+    windows = os.name == "nt" if windows is None else windows
+    cwd = Path(root) / cfg.get("cwd", ".")
+    argv = list(cfg["command"])
+    exe = argv[0]
+    if "/" in exe or "\\" in exe:
+        base = cwd / exe
+        for suffix in ("", ".exe", ".cmd", ".bat") if windows else ("",):
+            cand = base.with_name(base.name + suffix)
+            if cand.is_file():
+                argv[0] = str(cand.resolve())
+                break
+    else:
+        argv[0] = shutil.which(exe) or exe
+    return argv, str(cwd)
 
 
 def same_number(a, e, absolute, relative):
@@ -181,10 +206,10 @@ def main():
     if not files:
         print("no golden files matched", file=sys.stderr)
         return 2
-    base = cfg["command"]
+    base, cwd = resolve_command(cfg)
     version = {}
     try:
-        v = subprocess.run(base + ["version"], cwd=cfg.get("cwd"), capture_output=True, timeout=60)
+        v = subprocess.run(base + ["version"], cwd=cwd, capture_output=True, timeout=60)
         version = json.loads(v.stdout)
         if version.get("contract_version") != CONTRACT:
             print(f"contract version {version.get('contract_version')!r} is not {CONTRACT}", file=sys.stderr)
@@ -202,7 +227,7 @@ def main():
             if c["tolerance_class"] not in classes:
                 print(f"{c['case_id']}: unknown class {c['tolerance_class']}", file=sys.stderr)
                 return 2
-        results, err, took = run_batch(base + ["batch"], cfg.get("cwd"), cases, a.timeout)
+        results, err, took = run_batch(base + ["batch"], cwd, cases, a.timeout)
         row = {"suite": doc["suite"], "spec_version": doc["spec_version"], "cases": len(cases), "seconds": round(took, 3),
                "pass": 0, "fail": 0, "not_implemented": 0, "crash": err, "failures": []}
         if err:
