@@ -6,11 +6,12 @@ CI minutes are capped at about 2,000 a month with a hard stop, so pull-request w
 
 | Workflow | Runs on | What it does |
 |---|---|---|
-| `conformance.yml` | Pull request, push to main, manual | Builds each CLI and runs all golden cases, and tests the runner itself |
+| `conformance.yml` | Pull request, push to main, manual | Builds each CLI and runs all golden cases, and tests the runner itself. A scope job limits this to the languages changed; the runner, tolerances, datasets, specifications or this workflow run everything |
 | `java25.yml`, `cpp26.yml`, `python.yml`, `rust.yml` | Pull request and push to main, own paths only | Each language's own build and unit tests. `cpp26.yml` has GCC and Clang jobs |
 | `sanitizers.yml` | Same, C++ paths only | Unit tests and golden cases under ASan and UBSan |
 | `fuzz.yml` | Monday, manual | Three minutes of fuzzing per language; C++ uses the sanitizer build |
 | `mutation.yml` | Manual only | One language and one target per run |
+| `docs.yml` | Markdown or site script change, manual | Builds the static site with `tools/build_site.py`, fails on a broken relative link, and keeps the site as a 7-day artifact. Nothing is deployed, because Pages on a private repository needs a paid plan |
 | `security.yml` | Monday, lockfile change, manual | OSV scan of the Rust, Python and Java dependencies |
 
 Dependabot opens one grouped pull request per ecosystem each month. It does not track the Catch2 pin in `cpp26/CMakeLists.txt`, so update that by hand.
@@ -52,4 +53,24 @@ Start small: one file per run.
 | Python | `uv run --with mutmut==3.8.1 mutmut run 'quantforge_core.compounding*'` | From `python/`. Linux or WSL only. Uses `tests/test_core.py`, because mutmut's copy cannot see files outside `python/` |
 | Rust | `cargo mutants --in-place -p quantforge-core -f '**/compounding.rs'` | From `rust/`. `--in-place` is needed because the crate reads files outside `rust/`. It edits the tree while it runs, so use a clean checkout |
 
-Java, Python and Rust scores measure unit tests only, not the golden cases, so a survivor there may still be caught by conformance.
+The Java score measures unit tests only, so a survivor there may still be caught by conformance.
+
+### Rust and Python against the golden cases
+
+`conformance/mutation/golden_mutants.py` takes the mutants cargo-mutants and mutmut generate, keeps their unit verdict, and runs a seeded sample through the neutral runner in a private copy. Each sampled mutant then has two verdicts. Use Linux or WSL; `mutation.yml` does the same with its `golden` input.
+
+```bash
+python3 conformance/mutation/golden_mutants.py --impl rust --target '**/compounding.rs' --max 40
+python3 conformance/mutation/golden_mutants.py --impl python --target 'quantforge_core.compounding*' --suite compounding --max 40
+```
+
+Observed, WSL Ubuntu, 2026-11-06, source at `a60d814`, seed 1, one run. Unit score is over all viable mutants, with timeouts counted as killed. Sample columns are kills out of 40.
+
+| Target | Golden suites | Unit, all mutants | Sample: unit | Sample: golden | Sample: either |
+|---|---|---:|---:|---:|---:|
+| Rust `compounding.rs` | all | 25 of 61 (41%) | 16 | 36 | 36 |
+| Rust `daycount.rs` | all | 91 of 165 (55%) | 25 | 38 | 38 |
+| Python `compounding` | `compounding` | 44 of 192 (23%) | 8 | 21 | 21 |
+| Python `daycount` | `daycount` | 173 of 436 (40%) | 15 | 34 | 35 |
+
+Limits: this is two files per language and 40 mutants each, so a sample figure can be several points out. Python ran one suite, because all suites take over a minute per mutant, so it may undercount. Survivors have not been sorted into equivalent mutants and real gaps. mutmut changes error message text, which the runner does not compare, and that may explain some Python survivors. The four Rust compounding survivors include three in `check_rate`, which are worth a look as possible missing cases.
