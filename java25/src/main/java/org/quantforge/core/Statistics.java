@@ -102,7 +102,7 @@ public final class Statistics {
         double variance = s2 / (n - 1);
         Double skew = null;
         Double kurt = null;
-        if (s2 > 0.0) {
+        if (!constant(x)) {
             double m2 = s2 / n;
             skew = (s3 / n) / Math.pow(m2, 1.5);
             kurt = (s4 / n) / (m2 * m2) - 3.0;
@@ -137,7 +137,7 @@ public final class Statistics {
         double sxy = sumProducts(dx, dy);
         double sxx = sumSquares(dx);
         double syy = sumSquares(dy);
-        Double corr = sxx > 0.0 && syy > 0.0 ? sxy / Math.sqrt(sxx * syy) : null;
+        Double corr = constant(x) || constant(y) ? null : sxy / Math.sqrt(sxx * syy);
         return new Covariance(sxy / (x.length - 1), corr);
     }
 
@@ -149,7 +149,7 @@ public final class Statistics {
         double[] dx = centered(x);
         double[] dy = centered(y);
         double sxx = sumSquares(dx);
-        if (!(sxx > 0.0)) {
+        if (constant(x)) {
             throw new QfError("E_SINGULAR", "zero variance in x", "x");
         }
         double syy = sumSquares(dy);
@@ -163,7 +163,7 @@ public final class Statistics {
         double s2 = sse / dof;
         double seBeta = Math.sqrt(s2 / sxx);
         double seAlpha = Math.sqrt(s2 * (1.0 / n + mx * mx / sxx));
-        Double r2 = syy > 0.0 ? 1.0 - sse / syy : null;
+        Double r2 = constant(y) ? null : 1.0 - sse / syy;
         return new Ols(alpha, beta, r2, seAlpha, seBeta, sse);
     }
 

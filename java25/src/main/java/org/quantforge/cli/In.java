@@ -30,6 +30,31 @@ final class In {
         return values.get(key) != null;
     }
 
+    /** The key is present, even with a null value. */
+    boolean hasKey(String key) {
+        return values.containsKey(key);
+    }
+
+    /** A required key whose value may be null: absent is E_SCHEMA. */
+    Double nullableReal(String key) {
+        if (!hasKey(key)) {
+            throw schema(key, "missing");
+        }
+        return realOrNull(key);
+    }
+
+    /** A required key holding any JSON value, null included. */
+    Object anyValue(String key) {
+        if (!hasKey(key)) {
+            throw schema(key, "missing");
+        }
+        return values.get(key);
+    }
+
+    Map<?, ?> raw() {
+        return values;
+    }
+
     private Object need(String key) {
         Object v = values.get(key);
         if (v == null) {
@@ -120,6 +145,17 @@ final class In {
 
     long instant(String key) {
         return TimeZones.parseInstant(string(key));
+    }
+
+    List<Long> instants(String key) {
+        List<Long> out = new ArrayList<>();
+        for (Object v : list(key)) {
+            if (!(v instanceof String s)) {
+                throw schema(key, "expected instants");
+            }
+            out.add(TimeZones.parseInstant(s));
+        }
+        return out;
     }
 
     long u64(String key) {

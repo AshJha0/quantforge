@@ -262,6 +262,7 @@ public final class Json {
             case Integer x -> b.append(x.intValue());
             case Long x -> b.append(x.longValue());
             case Double x -> writeDouble(b, x);
+            case Number x -> b.append(x.text());
             case String x -> writeString(b, x);
             case double[] x -> {
                 b.append('[');

@@ -71,7 +71,7 @@ public final class TimeSeries {
         }
         double[] d = Statistics.centered(x);
         double denom = Statistics.sumSquares(d);
-        if (!(denom > 0.0)) {
+        if (Statistics.constant(x)) {
             throw new QfError("E_DOMAIN", "zero variance", "x");
         }
         double[] acf = new double[(int) maxLag];

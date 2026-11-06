@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import org.quantforge.core.AsOfStore;
 import org.quantforge.core.Calendars;
 import org.quantforge.core.Compounding;
 import org.quantforge.core.CosPricer;
@@ -44,6 +45,7 @@ final class Operations {
         numerics();
         statistics();
         engines();
+        store();
     }
 
     static Set<String> names() {
@@ -192,7 +194,7 @@ final class Operations {
             if (!status.equals("FIRM") && !status.equals("INDICATIVE")) {
                 throw new QfError("E_SCHEMA", "input quote_status must be FIRM or INDICATIVE", "quote_status");
             }
-            quotes.add(new DataChecks.Quote(id, eventTime, q.realOrNull("bid"), q.realOrNull("ask"), status));
+            quotes.add(new DataChecks.Quote(id, eventTime, q.nullableReal("bid"), q.nullableReal("ask"), status));
         }
         Map<String, double[]> history = new HashMap<>();
         if (in.has("history")) {
@@ -353,8 +355,11 @@ final class Operations {
             double x = in.real("x");
             double h = in.real("h");
             long order = in.integer("order");
-            if (!(h > 0.0) || (order != 1 && order != 2)) {
-                throw new QfError("E_INPUT", "need h > 0 and order 1 or 2");
+            if (order != 1 && order != 2) {
+                throw new QfError("E_SCHEMA", "order not listed", "order");
+            }
+            if (!(h > 0.0)) {
+                throw new QfError("E_INPUT", "need h > 0", "h");
             }
             double up = f.applyAsDouble(x + h);
             double down = f.applyAsDouble(x - h);
@@ -456,6 +461,79 @@ final class Operations {
         TABLE.put("core.ts.forward_fill", in -> {
             List<Double> v = in.nullableReals("values");
             return out("values", TimeSeries.forwardFill(v, in.integer("limit")));
+        });
+    }
+
+    /** Reads and checks the log. The store spec runs this before anything else in the case. */
+    private static List<AsOfStore.Entry> log(In in) {
+        List<AsOfStore.Entry> log = new ArrayList<>();
+        for (In r : in.objects("records")) {
+            long sequence = r.integer("sequence");
+            String series = r.string("series_id");
+            if (sequence < 1 || series.isEmpty()) {
+                throw new QfError("E_SCHEMA", "need sequence >= 1 and a non-empty series_id", "records");
+            }
+            log.add(new AsOfStore.Entry(sequence, series, r.instant("event_time"), r.instant("knowledge_time"),
+                    r.anyValue("value"), r.bool("deleted", false), r.raw()));
+        }
+        AsOfStore.checkLog(log);
+        return log;
+    }
+
+    private static void store() {
+        TABLE.put("core.store.query_as_of", in -> {
+            List<AsOfStore.Entry> log = log(in);
+            long asOf = in.instant("as_of");
+            String series = in.has("series_id") ? in.string("series_id") : null;
+            Long from = in.has("event_from") ? in.instant("event_from") : null;
+            Long to = in.has("event_to") ? in.instant("event_to") : null;
+            if (from != null && to != null && from > to) {
+                throw new QfError("E_DATE_ORDER", "event_from is after event_to", "event_to");
+            }
+            List<Map<String, Object>> rows = new ArrayList<>();
+            for (AsOfStore.Entry e : AsOfStore.view(log, asOf)) {
+                if ((series == null || series.equals(e.seriesId())) && (from == null || e.eventTime() >= from)
+                        && (to == null || e.eventTime() <= to)) {
+                    rows.add(AsOfStore.row(e));
+                }
+            }
+            return out("rows", rows);
+        });
+        TABLE.put("core.store.latest", in -> {
+            List<AsOfStore.Entry> log = log(in);
+            long asOf = in.instant("as_of");
+            String series = in.string("series_id");
+            AsOfStore.Entry last = null;
+            for (AsOfStore.Entry e : AsOfStore.view(log, asOf)) {
+                if (series.equals(e.seriesId())) {
+                    last = e; // The view is ordered by event time within a series.
+                }
+            }
+            return out("row", last == null ? null : AsOfStore.row(last));
+        });
+        TABLE.put("core.store.snapshot", in -> {
+            List<AsOfStore.Entry> log = log(in);
+            SnapshotHash.Result r = AsOfStore.snapshot(log, in.instant("as_of"));
+            return out("canonical", r.canonical(), "snapshot_id", r.snapshotId());
+        });
+        TABLE.put("core.store.replay", in -> {
+            List<AsOfStore.Entry> log = log(in);
+            List<Long> checkpoints = in.instants("checkpoints");
+            for (int i = 1; i < checkpoints.size(); i++) {
+                if (checkpoints.get(i) < checkpoints.get(i - 1)) {
+                    throw new QfError("E_INPUT", "checkpoints out of order", "checkpoints");
+                }
+            }
+            List<Map<String, Object>> snapshots = new ArrayList<>();
+            for (long c : checkpoints) {
+                snapshots.add(out("as_of", TimeZones.formatInstant(c), "row_count", AsOfStore.view(log, c).size(),
+                        "snapshot_id", AsOfStore.snapshot(log, c).snapshotId()).outputs());
+            }
+            return out("snapshots", snapshots, "head", AsOfStore.chain(log).head());
+        });
+        TABLE.put("core.store.chain", in -> {
+            AsOfStore.Chain c = AsOfStore.chain(log(in));
+            return out("head", c.head(), "hashes", c.hashes());
         });
     }
 
