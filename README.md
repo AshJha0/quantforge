@@ -47,7 +47,7 @@ Each capability moves through `Proposed → Specified → Implemented → Valida
 
 Stage B covers SONIA and minimal SOFR OIS curves, projection curves, FRAs, swaps, FX forwards and swaps, quote-driven basis, Gauss-Newton, Levenberg-Marquardt and BFGS fits, DV01 and key-rate risk, and hedges with a spread-based cost. It targets v0.2, which is not tagged. v0.1 was released on 2026-11-06.
 
-What has run (observed, local): on 2026-11-06, at commit `13d9871`, all four implementations passed all 4,731 golden cases in 39 suites through the neutral runner, on one Windows machine. That is 4,388 cases in 21 stage A suites, and 343 cases in 18 stage B suites.
+What has run (observed, local): on 2026-11-06, after the evidence cleanup, all four implementations passed all 4,737 golden cases in 40 suites through the neutral runner, on one Windows machine. That is 4,388 cases in 21 stage A suites, and 343 cases in 18 stage B suites.
 
 What that does not show:
 - **Validation is self-assessment** until the human review after the project ends. Many golden cases have only hand or replay sources, which can share a misreading with the spec. For stage B, `specifications/stage-b-rulings.md` lists which suites have an outside oracle: `usecases` and `rulings_b` have none, and `risk` is hand and self-consistency only, as are tenor basis and the FX forward, PV and delta formulas.
@@ -57,7 +57,6 @@ What that does not show:
 - **Trading is simulated only.** There are no live orders, and nothing here connects to a market: the hedges in stage B are calculations. QuantForge makes no HFT or latency claims. The only benchmark is one laptop run of CLI batch throughput on a stage A suite, in `benchmarks/`.
 
 ### Known issues
-- **Rust and ruling B24.** Cheap array operations such as `stats.summary` make a few linear passes over an oversized array before returning `E_LIMIT`, where the ruling allows one. The result is right, and only time shows the gap (`rust/SPEC_QUESTIONS.md`).
 - **Clang on Windows** is blocked at times by Windows Application Control, which stops freshly built binaries. Clang conformance therefore relies on CI, which has not yet run stage B.
 - **Licence questions are open** on SONIA redistribution and on the Bank of England's forward and curve data. Raw data stays local (`oracle/LICENCES.md`).
 

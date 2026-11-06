@@ -3,7 +3,7 @@
 
 Fetches each enabled source in sources.json, keeps the raw bytes and the source's notice under data/recorder/ (ignored by git, so no
 source's data is ever committed), and writes the hash, size and time to the forward log. Identical bytes
-are still logged, because "nothing new today" is evidence too. Run it once a day:
+are logged but stored once, because "nothing new today" is evidence too. Run it once a day:
 
   python tools/recorder/record.py [--sources FILE] [--data DIR] [--log FILE]
 
@@ -62,7 +62,8 @@ def main():
             digest = hashlib.sha256(raw).hexdigest()
             out = Path(a.data) / s["id"] / f"{now:%Y-%m-%d}-{digest[:12]}.raw"
             out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_bytes(raw)
+            if not any(out.parent.glob(f"*-{digest[:12]}.raw")):  # same bytes are stored once, but still logged
+                out.write_bytes(raw)
             (out.parent / "NOTICE.txt").write_text(s["notice"] + "\n", encoding="utf-8")
             value = {"kind": "recording", "url": url, "sha256": digest, "bytes": len(raw), "licence": s["licence"]}
             print(f"{s['id']}: {len(raw)} bytes {digest[:12]}")
