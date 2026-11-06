@@ -1,7 +1,5 @@
 # Implementation programme
 
-- `36-week-roadmap.md`: sequencing and milestone gates.
-- `epics/`: GitHub epic descriptions.
 - `weekly-tickets/`: 36 week-sized issue briefs.
 - `exercises/`: practical learning and implementation exercises.
 - `definition-of-done.md`: common quality bar.
