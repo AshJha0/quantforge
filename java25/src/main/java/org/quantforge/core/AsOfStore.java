@@ -40,6 +40,18 @@ public final class AsOfStore {
                 throw new QfError("E_INPUT", "knowledge_time runs backwards", "records");
             }
         }
+        for (Entry e : log) {
+            checkInstant(e.eventTime());
+            checkInstant(e.knowledgeTime());
+        }
+    }
+
+    /** Z form can show years 1 to 9999 only. */
+    public static void checkInstant(long instant) {
+        int y = TimeZones.utcYear(instant);
+        if (y < 1 || y > 9999) {
+            throw new QfError("E_DATE_RANGE", "instant outside years 1 to 9999 in UTC");
+        }
     }
 
     /** The view at {@code asOf}, ordered by series then event time. */

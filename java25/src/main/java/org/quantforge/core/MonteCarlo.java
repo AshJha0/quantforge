@@ -29,7 +29,7 @@ public final class MonteCarlo {
         if (in.spot() <= 0 || in.strike() <= 0 || in.sigma() <= 0 || in.t() <= 0) {
             throw new QfError("E_DOMAIN", "spot, strike, sigma and t must be positive");
         }
-        if (in.paths() < 2 || in.paths() > 10_000_000L || in.steps() < 1) {
+        if (in.paths() < 2 || in.steps() < 1) {
             throw new QfError("E_INPUT", "bad paths or steps");
         }
         if (in.method() == Method.SOBOL && in.steps() > Sobol.MAX_DIMENSIONS) {

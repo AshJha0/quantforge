@@ -138,7 +138,7 @@ public final class Main {
                 throw new QfError("E_SCHEMA", "case is not an object");
             }
             Function<In, Operations.Out> op = checkEnvelope(envelope);
-            Operations.Out result = op.apply(new In((Map<?, ?>) envelope.get("inputs")));
+            Operations.Out result = apply(op, new In((Map<?, ?>) envelope.get("inputs")));
             if (!finite(result.outputs())) {
                 throw new QfError("E_NON_FINITE", "a result is NaN or infinite");
             }
@@ -156,6 +156,23 @@ public final class Main {
             Map<String, Object> r = header(caseId, "error");
             r.put("error", err);
             return new Reply(json(r), false);
+        }
+    }
+
+    /**
+     * Runs an operation. Those with limits on work gate themselves before starting. For the rest the general array
+     * limit is settled here: it outranks a rule error, but not E_SCHEMA.
+     */
+    private static Operations.Out apply(Function<In, Operations.Out> op, In in) {
+        try {
+            Operations.Out out = op.apply(in);
+            in.gate();
+            return out;
+        } catch (QfError e) {
+            if (in.pendingLimit() != null && !e.code().equals("E_SCHEMA") && !e.code().equals("E_PARSE")) {
+                throw in.pendingLimit();
+            }
+            throw e;
         }
     }
 

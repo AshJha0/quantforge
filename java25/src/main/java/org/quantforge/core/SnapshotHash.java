@@ -15,6 +15,9 @@ public final class SnapshotHash {
 
     public record Result(String canonical, String snapshotId) {}
 
+    public static final int MAX_DEPTH = 64;
+    private static final int MAX_BYTES = 1_048_576;
+
     public static Result hash(String documentText) {
         Json.Document doc = Json.parse(documentText);
         if (doc.numberOverflow()) {
@@ -25,6 +28,9 @@ public final class SnapshotHash {
         }
         if (!(doc.value() instanceof Map<?, ?> top)) {
             throw new QfError("E_SCHEMA", "top level is not an object", "document_text");
+        }
+        if (documentText.getBytes(StandardCharsets.UTF_8).length > MAX_BYTES || doc.maxDepth() > MAX_DEPTH) {
+            throw new QfError("E_LIMIT", "document too large or too deep", "document_text");
         }
         return ofDocument(top);
     }
