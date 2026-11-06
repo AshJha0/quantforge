@@ -1,0 +1,628 @@
+{
+ "schema_version": "1.0",
+ "suite": "risk_deep",
+ "spec": "specifications/06-risk/rates-sensitivities.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "risk_deep-0001",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.036
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.037
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SONIA",
+     "tenor": "5Y",
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": 454.3667671489393,
+     "key_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.041379788318181454,
+      0.08332365737669534,
+      0.19214746278817074,
+      454.0498941869447,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6"
+   }
+  },
+  {
+   "case_id": "risk_deep-0002",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "10Y",
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": -820.7202065405309,
+     "key_rate": [
+      0.032474700345119345,
+      -7.32192347641103e-07,
+      5.622027856588829e-05,
+      -0.004715146273156279,
+      0.24833873204988777,
+      0.4998674425223726,
+      1.148804005841157,
+      2.584525577387467,
+      4.787296726899513,
+      -830.0167038290128,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6"
+   }
+  },
+  {
+   "case_id": "risk_deep-0003",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": -0.012800000000000006
+     },
+     {
+      "tenor": "1M",
+      "rate": -0.012900000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": -0.013200000000000003
+     },
+     {
+      "tenor": "6M",
+      "rate": -0.0138
+     },
+     {
+      "tenor": "1Y",
+      "rate": -0.015
+     },
+     {
+      "tenor": "2Y",
+      "rate": -0.0165
+     },
+     {
+      "tenor": "3Y",
+      "rate": -0.017
+     },
+     {
+      "tenor": "5Y",
+      "rate": -0.0165
+     },
+     {
+      "tenor": "7Y",
+      "rate": -0.0155
+     },
+     {
+      "tenor": "10Y",
+      "rate": -0.014000000000000005
+     },
+     {
+      "tenor": "15Y",
+      "rate": -0.012500000000000004
+     },
+     {
+      "tenor": "20Y",
+      "rate": -0.012000000000000004
+     },
+     {
+      "tenor": "30Y",
+      "rate": -0.013000000000000005
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SONIA",
+     "tenor": "7Y",
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": 901.7605754683318,
+     "key_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      5.696254164446145,
+      11.184272258717101,
+      24.95316447748337,
+      54.67424728407059,
+      805.2525428902009,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6"
+   }
+  },
+  {
+   "case_id": "risk_deep-0004",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.036
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.037
+     }
+    ],
+    "interpolation": "LINEAR_ZERO",
+    "trade": {
+     "convention": "SONIA",
+     "tenor": "6Y",
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": 536.2185034309824,
+     "key_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.07209053073942151,
+      -0.14516378477047454,
+      -0.3731368537207569,
+      265.8274695797186,
+      270.98139068353066,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6"
+   }
+  },
+  {
+   "case_id": "risk_deep-0005",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-07",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "3Y",
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": 284.29531802459655,
+     "key_rate": [
+      -0.0011848391919784262,
+      1.044580812958884e-07,
+      -8.017982167984883e-06,
+      0.0006724561324062961,
+      -0.045330767035807185,
+      -0.09177855201517104,
+      284.4329413203353,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6"
+   }
+  },
+  {
+   "case_id": "risk_deep-0006",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.01
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.014
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.018000000000000002
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.022
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.026000000000000002
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.03
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.042
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.046000000000000006
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.054
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.058
+     }
+    ],
+    "interpolation": "LINEAR_ZERO",
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "20Y",
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": -1045.7981719415839,
+     "key_rate": [
+      0.2841949489666149,
+      -3.404462768230587e-05,
+      0.0009286145941587165,
+      -0.04052083130227402,
+      0.8472137275093701,
+      1.6901264311018167,
+      4.230448432223056,
+      8.500506046417286,
+      16.670022895472357,
+      41.222080653999,
+      80.22503893512476,
+      -1199.4274154654413,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6"
+   }
+  }
+ ]
+}

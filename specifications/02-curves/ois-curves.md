@@ -8,7 +8,7 @@ An overnight indexed swap exchanges a fixed rate for daily compounded overnight 
 
 From `as_of` and a `tenor` (as in `calendars.md`), with convention `c` from `conventions.md`:
 
-- `spot` = `as_of` adjusted `FOLLOWING`, then `c.spot_lag` business days on.
+- `spot` = `core.calendar.add_business_days(as_of, c.spot_lag)`. Days count from `as_of` itself, even if it is not a business day, as in QuantLib (`MakeOIS`, its issue 753). So SOFR from Saturday 2026-11-07 is Tuesday 2026-11-10. A lag of 0 gives `as_of` adjusted `FOLLOWING`.
 - For `D` and `W` tenors, and for tenors of `c.fixed_months` or less: one period, ending at `add_tenor(spot, tenor)` with `MODIFIED_FOLLOWING`.
 - Otherwise a schedule from `spot` to `spot + tenor` (unadjusted), at `c.fixed_months`, by `schedules.md`.
 - `end_of_month` is true when `spot` is on or after the last business day of its month. For one-period swaps the `add_tenor` rule gives the same thing.
@@ -54,4 +54,4 @@ Inputs: `curve`, optional `snapshot_id`, `trade`: `{convention, tenor, fixed_rat
 
 ## Acceptance
 
-Targets are in `stage-b-targets.md`. Oracle: independent replay, QuantLib `OISRateHelper` and `OvernightIndexedSwap`. Measured: pillars within 5e-12 of QuantLib; swap PVs within 1e-3 on 1e6. Strata was used for conventions only, not as a second curve build.
+Targets are in `stage-b-targets.md`. Oracle: independent replay, QuantLib `OISRateHelper` and `OvernightIndexedSwap`. Measured: pillars within 2e-11 of QuantLib; swap PVs within 1e-3 on 1e6 against QuantLib, and through Strata's own swap pricer on the same curve (`oracle/REPORT.md`). No curve was built by Strata's calibrator.

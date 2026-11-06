@@ -10,13 +10,13 @@ Inputs: `pair`, `trade_date`. Output: `spot_date`. Step forward `spot_lag` days,
 
 ## Forward
 
-Common inputs: `pair`, `spot` (`<= 0`: `E_DOMAIN`), `as_of`, `base_curve`, `quote_curve`. With `sp` the spot date of `as_of`:
+Common inputs: `pair`, `spot` (`<= 0`: `E_DOMAIN`), `as_of`, `base_curve`, `quote_curve`, optional `snapshot_id`. A curve whose `as_of` differs: `E_INPUT`. With `sp` the spot date of `as_of`:
 
 `A(T) = D_base(T)/D_base(sp)`, `B(T) = D_quote(T)/D_quote(sp)`, and `F(T) = S A(T)/B(T)`.
 
 Quoted spot settles on `sp`, which is why both are measured from it.
 
-`fx.forward.outright`. Extra input: `value_date` (before `sp`: `E_DATE_ORDER`). Outputs: `forward`, `points`, with `points = (F - S)/pip`.
+`fx.forward.outright`. Extra input: `value_date`. Any value date before `sp`, in any `fx.*` operation: `E_DATE_ORDER`. So is `near_date >= far_date`. Outputs: `forward`, `points`, with `points = (F - S)/pip`.
 
 `fx.forward.pv`. Extra input: `trade`: `{notional_base, strike, value_date, side}`, `side` `BUY` or `SELL` of base. Outputs: `valuation` (`pv` in quote currency, `model` `FX_FORWARD_DISCOUNTING`, `conventions` the pair), `fx_delta`.
 
@@ -26,7 +26,7 @@ Quoted spot settles on `sp`, which is why both are measured from it.
 
 ## Quote-driven basis
 
-`fx.curve.implied`. Extra input: `points`: `{tenor, points}`, in tenor order. Output: `nodes`, each `{value_date, implied_ratio, basis_bp}`.
+`fx.curve.implied`. Extra input: `points`: `{tenor, points}`, in tenor order, else `E_INPUT`. Tenors are in `M` or `Y`; others are `E_SCHEMA`. Output: `nodes`, each `{value_date, implied_ratio, basis_bp}`.
 
 `value_date` is `sp` plus `tenor` (months, day clipped), `MODIFIED_FOLLOWING` on the pair's first calendar, then moved forward until it is a business day on both calendars. `F = S + points * pip`. `implied_ratio = (F/S) B(T)`: the base growth the quotes imply.
 

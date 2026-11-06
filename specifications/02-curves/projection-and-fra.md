@@ -4,7 +4,7 @@ Spec version 1.0.0. Status: Specified.
 
 Multi-curve means forecasting a rate on one curve and discounting on another. The index is `USD-TERM-3M`, which is synthetic (see `01-core/conventions.md`).
 
-Throughout: `spot` is `as_of` plus 2 `USGS` business days. `alpha` is `ACT_360` unless stated. Dates use `MODIFIED_FOLLOWING`.
+Throughout: `spot` is `core.calendar.add_business_days(as_of, 2)` on `USGS`, as in `ois-curves.md`, and schedules and month steps use `end_of_month` false. A `FRA` end steps from its adjusted start. `months` and `tenor_months` run from 1 to 1200, else `E_INPUT`. No quotes: `E_INPUT`. These operations take an optional `snapshot_id`. `alpha` is `ACT_360` unless stated. Dates use `MODIFIED_FOLLOWING`.
 
 ## `rates.projection.bootstrap`
 
@@ -44,4 +44,4 @@ The floating forward runs on accrual dates, not on a separate index end date.
 
 ## Acceptance
 
-Oracle: replay against QuantLib `DepositRateHelper`, `FraRateHelper`, `SwapRateHelper` with exogenous discounting, and `MakeVanillaSwap`. Measured: pillars within 1.1e-14; swap PVs within 1e-2 on 1e6. FRA PV and basis spread have hand replay only.
+Oracle: replay against QuantLib `DepositRateHelper`, `FraRateHelper`, `SwapRateHelper` with exogenous discounting, and `MakeVanillaSwap`. Measured: pillars within 1e-10; swap and FRA PVs within 1e-2 on 1e6. Basis spread has hand replay only. On an `as_of` that is not a business day QuantLib disagrees with itself: `DepositRateHelper` counts from `as_of`, `SwapRateHelper` adjusts first. So those dates have no outside check here.
