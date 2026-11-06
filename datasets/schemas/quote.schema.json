@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QuantForge Quote",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "instrument_id",
+    "event_time",
+    "currency",
+    "bid",
+    "ask",
+    "quality_flags"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "instrument_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "event_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "receive_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "bid": {
+      "type": "number"
+    },
+    "ask": {
+      "type": "number"
+    },
+    "bid_size": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "ask_size": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "quality_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

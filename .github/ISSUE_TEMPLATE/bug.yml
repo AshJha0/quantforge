@@ -1,0 +1,29 @@
+name: Bug / numerical defect
+description: Report incorrect, unstable or inconsistent behaviour
+title: "[BUG] "
+labels: ["type: bug", "status: triage"]
+body:
+  - type: input
+    id: domain
+    attributes:
+      label: Domain and implementation
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps and input fixture
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result and verification source
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result, diagnostics and environment
+    validations:
+      required: true

@@ -1,0 +1,19 @@
+name: C++26
+on:
+  push:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install compiler and CMake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++-14
+      - name: Configure
+        run: cmake -S cpp26 -B build/cpp26 -G Ninja -DCMAKE_CXX_COMPILER=g++-14
+      - name: Build
+        run: cmake --build build/cpp26 --parallel
+      - name: Test
+        run: ctest --test-dir build/cpp26 --output-on-failure

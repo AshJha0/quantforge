@@ -1,0 +1,39 @@
+# Financial mathematics and shared foundations
+
+## Purpose
+Define the scope and shared contract for the financial mathematics and shared foundations domain.
+
+## Capabilities
+- Date/time, calendars, business-day adjustment and settlement conventions
+- Day counts: ACT/360, ACT/365F, 30/360 variants; compounding and accrual
+- Strongly typed money, currency, rates, basis points, prices and quantities
+- Numerical root finding, interpolation, integration, differentiation and linear algebra
+- Statistics, covariance, correlation, time series and deterministic random generation
+- Market-data schemas, validation, quality flags and immutable snapshots
+
+## Required specification sections
+- Mathematical definitions and assumptions
+- Inputs, outputs, units and conventions
+- Algorithms and numerical considerations
+- Error handling and diagnostics
+- Data provenance and model versioning
+- Validation strategy and independent references
+- Performance expectations and benchmark workload
+- Limitations and unsupported cases
+
+## Suggested exercises
+- Calendar holiday boundaries and leap years
+- Day-count convention reference cases
+- Compounding and discount-factor identities
+- Root-finder convergence and failure modes
+- Unit conversion and invalid currency/rate handling
+
+## Acceptance criteria
+- [ ] Domain contract reviewed and versioned.
+- [ ] Analytical/simple benchmark cases independently checked.
+- [ ] Normal, boundary, invalid and stress inputs covered.
+- [ ] Python reference and applicable production implementations conform.
+- [ ] Numerical diagnostics and failure modes are explicit.
+- [ ] Deterministic fixtures and provenance are recorded.
+- [ ] Performance baseline exists where relevant.
+- [ ] User and developer documentation includes examples and limitations.

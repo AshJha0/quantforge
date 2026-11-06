@@ -1,0 +1,40 @@
+name: Feature / quantitative capability
+description: Propose a model, algorithm or platform capability
+title: "[FEATURE] "
+labels: ["type: feature", "status: triage"]
+body:
+  - type: input
+    id: domain
+    attributes:
+      label: Domain
+      placeholder: curves / calibration / pricing / risk / execution
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and use case
+    validations:
+      required: true
+  - type: textarea
+    id: maths
+    attributes:
+      label: Mathematical definition, assumptions and conventions
+    validations:
+      required: true
+  - type: textarea
+    id: io
+    attributes:
+      label: Inputs, outputs, units and failure behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and independent validation
+    validations:
+      required: true
+  - type: textarea
+    id: performance
+    attributes:
+      label: Performance and operational expectations
