@@ -1,0 +1,842 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedge_deep",
+ "spec": "specifications/08-hedging/stage-b-hedges.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedge_deep-0001",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.01,
+      0.047
+     ],
+     [
+      1.44,
+      -1.589
+     ],
+     [
+      -1.107,
+      0.404
+     ]
+    ],
+    "b": [
+     2.26,
+     11.33,
+     1.91
+    ],
+    "weights": [
+     2.33,
+     2.42,
+     2.38
+    ],
+    "costs": [
+     1.17,
+     0.48
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      6.14686843215065,
+      12.616644063800896
+     ],
+     "residual": [
+      2.9144509553201483,
+      0.13364312491731134,
+      0.20254084738479294
+     ],
+     "objective": 19.931933409424406
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0002",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.851
+     ],
+     [
+      -1.608
+     ],
+     [
+      -1.954
+     ]
+    ],
+    "b": [
+     15.64,
+     -0.39,
+     -7.43
+    ],
+    "weights": [
+     1.49,
+     1.37,
+     3.0
+    ],
+    "costs": [
+     0.71
+    ],
+    "lambda": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -1.5070789806667746
+     ],
+     "residual": [
+      16.922524212547426,
+      2.0333830009121736,
+      -4.485167671777122
+     ],
+     "objective": 493.77869914418153
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0003",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.054,
+      -1.695,
+      -0.638
+     ],
+     [
+      0.23,
+      -0.832,
+      -0.17
+     ],
+     [
+      1.506,
+      0.816,
+      0.31
+     ],
+     [
+      -1.901,
+      0.843,
+      -0.546
+     ],
+     [
+      -0.311,
+      -0.405,
+      0.343
+     ],
+     [
+      -0.006,
+      -1.534,
+      0.025
+     ]
+    ],
+    "b": [
+     10.01,
+     4.01,
+     -0.36,
+     16.67,
+     -9.65,
+     -3.2
+    ],
+    "weights": [
+     2.82,
+     1.7,
+     1.79,
+     0.56,
+     1.06,
+     0.82
+    ],
+    "costs": [
+     0.1,
+     1.41,
+     1.77
+    ],
+    "lambda": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.9123180523577293,
+      -1.0570124687246394,
+      16.945456321538266
+     ],
+     "residual": [
+      0.9411698265195323,
+      1.7988736472751166,
+      2.6566182983468165,
+      8.261035954837281,
+      -3.1258875175956415,
+      -1.1494325566238004
+     ],
+     "objective": 228.16545689879274
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0004",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.489,
+      -0.12,
+      -0.072
+     ],
+     [
+      -1.084,
+      1.544,
+      0.507
+     ],
+     [
+      -0.173,
+      -0.122,
+      1.718
+     ]
+    ],
+    "b": [
+     19.49,
+     1.83,
+     2.39
+    ],
+    "weights": [
+     2.17,
+     1.27,
+     2.5
+    ],
+    "costs": [
+     1.0,
+     0.96,
+     1.77
+    ],
+    "lambda": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -3.4172102738064187,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      17.81898417610866,
+      5.534255936806158,
+      2.9811773773685104
+     ],
+     "objective": 818.4704452459887
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0005",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.823
+     ],
+     [
+      -0.924
+     ],
+     [
+      -1.868
+     ],
+     [
+      0.623
+     ],
+     [
+      0.389
+     ],
+     [
+      -0.167
+     ]
+    ],
+    "b": [
+     0.92,
+     -0.42,
+     16.86,
+     -9.6,
+     -0.58,
+     0.45
+    ],
+    "weights": [
+     2.57,
+     2.52,
+     1.89,
+     2.77,
+     2.58,
+     1.29
+    ],
+    "costs": [
+     1.83
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      6.48426820033193
+     ],
+     "residual": [
+      -4.416552728873178,
+      -6.4114638171067035,
+      4.747387001779954,
+      -5.560300911193208,
+      1.942380329929121,
+      -0.6328727894554325
+     ],
+     "objective": 292.206343048862
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0006",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.757,
+      1.14
+     ],
+     [
+      0.061,
+      -0.188
+     ],
+     [
+      1.861,
+      1.869
+     ]
+    ],
+    "b": [
+     13.7,
+     -0.83,
+     -17.43
+    ],
+    "weights": [
+     1.17,
+     1.75,
+     0.74
+    ],
+    "costs": [
+     1.5,
+     0.82
+    ],
+    "lambda": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      31.672432540771872,
+      -25.650485653102653
+     ],
+     "residual": [
+      8.434477788827287,
+      5.924309687770383,
+      -6.4283607272724
+     ],
+     "objective": 243.77649051148214
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0007",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      -1.631
+     ],
+     [
+      -0.195
+     ],
+     [
+      0.186
+     ],
+     [
+      1.345
+     ],
+     [
+      0.441
+     ],
+     [
+      -1.205
+     ]
+    ],
+    "b": [
+     -15.17,
+     -18.21,
+     1.86,
+     -9.26,
+     10.31,
+     -5.71
+    ],
+    "weights": [
+     0.51,
+     2.16,
+     1.94,
+     2.82,
+     2.65,
+     2.22
+    ],
+    "costs": [
+     1.88
+    ],
+    "lambda": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.817795640605349
+     ],
+     "residual": [
+      -13.836175310172676,
+      -18.050529850081958,
+      1.707890010847405,
+      -10.359935136614194,
+      9.94935212249304,
+      -4.7245562530705545
+     ],
+     "objective": 1429.2967504586838
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0008",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.352,
+      1.833
+     ],
+     [
+      1.504,
+      0.019
+     ],
+     [
+      -1.662,
+      0.674
+     ],
+     [
+      1.74,
+      1.134
+     ]
+    ],
+    "b": [
+     16.6,
+     -7.76,
+     -3.52,
+     12.32
+    ],
+    "weights": [
+     1.8,
+     0.99,
+     0.54,
+     0.77
+    ],
+    "costs": [
+     1.78,
+     0.1
+    ],
+    "lambda": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.0,
+      -8.663306031441438
+     ],
+     "residual": [
+      0.7201600443678462,
+      -7.924602814597387,
+      -9.35906826519153,
+      2.495810960345411
+     ],
+     "objective": 132.5276348727125
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0009",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.586,
+      1.078,
+      -1.897
+     ],
+     [
+      0.042,
+      -0.689,
+      -0.785
+     ],
+     [
+      -0.696,
+      -1.515,
+      1.795
+     ],
+     [
+      0.286,
+      1.22,
+      -1.384
+     ],
+     [
+      0.078,
+      -0.266,
+      -0.654
+     ]
+    ],
+    "b": [
+     3.93,
+     7.14,
+     -17.22,
+     -4.03,
+     -12.18
+    ],
+    "weights": [
+     2.8,
+     0.61,
+     1.86,
+     2.6,
+     1.63
+    ],
+    "costs": [
+     1.51,
+     0.38,
+     1.42
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -3.0338396469298936,
+      -5.261548804733673,
+      -1.0556396938059842
+     ],
+     "residual": [
+      2.03842892074797,
+      11.466463020928142,
+      -9.032074416947019,
+      -9.855762344569548,
+      -10.32667915065226
+     ],
+     "objective": 669.9503924965
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0010",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.583
+     ],
+     [
+      -1.125
+     ],
+     [
+      1.531
+     ]
+    ],
+    "b": [
+     15.78,
+     -14.49,
+     6.45
+    ],
+    "weights": [
+     0.97,
+     1.18,
+     1.83
+    ],
+    "costs": [
+     1.74
+    ],
+    "lambda": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -7.420826022411497
+     ],
+     "residual": [
+      11.453658428934098,
+      -6.1415707247870674,
+      -4.911284640312
+     ],
+     "objective": 228.8121430624521
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0011",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      -1.251,
+      -1.301
+     ],
+     [
+      -0.144,
+      1.997
+     ],
+     [
+      1.26,
+      -0.849
+     ],
+     [
+      -1.292,
+      0.077
+     ],
+     [
+      -0.222,
+      0.109
+     ],
+     [
+      0.099,
+      -0.905
+     ]
+    ],
+    "b": [
+     -16.22,
+     -11.43,
+     -19.8,
+     -16.28,
+     -1.84,
+     -6.78
+    ],
+    "weights": [
+     1.86,
+     2.58,
+     2.62,
+     0.96,
+     0.57,
+     2.62
+    ],
+    "costs": [
+     0.7,
+     1.37
+    ],
+    "lambda": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.13713833194536926,
+      -2.037147349416078
+     ],
+     "residual": [
+      -13.741231351673338,
+      -15.51793117658404,
+      -17.897667602094586,
+      -16.614043070778457,
+      -2.0924937707782245,
+      -4.9228049539158585
+     ],
+     "objective": 2157.1519647033283
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge_deep-0012",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.483
+     ],
+     [
+      -0.878
+     ],
+     [
+      1.005
+     ],
+     [
+      0.924
+     ]
+    ],
+    "b": [
+     2.79,
+     2.51,
+     6.81,
+     -14.7
+    ],
+    "weights": [
+     2.45,
+     0.74,
+     1.59,
+     0.77
+    ],
+    "costs": [
+     0.12
+    ],
+    "lambda": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.26253698185191326
+     ],
+     "residual": [
+      2.663194637765526,
+      2.7405074700659795,
+      6.546150333238827,
+      -14.942584171231168
+     ],
+     "objective": 263.62570132701137
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "scipy-1.18.1"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "the minimiser is unique"
+   }
+  }
+ ]
+}
