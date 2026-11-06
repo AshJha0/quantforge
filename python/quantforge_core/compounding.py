@@ -18,7 +18,7 @@ class Compounding:
             raise QfError("E_SCHEMA", f"unknown compounding {self.kind}", "compounding")
         if self.kind == "PERIODIC" and self.frequency is None:
             raise QfError("E_SCHEMA", "PERIODIC needs frequency", "frequency")
-        if self.frequency is not None and self.frequency not in FREQUENCIES:
+        if self.kind == "PERIODIC" and self.frequency not in FREQUENCIES:
             raise QfError("E_SCHEMA", f"frequency {self.frequency} is not listed", "frequency")
 
 

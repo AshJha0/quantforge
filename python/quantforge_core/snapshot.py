@@ -7,13 +7,13 @@ from . import strictjson
 from .errors import QfError
 
 
-def _has_lone_surrogate(value: Any) -> bool:
+def has_lone_surrogate(value: Any) -> bool:
     if isinstance(value, str):
         return any(0xD800 <= ord(ch) <= 0xDFFF for ch in value)
     if isinstance(value, list):
-        return any(_has_lone_surrogate(v) for v in value)
+        return any(has_lone_surrogate(v) for v in value)
     if isinstance(value, dict):
-        return any(_has_lone_surrogate(k) or _has_lone_surrogate(v) for k, v in value.items())
+        return any(has_lone_surrogate(k) or has_lone_surrogate(v) for k, v in value.items())
     return False
 
 
@@ -56,15 +56,18 @@ def canonical(value: Any) -> str:
     return "{" + ",".join(_string(k) + ":" + canonical(value[k]) for k in keys) + "}"
 
 
+def hash_value(value: Any) -> tuple[str, str]:
+    form = canonical(value)
+    return form, "sha256:" + hashlib.sha256(form.encode("utf-8")).hexdigest()
+
+
 def hash_document(text: str) -> tuple[str, str]:
     """Returns (canonical, snapshot_id). Both exclude a top-level snapshot_id."""
     document, overflowed = strictjson.parse(text)
     if overflowed:
         raise QfError("E_SCHEMA", "a number overflows binary64", "document_text")
-    if _has_lone_surrogate(document):
+    if has_lone_surrogate(document):
         raise QfError("E_SCHEMA", "lone surrogate in a string", "document_text")
     if not isinstance(document, dict):
         raise QfError("E_SCHEMA", "the top level is not an object", "document_text")
-    body = {k: v for k, v in document.items() if k != "snapshot_id"}
-    form = canonical(body)
-    return form, "sha256:" + hashlib.sha256(form.encode("utf-8")).hexdigest()
+    return hash_value({k: v for k, v in document.items() if k != "snapshot_id"})

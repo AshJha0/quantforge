@@ -26,6 +26,7 @@ from quantforge_core import (
     snapshot,
     sobol,
     stats,
+    store,
     timezones,
 )
 from quantforge_core._sobol_data import DIRECTION_DATA
@@ -345,3 +346,22 @@ def test_cutoff_boundary_and_weekend():
     assert timezones.business_date(
         seconds(2024, 7, 6, 10), "Europe/London", 16 * 3600, "GBLO"
     ) == date(2024, 7, 8)
+
+
+def test_store_correction_withdrawal_and_inclusive_limit():
+    def rec(seq, known, value, deleted=False):
+        raw = {"sequence": seq, "series_id": "s", "event_time": "x", "knowledge_time": "y"}
+        return store.Record(seq, "s", 100, known, value, deleted, raw)
+
+    log = [rec(1, 10, 1.0), rec(2, 20, 2.0), rec(3, 30, None, True)]
+    fmt = str
+    assert store.query_as_of(log, 9, fmt) == []
+    assert store.query_as_of(log, 10, fmt)[0]["value"] == 1.0
+    assert store.query_as_of(log, 29, fmt)[0]["value"] == 2.0
+    assert store.query_as_of(log, 30, fmt) == []
+    early = store.snapshot(log[:1], 10, fmt)
+    assert store.snapshot(log, 10, fmt) == early
+
+
+def test_chain_of_an_empty_log_is_the_genesis_hash():
+    assert store.replay([], [], str) == ([], "0" * 64)

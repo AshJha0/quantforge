@@ -21,6 +21,10 @@ def _centre(x: Floats) -> tuple[float, list[float]]:
     return shift + offset, [v - offset for v in d]
 
 
+def _constant(x: Floats) -> bool:
+    return min(x) == max(x)
+
+
 def _dot(u: Floats, v: Floats) -> float:
     return ordered_sum(a * b for a, b in zip(u, v))
 
@@ -39,7 +43,7 @@ def summary(x: Floats) -> dict[str, float | int | None]:
     ss = _dot(dev, dev)
     variance = ss / (n - 1)
     skewness = kurtosis = None
-    if ss > 0:
+    if min(x) != max(x):
         m2 = ss / n
         m3 = ordered_sum(v**3 for v in dev) / n
         m4 = ordered_sum(v**4 for v in dev) / n
@@ -75,7 +79,7 @@ def covariance(x: Floats, y: Floats) -> tuple[float, float | None]:
     _, dx = _centre(x)
     _, dy = _centre(y)
     sxy, sxx, syy = _dot(dx, dy), _dot(dx, dx), _dot(dy, dy)
-    correlation = None if sxx == 0 or syy == 0 else sxy / math.sqrt(sxx * syy)
+    correlation = None if _constant(x) or _constant(y) else sxy / math.sqrt(sxx * syy)
     return sxy / (len(x) - 1), correlation
 
 
@@ -83,7 +87,7 @@ def covariance(x: Floats, y: Floats) -> tuple[float, float | None]:
 class Fit:
     alpha: float
     beta: float
-    r_squared: float
+    r_squared: float | None
     se_alpha: float
     se_beta: float
 
@@ -93,7 +97,7 @@ def _regress(x: Floats, y: Floats) -> tuple[float, float, float, float, float, f
     mx, dx = _centre(x)
     my, dy = _centre(y)
     sxx = _dot(dx, dx)
-    if sxx == 0:
+    if _constant(x):
         raise QfError("E_SINGULAR", "zero variance in the regressor", "x")
     beta = _dot(dx, dy) / sxx
     sse = ordered_sum((b - beta * a) ** 2 for a, b in zip(dx, dy))
@@ -108,7 +112,7 @@ def ols(x: Floats, y: Floats) -> Fit:
     return Fit(
         alpha,
         beta,
-        1 - sse / syy,
+        None if _constant(y) else 1 - sse / syy,
         math.sqrt(s2 * (1 / len(x) + mx * mx / sxx)),
         math.sqrt(s2 / sxx),
     )
@@ -132,8 +136,11 @@ def rolling(x: Floats, window: int, statistic: str) -> list[float | None]:
     out: list[float | None] = [None] * (window - 1)
     for end in range(window, n + 1):
         part = x[end - window:end]
-        m, dev = _centre(part)
-        out.append(m if statistic == "MEAN" else math.sqrt(_dot(dev, dev) / (window - 1)))
+        if statistic == "MEAN":
+            out.append(ordered_sum(part) / window)
+        else:
+            _, dev = _centre(part)
+            out.append(math.sqrt(_dot(dev, dev) / (window - 1)))
     return out
 
 
@@ -154,7 +161,7 @@ def autocorrelation(x: Floats, max_lag: int) -> list[float]:
         raise QfError("E_INPUT", "need 1 <= max_lag < n", "max_lag")
     _, dev = _centre(x)
     den = _dot(dev, dev)
-    if den == 0:
+    if _constant(x):
         raise QfError("E_DOMAIN", "zero variance", "x")
     return [
         ordered_sum(dev[t] * dev[t - k] for t in range(k, n)) / den

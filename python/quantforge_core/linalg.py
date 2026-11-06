@@ -33,7 +33,7 @@ def lu_solve(a: Matrix, b: Sequence[float], singular_below: float = 0.0) -> list
     x = list(b)
     for k in range(n):
         p = max(range(k, n), key=lambda i: abs(m[i][k]))
-        if m[p][k] == 0 or abs(m[p][k]) < singular_below:
+        if abs(m[p][k]) <= singular_below:
             raise QfError("E_SINGULAR", "the matrix is singular to working precision", "a")
         if p != k:
             m[k], m[p] = m[p], m[k]
