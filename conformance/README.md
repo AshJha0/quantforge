@@ -32,4 +32,12 @@ The CLI contract is `specifications/cli-contract.md`. Golden cases are `datasets
 python conformance/runner/runner.py --impl rust
 ```
 
-Commands per language are in `conformance/runner/implementations.json`; those paths are placeholders until each CLI exists. The runner uses only the Python standard library and holds no financial logic. It strips expected values before sending a case. `python conformance/runner/test_runner.py` tests it against `stub_cli.py`, which replays golden values and injects faults. A case an implementation does not support is reported as not implemented, and the run does not pass.
+Commands per language are in `conformance/runner/implementations.json`. Build the CLI first; `docs/developer-guides/test-infrastructure.md` gives the commands. The runner uses only the Python standard library and holds no financial logic. It strips expected values before sending a case. `python conformance/runner/test_runner.py` tests it against `stub_cli.py`, which replays golden values and injects faults. A case an implementation does not support is reported as not implemented, and the run does not pass.
+
+## Fuzzing
+
+`conformance/fuzz/fuzz_cli.py --impl NAME --seconds 60` damages golden inputs and raw bytes, and sends them through the same CLI each language ships. It checks for a clean exit, one result per input, the result shape and a known error code. It takes the same `--impl` names as the runner, so each language gets the same checks. A failing batch is replayed one input at a time, and each finding is written with its input to `conformance/reports/fuzz/NAME.jsonl`. Rerun with the same `--seed` to get the same inputs.
+
+## Mutation
+
+`conformance/mutation/cpp_mutants.py` is the C++ harness. It swaps operators in a private copy of `cpp26/` and uses the golden cases as the test. The other languages use PIT, mutmut and cargo-mutants, as described in the guide above.

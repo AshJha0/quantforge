@@ -1,0 +1,31 @@
+# Monthly and grouped, because each update PR spends CI minutes.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']
+  - package-ecosystem: cargo
+    directory: /rust
+    schedule:
+      interval: monthly
+    groups:
+      cargo:
+        patterns: ['*']
+  - package-ecosystem: maven
+    directory: /java25
+    schedule:
+      interval: monthly
+    groups:
+      maven:
+        patterns: ['*']
+  - package-ecosystem: uv
+    directory: /python
+    schedule:
+      interval: monthly
+    groups:
+      python:
+        patterns: ['*']

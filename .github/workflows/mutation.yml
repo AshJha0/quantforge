@@ -1,0 +1,72 @@
+name: Mutation
+# Manual only. Pick one language and one target, so a run stays small.
+on:
+  workflow_dispatch:
+    inputs:
+      language:
+        type: choice
+        options: [java, cpp, python, rust]
+      target:
+        description: 'java: class glob. cpp: source path. python: mutant glob. rust: file glob'
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  TARGET: ${{ inputs.target }}
+jobs:
+  java:
+    if: inputs.language == 'java'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - run: mvn -B -Pmutation test-compile org.pitest:pitest-maven:mutationCoverage "-DtargetClasses=$TARGET"
+        working-directory: java25
+  cpp:
+    if: inputs.language == 'cpp'
+    runs-on: ubuntu-24.04
+    container: gcc:16.2
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: apt-get update && apt-get install -y cmake ninja-build python3
+      - run: python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --max 40
+  python:
+    if: inputs.language == 'python'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - run: uv run --with mutmut==3.8.1 mutmut run "$TARGET"
+        working-directory: python
+      - run: uv run --with mutmut==3.8.1 mutmut results
+        if: always()
+        working-directory: python
+  rust:
+    if: inputs.language == 'rust'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup show
+        working-directory: rust
+      - run: cargo install cargo-mutants --version 27.1.0 --locked
+      - run: cargo mutants --in-place -p quantforge-core -f "$TARGET"
+        working-directory: rust
