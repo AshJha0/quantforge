@@ -98,9 +98,7 @@ def to_instant(zone: str, local: int, overlap: str | None = None) -> int:
         raise QfError("E_NONEXISTENT_LOCAL_TIME", "the local time falls in a gap", "local")
     if len(candidates) == 2 and overlap is None:
         raise QfError("E_AMBIGUOUS_LOCAL_TIME", "the local time falls in an overlap", "local")
-    instant = candidates[-1] if overlap == "LATER" else candidates[0]
-    _check_year(instant, "instant")
-    return instant
+    return candidates[-1] if overlap == "LATER" else candidates[0]
 
 
 def business_date(instant: int, zone: str, cutoff_seconds: int, calendar: str) -> date:

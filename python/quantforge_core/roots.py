@@ -110,7 +110,7 @@ def brent(
             if p > 0:
                 q = -q
             p = abs(p)
-            if 2 * p < min(3 * abs(xm * q) - abs(tol1 * q), abs(e * q)):
+            if 2 * p < min(3 * xm * q - abs(tol1 * q), abs(e * q)):
                 e = d
                 d = p / q
             else:
@@ -133,9 +133,9 @@ def newton(
     f_tol: float = 0.0,
     max_iter: int = 200,
 ) -> RootResult:
-    _check_common(x_tol, f_tol, max_iter)
     if (a is None) != (b is None):
-        raise QfError("E_INPUT", "a and b must both be given or both absent")
+        raise QfError("E_SCHEMA", "a and b must both be given or both absent")
+    _check_common(x_tol, f_tol, max_iter)
     bracketed = a is not None
     fa = 0.0
     fb = 0.0

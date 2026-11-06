@@ -94,8 +94,8 @@ def adaptive_simpson(
     _check_range(a, b)
     if tol <= 0:
         raise QfError("E_INPUT", "need tol > 0", "tol")
-    if max_depth < 0:
-        raise QfError("E_INPUT", "need max_depth >= 0", "max_depth")
+    if max_depth < 1:
+        raise QfError("E_INPUT", "need max_depth >= 1", "max_depth")
 
     def rule(width: float, fl: float, fm: float, fr: float) -> float:
         return width / 6 * (fl + 4 * fm + fr)

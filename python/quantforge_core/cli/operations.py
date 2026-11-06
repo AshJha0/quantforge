@@ -20,6 +20,7 @@ from .. import (
     snapshot,
     sobol,
     stats,
+    store,
     timezones,
 )
 from ..errors import QfError
@@ -35,17 +36,19 @@ def _iso(d: date) -> str:
 
 
 def _year_fraction(i: Inputs) -> Result:
-    convention = i.string("convention")
+    convention = i.enum("convention", daycount.CONVENTIONS)
     start, end = i.date("start"), i.date("end")
-    value = daycount.year_fraction(
-        convention, start, end,
-        frequency=i.opt_integer("frequency"),
-        ref_start=i.opt_date("ref_start"),
-        ref_end=i.opt_date("ref_end"),
-        termination=i.opt_date("termination"),
-        calendar=i.opt_string("calendar"),
-    )
-    return {"year_fraction": value}
+    # Keys a convention does not use are ignored, however they are written (rulings G2, G6).
+    used: dict[str, Any] = {}
+    if convention in ("ACT_ACT_ICMA", "ACT_365L"):
+        used["frequency"] = i.opt_integer("frequency")
+    if convention == "ACT_ACT_ICMA":
+        used["ref_start"], used["ref_end"] = i.opt_date("ref_start"), i.opt_date("ref_end")
+    if convention == "THIRTY_E_360_ISDA":
+        used["termination"] = i.opt_date("termination")
+    if convention == "BUS_252":
+        used["calendar"] = i.opt_string("calendar")
+    return {"year_fraction": daycount.year_fraction(convention, start, end, **used)}
 
 
 def _is_business_day(i: Inputs) -> Result:
@@ -81,7 +84,8 @@ def _add_tenor(i: Inputs) -> Result:
 
 
 def _compounding(i: Inputs) -> compounding.Compounding:
-    c = compounding.Compounding(i.string("compounding"), i.opt_integer("frequency"))
+    kind = i.string("compounding")
+    c = compounding.Compounding(kind, i.opt_integer("frequency") if kind == "PERIODIC" else None)
     c.validate()
     return c
 
@@ -381,6 +385,63 @@ def _check_quotes(i: Inputs) -> Result:
     return {"results": results}
 
 
+def _record(raw: Any) -> store.Record:
+    if not isinstance(raw, dict):
+        raise QfError("E_SCHEMA", "a record is not an object", "records")
+    r = Inputs(raw, "records.")
+    if "value" not in raw:
+        raise QfError("E_SCHEMA", "a record has no value", "records")
+    sequence, series_id = r.integer("sequence"), r.string("series_id")
+    if sequence < 1 or not series_id or snapshot.has_lone_surrogate(raw):
+        raise QfError("E_SCHEMA", "bad sequence, series_id or string in a record", "records")
+    return store.Record(
+        sequence, series_id, r.instant("event_time"), r.instant("knowledge_time"),
+        raw["value"], r.opt_boolean("deleted", False), raw,
+    )
+
+
+def _log(i: Inputs) -> list[store.Record]:
+    records = [_record(r) for r in i.array("records")]
+    store.check_log(records)
+    return records
+
+
+def _zulu(seconds: int) -> str:
+    return format_seconds(seconds, "Z")
+
+
+def _query_as_of(i: Inputs) -> Result:
+    log = _log(i)
+    rows = store.query_as_of(
+        log, i.instant("as_of"), _zulu, i.opt_string("series_id"),
+        i.opt_instant("event_from"), i.opt_instant("event_to"),
+    )
+    return {"rows": rows}
+
+
+def _latest(i: Inputs) -> Result:
+    log = _log(i)
+    return {"row": store.latest(log, i.instant("as_of"), i.string("series_id"), _zulu)}
+
+
+def _store_snapshot(i: Inputs) -> Result:
+    log = _log(i)
+    form, snapshot_id, _ = store.snapshot(log, i.instant("as_of"), _zulu)
+    return {"canonical": form, "snapshot_id": snapshot_id}
+
+
+def _replay(i: Inputs) -> Result:
+    log = _log(i)
+    checkpoints = [parse_instant(c, "checkpoints") for c in i.array("checkpoints")]
+    snapshots, head = store.replay(log, checkpoints, _zulu)
+    return {"snapshots": snapshots, "head": head}
+
+
+def _chain(i: Inputs) -> Result:
+    hashes = store.chain(_log(i))
+    return {"head": hashes[-1] if hashes else store.GENESIS, "hashes": hashes}
+
+
 def _utc_offset(i: Inputs) -> Result:
     return {"offset_seconds": timezones.utc_offset(i.string("zone"), i.instant("instant"))}
 
@@ -449,6 +510,11 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
     "core.mc.gbm_european": _monte_carlo,
     "core.cos.european": _cos,
     "core.data.check_quotes": _check_quotes,
+    "core.store.query_as_of": _query_as_of,
+    "core.store.latest": _latest,
+    "core.store.snapshot": _store_snapshot,
+    "core.store.replay": _replay,
+    "core.store.chain": _chain,
     "core.time.utc_offset": _utc_offset,
     "core.time.to_local": _to_local,
     "core.time.to_instant": _to_instant,

@@ -123,6 +123,9 @@ class Inputs:
     def date(self, key: str) -> date:
         return parse_date(self._get(key), key)
 
+    def opt_instant(self, key: str) -> int | None:
+        return self.instant(key) if self.has(key) else None
+
     def opt_date(self, key: str) -> date | None:
         return self.date(key) if self.has(key) else None
 
@@ -181,9 +184,9 @@ class Inputs:
 
 
 def parse_u64(text: Any, key: str) -> int:
-    if not isinstance(text, str) or _U64.fullmatch(text) is None or len(text) > 20:
+    if not isinstance(text, str) or _U64.fullmatch(text) is None:
         raise _bad(key, "not a decimal u64 string")
-    value = int(text)
-    if value > MAX_U64:
+    digits = text.lstrip("0")
+    if len(digits) > 20 or int(digits or "0") > MAX_U64:
         raise _bad(key, "not a decimal u64 string")
-    return value
+    return int(digits or "0")
