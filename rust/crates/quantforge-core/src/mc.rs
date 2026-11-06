@@ -52,7 +52,7 @@ pub fn gbm_european(p: &McInputs) -> Result<(f64, f64)> {
     if p.spot <= 0.0 || p.strike <= 0.0 || p.sigma <= 0.0 || p.t <= 0.0 {
         return fail("E_DOMAIN", "spot, strike, sigma and t must be positive");
     }
-    if p.paths < 2 || p.paths > 10_000_000 || p.steps < 1 {
+    if p.paths < 2 || p.steps < 1 {
         return fail("E_INPUT", "paths or steps out of range");
     }
     if p.method == Method::Sobol && p.steps > 64 {

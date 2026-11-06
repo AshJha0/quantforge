@@ -22,7 +22,7 @@ pub struct Flags {
     pub lone_surrogate: bool,
 }
 
-const MAX_DEPTH: usize = 1000;
+const MAX_DEPTH: usize = 5000;
 
 struct Parser<'a> {
     b: &'a [u8],
@@ -75,7 +75,7 @@ impl Parser<'_> {
 
     fn value(&mut self, depth: usize) -> Result<Json> {
         if depth > MAX_DEPTH {
-            return bad("nested too deeply");
+            return fail("E_LIMIT", "nested too deeply");
         }
         match self.b.get(self.i) {
             Some(b'n') => self.literal("null", Json::Null),
@@ -276,6 +276,15 @@ impl Json {
         match self {
             Json::Obj(o) => o.iter().find(|(k, _)| k == key).map(|(_, v)| v),
             _ => None,
+        }
+    }
+
+    /// Levels of nesting. An object or array is one level; scalars add none.
+    pub fn depth(&self) -> usize {
+        match self {
+            Json::Arr(a) => 1 + a.iter().map(Json::depth).max().unwrap_or(0),
+            Json::Obj(o) => 1 + o.iter().map(|(_, v)| v.depth()).max().unwrap_or(0),
+            _ => 0,
         }
     }
 

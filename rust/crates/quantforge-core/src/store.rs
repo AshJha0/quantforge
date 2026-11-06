@@ -3,7 +3,7 @@ use crate::error::{Result, err, fail};
 use crate::json::{Json, obj};
 use crate::sha256::sha256_hex;
 use crate::snapshot::{canonical_bytes, hash_value};
-use crate::time::{format_instant, parse_instant};
+use crate::time::{format_instant, in_z_range, parse_instant};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -58,9 +58,15 @@ fn record(r: &Json) -> Result<Record> {
 }
 
 impl<'a> Log<'a> {
-    /// Runs the log checks, in the spec's order.
-    pub fn parse(raw: &'a [Json]) -> Result<Log<'a>> {
+    /// Log check 1: the shape of each record.
+    pub fn read(raw: &'a [Json]) -> Result<Log<'a>> {
         let records = raw.iter().map(record).collect::<Result<Vec<_>>>()?;
+        Ok(Log { raw, records })
+    }
+
+    /// Log checks 2 and 3, then the year range of the records.
+    pub fn check(&self) -> Result<()> {
+        let records = &self.records;
         if records.windows(2).any(|w| w[1].sequence <= w[0].sequence) {
             return fail("E_INPUT", "sequence is not strictly increasing");
         }
@@ -70,7 +76,11 @@ impl<'a> Log<'a> {
         {
             return fail("E_INPUT", "knowledge_time runs backwards");
         }
-        Ok(Log { raw, records })
+        check_range(
+            records
+                .iter()
+                .flat_map(|r| [r.event_time, r.knowledge_time]),
+        )
     }
 
     fn view(&self, as_of: i64) -> Vec<&Record> {
@@ -165,6 +175,15 @@ impl<'a> Log<'a> {
             hashes.push(head.clone());
         }
         (head, hashes)
+    }
+}
+
+/// `E_DATE_RANGE` if an instant cannot be shown in `Z` form.
+pub fn check_range(instants: impl IntoIterator<Item = i64>) -> Result<()> {
+    if instants.into_iter().all(in_z_range) {
+        Ok(())
+    } else {
+        fail("E_DATE_RANGE", "instant is outside years 1 to 9999")
     }
 }
 

@@ -3,6 +3,9 @@ use crate::error::{Result, fail};
 use crate::json::{Json, parse};
 use crate::sha256::sha256_hex;
 
+const MAX_TEXT_BYTES: usize = 1_048_576;
+const MAX_DEPTH: usize = 64;
+
 fn string(s: &str, out: &mut Vec<u8>) {
     out.push(b'"');
     for &b in s.as_bytes() {
@@ -67,6 +70,9 @@ pub fn hash(document: &str) -> Result<(String, String)> {
     }
     if !matches!(doc, Json::Obj(_)) {
         return fail("E_SCHEMA", "top level is not an object");
+    }
+    if document.len() > MAX_TEXT_BYTES || doc.depth() > MAX_DEPTH {
+        return fail("E_LIMIT", "document is above its limit");
     }
     Ok(hash_value(doc))
 }

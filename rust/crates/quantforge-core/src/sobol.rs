@@ -86,8 +86,8 @@ pub fn points(dimensions: i64, count: i64, skip: i64) -> Result<Vec<Vec<f64>>> {
     if dimensions < 1 || dimensions > MAX_DIMENSIONS as i64 {
         return fail("E_INPUT", "dimensions must be 1 to 64");
     }
-    if count < 1 || count > 1_000_000 {
-        return fail("E_INPUT", "count must be 1 to 1000000");
+    if count < 1 {
+        return fail("E_INPUT", "count must be at least 1");
     }
     if skip < 0 || skip + count >= 1i64 << 32 {
         return fail("E_INPUT", "indices must stay below 2^32");

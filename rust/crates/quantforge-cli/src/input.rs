@@ -5,7 +5,8 @@ use quantforge_core::error::{QfError, Result, err};
 use quantforge_core::json::Json;
 use quantforge_core::time::{Zone, parse_instant, parse_local};
 
-pub struct Inputs<'a>(pub &'a Json);
+/// The inputs, and the `E_LIMIT` they break, if any.
+pub struct Inputs<'a>(pub &'a Json, pub Option<QfError>);
 
 fn schema(field: &str, what: &str) -> QfError {
     let mut e = err("E_SCHEMA", format!("{field}: {what}"));
@@ -35,6 +36,16 @@ pub fn parse_u64(v: &Json, k: &str) -> Result<u64> {
 }
 
 impl<'a> Inputs<'a> {
+    pub fn new(v: &'a Json) -> Inputs<'a> {
+        Inputs(v, None)
+    }
+
+    /// Called after the typed reads and before costly work. Reads come first, as `E_SCHEMA`
+    /// outranks `E_LIMIT`.
+    pub fn gate(&self) -> Result<()> {
+        self.1.clone().map_or(Ok(()), Err)
+    }
+
     /// The value of a key. A `null` counts as absent.
     pub fn opt(&self, k: &str) -> Option<&'a Json> {
         self.0.get(k).filter(|v| **v != Json::Null)

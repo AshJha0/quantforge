@@ -303,7 +303,7 @@ fn time_zones() {
 fn store_chain_and_view() {
     use quantforge_core::json::{Json, parse};
     use quantforge_core::store::Log;
-    assert_eq!(Log::parse(&[]).unwrap().chain().0, "0".repeat(64));
+    assert_eq!(Log::read(&[]).unwrap().chain().0, "0".repeat(64));
     let rec = |seq: i64, k: &str, v: &str| {
         let text = format!(
             r#"{{"sequence":{seq},"series_id":"s","event_time":"2024-01-01T00:00:00Z","knowledge_time":"{k}","value":{v}}}"#
@@ -314,10 +314,12 @@ fn store_chain_and_view() {
         rec(1, "2024-01-02T00:00:00Z", "1"),
         rec(2, "2024-01-03T00:00:00Z", "2"),
     ];
-    let l = Log::parse(&log).unwrap();
+    let l = Log::read(&log).unwrap();
+    l.check().unwrap();
     let as_of = parse_instant("2024-01-02T00:00:00Z").unwrap();
     let row = l.latest(as_of, "s");
     assert_eq!(row.get("value"), Some(&Json::Int(1)));
     let late = vec![log[1].clone(), rec(3, "2024-01-02T00:00:00Z", "3")];
-    assert_eq!(Log::parse(&late).unwrap_err().code, "E_INPUT");
+    let e = Log::read(&late).unwrap().check().unwrap_err();
+    assert_eq!(e.code, "E_INPUT");
 }
