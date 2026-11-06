@@ -47,6 +47,7 @@ final class Operations {
         statistics();
         engines();
         store();
+        StageB.register(TABLE);
     }
 
     static Set<String> names() {
@@ -57,7 +58,7 @@ final class Operations {
         return TABLE.get(name);
     }
 
-    private static Out out(Object... keysAndValues) {
+    static Out out(Object... keysAndValues) {
         Map<String, Object> m = new LinkedHashMap<>();
         for (int i = 0; i < keysAndValues.length; i += 2) {
             m.put((String) keysAndValues[i], keysAndValues[i + 1]);

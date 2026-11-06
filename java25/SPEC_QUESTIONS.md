@@ -36,6 +36,30 @@ code follows those rulings.
 
 None.
 
+## Stage B: choices where the spec is silent
+
+No golden conflict was found in stage B. No golden case is known to decide these.
+
+| # | Place | Choice |
+|---|---|---|
+| 14 | Swap schedules in `projection-and-fra.md`, and `rates.basis.spread` | `end_of_month` false. `ois-curves.md` sets it from `spot`, but this page does not |
+| 15 | Projection `spot` | `as_of` plus 2 `USGS` business days, with no `FOLLOWING` step first, as the page says. `ois-curves.md` adjusts first, so the two differ when `as_of` is a holiday |
+| 16 | `DEPOSIT`, `FRA` and `rates.fra.pv` end dates | `MODIFIED_FOLLOWING` on the unadjusted month step, with no end-of-month rule. A `FRA` end steps from its adjusted start |
+| 17 | `snapshot_id` on `rates.swap.pv`, `rates.fra.pv` | Accepted as an optional input, as the text on `data_version` implies. FX valuations always give `null`, as `fx.md` lists no such input |
+| 18 | `fx.forward.pv`, `fx.swap.pv` with a date before `sp` | No error, as only `fx.forward.outright` lists `E_DATE_ORDER`. A date before `as_of` is `E_OUT_OF_RANGE` from the curve |
+| 19 | `fx.curve.implied` `points` out of order | `E_INPUT`. `D` and `W` tenors are accepted, though the spec says months |
+| 20 | `fx.*` `as_of` differing from a curve's `as_of` | Not checked |
+| 21 | `rates.curve.forward` `day_count` needing extra inputs (`BUS_252`, `ACT_365L`, `ACT_ACT_ICMA`, `THIRTY_E_360_ISDA`) | `E_SCHEMA`, as a needed input cannot be given |
+| 22 | `hedge.solve` order of checks | Length, then domain (`weights`, `costs`, `lambda`), then `E_SINGULAR`. Non-positive `weights` is `E_DOMAIN`; no code is named |
+| 23 | `schedule.generate`, negative `payment_lag` | `E_INPUT`. Above 30,000 is `E_LIMIT`, following `add_business_days` |
+| 24 | `rates.ois.compound` with empty arrays | `E_INPUT` |
+| 25 | `calib.fit`, `ROSENBROCK` with other methods, `NELSON_SIEGEL` with `GAUSS_NEWTON` | Allowed; the spec says only that they are not used. An all-empty problem has zero gradient and returns `start` |
+| 26 | `calib.fit`, `lower` above `upper`, or bounds of the wrong length | `E_INPUT` |
+| 27 | `calib.curve_report`, required diagnostic "inputs with their timestamps" | Reports the quote count only, as stage B quotes carry no timestamps |
+| 28 | `calib.curve_report`, condition number | From the eigenvalues of `J^T J`, so it loses accuracy above about 1e8 |
+| 29 | `usecase.*`, `hedge_tenors` length | Above 20 is `E_LIMIT`, following `hedge.solve` |
+| 30 | `risk.ois.dv01`, `calib.curve_report` and `usecase.rates_hedge` solve method | `SEQUENTIAL`, as these operations take no `method` |
+
 ## Small document points
 
 - `Normal.java` does not use `erfc` (ruling S5 allows this). It works directly in `x`, because

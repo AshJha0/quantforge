@@ -211,7 +211,7 @@ public final class Calendars {
         return n;
     }
 
-    private static LocalDate lastBusinessDayOfMonth(Id cal, YearMonth ym) {
+    public static LocalDate lastBusinessDayOfMonth(Id cal, YearMonth ym) {
         return roll(cal, ym.atEndOfMonth(), -1);
     }
 
