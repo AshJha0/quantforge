@@ -30,7 +30,9 @@ QuantForge is a quantitative library written four times, in Java, C++, Python an
 | `oracle/` | Source of the golden results; tests only |
 | `datasets/` | Schemas and golden files |
 | `conformance/` | Neutral runner, fuzz and mutation harnesses, tolerance policy |
-| `tools/` | Public-data recorder and forward log |
+| `tools/` | Public-data recorder, forward log and docs site build |
+| `examples/` | Small cases to send to the CLI |
+| `benchmarks/` | CLI batch throughput harness |
 | `program/` | Tickets, exercises and traceability |
 | `docs/` | Developer guides, getting started and diagrams |
 | `.github/` | CI and issue templates |
@@ -50,7 +52,7 @@ What that does not show:
 - **CI has not yet run on GitHub.** The workflows are written, but no result here comes from them.
 - **The recorder is built but not scheduled.** There is no daily record yet: the forward log holds one run, from 2026-11-06.
 - **No market data is used.** Golden cases are constructed test values, and any synthetic data is labelled as synthetic.
-- **Trading is simulated only.** There are no live orders, and stage A contains no trading code. QuantForge makes no HFT or latency claims, and no benchmark has been run.
+- **Trading is simulated only.** There are no live orders, and stage A contains no trading code. QuantForge makes no HFT or latency claims. The only benchmark is one local run of CLI batch throughput, in `benchmarks/`.
 
 ### Licensing and market data
 The project is MIT-licensed, with third-party notices in `THIRD_PARTY_NOTICES.md`. Market-data licensing and redistribution rights are separate: only commit data that you are entitled to redistribute. Prefer deterministic synthetic data for CI.

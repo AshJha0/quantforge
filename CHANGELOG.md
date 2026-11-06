@@ -11,6 +11,7 @@ Nothing is tagged yet. Validation is self-assessment until the human review afte
 - Neutral runner, CLI fuzz driver, mutation harnesses, and CI workflows, none of which has run on GitHub.
 - Public-data recorder with a licence manifest, and a hash-chained forward log. The recorder is built but not scheduled.
 - Schemas, tolerance policy with no global default, data-availability table, oracle map and licences, ADR-0009 and ADR-0010, numeric targets for stage B.
+- Golden-case mutation scoring for Rust and Python, `examples/`, a CLI throughput harness in `benchmarks/`, and a static docs site build.
 - Root documents, diagrams, tickets W01 to W05, exercises 1 to 3 with data and solutions, traceability table.
 
 ### Changed
