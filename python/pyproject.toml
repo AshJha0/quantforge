@@ -9,6 +9,9 @@ description = "Quantitative analytics and trading infrastructure"
 requires-python = "==3.15.*"
 dependencies = ["numpy>=2.0"]
 
+[project.scripts]
+quantforge = "quantforge_core.cli.main:main"
+
 [dependency-groups]
 dev = ["scipy>=1.13", "pytest>=8", "hypothesis>=6", "ruff>=0.6", "mypy>=1.10"]
 
