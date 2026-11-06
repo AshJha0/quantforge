@@ -147,7 +147,7 @@ pub fn brent(f: &dyn Fn(f64) -> f64, lo: f64, hi: f64, ctl: &Controls) -> Result
                 q = -q;
             }
             p = p.abs();
-            if 2.0 * p < (3.0 * (xm * q).abs() - (tol1 * q).abs()).min((e * q).abs()) {
+            if 2.0 * p < (3.0 * xm * q - (tol1 * q).abs()).min((e * q).abs()) {
                 e = d;
                 d = p / q;
             } else {
@@ -193,7 +193,7 @@ pub fn newton(
         if x0 < a || x0 > b {
             return fail("E_INPUT", "x0 lies outside the bracket");
         }
-        br = Some((a, b, fa));
+        br = Some((a, b, fa, fb));
     }
     let mut x = x0;
     for it in 1..=c.max_iter {
@@ -206,12 +206,19 @@ pub fn newton(
             return fail("E_ZERO_DERIVATIVE", "derivative is zero");
         }
         let mut next = x - fx / dfx;
-        if let Some((a, b, fa)) = &mut br {
-            if same_sign(*fa, fx) {
+        if let Some((a, b, fa, fb)) = &mut br {
+            // An end point may be an exact root, so judge by an end with a sign.
+            let left = if *fa != 0.0 {
+                same_sign(*fa, fx)
+            } else {
+                !same_sign(*fb, fx)
+            };
+            if left {
                 *a = x;
                 *fa = fx;
             } else {
                 *b = x;
+                *fb = fx;
             }
             if !(next >= *a && next <= *b) {
                 next = *a + (*b - *a) / 2.0;

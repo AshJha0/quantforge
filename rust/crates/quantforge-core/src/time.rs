@@ -144,6 +144,11 @@ fn format_clock(s: i64) -> String {
     format!("{d}T{:02}:{:02}:{:02}", t / 3600, t % 3600 / 60, t % 60)
 }
 
+/// An instant in `Z` form.
+pub fn format_instant(s: i64) -> String {
+    format!("{}Z", format_clock(s))
+}
+
 pub fn utc_offset(zone: Zone, instant: i64) -> Result<i64> {
     check_instant(instant)?;
     Ok(offset_at(zone, instant))
@@ -172,7 +177,7 @@ pub fn to_instant(zone: Zone, local: i64, overlap: Option<bool>) -> Result<Strin
             Some(false) => standard_candidate,
         },
     };
-    Ok(format!("{}Z", format_clock(instant)))
+    Ok(format_instant(instant))
 }
 
 pub fn business_date(instant: i64, zone: Zone, cutoff: i64, calendar: &Calendar) -> Result<Date> {

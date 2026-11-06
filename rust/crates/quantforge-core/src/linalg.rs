@@ -44,7 +44,7 @@ pub fn solve(a: &Matrix, b: &[f64]) -> Result<Vec<f64>> {
                 p = i;
             }
         }
-        if m[p][k].abs() < limit || m[p][k] == 0.0 {
+        if m[p][k].abs() <= limit {
             return fail("E_SINGULAR", "matrix is singular to working precision");
         }
         m.swap(k, p);

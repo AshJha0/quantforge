@@ -137,7 +137,7 @@ fn adaptive(f: F, p: Panel, tol: f64, depth: i64, max_depth: i64) -> Result<f64>
 
 pub fn adaptive_simpson(f: F, a: f64, b: f64, tol: f64, max_depth: i64) -> Result<f64> {
     check_range(a, b)?;
-    if tol <= 0.0 || max_depth < 0 {
+    if tol <= 0.0 || max_depth < 1 {
         return fail("E_INPUT", "tol or max_depth out of range");
     }
     let (fl, fr) = (f(a), f(b));

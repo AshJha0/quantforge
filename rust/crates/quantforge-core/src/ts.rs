@@ -1,7 +1,7 @@
 //! Time series (`statistics-and-time-series.md`).
 use crate::dates::Date;
 use crate::error::{Result, fail};
-use crate::stats::{centered, is_constant, mean, ols, variance};
+use crate::stats::{centered, is_constant, mean, ols};
 
 pub fn returns(prices: &[f64], log: bool) -> Result<Vec<f64>> {
     if prices.len() < 2 {
@@ -34,7 +34,8 @@ pub fn rolling(x: &[f64], window: i64, stdev: bool) -> Result<Vec<Option<f64>>> 
         } else if is_constant(s) {
             0.0
         } else {
-            variance(s).sqrt()
+            let d = centered(s).1;
+            (d.iter().map(|v| v * v).sum::<f64>() / (w - 1) as f64).sqrt()
         })
     }));
     Ok(out)
