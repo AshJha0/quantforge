@@ -9,10 +9,11 @@ import gen_numerics
 import gen_rulings_store
 import gen_random
 import gen_stage_b
+import gen_stage_b_deep
 import gen_stats_engines
 from qf_oracle.common import REPORT, ROOT
 
-for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data, gen_rulings_store, gen_limits, gen_stage_b, gen_exercises):
+for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data, gen_rulings_store, gen_limits, gen_stage_b, gen_stage_b_deep, gen_exercises):
     g.main()
 check_invariants.main()
 check_fragility.main()

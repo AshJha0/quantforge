@@ -1,0 +1,2694 @@
+{
+ "schema_version": "1.0",
+ "suite": "projection_deep",
+ "spec": "specifications/02-curves/projection-and-fra.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "projection_deep-0001",
+   "operation": "rates.projection.bootstrap",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-23",
+       "discount_factor": 0.9984966970659203
+      },
+      {
+       "date": "2026-12-16",
+       "discount_factor": 0.9960465819422889
+      },
+      {
+       "date": "2027-02-17",
+       "discount_factor": 0.9894673195288839
+      },
+      {
+       "date": "2027-05-14",
+       "discount_factor": 0.9808827523894678
+      },
+      {
+       "date": "2027-11-16",
+       "discount_factor": 0.9636351668637737
+      },
+      {
+       "date": "2028-11-15",
+       "discount_factor": 0.9320367174528353
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9014676804161993
+      },
+      {
+       "date": "2031-11-14",
+       "discount_factor": 0.8394597075001357
+      },
+      {
+       "date": "2033-11-16",
+       "discount_factor": 0.7768078965804719
+      },
+      {
+       "date": "2036-11-14",
+       "discount_factor": 0.6859898651733682
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5538733684017644
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.4499762959746762
+      },
+      {
+       "date": "2056-11-15",
+       "discount_factor": 0.317954598128479
+      }
+     ]
+    },
+    "index": "USD-TERM-3M",
+    "as_of": "2026-11-09",
+    "quotes": [
+     {
+      "type": "DEPOSIT",
+      "months": 3,
+      "rate": 0.0395
+     },
+     {
+      "type": "FRA",
+      "start_months": 3,
+      "rate": 0.0385
+     },
+     {
+      "type": "FRA",
+      "start_months": 6,
+      "rate": 0.0375
+     },
+     {
+      "type": "FRA",
+      "start_months": 9,
+      "rate": 0.037
+     },
+     {
+      "type": "SWAP",
+      "months": 24,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 36,
+      "rate": 0.035
+     },
+     {
+      "type": "SWAP",
+      "months": 60,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 120,
+      "rate": 0.038
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896822448039717
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803512075465874
+      },
+      {
+       "date": "2027-08-12",
+       "discount_factor": 0.9710453562161823
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9619495884410342
+      },
+      {
+       "date": "2028-11-13",
+       "discount_factor": 0.9323297785286845
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9017186988741792
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.839702716666113
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.6868063385938805
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "projection_deep-0002",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-23",
+       "discount_factor": 0.9984966970659203
+      },
+      {
+       "date": "2026-12-16",
+       "discount_factor": 0.9960465819422889
+      },
+      {
+       "date": "2027-02-17",
+       "discount_factor": 0.9894673195288839
+      },
+      {
+       "date": "2027-05-14",
+       "discount_factor": 0.9808827523894678
+      },
+      {
+       "date": "2027-11-16",
+       "discount_factor": 0.9636351668637737
+      },
+      {
+       "date": "2028-11-15",
+       "discount_factor": 0.9320367174528353
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9014676804161993
+      },
+      {
+       "date": "2031-11-14",
+       "discount_factor": 0.8394597075001357
+      },
+      {
+       "date": "2033-11-16",
+       "discount_factor": 0.7768078965804719
+      },
+      {
+       "date": "2036-11-14",
+       "discount_factor": 0.6859898651733682
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5538733684017644
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.4499762959746762
+      },
+      {
+       "date": "2056-11-15",
+       "discount_factor": 0.317954598128479
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896822448039717
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803512075465874
+      },
+      {
+       "date": "2027-08-12",
+       "discount_factor": 0.9710453562161823
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9619495884410342
+      },
+      {
+       "date": "2028-11-13",
+       "discount_factor": 0.9323297785286845
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9017186988741792
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.839702716666113
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.6868063385938805
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 24,
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 2848.199011949659,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-09"
+     },
+     "par_rate": 0.035499999999999976
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0003",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-23",
+       "discount_factor": 0.9984966970659203
+      },
+      {
+       "date": "2026-12-16",
+       "discount_factor": 0.9960465819422889
+      },
+      {
+       "date": "2027-02-17",
+       "discount_factor": 0.9894673195288839
+      },
+      {
+       "date": "2027-05-14",
+       "discount_factor": 0.9808827523894678
+      },
+      {
+       "date": "2027-11-16",
+       "discount_factor": 0.9636351668637737
+      },
+      {
+       "date": "2028-11-15",
+       "discount_factor": 0.9320367174528353
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9014676804161993
+      },
+      {
+       "date": "2031-11-14",
+       "discount_factor": 0.8394597075001357
+      },
+      {
+       "date": "2033-11-16",
+       "discount_factor": 0.7768078965804719
+      },
+      {
+       "date": "2036-11-14",
+       "discount_factor": 0.6859898651733682
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5538733684017644
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.4499762959746762
+      },
+      {
+       "date": "2056-11-15",
+       "discount_factor": 0.317954598128479
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896822448039717
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803512075465874
+      },
+      {
+       "date": "2027-08-12",
+       "discount_factor": 0.9710453562161823
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9619495884410342
+      },
+      {
+       "date": "2028-11-13",
+       "discount_factor": 0.9323297785286845
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9017186988741792
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.839702716666113
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.6868063385938805
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 60,
+     "fixed_rate": 0.036,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 2253.8813009707615,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-09"
+     },
+     "par_rate": 0.03550000000000004
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0004",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-23",
+       "discount_factor": 0.9984966970659203
+      },
+      {
+       "date": "2026-12-16",
+       "discount_factor": 0.9960465819422889
+      },
+      {
+       "date": "2027-02-17",
+       "discount_factor": 0.9894673195288839
+      },
+      {
+       "date": "2027-05-14",
+       "discount_factor": 0.9808827523894678
+      },
+      {
+       "date": "2027-11-16",
+       "discount_factor": 0.9636351668637737
+      },
+      {
+       "date": "2028-11-15",
+       "discount_factor": 0.9320367174528353
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9014676804161993
+      },
+      {
+       "date": "2031-11-14",
+       "discount_factor": 0.8394597075001357
+      },
+      {
+       "date": "2033-11-16",
+       "discount_factor": 0.7768078965804719
+      },
+      {
+       "date": "2036-11-14",
+       "discount_factor": 0.6859898651733682
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5538733684017644
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.4499762959746762
+      },
+      {
+       "date": "2056-11-15",
+       "discount_factor": 0.317954598128479
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896822448039717
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803512075465874
+      },
+      {
+       "date": "2027-08-12",
+       "discount_factor": 0.9710453562161823
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9619495884410342
+      },
+      {
+       "date": "2028-11-13",
+       "discount_factor": 0.9323297785286845
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9017186988741792
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.839702716666113
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.6868063385938805
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 120,
+     "fixed_rate": 0.037,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 8239.66533242071,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-09"
+     },
+     "par_rate": 0.037999999999999964
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0005",
+   "operation": "rates.fra.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-23",
+       "discount_factor": 0.9984966970659203
+      },
+      {
+       "date": "2026-12-16",
+       "discount_factor": 0.9960465819422889
+      },
+      {
+       "date": "2027-02-17",
+       "discount_factor": 0.9894673195288839
+      },
+      {
+       "date": "2027-05-14",
+       "discount_factor": 0.9808827523894678
+      },
+      {
+       "date": "2027-11-16",
+       "discount_factor": 0.9636351668637737
+      },
+      {
+       "date": "2028-11-15",
+       "discount_factor": 0.9320367174528353
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9014676804161993
+      },
+      {
+       "date": "2031-11-14",
+       "discount_factor": 0.8394597075001357
+      },
+      {
+       "date": "2033-11-16",
+       "discount_factor": 0.7768078965804719
+      },
+      {
+       "date": "2036-11-14",
+       "discount_factor": 0.6859898651733682
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5538733684017644
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.4499762959746762
+      },
+      {
+       "date": "2056-11-15",
+       "discount_factor": 0.317954598128479
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-09",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896822448039717
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803512075465874
+      },
+      {
+       "date": "2027-08-12",
+       "discount_factor": 0.9710453562161823
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9619495884410342
+      },
+      {
+       "date": "2028-11-13",
+       "discount_factor": 0.9323297785286845
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9017186988741792
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.839702716666113
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.6868063385938805
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "start": "2027-02-12",
+     "fixed_rate": 0.0385,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -1.4803902537929849e-10,
+      "currency": "USD",
+      "model": "FRA_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-09"
+     },
+     "forward_rate": 0.03849999999999939
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0006",
+   "operation": "rates.projection.bootstrap",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-12-09",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-01-05",
+       "discount_factor": 0.9956195744124056
+      },
+      {
+       "date": "2027-03-02",
+       "discount_factor": 0.9897762006333997
+      },
+      {
+       "date": "2027-06-02",
+       "discount_factor": 0.9805744845505172
+      },
+      {
+       "date": "2027-12-02",
+       "discount_factor": 0.9636119241412238
+      },
+      {
+       "date": "2028-12-04",
+       "discount_factor": 0.9317541502086786
+      },
+      {
+       "date": "2029-12-04",
+       "discount_factor": 0.9011932626966367
+      },
+      {
+       "date": "2031-12-02",
+       "discount_factor": 0.8392731225582641
+      },
+      {
+       "date": "2033-12-02",
+       "discount_factor": 0.7767930568668466
+      },
+      {
+       "date": "2036-12-02",
+       "discount_factor": 0.6858270104400138
+      },
+      {
+       "date": "2041-12-03",
+       "discount_factor": 0.5536882013183373
+      },
+      {
+       "date": "2046-12-04",
+       "discount_factor": 0.44983034658968096
+      },
+      {
+       "date": "2056-12-04",
+       "discount_factor": 0.31786247635226306
+      }
+     ]
+    },
+    "index": "USD-TERM-3M",
+    "as_of": "2026-11-25",
+    "quotes": [
+     {
+      "type": "DEPOSIT",
+      "months": 3,
+      "rate": 0.0395
+     },
+     {
+      "type": "FRA",
+      "start_months": 3,
+      "rate": 0.0385
+     },
+     {
+      "type": "FRA",
+      "start_months": 6,
+      "rate": 0.0375
+     },
+     {
+      "type": "FRA",
+      "start_months": 9,
+      "rate": 0.037
+     },
+     {
+      "type": "SWAP",
+      "months": 24,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 36,
+      "rate": 0.035
+     },
+     {
+      "type": "SWAP",
+      "months": 60,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 120,
+      "rate": 0.038
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-02-26",
+       "discount_factor": 0.9898961720709801
+      },
+      {
+       "date": "2027-05-26",
+       "discount_factor": 0.9805631178396536
+      },
+      {
+       "date": "2027-08-30",
+       "discount_factor": 0.9708535740087624
+      },
+      {
+       "date": "2027-11-30",
+       "discount_factor": 0.9617596026547711
+      },
+      {
+       "date": "2028-11-30",
+       "discount_factor": 0.932214296972411
+      },
+      {
+       "date": "2029-11-30",
+       "discount_factor": 0.9016057116090738
+      },
+      {
+       "date": "2031-11-28",
+       "discount_factor": 0.8396789371849023
+      },
+      {
+       "date": "2036-11-28",
+       "discount_factor": 0.6867990929289848
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "projection_deep-0007",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-12-09",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-01-05",
+       "discount_factor": 0.9956195744124056
+      },
+      {
+       "date": "2027-03-02",
+       "discount_factor": 0.9897762006333997
+      },
+      {
+       "date": "2027-06-02",
+       "discount_factor": 0.9805744845505172
+      },
+      {
+       "date": "2027-12-02",
+       "discount_factor": 0.9636119241412238
+      },
+      {
+       "date": "2028-12-04",
+       "discount_factor": 0.9317541502086786
+      },
+      {
+       "date": "2029-12-04",
+       "discount_factor": 0.9011932626966367
+      },
+      {
+       "date": "2031-12-02",
+       "discount_factor": 0.8392731225582641
+      },
+      {
+       "date": "2033-12-02",
+       "discount_factor": 0.7767930568668466
+      },
+      {
+       "date": "2036-12-02",
+       "discount_factor": 0.6858270104400138
+      },
+      {
+       "date": "2041-12-03",
+       "discount_factor": 0.5536882013183373
+      },
+      {
+       "date": "2046-12-04",
+       "discount_factor": 0.44983034658968096
+      },
+      {
+       "date": "2056-12-04",
+       "discount_factor": 0.31786247635226306
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-26",
+       "discount_factor": 0.9898961720709801
+      },
+      {
+       "date": "2027-05-26",
+       "discount_factor": 0.9805631178396536
+      },
+      {
+       "date": "2027-08-30",
+       "discount_factor": 0.9708535740087624
+      },
+      {
+       "date": "2027-11-30",
+       "discount_factor": 0.9617596026547711
+      },
+      {
+       "date": "2028-11-30",
+       "discount_factor": 0.932214296972411
+      },
+      {
+       "date": "2029-11-30",
+       "discount_factor": 0.9016057116090738
+      },
+      {
+       "date": "2031-11-28",
+       "discount_factor": 0.8396789371849023
+      },
+      {
+       "date": "2036-11-28",
+       "discount_factor": 0.6867990929289848
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 24,
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 2843.8356245491236,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-25"
+     },
+     "par_rate": 0.03549999999999999
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0008",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-12-09",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-01-05",
+       "discount_factor": 0.9956195744124056
+      },
+      {
+       "date": "2027-03-02",
+       "discount_factor": 0.9897762006333997
+      },
+      {
+       "date": "2027-06-02",
+       "discount_factor": 0.9805744845505172
+      },
+      {
+       "date": "2027-12-02",
+       "discount_factor": 0.9636119241412238
+      },
+      {
+       "date": "2028-12-04",
+       "discount_factor": 0.9317541502086786
+      },
+      {
+       "date": "2029-12-04",
+       "discount_factor": 0.9011932626966367
+      },
+      {
+       "date": "2031-12-02",
+       "discount_factor": 0.8392731225582641
+      },
+      {
+       "date": "2033-12-02",
+       "discount_factor": 0.7767930568668466
+      },
+      {
+       "date": "2036-12-02",
+       "discount_factor": 0.6858270104400138
+      },
+      {
+       "date": "2041-12-03",
+       "discount_factor": 0.5536882013183373
+      },
+      {
+       "date": "2046-12-04",
+       "discount_factor": 0.44983034658968096
+      },
+      {
+       "date": "2056-12-04",
+       "discount_factor": 0.31786247635226306
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-26",
+       "discount_factor": 0.9898961720709801
+      },
+      {
+       "date": "2027-05-26",
+       "discount_factor": 0.9805631178396536
+      },
+      {
+       "date": "2027-08-30",
+       "discount_factor": 0.9708535740087624
+      },
+      {
+       "date": "2027-11-30",
+       "discount_factor": 0.9617596026547711
+      },
+      {
+       "date": "2028-11-30",
+       "discount_factor": 0.932214296972411
+      },
+      {
+       "date": "2029-11-30",
+       "discount_factor": 0.9016057116090738
+      },
+      {
+       "date": "2031-11-28",
+       "discount_factor": 0.8396789371849023
+      },
+      {
+       "date": "2036-11-28",
+       "discount_factor": 0.6867990929289848
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 60,
+     "fixed_rate": 0.036,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 2251.1440451085664,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-25"
+     },
+     "par_rate": 0.03550000000000005
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0009",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-12-09",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-01-05",
+       "discount_factor": 0.9956195744124056
+      },
+      {
+       "date": "2027-03-02",
+       "discount_factor": 0.9897762006333997
+      },
+      {
+       "date": "2027-06-02",
+       "discount_factor": 0.9805744845505172
+      },
+      {
+       "date": "2027-12-02",
+       "discount_factor": 0.9636119241412238
+      },
+      {
+       "date": "2028-12-04",
+       "discount_factor": 0.9317541502086786
+      },
+      {
+       "date": "2029-12-04",
+       "discount_factor": 0.9011932626966367
+      },
+      {
+       "date": "2031-12-02",
+       "discount_factor": 0.8392731225582641
+      },
+      {
+       "date": "2033-12-02",
+       "discount_factor": 0.7767930568668466
+      },
+      {
+       "date": "2036-12-02",
+       "discount_factor": 0.6858270104400138
+      },
+      {
+       "date": "2041-12-03",
+       "discount_factor": 0.5536882013183373
+      },
+      {
+       "date": "2046-12-04",
+       "discount_factor": 0.44983034658968096
+      },
+      {
+       "date": "2056-12-04",
+       "discount_factor": 0.31786247635226306
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-26",
+       "discount_factor": 0.9898961720709801
+      },
+      {
+       "date": "2027-05-26",
+       "discount_factor": 0.9805631178396536
+      },
+      {
+       "date": "2027-08-30",
+       "discount_factor": 0.9708535740087624
+      },
+      {
+       "date": "2027-11-30",
+       "discount_factor": 0.9617596026547711
+      },
+      {
+       "date": "2028-11-30",
+       "discount_factor": 0.932214296972411
+      },
+      {
+       "date": "2029-11-30",
+       "discount_factor": 0.9016057116090738
+      },
+      {
+       "date": "2031-11-28",
+       "discount_factor": 0.8396789371849023
+      },
+      {
+       "date": "2036-11-28",
+       "discount_factor": 0.6867990929289848
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 120,
+     "fixed_rate": 0.037,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 8234.133487100393,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-25"
+     },
+     "par_rate": 0.038000000000000006
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0010",
+   "operation": "rates.fra.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-12-09",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-01-05",
+       "discount_factor": 0.9956195744124056
+      },
+      {
+       "date": "2027-03-02",
+       "discount_factor": 0.9897762006333997
+      },
+      {
+       "date": "2027-06-02",
+       "discount_factor": 0.9805744845505172
+      },
+      {
+       "date": "2027-12-02",
+       "discount_factor": 0.9636119241412238
+      },
+      {
+       "date": "2028-12-04",
+       "discount_factor": 0.9317541502086786
+      },
+      {
+       "date": "2029-12-04",
+       "discount_factor": 0.9011932626966367
+      },
+      {
+       "date": "2031-12-02",
+       "discount_factor": 0.8392731225582641
+      },
+      {
+       "date": "2033-12-02",
+       "discount_factor": 0.7767930568668466
+      },
+      {
+       "date": "2036-12-02",
+       "discount_factor": 0.6858270104400138
+      },
+      {
+       "date": "2041-12-03",
+       "discount_factor": 0.5536882013183373
+      },
+      {
+       "date": "2046-12-04",
+       "discount_factor": 0.44983034658968096
+      },
+      {
+       "date": "2056-12-04",
+       "discount_factor": 0.31786247635226306
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-25",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-26",
+       "discount_factor": 0.9898961720709801
+      },
+      {
+       "date": "2027-05-26",
+       "discount_factor": 0.9805631178396536
+      },
+      {
+       "date": "2027-08-30",
+       "discount_factor": 0.9708535740087624
+      },
+      {
+       "date": "2027-11-30",
+       "discount_factor": 0.9617596026547711
+      },
+      {
+       "date": "2028-11-30",
+       "discount_factor": 0.932214296972411
+      },
+      {
+       "date": "2029-11-30",
+       "discount_factor": 0.9016057116090738
+      },
+      {
+       "date": "2031-11-28",
+       "discount_factor": 0.8396789371849023
+      },
+      {
+       "date": "2036-11-28",
+       "discount_factor": 0.6867990929289848
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "start": "2027-02-26",
+     "fixed_rate": 0.0385,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 6.898697899641829e-11,
+      "currency": "USD",
+      "model": "FRA_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-25"
+     },
+     "forward_rate": 0.038500000000000284
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0011",
+   "operation": "rates.projection.bootstrap",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-01-06",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-02-01",
+       "discount_factor": 0.995725986525258
+      },
+      {
+       "date": "2027-03-31",
+       "discount_factor": 0.9896712694819644
+      },
+      {
+       "date": "2027-06-30",
+       "discount_factor": 0.9805708087963789
+      },
+      {
+       "date": "2027-12-30",
+       "discount_factor": 0.9636119640547665
+      },
+      {
+       "date": "2029-01-02",
+       "discount_factor": 0.9316691617135507
+      },
+      {
+       "date": "2030-01-02",
+       "discount_factor": 0.9011110950096582
+      },
+      {
+       "date": "2031-12-31",
+       "discount_factor": 0.8392012009214792
+      },
+      {
+       "date": "2033-12-30",
+       "discount_factor": 0.7767920677736848
+      },
+      {
+       "date": "2036-12-31",
+       "discount_factor": 0.6857744173294776
+      },
+      {
+       "date": "2042-01-02",
+       "discount_factor": 0.5535734739235711
+      },
+      {
+       "date": "2047-01-02",
+       "discount_factor": 0.4497722992140453
+      },
+      {
+       "date": "2057-01-02",
+       "discount_factor": 0.31782882255044936
+      }
+     ]
+    },
+    "index": "USD-TERM-3M",
+    "as_of": "2026-12-23",
+    "quotes": [
+     {
+      "type": "DEPOSIT",
+      "months": 3,
+      "rate": 0.0395
+     },
+     {
+      "type": "FRA",
+      "start_months": 3,
+      "rate": 0.0385
+     },
+     {
+      "type": "FRA",
+      "start_months": 6,
+      "rate": 0.0375
+     },
+     {
+      "type": "FRA",
+      "start_months": 9,
+      "rate": 0.037
+     },
+     {
+      "type": "SWAP",
+      "months": 24,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 36,
+      "rate": 0.035
+     },
+     {
+      "type": "SWAP",
+      "months": 60,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 120,
+      "rate": 0.038
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-03-29",
+       "discount_factor": 0.9895736407080274
+      },
+      {
+       "date": "2027-06-29",
+       "discount_factor": 0.9799321967059924
+      },
+      {
+       "date": "2027-09-28",
+       "discount_factor": 0.9707336244660101
+      },
+      {
+       "date": "2027-12-28",
+       "discount_factor": 0.9617386961605309
+      },
+      {
+       "date": "2028-12-28",
+       "discount_factor": 0.9322149285074929
+      },
+      {
+       "date": "2029-12-28",
+       "discount_factor": 0.9016063218868864
+      },
+      {
+       "date": "2031-12-29",
+       "discount_factor": 0.8394396178396221
+      },
+      {
+       "date": "2036-12-29",
+       "discount_factor": 0.6865850660227226
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "projection_deep-0012",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-01-06",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-02-01",
+       "discount_factor": 0.995725986525258
+      },
+      {
+       "date": "2027-03-31",
+       "discount_factor": 0.9896712694819644
+      },
+      {
+       "date": "2027-06-30",
+       "discount_factor": 0.9805708087963789
+      },
+      {
+       "date": "2027-12-30",
+       "discount_factor": 0.9636119640547665
+      },
+      {
+       "date": "2029-01-02",
+       "discount_factor": 0.9316691617135507
+      },
+      {
+       "date": "2030-01-02",
+       "discount_factor": 0.9011110950096582
+      },
+      {
+       "date": "2031-12-31",
+       "discount_factor": 0.8392012009214792
+      },
+      {
+       "date": "2033-12-30",
+       "discount_factor": 0.7767920677736848
+      },
+      {
+       "date": "2036-12-31",
+       "discount_factor": 0.6857744173294776
+      },
+      {
+       "date": "2042-01-02",
+       "discount_factor": 0.5535734739235711
+      },
+      {
+       "date": "2047-01-02",
+       "discount_factor": 0.4497722992140453
+      },
+      {
+       "date": "2057-01-02",
+       "discount_factor": 0.31782882255044936
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-03-29",
+       "discount_factor": 0.9895736407080274
+      },
+      {
+       "date": "2027-06-29",
+       "discount_factor": 0.9799321967059924
+      },
+      {
+       "date": "2027-09-28",
+       "discount_factor": 0.9707336244660101
+      },
+      {
+       "date": "2027-12-28",
+       "discount_factor": 0.9617386961605309
+      },
+      {
+       "date": "2028-12-28",
+       "discount_factor": 0.9322149285074929
+      },
+      {
+       "date": "2029-12-28",
+       "discount_factor": 0.9016063218868864
+      },
+      {
+       "date": "2031-12-29",
+       "discount_factor": 0.8394396178396221
+      },
+      {
+       "date": "2036-12-29",
+       "discount_factor": 0.6865850660227226
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 24,
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 2843.835818639784,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-12-23"
+     },
+     "par_rate": 0.03550000000000003
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0013",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-01-06",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-02-01",
+       "discount_factor": 0.995725986525258
+      },
+      {
+       "date": "2027-03-31",
+       "discount_factor": 0.9896712694819644
+      },
+      {
+       "date": "2027-06-30",
+       "discount_factor": 0.9805708087963789
+      },
+      {
+       "date": "2027-12-30",
+       "discount_factor": 0.9636119640547665
+      },
+      {
+       "date": "2029-01-02",
+       "discount_factor": 0.9316691617135507
+      },
+      {
+       "date": "2030-01-02",
+       "discount_factor": 0.9011110950096582
+      },
+      {
+       "date": "2031-12-31",
+       "discount_factor": 0.8392012009214792
+      },
+      {
+       "date": "2033-12-30",
+       "discount_factor": 0.7767920677736848
+      },
+      {
+       "date": "2036-12-31",
+       "discount_factor": 0.6857744173294776
+      },
+      {
+       "date": "2042-01-02",
+       "discount_factor": 0.5535734739235711
+      },
+      {
+       "date": "2047-01-02",
+       "discount_factor": 0.4497722992140453
+      },
+      {
+       "date": "2057-01-02",
+       "discount_factor": 0.31782882255044936
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-03-29",
+       "discount_factor": 0.9895736407080274
+      },
+      {
+       "date": "2027-06-29",
+       "discount_factor": 0.9799321967059924
+      },
+      {
+       "date": "2027-09-28",
+       "discount_factor": 0.9707336244660101
+      },
+      {
+       "date": "2027-12-28",
+       "discount_factor": 0.9617386961605309
+      },
+      {
+       "date": "2028-12-28",
+       "discount_factor": 0.9322149285074929
+      },
+      {
+       "date": "2029-12-28",
+       "discount_factor": 0.9016063218868864
+      },
+      {
+       "date": "2031-12-29",
+       "discount_factor": 0.8394396178396221
+      },
+      {
+       "date": "2036-12-29",
+       "discount_factor": 0.6865850660227226
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 60,
+     "fixed_rate": 0.036,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 2254.5273355778495,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-12-23"
+     },
+     "par_rate": 0.0355
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0014",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-01-06",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-02-01",
+       "discount_factor": 0.995725986525258
+      },
+      {
+       "date": "2027-03-31",
+       "discount_factor": 0.9896712694819644
+      },
+      {
+       "date": "2027-06-30",
+       "discount_factor": 0.9805708087963789
+      },
+      {
+       "date": "2027-12-30",
+       "discount_factor": 0.9636119640547665
+      },
+      {
+       "date": "2029-01-02",
+       "discount_factor": 0.9316691617135507
+      },
+      {
+       "date": "2030-01-02",
+       "discount_factor": 0.9011110950096582
+      },
+      {
+       "date": "2031-12-31",
+       "discount_factor": 0.8392012009214792
+      },
+      {
+       "date": "2033-12-30",
+       "discount_factor": 0.7767920677736848
+      },
+      {
+       "date": "2036-12-31",
+       "discount_factor": 0.6857744173294776
+      },
+      {
+       "date": "2042-01-02",
+       "discount_factor": 0.5535734739235711
+      },
+      {
+       "date": "2047-01-02",
+       "discount_factor": 0.4497722992140453
+      },
+      {
+       "date": "2057-01-02",
+       "discount_factor": 0.31782882255044936
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-03-29",
+       "discount_factor": 0.9895736407080274
+      },
+      {
+       "date": "2027-06-29",
+       "discount_factor": 0.9799321967059924
+      },
+      {
+       "date": "2027-09-28",
+       "discount_factor": 0.9707336244660101
+      },
+      {
+       "date": "2027-12-28",
+       "discount_factor": 0.9617386961605309
+      },
+      {
+       "date": "2028-12-28",
+       "discount_factor": 0.9322149285074929
+      },
+      {
+       "date": "2029-12-28",
+       "discount_factor": 0.9016063218868864
+      },
+      {
+       "date": "2031-12-29",
+       "discount_factor": 0.8394396178396221
+      },
+      {
+       "date": "2036-12-29",
+       "discount_factor": 0.6865850660227226
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 120,
+     "fixed_rate": 0.037,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 8239.711495295121,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-12-23"
+     },
+     "par_rate": 0.03800000000000003
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0015",
+   "operation": "rates.fra.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-01-06",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-02-01",
+       "discount_factor": 0.995725986525258
+      },
+      {
+       "date": "2027-03-31",
+       "discount_factor": 0.9896712694819644
+      },
+      {
+       "date": "2027-06-30",
+       "discount_factor": 0.9805708087963789
+      },
+      {
+       "date": "2027-12-30",
+       "discount_factor": 0.9636119640547665
+      },
+      {
+       "date": "2029-01-02",
+       "discount_factor": 0.9316691617135507
+      },
+      {
+       "date": "2030-01-02",
+       "discount_factor": 0.9011110950096582
+      },
+      {
+       "date": "2031-12-31",
+       "discount_factor": 0.8392012009214792
+      },
+      {
+       "date": "2033-12-30",
+       "discount_factor": 0.7767920677736848
+      },
+      {
+       "date": "2036-12-31",
+       "discount_factor": 0.6857744173294776
+      },
+      {
+       "date": "2042-01-02",
+       "discount_factor": 0.5535734739235711
+      },
+      {
+       "date": "2047-01-02",
+       "discount_factor": 0.4497722992140453
+      },
+      {
+       "date": "2057-01-02",
+       "discount_factor": 0.31782882255044936
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-12-23",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-03-29",
+       "discount_factor": 0.9895736407080274
+      },
+      {
+       "date": "2027-06-29",
+       "discount_factor": 0.9799321967059924
+      },
+      {
+       "date": "2027-09-28",
+       "discount_factor": 0.9707336244660101
+      },
+      {
+       "date": "2027-12-28",
+       "discount_factor": 0.9617386961605309
+      },
+      {
+       "date": "2028-12-28",
+       "discount_factor": 0.9322149285074929
+      },
+      {
+       "date": "2029-12-28",
+       "discount_factor": 0.9016063218868864
+      },
+      {
+       "date": "2031-12-29",
+       "discount_factor": 0.8394396178396221
+      },
+      {
+       "date": "2036-12-29",
+       "discount_factor": 0.6865850660227226
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "start": "2027-03-29",
+     "fixed_rate": 0.0385,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 6.257607029995615e-11,
+      "currency": "USD",
+      "model": "FRA_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-12-23"
+     },
+     "forward_rate": 0.03850000000000025
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0016",
+   "operation": "rates.projection.bootstrap",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 1.0004623866205076
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 1.0013626578022798
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 1.003602215300708
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 1.0072112994574374
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 1.0158187454061245
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 1.034694469093977
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 1.0539461153157124
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 1.0883768016385063
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 1.1180472949073343
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 1.1552565866735067
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 1.2141600341173049
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 1.2820110896406771
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 1.489303582614119
+      }
+     ]
+    },
+    "index": "USD-TERM-3M",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "type": "DEPOSIT",
+      "months": 3,
+      "rate": -0.010500000000000002
+     },
+     {
+      "type": "FRA",
+      "start_months": 3,
+      "rate": -0.011500000000000003
+     },
+     {
+      "type": "FRA",
+      "start_months": 6,
+      "rate": -0.012500000000000004
+     },
+     {
+      "type": "FRA",
+      "start_months": 9,
+      "rate": -0.013000000000000005
+     },
+     {
+      "type": "SWAP",
+      "months": 24,
+      "rate": -0.014500000000000006
+     },
+     {
+      "type": "SWAP",
+      "months": 36,
+      "rate": -0.015
+     },
+     {
+      "type": "SWAP",
+      "months": 60,
+      "rate": -0.014500000000000006
+     },
+     {
+      "type": "SWAP",
+      "months": 120,
+      "rate": -0.012000000000000004
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 1.0028076976210978
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 1.0056668643869313
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 1.0088897065049331
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 1.0122526347024445
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 1.0297460773891323
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 1.0466084698979767
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 1.0759516506982
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 1.129567254060459
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "projection_deep-0017",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 1.0004623866205076
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 1.0013626578022798
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 1.003602215300708
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 1.0072112994574374
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 1.0158187454061245
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 1.034694469093977
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 1.0539461153157124
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 1.0883768016385063
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 1.1180472949073343
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 1.1552565866735067
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 1.2141600341173049
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 1.2820110896406771
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 1.489303582614119
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 1.0028076976210978
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 1.0056668643869313
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 1.0088897065049331
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 1.0122526347024445
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 1.0297460773891323
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 1.0466084698979767
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 1.0759516506982
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 1.129567254060459
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 24,
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -99428.55836237926,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": -0.014499999999999999
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0018",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 1.0004623866205076
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 1.0013626578022798
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 1.003602215300708
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 1.0072112994574374
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 1.0158187454061245
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 1.034694469093977
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 1.0539461153157124
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 1.0883768016385063
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 1.1180472949073343
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 1.1552565866735067
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 1.2141600341173049
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 1.2820110896406771
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 1.489303582614119
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 1.0028076976210978
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 1.0056668643869313
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 1.0088897065049331
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 1.0122526347024445
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 1.0297460773891323
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 1.0466084698979767
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 1.0759516506982
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 1.129567254060459
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 60,
+     "fixed_rate": 0.036,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 265773.21494242264,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": -0.014500000000000056
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "projection_deep-0019",
+   "operation": "rates.swap.pv",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 1.0004623866205076
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 1.0013626578022798
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 1.003602215300708
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 1.0072112994574374
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 1.0158187454061245
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 1.034694469093977
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 1.0539461153157124
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 1.0883768016385063
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 1.1180472949073343
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 1.1552565866735067
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 1.2141600341173049
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 1.2820110896406771
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 1.489303582614119
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 1.0028076976210978
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 1.0056668643869313
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 1.0088897065049331
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 1.0122526347024445
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 1.0297460773891323
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 1.0466084698979767
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 1.0759516506982
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 1.129567254060459
+      }
+     ]
+    },
+    "trade": {
+     "index": "USD-TERM-3M",
+     "tenor_months": 120,
+     "fixed_rate": 0.037,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -534664.8415124,
+      "currency": "USD",
+      "model": "SWAP_DISCOUNTING",
+      "data_version": null,
+      "conventions": "USD-TERM-3M",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": -0.012000000000000004
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  }
+ ]
+}
