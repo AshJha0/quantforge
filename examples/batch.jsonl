@@ -1,0 +1,4 @@
+{"schema_version":"1.0","case_id":"example-daycount","operation":"core.daycount.year_fraction","inputs":{"convention":"ACT_360","start":"2024-01-01","end":"2024-07-01"}}
+{"schema_version":"1.0","case_id":"example-discount","operation":"core.compounding.discount_factor","inputs":{"rate":0.05,"t":2.0,"compounding":"CONTINUOUS"}}
+{"schema_version":"1.0","case_id":"example-root","operation":"core.root.brent","inputs":{"function":"cubic_wallis","a":2,"b":3}}
+{"schema_version":"1.0","case_id":"example-error","operation":"core.daycount.year_fraction","inputs":{"convention":"ACT_360","start":"2024-07-01","end":"2024-01-01"}}

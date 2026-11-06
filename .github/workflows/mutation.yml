@@ -9,6 +9,13 @@ on:
       target:
         description: 'java: class glob. cpp: source path. python: mutant glob. rust: file glob'
         required: true
+      golden:
+        description: 'python and rust: also score a sample against the golden cases'
+        type: boolean
+        default: false
+      suite:
+        description: 'golden suite glob, used with golden'
+        default: '*'
 permissions:
   contents: read
 concurrency:
@@ -16,6 +23,7 @@ concurrency:
   cancel-in-progress: true
 env:
   TARGET: ${{ inputs.target }}
+  SUITE: ${{ inputs.suite }}
 jobs:
   java:
     if: inputs.language == 'java'
@@ -35,7 +43,7 @@ jobs:
   cpp:
     if: inputs.language == 'cpp'
     runs-on: ubuntu-24.04
-    container: gcc:16.2
+    container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -53,10 +61,13 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       - run: uv run --with mutmut==3.8.1 mutmut run "$TARGET"
+        if: ${{ !inputs.golden }}
         working-directory: python
       - run: uv run --with mutmut==3.8.1 mutmut results
-        if: always()
+        if: ${{ always() && !inputs.golden }}
         working-directory: python
+      - run: python3 conformance/mutation/golden_mutants.py --impl python --target "$TARGET" --suite "$SUITE" --max 40
+        if: ${{ inputs.golden }}
   rust:
     if: inputs.language == 'rust'
     runs-on: ubuntu-24.04
@@ -69,4 +80,7 @@ jobs:
         working-directory: rust
       - run: cargo install cargo-mutants --version 27.1.0 --locked
       - run: cargo mutants --in-place -p quantforge-core -f "$TARGET"
+        if: ${{ !inputs.golden }}
         working-directory: rust
+      - run: python3 conformance/mutation/golden_mutants.py --impl rust --target "$TARGET" --suite "$SUITE" --max 40
+        if: ${{ inputs.golden }}

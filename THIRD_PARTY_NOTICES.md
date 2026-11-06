@@ -2,6 +2,17 @@
 
 QuantForge's own code is under the MIT licence in `LICENSE`. This file carries notices that must travel with parts taken from others. `oracle/LICENCES.md` lists every outside tool and how each licence was checked.
 
+## Public market data
+
+No raw market data is in this repository, so these notices apply to anyone who publishes data the recorder fetches, or results that carry it. `oracle/LICENCES.md` has the terms as read, source by source. This is a reading of published terms, not legal advice.
+
+- **SONIA:** "SONIA and/or SONIA Compounded Index data licensed under the Open Government Licence v3.0". The Bank's key features page also says a direct licence is needed for some activities, such as redistributing to clients, so raw SONIA data stays local until the Bank has answered.
+- **ECB:** cite the European Central Bank as the source, leave values unchanged, and state any modification.
+- **New York Fed:** SOFR data "is subject to the Terms of Use posted at newyorkfed.org", and the Bank has no liability. QuantForge is not affiliated with the Federal Reserve Bank of New York. SOFR is not recorded yet.
+- **Federal Reserve Board:** cite the Board for H.10 and H.15. Not recorded yet.
+- **US Treasury:** cite the US Department of the Treasury.
+- **FRED:** not used. Its terms bar storing content.
+
 ## Joe-Kuo Sobol direction numbers
 
 The first 64 dimensions of `new-joe-kuo-6.21201` are stored in `specifications/01-core/data/sobol-joe-kuo-d6-64.json` and are compiled or copied into all four implementations (`cpp26/src/core/sobol.cpp`, `java25/.../SobolData.java`, `python/quantforge_core/_sobol_data.py`, `rust/crates/quantforge-core/src/sobol.rs`). The licence below was copied on 2026-11-06 from <https://web.maths.unsw.edu.au/~fkuo/sobol/licence>. A binary release must carry this file in its documentation.

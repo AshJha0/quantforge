@@ -10,13 +10,15 @@ To regenerate everything, compile `oracle/strata` with Maven, write its classpat
 cd oracle/python && uv run python -W ignore run_all.py
 ```
 
-This takes about three minutes and writes `datasets/golden/core/*.json` and `REPORT.md`. On Windows it also rewrites `oracle/strata/out/` with CRLF line endings, which git shows as changed; the content is the same. Generators stop with an error when sources disagree,
+This takes about three minutes and writes `datasets/golden/core/*.json`, `datasets/golden/stage_b/*.json`, the exercise data and solutions, `MUTANTS.md` and `REPORT.md`. On Windows it also rewrites `oracle/strata/out/` with CRLF line endings, which git shows as changed; the content is the same. Generators stop with an error when sources disagree,
 apart from the differences recorded in the specs. Each case's `verified_by` lists the sources that agreed with it.
 The oracle runs on Python 3.12, pinned separately from the Python implementation.
 
 A hand or replay source is written by the same author as the spec, so it can share a misreading with it.
 Where a case has no outside library in `verified_by`, this risk stands. These results are self-assessment until
 the human review at the end of the project.
+
+`REPORT.md`'s invariant line counts 4,388 cases because that check reads `datasets/golden/core/` only; stage B cases are not covered by it. Stage B's outside and hand sources, suite by suite, are in `specifications/stage-b-rulings.md`.
 
 ## Oracle map
 
@@ -36,7 +38,9 @@ the human review at the end of the project.
 | COS | A | Analytic, QuantLib Heston | In use |
 | Data checks, timezones | A | Hand cases, `zoneinfo` | In use |
 | As-of store, replay | A | Hand rows, own canonical form | In use. Single source |
-| Rates and vol curves, pricing | B-E | QuantLib, Strata | Planned |
+| Stage B rates, FX, hedges | B | Per suite in `specifications/stage-b-rulings.md`. Mutants in `MUTANTS.md` | In use. Strata checks schedules and OIS PVs, not curve building. `usecases`, `rulings_b` and `risk` have no outside source |
+| Calibration | B | Closed forms, known truth, NumPy, SciPy | In use |
+| Vol curves, further pricing | C-E | QuantLib, Strata | Planned |
 | CDS | D | ISDA CDS Standard Model | Planned; licence text to read first |
 | Exposure, xVA | G | Open Source Risk Engine | Planned; licence to verify |
 | SIMM-style margin | G | Hand cases on own parameters | See `LICENCES.md` |

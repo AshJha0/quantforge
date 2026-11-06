@@ -30,4 +30,4 @@ Run the whole suite against its golden file:
 python conformance/runner/runner.py --impl rust --suite daycount
 ```
 
-Then read each case's `verified_by` in `datasets/golden/core/daycount.json` to see what stands behind the expected values.
+Then read each case's `verified_by` in `datasets/golden/core/daycount.json` to see what stands behind the expected values. For a whole curve-to-hedge slice, try the use cases in `examples/README.md`.

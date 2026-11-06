@@ -10,6 +10,7 @@ MAX_ARRAY = 100_000
 MAX_MATRIX_ROWS = 200
 MAX_TEXT_BYTES = 1_048_576
 MAX_SKIP = 10_000_000
+MAX_QUOTES = 100
 
 
 def _over(key: str, limit: int) -> QfError:
@@ -76,6 +77,22 @@ def _replay(raw: Raw) -> None:
         raise _over("records x checkpoints", 10_000_000)
 
 
+def _start_length(raw: Raw) -> None:
+    if len(raw["start"]) > 20:
+        raise _over("start", 20)
+    _cap(raw, "max_iter", 100_000)
+
+
+def _hedge_tenors(raw: Raw) -> None:
+    if len(raw["hedge_tenors"]) > 20:
+        raise _over("hedge_tenors", 20)
+
+
+def _hedge(raw: Raw) -> None:
+    if any(len(row) > 20 for row in raw["a"]):
+        raise _over("a", 20)
+
+
 _RNG = _caps(count=MAX_ARRAY, skip=MAX_SKIP)
 _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
@@ -112,6 +129,10 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.store.snapshot": _record_depth,
     "core.store.chain": _record_depth,
     "core.store.replay": _replay,
+    "calib.fit": _start_length,
+    "hedge.solve": _hedge,
+    "rates.schedule.generate": _caps(payment_lag=30_000),
+    "usecase.rates_hedge": _hedge_tenors,
 }
 
 
@@ -127,8 +148,25 @@ def _check_arrays(raw: Raw) -> None:
             stack.extend(v for v in item.values() if isinstance(v, (list, dict)))
 
 
+def _check_curve_sizes(raw: Raw) -> None:
+    stack: list[Any] = [raw]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, dict):
+            for key, value in item.items():
+                if (
+                    key in ("quotes", "pillars", "points")
+                    and isinstance(value, list)
+                    and len(value) > MAX_QUOTES
+                ):
+                    raise _over(key, MAX_QUOTES)
+                if isinstance(value, dict):
+                    stack.append(value)
+
+
 def check_limits(operation: str, raw: Raw) -> None:
     _check_arrays(raw)
+    _check_curve_sizes(raw)
     specific = _BY_OPERATION.get(operation)
     if specific is not None:
         specific(raw)

@@ -9,16 +9,20 @@
 #include <utility>
 
 #include "quantforge/core/calendar.hpp"
+#include "quantforge/core/calibration.hpp"
 #include "quantforge/core/compounding.hpp"
 #include "quantforge/core/data_checks.hpp"
 #include "quantforge/core/dates.hpp"
 #include "quantforge/core/daycount.hpp"
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/fx.hpp"
 #include "quantforge/core/integrate.hpp"
 #include "quantforge/core/interp.hpp"
 #include "quantforge/core/json.hpp"
 #include "quantforge/core/linalg.hpp"
 #include "quantforge/core/models.hpp"
+#include "quantforge/core/money.hpp"
+#include "quantforge/core/rates.hpp"
 #include "quantforge/core/rng.hpp"
 #include "quantforge/core/snapshot.hpp"
 #include "quantforge/core/sobol.hpp"
@@ -128,7 +132,13 @@ constexpr EnumTable<Zone> zones = {{"UTC", Zone::Utc},
 // so handlers read all their inputs before they call the library.
 class In {
 public:
-    explicit In(const Value& v) : v_(v) {}
+    explicit In(const Value& v, bool oversized = false) : v_(v), oversized_(oversized) {}
+
+    // Every handler calls this once its inputs are read, before any work: E_SCHEMA has had its
+    // turn by then, so the array limit can stop the case (ruling B24).
+    void ready() const {
+        if (oversized_) throw Error("E_LIMIT", "an array in inputs is above its limit");
+    }
 
     const Value* find(string_view key) const {
         const Value* p = v_.find(key);
@@ -182,6 +192,7 @@ public:
 
 private:
     const Value& v_;
+    bool oversized_;
 };
 
 struct Out {
@@ -244,17 +255,25 @@ void op_year_fraction(const In& in, Out& out) {
     }
     if (c == ThirtyE360Isda) extra.termination = in.maybe_date("termination");
     if (c == Bus252 && in.find("calendar")) extra.calendar = in.choice("calendar", calendars);
+    check_day_count_inputs(c, extra);
+    in.ready();
     out.key_real("year_fraction", year_fraction(c, start, end, extra));
 }
 
 void op_is_business_day(const In& in, Out& out) {
-    const bool b = is_business_day(in.choice("calendar", calendars), in.date("date"));
+    const Calendar c = in.choice("calendar", calendars);
+    const Date date = in.date("date");
+    in.ready();
+    const bool b = is_business_day(c, date);
     out.values.key("is_business_day");
     out.values.boolean(b);
 }
 
 void op_holidays(const In& in, Out& out) {
-    const auto list = holidays(in.choice("calendar", calendars), int(std::clamp(in.integer("year"), -1LL, 100000LL)));
+    const Calendar c = in.choice("calendar", calendars);
+    const long long year = in.integer("year");
+    in.ready();
+    const auto list = holidays(c, int(std::clamp(year, -1LL, 100000LL)));
     out.values.key("dates");
     out.values.begin_array();
     for (const Date d : list) out.values.string(format_date(d));
@@ -262,7 +281,11 @@ void op_holidays(const In& in, Out& out) {
 }
 
 void op_adjust(const In& in, Out& out) {
-    const Date r = adjust(in.choice("calendar", calendars), in.date("date"), in.choice("convention", business_conventions));
+    const Calendar c = in.choice("calendar", calendars);
+    const Date date = in.date("date");
+    const auto conv = in.choice("convention", business_conventions);
+    in.ready();
+    const Date r = adjust(c, date, conv);
     out.key_string("date", format_date(r));
 }
 
@@ -270,12 +293,16 @@ void op_add_business_days(const In& in, Out& out) {
     const Calendar c = in.choice("calendar", calendars);
     const Date d = in.date("date");
     const long long days = in.integer("days");
+    in.ready();
     limit_if(days > 30000 || days < -30000, "days");
     out.key_string("date", format_date(add_business_days(c, d, days)));
 }
 
 void op_business_days_between(const In& in, Out& out) {
-    const long long n = business_days_between(in.choice("calendar", calendars), in.date("start"), in.date("end"));
+    const Calendar c = in.choice("calendar", calendars);
+    const Date start = in.date("start"), end = in.date("end");
+    in.ready();
+    const long long n = business_days_between(c, start, end);
     out.values.key("count");
     out.values.integer(n);
 }
@@ -293,7 +320,9 @@ void op_add_tenor(const In& in, Out& out) {
     const Date d = in.date("date");
     const Tenor t = parse_tenor(in.text("tenor"));
     const auto conv = in.choice("convention", business_conventions);
-    out.key_string("date", format_date(add_tenor(c, d, t, conv, in.boolean("end_of_month"))));
+    const bool eom = in.boolean("end_of_month");
+    in.ready();
+    out.key_string("date", format_date(add_tenor(c, d, t, conv, eom)));
 }
 
 // ---- compounding ----
@@ -312,19 +341,26 @@ Compounding compounding_of(const Value& v, string_view key) {
 void op_discount_factor(const In& in, Out& out) {
     const double rate = in.real("rate"), t = in.real("t");
     const Compounding c = compounding_of(in.raw(), "compounding");
+    check_frequency(c);
+    in.ready();
     out.key_real("discount_factor", discount_factor(rate, t, c));
 }
 
 void op_convert(const In& in, Out& out) {
     const double rate = in.real("rate"), t = in.real("t");
     const Compounding from = compounding_of(in.need("from"), "from"), to = compounding_of(in.need("to"), "to");
+    check_frequency(from);
+    check_frequency(to);
+    in.ready();
     out.key_real("rate", convert_rate(rate, t, from, to));
 }
 
 // ---- snapshot ----
 
 void op_snapshot_hash(const In& in, Out& out) {
-    const SnapshotHash h = snapshot_hash(in.text("document_text"));
+    const string& text = in.text("document_text");
+    const SnapshotHash h = snapshot_hash(text);  // one linear pass, and its E_SCHEMA comes first
+    in.ready();
     out.key_string("canonical", h.canonical);
     out.key_string("snapshot_id", h.snapshot_id);
 }
@@ -352,6 +388,7 @@ DrawRequest draws(const In& in) {
     const int stream = stream_of(in.integer("stream"));
     const long long count = draw_count(in), skip = in.integer("skip", 0);
     if (skip < 0) schema("skip", "must not be negative");
+    in.ready();
     limit_if(count > 100000, "count");
     limit_if(skip > 10000000, "skip");
     Xoshiro256 rng(seed, stream);
@@ -389,6 +426,7 @@ void op_normals(const In& in, Out& out) {
 
 void op_inverse_normal(const In& in, Out& out) {
     const Vec p = in.reals("p");
+    in.ready();
     Vec z;
     z.reserve(p.size());
     for (const double v : p) {
@@ -404,6 +442,7 @@ void op_set_state(const In& in, Out& out) {
     Xoshiro256::State s{};
     for (std::size_t i = 0; i < 4; ++i) s[i] = to_u64(a.items[i], "state");
     const long long count = draw_count(in);
+    in.ready();
     limit_if(count > 100000, "count");
     if (s == Xoshiro256::State{}) throw Error("E_INPUT", "the state is all zero", "state");
     Xoshiro256 rng(s);
@@ -412,6 +451,7 @@ void op_set_state(const In& in, Out& out) {
 
 void op_sobol(const In& in, Out& out) {
     const long long dimensions = in.integer("dimensions"), count = in.integer("count"), skip = in.integer("skip", 0);
+    in.ready();
     limit_if(product_above(count, dimensions, 100000), "count");
     limit_if(skip > 10000000, "skip");
     check_sobol_request(dimensions, count, skip);
@@ -432,6 +472,7 @@ void op_sobol(const In& in, Out& out) {
 
 RootOptions root_options(const In& in) {
     const RootOptions o{in.real("x_tol", 1e-12), in.real("f_tol", 0.0), in.integer("max_iter", 200)};
+    in.ready();
     limit_if(o.max_iter > 100000, "max_iter");
     return o;
 }
@@ -470,6 +511,7 @@ void op_trapezoid(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
     const double a = in.real("a"), b = in.real("b");
     const long long n = in.integer("n");
+    in.ready();
     limit_if(n > 10000000, "n");
     out.key_real("value", trapezoid(f, a, b, n));
 }
@@ -478,19 +520,24 @@ void op_simpson(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
     const double a = in.real("a"), b = in.real("b");
     const long long n = in.integer("n");
+    in.ready();
     limit_if(n > 10000000, "n");
     out.key_real("value", simpson(f, a, b, n));
 }
 
 void op_gauss_legendre(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
-    out.key_real("value", gauss_legendre(f, in.real("a"), in.real("b"), in.integer("n")));
+    const double a = in.real("a"), b = in.real("b");
+    const long long n = in.integer("n");
+    in.ready();
+    out.key_real("value", gauss_legendre(f, a, b, n));
 }
 
 void op_adaptive_simpson(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
     const double a = in.real("a"), b = in.real("b"), tol = in.real("tol", 1e-10);
     const long long max_depth = in.integer("max_depth", 50);
+    in.ready();
     limit_if(max_depth > 60, "max_depth");
     out.key_real("value", adaptive_simpson(f, a, b, tol, max_depth));
 }
@@ -499,6 +546,7 @@ void op_gauss_kronrod(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
     const double a = in.real("a"), b = in.real("b"), tol = in.real("tol", 1e-10);
     const long long max_intervals = in.integer("max_intervals", 500);
+    in.ready();
     limit_if(max_intervals > 10000, "max_intervals");
     const auto r = gauss_kronrod(f, a, b, tol, max_intervals);
     out.key_real("value", r.value);
@@ -511,6 +559,7 @@ void op_central(const In& in, Out& out) {
     const double x = in.real("x"), h = in.real("h");
     const long long order = in.integer("order");
     if (order != 1 && order != 2) schema("order", "must be 1 or 2");
+    in.ready();
     out.key_real("value", central_difference(f, x, h, order));
 }
 
@@ -529,6 +578,7 @@ void op_interp(const In& in, Out& out) {
         p.slope_end = in.real("slope_end");
     }
     if (method == Tension) p.tension = in.real("tension");
+    in.ready();
     const auto r = interpolate(method, x, y, at, p);
     out.key_reals("values", r.values);
     if (method != Linear && method != LogLinear) out.key_reals("derivatives", r.derivatives);
@@ -536,7 +586,9 @@ void op_interp(const In& in, Out& out) {
 
 void op_monotone_convex(const In& in, Out& out) {
     const Vec t = in.reals("t"), r = in.reals("r"), at = in.reals("at");
-    const auto v = monotone_convex(t, r, at, in.boolean("positive", false));
+    const bool positive = in.boolean("positive", false);
+    in.ready();
+    const auto v = monotone_convex(t, r, at, positive);
     out.key_reals("forwards", v.forwards);
     out.key_reals("zero_rates", v.zero_rates);
 }
@@ -544,12 +596,14 @@ void op_monotone_convex(const In& in, Out& out) {
 void op_solve(const In& in, Out& out) {
     const Matrix a = in.matrix("a");
     const Vec b = in.reals("b");
+    in.ready();
     limit_if(a.size() > 200, "a");
     out.key_reals("x", solve_linear(a, b));
 }
 
 void op_cholesky(const In& in, Out& out) {
     const Matrix a = in.matrix("a");
+    in.ready();
     limit_if(a.size() > 200, "a");
     const Matrix l = cholesky(a);
     out.values.key("l");
@@ -564,6 +618,7 @@ void op_cholesky(const In& in, Out& out) {
 
 void op_eigen(const In& in, Out& out) {
     const Matrix a = in.matrix("a");
+    in.ready();
     limit_if(a.size() > 200, "a");
     out.key_reals("values", eigen_symmetric(a));
 }
@@ -572,6 +627,7 @@ void op_eigen(const In& in, Out& out) {
 
 void op_normal(const In& in, Out& out) {
     const Vec x = in.reals("x");
+    in.ready();
     Vec pdf, cdf;
     for (const double v : x) {
         pdf.push_back(normal_pdf(v));
@@ -582,7 +638,9 @@ void op_normal(const In& in, Out& out) {
 }
 
 void op_summary(const In& in, Out& out) {
-    const Summary s = summary(in.reals("x"));
+    const Vec x = in.reals("x");
+    in.ready();
+    const Summary s = summary(x);
     out.values.key("count");
     out.values.integer((long long)s.count);
     out.key_real("mean", s.mean);
@@ -596,11 +654,13 @@ void op_summary(const In& in, Out& out) {
 
 void op_quantile(const In& in, Out& out) {
     const Vec x = in.reals("x"), p = in.reals("p");
+    in.ready();
     out.key_reals("values", quantiles(x, p));
 }
 
 void op_covariance(const In& in, Out& out) {
     const Vec x = in.reals("x"), y = in.reals("y");
+    in.ready();
     const Covariance c = covariance(x, y);
     out.key_real("covariance", c.covariance);
     out.key_maybe("correlation", c.correlation);
@@ -608,6 +668,7 @@ void op_covariance(const In& in, Out& out) {
 
 void op_ols(const In& in, Out& out) {
     const Vec x = in.reals("x"), y = in.reals("y");
+    in.ready();
     const Ols r = ols(x, y);
     out.key_real("alpha", r.alpha);
     out.key_real("beta", r.beta);
@@ -619,6 +680,7 @@ void op_ols(const In& in, Out& out) {
 void op_returns(const In& in, Out& out) {
     const Vec p = in.reals("prices");
     const auto kind = in.choice<ReturnKind>("kind", {{"SIMPLE", ReturnKind::Simple}, {"LOG", ReturnKind::Log}});
+    in.ready();
     out.key_reals("returns", returns(p, kind));
 }
 
@@ -626,18 +688,22 @@ void op_rolling(const In& in, Out& out) {
     const Vec x = in.reals("x");
     const long long window = in.integer("window");
     const auto s = in.choice<RollingStatistic>("statistic", {{"MEAN", RollingStatistic::Mean}, {"STDEV", RollingStatistic::Stdev}});
+    in.ready();
     limit_if(window > 1000, "window");
     out.key_maybes("values", rolling(x, window, s));
 }
 
 void op_ewma(const In& in, Out& out) {
     const Vec r = in.reals("returns");
-    out.key_reals("variance", ewma_variance(r, in.real("lambda")));
+    const double lambda = in.real("lambda");
+    in.ready();
+    out.key_reals("variance", ewma_variance(r, lambda));
 }
 
 void op_autocorrelation(const In& in, Out& out) {
     const Vec x = in.reals("x");
     const long long max_lag = in.integer("max_lag");
+    in.ready();
     limit_if(max_lag > 1000, "max_lag");
     out.key_reals("acf", autocorrelation(x, max_lag));
 }
@@ -645,12 +711,15 @@ void op_autocorrelation(const In& in, Out& out) {
 void op_ljung_box(const In& in, Out& out) {
     const Vec x = in.reals("x");
     const long long max_lag = in.integer("max_lag");
+    in.ready();
     limit_if(max_lag > 1000, "max_lag");
     out.key_real("statistic", ljung_box(x, max_lag));
 }
 
 void op_ar1(const In& in, Out& out) {
-    const Ar1 r = ar1(in.reals("x"));
+    const Vec x = in.reals("x");
+    in.ready();
+    const Ar1 r = ar1(x);
     out.key_real("constant", r.constant);
     out.key_real("phi", r.phi);
     out.key_real("sigma", r.sigma);
@@ -663,6 +732,7 @@ void op_resample_last(const In& in, Out& out) {
     for (const Value& v : a.items) dates.push_back(to_date(v, "dates"));
     const auto values = in.maybe_reals("values");
     const auto f = in.choice<ResampleFrequency>("frequency", {{"WEEK", ResampleFrequency::Week}, {"MONTH", ResampleFrequency::Month}});
+    in.ready();
     const Resampled r = resample_last(dates, values, f);
     out.values.key("dates");
     out.values.begin_array();
@@ -673,7 +743,9 @@ void op_resample_last(const In& in, Out& out) {
 
 void op_forward_fill(const In& in, Out& out) {
     const auto values = in.maybe_reals("values");
-    out.key_maybes("values", forward_fill(values, in.integer("limit")));
+    const long long limit = in.integer("limit");
+    in.ready();
+    out.key_maybes("values", forward_fill(values, limit));
 }
 
 // ---- engines ----
@@ -682,6 +754,7 @@ void op_pde(const In& in, Out& out) {
     PdeInputs p{in.choice("option", option_types), in.real("spot"), in.real("strike"), in.real("r"), in.real("q"),
                 in.real("sigma"), in.real("t"), in.integer("space_steps"), in.integer("time_steps"),
                 in.real("width", 6.0), in.integer("rannacher_steps", 2)};
+    in.ready();
     limit_if(product_above(p.space_steps, p.time_steps, 10000000), "space_steps");
     const PdeResult r = pde_bs_european(p);
     out.key_real("price", r.price);
@@ -697,6 +770,7 @@ void op_mc(const In& in, Out& out) {
                stream_of(in.integer("stream", 0)),
                in.choice<McMethod>("method", {{"PLAIN", Plain}, {"ANTITHETIC", Antithetic},
                                               {"CONTROL_VARIATE", ControlVariate}, {"SOBOL", Sobol}})};
+    in.ready();
     limit_if(product_above(m.paths, m.steps, 1000000), "paths");
     const McResult r = mc_gbm_european(m);
     out.key_real("price", r.price);
@@ -717,6 +791,7 @@ void op_cos(const In& in, Out& out) {
     }
     const CosInputs c{in.choice("option", option_types), in.real("spot"), in.real("strike"), in.real("r"), in.real("q"),
                       in.real("t"), m, in.integer("terms"), in.real("truncation")};
+    in.ready();
     limit_if(c.terms > 100000, "terms");
     const CosResult r = cos_european(c);
     out.key_real("price", r.price);
@@ -752,6 +827,7 @@ void op_check_quotes(const In& in, Out& out) {
         if (h->kind != Kind::Object) schema("history", "expected an object");
         for (const auto& [id, mids] : h->members) c.history[id] = to_reals(mids, "history");
     }
+    in.ready();
     const auto results = check_quotes(c);
     out.values.key("results");
     out.values.begin_array();
@@ -771,13 +847,19 @@ void op_check_quotes(const In& in, Out& out) {
 // ---- time ----
 
 void op_utc_offset(const In& in, Out& out) {
-    const long long v = utc_offset(in.choice("zone", zones), in.instant("instant"));
+    const Zone z = in.choice("zone", zones);
+    const Instant i = in.instant("instant");
+    in.ready();
+    const long long v = utc_offset(z, i);
     out.values.key("offset_seconds");
     out.values.integer(v);
 }
 
 void op_to_local(const In& in, Out& out) {
-    out.key_string("local", to_local(in.choice("zone", zones), in.instant("instant")));
+    const Zone z = in.choice("zone", zones);
+    const Instant i = in.instant("instant");
+    in.ready();
+    out.key_string("local", to_local(z, i));
 }
 
 void op_to_instant(const In& in, Out& out) {
@@ -786,6 +868,7 @@ void op_to_instant(const In& in, Out& out) {
     if (!local) schema("local", "bad local time");
     std::optional<Overlap> overlap;
     if (in.find("overlap")) overlap = in.choice<Overlap>("overlap", {{"EARLIER", Overlap::Earlier}, {"LATER", Overlap::Later}});
+    in.ready();
     out.key_string("instant", format_local(to_instant(z, *local, overlap)) + "Z");
 }
 
@@ -801,7 +884,9 @@ void op_business_date(const In& in, Out& out) {
     const Instant i = in.instant("instant");
     const Zone z = in.choice("zone", zones);
     const Cutoff c = parse_cutoff(in.text("cutoff"));
-    out.key_string("date", format_date(business_date(i, z, c, in.choice("calendar", calendars))));
+    const Calendar calendar = in.choice("calendar", calendars);
+    in.ready();
+    out.key_string("date", format_date(business_date(i, z, c, calendar)));
 }
 
 // ---- as-of store ----
@@ -873,6 +958,7 @@ void op_store_query(const In& in, Out& out) {
     const Instant as_of = in.instant("as_of");
     const string* series = in.find("series_id") ? &in.text("series_id") : nullptr;
     const auto from = maybe_instant(in, "event_from"), to = maybe_instant(in, "event_to");
+    in.ready();
     check_store_nesting(log);
     check_store(log, {as_of, from, to});
     if (from && to && *from > *to) throw Error("E_DATE_ORDER", "event_from is after event_to", "event_from");
@@ -890,6 +976,7 @@ void op_store_latest(const In& in, Out& out) {
     const auto log = log_of(in);
     const Instant as_of = in.instant("as_of");
     const string& series = in.text("series_id");
+    in.ready();
     check_store_nesting(log);
     check_store(log, {as_of});
     std::optional<StoreRow> best;
@@ -903,6 +990,7 @@ void op_store_latest(const In& in, Out& out) {
 void op_store_snapshot(const In& in, Out& out) {
     const auto log = log_of(in);
     const Instant as_of = in.instant("as_of");
+    in.ready();
     check_store_nesting(log);
     check_store(log, {as_of});
     const SnapshotHash h = store_snapshot(log, as_of);
@@ -916,6 +1004,7 @@ void op_store_replay(const In& in, Out& out) {
     if (a.kind != Kind::Array) schema("checkpoints", "expected an array");
     std::vector<Instant> points;
     for (const Value& v : a.items) points.push_back(to_instant_value(v, "checkpoints"));
+    in.ready();
     limit_if(points.size() > 1000, "checkpoints");
     limit_if(product_above((long long)log.size(), (long long)points.size(), 10000000), "checkpoints");
     check_store_nesting(log);
@@ -937,6 +1026,7 @@ void op_store_replay(const In& in, Out& out) {
 
 void op_store_chain(const In& in, Out& out) {
     const auto log = log_of(in);
+    in.ready();
     check_store_nesting(log);
     check_store(log, {});
     const Chain c = store_chain(log);
@@ -947,12 +1037,42 @@ void op_store_chain(const In& in, Out& out) {
     out.values.end_array();
 }
 
+#include "ops_stage_b.inc"
+
 // ---- dispatch ----
 
 using Handler = void (*)(const In&, Out&);
 
 const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
+        {"calib.check_bid_ask", op_check_bid_ask},
+        {"calib.curve_report", op_curve_report},
+        {"calib.fit", op_calib_fit},
+        {"core.conventions.lookup", op_conventions_lookup},
+        {"core.units.add_money", op_add_money},
+        {"core.units.convert", op_units_convert},
+        {"core.units.round_money", op_round_money},
+        {"fx.curve.implied", op_fx_implied},
+        {"fx.forward.outright", op_fx_outright},
+        {"fx.forward.pv", op_fx_forward_pv},
+        {"fx.spot_date", op_fx_spot_date},
+        {"fx.swap.pv", op_fx_swap_pv},
+        {"hedge.solve", op_hedge_solve},
+        {"hedge.spread_cost", op_spread_cost},
+        {"rates.basis.spread", op_basis_spread},
+        {"rates.curve.discount", op_curve_discount},
+        {"rates.curve.forward", op_curve_forward},
+        {"rates.fra.pv", op_fra_pv},
+        {"rates.ois.bootstrap", op_ois_bootstrap},
+        {"rates.ois.compound", op_ois_compound},
+        {"rates.ois.pv", op_ois_pv},
+        {"rates.projection.bootstrap", op_projection_bootstrap},
+        {"rates.schedule.generate", op_schedule},
+        {"rates.swap.pv", op_swap_pv},
+        {"risk.cashflows", op_cashflows},
+        {"risk.ois.dv01", op_ois_dv01},
+        {"usecase.fx_hedge", op_usecase_fx},
+        {"usecase.rates_hedge", op_usecase_rates},
         {"core.calendar.add_business_days", op_add_business_days},
         {"core.calendar.add_tenor", op_add_tenor},
         {"core.calendar.adjust", op_adjust},
@@ -1090,21 +1210,12 @@ CaseResult run_case(string_view text) {
             case_id = id->text;
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
-        if (oversized(inputs)) {
-            // E_SCHEMA still outranks E_LIMIT, and only the handler knows its schema. Its work is
-            // bounded here, as every other limit is checked first and the input is already in memory.
-            try {
-                Out scratch;
-                handler(In(inputs), scratch);
-            } catch (const Error& e) {
-                if (e.code() == "E_SCHEMA") throw;
-            }
-            throw Error("E_LIMIT", "an array in inputs is above its limit");
-        }
+        const bool big = oversized(inputs);
         Out out;
         out.values.begin_object();
         out.diagnostics.begin_object();
-        handler(In(inputs), out);
+        handler(In(inputs, big), out);
+        In(inputs, big).ready();  // for a handler with no work to guard
         out.values.end_object();
         out.diagnostics.end_object();
         string s = R"({"schema_version":"1.0","case_id":)";

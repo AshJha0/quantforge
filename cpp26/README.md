@@ -1,6 +1,6 @@
 # C++26 implementation
 
-Stage A of QuantForge: every spec in `specifications/01-core/`, behind the CLI in
+Stages A and B of QuantForge: the specs in `specifications/` that `stage-b-followups.md` names, behind the CLI in
 `specifications/cli-contract.md`. It is written from the specs alone.
 
 ## Layout
@@ -45,4 +45,6 @@ python conformance/runner/runner.py --impl cpp
 
 Checked with GCC 16.2 and Clang 23.1 on Windows (MinGW-w64 UCRT, libstdc++). Beyond C++20 the code relies on
 `#embed` only. Number parsing uses `strtod`, and printing `std::to_chars`. libc++ has not been
-tried here; CI's Clang job will be its first run.
+tried here. CI's Clang job builds with it, and passed on stage A; it has not yet run stage B.
+
+Windows Application Control blocks freshly built Clang binaries at times, so Clang conformance relies on CI. Do not change that policy; retry later. When it was not blocked, on 2026-11-06 at commit `13d9871`, a local Clang 23.1.5 build with libstdc++ passed all 4,731 golden cases.

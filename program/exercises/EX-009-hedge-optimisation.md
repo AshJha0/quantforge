@@ -14,3 +14,6 @@ Solve a small constrained least-squares hedge problem with transaction-cost pena
 - Normal, boundary and invalid cases.
 - Expected output and independent verification method.
 - Complexity/performance note where relevant.
+
+## Data and solution
+Synthetic input: `data/ex-009-hedge.csv`. Try it first, then see `solutions/EX-009.md`.

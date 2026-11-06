@@ -66,12 +66,39 @@ fn operation_above(op: &str, i: &Json) -> bool {
         "core.calendar.add_business_days" => int(i, "days").is_some_and(|d| d.abs() > 30_000),
         "core.ts.rolling" => above(i, "window", 1_000),
         "core.ts.autocorrelation" | "core.ts.ljung_box" => above(i, "max_lag", 1_000),
+        "rates.schedule.generate" => above(i, "payment_lag", 30_000),
+        "usecase.rates_hedge" => len(i, "hedge_tenors").is_some_and(|n| n > 20),
+        "calib.fit" => len(i, "start").is_some_and(|n| n > 20) || above(i, "max_iter", 100_000),
+        "hedge.solve" => i
+            .get("a")
+            .and_then(Json::as_array)
+            .and_then(|rows| rows.first())
+            .and_then(Json::as_array)
+            .is_some_and(|r| r.len() > 20),
         "core.store.replay" => {
             len(i, "checkpoints").is_some_and(|n| n > 1_000)
                 || product_above(len(i, "records"), len(i, "checkpoints"), 10_000_000)
         }
         _ => false,
     }
+}
+
+fn curve_points_above(i: &Json) -> bool {
+    let pillars = |k: &str| {
+        i.get(k)
+            .is_some_and(|c| len(c, "pillars").is_some_and(|n| n > 100))
+    };
+    [
+        "curve",
+        "discount",
+        "projection",
+        "base_curve",
+        "quote_curve",
+    ]
+    .iter()
+    .any(|k| pillars(k))
+        || len(i, "quotes").is_some_and(|n| n > 100)
+        || len(i, "points").is_some_and(|n| n > 100)
 }
 
 fn matrix_above(op: &str, i: &Json) -> bool {
@@ -92,6 +119,7 @@ fn value_too_deep(op: &str, i: &Json) -> bool {
 pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
     (too_long(inputs)
         || matrix_above(op, inputs)
+        || curve_points_above(inputs)
         || value_too_deep(op, inputs)
         || operation_above(op, inputs))
     .then(|| err("E_LIMIT", "an input is above its limit"))

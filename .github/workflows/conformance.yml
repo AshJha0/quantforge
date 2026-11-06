@@ -1,5 +1,7 @@
 name: Conformance
 # Linux only, because CI minutes are capped. Each job builds one CLI and runs the neutral runner.
+# The scope job looks at the changed paths, so a change inside one language runs only that language.
+# Shared inputs run everything, and so does any doubt about what changed.
 on:
   push:
     branches: [main]
@@ -29,7 +31,47 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      shared: ${{ steps.paths.outputs.shared }}
+      java: ${{ steps.paths.outputs.java }}
+      cpp: ${{ steps.paths.outputs.cpp }}
+      python: ${{ steps.paths.outputs.python }}
+      rust: ${{ steps.paths.outputs.rust }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: paths
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          shared=false java=false cpp=false python=false rust=false
+          base=
+          [ "$EVENT" = pull_request ] && base=HEAD^1 # the merge ref's first parent is the base branch
+          [ "$EVENT" = push ] && base=$BEFORE
+          if [ -n "$base" ] && files=$(git diff --name-only "$base" HEAD); then
+            for f in $files; do
+              case "$f" in
+                java25/*) java=true ;;
+                cpp26/*) cpp=true ;;
+                python/*) python=true ;;
+                rust/*) rust=true ;;
+                conformance/runner/*|conformance/tolerances/*|datasets/*|specifications/*|.github/workflows/conformance.yml) shared=true ;;
+              esac
+            done
+          else
+            shared=true
+          fi
+          echo "shared=$shared java=$java cpp=$cpp python=$python rust=$rust"
+          { echo "shared=$shared"; echo "java=$java"; echo "cpp=$cpp"; echo "python=$python"; echo "rust=$rust"; } >> "$GITHUB_OUTPUT"
   runner-self-test:
+    needs: scope
+    if: needs.scope.outputs.shared == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -38,6 +80,8 @@ jobs:
           persist-credentials: false
       - run: python3 conformance/runner/test_runner.py
   java:
+    needs: scope
+    if: needs.scope.outputs.shared == 'true' || needs.scope.outputs.java == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -58,8 +102,10 @@ jobs:
           name: conformance-java
           path: conformance/reports/
   cpp:
+    needs: scope
+    if: needs.scope.outputs.shared == 'true' || needs.scope.outputs.cpp == 'true'
     runs-on: ubuntu-24.04
-    container: gcc:16.2
+    container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -75,6 +121,8 @@ jobs:
           name: conformance-cpp
           path: conformance/reports/
   python:
+    needs: scope
+    if: needs.scope.outputs.shared == 'true' || needs.scope.outputs.python == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -90,6 +138,8 @@ jobs:
           name: conformance-python
           path: conformance/reports/
   rust:
+    needs: scope
+    if: needs.scope.outputs.shared == 'true' || needs.scope.outputs.rust == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:

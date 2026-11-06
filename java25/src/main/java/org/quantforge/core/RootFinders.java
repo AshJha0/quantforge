@@ -168,12 +168,13 @@ public final class RootFinders {
         double lo = 0.0;
         double hi = 0.0;
         double flo = 0.0;
+        double fhi = 0.0;
         if (bracket) {
             lo = a;
             hi = b;
             checkBracket(lo, hi);
             flo = eval(f, lo);
-            double fhi = eval(f, hi);
+            fhi = eval(f, hi);
             if (flo != 0.0 && fhi != 0.0 && sameSign(flo, fhi)) {
                 throw new QfError("E_NOT_BRACKETED", "no sign change on [a, b]");
             }
@@ -192,11 +193,13 @@ public final class RootFinders {
                 throw new QfError("E_ZERO_DERIVATIVE", "derivative is zero at " + x);
             }
             if (bracket) {
+                // An end with f exactly 0 stays; only the other end moves, and only on its own sign.
                 if (flo != 0.0 && sameSign(fx, flo)) {
                     lo = x;
                     flo = fx;
-                } else {
+                } else if (fhi != 0.0 && sameSign(fx, fhi)) {
                     hi = x;
+                    fhi = fx;
                 }
             }
             double next = x - fx / dfx;

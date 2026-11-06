@@ -20,6 +20,8 @@ struct DayCountInputs {
     std::optional<Calendar> calendar;
 };
 
+/// E_SCHEMA when a conditional input is missing or not listed.
+void check_day_count_inputs(DayCount convention, const DayCountInputs& in);
 double year_fraction(DayCount convention, Date start, Date end, const DayCountInputs& in = {});
 
 }  // namespace quantforge

@@ -1,5 +1,7 @@
 # Pricing and valuation
 
+Stage B specs: `pricing-framework.md`, `use-cases.md`. Instruments beyond these are specified before their stages.
+
 ## Purpose
 Define the scope and shared contract for the pricing and valuation domain.
 

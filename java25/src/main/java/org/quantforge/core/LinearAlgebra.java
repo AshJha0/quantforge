@@ -148,6 +148,56 @@ public final class LinearAlgebra {
         throw new QfError("E_NO_CONVERGENCE", "Jacobi sweeps exhausted");
     }
 
+    /** Singular values, descending, by one-sided Jacobi, which keeps small ones accurate. */
+    public static double[] singularValues(double[][] input) {
+        double[][] u = copy(input);
+        int n = u[0].length;
+        boolean moved = true;
+        for (int sweep = 0; sweep < 100 && moved; sweep++) {
+            moved = false;
+            for (int p = 0; p < n - 1; p++) {
+                for (int q = p + 1; q < n; q++) {
+                    double alpha = 0.0;
+                    double beta = 0.0;
+                    double gamma = 0.0;
+                    for (double[] row : u) {
+                        alpha += row[p] * row[p];
+                        beta += row[q] * row[q];
+                        gamma += row[p] * row[q];
+                    }
+                    if (Math.abs(gamma) <= 1e-16 * Math.sqrt(alpha * beta) || gamma == 0.0) {
+                        continue;
+                    }
+                    moved = true;
+                    double zeta = (beta - alpha) / (2.0 * gamma);
+                    double t = Math.copySign(1.0, zeta) / (Math.abs(zeta) + Math.sqrt(1.0 + zeta * zeta));
+                    double c = 1.0 / Math.sqrt(1.0 + t * t);
+                    double s = c * t;
+                    for (double[] row : u) {
+                        double x = row[p];
+                        row[p] = c * x - s * row[q];
+                        row[q] = s * x + c * row[q];
+                    }
+                }
+            }
+        }
+        double[] sigma = new double[n];
+        for (int k = 0; k < n; k++) {
+            double s = 0.0;
+            for (double[] row : u) {
+                s += row[k] * row[k];
+            }
+            sigma[k] = Math.sqrt(s);
+        }
+        Arrays.sort(sigma);
+        for (int i = 0; i < n / 2; i++) {
+            double t = sigma[i];
+            sigma[i] = sigma[n - 1 - i];
+            sigma[n - 1 - i] = t;
+        }
+        return sigma;
+    }
+
     private static void rotate(double[][] a, int p, int q) {
         double theta = (a[q][q] - a[p][p]) / (2.0 * a[p][q]);
         double t = Math.copySign(1.0, theta) / (Math.abs(theta) + Math.sqrt(theta * theta + 1.0));

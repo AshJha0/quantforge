@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QuantForge valuation",
+  "type": "object",
+  "required": [
+    "pv",
+    "currency",
+    "model",
+    "data_version",
+    "conventions",
+    "as_of"
+  ],
+  "properties": {
+    "pv": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "data_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "conventions": {
+      "type": "string",
+      "minLength": 1
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "additionalProperties": false
+}

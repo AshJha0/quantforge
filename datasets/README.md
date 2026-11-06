@@ -4,11 +4,12 @@
 
 | Folder | Holds |
 |---|---|
-| `golden/core/` | 21 golden suites, 4,388 cases, written only by `oracle/` |
+| `golden/core/` | 21 stage A suites, 4,388 cases, written only by `oracle/` |
+| `golden/stage_b/` | 18 stage B suites, 343 cases, written only by `oracle/`. All inputs are constructed, and quotes are synthetic |
 | `schemas/` | JSON schemas for cases, results and market data |
 | `synthetic/` | Rules only, so far: no synthetic dataset is committed yet |
 
-No market data is committed. `data-availability.md` says what free data is expected to exist for each planned backtest.
+No market data is committed. `program/exercises/data/` holds small synthetic inputs. `data-availability.md` says what free data is expected to exist for each planned backtest.
 
 ## Planned folders
 

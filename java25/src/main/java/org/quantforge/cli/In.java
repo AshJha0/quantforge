@@ -274,6 +274,39 @@ final class In {
         return out;
     }
 
+    /** A matrix without the row limit of core.linalg. */
+    double[][] anyMatrix(String key) {
+        List<?> rows = list(key);
+        double[][] out = new double[rows.size()][];
+        for (int i = 0; i < out.length; i++) {
+            if (!(rows.get(i) instanceof List<?> row)) {
+                throw schema(key, "expected an array of rows");
+            }
+            out[i] = realsOf(key, row);
+        }
+        return out;
+    }
+
+    long[] integers(String key) {
+        List<?> l = list(key);
+        long[] out = new long[l.size()];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = integerOf(key, l.get(i));
+        }
+        return out;
+    }
+
+    List<String> strings(String key) {
+        List<String> out = new ArrayList<>();
+        for (Object v : list(key)) {
+            if (!(v instanceof String s)) {
+                throw schema(key, "expected strings");
+            }
+            out.add(s);
+        }
+        return out;
+    }
+
     List<LocalDate> dates(String key) {
         List<LocalDate> out = new ArrayList<>();
         for (Object v : list(key)) {

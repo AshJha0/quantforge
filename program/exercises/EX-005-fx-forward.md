@@ -14,3 +14,6 @@ Implement an FX forward using explicit base/quote currency orientation and disco
 - Normal, boundary and invalid cases.
 - Expected output and independent verification method.
 - Complexity/performance note where relevant.
+
+## Data and solution
+Synthetic input: `data/ex-005-fx.csv`. Try it first, then see `solutions/EX-005.md`.

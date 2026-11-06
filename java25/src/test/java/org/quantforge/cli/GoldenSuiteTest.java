@@ -17,7 +17,7 @@ import org.quantforge.core.Json;
 
 /** Runs every oracle case through the CLI layer in process. The neutral runner stays the official check. */
 class GoldenSuiteTest {
-    private static final Path GOLDEN = Path.of("..", "datasets", "golden", "core");
+    private static final Path GOLDEN = Path.of("..", "datasets", "golden");
 
     /** absolute, relative; null means exact. Mirrors conformance/tolerances/policy.yaml. */
     private static final Map<String, double[]> CLASSES = Map.of(
@@ -30,10 +30,10 @@ class GoldenSuiteTest {
     @TestFactory
     Stream<DynamicTest> everySuite() throws IOException {
         List<Path> files;
-        try (Stream<Path> s = Files.list(GOLDEN)) {
-            files = s.sorted().toList();
+        try (Stream<Path> s = Files.walk(GOLDEN)) {
+            files = s.filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
-        assertEquals(21, files.size());
+        assertTrue(files.size() >= 39);
         return files.stream().map(p -> DynamicTest.dynamicTest(p.getFileName().toString(), () -> suite(p)));
     }
 

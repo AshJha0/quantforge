@@ -156,10 +156,17 @@ def newton(
         if dfx == 0:
             raise QfError("E_ZERO_DERIVATIVE", f"df({x}) is zero")
         if bracketed:
-            if _same_sign(fx, fb) or (fa != 0 and not _same_sign(fx, fa)):
-                b, fb = x, fx
-            else:
+            # An end point with f exactly 0 stays: only the other end may move.
+            if fa == 0:
+                if _same_sign(fx, fb):
+                    b, fb = x, fx
+            elif fb == 0:
+                if _same_sign(fx, fa):
+                    a, fa = x, fx
+            elif _same_sign(fx, fa):
                 a, fa = x, fx
+            else:
+                b, fb = x, fx
         x_new = x - fx / dfx
         if bracketed and not a <= x_new <= b:
             x_new = a + (b - a) / 2

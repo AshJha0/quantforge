@@ -1,6 +1,7 @@
 //! One arm per operation: read the inputs, call the library, shape the outputs.
 use crate::functions::{Fun, plain_function, root_function};
 use crate::input::{Inputs, parse_u64};
+use quantforge_core::calendar::parse_tenor;
 use quantforge_core::compounding::{self, Compounding};
 use quantforge_core::cos::{self, CosInputs, Model};
 use quantforge_core::data::{CheckInputs, Quote, check_quotes};
@@ -22,7 +23,7 @@ pub struct Outcome {
     pub diagnostics: Json,
 }
 
-fn plain(outputs: Json) -> Result<Outcome> {
+pub fn plain(outputs: Json) -> Result<Outcome> {
     Ok(Outcome {
         outputs,
         diagnostics: Json::Obj(Vec::new()),
@@ -31,6 +32,9 @@ fn plain(outputs: Json) -> Result<Outcome> {
 
 /// Sorted. A test checks the order and that each name dispatches.
 pub const OPERATIONS: &[&str] = &[
+    "calib.check_bid_ask",
+    "calib.curve_report",
+    "calib.fit",
     "core.calendar.add_business_days",
     "core.calendar.add_tenor",
     "core.calendar.adjust",
@@ -39,6 +43,7 @@ pub const OPERATIONS: &[&str] = &[
     "core.calendar.is_business_day",
     "core.compounding.convert",
     "core.compounding.discount_factor",
+    "core.conventions.lookup",
     "core.cos.european",
     "core.data.check_quotes",
     "core.daycount.year_fraction",
@@ -87,6 +92,30 @@ pub const OPERATIONS: &[&str] = &[
     "core.ts.resample_last",
     "core.ts.returns",
     "core.ts.rolling",
+    "core.units.add_money",
+    "core.units.convert",
+    "core.units.round_money",
+    "fx.curve.implied",
+    "fx.forward.outright",
+    "fx.forward.pv",
+    "fx.spot_date",
+    "fx.swap.pv",
+    "hedge.solve",
+    "hedge.spread_cost",
+    "rates.basis.spread",
+    "rates.curve.discount",
+    "rates.curve.forward",
+    "rates.fra.pv",
+    "rates.ois.bootstrap",
+    "rates.ois.compound",
+    "rates.ois.pv",
+    "rates.projection.bootstrap",
+    "rates.schedule.generate",
+    "rates.swap.pv",
+    "risk.cashflows",
+    "risk.ois.dv01",
+    "usecase.fx_hedge",
+    "usecase.rates_hedge",
 ];
 
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
@@ -276,7 +305,9 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             ]))
         }
         "core.stats.quantile" => {
-            let v = stats::quantile(&i.reals("x")?, &i.reals("p")?)?;
+            let (x, p) = (i.reals("x")?, i.reals("p")?);
+            i.gate()?;
+            let v = stats::quantile(&x, &p)?;
             plain(obj([("values", v.into())]))
         }
         "core.stats.summary" => {
@@ -430,29 +461,15 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             i.gate()?;
             plain(obj([("values", ts::rolling(&x, w, stdev)?.into())]))
         }
-        _ => fail(
-            "E_UNSUPPORTED_OPERATION",
-            format!("{op} is not in this build"),
-        ),
+        _ => crate::ops_b::dispatch(op, i),
     }
 }
 
 fn add_tenor(i: &Inputs) -> Result<Outcome> {
     let (c, d) = (i.calendar("calendar")?, i.date("date")?);
-    let tenor = i.str("tenor")?;
-    if !tenor.is_ascii() || tenor.is_empty() {
+    let Some((n, unit)) = parse_tenor(i.str("tenor")?) else {
         return i.fail("tenor", "malformed tenor");
-    }
-    let (digits, unit) = tenor.split_at(tenor.len() - 1);
-    let valid = (1..=4).contains(&digits.len())
-        && digits.bytes().all(|b| b.is_ascii_digit())
-        && !digits.starts_with('0')
-        && "DWMY".contains(unit);
-    if !valid {
-        return i.fail("tenor", "malformed tenor");
-    }
-    let n: i64 = digits.parse().unwrap_or(0);
-    let unit = unit.chars().next().unwrap_or('D');
+    };
     let (b, eom) = (i.bdc("convention")?, i.bool_or("end_of_month", false)?);
     let r = c.add_tenor(d, n, unit, b, eom)?;
     plain(obj([("date", r.to_string().into())]))
@@ -549,7 +566,7 @@ fn data_check(i: &Inputs) -> Result<Outcome> {
             history.insert(k.clone(), mids);
         }
     }
-    let checked = check_quotes(&CheckInputs {
+    let inputs = CheckInputs {
         as_of: i.instant("as_of")?,
         quotes,
         stale_after_seconds: i.int("stale_after_seconds")?,
@@ -558,7 +575,9 @@ fn data_check(i: &Inputs) -> Result<Outcome> {
         outlier_threshold: i.f64_or("outlier_threshold", 5.0)?,
         outlier_min_history: i.int_or("outlier_min_history", 5)?,
         history,
-    })?;
+    };
+    i.gate()?;
+    let checked = check_quotes(&inputs)?;
     let rows: Vec<Json> = checked
         .into_iter()
         .map(|c| {

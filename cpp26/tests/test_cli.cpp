@@ -51,7 +51,7 @@ TEST_CASE("nulls, and diagnostics") {
 
 TEST_CASE("operations are sorted and all answer") {
     const auto ops = quantforge::cli::operations();
-    CHECK(ops.size() == 56);
+    CHECK(ops.size() == 84);
     CHECK(std::is_sorted(ops.begin(), ops.end()));
     for (const auto& op : ops) CHECK_FALSE(has(run_case(wrap(op, "{}")).json, "E_UNSUPPORTED_OPERATION"));
 }
@@ -83,6 +83,18 @@ TEST_CASE("limits come after schema and before rules") {
     big += "]";
     CHECK(has(run_case(wrap("core.stats.quantile", R"({"x":)" + big + R"(,"p":[0.5]})")).json, "E_LIMIT"));
     CHECK(has(run_case(wrap("core.stats.quantile", R"({"x":)" + big + "}")).json, "E_SCHEMA"));
+}
+
+TEST_CASE("an oversized ignored key stops a costly case before its work") {
+    std::string big = "[0";
+    for (int i = 0; i < 100000; ++i) big += ",0";
+    big += "]";
+    const auto r = run_case(wrap("core.mc.gbm_european", R"({"option":"CALL","spot":100,"strike":100,"r":0,"q":0,"sigma":0.2,"t":1,"paths":1000000,"seed":"1","method":"PLAIN","ignored":)" + big + "}"));
+    CHECK(has(r.json, "E_LIMIT"));
+}
+
+TEST_CASE("a non-finite start stops at once") {
+    CHECK(has(run_case(wrap("calib.fit", R"({"model":"ROSENBROCK","start":[-1.2e300,1.0],"method":"BFGS"})")).json, "E_NON_FINITE"));
 }
 
 TEST_CASE("a case nested above 80 levels stops before parsing") {

@@ -6,17 +6,17 @@ The contract every implementation's CLI follows is `cli-contract.md`.
 
 | Domain | Folder | Stage | State |
 |---|---|---|---|
-| 01 Foundation | `01-core` | A | Real specs; see its README |
-| 02 Curves | `02-curves` | B, D | Capability list, plus `stage-b-targets.md` |
-| 03 Calibration | `03-calibration` | B, D | Capability list |
-| 04 Pricing | `04-pricing` | B to E | Capability list |
+| 01 Foundation | `01-core` | A, B | Real specs; see its README |
+| 02 Curves | `02-curves` | B, D | Stage B implemented; the rest a capability list |
+| 03 Calibration | `03-calibration` | B, D | Stage B implemented; the rest a capability list |
+| 04 Pricing | `04-pricing` | B to E | Framework and use cases 1, 2 implemented; the rest a capability list |
 | 05 Volatility | `05-volatility` | C, E | Capability list |
-| 06 Risk and xVA | `06-risk` | F, G | Capability list |
+| 06 Risk and xVA | `06-risk` | B, F, G | Stage B rates sensitivities implemented; the rest a capability list |
 | 07 Portfolio | `07-portfolio` | J | Capability list |
-| 08 Hedging | `08-hedging` | B, I | Capability list |
+| 08 Hedging | `08-hedging` | B, I | Stage B implemented; the rest a capability list |
 | 09 Microstructure | `09-microstructure` | H | Capability list |
 | 10 Execution and market making | `10-execution` | H | Capability list |
 | 11 Research and backtesting | `11-research` | J | Capability list |
 | 12 Platform and governance | `12-platform` | K | Capability list |
 
-Domains 02 to 12 are not specified yet. Each real spec is written before its own stage, with numeric targets first, and nothing in those folders has been implemented. `02-curves/stage-b-targets.md` is the first of these targets.
+Stage A and the stage B specs are at Implemented: all four builds pass their golden cases. None is Validated, as validation is self-assessment until the human review after the project. Everything else in domains 02 to 12 is unspecified and unbuilt. Each real spec is written before its own stage, with numeric targets first; `02-curves/stage-b-targets.md` is the first of these targets. `stage-b-rulings.md` is normative for stage B and lists each suite's oracle. `stage-b-followups.md` is the build list, kept as a record.

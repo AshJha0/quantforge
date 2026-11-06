@@ -31,3 +31,12 @@ contract and `root-finders.md`. The code follows those rulings.
 - Q29, A5 and `chain`: closed by B5, it applies.
 
 No question is open.
+
+## Stage B: closed by `stage-b-rulings.md`
+
+Q30 by B1, Q31 by B2, Q32 by the corrected `projection-and-fra.md`, Q33 by B9 (now checked in every `fx.*`), Q34 by B7,
+Q35 by B5 (now on `fx.*` too), Q36 by B12, Q37 by B11, Q38 by B12, Q39 by B3, Q40 by B4, Q41 by B17.
+
+Q42 is closed by B19: `start_months` runs from 0 to 1200, else `E_INPUT`.
+
+No question is open.

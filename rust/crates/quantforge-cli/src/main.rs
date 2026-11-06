@@ -4,6 +4,7 @@ mod functions;
 mod input;
 mod limits;
 mod ops;
+mod ops_b;
 
 use input::Inputs;
 use ops::{OPERATIONS, dispatch};
