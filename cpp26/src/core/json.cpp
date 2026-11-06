@@ -1,5 +1,6 @@
 #include "quantforge/core/json.hpp"
 
+#include <algorithm>
 #include <charconv>
 #include <cmath>
 #include <cstdint>
@@ -60,8 +61,12 @@ private:
     }
 
     void value(Value& v, int depth) {
-        if (depth > max_depth) fail("nesting too deep");
         if (!more()) fail("unexpected end of text");
+        if (depth > max_depth) {
+            r_.too_deep = true;
+            skim();
+            return;
+        }
         switch (peek()) {
             case '{': object(v, depth); break;
             case '[': array(v, depth); break;
@@ -83,7 +88,58 @@ private:
         }
     }
 
+    void key_and_colon() {
+        skip_space();
+        if (!more() || peek() != '"') fail("expected a key");
+        std::string ignored;
+        string(ignored);
+        skip_space();
+        if (!more() || peek() != ':') fail("expected ':'");
+        ++p_;
+    }
+
+    // Walks one value with an explicit stack, so that absurd nesting cannot exhaust the real one.
+    void skim() {
+        std::vector<char> open;
+        for (;;) {
+            skip_space();
+            if (!more()) fail("unexpected end of text");
+            bool closed = false;
+            if (peek() == '[' || peek() == '{') {
+                const char c = s_[p_++];
+                open.push_back(c);
+                skip_space();
+                if (more() && peek() == (c == '[' ? ']' : '}')) {
+                    ++p_;
+                    open.pop_back();
+                    closed = true;
+                } else if (c == '{') {
+                    key_and_colon();
+                }
+            } else {
+                Value scalar;
+                value(scalar, 0);
+                closed = true;
+            }
+            while (closed) {
+                if (open.empty()) return;
+                skip_space();
+                if (!more()) fail("unterminated value");
+                const char c = s_[p_++];
+                if (c == ',') {
+                    if (open.back() == '{') key_and_colon();
+                    closed = false;
+                } else if (c == (open.back() == '[' ? ']' : '}')) {
+                    open.pop_back();
+                } else {
+                    fail("expected ',' or a close");
+                }
+            }
+        }
+    }
+
     void object(Value& v, int depth) {
+        r_.depth = std::max(r_.depth, depth + 1);
         v.kind = Kind::Object;
         ++p_;
         skip_space();
@@ -113,6 +169,7 @@ private:
     }
 
     void array(Value& v, int depth) {
+        r_.depth = std::max(r_.depth, depth + 1);
         v.kind = Kind::Array;
         ++p_;
         skip_space();

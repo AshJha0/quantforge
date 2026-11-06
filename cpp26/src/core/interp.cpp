@@ -4,7 +4,6 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
-#include "quantforge/core/linalg.hpp"
 
 namespace quantforge {
 namespace {
@@ -37,6 +36,19 @@ struct Point {
     double value, derivative;
 };
 
+// Solves rows first..last of a tridiagonal system, in a vector of the full length.
+Vec thomas(const Vec& lo, Vec mid, const Vec& up, Vec rhs, std::size_t first, std::size_t last) {
+    for (std::size_t i = first + 1; i <= last; ++i) {
+        const double w = lo[i] / mid[i - 1];
+        mid[i] -= w * up[i - 1];
+        rhs[i] -= w * rhs[i - 1];
+    }
+    Vec x(mid.size(), 0.0);
+    x[last] = rhs[last] / mid[last];
+    for (std::size_t i = last; i-- > first;) x[i] = (rhs[i] - up[i] * x[i + 1]) / mid[i];
+    return x;
+}
+
 // Second derivatives M of the cubic spline, from its end conditions.
 Vec spline_moments(InterpMethod method, const Vec& x, const Vec& y, const InterpParams& p) {
     const std::size_t n = x.size() - 1;
@@ -45,32 +57,33 @@ Vec spline_moments(InterpMethod method, const Vec& x, const Vec& y, const Interp
         h[i] = x[i + 1] - x[i];
         d[i] = (y[i + 1] - y[i]) / h[i];
     }
-    Matrix a(n + 1, Vec(n + 1, 0.0));
-    Vec b(n + 1, 0.0);
+    Vec lo(n + 1, 0.0), mid(n + 1, 1.0), up(n + 1, 0.0), rhs(n + 1, 0.0);
     for (std::size_t i = 1; i < n; ++i) {
-        a[i][i - 1] = h[i - 1];
-        a[i][i] = 2.0 * (h[i - 1] + h[i]);
-        a[i][i + 1] = h[i];
-        b[i] = 6.0 * (d[i] - d[i - 1]);
+        lo[i] = h[i - 1];
+        mid[i] = 2.0 * (h[i - 1] + h[i]);
+        up[i] = h[i];
+        rhs[i] = 6.0 * (d[i] - d[i - 1]);
     }
-    if (method == InterpMethod::CubicNatural) {
-        a[0][0] = a[n][n] = 1.0;
-    } else if (method == InterpMethod::CubicClamped) {
-        a[0][0] = 2.0 * h[0];
-        a[0][1] = h[0];
-        b[0] = 6.0 * (d[0] - p.slope_start);
-        a[n][n - 1] = h[n - 1];
-        a[n][n] = 2.0 * h[n - 1];
-        b[n] = 6.0 * (p.slope_end - d[n - 1]);
-    } else {  // not-a-knot: s''' agrees across x_1 and x_{n-1}
-        a[0][0] = h[1];
-        a[0][1] = -(h[0] + h[1]);
-        a[0][2] = h[0];
-        a[n][n - 2] = h[n - 1];
-        a[n][n - 1] = -(h[n - 2] + h[n - 1]);
-        a[n][n] = h[n - 2];
+    if (method == InterpMethod::CubicClamped) {
+        mid[0] = 2.0 * h[0];
+        up[0] = h[0];
+        rhs[0] = 6.0 * (d[0] - p.slope_start);
+        lo[n] = h[n - 1];
+        mid[n] = 2.0 * h[n - 1];
+        rhs[n] = 6.0 * (p.slope_end - d[n - 1]);
     }
-    return lu_solve_unchecked(std::move(a), std::move(b));
+    if (method != InterpMethod::CubicNotAKnot) return thomas(lo, mid, up, rhs, 0, n);
+    // Not-a-knot: the third derivative agrees across x_1 and x_{n-1}. That gives M_0 and M_n from their neighbours;
+    // putting those into the first and last interior rows keeps the system tridiagonal and dominant.
+    const double h0 = h[0], h1 = h[1], f = h[n - 2], g = h[n - 1];
+    mid[1] += h0 * (h0 + h1) / h1;
+    up[1] -= h0 * h0 / h1;
+    mid[n - 1] += g * (f + g) / f;
+    lo[n - 1] -= g * g / f;
+    Vec m = thomas(lo, mid, up, rhs, 1, n - 1);
+    m[0] = ((h0 + h1) * m[1] - h0 * m[2]) / h1;
+    m[n] = ((f + g) * m[n - 1] - g * m[n - 2]) / f;
+    return m;
 }
 
 Point spline_at(const Vec& x, const Vec& y, const Vec& m, double t) {

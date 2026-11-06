@@ -41,6 +41,15 @@ using std::string_view;
     throw Error("E_SCHEMA", string(key) + ": " + why, string(key));
 }
 
+void limit_if(bool above, string_view key) {
+    if (above) throw Error("E_LIMIT", string(key) + " is above its limit", string(key));
+}
+
+// Is a * b above the limit? Only for sizes both at their minimum or more: below it, the spec's code stands.
+bool product_above(long long a, long long b, double limit) {
+    return a >= 1 && b >= 1 && double(a) * double(b) > limit;
+}
+
 template <class T>
 using EnumTable = std::initializer_list<std::pair<string_view, T>>;
 
@@ -258,7 +267,11 @@ void op_adjust(const In& in, Out& out) {
 }
 
 void op_add_business_days(const In& in, Out& out) {
-    out.key_string("date", format_date(add_business_days(in.choice("calendar", calendars), in.date("date"), in.integer("days"))));
+    const Calendar c = in.choice("calendar", calendars);
+    const Date d = in.date("date");
+    const long long days = in.integer("days");
+    limit_if(days > 30000 || days < -30000, "days");
+    out.key_string("date", format_date(add_business_days(c, d, days)));
 }
 
 void op_business_days_between(const In& in, Out& out) {
@@ -325,7 +338,7 @@ struct DrawRequest {
 
 long long draw_count(const In& in) {
     const long long count = in.integer("count");
-    if (count < 1 || count > 100000) schema("count", "must be 1 to 100000");
+    if (count < 1) schema("count", "must be at least 1");
     return count;
 }
 
@@ -339,6 +352,8 @@ DrawRequest draws(const In& in) {
     const int stream = stream_of(in.integer("stream"));
     const long long count = draw_count(in), skip = in.integer("skip", 0);
     if (skip < 0) schema("skip", "must not be negative");
+    limit_if(count > 100000, "count");
+    limit_if(skip > 10000000, "skip");
     Xoshiro256 rng(seed, stream);
     for (long long i = 0; i < skip; ++i) rng.next();
     return {rng, count};
@@ -389,6 +404,7 @@ void op_set_state(const In& in, Out& out) {
     Xoshiro256::State s{};
     for (std::size_t i = 0; i < 4; ++i) s[i] = to_u64(a.items[i], "state");
     const long long count = draw_count(in);
+    limit_if(count > 100000, "count");
     if (s == Xoshiro256::State{}) throw Error("E_INPUT", "the state is all zero", "state");
     Xoshiro256 rng(s);
     write_u64s(out, rng, count);
@@ -396,6 +412,8 @@ void op_set_state(const In& in, Out& out) {
 
 void op_sobol(const In& in, Out& out) {
     const long long dimensions = in.integer("dimensions"), count = in.integer("count"), skip = in.integer("skip", 0);
+    limit_if(product_above(count, dimensions, 100000), "count");
+    limit_if(skip > 10000000, "skip");
     check_sobol_request(dimensions, count, skip);
     Sobol sobol{int(dimensions), std::uint64_t(skip)};
     Vec point(std::size_t(dimensions), 0.0);
@@ -413,7 +431,9 @@ void op_sobol(const In& in, Out& out) {
 // ---- roots, integrals, differences ----
 
 RootOptions root_options(const In& in) {
-    return {in.real("x_tol", 1e-12), in.real("f_tol", 0.0), in.integer("max_iter", 200)};
+    const RootOptions o{in.real("x_tol", 1e-12), in.real("f_tol", 0.0), in.integer("max_iter", 200)};
+    limit_if(o.max_iter > 100000, "max_iter");
+    return o;
 }
 
 void write_root(Out& out, const RootResult& r) {
@@ -448,12 +468,18 @@ void op_newton(const In& in, Out& out) {
 
 void op_trapezoid(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
-    out.key_real("value", trapezoid(f, in.real("a"), in.real("b"), in.integer("n")));
+    const double a = in.real("a"), b = in.real("b");
+    const long long n = in.integer("n");
+    limit_if(n > 10000000, "n");
+    out.key_real("value", trapezoid(f, a, b, n));
 }
 
 void op_simpson(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
-    out.key_real("value", simpson(f, in.real("a"), in.real("b"), in.integer("n")));
+    const double a = in.real("a"), b = in.real("b");
+    const long long n = in.integer("n");
+    limit_if(n > 10000000, "n");
+    out.key_real("value", simpson(f, a, b, n));
 }
 
 void op_gauss_legendre(const In& in, Out& out) {
@@ -463,12 +489,18 @@ void op_gauss_legendre(const In& in, Out& out) {
 
 void op_adaptive_simpson(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
-    out.key_real("value", adaptive_simpson(f, in.real("a"), in.real("b"), in.real("tol", 1e-10), in.integer("max_depth", 50)));
+    const double a = in.real("a"), b = in.real("b"), tol = in.real("tol", 1e-10);
+    const long long max_depth = in.integer("max_depth", 50);
+    limit_if(max_depth > 60, "max_depth");
+    out.key_real("value", adaptive_simpson(f, a, b, tol, max_depth));
 }
 
 void op_gauss_kronrod(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
-    const auto r = gauss_kronrod(f, in.real("a"), in.real("b"), in.real("tol", 1e-10), in.integer("max_intervals", 500));
+    const double a = in.real("a"), b = in.real("b"), tol = in.real("tol", 1e-10);
+    const long long max_intervals = in.integer("max_intervals", 500);
+    limit_if(max_intervals > 10000, "max_intervals");
+    const auto r = gauss_kronrod(f, a, b, tol, max_intervals);
     out.key_real("value", r.value);
     out.diagnostics.key("error_estimate");
     out.diagnostics.real(r.error_estimate);
@@ -511,11 +543,15 @@ void op_monotone_convex(const In& in, Out& out) {
 
 void op_solve(const In& in, Out& out) {
     const Matrix a = in.matrix("a");
-    out.key_reals("x", solve_linear(a, in.reals("b")));
+    const Vec b = in.reals("b");
+    limit_if(a.size() > 200, "a");
+    out.key_reals("x", solve_linear(a, b));
 }
 
 void op_cholesky(const In& in, Out& out) {
-    const Matrix l = cholesky(in.matrix("a"));
+    const Matrix a = in.matrix("a");
+    limit_if(a.size() > 200, "a");
+    const Matrix l = cholesky(a);
     out.values.key("l");
     out.values.begin_array();
     for (const Vec& row : l) {
@@ -526,7 +562,11 @@ void op_cholesky(const In& in, Out& out) {
     out.values.end_array();
 }
 
-void op_eigen(const In& in, Out& out) { out.key_reals("values", eigen_symmetric(in.matrix("a"))); }
+void op_eigen(const In& in, Out& out) {
+    const Matrix a = in.matrix("a");
+    limit_if(a.size() > 200, "a");
+    out.key_reals("values", eigen_symmetric(a));
+}
 
 // ---- statistics and time series ----
 
@@ -586,6 +626,7 @@ void op_rolling(const In& in, Out& out) {
     const Vec x = in.reals("x");
     const long long window = in.integer("window");
     const auto s = in.choice<RollingStatistic>("statistic", {{"MEAN", RollingStatistic::Mean}, {"STDEV", RollingStatistic::Stdev}});
+    limit_if(window > 1000, "window");
     out.key_maybes("values", rolling(x, window, s));
 }
 
@@ -596,12 +637,16 @@ void op_ewma(const In& in, Out& out) {
 
 void op_autocorrelation(const In& in, Out& out) {
     const Vec x = in.reals("x");
-    out.key_reals("acf", autocorrelation(x, in.integer("max_lag")));
+    const long long max_lag = in.integer("max_lag");
+    limit_if(max_lag > 1000, "max_lag");
+    out.key_reals("acf", autocorrelation(x, max_lag));
 }
 
 void op_ljung_box(const In& in, Out& out) {
     const Vec x = in.reals("x");
-    out.key_real("statistic", ljung_box(x, in.integer("max_lag")));
+    const long long max_lag = in.integer("max_lag");
+    limit_if(max_lag > 1000, "max_lag");
+    out.key_real("statistic", ljung_box(x, max_lag));
 }
 
 void op_ar1(const In& in, Out& out) {
@@ -637,6 +682,7 @@ void op_pde(const In& in, Out& out) {
     PdeInputs p{in.choice("option", option_types), in.real("spot"), in.real("strike"), in.real("r"), in.real("q"),
                 in.real("sigma"), in.real("t"), in.integer("space_steps"), in.integer("time_steps"),
                 in.real("width", 6.0), in.integer("rannacher_steps", 2)};
+    limit_if(product_above(p.space_steps, p.time_steps, 10000000), "space_steps");
     const PdeResult r = pde_bs_european(p);
     out.key_real("price", r.price);
     out.key_real("delta", r.delta);
@@ -651,6 +697,7 @@ void op_mc(const In& in, Out& out) {
                stream_of(in.integer("stream", 0)),
                in.choice<McMethod>("method", {{"PLAIN", Plain}, {"ANTITHETIC", Antithetic},
                                               {"CONTROL_VARIATE", ControlVariate}, {"SOBOL", Sobol}})};
+    limit_if(product_above(m.paths, m.steps, 1000000), "paths");
     const McResult r = mc_gbm_european(m);
     out.key_real("price", r.price);
     out.key_real("stderr", r.standard_error);
@@ -670,6 +717,7 @@ void op_cos(const In& in, Out& out) {
     }
     const CosInputs c{in.choice("option", option_types), in.real("spot"), in.real("strike"), in.real("r"), in.real("q"),
                       in.real("t"), m, in.integer("terms"), in.real("truncation")};
+    limit_if(c.terms > 100000, "terms");
     const CosResult r = cos_european(c);
     out.key_real("price", r.price);
     out.diagnostic("a", r.a);
@@ -770,15 +818,33 @@ StoreRecord record_of(const Value& v) {
             r.boolean("deleted", false), v};
 }
 
-// The log comes before anything else, as asof-store.md says, even other inputs' schema errors.
 std::vector<StoreRecord> log_of(const In& in) {
     const Value& a = in.need("records");
     if (a.kind != Kind::Array) schema("records", "expected an array");
     std::vector<StoreRecord> log;
     log.reserve(a.items.size());
     for (const Value& v : a.items) log.push_back(record_of(v));
-    check_log(log);
     return log;
+}
+
+int nesting(const Value& v) {
+    int deepest = 0;
+    for (const Value& item : v.items) deepest = std::max(deepest, nesting(item));
+    for (const auto& m : v.members) deepest = std::max(deepest, nesting(m.second));
+    return v.kind == Kind::Array || v.kind == Kind::Object ? deepest + 1 : 0;
+}
+
+// Runs once all schema checks are done: limits, then log checks 2 and 3, then the range of
+// instants, records first (rulings A2 and A5).
+void check_store(const std::vector<StoreRecord>& log, std::initializer_list<std::optional<Instant>> others) {
+    for (const StoreRecord& r : log) limit_if(nesting(r.value) > 64, "value");
+    check_log(log);
+    for (const StoreRecord& r : log) {
+        check_store_instant(r.event_time);
+        check_store_instant(r.knowledge_time);
+    }
+    for (const auto& i : others)
+        if (i) check_store_instant(*i);
 }
 
 void write_row(Out& out, const StoreRow& r) {
@@ -803,6 +869,7 @@ void op_store_query(const In& in, Out& out) {
     const Instant as_of = in.instant("as_of");
     const string* series = in.find("series_id") ? &in.text("series_id") : nullptr;
     const auto from = maybe_instant(in, "event_from"), to = maybe_instant(in, "event_to");
+    check_store(log, {as_of, from, to});
     if (from && to && *from > *to) throw Error("E_DATE_ORDER", "event_from is after event_to", "event_from");
     out.values.key("rows");
     out.values.begin_array();
@@ -818,6 +885,7 @@ void op_store_latest(const In& in, Out& out) {
     const auto log = log_of(in);
     const Instant as_of = in.instant("as_of");
     const string& series = in.text("series_id");
+    check_store(log, {as_of});
     std::optional<StoreRow> best;
     for (StoreRow& r : store_view(log, as_of))
         if (r.series_id == series) best = std::move(r);  // the view ascends by event_time
@@ -828,7 +896,9 @@ void op_store_latest(const In& in, Out& out) {
 
 void op_store_snapshot(const In& in, Out& out) {
     const auto log = log_of(in);
-    const SnapshotHash h = store_snapshot(log, in.instant("as_of"));
+    const Instant as_of = in.instant("as_of");
+    check_store(log, {as_of});
+    const SnapshotHash h = store_snapshot(log, as_of);
     out.key_string("canonical", h.canonical);
     out.key_string("snapshot_id", h.snapshot_id);
 }
@@ -839,6 +909,15 @@ void op_store_replay(const In& in, Out& out) {
     if (a.kind != Kind::Array) schema("checkpoints", "expected an array");
     std::vector<Instant> points;
     for (const Value& v : a.items) points.push_back(to_instant_value(v, "checkpoints"));
+    limit_if(points.size() > 1000, "checkpoints");
+    limit_if(product_above((long long)log.size(), (long long)points.size(), 10000000), "checkpoints");
+    for (const StoreRecord& r : log) limit_if(nesting(r.value) > 64, "value");
+    check_log(log);
+    for (const StoreRecord& r : log) {
+        check_store_instant(r.event_time);
+        check_store_instant(r.knowledge_time);
+    }
+    for (const Instant i : points) check_store_instant(i);
     const auto replay = store_replay(log, points);
     out.values.key("snapshots");
     out.values.begin_array();
@@ -855,7 +934,9 @@ void op_store_replay(const In& in, Out& out) {
 }
 
 void op_store_chain(const In& in, Out& out) {
-    const Chain c = store_chain(log_of(in));
+    const auto log = log_of(in);
+    check_store(log, {});
+    const Chain c = store_chain(log);
     out.key_string("head", c.head);
     out.values.key("hashes");
     out.values.begin_array();
@@ -952,6 +1033,12 @@ bool valid_operation(string_view s) {
     return any_dot && previous != '.';
 }
 
+bool oversized(const Value& v) {
+    if (v.items.size() > 100000) return true;
+    return std::ranges::any_of(v.items, oversized) ||
+           std::ranges::any_of(v.members, [](const json::Member& m) { return oversized(m.second); });
+}
+
 string error_json(const string& case_id, const Error& e) {
     string s = R"({"schema_version":"1.0","case_id":)";
     json::append_string(s, case_id);
@@ -999,6 +1086,17 @@ CaseResult run_case(string_view text) {
             case_id = id->text;
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
+        if (parsed.too_deep || oversized(inputs)) {
+            // E_SCHEMA still outranks E_LIMIT, and only the handler knows its schema. Its work is
+            // bounded here, as every other limit is checked first and the input is already in memory.
+            try {
+                Out scratch;
+                handler(In(inputs), scratch);
+            } catch (const Error& e) {
+                if (e.code() == "E_SCHEMA") throw;
+            }
+            throw Error("E_LIMIT", "an array or nesting in inputs is above its limit");
+        }
         Out out;
         out.values.begin_object();
         out.diagnostics.begin_object();

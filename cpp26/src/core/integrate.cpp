@@ -14,12 +14,22 @@ void check_range(double a, double b) {
     if (!(a < b)) throw Error("E_INPUT", "a must be below b");
 }
 
-// For the adaptive rules, whose tests would otherwise spin on NaN.
-double finite(const Fn& f, double x) {
-    const double v = f(x);
-    if (!std::isfinite(v)) throw Error("E_NON_FINITE", "f is not finite");
-    return v;
-}
+// Evaluation for the adaptive rules: a NaN would spin their tests, and a tiny tol would otherwise
+// ask for exponential work.
+class Counted {
+public:
+    explicit Counted(const Fn& f) : f_(f) {}
+    double operator()(double x) {
+        if (++calls_ > 10000000) throw Error("E_NO_CONVERGENCE", "10,000,000 function calls reached");
+        const double v = f_(x);
+        if (!std::isfinite(v)) throw Error("E_NON_FINITE", "f is not finite");
+        return v;
+    }
+
+private:
+    const Fn& f_;
+    long long calls_ = 0;
+};
 
 struct Nodes {
     std::vector<double> t, w;
@@ -58,12 +68,12 @@ Nodes legendre_nodes(int n) {
 }
 
 struct AdaptiveSimpson {
-    const Fn& f;
+    Counted& f;
     long long max_depth;
 
     double run(double l, double r, double fl, double fm, double fr, double whole, double tol, long long depth) const {
         const double m = l + (r - l) / 2.0;
-        const double flm = finite(f, l + (m - l) / 2.0), frm = finite(f, m + (r - m) / 2.0);
+        const double flm = f(l + (m - l) / 2.0), frm = f(m + (r - m) / 2.0);
         const double s1 = (m - l) / 6.0 * (fl + 4.0 * flm + fm);
         const double s2 = (r - m) / 6.0 * (fm + 4.0 * frm + fr);
         const double delta = s1 + s2 - whole;
@@ -88,12 +98,12 @@ struct Piece {
     double l, r, value, error;
 };
 
-Piece kronrod(const Fn& f, double l, double r) {
+Piece kronrod(Counted& f, double l, double r) {
     const double c = (l + r) / 2.0, h = (r - l) / 2.0;
-    const double fc = finite(f, c);
+    const double fc = f(c);
     double k = wk[7] * fc, g = wg[3] * fc;
     for (int i = 0; i < 7; ++i) {
-        const double pair = finite(f, c - h * kx[i]) + finite(f, c + h * kx[i]);
+        const double pair = f(c - h * kx[i]) + f(c + h * kx[i]);
         k += wk[i] * pair;
         if (i % 2 == 1) g += wg[i / 2] * pair;
     }
@@ -136,16 +146,18 @@ double adaptive_simpson(const Fn& f, double a, double b, double tol, long long m
     check_range(a, b);
     if (tol <= 0.0) throw Error("E_INPUT", "tol must be positive", "tol");
     if (max_depth < 1) throw Error("E_INPUT", "max_depth must be at least 1", "max_depth");
-    const double fa = finite(f, a), fb = finite(f, b), fm = finite(f, a + (b - a) / 2.0);
+    Counted counted(f);
+    const double fa = counted(a), fb = counted(b), fm = counted(a + (b - a) / 2.0);
     const double whole = (b - a) / 6.0 * (fa + 4.0 * fm + fb);
-    return AdaptiveSimpson{f, max_depth}.run(a, b, fa, fm, fb, whole, tol, 0);
+    return AdaptiveSimpson{counted, max_depth}.run(a, b, fa, fm, fb, whole, tol, 0);
 }
 
 KronrodResult gauss_kronrod(const Fn& f, double a, double b, double tol, long long max_intervals) {
     check_range(a, b);
     if (tol <= 0.0) throw Error("E_INPUT", "tol must be positive", "tol");
     if (max_intervals < 1) throw Error("E_INPUT", "max_intervals must be at least 1", "max_intervals");
-    std::vector<Piece> pieces{kronrod(f, a, b)};
+    Counted counted(f);
+    std::vector<Piece> pieces{kronrod(counted, a, b)};
     for (;;) {
         double value = 0.0, error = 0.0;
         for (const Piece& p : pieces) {
@@ -156,8 +168,8 @@ KronrodResult gauss_kronrod(const Fn& f, double a, double b, double tol, long lo
         if (std::ssize(pieces) >= max_intervals) throw Error("E_NO_CONVERGENCE", "max_intervals reached");
         const auto worst = std::ranges::max_element(pieces, {}, &Piece::error);
         const double l = worst->l, r = worst->r, m = l + (r - l) / 2.0;
-        *worst = kronrod(f, l, m);
-        pieces.push_back(kronrod(f, m, r));
+        *worst = kronrod(counted, l, m);
+        pieces.push_back(kronrod(counted, m, r));
     }
 }
 

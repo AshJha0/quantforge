@@ -35,6 +35,8 @@ struct Parsed {
     bool duplicate_key = false;
     bool number_overflow = false;
     bool lone_surrogate = false;
+    int depth = 0;          // deepest nesting; an object or array is one level
+    bool too_deep = false;  // beyond the recursion cap: checked for syntax, but not kept
 };
 
 /// Throws Error E_PARSE on anything that is not JSON. Rule breaks are flagged in the result.

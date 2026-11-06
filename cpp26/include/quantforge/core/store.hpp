@@ -42,6 +42,8 @@ std::string format_instant(Instant i);
 
 /// Sequence and knowledge-time order. Throws E_INPUT.
 void check_log(const std::vector<StoreRecord>& log);
+/// Throws E_DATE_RANGE outside years 1 to 9999, which Z form cannot show.
+void check_store_instant(Instant i);
 std::vector<StoreRow> store_view(const std::vector<StoreRecord>& log, Instant as_of);
 SnapshotHash store_snapshot(const std::vector<StoreRecord>& log, Instant as_of);
 Chain store_chain(const std::vector<StoreRecord>& log);

@@ -44,7 +44,7 @@ McResult mean_and_error(const Vec& y) {
 McResult mc_gbm_european(const McInputs& in) {
     if (in.spot <= 0.0 || in.strike <= 0.0 || in.sigma <= 0.0 || in.t <= 0.0)
         throw Error("E_DOMAIN", "spot, strike, sigma and t must be positive");
-    if (in.paths < 2 || in.paths > 10000000) throw Error("E_INPUT", "paths must be 2 to 10000000", "paths");
+    if (in.paths < 2) throw Error("E_INPUT", "paths must be at least 2", "paths");
     if (in.steps < 1) throw Error("E_INPUT", "steps must be at least 1", "steps");
     if (in.method == McMethod::Sobol && in.steps > 64) throw Error("E_INPUT", "SOBOL allows at most 64 steps", "steps");
 

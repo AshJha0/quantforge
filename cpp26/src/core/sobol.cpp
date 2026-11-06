@@ -59,9 +59,8 @@ const std::vector<Directions>& directions() {
 void check_sobol_request(long long dimensions, long long count, long long skip) {
     if (dimensions < 1 || dimensions > Sobol::max_dimensions)
         throw Error("E_INPUT", "dimensions must be 1 to 64", "dimensions");
-    if (count < 1 || count > 1000000) throw Error("E_INPUT", "count must be 1 to 1000000", "count");
+    if (count < 1) throw Error("E_INPUT", "count must be at least 1", "count");
     if (skip < 0) throw Error("E_INPUT", "skip must not be negative", "skip");
-    if (skip + count >= (1LL << 32)) throw Error("E_INPUT", "indices must stay below 2^32", "skip");
 }
 
 Sobol::Sobol(int dimensions, std::uint64_t skip) : index_(skip), x_(std::size_t(dimensions), 0) {

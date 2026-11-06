@@ -56,6 +56,12 @@ TEST_CASE("snapshot rejections rank as the spec lists them") {
     for (int i = 0; i < 63; ++i) deep += ']';
     deep += '}';
     CHECK_NOTHROW(snapshot_hash(deep));
+    const std::string too_deep = R"({"a":[)" + deep + "]}";
+    CHECK(code_of([&] { snapshot_hash(too_deep); }) == "E_LIMIT");
+    const std::string absurd = "{\"a\":" + std::string(200000, '[') + std::string(200000, ']') + "}";
+    CHECK(code_of([&] { snapshot_hash(absurd); }) == "E_LIMIT");
+    CHECK(code_of([&] { snapshot_hash("{\"a\":" + std::string(200000, '[')); }) == "E_PARSE");
+    CHECK(code_of([] { snapshot_hash(std::string(1048577, ' ')); }) == "E_LIMIT");
 }
 
 TEST_CASE("JSON numbers round trip") {
@@ -102,7 +108,6 @@ TEST_CASE("Sobol first points and skip") {
     s.next(p);
     CHECK((p[0] == q[0] && p[1] == q[1]));
     CHECK(code_of([] { check_sobol_request(65, 1, 0); }) == "E_INPUT");
-    CHECK(code_of([] { check_sobol_request(1, 1, (1LL << 32) - 1); }) == "E_INPUT");
 }
 
 TEST_CASE("quote checks") {
