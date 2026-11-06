@@ -1,6 +1,6 @@
 # OIS curves: SONIA and minimal SOFR
 
-Spec version 1.0.0. Status: Specified. Full SOFR and ESTR are stage D.
+Spec version 1.0.0. Status: Implemented, not Validated. Full SOFR and ESTR are stage D.
 
 An overnight indexed swap exchanges a fixed rate for daily compounded overnight rates. Its quotes pin down the discount curve.
 

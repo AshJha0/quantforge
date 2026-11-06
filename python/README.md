@@ -2,7 +2,7 @@
 
 One of four equal implementations; it is not a reference for the others.
 
-Stage A, on Python 3.15.2, written from `specifications/01-core/` and `specifications/cli-contract.md`.
+Stages A and B, on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
 
 Install: `uv sync`
 

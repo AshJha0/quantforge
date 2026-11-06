@@ -26,11 +26,6 @@ Nothing here was tuned to fit: the code follows the spec text.
 - `E_LIMIT` on `document_text`: B1 and B2 put size and a lexical depth scan before parsing, and the code follows them.
 - `dimensions` of 65 with a large `count` is `E_LIMIT`: confirmed by B3.
 
-## Readings chosen where the spec is silent
-
-No golden case shows these to be wrong, but the other languages may read them differently.
-
-
 ## Stage B, closed at `stage-b` ddf2b18
 
 `specifications/stage-b-rulings.md` settles the stage B readings listed here earlier, and the code follows it. The

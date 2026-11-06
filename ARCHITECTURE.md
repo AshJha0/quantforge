@@ -9,7 +9,7 @@ QuantForge is one repository holding four isolated implementations and the neutr
 | `datasets/` | Schemas and golden files | Oracle output |
 | `conformance/` | Neutral runner and tolerances | Golden files and each CLI's JSON. No financial logic |
 | `java25/`, `cpp26/`, `python/`, `rust/` | Four equal implementations | Specs only. Never each other, never the oracle |
-| `tools/` | Recorder and forward log | No financial logic |
+| `tools/` | Recorder, forward log and docs site build | No financial logic |
 
 ## Rules that shape it
 
@@ -21,4 +21,10 @@ QuantForge is one repository holding four isolated implementations and the neutr
 
 The specification remains a shared-error risk: four builds and a hand case can share one misreading. That is why outside libraries are used wherever a licence allows, and why a human review closes the project. Until that review, validation is self-assessment.
 
-Stage A builds domain 01 only. Services, `infra/` and the other domains do not exist yet.
+## Inside one implementation
+
+Stage B adds the pricing framework (`specifications/04-pricing/pricing-framework.md`). The plain idea: terms, cashflows, market data, the model and the answer are five things, kept apart so that one can change without the others. Formally, each language separates instrument, product model, market data, pricing model and valuation result in its API; only the JSON is conformance. Use cases compose these parts and define nothing but their sums.
+
+Stage B calculations are pure functions of their inputs, so stage F can add AD (ADR-0010). Risk is bump and rebuild for now.
+
+Stage A built domain 01. Stage B built slices of domains 02, 03, 04, 06 and 08. Services, `infra/` and the other domains do not exist yet.

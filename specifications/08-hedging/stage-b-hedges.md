@@ -1,6 +1,6 @@
 # Stage B hedges and cost
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.0.0. Status: Implemented, not Validated.
 
 ## `hedge.solve`
 

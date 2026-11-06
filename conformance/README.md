@@ -25,7 +25,7 @@ Passing means a build matches the oracle within tolerance. Agreement between lan
 ## Report
 Each run writes `conformance/reports/NAME.json`, which git ignores, and prints pass, fail and not-implemented counts per suite.
 
-Stage A result (observed, local, Windows, 2026-11-06, commit `ffa0585`): Java, C++, Python and Rust each passed 4,388 of 4,388 cases in 21 suites. CI has not yet run this on GitHub.
+Stage B result (observed, local, Windows, 2026-11-06, at commit `13d9871`): Java, C++, Python and Rust each passed 4,731 of 4,731 cases in 39 suites. CI has not run stage B, as the branch is not pushed. Stage A's cases passed in CI on pull request #1.
 
 ## Running
 

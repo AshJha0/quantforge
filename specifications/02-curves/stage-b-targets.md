@@ -1,6 +1,6 @@
 # Stage B numeric targets
 
-Set before any stage B code, as plan section 8 requires. "Oracle measured" is from `oracle/REPORT.md`, and is the oracle's own replay against the outside source. No implementation has run against these.
+Set before any stage B code, as plan section 8 requires. "Oracle measured" is from `oracle/REPORT.md`, and is the oracle's own replay against the outside source. They were written before any implementation ran. All four builds now pass the golden cases, locally; that is self-assessment, not validation.
 
 Calibration is judged on repricing and objective, never on fitted parameters, unless the minimum is unique. Iteration counts are never compared.
 

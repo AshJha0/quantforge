@@ -11,4 +11,4 @@ Run `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D 
 `cargo test --workspace`. Build the CLI with `cargo build --release`, then run `python conformance/runner/runner.py --impl rust`
 from the repository root.
 
-Open questions on the specs and golden cases are in `SPEC_QUESTIONS.md`.
+Open questions on the specs and golden cases are in `SPEC_QUESTIONS.md`, including one known gap against ruling B24.

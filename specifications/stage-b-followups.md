@@ -1,6 +1,6 @@
 # Stage B follow-ups
 
-What each language builds, in a separate clean-room session. The list is the same for Java, C++, Python and Rust; none is the reference. No stage B code exists yet, and no build has run these suites.
+What each language built, in a separate clean-room session. The list is the same for Java, C++, Python and Rust; none is the reference. This page is a record: all of it is built, and all four builds pass these suites. The "Change" marks in the tables were the state when each round began. One gap is left: Rust against B24, in `rust/SPEC_QUESTIONS.md`.
 
 Read first: `cli-contract.md`, `01-core/rulings.md`, `01-core/limits.md`, `02-curves/stage-b-targets.md`.
 
@@ -28,7 +28,7 @@ The stage A follow-ups in `01-core/clean-room-followups.md` still stand where no
 
 ## Second round: deeper cases and rulings
 
-Run the new suites `schedule_deep`, `curve_deep`, `ois_deep`, `projection_deep`, `risk_deep`, `fx_deep`, `hedge_deep` and `rulings_b`. Read `stage-b-rulings.md`. No build has run them.
+Run the new suites `schedule_deep`, `curve_deep`, `ois_deep`, `projection_deep`, `risk_deep`, `fx_deep`, `hedge_deep` and `rulings_b`. Read `stage-b-rulings.md`.
 
 | Ruling | Java | C++ | Python | Rust |
 |---|---|---|---|---|
@@ -42,7 +42,7 @@ Run the new suites `schedule_deep`, `curve_deep`, `ois_deep`, `projection_deep`,
 
 ## Third round
 
-Run `rulings_b` again: it gains B19 to B22. No build has run these cases.
+Run `rulings_b` again: it gains B19 to B22.
 
 | Ruling | Java | C++ | Python | Rust |
 |---|---|---|---|---|

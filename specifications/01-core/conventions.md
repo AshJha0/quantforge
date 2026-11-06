@@ -1,6 +1,6 @@
 # Convention registry
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.0.0. Status: Implemented, not Validated.
 
 A market convention is data, kept in one place. All stage B operations read it.
 

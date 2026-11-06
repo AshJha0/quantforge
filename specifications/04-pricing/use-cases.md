@@ -1,6 +1,6 @@
 # Use cases 1 and 2
 
-Spec version 1.0.0. Status: Specified. All data in the cases is synthetic.
+Spec version 1.0.0. Status: Implemented, not Validated. All data in the cases is synthetic.
 
 Each use case runs a slice from market data to a hedge, by composing other specs. Nothing new is defined here but the sums.
 
@@ -25,4 +25,4 @@ The hedges must have key-rate exposure in the trade's buckets. In the golden cas
 
 ## Acceptance
 
-Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are checked against QuantLib. The use-case sums have no outside source.
+Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are checked against QuantLib. The use-case sums have no outside source. Trades, hedges and costs are calculations on synthetic data: nothing is traded. Real output is in `examples/README.md`.

@@ -1,6 +1,6 @@
 # Units and money
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.0.0. Status: Implemented, not Validated.
 
 A bare number invites mistakes: is 5 a percent or a decimal, and in which currency? Each implementation has distinct types for rates, basis points and money, and converts only at the edges. Inside the libraries a rate is a decimal, so 0.05 is 5%.
 

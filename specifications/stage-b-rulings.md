@@ -56,4 +56,4 @@ From a finite start, a trial point with a non-finite objective is a failed step:
 | `usecases` | None directly | Replay of parts checked elsewhere |
 | `rulings_b` | None | Hand, by nature |
 
-`oracle/MUTANTS.md` lists the deliberate convention errors. `gen_stage_b_deep.py` stops if a suite's tolerance would let one through. That proves each named error is caught, not that every plausible one is. `calibration`, `units`, `usecases` and `rulings_b` have no mutants.
+`oracle/MUTANTS.md` lists the deliberate convention errors. `gen_stage_b_deep.py` stops if a suite's tolerance would let one through. That proves each named error is caught, not that every plausible one is. `calibration`, `units`, `usecases` and `rulings_b` have no mutants. Stage B quotes are synthetic throughout, so an outside oracle here means agreement on method, not fit to a market.

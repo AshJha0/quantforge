@@ -1,6 +1,6 @@
 # Projection curves, FRAs, swaps and basis
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.0.0. Status: Implemented, not Validated.
 
 Multi-curve means forecasting a rate on one curve and discounting on another. The index is `USD-TERM-3M`, which is synthetic (see `01-core/conventions.md`).
 

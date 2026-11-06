@@ -1,6 +1,6 @@
 # Pricing framework
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.0.0. Status: Implemented, not Validated.
 
 Five separate things meet in a valuation:
 

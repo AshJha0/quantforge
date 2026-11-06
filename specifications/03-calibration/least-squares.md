@@ -1,6 +1,6 @@
 # Calibration core
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.0.0. Status: Implemented, not Validated.
 
 Calibration fits parameters to data. Different solvers take different paths, so results are judged on the objective and on repricing. Parameters are compared only when the minimum is unique and well identified, and never by iteration count.
 

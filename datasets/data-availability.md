@@ -19,7 +19,7 @@ Per plan section 8, corrected by the stage B data survey of 2026-11-06, which is
 | Later stages: gilt RV, option surfaces, FX vol, swaptions, inflation swaps, credit, borrow, order books | Method test or labelled synthetic, as before | Gilts: DMO terms unread | Not resurveyed here |
 | VaR, ES | Conditional | ECB, Fed series | FRED is no longer a source |
 
-FRED is dropped: its terms bar storing content, and it needs a key.
+FRED is dropped: its terms bar storing content, and it needs a key. Terms, source by source, are in `oracle/LICENCES.md`.
 
 ## Circularity warnings
 

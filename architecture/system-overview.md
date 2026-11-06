@@ -1,7 +1,7 @@
 # System overview
 
 ## Mission
-Provide reusable, testable quantitative capabilities from raw market observations through valuation, portfolio risk, hedging and execution analysis. Stage A builds the data, conventions and numerical layers only; the rest of this page describes the target.
+Provide reusable, testable quantitative capabilities from raw market observations through valuation, portfolio risk, hedging and execution analysis. Stages A and B have built the data, conventions and numerical layers, and FX and rates slices of the domain engines; the rest of this page describes the target.
 
 ## Logical layers
 1. **Data and conventions:** market-data contracts, instrument definitions, calendars, timestamps, currencies and units.

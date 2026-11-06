@@ -1,6 +1,6 @@
 # Schedules
 
-Spec version 1.0.0. Status: Specified. Stage B covers regular schedules with one short first stub. Long stubs and ex-dividend periods are stage D.
+Spec version 1.0.0. Status: Implemented, not Validated. Stage B covers regular schedules with one short first stub. Long stubs and ex-dividend periods are stage D.
 
 ## `rates.schedule.generate`
 

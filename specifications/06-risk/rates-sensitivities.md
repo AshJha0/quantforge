@@ -1,6 +1,6 @@
 # Rates sensitivities
 
-Spec version 1.0.0. Status: Specified. By ADR-0010, stage B uses bump and rebuild, with no AD.
+Spec version 1.0.0. Status: Implemented, not Validated. By ADR-0010, stage B uses bump and rebuild, with no AD.
 
 ## `risk.ois.dv01`
 

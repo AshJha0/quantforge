@@ -32,4 +32,4 @@ Machine: Intel Core 5 120U, 12 logical CPUs, 15.6 GiB, Windows 11 (10.0.26200), 
 | Java | JDK 25.0.5, default JVM flags | 21,032 | 28,150 | 0.148 |
 | Python | CPython 3.15.2, through `uv run` | 13,700 | 23,949 | 0.685 |
 
-Day counts are cheap, so this mostly compares JSON handling and I/O. A heavier suite would rank differently, and this one workload should not be read as a ranking of the languages. It has not been run on Linux or in CI, and no CI job runs it, to save minutes.
+Day counts are cheap, so this mostly compares JSON handling and I/O. A heavier suite would rank differently, and this one workload should not be read as a ranking of the languages. It has not been run on Linux or in CI, and no CI job runs it, to save minutes. This run predates stage B: no stage B operation has been benchmarked.

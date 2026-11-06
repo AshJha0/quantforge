@@ -1,6 +1,6 @@
 # Toolchain policy
 
-Versions are pinned so that a result can be reproduced. The stage A pins:
+Versions are pinned so that a result can be reproduced. The pins, unchanged by stage B:
 
 | Part | Pin | Where |
 |---|---|---|

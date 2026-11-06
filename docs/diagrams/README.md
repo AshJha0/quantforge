@@ -43,12 +43,39 @@ flowchart LR
 
 ## Curve lifecycle
 
+What stage B builds. Each step is one call to the CLI on the inputs it is given, and nothing is stored between calls. A solve that fails is an error, never a clamped curve.
+
+```mermaid
+flowchart LR
+  Q[synthetic quotes] --> V{input checks}
+  V -->|bad| E1[E_INPUT]
+  V --> M[mid of bid and ask] --> S[schedules] --> B[bootstrap: sequential or global]
+  B -->|no solution| E2[E_NO_CONVERGENCE]
+  B --> C[curve and max repricing error]
+  C --> P[PV, FX forwards] & R[bump quotes, rebuild: DV01, key rates]
+  R --> H[hedge solve with cost]
+```
+
+The target for later stages, not built yet: quotes pass the data checks, are frozen in a hashed snapshot, and a curve is published only if its inputs reprice.
+
 ```mermaid
 flowchart LR
   Q[quotes] --> V[checks] --> Sn[snapshot] --> B[build and calibrate]
   B --> Rp{inputs reprice?}
   Rp -->|yes| Pub[publish curve]
   Rp -->|no| Keep[keep last good curve, report failure]
+```
+
+## Valuation parts
+
+The five parts of `specifications/04-pricing/pricing-framework.md`.
+
+```mermaid
+flowchart LR
+  I[instrument: terms] --> PM[product model: cashflows]
+  PM --> M[pricing model: discounting]
+  D[market data: curves, spot] --> M
+  M --> V[valuation result]
 ```
 
 ## Conformance flow

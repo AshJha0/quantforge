@@ -141,7 +141,7 @@ differ in the last bits. Tolerance classes are in `conformance/tolerances/policy
 ## Operations
 
 Operation names are `<domain>.<area>.<verb>`. Each spec file defines its inputs, outputs, and
-errors. Stage A:
+errors. Stages A and B:
 
 | Prefix | Spec |
 |---|---|

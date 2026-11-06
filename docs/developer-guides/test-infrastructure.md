@@ -1,6 +1,6 @@
 # Test infrastructure
 
-None of these workflows has run on GitHub yet: the remote had no commits when this was written, so every result so far is local, on Windows.
+Pull request #1 ran the workflows it triggers on GitHub, and all passed, including GCC, Clang (libc++) and sanitizers. Whether `fuzz.yml`, `mutation.yml` and `docs.yml` have run there was not checked. Stage B has not been pushed, so all its results are local, on Windows.
 
 CI minutes are capped at about 2,000 a month with a hard stop, so pull-request workflows run only when their paths change. Everything runs on Linux.
 
@@ -73,4 +73,4 @@ Observed, WSL Ubuntu, 2026-11-06, source at `a60d814`, seed 1, one run. Unit sco
 | Python `compounding` | `compounding` | 44 of 192 (23%) | 8 | 21 | 21 |
 | Python `daycount` | `daycount` | 173 of 436 (40%) | 15 | 34 | 35 |
 
-Limits: this is two files per language and 40 mutants each, so a sample figure can be several points out. Python ran one suite, because all suites take over a minute per mutant, so it may undercount. Survivors have not been sorted into equivalent mutants and real gaps. mutmut changes error message text, which the runner does not compare, and that may explain some Python survivors. The four Rust compounding survivors include three in `check_rate`, which are worth a look as possible missing cases.
+This was measured on stage A code. No mutation score exists for stage B code; `oracle/MUTANTS.md` is a different check, of the golden tolerances. Limits: this is two files per language and 40 mutants each, so a sample figure can be several points out. Python ran one suite, because all suites take over a minute per mutant, so it may undercount. Survivors have not been sorted into equivalent mutants and real gaps. mutmut changes error message text, which the runner does not compare, and that may explain some Python survivors. The four Rust compounding survivors include three in `check_rate`, which are worth a look as possible missing cases.

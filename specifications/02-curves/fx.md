@@ -1,6 +1,6 @@
 # FX spot, forwards and swaps
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.0.0. Status: Implemented, not Validated.
 
 A rate of 1.28 for `GBPUSD` means 1 GBP (base) costs 1.28 USD (quote). A forward follows from no-arbitrage between the two currencies' discount curves.
 
