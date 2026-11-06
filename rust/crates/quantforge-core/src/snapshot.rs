@@ -1,6 +1,6 @@
 //! Snapshot hash (`snapshot-hash.md`).
 use crate::error::{Result, fail};
-use crate::json::{Json, parse};
+use crate::json::{Json, nesting_exceeds, parse};
 use crate::sha256::sha256_hex;
 
 const MAX_TEXT_BYTES: usize = 1_048_576;
@@ -61,6 +61,9 @@ fn canonical(v: &Json, out: &mut Vec<u8>) {
 
 /// Returns the canonical text and the snapshot id.
 pub fn hash(document: &str) -> Result<(String, String)> {
+    if document.len() > MAX_TEXT_BYTES || nesting_exceeds(document.as_bytes(), MAX_DEPTH) {
+        return fail("E_LIMIT", "document is above its limit");
+    }
     let (doc, flags) = parse(document)?;
     if flags.overflow {
         return fail("E_SCHEMA", "a number overflows binary64");
@@ -70,9 +73,6 @@ pub fn hash(document: &str) -> Result<(String, String)> {
     }
     if !matches!(doc, Json::Obj(_)) {
         return fail("E_SCHEMA", "top level is not an object");
-    }
-    if document.len() > MAX_TEXT_BYTES || doc.depth() > MAX_DEPTH {
-        return fail("E_LIMIT", "document is above its limit");
     }
     Ok(hash_value(doc))
 }

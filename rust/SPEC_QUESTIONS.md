@@ -21,13 +21,14 @@ Nothing here was tuned to fit: the code follows the spec text.
 - `core.store.*`, `sequence` below 1 is `E_SCHEMA`: confirmed by A1.
 - `core.store.replay`, `head` is the whole log: confirmed by A6.
 
+## Closed at `stage-a` bb663d6
+
+- `E_LIMIT` on `document_text`: B1 and B2 put size and a lexical depth scan before parsing, and the code follows them.
+- `dimensions` of 65 with a large `count` is `E_LIMIT`: confirmed by B3.
+
 ## Readings chosen where the spec is silent
 
 No golden case shows these to be wrong, but the other languages may read them differently.
 
 - `core.root.newton`: when `f(a)` is exactly 0, the bracket shrinks by the sign of `f(b)`, so the root at `a` stays
   inside it (ruling R3 leaves this step open).
-- `E_LIMIT` on `document_text` comes after `E_PARSE` and the snapshot `E_SCHEMA` checks, by the contract's order.
-  Text nested more than 5,000 levels stops the parser, and gives `E_LIMIT` even if later text is malformed.
-- `core.sobol.points`: `dimensions` of 65 with a `count` that makes the product too large is `E_LIMIT`, not
-  `E_INPUT`, as `E_LIMIT` comes first.

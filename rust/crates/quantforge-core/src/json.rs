@@ -30,6 +30,29 @@ struct Parser<'a> {
     flags: Flags,
 }
 
+/// Ruling B2: true if bracket nesting ever exceeds `limit`. A lexical walk that checks no syntax.
+pub fn nesting_exceeds(text: &[u8], limit: usize) -> bool {
+    let mut depth = 0usize;
+    let mut in_string = false;
+    let mut i = 0;
+    while i < text.len() {
+        match (in_string, text[i]) {
+            (true, b'\\') => i += 1,
+            (_, b'"') => in_string = !in_string,
+            (false, b'[' | b'{') => {
+                depth += 1;
+                if depth > limit {
+                    return true;
+                }
+            }
+            (false, b']' | b'}') => depth = depth.saturating_sub(1),
+            _ => {}
+        }
+        i += 1;
+    }
+    false
+}
+
 pub fn parse(text: &str) -> Result<(Json, Flags)> {
     let mut p = Parser {
         b: text.as_bytes(),

@@ -81,9 +81,10 @@ fn matrix_above(op: &str, i: &Json) -> bool {
 fn value_too_deep(op: &str, i: &Json) -> bool {
     op.starts_with("core.store.")
         && i.get("records").and_then(Json::as_array).is_some_and(|rs| {
-            rs.iter()
-                .filter_map(|r| r.get("value"))
-                .any(|v| v.depth() > MAX_VALUE_DEPTH)
+            rs.iter().any(|r| match r {
+                Json::Obj(keys) => keys.iter().any(|(_, v)| v.depth() > MAX_VALUE_DEPTH),
+                _ => false,
+            })
         })
 }
 
