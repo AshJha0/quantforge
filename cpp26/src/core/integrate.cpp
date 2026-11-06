@@ -162,10 +162,10 @@ KronrodResult gauss_kronrod(const Fn& f, double a, double b, double tol, long lo
 }
 
 double central_difference(const Fn& f, double x, double h, long long order) {
+    if (order != 1 && order != 2) throw Error("E_SCHEMA", "order must be 1 or 2", "order");
     if (h <= 0.0) throw Error("E_INPUT", "h must be positive", "h");
     if (order == 1) return (f(x + h) - f(x - h)) / (2.0 * h);
-    if (order == 2) return (f(x + h) - 2.0 * f(x) + f(x - h)) / (h * h);
-    throw Error("E_INPUT", "order must be 1 or 2", "order");
+    return (f(x + h) - 2.0 * f(x) + f(x - h)) / (h * h);
 }
 
 }  // namespace quantforge

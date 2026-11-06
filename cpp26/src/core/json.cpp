@@ -314,5 +314,26 @@ void Writer::integer(long long v) { separate(); out_ += std::to_string(v); }
 void Writer::string(std::string_view s) { separate(); append_string(out_, s); }
 void Writer::boolean(bool b) { separate(); out_ += b ? "true" : "false"; }
 void Writer::null() { separate(); out_ += "null"; }
+void Writer::value(const Value& v) {
+    switch (v.kind) {
+        case Kind::Null: null(); break;
+        case Kind::Bool: boolean(v.boolean); break;
+        case Kind::Number: real(v.number); break;
+        case Kind::String: string(v.text); break;
+        case Kind::Array:
+            begin_array();
+            for (const Value& item : v.items) value(item);
+            end_array();
+            break;
+        case Kind::Object:
+            begin_object();
+            for (const Member& m : v.members) {
+                key(m.first);
+                value(m.second);
+            }
+            end_object();
+            break;
+    }
+}
 
 }  // namespace quantforge::json

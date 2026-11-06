@@ -119,14 +119,29 @@ SnapshotHash snapshot_hash(std::string_view text) {
     if (parsed.number_overflow) throw Error("E_SCHEMA", "a number overflows binary64");
     if (parsed.lone_surrogate) throw Error("E_SCHEMA", "lone surrogate escape");
     if (parsed.value.kind != json::Kind::Object) throw Error("E_SCHEMA", "the top level must be an object");
-    SnapshotHash r;
-    canon(r.canonical, parsed.value, true);
-    r.snapshot_id = "sha256:";
+    return snapshot_of(parsed.value);
+}
+
+std::string sha256_hex(std::string_view bytes) {
+    std::string out;
     char b[3];
-    for (const std::uint8_t byte : sha256(r.canonical)) {
+    for (const std::uint8_t byte : sha256(bytes)) {
         std::snprintf(b, sizeof b, "%02x", unsigned(byte));
-        r.snapshot_id += b;
+        out += b;
     }
+    return out;
+}
+
+std::string canonical_form(const json::Value& v) {
+    std::string out;
+    canon(out, v, false);
+    return out;
+}
+
+SnapshotHash snapshot_of(const json::Value& document) {
+    SnapshotHash r;
+    canon(r.canonical, document, true);
+    r.snapshot_id = "sha256:" + sha256_hex(r.canonical);
     return r;
 }
 

@@ -23,6 +23,7 @@
 #include "quantforge/core/snapshot.hpp"
 #include "quantforge/core/sobol.hpp"
 #include "quantforge/core/stats.hpp"
+#include "quantforge/core/store.hpp"
 #include "quantforge/core/timeseries.hpp"
 #include "quantforge/core/timezone.hpp"
 #include "test_functions.hpp"
@@ -475,7 +476,10 @@ void op_gauss_kronrod(const In& in, Out& out) {
 
 void op_central(const In& in, Out& out) {
     const Fn f = plain_function(in.text("function"));
-    out.key_real("value", central_difference(f, in.real("x"), in.real("h"), in.integer("order")));
+    const double x = in.real("x"), h = in.real("h");
+    const long long order = in.integer("order");
+    if (order != 1 && order != 2) schema("order", "must be 1 or 2");
+    out.key_real("value", central_difference(f, x, h, order));
 }
 
 // ---- interpolation and linear algebra ----
@@ -567,7 +571,7 @@ void op_ols(const In& in, Out& out) {
     const Ols r = ols(x, y);
     out.key_real("alpha", r.alpha);
     out.key_real("beta", r.beta);
-    out.key_real("r_squared", r.r_squared);
+    out.key_maybe("r_squared", r.r_squared);
     out.key_real("se_alpha", r.se_alpha);
     out.key_real("se_beta", r.se_beta);
 }
@@ -752,6 +756,113 @@ void op_business_date(const In& in, Out& out) {
     out.key_string("date", format_date(business_date(i, z, c, in.choice("calendar", calendars))));
 }
 
+// ---- as-of store ----
+
+StoreRecord record_of(const Value& v) {
+    if (v.kind != Kind::Object) schema("records", "expected an object");
+    const In r(v);
+    if (!v.find("value")) schema("value", "missing");
+    const long long sequence = r.integer("sequence");
+    if (sequence < 1) schema("sequence", "must be at least 1");
+    const string& series = r.text("series_id");
+    if (series.empty()) schema("series_id", "empty");
+    return {sequence, series, r.instant("event_time"), r.instant("knowledge_time"), *v.find("value"),
+            r.boolean("deleted", false), v};
+}
+
+// The log comes before anything else, as asof-store.md says, even other inputs' schema errors.
+std::vector<StoreRecord> log_of(const In& in) {
+    const Value& a = in.need("records");
+    if (a.kind != Kind::Array) schema("records", "expected an array");
+    std::vector<StoreRecord> log;
+    log.reserve(a.items.size());
+    for (const Value& v : a.items) log.push_back(record_of(v));
+    check_log(log);
+    return log;
+}
+
+void write_row(Out& out, const StoreRow& r) {
+    out.values.begin_object();
+    out.key_string("series_id", r.series_id);
+    out.key_string("event_time", format_instant(r.event_time));
+    out.key_string("knowledge_time", format_instant(r.knowledge_time));
+    out.values.key("sequence");
+    out.values.integer(r.sequence);
+    out.values.key("value");
+    out.values.value(r.value);
+    out.values.end_object();
+}
+
+std::optional<Instant> maybe_instant(const In& in, string_view k) {
+    if (!in.find(k)) return std::nullopt;
+    return in.instant(k);
+}
+
+void op_store_query(const In& in, Out& out) {
+    const auto log = log_of(in);
+    const Instant as_of = in.instant("as_of");
+    const string* series = in.find("series_id") ? &in.text("series_id") : nullptr;
+    const auto from = maybe_instant(in, "event_from"), to = maybe_instant(in, "event_to");
+    if (from && to && *from > *to) throw Error("E_DATE_ORDER", "event_from is after event_to", "event_from");
+    out.values.key("rows");
+    out.values.begin_array();
+    for (const StoreRow& r : store_view(log, as_of)) {
+        if (series && r.series_id != *series) continue;
+        if ((from && r.event_time < *from) || (to && r.event_time > *to)) continue;
+        write_row(out, r);
+    }
+    out.values.end_array();
+}
+
+void op_store_latest(const In& in, Out& out) {
+    const auto log = log_of(in);
+    const Instant as_of = in.instant("as_of");
+    const string& series = in.text("series_id");
+    std::optional<StoreRow> best;
+    for (StoreRow& r : store_view(log, as_of))
+        if (r.series_id == series) best = std::move(r);  // the view ascends by event_time
+    out.values.key("row");
+    if (best) write_row(out, *best);
+    else out.values.null();
+}
+
+void op_store_snapshot(const In& in, Out& out) {
+    const auto log = log_of(in);
+    const SnapshotHash h = store_snapshot(log, in.instant("as_of"));
+    out.key_string("canonical", h.canonical);
+    out.key_string("snapshot_id", h.snapshot_id);
+}
+
+void op_store_replay(const In& in, Out& out) {
+    const auto log = log_of(in);
+    const Value& a = in.need("checkpoints");
+    if (a.kind != Kind::Array) schema("checkpoints", "expected an array");
+    std::vector<Instant> points;
+    for (const Value& v : a.items) points.push_back(to_instant_value(v, "checkpoints"));
+    const auto replay = store_replay(log, points);
+    out.values.key("snapshots");
+    out.values.begin_array();
+    for (const ReplayPoint& p : replay) {
+        out.values.begin_object();
+        out.key_string("as_of", format_instant(p.as_of));
+        out.values.key("row_count");
+        out.values.integer((long long)p.row_count);
+        out.key_string("snapshot_id", p.snapshot_id);
+        out.values.end_object();
+    }
+    out.values.end_array();
+    out.key_string("head", store_chain(log).head);
+}
+
+void op_store_chain(const In& in, Out& out) {
+    const Chain c = store_chain(log_of(in));
+    out.key_string("head", c.head);
+    out.values.key("hashes");
+    out.values.begin_array();
+    for (const string& h : c.hashes) out.values.string(h);
+    out.values.end_array();
+}
+
 // ---- dispatch ----
 
 using Handler = void (*)(const In&, Out&);
@@ -797,6 +908,11 @@ const std::map<string, Handler, std::less<>>& table() {
         {"core.stats.ols", op_ols},
         {"core.stats.quantile", op_quantile},
         {"core.stats.summary", op_summary},
+        {"core.store.chain", op_store_chain},
+        {"core.store.latest", op_store_latest},
+        {"core.store.query_as_of", op_store_query},
+        {"core.store.replay", op_store_replay},
+        {"core.store.snapshot", op_store_snapshot},
         {"core.time.business_date", op_business_date},
         {"core.time.to_instant", op_to_instant},
         {"core.time.to_local", op_to_local},

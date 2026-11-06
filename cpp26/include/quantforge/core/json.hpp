@@ -57,6 +57,7 @@ public:
     void string(std::string_view s);
     void boolean(bool b);
     void null();
+    void value(const Value& v);
     const std::string& str() const { return out_; }
 
 private:

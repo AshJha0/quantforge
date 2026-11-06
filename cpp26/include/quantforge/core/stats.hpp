@@ -11,6 +11,8 @@ struct Centred {
     std::vector<double> d;
 };
 Centred centre(const std::vector<double>& x);
+/// The zero-variance test: exact, so rounding cannot hide it.
+bool all_equal(const std::vector<double>& x);
 
 double normal_pdf(double x);
 double normal_cdf(double x);
@@ -32,7 +34,9 @@ struct Covariance {
 Covariance covariance(const std::vector<double>& x, const std::vector<double>& y);
 
 struct Ols {
-    double alpha, beta, r_squared, se_alpha, se_beta;
+    double alpha, beta;
+    std::optional<double> r_squared;
+    double se_alpha, se_beta;
 };
 Ols ols(const std::vector<double>& x, const std::vector<double>& y);
 

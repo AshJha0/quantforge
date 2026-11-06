@@ -36,7 +36,7 @@ std::vector<double> lu(Matrix& a, std::vector<double>& b, double threshold) {
         std::size_t p = k;
         for (std::size_t i = k + 1; i < n; ++i)
             if (std::fabs(a[i][k]) > std::fabs(a[p][k])) p = i;
-        if (threshold >= 0.0 && (a[p][k] == 0.0 || std::fabs(a[p][k]) < threshold))
+        if (threshold >= 0.0 && std::fabs(a[p][k]) <= threshold)
             throw Error("E_SINGULAR", "a pivot is below the threshold", "a");
         std::swap(a[k], a[p]);
         std::swap(b[k], b[p]);

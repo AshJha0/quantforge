@@ -37,15 +37,15 @@ std::vector<MaybeReal> rolling(const std::vector<double>& x, long long window, R
     const auto w = std::size_t(window);
     std::vector<MaybeReal> out(x.size());
     for (std::size_t end = w - 1; end < x.size(); ++end) {
-        double m = 0.0;
-        for (std::size_t i = end + 1 - w; i <= end; ++i) m += x[i];
-        m /= double(w);
+        const auto first = x.begin() + std::ptrdiff_t(end + 1 - w), last = x.begin() + std::ptrdiff_t(end + 1);
         if (statistic == RollingStatistic::Mean) {
-            out[end] = m;
+            double sum = 0.0;
+            for (auto it = first; it != last; ++it) sum += *it;
+            out[end] = sum / double(w);
             continue;
         }
         double s = 0.0;
-        for (std::size_t i = end + 1 - w; i <= end; ++i) s += (x[i] - m) * (x[i] - m);
+        for (const double d : centre(std::vector<double>(first, last)).d) s += d * d;
         out[end] = std::sqrt(s / double(w - 1));
     }
     return out;
@@ -65,7 +65,7 @@ std::vector<double> autocorrelation(const std::vector<double>& x, long long max_
     const auto d = centre(x).d;
     double denominator = 0.0;
     for (const double v : d) denominator += v * v;
-    if (denominator == 0.0) throw Error("E_DOMAIN", "x has zero variance", "x");
+    if (all_equal(x)) throw Error("E_DOMAIN", "x has zero variance", "x");
     std::vector<double> acf;
     for (std::size_t k = 1; k <= std::size_t(max_lag); ++k) {
         double s = 0.0;
@@ -93,7 +93,7 @@ Ar1 ar1(const std::vector<double>& x) {
         sxx += dx[i] * dx[i];
         sxy += dx[i] * dy[i];
     }
-    if (sxx == 0.0) throw Error("E_SINGULAR", "x has zero variance", "x");
+    if (all_equal(lagged)) throw Error("E_SINGULAR", "x has zero variance", "x");
     const double phi = sxy / sxx, constant = my - phi * mx;
     double sse = 0.0;
     for (std::size_t i = 0; i < dx.size(); ++i) {

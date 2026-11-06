@@ -63,6 +63,7 @@ TEST_CASE("central differences") {
     CHECK(central_difference(f, 1, 1e-5, 1) == Approx(std::numbers::e).epsilon(1e-9));
     CHECK(central_difference(f, 1, 1e-4, 2) == Approx(std::numbers::e).epsilon(1e-6));
     CHECK(code_of([&] { central_difference(f, 1, 0, 1); }) == "E_INPUT");
+    CHECK(code_of([&] { central_difference(f, 1, 1e-4, 3); }) == "E_SCHEMA");
 }
 
 TEST_CASE("every interpolant reproduces the knots") {
