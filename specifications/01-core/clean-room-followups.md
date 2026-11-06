@@ -47,3 +47,17 @@ All four add these. They come from `limits.md` and rulings A1 to A6, and no buil
 ## For the conformance stream
 
 `runner.py` sends cases with `ensure_ascii=False`, then encodes strictly, so a golden case holding a lone surrogate would crash it. Sending with `ensure_ascii=True` would allow one. Ruling A4 has no case until then.
+
+## Limit order rulings
+
+From `limits.md` B1 to B5, read from the language branches' `SPEC_QUESTIONS.md`. Run the `limit_order` suite. No build has been run against it. limits-0011 was replaced: it now uses `max_depth` 1 and `tol` 1e-6, so Java item 13 is closed with no code change.
+
+All four add the lexical depth scan in B2, on `document_text` with limit 64 and on each case document with limit 80. It replaces each build's own parser threshold.
+
+| Ruling | Java | C++ | Python | Rust |
+|---|---|---|---|---|
+| B1 byte limit before parsing | **Change**: parses first | ok | ok | **Change**: parses first |
+| B2 depth scan before parsing | **Change** | **Change**: after all checks | **Change**: parser-based | **Change** |
+| B3 all `E_SCHEMA` before `E_LIMIT` | Not stated | Not stated | **Change**: Q27 gave `E_LIMIT` | ok |
+| B4 nesting on every record key | Not stated | Not stated | ok | Not stated |
+| B5 A5 applies to `chain` | Not stated | Not stated | ok | Not stated |

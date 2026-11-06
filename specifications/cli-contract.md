@@ -110,7 +110,7 @@ These are the same in all four languages. A case that expects an error passes on
 | `E_NON_FINITE` | A result would be NaN or infinite |
 | `E_LIMIT` | A size-like input is above its limit in `01-core/limits.md`. No work is started |
 
-Order of checks: `E_PARSE`, then `E_SCHEMA`, then `E_LIMIT`, then the rule checks in the order the operation's spec
+Order of checks: `E_PARSE`, then `E_SCHEMA`, then `E_LIMIT` (with the text-size and depth exceptions in `01-core/limits.md` B1 and B2), then the rule checks in the order the operation's spec
 lists them. When one case breaks two rules, the first listed wins.
 
 ## Value encoding
