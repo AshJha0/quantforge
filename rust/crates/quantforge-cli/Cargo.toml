@@ -1,0 +1,12 @@
+[package]
+name = "quantforge-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "quantforge"
+path = "src/main.rs"
+
+[dependencies]
+quantforge-core = { path = "../quantforge-core" }

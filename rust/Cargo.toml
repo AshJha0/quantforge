@@ -1,9 +1,8 @@
 [workspace]
 resolver = "3"
-members = ["crates/quantforge-core"]
+members = ["crates/quantforge-core", "crates/quantforge-cli"]
 
 [workspace.package]
 edition = "2024"
 license = "MIT"
 version = "0.1.0"
-
