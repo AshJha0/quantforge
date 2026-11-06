@@ -1,6 +1,6 @@
 # Test infrastructure
 
-Pull request #1 ran the workflows it triggers on GitHub, and all passed, including GCC, Clang (libc++) and sanitizers. Whether `fuzz.yml`, `mutation.yml` and `docs.yml` have run there was not checked. Stage B has not been pushed, so all its results are local, on Windows.
+Pull request #1 ran the workflows it triggers on GitHub, and all passed, including GCC, Clang (libc++) and sanitizers. Whether `fuzz.yml`, `mutation.yml` and `docs.yml` have run there was not checked. Stages A and B passed their pull request and `main` workflows on GitHub.
 
 CI minutes are capped at about 2,000 a month with a hard stop, so pull-request workflows run only when their paths change. Everything runs on Linux.
 

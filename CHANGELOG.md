@@ -8,7 +8,7 @@
 - The recorder has six sources, each with its notice, and stores identical bytes once while still logging them.
 - All four CLIs report version 0.2.0.
 
-## Unreleased: stage B, FX and rates slices (target v0.2)
+## v0.2: stage B, FX and rates slices
 
 Released as v0.2 (tag on `fe33b40`). Stage B is at Implemented, not Validated: validation is self-assessment until the human review after the project. The figures below are one local run on Windows, 2026-11-06, at commit `13d9871`. The branch has not been pushed, so CI has not run it.
 
