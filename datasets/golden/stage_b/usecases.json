@@ -1,0 +1,301 @@
+{
+ "schema_version": "1.0",
+ "suite": "usecases",
+ "spec": "specifications/04-pricing/use-cases.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "usecases-0001",
+   "operation": "usecase.fx_hedge",
+   "inputs": {
+    "pair": "GBPUSD",
+    "spot": 1.28,
+    "as_of": "2026-11-06",
+    "base_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-13",
+       "discount_factor": 0.9992870839543515
+      },
+      {
+       "date": "2026-12-07",
+       "discount_factor": 0.9968589384517443
+      },
+      {
+       "date": "2027-02-08",
+       "discount_factor": 0.990611714947001
+      },
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9823653311701559
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9660045785970438
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9361852434249714
+      },
+      {
+       "date": "2029-11-06",
+       "discount_factor": 0.9072000992045789
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8480030126521996
+      },
+      {
+       "date": "2033-11-07",
+       "discount_factor": 0.7879297982987687
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.7000251340198215
+      },
+      {
+       "date": "2041-11-06",
+       "discount_factor": 0.5711047135767834
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4687936232412164
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.33728170101172816
+      }
+     ]
+    },
+    "quote_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "book": [
+     {
+      "notional_base": 5000000.0,
+      "strike": 1.27,
+      "value_date": "2027-02-10",
+      "side": "BUY"
+     },
+     {
+      "notional_base": 3000000.0,
+      "strike": 1.285,
+      "value_date": "2027-11-10",
+      "side": "SELL"
+     }
+    ],
+    "half_spread": 5e-05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 59903.64653464559,
+     "fx_delta": 2054546.4912482663,
+     "hedge_spot_base": -2054546.4912482663,
+     "residual_delta": 0.0,
+     "hedge_cost": 102.72732456241332
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "usecases-0002",
+   "operation": "usecase.rates_hedge",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.036
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.037
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SONIA",
+     "tenor": "6Y",
+     "fixed_rate": 0.034,
+     "notional": 10000000.0,
+     "side": "PAY"
+    },
+    "hedge_tenors": [
+     "5Y",
+     "7Y"
+    ],
+    "hedge_unit_notional": 1000000.0,
+    "half_spread_bp": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 4688.4634578853165,
+     "dv01": 5359.884273970078,
+     "key_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0032343798470719776,
+      0.006512847622616391,
+      0.015018871840766224,
+      2210.203389321625,
+      3149.6557672912318,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "hedge_units": [
+      -4.871268420003728,
+      -5.123922256644128
+     ],
+     "residual_key_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.003234379278202331,
+      0.006512847690218821,
+      0.015018871214812976,
+      0.0,
+      4.547473508864641e-13,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "hedge_cost": 1339.9647891534958
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-06,
+    "reason": "bumped solves on 1e7 notional"
+   }
+  }
+ ]
+}

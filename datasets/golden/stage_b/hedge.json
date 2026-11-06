@@ -1,0 +1,545 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedge",
+ "spec": "specifications/08-hedging/stage-b-hedges.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedge-0001",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.2,
+      0.0
+     ],
+     [
+      0.3,
+      1.0,
+      0.4
+     ],
+     [
+      0.0,
+      0.3,
+      1.0
+     ],
+     [
+      0.1,
+      0.1,
+      0.2
+     ]
+    ],
+    "b": [
+     10.0,
+     -4.0,
+     6.0,
+     1.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     1.0,
+     0.5
+    ],
+    "costs": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -12.2380722442972,
+      11.410328758675664,
+      -9.332796164966933
+     ],
+     "residual": [
+      0.04399350743793207,
+      0.0057886193997314095,
+      0.09030246263576647,
+      -0.9493335815555402
+     ],
+     "objective": 0.46077410421841997
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "first-order-conditions"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "any solver; the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge-0002",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.2,
+      0.0
+     ],
+     [
+      0.3,
+      1.0,
+      0.4
+     ],
+     [
+      0.0,
+      0.3,
+      1.0
+     ],
+     [
+      0.1,
+      0.1,
+      0.2
+     ]
+    ],
+    "b": [
+     10.0,
+     -4.0,
+     6.0,
+     1.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     1.0,
+     0.5
+    ],
+    "costs": [
+     0.5,
+     0.5,
+     0.5
+    ],
+    "lambda": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -11.730877194003114,
+      10.784797892826191,
+      -8.722691315325594
+     ],
+     "residual": [
+      0.4260823845621253,
+      -0.22354179150498066,
+      0.5127480525222623,
+      -0.8391461931828113
+     ],
+     "objective": 16.515664996742082
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "first-order-conditions"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "any solver; the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge-0003",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.2,
+      0.0
+     ],
+     [
+      0.3,
+      1.0,
+      0.4
+     ],
+     [
+      0.0,
+      0.3,
+      1.0
+     ],
+     [
+      0.1,
+      0.1,
+      0.2
+     ]
+    ],
+    "b": [
+     10.0,
+     -4.0,
+     6.0,
+     1.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     1.0,
+     0.5
+    ],
+    "costs": [
+     1.0,
+     2.0,
+     0.5
+    ],
+    "lambda": 8.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -3.0588698046414065,
+      0.0,
+      -0.10095712599973758
+     ],
+     "residual": [
+      6.9411301953585935,
+      -4.958043791792317,
+      5.899042874000262,
+      0.6739215943359118
+     ],
+     "objective": 157.24426379965908
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "first-order-conditions"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "any solver; the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge-0004",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.2,
+      0.0
+     ],
+     [
+      0.3,
+      1.0,
+      0.4
+     ],
+     [
+      0.0,
+      0.3,
+      1.0
+     ],
+     [
+      0.1,
+      0.1,
+      0.2
+     ]
+    ],
+    "b": [
+     10.0,
+     -4.0,
+     6.0,
+     1.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     1.0,
+     0.5
+    ],
+    "costs": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "lambda": 500.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      10.0,
+      -4.0,
+      6.0,
+      1.0
+     ],
+     "objective": 168.5
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "sign-enumeration",
+    "first-order-conditions"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "any solver; the minimiser is unique"
+   }
+  },
+  {
+   "case_id": "hedge-0005",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -5.0
+     ],
+     "residual": [
+      0.0
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [],
+   "description": "one instrument, exact hedge"
+  },
+  {
+   "case_id": "hedge-0006",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0
+     ]
+    ],
+    "b": [
+     1.0,
+     2.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "costs": [
+     0.0,
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "hedge-0007",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.2,
+      0.0
+     ],
+     [
+      0.3,
+      1.0,
+      0.4
+     ],
+     [
+      0.0,
+      0.3,
+      1.0
+     ],
+     [
+      0.1,
+      0.1,
+      0.2
+     ]
+    ],
+    "b": [
+     10.0,
+     -4.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     1.0,
+     0.5
+    ],
+    "costs": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "hedge-0008",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.2,
+      0.0
+     ],
+     [
+      0.3,
+      1.0,
+      0.4
+     ],
+     [
+      0.0,
+      0.3,
+      1.0
+     ],
+     [
+      0.1,
+      0.1,
+      0.2
+     ]
+    ],
+    "b": [
+     10.0,
+     -4.0,
+     6.0,
+     1.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     1.0,
+     0.5
+    ],
+    "costs": [
+     -1.0,
+     -1.0,
+     -1.0
+    ],
+    "lambda": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "hedge-0009",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cost": 50.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "hedge-0010",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     1.0
+    ],
+    "half_spreads": [
+     -0.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

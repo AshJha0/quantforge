@@ -14,3 +14,6 @@ Build a simple curve from coherent synthetic instruments generated from a known 
 - Normal, boundary and invalid cases.
 - Expected output and independent verification method.
 - Complexity/performance note where relevant.
+
+## Data and solution
+Synthetic input: `data/ex-006-quotes.csv`. Try it first, then see `solutions/EX-006.md`.

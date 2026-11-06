@@ -1,0 +1,400 @@
+{
+ "schema_version": "1.0",
+ "suite": "risk",
+ "spec": "specifications/06-risk/rates-sensitivities.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "risk-0001",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.036
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.037
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SONIA",
+     "tenor": "5Y",
+     "fixed_rate": 0.034,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": 454.3667671489393,
+     "key_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.041379788318181454,
+      0.08332365737669534,
+      0.19214746278817074,
+      454.0498941869447,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "identity-sum"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6, each good to 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "risk-0002",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.036
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.037
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SONIA",
+     "tenor": "10Y",
+     "fixed_rate": 0.036,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": -833.2636753896616,
+     "key_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      8.326672684688674e-11,
+      -8.326672684688674e-11,
+      5.551115123125783e-11,
+      1.3877787807814457e-10,
+      -5.551115123125783e-11,
+      -833.2635282368162,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "identity-sum"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6, each good to 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "risk-0003",
+   "operation": "risk.ois.dv01",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "7Y",
+     "fixed_rate": 0.036,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dv01": 617.9164176110946,
+     "key_rate": [
+      2.7755575615628914e-11,
+      -5.551115123125783e-11,
+      6.938893903907228e-11,
+      -9.71445146547012e-11,
+      -4.163336342344337e-11,
+      -2.7755575615628914e-11,
+      -6.938893903907228e-11,
+      -8.326672684688674e-11,
+      617.9163572127138,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "identity-sum"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-08,
+    "reason": "difference of two curve solves on 1e6, each good to 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "risk-0004",
+   "operation": "risk.cashflows",
+   "inputs": {
+    "cashflows": [
+     {
+      "t": 0.5,
+      "amount": 2.0
+     },
+     {
+      "t": 1.0,
+      "amount": 2.0
+     },
+     {
+      "t": 1.5,
+      "amount": 2.0
+     },
+     {
+      "t": 2.0,
+      "amount": 102.0
+     }
+    ],
+    "yield": 0.04
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 99.9233726235235,
+     "duration": 1.9419160975112761,
+     "convexity": 3.8357501140989734
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "risk-0005",
+   "operation": "risk.cashflows",
+   "inputs": {
+    "cashflows": [],
+    "yield": 0.04
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "risk-0006",
+   "operation": "risk.cashflows",
+   "inputs": {
+    "cashflows": [
+     {
+      "t": -1.0,
+      "amount": 1.0
+     }
+    ],
+    "yield": 0.04
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

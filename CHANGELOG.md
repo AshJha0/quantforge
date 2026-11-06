@@ -1,8 +1,13 @@
 # Changelog
 
-## Unreleased: stage A, Foundation (target v0.1)
+## Unreleased: stage B, FX and rates slices (target v0.2)
 
-Nothing is tagged yet. Validation is self-assessment until the human review after the project, and CI has not yet run on GitHub. The conformance figures below are one local run on Windows, 2026-11-06.
+### Added
+- Specifications, oracle cases and numeric targets for stage B. No stage B code exists yet.
+
+## v0.1: stage A, Foundation
+
+Validation is self-assessment until the human review after the project, and CI has not yet run on GitHub. The conformance figures below are one local run on Windows, 2026-11-06.
 
 ### Added
 - Four equal implementations of domain 01, in Java 25, C++26, Python 3.15.2 and Rust 1.99.1, each behind the `quantforge` CLI.

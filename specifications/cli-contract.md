@@ -1,6 +1,6 @@
 # CLI contract
 
-Version 1.2.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+Version 1.3.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
 The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
@@ -108,6 +108,7 @@ These are the same in all four languages. A case that expects an error passes on
 | `E_NONEXISTENT_LOCAL_TIME` | A local time falls in a daylight-saving gap |
 | `E_AMBIGUOUS_LOCAL_TIME` | A local time falls in a daylight-saving overlap and no choice was given |
 | `E_NON_FINITE` | A result would be NaN or infinite |
+| `E_CURRENCY_MISMATCH` | Two amounts in different currencies were combined |
 | `E_LIMIT` | A size-like input is above its limit in `01-core/limits.md`. No work is started |
 
 Order of checks: `E_PARSE`, then `E_SCHEMA`, then `E_LIMIT` (with the text-size and depth exceptions in `01-core/limits.md` B1 and B2), then the rule checks in the order the operation's spec
@@ -161,6 +162,17 @@ errors. Stage A:
 | `core.data.*` | `01-core/data-checks.md` |
 | `core.time.*` | `01-core/timezone-and-cutoff.md` |
 | `core.store.*` | `01-core/asof-store.md` |
+| `core.units.*` | `01-core/units-and-money.md` |
+| `core.conventions.*` | `01-core/conventions.md` |
+| `rates.schedule.*` | `02-curves/schedules.md` |
+| `rates.curve.*` | `02-curves/curve-framework.md` |
+| `rates.ois.*` | `02-curves/ois-curves.md` |
+| `rates.projection.*`, `rates.fra.*`, `rates.swap.*`, `rates.basis.*` | `02-curves/projection-and-fra.md` |
+| `fx.*` | `02-curves/fx.md` |
+| `calib.*` | `03-calibration/least-squares.md` |
+| `risk.*` | `06-risk/rates-sensitivities.md` |
+| `hedge.*` | `08-hedging/stage-b-hedges.md` |
+| `usecase.*` | `04-pricing/use-cases.md` |
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.

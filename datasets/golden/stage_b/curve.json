@@ -1,0 +1,309 @@
+{
+ "schema_version": "1.0",
+ "suite": "curve",
+ "spec": "specifications/02-curves/curve-framework.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "curve-0001",
+   "operation": "rates.curve.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.965
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.84
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.7
+      }
+     ]
+    },
+    "dates": [
+     "2026-11-06",
+     "2027-05-06",
+     "2027-11-08",
+     "2029-06-15",
+     "2036-11-06",
+     "2040-01-02"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      1.0,
+      0.9825825711611157,
+      0.965,
+      0.91278877507762,
+      0.7,
+      0.6239804010677897
+     ],
+     "zero_rates": [
+      null,
+      0.035433024086512756,
+      0.035433024086512735,
+      0.034985854915325854,
+      0.035638202720404424,
+      0.03582669233562529
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand",
+    "quantlib-1.44"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "curve-0002",
+   "operation": "rates.curve.forward",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.965
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.84
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.7
+      }
+     ]
+    },
+    "start": "2027-02-08",
+    "end": "2027-05-10",
+    "day_count": "ACT_360"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 0.035102459245486176
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "curve-0003",
+   "operation": "rates.curve.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.965
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.84
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.7
+      }
+     ]
+    },
+    "dates": [
+     "2026-11-06",
+     "2027-05-06",
+     "2027-11-08",
+     "2029-06-15",
+     "2036-11-06",
+     "2040-01-02"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      1.0,
+      0.9825825711611157,
+      0.965,
+      0.912279355451682,
+      0.7,
+      0.6239804010677897
+     ],
+     "zero_rates": [
+      null,
+      0.035433024086512756,
+      0.035433024086512735,
+      0.03519988879025319,
+      0.035638202720404424,
+      0.03582669233562529
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "curve-0004",
+   "operation": "rates.curve.forward",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.965
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.84
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.7
+      }
+     ]
+    },
+    "start": "2027-02-08",
+    "end": "2027-05-10",
+    "day_count": "ACT_360"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 0.035102459245486176
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "curve-0005",
+   "operation": "rates.curve.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.965
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.84
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.7
+      }
+     ]
+    },
+    "dates": [
+     "2026-11-05"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_OUT_OF_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "curve-0006",
+   "operation": "rates.curve.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.7
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.84
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.965
+      }
+     ]
+    },
+    "dates": [
+     "2027-01-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "curve-0007",
+   "operation": "rates.curve.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": -0.5
+      }
+     ]
+    },
+    "dates": [
+     "2027-01-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

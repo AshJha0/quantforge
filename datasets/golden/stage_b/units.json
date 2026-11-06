@@ -1,0 +1,575 @@
+{
+ "schema_version": "1.0",
+ "suite": "units",
+ "spec": "specifications/01-core/units-and-money.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "units-0001",
+   "operation": "core.units.convert",
+   "inputs": {
+    "value": 5.0,
+    "from": "PERCENT",
+    "to": "DECIMAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.05
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0002",
+   "operation": "core.units.convert",
+   "inputs": {
+    "value": 0.05,
+    "from": "DECIMAL",
+    "to": "BP"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 500.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0003",
+   "operation": "core.units.convert",
+   "inputs": {
+    "value": 25.0,
+    "from": "BP",
+    "to": "PERCENT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.25
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0004",
+   "operation": "core.units.convert",
+   "inputs": {
+    "value": -12.5,
+    "from": "BP",
+    "to": "DECIMAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": -0.00125
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0005",
+   "operation": "core.units.convert",
+   "inputs": {
+    "value": 0.0,
+    "from": "BP",
+    "to": "BP"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0006",
+   "operation": "core.units.convert",
+   "inputs": {
+    "value": 1.0,
+    "from": "PIPS",
+    "to": "BP"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "units-0007",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "2.675",
+    "currency": "GBP"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "2.68",
+     "currency": "GBP"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0008",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "2.665",
+    "currency": "GBP"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "2.66",
+     "currency": "GBP"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0009",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "-2.675",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "-2.68",
+     "currency": "USD"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0010",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "1000.5",
+    "currency": "JPY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "1000",
+     "currency": "JPY"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0011",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "1001.5",
+    "currency": "JPY"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "1002",
+     "currency": "JPY"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0012",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "0.005",
+    "currency": "EUR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "0.00",
+     "currency": "EUR"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0013",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "0.015",
+    "currency": "EUR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "0.02",
+     "currency": "EUR"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0014",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "123456789012345678.12345678",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "123456789012345678.12",
+     "currency": "USD"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "python-decimal"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0015",
+   "operation": "core.units.add_money",
+   "inputs": {
+    "a": {
+     "amount": "0.1",
+     "currency": "GBP"
+    },
+    "b": {
+     "amount": "0.2",
+     "currency": "GBP"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "0.3",
+     "currency": "GBP"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [],
+   "description": "decimal, so no binary rounding"
+  },
+  {
+   "case_id": "units-0016",
+   "operation": "core.units.add_money",
+   "inputs": {
+    "a": {
+     "amount": "1.50",
+     "currency": "GBP"
+    },
+    "b": {
+     "amount": "-1.5",
+     "currency": "GBP"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "amount": "0",
+     "currency": "GBP"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0017",
+   "operation": "core.units.add_money",
+   "inputs": {
+    "a": {
+     "amount": "1",
+     "currency": "GBP"
+    },
+    "b": {
+     "amount": "1",
+     "currency": "USD"
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_CURRENCY_MISMATCH"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "units-0018",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "1.5",
+    "currency": "XXX"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "units-0019",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "1e3",
+    "currency": "GBP"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "units-0020",
+   "operation": "core.units.round_money",
+   "inputs": {
+    "amount": "1234567890123456789.0",
+    "currency": "GBP"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "units-0021",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "SONIA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kind": "OVERNIGHT",
+     "currency": "GBP",
+     "day_count": "ACT_365F",
+     "calendar": "GBLO",
+     "spot_lag": 0,
+     "payment_lag": 0,
+     "fixed_months": 12,
+     "fixed_day_count": "ACT_365F",
+     "business_day_convention": "MODIFIED_FOLLOWING"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "strata-2.12.78-source"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0022",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "SOFR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kind": "OVERNIGHT",
+     "currency": "USD",
+     "day_count": "ACT_360",
+     "calendar": "USGS",
+     "spot_lag": 2,
+     "payment_lag": 2,
+     "fixed_months": 12,
+     "fixed_day_count": "ACT_360",
+     "business_day_convention": "MODIFIED_FOLLOWING"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "strata-2.12.78-source"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0023",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "USD-TERM-3M"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kind": "TERM",
+     "currency": "USD",
+     "day_count": "ACT_360",
+     "calendar": "USGS",
+     "spot_lag": 2,
+     "months": 3,
+     "fixed_months": 12,
+     "fixed_day_count": "THIRTY_360_BOND",
+     "business_day_convention": "MODIFIED_FOLLOWING"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "units-0024",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "GBPUSD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kind": "FX",
+     "base": "GBP",
+     "quote": "USD",
+     "spot_lag": 2,
+     "calendars": [
+      "GBLO",
+      "USGS"
+     ],
+     "pip": 0.0001
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0025",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "EURUSD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kind": "FX",
+     "base": "EUR",
+     "quote": "USD",
+     "spot_lag": 2,
+     "calendars": [
+      "EUTA",
+      "USGS"
+     ],
+     "pip": 0.0001
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "units-0026",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "NOPE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  }
+ ]
+}

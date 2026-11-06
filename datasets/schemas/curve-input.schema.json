@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QuantForge curve input",
+  "type": "object",
+  "required": [
+    "as_of",
+    "interpolation",
+    "pillars"
+  ],
+  "properties": {
+    "as_of": {
+      "type": "string",
+      "format": "date"
+    },
+    "interpolation": {
+      "enum": [
+        "LOG_LINEAR_DF",
+        "LINEAR_ZERO"
+      ]
+    },
+    "pillars": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "date",
+          "discount_factor"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "discount_factor": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

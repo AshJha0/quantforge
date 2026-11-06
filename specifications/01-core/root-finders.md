@@ -9,8 +9,7 @@ diagnostics that `architecture/numerical-standards.md` asks for.
 
 Inputs: `function`, `x_tol` (default 1e-12), `f_tol` (default 0), `max_iter` (default 200).
 Output: `root`. Diagnostics, always present on success: `iterations`, `residual` (`f(root)`),
-`termination` (`X_TOL`, `F_TOL` or `EXACT`). Only `root` is compared; diagnostics are checked for
-presence, because iteration paths may differ by a step.
+`termination` (`X_TOL`, `F_TOL` or `EXACT`). Only `root` is compared. Diagnostics are required, but their values are never compared: Brent's count differs by a step between correct builds, for example 6 or 7 on `cubic_wallis`, depending on where a build counts the first bracket.
 
 Checks, in order: `x_tol <= 0`, `f_tol < 0` or `max_iter < 1`: `E_INPUT`. Then the method's own.
 `max_iter` reached without meeting a test: `E_NO_CONVERGENCE`. An evaluation of `f` that is not finite:

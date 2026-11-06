@@ -1,0 +1,1331 @@
+{
+ "schema_version": "1.0",
+ "suite": "calibration",
+ "spec": "specifications/03-calibration/least-squares.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "calibration-0001",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "GAUSS_NEWTON"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      1.0004553911205063,
+      1.9999219781229889
+     ],
+     "objective": 1.3817617428083615e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "numpy"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0002",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "EXPONENTIAL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     2.7145122541078788,
+     2.4561922592339456,
+     2.0109601381069178,
+     1.3479868923516647,
+     0.9035826357366061,
+     0.4060058497098381,
+     0.18243018787565385,
+     0.054946916666202536
+    ],
+    "start": [
+     2.0,
+     0.3
+    ],
+    "method": "GAUSS_NEWTON"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      3.0,
+      0.4
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0003",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "EXPONENTIAL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     2.7165122541078786,
+     2.4551922592339457,
+     2.012460138106918,
+     1.3459868923516647,
+     0.9045826357366061,
+     0.4055058497098381,
+     0.18363018787565386,
+     0.054146916666202534
+    ],
+    "start": [
+     2.0,
+     0.3
+    ],
+    "method": "GAUSS_NEWTON"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      3.0010879976761773,
+      0.4001981797800546
+     ],
+     "objective": 1.3175709509794136e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "scipy-1.18.1"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0004",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "LEVENBERG_MARQUARDT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      1.0004553911205063,
+      1.9999219781229889
+     ],
+     "objective": 1.3817617428083615e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "numpy"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0005",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "EXPONENTIAL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     2.7145122541078788,
+     2.4561922592339456,
+     2.0109601381069178,
+     1.3479868923516647,
+     0.9035826357366061,
+     0.4060058497098381,
+     0.18243018787565385,
+     0.054946916666202536
+    ],
+    "start": [
+     2.0,
+     0.3
+    ],
+    "method": "LEVENBERG_MARQUARDT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      3.0,
+      0.4
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0006",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "EXPONENTIAL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     2.7165122541078786,
+     2.4551922592339457,
+     2.012460138106918,
+     1.3459868923516647,
+     0.9045826357366061,
+     0.4055058497098381,
+     0.18363018787565386,
+     0.054146916666202534
+    ],
+    "start": [
+     2.0,
+     0.3
+    ],
+    "method": "LEVENBERG_MARQUARDT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      3.0010879976761773,
+      0.4001981797800546
+     ],
+     "objective": 1.3175709509794136e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "scipy-1.18.1"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0007",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "NELSON_SIEGEL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     0.026929634497812285,
+     0.028582656552868946,
+     0.031216457202418522,
+     0.03460251788677671,
+     0.03648498537572541,
+     0.038196771056548354,
+     0.038844611048647365,
+     0.03923822813733761
+    ],
+    "start": [
+     0.035,
+     -0.01,
+     0.005,
+     1.2
+    ],
+    "method": "LEVENBERG_MARQUARDT",
+    "report_parameters": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 0.0,
+    "reason": "repricing, not parameters: Nelson-Siegel is poorly identified"
+   }
+  },
+  {
+   "case_id": "calibration-0008",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      1.0004553911205063,
+      1.9999219781229889
+     ],
+     "objective": 1.3817617428083615e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "numpy"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0009",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "EXPONENTIAL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     2.7145122541078788,
+     2.4561922592339456,
+     2.0109601381069178,
+     1.3479868923516647,
+     0.9035826357366061,
+     0.4060058497098381,
+     0.18243018787565385,
+     0.054946916666202536
+    ],
+    "start": [
+     2.0,
+     0.3
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      3.0,
+      0.4
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0010",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "EXPONENTIAL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     2.7165122541078786,
+     2.4551922592339457,
+     2.012460138106918,
+     1.3459868923516647,
+     0.9045826357366061,
+     0.4055058497098381,
+     0.18363018787565386,
+     0.054146916666202534
+    ],
+    "start": [
+     2.0,
+     0.3
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      3.0010879976761773,
+      0.4001981797800546
+     ],
+     "objective": 1.3175709509794136e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "scipy-1.18.1"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "solver stops by its own test; judged on objective and a unique minimiser"
+   }
+  },
+  {
+   "case_id": "calibration-0011",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "NELSON_SIEGEL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     0.026929634497812285,
+     0.028582656552868946,
+     0.031216457202418522,
+     0.03460251788677671,
+     0.03648498537572541,
+     0.038196771056548354,
+     0.038844611048647365,
+     0.03923822813733761
+    ],
+    "start": [
+     0.035,
+     -0.01,
+     0.005,
+     1.2
+    ],
+    "method": "BFGS",
+    "report_parameters": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 0.0,
+    "reason": "repricing, not parameters: Nelson-Siegel is poorly identified"
+   }
+  },
+  {
+   "case_id": "calibration-0012",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "LEVENBERG_MARQUARDT",
+    "regularisation": 0.5,
+    "prior": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      0.9160449190990478,
+      2.0074788934837597
+     ],
+     "objective": 2.465645436376119
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "closed-form"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "closed form; solver tolerance"
+   }
+  },
+  {
+   "case_id": "calibration-0013",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "LEVENBERG_MARQUARDT",
+    "regularisation": 10.0,
+    "prior": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      1.1049278452459594,
+      1.9343547403677461
+     ],
+     "objective": 9.343310052278701
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "closed-form"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "closed form; solver tolerance"
+   }
+  },
+  {
+   "case_id": "calibration-0014",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "weights": [
+     1,
+     1,
+     1,
+     1,
+     4,
+     4,
+     4,
+     4.0
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "GAUSS_NEWTON"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      1.0007304669230113,
+      1.9998987051714674
+     ],
+     "objective": 2.168650992705685e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "closed-form"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "calibration-0015",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "LEVENBERG_MARQUARDT",
+    "upper": [
+     100.0,
+     1.5
+    ],
+    "lower": [
+     -100.0,
+     -100.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      2.7970499999999996,
+      1.5
+     ],
+     "objective": 21.241429959999998
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "closed-form"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "calibration-0016",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     -1.2,
+     1.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "parameters": [
+      1.0,
+      1.0
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 0.0,
+    "reason": "gradient test at 1e-8"
+   }
+  },
+  {
+   "case_id": "calibration-0017",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "calibration-0018",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "calibration-0019",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "NEWTON"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "calibration-0020",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     1.502,
+     1.999,
+     3.0015,
+     4.998,
+     7.001,
+     10.9995,
+     15.0012,
+     20.9992
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "BFGS",
+    "regularisation": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "calibration-0021",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "LINEAR",
+    "x": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "y": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "start": [
+     0.0,
+     0.0
+    ],
+    "method": "GAUSS_NEWTON"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "calibration-0022",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "EXPONENTIAL",
+    "x": [
+     0.25,
+     0.5,
+     1.0,
+     2.0,
+     3.0,
+     5.0,
+     7.0,
+     10.0
+    ],
+    "y": [
+     2.7145122541078788,
+     2.4561922592339456,
+     2.0109601381069178,
+     1.3479868923516647,
+     0.9035826357366061,
+     0.4060058497098381,
+     0.18243018787565385,
+     0.054946916666202536
+    ],
+    "start": [
+     2.0,
+     0.3
+    ],
+    "method": "LEVENBERG_MARQUARDT",
+    "max_iter": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NO_CONVERGENCE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "calibration-0023",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "breaches": [
+      {
+       "index": 1,
+       "side": "BID",
+       "distance": 0.10000000000000009
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": []
+  },
+  {
+   "case_id": "calibration-0024",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0
+    ],
+    "bid": [
+     2.0
+    ],
+    "ask": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid"
+   ]
+  },
+  {
+   "case_id": "calibration-0025",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "jacobian": [
+      [
+       0.9992870837600281,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.9968589384491687,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.9906117149169335,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       0.9823653311608753,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.966004578613691,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       -0.01631140463462244,
+       0.9831461769034543,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       -0.010705962005114198,
+       -0.021557865468105338,
+       0.9993381611179962,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       -0.006535183095374152,
+       -0.013159452459318708,
+       -0.030346188375357516,
+       1.0177815290092485
+      ]
+     ],
+     "condition_number": 1.0703291128997303
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "central-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 0.0001,
+    "reason": "analytic or bumped Jacobians both pass; bump error is about 1e-7"
+   }
+  }
+ ]
+}

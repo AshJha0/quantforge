@@ -64,6 +64,24 @@ limits: mc at limit, price 9.24164, stderr 0.01384
 suite limits: 61 cases
 suite limit_order: 15 cases
 suite store_rulings: 11 cases
+suite units: 26 cases
+suite schedule: 7 cases
+suite curve: 7 cases
+ois: replay matches QuantLib to 5e-12 at every pillar, SONIA and SOFR, both interpolations
+ois: swap PVs match QuantLib OvernightIndexedSwap within 1e-3 on 1e6, with and without payment lag
+ois: with payment lag the telescoped form misses the leg by 1.13e-04 per unit notional on 10Y
+suite ois: 32 cases
+projection: replay against QuantLib, max pillar difference 1.09e-14
+projection: vanilla swap PVs match QuantLib within 1e-2 on 1e6
+suite projection: 6 cases
+suite fx: 14 cases
+risk: key-rate sums match the parallel DV01 to under 1e-5 relative at a 1 bp bump
+suite risk: 6 cases
+suite hedge: 10 cases
+calibration: Nelson-Siegel objective LM 7.2e-35, BFGS 4.3e-15; Gauss-Newton and BFGS reach the exponential minima
+suite calibration: 25 cases
+use case 2: DV01 5359.88 on 1e7, residual key-rate norm 0.02 against 3847.77 unhedged
+suite usecases: 2 cases
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4388 golden cases checked, none breaks a stated invariant
 fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps

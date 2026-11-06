@@ -49,6 +49,12 @@ Bounds that come from a table or a definition, not from work, keep their own cod
 | `core.calendar.add_business_days` | `|days|` | 30,000 | More than the business days in 2000 to 2099 |
 | `core.ts.rolling` | `window` | 1,000 | Each window is computed afresh |
 | `core.ts.autocorrelation`, `ljung_box` | `max_lag` | 1,000 | Cost is `n` x `max_lag` |
+| `rates.*`, `risk.*`, `usecase.*` | Quotes or pillars in a curve | 100 | Each is a solve step |
+| `risk.ois.dv01`, `usecase.rates_hedge` | Curve solves are `2 n + 2` per trade | Set by the quote limit | |
+| `calib.fit` | `start` length | 20 | Dense Jacobians |
+| `calib.fit` | `max_iter` | 100,000 | As for root finders |
+| `hedge.solve` | Instruments, the columns of `a` | 20 | Any exact convex method |
+| `core.units.*` | Amount digits | 18 before the point, 8 after | Fits 128-bit integers, so no decimal library is needed |
 | `core.store.replay` | `checkpoints` | 1,000, and `records` x `checkpoints` at most 10,000,000 | Each checkpoint rebuilds a view |
 
 A result date beyond a calendar's years, from `add_tenor` or `add_business_days`, is `E_DATE_RANGE`. Stop as soon as the walk leaves the range.

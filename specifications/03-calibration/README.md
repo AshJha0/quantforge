@@ -1,5 +1,7 @@
 # Calibration and parameter estimation
 
+Stage B spec: `least-squares.md`. MLE and Bayesian estimation come in later stages.
+
 ## Purpose
 Define the scope and shared contract for the calibration and parameter estimation domain.
 

@@ -1,5 +1,7 @@
 # Curves and term structures
 
+Stage B specs: `curve-framework.md`, `schedules.md`, `ois-curves.md`, `projection-and-fra.md`, `fx.md`, with targets in `stage-b-targets.md`. The rest of this domain is specified before stage D.
+
 ## Purpose
 Define the scope and shared contract for the curves and term structures domain.
 

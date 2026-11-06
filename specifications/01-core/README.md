@@ -26,7 +26,7 @@ Read `../cli-contract.md` first, then `rulings.md` and `limits.md`, which apply 
 | `limits.md` | `limits`, `limit_order` | Ready |
 | `asof-store.md` | `store` | Ready. Hashes have one source |
 
-Not yet specified from this domain's list: typed units and money, and the convention registry.
+Stage B adds `units-and-money.md` and `conventions.md`, with golden suite `units` in `datasets/golden/stage_b/`.
 
 ## Purpose
 Define the scope and shared contract for the financial mathematics and shared foundations domain.
