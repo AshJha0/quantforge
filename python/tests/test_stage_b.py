@@ -92,3 +92,9 @@ def test_bounds_need_levenberg_marquardt():
     with pytest.raises(QfError) as e:
         fit("LINEAR", [1.0, 2.0], [1.0, 2.0], [0.0, 0.0], "BFGS", lower=[0.0, 0.0])
     assert e.value.code == "E_INPUT"
+
+
+def test_non_finite_start_stops_at_once():
+    with pytest.raises(QfError) as e:
+        fit("ROSENBROCK", [], [], [-1.2e300, 1.0], "BFGS")
+    assert e.value.code == "E_NON_FINITE"
