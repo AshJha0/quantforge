@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 from runner import load_impls, resolve_command  # noqa: E402
 
 CODES = {
-    "E_PARSE", "E_SCHEMA", "E_UNSUPPORTED_OPERATION", "E_INPUT", "E_DATE_ORDER", "E_DATE_RANGE",
+    "E_PARSE", "E_LIMIT", "E_SCHEMA", "E_UNSUPPORTED_OPERATION", "E_INPUT", "E_DATE_ORDER", "E_DATE_RANGE",
     "E_DOMAIN", "E_NOT_BRACKETED", "E_NO_CONVERGENCE", "E_ZERO_DERIVATIVE", "E_SINGULAR",
     "E_NOT_POSITIVE_DEFINITE", "E_OUT_OF_RANGE", "E_NONEXISTENT_LOCAL_TIME",
     "E_AMBIGUOUS_LOCAL_TIME", "E_NON_FINITE",
