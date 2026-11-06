@@ -1,6 +1,7 @@
 name: Docs
-# Builds the static site and keeps it as a 7-day artifact. GitHub Pages on a private repository needs
-# a paid plan, so nothing is deployed. Download the artifact and open index.html.
+# Builds the static site and keeps it as a 7-day artifact. On a public repository, a push to main also
+# deploys it to GitHub Pages. The deploy job skips while the repository is private, because Pages on a
+# private repository needs a paid plan. Settings > Pages > Source must be set to GitHub Actions.
 on:
   push:
     branches: [main]
@@ -28,3 +29,21 @@ jobs:
           name: docs-site
           path: site/
           retention-days: 7
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.private
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site/
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.private
+    needs: site
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -51,7 +51,7 @@ What has run (observed, local): on 2026-11-06, after the evidence cleanup, all f
 
 What that does not show:
 - **Validation is self-assessment** until the human review after the project ends. Many golden cases have only hand or replay sources, which can share a misreading with the spec. For stage B, `specifications/stage-b-rulings.md` lists which suites have an outside oracle: `usecases` and `rulings_b` have none, and `risk` is hand and self-consistency only, as are tenor basis and the FX forward, PV and delta formulas.
-- **Stage B has not run in CI.** Stage A's pull request passed every workflow it triggered on GitHub. The `stage-b` branch has not been pushed, so every stage B result is local.
+- **CI.** Stages A and B and the evidence cleanup passed every workflow they triggered on GitHub, on their pull requests and on `main`. Fuzz and mutation workflows run on a schedule or by hand.
 - **The recorder is built but not scheduled.** There is no daily record yet.
 - **No market data is used.** Golden cases are constructed test values. Stage B curve data is labelled synthetic for almost everything, because no free history of OIS, swap, FRA, basis or bid/ask quotes was found (`datasets/data-availability.md`). A passing curve case shows the method agrees with its oracle on those quotes. It says nothing about fit to a market.
 - **Trading is simulated only.** There are no live orders, and nothing here connects to a market: the hedges in stage B are calculations. QuantForge makes no HFT or latency claims. The only benchmark is one laptop run of CLI batch throughput on a stage A suite, in `benchmarks/`.
