@@ -175,6 +175,9 @@ def explain_differences(diffs):
     one = st.pop("ONE_ONE", [])
     assert all(a == b for a, b, _, _ in one)
     note(f"daycount Strata ONE_ONE: {len(one)} differences, all start = end; Strata documents 1/1 as always 1")
+    eq = st.pop("THIRTY_E_360_ISDA", [])
+    assert all(a == b for a, b, _, _ in eq), eq
+    note(f"daycount Strata THIRTY_E_360_ISDA: {len(eq)} difference, same case as QuantLib, -1/360; the spec gives 0")
     assert not st, st
     note("daycount: no other difference from QuantLib or Strata, ACT_ACT_ICMA included")
 

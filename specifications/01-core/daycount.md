@@ -112,7 +112,8 @@ Measured by `oracle/python/gen_dates.py`, which stops if a difference appears th
   Strata's rule. This spec keeps the ISDA text, as QuantLib does.
 - `ONE_ONE`, Strata, 6 tested pairs, all with `start = end`. Strata documents 1/1 as always 1, which matches the bare
   ISDA 4.16(a) wording. Here it is 0, so that an empty period accrues nothing.
-- `THIRTY_E_360_ISDA`, QuantLib 1.44: with `start = end = termination` on 29 February it returns -1/360. Here it is 0.
+- `THIRTY_E_360_ISDA`, QuantLib 1.44 and Strata 2.12.78: with `start = end = termination` on 29 February both return -1/360. Here it is 0,
+  because a negative accrual on an empty period has no meaning.
 - QuantLib has no `ACT_365L`, `NL_365` or `THIRTY_E_PLUS_360`.
 
 An earlier report listed 13 `ACT_ACT_ICMA` differences. They came from the oracle passing Strata a maturity equal to the
