@@ -1,6 +1,6 @@
 # C++26 implementation
 
-Stage A of QuantForge: every spec in `specifications/01-core/`, behind the CLI in
+Stages A and B of QuantForge: the specs in `specifications/` that `stage-b-followups.md` names, behind the CLI in
 `specifications/cli-contract.md`. It is written from the specs alone.
 
 ## Layout
