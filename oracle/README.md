@@ -36,8 +36,7 @@ the human review at the end of the project.
 | COS | A | Analytic, QuantLib Heston | In use |
 | Data checks, timezones | A | Hand cases, `zoneinfo` | In use |
 | As-of store, replay | A | Hand rows, own canonical form | In use. Single source |
-| OIS, projection curves, swaps, schedules | B | Independent replay, QuantLib. Strata source for conventions only | In use |
-| FX, FRA, basis, hedges, use cases | B | Hand replay, sign enumeration, first-order conditions | In use. No outside library for most |
+| Stage B rates, FX, hedges | B | Per suite in `specifications/stage-b-rulings.md`. Mutants in `MUTANTS.md` | In use |
 | Calibration | B | Closed forms, known truth, NumPy, SciPy | In use |
 | Vol curves, further pricing | C-E | QuantLib, Strata | Planned |
 | CDS | D | ISDA CDS Standard Model | Planned; licence text to read first |

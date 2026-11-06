@@ -1,22 +1,31 @@
 # Data availability
 
-Per plan section 8. A row that cannot run on real data is a method test on labelled synthetic data. "Reachable" means the site answered on 2026-11-06. No licence terms were read for this table and no data was downloaded, so the "expected result" column is a judgement to verify. Each source's terms must be read and recorded in a manifest before use. US Treasury did not answer the first check on 2026-11-06, but the recorder fetched it later that day.
+Per plan section 8, corrected by the stage B data survey of 2026-11-06, which is a reading of published terms and not legal advice. Each source's terms must be recorded in a manifest before use. Questions for the Bank of England, and the DTCC and DMO terms, are the owner's.
 
-| Backtest | Data needed | Likely free source | Reachable | Expected result |
-|---|---|---|---|---|
-| Sovereign curve rebuilds | Yields | Bank of England, ECB, US Treasury | Yes | Fitted curves only. Rebuilding a central bank's fitted curve is circular, so use it for interpolation tests, not curve validation |
-| Interpolation leave-one-out | Published curve nodes | As above | As above | Can run |
-| OIS and swap curves | OIS and swap quotes | None confirmed | n/a | Method test |
-| Gilt RV, bond fits | Bond-level history | UK DMO | Yes | Partial at best |
-| FX forwards, hedging | Spot, forward points | ECB and FRED for spot | Yes | Spot can run; forwards are a method test |
-| Cross-currency basis | Basis quotes | None known | n/a | Method test |
-| Vol surface, Greeks and hedging | Option surface history | None known | n/a | Method test |
-| FX vol, swaptions | Vol quotes | None known | n/a | Method test |
-| Inflation | Index levels; swaps | FRED for indices; none for swaps | Yes | Indices can run; swaps are a method test |
-| Credit, CDS | Spreads | None known | n/a | Method test |
-| Equity borrow, dividends | Borrow, dividend history | None known | n/a | Method test |
-| VaR, ES | Daily returns | FRED series | Yes | Can run on those series |
-| Order books, execution | Book and trade data | None; no Nasdaq or LOBSTER | n/a | Simulated only |
-| Paper trading | Free live equity data | To find in stage K | n/a | Open |
+| Item | Status | Data | Notes |
+|---|---|---|---|
+| Overnight compounding, OIS floating leg accrual | Real | SONIA, SOFR, ESTR | Check against published compounded indices. An arithmetic check, not curve validation |
+| Interpolation leave-one-out | Real, fitted data | BoE, ECB, Treasury curve nodes | Fitted, not quotes. Errors measure their smoothing, so report as interpolation tests only |
+| FX spot series, spot-based hedging P&L | Real | ECB, Fed H.10; BoE spot for local use | H.10 needs a new route after the Fed's download tool goes |
+| GBP/USD covered parity and forward points, 1979 to mid-2021 | Real, conditional | BoE `XUDLDS*`, `XUDLDF*`, with same-period rates | Subject to the Bank's licence answer. Local only. Noisy at short tenors. Ends 30 Jun 2021. Fix a held-out range first. Do not call the inferred basis market basis |
+| Multi-instrument SOFR curve from one day of traded prices | Conditional, exploratory | Swap repository trades | Only if terms and access clear. Trade-derived, not quotes |
+| SONIA OIS global solve from quotes | Labelled synthetic | None free. BoE curve may give a realistic shape, with a label | Never treat BoE fitted curves as quotes |
+| SOFR swap curve from quotes | Labelled synthetic | As above | |
+| Term swap curves, FRA and futures strips, convexity | Labelled synthetic | No usable settlements | CME and ICE terms rule them out |
+| FX forwards after June 2021, other pairs | Labelled synthetic | None found | |
+| Cross-currency basis, multi-curve FX | Labelled synthetic | None found | |
+| Bid/ask fit | Labelled synthetic | None found | |
+| Solver, repricing and QuantLib targets | Not data-dependent | Same quotes both sides | |
+| Later stages: gilt RV, option surfaces, FX vol, swaptions, inflation swaps, credit, borrow, order books | Method test or labelled synthetic, as before | Gilts: DMO terms unread | Not resurveyed here |
+| VaR, ES | Conditional | ECB, Fed series | FRED is no longer a source |
+
+FRED is dropped: its terms bar storing content, and it needs a key.
+
+## Circularity warnings
+
+- BoE OIS and gilt, ECB and Treasury curves are model output. Turning them into pseudo par quotes and bootstrapping them back only shows the code inverts a smooth curve. A Treasury par curve is the same case.
+- Comparing our curve with the Bank's needs the same inputs, which are not published, so a gap cannot be attributed.
+- Deriving forwards from rates, then testing against those rates, is an identity. Use independently sourced forwards and rates.
+- Do not fit to a period and test on it.
 
 A 250-day record cannot exist inside the build, so v1.0 verdicts stay "conditionally approved".

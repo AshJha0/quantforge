@@ -82,6 +82,21 @@ calibration: Nelson-Siegel objective LM 7.2e-35, BFGS 4.3e-15; Gauss-Newton and 
 suite calibration: 25 cases
 use case 2: DV01 5359.88 on 1e7, residual key-rate norm 0.02 against 3847.77 unhedged
 suite usecases: 2 cases
+schedule_deep: 48 cases against QuantLib, 48 also equal to Strata PeriodicSchedule
+suite schedule_deep: 48 cases
+suite curve_deep: 8 cases
+ois_deep: 20 swap PVs against Strata's pricer on 1e6, worst difference 4.075e-10
+suite ois_deep: 36 cases
+projection_deep: pillars, swaps and FRAs match QuantLib, including month-end spot, a holiday in the spot lag and negative rates
+suite projection_deep: 19 cases
+risk_deep: DV01 and every key rate against bumped QuantLib quotes, worst difference 3.339e-06 on 1e6
+suite risk_deep: 6 cases
+fx_deep: implied ratios against QuantLib FxSwapRateHelper, worst difference 1.887e-15
+suite fx_deep: 33 cases
+hedge_deep: exact enumeration against SciPy L-BFGS-B, worst difference 6.04e-10
+suite hedge_deep: 12 cases
+suite rulings_b: 29 cases
+mutants: 23 deliberate errors, all caught
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4388 golden cases checked, none breaks a stated invariant
 fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps

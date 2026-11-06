@@ -25,3 +25,17 @@ Notes for all four:
 - Add the new limits in `01-core/limits.md`.
 
 The stage A follow-ups in `01-core/clean-room-followups.md` still stand where not yet done.
+
+## Second round: deeper cases and rulings
+
+Run the new suites `schedule_deep`, `curve_deep`, `ois_deep`, `projection_deep`, `risk_deep`, `fx_deep`, `hedge_deep` and `rulings_b`. Read `stage-b-rulings.md`. No build has run them.
+
+| Ruling | Java | C++ | Python | Rust |
+|---|---|---|---|---|
+| B0 spot counts from `as_of`, with no `FOLLOWING` first, in OIS too | **Change** OIS: spec said `FOLLOWING` | **Change** both | **Change** OIS | **Change** OIS |
+| B3 empty `pillars` is `E_INPUT` | Not stated | **Change**: `E_SCHEMA` | ok | ok |
+| B5 100-pillar limit on every curve | Not stated | Not stated | **Change**: not on `fx.*` | **Change**: not on `fx.*` |
+| B7 `D`, `W` tenors in `fx.curve.implied` are `E_SCHEMA` | **Change** | ok | ok | **Change** |
+| B8 curve `as_of` must match in `fx.*` | **Change** | **Change** | Not stated | Not stated |
+| B9 dates before spot, near after far are `E_DATE_ORDER` | **Change** | **Change** | **Change** | **Change** |
+| B10 `snapshot_id` in `fx.*` | **Change**: always `null` | Not stated | Not stated | Not stated |
