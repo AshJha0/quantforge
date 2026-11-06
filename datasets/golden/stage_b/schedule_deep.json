@@ -1,0 +1,3094 @@
+{
+ "schema_version": "1.0",
+ "suite": "schedule_deep",
+ "spec": "specifications/02-curves/schedules.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "schedule_deep-0001",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2027-06-06",
+    "frequency_months": 1,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2026-12-07",
+       "payment": "2026-12-07"
+      },
+      {
+       "start": "2026-12-07",
+       "end": "2027-01-06",
+       "payment": "2027-01-06"
+      },
+      {
+       "start": "2027-01-06",
+       "end": "2027-02-08",
+       "payment": "2027-02-08"
+      },
+      {
+       "start": "2027-02-08",
+       "end": "2027-03-08",
+       "payment": "2027-03-08"
+      },
+      {
+       "start": "2027-03-08",
+       "end": "2027-04-06",
+       "payment": "2027-04-06"
+      },
+      {
+       "start": "2027-04-06",
+       "end": "2027-05-06",
+       "payment": "2027-05-06"
+      },
+      {
+       "start": "2027-05-06",
+       "end": "2027-06-07",
+       "payment": "2027-06-07"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0002",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2029-01-06",
+    "frequency_months": 3,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2027-01-06",
+       "payment": "2027-01-08"
+      },
+      {
+       "start": "2027-01-06",
+       "end": "2027-04-06",
+       "payment": "2027-04-08"
+      },
+      {
+       "start": "2027-04-06",
+       "end": "2027-07-06",
+       "payment": "2027-07-08"
+      },
+      {
+       "start": "2027-07-06",
+       "end": "2027-10-06",
+       "payment": "2027-10-08"
+      },
+      {
+       "start": "2027-10-06",
+       "end": "2028-01-06",
+       "payment": "2028-01-10"
+      },
+      {
+       "start": "2028-01-06",
+       "end": "2028-04-06",
+       "payment": "2028-04-10"
+      },
+      {
+       "start": "2028-04-06",
+       "end": "2028-07-06",
+       "payment": "2028-07-10"
+      },
+      {
+       "start": "2028-07-06",
+       "end": "2028-10-06",
+       "payment": "2028-10-10"
+      },
+      {
+       "start": "2028-10-06",
+       "end": "2029-01-08",
+       "payment": "2029-01-10"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0003",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2030-04-06",
+    "frequency_months": 6,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2027-04-06",
+       "payment": "2027-04-06"
+      },
+      {
+       "start": "2027-04-06",
+       "end": "2027-10-06",
+       "payment": "2027-10-06"
+      },
+      {
+       "start": "2027-10-06",
+       "end": "2028-04-06",
+       "payment": "2028-04-06"
+      },
+      {
+       "start": "2028-04-06",
+       "end": "2028-10-06",
+       "payment": "2028-10-06"
+      },
+      {
+       "start": "2028-10-06",
+       "end": "2029-04-06",
+       "payment": "2029-04-06"
+      },
+      {
+       "start": "2029-04-06",
+       "end": "2029-10-08",
+       "payment": "2029-10-08"
+      },
+      {
+       "start": "2029-10-08",
+       "end": "2030-04-08",
+       "payment": "2030-04-08"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0004",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2031-12-06",
+    "frequency_months": 12,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2026-12-07",
+       "payment": "2026-12-08"
+      },
+      {
+       "start": "2026-12-07",
+       "end": "2027-12-06",
+       "payment": "2027-12-07"
+      },
+      {
+       "start": "2027-12-06",
+       "end": "2028-12-06",
+       "payment": "2028-12-07"
+      },
+      {
+       "start": "2028-12-06",
+       "end": "2029-12-06",
+       "payment": "2029-12-07"
+      },
+      {
+       "start": "2029-12-06",
+       "end": "2030-12-06",
+       "payment": "2030-12-09"
+      },
+      {
+       "start": "2030-12-06",
+       "end": "2031-12-08",
+       "payment": "2031-12-09"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0005",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2027-07-24",
+    "frequency_months": 1,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-01-25",
+       "payment": "2027-01-25"
+      },
+      {
+       "start": "2027-01-25",
+       "end": "2027-02-24",
+       "payment": "2027-02-24"
+      },
+      {
+       "start": "2027-02-24",
+       "end": "2027-03-24",
+       "payment": "2027-03-24"
+      },
+      {
+       "start": "2027-03-24",
+       "end": "2027-04-26",
+       "payment": "2027-04-26"
+      },
+      {
+       "start": "2027-04-26",
+       "end": "2027-05-24",
+       "payment": "2027-05-24"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-06-24",
+       "payment": "2027-06-24"
+      },
+      {
+       "start": "2027-06-24",
+       "end": "2027-07-26",
+       "payment": "2027-07-26"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0006",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2029-02-24",
+    "frequency_months": 3,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-02-24",
+       "payment": "2027-02-26"
+      },
+      {
+       "start": "2027-02-24",
+       "end": "2027-05-24",
+       "payment": "2027-05-26"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-08-24",
+       "payment": "2027-08-26"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2027-11-24",
+       "payment": "2027-11-26"
+      },
+      {
+       "start": "2027-11-24",
+       "end": "2028-02-24",
+       "payment": "2028-02-28"
+      },
+      {
+       "start": "2028-02-24",
+       "end": "2028-05-24",
+       "payment": "2028-05-26"
+      },
+      {
+       "start": "2028-05-24",
+       "end": "2028-08-24",
+       "payment": "2028-08-29"
+      },
+      {
+       "start": "2028-08-24",
+       "end": "2028-11-24",
+       "payment": "2028-11-28"
+      },
+      {
+       "start": "2028-11-24",
+       "end": "2029-02-26",
+       "payment": "2029-02-28"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0007",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2030-05-24",
+    "frequency_months": 6,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-05-24",
+       "payment": "2027-05-24"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-11-24",
+       "payment": "2027-11-24"
+      },
+      {
+       "start": "2027-11-24",
+       "end": "2028-05-24",
+       "payment": "2028-05-24"
+      },
+      {
+       "start": "2028-05-24",
+       "end": "2028-11-24",
+       "payment": "2028-11-24"
+      },
+      {
+       "start": "2028-11-24",
+       "end": "2029-05-24",
+       "payment": "2029-05-24"
+      },
+      {
+       "start": "2029-05-24",
+       "end": "2029-11-26",
+       "payment": "2029-11-26"
+      },
+      {
+       "start": "2029-11-26",
+       "end": "2030-05-24",
+       "payment": "2030-05-24"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0008",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2032-01-24",
+    "frequency_months": 12,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-01-25",
+       "payment": "2027-01-26"
+      },
+      {
+       "start": "2027-01-25",
+       "end": "2028-01-24",
+       "payment": "2028-01-25"
+      },
+      {
+       "start": "2028-01-24",
+       "end": "2029-01-24",
+       "payment": "2029-01-25"
+      },
+      {
+       "start": "2029-01-24",
+       "end": "2030-01-24",
+       "payment": "2030-01-25"
+      },
+      {
+       "start": "2030-01-24",
+       "end": "2031-01-24",
+       "payment": "2031-01-27"
+      },
+      {
+       "start": "2031-01-24",
+       "end": "2032-01-26",
+       "payment": "2032-01-27"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0009",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2027-08-29",
+    "frequency_months": 1,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-02-26",
+       "payment": "2027-02-26"
+      },
+      {
+       "start": "2027-02-26",
+       "end": "2027-03-30",
+       "payment": "2027-03-30"
+      },
+      {
+       "start": "2027-03-30",
+       "end": "2027-04-29",
+       "payment": "2027-04-29"
+      },
+      {
+       "start": "2027-04-29",
+       "end": "2027-05-28",
+       "payment": "2027-05-28"
+      },
+      {
+       "start": "2027-05-28",
+       "end": "2027-06-29",
+       "payment": "2027-06-29"
+      },
+      {
+       "start": "2027-06-29",
+       "end": "2027-07-29",
+       "payment": "2027-07-29"
+      },
+      {
+       "start": "2027-07-29",
+       "end": "2027-08-31",
+       "payment": "2027-08-31"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0010",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2029-03-29",
+    "frequency_months": 3,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-03-30",
+       "payment": "2027-04-01"
+      },
+      {
+       "start": "2027-03-30",
+       "end": "2027-06-29",
+       "payment": "2027-07-01"
+      },
+      {
+       "start": "2027-06-29",
+       "end": "2027-09-29",
+       "payment": "2027-10-01"
+      },
+      {
+       "start": "2027-09-29",
+       "end": "2027-12-29",
+       "payment": "2027-12-31"
+      },
+      {
+       "start": "2027-12-29",
+       "end": "2028-03-29",
+       "payment": "2028-03-31"
+      },
+      {
+       "start": "2028-03-29",
+       "end": "2028-06-29",
+       "payment": "2028-07-03"
+      },
+      {
+       "start": "2028-06-29",
+       "end": "2028-09-29",
+       "payment": "2028-10-03"
+      },
+      {
+       "start": "2028-09-29",
+       "end": "2028-12-29",
+       "payment": "2029-01-03"
+      },
+      {
+       "start": "2028-12-29",
+       "end": "2029-03-29",
+       "payment": "2029-04-04"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0011",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2030-06-29",
+    "frequency_months": 6,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-06-29",
+       "payment": "2027-06-29"
+      },
+      {
+       "start": "2027-06-29",
+       "end": "2027-12-29",
+       "payment": "2027-12-29"
+      },
+      {
+       "start": "2027-12-29",
+       "end": "2028-06-29",
+       "payment": "2028-06-29"
+      },
+      {
+       "start": "2028-06-29",
+       "end": "2028-12-29",
+       "payment": "2028-12-29"
+      },
+      {
+       "start": "2028-12-29",
+       "end": "2029-06-29",
+       "payment": "2029-06-29"
+      },
+      {
+       "start": "2029-06-29",
+       "end": "2029-12-31",
+       "payment": "2029-12-31"
+      },
+      {
+       "start": "2029-12-31",
+       "end": "2030-06-28",
+       "payment": "2030-06-28"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0012",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2032-02-29",
+    "frequency_months": 12,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-02-26",
+       "payment": "2027-03-01"
+      },
+      {
+       "start": "2027-02-26",
+       "end": "2028-02-29",
+       "payment": "2028-03-01"
+      },
+      {
+       "start": "2028-02-29",
+       "end": "2029-02-28",
+       "payment": "2029-03-01"
+      },
+      {
+       "start": "2029-02-28",
+       "end": "2030-02-28",
+       "payment": "2030-03-01"
+      },
+      {
+       "start": "2030-02-28",
+       "end": "2031-02-28",
+       "payment": "2031-03-03"
+      },
+      {
+       "start": "2031-02-28",
+       "end": "2032-02-27",
+       "payment": "2032-03-01"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0013",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2027-10-24",
+    "frequency_months": 1,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-04-26",
+       "payment": "2027-04-26"
+      },
+      {
+       "start": "2027-04-26",
+       "end": "2027-05-24",
+       "payment": "2027-05-24"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-06-24",
+       "payment": "2027-06-24"
+      },
+      {
+       "start": "2027-06-24",
+       "end": "2027-07-26",
+       "payment": "2027-07-26"
+      },
+      {
+       "start": "2027-07-26",
+       "end": "2027-08-24",
+       "payment": "2027-08-24"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2027-09-24",
+       "payment": "2027-09-24"
+      },
+      {
+       "start": "2027-09-24",
+       "end": "2027-10-25",
+       "payment": "2027-10-25"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0014",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2029-05-24",
+    "frequency_months": 3,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-05-24",
+       "payment": "2027-05-26"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-08-24",
+       "payment": "2027-08-26"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2027-11-24",
+       "payment": "2027-11-26"
+      },
+      {
+       "start": "2027-11-24",
+       "end": "2028-02-24",
+       "payment": "2028-02-28"
+      },
+      {
+       "start": "2028-02-24",
+       "end": "2028-05-24",
+       "payment": "2028-05-26"
+      },
+      {
+       "start": "2028-05-24",
+       "end": "2028-08-24",
+       "payment": "2028-08-29"
+      },
+      {
+       "start": "2028-08-24",
+       "end": "2028-11-24",
+       "payment": "2028-11-28"
+      },
+      {
+       "start": "2028-11-24",
+       "end": "2029-02-26",
+       "payment": "2029-02-28"
+      },
+      {
+       "start": "2029-02-26",
+       "end": "2029-05-24",
+       "payment": "2029-05-29"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0015",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2030-08-24",
+    "frequency_months": 6,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-08-24",
+       "payment": "2027-08-24"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2028-02-24",
+       "payment": "2028-02-24"
+      },
+      {
+       "start": "2028-02-24",
+       "end": "2028-08-24",
+       "payment": "2028-08-24"
+      },
+      {
+       "start": "2028-08-24",
+       "end": "2029-02-26",
+       "payment": "2029-02-26"
+      },
+      {
+       "start": "2029-02-26",
+       "end": "2029-08-24",
+       "payment": "2029-08-24"
+      },
+      {
+       "start": "2029-08-24",
+       "end": "2030-02-25",
+       "payment": "2030-02-25"
+      },
+      {
+       "start": "2030-02-25",
+       "end": "2030-08-27",
+       "payment": "2030-08-27"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0016",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2032-04-24",
+    "frequency_months": 12,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-04-26",
+       "payment": "2027-04-27"
+      },
+      {
+       "start": "2027-04-26",
+       "end": "2028-04-24",
+       "payment": "2028-04-25"
+      },
+      {
+       "start": "2028-04-24",
+       "end": "2029-04-24",
+       "payment": "2029-04-25"
+      },
+      {
+       "start": "2029-04-24",
+       "end": "2030-04-24",
+       "payment": "2030-04-25"
+      },
+      {
+       "start": "2030-04-24",
+       "end": "2031-04-24",
+       "payment": "2031-04-25"
+      },
+      {
+       "start": "2031-04-24",
+       "end": "2032-04-26",
+       "payment": "2032-04-27"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0017",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2028-09-29",
+    "frequency_months": 1,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-03-29",
+       "payment": "2028-03-29"
+      },
+      {
+       "start": "2028-03-29",
+       "end": "2028-04-28",
+       "payment": "2028-04-28"
+      },
+      {
+       "start": "2028-04-28",
+       "end": "2028-05-30",
+       "payment": "2028-05-30"
+      },
+      {
+       "start": "2028-05-30",
+       "end": "2028-06-29",
+       "payment": "2028-06-29"
+      },
+      {
+       "start": "2028-06-29",
+       "end": "2028-07-31",
+       "payment": "2028-07-31"
+      },
+      {
+       "start": "2028-07-31",
+       "end": "2028-08-29",
+       "payment": "2028-08-29"
+      },
+      {
+       "start": "2028-08-29",
+       "end": "2028-09-29",
+       "payment": "2028-09-29"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0018",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2030-04-29",
+    "frequency_months": 3,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-04-28",
+       "payment": "2028-05-03"
+      },
+      {
+       "start": "2028-04-28",
+       "end": "2028-07-31",
+       "payment": "2028-08-02"
+      },
+      {
+       "start": "2028-07-31",
+       "end": "2028-10-30",
+       "payment": "2028-11-01"
+      },
+      {
+       "start": "2028-10-30",
+       "end": "2029-01-29",
+       "payment": "2029-01-31"
+      },
+      {
+       "start": "2029-01-29",
+       "end": "2029-04-30",
+       "payment": "2029-05-02"
+      },
+      {
+       "start": "2029-04-30",
+       "end": "2029-07-30",
+       "payment": "2029-08-01"
+      },
+      {
+       "start": "2029-07-30",
+       "end": "2029-10-29",
+       "payment": "2029-10-31"
+      },
+      {
+       "start": "2029-10-29",
+       "end": "2030-01-29",
+       "payment": "2030-01-31"
+      },
+      {
+       "start": "2030-01-29",
+       "end": "2030-04-29",
+       "payment": "2030-05-01"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0019",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2031-07-29",
+    "frequency_months": 6,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-07-31",
+       "payment": "2028-07-31"
+      },
+      {
+       "start": "2028-07-31",
+       "end": "2029-01-29",
+       "payment": "2029-01-29"
+      },
+      {
+       "start": "2029-01-29",
+       "end": "2029-07-30",
+       "payment": "2029-07-30"
+      },
+      {
+       "start": "2029-07-30",
+       "end": "2030-01-29",
+       "payment": "2030-01-29"
+      },
+      {
+       "start": "2030-01-29",
+       "end": "2030-07-29",
+       "payment": "2030-07-29"
+      },
+      {
+       "start": "2030-07-29",
+       "end": "2031-01-29",
+       "payment": "2031-01-29"
+      },
+      {
+       "start": "2031-01-29",
+       "end": "2031-07-29",
+       "payment": "2031-07-29"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0020",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2033-03-29",
+    "frequency_months": 12,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-03-29",
+       "payment": "2028-03-30"
+      },
+      {
+       "start": "2028-03-29",
+       "end": "2029-03-29",
+       "payment": "2029-04-03"
+      },
+      {
+       "start": "2029-03-29",
+       "end": "2030-03-29",
+       "payment": "2030-04-01"
+      },
+      {
+       "start": "2030-03-29",
+       "end": "2031-03-31",
+       "payment": "2031-04-01"
+      },
+      {
+       "start": "2031-03-31",
+       "end": "2032-03-30",
+       "payment": "2032-03-31"
+      },
+      {
+       "start": "2032-03-30",
+       "end": "2033-03-29",
+       "payment": "2033-03-30"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0021",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2027-03-28",
+    "frequency_months": 1,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2026-09-28",
+       "payment": "2026-09-28"
+      },
+      {
+       "start": "2026-09-28",
+       "end": "2026-10-28",
+       "payment": "2026-10-28"
+      },
+      {
+       "start": "2026-10-28",
+       "end": "2026-11-30",
+       "payment": "2026-11-30"
+      },
+      {
+       "start": "2026-11-30",
+       "end": "2026-12-29",
+       "payment": "2026-12-29"
+      },
+      {
+       "start": "2026-12-29",
+       "end": "2027-01-28",
+       "payment": "2027-01-28"
+      },
+      {
+       "start": "2027-01-28",
+       "end": "2027-02-26",
+       "payment": "2027-02-26"
+      },
+      {
+       "start": "2027-02-26",
+       "end": "2027-03-30",
+       "payment": "2027-03-30"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0022",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2028-10-28",
+    "frequency_months": 3,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2026-10-28",
+       "payment": "2026-10-30"
+      },
+      {
+       "start": "2026-10-28",
+       "end": "2027-01-28",
+       "payment": "2027-02-01"
+      },
+      {
+       "start": "2027-01-28",
+       "end": "2027-04-28",
+       "payment": "2027-04-30"
+      },
+      {
+       "start": "2027-04-28",
+       "end": "2027-07-28",
+       "payment": "2027-07-30"
+      },
+      {
+       "start": "2027-07-28",
+       "end": "2027-10-28",
+       "payment": "2027-11-01"
+      },
+      {
+       "start": "2027-10-28",
+       "end": "2028-01-28",
+       "payment": "2028-02-01"
+      },
+      {
+       "start": "2028-01-28",
+       "end": "2028-04-28",
+       "payment": "2028-05-03"
+      },
+      {
+       "start": "2028-04-28",
+       "end": "2028-07-28",
+       "payment": "2028-08-01"
+      },
+      {
+       "start": "2028-07-28",
+       "end": "2028-10-30",
+       "payment": "2028-11-01"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0023",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2030-01-28",
+    "frequency_months": 6,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2027-01-28",
+       "payment": "2027-01-28"
+      },
+      {
+       "start": "2027-01-28",
+       "end": "2027-07-28",
+       "payment": "2027-07-28"
+      },
+      {
+       "start": "2027-07-28",
+       "end": "2028-01-28",
+       "payment": "2028-01-28"
+      },
+      {
+       "start": "2028-01-28",
+       "end": "2028-07-28",
+       "payment": "2028-07-28"
+      },
+      {
+       "start": "2028-07-28",
+       "end": "2029-01-29",
+       "payment": "2029-01-29"
+      },
+      {
+       "start": "2029-01-29",
+       "end": "2029-07-30",
+       "payment": "2029-07-30"
+      },
+      {
+       "start": "2029-07-30",
+       "end": "2030-01-28",
+       "payment": "2030-01-28"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0024",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2031-09-28",
+    "frequency_months": 12,
+    "calendar": "GBLO",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2026-09-28",
+       "payment": "2026-09-29"
+      },
+      {
+       "start": "2026-09-28",
+       "end": "2027-09-28",
+       "payment": "2027-09-29"
+      },
+      {
+       "start": "2027-09-28",
+       "end": "2028-09-28",
+       "payment": "2028-09-29"
+      },
+      {
+       "start": "2028-09-28",
+       "end": "2029-09-28",
+       "payment": "2029-10-01"
+      },
+      {
+       "start": "2029-09-28",
+       "end": "2030-09-30",
+       "payment": "2030-10-01"
+      },
+      {
+       "start": "2030-09-30",
+       "end": "2031-09-29",
+       "payment": "2031-09-30"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0025",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2027-06-06",
+    "frequency_months": 1,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2026-12-07",
+       "payment": "2026-12-07"
+      },
+      {
+       "start": "2026-12-07",
+       "end": "2027-01-06",
+       "payment": "2027-01-06"
+      },
+      {
+       "start": "2027-01-06",
+       "end": "2027-02-08",
+       "payment": "2027-02-08"
+      },
+      {
+       "start": "2027-02-08",
+       "end": "2027-03-08",
+       "payment": "2027-03-08"
+      },
+      {
+       "start": "2027-03-08",
+       "end": "2027-04-06",
+       "payment": "2027-04-06"
+      },
+      {
+       "start": "2027-04-06",
+       "end": "2027-05-06",
+       "payment": "2027-05-06"
+      },
+      {
+       "start": "2027-05-06",
+       "end": "2027-06-07",
+       "payment": "2027-06-07"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0026",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2029-01-06",
+    "frequency_months": 3,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2027-01-06",
+       "payment": "2027-01-08"
+      },
+      {
+       "start": "2027-01-06",
+       "end": "2027-04-06",
+       "payment": "2027-04-08"
+      },
+      {
+       "start": "2027-04-06",
+       "end": "2027-07-06",
+       "payment": "2027-07-08"
+      },
+      {
+       "start": "2027-07-06",
+       "end": "2027-10-06",
+       "payment": "2027-10-08"
+      },
+      {
+       "start": "2027-10-06",
+       "end": "2028-01-06",
+       "payment": "2028-01-10"
+      },
+      {
+       "start": "2028-01-06",
+       "end": "2028-04-06",
+       "payment": "2028-04-10"
+      },
+      {
+       "start": "2028-04-06",
+       "end": "2028-07-06",
+       "payment": "2028-07-10"
+      },
+      {
+       "start": "2028-07-06",
+       "end": "2028-10-06",
+       "payment": "2028-10-10"
+      },
+      {
+       "start": "2028-10-06",
+       "end": "2029-01-08",
+       "payment": "2029-01-10"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0027",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2030-04-06",
+    "frequency_months": 6,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2027-04-06",
+       "payment": "2027-04-06"
+      },
+      {
+       "start": "2027-04-06",
+       "end": "2027-10-06",
+       "payment": "2027-10-06"
+      },
+      {
+       "start": "2027-10-06",
+       "end": "2028-04-06",
+       "payment": "2028-04-06"
+      },
+      {
+       "start": "2028-04-06",
+       "end": "2028-10-06",
+       "payment": "2028-10-06"
+      },
+      {
+       "start": "2028-10-06",
+       "end": "2029-04-06",
+       "payment": "2029-04-06"
+      },
+      {
+       "start": "2029-04-06",
+       "end": "2029-10-08",
+       "payment": "2029-10-08"
+      },
+      {
+       "start": "2029-10-08",
+       "end": "2030-04-08",
+       "payment": "2030-04-08"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0028",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-11-06",
+    "end": "2031-12-06",
+    "frequency_months": 12,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-11-06",
+       "end": "2026-12-07",
+       "payment": "2026-12-08"
+      },
+      {
+       "start": "2026-12-07",
+       "end": "2027-12-06",
+       "payment": "2027-12-07"
+      },
+      {
+       "start": "2027-12-06",
+       "end": "2028-12-06",
+       "payment": "2028-12-07"
+      },
+      {
+       "start": "2028-12-06",
+       "end": "2029-12-06",
+       "payment": "2029-12-07"
+      },
+      {
+       "start": "2029-12-06",
+       "end": "2030-12-06",
+       "payment": "2030-12-09"
+      },
+      {
+       "start": "2030-12-06",
+       "end": "2031-12-08",
+       "payment": "2031-12-09"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0029",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2027-07-24",
+    "frequency_months": 1,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-01-25",
+       "payment": "2027-01-25"
+      },
+      {
+       "start": "2027-01-25",
+       "end": "2027-02-24",
+       "payment": "2027-02-24"
+      },
+      {
+       "start": "2027-02-24",
+       "end": "2027-03-24",
+       "payment": "2027-03-24"
+      },
+      {
+       "start": "2027-03-24",
+       "end": "2027-04-26",
+       "payment": "2027-04-26"
+      },
+      {
+       "start": "2027-04-26",
+       "end": "2027-05-24",
+       "payment": "2027-05-24"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-06-24",
+       "payment": "2027-06-24"
+      },
+      {
+       "start": "2027-06-24",
+       "end": "2027-07-26",
+       "payment": "2027-07-26"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0030",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2029-02-24",
+    "frequency_months": 3,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-02-24",
+       "payment": "2027-02-26"
+      },
+      {
+       "start": "2027-02-24",
+       "end": "2027-05-24",
+       "payment": "2027-05-26"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-08-24",
+       "payment": "2027-08-26"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2027-11-24",
+       "payment": "2027-11-26"
+      },
+      {
+       "start": "2027-11-24",
+       "end": "2028-02-24",
+       "payment": "2028-02-28"
+      },
+      {
+       "start": "2028-02-24",
+       "end": "2028-05-24",
+       "payment": "2028-05-26"
+      },
+      {
+       "start": "2028-05-24",
+       "end": "2028-08-24",
+       "payment": "2028-08-28"
+      },
+      {
+       "start": "2028-08-24",
+       "end": "2028-11-24",
+       "payment": "2028-11-28"
+      },
+      {
+       "start": "2028-11-24",
+       "end": "2029-02-26",
+       "payment": "2029-02-28"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0031",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2030-05-24",
+    "frequency_months": 6,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-05-24",
+       "payment": "2027-05-24"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-11-24",
+       "payment": "2027-11-24"
+      },
+      {
+       "start": "2027-11-24",
+       "end": "2028-05-24",
+       "payment": "2028-05-24"
+      },
+      {
+       "start": "2028-05-24",
+       "end": "2028-11-24",
+       "payment": "2028-11-24"
+      },
+      {
+       "start": "2028-11-24",
+       "end": "2029-05-24",
+       "payment": "2029-05-24"
+      },
+      {
+       "start": "2029-05-24",
+       "end": "2029-11-26",
+       "payment": "2029-11-26"
+      },
+      {
+       "start": "2029-11-26",
+       "end": "2030-05-24",
+       "payment": "2030-05-24"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0032",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-12-24",
+    "end": "2032-01-24",
+    "frequency_months": 12,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-12-24",
+       "end": "2027-01-25",
+       "payment": "2027-01-26"
+      },
+      {
+       "start": "2027-01-25",
+       "end": "2028-01-24",
+       "payment": "2028-01-25"
+      },
+      {
+       "start": "2028-01-24",
+       "end": "2029-01-24",
+       "payment": "2029-01-25"
+      },
+      {
+       "start": "2029-01-24",
+       "end": "2030-01-24",
+       "payment": "2030-01-25"
+      },
+      {
+       "start": "2030-01-24",
+       "end": "2031-01-24",
+       "payment": "2031-01-27"
+      },
+      {
+       "start": "2031-01-24",
+       "end": "2032-01-26",
+       "payment": "2032-01-27"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0033",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2027-08-29",
+    "frequency_months": 1,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-02-26",
+       "payment": "2027-02-26"
+      },
+      {
+       "start": "2027-02-26",
+       "end": "2027-03-30",
+       "payment": "2027-03-30"
+      },
+      {
+       "start": "2027-03-30",
+       "end": "2027-04-29",
+       "payment": "2027-04-29"
+      },
+      {
+       "start": "2027-04-29",
+       "end": "2027-05-31",
+       "payment": "2027-05-31"
+      },
+      {
+       "start": "2027-05-31",
+       "end": "2027-06-29",
+       "payment": "2027-06-29"
+      },
+      {
+       "start": "2027-06-29",
+       "end": "2027-07-29",
+       "payment": "2027-07-29"
+      },
+      {
+       "start": "2027-07-29",
+       "end": "2027-08-30",
+       "payment": "2027-08-30"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0034",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2029-03-29",
+    "frequency_months": 3,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-03-30",
+       "payment": "2027-04-01"
+      },
+      {
+       "start": "2027-03-30",
+       "end": "2027-06-29",
+       "payment": "2027-07-01"
+      },
+      {
+       "start": "2027-06-29",
+       "end": "2027-09-29",
+       "payment": "2027-10-01"
+      },
+      {
+       "start": "2027-09-29",
+       "end": "2027-12-29",
+       "payment": "2027-12-31"
+      },
+      {
+       "start": "2027-12-29",
+       "end": "2028-03-29",
+       "payment": "2028-03-31"
+      },
+      {
+       "start": "2028-03-29",
+       "end": "2028-06-29",
+       "payment": "2028-07-03"
+      },
+      {
+       "start": "2028-06-29",
+       "end": "2028-09-29",
+       "payment": "2028-10-03"
+      },
+      {
+       "start": "2028-09-29",
+       "end": "2028-12-29",
+       "payment": "2029-01-03"
+      },
+      {
+       "start": "2028-12-29",
+       "end": "2029-03-29",
+       "payment": "2029-04-04"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0035",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2030-06-29",
+    "frequency_months": 6,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-06-29",
+       "payment": "2027-06-29"
+      },
+      {
+       "start": "2027-06-29",
+       "end": "2027-12-29",
+       "payment": "2027-12-29"
+      },
+      {
+       "start": "2027-12-29",
+       "end": "2028-06-29",
+       "payment": "2028-06-29"
+      },
+      {
+       "start": "2028-06-29",
+       "end": "2028-12-29",
+       "payment": "2028-12-29"
+      },
+      {
+       "start": "2028-12-29",
+       "end": "2029-06-29",
+       "payment": "2029-06-29"
+      },
+      {
+       "start": "2029-06-29",
+       "end": "2029-12-31",
+       "payment": "2029-12-31"
+      },
+      {
+       "start": "2029-12-31",
+       "end": "2030-06-28",
+       "payment": "2030-06-28"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0036",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-01-29",
+    "end": "2032-02-29",
+    "frequency_months": 12,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-01-29",
+       "end": "2027-02-26",
+       "payment": "2027-03-01"
+      },
+      {
+       "start": "2027-02-26",
+       "end": "2028-02-29",
+       "payment": "2028-03-01"
+      },
+      {
+       "start": "2028-02-29",
+       "end": "2029-02-28",
+       "payment": "2029-03-01"
+      },
+      {
+       "start": "2029-02-28",
+       "end": "2030-02-28",
+       "payment": "2030-03-01"
+      },
+      {
+       "start": "2030-02-28",
+       "end": "2031-02-28",
+       "payment": "2031-03-03"
+      },
+      {
+       "start": "2031-02-28",
+       "end": "2032-02-27",
+       "payment": "2032-03-01"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0037",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2027-10-24",
+    "frequency_months": 1,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-04-26",
+       "payment": "2027-04-26"
+      },
+      {
+       "start": "2027-04-26",
+       "end": "2027-05-24",
+       "payment": "2027-05-24"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-06-24",
+       "payment": "2027-06-24"
+      },
+      {
+       "start": "2027-06-24",
+       "end": "2027-07-26",
+       "payment": "2027-07-26"
+      },
+      {
+       "start": "2027-07-26",
+       "end": "2027-08-24",
+       "payment": "2027-08-24"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2027-09-24",
+       "payment": "2027-09-24"
+      },
+      {
+       "start": "2027-09-24",
+       "end": "2027-10-25",
+       "payment": "2027-10-25"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0038",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2029-05-24",
+    "frequency_months": 3,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-05-24",
+       "payment": "2027-05-26"
+      },
+      {
+       "start": "2027-05-24",
+       "end": "2027-08-24",
+       "payment": "2027-08-26"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2027-11-24",
+       "payment": "2027-11-26"
+      },
+      {
+       "start": "2027-11-24",
+       "end": "2028-02-24",
+       "payment": "2028-02-28"
+      },
+      {
+       "start": "2028-02-24",
+       "end": "2028-05-24",
+       "payment": "2028-05-26"
+      },
+      {
+       "start": "2028-05-24",
+       "end": "2028-08-24",
+       "payment": "2028-08-28"
+      },
+      {
+       "start": "2028-08-24",
+       "end": "2028-11-24",
+       "payment": "2028-11-28"
+      },
+      {
+       "start": "2028-11-24",
+       "end": "2029-02-26",
+       "payment": "2029-02-28"
+      },
+      {
+       "start": "2029-02-26",
+       "end": "2029-05-24",
+       "payment": "2029-05-28"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0039",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2030-08-24",
+    "frequency_months": 6,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-08-24",
+       "payment": "2027-08-24"
+      },
+      {
+       "start": "2027-08-24",
+       "end": "2028-02-24",
+       "payment": "2028-02-24"
+      },
+      {
+       "start": "2028-02-24",
+       "end": "2028-08-24",
+       "payment": "2028-08-24"
+      },
+      {
+       "start": "2028-08-24",
+       "end": "2029-02-26",
+       "payment": "2029-02-26"
+      },
+      {
+       "start": "2029-02-26",
+       "end": "2029-08-24",
+       "payment": "2029-08-24"
+      },
+      {
+       "start": "2029-08-24",
+       "end": "2030-02-25",
+       "payment": "2030-02-25"
+      },
+      {
+       "start": "2030-02-25",
+       "end": "2030-08-26",
+       "payment": "2030-08-26"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0040",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2027-03-24",
+    "end": "2032-04-24",
+    "frequency_months": 12,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2027-03-24",
+       "end": "2027-04-26",
+       "payment": "2027-04-27"
+      },
+      {
+       "start": "2027-04-26",
+       "end": "2028-04-24",
+       "payment": "2028-04-25"
+      },
+      {
+       "start": "2028-04-24",
+       "end": "2029-04-24",
+       "payment": "2029-04-25"
+      },
+      {
+       "start": "2029-04-24",
+       "end": "2030-04-24",
+       "payment": "2030-04-25"
+      },
+      {
+       "start": "2030-04-24",
+       "end": "2031-04-24",
+       "payment": "2031-04-25"
+      },
+      {
+       "start": "2031-04-24",
+       "end": "2032-04-26",
+       "payment": "2032-04-27"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0041",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2028-09-29",
+    "frequency_months": 1,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-03-29",
+       "payment": "2028-03-29"
+      },
+      {
+       "start": "2028-03-29",
+       "end": "2028-04-28",
+       "payment": "2028-04-28"
+      },
+      {
+       "start": "2028-04-28",
+       "end": "2028-05-29",
+       "payment": "2028-05-29"
+      },
+      {
+       "start": "2028-05-29",
+       "end": "2028-06-29",
+       "payment": "2028-06-29"
+      },
+      {
+       "start": "2028-06-29",
+       "end": "2028-07-31",
+       "payment": "2028-07-31"
+      },
+      {
+       "start": "2028-07-31",
+       "end": "2028-08-29",
+       "payment": "2028-08-29"
+      },
+      {
+       "start": "2028-08-29",
+       "end": "2028-09-29",
+       "payment": "2028-09-29"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0042",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2030-04-29",
+    "frequency_months": 3,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-04-28",
+       "payment": "2028-05-03"
+      },
+      {
+       "start": "2028-04-28",
+       "end": "2028-07-31",
+       "payment": "2028-08-02"
+      },
+      {
+       "start": "2028-07-31",
+       "end": "2028-10-30",
+       "payment": "2028-11-01"
+      },
+      {
+       "start": "2028-10-30",
+       "end": "2029-01-29",
+       "payment": "2029-01-31"
+      },
+      {
+       "start": "2029-01-29",
+       "end": "2029-04-30",
+       "payment": "2029-05-03"
+      },
+      {
+       "start": "2029-04-30",
+       "end": "2029-07-30",
+       "payment": "2029-08-01"
+      },
+      {
+       "start": "2029-07-30",
+       "end": "2029-10-29",
+       "payment": "2029-10-31"
+      },
+      {
+       "start": "2029-10-29",
+       "end": "2030-01-29",
+       "payment": "2030-01-31"
+      },
+      {
+       "start": "2030-01-29",
+       "end": "2030-04-29",
+       "payment": "2030-05-02"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0043",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2031-07-29",
+    "frequency_months": 6,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-07-31",
+       "payment": "2028-07-31"
+      },
+      {
+       "start": "2028-07-31",
+       "end": "2029-01-29",
+       "payment": "2029-01-29"
+      },
+      {
+       "start": "2029-01-29",
+       "end": "2029-07-30",
+       "payment": "2029-07-30"
+      },
+      {
+       "start": "2029-07-30",
+       "end": "2030-01-29",
+       "payment": "2030-01-29"
+      },
+      {
+       "start": "2030-01-29",
+       "end": "2030-07-29",
+       "payment": "2030-07-29"
+      },
+      {
+       "start": "2030-07-29",
+       "end": "2031-01-29",
+       "payment": "2031-01-29"
+      },
+      {
+       "start": "2031-01-29",
+       "end": "2031-07-29",
+       "payment": "2031-07-29"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0044",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2028-02-29",
+    "end": "2033-03-29",
+    "frequency_months": 12,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2028-02-29",
+       "end": "2028-03-29",
+       "payment": "2028-03-30"
+      },
+      {
+       "start": "2028-03-29",
+       "end": "2029-03-29",
+       "payment": "2029-04-03"
+      },
+      {
+       "start": "2029-03-29",
+       "end": "2030-03-29",
+       "payment": "2030-04-01"
+      },
+      {
+       "start": "2030-03-29",
+       "end": "2031-03-31",
+       "payment": "2031-04-01"
+      },
+      {
+       "start": "2031-03-31",
+       "end": "2032-03-30",
+       "payment": "2032-03-31"
+      },
+      {
+       "start": "2032-03-30",
+       "end": "2033-03-29",
+       "payment": "2033-03-30"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0045",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2027-03-28",
+    "frequency_months": 1,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2026-09-28",
+       "payment": "2026-09-28"
+      },
+      {
+       "start": "2026-09-28",
+       "end": "2026-10-28",
+       "payment": "2026-10-28"
+      },
+      {
+       "start": "2026-10-28",
+       "end": "2026-11-30",
+       "payment": "2026-11-30"
+      },
+      {
+       "start": "2026-11-30",
+       "end": "2026-12-28",
+       "payment": "2026-12-28"
+      },
+      {
+       "start": "2026-12-28",
+       "end": "2027-01-28",
+       "payment": "2027-01-28"
+      },
+      {
+       "start": "2027-01-28",
+       "end": "2027-02-26",
+       "payment": "2027-02-26"
+      },
+      {
+       "start": "2027-02-26",
+       "end": "2027-03-30",
+       "payment": "2027-03-30"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0046",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2028-10-28",
+    "frequency_months": 3,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2026-10-28",
+       "payment": "2026-10-30"
+      },
+      {
+       "start": "2026-10-28",
+       "end": "2027-01-28",
+       "payment": "2027-02-01"
+      },
+      {
+       "start": "2027-01-28",
+       "end": "2027-04-28",
+       "payment": "2027-04-30"
+      },
+      {
+       "start": "2027-04-28",
+       "end": "2027-07-28",
+       "payment": "2027-07-30"
+      },
+      {
+       "start": "2027-07-28",
+       "end": "2027-10-28",
+       "payment": "2027-11-01"
+      },
+      {
+       "start": "2027-10-28",
+       "end": "2028-01-28",
+       "payment": "2028-02-01"
+      },
+      {
+       "start": "2028-01-28",
+       "end": "2028-04-28",
+       "payment": "2028-05-03"
+      },
+      {
+       "start": "2028-04-28",
+       "end": "2028-07-28",
+       "payment": "2028-08-01"
+      },
+      {
+       "start": "2028-07-28",
+       "end": "2028-10-30",
+       "payment": "2028-11-01"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0047",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2030-01-28",
+    "frequency_months": 6,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2027-01-28",
+       "payment": "2027-01-28"
+      },
+      {
+       "start": "2027-01-28",
+       "end": "2027-07-28",
+       "payment": "2027-07-28"
+      },
+      {
+       "start": "2027-07-28",
+       "end": "2028-01-28",
+       "payment": "2028-01-28"
+      },
+      {
+       "start": "2028-01-28",
+       "end": "2028-07-28",
+       "payment": "2028-07-28"
+      },
+      {
+       "start": "2028-07-28",
+       "end": "2029-01-29",
+       "payment": "2029-01-29"
+      },
+      {
+       "start": "2029-01-29",
+       "end": "2029-07-30",
+       "payment": "2029-07-30"
+      },
+      {
+       "start": "2029-07-30",
+       "end": "2030-01-28",
+       "payment": "2030-01-28"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  },
+  {
+   "case_id": "schedule_deep-0048",
+   "operation": "rates.schedule.generate",
+   "inputs": {
+    "start": "2026-08-28",
+    "end": "2031-09-28",
+    "frequency_months": 12,
+    "calendar": "EUTA",
+    "end_of_month": false,
+    "payment_lag": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "periods": [
+      {
+       "start": "2026-08-28",
+       "end": "2026-09-28",
+       "payment": "2026-09-29"
+      },
+      {
+       "start": "2026-09-28",
+       "end": "2027-09-28",
+       "payment": "2027-09-29"
+      },
+      {
+       "start": "2027-09-28",
+       "end": "2028-09-28",
+       "payment": "2028-09-29"
+      },
+      {
+       "start": "2028-09-28",
+       "end": "2029-09-28",
+       "payment": "2029-10-01"
+      },
+      {
+       "start": "2029-09-28",
+       "end": "2030-09-30",
+       "payment": "2030-10-01"
+      },
+      {
+       "start": "2030-09-30",
+       "end": "2031-09-29",
+       "payment": "2031-09-30"
+      }
+     ]
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "strata-2.12.78"
+   ],
+   "tags": [
+    "stub",
+    "holiday"
+   ]
+  }
+ ]
+}

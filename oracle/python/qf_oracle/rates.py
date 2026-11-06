@@ -113,7 +113,7 @@ class Curve:
 def ois_periods(conv, as_of, tenor):
     c = CONV[conv]
     cal = c["calendar"]
-    spot = add_bd(cal, adjust(cal, as_of, "FOLLOWING"), c["spot_lag"])
+    spot = add_bd(cal, as_of, c["spot_lag"])
     end = end_date(cal, spot, tenor)
     if tenor[-1] in "DW" or (tenor_months(tenor) or 0) <= c["fixed_months"]:
         b = [spot, end]
