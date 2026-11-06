@@ -1,5 +1,6 @@
 """Golden cases for limits.md, and for the store and skip rulings in rulings.md."""
 import hashlib
+import json
 from datetime import date
 from fractions import Fraction as Fr
 
@@ -40,8 +41,8 @@ def limits():
     over("core.integrate.adaptive_simpson", {"function": "exp", "a": 0.0, "b": 1.0, "max_depth": 61})
     at("core.integrate.gauss_kronrod", {"function": "exp", "a": 0.0, "b": 1.0, "tol": 1e-10, "max_intervals": 10000}, {"value": e1}, "quadrature", ["analytic"], limit=lim)
     over("core.integrate.gauss_kronrod", {"function": "exp", "a": 0.0, "b": 1.0, "max_intervals": 10001})
-    s.add("core.integrate.adaptive_simpson", {"function": "oscillatory", "a": 0.0, "b": 2.0, "tol": 1e-300, "max_depth": 60}, error="E_NO_CONVERGENCE", cls=E, tags=["limit"],
-          description="legal input, must stop rather than run for ever")
+    s.add("core.integrate.adaptive_simpson", {"function": "oscillatory", "a": 0.0, "b": 2.0, "tol": 1e-6, "max_depth": 1}, error="E_NO_CONVERGENCE", cls=E, tags=["limit"],
+          description="the Simpson difference at depth 1 is about 0.1, far above tol and rounding, so no build can accept it")
     root = f(mp.findroot(lambda x: mp.cos(x) - x, 0.7))
     for op in ("bisection", "brent"):
         at(f"core.root.{op}", {"function": "cos_minus_x", "a": 0.0, "b": 1.0, "max_iter": 100000}, {"root": root}, "root_finding", ["mpmath-50"])
@@ -137,6 +138,40 @@ def limits():
     s.write()
 
 
+def limit_order():
+    s = Suite("limit_order", "specifications/01-core/limits.md", G)
+    s.compact = True
+    h = "core.snapshot.hash"
+
+    def err(op, inp, code, rule):
+        s.add(op, inp, error=code, cls=E, tags=["limit", rule])
+
+    deep = "[" * 65
+    err(h, {"document_text": "x" * 1048577}, L, "B1")
+    err(h, {"document_text": "\u00e9" * 524289}, L, "B1")
+    err(h, {"document_text": '{"a":' + deep}, L, "B2")
+    err(h, {"document_text": "{x " + deep}, L, "B2")
+    err(h, {"document_text": '{"a":1e400,"b":' + deep + "1" + "]" * 65 + "}"}, L, "B2")
+    err(h, {"document_text": '{"a":1,"a":2,"b":' + deep + "1" + "]" * 65 + "}"}, L, "B2")
+    for t in ('{"a":"' + deep + '"}', '{"a":"\\"' + deep + '"}'):
+        c = canon(json.loads(t))
+        s.add(h, {"document_text": t}, {"canonical": c, "snapshot_id": "sha256:" + hashlib.sha256(c.encode()).hexdigest()}, cls=E, verified=["oracle-canon"], tags=["limit", "B2"],
+              description="brackets inside a string do not count")
+    err(h, {"document_text": '{"a":1'}, "E_PARSE", "B2")
+    big = [0] * 100001
+    dc = "core.daycount.year_fraction"
+    err(dc, {"convention": "ACT_360", "start": "2024-01-01", "end": "2024-01-02", "unused": big}, L, "B3")
+    err(dc, {"convention": "ACT_ACT_ICMA", "start": "2024-01-01", "end": "2024-01-02", "unused": big}, "E_SCHEMA", "B3")
+    err(dc, {"convention": "ACT_365L", "start": "2024-01-01", "end": "2024-01-02", "frequency": 5, "unused": big}, "E_SCHEMA", "B3")
+    err("core.sobol.points", {"dimensions": 65, "count": 100000}, L, "B3")
+    v = 1
+    for _ in range(65):
+        v = [v]
+    err("core.store.chain", {"records": [{**rec(1, "A", K1, K1, 1.0), "note": v}]}, L, "B4")
+    err("core.store.chain", {"records": [rec(1, "A", "0001-01-01T00:00:00+01:00", K1, 1.0)]}, "E_DATE_RANGE", "B5")
+    s.write()
+
+
 def store_rulings():
     s = Suite("store_rulings", "specifications/01-core/rulings.md", G)
     q = "core.store.query_as_of"
@@ -168,6 +203,7 @@ def store_rulings():
 
 def main():
     limits()
+    limit_order()
     store_rulings()
 
 
