@@ -23,7 +23,7 @@ Read `../cli-contract.md` first, then `rulings.md` and `limits.md`, which apply 
 | `data-checks.md` | `data_checks` | Ready |
 | `timezone-and-cutoff.md` | `time` | Ready |
 | `rulings.md` | `rulings`, `store_rulings` | Ready |
-| `limits.md` | `limits` | Ready |
+| `limits.md` | `limits`, `limit_order` | Ready |
 | `asof-store.md` | `store` | Ready. Hashes have one source |
 
 Not yet specified from this domain's list: typed units and money, and the convention registry.

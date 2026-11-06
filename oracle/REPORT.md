@@ -62,7 +62,11 @@ suite store: 21 cases
 store: expected rows hand-written; hashes from the oracle canonical form, one source by nature
 limits: mc at limit, price 9.24164, stderr 0.01384
 suite limits: 61 cases
+suite limit_order: 15 cases
 suite store_rulings: 11 cases
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
-invariants: 4373 golden cases checked, none breaks a stated invariant
+invariants: 4388 golden cases checked, none breaks a stated invariant
+fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps
+fragility: integrate-0095 error estimate 1.52e-01 against tol 1e-13
+fragility: root-0025 needs 7 Brent steps against max_iter 2; root-0026 has width 0.125 after 3 bisections against x_tol 1e-12
 ```
