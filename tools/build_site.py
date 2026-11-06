@@ -41,6 +41,20 @@ def tracked():
     return [p for p in out.splitlines() if not p.startswith(LEFT_OUT) and (ROOT / p).is_file()]
 
 
+MERMAID = """<script src="https://cdn.jsdelivr.net/npm/mermaid@12.3.0/dist/mermaid.min.js" integrity="sha384-HHW54r639fK42Ip0coGF3mz8oSiGn0eEoWNTLs75X7H63pLSDBa0Tqs0RwGmLlXE" crossorigin="anonymous"></script>
+<script>
+document.querySelectorAll("pre > code.language-mermaid").forEach(function (code) {
+  var box = document.createElement("div");
+  box.className = "mermaid";
+  box.textContent = code.textContent;
+  code.parentElement.replaceWith(box);
+});
+mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
+mermaid.run();
+</script>
+"""
+
+
 def fix_links(text, page, pages, broken):
     """Rewrites the links of one page, leaving fenced code alone."""
     here = PurePosixPath(page).parent
@@ -93,6 +107,8 @@ def main():
         text = (ROOT / page).read_text(encoding="utf-8")
         title = title_of(text, page)
         body = markdown.markdown(fix_links(text, page, known, broken), extensions=["tables", "fenced_code", "toc"])
+        if "language-mermaid" in body:
+            body += MERMAID
         target = out / (page[:-3] + ".html")
         target.parent.mkdir(parents=True, exist_ok=True)
         up = "../" * page.count("/")
