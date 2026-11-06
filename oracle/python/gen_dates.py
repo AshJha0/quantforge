@@ -92,7 +92,9 @@ def daycount():
             plan.append((conv, a, b, kw, inp))
             if conv in STRATA_NAMES:
                 rows.append("\t".join([STRATA_NAMES[conv], str(a), str(b), str(kw.get("ref_end", b)), str(mon), "0",
-                                       str(kw.get("termination", "-"))]))
+                                       # Strata reads a period ending at maturity as a final period counted forward
+                                       # from start. A later maturity makes it count back from ref_end, as the spec does.
+                                       "2099-12-31" if conv == "ACT_ACT_ICMA" else str(kw.get("termination", "-"))]))
     (STRATA / "out").mkdir(exist_ok=True)
     (STRATA / "out" / "daycount-in.tsv").write_text("\n".join(rows) + "\n", newline="\n")
     java = Path(os.environ.get("JAVA25_HOME", r"C:\Program Files\Eclipse Adoptium\jdk-25.0.5.8-hotspot")) / "bin" / "java"
@@ -126,9 +128,7 @@ def daycount():
             else:
                 diffs["strata"].setdefault(conv, []).append((str(a), str(b), v, sv))
         s.add(op, inp, {"year_fraction": v}, verified=ver)
-    for lib, d in diffs.items():
-        for conv, lst in d.items():
-            note(f"daycount difference {lib} {conv}: {len(lst)} of the tested pairs; first {lst[:3]}")
+    explain_differences(diffs)
     base = {"convention": "ACT_360", "start": "2024-01-02", "end": "2024-01-01"}
     s.add(op, base, error="E_DATE_ORDER", tags=["invalid"])
     s.add(op, {**base, "convention": "ACT_999", "end": "2024-02-01"}, error="E_SCHEMA", tags=["invalid"])
@@ -137,7 +137,70 @@ def daycount():
     s.add(op, {"convention": "ACT_ACT_ICMA", "start": "2023-01-01", "end": "2024-02-01", "frequency": 2,
                "ref_start": "2023-08-01", "ref_end": "2024-02-01"}, error="E_INPUT", tags=["invalid"])
     s.add(op, {"convention": "ACT_365L", "start": "2024-01-01", "end": "2024-02-01", "frequency": 5}, error="E_SCHEMA", tags=["invalid"])
+    # start == end is 0 for every convention, tested where the day adjustments alone would not give it.
+    for d in ("2024-02-29", "2023-02-28", "2024-01-31", "2024-03-31", "2024-01-30"):
+        for term in (d, "2099-12-31"):
+            s.add(op, {"convention": "THIRTY_E_360_ISDA", "start": d, "end": d, "termination": term}, {"year_fraction": 0.0}, verified=["hand"], tags=["boundary"])
+        s.add(op, {"convention": "THIRTY_E_PLUS_360", "start": d, "end": d}, {"year_fraction": 0.0}, verified=["hand"], tags=["boundary"])
     s.write()
+
+
+def strata_afb(a, b):
+    """Strata's documented reading: plain year subtraction from end, no 28 February rule."""
+    def minus(n):
+        y = b.year - n
+        return date(y, b.month, min(b.day, dim(y, b.month)))
+    end, n = b, 0
+    while minus(n + 1) >= a:
+        n += 1
+        end = minus(n)
+    y = a.year
+    while not (leap(y) and date(y, 2, 29) >= a):
+        y += 1
+    return n + (end - a).days / (366 if date(y, 2, 29) < end else 365)
+
+
+def explain_differences(diffs):
+    """Every difference must be one the specs explain. Anything else stops the run."""
+    qd = dict(diffs["quantlib"])
+    eq = qd.pop("THIRTY_E_360_ISDA", [])
+    assert not qd and all(a == b for a, b, _, _ in eq), diffs["quantlib"]
+    note(f"daycount QuantLib THIRTY_E_360_ISDA: {len(eq)} difference, start = end = termination on 29 February, QuantLib gives -1/360; the spec gives 0")
+    st = dict(diffs["strata"])
+    afb = st.pop("ACT_ACT_AFB", [])
+    for a, b, _, sv in afb:
+        a, b = date.fromisoformat(a), date.fromisoformat(b)
+        assert abs(strata_afb(a, b) - sv) < 1e-13 and b.month == 2 and b.day == 28, (a, b)
+    note(f"daycount Strata ACT_ACT_AFB: {len(afb)} differences, all with end on 28 February, all reproduced by Strata's documented rule")
+    one = st.pop("ONE_ONE", [])
+    assert all(a == b for a, b, _, _ in one)
+    note(f"daycount Strata ONE_ONE: {len(one)} differences, all start = end; Strata documents 1/1 as always 1")
+    assert not st, st
+    note("daycount: no other difference from QuantLib or Strata, ACT_ACT_ICMA included")
+
+
+def spec_add_tenor(c, d, months, conv, eom):
+    """calendars.md, for months and years, to prove the text against QuantLib."""
+    def adj(x, how):
+        step = -1 if how == "PRECEDING" else 1
+        while not is_business(c, x):
+            x += timedelta(step)
+        return x
+
+    def apply(x):
+        if conv == "UNADJUSTED":
+            return x
+        if conv in ("FOLLOWING", "PRECEDING"):
+            return adj(x, conv)
+        r = adj(x, conv.split("_")[1])
+        return r if r.month == x.month else adj(x, "PRECEDING" if conv == "MODIFIED_FOLLOWING" else "FOLLOWING")
+    t = add_months(d, months)
+    last_day = lambda x: date(x.year, x.month, dim(x.year, x.month))  # noqa: E731
+    if eom and conv == "UNADJUSTED" and d == last_day(d):
+        return last_day(t)
+    if eom and conv != "UNADJUSTED" and d >= adj(last_day(d), "PRECEDING"):
+        return adj(last_day(t), "PRECEDING")
+    return apply(t)
 
 
 def calendars():
@@ -185,6 +248,23 @@ def calendars():
     s.add("core.calendar.is_business_day", {"calendar": "GBLO", "date": "1999-12-31"}, error="E_DATE_RANGE", cls=E, tags=["invalid"])
     s.add("core.calendar.is_business_day", {"calendar": "XXXX", "date": "2024-01-02"}, error="E_SCHEMA", cls=E, tags=["invalid"])
     s.add("core.calendar.add_tenor", {"calendar": "GBLO", "date": "2024-01-02", "tenor": "0M", "convention": "FOLLOWING", "end_of_month": False}, error="E_SCHEMA", cls=E, tags=["invalid"])
+    wider = 0
+    for c in ("GBLO", "EUTA"):
+        q = QLCAL[c]
+        d = date(2021, 1, 1)
+        while d.year < 2027:
+            for name, qc in convs.items():
+                for eom in (False, True):
+                    for mths in (1, 3, 12):
+                        r = q.advance(Q(d), ql.Period(mths, ql.Months), qc, eom).ISO()
+                        assert r == str(spec_add_tenor(c, d, mths, name, eom)), (c, d, name, eom, mths)
+            d += timedelta(1)
+    note("add_tenor: text of calendars.md matches QuantLib on every day 2021 to 2026, two calendars, all conventions")
+    for d in (date(2024, 3, 30), date(2024, 3, 31), date(2024, 6, 30), date(2024, 2, 29), date(2024, 4, 29)):
+        for name in ("UNADJUSTED", "PRECEDING", "MODIFIED_PRECEDING"):
+            r = QLCAL["GBLO"].advance(Q(d), ql.Period(1, ql.Months), convs[name], True)
+            s.add("core.calendar.add_tenor", {"calendar": "GBLO", "date": str(d), "tenor": "1M", "convention": name, "end_of_month": True}, {"date": r.ISO()}, cls=E, verified=["quantlib-1.44", "rules"])
+            wider += 1
     assert easter(2024) == date(2024, 3, 31) and easter(2000) == date(2000, 4, 23)
     assert leap(2000) and not leap(2100)
     s.write()

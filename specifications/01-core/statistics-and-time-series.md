@@ -2,8 +2,12 @@
 
 Spec version 1.0.0. Status: Specified.
 
-Input arrays must be finite unless an operation allows `null`. Use a stable method: two-pass or
-Welford, never `sum(x^2) - n mean^2`.
+Input arrays must be finite unless an operation allows `null`. Never use `sum(x^2) - n mean^2`.
+
+Data with a large mean needs more than two passes. The mean rounds to about `1e-7` when values sit near `1e9`, and
+that error reaches the third and fourth moments. So `summary`, `covariance`, `ols`, `autocorrelation` and `ar1` first
+shift by the first value: `y_i = x_i - x_0`, which is exact for nearby values. Then `m_y = sum y / n`, `d_i = y_i - m_y`,
+and all moments use `d_i`. The reported mean is `x_0 + m_y`. Case stats-0006 needs this for `skewness`.
 
 ## Distributions
 
