@@ -47,8 +47,8 @@ def iter_points(dimensions: int, count: int, skip: int = 0) -> Iterator[list[flo
 def points(dimensions: int, count: int, skip: int = 0) -> list[list[float]]:
     if not 1 <= dimensions <= MAX_DIMENSIONS:
         raise QfError("E_INPUT", "dimensions must be 1 to 64", "dimensions")
-    if not 1 <= count <= 1_000_000:
-        raise QfError("E_INPUT", "count must be 1 to 1000000", "count")
-    if skip < 0 or skip + count >= 1 << 32:
-        raise QfError("E_INPUT", "indices must stay below 2^32", "skip")
+    if count < 1:
+        raise QfError("E_INPUT", "count must be at least 1", "count")
+    if skip < 0:
+        raise QfError("E_INPUT", "skip must not be negative", "skip")
     return list(iter_points(dimensions, count, skip))

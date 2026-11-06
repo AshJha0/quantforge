@@ -16,10 +16,18 @@ No golden case is known to disagree with the spec now.
 All of the earlier open choices, Q4 to Q21, are now settled by `specifications/01-core/rulings.md`, or by the corrected
 contract and `root-finders.md`. The code follows those rulings.
 
-## Open choices in `asof-store.md`
+## Closed by `limits.md` and rulings A1 to A6
+
+- Q22, `sequence < 1` or an empty `series_id`: closed by A1, `E_SCHEMA`.
+- Q23, lone surrogate in a record: closed by A4, `E_SCHEMA`.
+- Q24, an instant outside years 1 to 9999: closed by A5, now `E_DATE_RANGE`.
+
+## Open
 
 | # | Question | Choice made |
 |---|---|---|
-| Q22 | `sequence < 1` and an empty `series_id` have no stated code | `E_SCHEMA`, as log check 1 |
-| Q23 | A lone surrogate in a record cannot be put in canonical form | `E_SCHEMA`, as in `snapshot-hash.md` |
-| Q24 | With no year limit, an offset can move an instant outside years 1 to 9999, which `Z` form cannot show | Reported as `E_NON_FINITE`. No case covers it |
+| Q25 | `limits.md` puts `E_LIMIT` after `E_PARSE`, but a text too deep for the JSON reader cannot be shown valid | `E_LIMIT`, including for a deep text that is also malformed, in the case and in `document_text` |
+| Q26 | Is `document_text` over the byte limit `E_LIMIT` even if malformed? | Yes: `E_LIMIT` is checked on its size, without parsing, so no work is started. `snapshot-hash.md` nesting and `E_SCHEMA` inside the text keep their order |
+| Q27 | A conditional daycount input missing, or `frequency` unlisted (`E_SCHEMA`), together with an unused over-long array | `E_LIMIT`, because those two checks sit in the core. Other enums are read before the limit stage |
+| Q28 | Nesting limit on a record's keys other than `value` | The limit is applied to every key of a record, since the chain hashes them all |
+| Q29 | Does A5 apply to `chain`, which leaves instants untouched? | Yes: the ruling names no exception |

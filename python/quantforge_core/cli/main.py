@@ -8,8 +8,7 @@ from typing import Any
 
 from .. import __version__, strictjson
 from ..errors import QfError
-from .inputs import Inputs
-from .operations import OPERATIONS
+from .operations import OPERATIONS, execute
 
 CONTRACT_VERSION = "1.0.0"
 SCHEMA_VERSION = "1.0"
@@ -66,10 +65,9 @@ def run_case(text: str) -> dict[str, Any]:
         _check_envelope(document)
         if overflowed:
             raise QfError("E_SCHEMA", "a number overflows binary64")
-        handler = OPERATIONS.get(document["operation"])
-        if handler is None:
+        if document["operation"] not in OPERATIONS:
             raise QfError("E_UNSUPPORTED_OPERATION", f"{document['operation']} is not in this build")
-        result = handler(Inputs(document["inputs"]))
+        result = execute(document["operation"], document["inputs"])
     except QfError as e:
         return _error(case_id, e.code, e.message, e.field)
     except (ArithmeticError, ValueError) as e:

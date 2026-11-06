@@ -1,20 +1,40 @@
 """Canonical form and hash of a snapshot (specifications/01-core/snapshot-hash.md)."""
 import hashlib
 import struct
+from collections.abc import Iterator
 from typing import Any
 
 from . import strictjson
 from .errors import QfError
 
+MAX_DEPTH = 64
+
+
+def _walk(value: Any) -> Iterator[tuple[Any, int]]:
+    """Every value inside value, with its nesting depth. Not recursive: depth is not yet known."""
+    stack = [(value, 0)]
+    while stack:
+        item, depth = stack.pop()
+        yield item, depth
+        if isinstance(item, list):
+            stack.extend((v, depth + 1) for v in item)
+        elif isinstance(item, dict):
+            stack.extend((k, depth + 1) for k in item)
+            stack.extend((v, depth + 1) for v in item.values())
+
 
 def has_lone_surrogate(value: Any) -> bool:
-    if isinstance(value, str):
-        return any(0xD800 <= ord(ch) <= 0xDFFF for ch in value)
-    if isinstance(value, list):
-        return any(has_lone_surrogate(v) for v in value)
-    if isinstance(value, dict):
-        return any(has_lone_surrogate(k) or has_lone_surrogate(v) for k, v in value.items())
-    return False
+    return any(
+        isinstance(item, str) and any(0xD800 <= ord(ch) <= 0xDFFF for ch in item)
+        for item, _ in _walk(value)
+    )
+
+
+def nesting_depth(value: Any) -> int:
+    """An object or array is one level. Scalars add none."""
+    return max(
+        (depth + 1 for item, depth in _walk(value) if isinstance(item, (list, dict))), default=0
+    )
 
 
 def _string(s: str) -> str:
@@ -70,4 +90,6 @@ def hash_document(text: str) -> tuple[str, str]:
         raise QfError("E_SCHEMA", "lone surrogate in a string", "document_text")
     if not isinstance(document, dict):
         raise QfError("E_SCHEMA", "the top level is not an object", "document_text")
+    if nesting_depth(document) > MAX_DEPTH:
+        raise QfError("E_LIMIT", f"nesting beyond {MAX_DEPTH} levels", "document_text")
     return hash_value({k: v for k, v in document.items() if k != "snapshot_id"})

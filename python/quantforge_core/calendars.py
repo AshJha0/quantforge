@@ -11,7 +11,7 @@ CONVENTIONS = ("UNADJUSTED", "FOLLOWING", "PRECEDING", "MODIFIED_FOLLOWING", "MO
 MIN_YEAR, MAX_YEAR = 2000, 2099
 MON, THU, FRI, SAT, SUN = 0, 3, 4, 5, 6
 _DAY = timedelta(days=1)
-_TENOR = re.compile(r"[1-9][0-9]{0,3}[DWMY]")
+TENOR = re.compile(r"[1-9][0-9]{0,3}[DWMY]")
 
 
 def check_calendar(name: str) -> None:
@@ -196,7 +196,7 @@ def add_tenor(name: str, d: date, tenor: str, convention: str, end_of_month: boo
     check_calendar(name)
     if convention not in CONVENTIONS:
         raise QfError("E_SCHEMA", f"unknown convention {convention}", "convention")
-    if _TENOR.fullmatch(tenor) is None:
+    if TENOR.fullmatch(tenor) is None:
         raise QfError("E_SCHEMA", f"bad tenor {tenor}", "tenor")
     check_range(d)
     n, unit = int(tenor[:-1]), tenor[-1]

@@ -1,7 +1,9 @@
 """One handler per operation. A handler reads its inputs, which is the E_SCHEMA stage, then calls
 the core, which applies the rule checks in spec order. It returns (outputs, diagnostics)."""
+import inspect
 from collections.abc import Callable
 from datetime import date
+from types import ModuleType
 from typing import Any
 
 from .. import (
@@ -23,12 +25,75 @@ from .. import (
     store,
     timezones,
 )
+from ..calendars import TENOR
 from ..errors import QfError
+from ..snapshot import has_lone_surrogate
 from .functions import real_function, root_function
 from .inputs import Inputs, format_seconds, parse_instant, parse_u64
+from .limits import check_limits
 
 Result = dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]
 OPTIONS = ("CALL", "PUT")
+
+
+# Reading inputs is the E_SCHEMA stage, and the first call into the core ends it. So each core
+# module is reached through a gate, which applies limits.md at exactly that point.
+_pending: tuple[str, Inputs] | None = None
+
+
+def _pass_gate() -> None:
+    global _pending
+    if _pending is not None:
+        name, i = _pending
+        _pending = None
+        check_limits(name, i.raw)
+
+
+class _Core:
+    def __init__(self, module: ModuleType):
+        self._module = module
+
+    def __getattr__(self, name: str) -> Any:
+        value = getattr(self._module, name)
+        if not inspect.isfunction(value):
+            return value
+
+        def call(*args: Any, **kwargs: Any) -> Any:
+            _pass_gate()
+            return value(*args, **kwargs)
+
+        return call
+
+
+calendars, compounding, cos, daycount, data_checks = map(
+    _Core, (calendars, compounding, cos, daycount, data_checks)
+)
+integrate, interp, linalg, monte_carlo, pde = map(
+    _Core, (integrate, interp, linalg, monte_carlo, pde)
+)
+rng, roots, snapshot, sobol, stats, store, timezones = map(
+    _Core, (rng, roots, snapshot, sobol, stats, store, timezones)
+)
+
+
+def execute(operation: str, raw: dict[str, Any]) -> Result:
+    global _pending
+    i = Inputs(raw)
+    _pending = (operation, i)
+    result = OPERATIONS[operation](i)
+    _pass_gate()
+    return result
+
+
+def _tenor(i: Inputs) -> str:
+    tenor = i.string("tenor")
+    if TENOR.fullmatch(tenor) is None:
+        raise QfError("E_SCHEMA", f"bad tenor {tenor}", "tenor")
+    return tenor
+
+
+def _opt_calendar(i: Inputs) -> str | None:
+    return i.enum("calendar", calendars.CALENDARS) if i.has("calendar") else None
 
 
 def _iso(d: date) -> str:
@@ -47,38 +112,38 @@ def _year_fraction(i: Inputs) -> Result:
     if convention == "THIRTY_E_360_ISDA":
         used["termination"] = i.opt_date("termination")
     if convention == "BUS_252":
-        used["calendar"] = i.opt_string("calendar")
+        used["calendar"] = _opt_calendar(i)
     return {"year_fraction": daycount.year_fraction(convention, start, end, **used)}
 
 
 def _is_business_day(i: Inputs) -> Result:
-    return {"is_business_day": calendars.is_business_day(i.string("calendar"), i.date("date"))}
+    return {"is_business_day": calendars.is_business_day(i.enum("calendar", calendars.CALENDARS), i.date("date"))}
 
 
 def _holidays(i: Inputs) -> Result:
-    days = calendars.holidays(i.string("calendar"), i.integer("year"))
+    days = calendars.holidays(i.enum("calendar", calendars.CALENDARS), i.integer("year"))
     return {"dates": [_iso(d) for d in days]}
 
 
 def _adjust(i: Inputs) -> Result:
-    d = calendars.adjust(i.string("calendar"), i.date("date"), i.string("convention"))
+    d = calendars.adjust(i.enum("calendar", calendars.CALENDARS), i.date("date"), i.enum("convention", calendars.CONVENTIONS))
     return {"date": _iso(d)}
 
 
 def _add_business_days(i: Inputs) -> Result:
-    d = calendars.add_business_days(i.string("calendar"), i.date("date"), i.integer("days"))
+    d = calendars.add_business_days(i.enum("calendar", calendars.CALENDARS), i.date("date"), i.integer("days"))
     return {"date": _iso(d)}
 
 
 def _business_days_between(i: Inputs) -> Result:
-    n = calendars.business_days_between(i.string("calendar"), i.date("start"), i.date("end"))
+    n = calendars.business_days_between(i.enum("calendar", calendars.CALENDARS), i.date("start"), i.date("end"))
     return {"count": n}
 
 
 def _add_tenor(i: Inputs) -> Result:
     d = calendars.add_tenor(
-        i.string("calendar"), i.date("date"), i.string("tenor"),
-        i.string("convention"), i.boolean("end_of_month"),
+        i.enum("calendar", calendars.CALENDARS), i.date("date"), _tenor(i),
+        i.enum("convention", calendars.CONVENTIONS), i.boolean("end_of_month"),
     )
     return {"date": _iso(d)}
 
@@ -118,8 +183,8 @@ def _draw_inputs(i: Inputs) -> tuple[int, int, int, int]:
 
 def _count(i: Inputs) -> int:
     count = i.integer("count")
-    if not 1 <= count <= 100000:
-        raise QfError("E_SCHEMA", "count must be 1 to 100000", "count")
+    if count < 1:
+        raise QfError("E_SCHEMA", "count must be at least 1", "count")
     return count
 
 
@@ -233,6 +298,7 @@ def _diff_central(i: Inputs) -> Result:
     x, h, order = i.real("x"), i.real("h"), i.integer("order")
     if order not in (1, 2):
         raise QfError("E_SCHEMA", "order must be 1 or 2", "order")
+    _pass_gate()
     if h <= 0:
         raise QfError("E_INPUT", "need h > 0", "h")
     if order == 1:
@@ -392,7 +458,7 @@ def _record(raw: Any) -> store.Record:
     if "value" not in raw:
         raise QfError("E_SCHEMA", "a record has no value", "records")
     sequence, series_id = r.integer("sequence"), r.string("series_id")
-    if sequence < 1 or not series_id or snapshot.has_lone_surrogate(raw):
+    if sequence < 1 or not series_id or has_lone_surrogate(raw):
         raise QfError("E_SCHEMA", "bad sequence, series_id or string in a record", "records")
     return store.Record(
         sequence, series_id, r.instant("event_time"), r.instant("knowledge_time"),
@@ -400,10 +466,8 @@ def _record(raw: Any) -> store.Record:
     )
 
 
-def _log(i: Inputs) -> list[store.Record]:
-    records = [_record(r) for r in i.array("records")]
-    store.check_log(records)
-    return records
+def _records(i: Inputs) -> list[store.Record]:
+    return [_record(r) for r in i.array("records")]
 
 
 def _zulu(seconds: int) -> str:
@@ -411,53 +475,57 @@ def _zulu(seconds: int) -> str:
 
 
 def _query_as_of(i: Inputs) -> Result:
-    log = _log(i)
-    rows = store.query_as_of(
-        log, i.instant("as_of"), _zulu, i.opt_string("series_id"),
-        i.opt_instant("event_from"), i.opt_instant("event_to"),
-    )
-    return {"rows": rows}
+    log, as_of = _records(i), i.instant("as_of")
+    series_id = i.opt_string("series_id")
+    event_from, event_to = i.opt_instant("event_from"), i.opt_instant("event_to")
+    store.check_log(log, as_of, event_from, event_to)
+    return {"rows": store.query_as_of(log, as_of, _zulu, series_id, event_from, event_to)}
 
 
 def _latest(i: Inputs) -> Result:
-    log = _log(i)
-    return {"row": store.latest(log, i.instant("as_of"), i.string("series_id"), _zulu)}
+    log, as_of, series_id = _records(i), i.instant("as_of"), i.string("series_id")
+    store.check_log(log, as_of)
+    return {"row": store.latest(log, as_of, series_id, _zulu)}
 
 
 def _store_snapshot(i: Inputs) -> Result:
-    log = _log(i)
-    form, snapshot_id, _ = store.snapshot(log, i.instant("as_of"), _zulu)
+    log, as_of = _records(i), i.instant("as_of")
+    store.check_log(log, as_of)
+    form, snapshot_id, _ = store.snapshot(log, as_of, _zulu)
     return {"canonical": form, "snapshot_id": snapshot_id}
 
 
 def _replay(i: Inputs) -> Result:
-    log = _log(i)
+    log = _records(i)
     checkpoints = [parse_instant(c, "checkpoints") for c in i.array("checkpoints")]
+    store.check_log(log, *checkpoints)
     snapshots, head = store.replay(log, checkpoints, _zulu)
     return {"snapshots": snapshots, "head": head}
 
 
 def _chain(i: Inputs) -> Result:
-    hashes = store.chain(_log(i))
+    log = _records(i)
+    store.check_log(log)
+    hashes = store.chain(log)
     return {"head": hashes[-1] if hashes else store.GENESIS, "hashes": hashes}
 
 
 def _utc_offset(i: Inputs) -> Result:
-    return {"offset_seconds": timezones.utc_offset(i.string("zone"), i.instant("instant"))}
+    return {"offset_seconds": timezones.utc_offset(i.enum("zone", timezones.ZONES), i.instant("instant"))}
 
 
 def _to_local(i: Inputs) -> Result:
-    return {"local": format_seconds(timezones.to_local(i.string("zone"), i.instant("instant")))}
+    return {"local": format_seconds(timezones.to_local(i.enum("zone", timezones.ZONES), i.instant("instant")))}
 
 
 def _to_instant(i: Inputs) -> Result:
-    instant = timezones.to_instant(i.string("zone"), i.local("local"), i.opt_string("overlap"))
+    instant = timezones.to_instant(i.enum("zone", timezones.ZONES), i.local("local"), i.opt_string("overlap"))
     return {"instant": format_seconds(instant, "Z")}
 
 
 def _business_date(i: Inputs) -> Result:
     d = timezones.business_date(
-        i.instant("instant"), i.string("zone"), i.cutoff("cutoff"), i.string("calendar")
+        i.instant("instant"), i.enum("zone", timezones.ZONES), i.cutoff("cutoff"), i.enum("calendar", calendars.CALENDARS)
     )
     return {"date": _iso(d)}
 

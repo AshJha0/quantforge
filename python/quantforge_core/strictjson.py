@@ -45,6 +45,8 @@ def parse(text: str) -> tuple[Any, bool]:
             parse_constant=on_constant,
             object_pairs_hook=on_pairs,
         )
-    except (json.JSONDecodeError, RecursionError) as e:
+    except json.JSONDecodeError as e:
         raise QfError("E_PARSE", f"not valid JSON: {e}") from None
+    except RecursionError:
+        raise QfError("E_LIMIT", "nesting is too deep to read") from None
     return value, overflow
