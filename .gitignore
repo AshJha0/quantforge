@@ -12,3 +12,4 @@ data/recorder/
 mutants/
 mutants.out*/
 .mutmut-cache
+site/

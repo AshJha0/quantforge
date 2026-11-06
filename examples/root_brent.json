@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-root","operation":"core.root.brent","inputs":{"function":"cubic_wallis","a":2,"b":3}}
