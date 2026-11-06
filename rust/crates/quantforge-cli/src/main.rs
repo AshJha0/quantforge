@@ -81,8 +81,9 @@ fn check_envelope(doc: &Json, flags: Flags) -> Result<(&str, &Json), QfError> {
     }
 }
 
-/// `E_SCHEMA` outranks `E_LIMIT`, and `E_LIMIT` outranks every rule check. Operations with costly
-/// work stop at `Inputs::gate`; the rest are cheap, so their outcome is simply replaced here.
+/// `E_SCHEMA` outranks `E_LIMIT`, and `E_LIMIT` outranks every rule check. Every operation that
+/// works on an array stops at `Inputs::gate`, after its typed reads. An oversized array in a key
+/// the operation ignores reaches the end, and its small result is replaced here.
 fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
     let limit = OPERATIONS
         .contains(&op)

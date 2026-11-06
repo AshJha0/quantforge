@@ -211,6 +211,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "core.interp.monotone_convex" => {
             let (t, r, at) = (i.reals("t")?, i.reals("r")?, i.reals("at")?);
             let pos = i.bool_or("positive", false)?;
+            i.gate()?;
             let (f, z) = interp::monotone_convex(&t, &r, &at, pos)?;
             plain(obj([("forwards", f.into()), ("zero_rates", z.into())]))
         }
@@ -232,7 +233,11 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "core.mc.gbm_european" => monte_carlo(i),
         "core.pde.bs_european" => pde_european(i),
-        "core.rng.inverse_normal" => plain(obj([("z", inverse_normal(&i.reals("p")?)?.into())])),
+        "core.rng.inverse_normal" => {
+            let p = i.reals("p")?;
+            i.gate()?;
+            plain(obj([("z", inverse_normal(&p)?.into())]))
+        }
         "core.rng.next_u64" => {
             let (mut g, n) = generator(i)?;
             let v: Vec<String> = (0..n).map(|_| g.next_u64().to_string()).collect();
@@ -285,17 +290,22 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             plain(obj([("points", sobol::points(d, n, s)?.into())]))
         }
         "core.stats.covariance" => {
-            let (c, r) = stats::covariance(&i.reals("x")?, &i.reals("y")?)?;
+            let (x, y) = (i.reals("x")?, i.reals("y")?);
+            i.gate()?;
+            let (c, r) = stats::covariance(&x, &y)?;
             plain(obj([("covariance", c.into()), ("correlation", r.into())]))
         }
         "core.stats.normal" => {
             let x = i.reals("x")?;
+            i.gate()?;
             let pdf: Vec<f64> = x.iter().map(|v| stats::normal_pdf(*v)).collect();
             let cdf: Vec<f64> = x.iter().map(|v| stats::normal_cdf(*v)).collect();
             plain(obj([("pdf", pdf.into()), ("cdf", cdf.into())]))
         }
         "core.stats.ols" => {
-            let o = stats::ols(&i.reals("x")?, &i.reals("y")?)?;
+            let (x, y) = (i.reals("x")?, i.reals("y")?);
+            i.gate()?;
+            let o = stats::ols(&x, &y)?;
             plain(obj([
                 ("alpha", o.alpha.into()),
                 ("beta", o.beta.into()),
@@ -311,7 +321,9 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             plain(obj([("values", v.into())]))
         }
         "core.stats.summary" => {
-            let s = stats::summary(&i.reals("x")?)?;
+            let x = i.reals("x")?;
+            i.gate()?;
+            let s = stats::summary(&x)?;
             plain(obj([
                 ("count", s.count.into()),
                 ("mean", s.mean.into()),
@@ -406,7 +418,9 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             plain(obj([("offset_seconds", time::utc_offset(z, t)?.into())]))
         }
         "core.ts.ar1" => {
-            let (c, p, s) = ts::ar1(&i.reals("x")?)?;
+            let x = i.reals("x")?;
+            i.gate()?;
+            let (c, p, s) = ts::ar1(&x)?;
             plain(obj([
                 ("constant", c.into()),
                 ("phi", p.into()),
@@ -420,10 +434,12 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "core.ts.ewma_variance" => {
             let (r, l) = (i.reals("returns")?, i.f64("lambda")?);
+            i.gate()?;
             plain(obj([("variance", ts::ewma_variance(&r, l)?.into())]))
         }
         "core.ts.forward_fill" => {
             let (v, l) = (i.nullable_reals("values")?, i.int("limit")?);
+            i.gate()?;
             plain(obj([("values", ts::forward_fill(&v, l)?.into())]))
         }
         "core.ts.ljung_box" => {
@@ -438,6 +454,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 "MONTH" => true,
                 _ => return i.fail("frequency", "unknown frequency"),
             };
+            i.gate()?;
             let (od, ov) = ts::resample_last(&d, &v, monthly)?;
             let od: Vec<String> = od.iter().map(ToString::to_string).collect();
             plain(obj([("dates", od.into()), ("values", ov.into())]))
@@ -449,6 +466,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 "LOG" => true,
                 _ => return i.fail("kind", "unknown kind"),
             };
+            i.gate()?;
             plain(obj([("returns", ts::returns(&p, log)?.into())]))
         }
         "core.ts.rolling" => {
