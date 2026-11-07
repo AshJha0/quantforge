@@ -2,6 +2,8 @@
 
 Spec version 1.0.0. Status: Specified (stage D, D7).
 
+**Stylised conventions (ruling R1-5).** The term index is synthetic, caplets fix with no lag, and the swaption's fixed leg is annual 30/360. These are not the conventions of any market cap or swaption; they test the option machinery only.
+
 Index `USD-TERM-3M` on the stage B curves: `discount` (OIS) and `projection`. `spot = add_business_days(as_of, 2)` on `USGS`; schedules by `02-curves/schedules.md` with `MODIFIED_FOLLOWING`, no end-of-month. Option formulas are `black-models.md` (`BLACK_76` or `BACHELIER`, undiscounted, vols as ruling C7); time to expiry `t = (fixing - as_of)/365`.
 
 ## `rates.cap.price`

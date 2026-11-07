@@ -1,0 +1,12 @@
+{
+ "checked_by": "spec session, R1, 2026-11-07",
+ "rule": "plan 11.2.3: fail when a calendar's confirmed coverage ends within 12 months of the check date",
+ "calendars": {
+  "GBLO": {"source": "UK Government, England and Wales bank holidays", "url": "https://www.gov.uk/bank-holidays.json", "checked": "2026-11-07", "confirmed_through": "2028-12-31",
+           "notes": "Feed lists dates to 2028-12-26. No one-offs 2026-2028 for England and Wales; the 2026-06-15 holiday is Scotland only."},
+  "EUTA": {"source": "European Central Bank, T2 closing days", "url": "https://www.ecb.europa.eu/paym/target/t2/html/index.en.html", "checked": "2026-11-07", "confirmed_through": "2099-12-31",
+           "notes": "Standing rule with no end year: 1 Jan, Good Friday, Easter Monday, 1 May, 25 and 26 Dec. Read through a summary of the page, not verbatim; recheck the wording at the next refresh."},
+  "USGS": {"source": "SIFMA US fixed income holiday recommendations (17 Dec 2025 release)", "url": "https://www.sifma.org/resources/general/holiday-schedule/", "checked": "2026-11-07", "confirmed_through": "2027-01-01",
+           "notes": "Published only for 2026 and New Year 2027. SIFMA lists Good Friday 2026-04-03 as a 12:00 early close, not a full close; the spec treats every Good Friday as a holiday. Ruling candidate, not changed here."}
+ }
+}

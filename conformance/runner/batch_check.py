@@ -50,8 +50,11 @@ def parse_lines(raw):
 
 
 def strip_timing(r):
+    """The result without elapsed_ns. An empty or absent diagnostics object counts as the same."""
     r = json.loads(json.dumps(r))
     r.get("diagnostics", {}).pop("elapsed_ns", None)
+    if r.get("diagnostics") == {}:
+        del r["diagnostics"]
     return r
 
 
@@ -108,7 +111,7 @@ def check_sample(base, cwd, timeout, every, do_run):
         msgs.append("reorder: results differ when the stream is reversed (BT7)")
     _, out = call(base + ["batch", "--timings"], cwd, lines_of(cases), timeout)
     tim = parse_lines(out)
-    if [strip_timing(r) for r in tim] != fwd:
+    if [strip_timing(r) for r in tim] != [strip_timing(r) for r in fwd]:
         msgs.append("timings_identity: results differ with --timings")
     if do_run:
         for c, b in zip(cases, fwd):
