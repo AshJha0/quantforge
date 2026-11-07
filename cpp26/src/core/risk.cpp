@@ -49,21 +49,22 @@ ParRisk par_risk(const RateConvention& c, Date as_of, const std::vector<OisQuote
 
 PnlExplain pnl_explain(const RateConvention& c, Date as_of, const std::vector<OisQuote>& start,
                        const std::vector<OisQuote>& end, CurveInterpolation interpolation, const CurvePricer& price,
-                       double bump_bp) {
+                       double bump_bp, double notional) {
     bool same = start.size() == end.size();
     for (std::size_t j = 0; same && j < start.size(); ++j)
         same = start[j].tenor.count == end[j].tenor.count && start[j].tenor.unit == end[j].tenor.unit;
     if (!same) throw Error("E_INPUT", "quotes_start and quotes_end must have the same tenors", "quotes_end");
     const ParRisk par = par_risk(c, as_of, start, interpolation, price, bump_bp, BumpScheme::Central);
-    PnlExplain out{par.value, price(build(c, as_of, end, interpolation)), 0, 0, 0, 0, par.buckets, false};
+    PnlExplain out{par.value, price(build(c, as_of, end, interpolation)), 0, 0, 0, 0, 0, par.buckets, false};
     out.full_pnl = out.value_end - out.value_start;
-    double dv01 = 0.0;
     for (std::size_t j = 0; j < start.size(); ++j) {
-        out.risk_pnl += par.buckets[j] * (end[j].rate - start[j].rate) / bp;
-        dv01 += par.buckets[j];
+        const double move = (end[j].rate - start[j].rate) / bp;
+        out.risk_pnl += par.buckets[j] * move;
+        out.gross_risk_pnl += std::fabs(par.buckets[j]) * std::fabs(move);
     }
     out.unexplained = out.full_pnl - out.risk_pnl;
-    out.threshold = std::max(0.05 * std::fabs(out.full_pnl), 0.05 * std::fabs(dv01));
+    // Ruling R2-A3: scales with the move, plus a numerical floor equal to the golden tolerance.
+    out.threshold = 0.05 * std::max(std::fabs(out.full_pnl), out.gross_risk_pnl) + 1e-8 * notional;
     out.explained = std::fabs(out.unexplained) <= out.threshold;
     return out;
 }

@@ -14,6 +14,7 @@ struct RiskProduct {
         if (kind == Kind::Ois) return ois_price(trade, c).valuation.pv;
         return notional * curve_dirty(bond, settlement, c, 0.0) / 100.0;
     }
+    double face() const { return kind == Kind::Ois ? trade.notional : notional; }
 };
 
 RiskProduct product_of(const In& in) {
@@ -130,12 +131,13 @@ void op_pnl_explain(const In& in, Out& out) {
         throw Error("E_INPUT", "the trade's convention differs from the curve's", "product");
     check_crossed(raw_start);
     check_crossed(raw_end);
-    const PnlExplain r = pnl_explain(*c, as_of, start, end, interpolation, pricer_of(product), bump);
+    const PnlExplain r = pnl_explain(*c, as_of, start, end, interpolation, pricer_of(product), bump, product.face());
     out.key_real("value_start", r.value_start);
     out.key_real("value_end", r.value_end);
     out.key_real("full_pnl", r.full_pnl);
     out.key_reals("par_buckets", r.par_buckets);
     out.key_real("risk_pnl", r.risk_pnl);
+    out.key_real("gross_risk_pnl", r.gross_risk_pnl);
     out.key_real("unexplained", r.unexplained);
     out.key_real("threshold", r.threshold);
     out.values.key("explained");

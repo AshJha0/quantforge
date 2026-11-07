@@ -36,14 +36,14 @@ KeyRateRisk key_rate_risk(const Curve& curve, KeyRateMode mode, const std::vecto
 double triangular_weight(const std::vector<double>& key_times, std::size_t i, double t);
 
 struct PnlExplain {
-    double value_start, value_end, full_pnl, risk_pnl, unexplained, threshold;
+    double value_start, value_end, full_pnl, risk_pnl, gross_risk_pnl, unexplained, threshold;
     std::vector<double> par_buckets;
     bool explained;
 };
-/// E_INPUT unless both quote sets have the same tenors in the same order.
+/// E_INPUT unless both quote sets have the same tenors in the same order. `notional` sets the numerical floor.
 PnlExplain pnl_explain(const RateConvention& c, Date as_of, const std::vector<OisQuote>& start,
                        const std::vector<OisQuote>& end, CurveInterpolation interpolation, const CurvePricer& price,
-                       double bump_bp);
+                       double bump_bp, double notional);
 
 struct ZeroJacobian {
     std::vector<Date> pillar_dates;
