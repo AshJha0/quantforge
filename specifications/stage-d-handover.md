@@ -38,9 +38,13 @@ Read, beyond wave 1: `specifications/04-pricing/bonds.md`; the wave 2 table in `
 
 New operations: `fx.xccy.bootstrap`, `fx.xccy.pv`, `fx.ndf.pv`. Goldens: `datasets/golden/stage_d/xccy_d.json`, 13 cases. Read: `specifications/02-curves/cross-currency.md`; the D3 table in `stage-d-targets.md`; rulings D17, D18.
 
-### D4, D5
+### D4 credit (ready)
 
-Not yet specified. Do not start them.
+New operations: `credit.cds.price`, `credit.cds.bootstrap`, `credit.index.intrinsic`, `credit.curve.composite`. Goldens: `datasets/golden/stage_d/credit_d.json`, 19 cases. Read: `specifications/04-pricing/credit.md`; the D4 table in `stage-d-targets.md`; rulings D19 to D21.
+
+### D5
+
+Not yet specified. Do not start it.
 
 ## Wave 3
 

@@ -43,4 +43,12 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | Cross-currency swap PV | 1e-9 per unit notional | QuantLib `OvernightLeg` NPV for coupons | Within 1e-6 on 1e7 |
 | NDF | `interpolation` | Analytic | |
 
+## Wave 2, D4: credit
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| ISDA CDS price, upfront, par spread | 1e-9 per unit notional | QuantLib `IsdaCdsEngine` | NPV within 7e-16 per unit |
+| Hazard bootstrap | Survival within 1e-9 | QuantLib fair spreads on the result | Within 2e-10 |
+| Index intrinsic, composite curves | 1e-9 | Through the above | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).

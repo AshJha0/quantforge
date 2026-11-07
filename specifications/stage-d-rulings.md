@@ -27,6 +27,10 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D17 | Cross-currency schedule | Quarterly, `MODIFIED_FOLLOWING` on the joint calendar, ACT/360, constant notional with exchanges. `start` must be a joint business day. Domestic USD, foreign EUR only |
 | D18 | NDF forward | At the payment date, from the two curves; no spot lag and no convexity. A fixing on or before `as_of` must be given |
 
+| D19 | CDS trade date | Not on an adjusted coupon date (`E_INPUT`); that edge moves accrual start and has no outside check here |
+| D20 | Hazard pillars | At each quote's maturity (ISDA). QuantLib's `SpreadCdsHelper` puts them a day after the last payment; that is a wrong-convention check here |
+| D21 | Observation day | Coupon survival and accrual-on-default end at payment date minus 1 day, as QuantLib's `IsdaCdsEngine` source. Read from QuantLib 1.44 `isdacdsengine.cpp` |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
@@ -42,6 +46,7 @@ Cases for rulings carry the `ruling` tag.
 | `repo_d` | None | FRN replay and par identity; repo analytic; CBOT formula by hand |
 | `bondfit_d` | SciPy `least_squares` | Known truth |
 | `xccy_d` | QuantLib `OvernightLeg` NPV of foreign coupons | Bootstrap is known truth; NDF analytic |
+| `credit_d` | QuantLib `IsdaCdsEngine` (the ISDA model as QuantLib implements it) | Index and composite curves are sums of checked parts |
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.

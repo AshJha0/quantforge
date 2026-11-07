@@ -214,6 +214,16 @@ def check_d(c, counts):
         sg = 1 if i["trade"]["side"] == "RECEIVE_FOREIGN" else -1
         assert abs(o["pv"] - sg * (i["spot"] * o["foreign_leg"] - o["domestic_leg"])) < 1e-6, cid
         hit("xccy pv = sign (spot foreign - domestic)")
+    if op in ("credit.cds.bootstrap", "credit.curve.composite"):
+        sv = [p["survival"] for p in o["pillars"]]
+        assert all(0 < v <= 1 for v in sv) and all(b < a for a, b in zip(sv, sv[1:])), cid
+        hit("CDS survival in (0, 1] and strictly falling")
+    if op == "credit.cds.price":
+        assert o["protection_leg"] > 0 and o["rpv01"] > 0 and o["accrued"] >= 0, cid
+        hit("CDS legs positive")
+    if op == "credit.index.intrinsic":
+        assert abs(o["basis"] - (i["quoted_upfront"] - o["intrinsic_upfront"])) < 1e-15, cid
+        hit("index basis = quoted - intrinsic")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid

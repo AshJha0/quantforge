@@ -198,6 +198,7 @@ Wave 2 adds:
 |---|---|
 | `bond.*`, `repo.*` | `04-pricing/bonds.md` |
 | `fx.xccy.*`, `fx.ndf.*` | `02-curves/cross-currency.md` |
+| `credit.*` | `04-pricing/credit.md` |
 
 `ESTR` joins `rates.ois.*`, and curve objects take optional `jumps` (`02-curves/curve-framework.md`).
 
