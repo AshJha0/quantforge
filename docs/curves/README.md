@@ -17,6 +17,8 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [USD-TERM-3M projection](usd-term-3m.md) | Implemented, not Validated | B | 6 golden cases for `rates.projection.bootstrap`, 5 with an outside library in `verified_by` |
 | [GBPUSD FX forward](gbpusd-fx-forward.md) | Implemented, not Validated | B | 11 golden cases for `fx.forward.outright`, 0 with an outside library in `verified_by` |
 | Equity spot and parity-implied forward, discrete dividends | Planned | C | None yet |
+| Implied volatility smile | Planned | C | None yet |
+| Implied volatility surface | Planned | C | None yet |
 | Dividend curves | Planned | D | None yet |
 | Borrow curves | Planned | D | None yet |
 | Financing curves | Planned | D | None yet |

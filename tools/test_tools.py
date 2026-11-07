@@ -98,5 +98,35 @@ class Recorder(unittest.TestCase):
             self.assertFalse(log.exists())
 
 
+class GalleryVol(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sp = importlib.util.spec_from_file_location("build_gallery", ROOT / "tools/build_gallery.py")
+        cls.bg = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(cls.bg)
+
+    def test_smile_renders_only_given_numbers(self):
+        svg = self.bg.smile_chart("t", [{"name": "1y", "strikes": [90, 100, 110], "vols": [0.31, 0.25, 0.22]}], "c")
+        self.assertIn("<polyline", svg)
+        self.assertIn("</svg>", svg)
+
+    def test_smile_refuses_empty_or_ragged(self):
+        with self.assertRaises(ValueError):
+            self.bg.smile_chart("t", [], "c")
+        with self.assertRaises(ValueError):
+            self.bg.smile_chart("t", [{"name": "x", "strikes": [1, 2], "vols": [0.2]}], "c")
+
+    def test_surface_grid(self):
+        svg = self.bg.surface_svg("t", [90, 100], ["3m", "1y"], [[0.3, 0.25], [0.28, 0.24]], "c")
+        self.assertEqual(svg.count("<rect"), 4)
+        with self.assertRaises(ValueError):
+            self.bg.surface_svg("t", [90, 100], ["3m"], [[0.3]], "c")
+
+    def test_vol_listed_as_planned_without_data(self):
+        names = {n: st for n, st in self.bg.PLANNED}
+        self.assertEqual(names["Implied volatility smile"], "C")
+        self.assertEqual(names["Implied volatility surface"], "C")
+
+
 if __name__ == "__main__":
     unittest.main()
