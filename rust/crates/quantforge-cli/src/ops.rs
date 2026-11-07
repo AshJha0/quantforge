@@ -165,6 +165,7 @@ pub const OPERATIONS: &[&str] = &[
     "risk.curve.key_rate",
     "risk.curve.par",
     "risk.ois.dv01",
+    "risk.pnl.explain",
     "risk.vol.bump_greeks",
     "risk.vol.greeks",
     "risk.vol.surface_vega",

@@ -2,7 +2,9 @@
 
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
-use crate::ops_b::{curve_input, interpolation, ois_quotes, ois_trade, overnight, sub};
+use crate::ops_b::{
+    curve_input, interpolation, ois_quotes, ois_quotes_at, ois_trade, overnight, sub,
+};
 use crate::ops_d2::bond_fields;
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
@@ -99,6 +101,27 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("pillar_dates", dates.into()),
                 ("zero_rates", r.zero_rates.into()),
                 ("jacobian", rows.into()),
+            ]))
+        }
+        "risk.pnl.explain" => {
+            let c = overnight(i, "convention")?;
+            let (t, m) = (i.date("as_of")?, interpolation(i)?);
+            let (s, e) = (
+                ois_quotes_at(i, "quotes_start")?,
+                ois_quotes_at(i, "quotes_end")?,
+            );
+            let (p, bp) = (product(i)?, i.f64_or("bump_bp", 1.0)?);
+            i.gate()?;
+            let r = risk_curve::pnl_explain(&c, t, m, &s, &e, &p, bp)?;
+            plain(obj([
+                ("value_start", r.value_start.into()),
+                ("value_end", r.value_end.into()),
+                ("full_pnl", r.full_pnl.into()),
+                ("par_buckets", r.par_buckets.into()),
+                ("risk_pnl", r.risk_pnl.into()),
+                ("unexplained", r.unexplained.into()),
+                ("threshold", r.threshold.into()),
+                ("explained", r.explained.into()),
             ]))
         }
         _ => fail(
