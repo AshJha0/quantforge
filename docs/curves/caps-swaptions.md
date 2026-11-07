@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike. Stage D, target v0.4.
+Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike. The conventions are stylised: a synthetic term index, no fixing lag and an annual 30/360 fixed leg (ruling R1-5). Stage D, target v0.4.
 
 ## Runs
 

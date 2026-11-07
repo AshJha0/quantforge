@@ -9,7 +9,11 @@ Work in progress on branch `r1`. Nothing here changes a golden value.
 - The honest-ceiling statement in `README.md`: what free public data can and cannot show.
 - Batch mode sections in `COOKBOOK.md` and `LEARN.md`, and an R1 section in `ROADMAP.md`.
 
+### Known issues
+- The calendar expiry test is red in the weekly job until SIFMA's December holiday release.
+
 ### Changed
+- Docs and gallery text follow rulings R1-1 to R1-5 (`specifications/r1-rulings.md`): cross-currency is a synthetic constant-notional basis swap; the ESTR payment lag of 2 is a Strata library choice; bond-future conversion factors take a `contract` input with CME rounding; credit operations need `LOG_LINEAR_DF` discount curves; cap and swaption conventions are stylised.
 - `README.md` no longer says stage D is untagged; it was released as `v0.4`.
 
 ## 0.4.0: stage D, curves and fixed income (2026-11-07)

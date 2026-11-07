@@ -144,11 +144,11 @@ Stage C is Implemented, not Validated. All inputs are synthetic: the stage C dat
 | D1 meeting steps | Overnight rates move on central-bank dates and stay flat between them | `02-curves/meeting-steps.md` |
 | D1 convexity, CSA, basis, fits | Futures sit above forwards; collateral sets the discount curve; two indices differ by a spread; fits can be smoothed or made robust | `futures-convexity.md`, `csa-and-basis.md`, `03-calibration/curve-fits.md` |
 | D2 bonds, repo | A bond is its cash flows; repo finances it; a futures contract delivers the cheapest bond | `04-pricing/bonds.md` |
-| D3 cross-currency | Foreign cash flows under domestic collateral discount on a basis-adjusted curve | `02-curves/cross-currency.md` |
-| D4 credit | Survival probabilities from CDS spreads, by the ISDA model | `04-pricing/credit.md` |
+| D3 cross-currency | Foreign cash flows under domestic collateral discount on a basis-adjusted curve. The swap is a synthetic constant-notional basis swap, not the market's mark-to-market resetting one (ruling R1-1; register row E13, stage F) | `02-curves/cross-currency.md` |
+| D4 credit | Survival probabilities from CDS spreads, by the ISDA model. The discount curve must be `LOG_LINEAR_DF` (ruling R1-4) | `04-pricing/credit.md` |
 | D5 equity | Futures imply dividends and borrow; an index changes by its divisor | `02-curves/equity-curves.md`, `04-pricing/equity-index.md` |
 | D6 inflation | A CPI curve from zero-coupon swaps, with a monthly seasonal pattern | `02-curves/inflation.md` |
-| D7 caps, swaptions | Black or Bachelier on a forward rate, times an annuity | `05-volatility/caps-and-swaptions.md` |
+| D7 caps, swaptions | Black or Bachelier on a forward rate, times an annuity. Conventions are stylised: synthetic term index, no fixing lag, annual 30/360 fixed leg (ruling R1-5) | `05-volatility/caps-and-swaptions.md` |
 | D8 commodities | Forward curves with seasons; storage links two delivery dates | `02-curves/commodity.md` |
 | D9 MBS | A mortgage pool pays down early at a modelled speed | `04-pricing/mbs.md` |
 
@@ -176,7 +176,7 @@ Nothing in these examples is traded.
 
 ### Known limits
 
-Stage D is Implemented, not Validated. All inputs are synthetic. The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 410 of the 647 stage D cases (63.4%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
+Stage D is Implemented, not Validated. All inputs are synthetic. The ESTR payment lag of 2 is a library choice (Strata), not a market standard; TP ICAP terms use 1 (ruling R1-2). From R1, bond-future conversion factors take an optional `contract` input with CME rounding; `null` keeps the stage D `TEN_YEAR` behaviour (ruling R1-3). The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 410 of the 647 stage D cases (63.4%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
 
 ### What a tolerance means in money
 
