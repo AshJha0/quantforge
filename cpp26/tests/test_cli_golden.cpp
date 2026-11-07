@@ -1,5 +1,5 @@
-// Stage C and D operations through the CLI layer, against golden expectations
-// (tests/cli_cases_cd.inc). This reaches the argument handling in src/cli/ops_*.inc.
+// Every operation through the CLI layer, against golden expectations
+// (tests/cli_cases.inc). This reaches the argument handling in src/cli.
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <cmath>
@@ -16,7 +16,7 @@ struct Row {
     double abs_tol, rel_tol;
 };
 constexpr Row rows[] = {
-#include "cli_cases_cd.inc"
+#include "cli_cases.inc"
 };
 
 using quantforge::json::Kind;
@@ -53,7 +53,7 @@ std::string diff(const Value& got, const Value& want, double a, double r, const 
 
 }  // namespace
 
-TEST_CASE("stage C and D operations match their goldens through the CLI layer") {
+TEST_CASE("operations match their goldens through the CLI layer") {
     for (const Row& row : rows) {
         const auto result = quantforge::cli::run_case(row.input);
         const auto parsed = quantforge::json::parse(result.json);
