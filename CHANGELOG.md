@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.4.1: R1, credibility hardening (Unreleased)
+## 0.4.1: R1, credibility hardening (2026-11-07)
 
-On branch `r1` at `3f5d97d`. No new pricing. No golden value changed except where a ruling below says so.
+*Note: the v0.4.1 tag (3194067) still carries 0.4.0 in the package manifests; the bump to 0.4.1 landed just after, in the follow-up PR.*
+
+Merged as PR #17 (`3194067`). No new pricing. No golden value changed except where a ruling below says so.
 
 ### Added
 - Batch mode, CLI contract 1.6.0: `quantforge --batch` as a synonym of `quantforge batch`, framing rules BT1 to BT8, the optional `--timings` flag (`diagnostics.elapsed_ns`), and 19 stream fixtures in `datasets/batch/streams.json`, checked by `conformance/runner/batch_check.py`. The wire `contract_version` stays 1.0.0.

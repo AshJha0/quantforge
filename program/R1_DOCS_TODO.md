@@ -15,6 +15,6 @@ Closed in the final docs pass on `r1-docs`, after merging `r1` at `3f5d97d` (202
 | Batch mode builds | `LEARN.md`, `COOKBOOK.md`, `README.md` |
 
 Left for tag time:
-- Date the CHANGELOG 0.4.1 section, and drop "not yet tagged" from `README.md`, `ROADMAP.md` and `tools/site_home.html`.
+- Done 2026-11-07: CHANGELOG dated, "not yet tagged" removed, versions bumped to 0.4.1.
 - After the push, record the first results of the cross-platform matrix, the stage D mutation report, the recorder and the daily workflows, and replace "first run after push" wherever it appears.
 - Rerun Java and C++ through `runner.py` and `batch_check.py` on the tagged commit; this pass reran only Rust and Python.

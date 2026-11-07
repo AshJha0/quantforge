@@ -3,7 +3,7 @@
 Docs site: <https://ashjha0.github.io/quantforge/>
 ## Quantitative analytics and trading infrastructure
 
-QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Four stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3) and curves and fixed income (stage D, v0.4). Phase R1, credibility hardening for v0.4.1, is merged on branch `r1` and not yet tagged. See Status below.
+QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Four stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3) and curves and fixed income (stage D, v0.4). Phase R1, credibility hardening, is released as v0.4.1. See Status below.
 
 ### What it can and cannot show
 On free public data, QuantForge can show correct pricing and risk, curve quality against published curves, and signals on fitted curves with honest statistics.
