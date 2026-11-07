@@ -26,6 +26,11 @@ add_library(quantforge_core
   src/core/cos.cpp
   src/core/data_checks.cpp
   src/core/dates.cpp
+  src/core/sabr.cpp
+  src/core/surface.cpp
+  src/core/smile.cpp
+  src/core/black.cpp
+  src/core/equity.cpp
   src/core/daycount.cpp
   src/core/fx.cpp
   src/core/integrate.cpp
@@ -69,7 +74,7 @@ if(BUILD_TESTING)
     GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024) # v3.16.1
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_stage_b.cpp)
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_stage_b.cpp tests/test_stage_c.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   if(MINGW)
     target_link_options(quantforge_core_tests PRIVATE -static)
