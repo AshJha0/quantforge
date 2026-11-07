@@ -65,4 +65,4 @@ Measured 2026-11-07, after the targets above were written and with none of them 
 3. The 10,000-trade Python figure is scaled: start-up plus (200-trade time minus start-up) × 50, because a full run takes over three hours. Python key-rate risk is about 1.2 s per trade, against 8 to 15 ms in the compiled languages. This needs an issue for the Python lane.
 4. Peak RSS is read with `os.wait4`, which exists on Linux only.
 
-Misses to raise as issues, without moving the targets: Python on T1, T3 and T4; Java on T1, where the p99 is about 10 ms against a 5 ms target. Rerun Rust and C++ T1 natively before raising those. Results go in `benchmarks/results/` with the machine, commit, input hash and toolchain, and in a table here that links each figure to its file.
+Misses to raise as issues, without moving the targets: Python on T1, T3 and T4; Java on T1, where the p99 is about 10 ms against a 5 ms target. Rerun Rust and C++ T1 natively before raising those.
