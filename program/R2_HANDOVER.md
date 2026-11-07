@@ -28,3 +28,9 @@ python conformance/runner/runner.py --impl <lang> --suite risk_r2
 ```
 
 Questions go in `SPEC_QUESTIONS` as before.
+
+## R2.2 P&L explain (ready)
+
+New operation `risk.pnl.explain`: full revaluation between two quote sets on one `as_of`, against par buckets times the quote moves, with the fixed threshold `max(5% |full|, 5% |par_dv01|)` and a boolean `explained`. Read `specifications/06-risk/pnl-explain.md`. Golden suite `r2/pnl_r2`, 44 cases.
+
+Once it passes, the real-data run is `python tools/workflows/pnl_explain.py --impl <lang> --years 2025`, which calls your CLI in batch mode. That is infra's job to schedule; you only need the goldens.
