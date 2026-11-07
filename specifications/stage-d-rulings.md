@@ -79,7 +79,7 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D60 | ZCIS pv tolerance | 1e-9 per unit notional plus 1e-9 relative: a par swap's pv is rounding noise (`inflation_d-0009`). Widened in `inflation_d-0007` to `-0009`; values unchanged |
 | D61 | `bond.futures.basis` | `delivery <= settlement`: `E_DATE_ORDER`. `delivery` after a bond's maturity: `E_INPUT`. Empty `bonds`: `E_INPUT`. Cases `rulings2_d-0022` to `-0024` |
 | D62 | Need no golden | Asset-swap dates by plain month steps (pinned by `bonds_d-0041`). `joint_bootstrap` `GLOBAL` as block solve: same answer to solver tolerance (D9). Lockout `n` counted before business-day checks, and joint-bootstrap list order: every branch gives `E_INPUT`, so no output differs. Robust fit: at full rank the Huber minimum exists and is unique, so `E_NO_CONVERGENCE` cannot be a golden outcome (C12); rank deficiency is `E_SINGULAR` (D38). Discount pillars as CDS integration nodes: pinned by the multi-node case in `credit_d`. TRS side names: listed in the spec |
-| D63 | `jumps` in `rates.curve.joint_bootstrap` | Not an input. A stray key follows the contract's rule for unlisted input keys, which is not a stage D choice |
+| D63 | `jumps` in `rates.curve.joint_bootstrap` | Not an input, so ignored like any key the operation does not read (`01-core/limits.md` B3 counts such keys only for the array limit) |
 
 Cases for rulings carry the `ruling` tag.
 
