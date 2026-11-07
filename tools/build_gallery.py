@@ -664,7 +664,7 @@ def index_page(all_data):
                 f"snapshot of {all_data[gallery_real.SLUG]['inputs']['as_of']}. The same bands run daily in workflow (a).\n")
         if gallery_pnl.SLUG in all_data:
             real += (f"\n[P&L explain and calibration stability]({gallery_pnl.SLUG}.md): full revaluation against key-rate explain "
-                     "over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/pnl_explain.py`.\n")
+                     "over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/keyrate_explain.py`.\n")
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).

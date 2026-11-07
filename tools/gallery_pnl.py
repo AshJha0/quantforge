@@ -1,6 +1,6 @@
 """Gallery page: P&L explain and calibration stability on real Treasury moves (R2). Used by tools/build_gallery.py.
 
-Standard library only and no financial logic: tools/workflows/pnl_explain.py makes the CLI calls, and this file
+Standard library only and no financial logic: tools/workflows/keyrate_explain.py makes the CLI calls, and this file
 draws what comes back. Inputs are a committed snapshot in docs/curves/data/pnl-explain.json (US Treasury par
 yields are a US government work), so --check reruns the Python CLI offline. `--refresh-real` fetches a new snapshot.
 """
@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "workflows"))
 import common  # noqa: E402
 import eod_curves  # noqa: E402
-import pnl_explain  # noqa: E402
+import keyrate_explain as pnl_explain  # noqa: E402  (interim; see keyrate_explain.py)
 
 SLUG = "pnl-explain"
 DAYS, TRADES = 10, 10
@@ -95,7 +95,7 @@ A desk checks every day that risk times the market move gives back the P&L from 
 - explained = the sum over key rates of key-rate DV01 on day t, times the quote move in bp;
 - unexplained = full minus explained. Second-order terms (convexity, cross-gamma) are what remain on a clean run.
 
-Both curves of a pair are as of day t, so the trade does not age: this is the market-move P&L, and theta is out of scope. The same check runs daily on 20 moves and 20 trades in `tools/workflows/pnl_explain.py`, with provisional thresholds of {lim['explain']['book_rel']:.0%} of full P&L plus {lim['explain']['book_abs_per_dv01']} × book DV01 ([`pnl_explain.json`](../../tools/workflows/pnl_explain.json)).
+Both curves of a pair are as of day t, so the trade does not age: this is the market-move P&L, and theta is out of scope. The same check runs daily on 20 moves and 20 trades in `tools/workflows/keyrate_explain.py`, with provisional thresholds of {lim['explain']['book_rel']:.0%} of full P&L plus {lim['explain']['book_abs_per_dv01']} × book DV01 ([`keyrate_explain.json`](../../tools/workflows/keyrate_explain.json)).
 
 {pnl}
 

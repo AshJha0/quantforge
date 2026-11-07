@@ -65,10 +65,10 @@ jobs:
         id: richcheap
         continue-on-error: true
         run: python3 tools/workflows/rich_cheap.py --impl "$IMPL" --out out/reports
-      - name: P&L explain and calibration stability (R2)
+      - name: Key-rate explain and calibration diagnostics (interim, until risk.pnl.explain is implemented)
         id: pnl
         continue-on-error: true
-        run: python3 tools/workflows/pnl_explain.py --impl "$IMPL" --days 20 --trades 20 --out out/reports
+        run: python3 tools/workflows/keyrate_explain.py --impl "$IMPL" --days 20 --trades 20 --out out/reports
       - name: Push reports to forward-log
         env:
           GH_TOKEN: ${{ github.token }}

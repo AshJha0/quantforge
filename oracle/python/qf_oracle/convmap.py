@@ -31,6 +31,11 @@ ROWS = {
                       "rate in arrears with a 2 business-day observation shift; the spread is a published constant, not a QuantLib value"),
     "HW.CONVEXITY": ("02-curves/futures-convexity.md Hull-White futures convexity", lambda: ql.HullWhite.convexityBias, "same closed form; QuantLib takes the quoted price"),
     "RATE.SIMPLE_ACT_360": ("04-pricing/bonds.md repo: simple interest on ACT/360", lambda r: ql.InterestRate(r, ql.Actual360(), ql.Simple, ql.Annual), ""),
+    "CRV.ZERO_SPREAD": ("02-curves/csa-and-basis.md CSA spread: D(d) = Dc(d) exp(-s t), s continuous on curve time",
+                        lambda h, s: ql.ZeroSpreadedTermStructure(h, ql.QuoteHandle(ql.SimpleQuote(s)), ql.Continuous, ql.NoFrequency, ql.Actual365Fixed()), ""),
+    "CAL.JOINT_USGS_EUTA": ("02-curves/cross-currency.md joint calendar: a business day on both USGS and EUTA",
+                            lambda: ql.JointCalendar(ql.UnitedStates(ql.UnitedStates.GovernmentBond), ql.TARGET()), "QuantLib JoinHolidays is the default rule"),
+    "GEN.FORWARD": ("02-curves/cross-currency.md dates start + 3k months from start, each adjusted", lambda: ql.DateGeneration.Forward, ""),
     # Day counts
     "DC.ACT_360": ("01-core/daycount.md ACT_360", lambda: ql.Actual360(), ""),
     "DC.ACT_360_INCL_LAST": ("04-pricing/credit.md accrual on default, last day included", lambda: ql.Actual360(True), "ISDA CDS standard model"),
