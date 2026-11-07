@@ -80,4 +80,11 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | Seasonal forward curve | `simple_analytic`; quotes reprice | Analytic | Within 1e-13 |
 | Convenience yield, carry value | `simple_analytic`; arbitrage flags exact | Analytic | |
 
+## Wave 3, D9: MBS
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Pool cash flows, WAL | 1e-9 per unit balance plus 1e-10 relative | Standard PSA and level-pay formulas | Last month retires the balance within 1e-6 |
+| Pass-through price, duration | `simple_analytic` | Analytic | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).

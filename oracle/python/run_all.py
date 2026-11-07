@@ -19,10 +19,11 @@ import gen_stage_d_equity
 import gen_stage_d_w3
 import gen_stage_d_vol
 import gen_stage_d_cmdty
+import gen_stage_d_mbs
 import gen_stats_engines
 from qf_oracle.common import REPORT, ROOT
 
-for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data, gen_rulings_store, gen_limits, gen_stage_b, gen_stage_b_deep, gen_stage_c, gen_stage_d, gen_stage_d_w2, gen_stage_d_xccy, gen_stage_d_credit, gen_stage_d_equity, gen_stage_d_w3, gen_stage_d_vol, gen_stage_d_cmdty, gen_exercises):
+for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data, gen_rulings_store, gen_limits, gen_stage_b, gen_stage_b_deep, gen_stage_c, gen_stage_d, gen_stage_d_w2, gen_stage_d_xccy, gen_stage_d_credit, gen_stage_d_equity, gen_stage_d_w3, gen_stage_d_vol, gen_stage_d_cmdty, gen_stage_d_mbs, gen_exercises):
     g.main()
 check_invariants.main()
 check_fragility.main()

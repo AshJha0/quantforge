@@ -60,8 +60,10 @@ New operations: `rates.cap.price`, `rates.swaption.price`. Goldens: `datasets/go
 
 New operations: `cmdty.curve.forward`, `cmdty.storage.carry`. Goldens: `datasets/golden/stage_d/commodity_d.json`, 10 cases. Read: `specifications/02-curves/commodity.md`; the D8 table in `stage-d-targets.md`; ruling D29.
 
-### D9
+### D9 MBS (ready)
 
-Not yet specified. Do not start it.
+New operations: `mbs.cashflows`, `mbs.price`. Goldens: `datasets/golden/stage_d/mbs_d.json`, 12 cases. Read: `specifications/04-pricing/mbs.md`; the D9 table in `stage-d-targets.md`; ruling D30.
+
+All of stage D is now specified.
 
 Not for language sessions: anything under `oracle/`.

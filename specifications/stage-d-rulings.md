@@ -44,6 +44,8 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 
 | D29 | Commodity curve | Additive log seasonality by calendar month, linear in month index between quotes, no extrapolation |
 
+| D30 | MBS | PSA age is `age + k` for month `k`; net coupon at most WAC; delay measured in 30-day months; no servicing strip or guarantee fee beyond the WAC-net gap |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
@@ -64,6 +66,7 @@ Cases for rulings carry the `ruling` tag.
 | `inflation_d` | None | Analytic, exact-rational reference CPI |
 | `capswaption_d` | QuantLib `blackFormula`, `bachelierBlackFormula` | Composition on stage B curves |
 | `commodity_d` | None | Analytic |
+| `mbs_d` | None | Analytic |
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.
