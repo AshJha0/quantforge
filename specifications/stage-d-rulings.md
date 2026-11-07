@@ -35,6 +35,9 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D23 | Dividend futures | Fair price is the sum of known index dividend points in the period, ex-dates inclusive at both ends; no discounting (futures, deterministic dividends) |
 | D24 | TRS | One period, paid at `end`, dividends paid at `end`. `current_rate` key required |
 
+| D25 | CPI lag | `base_month` carries the swap lag; linkers use the three-month TIPS reference rule. Integer-year ZCIS only |
+| D26 | Seasonality | Multiplicative, normalised to the base month's calendar month, so pillars are untouched |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
@@ -52,6 +55,7 @@ Cases for rulings carry the `ruling` tag.
 | `xccy_d` | QuantLib `OvernightLeg` NPV of foreign coupons | Bootstrap is known truth; NDF analytic |
 | `credit_d` | QuantLib `IsdaCdsEngine` (the ISDA model as QuantLib implements it) | Index and composite curves are sums of checked parts |
 | `equity_d`, `index_d`, `trs_d` | None: analytic and exact rationals only | All |
+| `inflation_d` | None | Analytic, exact-rational reference CPI |
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.

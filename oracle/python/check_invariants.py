@@ -237,6 +237,12 @@ def check_d(c, counts):
         sg = 1 if i["trade"]["side"] == "RECEIVE_EQUITY" else -1
         assert abs(o["pv"] - sg * (o["equity_leg"] - o["funding_leg"])) < 1e-9 * abs(o["equity_leg"]) + 1e-9, cid
         hit("TRS pv = sign (equity - funding)")
+    if op == "infl.curve.cpi":
+        assert all(v > 0 for v in o["cpi"]), cid
+        hit("CPI positive")
+    if op == "infl.linker.price":
+        assert abs(o["nominal_clean"] - o["real_clean"] * o["index_ratio"]) < 1e-9 * o["nominal_clean"], cid
+        hit("linker nominal = real x index ratio")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid

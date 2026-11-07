@@ -48,6 +48,12 @@ New operations: `eq.dividend.implied`, `eq.borrow.implied`, `eq.futures.basis`, 
 
 ## Wave 3
 
-Not yet specified.
+### D6 inflation and linkers (ready)
+
+New operations: `infl.curve.cpi`, `infl.zcis.pv`, `infl.linker.price`, `infl.linker.price_curve`. Goldens: `datasets/golden/stage_d/inflation_d.json`, 13 cases. Read: `specifications/02-curves/inflation.md`; the D6 table in `stage-d-targets.md`; rulings D25, D26.
+
+### D7, D8, D9
+
+Not yet specified. Do not start them.
 
 Not for language sessions: anything under `oracle/`.

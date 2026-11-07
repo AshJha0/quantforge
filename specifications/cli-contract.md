@@ -201,6 +201,7 @@ Wave 2 adds:
 | `credit.*` | `04-pricing/credit.md` |
 | `eq.dividend.*`, `eq.borrow.*`, `eq.futures.*` | `02-curves/equity-curves.md` |
 | `eq.index.*`, `eq.corporate_action.*`, `eq.trs.*` | `04-pricing/equity-index.md` |
+| `infl.*` | `02-curves/inflation.md` |
 
 `ESTR` joins `rates.ois.*`, and curve objects take optional `jumps` (`02-curves/curve-framework.md`).
 

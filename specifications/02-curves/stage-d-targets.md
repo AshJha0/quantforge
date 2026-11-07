@@ -59,4 +59,12 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | Implied borrow, financing spread | `root_finding` | Known truth | |
 | Index dividends, dividend futures, rebalance, corporate actions | `simple_analytic` | Exact rationals | |
 
+## Wave 3, D6: inflation
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| CPI curve with seasonality | `simple_analytic`; pillars reprice exactly | Analytic | |
+| ZCIS, linker from curve | `interpolation` | Analytic | |
+| Linker from real yield | `simple_analytic` | Exact-rational reference CPI; bond formulas checked against QuantLib in D2 | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).
