@@ -139,6 +139,7 @@ def xccy_d():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     xccy_d()
     note(f"stage D D3: {len(D.MUTANTS)} wrong-convention checks, each caught")

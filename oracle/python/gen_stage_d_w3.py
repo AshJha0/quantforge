@@ -83,7 +83,8 @@ def infl_d():
         pv = sg * N * (idx / I0 - (1 + K) ** n) * disc.df(pay)
         s.add("infl.zcis.pv", {"curve": {"base_month": base, "base_cpi": I0, "quotes": [{"years": q, "rate": r} for q, r in quotes], "seasonality": SEAS}, "discount": jd,
                                "trade": {"years": n, "fixed_rate": K, "notional": N, "side": side, "payment_date": str(pay)}},
-              {"pv": pv, "index_ratio": idx / I0}, cls=I, verified=["analytic"], tags=["zcis"])
+              {"pv": pv, "index_ratio": idx / I0}, cls=I, verified=["analytic"], tags=["zcis"],
+              limit={"absolute": 1e-9 * N, "relative": 1e-9, "reason": "ruling D60: per unit notional; a par swap's pv is rounding noise"})
     # Linker from real yield: US TIPS style reference CPI (3-month lag, daily interpolation), index ratio on real figures.
     fix = {ms(k): v for k, v in zip(range(mi("2026-05"), mi("2026-10")), [320.580, 321.465, 321.910, 322.150, 322.880])}
     cpi_fix = lambda k: fix[ms(k)]  # noqa: E731
@@ -111,6 +112,7 @@ def infl_d():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     infl_d()
     note(f"stage D D6: {len(D.MUTANTS)} wrong-convention checks, each caught")

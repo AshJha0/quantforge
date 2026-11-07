@@ -483,7 +483,12 @@
    "tags": [
     "zcis",
     "synthetic"
-   ]
+   ],
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ruling D60: per unit notional; a par swap's pv is rounding noise"
+   }
   },
   {
    "case_id": "inflation_d-0008",
@@ -617,7 +622,12 @@
    "tags": [
     "zcis",
     "synthetic"
-   ]
+   ],
+   "tolerance_limit": {
+    "absolute": 0.025,
+    "relative": 1e-09,
+    "reason": "ruling D60: per unit notional; a par swap's pv is rounding noise"
+   }
   },
   {
    "case_id": "inflation_d-0009",
@@ -751,7 +761,12 @@
    "tags": [
     "zcis",
     "synthetic"
-   ]
+   ],
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ruling D60: per unit notional; a par swap's pv is rounding noise"
+   }
   },
   {
    "case_id": "inflation_d-0010",
