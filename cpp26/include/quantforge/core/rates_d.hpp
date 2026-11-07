@@ -97,3 +97,27 @@ struct RobustFit {
 RobustFit robust_fit(const std::vector<double>& maturities, const std::vector<double>& zero_rates, double tau, double delta);
 
 }  // namespace quantforge
+
+// ---- D3: cross-currency (02-curves/cross-currency.md); domestic USD SOFR, foreign EUR ESTR ----
+namespace quantforge {
+
+/// Quarterly dates start + 3k months, MODIFIED_FOLLOWING on the joint calendar; [start, e_1, ..., e_n].
+std::vector<Date> xccy_schedule(Date start, long long months);
+/// L = N [ sum ((P(s)/P(e) - 1) + m alpha) D(e) + D(T) - D(start) ].
+double xccy_leg(const std::vector<Date>& dates, double notional, const Curve& projection, const Curve& discount, double spread);
+
+struct XccyQuote {
+    long long months;
+    double spread;
+};
+SolvedCurve xccy_bootstrap(const Curve& foreign_projection, Date start, const std::vector<XccyQuote>& quotes,
+                           CurveInterpolation interpolation);
+
+struct NdfPrice {
+    double pv, forward;
+};
+/// sign +1 for BUY.
+NdfPrice ndf_price(const Curve& usd, const Curve& offshore, double spot, Date fixing_date, Date payment_date, double strike,
+                   double usd_notional, double sign, std::optional<double> fixing);
+
+}  // namespace quantforge

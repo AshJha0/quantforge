@@ -13,10 +13,23 @@ std::vector<Fixing> fixings_of(const In& in) {
 }
 
 // convention must be OVERNIGHT: a listed non-overnight record is E_INPUT; an unlisted string E_SCHEMA.
-const RateConvention* overnight_of(const In& in) {
-    const RateConvention* c = rate_convention(in.text("convention"));
-    if (!c) schema("convention", "not listed");
+const RateConvention* overnight_of_key(const In& in, string_view key) {
+    const RateConvention* c = rate_convention(in.text(key));
+    if (!c) schema(key, "not listed");
     return c;
+}
+const RateConvention* overnight_of(const In& in) { return overnight_of_key(in, "convention"); }
+
+template <class Row>
+std::vector<Row> rows_of(const In& in, string_view key, auto&& read) {
+    const Value& a = in.need(key);
+    if (a.kind != Kind::Array) schema(key, "expected an array");
+    std::vector<Row> out;
+    for (const Value& v : a.items) {
+        if (v.kind != Kind::Object) schema(key, "expected an object");
+        out.push_back(read(In(v)));
+    }
+    return out;
 }
 
 void op_compound_dated(const In& in, Out& out) {
@@ -203,4 +216,76 @@ void op_curve_robust(const In& in, Out& out) {
     for (const std::size_t j : f.outliers) out.values.integer((long long)j);
     out.values.end_array();
     out.key_real("objective", f.objective);
+}
+
+// ---- D3 cross-currency and NDF ----
+
+void xccy_conventions(const In& in) {
+    const RateConvention* d = overnight_of_key(in, "domestic_convention");
+    const RateConvention* f = overnight_of_key(in, "foreign_convention");
+    if (d->id != "SOFR" || f->id != "ESTR") throw Error("E_INPUT", "domestic SOFR and foreign ESTR only (ruling D17)");
+}
+
+void op_xccy_bootstrap(const In& in, Out& out) {
+    const CurveInput dom = curve_of(in, "domestic"), fp = curve_of(in, "foreign_projection");
+    const Value& dc = in.need("domestic_convention");
+    const Value& fc = in.need("foreign_convention");
+    const Date start = in.date("start");
+    const auto quotes = rows_of<XccyQuote>(in, "quotes", [](const In& q) { return XccyQuote{q.integer("months"), q.real("spread")}; });
+    const auto interpolation = in.choice("interpolation", curve_interpolations);
+    (void)dc;
+    (void)fc;
+    in.ready();
+    dom.limit();
+    fp.limit();
+    limit_if(quotes.size() > max_quotes, "quotes");
+    xccy_conventions(in);
+    const SolvedCurve s = xccy_bootstrap(fp.build(), start, quotes, interpolation);
+    (void)dom.build();
+    write_pillars(out, s.curve);
+    out.diagnostic("max_repricing_error", s.max_repricing_error);
+}
+
+void op_xccy_pv(const In& in, Out& out) {
+    const CurveInput dom = curve_of(in, "domestic"), fp = curve_of(in, "foreign_projection"), fd = curve_of(in, "foreign_discount");
+    const double spot = in.real("spot");
+    const Value& tv = in.need("trade");
+    if (tv.kind != Kind::Object) schema("trade", "expected an object");
+    const In t(tv);
+    const Date start = t.date("start");
+    const long long months = t.integer("months");
+    const double nf = t.real("foreign_notional"), spread = t.real("spread");
+    const double sign = t.choice<double>("side", {{"RECEIVE_FOREIGN", 1.0}, {"PAY_FOREIGN", -1.0}});
+    in.ready();
+    dom.limit();
+    fp.limit();
+    fd.limit();
+    if (!(spot > 0.0)) throw Error("E_DOMAIN", "spot is not positive", "spot");
+    const auto dates = xccy_schedule(start, months);
+    const Curve d = dom.build();
+    const double foreign = xccy_leg(dates, nf, fp.build(), fd.build(), spread);
+    const double domestic = xccy_leg(dates, nf * spot, d, d, 0.0);
+    out.key_real("pv", sign * (spot * foreign - domestic));
+    out.key_real("foreign_leg", foreign);
+    out.key_real("domestic_leg", domestic);
+}
+
+void op_ndf_pv(const In& in, Out& out) {
+    const CurveInput u = curve_of(in, "usd_curve"), o = curve_of(in, "offshore_curve");
+    const double spot = in.real("spot");
+    const Value& tv = in.need("trade");
+    if (tv.kind != Kind::Object) schema("trade", "expected an object");
+    const In t(tv);
+    const Date fixing_date = t.date("fixing_date"), payment_date = t.date("payment_date");
+    const double strike = t.real("strike"), n = t.real("usd_notional");
+    const double sign = t.choice<double>("side", {{"BUY", 1.0}, {"SELL", -1.0}});
+    const Value* fv = in.raw().find("fixing");
+    if (!fv) schema("fixing", "missing");
+    const std::optional<double> fixing = fv->kind == Kind::Null ? std::nullopt : std::optional<double>(to_real(*fv, "fixing"));
+    in.ready();
+    u.limit();
+    o.limit();
+    const NdfPrice p = ndf_price(u.build(), o.build(), spot, fixing_date, payment_date, strike, n, sign, fixing);
+    out.key_real("pv", p.pv);
+    out.key_real("forward", p.forward);
 }

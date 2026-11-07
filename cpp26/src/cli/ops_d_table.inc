@@ -19,3 +19,6 @@
         {"bond.yield.from_price", op_bond_yield},
         {"repo.forward", op_repo_forward},
         {"repo.implied_rate", op_repo_implied},
+        {"fx.ndf.pv", op_ndf_pv},
+        {"fx.xccy.bootstrap", op_xccy_bootstrap},
+        {"fx.xccy.pv", op_xccy_pv},

@@ -384,3 +384,67 @@ RobustFit robust_fit(const std::vector<double>& m, const std::vector<double>& y,
 }
 
 }  // namespace quantforge
+
+// ---- D3: cross-currency ----
+
+namespace quantforge {
+namespace {
+
+bool joint_business(Date d) { return is_business_day(Calendar::Usgs, d) && is_business_day(Calendar::Euta, d); }
+
+Date joint_modified_following(Date d) {
+    Date x = d;
+    while (!joint_business(x)) x = Date(x + std::chrono::days(1));
+    if (month_of(x) != month_of(d)) {
+        x = d;
+        while (!joint_business(x)) x = Date(x - std::chrono::days(1));
+    }
+    return x;
+}
+
+}  // namespace
+
+std::vector<Date> xccy_schedule(Date start, long long months) {
+    if (!joint_business(start)) throw Error("E_INPUT", "start must be a business day on both calendars", "start");
+    if (months <= 0 || months % 3 != 0 || months > 1200) throw Error("E_INPUT", "months must be a positive multiple of 3", "months");
+    std::vector<Date> out{start};
+    for (long long k = 1; k <= months / 3; ++k) out.push_back(joint_modified_following(add_months(start, int(3 * k))));
+    return out;
+}
+
+double xccy_leg(const std::vector<Date>& dates, double notional, const Curve& projection, const Curve& discount, double spread) {
+    double sum = 0.0;
+    for (std::size_t i = 1; i < dates.size(); ++i) {
+        const double alpha = double(days_between(dates[i - 1], dates[i])) / 360.0;
+        sum += ((projection.discount(dates[i - 1]) / projection.discount(dates[i]) - 1.0) + spread * alpha) * discount.discount(dates[i]);
+    }
+    return notional * (sum + discount.discount(dates.back()) - discount.discount(dates.front()));
+}
+
+SolvedCurve xccy_bootstrap(const Curve& foreign_projection, Date start, const std::vector<XccyQuote>& quotes,
+                           CurveInterpolation interpolation) {
+    if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
+    std::vector<std::vector<Date>> swaps;
+    std::vector<Date> dates;
+    for (std::size_t j = 0; j < quotes.size(); ++j) {
+        if (j > 0 && quotes[j].months <= quotes[j - 1].months) throw Error("E_INPUT", "months must strictly increase", "quotes");
+        swaps.push_back(xccy_schedule(start, quotes[j].months));
+        dates.push_back(swaps.back().back());
+    }
+    if (start < foreign_projection.as_of()) throw Error("E_OUT_OF_RANGE", "start is before as_of", "start");
+    return solve_curve(foreign_projection.as_of(), interpolation, dates, std::vector<double>(quotes.size(), 0.0),
+                       [&](std::size_t j, const Curve& d) { return xccy_leg(swaps[j], 1.0, foreign_projection, d, quotes[j].spread); },
+                       SolveMethod::Sequential);
+}
+
+NdfPrice ndf_price(const Curve& usd, const Curve& offshore, double spot, Date fixing_date, Date payment_date, double strike,
+                   double usd_notional, double sign, std::optional<double> fixing) {
+    if (payment_date < fixing_date) throw Error("E_DATE_ORDER", "payment_date is before fixing_date", "trade");
+    if (fixing_date <= usd.as_of() && !fixing) throw Error("E_INPUT", "a past fixing must be given", "fixing");
+    if (!(spot > 0.0) || (fixing && !(*fixing > 0.0)) || !(strike > 0.0)) throw Error("E_DOMAIN", "spot, fixing and strike must be positive");
+    const double du = usd.discount(payment_date);
+    const double f = fixing ? *fixing : spot * du / offshore.discount(payment_date);
+    return {sign * usd_notional * (1.0 - strike / f) * du, f};
+}
+
+}  // namespace quantforge

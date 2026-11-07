@@ -14,18 +14,6 @@ Bond bond_of(const In& in) {
     return bond_fields(In(v));
 }
 
-template <class Row>
-std::vector<Row> rows_of(const In& in, string_view key, auto&& read) {
-    const Value& a = in.need(key);
-    if (a.kind != Kind::Array) schema(key, "expected an array");
-    std::vector<Row> out;
-    for (const Value& v : a.items) {
-        if (v.kind != Kind::Object) schema(key, "expected an object");
-        out.push_back(read(In(v)));
-    }
-    return out;
-}
-
 void op_bond_from_yield(const In& in, Out& out) {
     const Bond b = bond_of(in);
     const Date s = in.date("settlement");
