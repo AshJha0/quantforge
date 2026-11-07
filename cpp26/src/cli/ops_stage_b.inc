@@ -88,6 +88,10 @@ void op_conventions_lookup(const In& in, Out& out) {
         rate("OVERNIGHT", "USD", "ACT_360", "USGS", 2);
         key_int(out, "payment_lag", 2);
         tail("ACT_360");
+    } else if (id == "ESTR") {
+        rate("OVERNIGHT", "EUR", "ACT_360", "EUTA", 2);
+        key_int(out, "payment_lag", 2);
+        tail("ACT_360");
     } else if (id == "USD-TERM-3M") {
         rate("TERM", "USD", "ACT_360", "USGS", 2);
         key_int(out, "months", 3);
@@ -128,20 +132,38 @@ void op_schedule(const In& in, Out& out) {
     out.values.end_array();
 }
 
+// Stage D jumps: [{date, factor}]. Absent is none when optional; null is E_SCHEMA (ruling D10).
+std::vector<Jump> jumps_of(const In& in, bool required) {
+    const Value* a = in.raw().find("jumps");
+    if (!a) {
+        if (required) schema("jumps", "missing");
+        return {};
+    }
+    if (a->kind != Kind::Array) schema("jumps", "expected an array");
+    std::vector<Jump> out;
+    for (const Value& item : a->items) {
+        if (item.kind != Kind::Object) schema("jumps", "expected an object");
+        const In row(item);
+        out.push_back({row.date("date"), row.real("factor")});
+    }
+    return out;
+}
+
 struct CurveInput {
     Date as_of;
     CurveInterpolation interpolation;
     std::vector<Pillar> pillars;
+    std::vector<Jump> jumps;
 
     void limit() const { limit_if(pillars.size() > max_quotes, "pillars"); }
-    Curve build() const { return Curve(as_of, interpolation, pillars); }
+    Curve build() const { return Curve(as_of, interpolation, pillars, jumps); }
 };
 
 CurveInput curve_of(const In& in, string_view key) {
     const Value& v = in.need(key);
     if (v.kind != Kind::Object) schema(key, "expected an object");
     const In c(v);
-    CurveInput out{c.date("as_of"), c.choice("interpolation", curve_interpolations), {}};
+    CurveInput out{c.date("as_of"), c.choice("interpolation", curve_interpolations), {}, {}};
     const Value& p = c.need("pillars");
     if (p.kind != Kind::Array) schema("pillars", "expected an array");
     for (const Value& item : p.items) {
@@ -149,6 +171,7 @@ CurveInput curve_of(const In& in, string_view key) {
         const In row(item);
         out.pillars.push_back({row.date("date"), row.real("discount_factor")});
     }
+    out.jumps = jumps_of(c, false);
     return out;
 }
 
@@ -275,10 +298,12 @@ void op_ois_bootstrap(const In& in, Out& out) {
     const auto raw = quotes_of(in);
     const auto interpolation = in.choice("interpolation", curve_interpolations);
     const auto method = in.choice<SolveMethod>("method", {{"SEQUENTIAL", SolveMethod::Sequential}, {"GLOBAL", SolveMethod::Global}});
+    const auto jumps = jumps_of(in, false);
     in.ready();
     const auto quotes = checked_quotes(raw);
+    check_jumps(as_of, jumps);
     check_crossed(raw);
-    const SolvedCurve s = ois_bootstrap(*c, as_of, quotes, interpolation, method);
+    const SolvedCurve s = ois_bootstrap(*c, as_of, quotes, interpolation, method, jumps);
     write_pillars(out, s.curve);
     out.diagnostic("max_repricing_error", s.max_repricing_error);
 }

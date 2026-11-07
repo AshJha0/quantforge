@@ -43,3 +43,15 @@ No golden depends on these. Each is how the build reads a point the spec leaves 
 - `usecase.vol_surface`: no check order given, and no rule for `target.strike` or `quantity`. Built as `vol.equity.price`, `E_DOMAIN`.
 
 Settled by rulings: `SPOT` with null `scale` (C15, my `E_DOMAIN` was wrong), a price at or above `f0` (C16, as built), empty lists (C17; my order was wrong in `vol.svi.evaluate`, `vol.sabr.*`).
+
+## Stage D wave 1 (open)
+
+Each is answered here with the most conservative reading; none changes a golden result.
+
+1. **Stage B golden `ois-0023` against ESTR.** It expects `rates.ois.bootstrap` with `ESTR` to be `E_SCHEMA`. `ois-curves.md` 1.1.0 and contract 1.5.0 now list `ESTR`, so this build returns `ok` and that one stage B case fails. The spec wins; the case needs retiring or changing to `ok` by the oracle session.
+2. **Unknown `convention` string in `rates.ois.compound_dated`, `rates.ois.fit_steps`, `rates.basis.ois_spread`.** The specs say "not `OVERNIGHT`: `E_INPUT`". A listed non-overnight record (`USD-TERM-3M`) gives `E_INPUT`; an unlisted string gives `E_SCHEMA`, as every other enum. `rates.curve.joint_bootstrap` keeps the bootstrap's rule (`E_SCHEMA` for anything not overnight).
+3. **Empty `step_dates` in `rates.ois.fit_steps`.** Ruling D12 makes empty date lists `E_INPUT`; with `m = 0` the fit would otherwise be a one-quote flat rate. This build returns `E_INPUT`, checked before the quote count.
+4. **Empty `dates` in `rates.ois.step_curve`, `rates.csa.discount`.** D12: `E_INPUT`, checked after the curve's own checks.
+5. **Two forwards on one date in `rates.csa.discount`, two jumps on one date.** Forwards: `E_INPUT` (ambiguous data), after the `E_DOMAIN` checks. Jumps: already `E_INPUT` by the strictly increasing rule.
+6. **`GLOBAL` in `rates.curve.joint_bootstrap`.** The system is block triangular, so Newton on all pillars equals the discount block's `GLOBAL` Newton followed by the projection block's solve. This build does exactly that; `max_repricing_error` is the larger of the two blocks.
+7. **Order of `LOCKOUT` range check against business-day checks.** `n` is counted from the business days in `[start, end]` before `start`/`end` are checked, as the listed order puts `shift_days` first.

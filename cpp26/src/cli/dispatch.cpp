@@ -28,6 +28,7 @@
 #include "quantforge/core/models.hpp"
 #include "quantforge/core/money.hpp"
 #include "quantforge/core/rates.hpp"
+#include "quantforge/core/rates_d.hpp"
 #include "quantforge/core/rng.hpp"
 #include "quantforge/core/snapshot.hpp"
 #include "quantforge/core/sobol.hpp"
@@ -1044,6 +1045,7 @@ void op_store_chain(const In& in, Out& out) {
 
 #include "ops_stage_b.inc"
 #include "ops_c_all.inc"
+#include "ops_stage_d.inc"
 
 // ---- dispatch ----
 
@@ -1052,6 +1054,7 @@ using Handler = void (*)(const In&, Out&);
 const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
 #include "ops_c_table.inc"
+#include "ops_d_table.inc"
         {"calib.check_bid_ask", op_check_bid_ask},
         {"calib.curve_report", op_curve_report},
         {"calib.fit", op_calib_fit},
