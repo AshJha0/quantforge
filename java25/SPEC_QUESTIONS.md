@@ -108,3 +108,5 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | D-12 | `bond.yield.from_price` with `clean_price <= 0` but `clean + accrued > 0` | `E_DOMAIN`, as golden bonds_d-0048; the spec text only names `clean + accrued <= 0` |
 | D-13 | `bond.futures.basis` with `delivery >= maturity`, or `delivery <= settlement` | As `repo.forward`: `E_INPUT` and `E_DATE_ORDER`. Empty `bonds`: `E_INPUT` |
 | D-14 | `bond.fit.nelson_siegel` `weights` of the wrong length | `E_INPUT` |
+| D-15 | `credit.*` hazard `as_of` different from `trade_date` | Survival is anchored at the hazard's `as_of` (Q = 1 there); integration time counts from `trade_date`. No golden has them differ |
+| D-16 | `credit.index.intrinsic`, `credit.curve.composite` weights that are negative or sum to 0 | `E_DOMAIN` for a negative weight, `E_INPUT` for a zero sum |
