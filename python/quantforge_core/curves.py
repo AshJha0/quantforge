@@ -28,6 +28,7 @@ class Curve:
         self.as_of = data.as_of
         self.interpolation = data.interpolation
         self.jumps = data.jumps
+        self.dates = data.dates
         self.times = [0.0, *(self.time(d) for d in data.dates)]
         self.logs = [0.0, *(math.log(v / self.jump(d))
                             for d, v in zip(data.dates, data.discount_factors, strict=True))]

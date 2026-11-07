@@ -276,3 +276,57 @@ def _ndf(i: Inputs) -> Any:
             t.real("usd_notional"), t.enum("side", ("BUY", "SELL")), fixing)
     value, forward = D.xccy.ndf_pv(*args)
     return {"pv": value, "forward": forward}
+
+
+# Wave 2, D4: credit
+
+def _hazard(h: Inputs) -> Any:
+    pillars = _objects(h, "pillars")
+    dates = [p.date("date") for p in pillars]
+    return h.date("as_of"), dates, [p.real("survival") for p in pillars]
+
+
+def _cds_quotes(i: Inputs, key: str = "quotes") -> list[tuple[str, float]]:
+    return [(_tenor(q), q.real("spread")) for q in _objects(i, key)]
+
+
+@op("credit.cds.price")
+def _cds_price(i: Inputs) -> Any:
+    t = i.object("trade")
+    as_of, dates, survival = _hazard(i.object("hazard"))
+    args = (i.date("trade_date"), _curve(i, "discount"), i.real("recovery"), t.date("maturity"),
+            t.real("coupon"), t.real("notional"),
+            t.enum("side", ("BUY_PROTECTION", "SELL_PROTECTION")),
+            i.enum("payout", ("STANDARD", "DIGITAL")))
+    hazard = D.credit.check_hazard(as_of, dates, survival)
+    return D.credit.price(args[0], args[1], hazard, *args[2:])
+
+
+@op("credit.cds.bootstrap")
+def _cds_bootstrap(i: Inputs) -> Any:
+    args = (i.date("trade_date"), _curve(i, "discount"), i.real("recovery"), _cds_quotes(i))
+    pillars = D.credit.bootstrap(*args)
+    return {"pillars": [{"date": d.isoformat(), "survival": q} for d, q in pillars]}
+
+
+@op("credit.index.intrinsic")
+def _cds_index(i: Inputs) -> Any:
+    t = i.object("trade")
+    raw = [(_hazard(n.object("hazard")), n.real("recovery"), n.real("weight"))
+           for n in _objects(i, "names")]
+    trade_date, disc = i.date("trade_date"), _curve(i, "discount")
+    mat, coupon, quoted = t.date("maturity"), t.real("coupon"), i.real("quoted_upfront")
+    names = [(D.credit.check_hazard(*h), r, w) for h, r, w in raw]
+    ups, intrinsic, basis = D.credit.index_intrinsic(trade_date, disc, names, mat, coupon,
+                                                     quoted)
+    return {"name_upfronts": ups, "intrinsic_upfront": intrinsic, "basis": basis}
+
+
+@op("credit.curve.composite")
+def _cds_composite(i: Inputs) -> Any:
+    constituents = [(_cds_quotes(c), c.real("weight")) for c in _objects(i, "constituents")]
+    args = (i.date("trade_date"), _curve(i, "discount"), i.real("recovery"), constituents,
+            i.real("scale"))
+    spreads, pillars = D.credit.composite(*args)
+    return {"spreads": spreads,
+            "pillars": [{"date": d.isoformat(), "survival": q} for d, q in pillars]}

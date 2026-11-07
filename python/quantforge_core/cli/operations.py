@@ -13,6 +13,7 @@ from .. import calibration as _calibration
 from .. import compounding as compounding_module
 from .. import conventions as _conventions
 from .. import cos as cos_module
+from .. import credit as _credit
 from .. import csa as _csa
 from .. import curve_fits as _curve_fits
 from .. import curves as _curves
@@ -125,7 +126,7 @@ _STAGE_C = SimpleNamespace(
 )
 _STAGE_D = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
-       for m in (_bonds, _csa, _curve_fits, _futures, _overnight, _steps, _xccy)}
+       for m in (_bonds, _credit, _csa, _curve_fits, _futures, _overnight, _steps, _xccy)}
 )
 
 
