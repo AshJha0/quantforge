@@ -20,7 +20,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [SVI smile](svi-smile.md) | Implemented, not Validated | C | 2 golden cases for `vol.svi.evaluate`, 1 with an outside library in `verified_by` |
 | [SSVI surface](ssvi-surface.md) | Implemented, not Validated | C | 3 golden cases for `vol.ssvi.evaluate`, 0 with an outside library in `verified_by` |
 | [SABR](sabr.md) | Implemented, not Validated | C | 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
-| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 79 golden cases |
+| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 81 golden cases |
 | [Bond and sovereign fits](bond-fit.md) | Implemented, not Validated | D | 2 golden cases |
 | [Repo and special repo](repo.md) | Implemented, not Validated | D | 4 golden cases |
 | [Cross-currency](cross-currency.md) | Implemented, not Validated | D | 1 golden case |

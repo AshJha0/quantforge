@@ -50,11 +50,11 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 ## Oracle evidence and limits
 
-79 golden cases with status ok in `datasets/golden/stage_d` for `rates.ois.bootstrap`, `rates.ois.compound_dated`, by `verified_by`:
+81 golden cases with status ok in `datasets/golden/stage_d` for `rates.ois.bootstrap`, `rates.ois.compound_dated`, by `verified_by`:
 
 | Operation: sources | Cases |
 |---|---|
 | rates.ois.bootstrap: independent-replay, quantlib-1.44 | 10 |
-| rates.ois.compound_dated: exact-rational, quantlib-1.44 | 69 |
+| rates.ois.compound_dated: exact-rational, quantlib-1.44 | 71 |
 
 Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
