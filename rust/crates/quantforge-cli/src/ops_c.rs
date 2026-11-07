@@ -7,6 +7,7 @@ use quantforge_core::dates::Date;
 use quantforge_core::equity::{self, Outright, ParityQuote};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::black::{Model, Option_};
 
 /// Ruling C9: the key must be present, and `null` carries meaning.
 fn present(i: &Inputs, k: &str) -> Result<()> {
@@ -70,6 +71,68 @@ fn parity_quotes(i: &Inputs) -> Result<Vec<ParityQuote>> {
         .collect()
 }
 
+/// Ruling C9: an optional key may be absent, but `null` is `E_SCHEMA`.
+fn no_null(i: &Inputs, k: &str) -> Result<()> {
+    match i.0.get(k) {
+        Some(Json::Null) => i.fail(k, "null is not allowed here"),
+        _ => Ok(()),
+    }
+}
+
+fn option_type(i: &Inputs) -> Result<bool> {
+    match i.str("option_type")? {
+        "CALL" => Ok(true),
+        "PUT" => Ok(false),
+        _ => i.fail("option_type", "unknown option type"),
+    }
+}
+
+/// Keys of other models are `E_SCHEMA`, whatever their value.
+fn only(i: &Inputs, keys: &[&str]) -> Result<()> {
+    for k in ["spot", "rate", "yield", "forward", "discount_factor", "shift"] {
+        if !keys.contains(&k) && i.0.get(k).is_some() {
+            return i.fail(k, "not an input of this model");
+        }
+    }
+    Ok(())
+}
+
+fn option_inputs(i: &Inputs) -> Result<Option_> {
+    let model = match i.str("model")? {
+        "BLACK_SCHOLES" => {
+            only(i, &["spot", "rate", "yield"])?;
+            Model::BlackScholes {
+                spot: i.f64("spot")?,
+                rate: i.f64("rate")?,
+                dividend: i.f64("yield")?,
+            }
+        }
+        "BLACK_76" => {
+            only(i, &["forward", "discount_factor", "shift"])?;
+            no_null(i, "shift")?;
+            Model::Black76 {
+                forward: i.f64("forward")?,
+                discount: i.f64("discount_factor")?,
+                shift: i.f64_or("shift", 0.0)?,
+            }
+        }
+        "BACHELIER" => {
+            only(i, &["forward", "discount_factor"])?;
+            Model::Bachelier {
+                forward: i.f64("forward")?,
+                discount: i.f64("discount_factor")?,
+            }
+        }
+        _ => return i.fail("model", "unknown model"),
+    };
+    Ok(Option_ {
+        model,
+        call: option_type(i)?,
+        strike: i.f64("strike")?,
+        t: i.f64("expiry_years")?,
+    })
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
         "eq.forward.outright" => {
@@ -109,6 +172,17 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("max_residual", r.max_residual.into()),
                 ("outside_spread", r.outside_spread.into()),
             ]))
+        }
+        "vol.option.price" => {
+            let (o, v) = (option_inputs(i)?, i.f64("vol")?);
+            plain(obj([
+                ("price", o.price(v)?.into()),
+                ("forward", o.unshifted_forward().into()),
+            ]))
+        }
+        "vol.option.implied" => {
+            let (o, p) = (option_inputs(i)?, i.f64("price")?);
+            plain(obj([("vol", o.implied(p)?.into())]))
         }
         // next arm
         _ => fail(

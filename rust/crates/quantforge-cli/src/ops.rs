@@ -119,6 +119,8 @@ pub const OPERATIONS: &[&str] = &[
     "risk.ois.dv01",
     "usecase.fx_hedge",
     "usecase.rates_hedge",
+    "vol.option.implied",
+    "vol.option.price",
 ];
 
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {

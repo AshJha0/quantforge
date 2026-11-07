@@ -7,6 +7,7 @@
     clippy::manual_range_contains
 )]
 
+pub mod black;
 pub mod calendar;
 pub mod calib;
 pub mod compounding;
