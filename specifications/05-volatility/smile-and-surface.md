@@ -11,7 +11,7 @@ Log-moneyness is `k = ln(K/F)`, with `F` the forward of that expiry. Total varia
 | `convention` | `s` | Meaning |
 |---|---|---|
 | `FORWARD` | 1 | `scale` must be `null`, else `E_INPUT` |
-| `SPOT` | `scale`, given | `dV/dS`. On an equity, `D(T)/C(T)`. Must be above 0, else `E_DOMAIN` |
+| `SPOT` | `scale`, given | `dV/dS`. On an equity, `D(T)/C(T)`. `null`: `E_INPUT`. Must be above 0, else `E_DOMAIN` |
 
 `vol.delta.to_strike`. Inputs: `forward`, `vol`, `expiry_years`, `option_type`, `delta`, `convention`, `scale`. With `d1 = phi Ninv(phi delta/s)`, output `strike = F exp(-d1 v sqrt T + v^2 T/2)`. `phi delta/s` outside the open interval `(0, 1)`: `E_DOMAIN`. `forward`, `vol`, `expiry_years` must be above 0, else `E_DOMAIN`. `Ninv` must be good to 1e-12.
 

@@ -854,6 +854,89 @@
     "invalid",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "sabr-0023",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6,
+    "h_strike": 0.5,
+    "on_negative": "REJECT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0024",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [],
+    "expiry_years": 1.0,
+    "alpha": 0.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6,
+    "h_strike": 0.5,
+    "on_negative": "REJECT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "an empty list comes before domain checks"
+  },
+  {
+   "case_id": "sabr-0025",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
   }
  ]
 }

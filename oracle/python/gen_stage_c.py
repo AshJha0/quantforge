@@ -429,6 +429,20 @@ def smile():
     assert all(max(abs(a - b) for a, b in zip(x, (-.4, 1., .5))) < 1e-6 for x in sols), sols
     s.add("vol.ssvi.calibrate", dict(thetas=ths, log_moneyness=kk, total_variance=tv), {"rho": -.4, "eta": 1.0, "gamma": .5, "rmse": 0.0}, cls=I, limit=FITLIM, verified=["known-truth", "scipy"])
     s.add("vol.ssvi.calibrate", dict(thetas=ths, log_moneyness=kk, total_variance=[tv[0]] + [r[:-1] for r in tv[1:]]), error="E_INPUT", cls=E, tags=["invalid"])
+    # rulings C15, C17
+    fs = dict(forward=100., vol=.22, expiry_years=.75, option_type="CALL", convention="SPOT", scale=None)
+    s.add(to, dict(fs, delta=.25), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add(fr, dict(fs, strike=100.), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add(to, dict(fs, delta=.25, vol=-.1), error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="scale pairing comes before domain checks")
+    s.add(to, dict(fs, delta=2.0, scale=.9, vol=-.1), error="E_DOMAIN", cls=E, tags=["invalid", "ruling"])
+    rb = dict(forward=100., expiry_years=1., atm_vol=.2, atm_convention="ATM_FORWARD", rr=-.04, bf=.006, delta=.25, convention="SPOT", scale=None)
+    s.add("vol.smile.rr_bf", rb, error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add("vol.smile.rr_bf", dict(rb, convention="FORWARD", scale=.9), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add("vol.smile.rr_bf", dict(rb, atm_vol=-1.0), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add(ev, dict(svi=P, log_moneyness=[], expiry_years=T), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add(ev, dict(svi=dict(P, b=-.1), log_moneyness=[], expiry_years=T), error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="an empty list comes before domain checks")
+    s.add("vol.ssvi.evaluate", dict(i1, log_moneyness=[]), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add("vol.ssvi.evaluate", dict(i1, thetas=[]), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
     write(s)
 
 
@@ -497,6 +511,8 @@ def surface():
     s.add(op, dict(surface=sf, positions=pos), {"pv": pv(sf), "bucket_vega": bk, "parallel_vega": par, "bucket_sum": tot}, cls=I, limit={"absolute": 1e-7, "relative": 1e-8, "reason": "central difference over 2e-4 of prices near 100"}, verified=["analytic-bump"])
     caught("surface", "bucket vega per vol point", abs(par) * .99, 1e-7 + 1e-8 * abs(par))
     s.add(op, dict(surface={**sf, "vols": [[5e-5] + r[1:] for r in sf["vols"]]}, positions=pos), error="E_DOMAIN", cls=E, tags=["invalid"])
+    s.add(op, dict(surface=sf, positions=[]), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add("vol.surface.query", dict(surface=sf, points=[]), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
     write(s)
 
 
@@ -562,6 +578,9 @@ def sabr():
     caught("sabr", "beta 0.5 fitted as beta 1 misses the quotes", V.sabr_fit(100., 1., 1., ks, vs)[1], 1e-6)
     s.add(cal, dict(forward=100., expiry_years=1., beta=be, strikes=ks[:2], vols=vs[:2]), error="E_INPUT", cls=E, tags=["invalid"])
     s.add(cal, dict(forward=100., expiry_years=1., beta=be, strikes=ks, vols=[0.0] + vs[1:]), error="E_DOMAIN", cls=E, tags=["invalid"])
+    s.add(dn, dict(good, strikes=[]), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    s.add(dn, dict(good, strikes=[], alpha=0.0), error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="an empty list comes before domain checks")
+    s.add(op, dict(base, strikes=[]), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
     write(s)
     s = S("sabr_deep", "05-volatility/sabr.md")
     af = "vol.sabr.arbfree"
@@ -624,6 +643,10 @@ def sabr():
     s.add(af, dict(i, steps=0), error="E_INPUT", cls=E, tags=["invalid"])
     s.add(af, dict(i, cells=20001), error="E_LIMIT", cls=E, tags=["invalid"])
     s.add(af, dict(i, strikes=[100.]), error="E_INPUT", cls=E, tags=["invalid"])
+    s.add(af, dict(i, strikes=[]), error="E_INPUT", cls=E, tags=["invalid", "ruling"])
+    # ruling C16: at a strike of 1e-20, f0 - x rounds to f0, so the price cannot lie strictly between intrinsic and f0, whichever way it rounds
+    r, vs = run(1., 1., .3, .5, -.4, .5, 0., 100, 25, 50, [1e-20, 1.], ["mass-and-mean"], ["ruling", "boundary"])
+    assert vs[0] is None and vs[1] is not None and abs(r["calls"][0] - 1) < 1e-12
     write(s)
 
 
