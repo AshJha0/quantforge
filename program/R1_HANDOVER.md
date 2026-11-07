@@ -31,3 +31,9 @@ The full run includes a `run` call per sampled case, which is slow on the JVM. `
 Status on the v0.4 builds (observed 2026-11-07, all four the same): 14 of 19 streams pass, plus equivalence, reorder and interactive. The 5 failures are the new items: bt-0012 (BT5), bt-0015 to bt-0017 (`--batch` and `--timings`) and timings_identity.
 
 Questions go in your `SPEC_QUESTIONS` file as before; the spec session rules on them and pins each ruling with a fixture.
+
+## R1.1 outside-oracle suite (ready)
+
+New golden suite `datasets/golden/stage_d/outside_d.json`, 284 cases. It uses existing stage D operations only (`bond.*` price, yield, curve price and Z-spread; `rates.ois.compound_dated`; `rates.cap.price`; `rates.swaption.price`; `credit.cds.price`), so no new code should be needed. Run it through the runner as usual. Read nothing new beyond the specs you already have.
+
+Observed 2026-11-07: the stage D builds in the four language worktrees pass 284 of 284 (Rust, C++, Java, Python).

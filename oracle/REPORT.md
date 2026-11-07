@@ -332,3 +332,32 @@ fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps
 fragility: integrate-0095 error estimate 1.52e-01 against tol 1e-13
 fragility: root-0025 needs 7 Brent steps against max_iter 2; root-0026 has width 0.125 after 3 bisections against x_tol 1e-12
 ```
+
+## Stage D outside-oracle coverage (rule 11.2.5)
+
+Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, built from its own convention objects through `qf_oracle/convmap.py` (reviewed copy: `oracle/CONVENTION_MAP.md`), reproduces every output of the case within the case's own tolerance. One row per counted case, with the library version and the convention rows used, is in `oracle/outside_register.json`. Error cases are in the denominator and never count. Older `verified_by` tags that name QuantLib are not counted here unless this check passes.
+
+| Suite | Outside-oracle cases | Cases | Share |
+|---|---|---|---|
+| `bondfit_d` | 0 | 4 | 0% |
+| `bonds_d` | 39 | 49 | 80% |
+| `capswaption_d` | 9 | 14 | 64% |
+| `commodity_d` | 0 | 10 | 0% |
+| `compound_d` | 25 | 35 | 71% |
+| `credit_d` | 9 | 19 | 47% |
+| `csa_d` | 0 | 13 | 0% |
+| `equity_d` | 0 | 10 | 0% |
+| `fits_d` | 0 | 16 | 0% |
+| `futures_d` | 0 | 10 | 0% |
+| `index_d` | 0 | 12 | 0% |
+| `inflation_d` | 0 | 13 | 0% |
+| `mbs_d` | 0 | 12 | 0% |
+| `ois_d` | 20 | 25 | 80% |
+| `outside_d` | 284 | 284 | 100% |
+| `repo_d` | 0 | 19 | 0% |
+| `rulings2_d` | 1 | 25 | 4% |
+| `rulings_d` | 0 | 18 | 0% |
+| `steps_d` | 0 | 11 | 0% |
+| `trs_d` | 0 | 3 | 0% |
+| `xccy_d` | 0 | 13 | 0% |
+| **stage D** | **387** | **615** | **62.9%** |
