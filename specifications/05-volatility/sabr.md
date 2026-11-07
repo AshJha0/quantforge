@@ -56,7 +56,7 @@ This is one tridiagonal solve. Then `P_L += 2 dt a_1/h`, `P_R += 2 dt a_J/h`. Th
 
 Call, undiscounted, at shifted strike `x` in `(0, u_max)`, with `Q` constant in a cell: sum over cells above the one holding `x` of `(u_j - x) Q_j h`, plus `Q_c (e_c - x)^2/2` for the holding cell with top edge `e_c`, plus `(u_max - x) P_R`. `x` at or beyond `u_max`: `E_INPUT`.
 
-Outputs: `call_prices`; `vols`, the Black vol on `f0`, `x` of each price, or `null` where the price does not exceed intrinsic; `mass` (`sum Q h + P_L + P_R`); `mean` (`sum u Q h + u_max P_R`, on the shifted axis); `absorbed` (`P_L`); `min_density` (`min Q`).
+Outputs: `call_prices`; `vols`, the Black vol on `f0`, `x` of each price, or `null` where no finite vol exists: the price does not exceed intrinsic, or is at or above `f0` (ruling C16); `mass` (`sum Q h + P_L + P_R`); `mean` (`sum u Q h + u_max P_R`, on the shifted axis); `absorbed` (`P_L`); `min_density` (`min Q`).
 
 ## Limits of this stage
 

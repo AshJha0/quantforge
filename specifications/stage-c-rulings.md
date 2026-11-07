@@ -20,6 +20,11 @@ Spec version 1.0.0. Normative: this page is part of every stage C spec, and wins
 | C12 | Non-convergence | Never a golden outcome: whether a solver stops depends on its path |
 | C13 | `E_ARBITRAGE` | New in contract 1.4.0. Only `vol.sabr.density` with `REJECT` returns it in stage C |
 | C14 | QuantLib and borrow | `AnalyticDividendEuropeanEngine` in 1.44 carries dividends on `r-b`, so agrees with the corrected forward. It is an outside check of C2, measured, not assumed |
+| C15 | `scale` against `convention`, in `vol.delta.*` and `vol.smile.rr_bf` | `SPOT` with `null`, or `FORWARD` with a number: `E_INPUT`. This is the first rule check, before every `E_DOMAIN`. `SPOT` with `scale <= 0` stays `E_DOMAIN` |
+| C16 | `vol.sabr.arbfree`, price with no finite vol | `null` in `vols`, never an error: at or below intrinsic, or at or above `f0`. Prices and the other outputs stand. The Black solve is skipped, so it cannot fail |
+| C17 | Empty arrays | `E_INPUT`, as B3 and B6, for every stage C list but `dividends`, which may be empty: `strikes`, `log_moneyness`, `thetas`, `points`, `positions`, `quotes`, `slices`, `k_grid`. This is the first rule check, before every `E_DOMAIN`, and applies to `vol.sabr.hagan`, `density`, `arbfree` and `vol.svi.evaluate`, `vol.ssvi.evaluate` as much as to fits |
+
+Cases for C15 to C17 carry the `ruling` tag, in `smile`, `surface`, `sabr` and `sabr_deep`.
 
 ## Oracle coverage
 
