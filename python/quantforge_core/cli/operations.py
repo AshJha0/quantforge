@@ -7,6 +7,7 @@ from types import ModuleType, SimpleNamespace
 from typing import Any
 
 from .. import black as _black
+from .. import bonds as _bonds
 from .. import calendars as calendars_module
 from .. import calibration as _calibration
 from .. import compounding as compounding_module
@@ -123,7 +124,7 @@ _STAGE_C = SimpleNamespace(
 )
 _STAGE_D = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
-       for m in (_csa, _curve_fits, _futures, _overnight, _steps)}
+       for m in (_bonds, _csa, _curve_fits, _futures, _overnight, _steps)}
 )
 
 
