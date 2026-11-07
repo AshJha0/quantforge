@@ -28,6 +28,8 @@ from .. import (
 from .. import calibration as _calibration
 from .. import conventions as _conventions
 from .. import curves as _curves
+from .. import black as _black
+from .. import equity as _equity
 from .. import fx as _fx
 from .. import hedging as _hedging
 from .. import money as _money
@@ -44,6 +46,7 @@ from .functions import real_function, root_function
 from .inputs import Inputs, format_seconds, parse_instant, parse_u64
 from .limits import check_limits
 from .stage_b import handlers as _stage_b_handlers
+from .stage_c import handlers as _stage_c_handlers
 
 Result = dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]
 OPTIONS = ("CALL", "PUT")
@@ -97,6 +100,11 @@ _STAGE_B = SimpleNamespace(
             _schedules, _sensitivities, _usecases,
         )
     }
+)
+
+
+_STAGE_C = SimpleNamespace(
+    **{m.__name__.rsplit(".", 1)[-1]: _Core(m) for m in (_black, _equity)}
 )
 
 
@@ -620,3 +628,4 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
     "core.time.business_date": _business_date,
 }
 OPERATIONS.update(_stage_b_handlers(_STAGE_B))
+OPERATIONS.update(_stage_c_handlers(_STAGE_C))

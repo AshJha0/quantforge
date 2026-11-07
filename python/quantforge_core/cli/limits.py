@@ -133,7 +133,10 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "hedge.solve": _hedge,
     "rates.schedule.generate": _caps(payment_lag=30_000),
     "usecase.rates_hedge": _hedge_tenors,
+    "vol.sabr.arbfree": _caps(cells=20_000, steps=20_000),
 }
+STAGE_C_ARRAY = 100
+STAGE_C_PREFIXES = ("eq.", "vol.", "risk.vol.")
 
 
 def _check_arrays(raw: Raw) -> None:
@@ -164,9 +167,26 @@ def _check_curve_sizes(raw: Raw) -> None:
                     stack.append(value)
 
 
+def _check_stage_c(raw: Raw) -> None:
+    """Rulings C10: 100 for any quote, strike, point, dividend or position list, and surface grid."""
+    stack: list[Any] = [raw]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, list):
+            if len(item) > STAGE_C_ARRAY:
+                raise _over("an array", STAGE_C_ARRAY)
+            stack.extend(v for v in item if isinstance(v, (list, dict)))
+        elif isinstance(item, dict):
+            stack.extend(
+                v for k, v in item.items() if k != "pillars" and isinstance(v, (list, dict))
+            )
+
+
 def check_limits(operation: str, raw: Raw) -> None:
     _check_arrays(raw)
     _check_curve_sizes(raw)
+    if operation.startswith(STAGE_C_PREFIXES) or operation == "usecase.vol_surface":
+        _check_stage_c(raw)
     specific = _BY_OPERATION.get(operation)
     if specific is not None:
         specific(raw)
