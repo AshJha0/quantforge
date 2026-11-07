@@ -65,6 +65,54 @@ python conformance/runner/batch_check.py --impl rust
 
 `--skip-run` leaves out the slow per-case `run` comparison.
 
+## R2 risk recipes
+
+The language builds of these operations are landing, so no CLI output is shown yet. Each recipe sends golden cases through batch mode; the expected values are the oracle's, from `datasets/golden/r2/`. This shell function turns golden cases into batch input lines:
+
+```bash
+pick() { python -c "import json,sys; f,ids=sys.argv[1],sys.argv[2:]; [print(json.dumps({'schema_version':'1.0','case_id':c['case_id'],'operation':c['operation'],'inputs':c['inputs']})) for c in json.load(open(f))['cases'] if c['case_id'] in ids]" "$@"; }
+```
+
+### Par risk, `risk.curve.par`
+
+```bash
+pick datasets/golden/r2/risk_r2.json risk_r2-0001 | rust/target/release/quantforge --batch
+```
+
+Expected: `value` -24052.571714570924, `par_dv01` -4806.9447178779665, 2Y bucket -4808.126944588765. CLI output: TODO, once the Rust build lands.
+
+### Key-rate risk, `risk.curve.key_rate`
+
+```bash
+pick datasets/golden/r2/risk_r2.json risk_r2-0002 risk_r2-0004 | rust/target/release/quantforge --batch
+```
+
+`risk_r2-0002` is `TRIANGULAR` with key dates on the pillars; `-0004` is `PILLAR` (`key_dates: null`). Both give `zero_dv01` -4913.216280838518; the 2Y bucket is -4802.5944942185415 and -4828.703749426391. CLI output: TODO.
+
+### Jacobian, `risk.curve.jacobian`
+
+```bash
+pick datasets/golden/r2/risk_r2.json risk_r2-0031 | rust/target/release/quantforge --batch
+```
+
+Expected: 13 pillar dates, their zero rates, and a lower-triangular 13 by 13 matrix whose first entry is 1.0131265112373748. CLI output: TODO.
+
+### P&L explain, `risk.pnl.explain`
+
+```bash
+pick datasets/golden/r2/pnl_r2.json pnl_r2-0001 pnl_r2-0011 | rust/target/release/quantforge --batch
+```
+
+Expected: `pnl_r2-0001` explained (unexplained 0.7134295024516177, threshold 240.71713873755908); `pnl_r2-0011` not (unexplained -91509.0298994584, threshold 63158.45945421277). CLI output: TODO.
+
+Over real daily moves, once a build passes the goldens:
+
+```bash
+python tools/workflows/pnl_explain.py --impl rust --years 2025
+```
+
+Check a build with `python conformance/runner/runner.py --impl rust --suite risk_r2`, and `--suite pnl_r2`.
+
 ## Run the daily workflows
 
 Workflow (a) builds end-of-day curves and checks them against wide sanity bands; workflow (c) recomputes the NY Fed SOFR averages and checks the LIBOR fallback. Both send every case to one `quantforge --batch` process. Both fetch public data, so they need a network connection, or `--data DIR` to read saved files.
