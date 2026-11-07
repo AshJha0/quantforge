@@ -51,6 +51,7 @@ final class Operations {
         OpsForward.register(TABLE);
         OpsBlack.register(TABLE);
         OpsGreeks.register(TABLE);
+        OpsSmile.register(TABLE);
     }
 
     static Set<String> names() {
