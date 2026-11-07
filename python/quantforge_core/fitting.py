@@ -2,9 +2,9 @@
 judged, so the path here is free. numpy only: scipy is a development dependency."""
 from collections.abc import Callable, Iterable
 
-import numpy as np
+lazy import numpy as np
 
-Residual = Callable[[np.ndarray], np.ndarray]
+type Residual = Callable[[np.ndarray], np.ndarray]
 
 
 def _safe(residual: Residual, x: np.ndarray) -> np.ndarray | None:

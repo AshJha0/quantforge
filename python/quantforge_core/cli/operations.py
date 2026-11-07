@@ -1,9 +1,8 @@
 """One handler per operation. A handler reads its inputs, which is the E_SCHEMA stage, then calls
 the core, which applies the rule checks in spec order. It returns (outputs, diagnostics)."""
-import inspect
 from collections.abc import Callable
 from datetime import date
-from types import ModuleType, SimpleNamespace
+from types import FunctionType, ModuleType, SimpleNamespace
 from typing import Any
 
 from .. import black as _black
@@ -84,7 +83,7 @@ class _Core:
 
     def __getattr__(self, name: str) -> Any:
         value = getattr(self._module, name)
-        if not inspect.isfunction(value):
+        if not isinstance(value, FunctionType):
             return value
 
         def call(*args: Any, **kwargs: Any) -> Any:

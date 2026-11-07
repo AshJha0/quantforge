@@ -4,7 +4,7 @@ import math
 from bisect import bisect_left, bisect_right
 from collections.abc import Sequence
 
-from .errors import QfError
+from .errors import QfError, required
 from .numeric import thomas
 
 Floats = Sequence[float]
@@ -50,8 +50,8 @@ def _spline_slopes(
         diag[0], upper[0], rhs[0] = 2.0, 1.0, 3 * d[0]
         lower[n], diag[n], rhs[n] = 1.0, 2.0, 3 * d[n - 1]
     elif method == "cubic_clamped":
-        diag[0], rhs[0] = 1.0, slope_start
-        diag[n], rhs[n] = 1.0, slope_end
+        diag[0], rhs[0] = 1.0, required(slope_start, "slope_start")
+        diag[n], rhs[n] = 1.0, required(slope_end, "slope_end")
     else:
         # Equal third derivatives at x_1 and x_{n-1}, with the far unknown eliminated by the
         # neighbouring row, so that the system stays tridiagonal.
@@ -162,6 +162,7 @@ def evaluate(
     if method == "log_linear" and any(v <= 0 for v in y):
         raise QfError("E_DOMAIN", "log_linear needs y > 0", "y")
     if method == "tension":
+        tension = required(tension, "tension")
         if tension < 0:
             raise QfError("E_DOMAIN", "tension must not be negative", "tension")
         if tension > 0 and any(not 0.01 <= tension * hi <= 500 for hi in h):
@@ -181,8 +182,8 @@ def evaluate(
         return values, None
     if method == "monotone_pchip":
         return _hermite(x, y, _pchip_slopes(x, y), at)
-    if method == "tension" and tension > 0:
-        return _tension(x, y, tension, at)
+    if method == "tension" and required(tension, "tension") > 0:
+        return _tension(x, y, required(tension, "tension"), at)
     spline = "cubic_natural" if method == "tension" else method
     return _hermite(x, y, _spline_slopes(spline, x, y, slope_start, slope_end), at)
 

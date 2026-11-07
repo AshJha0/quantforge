@@ -2,7 +2,7 @@
 import math
 from dataclasses import dataclass
 
-from .errors import QfError
+from .errors import QfError, required
 
 FREQUENCIES = (1, 2, 3, 4, 6, 12)
 KINDS = ("SIMPLE", "PERIODIC", "CONTINUOUS")
@@ -25,7 +25,7 @@ class Compounding:
 def _check_rate(rate: float, t: float, c: Compounding) -> None:
     if c.kind == "SIMPLE" and 1 + rate * t <= 0:
         raise QfError("E_DOMAIN", "1 + r t must be positive", "rate")
-    if c.kind == "PERIODIC" and 1 + rate / c.frequency <= 0:
+    if c.kind == "PERIODIC" and 1 + rate / required(c.frequency, "frequency") <= 0:
         raise QfError("E_DOMAIN", "1 + r/n must be positive", "rate")
 
 
@@ -33,7 +33,8 @@ def _discount(rate: float, t: float, c: Compounding) -> float:
     if c.kind == "SIMPLE":
         return 1 / (1 + rate * t)
     if c.kind == "PERIODIC":
-        return (1 + rate / c.frequency) ** (-c.frequency * t)
+        n = required(c.frequency, "frequency")
+        return (1 + rate / n) ** (-n * t)
     return math.exp(-rate * t)
 
 
@@ -41,7 +42,7 @@ def _rate(d: float, t: float, c: Compounding) -> float:
     if c.kind == "SIMPLE":
         return (1 / d - 1) / t
     if c.kind == "PERIODIC":
-        n = c.frequency
+        n = required(c.frequency, "frequency")
         return n * (d ** (-1 / (n * t)) - 1)
     return -math.log(d) / t
 
