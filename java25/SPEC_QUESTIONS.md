@@ -110,3 +110,5 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | D-14 | `bond.fit.nelson_siegel` `weights` of the wrong length | `E_INPUT` |
 | D-15 | `credit.*` hazard `as_of` different from `trade_date` | Survival is anchored at the hazard's `as_of` (Q = 1 there); integration time counts from `trade_date`. No golden has them differ |
 | D-16 | `credit.index.intrinsic`, `credit.curve.composite` weights that are negative or sum to 0 | `E_DOMAIN` for a negative weight, `E_INPUT` for a zero sum |
+| D-17 | `eq.futures.basis` implied spread with no root | `E_NOT_BRACKETED` on `[-0.5, 0.5]`, as `eq.borrow.implied` |
+| D-18 | `eq.trs.pv` with `end <= start`; `current_rate` given when `start >= as_of` | `E_DATE_ORDER`; a given rate is used |
