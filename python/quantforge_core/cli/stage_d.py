@@ -402,3 +402,50 @@ def _trs(i: Inputs) -> Any:
             t.real("spread"), t.enum("side", ("RECEIVE_EQUITY", "PAY_EQUITY")), current)
     equity, funding_leg, value = D.equity_d.trs_pv(*args)
     return {"equity_leg": equity, "funding_leg": funding_leg, "pv": value}
+
+
+# Wave 3, D6: inflation
+
+def _month_index(i: Inputs, key: str) -> int:
+    year, month = _month(i, key)
+    return 12 * year + month - 1
+
+
+def _cpi_curve(c: Inputs) -> Any:
+    from ..inflation import CpiCurveData
+    _present(c, "seasonality")
+    season = tuple(c.reals("seasonality")) if c.has("seasonality") else None
+    quotes = tuple((q.real("years"), q.real("rate")) for q in _objects(c, "quotes"))
+    return CpiCurveData(_month_index(c, "base_month"), c.real("base_cpi"), quotes, season)
+
+
+@op("infl.curve.cpi")
+def _cpi(i: Inputs) -> Any:
+    data = _cpi_curve(i)
+    months = [_month_index(Inputs({"m": m}), "m") for m in i.array("months")]
+    return {"cpi": D.inflation.cpi(data, months)}
+
+
+@op("infl.zcis.pv")
+def _zcis(i: Inputs) -> Any:
+    t = i.object("trade")
+    args = (_cpi_curve(i.object("curve")), _curve(i, "discount"), t.integer("years"),
+            t.real("fixed_rate"), t.real("notional"),
+            t.enum("side", ("RECEIVE_INFLATION", "PAY_INFLATION")), t.date("payment_date"))
+    value, ratio = D.inflation.zcis_pv(*args)
+    return {"pv": value, "index_ratio": ratio}
+
+
+@op("infl.linker.price")
+def _linker(i: Inputs) -> Any:
+    fixings = [(_month_index(f, "month"), f.real("value")) for f in _objects(i, "cpi_fixings")]
+    args = (_bond(i.object("bond")), i.date("settlement"), i.real("real_yield"),
+            i.real("base_ref_cpi"), fixings)
+    return D.inflation.linker_price(*args)
+
+
+@op("infl.linker.price_curve")
+def _linker_curve(i: Inputs) -> Any:
+    args = (_bond(i.object("bond")), i.date("settlement"), i.real("base_ref_cpi"),
+            _cpi_curve(i.object("curve")), _curve(i, "discount"))
+    return {"nominal_dirty": D.inflation.linker_price_curve(*args)}

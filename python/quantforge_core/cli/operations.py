@@ -24,6 +24,7 @@ from .. import equity_d as _equity_d
 from .. import futures as _futures
 from .. import fx as _fx
 from .. import hedging as _hedging
+from .. import inflation as _inflation
 from .. import integrate as integrate_module
 from .. import interp as interp_module
 from .. import linalg as linalg_module
@@ -127,7 +128,7 @@ _STAGE_C = SimpleNamespace(
 )
 _STAGE_D = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
-       for m in (_bonds, _credit, _csa, _curve_fits, _equity_d, _futures, _overnight, _steps, _xccy)}
+       for m in (_bonds, _credit, _csa, _curve_fits, _equity_d, _futures, _inflation, _overnight, _steps, _xccy)}
 )
 
 
