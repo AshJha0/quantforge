@@ -80,4 +80,4 @@ Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: th
 
 - [S1] Snodgrass, R. T., *Developing Time-Oriented Database Applications in SQL*, Morgan Kaufmann, 2000 (valid time and transaction time, the bitemporal model behind `event_time` and `knowledge_time`) (not opened)
 - [S2] NIST FIPS PUB 180-4, *Secure Hash Standard (SHS)*, 2015, SHA-256 (not opened)
-- [S3] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017 (not opened)
+- [S3] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017 (opened 2026-11-07)

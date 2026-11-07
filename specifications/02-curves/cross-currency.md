@@ -45,5 +45,5 @@ Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: th
 - [S1] Fujii, M., Shimada, Y. and Takahashi, A., "A note on construction of multiple swap curves with and without collateral", *FSA Research Review* 6, 2010 (collateralised cross-currency discounting) (not opened)
 - [S2] Andersen, L. B. G. and Piterbarg, V. V., *Interest Rate Modeling*, Atlantic Financial Press, 2010, vol. 1, chapter on multi-curve and cross-currency (not opened)
 - [S3] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Swaps" (currency swaps) (not opened)
-- [S4] Federal Reserve Bank of New York, SOFR and reference-rate production methodology (statement on the Secured Overnight Financing Rate) (not opened)
-- [S5] European Central Bank, *Euro short-term rate (€STR) methodology and policies* (not opened)
+- [S4] Federal Reserve Bank of New York, *Additional Information about Reference Rates Administered by the New York Fed*, section "Calculation Methodology for the TGCR, BGCR, and SOFR" (opened 2026-11-07)
+- [S5] European Central Bank, *The euro short-term rate (€STR) methodology and policies* (opened 2026-11-07, title from the PDF; body not read)

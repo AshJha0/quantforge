@@ -61,8 +61,8 @@ Survival within 1e-9; prices 1e-9 per unit notional. QuantLib `IsdaCdsEngine` NP
 
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
-- [S1] ISDA / Markit, *ISDA CDS Standard Model* documentation and source (cdsmodel.com), and the 2009 Big Bang Protocol conventions (fixed coupons, step-in T+1, cash settlement T+3) (not opened)
+- [S1] ISDA / Markit, *ISDA CDS Standard Model* documentation and source (cdsmodel.com), and the 2009 Big Bang Protocol conventions (fixed coupons, step-in T+1, cash settlement T+3) (cdsmodel.com opened 2026-11-07: free source confirmed; the dates were not found there)
 - [S2] ISDA, *2014 ISDA Credit Derivatives Definitions* (not opened)
 - [S3] O'Kane, D., *Modelling Single-name and Multi-name Credit Derivatives*, Wiley, 2008, chapters on CDS pricing and on index CDS (not opened)
-- [S4] ISDA, amendments to standard CDS roll dates (semi-annual roll on 20 March and 20 September), effective December 2015 (not opened)
+- [S4] ISDA semi-annual roll for single-name CDS, effective 21 December 2015: on-the-run roll on 20 March and 20 September, maturities on 20 June and 20 December (cdsmodel.com news, opened 2026-11-07)
 - [S5] ISDA CDS Standard Model, flat-forward (log-linear discount factor) interpolation of the discount curve between nodes: basis of ruling R1-4 (not opened)
