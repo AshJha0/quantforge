@@ -243,6 +243,22 @@ def check_d(c, counts):
     if op == "infl.linker.price":
         assert abs(o["nominal_clean"] - o["real_clean"] * o["index_ratio"]) < 1e-9 * o["nominal_clean"], cid
         hit("linker nominal = real x index ratio")
+    if op == "rates.cap.price":
+        assert all(c >= 0 for c in o["caplets"]) and abs(sum(o["caplets"]) - o["price"]) < 1e-9 * max(1, o["price"]), cid
+        hit("cap = sum of non-negative caplets")
+    if op == "rates.swaption.price":
+        K, Sw, A, N = i["trade"]["strike"], o["forward_rate"], o["annuity"], i["trade"]["notional"]
+        intr = N * A * max(Sw - K if i["trade"]["type"] == "PAYER" else K - Sw, 0)
+        assert o["price"] >= intr - 1e-9 * N and A > 0, cid
+        hit("swaption at least intrinsic on the annuity")
+    if op == "cmdty.storage.carry":
+        assert o["arbitrage"] == [v > 0 for v in o["carry_values"]], cid
+        hit("storage arbitrage flag = positive carry value")
+    if op == "mbs.cashflows":
+        b = o["balance"]
+        assert all(x >= -1e-6 for x in o["prepayment"] + o["scheduled_principal"]) and all(y <= x + 1e-6 for x, y in zip(b, b[1:])), cid
+        assert abs(b[-1] - o["scheduled_principal"][-1] - o["prepayment"][-1]) < 1e-6, cid
+        hit("MBS balance falls to zero; principal not negative")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid
