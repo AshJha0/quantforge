@@ -26,10 +26,11 @@ import gen_r1_outside
 import gen_r1_edge
 import gen_r1_rulings
 import gen_r2_risk
+import gen_r2_pnl
 import outside_d
 from qf_oracle.common import REPORT, ROOT
 
-for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data, gen_rulings_store, gen_limits, gen_stage_b, gen_stage_b_deep, gen_stage_c, gen_stage_d, gen_stage_d_w2, gen_stage_d_xccy, gen_stage_d_credit, gen_stage_d_equity, gen_stage_d_w3, gen_stage_d_vol, gen_stage_d_cmdty, gen_stage_d_mbs, gen_stage_d_rulings, gen_r1_outside, gen_r1_edge, gen_r1_rulings, gen_r2_risk, gen_exercises):
+for g in (gen_dates, gen_random, gen_numerics, gen_stats_engines, gen_data, gen_rulings_store, gen_limits, gen_stage_b, gen_stage_b_deep, gen_stage_c, gen_stage_d, gen_stage_d_w2, gen_stage_d_xccy, gen_stage_d_credit, gen_stage_d_equity, gen_stage_d_w3, gen_stage_d_vol, gen_stage_d_cmdty, gen_stage_d_mbs, gen_stage_d_rulings, gen_r1_outside, gen_r1_edge, gen_r1_rulings, gen_r2_risk, gen_r2_pnl, gen_exercises):
     g.main()
 check_invariants.main()
 check_fragility.main()

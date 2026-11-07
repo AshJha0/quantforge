@@ -1,0 +1,7681 @@
+{
+ "schema_version": "1.0",
+ "suite": "pnl_r2",
+ "spec": "specifications/06-risk/pnl-explain.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r2_pnl.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "pnl_r2-0001",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0386
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -24052.571714570924,
+     "value_end": -28858.802956331296,
+     "full_pnl": -4806.231241760372,
+     "par_buckets": [
+      0.02670510739699239,
+      -2.605554982437752e-06,
+      0.00020001986194984056,
+      -0.016775812682681135,
+      1.1721466169201449,
+      -4808.126944588765,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -4806.944671262823,
+     "unexplained": 0.7134295024516177,
+     "threshold": 240.34723356314117,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel +1bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0002",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0377
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0373
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0367
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0365
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -24052.571714570924,
+     "value_end": 24088.31571573712,
+     "full_pnl": 48140.887430308045,
+     "par_buckets": [
+      0.02670510739699239,
+      -2.605554982437752e-06,
+      0.00020001986194984056,
+      -0.016775812682681135,
+      1.1721466169201449,
+      -4808.126944588765,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 48069.44671262824,
+     "unexplained": 71.44071767980495,
+     "threshold": 2407.0443715154024,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel -10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0003",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0382
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.03826666666666667
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.03813333333333333
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036666666666666674
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035333333333333335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.03566666666666667
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036833333333333336
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.04016666666666667
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.04083333333333333
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.04
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -24052.571714570924,
+     "value_end": -40071.32893038556,
+     "full_pnl": -16018.75721581464,
+     "par_buckets": [
+      0.02670510739699239,
+      -2.605554982437752e-06,
+      0.00020001986194984056,
+      -0.016775812682681135,
+      1.1721466169201449,
+      -4808.126944588765,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -16025.270087819259,
+     "unexplained": 6.512872004619567,
+     "threshold": 800.937860790732,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "steepener",
+    "synthetic"
+   ],
+   "description": "steepener -5/+15bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0004",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0407
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.040350000000000004
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0398
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.038950000000000005
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.037500000000000006
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035750000000000004
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035250000000000004
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.03725
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.03875
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -24052.571714570924,
+     "value_end": -60056.62701295163,
+     "full_pnl": -36004.0552983807,
+     "par_buckets": [
+      0.02670510739699239,
+      -2.605554982437752e-06,
+      0.00020001986194984056,
+      -0.016775812682681135,
+      1.1721466169201449,
+      -4808.126944588765,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -36048.90325905641,
+     "unexplained": 44.847960675710056,
+     "threshold": 1800.202764919035,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "flattener",
+    "synthetic"
+   ],
+   "description": "flattener +20/-10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0005",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0537
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0536
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0533
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.052700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.051500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0495
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.051000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0525
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.054
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0545
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0535
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -24052.571714570924,
+     "value_end": -729350.7762572728,
+     "full_pnl": -705298.2045427018,
+     "par_buckets": [
+      0.02670510739699239,
+      -2.605554982437752e-06,
+      0.00020001986194984056,
+      -0.016775812682681135,
+      1.1721466169201449,
+      -4808.126944588765,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -721041.7006894236,
+     "unexplained": 15743.496146721765,
+     "threshold": 35264.91022713509,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "shock",
+    "synthetic"
+   ],
+   "description": "shock +150bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0006",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035300000000000005
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035800000000000005
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036800000000000006
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -24052.571714570924,
+     "value_end": -24052.571714570924,
+     "full_pnl": 0.0,
+     "par_buckets": [
+      0.02670510739699239,
+      -2.605554982437752e-06,
+      0.00020001986194984056,
+      -0.016775812682681135,
+      1.1721466169201449,
+      -4808.126944588765,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 0.0,
+     "unexplained": 0.0,
+     "threshold": 240.34723356314117,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "belly",
+    "synthetic"
+   ],
+   "description": "belly +8bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0007",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0386
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "10Y",
+      "fixed_rate": 0.039,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -125353.67961054755,
+     "value_end": -116936.9058719627,
+     "full_pnl": 8416.773738584845,
+     "par_buckets": [
+      0.13917728497472126,
+      -3.1386007321998477e-06,
+      0.00024094309628708288,
+      -0.020207771565765142,
+      1.064308852161048,
+      2.142289038383751,
+      4.92344574026356,
+      11.076538187495316,
+      20.516985972382827,
+      8381.231396966112,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 8421.074172074703,
+     "unexplained": -4.300433489857824,
+     "threshold": 421.0537086037352,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel +1bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0008",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0377
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0373
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0367
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0365
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "10Y",
+      "fixed_rate": 0.039,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -125353.67961054755,
+     "value_end": -209996.2608765854,
+     "full_pnl": -84642.58126603786,
+     "par_buckets": [
+      0.13917728497472126,
+      -3.1386007321998477e-06,
+      0.00024094309628708288,
+      -0.020207771565765142,
+      1.064308852161048,
+      2.142289038383751,
+      4.92344574026356,
+      11.076538187495316,
+      20.516985972382827,
+      8381.231396966112,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -84210.74172074701,
+     "unexplained": -431.8395452908444,
+     "threshold": 4232.129063301893,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel -10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0009",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0382
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.03826666666666667
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.03813333333333333
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036666666666666674
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035333333333333335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.03566666666666667
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036833333333333336
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.04016666666666667
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.04083333333333333
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.04
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "10Y",
+      "fixed_rate": 0.039,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -125353.67961054755,
+     "value_end": -41611.44866722644,
+     "full_pnl": 83742.2309433211,
+     "par_buckets": [
+      0.13917728497472126,
+      -3.1386007321998477e-06,
+      0.00024094309628708288,
+      -0.020207771565765142,
+      1.064308852161048,
+      2.142289038383751,
+      4.92344574026356,
+      11.076538187495316,
+      20.516985972382827,
+      8381.231396966112,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 84089.96820339577,
+     "unexplained": -347.7372600746603,
+     "threshold": 4187.111547166055,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "steepener",
+    "synthetic"
+   ],
+   "description": "steepener -5/+15bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0010",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0407
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.040350000000000004
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0398
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.038950000000000005
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.037500000000000006
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035750000000000004
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035250000000000004
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.03725
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.03875
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "10Y",
+      "fixed_rate": 0.039,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -125353.67961054755,
+     "value_end": -146221.8211433164,
+     "full_pnl": -20868.141532768845,
+     "par_buckets": [
+      0.13917728497472126,
+      -3.1386007321998477e-06,
+      0.00024094309628708288,
+      -0.020207771565765142,
+      1.064308852161048,
+      2.142289038383751,
+      4.92344574026356,
+      11.076538187495316,
+      20.516985972382827,
+      8381.231396966112,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -20871.525154159877,
+     "unexplained": 3.383621391032648,
+     "threshold": 1043.4070766384423,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "flattener",
+    "synthetic"
+   ],
+   "description": "flattener +20/-10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0011",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0537
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0536
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0533
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.052700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.051500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0495
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.051000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0525
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.054
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0545
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0535
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "10Y",
+      "fixed_rate": 0.039,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -125353.67961054755,
+     "value_end": 1046298.4163011996,
+     "full_pnl": 1171652.095911747,
+     "par_buckets": [
+      0.13917728497472126,
+      -3.1386007321998477e-06,
+      0.00024094309628708288,
+      -0.020207771565765142,
+      1.064308852161048,
+      2.142289038383751,
+      4.92344574026356,
+      11.076538187495316,
+      20.516985972382827,
+      8381.231396966112,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 1263161.1258112055,
+     "unexplained": -91509.0298994584,
+     "threshold": 58582.60479558736,
+     "explained": false
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "shock",
+    "synthetic"
+   ],
+   "description": "shock +150bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0012",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035300000000000005
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035800000000000005
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036800000000000006
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "10Y",
+      "fixed_rate": 0.039,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -125353.67961054755,
+     "value_end": -58271.901945652906,
+     "full_pnl": 67081.77766489465,
+     "par_buckets": [
+      0.13917728497472126,
+      -3.1386007321998477e-06,
+      0.00024094309628708288,
+      -0.020207771565765142,
+      1.064308852161048,
+      2.142289038383751,
+      4.92344574026356,
+      11.076538187495316,
+      20.516985972382827,
+      8381.231396966112,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 67341.98693493003,
+     "unexplained": -260.20927003538236,
+     "threshold": 3354.0888832447326,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "belly",
+    "synthetic"
+   ],
+   "description": "belly +8bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0013",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0386
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "30Y",
+      "fixed_rate": 0.04,
+      "notional": 5000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 132721.81579867483,
+     "value_end": 123719.98529102646,
+     "full_pnl": -9001.830507648367,
+     "par_buckets": [
+      -0.14735786979144905,
+      1.5140685718506575e-06,
+      -0.00011618623102549464,
+      0.009744480499648489,
+      -0.2525398037978448,
+      -0.5009698564390419,
+      -1.1313720610487508,
+      -2.5258842428738717,
+      -4.7409885253728135,
+      -11.383440342571703,
+      -23.349554064960103,
+      -54.202798809303204,
+      -8914.739139755373
+     ],
+     "risk_pnl": -9012.964415523194,
+     "unexplained": 11.133907874827855,
+     "threshold": 450.64822077615975,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel +1bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0014",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0377
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0373
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0367
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0365
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "30Y",
+      "fixed_rate": 0.04,
+      "notional": 5000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 132721.81579867483,
+     "value_end": 223976.46657290714,
+     "full_pnl": 91254.65077423232,
+     "par_buckets": [
+      -0.14735786979144905,
+      1.5140685718506575e-06,
+      -0.00011618623102549464,
+      0.009744480499648489,
+      -0.2525398037978448,
+      -0.5009698564390419,
+      -1.1313720610487508,
+      -2.5258842428738717,
+      -4.7409885253728135,
+      -11.383440342571703,
+      -23.349554064960103,
+      -54.202798809303204,
+      -8914.739139755373
+     ],
+     "risk_pnl": 90129.64415523193,
+     "unexplained": 1125.0066190003854,
+     "threshold": 4562.732538711616,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel -10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0015",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0382
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.03826666666666667
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.03813333333333333
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036666666666666674
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035333333333333335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.03566666666666667
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036833333333333336
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.04016666666666667
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.04083333333333333
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.04
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "30Y",
+      "fixed_rate": 0.04,
+      "notional": 5000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 132721.81579867483,
+     "value_end": -0.0,
+     "full_pnl": -132721.81579867483,
+     "par_buckets": [
+      -0.14735786979144905,
+      1.5140685718506575e-06,
+      -0.00011618623102549464,
+      0.009744480499648489,
+      -0.2525398037978448,
+      -0.5009698564390419,
+      -1.1313720610487508,
+      -2.5258842428738717,
+      -4.7409885253728135,
+      -11.383440342571703,
+      -23.349554064960103,
+      -54.202798809303204,
+      -8914.739139755373
+     ],
+     "risk_pnl": -134893.39509552275,
+     "unexplained": 2171.579296847922,
+     "threshold": 6636.090789933742,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "steepener",
+    "synthetic"
+   ],
+   "description": "steepener -5/+15bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0016",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0407
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.040350000000000004
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0398
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.038950000000000005
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.037500000000000006
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035750000000000004
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035250000000000004
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.03725
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.03875
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "30Y",
+      "fixed_rate": 0.04,
+      "notional": 5000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 132721.81579867483,
+     "value_end": 223209.56816777147,
+     "full_pnl": 90487.75236909665,
+     "par_buckets": [
+      -0.14735786979144905,
+      1.5140685718506575e-06,
+      -0.00011618623102549464,
+      0.009744480499648489,
+      -0.2525398037978448,
+      -0.5009698564390419,
+      -1.1313720610487508,
+      -2.5258842428738717,
+      -4.7409885253728135,
+      -11.383440342571703,
+      -23.349554064960103,
+      -54.202798809303204,
+      -8914.739139755373
+     ],
+     "risk_pnl": 89678.03744924416,
+     "unexplained": 809.7149198524858,
+     "threshold": 4524.387618454833,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "flattener",
+    "synthetic"
+   ],
+   "description": "flattener +20/-10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0017",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0537
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0536
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0533
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.052700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.051500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0495
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.051000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0525
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.054
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0545
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0535
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "30Y",
+      "fixed_rate": 0.04,
+      "notional": 5000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 132721.81579867483,
+     "value_end": -1000105.5084579996,
+     "full_pnl": -1132827.3242566744,
+     "par_buckets": [
+      -0.14735786979144905,
+      1.5140685718506575e-06,
+      -0.00011618623102549464,
+      0.009744480499648489,
+      -0.2525398037978448,
+      -0.5009698564390419,
+      -1.1313720610487508,
+      -2.5258842428738717,
+      -4.7409885253728135,
+      -11.383440342571703,
+      -23.349554064960103,
+      -54.202798809303204,
+      -8914.739139755373
+     ],
+     "risk_pnl": -1351944.662328479,
+     "unexplained": 219117.33807180473,
+     "threshold": 56641.366212833724,
+     "explained": false
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "shock",
+    "synthetic"
+   ],
+   "description": "shock +150bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0018",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035300000000000005
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035800000000000005
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036800000000000006
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "30Y",
+      "fixed_rate": 0.04,
+      "notional": 5000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 132721.81579867483,
+     "value_end": 132563.93316648906,
+     "full_pnl": -157.8826321857632,
+     "par_buckets": [
+      -0.14735786979144905,
+      1.5140685718506575e-06,
+      -0.00011618623102549464,
+      0.009744480499648489,
+      -0.2525398037978448,
+      -0.5009698564390419,
+      -1.1313720610487508,
+      -2.5258842428738717,
+      -4.7409885253728135,
+      -11.383440342571703,
+      -23.349554064960103,
+      -54.202798809303204,
+      -8914.739139755373
+     ],
+     "risk_pnl": -158.2534813749371,
+     "unexplained": 0.37084918917389587,
+     "threshold": 450.64822077615975,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "belly",
+    "synthetic"
+   ],
+   "description": "belly +8bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0019",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "ESTR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.022799999999999997
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0227
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0224
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021800000000000003
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020600000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019100000000000002
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018600000000000002
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019100000000000002
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020100000000000003
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.021599999999999998
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0231
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0236
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0226
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "ESTR",
+      "tenor": "5Y",
+      "fixed_rate": 0.0195,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -23952.927906646382,
+     "value_end": -19156.66120342066,
+     "full_pnl": 4796.266703225723,
+     "par_buckets": [
+      0.02660264293626824,
+      -4.2556166590657085e-07,
+      3.283019759692252e-05,
+      -0.002764166049018968,
+      0.4570379414508352,
+      0.9319332055365521,
+      2.1263000376402488,
+      4794.149559073854,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 4797.688701140005,
+     "unexplained": -1.4219979142817465,
+     "threshold": 239.88443505700025,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel +1bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0020",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "ESTR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.021699999999999997
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0216
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0213
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.020700000000000003
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.019500000000000003
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.018000000000000002
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0175
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.018000000000000002
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.020499999999999997
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.022
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0225
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0215
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "ESTR",
+      "tenor": "5Y",
+      "fixed_rate": 0.0195,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -23952.927906646382,
+     "value_end": -72072.36868345735,
+     "full_pnl": -48119.44077681097,
+     "par_buckets": [
+      0.02660264293626824,
+      -4.2556166590657085e-07,
+      3.283019759692252e-05,
+      -0.002764166049018968,
+      0.4570379414508352,
+      0.9319332055365521,
+      2.1263000376402488,
+      4794.149559073854,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -47976.887011400046,
+     "unexplained": -142.5537654109212,
+     "threshold": 2405.9720388405485,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel -10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0021",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "ESTR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.022199999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022266666666666667
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.022133333333333335
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.02066666666666667
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019333333333333338
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.01966666666666667
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020833333333333336
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0225
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.024166666666666666
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.024833333333333332
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.024
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "ESTR",
+      "tenor": "5Y",
+      "fixed_rate": 0.0195,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -23952.927906646382,
+     "value_end": 7971.615754398531,
+     "full_pnl": 31924.543661044914,
+     "par_buckets": [
+      0.02660264293626824,
+      -4.2556166590657085e-07,
+      3.283019759692252e-05,
+      -0.002764166049018968,
+      0.4570379414508352,
+      0.9319332055365521,
+      2.1263000376402488,
+      4794.149559073854,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 31975.363668088292,
+     "unexplained": -50.8200070433777,
+     "threshold": 1596.227183052246,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "steepener",
+    "synthetic"
+   ],
+   "description": "steepener -5/+15bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0022",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "ESTR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0247
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.024350000000000004
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0238
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.022950000000000005
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.021500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019750000000000004
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019250000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.021249999999999998
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0225
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.02275
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0215
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "ESTR",
+      "tenor": "5Y",
+      "fixed_rate": 0.0195,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -23952.927906646382,
+     "value_end": -11960.684040420028,
+     "full_pnl": 11992.243866226354,
+     "par_buckets": [
+      0.02660264293626824,
+      -4.2556166590657085e-07,
+      3.283019759692252e-05,
+      -0.002764166049018968,
+      0.4570379414508352,
+      0.9319332055365521,
+      2.1263000376402488,
+      4794.149559073854,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 12008.063262117616,
+     "unexplained": -15.819395891261593,
+     "threshold": 599.6121933113177,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "flattener",
+    "synthetic"
+   ],
+   "description": "flattener +20/-10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0023",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "ESTR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0377
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0373
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0367
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0365
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "ESTR",
+      "tenor": "5Y",
+      "fixed_rate": 0.0195,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -23952.927906646382,
+     "value_end": 664777.1175516204,
+     "full_pnl": 688730.0454582667,
+     "par_buckets": [
+      0.02660264293626824,
+      -4.2556166590657085e-07,
+      3.283019759692252e-05,
+      -0.002764166049018968,
+      0.4570379414508352,
+      0.9319332055365521,
+      2.1263000376402488,
+      4794.149559073854,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 719653.3051710008,
+     "unexplained": -30923.259712734027,
+     "threshold": 34436.50227291334,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "shock",
+    "synthetic"
+   ],
+   "description": "shock +150bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0024",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "ESTR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0193
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0198
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020800000000000003
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.022299999999999997
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "ESTR",
+      "tenor": "5Y",
+      "fixed_rate": 0.0195,
+      "notional": 10000000.0,
+      "side": "PAY"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": -23952.927906646382,
+     "value_end": 14344.483372132483,
+     "full_pnl": 38297.41127877886,
+     "par_buckets": [
+      0.02660264293626824,
+      -4.2556166590657085e-07,
+      3.283019759692252e-05,
+      -0.002764166049018968,
+      0.4570379414508352,
+      0.9319332055365521,
+      2.1263000376402488,
+      4794.149559073854,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 38370.206872891955,
+     "unexplained": -72.7955941130931,
+     "threshold": 1914.8705639389432,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "ois",
+    "belly",
+    "synthetic"
+   ],
+   "description": "belly +8bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0025",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0386
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 10000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 10426395.224173218,
+     "value_end": 10423527.491242267,
+     "full_pnl": -2867.7329309508204,
+     "par_buckets": [
+      -3.1886960165575147,
+      -0.0015376042574644089,
+      0.11805273685604334,
+      -9.900993733666837,
+      2.276287455111742,
+      -4.490159340202808,
+      -2853.1013856055215,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -2868.2884321082383,
+     "unexplained": 0.5555011574178934,
+     "threshold": 143.41442160541192,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel +1bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0026",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0377
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0373
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0367
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0365
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 10000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 10426395.224173218,
+     "value_end": 10455133.755242454,
+     "full_pnl": 28738.531069235876,
+     "par_buckets": [
+      -3.1886960165575147,
+      -0.0015376042574644089,
+      0.11805273685604334,
+      -9.900993733666837,
+      2.276287455111742,
+      -4.490159340202808,
+      -2853.1013856055215,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 28682.88432108238,
+     "unexplained": 55.646748153496446,
+     "threshold": 1436.926553461794,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel -10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0027",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0382
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.03826666666666667
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.03813333333333333
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036666666666666674
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035333333333333335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.03566666666666667
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036833333333333336
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.04016666666666667
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.04083333333333333
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.04
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 10000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 10426395.224173218,
+     "value_end": 10412145.10670455,
+     "full_pnl": -14250.117468668148,
+     "par_buckets": [
+      -3.1886960165575147,
+      -0.0015376042574644089,
+      0.11805273685604334,
+      -9.900993733666837,
+      2.276287455111742,
+      -4.490159340202808,
+      -2853.1013856055215,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -14260.92846253421,
+     "unexplained": 10.810993866061835,
+     "threshold": 712.5058734334075,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "steepener",
+    "synthetic"
+   ],
+   "description": "steepener -5/+15bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0028",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0407
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.040350000000000004
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0398
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.038950000000000005
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.037500000000000006
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035750000000000004
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035250000000000004
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.03725
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.03875
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 10000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 10426395.224173218,
+     "value_end": 10411951.484909661,
+     "full_pnl": -14443.739263556898,
+     "par_buckets": [
+      -3.1886960165575147,
+      -0.0015376042574644089,
+      0.11805273685604334,
+      -9.900993733666837,
+      2.276287455111742,
+      -4.490159340202808,
+      -2853.1013856055215,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -14462.21270755166,
+     "unexplained": 18.47344399476242,
+     "threshold": 722.186963177845,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "flattener",
+    "synthetic"
+   ],
+   "description": "flattener +20/-10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0029",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0537
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0536
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0533
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.052700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.051500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0495
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.051000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0525
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.054
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0545
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0535
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 10000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 10426395.224173218,
+     "value_end": 10008353.738838667,
+     "full_pnl": -418041.48533455096,
+     "par_buckets": [
+      -3.1886960165575147,
+      -0.0015376042574644089,
+      0.11805273685604334,
+      -9.900993733666837,
+      2.276287455111742,
+      -4.490159340202808,
+      -2853.1013856055215,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -430243.26481623575,
+     "unexplained": 12201.779481684789,
+     "threshold": 20902.074266727548,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "shock",
+    "synthetic"
+   ],
+   "description": "shock +150bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0030",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035300000000000005
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035800000000000005
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036800000000000006
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 10000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 10426395.224173218,
+     "value_end": 10403588.226809083,
+     "full_pnl": -22806.99736413546,
+     "par_buckets": [
+      -3.1886960165575147,
+      -0.0015376042574644089,
+      0.11805273685604334,
+      -9.900993733666837,
+      2.276287455111742,
+      -4.490159340202808,
+      -2853.1013856055215,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -22824.811084844172,
+     "unexplained": 17.813720708712935,
+     "threshold": 1140.349868206773,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "belly",
+    "synthetic"
+   ],
+   "description": "belly +8bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.1,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0031",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0386
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 25000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 26769205.343907475,
+     "value_end": 26748178.25815441,
+     "full_pnl": -21027.085753064603,
+     "par_buckets": [
+      -7.439025055617094,
+      0.1813448630273342,
+      -13.923133838921785,
+      -13.445743013173342,
+      12.333941655233502,
+      -27.94386390224099,
+      -58.004080433398485,
+      -129.72195071913302,
+      -1405.745178554207,
+      -19393.783036779612,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -21037.490725778043,
+     "unexplained": 10.404972713440657,
+     "threshold": 1051.8745362889022,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel +1bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0032",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0377
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0373
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0367
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0365
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 25000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 26769205.343907475,
+     "value_end": 26980624.974991,
+     "full_pnl": 211419.63108352572,
+     "par_buckets": [
+      -7.439025055617094,
+      0.1813448630273342,
+      -13.923133838921785,
+      -13.445743013173342,
+      12.333941655233502,
+      -27.94386390224099,
+      -58.004080433398485,
+      -129.72195071913302,
+      -1405.745178554207,
+      -19393.783036779612,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 210374.90725778043,
+     "unexplained": 1044.7238257452846,
+     "threshold": 10570.981554176287,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel -10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0033",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0382
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.03826666666666667
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.03813333333333333
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036666666666666674
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035333333333333335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.03566666666666667
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036833333333333336
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.04016666666666667
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.04083333333333333
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.04
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 25000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 26769205.343907475,
+     "value_end": 26563204.571211804,
+     "full_pnl": -206000.77269567177,
+     "par_buckets": [
+      -7.439025055617094,
+      0.1813448630273342,
+      -13.923133838921785,
+      -13.445743013173342,
+      12.333941655233502,
+      -27.94386390224099,
+      -58.004080433398485,
+      -129.72195071913302,
+      -1405.745178554207,
+      -19393.783036779612,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -206820.00070749162,
+     "unexplained": 819.2280118198541,
+     "threshold": 10300.038634783588,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "steepener",
+    "synthetic"
+   ],
+   "description": "steepener -5/+15bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0034",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0407
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.040350000000000004
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0398
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.038950000000000005
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.037500000000000006
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035750000000000004
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035250000000000004
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.03725
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.03875
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 25000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 26769205.343907475,
+     "value_end": 26816453.903611466,
+     "full_pnl": 47248.55970399082,
+     "par_buckets": [
+      -7.439025055617094,
+      0.1813448630273342,
+      -13.923133838921785,
+      -13.445743013173342,
+      12.333941655233502,
+      -27.94386390224099,
+      -58.004080433398485,
+      -129.72195071913302,
+      -1405.745178554207,
+      -19393.783036779612,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": 47261.366989011876,
+     "unexplained": -12.807285021059215,
+     "threshold": 2362.427985199541,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "flattener",
+    "synthetic"
+   ],
+   "description": "flattener +20/-10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0035",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0537
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0536
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0533
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.052700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.051500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0495
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.051000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0525
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.054
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0545
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0535
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 25000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 26769205.343907475,
+     "value_end": 23835283.906865854,
+     "full_pnl": -2933921.4370416217,
+     "par_buckets": [
+      -7.439025055617094,
+      0.1813448630273342,
+      -13.923133838921785,
+      -13.445743013173342,
+      12.333941655233502,
+      -27.94386390224099,
+      -58.004080433398485,
+      -129.72195071913302,
+      -1405.745178554207,
+      -19393.783036779612,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -3155623.6088667065,
+     "unexplained": 221702.17182508484,
+     "threshold": 146696.07185208108,
+     "explained": false
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "shock",
+    "synthetic"
+   ],
+   "description": "shock +150bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0036",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035300000000000005
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035800000000000005
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036800000000000006
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 25000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 26769205.343907475,
+     "value_end": 26601934.495573875,
+     "full_pnl": -167270.8483336009,
+     "par_buckets": [
+      -7.439025055617094,
+      0.1813448630273342,
+      -13.923133838921785,
+      -13.445743013173342,
+      12.333941655233502,
+      -27.94386390224099,
+      -58.004080433398485,
+      -129.72195071913302,
+      -1405.745178554207,
+      -19393.783036779612,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "risk_pnl": -167898.0339718908,
+     "unexplained": 627.1856382898986,
+     "threshold": 8363.542416680046,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "belly",
+    "synthetic"
+   ],
+   "description": "belly +8bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.25,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0037",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0386
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 5000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 5861820.809987638,
+     "value_end": 5852428.628680608,
+     "full_pnl": -9392.18130702991,
+     "par_buckets": [
+      -1.7917179283685982,
+      -0.0008641136810183525,
+      0.06634414056316018,
+      -5.5642328877002,
+      3.750070135574788,
+      -3.256303633097559,
+      -6.286761027760804,
+      -14.684514163993299,
+      -29.618027133401483,
+      -68.4457995723933,
+      -140.89756535552442,
+      -1229.9303966909647,
+      -7906.477219255175
+     ],
+     "risk_pnl": -9403.136987485923,
+     "unexplained": 10.955680456012487,
+     "threshold": 470.15684937429614,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel +1bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0038",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0377
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0373
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0367
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.034
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0365
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.038
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 5000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 5861820.809987638,
+     "value_end": 5956958.248912956,
+     "full_pnl": 95137.43892531749,
+     "par_buckets": [
+      -1.7917179283685982,
+      -0.0008641136810183525,
+      0.06634414056316018,
+      -5.5642328877002,
+      3.750070135574788,
+      -3.256303633097559,
+      -6.286761027760804,
+      -14.684514163993299,
+      -29.618027133401483,
+      -68.4457995723933,
+      -140.89756535552442,
+      -1229.9303966909647,
+      -7906.477219255175
+     ],
+     "risk_pnl": 94031.36987485923,
+     "unexplained": 1106.0690504582599,
+     "threshold": 4756.871946265875,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "parallel",
+    "synthetic"
+   ],
+   "description": "parallel -10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0039",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0382
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.03826666666666667
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.03813333333333333
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036666666666666674
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035333333333333335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.03566666666666667
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036833333333333336
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.04016666666666667
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.04083333333333333
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.04
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 5000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 5861820.809987638,
+     "value_end": 5726173.969910437,
+     "full_pnl": -135646.8400772009,
+     "par_buckets": [
+      -1.7917179283685982,
+      -0.0008641136810183525,
+      0.06634414056316018,
+      -5.5642328877002,
+      3.750070135574788,
+      -3.256303633097559,
+      -6.286761027760804,
+      -14.684514163993299,
+      -29.618027133401483,
+      -68.4457995723933,
+      -140.89756535552442,
+      -1229.9303966909647,
+      -7906.477219255175
+     ],
+     "risk_pnl": -137696.39396068716,
+     "unexplained": 2049.5538834862527,
+     "threshold": 6782.342003860045,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "steepener",
+    "synthetic"
+   ],
+   "description": "steepener -5/+15bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0040",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0407
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.040350000000000004
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0398
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.038950000000000005
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.037500000000000006
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035750000000000004
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035250000000000004
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.03725
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0385
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.03875
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0375
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 5000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 5861820.809987638,
+     "value_end": 5951539.817782503,
+     "full_pnl": 89719.00779486448,
+     "par_buckets": [
+      -1.7917179283685982,
+      -0.0008641136810183525,
+      0.06634414056316018,
+      -5.5642328877002,
+      3.750070135574788,
+      -3.256303633097559,
+      -6.286761027760804,
+      -14.684514163993299,
+      -29.618027133401483,
+      -68.4457995723933,
+      -140.89756535552442,
+      -1229.9303966909647,
+      -7906.477219255175
+     ],
+     "risk_pnl": 89005.37859745673,
+     "unexplained": 713.6291974077467,
+     "threshold": 4485.950389743224,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "flattener",
+    "synthetic"
+   ],
+   "description": "flattener +20/-10bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0041",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0537
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0536
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0533
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.052700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.051500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0495
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.05
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.051000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0525
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.054
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0545
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0535
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 5000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 5861820.809987638,
+     "value_end": 4668364.051580395,
+     "full_pnl": -1193456.7584072435,
+     "par_buckets": [
+      -1.7917179283685982,
+      -0.0008641136810183525,
+      0.06634414056316018,
+      -5.5642328877002,
+      3.750070135574788,
+      -3.256303633097559,
+      -6.286761027760804,
+      -14.684514163993299,
+      -29.618027133401483,
+      -68.4457995723933,
+      -140.89756535552442,
+      -1229.9303966909647,
+      -7906.477219255175
+     ],
+     "risk_pnl": -1410470.5481228884,
+     "unexplained": 217013.7897156449,
+     "threshold": 59672.83792036218,
+     "explained": false
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "shock",
+    "synthetic"
+   ],
+   "description": "shock +150bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0042",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.035300000000000005
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035800000000000005
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036800000000000006
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "product": {
+     "kind": "BOND",
+     "bond": {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2
+     },
+     "settlement": "2026-11-09",
+     "notional": 5000000.0
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "value_start": 5861820.809987638,
+     "value_end": 5860869.458455828,
+     "full_pnl": -951.3515318101272,
+     "par_buckets": [
+      -1.7917179283685982,
+      -0.0008641136810183525,
+      0.06634414056316018,
+      -5.5642328877002,
+      3.750070135574788,
+      -3.256303633097559,
+      -6.286761027760804,
+      -14.684514163993299,
+      -29.618027133401483,
+      -68.4457995723933,
+      -140.89756535552442,
+      -1229.9303966909647,
+      -7906.477219255175
+     ],
+     "risk_pnl": -952.2808151803911,
+     "unexplained": 0.9292833702638745,
+     "threshold": 470.15684937429614,
+     "explained": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "r2",
+    "pnl-explain",
+    "bond",
+    "belly",
+    "synthetic"
+   ],
+   "description": "belly +8bp",
+   "output_classes": {
+    "explained": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 0.05,
+    "relative": 1e-07,
+    "reason": "difference of curve solves; solves stop below 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "pnl_r2-0043",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r2",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "tenors differ"
+  },
+  {
+   "case_id": "pnl_r2-0044",
+   "operation": "risk.pnl.explain",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "convention": "SOFR",
+    "interpolation": "LOG_LINEAR_DF",
+    "quotes_start": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "quotes_end": [
+     {
+      "tenor": "1W",
+      "rate": 0.0388
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.038700000000000005
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.038400000000000004
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03780000000000001
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03660000000000001
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.034600000000000006
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035100000000000006
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.03610000000000001
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0376
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.0391
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0396
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0386
+     }
+    ],
+    "product": {
+     "kind": "OIS",
+     "trade": {
+      "convention": "SOFR",
+      "tenor": "2Y",
+      "fixed_rate": 0.0345,
+      "notional": 25000000.0,
+      "side": "RECEIVE"
+     }
+    },
+    "bump_bp": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r2",
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}
