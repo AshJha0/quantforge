@@ -7,6 +7,7 @@
     clippy::manual_range_contains
 )]
 
+pub mod black;
 pub mod calendar;
 pub mod calib;
 pub mod compounding;
@@ -16,8 +17,10 @@ pub mod curve;
 pub mod data;
 pub mod dates;
 pub mod daycount;
+pub mod equity;
 pub mod error;
 pub mod fx;
+pub mod greeks;
 pub mod hedge;
 pub mod integrate;
 pub mod interp;
@@ -30,12 +33,16 @@ pub mod projection;
 pub mod risk;
 pub mod rng;
 pub mod root;
+pub mod sabr;
 pub mod schedule;
 pub mod sha256;
+pub mod smile;
 pub mod snapshot;
 pub mod sobol;
 pub mod stats;
 pub mod store;
+pub mod surface;
+pub mod svi;
 pub mod time;
 pub mod ts;
 pub mod units;
