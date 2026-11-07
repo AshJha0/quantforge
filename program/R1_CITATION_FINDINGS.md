@@ -12,11 +12,11 @@ Not touched, as they are not specs of a convention: `README.md` files, `rulings.
 
 ## Specs that may disagree with a source
 
-Reported to the coordinator, not fixed here.
+Reported to the coordinator, not fixed here. Status as of r1 at 1d6e585.
 
 | # | Spec | Point | Source | Note |
 |---|---|---|---|---|
-| F1 | `04-pricing/bonds.md`, `bond.futures.conversion_factor` | Months to maturity are always rounded down to a multiple of 3 | CME Group, *Calculating U.S. Treasury Futures Conversion Factors* (not opened) | From memory, CME rounds to the quarter for the bond, Ultra bond and 10-year note contracts, but to the whole month for the 2-, 3- and 5-year note contracts (with `v = z - 6` when `z >= 7`). The spec is right for the long contracts but does not say it excludes the short ones. Suggest a scope sentence, or an input naming the contract. To confirm against the CME document. |
+| F1 (resolved by R1-3, `specifications/r1-rulings.md`) | `04-pricing/bonds.md`, `bond.futures.conversion_factor` | Months to maturity are always rounded down to a multiple of 3 | CME Group, *Calculating U.S. Treasury Futures Conversion Factors* (not opened) | From memory, CME rounds to the quarter for the bond, Ultra bond and 10-year note contracts, but to the whole month for the 2-, 3- and 5-year note contracts (with `v = z - 6` when `z >= 7`). The spec is right for the long contracts but does not say it excludes the short ones. Suggest a scope sentence, or an input naming the contract. To confirm against the CME document. |
 
 No other disagreement was seen. Checked in passing, from memory, and consistent: TIPS reference CPI (31 CFR 356 App. B), PSA ramp and SMM (SIFMA SF), ISDA 2020 fallback (2-day observation shift, spread fixed 5 March 2021), CDS standard-model dates (step-in T+1, cash settlement T+3, 20th roll dates), CBOT conversion-factor formula itself, ARRC lockout.
 
@@ -74,3 +74,7 @@ No other disagreement was seen. Checked in passing, from memory, and consistent:
 | 06-risk/rates-sensitivities | DV01 | Hull; Andersen-Piterbarg |
 | 06-risk/vol-greeks | Greeks | Hull; Black-Scholes; Black; Bachelier |
 | 08-hedging/stage-b-hedges | weighted LS hedge | Numerical Recipes ch.15; Hull |
+
+## Follow-up after R1-3 and R1-4
+
+F1 is closed: ruling R1-3 adds the `contract` input (whole months for 2Y, 3Y, 5Y; quarters otherwise) and withdraws the half-even rounding claim. Sources added after the merge of r1: the CME conversion-factor document marked as the basis of R1-3 (`bonds.md` S3); TP ICAP's EUR OIS term sheet and Strata 2.12.78 for the `ESTR` payment lag (`conventions.md` S5, S6); the ISDA CDS Standard Model flat-forward assumption behind R1-4 (`credit.md` S5). All marked "(not opened)".

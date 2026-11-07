@@ -65,3 +65,4 @@ Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: th
 - [S2] ISDA, *2014 ISDA Credit Derivatives Definitions* (not opened)
 - [S3] O'Kane, D., *Modelling Single-name and Multi-name Credit Derivatives*, Wiley, 2008, chapters on CDS pricing and on index CDS (not opened)
 - [S4] ISDA, amendments to standard CDS roll dates (semi-annual roll on 20 March and 20 September), effective December 2015 (not opened)
+- [S5] ISDA CDS Standard Model, flat-forward (log-linear discount factor) interpolation of the discount curve between nodes: basis of ruling R1-4 (not opened)

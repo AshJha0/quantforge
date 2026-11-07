@@ -84,7 +84,7 @@ Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: th
 
 - [S1] ICMA, *Primary Market Handbook* / Rule 251 (accrued interest calculation, ACT/ACT ICMA) (not opened)
 - [S2] UK Debt Management Office, *Formulae for calculating gilt prices from yields* (not opened)
-- [S3] CME Group, *Calculating U.S. Treasury Futures Conversion Factors* (conversion-factor formula) and CBOT Treasury futures contract specifications (not opened)
+- [S3] CME Group, *Calculating U.S. Treasury Futures Conversion Factors* (conversion-factor formula) and CBOT Treasury futures contract specifications. Basis of ruling R1-3 (whole months for 2Y, 3Y, 5Y; quarters otherwise; coupon to the nearest 1/8; 4 decimals) (not opened)
 - [S4] Fabozzi, F. J. (ed.), *The Handbook of Fixed Income Securities*, 8th ed., McGraw-Hill, 2012 (yield, duration, convexity, repo) (not opened)
 - [S5] Burghardt, G., Belton, T., Lane, M. and Papa, J., *The Treasury Bond Basis*, 3rd ed., McGraw-Hill, 2005 (gross and net basis, implied repo, CTD) (not opened)
 - [S6] O'Kane, D., *Introduction to Asset Swaps*, Lehman Brothers Analytical Research Series, 2000 (par-par asset swap spread) (not opened)
