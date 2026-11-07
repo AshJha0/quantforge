@@ -50,6 +50,7 @@ final class Operations {
         StageB.register(TABLE);
         OpsForward.register(TABLE);
         OpsBlack.register(TABLE);
+        OpsGreeks.register(TABLE);
     }
 
     static Set<String> names() {
