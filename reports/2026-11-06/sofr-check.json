@@ -1,0 +1,289 @@
+{
+ "as_of": "2026-11-06",
+ "averages": [
+  {
+   "date": "2026-11-02",
+   "diff": "-1.98e-08",
+   "library_pct": "3.9052380",
+   "operation": "rates.ois.compound",
+   "published_pct": "3.90524",
+   "window": 30
+  },
+  {
+   "date": "2026-11-02",
+   "diff": "-9.04e-10",
+   "library_pct": "3.7851799",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.78518",
+   "window": 90
+  },
+  {
+   "date": "2026-11-02",
+   "diff": "-6.16e-11",
+   "library_pct": "3.7230100",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.72301",
+   "window": 180
+  },
+  {
+   "date": "2026-11-03",
+   "diff": "2.68e-08",
+   "library_pct": "3.9075927",
+   "operation": "rates.ois.compound",
+   "published_pct": "3.90759",
+   "window": 30
+  },
+  {
+   "date": "2026-11-03",
+   "diff": "2.29e-08",
+   "library_pct": "3.7884323",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.78843",
+   "window": 90
+  },
+  {
+   "date": "2026-11-03",
+   "diff": "3.85e-08",
+   "library_pct": "3.7249339",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.72493",
+   "window": 180
+  },
+  {
+   "date": "2026-11-04",
+   "diff": "2.13e-08",
+   "library_pct": "3.9106021",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.91060",
+   "window": 30
+  },
+  {
+   "date": "2026-11-04",
+   "diff": "3.31e-08",
+   "library_pct": "3.7921333",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.79213",
+   "window": 90
+  },
+  {
+   "date": "2026-11-04",
+   "diff": "-2.52e-08",
+   "library_pct": "3.7270275",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.72703",
+   "window": 180
+  },
+  {
+   "date": "2026-11-05",
+   "diff": "4.04e-08",
+   "library_pct": "3.9122740",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.91227",
+   "window": 30
+  },
+  {
+   "date": "2026-11-05",
+   "diff": "-4.25e-08",
+   "library_pct": "3.7953858",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.79539",
+   "window": 90
+  },
+  {
+   "date": "2026-11-05",
+   "diff": "-4.55e-08",
+   "library_pct": "3.7289555",
+   "operation": "rates.ois.compound",
+   "published_pct": "3.72896",
+   "window": 180
+  },
+  {
+   "date": "2026-11-06",
+   "diff": "2.81e-08",
+   "library_pct": "3.9129428",
+   "operation": "rates.ois.compound_dated",
+   "published_pct": "3.91294",
+   "window": 30
+  },
+  {
+   "date": "2026-11-06",
+   "diff": "-1.46e-08",
+   "library_pct": "3.7987585",
+   "operation": "rates.ois.compound",
+   "published_pct": "3.79876",
+   "window": 90
+  },
+  {
+   "date": "2026-11-06",
+   "diff": "-1.77e-08",
+   "library_pct": "3.7307682",
+   "operation": "rates.ois.compound",
+   "published_pct": "3.73077",
+   "window": 180
+  }
+ ],
+ "batch_command": {
+  "rust": "--batch"
+ },
+ "checks": [
+  {
+   "check": "SOFR level",
+   "detail": "2026-11-05: 0.0392",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SOFR day change",
+   "detail": "0.0002 vs 0.01",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SOFR day change (warn)",
+   "detail": "0.0002 vs 0.0025",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "30-day average 2026-11-02",
+   "detail": "diff -1.98e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "90-day average 2026-11-02",
+   "detail": "diff -9.04e-10",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "180-day average 2026-11-02",
+   "detail": "diff -6.16e-11",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "30-day average 2026-11-03",
+   "detail": "diff 2.68e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "90-day average 2026-11-03",
+   "detail": "diff 2.29e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "180-day average 2026-11-03",
+   "detail": "diff 3.85e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "30-day average 2026-11-04",
+   "detail": "diff 2.13e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "90-day average 2026-11-04",
+   "detail": "diff 3.31e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "180-day average 2026-11-04",
+   "detail": "diff -2.52e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "30-day average 2026-11-05",
+   "detail": "diff 4.04e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "90-day average 2026-11-05",
+   "detail": "diff -4.25e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "180-day average 2026-11-05",
+   "detail": "diff -4.55e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "30-day average 2026-11-06",
+   "detail": "diff 2.81e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "90-day average 2026-11-06",
+   "detail": "diff -1.46e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "180-day average 2026-11-06",
+   "detail": "diff -1.77e-08",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "Index step 2026-11-03",
+   "detail": "diff -2.41e-07",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "Index step 2026-11-04",
+   "detail": "diff -7.27e-07",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "Index step 2026-11-05",
+   "detail": "diff 2.31e-06",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "Index step 2026-11-06",
+   "detail": "diff 2.09e-08",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "fallback computed",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "ISDA 3M spread adjustment",
+   "detail": "0.0026161",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "fallback = compounded + spread",
+   "detail": "0.0404901187379309",
+   "level": "fail",
+   "ok": true
+  }
+ ],
+ "fallback": {
+  "compounded_rate": 0.0378740187379309,
+  "end": "2026-11-05",
+  "fallback_rate": 0.0404901187379309,
+  "spread_adjustment": 0.0026161,
+  "start": "2026-08-06"
+ },
+ "workflow": "SOFR check",
+ "worst_abs_diff": 4.54863739660083e-08
+}
