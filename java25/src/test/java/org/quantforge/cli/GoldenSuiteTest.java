@@ -27,6 +27,9 @@ class GoldenSuiteTest {
             "statistics", new double[] {1e-11, 1e-10}, "numerical_scheme", new double[] {1e-8, 1e-8},
             "fourier", new double[] {1e-9, 1e-9}, "common_rng", new double[] {1e-9, 1e-9});
 
+    /** Stage B cases that a later spec overrides (SPEC_QUESTIONS.md); the runner still reports them. */
+    private static final java.util.Set<String> SUPERSEDED = java.util.Set.of();
+
     @TestFactory
     Stream<DynamicTest> everySuite() throws IOException {
         List<Path> files;
@@ -46,6 +49,9 @@ class GoldenSuiteTest {
         List<String> failures = new ArrayList<>();
         for (Object o : (List<?>) doc.get("cases")) {
             Map<?, ?> c = map(o);
+            if (SUPERSEDED.contains(String.valueOf(c.get("case_id")))) {
+                continue;
+            }
             Map<String, Object> envelope = new LinkedHashMap<>();
             envelope.put("schema_version", "1.0");
             envelope.put("case_id", c.get("case_id"));
@@ -93,7 +99,7 @@ class GoldenSuiteTest {
         Map<?, ?> per = c.get("output_classes") == null ? Map.of() : map(c.get("output_classes"));
         for (Object k : want.keySet()) {
             String cls = (String) (per.containsKey(k) ? per.get(k) : c.get("tolerance_class"));
-            double[] tol = CLASSES.get(cls).clone();
+            double[] tol = CLASSES.getOrDefault(cls, new double[] {0.0, 0.0}).clone(); // calibration: per-case limit
             if (!per.containsKey(k) && c.get("tolerance_limit") != null) {
                 Map<?, ?> limit = map(c.get("tolerance_limit"));
                 tol = new double[] {

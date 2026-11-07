@@ -6,7 +6,7 @@ import java.util.Arrays;
 import org.quantforge.core.QfError;
 
 /** An immutable discount curve (curve-framework.md). Curve time is always days / 365. */
-public final class Curve {
+public final class Curve implements Discounting {
     public enum Interpolation { LOG_LINEAR_DF, LINEAR_ZERO }
 
     private final LocalDate asOf;
@@ -15,18 +15,20 @@ public final class Curve {
     private final double[] t;   // t[0] = 0, the implied node at as_of.
     private final double[] lnD; // lnD[0] = 0.
     private final double[] z;   // Zero rates, for LINEAR_ZERO; z[0] = z[1].
+    private final Jumps jumps;  // lnD holds ln S = ln D - ln J at the pillars.
 
-    private Curve(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] lnDf) {
+    private Curve(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] lnDf, Jumps jumps) {
         this.asOf = asOf;
         this.interpolation = interpolation;
         this.dates = dates;
+        this.jumps = jumps;
         int n = dates.length;
         t = new double[n + 1];
         lnD = new double[n + 1];
         z = new double[n + 1];
         for (int i = 1; i <= n; i++) {
             t[i] = time(dates[i - 1]);
-            lnD[i] = lnDf[i - 1];
+            lnD[i] = lnDf[i - 1] - jumps.logFactor(dates[i - 1]);
             z[i] = -lnD[i] / t[i];
         }
         z[0] = z[1];
@@ -34,6 +36,12 @@ public final class Curve {
 
     /** Builds from a curve object, with the spec's checks. */
     public static Curve of(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] discountFactors) {
+        return of(asOf, interpolation, dates, discountFactors, Jumps.NONE);
+    }
+
+    /** As {@link #of(LocalDate, Interpolation, LocalDate[], double[])}, with jumps checked after the pillars. */
+    public static Curve of(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] discountFactors,
+                           Jumps jumps) {
         if (dates.length == 0) {
             throw new QfError("E_INPUT", "curve has no pillars");
         }
@@ -51,12 +59,21 @@ public final class Curve {
             }
             ln[i] = Math.log(discountFactors[i]);
         }
-        return new Curve(asOf, interpolation, dates, ln);
+        jumps.check(asOf);
+        return new Curve(asOf, interpolation, dates, ln, jumps);
     }
 
-    /** Builds from log discount factors, for solvers. {@code dates} are already checked. */
+    /** Builds from full log discount factors, for solvers. {@code dates} and {@code jumps} are already checked. */
+    static Curve fromLogs(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] lnDf, Jumps jumps) {
+        return new Curve(asOf, interpolation, dates, lnDf, jumps);
+    }
+
     static Curve fromLogs(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] lnDf) {
-        return new Curve(asOf, interpolation, dates, lnDf);
+        return new Curve(asOf, interpolation, dates, lnDf, Jumps.NONE);
+    }
+
+    public Jumps jumps() {
+        return jumps;
     }
 
     public LocalDate asOf() {
@@ -70,7 +87,7 @@ public final class Curve {
     public double[] discountFactors() {
         double[] d = new double[dates.length];
         for (int i = 0; i < d.length; i++) {
-            d[i] = Math.exp(lnD[i + 1]);
+            d[i] = Math.exp(lnD[i + 1] + jumps.logFactor(dates[i]));
         }
         return d;
     }
@@ -79,14 +96,15 @@ public final class Curve {
         return ChronoUnit.DAYS.between(asOf, d) / 365.0;
     }
 
+    @Override
     public double discount(LocalDate d) {
-        return Math.exp(logDiscount(time(d)));
+        return Math.exp(logDiscount(time(d)) + jumps.logFactor(d));
     }
 
     /** -ln(D)/t, or null at as_of. */
     public Double zeroRate(LocalDate d) {
         double time = time(d);
-        return time == 0.0 ? null : Double.valueOf(-logDiscount(time) / time);
+        return time == 0.0 ? null : Double.valueOf(-(logDiscount(time) + jumps.logFactor(d)) / time);
     }
 
     private double logDiscount(double time) {

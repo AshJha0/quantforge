@@ -19,6 +19,8 @@ public final class Conventions {
             Calendars.Id.GBLO, 0, 0, 0, 12, DayCount.Convention.ACT_365F);
     public static final RateIndex SOFR = new RateIndex("SOFR", true, "USD", DayCount.Convention.ACT_360,
             Calendars.Id.USGS, 2, 2, 0, 12, DayCount.Convention.ACT_360);
+    public static final RateIndex ESTR = new RateIndex("ESTR", true, "EUR", DayCount.Convention.ACT_360,
+            Calendars.Id.EUTA, 2, 2, 0, 12, DayCount.Convention.ACT_360);
     public static final RateIndex USD_TERM_3M = new RateIndex("USD-TERM-3M", false, "USD", DayCount.Convention.ACT_360,
             Calendars.Id.USGS, 2, 0, 3, 12, DayCount.Convention.THIRTY_360_BOND);
     public static final FxPair GBPUSD = new FxPair("GBPUSD", "GBP", "USD", 2,
@@ -34,8 +36,18 @@ public final class Conventions {
         return switch (id) {
             case "SONIA" -> SONIA;
             case "SOFR" -> SOFR;
+            case "ESTR" -> ESTR;
             default -> throw unknown(id);
         };
+    }
+
+    /** An overnight index; a known record of another kind is E_INPUT, an unknown id E_SCHEMA. */
+    public static RateIndex requireOvernight(String id) {
+        lookup(id);
+        if (id.equals(SONIA.id()) || id.equals(SOFR.id()) || id.equals(ESTR.id())) {
+            return overnight(id);
+        }
+        throw new QfError("E_INPUT", id + " is not an overnight index", "convention");
     }
 
     public static RateIndex term(String id) {
@@ -86,6 +98,7 @@ public final class Conventions {
         return switch (id) {
             case "SONIA" -> rateRecord(SONIA);
             case "SOFR" -> rateRecord(SOFR);
+            case "ESTR" -> rateRecord(ESTR);
             case "USD-TERM-3M" -> rateRecord(USD_TERM_3M);
             case "GBPUSD" -> pairRecord(GBPUSD);
             case "EURUSD" -> pairRecord(EURUSD);
