@@ -118,3 +118,15 @@ Still open: QD4, QD5, QD6, QD7, QD9, QD13 (in part), QD16, QD18, QD19.
 - Also applied: D54 `years` at most 100, and D59 `months` at most 1200 in `fx.xccy.*`. Both are now `E_INPUT`.
 
 No stage D question is open.
+
+## R1.7 batch mode (silent choices, no question open)
+
+- R1-P1. Error results now always carry `"diagnostics": {}` (allowed: "`diagnostics` is an object and may always
+  be present"). Without it, `--timings` would add a whole `diagnostics` object to error results, not one key, and
+  `batch_check.py` timings_identity would fail. Applies to `run` and `batch` alike.
+- R1-P2. BT5 reads each line with a cap of limit + 2 bytes (content, CR, LF); a capped read with no LF is over
+  the limit and the rest of the line is drained in 1 MiB pieces, so at most limit + 2 bytes are held.
+- R1-P3. `elapsed_ns` uses `time.monotonic_ns()`, from after the line (or for `run`, all of stdin) is read to
+  just before the result is serialised.
+- R1-P4. `--batch` is accepted only as the first argument and is rewritten to `batch`; so `--batch batch` and
+  `batch --batch` are exit 64.
