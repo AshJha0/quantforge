@@ -35,9 +35,12 @@ from .. import hedging as _hedging
 from .. import money as _money
 from .. import ois as _ois
 from .. import projection as _projection
+from .. import sabr as _sabr
 from .. import schedules as _schedules
 from .. import sensitivities as _sensitivities
+from .. import smile as _smile
 from .. import usecases as _usecases
+from .. import vol_usecase as _vol_usecase
 from ..calendars import TENOR
 from ..daycount import check_conditional
 from ..errors import QfError
@@ -104,7 +107,7 @@ _STAGE_B = SimpleNamespace(
 
 
 _STAGE_C = SimpleNamespace(
-    **{m.__name__.rsplit(".", 1)[-1]: _Core(m) for m in (_black, _equity)}
+    **{m.__name__.rsplit(".", 1)[-1]: _Core(m) for m in (_black, _equity, _sabr, _smile, _vol_usecase)}
 )
 
 
