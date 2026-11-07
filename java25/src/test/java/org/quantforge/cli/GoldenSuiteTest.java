@@ -28,7 +28,7 @@ class GoldenSuiteTest {
             "fourier", new double[] {1e-9, 1e-9}, "common_rng", new double[] {1e-9, 1e-9});
 
     /** Stage B cases that a later spec overrides (SPEC_QUESTIONS.md); the runner still reports them. */
-    private static final java.util.Set<String> SUPERSEDED = java.util.Set.of("ois-0023");
+    private static final java.util.Set<String> SUPERSEDED = java.util.Set.of();
 
     @TestFactory
     Stream<DynamicTest> everySuite() throws IOException {

@@ -114,3 +114,8 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | D-18 | `eq.trs.pv` with `end <= start`; `current_rate` given when `start >= as_of` | `E_DATE_ORDER`; a given rate is used |
 | D-19 | inflation_d-0009: a par ZCIS whose expected `pv` is 2e-9 on 1e7, judged at 1e-10 absolute | That is rounding noise (2e-16 in the index ratio). The build passes by dividing by the given `base_cpi`, not `exp(ln base_cpi)`; the limit may be too tight for other correct forms |
 | D-20 | `infl.curve.cpi` empty `months`; `infl.linker.price` two fixings for one month | `E_INPUT` both (ruling D12 style) |
+| D-21 | `mbs.*` with `wac <= 0` and `net_coupon > wac` | `E_DOMAIN`, as golden mbs_d-0011, so `wac <= 0` is checked before `net_coupon > wac` (the spec's order would give `E_INPUT`). `wam < 1` and `age < 0` still come first |
+| D-22 | `mbs.*` `wam` above 1200 | `E_LIMIT` |
+| D-23 | `rates.cap.price`, `rates.swaption.price` model `BLACK_SCHOLES` | `E_SCHEMA`; only `BLACK_76` and `BACHELIER` are listed |
+| D-24 | `cmdty.storage.carry` a forward price `<= 0` | `E_DOMAIN` (the logs need it) |
+| D-1 | (update) | Closed by ruling D27: `ois-0023` now sends `TONA`, which this build rejects with `E_SCHEMA`; no code change, and the test skip is removed |
