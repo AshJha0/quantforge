@@ -4,6 +4,7 @@
     python tools/build_gallery.py           # runs all four CLIs, rewrites data and pages
     python tools/build_gallery.py --check   # reruns the Python CLI, changes nothing
     python tools/build_gallery.py --refresh-real  # also fetches a new real-data snapshot (gallery_real.py)
+    python tools/build_gallery.py --evidence-only # recounts golden evidence after golden-only changes; no CLI runs
 
 Commands come from conformance/runner/implementations.json, so the CLIs must be built first. This
 file holds no financial logic: it sends cases, stores what comes back and draws it. Its only sums
@@ -1036,6 +1037,33 @@ def committed_slugs():
     return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()]
 
 
+def refresh_evidence():
+    """Recounts golden evidence for every page from datasets/golden and re-renders. No CLI runs and no change to run data,
+    so it is the fix when only goldens were added: the run data stays as committed, and --check still compares it."""
+    all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
+    real = DATA / f"{gallery_real.SLUG}.json"
+    if real.is_file():
+        all_data[gallery_real.SLUG] = json.loads(real.read_text(encoding="utf-8"))
+    changed = []
+    for slug, d in all_data.items():
+        if slug in CURVES:
+            new = evidence(CURVES[slug])
+        elif slug in VOLS:
+            new = golden_c(VOLS[slug]["golden"])
+        elif slug in STAGE_D:
+            new = golden_d(STAGE_D[slug]["examples"])
+        else:
+            continue
+        if d["evidence"] != new:
+            d["evidence"] = new
+            changed.append(slug)
+            (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    for name, text in render_all(all_data).items():
+        (OUT / name).write_text(text, encoding="utf-8", newline="\n")
+    print(f"evidence recounted; changed: {', '.join(changed) or 'none'}")
+    return 0
+
+
 def generate(refresh_real=False, real_only=False):
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     meta = {"commit": commit, "date": dt.date.today().isoformat(), "reference_language": "python", "tolerance": TOL,
@@ -1152,7 +1180,10 @@ def main():
     ap.add_argument("--check", action="store_true", help="rerun the Python CLI and compare with committed data")
     ap.add_argument("--refresh-real", action="store_true", help="fetch a new real-data snapshot before generating")
     ap.add_argument("--real-only", action="store_true", help="rebuild only the real-data page and the index")
+    ap.add_argument("--evidence-only", action="store_true", help="recount golden evidence and re-render; no CLI runs")
     a = ap.parse_args()
+    if a.evidence_only:
+        return refresh_evidence()
     return check() if a.check else generate(a.refresh_real, a.real_only)
 
 

@@ -20,14 +20,14 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [SVI smile](svi-smile.md) | Implemented, not Validated | C | 2 golden cases for `vol.svi.evaluate`, 1 with an outside library in `verified_by` |
 | [SSVI surface](ssvi-surface.md) | Implemented, not Validated | C | 3 golden cases for `vol.ssvi.evaluate`, 0 with an outside library in `verified_by` |
 | [SABR](sabr.md) | Implemented, not Validated | C | 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
-| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 31 golden cases |
+| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 79 golden cases |
 | [Bond and sovereign fits](bond-fit.md) | Implemented, not Validated | D | 2 golden cases |
 | [Repo and special repo](repo.md) | Implemented, not Validated | D | 4 golden cases |
 | [Cross-currency](cross-currency.md) | Implemented, not Validated | D | 1 golden case |
 | [Credit and ISDA CDS](cds.md) | Implemented, not Validated | D | 5 golden cases |
 | [Dividend and borrow](dividend-borrow.md) | Implemented, not Validated | D | 4 golden cases |
 | [Inflation, with seasonality](inflation.md) | Implemented, not Validated | D | 2 golden cases |
-| [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 10 golden cases |
+| [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 22 golden cases |
 | [Commodity forwards](commodities.md) | Implemented, not Validated | D | 4 golden cases |
 | [MBS](mbs.md) | Implemented, not Validated | D | 3 golden cases |
 | Financing curves | Planned | D | None yet |
