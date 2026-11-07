@@ -31,6 +31,7 @@ from runner import resolve_command  # noqa: E402
 sys.path.insert(0, str(ROOT / "tools"))
 import gallery_real  # noqa: E402
 import gallery_pnl  # noqa: E402
+import gallery_r2  # noqa: E402
 
 OUT = ROOT / "docs" / "curves"
 DATA = OUT / "data"
@@ -665,6 +666,8 @@ def index_page(all_data):
         if gallery_pnl.SLUG in all_data:
             real += (f"\n[P&L explain and calibration stability]({gallery_pnl.SLUG}.md): full revaluation against key-rate explain "
                      "over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/keyrate_explain.py`.\n")
+        real += (f"\n[Calibration stability]({gallery_r2.CALIB}.md): seven calibrations under seeded noise in four languages, synthetic inputs. "
+                 f"[Rich/cheap screen]({gallery_r2.RICH}.md): workflow (b), blocked on data until a price source is cleared.\n")
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
@@ -703,6 +706,10 @@ def render_all(all_data):
         d = all_data[gallery_pnl.SLUG]
         versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
         pages[f"{gallery_pnl.SLUG}.md"] = gallery_pnl.page(d, chart, table, versions)
+    calib = DATA / f"{gallery_r2.CALIB}.json"
+    if calib.is_file():
+        pages[f"{gallery_r2.CALIB}.md"] = gallery_r2.calib_page(json.loads(calib.read_text(encoding="utf-8")), table, bars)
+    pages[f"{gallery_r2.RICH}.md"] = gallery_r2.rich_page(table)
     return pages
 
 

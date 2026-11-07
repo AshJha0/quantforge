@@ -41,6 +41,8 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 
 [P&L explain and calibration stability](pnl-explain.md): full revaluation against key-rate explain over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/keyrate_explain.py`.
 
+[Calibration stability](calib-stability.md): seven calibrations under seeded noise in four languages, synthetic inputs. [Rich/cheap screen](rich-cheap.md): workflow (b), blocked on data until a price source is cleared.
+
 ## How the gallery is built
 
 `tools/build_gallery.py` runs the CLIs and writes these pages and `docs/curves/data/`. CI reruns the Python CLI and fails if a committed number moves by more than 1e-10 plus 1e-08 relative, or 0.01 plus 1e-06 relative for risk figures. See [the guide](../developer-guides/curves-gallery.md).

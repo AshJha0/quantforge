@@ -1,0 +1,41 @@
+name: Calibration stability
+# Weekly report per specifications/03-calibration/stability.md: seven calibrations, metrics S1-S7, four languages.
+# Not on pull requests. Run by hand before each tag. The report is an artifact; the job fails on a fail-level metric,
+# which is expected for S7 on C3, C6 and C7 until the spec rules on the first-run numbers (docs/curves/calib-stability.md).
+on:
+  schedule:
+    - cron: '47 5 * * 6'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  stability:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Build Java, Rust and C++ (C++ in the GCC 16.2 container, static libstdc++ so it runs on the host)
+        run: |
+          (cd java25 && mvn -B -q -DskipTests package)
+          (cd rust && cargo build --release -p quantforge-cli)
+          docker run --rm -v "$PWD:/w" -w /w gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
+            bash -c "apt-get update -qq && apt-get install -y -qq cmake ninja-build >/dev/null && cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_EXE_LINKER_FLAGS='-static-libstdc++ -static-libgcc' && cmake --build cpp26/build --parallel"
+          sudo chown -R "$(id -u)" cpp26/build
+      - name: Report
+        run: python3 tools/workflows/calib_stability.py --impls python java cpp rust --draws 200 --out out
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: calibration-stability
+          path: out/
