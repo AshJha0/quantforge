@@ -7,6 +7,7 @@ use quantforge_core::dates::Date;
 use quantforge_core::equity::{self, Outright, ParityQuote};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::sabr::{self, Sabr};
 use quantforge_core::surface::{Check, Position, Surface};
 use quantforge_core::svi::{self, Svi};
 use quantforge_core::smile;
@@ -247,6 +248,19 @@ fn surface_input(i: &Inputs) -> Result<Surface> {
     })
 }
 
+fn sabr_inputs(i: &Inputs) -> Result<Sabr> {
+    no_null(i, "shift")?;
+    Ok(Sabr {
+        t: i.f64("expiry_years")?,
+        alpha: i.f64("alpha")?,
+        beta: i.f64("beta")?,
+        rho: i.f64("rho")?,
+        nu: i.f64("nu")?,
+        forward: i.f64("forward")?,
+        shift: i.f64_or("shift", 0.0)?,
+    })
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
         "eq.forward.outright" => {
@@ -453,6 +467,45 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("bucket_vega", rows(r.bucket)),
                 ("parallel_vega", r.parallel.into()),
                 ("bucket_sum", r.bucket_sum.into()),
+            ]))
+        }
+        "vol.sabr.hagan" => {
+            let (s, k) = (sabr_inputs(i)?, i.reals("strikes")?);
+            i.gate()?;
+            plain(obj([("vols", s.hagan(&k)?.into())]))
+        }
+        "vol.sabr.density" => {
+            let (s, k, h) = (sabr_inputs(i)?, i.reals("strikes")?, i.f64("h_strike")?);
+            let reject = match i.str("on_negative")? {
+                "REPORT" => false,
+                "REJECT" => true,
+                _ => return i.fail("on_negative", "unknown choice"),
+            };
+            i.gate()?;
+            let (density, min) = s.density(&k, h)?;
+            let negative = min < -1e-9;
+            if reject && negative {
+                return fail("E_ARBITRAGE", "the Hagan density is negative");
+            }
+            plain(obj([
+                ("density", density.into()),
+                ("min_density", min.into()),
+                ("negative_density", negative.into()),
+            ]))
+        }
+        "vol.sabr.calibrate" => {
+            no_null(i, "shift")?;
+            let (f, t, beta) = (i.f64("forward")?, i.f64("expiry_years")?, i.f64("beta")?);
+            let (k, v) = (i.reals("strikes")?, i.reals("vols")?);
+            let shift = i.f64_or("shift", 0.0)?;
+            let q = opt_weights(i)?;
+            i.gate()?;
+            let [alpha, rho, nu, rmse] = sabr::calibrate(f, t, beta, shift, &k, &v, q.as_deref())?;
+            plain(obj([
+                ("alpha", alpha.into()),
+                ("rho", rho.into()),
+                ("nu", nu.into()),
+                ("rmse", rmse.into()),
             ]))
         }
         // next arm

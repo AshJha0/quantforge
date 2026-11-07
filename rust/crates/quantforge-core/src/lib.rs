@@ -33,6 +33,7 @@ pub mod projection;
 pub mod risk;
 pub mod rng;
 pub mod root;
+pub mod sabr;
 pub mod schedule;
 pub mod sha256;
 pub mod smile;
