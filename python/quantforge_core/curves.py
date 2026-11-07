@@ -35,6 +35,14 @@ class Curve:
         self.zeros = [0.0, *(-x / t for x, t in zip(self.logs[1:], self.times[1:], strict=True))]
         self.zeros[0] = self.zeros[1]
         self._memo: dict[date, float] = {}
+        self._stable_until = date.min
+        self._stable = self._memo
+
+    def share_stable(self, until: date, memo: dict[date, float]) -> Curve:
+        """Uses `memo` for dates on or before `until`. For the curve solve: while the last
+        pillar moves, a date on or before the previous pillar discounts to the same bits."""
+        self._stable_until, self._stable = until, memo
+        return self
 
     def time(self, d: date) -> float:
         return (d - self.as_of).days / 365
@@ -50,7 +58,7 @@ class Curve:
     def discount(self, d: date) -> float:
         # A curve is immutable, so a date's factor is memoised: swap legs ask for each period
         # boundary more than once. The arithmetic is unchanged.
-        memo = self._memo
+        memo = self._stable if d <= self._stable_until else self._memo
         value = memo.get(d)
         if value is None:
             value = self._smooth(d) * self.jump(d) if self.jumps else self._smooth(d)
@@ -137,8 +145,12 @@ def solve_pillars(
         return Curve(CurveData(as_of, interpolation, tuple(pillars[:count]), factors, jumps))
 
     for j, (model, target) in enumerate(zip(models, targets, strict=True)):
-        def error(x: float, model: Model = model, target: float = target, j: int = j) -> float:
-            return model(curve_with(x, j + 1)) - target
+        stable_until = pillars[j - 1] if j else as_of
+        stable: dict[date, float] = {}
+
+        def error(x: float, model: Model = model, target: float = target, j: int = j,
+                  until: date = stable_until, memo: dict[date, float] = stable) -> float:
+            return model(curve_with(x, j + 1).share_stable(until, memo)) - target
 
         t = (pillars[j] - as_of).days / 365
         guess = logs[-1] - target * 0.1 if logs else -target * t

@@ -128,3 +128,33 @@ def test_checks_and_their_order():
     assert _code(R.pnl_explain, AS_OF, "SOFR", "LOG_LINEAR_DF", QUOTES, other, _ois(),
                  1.0) == ("E_INPUT", "quotes_end")
     assert _code(R.jacobian, AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", 0.0)[0] == "E_DOMAIN"
+
+
+# Boundaries found by mutation testing that neither the unit tests nor the goldens covered
+
+def test_futures_convexity_allows_zero_volatility():
+    from quantforge_core.futures import convexity
+    rate, adj, fwd = convexity(96.0, 0.5, 0.75, 0.0, 0.03)
+    assert adj == 0.0 and fwd == rate == pytest.approx(0.04)
+
+
+def test_repo_counts_a_coupon_paid_on_the_end_date():
+    from quantforge_core.bonds import repo_forward
+    bond = Bond(date(2030, 11, 15), 0.04, 2)
+    start, end, r = date(2026, 3, 2), date(2026, 5, 15), 0.03  # 2026-05-15 is a coupon date
+    out = repo_forward(bond, start, end, 99.0, r, None)
+    days = (end - start).days
+    assert out["forward_dirty"] == pytest.approx(out["dirty"] * (1 + r * days / 360) - 2.0, abs=1e-12)
+    assert out["forward_clean"] == pytest.approx(out["forward_dirty"], abs=1e-12)  # no accrual yet
+
+
+def test_conversion_factor_maturity_just_inside_the_delivery_month():
+    from quantforge_core.bonds import conversion_factor
+    # maturity on day 2: after the first day of the delivery month, so priced (n = z = 0)
+    assert conversion_factor(Bond(date(2026, 3, 2), 0.06, 2), 2026, 3, 0.06) == 1.0
+    assert _code(conversion_factor, Bond(date(2026, 3, 1), 0.06, 2), 2026, 3, 0.06)[0] == "E_DATE_ORDER"
+
+
+def test_smooth_fit_rejects_repeated_knots():
+    from quantforge_core.curve_fits import smooth
+    assert _code(smooth, [1.0, 2.0, 2.0, 5.0], [1.0, 3.0], [0.03, 0.035], 0.1)[0] == "E_INPUT"

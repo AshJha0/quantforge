@@ -8,7 +8,6 @@ from typing import Any
 
 from .. import __version__, strictjson
 from ..errors import QfError
-from .operations import OPERATIONS, execute
 
 CONTRACT_VERSION = "1.0.0"
 SCHEMA_VERSION = "1.0"
@@ -70,6 +69,8 @@ def run_case(text: str) -> dict[str, Any]:
         _check_envelope(document)
         if overflowed:
             raise QfError("E_SCHEMA", "a number overflows binary64")
+        from .operations import OPERATIONS, execute  # lazy: `version` needs none of it
+
         if document["operation"] not in OPERATIONS:
             raise QfError("E_UNSUPPORTED_OPERATION", f"{document['operation']} is not in this build")
         result = execute(document["operation"], document["inputs"])
@@ -158,6 +159,8 @@ def _version() -> int:
 
 
 def _operations() -> int:
+    from .operations import OPERATIONS
+
     _write(sorted(OPERATIONS))
     return 0
 
