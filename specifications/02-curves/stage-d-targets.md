@@ -67,4 +67,24 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | ZCIS, linker from curve | `interpolation` | Analytic | |
 | Linker from real yield | `simple_analytic` | Exact-rational reference CPI; bond formulas checked against QuantLib in D2 | |
 
+## Wave 3, D7: caps and swaptions
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Caps, floors (flat or quoted vol), swaptions | 1e-9 per unit notional | QuantLib Black and Bachelier formulas; stage B curves | Formula values exact in the oracle |
+
+## Wave 3, D8: commodities
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Seasonal forward curve | `simple_analytic`; quotes reprice | Analytic | Within 1e-13 |
+| Convenience yield, carry value | `simple_analytic`; arbitrage flags exact | Analytic | |
+
+## Wave 3, D9: MBS
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Pool cash flows, WAL | 1e-9 per unit balance plus 1e-10 relative | Standard PSA and level-pay formulas | Last month retires the balance within 1e-6 |
+| Pass-through price, duration | `simple_analytic` | Analytic | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).
