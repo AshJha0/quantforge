@@ -68,3 +68,14 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | SABR | Model in which the forward's vol is itself random; Hagan's 2002 formula approximates its Black vol |
 | SVI, SSVI | Smile shapes in total variance: SVI per expiry, SSVI across expiries with simple no-arbitrage conditions |
 | Total variance | `w = v^2 T`, the vol squared times time to expiry |
+
+## Stage D: Curves and fixed income (in progress)
+
+In progress. Terms are added with the specs, as each curve lands.
+
+| Term | Meaning |
+|---|---|
+| ESTR | Euro short-term rate, the euro overnight rate |
+| Repo | A sale with an agreed buy-back, in effect a loan secured on a bond |
+| CDS | Credit default swap: protection against a named borrower's default, paid for with a running premium |
+| MBS | Mortgage-backed security: a bond paid from a pool of mortgages, whose cash flows depend on prepayment |
