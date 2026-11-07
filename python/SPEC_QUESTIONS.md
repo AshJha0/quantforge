@@ -45,10 +45,10 @@ No question is open.
 
 No golden turns on these, so none blocked work. Each is this build's reading, not a ruling.
 
-- Q43, `SPOT` with `scale: null`: `E_DOMAIN`, as "must be above 0".
+- Q43, `SPOT` with `scale: null`: closed by C15, `E_INPUT`.
 - Q44, order of the scale, positivity and delta checks in `vol.delta.*`, unlisted: scale, then `forward`/`vol`/`expiry_years`, then strike or delta.
-- Q45, `vol.sabr.arbfree` where a call price reaches `f0`: the spec gives `null` only at or below intrinsic. This build also gives `null` at or above `f0`, where no Black vol exists.
-- Q46, `vol.svi.evaluate` with empty `log_moneyness`: `min_g` is `null`, `butterfly_free` true.
+- Q45, `vol.sabr.arbfree` where a call price reaches `f0`: closed by C16, `null`.
+- Q46, `vol.svi.evaluate` with empty `log_moneyness`: closed by C17, `E_INPUT`.
 - Q47, `usecase.vol_surface` checks not listed: `as_of` differing from the curve's, empty `slices`, or expiries out of order `E_INPUT`; target `strike`, `quantity` not above 0 `E_DOMAIN`, after the expiry check.
 - Q48, `vol.ssvi.calibrate` has no listed check of `thetas`: it applies those of `vol.ssvi.evaluate`.
 - Q49, `gamma` at exactly 1 in `vol.ssvi.calibrate`: the fit keeps `gamma` below 1, so a true 1 is only approached.

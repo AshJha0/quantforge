@@ -30,12 +30,24 @@ def _increasing(values: Floats) -> bool:
 # --- delta ---
 
 
+def _not_empty(**lists: Sequence[object]) -> None:
+    """Ruling C17: an empty list is E_INPUT, ahead of every E_DOMAIN."""
+    for key, values in lists.items():
+        if not values:
+            raise _input(f"{key} is empty", key)
+
+
+def _scale_matches(convention: str, scale: float | None) -> None:
+    """Ruling C15: the first rule check."""
+    if (convention == "FORWARD") != (scale is None):
+        raise _input("scale must be null with FORWARD and a number with SPOT", "scale")
+
+
 def _delta_scale(convention: str, scale: float | None) -> float:
-    if convention == "FORWARD":
-        if scale is not None:
-            raise _input("scale must be null with FORWARD", "scale")
+    _scale_matches(convention, scale)
+    if scale is None:
         return 1.0
-    if scale is None or scale <= 0:
+    if scale <= 0:
         raise _domain("scale must be above 0", "scale")
     return scale
 
@@ -78,6 +90,7 @@ def rr_bf(
     forward: float, expiry_years: float, atm_vol: float, atm_convention: str, rr: float, bf: float,
     delta: float, convention: str, scale: float | None,
 ) -> dict[str, float]:
+    _scale_matches(convention, scale)
     call_vol, put_vol = atm_vol + bf + rr / 2, atm_vol + bf - rr / 2
     if min(atm_vol, call_vol, put_vol) <= 0:
         raise _domain("a vol is not above 0")
@@ -120,6 +133,7 @@ def _check_svi(p: Svi) -> None:
 
 
 def svi_evaluate(p: Svi, ks: Floats, expiry_years: float) -> dict[str, object]:
+    _not_empty(log_moneyness=ks)
     _check_svi(p)
     if expiry_years <= 0:
         raise _domain("expiry_years must be above 0", "expiry_years")
@@ -134,10 +148,10 @@ def svi_evaluate(p: Svi, ks: Floats, expiry_years: float) -> dict[str, object]:
         ws.append(w)
         vols.append(math.sqrt(w / expiry_years))
         gs.append(g)
-    min_g = min(gs) if gs else None
+    min_g = min(gs)
     return {
         "total_variance": ws, "implied_vol": vols, "g": gs, "min_g": min_g,
-        "butterfly_free": min_g is None or min_g >= 0,
+        "butterfly_free": min_g >= 0,
     }
 
 
@@ -205,6 +219,7 @@ def _ssvi_w(k: float, theta: float, rho: float, phi: float) -> float:
 def ssvi_evaluate(
     rho: float, eta: float, gamma: float, thetas: Floats, ks: Floats
 ) -> dict[str, object]:
+    _not_empty(thetas=thetas, log_moneyness=ks)
     if abs(rho) >= 1 or eta <= 0 or not 0 < gamma <= 1 or any(t <= 0 for t in thetas):
         raise _domain("ssvi parameters are out of range")
     if not _increasing(thetas):
@@ -298,6 +313,7 @@ def _query(s: Surface, t: float, k: float) -> float:
 
 
 def surface_query(s: Surface, points: Sequence[tuple[float, float]]) -> tuple[list[float], list[float]]:
+    _not_empty(points=points)
     check_surface(s)
     if any(t <= 0 for t, _ in points):
         raise _domain("expiry_years must be above 0", "points")
@@ -360,6 +376,7 @@ def _book_pv(s: Surface, book: Sequence[Position]) -> float:
 
 
 def surface_vega(s: Surface, book: Sequence[Position]) -> dict[str, object]:
+    _not_empty(positions=book)
     check_surface(s)
     for p in book:
         if min(p.forward, p.strike, p.discount_factor, p.expiry_years) <= 0:

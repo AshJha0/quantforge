@@ -31,6 +31,8 @@ class Sabr:
 
 
 def _check(p: Sabr, strikes: Floats) -> None:
+    if not strikes:  # ruling C17: ahead of every E_DOMAIN
+        raise QfError("E_INPUT", "strikes is empty", "strikes")
     if p.expiry_years <= 0:
         raise _domain("expiry_years must be above 0", "expiry_years")
     if p.alpha <= 0:

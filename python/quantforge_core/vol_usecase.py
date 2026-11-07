@@ -17,11 +17,11 @@ def vol_surface(
     as_of: date, funding: CurveData, slices: Sequence[tuple[date, Sequence[ParityQuote]]],
     k_grid: Sequence[float], target: tuple[str, float, date, float, str],
 ) -> dict[str, Any]:
+    if not slices or not k_grid or not all(quotes for _, quotes in slices):
+        raise QfError("E_INPUT", "slices, k_grid and quotes must not be empty", "slices")
     curve = curves.build(funding)
     if funding.as_of != as_of:
         raise QfError("E_INPUT", "the curve as_of differs from as_of", "as_of")
-    if not slices:
-        raise QfError("E_INPUT", "slices is empty", "slices")
     if any(a[0] >= b[0] for a, b in itertools.pairwise(slices)):
         raise QfError("E_INPUT", "slices must be in expiry order", "slices")
     forwards, rmses, times, discounts, fits = [], [], [], [], []
