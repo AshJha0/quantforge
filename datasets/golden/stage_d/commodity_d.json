@@ -1,0 +1,665 @@
+{
+ "schema_version": "1.0",
+ "suite": "commodity_d",
+ "spec": "specifications/02-curves/commodity.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "commodity_d-0001",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": [
+     0.06,
+     0.045,
+     0.01,
+     -0.03,
+     -0.045,
+     -0.04,
+     -0.02,
+     -0.015,
+     -0.02,
+     0.0,
+     0.025,
+     0.03
+    ],
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forwards": [
+      3.4200000000000004,
+      3.4352794377512383,
+      3.298790855644737,
+      2.8898312263351453,
+      3.0960085305002294,
+      3.4594127056508226,
+      3.430561811898926,
+      3.7534105089980185,
+      3.7000000000000006
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "commodity-curve",
+    "seasonality",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "commodity_d-0002",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forwards": [
+      3.4200000000000004,
+      3.3116004952905813,
+      3.2066367954411756,
+      2.95312746938569,
+      3.0908528139066758,
+      3.4364266595668713,
+      3.6064504771807036,
+      3.6424804640311597,
+      3.7000000000000006
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "commodity-curve",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "commodity_d-0003",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": [
+     0.06,
+     0.045,
+     0.01,
+     -0.03,
+     -0.045,
+     -0.04,
+     -0.02,
+     -0.015,
+     -0.02,
+     0.0,
+     0.025,
+     0.03
+    ],
+    "months": [
+     "2031-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_OUT_OF_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "no extrapolation past the last quote"
+  },
+  {
+   "case_id": "commodity_d-0004",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2030-12",
+      "price": 3.7
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2026-12",
+      "price": 3.42
+     }
+    ],
+    "seasonality": [
+     0.06,
+     0.045,
+     0.01,
+     -0.03,
+     -0.045,
+     -0.04,
+     -0.02,
+     -0.015,
+     -0.02,
+     0.0,
+     0.025,
+     0.03
+    ],
+    "months": [
+     "2027-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "commodity_d-0005",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 0.0
+     },
+     {
+      "month": "2027-03",
+      "price": 3.0
+     }
+    ],
+    "seasonality": [
+     0.06,
+     0.045,
+     0.01,
+     -0.03,
+     -0.045,
+     -0.04,
+     -0.02,
+     -0.015,
+     -0.02,
+     0.0,
+     0.025,
+     0.03
+    ],
+    "months": [
+     "2027-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "commodity_d-0006",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": [
+     0.06,
+     0.045,
+     0.01,
+     -0.03,
+     -0.045,
+     -0.04
+    ],
+    "months": [
+     "2027-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "commodity_d-0007",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "convenience_yields": [
+      0.11976144454022078,
+      -0.03607983964691383,
+      -0.006819802690525706,
+      0.087927141008683
+     ],
+     "carry_values": [
+      -2.189643685364544,
+      0.6708164887620427,
+      0.2563568923399657,
+      -6.466559878126418
+     ],
+     "arbitrage": [
+      false,
+      true,
+      true,
+      false
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "storage",
+    "synthetic"
+   ],
+   "output_classes": {
+    "arbitrage": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "commodity_d-0008",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "convenience_yields": [
+      0.15976144454022076,
+      0.003920160353086177,
+      0.03318019730947429,
+      0.127927141008683
+     ],
+     "carry_values": [
+      -2.9355023287745183,
+      -0.07325390884743399,
+      -1.2598295540913682,
+      -9.602400110301545
+     ],
+     "arbitrage": [
+      false,
+      false,
+      false,
+      false
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "storage",
+    "synthetic"
+   ],
+   "output_classes": {
+    "arbitrage": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "commodity_d-0009",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "at least two forwards"
+  },
+  {
+   "case_id": "commodity_d-0010",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": -0.01
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}
