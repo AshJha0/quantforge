@@ -16,7 +16,7 @@ CALIB = "calib-stability"
 RICH = "rich-cheap"
 NAMES = {"C1": "OIS bootstrap, LOG_LINEAR_DF", "C2": "OIS bootstrap, LINEAR_ZERO", "C3": "Bond Nelson-Siegel fit", "C4": "Smoothing spline",
          "C5": "Robust Nelson-Siegel", "C6": "SVI smile", "C7": "SABR smile"}
-TH = {"C1": {"S3": 3, "S7": "1e-12"}, "C2": {"S3": 3, "S7": "1e-12"}, "C3": {"S3": 20, "S7": "rms_0 + 1.5a"}, "C4": {"S3": 5}, "C5": {"S3": 5, "S6": 0.95},
+TH = {"C1": {"S3": 3, "S7": "1e-12"}, "C2": {"S3": 3, "S7": "1e-12"}, "C3": {"S3": 2, "S7": "rms_0 + 1.5a"}, "C4": {"S3": 5}, "C5": {"S3": 5, "S6": 0.95},
       "C6": {"S3": 10, "S7": "rms_0 + 1.5a (vol)"}, "C7": {"S3": 10, "S7": "rms_0 + 1.5a (vol)"}}
 
 
@@ -72,9 +72,9 @@ From `tools/workflows/calib_stability.py` (spec `specifications/03-calibration/s
 
 ## Reading the run
 
-- **Rulings applied (`specifications/r2-rulings.md`).** R2-A7: Gaussian noise `N(0, a^2)`. The amplitudes are 0.1 bp for rates, 0.0001 for vol and 0.001 per 100 for prices, and A is in the spec's units: bp per bp for C1, C2, C4 and C5; bp of zero per 0.001 of price for C3; total variance per 0.0001 of vol for C6; vol per vol for C7. R2-A2: S7 for the least-squares fits (C3, C6, C7) is the pooled RMS repricing error, which must be at most `rms_0 + 1.5 a`, where `rms_0` is the noise-free fit's RMS. C1 and C2 keep a 1e-12 solve tolerance.
+- **Rulings applied (`specifications/r2-rulings.md`).** R2-A7: Gaussian noise `N(0, a^2)`. The amplitudes are 0.1 bp for rates, 0.0001 for vol and 0.001 per 100 for prices, and A is in the spec's units: bp per bp for C1, C2, C4 and C5; price per price for C3 (model prices of the input bonds, R2-A9); total variance per 0.0001 of vol for C6; vol per vol for C7. R2-A2: S7 for the least-squares fits (C3, C6, C7) is the pooled RMS repricing error, which must be at most `rms_0 + 1.5 a`, where `rms_0` is the noise-free fit's RMS. C1 and C2 keep a 1e-12 solve tolerance.
 - **C6 noise on vol.** SVI calibration takes total variance and no expiry, so the noise goes on `sqrt(total variance)`, which is vol at T = 1. That reading is infra's and is stated here.
-- **C3 grid.** No operation evaluates a Nelson-Siegel curve from its betas, so the tool evaluates the form stated in `curve-fits.md` on the grid.
+- **C3 (ruling R2-A9).** C3 is judged on the op's own outputs, the model prices of the input bonds (market plus residual), in price per price, with A at most 2. No formula is evaluated in the tool. C3 was rerun in all four languages after the ruling; the other calibrations are from the full run.
 - **An earlier run under the original thresholds** failed S7 on C3, C6 and C7. That is what led to ruling R2-A2.
 
 ## Limits

@@ -21,7 +21,7 @@ This covers seven calibrations, C1 to C7, under 200 seeded noise draws from `cor
 |---|---|---|---|
 | C1 OIS LOG_LINEAR_DF | 1.55 (3) | 1.1e-14 (1e-12) | |
 | C2 OIS LINEAR_ZERO | 1.64 (3) | 1.1e-14 (1e-12) | |
-| C3 bond NS fit | 0.027 bp per 0.001 (20) | RMS 7.4e-4 (rms_0 + 1.5a = 1.5e-3) | S5: 3.7e-5, 0.0022, 0.0055 |
+| C3 bond NS fit | 0.92 price per price (2), on model prices (R2-A9) | RMS 7.4e-4 (rms_0 + 1.5a = 1.5e-3) | S5: 3.7e-5, 0.0022, 0.0055 |
 | C4 smoothing spline | 4.02 (5) | — | |
 | C5 robust NS | 0.69 (5) | — | S6 1.00 (0.95) |
 | C6 SVI | 0.71 (10) | RMS 6.9e-5 vol (1.5e-4) | noise on sqrt(w), i.e. T = 1 |
@@ -29,7 +29,7 @@ This covers seven calibrations, C1 to C7, under 200 seeded noise draws from `cor
 
 - **Agreement:** S1 and S2 pass in every language, and S3 agrees across languages to within 2e-8.
 - **Earlier run:** under the original thresholds, S7 failed on C3, C6 and C7. That led to ruling R2-A2.
-- **C3 grid:** no operation evaluates a Nelson-Siegel curve from betas, so the tool evaluates the `curve-fits.md` form on the grid. This is flagged in the code and on the page.
+- **C3 (ruling R2-A9):** C3 is judged on the op's own model prices (market plus residual), so no Nelson-Siegel formula lives in the tool. It was rerun in four languages; the other six calibrations stand.
 
 ## Rich/cheap: blocked on data
 

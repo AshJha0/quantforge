@@ -7,9 +7,8 @@ Runs seven calibrations (C1..C7) through `quantforge --batch` and judges metrics
 provisional thresholds. Noise comes from the library's own seeded generator: `core.rng.normals`, seed 20261107,
 stream = calibration number, drawn once through the first implementation listed, so every language sees the same
 draws. The tool perturbs inputs, sends cases and measures differences in what comes back. Model curves are
-evaluated by CLI operations (vol.svi.evaluate, vol.sabr.hagan), with one exception: C3's zero grid evaluates the
-Nelson-Siegel form stated in specifications/03-calibration/curve-fits.md, because no operation evaluates a
-Nelson-Siegel curve from betas (raised with the spec session). Synthetic inputs: stability of the method, not of any market.
+evaluated by CLI operations (vol.svi.evaluate, vol.sabr.hagan); C3 is judged on the op's own outputs, model price =
+market + residual (ruling R2-A9), so no formula lives in this file. Synthetic inputs: stability of the method, not of any market.
 Exit status: 0 every judged metric passed; 1 otherwise.
 """
 import argparse
@@ -46,13 +45,6 @@ def golden_case(case_id):
     raise SystemExit(f"golden case {case_id} not found")
 
 
-def ns_zero(betas, tau, m):
-    """Nelson-Siegel zero rate, the form in curve-fits.md (see module docstring)."""
-    x = m / tau
-    e = (1 - math.exp(-x)) / x
-    return betas[0] + betas[1] * e + betas[2] * (e - math.exp(-x))
-
-
 def zeros_from_pillars(pillars, as_of):
     return [c.zero_rate(p["discount_factor"], c.years(p["date"], as_of)) for p in pillars]
 
@@ -82,11 +74,6 @@ def cal_specs():
         for b, x in zip(i["bonds"], v):
             b["dirty_price"] = x
 
-    def c3_out(inputs, outs, ev):
-        mats = [c.years(b["maturity"], inputs["settlement"]) for b in inputs["bonds"]]
-        grid = [min(mats) + k * (max(mats) - min(mats)) / 20 for k in range(21)]
-        return [ns_zero(outs["betas"], inputs["tau"], m) for m in grid]
-
     return {
         "C1": dict(case="ois-0009", get=quotes_get, set=quotes_set, a=RATE_A,
                    out=lambda i, o, ev: zeros_from_pillars(o["pillars"], i["as_of"]),
@@ -94,9 +81,10 @@ def cal_specs():
         "C2": dict(case="ois-0011", get=quotes_get, set=quotes_set, a=RATE_A,
                    out=lambda i, o, ev: zeros_from_pillars(o["pillars"], i["as_of"]),
                    s7=lambda i, o, ev, d: d.get("max_repricing_error"), th=dict(S3=3, S7=1e-12)),
-        "C3": dict(case="bondfit_d-0001", get=bonds_get, set=bonds_set, a=PRICE_A, out=c3_out,
-                   s7=lambda i, o, ev, d: list(o["residuals"]), s7_rms=True, a_factor=1e4 * PRICE_A,  # A in bp of zero per 0.001 of price
-                   params=lambda o: o["betas"], th=dict(S3=20, S7="rms")),
+        "C3": dict(case="bondfit_d-0001", get=bonds_get, set=bonds_set, a=PRICE_A,
+                   out=lambda i, o, ev: [b["dirty_price"] + r for b, r in zip(i["bonds"], o["residuals"])],  # R2-A9: model price = market + residual
+                   s7=lambda i, o, ev, d: list(o["residuals"]), s7_rms=True,
+                   params=lambda o: o["betas"], th=dict(S3=2, S7="rms")),
         "C4": dict(case="fits_d-0001", get=key_get("zero_rates"), set=key_set("zero_rates"), a=RATE_A,
                    out=lambda i, o, ev: o["forwards"], th=dict(S3=5)),
         "C5": dict(case="fits_d-0009", get=key_get("zero_rates"), set=key_set("zero_rates"), a=RATE_A,
@@ -252,20 +240,23 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--impls", nargs="+", default=["python"])
     ap.add_argument("--draws", type=int, default=200)
+    ap.add_argument("--cals", nargs="+", help="run only these calibrations, e.g. C3 (a partial report)")
     ap.add_argument("--out", default=str(c.ROOT / "reports" / "workflows"))
     a = ap.parse_args()
     import datetime as dt
     specs = cal_specs()
+    if a.cals:
+        specs = {k: v for k, v in specs.items() if k in a.cals}
     noise = {}
-    for k, (cid, s) in enumerate(specs.items(), 1):
+    for cid, s in specs.items():
         n = len(s["get"](golden_case(s["case"])["inputs"]))
-        noise[cid] = draws(a.impls[0], k, n * a.draws)
+        noise[cid] = draws(a.impls[0], int(cid[1:]), n * a.draws)  # stream = calibration number, also when --cals picks a subset
     results = {lang: run_impl(lang, specs, noise, a.draws) for lang in a.impls}
     verdicts = judge(specs, results)
     r = c.Report("Calibration stability", dt.date.today().isoformat(), a.out)
     r.p(f"{LABEL} Seed {SEED}, stream = calibration number (`core.rng.normals` via {a.impls[0]}), {a.draws} draws. "
         f"Gaussian noise N(0, a^2): rates {RATE_A}, vols {VOL_A} (SVI: on sqrt(total variance), i.e. T = 1), prices {PRICE_A} per 100 (R2-A7). "
-        "A units: bp per bp (C1, C2, C4, C5), bp of zero per 0.001 of price (C3), total variance per 0.0001 of vol (C6), vol per vol (C7). "
+        "A units: bp per bp (C1, C2, C4, C5), price per price (C3, model prices of the input bonds, R2-A9), total variance per 0.0001 of vol (C6), vol per vol (C7). "
         "S7 for C3, C6, C7: pooled RMS against rms_0 + 1.5 a (R2-A2). "
         "Thresholds are the spec's provisional ones (`specifications/03-calibration/stability.md`); this is a first-run report.")
     head = ["Cal", "Language", "Base case", "S1", "S2", "S3 (A)", "S4 largest (input)", "S5 (std/base)", "S6", "S7", "Pass"]
