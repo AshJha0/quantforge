@@ -45,6 +45,7 @@ from .. import store as store_module
 from .. import timezones as timezones_module
 from .. import usecases as _usecases
 from .. import vol_usecase as _vol_usecase
+from .. import xccy as _xccy
 from ..calendars import TENOR
 from ..daycount import check_conditional
 from ..errors import QfError
@@ -124,7 +125,7 @@ _STAGE_C = SimpleNamespace(
 )
 _STAGE_D = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
-       for m in (_bonds, _csa, _curve_fits, _futures, _overnight, _steps)}
+       for m in (_bonds, _csa, _curve_fits, _futures, _overnight, _steps, _xccy)}
 )
 
 

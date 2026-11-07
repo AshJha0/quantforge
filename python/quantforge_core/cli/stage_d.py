@@ -241,3 +241,38 @@ def _bond_fit(i: Inputs) -> Any:
     betas, residuals = D.bonds.fit_nelson_siegel(i.date("settlement"), i.real("tau"), bonds,
                                                  weights)
     return {"betas": betas, "residuals": residuals}
+
+
+# Wave 2, D3: cross-currency and NDF
+
+@op("fx.xccy.bootstrap")
+def _xccy_bootstrap(i: Inputs) -> Any:
+    quotes = [(q.integer("months"), q.real("spread")) for q in _objects(i, "quotes")]
+    args = (_curve(i, "domestic"), _curve(i, "foreign_projection"),
+            i.enum("domestic_convention", ("SOFR",)), i.enum("foreign_convention", ("ESTR",)),
+            i.date("start"), quotes, i.enum("interpolation", curves.INTERPOLATIONS))
+    data, error = D.xccy.bootstrap(*args)
+    return {"pillars": _pillars(data)}, {"max_repricing_error": error}
+
+
+@op("fx.xccy.pv")
+def _xccy_pv(i: Inputs) -> Any:
+    t = i.object("trade")
+    args = (_curve(i, "domestic"), _curve(i, "foreign_projection"),
+            _curve(i, "foreign_discount"), i.real("spot"), t.date("start"), t.integer("months"),
+            t.real("foreign_notional"), t.real("spread"),
+            t.enum("side", ("RECEIVE_FOREIGN", "PAY_FOREIGN")))
+    foreign, domestic, value = D.xccy.pv(*args)
+    return {"pv": value, "foreign_leg": foreign, "domestic_leg": domestic}
+
+
+@op("fx.ndf.pv")
+def _ndf(i: Inputs) -> Any:
+    _present(i, "fixing")
+    t = i.object("trade")
+    fixing = i.real("fixing") if i.has("fixing") else None
+    args = (_curve(i, "usd_curve"), _curve(i, "offshore_curve"), i.real("spot"),
+            t.date("fixing_date"), t.date("payment_date"), t.real("strike"),
+            t.real("usd_notional"), t.enum("side", ("BUY", "SELL")), fixing)
+    value, forward = D.xccy.ndf_pv(*args)
+    return {"pv": value, "forward": forward}
