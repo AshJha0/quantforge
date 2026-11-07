@@ -191,7 +191,7 @@ def ois_d():
 
 
 # ---------------------------------------------------------------- D1b: dated compounding, lookback, lockout, shift, fallbacks
-CAL = {"SOFR": "USGS", "ESTR": "EUTA", "SONIA": "GBLO"}
+CAL = {"SOFR": "USGS_SOFR", "ESTR": "EUTA", "SONIA": "GBLO"}
 
 
 def fix_rate(conv, d):

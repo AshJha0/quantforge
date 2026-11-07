@@ -8,7 +8,7 @@ A coupon on an overnight index compounds one published fixing per business day. 
 
 Inputs: `convention` (an `OVERNIGHT` record from `01-core/conventions.md`: `SONIA`, `SOFR`, `ESTR`), `start`, `end`, `method` (`NONE`, `LOOKBACK`, `OBSERVATION_SHIFT`, `LOCKOUT`), `shift_days` (integer), `fixings`: `[{date, rate}]`.
 
-Let `cal` be the record's calendar and `B` its day-count denominator (`ACT_360`: 360, `ACT_365F`: 365). `d_0 = start < d_1 < ... < d_n = end` are the business days of `cal` in `[start, end]`. `back(d, k)` is `d` moved `k` business days earlier on `cal`. `r(x)` is the fixing dated `x`.
+Let `cal` be the record's calendar, except that for `SOFR` it is `USGS` with every Good Friday a non-business day: the New York Fed publishes no SOFR on Good Friday, even in the years when the bond market had an early close (none on 2021-04-02 or 2023-04-07; ruling R1-6). Let `B` its day-count denominator (`ACT_360`: 360, `ACT_365F`: 365). `d_0 = start < d_1 < ... < d_n = end` are the business days of `cal` in `[start, end]`. `back(d, k)` is `d` moved `k` business days earlier on `cal`. `r(x)` is the fixing dated `x`.
 
 | `method` | Rate for step `i` (`0 <= i < n`) | Weight `w_i` |
 |---|---|---|
