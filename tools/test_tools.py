@@ -167,5 +167,42 @@ class GalleryVol(unittest.TestCase):
         self.assertIn(">0<", svg)
 
 
+    def test_stage_d_planned_pages(self):
+        out = ROOT / "docs/curves"
+        self.assertEqual(set(self.bg.STAGE_D), {"ois-full", "bond-fit", "repo", "cross-currency", "cds", "dividend-borrow",
+                                                "inflation", "caps-swaptions", "commodities", "mbs"})
+        index = (out / "README.md").read_text(encoding="utf-8")
+        for slug, spec in self.bg.STAGE_D.items():
+            self.assertFalse(self.bg.is_live(spec), slug)
+            text = (out / f"{slug}.md").read_text(encoding="utf-8")
+            self.assertEqual(text, self.bg.planned_page(slug, spec))
+            self.assertIn("Planned, stage D (in progress)", text)
+            self.assertNotIn("<svg", text)
+            self.assertFalse(any(c.isdigit() for c in spec["shows"]), slug)
+            self.assertNotIn("nterview", text)
+            self.assertIn(f"]({slug}.md) | Planned | D |", index)
+        planned = {n for n, _ in self.bg.PLANNED}
+        for gone in ("Full SOFR", "ESTR", "Cross-currency", "Credit and ISDA CDS", "Swaption cube and cap surface"):
+            self.assertNotIn(gone, planned)
+
+    def test_stage_d_renderer_hook_routes_live_entries(self):
+        bg = self.bg
+        saved = dict(bg.STAGE_D["repo"])
+        try:
+            bg.STAGE_D["repo"]["cli"] = "rates.repo.curve"
+            self.assertNotIn("repo", bg.RENDERERS)
+            self.assertFalse(bg.is_live(bg.STAGE_D["repo"]))
+            bg.renderer("repo")(lambda slug, spec, d: f"LIVE {slug} {d['x']}")
+            self.assertTrue(bg.is_live(bg.STAGE_D["repo"]))
+            data = {s: json.loads((ROOT / "docs/curves/data" / f"{s}.json").read_text(encoding="utf-8"))
+                    for s in list(bg.CURVES) + list(bg.VOLS)}
+            self.assertEqual(bg.render_all({**data, "repo": {"x": 1}})["repo.md"], "LIVE repo 1")
+            self.assertIn("planned", bg.render_all(data)["repo.md"].lower())
+        finally:
+            bg.STAGE_D["repo"].clear()
+            bg.STAGE_D["repo"].update(saved)
+            bg.RENDERERS.pop("repo", None)
+
+
 if __name__ == "__main__":
     unittest.main()
