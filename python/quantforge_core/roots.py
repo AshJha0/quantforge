@@ -136,16 +136,19 @@ def newton(
     if (a is None) != (b is None):
         raise QfError("E_SCHEMA", "a and b must both be given or both absent")
     _check_common(x_tol, f_tol, max_iter)
-    bracketed = a is not None
+    bracketed = a is not None and b is not None
+    lo = a if a is not None else 0.0
+    hi = b if b is not None else 0.0
     fa = 0.0
     fb = 0.0
     if bracketed:
+        a, b = lo, hi
         if a >= b:
             raise QfError("E_INPUT", "need a < b")
         fa, fb = _finite(f(a)), _finite(f(b))
         if _same_sign(fa, fb):
             raise QfError("E_NOT_BRACKETED", "f(a) and f(b) have the same sign")
-        if not a <= x0 <= b:
+        if not lo <= x0 <= hi:
             raise QfError("E_INPUT", "x0 is outside the bracket", "x0")
     x = x0
     fx = _finite(f(x))
@@ -159,17 +162,17 @@ def newton(
             # An end point with f exactly 0 stays: only the other end may move.
             if fa == 0:
                 if _same_sign(fx, fb):
-                    b, fb = x, fx
+                    hi, fb = x, fx
             elif fb == 0:
                 if _same_sign(fx, fa):
-                    a, fa = x, fx
+                    lo, fa = x, fx
             elif _same_sign(fx, fa):
-                a, fa = x, fx
+                lo, fa = x, fx
             else:
-                b, fb = x, fx
+                hi, fb = x, fx
         x_new = x - fx / dfx
-        if bracketed and not a <= x_new <= b:
-            x_new = a + (b - a) / 2
+        if bracketed and not lo <= x_new <= hi:
+            x_new = lo + (hi - lo) / 2
         f_new = _finite(f(x_new))
         if abs(x_new - x) <= x_tol * (1 + abs(x_new)):
             return RootResult(x_new, it, f_new, "X_TOL")

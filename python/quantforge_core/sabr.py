@@ -5,7 +5,7 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-import numpy as np
+lazy import numpy as np
 
 from .black import BLACK_76, Option, _value, implied
 from .errors import QfError

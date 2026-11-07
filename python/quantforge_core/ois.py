@@ -12,7 +12,7 @@ from typing import Protocol
 from . import calendars, curves, daycount, linalg, schedules
 from .conventions import REGISTRY
 from .curves import Curve, CurveData
-from .errors import QfError
+from .errors import QfError, required
 from .numeric import ordered_sum
 from .schedules import Period
 
@@ -32,7 +32,9 @@ class Quote:
 
     @property
     def mid(self) -> float:
-        return self.rate if self.rate is not None else (self.bid + self.ask) / 2
+        if self.rate is not None:
+            return self.rate
+        return (required(self.bid, "bid") + required(self.ask, "ask")) / 2
 
 
 @dataclass(frozen=True)
@@ -89,7 +91,10 @@ def par_rate(convention: str, ps: Sequence[Period], curve: Discounting) -> float
 
 
 def _models(convention: str, swaps: Sequence[Sequence[Period]]) -> list[curves.Model]:
-    return [lambda c, ps=ps: par_rate(convention, ps, c) for ps in swaps]
+    def model(ps: Sequence[Period]) -> curves.Model:
+        return lambda c: par_rate(convention, ps, c)
+
+    return [model(ps) for ps in swaps]
 
 
 def _global_solve(
@@ -137,7 +142,7 @@ def _check_quotes(
     pillars = [ps[-1].payment for ps in swaps]
     if any(b <= a for a, b in itertools.pairwise(pillars)):
         raise QfError("E_INPUT", "pillars are not strictly increasing", "quotes")
-    if any(q.rate is None and q.bid > q.ask for q in quotes):
+    if any(q.rate is None and required(q.bid, "bid") > required(q.ask, "ask") for q in quotes):
         raise QfError("E_INPUT", "bid is above ask", "quotes")
     return swaps, pillars
 

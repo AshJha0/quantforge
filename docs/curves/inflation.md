@@ -2,7 +2,7 @@
 
 <p class="note">Status: Implemented, not Validated. Validation is self-assessment until the human review at the end of the project. Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>
 
-Generated on 2026-11-07 from commit `95cbf11`, by Java 0.4.0 (JDK 25.0.5+8-LTS), C++ 0.4.0 (GCC 16.2.0), Python 0.4.0 (CPython 3.15.2), Rust 0.4.0 (rustc 1.99.1), on one Windows machine.
+Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS), C++ 0.4.0 (GCC 16.2.0), Python 0.4.0 (CPython 3.15.2), Rust 0.4.0 (rustc 1.99.1), on one Windows machine.
 
 ## What it is
 
@@ -10,9 +10,11 @@ Forward index levels with and without the seasonal adjustment. Stage D, target v
 
 ## Runs
 
-Synthetic inputs, not market data. The inputs are copied from a golden case's inputs, so the method is shown, not a market.
+Each run is labelled. Synthetic inputs are copied from a golden case's inputs, so they show the method, not a market. Real inputs name their source and date.
 
 ### `infl.curve.cpi`
+
+**Synthetic.** Synthetic inputs, not market data.
 
 Input: [`examples/inflation_cpi_d.json`](../../examples/inflation_cpi_d.json). Command: `quantforge batch < examples/inflation_cpi_d.json` (wrap as one line).
 
@@ -38,4 +40,4 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 |---|---|
 | infl.curve.cpi: analytic | 2 |
 
-Limits: one synthetic input per operation; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.

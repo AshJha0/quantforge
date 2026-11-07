@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0: stage D, curves and fixed income (unreleased)
+## 0.4.0: stage D, curves and fixed income (2026-11-07)
 
 Not tagged yet. Stage D is at Implemented, not Validated. Figures are local runs on Windows, 2026-11-07, on branch `stage-d` at merge `95cbf11`.
 
@@ -11,10 +11,10 @@ Not tagged yet. Stage D is at Implemented, not Validated. Figures are local runs
 - Stage D sections in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`.
 
 ### Changed
+- Stage C goldens regenerated: the committed values could not be reproduced on this machine by any generator version or venv, while reruns are byte-identical to each other. 31 output lines in 6 files moved, each by at most 1.4e-4 of its own tolerance (largest: `greeks-0014` volga, 2.7e-8 absolute), and quote inputs of `usecases_c-0001` and `-0002` moved in the last bits. The cause is the platform's numerics, not seeding, threads, order or solver starts.
 - Stage B case `ois-0023` now sends `TONA`, not `ESTR`, as its unlisted convention (ruling D27).
 
 ### Known issues
-- Rerunning the oracle on this machine reproduces 31 stage C golden lines that differ from the committed ones by about 1e-9 relative or less (bumped Greeks and fits), with the stage C generator unchanged and single-threaded too. The committed stage C goldens are kept; the cause is not yet found.
 - Free data is thin. The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors. Those studies stay method tests on synthetic data.
 - Python fuzz volume is low compared with the other languages.
 - Python has 40 mypy errors in older modules. mypy is not a CI check.

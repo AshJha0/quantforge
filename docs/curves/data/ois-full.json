@@ -1,6 +1,6 @@
 {
  "meta": {
-  "commit": "95cbf11",
+  "commit": "8dddd58",
   "date": "2026-11-07",
   "reference_language": "python",
   "tolerance": {
@@ -41,7 +41,8 @@
    }
   },
   "example_hashes": {
-   "estr_ois_d.json": "sha256:21b5b669de245aab1898dc4dc8197b48e10b1591304b9208ec523fb7a5902a22"
+   "estr_ois_d.json": "sha256:21b5b669de245aab1898dc4dc8197b48e10b1591304b9208ec523fb7a5902a22",
+   "real_sofr_compound_2026_10.json": "sha256:edf27df4168b4b256721eac03bf1d685aff5033b77fb237af374ea8f8ff87d79"
   }
  },
  "inputs": {
@@ -104,6 +105,147 @@
    ],
    "interpolation": "LOG_LINEAR_DF",
    "method": "SEQUENTIAL"
+  },
+  "rates.ois.compound_dated": {
+   "convention": "SOFR",
+   "start": "2026-10-01",
+   "end": "2026-11-02",
+   "method": "NONE",
+   "shift_days": 0,
+   "fixings": [
+    {
+     "date": "2026-09-21",
+     "rate": 0.0385
+    },
+    {
+     "date": "2026-09-22",
+     "rate": 0.0387
+    },
+    {
+     "date": "2026-09-23",
+     "rate": 0.0387
+    },
+    {
+     "date": "2026-09-24",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-09-25",
+     "rate": 0.039
+    },
+    {
+     "date": "2026-09-28",
+     "rate": 0.039
+    },
+    {
+     "date": "2026-09-29",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-09-30",
+     "rate": 0.039
+    },
+    {
+     "date": "2026-10-01",
+     "rate": 0.0387
+    },
+    {
+     "date": "2026-10-02",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-10-05",
+     "rate": 0.0389
+    },
+    {
+     "date": "2026-10-06",
+     "rate": 0.039
+    },
+    {
+     "date": "2026-10-07",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-10-08",
+     "rate": 0.0387
+    },
+    {
+     "date": "2026-10-09",
+     "rate": 0.0387
+    },
+    {
+     "date": "2026-10-13",
+     "rate": 0.0389
+    },
+    {
+     "date": "2026-10-14",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-10-15",
+     "rate": 0.0389
+    },
+    {
+     "date": "2026-10-16",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-10-19",
+     "rate": 0.0387
+    },
+    {
+     "date": "2026-10-20",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-10-21",
+     "rate": 0.0388
+    },
+    {
+     "date": "2026-10-22",
+     "rate": 0.039
+    },
+    {
+     "date": "2026-10-23",
+     "rate": 0.0392
+    },
+    {
+     "date": "2026-10-26",
+     "rate": 0.0393
+    },
+    {
+     "date": "2026-10-27",
+     "rate": 0.0395
+    },
+    {
+     "date": "2026-10-28",
+     "rate": 0.0394
+    },
+    {
+     "date": "2026-10-29",
+     "rate": 0.0394
+    },
+    {
+     "date": "2026-10-30",
+     "rate": 0.0395
+    },
+    {
+     "date": "2026-11-02",
+     "rate": 0.0395
+    },
+    {
+     "date": "2026-11-03",
+     "rate": 0.0397
+    },
+    {
+     "date": "2026-11-04",
+     "rate": 0.0394
+    },
+    {
+     "date": "2026-11-05",
+     "rate": 0.0392
+    }
+   ]
   }
  },
  "reference": {
@@ -162,6 +304,11 @@
      "discount_factor": 0.5087217489424133
     }
    ]
+  },
+  "rates.ois.compound_dated": {
+   "compounded_rate": 0.0390412317293215,
+   "accrual": 0.08888888888888889,
+   "interest": 0.0034703317092730224
   }
  },
  "agreement": [
@@ -175,14 +322,49 @@
     "python": 0.5087217489424133,
     "rust": 0.5087217489424135
    }
+  },
+  {
+   "output": "rates.ois.compound_dated: compounded_rate",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.0390412317293215,
+    "cpp": 0.0390412317293215,
+    "python": 0.0390412317293215,
+    "rust": 0.0390412317293215
+   }
+  },
+  {
+   "output": "rates.ois.compound_dated: accrual",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.08888888888888889,
+    "cpp": 0.08888888888888889,
+    "python": 0.08888888888888889,
+    "rust": 0.08888888888888889
+   }
+  },
+  {
+   "output": "rates.ois.compound_dated: interest",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.0034703317092730224,
+    "cpp": 0.0034703317092730224,
+    "python": 0.0034703317092730224,
+    "rust": 0.0034703317092730224
+   }
   }
  ],
  "evidence": {
   "operations": [
-   "rates.ois.bootstrap"
+   "rates.ois.bootstrap",
+   "rates.ois.compound_dated"
   ],
-  "cases": 10,
+  "cases": 31,
   "by_source": {
+   "rates.ois.compound_dated: exact-rational, quantlib-1.44": 21,
    "rates.ois.bootstrap: independent-replay, quantlib-1.44": 10
   }
  }
