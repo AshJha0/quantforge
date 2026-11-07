@@ -66,6 +66,10 @@ class ContractTest {
         assertEquals("E_SCHEMA", code("{\"schema_version\":\"1.0\",\"case_id\":\"x\",\"operation\":\"core.a\"}"));
         assertEquals("E_SCHEMA", code(GOOD.replace("\"inputs\":{", "\"inputs\":{\"z\":1e400,")));
         assertEquals("E_UNSUPPORTED_OPERATION", code(GOOD.replace("core.daycount.year_fraction", "core.no.such")));
+        assertEquals("E_SCHEMA", code(GOOD.replace("{\"schema_version\"", "{\"extra\":1,\"schema_version\"")));
+        assertEquals("E_SCHEMA", code(GOOD.replace("\"1.0\"", "\"v1\"")));
+        assertEquals("E_SCHEMA", code(GOOD.replace("\"c1\"", "\"\"")));
+        assertEquals("E_SCHEMA", code(GOOD.replace("core.daycount.year_fraction", "Core")));
     }
 
     @Test
@@ -83,5 +87,49 @@ class ContractTest {
                 + "\"inputs\":{\"function\":\"inv_sqrt\",\"a\":0,\"b\":1,\"n\":4}}";
         assertEquals("E_NON_FINITE", code(c));
         assertFalse(Main.handle(c).ok());
+    }
+
+    @Test
+    void dashDashBatchAndTimings() throws IOException {
+        String two = GOOD + "\n" + GOOD.replace("2024-07-01", "2023-07-01") + "\n";
+        Run plain = run(two, "--batch");
+        assertEquals(0, plain.code());
+        assertFalse(plain.out().contains("elapsed_ns"));
+        assertEquals(run(two, "batch").out(), plain.out());
+        Run timed = run(two, "--batch", "--timings");
+        String[] lines = timed.out().split("\n");
+        assertEquals(2, lines.length);
+        assertTrue(lines[0].contains("\"status\":\"ok\"") && lines[0].matches(".*\"elapsed_ns\":[0-9]+.*"));
+        assertTrue(lines[1].contains("E_DATE_ORDER") && lines[1].matches(".*\"elapsed_ns\":[0-9]+.*"));
+        assertEquals(plain.out(), timed.out().replaceAll("\"elapsed_ns\":[0-9]+", ""));
+        Run once = run(GOOD, "run", "--timings");
+        assertEquals(0, once.code());
+        assertTrue(once.out().contains("elapsed_ns"));
+        for (String[] bad : new String[][] {{"--timings", "batch"}, {"batch", "--fast"}, {"version", "--timings"}}) {
+            Run r = run(GOOD, bad);
+            assertEquals(64, r.code());
+            assertEquals("", r.out());
+        }
+    }
+
+    @Test
+    void overlongLineIsALimitErrorAndTheStreamContinues() throws IOException {
+        int limit = Main.MAX_LINE_BYTES;
+        String atLimitWithCr = "x".repeat(limit) + "\r\n";
+        String over = "y".repeat(limit + 1) + "\n";
+        String[] lines = run(atLimitWithCr + over + GOOD, "batch").out().split("\n");
+        assertEquals(3, lines.length);
+        assertTrue(lines[0].contains("E_PARSE"), "the limit itself is parsed");
+        assertTrue(lines[1].contains("E_LIMIT") && lines[1].contains("\"case_id\":\"unknown\""));
+        assertTrue(lines[2].contains("\"case_id\":\"c1\"") && lines[2].contains("\"ok\""));
+    }
+
+    @Test
+    void notUtf8AndTooDeepAreReported() throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] in = {'{', (byte) 0xC3, '}', '\n'};
+        assertEquals(0, Main.run(new String[] {"batch"}, new ByteArrayInputStream(in), out));
+        assertTrue(out.toString(StandardCharsets.UTF_8).contains("E_PARSE"));
+        assertEquals("E_LIMIT", code("[".repeat(100) + "]".repeat(100)));
     }
 }
