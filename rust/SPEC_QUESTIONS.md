@@ -100,3 +100,9 @@ None of these is reached by a golden. Rulings C15 and C16 settled the readings o
   - D60: the `inflation_d-0009` tolerance is widened, so the `powf` and `base_cpi` choice no longer matters.
 
 No stage D question is open.
+
+## R1.7 batch mode (silent choices, 2026-11-07)
+
+- **Error results always carry `diagnostics: {}`.** `batch_check.py` timings_identity strips only `elapsed_ns`, so an error result that gained `diagnostics` under `--timings` left an empty object behind and failed. The contract allows `diagnostics` on every result ("may always be present"), so the Rust build now writes it on every error result, with or without the flag. Suggest the spec state this, or have the checker drop an empty `diagnostics`.
+- **BT1 CR removal:** exactly one CR before the LF is removed (v0.4 removed every trailing CR/LF). A last line without LF keeps a trailing CR removed too, as before.
+- **BT5 memory:** the reader keeps at most 16,777,217 bytes (room for the CRLF's CR) and drops the rest of the line; the `E_LIMIT` message is "the line is longer than 16 MiB". Under `--timings` it carries `elapsed_ns` like any other result.
