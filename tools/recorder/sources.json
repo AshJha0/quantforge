@@ -66,6 +66,105 @@
       "redistribute_raw": "yes with citation, except any third-party series; held back from git by the rule above",
       "notice": "Source: Board of Governors of the Federal Reserve System, H.10 Foreign Exchange Rates.",
       "enabled": true
+    },
+    {
+      "id": "nyfed-tgcr",
+      "url": "https://markets.newyorkfed.org/api/rates/secured/tgcr/search.json?startDate={year}-01-01&endDate={year}-12-31",
+      "licence": "New York Fed Terms of Use: non-exclusive licence to use, copy and distribute, with the reference rate notice",
+      "licence_url": "https://www.newyorkfed.org/privacy/termsofuse",
+      "terms_checked": "2026-11-07: rechecked as text for stage D. Terms of Use read: automated access, copy, distribute and modify allowed with the reference rate notice; the Registration section covers only features that need registration, which this API does not. API tested with no key, JSON returned. The DTCC Solutions sentence of the SOFR notice is left out: the data provider line for this rate was not confirmed, so check the rate's own page before publishing",
+      "attribution": "Federal Reserve Bank of New York",
+      "redistribute_raw": "yes, with the notice and the same terms passed on; held back from git by the rule above",
+      "notice": "The TGCR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of the TGCR data by QuantForge, does not sanction or endorse any particular republication, and has no liability for your use. QuantForge is not affiliated with the New York Fed. The New York Fed does not sanction, endorse, or recommend any products or services offered by QuantForge.",
+      "enabled": true
+    },
+    {
+      "id": "nyfed-bgcr",
+      "url": "https://markets.newyorkfed.org/api/rates/secured/bgcr/search.json?startDate={year}-01-01&endDate={year}-12-31",
+      "licence": "New York Fed Terms of Use: non-exclusive licence to use, copy and distribute, with the reference rate notice",
+      "licence_url": "https://www.newyorkfed.org/privacy/termsofuse",
+      "terms_checked": "2026-11-07: rechecked as text for stage D. Terms of Use read: automated access, copy, distribute and modify allowed with the reference rate notice; the Registration section covers only features that need registration, which this API does not. API tested with no key, JSON returned. The DTCC Solutions sentence of the SOFR notice is left out: the data provider line for this rate was not confirmed, so check the rate's own page before publishing",
+      "attribution": "Federal Reserve Bank of New York",
+      "redistribute_raw": "yes, with the notice and the same terms passed on; held back from git by the rule above",
+      "notice": "The BGCR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of the BGCR data by QuantForge, does not sanction or endorse any particular republication, and has no liability for your use. QuantForge is not affiliated with the New York Fed. The New York Fed does not sanction, endorse, or recommend any products or services offered by QuantForge.",
+      "enabled": true
+    },
+    {
+      "id": "ons-d7bt",
+      "url": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+      "licence": "Open Government Licence v3.0",
+      "licence_url": "https://www.ons.gov.uk/help/termsandconditions",
+      "attribution": "Office for National Statistics",
+      "redistribute_raw": "yes under the OGL with attribution; held back from git by the rule above",
+      "notice": "Source: Office for National Statistics licensed under the Open Government Licence v3.0. Contains public sector information.",
+      "enabled": true,
+      "terms_checked": "2026-11-07: rechecked as text for stage D. ONS terms page read: content is Crown copyright under the OGL, exemptions are third-party images only. CSV tested with no sign-up: CPI index 2015=100, monthly from 1988 JAN"
+    },
+    {
+      "id": "ons-l522",
+      "url": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/l522/mm23",
+      "licence": "Open Government Licence v3.0",
+      "licence_url": "https://www.ons.gov.uk/help/termsandconditions",
+      "attribution": "Office for National Statistics",
+      "redistribute_raw": "yes under the OGL with attribution; held back from git by the rule above",
+      "notice": "Source: Office for National Statistics licensed under the Open Government Licence v3.0. Contains public sector information.",
+      "enabled": true,
+      "terms_checked": "2026-11-07: rechecked as text for stage D. ONS terms page read: content is Crown copyright under the OGL, exemptions are third-party images only. CSV tested with no sign-up: CPIH index 2015=100, monthly from 1988 JAN"
+    },
+    {
+      "id": "ons-chaw",
+      "url": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/chaw/mm23",
+      "licence": "Open Government Licence v3.0",
+      "licence_url": "https://www.ons.gov.uk/help/termsandconditions",
+      "attribution": "Office for National Statistics",
+      "redistribute_raw": "yes under the OGL with attribution; held back from git by the rule above",
+      "notice": "Source: Office for National Statistics licensed under the Open Government Licence v3.0. Contains public sector information.",
+      "enabled": true,
+      "terms_checked": "2026-11-07: rechecked as text for stage D. ONS terms page read: content is Crown copyright under the OGL, exemptions are third-party images only. CSV tested with no sign-up: RPI all items index Jan 1987=100 (CZBH is the percentage change, not the level), monthly from 1987 JAN"
+    },
+    {
+      "id": "ecb-aaa-yield-curve",
+      "url": "https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_3M+SR_1Y+SR_2Y+SR_3Y+SR_5Y+SR_7Y+SR_10Y+SR_15Y+SR_20Y+SR_30Y?format=csvdata&startPeriod={year}-01-01",
+      "licence": "ESCB statistics policy: free access and free reuse if the source is quoted and the statistics, including metadata, are not modified. Third-party data excluded. The ECB says it does not charge for the rate or license its use",
+      "licence_url": "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",
+      "terms_checked": "2026-11-07: rechecked as text for stage D. ESCB statistics reuse policy as for ecb-estr. Data API tested with no key: AAA euro area government spot curve, ten spot maturities from 3M to 30Y, CSV. A fitted government curve, not OIS quotes",
+      "attribution": "European Central Bank",
+      "redistribute_raw": "yes, unchanged and cited; held back from git by the rule above",
+      "notice": "Source: ECB statistics. Any modification of this data must be stated.",
+      "enabled": true
+    },
+    {
+      "id": "eurostat-hicp",
+      "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?format=JSON&geo=EA20&coicop18=TOTAL&unit=I25",
+      "licence": "Eurostat copyright notice: reuse of statistical data for commercial or non-commercial purposes is authorised provided the source is acknowledged",
+      "licence_url": "https://ec.europa.eu/eurostat/en/help/copyright-notice",
+      "attribution": "Eurostat",
+      "terms_checked": "2026-11-07: rechecked as text for stage D. Copyright notice read. API tested with no key. prc_hicp_midx stops at 2025-12 (last updated 2026-02-06); its successor prc_hicp_minr (ECOICOP 2, 2025=100) is current, last updated 2026-11-04, latest month flagged estimated",
+      "redistribute_raw": "yes with acknowledgement; held back from git by the rule above",
+      "notice": "Source: Eurostat.",
+      "enabled": true
+    },
+    {
+      "id": "cftc-cot-disaggregated",
+      "url": "https://www.cftc.gov/files/dea/history/fut_disagg_txt_{year}.zip",
+      "licence": "Public domain (CFTC website policies: government information is in the public domain, acknowledgement requested)",
+      "licence_url": "https://www.cftc.gov/WebPolicy/index.htm",
+      "attribution": "Commodity Futures Trading Commission",
+      "terms_checked": "2026-11-07: rechecked as text for stage D. Website policies Copyright section read. Yearly zip tested with no key, about 2 MB. Weekly positioning, not prices; no curve uses it",
+      "redistribute_raw": "yes with acknowledgement; held back from git by the rule above",
+      "notice": "Source: U.S. Commodity Futures Trading Commission, Commitments of Traders.",
+      "enabled": true
+    },
+    {
+      "id": "eia-ng-bulk",
+      "url": "https://api.eia.gov/bulk/NG.zip",
+      "licence": "Public domain (EIA Copyrights and Reuse: US government publications are not subject to copyright; acknowledgement with publication date requested)",
+      "licence_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "attribution": "U.S. Energy Information Administration",
+      "terms_checked": "2026-11-07: rechecked as text for stage D. Copyrights and Reuse page read. Bulk zip tested with no key, about 4.5 MB. The API itself needs a registered key and is not used. Spot and a few front futures, not a full term structure",
+      "redistribute_raw": "yes with acknowledgement; held back from git by the rule above",
+      "notice": "Source: U.S. Energy Information Administration, natural gas bulk file, with the date fetched.",
+      "enabled": true
     }
   ]
 }
