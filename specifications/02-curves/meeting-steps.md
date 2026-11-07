@@ -14,7 +14,7 @@ Short overnight rates move on central-bank meeting dates and stay flat in betwee
 
 Inputs: the step curve, `dates`. Outputs: `discount_factors`, `overnight_forwards` (the forward in force on each date: `base_rate` before the first step, else the rate of the last step dated on or before it).
 
-Checks, in order: step dates not strictly increasing or not after `as_of`: `E_INPUT`. Bad jumps: as `curve-framework.md`. A date before `as_of`: `E_OUT_OF_RANGE`.
+`steps` may be empty: a flat curve. Checks, in order: empty `dates`: `E_INPUT`. Step dates not strictly increasing or not after `as_of`: `E_INPUT`. Bad jumps: as `curve-framework.md`. A date before `as_of`: `E_OUT_OF_RANGE`.
 
 ## `rates.ois.fit_steps`
 

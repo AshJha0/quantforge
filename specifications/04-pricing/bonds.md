@@ -22,7 +22,7 @@ Outputs: `dirty`, `accrued`, `clean`, `modified_duration`, `macaulay_duration`, 
 
 ## `bond.yield.from_price`
 
-Inputs: `bond`, `settlement`, `clean_price`. Outputs: `yield`, `dirty`, `accrued`. The `yield` with `from_yield` clean equal to `clean_price`; price is strictly decreasing in `y`, so it is unique. `clean_price + accrued <= 0`: `E_DOMAIN`.
+Inputs: `bond`, `settlement`, `clean_price`. Outputs: `yield`, `dirty`, `accrued`. The `yield` with `from_yield` clean equal to `clean_price`; price is strictly decreasing in `y`, so it is unique. `clean_price <= 0` or `clean_price + accrued <= 0`: `E_DOMAIN` (ruling D43).
 
 ## `bond.price.from_curve`, `bond.spread.z`
 
