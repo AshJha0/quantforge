@@ -19,7 +19,7 @@ struct OptionInput {
     double model_discount() const;
 };
 
-/// Undiscounted by nothing: D phi (F N(phi d1) - K N(phi d2)), with the intrinsic at T = 0 or v = 0.
+/// D phi (F N(phi d1) - K N(phi d2)), with the intrinsic at T = 0 or v = 0.
 double black_price(double f, double k, double vol, double t, double d, double phi);
 double bachelier_price(double f, double k, double vol, double t, double d, double phi);
 

@@ -16,3 +16,7 @@
         {"vol.surface.query", op_surface_query},
         {"vol.surface.check", op_surface_check},
         {"risk.vol.surface_vega", op_surface_vega},
+        {"vol.sabr.hagan", op_sabr_hagan},
+        {"vol.sabr.density", op_sabr_density},
+        {"vol.sabr.calibrate", op_sabr_calibrate},
+        {"vol.sabr.arbfree", op_sabr_arbfree},
