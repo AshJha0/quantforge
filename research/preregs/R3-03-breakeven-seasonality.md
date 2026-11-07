@@ -1,6 +1,13 @@
 # R3-03: Seasonality in US breakeven inflation
 
-Status: draft, unsigned. Common rules: `README.md`.
+Status: **signed**. Signed by Claude (signing delegated by the owner, 2026-11-07) on 2026-11-07.
+- SHA-256 of the body below the marker line: `08537a3964958f91e1c7dafd6963612236853244e5b4bb8fd6af91ba2937646a`
+- SHA-256 of the common rules (`README.md` body): `53566e4c3060d1adfd386a543b8d789b1de0b9b53393a8ffa03e0c3f4b5d58aa`
+- Holdout data has not been read, downloaded or summarised. No study data of any period has been downloaded at signing.
+- This file is not edited after signing; a change is a new prereg.
+
+<!-- body -->
+Common rules: `README.md`.
 
 **Label:** signal on a fitted curve; tradability not established.
 
@@ -26,7 +33,6 @@ Do month-of-year effects in headline CPI show up as a predictable seasonal patte
 - Holdout T = 10.83 years, MDS = 0.76. **Threshold:** holdout deflated Sharpe ratio above 0.95, and holdout net Sharpe at least 0.76.
 - Sub-periods: thirds of the holdout. The 2021 to 2022 inflation shock sits in the middle third.
 - Correlations with carry (the breakeven roll-down) and a 12-month momentum factor are reported.
-
 - **Pass rule (all three, per `research/TEMPLATE.md` section 5):** (1) holdout deflated Sharpe ratio above 0.95 and holdout net Sharpe at least the MDS above; (2) holdout net Sharpe still above 0 at 2x costs; (3) the holdout Sharpe has the same sign in each third of the holdout. Otherwise the study fails and is published as a null result.
 - **Forward log:** live paper out-of-sample from the signing date, 2026-11-07, judged on the same rule after 250 US business days.
 

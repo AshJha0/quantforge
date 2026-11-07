@@ -1,5 +1,6 @@
 # R3 preregistrations
 
+<!-- body -->
 Three relative-value studies on free public daily data. Plan 11.1.1 to 11.1.3 and 11.3. Signing: delegated by the owner to Claude on 2026-11-07. Each prereg's header records the signer, the date, and the SHA-256 of its body (the bytes after the `<!-- body -->` line) and of this file's body, which holds the common rules. A signed prereg is never edited; a change is a new prereg.
 
 ## Common rules (part of each prereg)
