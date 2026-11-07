@@ -10,6 +10,7 @@ Plan sections 11.1.4, 11.1.5, 11.2.7, 11.2.8 and 11.5. None of these jobs runs o
 | Sanity bands | `tools/workflows/sanity_bands.json`, `tools/workflows/sanity.py` | In workflow (a) and the gallery |
 | Real-data gallery page | `tools/gallery_real.py`, [docs/curves/real-usd-treasury.md](../curves/real-usd-treasury.md) | Refreshed by hand |
 | Per-stage mutation report | `.github/workflows/mutation-stage.yml`, `conformance/mutation/stage_report.py`, `stages.json` | First of the month, manual |
+| Outside-oracle floor | `.github/workflows/oracle-coverage.yml` | PRs touching `oracle/`, `datasets/`, `specifications/` |
 | Batch performance targets | [benchmarks/targets.md](../../benchmarks/targets.md) | Written before measuring |
 
 ## Cross-platform conformance
@@ -43,7 +44,7 @@ Rules learned the hard way:
 - **Limit parallelism to `-j3`.** WSL gets about 7 GB here. An unbounded `--parallel` on 12 cores ran the VM out of memory and hung the WSL service for every session. Recovery needed `wsl --shutdown`.
 - **No Docker or Podman is installed, and none is needed.** If GCC 16 itself is wanted locally, the zero-cost route is the CI container image under a rootless Podman inside WSL. That is not set up.
 
-Measured result: see the "Local Linux run" note at the end of this page.
+Measured 2026-11-07 at commit `af081b9`, GCC 15.2.0 in WSL Ubuntu 26.04 with `-j3`: the build and ctest pass, and the runner passes all 5,514 golden cases with 0 failures. Configure, build, test and conformance together took 7 min 40 s.
 
 ## Daily workflows (a) and (c)
 
@@ -98,3 +99,9 @@ A band changes only in its own commit, with the reason. The gallery page [real-u
 `stage_report.py` then writes one table and a pooled score. The stage D target is **80%** per module and language (where at least 10 mutants were scored) and pooled. Use `--gate` to fail the run when a mapped result is missing or a score is below target. Survivors are not yet sorted into equivalent mutants and real gaps, so the score is a lower bound.
 
 **Status.** The job and report are built and linted, but **no stage D score has been measured yet**. Local runs are not possible here: Windows blocks freshly built Rust and C++ executables, and mutmut needs Linux. The first figure comes from a manual run of `mutation-stage.yml` once this branch is on GitHub. Some modules are not mapped in some languages, for example C++ `curve_fits` and `xccy`, and Python `compounding_d`. The report lists them as "not mapped" rather than hiding them.
+
+## Outside-oracle coverage floor
+
+`oracle-coverage.yml` runs `oracle/python/outside_d.py` with QuantLib 1.44 from `oracle/python/uv.lock`. The script rebuilds every stage D case from QuantLib's own convention objects and exits 1 if the stage D share is below 60% (rule 11.2.5). The job then fails if `oracle/outside_register.json` differs from the fresh run.
+
+It is a light PR check: no CLI build, about 11 seconds of run time locally, and it starts only for changes under `oracle/`, `datasets/`, `specifications/` or the tolerances. Checked against branch `r1` at `1d6e585`: 396 of 647 cases, 61.2%, exit 0, register unchanged. It uses `uv run --frozen`, because the lock records the project's own version as 0.2.0, and `--locked` rejects that.
