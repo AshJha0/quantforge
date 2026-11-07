@@ -166,7 +166,14 @@ fn with_elapsed(mut result: Json, start: std::time::Instant) -> Json {
 fn timed_case(bytes: &[u8], timings: bool) -> (Json, bool) {
     let start = std::time::Instant::now();
     let (result, ok) = run_case(bytes);
-    (if timings { with_elapsed(result, start) } else { result }, ok)
+    (
+        if timings {
+            with_elapsed(result, start)
+        } else {
+            result
+        },
+        ok,
+    )
 }
 
 fn run(timings: bool) -> std::io::Result<u8> {
