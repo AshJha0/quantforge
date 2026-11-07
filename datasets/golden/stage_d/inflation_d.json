@@ -1,0 +1,1052 @@
+{
+ "schema_version": "1.0",
+ "suite": "inflation_d",
+ "spec": "specifications/02-curves/inflation.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "inflation_d-0001",
+   "operation": "infl.curve.cpi",
+   "inputs": {
+    "base_month": "2026-08",
+    "base_cpi": 322.15,
+    "quotes": [
+     {
+      "years": 1,
+      "rate": 0.0265
+     },
+     {
+      "years": 2,
+      "rate": 0.0255
+     },
+     {
+      "years": 3,
+      "rate": 0.025
+     },
+     {
+      "years": 5,
+      "rate": 0.0245
+     },
+     {
+      "years": 7,
+      "rate": 0.0245
+     },
+     {
+      "years": 10,
+      "rate": 0.025
+     },
+     {
+      "years": 20,
+      "rate": 0.0255
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-08",
+     "2026-12",
+     "2027-01",
+     "2027-08",
+     "2028-03",
+     "2031-08",
+     "2036-11",
+     "2048-02"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cpi": [
+      322.1499999999999,
+      324.97088533868157,
+      325.6799577718831,
+      330.686975,
+      335.38938143637296,
+      363.59503935374437,
+      415.03398050181625,
+      553.9781374577557
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "cpi-curve",
+    "no-seasonality",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0002",
+   "operation": "infl.curve.cpi",
+   "inputs": {
+    "base_month": "2026-08",
+    "base_cpi": 322.15,
+    "quotes": [
+     {
+      "years": 1,
+      "rate": 0.0265
+     },
+     {
+      "years": 2,
+      "rate": 0.0255
+     },
+     {
+      "years": 3,
+      "rate": 0.025
+     },
+     {
+      "years": 5,
+      "rate": 0.0245
+     },
+     {
+      "years": 7,
+      "rate": 0.0245
+     },
+     {
+      "years": 10,
+      "rate": 0.025
+     },
+     {
+      "years": 20,
+      "rate": 0.0255
+     }
+    ],
+    "seasonality": [
+     0.9978,
+     0.9992,
+     1.0011,
+     1.0018,
+     1.0012,
+     1.0005,
+     0.9989,
+     0.9994,
+     1.0006,
+     1.0003,
+     0.9995,
+     0.9997
+    ],
+    "months": [
+     "2026-08",
+     "2026-12",
+     "2027-01",
+     "2027-08",
+     "2028-03",
+     "2031-08",
+     "2036-11",
+     "2048-02"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cpi": [
+      322.1499999999999,
+      325.0684351341605,
+      325.15855699898435,
+      330.686975,
+      335.95988568736544,
+      363.59503935374437,
+      415.07550881685546,
+      553.8672753129773
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "cpi-curve",
+    "seasonality",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0003",
+   "operation": "infl.curve.cpi",
+   "inputs": {
+    "base_month": "2026-08",
+    "base_cpi": 322.15,
+    "quotes": [
+     {
+      "years": 1,
+      "rate": 0.0265
+     },
+     {
+      "years": 2,
+      "rate": 0.0255
+     },
+     {
+      "years": 3,
+      "rate": 0.025
+     },
+     {
+      "years": 5,
+      "rate": 0.0245
+     },
+     {
+      "years": 7,
+      "rate": 0.0245
+     },
+     {
+      "years": 10,
+      "rate": 0.025
+     },
+     {
+      "years": 20,
+      "rate": 0.0255
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-07"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_OUT_OF_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "month before base"
+  },
+  {
+   "case_id": "inflation_d-0004",
+   "operation": "infl.curve.cpi",
+   "inputs": {
+    "base_month": "2026-08",
+    "base_cpi": 322.15,
+    "quotes": [
+     {
+      "years": 1,
+      "rate": 0.0265
+     },
+     {
+      "years": 2,
+      "rate": 0.0255
+     },
+     {
+      "years": 3,
+      "rate": 0.025
+     },
+     {
+      "years": 5,
+      "rate": 0.0245
+     },
+     {
+      "years": 7,
+      "rate": 0.0245
+     },
+     {
+      "years": 10,
+      "rate": 0.025
+     },
+     {
+      "years": 20,
+      "rate": 0.0255
+     }
+    ],
+    "seasonality": [
+     0.9978,
+     0.9992,
+     1.0011,
+     1.0018,
+     1.0012,
+     1.0005,
+     0.9989,
+     0.9994,
+     1.0006,
+     1.0003,
+     0.9995
+    ],
+    "months": [
+     "2027-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "12 factors"
+  },
+  {
+   "case_id": "inflation_d-0005",
+   "operation": "infl.curve.cpi",
+   "inputs": {
+    "base_month": "2026-08",
+    "base_cpi": 322.15,
+    "quotes": [
+     {
+      "years": 2,
+      "rate": 0.02
+     },
+     {
+      "years": 1,
+      "rate": 0.02
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2027-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0006",
+   "operation": "infl.curve.cpi",
+   "inputs": {
+    "base_month": "2026-08",
+    "base_cpi": 322.15,
+    "quotes": [
+     {
+      "years": 1,
+      "rate": -1.0
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2027-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0007",
+   "operation": "infl.zcis.pv",
+   "inputs": {
+    "curve": {
+     "base_month": "2026-08",
+     "base_cpi": 322.15,
+     "quotes": [
+      {
+       "years": 1,
+       "rate": 0.0265
+      },
+      {
+       "years": 2,
+       "rate": 0.0255
+      },
+      {
+       "years": 3,
+       "rate": 0.025
+      },
+      {
+       "years": 5,
+       "rate": 0.0245
+      },
+      {
+       "years": 7,
+       "rate": 0.0245
+      },
+      {
+       "years": 10,
+       "rate": 0.025
+      },
+      {
+       "years": 20,
+       "rate": 0.0255
+      }
+     ],
+     "seasonality": [
+      0.9978,
+      0.9992,
+      1.0011,
+      1.0018,
+      1.0012,
+      1.0005,
+      0.9989,
+      0.9994,
+      1.0006,
+      1.0003,
+      0.9995,
+      0.9997
+     ]
+    },
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "trade": {
+     "years": 5,
+     "fixed_rate": 0.026,
+     "notional": 10000000.0,
+     "side": "RECEIVE_INFLATION",
+     "payment_date": "2031-11-10"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": -69569.4851246751,
+     "index_ratio": 1.1286513715776638
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "zcis",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0008",
+   "operation": "infl.zcis.pv",
+   "inputs": {
+    "curve": {
+     "base_month": "2026-08",
+     "base_cpi": 322.15,
+     "quotes": [
+      {
+       "years": 1,
+       "rate": 0.0265
+      },
+      {
+       "years": 2,
+       "rate": 0.0255
+      },
+      {
+       "years": 3,
+       "rate": 0.025
+      },
+      {
+       "years": 5,
+       "rate": 0.0245
+      },
+      {
+       "years": 7,
+       "rate": 0.0245
+      },
+      {
+       "years": 10,
+       "rate": 0.025
+      },
+      {
+       "years": 20,
+       "rate": 0.0255
+      }
+     ],
+     "seasonality": [
+      0.9978,
+      0.9992,
+      1.0011,
+      1.0018,
+      1.0012,
+      1.0005,
+      0.9989,
+      0.9994,
+      1.0006,
+      1.0003,
+      0.9995,
+      0.9997
+     ]
+    },
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "trade": {
+     "years": 10,
+     "fixed_rate": 0.024,
+     "notional": 25000000.0,
+     "side": "PAY_INFLATION",
+     "payment_date": "2036-11-10"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": -213264.70405359636,
+     "index_ratio": 1.2800845441963578
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "zcis",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0009",
+   "operation": "infl.zcis.pv",
+   "inputs": {
+    "curve": {
+     "base_month": "2026-08",
+     "base_cpi": 322.15,
+     "quotes": [
+      {
+       "years": 1,
+       "rate": 0.0265
+      },
+      {
+       "years": 2,
+       "rate": 0.0255
+      },
+      {
+       "years": 3,
+       "rate": 0.025
+      },
+      {
+       "years": 5,
+       "rate": 0.0245
+      },
+      {
+       "years": 7,
+       "rate": 0.0245
+      },
+      {
+       "years": 10,
+       "rate": 0.025
+      },
+      {
+       "years": 20,
+       "rate": 0.0255
+      }
+     ],
+     "seasonality": [
+      0.9978,
+      0.9992,
+      1.0011,
+      1.0018,
+      1.0012,
+      1.0005,
+      0.9989,
+      0.9994,
+      1.0006,
+      1.0003,
+      0.9995,
+      0.9997
+     ]
+    },
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "trade": {
+     "years": 3,
+     "fixed_rate": 0.025,
+     "notional": 10000000.0,
+     "side": "RECEIVE_INFLATION",
+     "payment_date": "2029-11-13"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 2.001440088640117e-09,
+     "index_ratio": 1.0768906249999999
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "zcis",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0010",
+   "operation": "infl.linker.price",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "real_yield": 0.0185,
+    "base_ref_cpi": 300.12345,
+    "cpi_fixings": [
+     {
+      "month": "2026-05",
+      "value": 320.58
+     },
+     {
+      "month": "2026-06",
+      "value": 321.465
+     },
+     {
+      "month": "2026-07",
+      "value": 321.91
+     },
+     {
+      "month": "2026-08",
+      "value": 322.15
+     },
+     {
+      "month": "2026-09",
+      "value": 322.88
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ref_cpi": 322.3446666666666,
+     "index_ratio": 1.0740402546574306,
+     "real_clean": 107.00907483165305,
+     "real_accrued": 2.0557065217391304,
+     "nominal_clean": 114.93205398284469,
+     "nominal_accrued": 2.2079115561096363
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "exact-rational"
+   ],
+   "tags": [
+    "linker",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0011",
+   "operation": "infl.linker.price",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-25",
+    "real_yield": 0.021,
+    "base_ref_cpi": 287.65,
+    "cpi_fixings": [
+     {
+      "month": "2026-05",
+      "value": 320.58
+     },
+     {
+      "month": "2026-06",
+      "value": 321.465
+     },
+     {
+      "month": "2026-07",
+      "value": 321.91
+     },
+     {
+      "month": "2026-08",
+      "value": 322.15
+     },
+     {
+      "month": "2026-09",
+      "value": 322.88
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ref_cpi": 322.734,
+     "index_ratio": 1.1219676690422389,
+     "real_clean": 121.00458258105418,
+     "real_accrued": 1.247282608695652,
+     "nominal_clean": 135.76322946189447,
+     "nominal_accrued": 1.3994107611151838
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "exact-rational"
+   ],
+   "tags": [
+    "linker",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "inflation_d-0012",
+   "operation": "infl.linker.price",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2027-03-09",
+    "real_yield": 0.02,
+    "base_ref_cpi": 300.0,
+    "cpi_fixings": [
+     {
+      "month": "2026-05",
+      "value": 320.58
+     },
+     {
+      "month": "2026-06",
+      "value": 321.465
+     },
+     {
+      "month": "2026-07",
+      "value": 321.91
+     },
+     {
+      "month": "2026-08",
+      "value": 322.15
+     },
+     {
+      "month": "2026-09",
+      "value": 322.88
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "a needed CPI fixing is missing"
+  },
+  {
+   "case_id": "inflation_d-0013",
+   "operation": "infl.linker.price_curve",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "base_ref_cpi": 287.65,
+    "curve": {
+     "base_month": "2026-08",
+     "base_cpi": 322.15,
+     "quotes": [
+      {
+       "years": 1,
+       "rate": 0.0265
+      },
+      {
+       "years": 2,
+       "rate": 0.0255
+      },
+      {
+       "years": 3,
+       "rate": 0.025
+      },
+      {
+       "years": 5,
+       "rate": 0.0245
+      },
+      {
+       "years": 7,
+       "rate": 0.0245
+      },
+      {
+       "years": 10,
+       "rate": 0.025
+      },
+      {
+       "years": 20,
+       "rate": 0.0255
+      }
+     ],
+     "seasonality": [
+      0.9978,
+      0.9992,
+      1.0011,
+      1.0018,
+      1.0012,
+      1.0005,
+      0.9989,
+      0.9994,
+      1.0006,
+      1.0003,
+      0.9995,
+      0.9997
+     ]
+    },
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "nominal_dirty": 146.61373502120364
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "linker",
+    "seasonality",
+    "synthetic"
+   ]
+  }
+ ]
+}

@@ -192,6 +192,17 @@ Stage D (contract 1.5.0, wave 1) adds these, with no new error code. `stage-d-ru
 | `rates.csa.discount`, `rates.basis.ois_spread`, `rates.curve.joint_bootstrap` | `02-curves/csa-and-basis.md` |
 | `calib.curve.smooth`, `calib.curve.robust` | `03-calibration/curve-fits.md` |
 
+Wave 2 adds:
+
+| Prefix | Spec |
+|---|---|
+| `bond.*`, `repo.*` | `04-pricing/bonds.md` |
+| `fx.xccy.*`, `fx.ndf.*` | `02-curves/cross-currency.md` |
+| `credit.*` | `04-pricing/credit.md` |
+| `eq.dividend.*`, `eq.borrow.*`, `eq.futures.*` | `02-curves/equity-curves.md` |
+| `eq.index.*`, `eq.corporate_action.*`, `eq.trs.*` | `04-pricing/equity-index.md` |
+| `infl.*` | `02-curves/inflation.md` |
+
 `ESTR` joins `rates.ois.*`, and curve objects take optional `jumps` (`02-curves/curve-framework.md`).
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in

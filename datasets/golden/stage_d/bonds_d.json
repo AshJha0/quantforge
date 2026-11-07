@@ -1,0 +1,2107 @@
+{
+ "schema_version": "1.0",
+ "suite": "bonds_d",
+ "spec": "specifications/04-pricing/bonds.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "bonds_d-0001",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.041
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 102.47656626467639,
+     "accrued": 2.0557065217391304,
+     "clean": 100.42085974293727,
+     "modified_duration": 2.74949144731416,
+     "macaulay_duration": 2.8058560219841002,
+     "convexity": 9.306657676461866
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0002",
+   "operation": "bond.yield.from_price",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "clean_price": 100.42085974293727
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.041,
+     "dirty": 102.47656626467639,
+     "accrued": 2.0557065217391304
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0003",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 115.52561884400167,
+     "accrued": 2.0557065217391304,
+     "clean": 113.46991232226254,
+     "modified_duration": 2.8256621765829473,
+     "macaulay_duration": 2.8228365144063643,
+     "convexity": 9.780911624779087
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0004",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 92.17802814854188,
+     "accrued": 2.0557065217391304,
+     "clean": 90.12232162680276,
+     "modified_duration": 2.682181985301589,
+     "macaulay_duration": 2.7894692647136528,
+     "convexity": 8.899416372050553
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0005",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.041
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 99.35167210230762,
+     "accrued": 0.7251381215469613,
+     "clean": 98.62653398076066,
+     "modified_duration": 3.90631067381592,
+     "macaulay_duration": 3.986390042629146,
+     "convexity": 17.957958627526946
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0006",
+   "operation": "bond.yield.from_price",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "clean_price": 98.62653398076066
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.041,
+     "dirty": 99.35167210230762,
+     "accrued": 0.7251381215469613
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0007",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 117.81860503009642,
+     "accrued": 0.7251381215469613,
+     "clean": 117.09346690854946,
+     "modified_duration": 4.0233495786149405,
+     "macaulay_duration": 4.0193262290363245,
+     "convexity": 18.93341863160692
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0008",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 85.48681953948798,
+     "accrued": 0.7251381215469613,
+     "clean": 84.76168141794102,
+     "modified_duration": 3.8018101583527795,
+     "macaulay_duration": 3.953882564686891,
+     "convexity": 17.114863107858586
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0009",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.041
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 104.23855247985888,
+     "accrued": 1.0516304347826086,
+     "clean": 103.18692204507627,
+     "modified_duration": 7.802708887033614,
+     "macaulay_duration": 7.962664419217802,
+     "convexity": 73.19788782182854
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0010",
+   "operation": "bond.yield.from_price",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "clean_price": 103.18692204507627
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.041,
+     "dirty": 104.23855247985888,
+     "accrued": 1.0516304347826086
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0011",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 147.42818266083395,
+     "accrued": 1.0516304347826086,
+     "clean": 146.37655222605136,
+     "modified_duration": 8.315238628192407,
+     "macaulay_duration": 8.306923389564213,
+     "convexity": 80.66051062846005
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0012",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 77.62697806823762,
+     "accrued": 1.0516304347826086,
+     "clean": 76.57534763345501,
+     "modified_duration": 7.3092832882273235,
+     "macaulay_duration": 7.601654619756419,
+     "convexity": 66.39615390839741
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0013",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.041
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 94.92648468881484,
+     "accrued": 1.832876712328767,
+     "clean": 93.09360797648607,
+     "modified_duration": 6.323938178675942,
+     "macaulay_duration": 6.583219644001654,
+     "convexity": 49.2736306196595
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0014",
+   "operation": "bond.yield.from_price",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "clean_price": 93.09360797648607
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.041,
+     "dirty": 94.92648468881484,
+     "accrued": 1.832876712328767
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0015",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "yield": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 125.67812832193717,
+     "accrued": 1.832876712328767,
+     "clean": 123.8452516096084,
+     "modified_duration": 6.730920442553724,
+     "macaulay_duration": 6.717458601668617,
+     "convexity": 54.964197462421275
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0016",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 74.6978035645796,
+     "accrued": 1.832876712328767,
+     "clean": 72.86492685225083,
+     "modified_duration": 5.967822170403401,
+     "macaulay_duration": 6.445247944035673,
+     "convexity": 44.602053860612834
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0017",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.041
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 113.16733883362802,
+     "accrued": 2.297554347826087,
+     "clean": 110.86978448580193,
+     "modified_duration": 15.890629257710517,
+     "macaulay_duration": 16.216387157493582,
+     "convexity": 361.5628764142893
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0018",
+   "operation": "bond.yield.from_price",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "clean_price": 110.86978448580193
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.041,
+     "dirty": 113.16733883362802,
+     "accrued": 2.297554347826087
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0019",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 247.63093537946827,
+     "accrued": 2.297554347826087,
+     "clean": 245.33338103164218,
+     "modified_duration": 20.459456070402368,
+     "macaulay_duration": 20.438996614331963,
+     "convexity": 517.8348785187496
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0020",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 66.00955615606529,
+     "accrued": 2.297554347826087,
+     "clean": 63.7120018082392,
+     "modified_duration": 11.845316596955817,
+     "macaulay_duration": 12.319129260834051,
+     "convexity": 235.50511130943204
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0021",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2027-12-15",
+     "coupon": 0.015,
+     "frequency": 4
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.041
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 97.44636094263163,
+     "accrued": 0.22664835164835165,
+     "clean": 97.21971259098328,
+     "modified_duration": 1.078362665001299,
+     "macaulay_duration": 1.0894158823175626,
+     "convexity": 1.4366271930579573
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0022",
+   "operation": "bond.yield.from_price",
+   "inputs": {
+    "bond": {
+     "maturity": "2027-12-15",
+     "coupon": 0.015,
+     "frequency": 4
+    },
+    "settlement": "2026-11-09",
+    "clean_price": 97.21971259098328
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "yield": 0.041,
+     "dirty": 97.44636094263163,
+     "accrued": 0.22664835164835165
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0023",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2027-12-15",
+     "coupon": 0.015,
+     "frequency": 4
+    },
+    "settlement": "2026-11-09",
+    "yield": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 102.09732525445575,
+     "accrued": 0.22664835164835165,
+     "clean": 101.8706769028074,
+     "modified_duration": 1.0902574002095093,
+     "macaulay_duration": 1.0897122715094048,
+     "convexity": 1.4681747471909694
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0024",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2027-12-15",
+     "coupon": 0.015,
+     "frequency": 4
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 93.45245853689983,
+     "accrued": 0.22664835164835165,
+     "clean": 93.22581018525148,
+     "modified_duration": 1.0677851023704312,
+     "macaulay_duration": 1.0891408044178401,
+     "convexity": 1.4088676286017914
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0025",
+   "operation": "bond.price.from_curve",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 103.56512952729669,
+     "accrued": 2.0557065217391304,
+     "clean": 101.50942300555757
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0026",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 100.4961321425112
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": 0.0035
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0027",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 101.8008663439443
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": -0.001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0028",
+   "operation": "bond.price.from_curve",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 100.80440608038614,
+     "accrued": 0.7251381215469613,
+     "clean": 100.07926795883918
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0029",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 98.68188554637129
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": 0.0035
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0030",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 100.48230066087105
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": -0.001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0031",
+   "operation": "bond.price.from_curve",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 105.7624232133105,
+     "accrued": 1.0516304347826086,
+     "clean": 104.71079277852789
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0032",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 101.80449804120845
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": 0.0035
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0033",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 105.55826506110417
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": -0.001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0034",
+   "operation": "bond.price.from_curve",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 96.15743038552337,
+     "accrued": 1.832876712328767,
+     "clean": 94.3245536731946
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0035",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 92.13308926672437
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": 0.0035
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0036",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 94.96077740446427
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": -0.001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0037",
+   "operation": "bond.price.from_curve",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 112.6983454240758,
+     "accrued": 2.297554347826087,
+     "clean": 110.4007910762497
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "fixed-bond",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0038",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 104.29561683030224
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": 0.0035
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0039",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 112.23573553203285
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "z_spread": -0.001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "z-spread",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0040",
+   "operation": "bond.spread.asset_swap",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "dirty_price": 102.7151295272967
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": 0.002947917449755707,
+     "annuity": 2.8833914601999235
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "asset-swap",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0041",
+   "operation": "bond.spread.asset_swap",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "dirty_price": 99.95440608038615
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": 0.0021150072275150284,
+     "annuity": 4.018898795909455
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "asset-swap",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0042",
+   "operation": "bond.spread.asset_swap",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "dirty_price": 104.9124232133105
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": 0.0010313550501518832,
+     "annuity": 8.24158469844908
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "asset-swap",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0043",
+   "operation": "bond.spread.asset_swap",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "dirty_price": 95.30743038552338
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": 0.0013036943489242666,
+     "annuity": 6.519933147684235
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "asset-swap",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0044",
+   "operation": "bond.spread.asset_swap",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "dirty_price": 111.8483454240758
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": 0.0004983790573911368,
+     "annuity": 17.0552912967388
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "asset-swap",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0045",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2029-11-15",
+    "yield": 0.04
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_ORDER"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "settlement on or after maturity"
+  },
+  {
+   "case_id": "bonds_d-0046",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 3
+    },
+    "settlement": "2026-11-09",
+    "yield": 0.04
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0047",
+   "operation": "bond.price.from_yield",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "yield": -2.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "1 + y/f <= 0"
+  },
+  {
+   "case_id": "bonds_d-0048",
+   "operation": "bond.yield.from_price",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-09",
+    "clean_price": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "bonds_d-0049",
+   "operation": "bond.spread.z",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "settlement": "2026-11-05",
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "clean_price": 100.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_OUT_OF_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "settlement before the curve's as_of"
+  }
+ ]
+}

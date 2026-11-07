@@ -1,0 +1,226 @@
+{
+ "schema_version": "1.0",
+ "suite": "trs_d",
+ "spec": "specifications/04-pricing/equity-index.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "trs_d-0001",
+   "operation": "eq.trs.pv",
+   "inputs": {
+    "spot": 5012.5,
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-07",
+       "discount_factor": 0.9800080230670242
+      },
+      {
+       "date": "2027-11-06",
+       "discount_factor": 0.9607894391523232
+      },
+      {
+       "date": "2028-11-05",
+       "discount_factor": 0.9258898536064953
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8289439483311681
+      }
+     ]
+    },
+    "borrow_rate": 0.003,
+    "dividends": [
+     {
+      "ex_date": "2026-12-18",
+      "amount": 18.0
+     },
+     {
+      "ex_date": "2027-03-19",
+      "amount": 16.5
+     },
+     {
+      "ex_date": "2027-06-18",
+      "amount": 21.0
+     },
+     {
+      "ex_date": "2027-09-17",
+      "amount": 17.5
+     },
+     {
+      "ex_date": "2027-12-17",
+      "amount": 19.0
+     },
+     {
+      "ex_date": "2028-03-17",
+      "amount": 17.0
+     }
+    ],
+    "trade": {
+     "start": "2026-09-18",
+     "end": "2027-03-19",
+     "initial_price": 4890.0,
+     "shares": 2000.0,
+     "spread": 0.0045,
+     "side": "RECEIVE_EQUITY"
+    },
+    "current_rate": 0.0402
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "equity_leg": 376982.88874238275,
+     "funding_leg": 217774.06081278934,
+     "pv": 159208.82792959342
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "trs",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "trs_d-0002",
+   "operation": "eq.trs.pv",
+   "inputs": {
+    "spot": 5012.5,
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-07",
+       "discount_factor": 0.9800080230670242
+      },
+      {
+       "date": "2027-11-06",
+       "discount_factor": 0.9607894391523232
+      },
+      {
+       "date": "2028-11-05",
+       "discount_factor": 0.9258898536064953
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8289439483311681
+      }
+     ]
+    },
+    "borrow_rate": 0.003,
+    "dividends": [
+     {
+      "ex_date": "2026-12-18",
+      "amount": 18.0
+     },
+     {
+      "ex_date": "2027-03-19",
+      "amount": 16.5
+     },
+     {
+      "ex_date": "2027-06-18",
+      "amount": 21.0
+     },
+     {
+      "ex_date": "2027-09-17",
+      "amount": 17.5
+     },
+     {
+      "ex_date": "2027-12-17",
+      "amount": 19.0
+     },
+     {
+      "ex_date": "2028-03-17",
+      "amount": 17.0
+     }
+    ],
+    "trade": {
+     "start": "2026-11-06",
+     "end": "2027-12-17",
+     "initial_price": 5012.5,
+     "shares": 500.0,
+     "spread": 0.006,
+     "side": "PAY_EQUITY"
+    },
+    "current_rate": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "equity_leg": 99116.0086532891,
+     "funding_leg": 124485.06227210733,
+     "pv": 25369.05361881823
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "trs",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "trs_d-0003",
+   "operation": "eq.trs.pv",
+   "inputs": {
+    "spot": 5012.5,
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-07",
+       "discount_factor": 0.9800080230670242
+      },
+      {
+       "date": "2027-11-06",
+       "discount_factor": 0.9607894391523232
+      },
+      {
+       "date": "2028-11-05",
+       "discount_factor": 0.9258898536064953
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8289439483311681
+      }
+     ]
+    },
+    "borrow_rate": 0.003,
+    "dividends": [],
+    "trade": {
+     "start": "2026-09-18",
+     "end": "2027-03-19",
+     "initial_price": 4890.0,
+     "shares": 1.0,
+     "spread": 0.0,
+     "side": "RECEIVE_EQUITY"
+    },
+    "current_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "started period needs current_rate"
+  }
+ ]
+}
