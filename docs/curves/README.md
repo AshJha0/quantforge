@@ -4,7 +4,7 @@ A curve says what one unit paid on a future date is worth today, or what a rate 
 
 <p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
-Generated on 2026-11-07 from commit `95cbf11`.
+Generated on 2026-11-07 from commit `8dddd58`.
 
 ## Status of every curve in the plan
 
@@ -20,7 +20,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [SVI smile](svi-smile.md) | Implemented, not Validated | C | 2 golden cases for `vol.svi.evaluate`, 1 with an outside library in `verified_by` |
 | [SSVI surface](ssvi-surface.md) | Implemented, not Validated | C | 3 golden cases for `vol.ssvi.evaluate`, 0 with an outside library in `verified_by` |
 | [SABR](sabr.md) | Implemented, not Validated | C | 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
-| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 10 golden cases |
+| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 31 golden cases |
 | [Bond and sovereign fits](bond-fit.md) | Implemented, not Validated | D | 2 golden cases |
 | [Repo and special repo](repo.md) | Implemented, not Validated | D | 4 golden cases |
 | [Cross-currency](cross-currency.md) | Implemented, not Validated | D | 1 golden case |

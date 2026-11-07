@@ -242,8 +242,9 @@ PLANNED = [
 # Stage D curves. Each gets a page: a planned page until `cli` names a CLI operation and a renderer
 # is registered for its `kind`, then the renderer's page. Text here is plain description, no numbers.
 STAGE_D = {
-    "ois-full": {"kind": "stage-d", "title": "OIS curves: full SOFR, ESTR and SONIA", "short": "Full SOFR, ESTR, SONIA OIS", "cli": "rates.ois.bootstrap", "examples": {"rates.ois.bootstrap": "estr_ois_d.json"},
-                 "shows": "Discount factors and forwards, with meeting-date steps and observation conventions."},
+    "ois-full": {"kind": "stage-d", "title": "OIS curves: full SOFR, ESTR and SONIA", "short": "Full SOFR, ESTR, SONIA OIS", "cli": "rates.ois.bootstrap", "examples": {"rates.ois.bootstrap": "estr_ois_d.json", "rates.ois.compound_dated": "real_sofr_compound_2026_10.json"},
+                 "real": {"real_sofr_compound_2026_10.json": "Real data: SOFR fixings from 2026-09-21 to 2026-11-05, from the Federal Reserve Bank of New York markets API, fetched 2026-11-07, converted from percent to decimal (the only modification). The SOFR data is subject to the Terms of Use posted at newyorkfed.org; the New York Fed does not endorse this use, and SOFR is calculated using data licensed from DTCC Solutions LLC."},
+                 "shows": "Discount factors and forwards, with meeting-date steps and observation conventions, and compounding of published overnight fixings."},
     "bond-fit": {"kind": "stage-d", "title": "Bond and sovereign curve fits", "short": "Bond and sovereign fits", "cli": "bond.fit.nelson_siegel", "examples": {"bond.fit.nelson_siegel": "bond_fit_ns_d.json"},
                  "shows": "A fitted yield curve against bond yields, with residuals per bond."},
     "repo": {"kind": "stage-d", "title": "Repo and special repo curves", "short": "Repo and special repo", "cli": "repo.forward", "examples": {"repo.forward": "repo_forward_d.json"},
@@ -956,9 +957,12 @@ def stage_d_page(slug, spec, d):
         ex = spec["examples"][op]
         rows = [[f"`{k}`", d_value(v)] for k, v in outs.items()]
         charts = "\n\n".join(chart(name, xlabel, name, [{"name": name, "colour": 1, "shape": "line", "pts": pts}],
-                                   f"{name}, Python CLI, from examples/{ex}. {SYNTHETIC}")
+                                   f"{name}, Python CLI, from examples/{ex}. {'Real data, see the label above.' if ex in spec.get('real', {}) else SYNTHETIC}")
                              for name, pts, xlabel in d_series(outs)[:3])
+        label = spec.get("real", {}).get(ex, SYNTHETIC)
         parts.append(f"""### `{op}`
+
+**{"Real data" if ex in spec.get("real", {}) else "Synthetic"}.** {label}
 
 Input: [`examples/{ex}`](../../examples/{ex}). Command: `quantforge batch < examples/{ex}` (wrap as one line).
 
@@ -980,7 +984,7 @@ Input: [`examples/{ex}`](../../examples/{ex}). Command: `quantforge batch < exam
 
 ## Runs
 
-{SYNTHETIC} The inputs are copied from a golden case's inputs, so the method is shown, not a market.
+Each run is labelled. Synthetic inputs are copied from a golden case's inputs, so they show the method, not a market. Real inputs name their source and date.
 
 {''.join(parts)}
 ## Four-language agreement
@@ -995,7 +999,7 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 {table(['Operation: sources', 'Cases'], ev_rows)}
 
-Limits: one synthetic input per operation; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
 """
 
 

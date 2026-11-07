@@ -90,6 +90,21 @@ class Recorder(unittest.TestCase):
             for k in ("licence", "licence_url", "terms_checked", "attribution", "redistribute_raw", "notice"):
                 self.assertTrue(s[k], (s["id"], k))
             self.assertNotIn("stlouisfed", s["url"])
+            for banned in ("nasdaq", "lobster", "api.bls.gov", "api_key", "apikey"):
+                self.assertNotIn(banned, s["url"].lower(), s["id"])
+            self.assertTrue(s["url"].startswith("https://"), s["id"])
+
+    def test_stage_d_sources_are_rechecked_and_wired(self):
+        sources = {s["id"]: s for s in json.loads((ROOT / "tools/recorder/sources.json").read_text(encoding="utf-8"))["sources"]}
+        for sid in ("nyfed-tgcr", "nyfed-bgcr", "ons-d7bt", "ons-l522", "ons-chaw", "ecb-aaa-yield-curve", "eurostat-hicp",
+                    "cftc-cot-disaggregated", "eia-ng-bulk"):
+            s = sources[sid]
+            self.assertTrue(s["enabled"], sid)
+            self.assertTrue(s["terms_checked"].startswith("2026-11-07"), sid)
+            self.assertIn("held back from git", s["redistribute_raw"], sid)
+        self.assertIn("TGCR data", sources["nyfed-tgcr"]["notice"])
+        self.assertNotIn("SOFR", sources["nyfed-bgcr"]["notice"])
+        self.assertNotIn("bankofengland.co.uk/-/media", json.dumps(sources))  # BoE curve zips: third-party inputs, not cleared
 
     def test_disabled_source_is_skipped(self):
         with tempfile.TemporaryDirectory() as d:
@@ -184,7 +199,11 @@ class GalleryVol(unittest.TestCase):
             for op, f in spec["examples"].items():
                 ex = json.loads((ROOT / "examples" / f).read_text(encoding="utf-8"))
                 self.assertEqual(ex["operation"], op)
-                self.assertTrue(ex["case_id"].startswith("example-synthetic-"))
+                real = spec.get("real", {})
+                self.assertTrue(ex["case_id"].startswith("example-real-" if f in real else "example-synthetic-"), f)
+                if f in real:
+                    self.assertIn(real[f], text)
+                    self.assertIn("fetched", real[f])
                 self.assertEqual(d["meta"]["example_hashes"][f], self.bg.example_hash(f))
             self.assertEqual(d["evidence"], self.bg.golden_d(spec["examples"]))
             self.assertTrue(all(r["largest_difference"] is not None and r["largest_difference"] < 1e-6 for r in d["agreement"]), slug)
