@@ -2866,6 +2866,35 @@
     "D61",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "rulings2_d-0025",
+   "operation": "rates.ois.fit_steps",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "step_dates": [],
+    "quotes": [
+     {
+      "tenor": "3W",
+      "rate": 0.04196909884320199
+     }
+    ],
+    "jumps": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "D64",
+    "synthetic"
+   ]
   }
  ]
 }
