@@ -77,3 +77,15 @@ None.
 
 - `Normal.java` does not use `erfc` (ruling S5 allows this). It works directly in `x`, because
   `x/sqrt(2)` and a rounded `x^2` alone cost about 1e-13 relative at `x = -37`, over the 1e-14 target.
+
+## Stage C
+
+Points the spec leaves open, with what Java does. None changes a golden.
+
+| # | Point | Java |
+|---|---|---|
+| C-1 | `SPOT` convention with `scale` null | `E_DOMAIN`, read as "must be above 0" |
+| C-2 | `vol.smile.rr_bf` with `delta <= 0` | `E_DOMAIN`, after the vol checks |
+| C-3 | `risk.vol.surface_vega`: a position's `forward`, `strike`, `discount_factor` or `expiry_years` `<= 0` | `E_DOMAIN`, as no check is listed |
+| C-4 | `usecase.vol_surface`: order of checks, and `strike` or `quantity <= 0` on `target` | Curve checks, then `E_DOMAIN` on target, then slices; a target expiry that is no slice's is `E_INPUT` after the fits |
+| C-5 | `vol.ssvi.calibrate`: `thetas` checks against the point count | Point count and ragged rows first |
