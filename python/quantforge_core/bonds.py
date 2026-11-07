@@ -242,7 +242,14 @@ def repo_implied(bond: Bond, start: date, end: date, clean: float, fwd_clean: fl
     return _implied(clean + acc0, fwd_clean + acc1, end, (end - start).days, paid)
 
 
-def conversion_factor(bond: Bond, year: int, month: int, notional: float) -> float:
+CONTRACTS = ("TWO_YEAR", "THREE_YEAR", "FIVE_YEAR", "TEN_YEAR", "ULTRA_TEN_YEAR", "BOND",
+             "ULTRA_BOND")
+_WHOLE_MONTHS = ("TWO_YEAR", "THREE_YEAR", "FIVE_YEAR")
+
+
+def conversion_factor(
+    bond: Bond, year: int, month: int, notional: float, contract: str = "TEN_YEAR",
+) -> float:
     if notional != 0.06:
         raise QfError("E_INPUT", "notional_coupon must be 0.06", "notional_coupon")
     if bond.frequency != 2:
@@ -252,12 +259,15 @@ def conversion_factor(bond: Bond, year: int, month: int, notional: float) -> flo
         raise QfError("E_DATE_ORDER", "maturity is not after the delivery month", "bond")
     m = bond.maturity
     total = (m.year - first.year) * 12 + (m.month - first.month)
-    n, z = total // 12, (total % 12) // 3 * 3
-    v = z if z < 7 else 3
+    n, z = total // 12, total % 12
+    if contract not in _WHOLE_MONTHS:
+        z = z // 3 * 3
+    c = math.floor(bond.coupon * 800 + 0.5) / 800  # R1-3: nearest 1/8 of 1%, ties up
+    v = z if z < 7 else z - 6
     a = 1.03 ** (-v / 6)
-    b = (bond.coupon / 2) * (6 - v) / 6
+    b = (c / 2) * (6 - v) / 6
     big_c = 1.03 ** (-2 * n) if z < 7 else 1.03 ** (-2 * n - 1)
-    cf = a * (bond.coupon / 2 + (bond.coupon / 0.06) * (1 - big_c) + big_c) - b
+    cf = a * (c / 2 + (c / 0.06) * (1 - big_c) + big_c) - b
     return round(cf, 4)
 
 

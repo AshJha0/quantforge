@@ -96,11 +96,18 @@ def _euta(y: int) -> set[date]:
     return days
 
 
+# Ruling R1-6: Good Fridays with a SIFMA early close are business days.
+USGS_GOOD_FRIDAY_OPEN = frozenset({2007, 2010, 2012, 2015, 2021, 2023, 2026})
+
+
+def good_friday(y: int) -> date:
+    return easter_sunday(y) - 2 * _DAY
+
+
 def _usgs(y: int) -> set[date]:
     days = {
         _nth_weekday(y, 1, MON, 3),
         _nth_weekday(y, 2, MON, 3),
-        easter_sunday(y) - 2 * _DAY,
         _last_weekday(y, 5, MON),
         _observed(date(y, 7, 4)),
         _nth_weekday(y, 9, MON, 1),
@@ -114,6 +121,8 @@ def _usgs(y: int) -> set[date]:
     days.add(veterans + _DAY if veterans.weekday() == SUN else veterans)
     if y >= 2022:
         days.add(_observed(date(y, 6, 19)))
+    if y not in USGS_GOOD_FRIDAY_OPEN:
+        days.add(good_friday(y))
     one_offs = (date(2004, 6, 11), date(2012, 10, 30), date(2018, 12, 5))
     return days | {d for d in one_offs if d.year == y}
 
