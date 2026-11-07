@@ -112,3 +112,5 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | D-16 | `credit.index.intrinsic`, `credit.curve.composite` weights that are negative or sum to 0 | `E_DOMAIN` for a negative weight, `E_INPUT` for a zero sum |
 | D-17 | `eq.futures.basis` implied spread with no root | `E_NOT_BRACKETED` on `[-0.5, 0.5]`, as `eq.borrow.implied` |
 | D-18 | `eq.trs.pv` with `end <= start`; `current_rate` given when `start >= as_of` | `E_DATE_ORDER`; a given rate is used |
+| D-19 | inflation_d-0009: a par ZCIS whose expected `pv` is 2e-9 on 1e7, judged at 1e-10 absolute | That is rounding noise (2e-16 in the index ratio). The build passes by dividing by the given `base_cpi`, not `exp(ln base_cpi)`; the limit may be too tight for other correct forms |
+| D-20 | `infl.curve.cpi` empty `months`; `infl.linker.price` two fixings for one month | `E_INPUT` both (ruling D12 style) |
