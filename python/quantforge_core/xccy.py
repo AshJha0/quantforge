@@ -1,4 +1,5 @@
 """Cross-currency basis and NDFs (specifications/02-curves/cross-currency.md)."""
+import itertools
 from collections.abc import Sequence
 from datetime import date, timedelta
 
@@ -53,13 +54,13 @@ def bootstrap(
     if not quotes:
         raise QfError("E_INPUT", "no quotes", "quotes")
     tables = [schedule((dom_conv, for_conv), start, m) for m, _ in quotes]
-    if any(b[0] <= a[0] for a, b in zip(quotes, quotes[1:], strict=False)):
+    if any(b[0] <= a[0] for a, b in itertools.pairwise(quotes)):
         raise QfError("E_INPUT", "months must be strictly increasing", "quotes")
     pillars = [ends[-1] for ends in tables]
-    models: list[curves.Model] = [
-        lambda c, ends=ends, m=m: leg(1.0, start, ends, p, c, m)
-        for ends, (_, m) in zip(tables, quotes, strict=True)
-    ]
+    def model(ends: list[date], m: float) -> curves.Model:
+        return lambda c: leg(1.0, start, ends, p, c, m)
+
+    models = [model(ends, m) for ends, (_, m) in zip(tables, quotes, strict=True)]
     as_of = domestic.as_of
     factors, error = curves.solve_pillars(as_of, interpolation, pillars, models,
                                           [0.0] * len(quotes))

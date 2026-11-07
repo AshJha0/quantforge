@@ -1,4 +1,5 @@
 """ISDA CDS, index CDS and composite curves (specifications/04-pricing/credit.md)."""
+import itertools
 import math
 from bisect import bisect_right
 from collections.abc import Sequence
@@ -57,7 +58,7 @@ def periods(trade_date: date, mat: date) -> list[Period]:
         raw.append(schedules.add_months(raw[-1], 3))
     raw[-1] = mat
     out = []
-    for i, (s, e) in enumerate(zip(raw, raw[1:], strict=False)):
+    for i, (s, e) in enumerate(itertools.pairwise(raw)):
         last = i == len(raw) - 2
         start = _weekday(s)
         end = e if last else _weekday(e)
@@ -126,7 +127,7 @@ class Model:
         """(t0, D, h, k, QP(t0)) for each piece of [a, b] between nodes."""
         cuts = [a, *(n for n in self.nodes if a < n < b), b]
         out = []
-        for x, y in zip(cuts, cuts[1:], strict=False):
+        for x, y in itertools.pairwise(cuts):
             t0, q0, p0 = self.qp(x)
             t1, q1, p1 = self.qp(y)
             span = t1 - t0
@@ -136,7 +137,7 @@ class Model:
         return out
 
     def protection(self, mat: date) -> float:
-        return ordered_sum(h * qp0 * span * _series((k * span))[0]
+        return ordered_sum(h * qp0 * span * _series(k * span)[0]
                            for _, span, h, k, qp0 in self.pieces(self.t0, mat))
 
     def rpv01(self, ps: Sequence[Period]) -> float:
@@ -203,7 +204,7 @@ def bootstrap(
     if not quotes:
         raise QfError("E_INPUT", "no quotes", "quotes")
     mats = [maturity(trade_date, t) for t, _ in quotes]
-    if any(b <= a for a, b in zip(mats, mats[1:], strict=False)):
+    if any(b <= a for a, b in itertools.pairwise(mats)):
         raise QfError("E_INPUT", "maturities must be strictly increasing", "quotes")
     if any(s <= 0 for _, s in quotes):
         raise QfError("E_DOMAIN", "spreads must be positive", "quotes")
