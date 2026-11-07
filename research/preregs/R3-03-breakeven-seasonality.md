@@ -23,9 +23,12 @@ Do month-of-year effects in headline CPI show up as a predictable seasonal patte
 
 ## Statistics and pass rule
 - 12 outcomes a year. Sharpe standard error from Lo (2002) with 3 lags.
-- Holdout T = 10.83 years, MDS = 0.76. **Threshold:** holdout deflated Sharpe ratio above 0.95 probability, and holdout net Sharpe at least 0.76.
+- Holdout T = 10.83 years, MDS = 0.76. **Threshold:** holdout deflated Sharpe ratio above 0.95, and holdout net Sharpe at least 0.76.
 - Sub-periods: thirds of the holdout. The 2021 to 2022 inflation shock sits in the middle third.
 - Correlations with carry (the breakeven roll-down) and a 12-month momentum factor are reported.
+
+- **Pass rule (all three, per `research/TEMPLATE.md` section 5):** (1) holdout deflated Sharpe ratio above 0.95 and holdout net Sharpe at least the MDS above; (2) holdout net Sharpe still above 0 at 2x costs; (3) the holdout Sharpe has the same sign in each third of the holdout. Otherwise the study fails and is published as a null result.
+- **Forward log:** live paper out-of-sample from the signing date, 2026-11-07, judged on the same rule after 250 US business days.
 
 ## Known limits
 Breakevens are fitted from par curves and include liquidity and convexity premia. The index lag (`02-curves/inflation.md`) means an announced CPI moves the breakeven before the accrual it affects.

@@ -421,6 +421,8 @@ def verify_all(folder="stage_d", show=True):
                 ok, why, worst = judge(c, got)
             except NotImplementedError as e:
                 ok, why, worst = False, f"not mapped: {e}", None
+            except RuntimeError as e:  # QuantLib refused the inputs (for example a fixing on a day its calendar closes)
+                ok, why, worst = False, f"QuantLib refused: {e}", None
             if ok:
                 n_ok += 1
                 reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": CM.LIBRARY, "version": CM.VERSION,

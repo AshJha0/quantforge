@@ -13,7 +13,7 @@ Does the 2s5s10s butterfly on the US Treasury par curve mean-revert enough that 
 
 ## Method (fixed)
 - Fly level `f_t = 2 y5 - y2 - y10`, in bp.
-- Signal `z_t = (f_t - mean_L) / sd_L` over a trailing window `L`. Position: short the fly (pay the body) when `z_t > k`, long when `z_t < -k`, flat when `|z_t| < 0.5`. Rebalanced daily on the close, entered the next day.
+- Signal `z_t = (f_t - mean_L) / sd_L` over a trailing window `L`. Position: short the fly (pay the body) when `z_t > k`, long when `z_t < -k`, flat when `|z_t| < 0.5`; between 0.5 and `k` the previous position is held. Rebalanced daily on the close, entered the next day.
 - Return proxy: the change in the fly level times the position, in bp. Converted to a return using par-bond DV01s from `bond.price.from_yield` at each day's par yields, weights DV01-neutral and duration-neutral.
 - Grid (8 trials): `L` in {60, 120, 250, 500} business days, `k` in {1.0, 1.5}.
 
@@ -22,9 +22,12 @@ Does the 2s5s10s butterfly on the US Treasury par curve mean-revert enough that 
 
 ## Statistics and pass rule
 - Sharpe standard error: Lo (2002) with the autocorrelation adjustment, 20 lags.
-- Holdout T = 13.83 years, MDS = 0.67. **Threshold:** holdout deflated Sharpe ratio, given the logged trial count, above 0.95 probability, and holdout annualised net Sharpe at least 0.67.
+- Holdout T = 13.83 years, MDS = 0.67. **Threshold:** holdout deflated Sharpe ratio, given the logged trial count, above 0.95, and holdout annualised net Sharpe at least 0.67.
 - PBO by CSCV over 16 in-sample blocks is reported; above 0.5 makes the result exploratory.
 - Correlations with level, slope and curvature (first three PCs of in-sample yield changes) and a carry proxy are reported.
+
+- **Pass rule (all three, per `research/TEMPLATE.md` section 5):** (1) holdout deflated Sharpe ratio above 0.95 and holdout net Sharpe at least the MDS above; (2) holdout net Sharpe still above 0 at 2x costs; (3) the holdout Sharpe has the same sign in each third of the holdout. Otherwise the study fails and is published as a null result.
+- **Forward log:** live paper out-of-sample from the signing date, 2026-11-07, judged on the same rule after 250 US business days.
 
 ## Known limits
 Par yields are fitted, not traded. On-the-run and off-the-run effects, bid/ask and repo specials are missing.
