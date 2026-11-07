@@ -22,19 +22,33 @@ double days(Date a, Date b) { return double(days_between(a, b)); }
 
 // ---- dated compounding ----
 
+namespace {
+// Ruling R1-6: no SOFR is published on any Good Friday, even in a USGS early-close year.
+bool fixing_day(const RateConvention& c, Date x) {
+    if (!is_business_day(c.calendar, x)) return false;
+    return c.id != "SOFR" || x != Date(easter_sunday(year_of(x)) - std::chrono::days(2));
+}
+Date fixing_days_back(const RateConvention& c, Date x, long long k) {
+    while (k > 0) {
+        x = Date(x - std::chrono::days(1));
+        if (fixing_day(c, x)) --k;
+    }
+    return x;
+}
+}  // namespace
+
 DatedCompound compound_dated(const RateConvention& c, Date start, Date end, ShiftMethod method, long long k,
                              const std::vector<Fixing>& fixings) {
     if (c.months != 0) input("the convention is not overnight", "convention");
     if (end <= start) throw Error("E_DATE_ORDER", "end must be after start", "end");
-    const Calendar cal = c.calendar;
     std::vector<Date> d;
     for (Date x = start; x <= end; x = Date(x + std::chrono::days(1)))
-        if (is_business_day(cal, x)) d.push_back(x);
+        if (fixing_day(c, x)) d.push_back(x);
     const long long n = d.empty() ? 0 : (long long)d.size() - 1;
     if (k < 0) input("shift_days is negative", "shift_days");
     if (method == ShiftMethod::None && k != 0) input("NONE takes shift_days 0", "shift_days");
     if (method == ShiftMethod::Lockout && (k < 1 || k > n - 1)) input("LOCKOUT needs 1 <= shift_days <= n-1", "shift_days");
-    if (!is_business_day(cal, start) || !is_business_day(cal, end)) input("start and end must be business days", "start");
+    if (!fixing_day(c, start) || !fixing_day(c, end)) input("start and end must be business days", "start");
 
     std::map<Date, double> by_date;
     for (const Fixing& f : fixings)
@@ -44,7 +58,7 @@ DatedCompound compound_dated(const RateConvention& c, Date start, Date end, Shif
         if (it == by_date.end()) input("a needed fixing is missing", "fixings");
         return it->second;
     };
-    const auto back = [&](Date x) { return k == 0 ? x : add_business_days(cal, x, -k); };
+    const auto back = [&](Date x) { return k == 0 ? x : fixing_days_back(c, x, k); };
 
     const double b = c.denominator;
     double growth = 1.0, total = 0.0;

@@ -61,7 +61,9 @@ RepoForward repo_forward(const Bond& b, Date start, Date end, double clean_price
 double repo_implied_rate(const Bond& b, Date start, Date end, double clean_price, double forward_clean);
 
 /// delivery = first day of the delivery month.
-double conversion_factor(const Bond& b, Date delivery, double notional_coupon);
+enum class FuturesContract { TwoYear, ThreeYear, FiveYear, TenYear, UltraTenYear, Bond, UltraBond };
+double conversion_factor(const Bond& b, Date delivery, double notional_coupon,
+                         FuturesContract contract = FuturesContract::TenYear);
 
 struct BasisBond {
     Bond bond;

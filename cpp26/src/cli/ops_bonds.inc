@@ -125,8 +125,14 @@ void op_conversion_factor(const In& in, Out& out) {
     const Bond b = bond_of(in);
     const Date d = delivery_month_of(in);
     const double nc = in.real("notional_coupon");
+    using enum FuturesContract;
+    const FuturesContract k = in.find("contract")
+        ? in.choice<FuturesContract>("contract", {{"TWO_YEAR", TwoYear}, {"THREE_YEAR", ThreeYear}, {"FIVE_YEAR", FiveYear},
+                                                  {"TEN_YEAR", TenYear}, {"ULTRA_TEN_YEAR", UltraTenYear}, {"BOND", Bond},
+                                                  {"ULTRA_BOND", UltraBond}})
+        : TenYear;
     in.ready();
-    out.key_real("conversion_factor", conversion_factor(b, d, nc));
+    out.key_real("conversion_factor", conversion_factor(b, d, nc, k));
 }
 
 void op_futures_basis(const In& in, Out& out) {
