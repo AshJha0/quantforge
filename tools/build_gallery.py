@@ -235,6 +235,7 @@ CURVES = {
 # Curves named in the plan's stage rows that have no page. Stage from the plan.
 PLANNED = [
     ("Equity spot and parity-implied forward, discrete dividends", "C"),
+    ("Implied volatility smile", "C"), ("Implied volatility surface", "C"),
     ("Dividend curves", "D"), ("Borrow curves", "D"), ("Financing curves", "D"),
     ("Full SOFR", "D"), ("ESTR", "D"), ("Sovereign fits", "D"), ("Repo and special repo", "D"),
     ("Inflation, with seasonality", "D"), ("Cross-currency", "D"),
@@ -289,11 +290,11 @@ def frame(title, xlabel, ylabel, x_ticks, y_ticks, sx, sy, legend, xtext=None):
     return out
 
 
-def chart(title, xlabel, ylabel, series, caption, y_zero=False):
+def chart(title, xlabel, ylabel, series, caption, y_zero=False, x_lo=0):
     """series: dicts of name, colour, shape (line or points), pts [(x, y)] or [(x, y, tip)]."""
     xs = [p[0] for s in series for p in s["pts"]]
     ys = [p[1] for s in series for p in s["pts"]] + ([0] if y_zero else [])
-    x_ticks, y_ticks = ticks(0, max(xs)), ticks(min(ys), max(ys))
+    x_ticks, y_ticks = ticks(x_lo, max(xs)), ticks(min(ys), max(ys))
 
     def sx(v):
         return ML + (v - x_ticks[0]) / (x_ticks[-1] - x_ticks[0]) * (W - ML - MR)
@@ -312,6 +313,41 @@ def chart(title, xlabel, ylabel, series, caption, y_zero=False):
             continue
         path = " ".join(f"{sx(p[0]):.1f},{sy(p[1]):.1f}" for p in s["pts"])
         out.append(f'<polyline points="{path}" style="fill:none;stroke:{c};stroke-width:2;stroke-linejoin:round"/>')
+    return wrap(out, caption)
+
+
+def smile_chart(title, expiries, caption):
+    """expiries: [{"name", "strikes", "vols"}] taken from CLI output. Refuses empty or ragged input."""
+    if not expiries:
+        raise ValueError("no CLI output to chart")
+    series = []
+    for i, e in enumerate(expiries):
+        if not e["strikes"] or len(e["strikes"]) != len(e["vols"]):
+            raise ValueError(f"smile {e.get('name')}: strikes and vols must be equal length and non-empty")
+        series.append({"name": e["name"], "colour": 1 + i % 2, "shape": "line", "pts": list(zip(e["strikes"], e["vols"]))})
+    lo = min(p[0] for s in series for p in s["pts"])
+    return chart(title, "Strike", "Implied volatility", series, caption, x_lo=lo)
+
+
+def surface_svg(title, strikes, expiries, vols, caption):
+    """Heat grid, one cell per (expiry, strike), shaded by the value read from CLI output. vols[i][j] is expiry i, strike j."""
+    if not strikes or not expiries or len(vols) != len(expiries) or any(len(r) != len(strikes) for r in vols):
+        raise ValueError("surface grid must be non-empty and match strikes x expiries")
+    flat_v = [v for r in vols for v in r]
+    lo, hi = min(flat_v), max(flat_v)
+    cw, ch = (W - ML - MR) / len(strikes), (H - MB - MT) / len(expiries)
+    out = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="{html.escape(title)}" xmlns="http://www.w3.org/2000/svg">',
+           f'<text x="{ML}" y="20" style="fill:var(--ink);font-size:14px;font-weight:600">{html.escape(title)}</text>']
+    for i, row in enumerate(vols):
+        y = MT + i * ch
+        out.append(f'<text x="{ML - 6}" y="{y + ch / 2 + 4:.1f}" text-anchor="end" style="fill:var(--ink);font-size:11px">{html.escape(str(expiries[i]))}</text>')
+        for j, v in enumerate(row):
+            a = 0.15 + 0.85 * ((v - lo) / (hi - lo) if hi > lo else 0.5)
+            out.append(f'<rect x="{ML + j * cw:.1f}" y="{y:.1f}" width="{cw:.1f}" height="{ch:.1f}" style="fill:var(--c1);fill-opacity:{a:.2f};stroke:var(--bg)">'
+                       f'<title>{html.escape(str(expiries[i]))}, strike {strikes[j]:g}: {v:.6g}</title></rect>')
+    for j, k in enumerate(strikes):
+        out.append(f'<text x="{ML + (j + .5) * cw:.1f}" y="{H - MB + 16}" text-anchor="middle" style="fill:var(--ink);font-size:11px">{k:g}</text>')
+    out.append(f'<text x="{(ML + W - MR) / 2}" y="{H - 8}" text-anchor="middle" style="fill:var(--ink);font-size:12px">Strike (darker is higher volatility)</text>')
     return wrap(out, caption)
 
 
