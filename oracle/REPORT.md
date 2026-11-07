@@ -99,6 +99,33 @@ hedge_deep: exact enumeration against SciPy L-BFGS-B, worst difference 6.04e-10
 suite hedge_deep: 12 cases
 suite rulings_b: 46 cases
 mutants: 23 deliberate errors, all caught
+suite equity_forward: 26 cases
+equity_forward: 26 cases
+suite black: 61 cases
+black: 61 cases
+suite black_deep: 156 cases
+black_deep: 156 cases
+equity_forward_deep: 6 QuantLib checks, 3 with a borrow on the shipped engine; the wrong forward misses by up to 4.234e-02
+suite equity_forward_deep: 15 cases
+equity_forward_deep: 15 cases
+suite greeks: 45 cases
+greeks: 45 cases
+suite smile: 57 cases
+smile: 57 cases
+suite surface: 14 cases
+surface: 14 cases
+suite sabr: 25 cases
+sabr: 25 cases
+sabr_deep: arbitrage-free recipe against QuantLib CEV at nu=0: worst call error 1.51e-05
+sabr_deep: against QuantLib NoArbSabr (Doust, another method): worst vol gap 1.79e-02
+suite sabr_deep: 13 cases
+sabr_deep: 13 cases
+strata_vol: Black, Greeks, Bachelier, Hagan against Strata, worst gap 2.04e-14
+suite strata_vol: 32 cases
+strata_vol: 32 cases
+suite usecases_c: 2 cases
+usecases_c: 2 cases
+stage C mutants: 30 caught; arbitrage-free against CEV [1.5084564432291114e-05], Hagan [0.005817758552876473], Doust [0.017899914994640886]
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4394 golden cases checked, none breaks a stated invariant
 invariants: 343 stage B cases checked, none breaks one
@@ -115,6 +142,19 @@ invariants:   points equal forward minus spot: 11
 invariants:   residual, objective and first-order conditions: 17
 invariants:   spot after trade date: 20
 invariants:   valuation carries its snapshot: 57
+invariants: 446 stage C cases checked, none breaks one
+invariants:   SABR density flag matches minimum: 3
+invariants:   SSVI ATM total variance equals theta: 3
+invariants:   SVI variance positive, flag matches min g: 2
+invariants:   arbitrage-free SABR: mass 1, mean f, density not negative, calls bounded and decreasing: 6
+invariants:   forward positive, factors positive, dividends not negative: 4
+invariants:   gamma and vega not negative for a long option: 59
+invariants:   implied vol not negative: 97
+invariants:   option price within no-arbitrage bounds: 115
+invariants:   parity residual not negative, breaches ascending: 3
+invariants:   surface flag matches violation lists: 4
+invariants:   surface variance positive: 1
+invariants:   use case 3 vol and forwards positive: 1
 fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps
 fragility: integrate-0095 error estimate 1.52e-01 against tol 1e-13
 fragility: root-0025 needs 7 Brent steps against max_iter 2; root-0026 has width 0.125 after 3 bisections against x_tol 1e-12

@@ -12,8 +12,8 @@ From the spec and oracle session, to the four language sessions. Date 2026-11-07
 
 ## Not finished
 
-- `oracle/python/run_all.py` lists the generator, but the full run was not repeated; `gen_stage_c.py` was run alone. `oracle/REPORT.md` has no stage C lines yet.
-- `check_invariants.py` does not cover `stage_c`.
+- Full `run_all.py` rerun on 2026-11-07: stage C goldens unchanged; `REPORT.md` carries the stage C lines.
+- `check_invariants.py` covers `stage_c`: 446 cases, none breaks a rule.
 - `vol.sabr.arbfree` at `nu > 0` has no tight outside source. See `stage-c-rulings.md`.
 - No implementation has run a case, so spec gaps may surface. Use each language's `SPEC_QUESTIONS.md`.
 - Runner, schemas: no change needed, as cases use the existing format. The runner must be pointed at `datasets/golden/stage_c/`; infrastructure work is with another session.
