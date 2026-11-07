@@ -64,3 +64,35 @@ def check_curve(report, name, as_of, pillars):
 def check_front_end(report, name, fixing, shortest):
     lim = BANDS["front_end"]["fixing_vs_shortest_quote_warn"]
     report.check(f"{name} fixing vs shortest quote", "warn", abs(fixing - shortest) <= lim, f"{fmt(fixing - shortest)} vs ±{lim}")
+
+
+def check_zero_curve(report, name, points, previous=None, redact=False):
+    """points, previous: [(years, continuously compounded zero)]. Same curve bands as check_curve, on zeros,
+    plus the par-quote day-change bands applied to zeros at matching maturities. Forwards between points are
+    (z2 t2 - z1 t1) / (t2 - t1), a unit change."""
+    b, q = BANDS["curve"], BANDS["par_quotes"]
+
+    def show(text):
+        return "value withheld" if redact else text
+
+    zs = [z for _, z in points]
+    fwds = [(z2 * t2 - z1 * t1) / (t2 - t1) for (t1, z1), (t2, z2) in zip(points, points[1:]) if t2 > t1]
+    report.check(f"{name} zero rates in band", "fail", all(b["zero_min"] <= z <= b["zero_max"] for z in zs),
+                 show(f"min {fmt(min(zs))}, max {fmt(max(zs))}") + f"; {len(points)} maturities")
+    report.check(f"{name} forwards in band", "fail", all(b["forward_min"] <= f <= b["forward_max"] for f in fwds),
+                 show(f"min {fmt(min(fwds))}, max {fmt(max(fwds))}") if fwds else "fewer than two maturities")
+    if previous:
+        prev = dict(previous)
+        moves = [abs(z - prev[t]) for t, z in points if t in prev]
+        worst = max(moves) if moves else 0.0
+        report.check(f"{name} day change", "fail", worst <= q["day_change_fail"], show(f"largest {fmt(worst)}") + f" vs {q['day_change_fail']}")
+        report.check(f"{name} day change (warn)", "warn", worst <= q["day_change_warn"], show(f"largest {fmt(worst)}") + f" vs {q['day_change_warn']}")
+
+
+def check_curve_gap(report, name, a, b, limit, redact=False):
+    """Largest gap between two zero curves at shared maturities; a warn-level consistency check."""
+    other = dict(b)
+    gaps = [abs(z - other[t]) for t, z in a if t in other]
+    worst = max(gaps) if gaps else float("nan")
+    report.check(name, "warn", bool(gaps) and worst <= limit,
+                 ("value withheld" if redact else f"largest {fmt(worst)}") + f" vs {limit}; {len(gaps)} shared maturities")

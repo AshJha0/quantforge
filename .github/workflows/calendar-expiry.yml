@@ -1,0 +1,26 @@
+name: Calendar expiry
+# Plan 11.2.3: weekly check that no holiday calendar's confirmed coverage ends within 12 months, and that
+# each was checked within a year. Not a required PR check and not run on pull requests. Expected red until SIFMA
+# publishes the US calendar for 2028 (usually in December): a red run is the reminder to refresh
+# datasets/calendar_provenance.json from the source URL it prints.
+on:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  provenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Calendar provenance (standard library only)
+        shell: bash
+        run: |
+          python3 oracle/python/check_calendar_provenance.py | tee "$RUNNER_TEMP/out.txt"
+      - if: always()
+        run: |
+          { echo "## Calendar provenance"; echo; sed 's/^/    /' "$RUNNER_TEMP/out.txt"; } >> "$GITHUB_STEP_SUMMARY"

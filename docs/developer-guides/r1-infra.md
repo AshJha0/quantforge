@@ -11,6 +11,7 @@ Plan sections 11.1.4, 11.1.5, 11.2.7, 11.2.8 and 11.5. None of these jobs runs o
 | Real-data gallery page | `tools/gallery_real.py`, [docs/curves/real-usd-treasury.md](../curves/real-usd-treasury.md) | Refreshed by hand |
 | Per-stage mutation report | `.github/workflows/mutation-stage.yml`, `conformance/mutation/stage_report.py`, `stages.json` | First of the month, manual |
 | Outside-oracle floor | `.github/workflows/oracle-coverage.yml` | PRs touching `oracle/`, `datasets/`, `specifications/` |
+| Calendar expiry | `.github/workflows/calendar-expiry.yml`, `oracle/python/check_calendar_provenance.py` | Monday 06:23 UTC, manual. Not a PR check |
 | Batch performance targets | [benchmarks/targets.md](../../benchmarks/targets.md) | Written before measuring |
 
 ## Cross-platform conformance
@@ -48,14 +49,21 @@ Measured 2026-11-07 at commit `af081b9`, GCC 15.2.0 in WSL Ubuntu 26.04 with `-j
 
 ## Daily workflows (a) and (c)
 
-Both are standard-library Python in `tools/workflows/`. All the finance happens in the CLI: `common.batch` sends every case to a single `quantforge batch` process. The batch verb is one constant, `BATCH_ARGS` in `common.py`. When the spec session's `--batch` contract lands in `specifications/cli-contract.md` (branch `r1`), change that line and nothing else.
+Both are standard-library Python in `tools/workflows/`. All the finance happens in the CLI: `common.batch` sends every case to one `quantforge --batch` process (`specifications/cli-contract.md`, contract 1.6.0). On 2026-11-07, no CLI on `r1` accepted `--batch` yet; the r1-lang branches are adding it. Until they land, a usage error (exit 64) retries with the older `batch` spelling. Each report's header names the command that ran and marks a fallback, so it is never silent. Delete the fallback in `common.py` once all four languages have merged.
 
 Each run writes `reports/workflows/<as-of>/<name>.md`, plus a `.json` twin holding every number. CI pushes them to branch `forward-log` under `reports/`. Locally, `reports/workflows/` is ignored by git. A failed fail-level check fails the job after the report is pushed. Warnings are only reported.
 
 **(a) EOD curves, `eod_curves.py`.**
 
 - **USD.** The latest US Treasury par curve (13 tenors, 1M to 30Y) is bootstrapped with `rates.ois.bootstrap` under SOFR conventions. Bands are checked on the quotes, the SOFR fixing, the curve and the front end. Key-rate risk comes from `risk.ois.dv01`, run on a 50-trade seeded book from `sample_book.py`; fixed rates are par from `rates.ois.pv`, plus an offset. The report says plainly that this is a **proxy curve**: Treasury par yields are not SOFR swap rates, and free data has no SOFR swap quotes.
-- **GBP.** Only the SONIA fixings are band-checked, and their values are withheld from the report. Raw SONIA may not be redistributed until the Bank of England answers (`tools/recorder/sources.json`). **No GBP curve is built.** No free GBP term source is licensed in `sources.json` yet. The candidate is the BoE OIS spot curve, after a licence check. This part of 11.2.7 (a) is open.
+- **GBP.** The reference is the Bank of England's fitted OIS spot curve (50 maturities, 0.5Y to 25Y) and nominal government spot curve (80 maturities, to 40Y), from the latest yield curve data zip, read by `boe_curves.py`. Checks: the curve bands on each curve, day change, the OIS-to-nominal gap, and SONIA against the shortest OIS point. **Only pass or fail is published** (terms below). The library builds no GBP curve of its own, because free data has no SONIA swap quotes to bootstrap from.
+
+  BoE terms, checked 2026-11-07, at https://www.bankofengland.co.uk/statistics/yield-curves and https://www.bankofengland.co.uk/legal:
+  - The curves are Bank copyright. The legal page allows download "for personal use or internal use within an individual organisation" for non-commercial purposes, and says the Bank "typically grants permission for non-commercial re-use". The curve page has no objection to electronic storage.
+  - The Open Government Licence is stated only for the Bank's Database, and the curve downloads are not stated to be part of it.
+  - The curve page names its inputs as Bloomberg Finance L.P., Tradeweb and Bank calculations, and the legal page puts third-party material under that party's separate approval.
+  - So no clause forbids internal use, but nothing grants public redistribution either. Reports withhold every value, as with SONIA. Publishing values needs the Bank's permission; the owner could ask in the same message as the SONIA question.
+  - This reading is recorded in `tools/workflows/boe_curves.py`. The zip is deliberately **not** in `tools/recorder/sources.json`: a stage D decision, guarded in `tools/test_tools.py`, keeps BoE curve zips out of the recorder as third-party inputs that are not cleared. Workflow (a) fetches the zip on each run, keeps no raw copy, and publishes no values.
 
 **(c) SOFR check, `sofr_check.py`.**
 
@@ -105,3 +113,21 @@ A band changes only in its own commit, with the reason. The gallery page [real-u
 `oracle-coverage.yml` runs `oracle/python/outside_d.py` with QuantLib 1.44 from `oracle/python/uv.lock`. The script rebuilds every stage D case from QuantLib's own convention objects and exits 1 if the stage D share is below 60% (rule 11.2.5). The job then fails if `oracle/outside_register.json` differs from the fresh run.
 
 It is a light PR check: no CLI build, about 11 seconds of run time locally, and it starts only for changes under `oracle/`, `datasets/`, `specifications/` or the tolerances. Checked against branch `r1` at `1d6e585`: 396 of 647 cases, 61.2%, exit 0, register unchanged. It uses `uv run --frozen`, because the lock records the project's own version as 0.2.0, and `--locked` rejects that.
+
+## Calendar expiry
+
+`calendar-expiry.yml` runs `oracle/python/check_calendar_provenance.py` every Monday. The script is standard library only. It fails when any calendar's confirmed coverage ends within 12 months, or was last checked over a year ago. **It is expected red** until SIFMA publishes the 2028 US calendar, usually in December: on 2026-11-07, USGS is confirmed only through 2027-01-01. A red run is the reminder to refresh `datasets/calendar_provenance.json` from the URL it prints. It is not a PR check, so it never blocks a merge.
+
+## Post-push checks
+
+These can run only once the branch is on GitHub. Run each by hand (Actions, then "Run workflow") after the R1 PR is pushed, and record the result in the PR.
+
+| Check | Workflow | Pass means |
+|---|---|---|
+| First cross-platform matrix | `cross-platform.yml` | 12 cells green; Windows and macOS C++ compiler versions noted from the logs |
+| First stage D mutation report | `mutation-stage.yml`, stage D, gate off | A score per mapped module and language. The 80% target is judged on this run; below-target modules get issues |
+| Recorder first run | `recorder.yml` | Creates branch `forward-log` with `actions/log.jsonl` and `actions/gaps.md`. Needs the workflow on `main` for the schedule, but a manual dispatch works from the PR branch |
+| Daily workflows first run | `daily-workflows.yml`, Rust | Both reports on `forward-log` under `reports/`. The header shows `--batch` once the Rust branch has merged |
+| Outside-oracle floor | `oracle-coverage.yml` | Runs on the PR itself, because it touches `oracle/` and `datasets/` |
+| Calendar expiry | `calendar-expiry.yml` | Expected red on USGS until SIFMA's December release |
+| Gallery and docs | `docs.yml` | `build_gallery.py --check` including the real-data page; site has no broken links |

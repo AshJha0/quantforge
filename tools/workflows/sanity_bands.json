@@ -1,28 +1,37 @@
 {
   "note": "Real-data curve sanity bands (plan 11.5.3). Bands are wide on purpose: they catch a broken feed, a wrong unit or a bad build, not a market move. A 'fail' stops the daily workflow; a 'warn' is reported. Changing a band needs its own commit and reason. Rates are decimals.",
   "fixing": {
-    "level_min": -0.01, "level_max": 0.15,
+    "level_min": -0.01,
+    "level_max": 0.15,
     "day_change_warn": 0.0025,
-    "day_change_fail": 0.0100
+    "day_change_fail": 0.01
   },
   "par_quotes": {
-    "level_min": -0.01, "level_max": 0.15,
-    "day_change_warn": 0.0030,
-    "day_change_fail": 0.0100,
-    "adjacent_tenor_gap_warn": 0.0150
+    "level_min": -0.01,
+    "level_max": 0.15,
+    "day_change_warn": 0.003,
+    "day_change_fail": 0.01,
+    "adjacent_tenor_gap_warn": 0.015
   },
   "curve": {
     "df_max": 1.02,
     "df_min": 0.0,
-    "zero_min": -0.01, "zero_max": 0.15,
-    "forward_min": -0.02, "forward_max": 0.20,
+    "zero_min": -0.01,
+    "zero_max": 0.15,
+    "forward_min": -0.02,
+    "forward_max": 0.2,
     "df_increase_tolerance": 0.0
   },
   "front_end": {
     "fixing_vs_shortest_quote_warn": 0.0075
   },
   "sofr_average": {
-    "abs_diff_fail": 1e-7,
+    "abs_diff_fail": 1e-07,
     "published_decimals_percent": 5
+  },
+  "gbp_reference": {
+    "ois_vs_nominal_warn": 0.015,
+    "sonia_vs_ois_front_warn": 0.0075,
+    "note": "BoE OIS and nominal government spot curves differ by the gilt-OIS spread, normally well under 150 bp."
   }
 }

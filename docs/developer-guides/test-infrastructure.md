@@ -17,6 +17,7 @@ Pull-request workflows run only when their paths change, so PRs stay fast. The r
 | `daily-workflows.yml` | 15:00 UTC on weekdays, manual | Workflows (a) EOD curves and (c) SOFR check on real data; dated reports to `forward-log` (`r1-infra.md`) |
 | `mutation-stage.yml` | First of the month, manual | Every module of one stage in all four languages, then one report scored against the stage target (`r1-infra.md`) |
 | `oracle-coverage.yml` | PR and push touching `oracle/`, `datasets/`, `specifications/`, tolerances; manual | QuantLib 1.44 rebuilds the stage D cases; fails below 60% outside-oracle share or on a stale register |
+| `calendar-expiry.yml` | Monday, manual | Calendar provenance: fails when a calendar's coverage ends within 12 months; expected red until SIFMA's December release |
 | `security.yml` | Monday, lockfile change, manual | OSV scan of the Rust, Python and Java dependencies |
 
 Dependabot opens one grouped pull request per ecosystem each month. It does not track the Catch2 pin in `cpp26/CMakeLists.txt`, so update that by hand.

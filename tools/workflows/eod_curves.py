@@ -6,9 +6,10 @@
 USD: the US Treasury daily par yield curve, bootstrapped by `rates.ois.bootstrap` with SOFR conventions.
      Treasury par yields are not SOFR swap rates, so this is a proxy curve, labelled as such. Free data has no
      SOFR swap quotes. The SOFR fixing is checked against the curve's front end.
-GBP: SONIA fixings from the Bank of England, sanity bands only. No free GBP term source is in
-     tools/recorder/sources.json yet. The BoE OIS spot curve is the candidate, after a licence check. So no GBP
-     curve is built, and the report says so.
+GBP: the Bank of England's fitted OIS and nominal government spot curves (boe_curves.py) are the
+     reference, with SONIA fixings. All bands run on them, but only pass or fail is published: the curves are
+     Bank copyright for internal non-commercial use (terms in boe_curves.py; kept out of the recorder on purpose).
+     The library builds no GBP curve of its own, because free data has no SONIA swap quotes.
 --data reads saved source files (the same names as the fetch) instead of fetching, for tests and reruns.
 
 Exit status: 0 all fail-level checks passed, 1 otherwise.
@@ -24,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common as c  # noqa: E402
 import sanity  # noqa: E402
+import boe_curves  # noqa: E402
 from sample_book import book, digest  # noqa: E402
 
 UST_TENORS = {"1 Mo": "1M", "2 Mo": "2M", "3 Mo": "3M", "4 Mo": "4M", "6 Mo": "6M", "1 Yr": "1Y", "2 Yr": "2Y",
@@ -93,12 +95,37 @@ def main():
     # ---- GBP ----
     r.h("GBP")
     sanity.check_fixings(r, "SONIA", so, redact=True)  # raw SONIA stays local until the Bank answers (sources.json)
-    r.p(f"SONIA fixings to {so[-1][0]} checked against the bands; values are not published, because raw SONIA data "
-        "may not be redistributed until the Bank of England answers. No GBP curve is built: no free GBP term source is licensed in "
-        "`tools/recorder/sources.json` yet (candidate: the BoE OIS spot curve, licence check pending).")
+    gbp_reference(r, so, a)
     r.data["sonia_latest_date"] = so[-1][0]
-    notices = [c.SOURCES[s]["notice"] for s in ("us-treasury-par-yields", "nyfed-sofr", "boe-sonia")]
+    notices = [c.SOURCES[s]["notice"] for s in ("us-treasury-par-yields", "nyfed-sofr", "boe-sonia")] + [boe_curves.NOTICE]
     return r.write(notices)
+
+
+def gbp_reference(r, so, a):
+    """BoE fitted OIS and nominal government spot curves as the GBP reference. Values withheld (boe_curves.py)."""
+    gb = sanity.BANDS["gbp_reference"]
+    try:
+        raw = load("boe-yield-curves.zip", boe_curves.URL, a.data)
+        ois, nom = boe_curves.spot_curves(raw, "ois"), boe_curves.spot_curves(raw, "nominal")
+    except (OSError, KeyError, ValueError, StopIteration) as e:
+        r.check("GBP BoE curves read", "fail", False, str(e)[:120])
+        return
+    r.check("GBP BoE curves read", "fail", bool(ois and nom), f"OIS {len(ois)} days, nominal {len(nom)} days")
+    if not (ois and nom):
+        return
+    sanity.check_zero_curve(r, "GBP BoE OIS spot", ois[-1][1], ois[-2][1] if len(ois) > 1 else None, redact=True)
+    sanity.check_zero_curve(r, "GBP BoE nominal spot", nom[-1][1], nom[-2][1] if len(nom) > 1 else None, redact=True)
+    sanity.check_curve_gap(r, "GBP OIS vs nominal gap", ois[-1][1], nom[-1][1], gb["ois_vs_nominal_warn"], redact=True)
+    front = ois[-1][1][0]
+    r.check("GBP SONIA vs shortest OIS spot", "warn", abs(so[-1][1] - front[1]) <= gb["sonia_vs_ois_front_warn"],
+            f"value withheld vs {gb['sonia_vs_ois_front_warn']}; OIS shortest maturity {front[0]}y")
+    r.check("GBP BoE curve date vs SONIA", "warn", ois[-1][0] >= so[-1][0], f"BoE {ois[-1][0]}, SONIA {so[-1][0]}")
+    r.p(f"Reference: Bank of England fitted OIS spot curve ({len(ois[-1][1])} maturities) and nominal government spot curve "
+        f"({len(nom[-1][1])} maturities) for {ois[-1][0]}, from the latest yield curve data zip, with SONIA fixings to {so[-1][0]}. "
+        "Only pass or fail is published: the curves are Bank copyright, licensed here for internal non-commercial use only, "
+        "and raw SONIA may not be redistributed until the Bank answers (`tools/recorder/sources.json`); the zip is fetched per run and no raw copy is kept. "
+        "The library does not build its own GBP curve: free data has no SONIA swap quotes to bootstrap from.")
+    r.data["gbp_reference"] = {"boe_date": ois[-1][0], "ois_maturities": len(ois[-1][1]), "nominal_maturities": len(nom[-1][1])}
 
 
 def key_rate_section(r, as_of, quotes, curve, a):

@@ -18,8 +18,13 @@ from runner import resolve_command  # noqa: E402
 
 USER_AGENT = "Mozilla/5.0 (compatible; quantforge-workflows/0.1)"
 SOURCES = {s["id"]: s for s in json.loads((ROOT / "tools/recorder/sources.json").read_text(encoding="utf-8"))["sources"]}
-# Batch entry point. When specifications/cli-contract.md names `--batch`, change this one line (plan 11.5.7).
-BATCH_ARGS = ["batch"]
+# Batch entry point, per specifications/cli-contract.md (contract 1.6.0: `--batch` is the same command as `batch`).
+BATCH_ARGS = ["--batch"]
+# Until every CLI implements contract 1.6.0, a usage error (exit 64) on `--batch` retries with the older `batch`
+# spelling. USED records what ran, and each report prints it, so the fallback is never silent. Delete the fallback
+# once all four r1-lang branches have merged.
+LEGACY_ARGS = ["batch"]
+USED = {}
 
 
 def fetch(url, timeout=60):
@@ -41,7 +46,12 @@ def batch(cases, impl="python"):
     impls = json.loads((ROOT / "conformance/runner/implementations.json").read_text(encoding="utf-8"))
     base, cwd = resolve_command(impls[impl])
     text = "".join(json.dumps(c, separators=(",", ":")) + "\n" for c in cases)
-    p = subprocess.run(base + BATCH_ARGS, cwd=cwd, input=text.encode("utf-8"), capture_output=True, timeout=1800)
+    args = BATCH_ARGS
+    p = subprocess.run(base + args, cwd=cwd, input=text.encode("utf-8"), capture_output=True, timeout=1800)
+    if p.returncode == 64:
+        args = LEGACY_ARGS
+        p = subprocess.run(base + args, cwd=cwd, input=text.encode("utf-8"), capture_output=True, timeout=1800)
+    USED[impl] = " ".join(args)
     if p.returncode != 0:
         raise SystemExit(f"{impl} batch exited {p.returncode}: {p.stderr.decode('utf-8', 'replace')[:500]}")
     rows = [json.loads(x) for x in p.stdout.decode("utf-8").splitlines() if x.strip()]
@@ -89,7 +99,10 @@ class Report:
         warn = [c for c in self.checks if not c["ok"] and c["level"] == "warn"]
         head = [f"# {self.name}: {self.as_of}", "",
                 f"Result: **{'FAIL' if bad else 'PASS'}** ({len(self.checks)} checks, {len(bad)} failed, {len(warn)} warnings). "
-                f"Generated {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ} by `tools/workflows/`.", ""]
+                f"Generated {dt.datetime.now(dt.timezone.utc):%Y-%m-%dT%H:%MZ} by `tools/workflows/`. Batch command: "
+                + (", ".join(f"{k} `quantforge {v}`" + ("" if v == " ".join(BATCH_ARGS) else " (fallback: `--batch` not yet implemented)")
+                             for k, v in USED.items()) or "none") + ".", ""]
+        self.data["batch_command"] = dict(USED)
         checks = ["", "## Checks", "", "| Check | Level | Result | Detail |", "|---|---|---|---|"]
         checks += [f"| {c['check']} | {c['level']} | {'ok' if c['ok'] else 'NOT OK'} | {c['detail']} |" for c in self.checks]
         tail = ["", "## Data notices", ""] + [f"- {n}" for n in notices] + [""]
