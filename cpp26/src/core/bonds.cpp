@@ -200,16 +200,20 @@ double repo_implied_rate(const Bond& b, Date start, Date end, double clean_price
     return (fd - t.dirty + t.coupons) / (t.dirty * t.t - t.coupons_weighted);
 }
 
-double conversion_factor(const Bond& b, Date delivery, double notional_coupon) {
+double conversion_factor(const Bond& b, Date delivery, double notional_coupon, FuturesContract contract) {
     if (notional_coupon != 0.06) throw Error("E_INPUT", "notional_coupon must be 0.06", "notional_coupon");
     if (b.frequency != 2) throw Error("E_INPUT", "only semi-annual bonds", "bond");
     if (delivery >= b.maturity) throw Error("E_DATE_ORDER", "maturity must follow the delivery month", "delivery_month");
     int months = (year_of(b.maturity) - year_of(delivery)) * 12 + int(month_of(b.maturity)) - int(month_of(delivery));
-    const int n = months / 12, z = (months % 12) / 3 * 3;
-    const double v = z < 7 ? z : 3;
-    const double a = std::pow(1.03, -v / 6.0), bb = b.coupon / 2.0 * (6.0 - v) / 6.0;
+    // Ruling R1-3: the coupon on the 1/8 of 1% grid, ties up; whole months for the short contracts.
+    const double cpn = std::floor(b.coupon * 800.0 + 0.5) / 800.0;
+    const bool whole = contract == FuturesContract::TwoYear || contract == FuturesContract::ThreeYear ||
+                       contract == FuturesContract::FiveYear;
+    const int n = months / 12, z = whole ? months % 12 : months % 12 / 3 * 3;
+    const double v = z < 7 ? z : z - 6;
+    const double a = std::pow(1.03, -v / 6.0), bb = cpn / 2.0 * (6.0 - v) / 6.0;
     const double c = z < 7 ? std::pow(1.03, -2.0 * n) : std::pow(1.03, -2.0 * n - 1.0);
-    const double cf = a * (b.coupon / 2.0 + (b.coupon / 0.06) * (1.0 - c) + c) - bb;
+    const double cf = a * (cpn / 2.0 + (cpn / 0.06) * (1.0 - c) + c) - bb;
     return std::nearbyint(cf * 1e4) / 1e4;  // default rounding mode: half-even
 }
 

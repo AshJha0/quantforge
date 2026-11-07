@@ -123,3 +123,21 @@ TEST_CASE("Nelson-Siegel bond fit recovers known betas") {
     CHECK(code_of([&] { bond_nelson_siegel(s, tau, bonds, std::vector<double>{1, 1, 0, 0, 0}); }) == "E_INPUT");
     CHECK(code_of([&] { bond_nelson_siegel(s, 0.0, bonds, std::nullopt); }) == "E_DOMAIN");
 }
+
+TEST_CASE("conversion factor contracts (ruling R1-3)") {
+    const Date dm = d("2026-12-01");
+    const Bond b8{d("2031-08-15"), 0.0425, 2};  // n = 4, z = 8 whole months
+    // FIVE_YEAR keeps z = 8, so v = z - 6 = 2 and C carries the extra half year.
+    const double a = std::pow(1.03, -2.0 / 6.0), c = std::pow(1.03, -9.0);
+    const double five = std::nearbyint((a * (0.02125 + (0.0425 / 0.06) * (1 - c) + c) - 0.02125 * 4.0 / 6.0) * 1e4) / 1e4;
+    CHECK(conversion_factor(b8, dm, 0.06, FuturesContract::FiveYear) == five);
+    // TEN_YEAR rounds z down to 6: v = 6, b = 0, no extra half year.
+    const double ten = std::nearbyint((std::pow(1.03, -1.0) * (0.02125 + (0.0425 / 0.06) * (1 - std::pow(1.03, -8.0)) +
+                                                               std::pow(1.03, -8.0))) * 1e4) / 1e4;
+    CHECK(conversion_factor(b8, dm, 0.06) == ten);
+    CHECK(conversion_factor(b8, dm, 0.06, FuturesContract::Bond) == ten);
+    // The coupon goes to the 1/8 of 1% grid first, ties up.
+    CHECK(conversion_factor({d("2031-08-15"), 0.04240, 2}, dm, 0.06) == ten);
+    CHECK(conversion_factor({d("2031-08-15"), 0.044375, 2}, dm, 0.06) ==
+          conversion_factor({d("2031-08-15"), 0.045, 2}, dm, 0.06));
+}

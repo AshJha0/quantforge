@@ -75,3 +75,12 @@ TEST_CASE("stage C and D operations match their goldens through the CLI layer") 
         }
     }
 }
+
+TEST_CASE("credit operations need a LOG_LINEAR_DF discount curve (ruling R1-4)") {
+    const auto r = quantforge::cli::run_case(
+        R"({"schema_version":"1.0","case_id":"x","operation":"credit.cds.bootstrap","inputs":{"trade_date":"2026-11-06",)"
+        R"("discount":{"as_of":"2026-11-06","interpolation":"LINEAR_ZERO","pillars":[{"date":"2031-11-06","discount_factor":0.85}]},)"
+        R"("recovery":-1,"quotes":[{"tenor":"5Y","spread":0.01}]}})");
+    CHECK_FALSE(r.ok);
+    CHECK(r.json.find(R"("code":"E_INPUT")") != std::string::npos);  // before the recovery rule
+}
