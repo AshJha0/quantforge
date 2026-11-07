@@ -5,9 +5,10 @@
 On branch `r2`. No golden value of an earlier stage changed.
 
 ### Added
-- CLI contract 1.7.0, with no new error code; the wire `contract_version` stays 1.0.0. New operations: `risk.curve.par` (bump and rebuild, one bucket per quote), `risk.curve.key_rate` (`TRIANGULAR` or `PILLAR` zero shifts on a given curve), `risk.curve.jacobian` (zero rates against par quotes) and `risk.pnl.explain` (full revaluation against par risk times the move, with a threshold, `max(5% |full|, 5% |par_dv01|)` in spec 1.0.0; formula under review in audit item 3, TODO). Products are `OIS` and `BOND`. Specs in `specifications/06-risk/`.
+- CLI contract 1.7.0, with no new error code; the wire `contract_version` stays 1.0.0. New operations: `risk.curve.par` (bump and rebuild, one bucket per quote), `risk.curve.key_rate` (`TRIANGULAR` or `PILLAR` zero shifts on a given curve), `risk.curve.jacobian` (zero rates against par quotes) and `risk.pnl.explain` (full revaluation against par risk times the move, with threshold `0.05 max(|full_pnl|, gross_risk_pnl) + 1e-8 x notional`, a project choice and not the FRTB P&L attribution test; the real-move run reports Spearman and Kolmogorov-Smirnov statistics without judging them). Products are `OIS` and `BOND`. Specs in `specifications/06-risk/`.
 - Goldens `datasets/golden/r2/risk_r2.json` (41 cases) and `pnl_r2.json` (44 cases), each re-priced in QuantLib 1.44. The oracle checks the pillar chain rule, par buckets against pillar key rates times the Jacobian, on every product.
 - Specs for the calibration stability report (`03-calibration/stability.md`) and workflow (b), the rich/cheap screen (`04-pricing/workflow-b-rich-cheap.md`), and the real-move P&L explain tool `tools/workflows/pnl_explain.py`.
+- Rulings R2-A1 to R2-A8 (`specifications/r2-rulings.md`), including a move-scaled P&L explain threshold (`pnl_r2` regenerated, no flag changed), `1/D_mod^2` rich/cheap weights with Treasury on-the-run and first off-the-run issues reported but not fitted, and the Jacobian basis (continuous zeros on ACT/365F).
 - R2 sections in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`.
 
 ### Changed
@@ -16,7 +17,7 @@ On branch `r2`. No golden value of an earlier stage changed.
 
 ### Known issues
 - The calendar provenance check still fails: SIFMA has not published its 2027 US holiday schedule, usually out in December, so the check stays red until then.
-- To fill in before the tag (TODO): P&L explain share of days explained on real moves; calibration stability first run; rich/cheap first report; Python fuzz rate; stage D mutation scores; P&L explain threshold formula (audit item 3); cross-platform matrix results.
+- To fill in before the tag (TODO): P&L explain share of days explained on real moves; calibration stability first run; rich/cheap first report; Python fuzz rate; stage D mutation scores; cross-platform matrix results.
 
 ## 0.4.1: R1, credibility hardening (2026-11-07)
 

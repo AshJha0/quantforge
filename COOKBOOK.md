@@ -103,7 +103,7 @@ Expected: 13 pillar dates, their zero rates, and a lower-triangular 13 by 13 mat
 pick datasets/golden/r2/pnl_r2.json pnl_r2-0001 pnl_r2-0011 | rust/target/release/quantforge --batch
 ```
 
-Expected: `pnl_r2-0001` explained (unexplained 0.7134295024516177, threshold 240.34723356314117); `pnl_r2-0011` not (unexplained -91509.0298994584, threshold 58582.60479558736). CLI output: TODO. The threshold values may change with the threshold review (audit item 3): TODO.
+Expected: `pnl_r2-0001` explained (unexplained 0.7134295024516177, threshold 240.71713873755908); `pnl_r2-0011` not (unexplained -91509.0298994584, threshold 63158.45945421277). CLI output: TODO.
 
 Over real daily moves, once a build passes the goldens:
 
