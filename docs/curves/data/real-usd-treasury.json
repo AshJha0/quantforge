@@ -1,0 +1,226 @@
+{
+ "meta": {
+  "commit": "af081b9",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "real",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.2.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.2.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.2.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  }
+ },
+ "inputs": {
+  "as_of": "2026-11-06",
+  "quotes": [
+   {
+    "tenor": "1M",
+    "rate": 0.04019999999999999
+   },
+   {
+    "tenor": "2M",
+    "rate": 0.0415
+   },
+   {
+    "tenor": "3M",
+    "rate": 0.04190000000000001
+   },
+   {
+    "tenor": "4M",
+    "rate": 0.04190000000000001
+   },
+   {
+    "tenor": "6M",
+    "rate": 0.042300000000000004
+   },
+   {
+    "tenor": "1Y",
+    "rate": 0.0433
+   },
+   {
+    "tenor": "2Y",
+    "rate": 0.0451
+   },
+   {
+    "tenor": "3Y",
+    "rate": 0.045899999999999996
+   },
+   {
+    "tenor": "5Y",
+    "rate": 0.0464
+   },
+   {
+    "tenor": "7Y",
+    "rate": 0.047400000000000005
+   },
+   {
+    "tenor": "10Y",
+    "rate": 0.048600000000000004
+   },
+   {
+    "tenor": "20Y",
+    "rate": 0.0529
+   },
+   {
+    "tenor": "30Y",
+    "rate": 0.0526
+   }
+  ],
+  "previous": {
+   "as_of": "2026-11-05",
+   "quotes": [
+    {
+     "tenor": "1M",
+     "rate": 0.0403
+    },
+    {
+     "tenor": "2M",
+     "rate": 0.0415
+    },
+    {
+     "tenor": "3M",
+     "rate": 0.0417
+    },
+    {
+     "tenor": "4M",
+     "rate": 0.0416
+    },
+    {
+     "tenor": "6M",
+     "rate": 0.04190000000000001
+    },
+    {
+     "tenor": "1Y",
+     "rate": 0.042800000000000005
+    },
+    {
+     "tenor": "2Y",
+     "rate": 0.0446
+    },
+    {
+     "tenor": "3Y",
+     "rate": 0.0453
+    },
+    {
+     "tenor": "5Y",
+     "rate": 0.045899999999999996
+    },
+    {
+     "tenor": "7Y",
+     "rate": 0.047
+    },
+    {
+     "tenor": "10Y",
+     "rate": 0.0484
+    },
+    {
+     "tenor": "20Y",
+     "rate": 0.0527
+    },
+    {
+     "tenor": "30Y",
+     "rate": 0.0525
+    }
+   ]
+  },
+  "sofr": [
+   [
+    "2026-11-04",
+    0.0394
+   ],
+   [
+    "2026-11-05",
+    0.0392
+   ]
+  ],
+  "fetched": "2026-11-07"
+ },
+ "reference": {
+  "pillars": [
+   {
+    "date": "2026-12-14",
+    "discount_factor": 0.9957727186305418
+   },
+   {
+    "date": "2027-01-13",
+    "discount_factor": 0.9922247003102393
+   },
+   {
+    "date": "2027-02-12",
+    "discount_factor": 0.988732110034245
+   },
+   {
+    "date": "2027-03-12",
+    "discount_factor": 0.9855597770155683
+   },
+   {
+    "date": "2027-05-12",
+    "discount_factor": 0.9785084619790956
+   },
+   {
+    "date": "2027-11-15",
+    "discount_factor": 0.9569475509330236
+   },
+   {
+    "date": "2028-11-14",
+    "discount_factor": 0.9134018136695298
+   },
+   {
+    "date": "2029-11-15",
+    "discount_factor": 0.8712346973490014
+   },
+   {
+    "date": "2031-11-13",
+    "discount_factor": 0.7935946250084945
+   },
+   {
+    "date": "2033-11-15",
+    "discount_factor": 0.7180495971172015
+   },
+   {
+    "date": "2036-11-13",
+    "discount_factor": 0.615192626440434
+   },
+   {
+    "date": "2046-11-15",
+    "discount_factor": 0.3395035159144775
+   },
+   {
+    "date": "2056-11-14",
+    "discount_factor": 0.20466555190583124
+   }
+  ]
+ },
+ "agreement": 1.071365218763276e-14
+}

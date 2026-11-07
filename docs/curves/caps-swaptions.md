@@ -52,11 +52,11 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 ## Oracle evidence and limits
 
-10 golden cases with status ok in `datasets/golden/stage_d` for `rates.cap.price`, `rates.swaption.price`, by `verified_by`:
+22 golden cases with status ok in `datasets/golden/stage_d` for `rates.cap.price`, `rates.swaption.price`, by `verified_by`:
 
 | Operation: sources | Cases |
 |---|---|
-| rates.cap.price: independent-replay, quantlib-1.44 | 6 |
-| rates.swaption.price: independent-replay, quantlib-1.44 | 4 |
+| rates.cap.price: independent-replay, quantlib-1.44 | 12 |
+| rates.swaption.price: independent-replay, quantlib-1.44 | 10 |
 
 Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.

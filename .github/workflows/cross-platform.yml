@@ -1,0 +1,126 @@
+name: Cross-platform conformance
+# Weekly Linux, Windows and macOS x the four languages (plan 11.1.5). Standard runners are free on a public repo.
+# Not on pull requests, so it never slows one; run it by hand before a release. The Linux leg repeats
+# conformance.yml on purpose, so the three columns of one run share a commit.
+on:
+  schedule:
+    - cron: '17 4 * * 0'
+  workflow_dispatch:
+    inputs:
+      golden:
+        description: 'golden folder to run'
+        default: datasets/golden
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  GOLDEN: ${{ inputs.golden || 'datasets/golden' }}
+jobs:
+  conformance:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-15]
+        lang: [java, cpp, python, rust]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    env:
+      MSYS_NO_PATHCONV: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pick python
+        run: echo "PY=$(command -v python3 || command -v python)" >> "$GITHUB_ENV"
+
+      # ---- Java ----
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        if: matrix.lang == 'java'
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - if: matrix.lang == 'java'
+        run: mvn -B -DskipTests package
+        working-directory: java25
+
+      # ---- C++: GCC 16 where the platform offers it ----
+      - name: C++ toolchain (Linux)
+        if: matrix.lang == 'cpp' && runner.os == 'Linux'
+        run: |
+          sudo apt-get update && sudo apt-get install -y ninja-build
+          docker run --rm -v "$PWD:/w" -w /w gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
+            bash -c "apt-get update -qq && apt-get install -y -qq cmake ninja-build >/dev/null && cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build cpp26/build --parallel && ctest --test-dir cpp26/build --output-on-failure"
+          sudo chown -R "$(id -u)" cpp26/build
+      - name: C++ toolchain (Windows, MSYS2 UCRT GCC)
+        if: matrix.lang == 'cpp' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja"
+          "C:\msys64\ucrt64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: C++ build (Windows)
+        if: matrix.lang == 'cpp' && runner.os == 'Windows'
+        run: |
+          g++ --version | head -1
+          cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+          cmake --build cpp26/build --parallel
+          ctest --test-dir cpp26/build --output-on-failure
+      - name: C++ build (macOS, Homebrew GCC)
+        if: matrix.lang == 'cpp' && runner.os == 'macOS'
+        run: |
+          brew install gcc ninja
+          cxx=$(ls "$(brew --prefix)"/bin/g++-[0-9]* | sort -V | tail -1)
+          "$cxx" --version | head -1
+          cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER="$cxx"
+          cmake --build cpp26/build --parallel
+          ctest --test-dir cpp26/build --output-on-failure
+
+      # ---- Python ----
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        if: matrix.lang == 'python'
+      - if: matrix.lang == 'python'
+        run: uv sync --locked --project python
+
+      # ---- Rust ----
+      - if: matrix.lang == 'rust'
+        run: rustup show && cargo build --release -p quantforge-cli
+        working-directory: rust
+
+      - name: Conformance
+        run: |
+          "$PY" conformance/runner/runner.py --impl "${{ matrix.lang }}" --golden "$GOLDEN"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: conformance-${{ matrix.os }}-${{ matrix.lang }}
+          path: conformance/reports/
+          if-no-files-found: ignore
+  summary:
+    needs: conformance
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: reports
+      - name: Matrix table
+        run: |
+          {
+            echo "## Cross-platform conformance"
+            echo
+            echo "| OS | Language | Report files |"
+            echo "|---|---|---:|"
+            for d in reports/conformance-*; do
+              [ -d "$d" ] || continue
+              n=${d#reports/conformance-}
+              echo "| ${n%-*} | ${n##*-} | $(find "$d" -type f | wc -l) |"
+            done
+            echo
+            echo "Pass or fail per cell is the job status above; reports are the uploaded artifacts."
+          } >> "$GITHUB_STEP_SUMMARY"

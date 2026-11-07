@@ -30,3 +30,7 @@ Add a synthetic example to `examples/` and an entry in `CURVES`, and remove the 
 ## Charts
 
 Charts are inline SVG inside one `<div class="chart">` line, so Python-Markdown treats each as a raw block. Colours are CSS variables from `tools/build_site.py`, set in `style` attributes, because `var()` does not work in SVG presentation attributes. The `viewBox` is 480 wide and scales to the page, which keeps labels readable on a phone.
+
+## After golden-only changes
+
+When new golden cases land but no implementation or example changed, the gallery's evidence counts go stale and `--check` reports "golden evidence changed". Run `python tools/build_gallery.py --evidence-only`. It recounts evidence from `datasets/golden` and re-renders the pages, with no CLI runs, and leaves the committed run data alone, so `--check` still tests it against the CLI.

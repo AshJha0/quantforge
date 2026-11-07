@@ -1,0 +1,40 @@
+name: Outside-oracle coverage
+# Plan rule 11.2.5 and R1 item 1: stage D outside-oracle share must stay at or above 60%.
+# oracle/python/outside_d.py rebuilds every stage D case in QuantLib 1.44 (pinned in oracle/python/uv.lock,
+# installed from PyPI, free) and exits 1 below the floor. --frozen, not --locked: uv.lock still records the
+# project's own version as 0.2.0, which --locked rejects; every dependency pin, QuantLib 1.44 included, is used as locked. A light PR check: it runs only when the oracle,
+# the golden datasets or the specifications change, and needs no CLI build.
+on:
+  push:
+    branches: [main]
+    paths: ['oracle/**', 'datasets/**', 'specifications/**', 'conformance/tolerances/**', 'conformance/runner/runner.py', '.github/workflows/oracle-coverage.yml']
+  pull_request:
+    paths: ['oracle/**', 'datasets/**', 'specifications/**', 'conformance/tolerances/**', 'conformance/runner/runner.py', '.github/workflows/oracle-coverage.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  outside-d:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Coverage floor (exits 1 below 60%)
+        shell: bash # explicit bash adds pipefail, so tee keeps the exit status
+        run: uv run --frozen python -W ignore outside_d.py | tee "$RUNNER_TEMP/coverage.md"
+        working-directory: oracle/python
+      - name: Register matches the committed copy
+        run: |
+          if ! git diff --exit-code --stat oracle/outside_register.json; then
+            echo "::error::oracle/outside_register.json differs from a fresh run; rerun outside_d.py and commit the register"
+            exit 1
+          fi
+      - name: Summary
+        if: always()
+        run: cat "$RUNNER_TEMP/coverage.md" >> "$GITHUB_STEP_SUMMARY" || true

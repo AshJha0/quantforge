@@ -343,10 +343,10 @@
    "rates.cap.price",
    "rates.swaption.price"
   ],
-  "cases": 10,
+  "cases": 22,
   "by_source": {
-   "rates.cap.price: independent-replay, quantlib-1.44": 6,
-   "rates.swaption.price: independent-replay, quantlib-1.44": 4
+   "rates.cap.price: independent-replay, quantlib-1.44": 12,
+   "rates.swaption.price: independent-replay, quantlib-1.44": 10
   }
  }
 }

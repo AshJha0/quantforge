@@ -52,6 +52,7 @@ def main():
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--suite", default="*")
     ap.add_argument("--compiler", default="g++")
+    ap.add_argument("--out", help="write the counts and survivors to this JSON file")
     a = ap.parse_args()
     killed, no_build, survived = 0, 0, []
     with tempfile.TemporaryDirectory(prefix="qf-mutants-") as tmp:
@@ -86,6 +87,11 @@ def main():
           f"did not build {no_build}, survived {len(survived)}")
     for row in survived:
         print("SURVIVED", row)
+    if a.out:
+        Path(a.out).write_text(json.dumps({"summary": {"impl": "cpp", "target": a.file, "suite": a.suite, "seed": a.seed,
+                                                       "sites": len(chosen), "killed": killed, "no_build": no_build,
+                                                       "survived": len(survived)}, "survivors": survived}, indent=1) + "\n",
+                               encoding="utf-8")
     return 0
 
 

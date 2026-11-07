@@ -1,0 +1,91 @@
+name: Daily workflows
+# Plan 11.2.7 (a) and (c): real-data acceptance runs, one dated report each, pushed to branch forward-log under
+# reports/<date>/. Not on pull requests. Uses the Rust CLI because it is the fastest to run (benchmarks/README.md);
+# a failed fail-level check fails the job, after the report is pushed.
+on:
+  schedule:
+    - cron: '0 15 * * 1-5' # after the NY Fed's 08:00 ET SOFR and averages
+  workflow_dispatch:
+    inputs:
+      impl:
+        type: choice
+        options: [rust, python, java, cpp]
+        default: rust
+permissions:
+  contents: write
+concurrency:
+  group: daily-workflows # recorder.yml also pushes to forward-log; both retry with a rebase
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      IMPL: ${{ inputs.impl || 'rust' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: env.IMPL == 'rust'
+        with:
+          path: |
+            ~/.cargo/registry
+            rust/target
+          key: daily-rust-${{ hashFiles('rust/Cargo.lock', 'rust/rust-toolchain.toml') }}
+      - if: env.IMPL == 'rust'
+        run: cargo build --release -p quantforge-cli
+        working-directory: rust
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        if: env.IMPL == 'python'
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        if: env.IMPL == 'java'
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - if: env.IMPL == 'java'
+        run: mvn -B -DskipTests package
+        working-directory: java25
+      - if: env.IMPL == 'cpp'
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
+            bash -c "apt-get update -qq && apt-get install -y -qq cmake ninja-build >/dev/null && cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF && cmake --build cpp26/build --parallel"
+          sudo chown -R "$(id -u)" cpp26/build
+      - name: (a) EOD curves
+        id: eod
+        continue-on-error: true
+        run: python3 tools/workflows/eod_curves.py --impl "$IMPL" --out out/reports
+      - name: (c) SOFR check
+        id: sofr
+        continue-on-error: true
+        run: python3 tools/workflows/sofr_check.py --impl "$IMPL" --out out/reports
+      - name: Push reports to forward-log
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if git ls-remote --exit-code --heads "$url" forward-log >/dev/null; then
+            git clone --branch forward-log "$url" log
+          else
+            git init -b forward-log log && git -C log remote add origin "$url"
+          fi
+          mkdir -p log/reports && cp -r out/reports/. log/reports/
+          cd log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -q -m "workflows: reports $(date -u +%Y-%m-%d) (${IMPL}, main ${GITHUB_SHA::7})"
+          for i in 1 2 3; do git push origin forward-log && exit 0; git pull --rebase -q origin forward-log; done
+          exit 1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: daily-reports
+          path: out/reports/
+      - name: Fail on a failed check
+        if: steps.eod.outcome == 'failure' || steps.sofr.outcome == 'failure'
+        run: |
+          echo "::error::a fail-level check failed; see the reports on branch forward-log"
+          exit 1
