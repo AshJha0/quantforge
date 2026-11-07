@@ -218,6 +218,64 @@ On the nine strikes of case `sabr-0013` the density at 0.0005 is -174.5744972324
 
 The inputs of every case are in `datasets/golden/stage_c/*.json`. Wrap a case's `operation` and `inputs` in `{"schema_version":"1.0","case_id":"x",...}` and pipe it to the CLI. That is how the [Learn](LEARN.md#stage-c-equity-vol-slice) worked examples were made, including use case 3 (`usecases_c-0001`).
 
-## Stage D recipes (in progress)
+## Stage D recipes
 
-No stage D CLI operations exist yet. Recipes are added here, one per curve, as each operation passes conformance in all four languages. Until then the [Curves gallery](docs/curves/README.md) lists the planned stage D pages.
+Outputs below are the golden values of the named case; all four builds match them within tolerance. Recipes that need curves point to a case to copy the inputs from.
+
+### Compound SOFR with a lookback
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"rates.ois.compound_dated",
+ "inputs":{"convention":"SOFR","start":"2026-11-10","end":"2027-02-10",
+ "method":"LOOKBACK","shift_days":2,"fixings":[...]}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Copy `fixings` from case `compound_d-0002`. Output: `compounded_rate` 0.04333939898551821. Methods: `NONE`, `LOOKBACK`, `OBSERVATION_SHIFT`, `LOCKOUT` (`specifications/02-curves/overnight-compounding.md`).
+
+### Futures convexity
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"rates.futures.convexity",
+ "inputs":{"price":96.0,"start_years":0.25,"end_years":0.5,
+ "sigma":0.01,"mean_reversion":0.03}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Output (case `futures_d-0001`): `futures_rate` 0.04, `convexity` 9.33955888783533e-06, `forward_rate` 0.039990660441112165.
+
+### Price a bond from its yield
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"bond.price.from_yield",
+ "inputs":{"bond":{"maturity":"2029-11-15","coupon":0.0425,"frequency":2},
+ "settlement":"2026-11-09","yield":0.041}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Output (case `bonds_d-0001`): clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.74949144731416. `bond.yield.from_price` goes back.
+
+### Price a pass-through MBS
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"mbs.price",
+ "inputs":{"pool":{"balance":1000000,"wac":0.065,"net_coupon":0.06,"wam":60,"age":0,
+ "prepayment":{"model":"PSA","speed":150}},"yield":0.055,"delay_days":24}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Output (case `mbs_d-0004`): price 100.76748931062598, modified duration 2.3323199804373487, WAL 2.4872786417395525.
+
+### Recipes that need curves
+
+Copy the inputs of the named case from `datasets/golden/stage_d/`:
+
+| Task | Operation | Case |
+|---|---|---|
+| ESTR OIS curve; with a year-end jump | `rates.ois.bootstrap` | `ois_d-0001`; `ois_d` cases tagged `turn-of-year` |
+| Meeting-date step curve and fit | `rates.ois.step_curve`, `rates.ois.fit_steps` | `steps_d-0001`, `steps_d-0007` |
+| IBOR fallback rate | `rates.fallback.rate` | `compound_d` cases tagged `fallback` |
+| CSA discounting, OIS basis, joint bootstrap | `rates.csa.discount`, `rates.basis.ois_spread`, `rates.curve.joint_bootstrap` | `csa_d-0001`, `csa_d-0008`, `csa_d-0011` |
+| Z-spread, asset swap, FRN, repo, CTD | `bond.*`, `repo.*` | `bonds_d`, `repo_d` |
+| Cross-currency curve and NDF | `fx.xccy.*`, `fx.ndf.pv` | `xccy_d-0001`, `xccy_d-0002` |
+| CDS price and hazard curve | `credit.*` | `credit_d-0004`, `credit_d-0001` |
+| Implied dividends, TRS | `eq.*` | `equity_d-0001`, `trs_d-0001` |
+| CPI curve, ZCIS, linkers | `infl.*` | `inflation_d-0001`, `inflation_d-0007` |
+| Caps and swaptions | `rates.cap.price`, `rates.swaption.price` | `capswaption_d-0001`, `capswaption_d-0010` |
+| Commodity curve and storage | `cmdty.*` | `commodity_d-0001`, `commodity_d-0007` |
