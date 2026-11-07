@@ -361,6 +361,62 @@ def h_repo_implied(u, i, exp):
     return {"repo_rate": num / den}
 
 
+def h_csa(u, i, exp):
+    if i.get("fx") is not None:
+        raise NotImplementedError("CSA with FX forwards has no QuantLib object")
+    qc, a = curve(u, i["curve"])
+    qc.enableExtrapolation()
+    ql.Settings.instance().evaluationDate = Q(a)
+    sp = u("CRV.ZERO_SPREAD", ql.YieldTermStructureHandle(qc), i["collateral_spread"])
+    sp.enableExtrapolation()
+    return {"discount_factors": [sp.discount(Q(D(d))) for d in i["dates"]]}
+
+
+def _xccy_leg(u, idx_row, proj, disc, start, months, n, spread):
+    cal = u("CAL.JOINT_USGS_EUTA")
+    sch = ql.Schedule(Q(start), Q(add_months(start, months)), ql.Period(3, ql.Months), cal, u("BDC.MODIFIED_FOLLOWING"), u("BDC.MODIFIED_FOLLOWING"),
+                      ql.DateGeneration.Forward, False)
+    u.rows.add("GEN.FORWARD")
+    ix = u(idx_row, ql.YieldTermStructureHandle(proj))
+    leg = ql.OvernightLeg([n], sch, ix, u("DC.ACT_360"), u("BDC.MODIFIED_FOLLOWING"), [1.0], [spread], True)
+    dh = ql.YieldTermStructureHandle(disc)
+    cpn = ql.CashFlows.npv(leg, dh, False, disc.referenceDate(), disc.referenceDate())
+    return cpn + n * disc.discount(sch[len(sch) - 1]) - n * disc.discount(sch[0])
+
+
+def h_xccy_pv(u, i, exp):
+    dom, a = curve(u, i["domestic"])
+    fp, _ = curve(u, i["foreign_projection"])
+    fd, _ = curve(u, i["foreign_discount"])
+    for c in (dom, fp, fd):
+        c.enableExtrapolation()
+    ql.Settings.instance().evaluationDate = Q(a)
+    t = i["trade"]
+    st = D(t["start"])
+    fl = _xccy_leg(u, "IDX.ESTR", fp, fd, st, t["months"], t["foreign_notional"], t["spread"])
+    dl = _xccy_leg(u, "IDX.SOFR", dom, dom, st, t["months"], t["foreign_notional"] * i["spot"], 0.0)
+    sign = 1 if t["side"] == "RECEIVE_FOREIGN" else -1
+    return {"pv": sign * (i["spot"] * fl - dl), "foreign_leg": fl, "domestic_leg": dl}
+
+
+def h_xccy_boot(u, i, exp):
+    """Reprice check: the golden foreign discount pillars, with QuantLib OvernightLeg foreign legs, give L_foreign within 1e-12 per unit
+    for every quote, and the pillar dates are QuantLib's schedule ends."""
+    fp, a = curve(u, i["foreign_projection"])
+    fp.enableExtrapolation()
+    ql.Settings.instance().evaluationDate = Q(a)
+    fd, _ = curve(u, {"as_of": str(a), "interpolation": i["interpolation"], "pillars": exp["pillars"]})
+    fd.enableExtrapolation()
+    st = D(i["start"])
+    bad = [{"date": p["date"], "discount_factor": None} for p in exp["pillars"]]
+    cal = u("CAL.JOINT_USGS_EUTA")
+    for q, p in zip(i["quotes"], exp["pillars"]):
+        end = cal.adjust(Q(add_months(st, q["months"])), u("BDC.MODIFIED_FOLLOWING")).ISO()
+        if end != p["date"] or abs(_xccy_leg(u, "IDX.ESTR", fp, fd, st, q["months"], 1.0, q["spread"])) > 1e-12:
+            return {"pillars": bad}
+    return {"pillars": exp["pillars"]}
+
+
 # ---------------------------------------------------------------- dispatch
 HANDLERS = {
     "bond.price.from_yield": h_price_from_yield,
@@ -371,6 +427,9 @@ HANDLERS = {
     "rates.cap.price": h_cap,
     "rates.swaption.price": h_swaption,
     "credit.cds.price": h_cds,
+    "rates.csa.discount": h_csa,
+    "fx.xccy.pv": h_xccy_pv,
+    "fx.xccy.bootstrap": h_xccy_boot,
     "rates.futures.convexity": h_futures_convexity,
     "repo.forward": h_repo_forward,
     "repo.implied_rate": h_repo_implied,
@@ -438,7 +497,7 @@ def verify_all(folder="stage_d", show=True):
 NO_ORACLE = {
     "bondfit_d": "Nelson-Siegel fit judged on repricing; QuantLib's FittedBondDiscountCurve fits by its own optimiser path, so it cannot reproduce a golden independently of iteration path",
     "commodity_d": "no QuantLib object for monthly log-linear commodity forwards with additive seasonality or for storage carry",
-    "csa_d": "CSA discounting with FX forwards is a composition of curve ratios; QuantLib has no CSA-discount object, so a check would re-implement the spec",
+    "csa_d": "cases without FX count via QuantLib ZeroSpreadedTermStructure; CSA with FX forwards has no QuantLib object; spread and basis cases are internal",
     "equity_d": "QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions",
     "fits_d": "smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent",
     "index_d": "index dividends, rebalancing and corporate actions have no QuantLib object",
@@ -449,7 +508,7 @@ NO_ORACLE = {
     "rulings_r1": "internal: spec rulings; CME conversion factors have no QuantLib object",
     "steps_d": "meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit",
     "trs_d": "QuantLib has no equity total return swap with these legs",
-    "xccy_d": "constant-notional xccy legs could be built from QuantLib OvernightLegs, deferred: the curve solve and NDF are compositions of the spec's own curves",
+    "xccy_d": "PV and bootstrap count via QuantLib OvernightLeg; NDF has no QuantLib object; the rest are error cases",
 }
 
 
