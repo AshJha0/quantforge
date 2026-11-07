@@ -22,6 +22,7 @@ def case(cid):
 
 
 def main():
+    D.estr()
     s = S("rulings_d", "stage-d-rulings.md")
     tag = lambda r: ["ruling", r]  # noqa: E731
     # D31: empty steps is a flat curve.

@@ -324,6 +324,7 @@ def d2():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     d2()
     note(f"stage D wave 2: {len(D.MUTANTS)} wrong-convention checks, each caught")

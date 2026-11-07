@@ -111,6 +111,7 @@ def infl_d():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     infl_d()
     note(f"stage D D6: {len(D.MUTANTS)} wrong-convention checks, each caught")
