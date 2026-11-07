@@ -152,7 +152,10 @@ impl StepCurve {
         steps: Vec<(Date, f64)>,
         jumps: Vec<(Date, f64)>,
     ) -> Result<StepCurve> {
-        check_step_dates(as_of, &steps.iter().map(|s| s.0).collect::<Vec<_>>())?;
+        let dates: Vec<Date> = steps.iter().map(|s| s.0).collect();
+        if !dates.is_empty() {
+            check_step_dates(as_of, &dates)?;
+        }
         check_jumps(as_of, &jumps)?;
         Ok(StepCurve {
             as_of,
@@ -556,7 +559,7 @@ mod tests {
             StepCurve::new(as_of, 0.04, s, j).unwrap_err().code
         };
         assert_eq!(e(vec![(as_of, 0.04)], vec![]), "E_INPUT");
-        assert_eq!(e(vec![], vec![]), "E_INPUT");
+        assert!(StepCurve::new(as_of, 0.04, vec![], vec![]).is_ok());
         let s = vec![(d("2027-01-01"), 0.04)];
         assert_eq!(e(s.clone(), vec![(as_of, 0.9)]), "E_INPUT");
         assert_eq!(e(s, vec![(d("2027-01-01"), 0.0)]), "E_DOMAIN");

@@ -155,9 +155,9 @@ pub fn futures_basis(
     };
     let fair = fwd(spread)?;
     let g = |s: f64| -> Result<f64> { Ok(fwd(s)? - price) };
-    match bisect(&g, -1.0, 1.0)? {
+    match bisect(&g, -0.5, 0.5)? {
         Some(s) => Ok((fair, price - fair, s)),
-        None => fail("E_NOT_BRACKETED", "no financing spread in [-1, 1]"),
+        None => fail("E_NOT_BRACKETED", "no financing spread in [-0.5, 0.5]"),
     }
 }
 
@@ -398,6 +398,8 @@ mod tests {
         assert!((basis - (5010.0 - fair)).abs() < 1e-12);
         let (again, _, _) = futures_basis(5000.0, &c, 0.003, s, &divs(), x, 5010.0).unwrap();
         assert!((again - 5010.0).abs() < 1e-9);
+        let far = futures_basis(5000.0, &c, 0.003, 0.0, &divs(), x, 3500.0).unwrap_err();
+        assert_eq!(far.code, "E_NOT_BRACKETED");
         let e = futures_basis(5000.0, &c, 0.003, 0.0, &[], d("2026-11-05"), 5000.0).unwrap_err();
         assert_eq!(e.code, "E_DATE_ORDER");
     }

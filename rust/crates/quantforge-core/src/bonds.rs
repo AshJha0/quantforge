@@ -363,7 +363,7 @@ pub fn conversion_factor(b: &Bond, delivery: Date, notional: f64) -> Result<f64>
         months -= 1;
     }
     if months < 0 {
-        return fail("E_INPUT", "maturity is before delivery");
+        return fail("E_DATE_ORDER", "maturity is before delivery");
     }
     let n = months / 12;
     let z = (months % 12) / 3 * 3;
@@ -440,8 +440,8 @@ pub fn fit_nelson_siegel(
     if weights.is_some_and(|w| w.len() != n) {
         return fail("E_INPUT", "weights and bonds differ in length");
     }
-    if weights.is_some_and(|w| w.iter().any(|x| *x < 0.0)) {
-        return fail("E_DOMAIN", "a weight is negative");
+    if weights.is_some_and(|w| w.iter().any(|x| *x < 0.0) || w.iter().sum::<f64>() <= 0.0) {
+        return fail("E_DOMAIN", "a weight is negative, or the weights sum to 0");
     }
     let w = |j: usize| weights.map_or(1.0, |w| w[j]);
     if (0..n).filter(|j| w(*j) > 0.0).count() < 3 {
@@ -638,6 +638,8 @@ mod tests {
                 .code,
             "E_INPUT"
         );
+        let early = conversion_factor(&b, d("2034-01-01"), 0.06).unwrap_err();
+        assert_eq!(early.code, "E_DATE_ORDER");
         let annual = Bond::new(d("2033-11-15"), 0.0425, 1);
         assert_eq!(
             conversion_factor(&annual, d("2026-12-01"), 0.06)
@@ -701,6 +703,13 @@ mod tests {
                 .unwrap_err()
                 .code,
             "E_INPUT"
+        );
+        let zero = [0.0; 4];
+        assert_eq!(
+            fit_nelson_siegel(s, 2.5, &bonds, Some(&zero))
+                .unwrap_err()
+                .code,
+            "E_DOMAIN"
         );
         let neg = [1.0, 1.0, 1.0, -1.0];
         assert_eq!(

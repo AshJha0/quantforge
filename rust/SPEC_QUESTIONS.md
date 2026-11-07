@@ -78,3 +78,24 @@ None of these is reached by a golden. Rulings C15 and C16 settled the readings o
 - `mbs.price`: `1 + y/12 <= 0` is `E_DOMAIN`.
 - `rates.cap.price` and `rates.swaption.price`: `tenor_months` outside 1 to 1200 is `E_INPUT`. A swaption `vol < 0` is `E_DOMAIN`. Under `BACHELIER`, any strike and forward are accepted.
 - `cmdty.curve.forward`: `seasonality` is a required key that may be `null`, and an empty `quotes` list is `E_INPUT`. In `cmdty.storage.carry`, a forward price `<= 0` is `E_DOMAIN`.
+
+## Stage D, closed by rulings D31 to D46 (merged from `stage-d` 2836b6b)
+
+- Closed, and the code changed:
+  - D31: an empty `steps` is now a flat curve.
+  - D32: `eq.futures.basis` now searches `[-0.5, 0.5]`.
+  - D35: a conversion-factor maturity before delivery is now `E_DATE_ORDER`.
+  - D36: CDS curves must have `as_of = trade_date`, else `E_INPUT`.
+  - D37: in `credit.index.intrinsic` and `bond.fit.nelson_siegel`, a negative weight or a zero sum is `E_DOMAIN`.
+- Closed, confirming the reading already taken: D33 (`wam` above 1200), D34 (`mbs.price` domain), D38 (robust singular), D39 (xccy `start`), D40 (`tenor_months`), D41 (TRS dates), D42 (duplicate forwards and fixings), D43 (`bonds_d-0048`), D44 (`mbs_d-0011`), D45 (convention ids), D46 (jump check order), D12 (empty `dates`).
+- Still open, each with the reading recorded above:
+  - Asset-swap floating dates with no month-end rule (`bonds_d-0041`).
+  - `index_ratio` over the input `base_cpi`, with `powf` (`inflation_d-0009`).
+  - The `joint_bootstrap` `GLOBAL` path, and `jumps` not read there.
+  - The 100-item limit on `ois_quotes` and `term_quotes`.
+  - Credit details: survival in `(0, 1]`, a maturity on or before the trade date, and the discount pillars as integration nodes.
+  - Equity details: empty `futures`, an expiry on or before `as_of`, the rebalance check order, and the TRS side names.
+  - Inflation and commodity: `seasonality` required but nullable, and `years` above 100.
+  - `BACHELIER` caps accepting any strike.
+  - `months` above 1200 in xccy.
+  - Robust fit non-convergence as `E_NO_CONVERGENCE`.

@@ -278,6 +278,14 @@ fn check_recovery(r: f64) -> Result<()> {
     Ok(())
 }
 
+/// Ruling D36: every curve's `as_of` is the trade date.
+fn check_as_of(t: Date, discount: &Curve, hazard: &Hazard) -> Result<()> {
+    if discount.as_of != t || hazard.as_of != t {
+        return fail("E_INPUT", "curves must have as_of = trade_date");
+    }
+    Ok(())
+}
+
 fn nodes(hazard: &Hazard, pillars: &[Date]) -> Vec<Date> {
     let mut n: Vec<Date> = hazard.dates[1..].to_vec();
     n.extend_from_slice(pillars);
@@ -297,6 +305,7 @@ pub fn price(
     digital: bool,
 ) -> Result<CdsPrice> {
     check_recovery(recovery)?;
+    check_as_of(t, discount, hazard)?;
     let ps = periods(t, trade.maturity)?;
     let e = Engine {
         t,
@@ -333,6 +342,9 @@ pub fn bootstrap(
     quotes: &[((i64, char), f64)],
 ) -> Result<Hazard> {
     check_recovery(recovery)?;
+    if discount.as_of != t {
+        return fail("E_INPUT", "discount as_of must be trade_date");
+    }
     if quotes.is_empty() {
         return fail("E_INPUT", "no quotes");
     }
@@ -407,6 +419,12 @@ pub fn index_intrinsic(
 ) -> Result<(Vec<f64>, f64)> {
     if names.is_empty() {
         return fail("E_INPUT", "no names");
+    }
+    if names.iter().any(|n| n.2 < 0.0) || names.iter().map(|n| n.2).sum::<f64>() <= 0.0 {
+        return fail("E_DOMAIN", "a weight is negative, or the weights sum to 0");
+    }
+    for (h, _, _) in names {
+        check_as_of(t, discount, h)?;
     }
     let trade = CdsTrade {
         maturity,
@@ -575,5 +593,42 @@ mod tests {
         );
         assert_eq!(Hazard::new(t, &[(t, 0.9)]).unwrap_err().code, "E_INPUT");
         assert_eq!(Hazard::new(t, &[(m, 0.0)]).unwrap_err().code, "E_DOMAIN");
+    }
+
+    #[test]
+    fn rulings_d36_d37() {
+        let (c, pil) = flat();
+        let t = d("2026-11-06");
+        let m = d("2031-12-20");
+        let h = Hazard::new(t, &[(m, 0.9)]).unwrap();
+        let neg = [(h.clone(), 0.4, -1.0)];
+        assert_eq!(
+            index_intrinsic(t, &c, &pil, &neg, m, 0.01)
+                .unwrap_err()
+                .code,
+            "E_DOMAIN"
+        );
+        let zero = [(h, 0.4, 0.0)];
+        assert_eq!(
+            index_intrinsic(t, &c, &pil, &zero, m, 0.01)
+                .unwrap_err()
+                .code,
+            "E_DOMAIN"
+        );
+        let later = Hazard::new(d("2026-11-09"), &[(m, 0.9)]).unwrap();
+        let tr = CdsTrade {
+            maturity: m,
+            coupon: 0.01,
+            notional: 1.0,
+            buy: true,
+        };
+        assert_eq!(
+            price(t, &c, &pil, &later, 0.4, &tr, false)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
+        let e = bootstrap(d("2026-11-09"), &c, &pil, 0.4, &[((5, 'Y'), 0.01)]).unwrap_err();
+        assert_eq!(e.code, "E_INPUT");
     }
 }
