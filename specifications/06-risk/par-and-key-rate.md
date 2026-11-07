@@ -2,7 +2,7 @@
 
 Spec version 1.0.0. Status: Specified (phase R2). Builds on `rates-sensitivities.md` (stage B) and keeps its sign and bump rules. Goldens: `datasets/golden/r2/risk_r2.json`, written by `oracle/python/gen_r2_risk.py`.
 
-All risk is bump and revalue (ADR-0010): no AD. Every number is **money per basis point**: the change in the product's value, in its currency, for a +1 bp move, with the sign of that change. A receiver of fixed gains when rates fall, so its DV01 is positive.
+All risk is bump and revalue (ADR-0010): no AD. Every number is **money per basis point**: the change in the product's value, in its currency, for a +1 bp move, with the sign of that change. Risk is `dV/d(bp)`: the value change for rates **up** 1 bp. A receiver of fixed loses when rates rise, so its DV01 is **negative**; a payer's is positive; a long bond's is negative. This is the sign of `rates-sensitivities.md` and of every golden (ruling R2-A1).
 
 ## Products
 
