@@ -66,4 +66,8 @@ New operations: `mbs.cashflows`, `mbs.price`. Goldens: `datasets/golden/stage_d/
 
 All of stage D is now specified.
 
+## Rulings on the builds' spec questions
+
+Rulings D31 to D46, with goldens in `datasets/golden/stage_d/rulings_d.json` (18 cases). `bonds.md`, `mbs.md` and `meeting-steps.md` were corrected to match goldens already in place.
+
 Not for language sessions: anything under `oracle/`.
