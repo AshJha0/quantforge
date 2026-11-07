@@ -263,3 +263,152 @@ mod tests {
         assert_eq!(code(&r), Some("E_NON_FINITE"));
     }
 }
+
+#[cfg(test)]
+mod stage_d_tests {
+    use super::*;
+
+    fn code(op: &str, inputs: &str) -> Option<String> {
+        let text = format!(
+            r#"{{"schema_version":"1.0","case_id":"c","operation":"{op}","inputs":{inputs}}}"#
+        );
+        let r = run_case(text.as_bytes()).0;
+        Some(r.get("error")?.get("code")?.as_str()?.to_string())
+    }
+
+    const CURVE: &str = r#"{"as_of":"2026-11-06","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2027-11-06","discount_factor":0.96}]}"#;
+    const CURVE_LATER: &str = r#"{"as_of":"2026-11-09","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2027-11-06","discount_factor":0.96}]}"#;
+
+    #[test]
+    fn jumps_null_is_schema_and_bad_jumps_are_checked() {
+        let q = r#""quotes":[{"tenor":"1Y","rate":0.03}],"interpolation":"LOG_LINEAR_DF","method":"SEQUENTIAL""#;
+        let b = |j: &str| {
+            code(
+                "rates.ois.bootstrap",
+                &format!(r#"{{"convention":"ESTR","as_of":"2026-11-06",{q}{j}}}"#),
+            )
+        };
+        assert_eq!(b(""), None);
+        assert_eq!(b(r#","jumps":[]"#), None);
+        assert_eq!(b(r#","jumps":null"#).as_deref(), Some("E_SCHEMA"));
+        assert_eq!(
+            b(r#","jumps":[{"date":"2026-12-31","factor":-1}]"#).as_deref(),
+            Some("E_DOMAIN")
+        );
+        let c = r#"{"as_of":"2026-11-06","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2027-11-06","discount_factor":0.96}],"jumps":[{"date":"2026-11-06","factor":0.99}]}"#;
+        let d = code(
+            "rates.curve.discount",
+            &format!(r#"{{"curve":{c},"dates":["2027-01-01"]}}"#),
+        );
+        assert_eq!(d.as_deref(), Some("E_INPUT"));
+    }
+
+    #[test]
+    fn compound_dated_convention_kinds() {
+        let rest = r#""start":"2026-11-10","end":"2026-11-12","method":"NONE","shift_days":0,"fixings":[{"date":"2026-11-10","rate":0.04}]"#;
+        let c = |id: &str| {
+            code(
+                "rates.ois.compound_dated",
+                &format!(r#"{{"convention":"{id}",{rest}}}"#),
+            )
+        };
+        assert_eq!(c("SOFR"), None);
+        assert_eq!(c("USD-TERM-3M").as_deref(), Some("E_INPUT"));
+        assert_eq!(c("NOPE").as_deref(), Some("E_SCHEMA"));
+        let m = code(
+            "rates.ois.compound_dated",
+            &format!(r#"{{"convention":"SOFR",{}}}"#, rest.replace("NONE", "BAD")),
+        );
+        assert_eq!(m.as_deref(), Some("E_SCHEMA"));
+        let f = code(
+            "rates.fallback.rate",
+            r#"{"ibor":"GBP-LIBOR-1M","start":"2026-11-10","end":"2026-11-12","fixings":[]}"#,
+        );
+        assert_eq!(f.as_deref(), Some("E_INPUT"));
+    }
+
+    #[test]
+    fn csa_fx_must_be_present() {
+        let base = format!(r#""curve":{CURVE},"collateral_spread":0.0,"dates":["2027-01-01"]"#);
+        assert_eq!(
+            code("rates.csa.discount", &format!("{{{base}}}")).as_deref(),
+            Some("E_SCHEMA")
+        );
+        assert_eq!(
+            code("rates.csa.discount", &format!(r#"{{{base},"fx":null}}"#)),
+            None
+        );
+        let fx = r#","fx":{"spot":1.1,"forwards":[{"date":"2027-01-01","forward":1.2}]}"#;
+        assert_eq!(code("rates.csa.discount", &format!("{{{base}{fx}}}")), None);
+        let none = code(
+            "rates.csa.discount",
+            &format!(r#"{{"curve":{CURVE},"collateral_spread":0.0,"dates":[],"fx":null}}"#),
+        );
+        assert_eq!(none.as_deref(), Some("E_INPUT"));
+    }
+
+    #[test]
+    fn basis_needs_one_as_of() {
+        let s = |b: &str| {
+            code(
+                "rates.basis.ois_spread",
+                &format!(
+                    r#"{{"convention":"SOFR","tenor":"1Y","discount":{CURVE},"projection_a":{CURVE},"projection_b":{b}}}"#
+                ),
+            )
+        };
+        assert_eq!(s(CURVE), None);
+        assert_eq!(s(CURVE_LATER).as_deref(), Some("E_INPUT"));
+    }
+
+    #[test]
+    fn step_ops_and_fits_inputs() {
+        let s = |extra: &str| {
+            code(
+                "rates.ois.step_curve",
+                &format!(
+                    r#"{{"as_of":"2026-11-06","base_rate":0.04,"steps":[{{"date":"2027-01-01","rate":0.03}}]{extra}}}"#
+                ),
+            )
+        };
+        assert_eq!(s(r#","jumps":[],"dates":["2027-02-01"]"#), None);
+        assert_eq!(s(r#","dates":["2027-02-01"]"#).as_deref(), Some("E_SCHEMA"));
+        assert_eq!(s(r#","jumps":[],"dates":[]"#).as_deref(), Some("E_INPUT"));
+        let w = |extra: &str| {
+            code(
+                "calib.curve.smooth",
+                &format!(
+                    r#"{{"knots":[1,2],"maturities":[1,2],"zero_rates":[0.03,0.04],"lambda":0.1{extra}}}"#
+                ),
+            )
+        };
+        assert_eq!(w(""), None);
+        assert_eq!(w(r#","weights":[1,1]"#), None);
+        assert_eq!(w(r#","weights":null"#).as_deref(), Some("E_SCHEMA"));
+        let r = code(
+            "calib.curve.robust",
+            r#"{"maturities":[1,2,3,5],"zero_rates":[0.03,0.032,0.033,0.04],"tau":2,"delta":0.001}"#,
+        );
+        assert_eq!(r, None);
+        let f = code(
+            "rates.futures.convexity",
+            r#"{"price":96,"start_years":1,"end_years":1.25,"sigma":0.01,"mean_reversion":0}"#,
+        );
+        assert_eq!(f, None);
+    }
+
+    #[test]
+    fn joint_quote_lists_have_the_quote_limit() {
+        let q: Vec<String> = (1..=101)
+            .map(|n| format!(r#"{{"tenor":"{n}Y","rate":0.03}}"#))
+            .collect();
+        let j = format!(
+            r#"{{"convention":"SOFR","index":"USD-TERM-3M","as_of":"2026-11-06","ois_quotes":[{}],"term_quotes":[{{"type":"DEPOSIT","months":3,"rate":0.03}}],"interpolation":"LOG_LINEAR_DF","method":"GLOBAL"}}"#,
+            q.join(",")
+        );
+        assert_eq!(
+            code("rates.curve.joint_bootstrap", &j).as_deref(),
+            Some("E_LIMIT")
+        );
+    }
+}

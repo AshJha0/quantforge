@@ -48,3 +48,14 @@ None of these is reached by a golden. Rulings C15 and C16 settled the readings o
 - `vol.svi.calibrate`, `vol.sabr.calibrate`: a `weights` of another length is `E_INPUT`, and lengths are checked before order.
 - `risk.vol.surface_vega`: a position with `forward`, `strike`, `discount_factor` or `expiry_years` not above 0 is `E_DOMAIN`.
 - `usecase.vol_surface`: empty or out-of-order `slices` is `E_INPUT`; a slice expiry on or before `as_of`, or a target `strike` or `quantity` not above 0, is `E_DOMAIN`. The target check runs before any fit.
+
+## Stage D wave 1, readings taken where the spec is silent
+
+- **Conflict:** `stage_b/ois.json` case `ois-0023` still expects `ESTR` in `rates.ois.bootstrap` to be `E_SCHEMA`, but stage D (`ois-curves.md` 1.1.0, contract 1.5.0) accepts `ESTR`. Rust follows stage D, so this one old case fails. The oracle needs to retire or update it.
+- `rates.ois.compound_dated`: an unknown `convention` id is `E_SCHEMA`; a known non-overnight id (such as `USD-TERM-3M`) is `E_INPUT`, as golden `compound_d-0030` shows.
+- Jumps: date checks (`E_INPUT`) run before factor checks (`E_DOMAIN`). On a curve object they run after the pillar checks.
+- `rates.ois.step_curve`: an empty `steps` is `E_INPUT` (ruling D12 exempts only `jumps`). An empty `dates` is `E_INPUT` and is the first rule check (as C17).
+- `rates.csa.discount`: two forwards on one date are `E_INPUT`. The curve's own checks run before the CSA checks.
+- `rates.curve.joint_bootstrap`: `GLOBAL` runs Newton on all OIS pillars, then the projection block on that curve (the system is block triangular, D9). Optional `jumps` are not read here, as the spec does not list them.
+- `calib.curve.robust`: if the inlier set is too small to fix the betas, or the Newton active set does not settle, the result is `E_NO_CONVERGENCE`.
+- Limits: `ois_quotes` and `term_quotes` take the 100-item quote-list limit, and `projection_a` and `projection_b` take the 100-pillar curve limit. `fixings`, `knots`, `maturities`, `dates` and `steps` take only the general array limit.

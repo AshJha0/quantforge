@@ -24,12 +24,12 @@ pub fn smooth(
             "maturities, zero_rates and weights must match and be non-empty",
         );
     }
-    if knots.is_empty() || !(knots[0] > 0.0) || knots.windows(2).any(|w| !(w[1] > w[0])) {
+    if knots.is_empty() || knots[0] <= 0.0 || knots.windows(2).any(|w| w[1] <= w[0]) {
         return fail("E_INPUT", "knots must be positive and strictly increasing");
     }
-    if !(lambda >= 0.0)
-        || weights.is_some_and(|w| w.iter().any(|x| !(*x >= 0.0)))
-        || maturities.iter().any(|m| !(*m > 0.0))
+    if lambda < 0.0
+        || weights.is_some_and(|w| w.iter().any(|x| *x < 0.0))
+        || maturities.iter().any(|m| *m <= 0.0)
     {
         return fail(
             "E_DOMAIN",
@@ -130,7 +130,7 @@ pub fn robust(maturities: &[f64], zero_rates: &[f64], tau: f64, delta: f64) -> R
     if zero_rates.len() != n || n < 3 {
         return fail("E_INPUT", "need at least 3 points of equal length");
     }
-    if !(tau > 0.0) || !(delta > 0.0) || maturities.iter().any(|m| !(*m > 0.0)) {
+    if tau <= 0.0 || delta <= 0.0 || maturities.iter().any(|m| *m <= 0.0) {
         return fail("E_DOMAIN", "tau, delta and maturities must be positive");
     }
     let x: Vec<[f64; 3]> = maturities.iter().map(|m| ns_row(*m, tau)).collect();
