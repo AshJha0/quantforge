@@ -23,11 +23,15 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Honest ceiling | What free public data can show (correct pricing and risk, curve quality, honest statistics) and what it cannot (tradable profitability) |
 | Golden case | A stored case with an independently obtained expected result |
 | Golden suite | A file of golden cases on one topic, such as `daycount` |
+| Jacobian | How each bootstrapped zero rate moves per basis point of each par quote; lower triangular for a bootstrap (`risk.curve.jacobian`) |
+| Key-rate risk | Value change per 1 bp shift of the zero curve around one maturity: a triangular tent around a key date, or a bump of one curve pillar |
 | Knowledge time | The instant the store learned a value |
 | Locked quote | Bid equal to ask |
 | Method test | A test on synthetic data, proving a method and not market accuracy |
 | Monotone convex | Forward-rate interpolation that reprices all inputs (Hagan and West) |
 | Oracle | The source of expected results, separate from the implementations |
+| P&L explain | The daily check that risk times the market move matches full revaluation, within a stated unexplained threshold (`risk.pnl.explain`) |
+| Par risk | Value change per 1 bp move in a market par quote, with the curve rebuilt (`risk.curve.par`) |
 | Rannacher start-up | Implicit half steps that damp a payoff kink before Crank-Nicolson |
 | Ruling | A recorded decision on a point a spec left silent, in `rulings.md` or `stage-b-rulings.md` |
 | Snapshot | A frozen, hashed document of everything a calculation read |

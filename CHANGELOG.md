@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.2: R2, risk first (Unreleased)
+
+On branch `r2`. No golden value of an earlier stage changed.
+
+### Added
+- CLI contract 1.7.0, with no new error code; the wire `contract_version` stays 1.0.0. New operations: `risk.curve.par` (bump and rebuild, one bucket per quote), `risk.curve.key_rate` (`TRIANGULAR` or `PILLAR` zero shifts on a given curve), `risk.curve.jacobian` (zero rates against par quotes) and `risk.pnl.explain` (full revaluation against par risk times the move, with a threshold, `max(5% |full|, 5% |par_dv01|)` in spec 1.0.0; formula under review in audit item 3, TODO). Products are `OIS` and `BOND`. Specs in `specifications/06-risk/`.
+- Goldens `datasets/golden/r2/risk_r2.json` (41 cases) and `pnl_r2.json` (44 cases), each re-priced in QuantLib 1.44. The oracle checks the pillar chain rule, par buckets against pillar key rates times the Jacobian, on every product.
+- Specs for the calibration stability report (`03-calibration/stability.md`) and workflow (b), the rich/cheap screen (`04-pricing/workflow-b-rich-cheap.md`), and the real-move P&L explain tool `tools/workflows/pnl_explain.py`.
+- R2 sections in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`.
+
+### Changed
+- Stage D outside-oracle coverage is 64.1% (419 of 654 cases) under rule 11.2.5, up from 63.4%: CSA (no FX) and cross-currency PV and bootstrap are now counted through QuantLib.
+- Citations: the citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened.
+
+### Known issues
+- The calendar provenance check still fails: SIFMA has not published its 2027 US holiday schedule, usually out in December, so the check stays red until then.
+- To fill in before the tag (TODO): P&L explain share of days explained on real moves; calibration stability first run; rich/cheap first report; Python fuzz rate; stage D mutation scores; P&L explain threshold formula (audit item 3); cross-platform matrix results.
+
 ## 0.4.1: R1, credibility hardening (2026-11-07)
 
 *Note: the v0.4.1 tag (3194067) still carries 0.4.0 in the package manifests; the bump to 0.4.1 landed just after, in the follow-up PR.*

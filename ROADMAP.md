@@ -32,7 +32,7 @@ Done means built and passing locally through the neutral runner, at status Imple
 | D Curves and fixed income | Done, tag `v0.4` | D1 rates core (full SOFR, ESTR, jumps, compounding conventions, IBOR fallbacks, meeting steps, convexity, CSA, basis, joint and robust fits), D2 bonds and repo, D3 cross-currency and NDF, D4 ISDA CDS, D5 equity carry, index and TRS, D6 inflation, D7 caps and swaptions, D8 commodities, D9 MBS. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases locally, 331 of them in stage D's 20 suites, and fuzzing with seed 17 found nothing (`conformance/README.md`) | To later stages: monotone-convex and spline curves; term structures of borrow; cap and swaption surfaces (stage E). End of project: the human review | All inputs synthetic; the stage D data survey found no free swap, bond-level, special repo, cross-currency, CDS, borrow, commodity-curve or MBS data. Several suites have no outside oracle (`specifications/stage-d-rulings.md`) |
 | E to K | Planned | Nothing yet. Each domain's real specs are written before its own stage | | |
 
-## R1: credibility hardening (v0.4.1, merged on `r1`, not tagged)
+## R1: credibility hardening (tag `v0.4.1`)
 
 Before stage E, R1 works on how far the existing results can be trusted. It adds no new pricing.
 
@@ -49,12 +49,24 @@ Before stage E, R1 works on how far the existing results can be trusted. It adds
 | Workflows (a) and (c) | EOD curves with sanity bands (USD proxy curve, BoE GBP pass or fail) and a SOFR averages check, through `--batch` | Built; first local runs passed 2026-11-07 |
 | Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Built; not yet measured |
 | Coverage | Unit-test line coverage: C++ 94.2%, Java 97.3%, Python 97.2%, Rust 96.5% | Measured |
-| Citations | A `## Sources` section in 50 specs; references cited from memory and marked "(not opened)" (`program/R1_CITATION_FINDINGS.md`) | Done; sources not yet opened |
+| Citations | A `## Sources` section in 50 specs (`program/R1_CITATION_FINDINGS.md`) | Done. The citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened |
 | R3 preregistrations | Three studies in `research/preregs/` | Signed by Claude under the owner's delegation; holdout unread |
 
 Open at the end of R1: Python fuzz runs at about 2,760 cases a minute against the 50,000 target.
 
-R2, risk-first (par and key-rate risk, P&L explain, calibration stability), follows as v0.4.2, then stage E.
+## R2: risk first (target v0.4.2, in progress)
+
+Risk before more products: par and key-rate risk, P&L explain, calibration stability and workflow (b). Contract 1.7.0 adds operations and no error code.
+
+| Item | What it adds | State |
+|---|---|---|
+| Par and key-rate risk | `risk.curve.par`, `risk.curve.key_rate` (`TRIANGULAR`, `PILLAR`), `risk.curve.jacobian`; spec `06-risk/par-and-key-rate.md`; 41 goldens in `risk_r2`, re-priced in QuantLib | Specified; language builds landing |
+| P&L explain | `risk.pnl.explain` with a stated threshold (formula under review, audit item 3: TODO); spec `06-risk/pnl-explain.md`; 44 goldens in `pnl_r2`; real-move run `tools/workflows/pnl_explain.py` | Specified; share of days explained TODO |
+| Calibration stability | Seven calibrations, C1 to C7, judged on metrics S1 to S7, `03-calibration/stability.md` | Specified; first run TODO |
+| Workflow (b) | Treasury and gilt rich/cheap screen, `04-pricing/workflow-b-rich-cheap.md` | Specified; first report TODO |
+| Carried from R1 | Python fuzz rate, stage D mutation scores, cross-platform matrix | TODO, waiting on language and infra results |
+
+Stage E follows R2.
 
 What R1 cannot change: on free public data QuantForge can show correct pricing, curve quality against published curves and honest statistics, never tradable profitability (see the README).
 
