@@ -1,6 +1,8 @@
 //! The `quantforge` executable (`specifications/cli-contract.md`).
 
 mod functions;
+#[cfg(test)]
+mod golden_replay;
 mod input;
 mod limits;
 mod ops;
@@ -33,6 +35,7 @@ fn error_result(case_id: &str, e: &QfError) -> Json {
         ("case_id", case_id.into()),
         ("status", "error".into()),
         ("error", Json::Obj(body)),
+        ("diagnostics", Json::Obj(Vec::new())),
     ])
 }
 
@@ -145,27 +148,89 @@ fn run_case(bytes: &[u8]) -> (Json, bool) {
     }
 }
 
-fn run() -> std::io::Result<u8> {
+/// BT5: the longest line, in bytes after the CR of a CRLF is removed.
+const MAX_LINE: usize = 16_777_216;
+
+/// Adds `diagnostics.elapsed_ns` (the `--timings` flag), also to an error result.
+fn with_elapsed(mut result: Json, start: std::time::Instant) -> Json {
+    let ns = i64::try_from(start.elapsed().as_nanos()).unwrap_or(i64::MAX);
+    let entry = ("elapsed_ns".to_string(), Json::Int(ns));
+    if let Json::Obj(fields) = &mut result {
+        match fields.iter_mut().find(|(k, _)| k == "diagnostics") {
+            Some((_, Json::Obj(d))) => d.push(entry),
+            Some((_, other)) => *other = Json::Obj(vec![entry]),
+            None => fields.push(("diagnostics".to_string(), Json::Obj(vec![entry]))),
+        }
+    }
+    result
+}
+
+fn timed_case(bytes: &[u8], timings: bool) -> (Json, bool) {
+    let start = std::time::Instant::now();
+    let (result, ok) = run_case(bytes);
+    (
+        if timings {
+            with_elapsed(result, start)
+        } else {
+            result
+        },
+        ok,
+    )
+}
+
+fn run(timings: bool) -> std::io::Result<u8> {
     let mut bytes = Vec::new();
     std::io::stdin().read_to_end(&mut bytes)?;
-    let (result, ok) = run_case(&bytes);
+    let (result, ok) = timed_case(&bytes, timings);
     print(result)?;
     Ok(if ok { 0 } else { 2 })
 }
 
-fn batch() -> std::io::Result<u8> {
+/// Reads one line into `line`, keeping at most `MAX_LINE + 1` bytes (room for a CR) and dropping
+/// the rest. Returns `None` at end of input, else whether the line had more bytes than were kept.
+fn read_line(input: &mut impl BufRead, line: &mut Vec<u8>) -> std::io::Result<Option<bool>> {
+    line.clear();
+    let (mut any, mut dropped) = (false, false);
+    loop {
+        let buf = input.fill_buf()?;
+        if buf.is_empty() {
+            return Ok(any.then_some(dropped));
+        }
+        any = true;
+        let (chunk, done) = match buf.iter().position(|&b| b == b'\n') {
+            Some(i) => (&buf[..i], i + 1),
+            None => (buf, buf.len()),
+        };
+        let room = (MAX_LINE + 1).saturating_sub(line.len());
+        if chunk.len() > room {
+            dropped = true;
+        }
+        line.extend_from_slice(&chunk[..chunk.len().min(room)]);
+        let ended = done > chunk.len();
+        input.consume(done);
+        if ended {
+            return Ok(Some(dropped));
+        }
+    }
+}
+
+fn batch(timings: bool) -> std::io::Result<u8> {
     let mut stdin = std::io::stdin().lock();
     let mut line = Vec::new();
-    loop {
-        line.clear();
-        if stdin.read_until(b'\n', &mut line)? == 0 {
-            return Ok(0);
-        }
-        while matches!(line.last(), Some(b'\n' | b'\r')) {
+    while let Some(dropped) = read_line(&mut stdin, &mut line)? {
+        if !dropped && line.last() == Some(&b'\r') {
             line.pop();
         }
-        print(run_case(&line).0)?;
+        let result = if dropped || line.len() > MAX_LINE {
+            let start = std::time::Instant::now();
+            let r = error_result("unknown", &err("E_LIMIT", "the line is longer than 16 MiB"));
+            if timings { with_elapsed(r, start) } else { r }
+        } else {
+            timed_case(&line, timings).0
+        };
+        print(result)?;
     }
+    Ok(0)
 }
 
 fn print(v: Json) -> std::io::Result<u8> {
@@ -176,10 +241,10 @@ fn print(v: Json) -> std::io::Result<u8> {
     Ok(0)
 }
 
-fn command(name: &str) -> std::io::Result<u8> {
+fn command(name: &str, timings: bool) -> std::io::Result<u8> {
     match name {
-        "run" => run(),
-        "batch" => batch(),
+        "run" => run(timings),
+        "batch" | "--batch" => batch(timings),
         "version" => print(obj([
             ("language", "rust".into()),
             ("implementation_version", env!("CARGO_PKG_VERSION").into()),
@@ -192,19 +257,20 @@ fn command(name: &str) -> std::io::Result<u8> {
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    let [name] = args.as_slice() else {
-        eprintln!("usage: quantforge run|batch|version|operations");
-        return ExitCode::from(64);
+    let args: Vec<&str> = args.iter().map(String::as_str).collect();
+    let (name, timings) = match args.as_slice() {
+        [n @ ("run" | "batch" | "--batch" | "version" | "operations")] => (*n, false),
+        [n @ ("run" | "batch" | "--batch"), "--timings"] => (*n, true),
+        _ => {
+            eprintln!("usage: quantforge run|batch|--batch [--timings] | version | operations");
+            return ExitCode::from(64);
+        }
     };
-    if !["run", "batch", "version", "operations"].contains(&name.as_str()) {
-        eprintln!("unknown command {name}");
-        return ExitCode::from(64);
-    }
-    let name = name.clone();
+    let name = name.to_string();
     // A large stack: parsing and adaptive recursion are depth-limited but not shallow.
     let worker = std::thread::Builder::new()
         .stack_size(256 << 20)
-        .spawn(move || command(&name));
+        .spawn(move || command(&name, timings));
     match worker.map(|h| h.join()) {
         Ok(Ok(Ok(code))) => ExitCode::from(code),
         _ => ExitCode::from(70),

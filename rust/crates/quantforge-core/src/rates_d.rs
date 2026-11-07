@@ -1,7 +1,7 @@
 //! Stage D rates core: dated overnight compounding and fallbacks (`overnight-compounding.md`),
 //! meeting-date step curves (`meeting-steps.md`), futures convexity (`futures-convexity.md`),
 //! and CSA discounting and joint calibration (`csa-and-basis.md`).
-use crate::calendar::Calendar;
+use crate::calendar::{Calendar, CalendarId};
 use crate::conventions::Overnight;
 use crate::curve::{Curve, Discount, Interpolation, SolveMethod, Solved, check_jumps, curve_time};
 use crate::dates::Date;
@@ -57,7 +57,12 @@ pub fn compound_dated(
     if end <= start {
         return fail("E_DATE_ORDER", "end is not after start");
     }
-    let cal = Calendar::parse(c.calendar).expect("registry calendars exist");
+    // SOFR is not published on any Good Friday, even on a USGS early close (ruling R1-6).
+    let cal = if c.id == "SOFR" {
+        Calendar::new(CalendarId::UsgsSofr)
+    } else {
+        Calendar::parse(c.calendar).expect("registry calendars exist")
+    };
     let mut days = Vec::new();
     let mut d = start;
     while d <= end {

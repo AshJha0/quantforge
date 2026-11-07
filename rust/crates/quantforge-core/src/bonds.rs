@@ -351,8 +351,14 @@ pub fn repo_implied_rate(
     Ok((forward_dirty - dirty + sum) / (dirty * tau - weighted))
 }
 
-/// CBOT conversion factor; `delivery` is the first day of the delivery month.
-pub fn conversion_factor(b: &Bond, delivery: Date, notional: f64) -> Result<f64> {
+/// CBOT conversion factor; `delivery` is the first day of the delivery month. `whole_months` is
+/// true for the 2, 3 and 5 year contracts, which do not round `z` down to a quarter (ruling R1-3).
+pub fn conversion_factor(
+    b: &Bond,
+    delivery: Date,
+    notional: f64,
+    whole_months: bool,
+) -> Result<f64> {
     if notional != 0.06 || b.frequency != 2 {
         return fail("E_INPUT", "6% notional and semi-annual bonds only");
     }
@@ -366,9 +372,13 @@ pub fn conversion_factor(b: &Bond, delivery: Date, notional: f64) -> Result<f64>
         return fail("E_DATE_ORDER", "maturity is before delivery");
     }
     let n = months / 12;
-    let z = (months % 12) / 3 * 3;
-    let v = if z < 7 { z } else { 3 } as f64;
-    let c = b.coupon;
+    let z = if whole_months {
+        months % 12
+    } else {
+        (months % 12) / 3 * 3
+    };
+    let v = if z < 7 { z } else { z - 6 } as f64;
+    let c = (b.coupon * 800.0 + 0.5).floor() / 800.0;
     let a = 1.03f64.powf(-v / 6.0);
     let bb = c / 2.0 * (6.0 - v) / 6.0;
     let big_c = if z < 7 {
@@ -629,20 +639,34 @@ mod tests {
     #[test]
     fn conversion_factor_cases() {
         let b = Bond::new(d("2033-11-15"), 0.0425, 2);
-        assert_eq!(conversion_factor(&b, d("2026-12-01"), 0.06).unwrap(), 0.904);
-        let six = Bond::new(d("2036-12-15"), 0.06, 2);
-        assert_eq!(conversion_factor(&six, d("2026-12-01"), 0.06).unwrap(), 1.0);
         assert_eq!(
-            conversion_factor(&b, d("2026-12-01"), 0.05)
+            conversion_factor(&b, d("2026-12-01"), 0.06, false).unwrap(),
+            0.904
+        );
+        let six = Bond::new(d("2036-12-15"), 0.06, 2);
+        assert_eq!(
+            conversion_factor(&six, d("2026-12-01"), 0.06, false).unwrap(),
+            1.0
+        );
+        assert_eq!(
+            conversion_factor(&b, d("2026-12-01"), 0.05, false)
                 .unwrap_err()
                 .code,
             "E_INPUT"
         );
-        let early = conversion_factor(&b, d("2034-01-01"), 0.06).unwrap_err();
+        let early = conversion_factor(&b, d("2034-01-01"), 0.06, false).unwrap_err();
         assert_eq!(early.code, "E_DATE_ORDER");
+        // 20 months: n = 1, z = 8 (v = 2) in whole months, z = 6 when rounded to a quarter.
+        let short = Bond::new(d("2028-08-15"), 0.0425, 2);
+        let dl = d("2026-12-01");
+        assert_eq!(conversion_factor(&short, dl, 0.06, true).unwrap(), 0.9726);
+        assert_eq!(conversion_factor(&short, dl, 0.06, false).unwrap(), 0.9752);
+        // The coupon is rounded to 1/8 % first, ties up: 4.1875 % becomes 4.25 %.
+        let tie = Bond::new(d("2028-08-15"), 0.041875, 2);
+        assert_eq!(conversion_factor(&tie, dl, 0.06, true).unwrap(), 0.9726);
         let annual = Bond::new(d("2033-11-15"), 0.0425, 1);
         assert_eq!(
-            conversion_factor(&annual, d("2026-12-01"), 0.06)
+            conversion_factor(&annual, d("2026-12-01"), 0.06, false)
                 .unwrap_err()
                 .code,
             "E_INPUT"

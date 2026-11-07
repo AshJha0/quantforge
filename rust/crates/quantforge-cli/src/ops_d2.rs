@@ -7,8 +7,8 @@ use crate::ops_b::{interpolation, pillars_json, repricing};
 use quantforge_core::bonds::{self, Bond, Frn};
 use quantforge_core::conventions;
 use quantforge_core::credit::{self, CdsTrade, Hazard};
-use quantforge_core::curve::Curve;
 use quantforge_core::curve::CurveInput;
+use quantforge_core::curve::{Curve, Interpolation};
 use quantforge_core::dates::Date;
 use quantforge_core::equity_d::{self, Action, Constituent, Trs};
 use quantforge_core::error::{Result, fail};
@@ -134,7 +134,12 @@ fn cds_quotes(i: &Inputs) -> Result<Vec<((i64, char), f64)>> {
         .collect()
 }
 
+/// Every `credit.*` operation: a discount curve other than `LOG_LINEAR_DF` is `E_INPUT`, before
+/// any other rule check (ruling R1-4).
 fn credit_discount(c: &CurveInput) -> Result<(Curve, Vec<Date>)> {
+    if c.interpolation != Interpolation::LogLinearDf {
+        return fail("E_INPUT", "credit discount curves are LOG_LINEAR_DF");
+    }
     Ok((Curve::new(c)?, c.pillars.iter().map(|p| p.0).collect()))
 }
 
@@ -291,7 +296,16 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "bond.futures.conversion_factor" => {
             let (b, d) = (bond(i)?, month_start(i, "delivery_month")?);
-            let cf = bonds::conversion_factor(&b, d, i.f64("notional_coupon")?)?;
+            let notional = i.f64("notional_coupon")?;
+            let whole_months = match i.opt("contract") {
+                None | Some(Json::Null) => false,
+                Some(_) => match i.str("contract")? {
+                    "TWO_YEAR" | "THREE_YEAR" | "FIVE_YEAR" => true,
+                    "TEN_YEAR" | "ULTRA_TEN_YEAR" | "BOND" | "ULTRA_BOND" => false,
+                    _ => return i.fail("contract", "unknown contract"),
+                },
+            };
+            let cf = bonds::conversion_factor(&b, d, notional, whole_months)?;
             plain(obj([("conversion_factor", cf.into())]))
         }
         "bond.futures.basis" => {
