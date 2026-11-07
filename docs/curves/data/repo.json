@@ -1,0 +1,148 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "repo_forward_d.json": "sha256:beb3ed2925f395e27e355ee0f9de57325fa9ff9d0977c34621e6c695c248c310"
+  }
+ },
+ "inputs": {
+  "repo.forward": {
+   "bond": {
+    "maturity": "2029-11-15",
+    "coupon": 0.0425,
+    "frequency": 2
+   },
+   "start": "2026-11-09",
+   "end": "2026-12-09",
+   "clean_price": 100.42085974293727,
+   "repo_rate": 0.0385,
+   "gc_rate": null
+  }
+ },
+ "reference": {
+  "repo.forward": {
+   "dirty": 102.47656626467639,
+   "forward_dirty": 100.67489108144223,
+   "forward_clean": 100.39312312564113,
+   "interest": 0.32877898343250345,
+   "special_spread": null,
+   "specialness_value": null
+  }
+ },
+ "agreement": [
+  {
+   "output": "repo.forward: dirty",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 102.47656626467639,
+    "cpp": 102.47656626467639,
+    "python": 102.47656626467639,
+    "rust": 102.47656626467639
+   }
+  },
+  {
+   "output": "repo.forward: forward_dirty",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 100.67489108144223,
+    "cpp": 100.67489108144223,
+    "python": 100.67489108144223,
+    "rust": 100.67489108144223
+   }
+  },
+  {
+   "output": "repo.forward: forward_clean",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 100.39312312564113,
+    "cpp": 100.39312312564113,
+    "python": 100.39312312564113,
+    "rust": 100.39312312564113
+   }
+  },
+  {
+   "output": "repo.forward: interest",
+   "count": 1,
+   "largest_difference": 5.551115123125783e-17,
+   "last": {
+    "java": 0.3287789834325034,
+    "cpp": 0.3287789834325034,
+    "python": 0.32877898343250345,
+    "rust": 0.3287789834325034
+   }
+  },
+  {
+   "output": "repo.forward: special_spread",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": null,
+    "cpp": null,
+    "python": null,
+    "rust": null
+   }
+  },
+  {
+   "output": "repo.forward: specialness_value",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": null,
+    "cpp": null,
+    "python": null,
+    "rust": null
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "repo.forward"
+  ],
+  "cases": 4,
+  "by_source": {
+   "repo.forward: analytic": 4
+  }
+ }
+}

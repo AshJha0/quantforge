@@ -1,0 +1,262 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "commodity_forward_d.json": "sha256:20d590a6206aff1f2e584497df6ab47a27ee38d1924aa44c12672e93847290ff",
+   "commodity_carry_d.json": "sha256:f82e4197b7830ab4de46027a2743a5ea19a30cd1ea59818ca41f3c421cd245da"
+  }
+ },
+ "inputs": {
+  "cmdty.curve.forward": {
+   "quotes": [
+    {
+     "month": "2026-12",
+     "price": 3.42
+    },
+    {
+     "month": "2027-03",
+     "price": 3.105
+    },
+    {
+     "month": "2027-06",
+     "price": 2.88
+    },
+    {
+     "month": "2027-12",
+     "price": 3.56
+    },
+    {
+     "month": "2028-12",
+     "price": 3.64
+    },
+    {
+     "month": "2030-12",
+     "price": 3.7
+    }
+   ],
+   "seasonality": [
+    0.06,
+    0.045,
+    0.01,
+    -0.03,
+    -0.045,
+    -0.04,
+    -0.02,
+    -0.015,
+    -0.02,
+    0.0,
+    0.025,
+    0.03
+   ],
+   "months": [
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-05",
+    "2027-08",
+    "2027-11",
+    "2028-07",
+    "2029-01",
+    "2030-12"
+   ]
+  },
+  "cmdty.storage.carry": {
+   "funding": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2027-05-06",
+      "discount_factor": 0.9803598150999601
+     },
+     {
+      "date": "2027-11-08",
+      "discount_factor": 0.9615452062959098
+     },
+     {
+      "date": "2028-11-06",
+      "discount_factor": 0.9267197211276171
+     },
+     {
+      "date": "2031-11-06",
+      "discount_factor": 0.8310200391947283
+     }
+    ]
+   },
+   "forwards": [
+    {
+     "date": "2026-12-15",
+     "price": 75.2
+    },
+    {
+     "date": "2027-03-15",
+     "price": 74.1
+    },
+    {
+     "date": "2027-06-15",
+     "price": 75.9
+    },
+    {
+     "date": "2027-12-15",
+     "price": 78.4
+    },
+    {
+     "date": "2028-12-15",
+     "price": 76.0
+    }
+   ],
+   "storage_cost": 0.02
+  }
+ },
+ "reference": {
+  "cmdty.curve.forward": {
+   "forwards": [
+    3.4200000000000004,
+    3.4352794377512383,
+    3.298790855644737,
+    2.8898312263351453,
+    3.0960085305002294,
+    3.4594127056508226,
+    3.430561811898926,
+    3.7534105089980185,
+    3.7000000000000006
+   ]
+  },
+  "cmdty.storage.carry": {
+   "convenience_yields": [
+    0.11976144454022078,
+    -0.03607983964691383,
+    -0.006819802690525706,
+    0.087927141008683
+   ],
+   "carry_values": [
+    -2.189643685364544,
+    0.6708164887620427,
+    0.2563568923399657,
+    -6.466559878126418
+   ],
+   "arbitrage": [
+    false,
+    true,
+    true,
+    false
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "cmdty.curve.forward: forwards",
+   "count": 9,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 3.7000000000000006,
+    "cpp": 3.7000000000000006,
+    "python": 3.7000000000000006,
+    "rust": 3.7000000000000006
+   }
+  },
+  {
+   "output": "cmdty.storage.carry: convenience_yields",
+   "count": 4,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.087927141008683,
+    "cpp": 0.087927141008683,
+    "python": 0.087927141008683,
+    "rust": 0.087927141008683
+   }
+  },
+  {
+   "output": "cmdty.storage.carry: carry_values",
+   "count": 4,
+   "largest_difference": 0.0,
+   "last": {
+    "java": -6.466559878126418,
+    "cpp": -6.466559878126418,
+    "python": -6.466559878126418,
+    "rust": -6.466559878126418
+   }
+  },
+  {
+   "output": "cmdty.storage.carry: arbitrage",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": [
+     false,
+     true,
+     true,
+     false
+    ],
+    "cpp": [
+     false,
+     true,
+     true,
+     false
+    ],
+    "python": [
+     false,
+     true,
+     true,
+     false
+    ],
+    "rust": [
+     false,
+     true,
+     true,
+     false
+    ]
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "cmdty.curve.forward",
+   "cmdty.storage.carry"
+  ],
+  "cases": 4,
+  "by_source": {
+   "cmdty.curve.forward: analytic": 2,
+   "cmdty.storage.carry: analytic": 2
+  }
+ }
+}

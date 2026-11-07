@@ -1,0 +1,352 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "cap_price_d.json": "sha256:9d6925a0e7f31a068a6fb3a766fa833d9885b02e154f2752671c7db588a1258f",
+   "swaption_price_d.json": "sha256:e6346aee8fd9e8c6c2e4505d3f5e113b7dd02c4ad6678a93720187e1bcc5dbad"
+  }
+ },
+ "inputs": {
+  "rates.cap.price": {
+   "discount": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2026-11-19",
+      "discount_factor": 0.9986040008603395
+     },
+     {
+      "date": "2026-12-14",
+      "discount_factor": 0.9959394252774483
+     },
+     {
+      "date": "2027-02-12",
+      "discount_factor": 0.989673278797288
+     },
+     {
+      "date": "2027-05-12",
+      "discount_factor": 0.9807770908259003
+     },
+     {
+      "date": "2027-11-15",
+      "discount_factor": 0.9634397330592425
+     },
+     {
+      "date": "2028-11-14",
+      "discount_factor": 0.9318539967570951
+     },
+     {
+      "date": "2029-11-15",
+      "discount_factor": 0.9012037662703272
+     },
+     {
+      "date": "2031-11-13",
+      "discount_factor": 0.839287128565213
+     },
+     {
+      "date": "2033-11-15",
+      "discount_factor": 0.7766268603223262
+     },
+     {
+      "date": "2036-11-13",
+      "discount_factor": 0.6858387444275659
+     },
+     {
+      "date": "2041-11-14",
+      "discount_factor": 0.5536981725589005
+     },
+     {
+      "date": "2046-11-15",
+      "discount_factor": 0.449831073617216
+     },
+     {
+      "date": "2056-11-14",
+      "discount_factor": 0.31789224697028523
+     }
+    ]
+   },
+   "projection": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2027-02-10",
+      "discount_factor": 0.9895742049842318
+     },
+     {
+      "date": "2027-05-10",
+      "discount_factor": 0.9802441863604426
+     },
+     {
+      "date": "2027-08-10",
+      "discount_factor": 0.9709393509141818
+     },
+     {
+      "date": "2027-11-10",
+      "discount_factor": 0.9618445760891611
+     },
+     {
+      "date": "2028-11-10",
+      "discount_factor": 0.9323166788327014
+     },
+     {
+      "date": "2029-11-13",
+      "discount_factor": 0.9014506533357646
+     },
+     {
+      "date": "2031-11-10",
+      "discount_factor": 0.8396105741150829
+     },
+     {
+      "date": "2036-11-10",
+      "discount_factor": 0.6867313481800761
+     }
+    ]
+   },
+   "model": "BLACK_76",
+   "vol": 0.22,
+   "trade": {
+    "type": "CAP",
+    "start_months": 3,
+    "tenor_months": 24,
+    "strike": 0.038,
+    "notional": 10000000.0
+   }
+  },
+  "rates.swaption.price": {
+   "discount": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2026-11-19",
+      "discount_factor": 0.9986040008603395
+     },
+     {
+      "date": "2026-12-14",
+      "discount_factor": 0.9959394252774483
+     },
+     {
+      "date": "2027-02-12",
+      "discount_factor": 0.989673278797288
+     },
+     {
+      "date": "2027-05-12",
+      "discount_factor": 0.9807770908259003
+     },
+     {
+      "date": "2027-11-15",
+      "discount_factor": 0.9634397330592425
+     },
+     {
+      "date": "2028-11-14",
+      "discount_factor": 0.9318539967570951
+     },
+     {
+      "date": "2029-11-15",
+      "discount_factor": 0.9012037662703272
+     },
+     {
+      "date": "2031-11-13",
+      "discount_factor": 0.839287128565213
+     },
+     {
+      "date": "2033-11-15",
+      "discount_factor": 0.7766268603223262
+     },
+     {
+      "date": "2036-11-13",
+      "discount_factor": 0.6858387444275659
+     },
+     {
+      "date": "2041-11-14",
+      "discount_factor": 0.5536981725589005
+     },
+     {
+      "date": "2046-11-15",
+      "discount_factor": 0.449831073617216
+     },
+     {
+      "date": "2056-11-14",
+      "discount_factor": 0.31789224697028523
+     }
+    ]
+   },
+   "projection": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2027-02-10",
+      "discount_factor": 0.9895742049842318
+     },
+     {
+      "date": "2027-05-10",
+      "discount_factor": 0.9802441863604426
+     },
+     {
+      "date": "2027-08-10",
+      "discount_factor": 0.9709393509141818
+     },
+     {
+      "date": "2027-11-10",
+      "discount_factor": 0.9618445760891611
+     },
+     {
+      "date": "2028-11-10",
+      "discount_factor": 0.9323166788327014
+     },
+     {
+      "date": "2029-11-13",
+      "discount_factor": 0.9014506533357646
+     },
+     {
+      "date": "2031-11-10",
+      "discount_factor": 0.8396105741150829
+     },
+     {
+      "date": "2036-11-10",
+      "discount_factor": 0.6867313481800761
+     }
+    ]
+   },
+   "model": "BLACK_76",
+   "vol": 0.21,
+   "trade": {
+    "type": "PAYER",
+    "expiry_months": 12,
+    "tenor_months": 60,
+    "strike": 0.037,
+    "notional": 10000000.0
+   }
+  }
+ },
+ "reference": {
+  "rates.cap.price": {
+   "price": 31564.463394283095,
+   "caplets": [
+    4807.443917794534,
+    5255.254005231878,
+    5888.26432985572,
+    1681.9006673747094,
+    2188.6486680736475,
+    2758.3922027657563,
+    3262.9160157211404,
+    5721.643587465708
+   ]
+  },
+  "rates.swaption.price": {
+   "price": 106969.44213342645,
+   "forward_rate": 0.035718133968365824,
+   "annuity": 4.351040526247382
+  }
+ },
+ "agreement": [
+  {
+   "output": "rates.cap.price: price",
+   "count": 1,
+   "largest_difference": 7.275957614183426e-12,
+   "last": {
+    "java": 31564.463394283095,
+    "cpp": 31564.46339428309,
+    "python": 31564.463394283095,
+    "rust": 31564.463394283088
+   }
+  },
+  {
+   "output": "rates.cap.price: caplets",
+   "count": 8,
+   "largest_difference": 1.2732925824820995e-11,
+   "last": {
+    "java": 5721.643587465708,
+    "cpp": 5721.643587465708,
+    "python": 5721.643587465708,
+    "rust": 5721.643587465708
+   }
+  },
+  {
+   "output": "rates.swaption.price: price",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 106969.44213342645,
+    "cpp": 106969.44213342645,
+    "python": 106969.44213342645,
+    "rust": 106969.44213342645
+   }
+  },
+  {
+   "output": "rates.swaption.price: forward_rate",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.035718133968365824,
+    "cpp": 0.035718133968365824,
+    "python": 0.035718133968365824,
+    "rust": 0.035718133968365824
+   }
+  },
+  {
+   "output": "rates.swaption.price: annuity",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 4.351040526247382,
+    "cpp": 4.351040526247382,
+    "python": 4.351040526247382,
+    "rust": 4.351040526247382
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "rates.cap.price",
+   "rates.swaption.price"
+  ],
+  "cases": 10,
+  "by_source": {
+   "rates.cap.price: independent-replay, quantlib-1.44": 6,
+   "rates.swaption.price: independent-replay, quantlib-1.44": 4
+  }
+ }
+}

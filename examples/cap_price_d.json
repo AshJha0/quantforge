@@ -1,0 +1,112 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-cap-price-d",
+ "operation": "rates.cap.price",
+ "inputs": {
+  "discount": {
+   "as_of": "2026-11-06",
+   "interpolation": "LOG_LINEAR_DF",
+   "pillars": [
+    {
+     "date": "2026-11-19",
+     "discount_factor": 0.9986040008603395
+    },
+    {
+     "date": "2026-12-14",
+     "discount_factor": 0.9959394252774483
+    },
+    {
+     "date": "2027-02-12",
+     "discount_factor": 0.989673278797288
+    },
+    {
+     "date": "2027-05-12",
+     "discount_factor": 0.9807770908259003
+    },
+    {
+     "date": "2027-11-15",
+     "discount_factor": 0.9634397330592425
+    },
+    {
+     "date": "2028-11-14",
+     "discount_factor": 0.9318539967570951
+    },
+    {
+     "date": "2029-11-15",
+     "discount_factor": 0.9012037662703272
+    },
+    {
+     "date": "2031-11-13",
+     "discount_factor": 0.839287128565213
+    },
+    {
+     "date": "2033-11-15",
+     "discount_factor": 0.7766268603223262
+    },
+    {
+     "date": "2036-11-13",
+     "discount_factor": 0.6858387444275659
+    },
+    {
+     "date": "2041-11-14",
+     "discount_factor": 0.5536981725589005
+    },
+    {
+     "date": "2046-11-15",
+     "discount_factor": 0.449831073617216
+    },
+    {
+     "date": "2056-11-14",
+     "discount_factor": 0.31789224697028523
+    }
+   ]
+  },
+  "projection": {
+   "as_of": "2026-11-06",
+   "interpolation": "LOG_LINEAR_DF",
+   "pillars": [
+    {
+     "date": "2027-02-10",
+     "discount_factor": 0.9895742049842318
+    },
+    {
+     "date": "2027-05-10",
+     "discount_factor": 0.9802441863604426
+    },
+    {
+     "date": "2027-08-10",
+     "discount_factor": 0.9709393509141818
+    },
+    {
+     "date": "2027-11-10",
+     "discount_factor": 0.9618445760891611
+    },
+    {
+     "date": "2028-11-10",
+     "discount_factor": 0.9323166788327014
+    },
+    {
+     "date": "2029-11-13",
+     "discount_factor": 0.9014506533357646
+    },
+    {
+     "date": "2031-11-10",
+     "discount_factor": 0.8396105741150829
+    },
+    {
+     "date": "2036-11-10",
+     "discount_factor": 0.6867313481800761
+    }
+   ]
+  },
+  "model": "BLACK_76",
+  "vol": 0.22,
+  "trade": {
+   "type": "CAP",
+   "start_months": 3,
+   "tenor_months": 24,
+   "strike": 0.038,
+   "notional": 10000000.0
+  }
+ }
+}

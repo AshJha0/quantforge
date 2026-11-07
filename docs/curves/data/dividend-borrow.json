@@ -1,0 +1,229 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "dividend_implied_d.json": "sha256:8948e402f384037d96c2e06823a29a984222f23cadbe551256d4d496c7bc303e",
+   "borrow_implied_d.json": "sha256:715f9a47a6fa4e7ff72364d930e4a07d6c4fd8f099b276d3d0fea5dabd888657"
+  }
+ },
+ "inputs": {
+  "eq.dividend.implied": {
+   "spot": 5012.5,
+   "funding": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2027-05-07",
+      "discount_factor": 0.9800080230670242
+     },
+     {
+      "date": "2027-11-06",
+      "discount_factor": 0.9607894391523232
+     },
+     {
+      "date": "2028-11-05",
+      "discount_factor": 0.9258898536064953
+     },
+     {
+      "date": "2031-11-06",
+      "discount_factor": 0.8289439483311681
+     }
+    ]
+   },
+   "borrow_rate": 0.003,
+   "futures": [
+    {
+     "expiry": "2026-12-18",
+     "price": 5016.176013930697
+    },
+    {
+     "expiry": "2027-03-19",
+     "price": 5046.793739945202
+    },
+    {
+     "expiry": "2027-06-18",
+     "price": 5072.614516369763
+    },
+    {
+     "expiry": "2027-12-17",
+     "price": 5127.681312075034
+    }
+   ]
+  },
+  "eq.borrow.implied": {
+   "spot": 5012.5,
+   "funding": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2027-05-07",
+      "discount_factor": 0.9800080230670242
+     },
+     {
+      "date": "2027-11-06",
+      "discount_factor": 0.9607894391523232
+     },
+     {
+      "date": "2028-11-05",
+      "discount_factor": 0.9258898536064953
+     },
+     {
+      "date": "2031-11-06",
+      "discount_factor": 0.8289439483311681
+     }
+    ]
+   },
+   "dividends": [
+    {
+     "ex_date": "2026-12-18",
+     "amount": 18.0
+    },
+    {
+     "ex_date": "2027-03-19",
+     "amount": 16.5
+    },
+    {
+     "ex_date": "2027-06-18",
+     "amount": 21.0
+    },
+    {
+     "ex_date": "2027-09-17",
+     "amount": 17.5
+    },
+    {
+     "ex_date": "2027-12-17",
+     "amount": 19.0
+    },
+    {
+     "ex_date": "2028-03-17",
+     "amount": 17.0
+    }
+   ],
+   "expiry": "2027-03-19",
+   "forward": 5046.793739945202
+  }
+ },
+ "reference": {
+  "eq.dividend.implied": {
+   "pv_dividends": [
+    17.922496104690254,
+    34.19856718548181,
+    54.72315336158954,
+    89.91207626349205
+   ],
+   "period_pv_dividends": [
+    17.922496104690254,
+    16.276071080791553,
+    20.524586176107732,
+    35.188922901902515
+   ],
+   "dividend_yields": [
+    0.031129006874493576,
+    0.018787997717501892,
+    0.017887230375510255,
+    0.01627252678696537
+   ]
+  },
+  "eq.borrow.implied": {
+   "borrow_rate": 0.0030000000000000382
+  }
+ },
+ "agreement": [
+  {
+   "output": "eq.dividend.implied: pv_dividends",
+   "count": 4,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 89.91207626349205,
+    "cpp": 89.91207626349205,
+    "python": 89.91207626349205,
+    "rust": 89.91207626349205
+   }
+  },
+  {
+   "output": "eq.dividend.implied: period_pv_dividends",
+   "count": 4,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 35.188922901902515,
+    "cpp": 35.188922901902515,
+    "python": 35.188922901902515,
+    "rust": 35.188922901902515
+   }
+  },
+  {
+   "output": "eq.dividend.implied: dividend_yields",
+   "count": 4,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.01627252678696537,
+    "cpp": 0.01627252678696537,
+    "python": 0.01627252678696537,
+    "rust": 0.01627252678696537
+   }
+  },
+  {
+   "output": "eq.borrow.implied: borrow_rate",
+   "count": 1,
+   "largest_difference": 8.38305119765792e-16,
+   "last": {
+    "java": 0.0029999999999997195,
+    "cpp": 0.0030000000000005578,
+    "python": 0.0030000000000000382,
+    "rust": 0.0030000000000001137
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "eq.dividend.implied",
+   "eq.borrow.implied"
+  ],
+  "cases": 4,
+  "by_source": {
+   "eq.dividend.implied: analytic": 1,
+   "eq.borrow.implied: known-truth": 3
+  }
+ }
+}

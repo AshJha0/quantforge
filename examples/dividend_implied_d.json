@@ -1,0 +1,49 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-dividend-implied-d",
+ "operation": "eq.dividend.implied",
+ "inputs": {
+  "spot": 5012.5,
+  "funding": {
+   "as_of": "2026-11-06",
+   "interpolation": "LOG_LINEAR_DF",
+   "pillars": [
+    {
+     "date": "2027-05-07",
+     "discount_factor": 0.9800080230670242
+    },
+    {
+     "date": "2027-11-06",
+     "discount_factor": 0.9607894391523232
+    },
+    {
+     "date": "2028-11-05",
+     "discount_factor": 0.9258898536064953
+    },
+    {
+     "date": "2031-11-06",
+     "discount_factor": 0.8289439483311681
+    }
+   ]
+  },
+  "borrow_rate": 0.003,
+  "futures": [
+   {
+    "expiry": "2026-12-18",
+    "price": 5016.176013930697
+   },
+   {
+    "expiry": "2027-03-19",
+    "price": 5046.793739945202
+   },
+   {
+    "expiry": "2027-06-18",
+    "price": 5072.614516369763
+   },
+   {
+    "expiry": "2027-12-17",
+    "price": 5127.681312075034
+   }
+  ]
+ }
+}

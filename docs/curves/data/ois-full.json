@@ -1,0 +1,189 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "estr_ois_d.json": "sha256:21b5b669de245aab1898dc4dc8197b48e10b1591304b9208ec523fb7a5902a22"
+  }
+ },
+ "inputs": {
+  "rates.ois.bootstrap": {
+   "convention": "ESTR",
+   "as_of": "2026-11-06",
+   "quotes": [
+    {
+     "tenor": "1W",
+     "rate": 0.022699999999999998
+    },
+    {
+     "tenor": "1M",
+     "rate": 0.022600000000000002
+    },
+    {
+     "tenor": "3M",
+     "rate": 0.0223
+    },
+    {
+     "tenor": "6M",
+     "rate": 0.021700000000000004
+    },
+    {
+     "tenor": "1Y",
+     "rate": 0.020500000000000004
+    },
+    {
+     "tenor": "2Y",
+     "rate": 0.019000000000000003
+    },
+    {
+     "tenor": "3Y",
+     "rate": 0.018500000000000003
+    },
+    {
+     "tenor": "5Y",
+     "rate": 0.019000000000000003
+    },
+    {
+     "tenor": "7Y",
+     "rate": 0.020000000000000004
+    },
+    {
+     "tenor": "10Y",
+     "rate": 0.0215
+    },
+    {
+     "tenor": "15Y",
+     "rate": 0.023
+    },
+    {
+     "tenor": "20Y",
+     "rate": 0.0235
+    },
+    {
+     "tenor": "30Y",
+     "rate": 0.0225
+    }
+   ],
+   "interpolation": "LOG_LINEAR_DF",
+   "method": "SEQUENTIAL"
+  }
+ },
+ "reference": {
+  "rates.ois.bootstrap": {
+   "pillars": [
+    {
+     "date": "2026-11-19",
+     "discount_factor": 0.9991807943650068
+    },
+    {
+     "date": "2026-12-14",
+     "discount_factor": 0.997618789542139
+    },
+    {
+     "date": "2027-02-12",
+     "discount_factor": 0.9939609880010526
+    },
+    {
+     "date": "2027-05-12",
+     "discount_factor": 0.9888433447909687
+    },
+    {
+     "date": "2027-11-12",
+     "discount_factor": 0.9792881221090861
+    },
+    {
+     "date": "2028-11-14",
+     "discount_factor": 0.9621077025177935
+    },
+    {
+     "date": "2029-11-14",
+     "discount_factor": 0.9453565613174705
+    },
+    {
+     "date": "2031-11-12",
+     "discount_factor": 0.9086167288534557
+    },
+    {
+     "date": "2033-11-14",
+     "discount_factor": 0.8680406595029004
+    },
+    {
+     "date": "2036-11-12",
+     "discount_factor": 0.8042612131003803
+    },
+    {
+     "date": "2041-11-13",
+     "discount_factor": 0.7039030892201983
+    },
+    {
+     "date": "2046-11-14",
+     "discount_factor": 0.6196603907598698
+    },
+    {
+     "date": "2056-11-14",
+     "discount_factor": 0.5087217489424133
+    }
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "rates.ois.bootstrap: pillars",
+   "count": 13,
+   "largest_difference": 3.885780586188048e-15,
+   "last": {
+    "java": 0.5087217489424135,
+    "cpp": 0.5087217489424133,
+    "python": 0.5087217489424133,
+    "rust": 0.5087217489424135
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "rates.ois.bootstrap"
+  ],
+  "cases": 10,
+  "by_source": {
+   "rates.ois.bootstrap: independent-replay, quantlib-1.44": 10
+  }
+ }
+}

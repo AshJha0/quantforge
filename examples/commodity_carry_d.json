@@ -1,0 +1,52 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-commodity-carry-d",
+ "operation": "cmdty.storage.carry",
+ "inputs": {
+  "funding": {
+   "as_of": "2026-11-06",
+   "interpolation": "LOG_LINEAR_DF",
+   "pillars": [
+    {
+     "date": "2027-05-06",
+     "discount_factor": 0.9803598150999601
+    },
+    {
+     "date": "2027-11-08",
+     "discount_factor": 0.9615452062959098
+    },
+    {
+     "date": "2028-11-06",
+     "discount_factor": 0.9267197211276171
+    },
+    {
+     "date": "2031-11-06",
+     "discount_factor": 0.8310200391947283
+    }
+   ]
+  },
+  "forwards": [
+   {
+    "date": "2026-12-15",
+    "price": 75.2
+   },
+   {
+    "date": "2027-03-15",
+    "price": 74.1
+   },
+   {
+    "date": "2027-06-15",
+    "price": 75.9
+   },
+   {
+    "date": "2027-12-15",
+    "price": 78.4
+   },
+   {
+    "date": "2028-12-15",
+    "price": 76.0
+   }
+  ],
+  "storage_cost": 0.02
+ }
+}

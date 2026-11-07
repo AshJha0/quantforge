@@ -1,0 +1,130 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "inflation_cpi_d.json": "sha256:0fbc08aec61fe7a3131268bb14feaf20cefb2d3ef49a01a74e19ca634979614a"
+  }
+ },
+ "inputs": {
+  "infl.curve.cpi": {
+   "base_month": "2026-08",
+   "base_cpi": 322.15,
+   "quotes": [
+    {
+     "years": 1,
+     "rate": 0.0265
+    },
+    {
+     "years": 2,
+     "rate": 0.0255
+    },
+    {
+     "years": 3,
+     "rate": 0.025
+    },
+    {
+     "years": 5,
+     "rate": 0.0245
+    },
+    {
+     "years": 7,
+     "rate": 0.0245
+    },
+    {
+     "years": 10,
+     "rate": 0.025
+    },
+    {
+     "years": 20,
+     "rate": 0.0255
+    }
+   ],
+   "seasonality": null,
+   "months": [
+    "2026-08",
+    "2026-12",
+    "2027-01",
+    "2027-08",
+    "2028-03",
+    "2031-08",
+    "2036-11",
+    "2048-02"
+   ]
+  }
+ },
+ "reference": {
+  "infl.curve.cpi": {
+   "cpi": [
+    322.1499999999999,
+    324.97088533868157,
+    325.6799577718831,
+    330.686975,
+    335.38938143637296,
+    363.59503935374437,
+    415.03398050181625,
+    553.9781374577557
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "infl.curve.cpi: cpi",
+   "count": 8,
+   "largest_difference": 5.684341886080801e-13,
+   "last": {
+    "java": 553.9781374577557,
+    "cpp": 553.9781374577557,
+    "python": 553.9781374577557,
+    "rust": 553.9781374577562
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "infl.curve.cpi"
+  ],
+  "cases": 2,
+  "by_source": {
+   "infl.curve.cpi: analytic": 2
+  }
+ }
+}

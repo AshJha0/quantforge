@@ -1,0 +1,17 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-repo-forward-d",
+ "operation": "repo.forward",
+ "inputs": {
+  "bond": {
+   "maturity": "2029-11-15",
+   "coupon": 0.0425,
+   "frequency": 2
+  },
+  "start": "2026-11-09",
+  "end": "2026-12-09",
+  "clean_price": 100.42085974293727,
+  "repo_rate": 0.0385,
+  "gc_rate": null
+ }
+}
