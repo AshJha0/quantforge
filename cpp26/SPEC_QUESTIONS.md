@@ -35,12 +35,11 @@ order of swap legs (I had no check, B8, B9), `calib.fit` checks, `hedge.solve` o
 
 No golden depends on these. Each is how the build reads a point the spec leaves open; none is sent as a question yet.
 
-- `vol.delta.*` with `SPOT` and `scale: null`: built as `E_DOMAIN`, the "must be above 0" rule. `E_SCHEMA` is also a fair reading.
-- `vol.delta.*`, `vol.smile.rr_bf`: the spec lists no order among the scale, forward, vol and delta checks. Built scale first.
+- `vol.delta.*`, `vol.smile.rr_bf`: the spec lists no order among the scale, forward, vol and delta checks. Scale first is now ruling C15.
 - `BACHELIER` with `shift: 0`: `E_SCHEMA`, by C8. C9 says `shift` at 0 may be absent, which does not settle whether it may be present.
 - `eq.forward.parity` with no `discount_factor` key: `E_SCHEMA`, treated like `borrow_curve` under C9, though C9 does not name it.
-- `vol.svi.evaluate` with empty `log_moneyness`, `vol.sabr.density` with empty `strikes`: `E_INPUT`, as `min_g` and `min_density` have no value.
 - `vol.svi.calibrate`, `vol.sabr.calibrate`: the length rule is checked before the increasing rule, though the spec names increasing first.
 - `vol.ssvi.calibrate`: no rule for `total_variance <= 0`. None added.
-- `vol.sabr.arbfree`: a price at or above `f0` gives a `null` vol, like one at intrinsic. The spec only names intrinsic.
 - `usecase.vol_surface`: no check order given, and no rule for `target.strike` or `quantity`. Built as `vol.equity.price`, `E_DOMAIN`.
+
+Settled by rulings: `SPOT` with null `scale` (C15, my `E_DOMAIN` was wrong), a price at or above `f0` (C16, as built), empty lists (C17; my order was wrong in `vol.svi.evaluate`, `vol.sabr.*`).

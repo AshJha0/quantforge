@@ -19,6 +19,12 @@ std::optional<string> optional_snapshot(const In& in) {
     return to_string(*p, "snapshot_id");
 }
 
+// Ruling C17: an empty list is E_INPUT, the first rule check.
+template <class List>
+void need_items(const List& list, string_view key) {
+    if (list.empty()) throw Error("E_INPUT", string(key) + " is empty", string(key));
+}
+
 template <class Row>
 std::vector<Row> rows_of(const In& in, string_view key, Row (*read)(const In&)) {
     const Value& a = in.need(key);

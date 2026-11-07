@@ -14,6 +14,7 @@ struct SabrInput {
     }
     void check() const {
         limit_if(strikes.size() > max_quotes, "strikes");
+        need_items(strikes, "strikes");
         check_sabr(t, p, f(), shifted());
     }
 };
@@ -45,7 +46,6 @@ void op_sabr_density(const In& in, Out& out) {
     const Vec x = s.shifted();
     for (const double k : x)
         if (k - h <= 0) throw Error("E_DOMAIN", "strike - h_strike is not above 0");
-    if (x.empty()) throw Error("E_INPUT", "strikes is empty");
     const SabrDensity d = sabr_density(s.f(), x, s.t, s.p, h);
     if (d.negative && action == OnNegative::Reject) throw Error("E_ARBITRAGE", "negative density");
     out.key_reals("density", d.density);
@@ -62,6 +62,7 @@ void op_sabr_calibrate(const In& in, Out& out) {
     const auto weights = optional_weights(in);
     in.ready();
     limit_if(strikes.size() > max_quotes || vols.size() > max_quotes, "strikes");
+    need_items(strikes, "strikes");
     for (double& k : strikes) k += shift;
     // alpha, rho and nu are outputs here, so stand-ins that pass let the common checks run on the rest.
     check_sabr(t, {1.0, beta, 0.0, 0.0}, forward + shift, strikes);

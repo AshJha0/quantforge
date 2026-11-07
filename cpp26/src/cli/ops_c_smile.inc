@@ -8,11 +8,13 @@ struct DeltaScale {
     std::optional<double> scale;
 
     double value() const {
+        // Ruling C15: a scale that does not match the convention is the first rule check.
         if (convention == DeltaConvention::Forward) {
             if (scale) throw Error("E_INPUT", "scale must be null for FORWARD");
             return 1.0;
         }
-        if (!scale || *scale <= 0) throw Error("E_DOMAIN", "scale is not above 0");
+        if (!scale) throw Error("E_INPUT", "scale must be a number for SPOT");
+        if (*scale <= 0) throw Error("E_DOMAIN", "scale is not above 0");
         return *scale;
     }
 };
@@ -84,9 +86,9 @@ void op_svi_evaluate(const In& in, Out& out) {
     const double t = in.real("expiry_years");
     in.ready();
     limit_if(k.size() > max_quotes, "log_moneyness");
+    need_items(k, "log_moneyness");
     check_svi(s);
     if (t <= 0) throw Error("E_DOMAIN", "expiry_years is not above 0");
-    if (k.empty()) throw Error("E_INPUT", "log_moneyness is empty");
     Vec w, vols, g;
     for (const double x : k) {
         w.push_back(s.w(x));
@@ -124,6 +126,8 @@ void op_ssvi_evaluate(const In& in, Out& out) {
     const Vec thetas = in.reals("thetas"), k = in.reals("log_moneyness");
     in.ready();
     limit_if(thetas.size() > max_quotes || k.size() > max_quotes, "thetas");
+    need_items(thetas, "thetas");
+    need_items(k, "log_moneyness");
     check_ssvi(s, thetas);
     out.values.key("total_variance");
     out.values.begin_array();
@@ -144,6 +148,8 @@ void op_ssvi_calibrate(const In& in, Out& out) {
     const Matrix w = in.matrix("total_variance");
     in.ready();
     limit_if(thetas.size() > max_quotes || k.size() > max_quotes, "thetas");
+    need_items(thetas, "thetas");
+    need_items(k, "log_moneyness");
     const SsviFit fit = ssvi_calibrate(thetas, k, w);
     out.key_real("rho", fit.ssvi.rho);
     out.key_real("eta", fit.ssvi.eta);

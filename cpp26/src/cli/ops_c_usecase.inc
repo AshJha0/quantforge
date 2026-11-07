@@ -25,6 +25,9 @@ void op_usecase_vol_surface(const In& in, Out& out) {
     funding.limit();
     limit_if(slices.size() > max_quotes || k_grid.size() > max_quotes, "slices");
     for (const Slice& s : slices) limit_if(s.quotes.size() > max_quotes, "quotes");
+    need_items(slices, "slices");
+    need_items(k_grid, "k_grid");
+    for (const Slice& s : slices) need_items(s.quotes, "quotes");
 
     const Curve curve = funding.build();
     if (curve.as_of() != as_of) throw Error("E_INPUT", "the curve as_of differs");

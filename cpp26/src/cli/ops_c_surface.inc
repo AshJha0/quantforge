@@ -20,6 +20,7 @@ void op_surface_query(const In& in, Out& out) {
     in.ready();
     limit_surface(s);
     limit_if(points.size() > max_quotes, "points");
+    need_items(points, "points");
     check_surface(s);
     Vec w, vols;
     for (const Point& p : points) {
@@ -91,6 +92,7 @@ void op_surface_vega(const In& in, Out& out) {
     in.ready();
     limit_surface(s);
     limit_if(positions.size() > max_quotes, "positions");
+    need_items(positions, "positions");
     check_surface(s);
     for (const VegaPosition& p : positions)
         if (p.forward <= 0 || p.strike <= 0 || p.discount_factor <= 0 || p.expiry_years <= 0)
