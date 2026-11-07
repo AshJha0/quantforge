@@ -2,11 +2,12 @@
 import re
 from collections.abc import Mapping
 from datetime import date
-from typing import Any
+from typing import Any, overload
 
 from ..errors import QfError
 from ..timezones import DAY, date_seconds, to_date
 
+Date = date  # Inputs.date shadows the type inside the class
 _DATE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 _TIME = r"(\d{2}):(\d{2}):(\d{2})"
 _LOCAL = re.compile(r"(\d{4}-\d{2}-\d{2})T" + _TIME)
@@ -84,6 +85,11 @@ class Inputs:
             raise _bad(key, "not a number")
         return float(v)
 
+    @overload
+    def opt_real(self, key: str) -> float | None: ...
+    @overload
+    def opt_real(self, key: str, default: float) -> float: ...
+
     def opt_real(self, key: str, default: float | None = None) -> float | None:
         return self.real(key) if self.has(key) else default
 
@@ -92,6 +98,11 @@ class Inputs:
         if isinstance(v, bool) or not isinstance(v, int) or abs(v) > MAX_INTEGER:
             raise _bad(key, "not an integer")
         return v
+
+    @overload
+    def opt_integer(self, key: str) -> int | None: ...
+    @overload
+    def opt_integer(self, key: str, default: int) -> int: ...
 
     def opt_integer(self, key: str, default: int | None = None) -> int | None:
         return self.integer(key) if self.has(key) else default
@@ -126,7 +137,7 @@ class Inputs:
     def opt_instant(self, key: str) -> int | None:
         return self.instant(key) if self.has(key) else None
 
-    def opt_date(self, key: str) -> date | None:
+    def opt_date(self, key: str) -> Date | None:
         return self.date(key) if self.has(key) else None
 
     def instant(self, key: str) -> int:
@@ -166,7 +177,7 @@ class Inputs:
             raise _bad(key, "not an array of numbers and nulls")
         return [None if e is None else float(e) for e in v]
 
-    def dates(self, key: str) -> list[date]:
+    def dates(self, key: str) -> list[Date]:
         return [parse_date(e, key) for e in self.array(key)]
 
     def matrix(self, key: str) -> list[list[float]]:

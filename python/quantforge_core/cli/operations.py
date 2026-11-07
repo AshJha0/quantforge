@@ -6,36 +6,39 @@ from datetime import date
 from types import ModuleType, SimpleNamespace
 from typing import Any
 
-from .. import (
-    calendars,
-    compounding,
-    cos,
-    data_checks,
-    daycount,
-    integrate,
-    interp,
-    linalg,
-    monte_carlo,
-    pde,
-    rng,
-    roots,
-    snapshot,
-    sobol,
-    stats,
-    store,
-    timezones,
-)
+from .. import black as _black
+from .. import calendars as calendars_module
 from .. import calibration as _calibration
+from .. import compounding as compounding_module
 from .. import conventions as _conventions
+from .. import cos as cos_module
 from .. import curves as _curves
+from .. import data_checks as data_checks_module
+from .. import daycount as daycount_module
+from .. import equity as _equity
 from .. import fx as _fx
 from .. import hedging as _hedging
+from .. import integrate as integrate_module
+from .. import interp as interp_module
+from .. import linalg as linalg_module
 from .. import money as _money
+from .. import monte_carlo as monte_carlo_module
 from .. import ois as _ois
+from .. import pde as pde_module
 from .. import projection as _projection
+from .. import rng as rng_module
+from .. import roots as roots_module
+from .. import sabr as _sabr
 from .. import schedules as _schedules
 from .. import sensitivities as _sensitivities
+from .. import smile as _smile
+from .. import snapshot as snapshot_module
+from .. import sobol as sobol_module
+from .. import stats as stats_module
+from .. import store as store_module
+from .. import timezones as timezones_module
 from .. import usecases as _usecases
+from .. import vol_usecase as _vol_usecase
 from ..calendars import TENOR
 from ..daycount import check_conditional
 from ..errors import QfError
@@ -44,6 +47,7 @@ from .functions import real_function, root_function
 from .inputs import Inputs, format_seconds, parse_instant, parse_u64
 from .limits import check_limits
 from .stage_b import handlers as _stage_b_handlers
+from .stage_c import handlers as _stage_c_handlers
 
 Result = dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]
 OPTIONS = ("CALL", "PUT")
@@ -78,15 +82,23 @@ class _Core:
         return call
 
 
-calendars, compounding, cos, daycount, data_checks = map(
-    _Core, (calendars, compounding, cos, daycount, data_checks)
-)
-integrate, interp, linalg, monte_carlo, pde = map(
-    _Core, (integrate, interp, linalg, monte_carlo, pde)
-)
-rng, roots, snapshot, sobol, stats, store, timezones = map(
-    _Core, (rng, roots, snapshot, sobol, stats, store, timezones)
-)
+calendars = _Core(calendars_module)
+compounding = _Core(compounding_module)
+cos = _Core(cos_module)
+data_checks = _Core(data_checks_module)
+daycount = _Core(daycount_module)
+integrate = _Core(integrate_module)
+interp = _Core(interp_module)
+linalg = _Core(linalg_module)
+monte_carlo = _Core(monte_carlo_module)
+pde = _Core(pde_module)
+rng = _Core(rng_module)
+roots = _Core(roots_module)
+snapshot = _Core(snapshot_module)
+sobol = _Core(sobol_module)
+stats = _Core(stats_module)
+store = _Core(store_module)
+timezones = _Core(timezones_module)
 
 
 _STAGE_B = SimpleNamespace(
@@ -97,6 +109,11 @@ _STAGE_B = SimpleNamespace(
             _schedules, _sensitivities, _usecases,
         )
     }
+)
+
+
+_STAGE_C = SimpleNamespace(
+    **{m.__name__.rsplit(".", 1)[-1]: _Core(m) for m in (_black, _equity, _sabr, _smile, _vol_usecase)}
 )
 
 
@@ -173,7 +190,7 @@ def _add_tenor(i: Inputs) -> Result:
     return {"date": _iso(d)}
 
 
-def _compounding(i: Inputs) -> compounding.Compounding:
+def _compounding(i: Inputs) -> compounding_module.Compounding:
     kind = i.string("compounding")
     c = compounding.Compounding(kind, i.opt_integer("frequency") if kind == "PERIODIC" else None)
     c.validate()
@@ -241,7 +258,7 @@ def _sobol_points(i: Inputs) -> Result:
     return {"points": points}
 
 
-def _root_result(r: roots.RootResult) -> Result:
+def _root_result(r: roots_module.RootResult) -> Result:
     diagnostics = {
         "iterations": r.iterations, "residual": r.residual, "termination": r.termination,
     }
@@ -432,7 +449,7 @@ def _monte_carlo(i: Inputs) -> Result:
     return {"price": price, "stderr": stderr}
 
 
-def _cos_model(m: Inputs) -> cos.BlackScholes | cos.Heston:
+def _cos_model(m: Inputs) -> cos_module.BlackScholes | cos_module.Heston:
     name = m.enum("name", ("BLACK_SCHOLES", "HESTON"))
     if name == "BLACK_SCHOLES":
         return cos.BlackScholes(m.real("sigma"))
@@ -447,7 +464,7 @@ def _cos(i: Inputs) -> Result:
     return {"price": price}, {"a": a, "b": b}
 
 
-def _quote(raw: Any) -> data_checks.Quote:
+def _quote(raw: Any) -> data_checks_module.Quote:
     if not isinstance(raw, dict):
         raise QfError("E_SCHEMA", "a quote is not an object", "quotes")
     q = Inputs(raw, "quotes.")
@@ -478,7 +495,7 @@ def _check_quotes(i: Inputs) -> Result:
     return {"results": results}
 
 
-def _record(raw: Any) -> store.Record:
+def _record(raw: Any) -> store_module.Record:
     if not isinstance(raw, dict):
         raise QfError("E_SCHEMA", "a record is not an object", "records")
     r = Inputs(raw, "records.")
@@ -493,7 +510,7 @@ def _record(raw: Any) -> store.Record:
     )
 
 
-def _records(i: Inputs) -> list[store.Record]:
+def _records(i: Inputs) -> list[store_module.Record]:
     return [_record(r) for r in i.array("records")]
 
 
@@ -620,3 +637,4 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
     "core.time.business_date": _business_date,
 }
 OPERATIONS.update(_stage_b_handlers(_STAGE_B))
+OPERATIONS.update(_stage_c_handlers(_STAGE_C))
