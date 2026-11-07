@@ -7,6 +7,7 @@ mod ops;
 mod ops_b;
 mod ops_c;
 mod ops_d;
+mod ops_d2;
 
 use input::Inputs;
 use ops::{OPERATIONS, dispatch};

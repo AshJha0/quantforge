@@ -220,9 +220,6 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("objective", r.objective.into()),
             ]))
         }
-        _ => fail(
-            "E_UNSUPPORTED_OPERATION",
-            format!("{op} is not in this build"),
-        ),
+        _ => crate::ops_d2::dispatch(op, i),
     }
 }

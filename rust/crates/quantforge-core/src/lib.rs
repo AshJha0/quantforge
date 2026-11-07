@@ -8,6 +8,7 @@
 )]
 
 pub mod black;
+pub mod bonds;
 pub mod calendar;
 pub mod calib;
 pub mod compounding;

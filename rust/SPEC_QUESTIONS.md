@@ -59,3 +59,10 @@ None of these is reached by a golden. Rulings C15 and C16 settled the readings o
 - `rates.curve.joint_bootstrap`: `GLOBAL` runs Newton on all OIS pillars, then the projection block on that curve (the system is block triangular, D9). Optional `jumps` are not read here, as the spec does not list them.
 - `calib.curve.robust`: if the inlier set is too small to fix the betas, or the Newton active set does not settle, the result is `E_NO_CONVERGENCE`.
 - Limits: `ois_quotes` and `term_quotes` take the 100-item quote-list limit, and `projection_a` and `projection_b` take the 100-pillar curve limit. `fixings`, `knots`, `maturities`, `dates` and `steps` take only the general array limit.
+
+## Stage D wave 2, readings taken where the spec is silent
+
+- `bond.yield.from_price`: a `clean_price <= 0` is `E_DOMAIN` as well as `clean_price + accrued <= 0`. Golden `bonds_d-0048` (clean -1, dirty above 0) expects `E_DOMAIN`.
+- `bond.spread.asset_swap`: floating dates step back by plain month arithmetic, with no month-end rule even for a month-end maturity. Golden `bonds_d-0041` needs this. The spec says only "unadjusted".
+- `bond.fit.nelson_siegel`: a `weights` of another length is `E_INPUT`, and a negative weight is `E_DOMAIN`. The `tau` check runs first.
+- `bond.futures.conversion_factor`: whole months from the first of the delivery month, less one if the maturity day is earlier (it never is). A maturity before delivery is `E_INPUT`. `bond.futures.basis` with no bonds is `E_INPUT`.

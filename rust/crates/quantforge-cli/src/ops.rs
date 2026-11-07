@@ -32,6 +32,15 @@ pub fn plain(outputs: Json) -> Result<Outcome> {
 
 /// Sorted. A test checks the order and that each name dispatches.
 pub const OPERATIONS: &[&str] = &[
+    "bond.fit.nelson_siegel",
+    "bond.frn.price",
+    "bond.futures.basis",
+    "bond.futures.conversion_factor",
+    "bond.price.from_curve",
+    "bond.price.from_yield",
+    "bond.spread.asset_swap",
+    "bond.spread.z",
+    "bond.yield.from_price",
     "calib.check_bid_ask",
     "calib.curve.robust",
     "calib.curve.smooth",
@@ -125,6 +134,8 @@ pub const OPERATIONS: &[&str] = &[
     "rates.projection.bootstrap",
     "rates.schedule.generate",
     "rates.swap.pv",
+    "repo.forward",
+    "repo.implied_rate",
     "risk.cashflows",
     "risk.ois.dv01",
     "risk.vol.bump_greeks",
