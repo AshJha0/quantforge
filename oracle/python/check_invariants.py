@@ -251,6 +251,9 @@ def check_d(c, counts):
         intr = N * A * max(Sw - K if i["trade"]["type"] == "PAYER" else K - Sw, 0)
         assert o["price"] >= intr - 1e-9 * N and A > 0, cid
         hit("swaption at least intrinsic on the annuity")
+    if op == "cmdty.storage.carry":
+        assert o["arbitrage"] == [v > 0 for v in o["carry_values"]], cid
+        hit("storage arbitrage flag = positive carry value")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid

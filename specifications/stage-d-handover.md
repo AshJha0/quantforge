@@ -56,8 +56,12 @@ New operations: `infl.curve.cpi`, `infl.zcis.pv`, `infl.linker.price`, `infl.lin
 
 New operations: `rates.cap.price`, `rates.swaption.price`. Goldens: `datasets/golden/stage_d/capswaption_d.json`, 14 cases. Read: `specifications/05-volatility/caps-and-swaptions.md`, `specifications/05-volatility/black-models.md`; the D7 table in `stage-d-targets.md`; ruling D28. Stage B case `ois-0023` changed (ruling D27).
 
-### D8, D9
+### D8 commodities (ready)
 
-Not yet specified. Do not start them.
+New operations: `cmdty.curve.forward`, `cmdty.storage.carry`. Goldens: `datasets/golden/stage_d/commodity_d.json`, 10 cases. Read: `specifications/02-curves/commodity.md`; the D8 table in `stage-d-targets.md`; ruling D29.
+
+### D9
+
+Not yet specified. Do not start it.
 
 Not for language sessions: anything under `oracle/`.

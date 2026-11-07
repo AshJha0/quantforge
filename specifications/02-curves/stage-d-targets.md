@@ -73,4 +73,11 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 |---|---|---|---|
 | Caps, floors (flat or quoted vol), swaptions | 1e-9 per unit notional | QuantLib Black and Bachelier formulas; stage B curves | Formula values exact in the oracle |
 
+## Wave 3, D8: commodities
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Seasonal forward curve | `simple_analytic`; quotes reprice | Analytic | Within 1e-13 |
+| Convenience yield, carry value | `simple_analytic`; arbitrage flags exact | Analytic | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).
