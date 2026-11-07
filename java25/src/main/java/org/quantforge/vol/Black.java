@@ -135,8 +135,12 @@ public final class Black {
                 break;
             }
         }
-        if (!(Math.abs(value(normal, phi, f, x, t, d, v) - price) <= 1e-13 * Math.max(1.0, price))) {
-            throw new QfError("E_NO_CONVERGENCE", "implied vol did not converge");
+        // Accept a tiny price error, or a vol bracket collapsed to a few ulps: there the price formula's own
+        // rounding (cancellation in f N(d1) - x N(d2) far from the money) is larger than 1e-13 of the price.
+        boolean priced = Math.abs(value(normal, phi, f, x, t, d, v) - price) <= 1e-13 * Math.max(1.0, price);
+        boolean collapsed = hi - lo <= 1e-14 * hi && Math.abs(value(normal, phi, f, x, t, d, v) - price) <= 1e-10 * Math.max(1.0, price);
+        if (!priced && !collapsed) {
+            throw new QfError("E_NO_CONVERGENCE", "implied vol did not converge: f=" + f + " x=" + x + " t=" + t + " d=" + d + " price=" + price + " v=" + v + " value=" + value(normal, phi, f, x, t, d, v));
         }
         return v;
     }
