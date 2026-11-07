@@ -100,7 +100,7 @@ final class StageB {
         return quotes;
     }
 
-    private static Pricing.OisTrade oisTrade(In t) {
+    static Pricing.OisTrade oisTrade(In t) {
         Conventions.RateIndex c = Conventions.overnight(t.string("convention"));
         String tenor = t.string("tenor");
         Ois.checkTenor(tenor);
