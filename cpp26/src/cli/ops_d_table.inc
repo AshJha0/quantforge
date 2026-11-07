@@ -22,3 +22,7 @@
         {"fx.ndf.pv", op_ndf_pv},
         {"fx.xccy.bootstrap", op_xccy_bootstrap},
         {"fx.xccy.pv", op_xccy_pv},
+        {"credit.cds.bootstrap", op_cds_bootstrap},
+        {"credit.cds.price", op_cds_price},
+        {"credit.curve.composite", op_credit_composite},
+        {"credit.index.intrinsic", op_index_intrinsic},
