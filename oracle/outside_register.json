@@ -1281,6 +1281,123 @@
    "worst_abs_gap": 0.0
   },
   {
+   "case_id": "edge_d-0001",
+   "operation": "bond.price.from_yield",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CMP.BOND_YIELD",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 1.021405182655144e-14
+  },
+  {
+   "case_id": "edge_d-0002",
+   "operation": "bond.price.from_yield",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "CMP.BOND_YIELD",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 5.684341886080802e-14
+  },
+  {
+   "case_id": "edge_d-0003",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.ESTR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 4.765285388508289e-15
+  },
+  {
+   "case_id": "edge_d-0004",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.ESTR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 2.7868332641567406e-15
+  },
+  {
+   "case_id": "edge_d-0005",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.ESTR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 5.415806691999592e-15
+  },
+  {
+   "case_id": "edge_d-0006",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.SOFR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "edge_d-0007",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.SOFR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "edge_d-0008",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.SOFR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "edge_d-0009",
+   "operation": "rates.curve.discount",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMP.CONTINUOUS",
+    "CRV.LOG_LINEAR_DF",
+    "DC.ACT_365F"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 1.7867651802561113e-16
+  },
+  {
    "case_id": "ois_d-0001",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",

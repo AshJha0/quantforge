@@ -346,6 +346,7 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `compound_d` | 25 | 35 | 71% |
 | `credit_d` | 9 | 19 | 47% |
 | `csa_d` | 0 | 13 | 0% |
+| `edge_d` | 9 | 17 | 53% |
 | `equity_d` | 0 | 10 | 0% |
 | `fits_d` | 0 | 16 | 0% |
 | `futures_d` | 0 | 10 | 0% |
@@ -360,4 +361,4 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `steps_d` | 0 | 11 | 0% |
 | `trs_d` | 0 | 3 | 0% |
 | `xccy_d` | 0 | 13 | 0% |
-| **stage D** | **387** | **615** | **62.9%** |
+| **stage D** | **396** | **632** | **62.7%** |
