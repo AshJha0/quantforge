@@ -48,6 +48,13 @@ final class Operations {
         engines();
         store();
         StageB.register(TABLE);
+        OpsForward.register(TABLE);
+        OpsBlack.register(TABLE);
+        OpsGreeks.register(TABLE);
+        OpsSmile.register(TABLE);
+        OpsSurface.register(TABLE);
+        OpsSabr.register(TABLE);
+        OpsUseCase3.register(TABLE);
     }
 
     static Set<String> names() {
