@@ -93,7 +93,7 @@ def bump_greeks(model, t, K, v, T, S=None, r=None, q=None, F=None, D=None, shift
         return black(t, u, K + shift, x, T, D)
     U = S if model == "BLACK_SCHOLES" else (F if model == "BACHELIER" else F + shift)
     hu = 1e-4 * (max(abs(U), 1.0) if model == "BACHELIER" else U)
-    hv = 1e-4 * v
+    hv = 1e-3 * v
     c = V(U, v)
     return dict(delta=(V(U + hu, v) - V(U - hu, v)) / (2 * hu), gamma=(V(U + hu, v) - 2 * c + V(U - hu, v)) / hu ** 2, vega=(V(U, v + hv) - V(U, v - hv)) / (2 * hv),
                 volga=(V(U, v + hv) - 2 * c + V(U, v - hv)) / hv ** 2, vanna=(V(U + hu, v + hv) - V(U + hu, v - hv) - V(U - hu, v + hv) + V(U - hu, v - hv)) / (4 * hu * hv))

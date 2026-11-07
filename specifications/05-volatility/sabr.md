@@ -64,4 +64,4 @@ Backward Euler is first order in time, on purpose: it keeps `Q >= 0`. The result
 
 ## Acceptance
 
-Targets in `stage-c-targets.md`. Suites `sabr`, `sabr_deep`.
+Targets in `stage-c-targets.md`. Suites `sabr`, `sabr_deep`, `strata_vol`.

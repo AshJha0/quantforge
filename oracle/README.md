@@ -40,7 +40,8 @@ the human review at the end of the project.
 | As-of store, replay | A | Hand rows, own canonical form | In use. Single source |
 | Stage B rates, FX, hedges | B | Per suite in `specifications/stage-b-rulings.md`. Mutants in `MUTANTS.md` | In use. Strata checks schedules and OIS PVs, not curve building. `usecases`, `rulings_b` and `risk` have no outside source |
 | Calibration | B | Closed forms, known truth, NumPy, SciPy | In use |
-| Vol curves, further pricing | C-E | QuantLib, Strata | Planned |
+| Equity forward, Black models, smile, surface, SABR, Greeks | C | Per suite in `specifications/stage-c-rulings.md`. Mutants in `MUTANTS_C.md` | In use. Arbitrage-free SABR at `nu > 0` has no tight outside source |
+| Further vol, pricing | D, E | QuantLib, Strata | Planned |
 | CDS | D | ISDA CDS Standard Model | Planned; licence text to read first |
 | Exposure, xVA | G | Open Source Risk Engine | Planned; licence to verify |
 | SIMM-style margin | G | Hand cases on own parameters | See `LICENCES.md` |

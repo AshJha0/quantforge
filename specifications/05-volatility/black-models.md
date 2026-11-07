@@ -40,4 +40,4 @@ No American exercise. Implied vol is ill-conditioned when vega is tiny: goldens 
 
 ## Acceptance
 
-Targets in `stage-c-targets.md`. Suites `black`, `black_deep`.
+Targets in `stage-c-targets.md`. Suites `black`, `black_deep`, `strata_vol`.

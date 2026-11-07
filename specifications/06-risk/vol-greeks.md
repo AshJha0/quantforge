@@ -25,7 +25,7 @@ For `BLACK_76` and `BACHELIER`, `theta` holds `D` as a number, so has no `r` ter
 
 ## Bump and revalue
 
-`risk.vol.bump_greeks`. Inputs as `risk.vol.greeks`. Fixed bumps, on `vol.option.price`: `hu = 1e-4 U`, with `U` the `spot` or `forward` (`1e-4 max(|U|, 1)` for `BACHELIER`; shifted `forward` for a shifted `BLACK_76`), and `hv = 1e-4 v`. Central everywhere:
+`risk.vol.bump_greeks`. Inputs as `risk.vol.greeks`. Fixed bumps, on `vol.option.price`: `hu = 1e-4 U`, with `U` the `spot` or `forward` (`1e-4 max(|U|, 1)` for `BACHELIER`; shifted `forward` for a shifted `BLACK_76`), and `hv = 1e-3 v`. Central everywhere:
 
 - `delta = (V(U+hu) - V(U-hu))/(2 hu)`; `gamma = (V(U+hu) - 2V + V(U-hu))/hu^2`
 - `vega = (V(v+hv) - V(v-hv))/(2 hv)`; `volga = (V(v+hv) - 2V + V(v-hv))/hv^2`
@@ -51,4 +51,4 @@ Each position: Black-76 with vol from `vol.surface.query` at `(expiry_years, ln(
 
 ## Acceptance
 
-Analytic against bump is a target in `../05-volatility/stage-c-targets.md`. Suites `greeks`, `greeks_deep`.
+Analytic against bump is a target in `../05-volatility/stage-c-targets.md`. Suites `greeks`, `equity_forward_deep`, `surface`, `strata_vol`.

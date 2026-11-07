@@ -1,0 +1,1746 @@
+{
+ "schema_version": "1.0",
+ "suite": "smile",
+ "spec": "specifications/05-volatility/smile-and-surface.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "smile-0001",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 115.79573605232507
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0002",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "strike": 115.79573605232507,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.25
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0003",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 115.26446298022906
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0004",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "strike": 115.26446298022906,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.25
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0005",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 89.55138809519471
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0006",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "strike": 89.55138809519471,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.25
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0007",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 89.96414533045774
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0008",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "strike": 89.96414533045774,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.25
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0009",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 129.9940334199641
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0010",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "strike": 129.9940334199641,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.1
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0011",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 129.56311441511744
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0012",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "strike": 129.56311441511744,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.1
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0013",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 79.77034503952818
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0014",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "strike": 79.77034503952818,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.1
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0015",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 80.03565633476745
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0016",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "strike": 80.03565633476745,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.1
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0017",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.5,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 101.83157122911584
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0018",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "strike": 101.83157122911584,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0019",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.5,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 101.08210697554117
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "round-trip",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0020",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "strike": 101.08210697554117,
+    "convention": "SPOT",
+    "scale": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "round-trip"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "strike came through Ninv"
+   }
+  },
+  {
+   "case_id": "smile-0021",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 1.0,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0022",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "PUT",
+    "delta": 0.25,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "a put delta is negative"
+  },
+  {
+   "case_id": "smile-0023",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "convention": "FORWARD",
+    "scale": 0.9
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0024",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "convention": "SPOT",
+    "scale": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0025",
+   "operation": "vol.smile.rr_bf",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "atm_vol": 0.2,
+    "atm_convention": "ATM_FORWARD",
+    "rr": -0.04,
+    "bf": 0.006,
+    "delta": 0.25,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 100.0,
+     "call_vol": 0.18600000000000003,
+     "put_vol": 0.226,
+     "call_strike": 115.34449734852197,
+     "put_strike": 88.08246715793778
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0026",
+   "operation": "vol.smile.rr_bf",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "atm_vol": 0.2,
+    "atm_convention": "DELTA_NEUTRAL",
+    "rr": -0.04,
+    "bf": 0.006,
+    "delta": 0.25,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 102.02013400267558,
+     "call_vol": 0.18600000000000003,
+     "put_vol": 0.226,
+     "call_strike": 115.34449734852197,
+     "put_strike": 88.08246715793778
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0027",
+   "operation": "vol.smile.rr_bf",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "atm_vol": 0.01,
+    "atm_convention": "ATM_FORWARD",
+    "rr": -0.1,
+    "bf": 0.0,
+    "delta": 0.25,
+    "convention": "FORWARD",
+    "scale": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0028",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": 0.03,
+     "b": 0.12,
+     "rho": -0.35,
+     "m": 0.02,
+     "sigma": 0.15
+    },
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "expiry_years": 1.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "total_variance": [
+      0.1325864564823219,
+      0.10115784749034662,
+      0.0784042685075532,
+      0.058091247254758255,
+      0.04899929514050587,
+      0.04704,
+      0.05329087252259035,
+      0.06306407571795719,
+      0.07752991584360076
+     ],
+     "implied_vol": [
+      0.297306190632174,
+      0.25968936249597213,
+      0.22862526618545204,
+      0.19679303384479552,
+      0.180737922861632,
+      0.17708754896942924,
+      0.18848673255270135,
+      0.20504320799603384,
+      0.22734689477184533
+     ],
+     "g": [
+      0.36713661487548577,
+      0.43531956289452356,
+      0.5621070238421383,
+      0.9395165933214249,
+      1.372275771715203,
+      1.2431295086934995,
+      0.7932665186296156,
+      0.6074557139283969,
+      0.49652076958101377
+     ],
+     "min_g": 0.36713661487548577,
+     "butterfly_free": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0029",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": -0.041,
+     "b": 0.1331,
+     "rho": 0.306,
+     "m": 0.3586,
+     "sigma": 0.4153
+    },
+    "log_moneyness": [
+     -1.5,
+     -1.0,
+     -0.5,
+     0.0,
+     0.5,
+     1.0,
+     1.5
+    ],
+    "expiry_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "total_variance": [
+      0.13678196112229782,
+      0.09275565217220644,
+      0.05097657169033439,
+      0.017426252555159116,
+      0.023151565612194815,
+      0.08682670975188522,
+      0.16715169988636883
+     ],
+     "implied_vol": [
+      0.3698404536043858,
+      0.3045581260978049,
+      0.22577991870477407,
+      0.1320085321301586,
+      0.15215638538094553,
+      0.29466372316911565,
+      0.408841900844775
+     ],
+     "g": [
+      0.2478306952583732,
+      0.2678703587364596,
+      0.3568535725377076,
+      1.0386497312817975,
+      0.06937921130082883,
+      -0.027741695904626246,
+      0.029123865658198626
+     ],
+     "min_g": -0.027741695904626246,
+     "butterfly_free": false
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "published-counterexample",
+    "analytic"
+   ],
+   "tags": [
+    "arbitrage",
+    "synthetic"
+   ],
+   "description": "Vogt parameters from Gatheral-Jacquier 2014; g is negative"
+  },
+  {
+   "case_id": "smile-0030",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": 0.03,
+     "b": -0.1,
+     "rho": -0.35,
+     "m": 0.02,
+     "sigma": 0.15
+    },
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "expiry_years": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0031",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": 0.03,
+     "b": 0.12,
+     "rho": 1.0,
+     "m": 0.02,
+     "sigma": 0.15
+    },
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "expiry_years": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0032",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": 0.03,
+     "b": 0.12,
+     "rho": -0.35,
+     "m": 0.02,
+     "sigma": 0.0
+    },
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "expiry_years": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0033",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": -1.0,
+     "b": 0.12,
+     "rho": -0.35,
+     "m": 0.02,
+     "sigma": 0.15
+    },
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "expiry_years": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0034",
+   "operation": "vol.svi.calibrate",
+   "inputs": {
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "total_variance": [
+     0.1325864564823219,
+     0.10115784749034662,
+     0.0784042685075532,
+     0.058091247254758255,
+     0.04899929514050587,
+     0.04704,
+     0.05329087252259035,
+     0.06306407571795719,
+     0.07752991584360076
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "svi": {
+      "a": 0.03,
+      "b": 0.12,
+      "rho": -0.35,
+      "m": 0.02,
+      "sigma": 0.15
+     },
+     "rmse": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth",
+    "scipy"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "stage-c-targets: languages use different solvers; minimum checked unique from several starts"
+   }
+  },
+  {
+   "case_id": "smile-0035",
+   "operation": "vol.svi.calibrate",
+   "inputs": {
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "total_variance": [
+     0.13268645648232189,
+     0.10105784749034662,
+     0.07845426850755319,
+     0.05804124725475825,
+     0.04909929514050587,
+     0.046939999999999996,
+     0.05332087252259035,
+     0.06313407571795719,
+     0.07748991584360077
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "svi": {
+      "a": 0.02993380322563898,
+      "b": 0.12014422148511321,
+      "rho": -0.35050647452257777,
+      "m": 0.0196267983436372,
+      "sigma": 0.15056688781659594
+     },
+     "rmse": 7.374584385924671e-05
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "scipy"
+   ],
+   "tags": [
+    "noisy",
+    "synthetic"
+   ],
+   "description": "parameters loose, rmse tight",
+   "tolerance_limit": {
+    "absolute": 0.0002,
+    "relative": 0.0,
+    "reason": "noisy fit: flat directions in the minimum; rmse itself is held by the extra check"
+   },
+   "extra_checks": [
+    {
+     "output": "rmse",
+     "expected": 7.374584385924671e-05,
+     "method": "absolute",
+     "limit": 1e-08
+    }
+   ]
+  },
+  {
+   "case_id": "smile-0036",
+   "operation": "vol.svi.calibrate",
+   "inputs": {
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1
+    ],
+    "total_variance": [
+     0.1325864564823219,
+     0.10115784749034662,
+     0.0784042685075532,
+     0.058091247254758255
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0037",
+   "operation": "vol.svi.calibrate",
+   "inputs": {
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.25,
+     -0.1,
+     0.0,
+     0.1,
+     0.25,
+     0.4,
+     0.6
+    ],
+    "total_variance": [
+     -0.01,
+     0.10115784749034662,
+     0.0784042685075532,
+     0.058091247254758255,
+     0.04899929514050587,
+     0.04704,
+     0.05329087252259035,
+     0.06306407571795719,
+     0.07752991584360076
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0038",
+   "operation": "vol.svi.calibrate",
+   "inputs": {
+    "log_moneyness": [
+     0.6,
+     0.4,
+     0.25,
+     0.1,
+     0.0,
+     -0.1,
+     -0.25,
+     -0.4,
+     -0.6
+    ],
+    "total_variance": [
+     0.1325864564823219,
+     0.10115784749034662,
+     0.0784042685075532,
+     0.058091247254758255,
+     0.04899929514050587,
+     0.04704,
+     0.05329087252259035,
+     0.06306407571795719,
+     0.07752991584360076
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0039",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": -0.4,
+    "eta": 1.0,
+    "gamma": 0.5,
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.1,
+     0.0,
+     0.1,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "total_variance": [
+      [
+       0.035335341190401444,
+       0.015335924789558916,
+       0.01,
+       0.00847359942420315,
+       0.015517706394966413
+      ],
+      [
+       0.08634531879296155,
+       0.04947710218262603,
+       0.04,
+       0.03449671467825325,
+       0.04051692282720563
+      ],
+      [
+       0.15399165093288086,
+       0.10317450974618779,
+       0.09,
+       0.0806558903106293,
+       0.07909848553173927
+      ],
+      [
+       0.23882764360494826,
+       0.1764967629457208,
+       0.16,
+       0.14711329876589196,
+       0.13492585785786426
+      ]
+     ],
+     "butterfly_free": true,
+     "calendar_free": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic",
+    "atm-equals-theta"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0040",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": -0.7,
+    "eta": 3.0,
+    "gamma": 0.5,
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.1,
+     0.0,
+     0.1,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "total_variance": [
+      [
+       0.11009457973309267,
+       0.03421624637084954,
+       0.01,
+       0.006522630471227271,
+       0.019523984850000814
+      ],
+      [
+       0.23481085812372463,
+       0.08629856555023963,
+       0.04,
+       0.020424390875725288,
+       0.04228017343178713
+      ],
+      [
+       0.3721116934838781,
+       0.15640105268909307,
+       0.09,
+       0.048995131883534444,
+       0.06884077333886807
+      ],
+      [
+       0.5206112540029885,
+       0.24446638261150724,
+       0.16,
+       0.09813614954471117,
+       0.1003613694105123
+      ]
+     ],
+     "butterfly_free": false,
+     "calendar_free": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "arbitrage",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0041",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": 0.0,
+    "eta": 0.15,
+    "gamma": 1.0,
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.1,
+     0.0,
+     0.1,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "total_variance": [
+      [
+       0.0354138126514911,
+       0.014013878188659974,
+       0.01,
+       0.014013878188659974,
+       0.0354138126514911
+      ],
+      [
+       0.056055512754639894,
+       0.04136000936329383,
+       0.04,
+       0.04136000936329383,
+       0.056055512754639894
+      ],
+      [
+       0.09908326913195982,
+       0.09062071897723664,
+       0.09,
+       0.09062071897723664,
+       0.09908326913195982
+      ],
+      [
+       0.16544003745317531,
+       0.160350793399941,
+       0.16,
+       0.160350793399941,
+       0.16544003745317531
+      ]
+     ],
+     "butterfly_free": true,
+     "calendar_free": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0042",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": 1.0,
+    "eta": 1.0,
+    "gamma": 0.5,
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.1,
+     0.0,
+     0.1,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0043",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": -0.4,
+    "eta": 1.0,
+    "gamma": 0.0,
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.1,
+     0.0,
+     0.1,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0044",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": -0.4,
+    "eta": 1.0,
+    "gamma": 0.5,
+    "thetas": [
+     0.04,
+     0.01
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.1,
+     0.0,
+     0.1,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0045",
+   "operation": "vol.ssvi.calibrate",
+   "inputs": {
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4
+    ],
+    "total_variance": [
+     [
+      0.035335341190401444,
+      0.02177903107917145,
+      0.015335924789558916,
+      0.01,
+      0.00847359942420315,
+      0.010196365467433188,
+      0.015517706394966413
+     ],
+     [
+      0.08634531879296155,
+      0.06098678174035767,
+      0.04947710218262603,
+      0.04,
+      0.03449671467825325,
+      0.033853962116484046,
+      0.04051692282720563
+     ],
+     [
+      0.15399165093288086,
+      0.11882481034189381,
+      0.10317450974618779,
+      0.09,
+      0.0806558903106293,
+      0.07612340130840811,
+      0.07909848553173927
+     ],
+     [
+      0.23882764360494826,
+      0.195633653793597,
+      0.1764967629457208,
+      0.16,
+      0.14711329876589196,
+      0.13864546148309034,
+      0.13492585785786426
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "rho": -0.4,
+     "eta": 1.0,
+     "gamma": 0.5,
+     "rmse": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth",
+    "scipy"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "stage-c-targets: languages use different solvers; minimum checked unique from several starts"
+   }
+  },
+  {
+   "case_id": "smile-0046",
+   "operation": "vol.ssvi.calibrate",
+   "inputs": {
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": [
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4
+    ],
+    "total_variance": [
+     [
+      0.035335341190401444,
+      0.02177903107917145,
+      0.015335924789558916,
+      0.01,
+      0.00847359942420315,
+      0.010196365467433188,
+      0.015517706394966413
+     ],
+     [
+      0.08634531879296155,
+      0.06098678174035767,
+      0.04947710218262603,
+      0.04,
+      0.03449671467825325,
+      0.033853962116484046
+     ],
+     [
+      0.15399165093288086,
+      0.11882481034189381,
+      0.10317450974618779,
+      0.09,
+      0.0806558903106293,
+      0.07612340130840811
+     ],
+     [
+      0.23882764360494826,
+      0.195633653793597,
+      0.1764967629457208,
+      0.16,
+      0.14711329876589196,
+      0.13864546148309034
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

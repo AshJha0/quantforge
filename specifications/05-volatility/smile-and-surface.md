@@ -65,4 +65,4 @@ Linear surface interpolation can create butterfly arbitrage between nodes: the c
 
 ## Acceptance
 
-Targets in `stage-c-targets.md`. Suites `smile`, `surface`, `smile_deep`.
+Targets in `stage-c-targets.md`. Suites `smile`, `surface`.

@@ -1,0 +1,918 @@
+{
+ "schema_version": "1.0",
+ "suite": "equity_forward_deep",
+ "spec": "specifications/06-risk/vol-greeks.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "equity_forward_deep-0001",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": null,
+    "dividends": [
+     {
+      "ex_date": "2027-02-04",
+      "amount": 1.0
+     },
+     {
+      "ex_date": "2027-08-03",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 8.271617072707915,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 101.01475449539838,
+     "delta": 0.5598078330013553,
+     "gamma": 0.020119020246255954,
+     "vega": 38.66773911108963
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "dividends",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0002",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": null,
+    "dividends": [
+     {
+      "ex_date": "2027-02-04",
+      "amount": 1.0
+     },
+     {
+      "ex_date": "2027-08-03",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "PUT",
+    "strike": 95.0,
+    "vol": 0.25,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 6.825033958337038,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 101.01475449539838,
+     "delta": -0.3554830886893818,
+     "gamma": 0.01519836120279167,
+     "vega": 36.51310170130054
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "dividends",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0003",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 250.0,
+    "as_of": "2026-11-06",
+    "expiry": "2028-05-07",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "borrow_curve": null,
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 4.0
+     },
+     {
+      "ex_date": "2027-08-13",
+      "amount": 4.0
+     },
+     {
+      "ex_date": "2028-02-09",
+      "amount": 4.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 260.0,
+    "vol": 0.3,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 27.71806828078569,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 241.6932107432036,
+     "delta": 0.49408454088860826,
+     "gamma": 0.004557777633294704,
+     "vega": 116.37246959668614
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "dividends",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0004",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.36787944117144233
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-05-07",
+      "amount": 2.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 6.191107527021009,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 97.01498567696059,
+     "delta": 0.45607087865600504,
+     "gamma": 0.01933780247010937,
+     "vega": 37.13647284213851
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "dividends",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0005",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.36787944117144233
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-05-07",
+      "amount": 2.0
+     }
+    ],
+    "option_type": "PUT",
+    "strike": 90.0,
+    "vol": 0.3,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 7.673095077550375,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 97.01498567696059,
+     "delta": -0.32770783759714095,
+     "gamma": 0.011915614597535516,
+     "vega": 34.32426450079444
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "dividends",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0006",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2028-11-05",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.36787944117144233
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.6703200460356393
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-05-05",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2027-11-01",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2028-04-29",
+      "amount": 1.5
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 105.0,
+    "vol": 0.22,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 10.054702869575856,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 101.54436476429866,
+     "delta": 0.4987876943443123,
+     "gamma": 0.012867733331210439,
+     "vega": 51.77868837219814
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "dividends",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0007",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 50.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-05-25",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.6703200460356393
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [],
+    "option_type": "PUT",
+    "strike": 50.0,
+    "vol": 0.4,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 5.701681706718004,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 50.27472458546729,
+     "delta": -0.4314902766701046,
+     "gamma": 0.02643067191348101,
+     "vega": 14.482559952592336
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0008",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 250.0,
+    "side": "SELL",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -2066.6485857038297,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": null,
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 101.005507519449,
+     "delta": -138.51472307569523,
+     "gamma": -4.930949703355994,
+     "vega": -9666.714660485728
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0009",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD",
+    "snapshot_id": "snap-1"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 8.266594342815319,
+      "currency": "USD",
+      "model": "BLACK_76_EQUITY",
+      "data_version": "snap-1",
+      "conventions": "EQUITY_FORWARD",
+      "as_of": "2026-11-06"
+     },
+     "forward": 101.005507519449,
+     "delta": 0.5540588923027808,
+     "gamma": 0.019723798813423978,
+     "vega": 38.66685864194291
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0010",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.0,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0011",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 0.0,
+    "vol": 0.2,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0012",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 0.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0013",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2026-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0014",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2026-11-04",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_ORDER"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward_deep-0015",
+   "operation": "vol.equity.price",
+   "inputs": {
+    "spot": -1.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.5488116360940265
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-02-14",
+      "amount": 1.0
+     }
+    ],
+    "option_type": "CALL",
+    "strike": 100.0,
+    "vol": 0.2,
+    "quantity": 1.0,
+    "side": "BUY",
+    "currency": "USD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

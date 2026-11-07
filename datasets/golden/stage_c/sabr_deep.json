@@ -1,0 +1,479 @@
+{
+ "schema_version": "1.0",
+ "suite": "sabr_deep",
+ "spec": "specifications/05-volatility/sabr.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "sabr_deep-0001",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": 0.0,
+    "nu": 0.0,
+    "shift": 0.0,
+    "cells": 2000,
+    "cells_below": 500,
+    "steps": 1000,
+    "strikes": [
+     0.7,
+     0.85,
+     1.0,
+     1.2,
+     1.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "call_prices": [
+      0.3191193591190782,
+      0.2049215774726455,
+      0.11932955146446021,
+      0.04968468034566087,
+      0.009725606790348782
+     ],
+     "vols": [
+      0.32791261821244505,
+      0.31263719059456563,
+      0.3002387135643896,
+      0.28675338530020367,
+      0.2708631209127576
+     ],
+     "mass": 0.9999999999999969,
+     "mean": 0.9999999999999984,
+     "absorbed": 3.274227435933977e-10,
+     "min_density": 2.690847963772687e-12
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "quantlib-1.44-cev"
+   ],
+   "tags": [
+    "cev",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0002",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.25,
+    "rho": 0.0,
+    "nu": 0.0,
+    "shift": 0.0,
+    "cells": 2000,
+    "cells_below": 500,
+    "steps": 1000,
+    "strikes": [
+     0.7,
+     0.85,
+     1.0,
+     1.2,
+     1.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "call_prices": [
+      0.32191079210823703,
+      0.20706677698256046,
+      0.11946849970769581,
+      0.04746576888830472,
+      0.007681843113825378
+     ],
+     "vols": [
+      0.34284581272462633,
+      0.31937795749895276,
+      0.300590956530308,
+      0.2804472717313126,
+      0.2571368121271436
+     ],
+     "mass": 1.0000000000000129,
+     "mean": 1.000000000000003,
+     "absorbed": 1.7876407604199287e-05,
+     "min_density": 2.0164220391050537e-16
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "quantlib-1.44-cev"
+   ],
+   "tags": [
+    "cev",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0003",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 2.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 1000,
+    "cells_below": 250,
+    "steps": 800,
+    "strikes": [
+     0.6,
+     0.8,
+     1.0,
+     1.25,
+     1.6
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "call_prices": [
+      0.44487778644964326,
+      0.2915675435934761,
+      0.17069593723404114,
+      0.0752371067803112,
+      0.021680955081619505
+     ],
+     "vols": [
+      0.40772903650148284,
+      0.3466275477180167,
+      0.30489626782577756,
+      0.2740120078076997,
+      0.25923426886966244
+     ],
+     "mass": 0.9999999999999996,
+     "mean": 1.0000000000000002,
+     "absorbed": 0.023010749703289746,
+     "min_density": 1.4145646539815998e-06
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "hagan-formula-near",
+    "quantlib-1.44-noarbsabr-near"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0004",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 0.02,
+    "expiry_years": 20.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 800,
+    "cells_below": 40,
+    "steps": 400,
+    "strikes": [
+     0.002,
+     0.004,
+     0.008,
+     0.012,
+     0.02,
+     0.03,
+     0.05
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "call_prices": [
+      0.018676807228749457,
+      0.017366152667486878,
+      0.0148015733172678,
+      0.012357860340082879,
+      0.008227201086342745,
+      0.005476228784603462,
+      0.00380199130941394
+     ],
+     "vols": [
+      0.47860943188974747,
+      0.41436963229750756,
+      0.3421096448268052,
+      0.2960328226080087,
+      0.24185667877946926,
+      0.22928169485695002,
+      0.2516845437579852
+     ],
+     "mass": 0.9999999999999972,
+     "mean": 0.019999999999999924,
+     "absorbed": 0.33597563775876427,
+     "min_density": 3.87093171497667e-06
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "mass-and-mean"
+   ],
+   "tags": [
+    "arbitrage",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0005",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 0.01,
+    "expiry_years": 20.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.5,
+    "shift": 0.01,
+    "cells": 800,
+    "cells_below": 40,
+    "steps": 400,
+    "strikes": [
+     -0.008,
+     -0.006,
+     -0.002,
+     0.002,
+     0.01,
+     0.019999999999999997,
+     0.04
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "call_prices": [
+      0.018676807228749457,
+      0.017366152667486878,
+      0.0148015733172678,
+      0.012357860340082879,
+      0.008227201086342745,
+      0.005476228784603462,
+      0.00380199130941394
+     ],
+     "vols": [
+      0.47860943188974747,
+      0.41436963229750756,
+      0.3421096448268052,
+      0.2960328226080087,
+      0.24185667877946926,
+      0.22928169485695002,
+      0.2516845437579852
+     ],
+     "mass": 0.9999999999999972,
+     "mean": 0.019999999999999924,
+     "absorbed": 0.33597563775876427,
+     "min_density": 3.87093171497667e-06
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "mass-and-mean"
+   ],
+   "tags": [
+    "arbitrage",
+    "shift",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0006",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 1.0,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 100,
+    "cells_below": 25,
+    "steps": 50,
+    "strikes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0007",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 100,
+    "cells_below": 100,
+    "steps": 50,
+    "strikes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0008",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 100,
+    "cells_below": 0,
+    "steps": 50,
+    "strikes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0009",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 100,
+    "cells_below": 25,
+    "steps": 0,
+    "strikes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0010",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 20001,
+    "cells_below": 25,
+    "steps": 50,
+    "strikes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0011",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 100,
+    "cells_below": 25,
+    "steps": 50,
+    "strikes": [
+     100.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}
