@@ -35,4 +35,12 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | Conversion factor, CTD index | Exact | CBOT formula, hand | No outside library |
 | Sovereign fit, RV residuals | Betas within 1e-8 | Known truth; SciPy from three starts | Within 1e-9 |
 
+## Wave 2, D3: cross-currency and NDF
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Basis-adjusted foreign curve | Pillars within 1e-9 | Known truth | Replay within 1e-13 |
+| Cross-currency swap PV | 1e-9 per unit notional | QuantLib `OvernightLeg` NPV for coupons | Within 1e-6 on 1e7 |
+| NDF | `interpolation` | Analytic | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).

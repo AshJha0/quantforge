@@ -207,6 +207,13 @@ def check_d(c, counts):
         irs = [b["implied_repo"] for b in o["bonds"]]
         assert irs[o["ctd"]] == max(irs), cid
         hit("CTD has the highest implied repo")
+    if op == "fx.ndf.pv":
+        assert o["forward"] > 0 and (i["fixing"] is None or o["forward"] == i["fixing"]), cid
+        hit("NDF forward positive, equal to the fixing once known")
+    if op == "fx.xccy.pv":
+        sg = 1 if i["trade"]["side"] == "RECEIVE_FOREIGN" else -1
+        assert abs(o["pv"] - sg * (i["spot"] * o["foreign_leg"] - o["domestic_leg"])) < 1e-6, cid
+        hit("xccy pv = sign (spot foreign - domestic)")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid

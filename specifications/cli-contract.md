@@ -197,6 +197,7 @@ Wave 2 adds:
 | Prefix | Spec |
 |---|---|
 | `bond.*`, `repo.*` | `04-pricing/bonds.md` |
+| `fx.xccy.*`, `fx.ndf.*` | `02-curves/cross-currency.md` |
 
 `ESTR` joins `rates.ois.*`, and curve objects take optional `jumps` (`02-curves/curve-framework.md`).
 

@@ -24,6 +24,9 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D15 | Repo | ACT/360 simple; coupons inside the term reinvested at the repo rate. `gc_rate` key required, may be `null` |
 | D16 | CTD | Highest implied repo. Conversion factors are inputs to `bond.futures.basis`, so a factor error does not move the basis case |
 
+| D17 | Cross-currency schedule | Quarterly, `MODIFIED_FOLLOWING` on the joint calendar, ACT/360, constant notional with exchanges. `start` must be a joint business day. Domestic USD, foreign EUR only |
+| D18 | NDF forward | At the payment date, from the two curves; no spot lag and no convexity. A fixing on or before `as_of` must be given |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
@@ -38,6 +41,7 @@ Cases for rulings carry the `ruling` tag.
 | `bonds_d` | QuantLib `FixedRateBond`, `BondFunctions` (price, yield, duration, convexity, Z-spread) | Asset swap is replay only |
 | `repo_d` | None | FRN replay and par identity; repo analytic; CBOT formula by hand |
 | `bondfit_d` | SciPy `least_squares` | Known truth |
+| `xccy_d` | QuantLib `OvernightLeg` NPV of foreign coupons | Bootstrap is known truth; NDF analytic |
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.

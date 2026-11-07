@@ -34,7 +34,11 @@ Goldens: `datasets/golden/stage_d/{bonds_d,repo_d,bondfit_d}.json`, 72 cases.
 
 Read, beyond wave 1: `specifications/04-pricing/bonds.md`; the wave 2 table in `02-curves/stage-d-targets.md`; rulings D13 to D16.
 
-### D3, D4, D5
+### D3 cross-currency and NDF (ready)
+
+New operations: `fx.xccy.bootstrap`, `fx.xccy.pv`, `fx.ndf.pv`. Goldens: `datasets/golden/stage_d/xccy_d.json`, 13 cases. Read: `specifications/02-curves/cross-currency.md`; the D3 table in `stage-d-targets.md`; rulings D17, D18.
+
+### D4, D5
 
 Not yet specified. Do not start them.
 
