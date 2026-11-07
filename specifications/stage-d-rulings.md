@@ -38,6 +38,8 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D25 | CPI lag | `base_month` carries the swap lag; linkers use the three-month TIPS reference rule. Integer-year ZCIS only |
 | D26 | Seasonality | Multiplicative, normalised to the base month's calendar month, so pillars are untouched |
 
+| D27 | Stage B case `ois-0023` | It expected `ESTR` to be `E_SCHEMA`; D1 lists `ESTR`, so that expectation is retired. The case now sends `TONA`, still unlisted, and keeps `E_SCHEMA`. Changed in `gen_stage_b.py` and `stage_b/ois.json`; nothing else in stage B moves |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
