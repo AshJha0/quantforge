@@ -53,6 +53,7 @@ final class Operations {
         OpsGreeks.register(TABLE);
         OpsSmile.register(TABLE);
         OpsSurface.register(TABLE);
+        OpsSabr.register(TABLE);
     }
 
     static Set<String> names() {
