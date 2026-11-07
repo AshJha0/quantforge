@@ -178,3 +178,4 @@ Silent choices, all passing `risk_r2`:
 | R2-3 | In `risk.curve.key_rate` the OIS periods come from the given curve's `as_of`. The curve object has no convention, so the "trade convention differs" `E_INPUT` rule is applied in `risk.curve.par` only |
 | R2-4 | The `E_DOMAIN` checks (`bump_bp`, then `notional`) run after every `E_SCHEMA` check, and the curve's own rule checks (`key_rate`) run after them, just before `key_dates`, as "Checks, in order" lists |
 | R2-5 | The bumped curves use the same SEQUENTIAL bootstrap as stage B risk. So Jacobian entries above the diagonal, and par buckets for quotes beyond a product's last date, come out as exact zeros |
+| R2-6 | `risk.pnl.explain`: a quote's move is taken on its mid (`rate`, or `(bid+ask)/2` when bid and ask are given), the same value the bootstrap uses. The checks run in this order: `bump_bp`, `notional`, convention, tenor match, then the bootstrap's own quote checks |

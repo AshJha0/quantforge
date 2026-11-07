@@ -60,6 +60,12 @@ final class OpsRisk {
         return in.has("scheme") ? in.choice("scheme", CurveRisk.Scheme.class) : CurveRisk.Scheme.CENTRAL;
     }
 
+    private static void checkConvention(Product p, Conventions.RateIndex c) {
+        if (p.convention() != null && p.convention() != c) {
+            throw new QfError("E_INPUT", "trade convention differs from the curve's", "convention");
+        }
+    }
+
     static void register(Map<String, Function<In, Out>> table) {
         table.put("risk.curve.par", in -> {
             LocalDate asOf = in.date("as_of");
@@ -72,9 +78,7 @@ final class OpsRisk {
             in.gate();
             CurveRisk.checkBump(bump);
             p.checkNotional();
-            if (p.convention() != null && p.convention() != c) {
-                throw new QfError("E_INPUT", "trade convention differs from the curve's", "convention");
-            }
+            checkConvention(p, c);
             CurveRisk.Par r = CurveRisk.par(c, asOf, quotes, interp, p.pricer(asOf), bump, scheme);
             return Operations.out("value", r.value(), "par_dv01", r.parDv01(), "par_buckets", r.parBuckets());
         });
@@ -92,6 +96,24 @@ final class OpsRisk {
             CurveRisk.checkKeyDates(curve, mode, keys);
             CurveRisk.KeyRate r = CurveRisk.keyRate(curve, mode, keys, p.pricer(curve.asOf()), bump, scheme);
             return Operations.out("value", r.value(), "key_rates", r.keyRates(), "zero_dv01", r.zeroDv01());
+        });
+        table.put("risk.pnl.explain", in -> {
+            LocalDate asOf = in.date("as_of");
+            Conventions.RateIndex c = Conventions.overnight(in.string("convention"));
+            Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
+            List<Ois.Quote> start = StageB.quotes(in, "quotes_start");
+            List<Ois.Quote> end = StageB.quotes(in, "quotes_end");
+            Product p = product(in);
+            double bump = bumpBp(in);
+            in.gate();
+            CurveRisk.checkBump(bump);
+            p.checkNotional();
+            checkConvention(p, c);
+            CurveRisk.checkSameTenors(start, end);
+            CurveRisk.Explain e = CurveRisk.explain(c, asOf, interp, start, end, p.pricer(asOf), bump);
+            return Operations.out("value_start", e.valueStart(), "value_end", e.valueEnd(), "full_pnl", e.fullPnl(),
+                    "par_buckets", e.parBuckets(), "risk_pnl", e.riskPnl(), "unexplained", e.unexplained(),
+                    "threshold", e.threshold(), "explained", e.explained());
         });
         table.put("risk.curve.jacobian", in -> {
             LocalDate asOf = in.date("as_of");

@@ -124,6 +124,38 @@ class CurveRiskTest {
     }
 
     @Test
+    void pnlExplainPassesSmallMovesAndFailsAShockOnALongTrade() {
+        List<Ois.Quote> up1 = QUOTES.stream().map(x -> q(x.tenor(), x.rate() + 0.0001)).toList();
+        CurveRisk.Explain e = CurveRisk.explain(Conventions.SOFR, AS_OF, Curve.Interpolation.LOG_LINEAR_DF, QUOTES,
+                up1, receiver(), 1.0);
+        assertEquals(e.valueEnd() - e.valueStart(), e.fullPnl(), 0.0);
+        assertEquals(e.fullPnl() - e.riskPnl(), e.unexplained(), 0.0);
+        assertTrue(e.explained());
+        Pricing.OisTrade longPay = new Pricing.OisTrade(Conventions.SOFR, "10Y", 0.0375, 1e8, Pricing.Side.PAY);
+        Ois.Legs legs = Ois.legs(Conventions.SOFR, AS_OF, "10Y");
+        List<Ois.Quote> twist = QUOTES.stream()
+                .map(x -> q(x.tenor(), x.rate() + (x.tenor().equals("10Y") ? 0.03 : -0.03))).toList();
+        CurveRisk.Explain shock = CurveRisk.explain(Conventions.SOFR, AS_OF, Curve.Interpolation.LOG_LINEAR_DF,
+                QUOTES, twist, c -> Pricing.oisPv(longPay, legs, c), 1.0);
+        assertTrue(Math.abs(shock.unexplained()) > 0.0);
+        assertEquals(Math.max(0.05 * Math.abs(shock.fullPnl()), 0.05 * Math.abs(sum(shock.parBuckets()))),
+                shock.threshold(), 0.0);
+        assertEquals(Math.abs(shock.unexplained()) <= shock.threshold(), shock.explained());
+        assertEquals("E_INPUT", assertThrows(QfError.class,
+                () -> CurveRisk.checkSameTenors(QUOTES, QUOTES.subList(0, 3))).code());
+        assertEquals("E_INPUT", assertThrows(QfError.class,
+                () -> CurveRisk.checkSameTenors(QUOTES, QUOTES.reversed())).code());
+    }
+
+    private static double sum(double[] a) {
+        double s = 0.0;
+        for (double v : a) {
+            s += v;
+        }
+        return s;
+    }
+
+    @Test
     void inputChecks() {
         Curve c = curve();
         for (double b : new double[] {0.0, -1.0, 100.5, Double.NaN}) {

@@ -73,6 +73,39 @@ public final class CurveRisk {
         return new Par(base, parallel, buckets);
     }
 
+    public record Explain(double valueStart, double valueEnd, double fullPnl, double[] parBuckets, double riskPnl,
+                          double unexplained, double threshold, boolean explained) {}
+
+    /** The two quote sets must have the same tenors in the same order, else E_INPUT. */
+    public static void checkSameTenors(List<Ois.Quote> start, List<Ois.Quote> end) {
+        boolean same = start.size() == end.size();
+        for (int j = 0; same && j < start.size(); j++) {
+            same = start.get(j).tenor().equals(end.get(j).tenor());
+        }
+        if (!same) {
+            throw new QfError("E_INPUT", "quotes_start and quotes_end need the same tenors in order", "quotes_end");
+        }
+    }
+
+    /** Market-move P&L explain on one as_of (06-risk/pnl-explain.md): full revaluation against par risk. */
+    public static Explain explain(Conventions.RateIndex c, LocalDate asOf, Curve.Interpolation interp,
+                                  List<Ois.Quote> start, List<Ois.Quote> end, ToDoubleFunction<Curve> product,
+                                  double bumpBp) {
+        Par par = par(c, asOf, start, interp, product, bumpBp, Scheme.CENTRAL);
+        double valueEnd = product.applyAsDouble(rebuilt(c, asOf, end, interp, null));
+        double full = valueEnd - par.value();
+        double riskPnl = 0.0;
+        double dv01 = 0.0;
+        for (int j = 0; j < start.size(); j++) {
+            riskPnl += par.parBuckets()[j] * (end.get(j).mid() - start.get(j).mid()) / BP;
+            dv01 += par.parBuckets()[j];
+        }
+        double unexplained = full - riskPnl;
+        double threshold = Math.max(0.05 * Math.abs(full), 0.05 * Math.abs(dv01));
+        return new Explain(par.value(), valueEnd, full, par.parBuckets(), riskPnl, unexplained, threshold,
+                Math.abs(unexplained) <= threshold);
+    }
+
     /** TRIANGULAR needs key dates strictly increasing after as_of; PILLAR needs none. Else E_INPUT. */
     public static void checkKeyDates(Curve curve, Mode mode, LocalDate[] keyDates) {
         if (mode == Mode.PILLAR) {
