@@ -29,6 +29,7 @@
 #include "quantforge/core/money.hpp"
 #include "quantforge/core/rates.hpp"
 #include "quantforge/core/rates_d.hpp"
+#include "quantforge/core/bonds.hpp"
 #include "quantforge/core/rng.hpp"
 #include "quantforge/core/snapshot.hpp"
 #include "quantforge/core/sobol.hpp"
@@ -1046,6 +1047,7 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_stage_b.inc"
 #include "ops_c_all.inc"
 #include "ops_stage_d.inc"
+#include "ops_bonds.inc"
 
 // ---- dispatch ----
 
