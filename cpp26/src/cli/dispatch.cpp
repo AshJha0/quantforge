@@ -1193,7 +1193,7 @@ string error_json(const string& case_id, const Error& e) {
         s += R"(,"field":)";
         json::append_string(s, e.field());
     }
-    s += "}}";
+    s += R"(},"diagnostics":{}})";
     return s;
 }
 

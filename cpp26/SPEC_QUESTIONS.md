@@ -68,3 +68,10 @@ Each is answered here with the most conservative reading; none changes a golden 
 18. **Closed by ruling D44.** **`mbs.cashflows` with `wac <= 0` and `net_coupon > wac` together** (`mbs_d-0011`: wac 0, net 0.06). `mbs.md` lists the `E_INPUT` checks first, yet the golden expects `E_DOMAIN`. This build checks `wac <= 0` before `net_coupon > wac`, as the comparison presumes a valid WAC.
 19. **Closed by ruling D56.** **Cap vol given as a list for one caplet, or `vol` neither number nor list.** A number is flat; any array is quoted (length must match, `E_INPUT`); anything else `E_SCHEMA`.
 20. **Closed by ruling D40.** **Swaption and cap `tenor_months < 1`.** Not specified; `E_INPUT`, as `start_months`.
+
+## R1.7 batch mode (silent choices)
+
+1. **`diagnostics` on error results.** `--timings` must add `diagnostics.elapsed_ns` to error results, which had no `diagnostics` member. `batch_check.py` strips only `elapsed_ns`, so a key present only with the flag fails timings_identity. The contract says `diagnostics` "may always be present", so every error result now carries `"diagnostics":{}`. The runner does not compare `diagnostics`, and no golden changes.
+2. **`--timings` with `version` or `operations`.** Exit 64, empty stdout, as "any other argument".
+3. **BT5 at end of file.** A final line of exactly 16,777,216 bytes plus a CR and no LF is parsed, not `E_LIMIT`: the CR is removed before the length is checked. The line buffer is the limit plus 2 bytes, and the rest of a longer line is read and dropped.
+4. **Clock window.** `elapsed_ns` is measured with `steady_clock`, from just after the line is read to just before the result is written. For `run`, it starts after stdin reaches end of file.
