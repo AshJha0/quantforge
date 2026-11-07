@@ -3,7 +3,7 @@ import calendar as _cal
 from datetime import date
 
 from . import calendars
-from .errors import QfError
+from .errors import QfError, required
 
 FREQUENCIES = (1, 2, 3, 4, 6, 12)
 _SIMPLE = {"ACT_360": 360.0, "ACT_365F": 365.0, "ACT_364": 364.0, "ACT_365_25": 365.25}
@@ -137,7 +137,7 @@ def check_conditional(
         _required(convention, termination=termination)
     elif convention == "BUS_252":
         _required(convention, calendar=calendar)
-        calendars.check_calendar(calendar)
+        calendars.check_calendar(required(calendar, "calendar"))
     if convention in ("ACT_ACT_ICMA", "ACT_365L") and frequency not in FREQUENCIES:
         raise QfError("E_SCHEMA", f"frequency {frequency} is not listed", "frequency")
 
@@ -157,12 +157,13 @@ def year_fraction(
     if end < start:
         raise QfError("E_DATE_ORDER", "end is before start", "end")
     if convention == "ACT_ACT_ICMA" and (
-        ref_end <= ref_start or start < ref_start or end > ref_end
+        required(ref_end, "ref_end") <= required(ref_start, "ref_start")
+        or start < required(ref_start, "ref_start") or end > required(ref_end, "ref_end")
     ):
         raise QfError("E_INPUT", "the accrual must lie inside the reference period")
 
     if convention == "BUS_252":
-        return calendars.business_days_between(calendar, start, end) / 252
+        return calendars.business_days_between(required(calendar, "calendar"), start, end) / 252
     if start == end:
         return 0.0
 
@@ -182,5 +183,6 @@ def year_fraction(
     if convention == "ACT_ACT_ISDA":
         return _act_act_isda(start, end)
     if convention == "ACT_ACT_ICMA":
-        return days / (frequency * (ref_end - ref_start).days)
+        span = (required(ref_end, "ref_end") - required(ref_start, "ref_start")).days
+        return days / (required(frequency, "frequency") * span)
     return _afb(start, end)
