@@ -243,6 +243,14 @@ def check_d(c, counts):
     if op == "infl.linker.price":
         assert abs(o["nominal_clean"] - o["real_clean"] * o["index_ratio"]) < 1e-9 * o["nominal_clean"], cid
         hit("linker nominal = real x index ratio")
+    if op == "rates.cap.price":
+        assert all(c >= 0 for c in o["caplets"]) and abs(sum(o["caplets"]) - o["price"]) < 1e-9 * max(1, o["price"]), cid
+        hit("cap = sum of non-negative caplets")
+    if op == "rates.swaption.price":
+        K, Sw, A, N = i["trade"]["strike"], o["forward_rate"], o["annuity"], i["trade"]["notional"]
+        intr = N * A * max(Sw - K if i["trade"]["type"] == "PAYER" else K - Sw, 0)
+        assert o["price"] >= intr - 1e-9 * N and A > 0, cid
+        hit("swaption at least intrinsic on the annuity")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid

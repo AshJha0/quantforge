@@ -40,6 +40,8 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 
 | D27 | Stage B case `ois-0023` | It expected `ESTR` to be `E_SCHEMA`; D1 lists `ESTR`, so that expectation is retired. The case now sends `TONA`, still unlisted, and keeps `E_SCHEMA`. Changed in `gen_stage_b.py` and `stage_b/ois.json`; nothing else in stage B moves |
 
+| D28 | Cap and swaption timing | Caplets fix at accrual start, swaptions exercise at swap start: no fixing or notice lag in stage D |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
@@ -58,6 +60,7 @@ Cases for rulings carry the `ruling` tag.
 | `credit_d` | QuantLib `IsdaCdsEngine` (the ISDA model as QuantLib implements it) | Index and composite curves are sums of checked parts |
 | `equity_d`, `index_d`, `trs_d` | None: analytic and exact rationals only | All |
 | `inflation_d` | None | Analytic, exact-rational reference CPI |
+| `capswaption_d` | QuantLib `blackFormula`, `bachelierBlackFormula` | Composition on stage B curves |
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.

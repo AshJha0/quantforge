@@ -67,4 +67,10 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | ZCIS, linker from curve | `interpolation` | Analytic | |
 | Linker from real yield | `simple_analytic` | Exact-rational reference CPI; bond formulas checked against QuantLib in D2 | |
 
+## Wave 3, D7: caps and swaptions
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Caps, floors (flat or quoted vol), swaptions | 1e-9 per unit notional | QuantLib Black and Bachelier formulas; stage B curves | Formula values exact in the oracle |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).

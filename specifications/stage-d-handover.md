@@ -52,7 +52,11 @@ New operations: `eq.dividend.implied`, `eq.borrow.implied`, `eq.futures.basis`, 
 
 New operations: `infl.curve.cpi`, `infl.zcis.pv`, `infl.linker.price`, `infl.linker.price_curve`. Goldens: `datasets/golden/stage_d/inflation_d.json`, 13 cases. Read: `specifications/02-curves/inflation.md`; the D6 table in `stage-d-targets.md`; rulings D25, D26.
 
-### D7, D8, D9
+### D7 caps and swaptions (ready)
+
+New operations: `rates.cap.price`, `rates.swaption.price`. Goldens: `datasets/golden/stage_d/capswaption_d.json`, 14 cases. Read: `specifications/05-volatility/caps-and-swaptions.md`, `specifications/05-volatility/black-models.md`; the D7 table in `stage-d-targets.md`; ruling D28. Stage B case `ois-0023` changed (ruling D27).
+
+### D8, D9
 
 Not yet specified. Do not start them.
 
