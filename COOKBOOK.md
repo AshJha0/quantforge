@@ -217,3 +217,7 @@ On the nine strikes of case `sabr-0013` the density at 0.0005 is -174.5744972324
 ### Any stage C case by hand
 
 The inputs of every case are in `datasets/golden/stage_c/*.json`. Wrap a case's `operation` and `inputs` in `{"schema_version":"1.0","case_id":"x",...}` and pipe it to the CLI. That is how the [Learn](LEARN.md#stage-c-equity-vol-slice) worked examples were made, including use case 3 (`usecases_c-0001`).
+
+## Stage D recipes (in progress)
+
+No stage D CLI operations exist yet. Recipes are added here, one per curve, as each operation passes conformance in all four languages. Until then the [Curves gallery](docs/curves/README.md) lists the planned stage D pages.

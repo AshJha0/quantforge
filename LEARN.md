@@ -131,6 +131,22 @@ Nothing in these examples is traded.
 
 Stage C is Implemented, not Validated. All inputs are synthetic: the stage C data survey found no free history of option quotes, vol surfaces, borrow cost or dividends. European options only (C1). Arbitrage checks run on the given points only. `vol.sabr.arbfree` at `nu > 0` lacks a tight outside source. See `specifications/stage-c-rulings.md`.
 
+## Stage D: Curves and fixed income (in progress)
+
+**Status: in progress, target v0.4.** Nothing here is Implemented yet. Planned curves: OIS curves (full SOFR, ESTR, SONIA), bond and sovereign fits, repo, cross-currency, CDS, dividend and borrow, inflation, caps and swaptions, commodities and MBS. Each gets a page in the [Curves gallery](docs/curves/README.md), planned until its CLI exists.
+
+### Learning path
+
+In progress. Filled in as each curve lands, in the same shape as stages B and C: plain idea, formal statement, and a worked golden case.
+
+### Worked examples
+
+In progress.
+
+### Known limits
+
+In progress.
+
 ## Validate and backtest
 
 Stages A to C test correctness with analytic, hand and outside-library answers. Stages B and C add calibration on known truth. Later stages add backtests and new-model tests. `specifications/stage-b-rulings.md` says which stage B suites have an outside oracle. Evidence is always labelled analytic, simulated, proxy or observed, and validation reports are self-assessment until the human review at the end of the project.

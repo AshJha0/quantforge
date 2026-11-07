@@ -233,14 +233,66 @@ CURVES = {
 }
 
 # Curves named in the plan's stage rows that have no page. Stage from the plan.
+# Stage D curves are in STAGE_D below, each with a planned page.
 PLANNED = [
-    ("Dividend curves", "D"), ("Borrow curves", "D"), ("Financing curves", "D"),
-    ("Full SOFR", "D"), ("ESTR", "D"), ("Sovereign fits", "D"), ("Repo and special repo", "D"),
-    ("Inflation, with seasonality", "D"), ("Cross-currency", "D"),
-    ("Credit and ISDA CDS", "D"), ("Sector and rating curves", "D"),
-    ("Commodity forward curves, with seasonality and storage carry", "D"),
-    ("Swaption cube and cap surface", "E"), ("Funding curve", "F"), ("Liquidity curves", "H"),
+    ("Financing curves", "D"), ("Sector and rating curves", "D"),
+    ("Funding curve", "F"), ("Liquidity curves", "H"),
 ]
+
+# Stage D curves. Each gets a page: a planned page until `cli` names a CLI operation and a renderer
+# is registered for its `kind`, then the renderer's page. Text here is plain description, no numbers.
+STAGE_D = {
+    "ois-full": {"kind": "rates-d", "title": "OIS curves: full SOFR, ESTR and SONIA", "short": "Full SOFR, ESTR, SONIA OIS", "cli": None,
+                 "shows": "Discount factors and forwards, with meeting-date steps and observation conventions."},
+    "bond-fit": {"kind": "bond-fit", "title": "Bond and sovereign curve fits", "short": "Bond and sovereign fits", "cli": None,
+                 "shows": "A fitted yield curve against bond yields, with residuals per bond."},
+    "repo": {"kind": "repo", "title": "Repo and special repo curves", "short": "Repo and special repo", "cli": None,
+             "shows": "General collateral repo rates by term, and specials against them."},
+    "cross-currency": {"kind": "xccy", "title": "Cross-currency basis curves", "short": "Cross-currency", "cli": None,
+                       "shows": "Basis by tenor and the FX forwards it implies."},
+    "cds": {"kind": "credit", "title": "Credit curves and ISDA CDS", "short": "Credit and ISDA CDS", "cli": None,
+            "shows": "Survival probabilities and hazard rates from CDS quotes."},
+    "dividend-borrow": {"kind": "equity-carry", "title": "Dividend and borrow curves", "short": "Dividend and borrow", "cli": None,
+                        "shows": "Dividend schedules and borrow cost by term, and their effect on equity forwards."},
+    "inflation": {"kind": "inflation", "title": "Inflation curves, with seasonality", "short": "Inflation, with seasonality", "cli": None,
+                  "shows": "Forward index levels with and without the seasonal adjustment."},
+    "caps-swaptions": {"kind": "rates-vol", "title": "Cap surface and swaption cube", "short": "Caps and swaptions", "cli": None,
+                       "shows": "Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike."},
+    "commodities": {"kind": "commodity", "title": "Commodity forward curves, with seasonality and storage carry", "short": "Commodity forwards", "cli": None,
+                    "shows": "Forward prices by delivery month, with seasonality and carry shown apart."},
+    "mbs": {"kind": "mbs", "title": "MBS prepayment and valuation curves", "short": "MBS", "cli": None,
+            "shows": "Prepayment speeds by month and the resulting cash flows."},
+}
+
+# Renderer hooks: kind -> function(slug, spec, data) returning page text. A language session that ships a
+# stage D CLI adds its renderer with @renderer("kind") and sets `cli` above.
+RENDERERS = {}
+
+
+def renderer(kind):
+    def register(fn):
+        RENDERERS[kind] = fn
+        return fn
+    return register
+
+
+def is_live(spec):
+    return bool(spec.get("cli")) and spec["kind"] in RENDERERS
+
+
+def planned_page(slug, spec):
+    return f"""# {spec['title']}
+
+<p class="note">Status: Planned, stage D (in progress). No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.</p>
+
+## What it will show
+
+{spec['shows']}
+
+## When this page fills in
+
+When a CLI operation for this curve exists in all four languages, `tools/build_gallery.py` gets a renderer for kind `{spec['kind']}` and this page is generated from real CLI output, like the stage B and C pages. See [the gallery index](README.md).
+"""
 
 
 # ---- charts -------------------------------------------------------------------------------------
@@ -591,6 +643,10 @@ def index_page(all_data):
         outside = sum(v for k, v in e["by_source"].items() if "quantlib" in k or "strata" in k)
         rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated", "C",
                      f"{e['cases']} golden cases for {', '.join('`' + o + '`' for o in e['operations'])}, {outside} with an outside library in `verified_by`"])
+    for slug, spec in STAGE_D.items():
+        live = is_live(spec)
+        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "D",
+                     "See page" if live else "None yet"])
     rows += [[name, "Planned", stage, "None yet"] for name, stage in PLANNED]
     return f"""# Curves
 
@@ -619,6 +675,9 @@ def render_all(all_data):
         pages[f"{slug}.md"] = make(slug, spec, all_data[slug])
     for slug, spec in VOLS.items():
         pages[f"{slug}.md"] = vol_page(slug, spec, all_data[slug])
+    for slug, spec in STAGE_D.items():
+        live = is_live(spec) and slug in all_data
+        pages[f"{slug}.md"] = RENDERERS[spec["kind"]](slug, spec, all_data[slug]) if live else planned_page(slug, spec)
     return pages
 
 

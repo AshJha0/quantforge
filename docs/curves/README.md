@@ -20,19 +20,18 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [SVI smile](svi-smile.md) | Implemented, not Validated | C | 2 golden cases for `vol.svi.evaluate`, 1 with an outside library in `verified_by` |
 | [SSVI surface](ssvi-surface.md) | Implemented, not Validated | C | 3 golden cases for `vol.ssvi.evaluate`, 0 with an outside library in `verified_by` |
 | [SABR](sabr.md) | Implemented, not Validated | C | 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
-| Dividend curves | Planned | D | None yet |
-| Borrow curves | Planned | D | None yet |
+| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Planned | D | None yet |
+| [Bond and sovereign fits](bond-fit.md) | Planned | D | None yet |
+| [Repo and special repo](repo.md) | Planned | D | None yet |
+| [Cross-currency](cross-currency.md) | Planned | D | None yet |
+| [Credit and ISDA CDS](cds.md) | Planned | D | None yet |
+| [Dividend and borrow](dividend-borrow.md) | Planned | D | None yet |
+| [Inflation, with seasonality](inflation.md) | Planned | D | None yet |
+| [Caps and swaptions](caps-swaptions.md) | Planned | D | None yet |
+| [Commodity forwards](commodities.md) | Planned | D | None yet |
+| [MBS](mbs.md) | Planned | D | None yet |
 | Financing curves | Planned | D | None yet |
-| Full SOFR | Planned | D | None yet |
-| ESTR | Planned | D | None yet |
-| Sovereign fits | Planned | D | None yet |
-| Repo and special repo | Planned | D | None yet |
-| Inflation, with seasonality | Planned | D | None yet |
-| Cross-currency | Planned | D | None yet |
-| Credit and ISDA CDS | Planned | D | None yet |
 | Sector and rating curves | Planned | D | None yet |
-| Commodity forward curves, with seasonality and storage carry | Planned | D | None yet |
-| Swaption cube and cap surface | Planned | E | None yet |
 | Funding curve | Planned | F | None yet |
 | Liquidity curves | Planned | H | None yet |
 

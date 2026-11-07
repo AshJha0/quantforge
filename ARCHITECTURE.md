@@ -42,3 +42,7 @@ Built slices of domains 02, 03, 04, 06 and 08, on top of domain 01 in each langu
 ### Stage C: Equity vol slice
 
 Built domain 05 (volatility) and slices of 02, 04 and 06: the equity forward on funding and borrow curves, Black models, Greeks, smiles, the surface and SABR. The plain idea: a vol is an input to a price model, so the forward and the curves come first, the models next, and smiles and surfaces sit on top. Dividends are carried on `C = D/B` and option PVs discounted on `D` (rulings C2, C3). CLI contract 1.4.0 adds one error, `E_ARBITRAGE`. Limits: inputs are synthetic, options are European only, and arbitrage checks run on given points only.
+
+### Stage D: Curves and fixed income (in progress)
+
+In progress, target v0.4. Planned: OIS curves (full SOFR, ESTR, SONIA), bond and sovereign fits, repo, cross-currency, CDS, dividend and borrow, inflation, caps and swaptions, commodities and MBS, in domain 02 with slices of 03, 04 and 06. The gallery has a renderer hook per curve kind in `tools/build_gallery.py`, and CI has a stage D conformance slot that runs stage D goldens alone when only they change. This section is filled in when the stage lands.
