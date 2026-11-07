@@ -14,6 +14,7 @@ pub mod calib;
 pub mod compounding;
 pub mod conventions;
 pub mod cos;
+pub mod credit;
 pub mod curve;
 pub mod curve_fits;
 pub mod data;

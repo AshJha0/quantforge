@@ -1,15 +1,49 @@
 //! Stage D wave 2 and 3 operations: read the inputs, call the library, shape the outputs.
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
+use crate::ops_b::tenor;
 use crate::ops_b::{curve_input, items, sub};
 use crate::ops_b::{interpolation, pillars_json, repricing};
 use quantforge_core::bonds::{self, Bond, Frn};
 use quantforge_core::conventions;
+use quantforge_core::credit::{self, CdsTrade, Hazard};
 use quantforge_core::curve::Curve;
+use quantforge_core::curve::CurveInput;
 use quantforge_core::dates::Date;
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
 use quantforge_core::xccy::{self, Ndf, XccyTrade};
+
+type HazardInput = (Date, Vec<(Date, f64)>);
+
+fn hazard_input(i: &Inputs, k: &str) -> Result<HazardInput> {
+    let h = sub(i, k)?;
+    let mut p = Vec::new();
+    for x in items(&h, "pillars")? {
+        p.push((x.date("date")?, x.f64("survival")?));
+    }
+    Ok((h.date("as_of")?, p))
+}
+
+fn cds_quotes(i: &Inputs) -> Result<Vec<((i64, char), f64)>> {
+    items(i, "quotes")?
+        .iter()
+        .map(|q| Ok((tenor(q, "tenor")?, q.f64("spread")?)))
+        .collect()
+}
+
+fn credit_discount(c: &CurveInput) -> Result<(Curve, Vec<Date>)> {
+    Ok((Curve::new(c)?, c.pillars.iter().map(|p| p.0).collect()))
+}
+
+fn survival_json(h: &Hazard) -> Json {
+    let rows: Vec<Json> = h
+        .pillars()
+        .iter()
+        .map(|(d, s)| obj([("date", d.to_string().into()), ("survival", (*s).into())]))
+        .collect();
+    rows.into()
+}
 
 /// A convention id that must be `want`: another known id is `E_INPUT`, an unknown one `E_SCHEMA`.
 fn known_convention(i: &Inputs, k: &str, want: &str) -> Result<Result<()>> {
@@ -271,6 +305,91 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             i.gate()?;
             let (pv, f) = xccy::ndf_pv(&Curve::new(&u)?, &Curve::new(&o)?, spot, &trade, fixing)?;
             plain(obj([("pv", pv.into()), ("forward", f.into())]))
+        }
+        "credit.cds.price" => {
+            let (t, d) = (i.date("trade_date")?, curve_input(i, "discount")?);
+            let h = hazard_input(i, "hazard")?;
+            let r = i.f64("recovery")?;
+            let x = sub(i, "trade")?;
+            let trade = CdsTrade {
+                maturity: x.date("maturity")?,
+                coupon: x.f64("coupon")?,
+                notional: x.f64("notional")?,
+                buy: match x.str("side")? {
+                    "BUY_PROTECTION" => true,
+                    "SELL_PROTECTION" => false,
+                    _ => return x.fail("side", "unknown side"),
+                },
+            };
+            let digital = match i.str("payout")? {
+                "STANDARD" => false,
+                "DIGITAL" => true,
+                _ => return i.fail("payout", "unknown payout"),
+            };
+            i.gate()?;
+            let (c, pil) = credit_discount(&d)?;
+            let h = Hazard::new(h.0, &h.1)?;
+            let p = credit::price(t, &c, &pil, &h, r, &trade, digital)?;
+            plain(obj([
+                ("pv", p.pv.into()),
+                ("upfront", p.upfront.into()),
+                ("accrued", p.accrued.into()),
+                ("par_spread", p.par_spread.into()),
+                ("protection_leg", p.protection_leg.into()),
+                ("rpv01", p.rpv01.into()),
+            ]))
+        }
+        "credit.cds.bootstrap" => {
+            let (t, d) = (i.date("trade_date")?, curve_input(i, "discount")?);
+            let (r, q) = (i.f64("recovery")?, cds_quotes(i)?);
+            i.gate()?;
+            let (c, pil) = credit_discount(&d)?;
+            let h = credit::bootstrap(t, &c, &pil, r, &q)?;
+            plain(obj([("pillars", survival_json(&h))]))
+        }
+        "credit.index.intrinsic" => {
+            let (t, d) = (i.date("trade_date")?, curve_input(i, "discount")?);
+            let mut names = Vec::new();
+            for n in items(i, "names")? {
+                names.push((
+                    hazard_input(&n, "hazard")?,
+                    n.f64("recovery")?,
+                    n.f64("weight")?,
+                ));
+            }
+            let x = sub(i, "trade")?;
+            let (m, cpn) = (x.date("maturity")?, x.f64("coupon")?);
+            let quoted = i.f64("quoted_upfront")?;
+            i.gate()?;
+            let (c, pil) = credit_discount(&d)?;
+            if names.is_empty() {
+                return fail("E_INPUT", "no names");
+            }
+            let mut built = Vec::new();
+            for (h, r, w) in names {
+                built.push((Hazard::new(h.0, &h.1)?, r, w));
+            }
+            let (ups, intrinsic) = credit::index_intrinsic(t, &c, &pil, &built, m, cpn)?;
+            plain(obj([
+                ("intrinsic_upfront", intrinsic.into()),
+                ("basis", (quoted - intrinsic).into()),
+                ("name_upfronts", ups.into()),
+            ]))
+        }
+        "credit.curve.composite" => {
+            let (t, d) = (i.date("trade_date")?, curve_input(i, "discount")?);
+            let r = i.f64("recovery")?;
+            let mut cons = Vec::new();
+            for c in items(i, "constituents")? {
+                cons.push((cds_quotes(&c)?, c.f64("weight")?));
+            }
+            let scale = i.f64("scale")?;
+            i.gate()?;
+            let (c, pil) = credit_discount(&d)?;
+            let spreads = credit::composite_spreads(&cons, scale)?;
+            let h = credit::bootstrap(t, &c, &pil, r, &spreads)?;
+            let s: Vec<f64> = spreads.iter().map(|x| x.1).collect();
+            plain(obj([("spreads", s.into()), ("pillars", survival_json(&h))]))
         }
         _ => fail(
             "E_UNSUPPORTED_OPERATION",
