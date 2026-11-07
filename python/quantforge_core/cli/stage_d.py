@@ -330,3 +330,75 @@ def _cds_composite(i: Inputs) -> Any:
     spreads, pillars = D.credit.composite(*args)
     return {"spreads": spreads,
             "pillars": [{"date": d.isoformat(), "survival": q} for d, q in pillars]}
+
+
+# Wave 2, D5: equity
+
+def _divs(i: Inputs, key: str = "dividends") -> list[tuple[Any, float]]:
+    return [(d.date("ex_date"), d.real("amount")) for d in _objects(i, key)]
+
+
+@op("eq.dividend.implied")
+def _div_implied(i: Inputs) -> Any:
+    futures = [(f.date("expiry"), f.real("price")) for f in _objects(i, "futures")]
+    args = (i.real("spot"), _curve(i, "funding"), i.real("borrow_rate"), futures)
+    xs, periods, yields = D.equity_d.dividend_implied(*args)
+    return {"pv_dividends": xs, "period_pv_dividends": periods, "dividend_yields": yields}
+
+
+@op("eq.borrow.implied")
+def _borrow_implied(i: Inputs) -> Any:
+    args = (i.real("spot"), _curve(i, "funding"), _divs(i), i.date("expiry"), i.real("forward"))
+    return {"borrow_rate": D.equity_d.borrow_implied(*args)}
+
+
+@op("eq.futures.basis")
+def _eq_futures_basis(i: Inputs) -> Any:
+    args = (i.real("spot"), _curve(i, "funding"), i.real("borrow_rate"),
+            i.real("financing_spread"), _divs(i), i.date("expiry"), i.real("futures_price"))
+    fair, basis, implied = D.equity_d.futures_basis(*args)
+    return {"fair_price": fair, "basis": basis, "implied_financing_spread": implied}
+
+
+@op("eq.index.dividends")
+def _index_divs(i: Inputs) -> Any:
+    cons = [(c.string("id"), c.real("shares"), c.real("price"), _divs(c))
+            for c in _objects(i, "constituents")]
+    periods = [(p.date("start"), p.date("end")) for p in _objects(i, "periods")]
+    args = (i.real("divisor"), cons, periods, i.reals("implied_period_points"))
+    return D.equity_d.index_dividends(*args)
+
+
+def _members(i: Inputs, key: str) -> list[tuple[str, float, float]]:
+    return [(c.string("id"), c.real("shares"), c.real("price")) for c in _objects(i, key)]
+
+
+@op("eq.index.rebalance")
+def _rebalance(i: Inputs) -> Any:
+    args = (i.real("divisor"), _members(i, "constituents"), _members(i, "new_constituents"))
+    level, divisor, weights = D.equity_d.rebalance(*args)
+    return {"level": level, "new_divisor": divisor, "weights": weights}
+
+
+_ACTION_KEYS = {"SPLIT": ("ratio",), "REVERSE_SPLIT": ("ratio",),
+                "RIGHTS": ("new_per_old", "subscription_price"), "SPECIAL_DIVIDEND": ("amount",)}
+
+
+@op("eq.corporate_action.adjust")
+def _corporate_action(i: Inputs) -> Any:
+    action = i.enum("action", tuple(_ACTION_KEYS))
+    params = {k: i.real(k) for k in _ACTION_KEYS[action]}
+    args = (action, i.real("cum_price"), i.real("shares"), i.real("strike"), params)
+    return D.equity_d.corporate_action(*args)
+
+
+@op("eq.trs.pv")
+def _trs(i: Inputs) -> Any:
+    _present(i, "current_rate")
+    t = i.object("trade")
+    current = i.real("current_rate") if i.has("current_rate") else None
+    args = (i.real("spot"), _curve(i, "funding"), i.real("borrow_rate"), _divs(i),
+            t.date("start"), t.date("end"), t.real("initial_price"), t.real("shares"),
+            t.real("spread"), t.enum("side", ("RECEIVE_EQUITY", "PAY_EQUITY")), current)
+    equity, funding_leg, value = D.equity_d.trs_pv(*args)
+    return {"equity_leg": equity, "funding_leg": funding_leg, "pv": value}

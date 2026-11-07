@@ -20,6 +20,7 @@ from .. import curves as _curves
 from .. import data_checks as data_checks_module
 from .. import daycount as daycount_module
 from .. import equity as _equity
+from .. import equity_d as _equity_d
 from .. import futures as _futures
 from .. import fx as _fx
 from .. import hedging as _hedging
@@ -126,7 +127,7 @@ _STAGE_C = SimpleNamespace(
 )
 _STAGE_D = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
-       for m in (_bonds, _credit, _csa, _curve_fits, _futures, _overnight, _steps, _xccy)}
+       for m in (_bonds, _credit, _csa, _curve_fits, _equity_d, _futures, _overnight, _steps, _xccy)}
 )
 
 
