@@ -18,7 +18,7 @@ A hand or replay source is written by the same author as the spec, so it can sha
 Where a case has no outside library in `verified_by`, this risk stands. These results are self-assessment until
 the human review at the end of the project.
 
-`REPORT.md`'s invariant line counts 4,388 cases because that check reads `datasets/golden/core/` only; stage B cases are not covered by it. Stage B's outside and hand sources, suite by suite, are in `specifications/stage-b-rulings.md`.
+`REPORT.md`'s invariant lines cover all three folders: 4,394 stage A cases, 343 stage B cases and 446 stage C cases. Most stage B and C cases have no stated invariant, so for them the check only confirms that none is broken; the lines below each total count the cases that do have one. Stage B's outside and hand sources, suite by suite, are in `specifications/stage-b-rulings.md`.
 
 ## Oracle map
 
