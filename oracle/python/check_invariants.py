@@ -196,6 +196,53 @@ def check_d(c, counts):
         res = sum(w * (f - y) ** 2 for f, y, w in zip(o["fitted"], i["zero_rates"], i.get("weights", [1] * len(i["zero_rates"]))))
         assert res <= o["objective"] * (1 + 1e-9) + 1e-18, cid
         hit("smooth fit: objective not negative and at least the weighted residual sum")
+    if op == "bond.price.from_yield":
+        assert abs(o["dirty"] - o["clean"] - o["accrued"]) < 1e-9 and o["accrued"] >= 0 and o["modified_duration"] > 0 and o["convexity"] > 0, cid
+        assert abs(o["macaulay_duration"] / (1 + i["yield"] / i["bond"]["frequency"]) - o["modified_duration"]) < 1e-9, cid
+        hit("bond: dirty = clean + accrued; modified = Macaulay / (1 + y/f); duration and convexity positive")
+    if op == "repo.forward":
+        assert (i["gc_rate"] is None) == (o["special_spread"] is None), cid
+        hit("repo: special outputs null exactly when gc_rate is null")
+    if op == "bond.futures.basis":
+        irs = [b["implied_repo"] for b in o["bonds"]]
+        assert irs[o["ctd"]] == max(irs), cid
+        hit("CTD has the highest implied repo")
+    if op == "fx.ndf.pv":
+        assert o["forward"] > 0 and (i["fixing"] is None or o["forward"] == i["fixing"]), cid
+        hit("NDF forward positive, equal to the fixing once known")
+    if op == "fx.xccy.pv":
+        sg = 1 if i["trade"]["side"] == "RECEIVE_FOREIGN" else -1
+        assert abs(o["pv"] - sg * (i["spot"] * o["foreign_leg"] - o["domestic_leg"])) < 1e-6, cid
+        hit("xccy pv = sign (spot foreign - domestic)")
+    if op in ("credit.cds.bootstrap", "credit.curve.composite"):
+        sv = [p["survival"] for p in o["pillars"]]
+        assert all(0 < v <= 1 for v in sv) and all(b < a for a, b in zip(sv, sv[1:])), cid
+        hit("CDS survival in (0, 1] and strictly falling")
+    if op == "credit.cds.price":
+        assert o["protection_leg"] > 0 and o["rpv01"] > 0 and o["accrued"] >= 0, cid
+        hit("CDS legs positive")
+    if op == "credit.index.intrinsic":
+        assert abs(o["basis"] - (i["quoted_upfront"] - o["intrinsic_upfront"])) < 1e-15, cid
+        hit("index basis = quoted - intrinsic")
+    if op == "eq.dividend.implied":
+        assert all(abs(a - b) < 1e-9 for a, b in zip(o["pv_dividends"], [sum(o["period_pv_dividends"][:k + 1]) for k in range(len(o["pv_dividends"]))])), cid
+        hit("implied dividends: period amounts sum to the cumulative")
+    if op == "eq.futures.basis":
+        assert abs(o["basis"] - (i["futures_price"] - o["fair_price"])) < 1e-9, cid
+        hit("futures basis = market - fair")
+    if op == "eq.corporate_action.adjust":
+        assert abs(o["adjusted_shares"] * o["ex_price"] - i["shares"] * i["cum_price"]) < 1e-6 * i["shares"] * i["cum_price"], cid
+        hit("corporate action keeps shares x price")
+    if op == "eq.trs.pv":
+        sg = 1 if i["trade"]["side"] == "RECEIVE_EQUITY" else -1
+        assert abs(o["pv"] - sg * (o["equity_leg"] - o["funding_leg"])) < 1e-9 * abs(o["equity_leg"]) + 1e-9, cid
+        hit("TRS pv = sign (equity - funding)")
+    if op == "infl.curve.cpi":
+        assert all(v > 0 for v in o["cpi"]), cid
+        hit("CPI positive")
+    if op == "infl.linker.price":
+        assert abs(o["nominal_clean"] - o["real_clean"] * o["index_ratio"]) < 1e-9 * o["nominal_clean"], cid
+        hit("linker nominal = real x index ratio")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid
