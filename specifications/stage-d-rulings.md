@@ -1,0 +1,35 @@
+# Stage D rulings and oracle coverage
+
+Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins where it is more exact.
+
+## Rulings
+
+| # | Point | Ruling |
+|---|---|---|
+| D1 | ESTR convention | Spot lag 2, payment lag 2, as Strata 2.12.78 `EUR-FIXED-1Y-ESTR-OIS`, read from its bytecode. Lag 1 is a wrong-convention check |
+| D2 | Jump date | A jump multiplies discount factors for dates strictly after its date, as QuantLib. On its own date it does not apply |
+| D3 | Lockout `k` | ARRC rule: the fixing of `d_{n-k}` applies from `d_{n-k}` to the end. QuantLib's `lockoutDays` is this `k` minus 1 |
+| D4 | `shift_days` | `NONE`: must be 0. `LOCKOUT`: 1 to `n-1`. Others: 0 or more. Else `E_INPUT` |
+| D5 | `start`, `end` of dated compounding | Business days of the index calendar, else `E_INPUT`. No adjustment is made for the caller |
+| D6 | Step date | A step takes effect on its date. A step on `as_of` is `E_INPUT`: use `base_rate` |
+| D7 | Step fit | `b_j < p_j <= b_{j+1}` makes the fit triangular and unique; anything else is `E_INPUT`, not a least-squares fit |
+| D8 | Fallback spreads | ISDA's fixed values of 2021-03-05, as `overnight-compounding.md`. Only those eight IBORs |
+| D9 | Joint bootstrap | Block triangular, so the joint and two-step solves agree to solver tolerance. Goldens use QuantLib's two-step build |
+| D10 | Optional `jumps`, `weights` | May be absent. `null` is `E_SCHEMA`, as C9. `jumps` is required (may be empty) in `rates.ois.step_curve` and `rates.ois.fit_steps`; `fx` is required (may be `null`) in `rates.csa.discount` |
+| D11 | Time | Curve time `(date - as_of)/365` throughout, as stage B. Operations with `*_years` take them as given |
+| D12 | Empty arrays | `E_INPUT` for quote, fixing, date, maturity and knot lists. `jumps` may be empty |
+
+Cases for rulings carry the `ruling` tag.
+
+## Oracle coverage
+
+| Suite | Outside oracle | Analytic, hand or replay only |
+|---|---|---|
+| `ois_d` | QuantLib `OISRateHelper` with jumps, `MakeOIS` | Telescoping check |
+| `compound_d` | QuantLib `OvernightLeg` (lookback, lockout, observation shift) | Exact rationals; ISDA spread table |
+| `steps_d` | QuantLib `ForwardCurve` with jumps; `MakeOIS` par rates for the fit | Exact integral |
+| `futures_d` | QuantLib `HullWhite::convexityBias` | Limit at `a = 0` |
+| `csa_d` | QuantLib for basis and joint build | CSA discount is hand replay only |
+| `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
+
+The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.

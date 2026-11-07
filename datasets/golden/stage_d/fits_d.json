@@ -1,0 +1,1017 @@
+{
+ "schema_version": "1.0",
+ "suite": "fits_d",
+ "spec": "specifications/03-calibration/curve-fits.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "fits_d-0001",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forwards": [
+      0.04175,
+      0.03792142857142857,
+      0.035507142857142855,
+      0.033982653061224485,
+      0.036094897959183685,
+      0.03909234693877551,
+      0.0401
+     ],
+     "fitted": [
+      0.04175,
+      0.04175,
+      0.03983571428571429,
+      0.038392857142857145,
+      0.03767142857142857,
+      0.03644183673469387,
+      0.03635510204081633,
+      0.0363030612244898,
+      0.0371,
+      0.038
+     ],
+     "objective": 1.796938775510193e-07
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "numpy"
+   ],
+   "tags": [
+    "regularised",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   }
+  },
+  {
+   "case_id": "fits_d-0002",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forwards": [
+      0.04174973805438806,
+      0.03792220456124978,
+      0.03550604981391275,
+      0.03398576375727186,
+      0.03609473145041608,
+      0.039089769636940434,
+      0.040099948561067675
+     ],
+     "fitted": [
+      0.04174973805438806,
+      0.04174973805438806,
+      0.039835971307818914,
+      0.03839266414318353,
+      0.03767101056086583,
+      0.03644259495966784,
+      0.0363556290823549,
+      0.036303449555967135,
+      0.03709954100767379,
+      0.037999663273691954
+     ],
+     "objective": 1.83419374964527e-07
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "numpy"
+   ],
+   "tags": [
+    "regularised",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   }
+  },
+  {
+   "case_id": "fits_d-0003",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forwards": [
+      0.04172520750951159,
+      0.03797672480700768,
+      0.03543825749968105,
+      0.03422109608785306,
+      0.036092540054114115,
+      0.03889399334282355,
+      0.04004438337238163
+     ],
+     "fitted": [
+      0.04172520750951159,
+      0.04172520750951159,
+      0.039850966158259636,
+      0.03838006327206678,
+      0.037644611828970345,
+      0.036503439915264585,
+      0.036400714949976966,
+      0.03633907997080439,
+      0.037069055219952726,
+      0.0379616536656814
+     ],
+     "objective": 5.381421234503406e-07
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "numpy"
+   ],
+   "tags": [
+    "regularised",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   }
+  },
+  {
+   "case_id": "fits_d-0004",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.001,
+    "weights": [
+     1,
+     1,
+     2,
+     2,
+     1,
+     1,
+     1,
+     1,
+     0.5,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forwards": [
+      0.04174732783012604,
+      0.03791182896871879,
+      0.0355851709938312,
+      0.033935442019160066,
+      0.03609133980330063,
+      0.0390535873643258,
+      0.040096802198898426
+     ],
+     "fitted": [
+      0.04174732783012604,
+      0.04174732783012604,
+      0.03982957839942241,
+      0.03841477593089201,
+      0.0377073746966268,
+      0.03645006380413789,
+      0.03636038280392857,
+      0.03630657420380299,
+      0.037091435106809505,
+      0.03799304523443618
+     ],
+     "objective": 2.2718226132008988e-07
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "regularised",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve"
+   }
+  },
+  {
+   "case_id": "fits_d-0005",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     12
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "maturity past the last knot"
+  },
+  {
+   "case_id": "fits_d-0006",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "fewer maturities than knots, no penalty"
+  },
+  {
+   "case_id": "fits_d-0007",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fits_d-0008",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     1,
+     0.5
+    ],
+    "maturities": [
+     0.25
+    ],
+    "zero_rates": [
+     0.04
+    ],
+    "lambda": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fits_d-0009",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.03989040157546734,
+      -0.003955411477528432,
+      0.00677303780464318
+     ],
+     "residuals": [
+      -1.321288499615133e-05,
+      1.1792341059373348e-05,
+      5.4952228897149144e-05,
+      0.0001328552706995279,
+      -0.0028586269844807807,
+      0.00012926860349982375,
+      0.00013715135680845075,
+      9.361104260020705e-05,
+      3.761632856287765e-05,
+      8.930568443075394e-06,
+      -2.7874599701005334e-05,
+      -6.509025587332832e-05
+     ],
+     "outliers": [
+      4
+     ],
+     "objective": 1.3402016331495386e-06
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "outlier-robust",
+    "synthetic"
+   ],
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   }
+  },
+  {
+   "case_id": "fits_d-0010",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.035444693402873664,
+     0.039046964470628456,
+     0.03969704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.042253200671280404,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0004
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.04020674021342796,
+      -0.004335694034052244,
+      0.005693869227466764
+     ],
+     "residuals": [
+      -0.00011643155020032383,
+      -0.00012272947968912338,
+      0.002377341146396371,
+      -7.635122445597205e-05,
+      -5.736233474022386e-05,
+      -3.9311124062790094e-05,
+      6.212710182032384e-06,
+      3.814359694035658e-05,
+      7.130286133687028e-05,
+      -0.0018686197802020737,
+      0.00014257454496509334,
+      0.00015395199972408064
+     ],
+     "outliers": [
+      2,
+      9
+     ],
+     "objective": 1.5833296163123256e-06
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "outlier-robust",
+    "synthetic"
+   ],
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   }
+  },
+  {
+   "case_id": "fits_d-0011",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.03969704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 1.5,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.0402261447654972,
+      -0.00444140224973578,
+      0.004812219247282789
+     ],
+     "residuals": [
+      -8.08159115654969e-05,
+      -3.405010592242334e-06,
+      8.142542499757759e-05,
+      0.00011549609697129725,
+      3.815240550217286e-05,
+      -4.148359589400124e-05,
+      -7.007177894033246e-05,
+      -0.00011338229170616199,
+      -9.130480408693428e-05,
+      9.805636049106555e-06,
+      5.422968097984306e-05,
+      0.0001013541482851719
+     ],
+     "outliers": [],
+     "objective": 3.455029319135357e-08
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "outlier-robust",
+    "synthetic"
+   ],
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   }
+  },
+  {
+   "case_id": "fits_d-0012",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.03969704549224485,
+     0.04006265301734371,
+     0.04173182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 3.0,
+    "delta": 0.0003
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.03940241305938701,
+      -0.0031352041010790474,
+      0.008355708263272874
+     ],
+     "residuals": [
+      0.0001486237929709689,
+      4.1326444096902316e-05,
+      -8.985851713831586e-05,
+      -0.00012420314223389697,
+      -6.853771096948771e-05,
+      2.0514911053364193e-05,
+      -0.0013669114104648532,
+      0.00023955279168963074,
+      0.0002477348186183065,
+      0.0001299778050569529,
+      -2.5860161997886398e-05,
+      -0.00021927103114653866
+     ],
+     "outliers": [
+      6
+     ],
+     "objective": 4.83481924694703e-07
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "independent-replay",
+    "scipy-least-squares-huber"
+   ],
+   "tags": [
+    "outlier-robust",
+    "synthetic"
+   ],
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   }
+  },
+  {
+   "case_id": "fits_d-0013",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365850681431389,
+     0.03709678903700033,
+     0.037934693402873663,
+     0.03905696447062846,
+     0.03969704549224485,
+     0.04005265301734371,
+     0.04024182200935749,
+     0.04037298862322476,
+     0.040356877139205855,
+     0.040263200671280405,
+     0.040199718520435475,
+     0.04013333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fits_d-0014",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365850681431389,
+     0.03709678903700033,
+     0.037934693402873663,
+     0.03905696447062846,
+     0.03969704549224485,
+     0.04005265301734371,
+     0.04024182200935749,
+     0.04037298862322476,
+     0.040356877139205855,
+     0.040263200671280405,
+     0.040199718520435475,
+     0.04013333145713244
+    ],
+    "tau": -1.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fits_d-0015",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5
+    ],
+    "zero_rates": [
+     0.0365850681431389,
+     0.03709678903700033
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "fewer than 3 points"
+  },
+  {
+   "case_id": "fits_d-0016",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.0,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365850681431389,
+     0.03709678903700033,
+     0.037934693402873663,
+     0.03905696447062846,
+     0.03969704549224485,
+     0.04005265301734371,
+     0.04024182200935749,
+     0.04037298862322476,
+     0.040356877139205855,
+     0.040263200671280405,
+     0.040199718520435475,
+     0.04013333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "maturity must be > 0"
+  }
+ ]
+}

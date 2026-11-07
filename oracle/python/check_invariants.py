@@ -150,6 +150,58 @@ def check_b(c, counts):
         hit("hedge cuts key-rate risk")
 
 
+def check_d(c, counts):
+    """Stage D invariants, from the specs. Counts how many each rule saw."""
+    op, i, e = c["operation"], c["inputs"], c["expected"]
+    if e["status"] != "ok":
+        return
+    o, cid = e["outputs"], c["case_id"]
+
+    def hit(k):
+        counts[k] = counts.get(k, 0) + 1
+    if op == "rates.ois.bootstrap":
+        ds = [p["date"] for p in o["pillars"]]
+        assert ds == sorted(set(ds)) and all(p["discount_factor"] > 0 for p in o["pillars"]), cid
+        hit("OIS pillars strictly increasing, discount factors positive")
+    if op == "rates.ois.compound_dated":
+        rs = [f["rate"] for f in i["fixings"]]
+        assert min(rs) - 1e-15 <= o["compounded_rate"] <= max(rs) * 1.01 + 1e-15, cid
+        assert abs(o["interest"] - o["compounded_rate"] * o["accrual"]) < 1e-15, cid
+        hit("compounded rate within the fixings' range (plus compounding); interest = rate x accrual")
+    if op == "rates.fallback.rate":
+        assert abs(o["fallback_rate"] - o["compounded_rate"] - o["spread_adjustment"]) < 1e-15 and o["spread_adjustment"] > 0, cid
+        hit("fallback = compounded + positive fixed spread")
+    if op == "rates.ois.step_curve":
+        dfs, ds = o["discount_factors"], i["dates"]
+        assert all(v > 0 for v in dfs), cid
+        if i["base_rate"] > 0 and all(st["rate"] > 0 for st in i["steps"]):
+            order = sorted(range(len(ds)), key=lambda k: ds[k])
+            assert all(dfs[order[k + 1]] <= dfs[order[k]] for k in range(len(order) - 1)), cid
+        hit("step curve positive; decreasing when all forwards are positive")
+    if op == "rates.futures.convexity":
+        assert o["convexity"] >= 0 and abs(o["futures_rate"] - o["convexity"] - o["forward_rate"]) < 1e-15, cid
+        assert abs(o["futures_rate"] - (100 - i["price"]) / 100) < 1e-15, cid
+        hit("convexity not negative; forward = futures rate - convexity")
+    if op == "rates.csa.discount":
+        if i["fx"] is None and i["collateral_spread"] > 0:
+            assert all(0 < v < 1 for v in o["discount_factors"]), cid
+        hit("CSA discount factors positive")
+    if op == "rates.curve.joint_bootstrap":
+        for k in ("discount_pillars", "projection_pillars"):
+            ds = [p["date"] for p in o[k]]
+            assert ds == sorted(set(ds)), cid
+        hit("joint bootstrap pillars strictly increasing")
+    if op == "calib.curve.smooth":
+        assert len(o["forwards"]) == len(i["knots"]) and o["objective"] >= 0, cid
+        res = sum(w * (f - y) ** 2 for f, y, w in zip(o["fitted"], i["zero_rates"], i.get("weights", [1] * len(i["zero_rates"]))))
+        assert res <= o["objective"] * (1 + 1e-9) + 1e-18, cid
+        hit("smooth fit: objective not negative and at least the weighted residual sum")
+    if op == "calib.curve.robust":
+        d = i["delta"]
+        assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid
+        hit("robust fit: outliers are exactly the residuals beyond delta")
+
+
 def check_c(c, counts):
     """Stage C invariants, from the specs. Counts how many each rule saw."""
     op, i, e = c["operation"], c["inputs"], c["expected"]
@@ -232,6 +284,14 @@ def main():
             check_c(c, counts)
             m += 1
     note(f"invariants: {m} stage C cases checked, none breaks one")
+    for k, v in sorted(counts.items()):
+        note(f"invariants:   {k}: {v}")
+    counts, m = {}, 0
+    for p in sorted((GOLDEN.parent / "stage_d").glob("*.json")):
+        for c in json.loads(p.read_text(encoding="utf-8"))["cases"]:
+            check_d(c, counts)
+            m += 1
+    note(f"invariants: {m} stage D cases checked, none breaks one")
     for k, v in sorted(counts.items()):
         note(f"invariants:   {k}: {v}")
 

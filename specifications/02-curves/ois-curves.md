@@ -1,6 +1,6 @@
-# OIS curves: SONIA and minimal SOFR
+# OIS curves: SONIA, SOFR and ESTR
 
-Spec version 1.0.0. Status: Implemented, not Validated. Full SOFR and ESTR are stage D.
+Spec version 1.1.0. Status: SONIA and SOFR Implemented, not Validated; ESTR and jumps Specified (stage D).
 
 An overnight indexed swap exchanges a fixed rate for daily compounded overnight rates. Its quotes pin down the discount curve.
 
@@ -28,13 +28,13 @@ Par rate: `K = F / A`.
 
 ## `rates.ois.bootstrap`
 
-Inputs: `convention`, `as_of`, `quotes`, `interpolation`, `method` (`SEQUENTIAL` or `GLOBAL`). Each quote is `{tenor, rate}` or `{tenor, bid, ask}`, which uses the mid. Output: `pillars`.
+Inputs: `convention` (`SONIA`, `SOFR`, `ESTR`), `as_of`, `quotes`, `interpolation`, `method` (`SEQUENTIAL` or `GLOBAL`), optional `jumps` (stage D, as in `curve-framework.md`: the solve is on the curve with those jumps, and pillars hold the full discount factor). Each quote is `{tenor, rate}` or `{tenor, bid, ask}`, which uses the mid. Output: `pillars`.
 
 There is one pillar per quote, at the last payment date `p_n` of that swap. So a lag leaves every date the swap needs on or before its pillar.
 
 The curve solves `K_j(curve) = quote_j` for all `j`. It is a square system with one solution in practice, so `SEQUENTIAL` (one unknown at a time, in tenor order) and the `GLOBAL` solve (Newton on all pillars together) give the same curve to solver tolerance. Both must stop with every repricing error below 1e-13. Diagnostic: `max_repricing_error`, required.
 
-Checks, in order: no quotes, pillars not strictly increasing, or `bid > ask`: `E_INPUT`. A solve that fails: `E_NO_CONVERGENCE`, never a silently clamped curve.
+Checks, in order: a bad jump (`E_INPUT` for dates, `E_DOMAIN` for a factor), no quotes, pillars not strictly increasing, or `bid > ask`: `E_INPUT`. A solve that fails: `E_NO_CONVERGENCE`, never a silently clamped curve.
 
 Negative rates are valid, and give discount factors above 1.
 
@@ -44,7 +44,7 @@ Compounded in arrears, from actual fixings. Inputs: `rates`, `days` (integers at
 
 `(prod(1 + r_i n_i / B) - 1) * B / sum n_i`
 
-Lookback, lockout and observation shift are stage D.
+Dated compounding with lookback, lockout and observation shift: `overnight-compounding.md`.
 
 ## `rates.ois.pv`
 
@@ -53,5 +53,8 @@ Inputs: `curve`, optional `snapshot_id`, `trade`: `{convention, tenor, fixed_rat
 `pv = sign * notional * (F - fixed_rate * A)`, with sign +1 for `PAY`.
 
 ## Acceptance
+
+Stage D (ESTR, SOFR at more tenors and notionals, jumps): `stage-d-targets.md`; suite `stage_d/ois_d`.
+
 
 Targets are in `stage-b-targets.md`. Oracle: independent replay, QuantLib `OISRateHelper` and `OvernightIndexedSwap`. Measured: pillars within 2e-11 of QuantLib; swap PVs within 1e-5 on 1e6 against QuantLib, and through Strata's own swap pricer on the same curve (`oracle/REPORT.md`). No curve was built by Strata's calibrator.

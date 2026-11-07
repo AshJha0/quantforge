@@ -38,6 +38,27 @@
         },
         "additionalProperties": false
       }
+    },
+    "jumps": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "date",
+          "factor"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "factor": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false
