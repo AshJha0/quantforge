@@ -216,6 +216,11 @@ def second():
     i = case("repo_d-0019")
     i["bonds"] = []
     s.add("bond.futures.basis", i, error="E_INPUT", cls=E, tags=tag("D61"))
+    # D64: empty step_dates is E_INPUT (D12), before the quote count; with one quote it would otherwise be a flat fit.
+    i = case("steps_d-0007")
+    i["step_dates"] = []
+    i["quotes"] = i["quotes"][:1]
+    s.add("rates.ois.fit_steps", i, error="E_INPUT", cls=E, tags=tag("D64"))
     write(s)
     note(f"rulings2_d: {len(s.cases)} cases")
 
