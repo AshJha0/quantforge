@@ -158,7 +158,7 @@ def _check_curve_sizes(raw: Raw) -> None:
         if isinstance(item, dict):
             for key, value in item.items():
                 if (
-                    key in ("quotes", "pillars", "points")
+                    key in ("quotes", "pillars", "points", "ois_quotes", "term_quotes")
                     and isinstance(value, list)
                     and len(value) > MAX_QUOTES
                 ):

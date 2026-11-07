@@ -12,10 +12,13 @@ from .. import calibration as _calibration
 from .. import compounding as compounding_module
 from .. import conventions as _conventions
 from .. import cos as cos_module
+from .. import csa as _csa
+from .. import curve_fits as _curve_fits
 from .. import curves as _curves
 from .. import data_checks as data_checks_module
 from .. import daycount as daycount_module
 from .. import equity as _equity
+from .. import futures as _futures
 from .. import fx as _fx
 from .. import hedging as _hedging
 from .. import integrate as integrate_module
@@ -24,6 +27,7 @@ from .. import linalg as linalg_module
 from .. import money as _money
 from .. import monte_carlo as monte_carlo_module
 from .. import ois as _ois
+from .. import overnight as _overnight
 from .. import pde as pde_module
 from .. import projection as _projection
 from .. import rng as rng_module
@@ -35,6 +39,7 @@ from .. import smile as _smile
 from .. import snapshot as snapshot_module
 from .. import sobol as sobol_module
 from .. import stats as stats_module
+from .. import steps as _steps
 from .. import store as store_module
 from .. import timezones as timezones_module
 from .. import usecases as _usecases
@@ -48,6 +53,7 @@ from .inputs import Inputs, format_seconds, parse_instant, parse_u64
 from .limits import check_limits
 from .stage_b import handlers as _stage_b_handlers
 from .stage_c import handlers as _stage_c_handlers
+from .stage_d import handlers as _stage_d_handlers
 
 Result = dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]
 OPTIONS = ("CALL", "PUT")
@@ -114,6 +120,10 @@ _STAGE_B = SimpleNamespace(
 
 _STAGE_C = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m) for m in (_black, _equity, _sabr, _smile, _vol_usecase)}
+)
+_STAGE_D = SimpleNamespace(
+    **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
+       for m in (_csa, _curve_fits, _futures, _overnight, _steps)}
 )
 
 
@@ -638,3 +648,4 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
 }
 OPERATIONS.update(_stage_b_handlers(_STAGE_B))
 OPERATIONS.update(_stage_c_handlers(_STAGE_C))
+OPERATIONS.update(_stage_d_handlers(_STAGE_D))

@@ -1,6 +1,7 @@
 """Handlers for the stage B operations. As in operations.py, a handler reads every input first:
 the gate passed in as `core` wraps each core module, and the first call through it ends E_SCHEMA."""
 from collections.abc import Callable
+from datetime import date
 from types import SimpleNamespace
 from typing import Any
 
@@ -26,6 +27,15 @@ def _objects(i: Inputs, key: str) -> list[Inputs]:
     return [Inputs(v, f"{key}.") for v in items]
 
 
+def jumps(i: Inputs, required: bool = False) -> tuple[tuple[date, float], ...]:
+    """Optional `jumps` (ruling D10): absent means none, null is E_SCHEMA."""
+    if "jumps" in i.raw and i.raw["jumps"] is None:
+        raise QfError("E_SCHEMA", "jumps: null is not allowed", "jumps")
+    if "jumps" not in i.raw and not required:
+        return ()
+    return tuple((j.date("date"), j.real("factor")) for j in _objects(i, "jumps"))
+
+
 def _curve(i: Inputs, key: str = "curve") -> CurveData:
     c = i.object(key)
     pillars = _objects(c, "pillars")
@@ -34,6 +44,7 @@ def _curve(i: Inputs, key: str = "curve") -> CurveData:
         c.enum("interpolation", curves.INTERPOLATIONS),
         tuple(p.date("date") for p in pillars),
         tuple(p.real("discount_factor") for p in pillars),
+        jumps(c),
     )
 
 
@@ -151,7 +162,7 @@ def handlers(core: SimpleNamespace) -> dict[str, Callable[[Inputs], Result]]:
         data, error = core.ois.bootstrap(
             i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), _quotes(i),
             i.enum("interpolation", curves.INTERPOLATIONS),
-            i.enum("method", ("SEQUENTIAL", "GLOBAL")),
+            i.enum("method", ("SEQUENTIAL", "GLOBAL")), jumps(i),
         )
         return {"pillars": _pillars(data)}, {"max_repricing_error": error}
 

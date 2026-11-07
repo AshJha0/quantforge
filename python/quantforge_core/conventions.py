@@ -14,6 +14,11 @@ REGISTRY: dict[str, dict[str, Any]] = {
         "spot_lag": 2, "payment_lag": 2, "fixed_months": 12, "fixed_day_count": "ACT_360",
         "business_day_convention": _MF,
     },
+    "ESTR": {
+        "kind": "OVERNIGHT", "currency": "EUR", "day_count": "ACT_360", "calendar": "EUTA",
+        "spot_lag": 2, "payment_lag": 2, "fixed_months": 12, "fixed_day_count": "ACT_360",
+        "business_day_convention": _MF,
+    },
     "USD-TERM-3M": {
         "kind": "TERM", "currency": "USD", "day_count": "ACT_360", "calendar": "USGS",
         "spot_lag": 2, "months": 3, "fixed_months": 12, "fixed_day_count": "THIRTY_360_BOND",
