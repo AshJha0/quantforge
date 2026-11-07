@@ -9,6 +9,7 @@ Spec version 1.0.0. Status: Specified (phase R2, plan 11.2.7(b)). Infra builds t
 | Market | Source | What it gives | Terms |
 |---|---|---|---|
 | US Treasury | TreasuryDirect FedInvest "Securities prices", daily | CUSIP, type, coupon, maturity, end-of-day buy, sell and EOD prices | US government work; `sources.json` row to add, terms read before the first run |
+| US Treasury auctions | TreasuryDirect auction results (public API) | CUSIP, security term, issue date | Used only to mark on-the-run and first off-the-run issues |
 | UK gilts | UK DMO "Gilt reference prices", daily | ISIN, coupon, maturity, clean and dirty reference prices | Read the DMO terms before recording; publish only derived residuals if redistribution is unclear |
 
 Both are recorded by the Actions recorder under `tools/recorder/sources.json` rules: raw files are not committed until the owner reviews the source.
@@ -21,7 +22,8 @@ Conventions: Treasuries semi-annual, ACT/ACT ICMA. Gilts semi-annual, ACT/ACT IC
 
 ## Calculation (all through the CLI)
 
-1. `bond.fit.nelson_siegel` on the day's universe, per market, with `tau` fixed at 2.5 years (the stage D setting) and equal weights. The fit's repricing error is reported.
+1. `bond.fit.nelson_siegel` on the day's universe, per market, with `tau` fixed at 2.5 years (the stage D setting). Weights are `w = 1 / D_mod^2`, with `D_mod` the bond's modified duration from `bond.price.from_yield` at its market yield. A price error divided by duration is about a yield error, so this fits yields, not prices, as Gurkaynak, Sack and Wright (2007) and the Bank of England's spline method (Anderson and Sleath 2001) do (ruling R2-A5). The operation squares nothing itself: it minimises `sum w (model - price)^2`, so `w = 1/D^2` gives duration-scaled errors. The fit's repricing error is reported.
+   Excluded from the fit with weight 0, but still reported with their residuals: Treasury on-the-run and first off-the-run issues in each auction tenor (2, 3, 5, 7, 10, 20 and 30 years), identified from TreasuryDirect auction results, because their liquidity premium biases a fit (GSW 2007; ruling R2-A6). Gilts have no such list in the free data, so none are excluded, and the report says so. A weight-0 bond still gets a residual, because `bonds.md` reports residuals for every bond.
 2. The fit's `residuals` output is model minus market dirty price for every bond (`bonds.md`), so the job computes no price itself. `model_clean = market_clean + residual`.
 3. Per bond:
    - `price_residual = residual` (per 100): positive means the bond is cheap against the curve;

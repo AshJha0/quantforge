@@ -70,7 +70,7 @@ How the bootstrapped zero rates move with the par quotes.
 
 Inputs: `as_of`, `convention`, `quotes`, `interpolation`, `bump_bp`; the scheme is always central.
 
-Let `z_i = -ln D(p_i) / t_i` be the continuously compounded zero rate at pillar `i`, with pillars as `rates.ois.bootstrap`.
+**Basis (ruling R2-A8).** Rows are continuously compounded zero rates on ACT/365F curve time, `z_i = -ln D(p_i) / t_i` at pillar `i` (pillars as `rates.ois.bootstrap`). Columns are the par quotes as decimal rates on their own day counts. Neither is a simply compounded or annually compounded zero, and the matrix changes if either basis changes.
 
 Outputs:
 - `pillar_dates`;
