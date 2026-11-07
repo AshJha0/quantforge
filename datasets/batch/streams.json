@@ -1,0 +1,535 @@
+{
+ "schema_version": "1.0",
+ "suite": "batch_streams",
+ "spec": "specifications/cli-contract.md",
+ "spec_version": "1.6.0",
+ "generator": "hand-written from the batch section; behaviour of BT1-BT4 observed identical in all four v0.4 builds on 2026-11-07",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "segment_forms": {
+  "text": "UTF-8 text, written as is",
+  "hex": "raw bytes in hex",
+  "repeat": "the one-character string, repeated count times"
+ },
+ "expected_form": "one entry per result line, in order; code and case_id are compared; a missing timings key or a present one when timings is false is a failure",
+ "streams": [
+  {
+   "id": "bt-0001",
+   "rules": [
+    "BT1"
+   ],
+   "description": "two cases, LF",
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0002",
+   "rules": [
+    "BT1"
+   ],
+   "description": "two cases, CRLF",
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\r\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\r\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0003",
+   "rules": [
+    "BT2"
+   ],
+   "description": "last line without LF",
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0004",
+   "rules": [
+    "BT2"
+   ],
+   "description": "empty stream",
+   "segments": [],
+   "expected": [],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0005",
+   "rules": [
+    "BT3"
+   ],
+   "description": "empty line between cases",
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    },
+    {
+     "status": "error",
+     "code": "E_PARSE",
+     "case_id": "unknown"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0006",
+   "rules": [
+    "BT3"
+   ],
+   "description": "whitespace-only line",
+   "segments": [
+    {
+     "text": "   \t\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_PARSE",
+     "case_id": "unknown"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0007",
+   "rules": [
+    "BT3"
+   ],
+   "description": "byte order mark before a valid case",
+   "segments": [
+    {
+     "hex": "efbbbf"
+    },
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_PARSE",
+     "case_id": "unknown"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0008",
+   "rules": [
+    "BT3"
+   ],
+   "description": "invalid UTF-8 inside a string",
+   "segments": [
+    {
+     "text": "{\"x\":\""
+    },
+    {
+     "hex": "ff"
+    },
+    {
+     "text": "\"}\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_PARSE",
+     "case_id": "unknown"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0009",
+   "rules": [
+    "BT3"
+   ],
+   "description": "not JSON",
+   "segments": [
+    {
+     "text": "nope\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_PARSE",
+     "case_id": "unknown"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0010",
+   "rules": [
+    "BT3",
+    "BT4"
+   ],
+   "description": "mixed statuses keep order and case_id",
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"e\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-07-01\",\"end\":\"2024-01-01\"}}\n{\"schema_version\":\"1.0\",\"case_id\":\"s\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"NOPE\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n{\"schema_version\":\"1.0\",\"case_id\":\"u\",\"operation\":\"core.nothing.here\",\"inputs\":{}}\n{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_DATE_ORDER",
+     "case_id": "e"
+    },
+    {
+     "status": "error",
+     "code": "E_SCHEMA",
+     "case_id": "s"
+    },
+    {
+     "status": "error",
+     "code": "E_UNSUPPORTED_OPERATION",
+     "case_id": "u"
+    },
+    {
+     "status": "ok",
+     "case_id": "a"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0011",
+   "rules": [
+    "BT3"
+   ],
+   "description": "lone CR is not a line break",
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\r{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_PARSE",
+     "case_id": "unknown"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0012",
+   "rules": [
+    "BT5"
+   ],
+   "description": "line over 16,777,216 bytes, then a valid case",
+   "segments": [
+    {
+     "repeat": "x",
+     "count": 16777217
+    },
+    {
+     "text": "\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_LIMIT",
+     "case_id": "unknown"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0013",
+   "rules": [
+    "BT5"
+   ],
+   "description": "line of exactly 16,777,216 bytes is parsed, so not JSON",
+   "segments": [
+    {
+     "repeat": "x",
+     "count": 16777216
+    },
+    {
+     "text": "\n{\"schema_version\":\"1.0\",\"case_id\":\"b\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "error",
+     "code": "E_PARSE",
+     "case_id": "unknown"
+    },
+    {
+     "status": "ok",
+     "case_id": "b"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0014",
+   "rules": [
+    "BT2",
+    "BT3"
+   ],
+   "description": "final empty line after LF is not a case",
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    }
+   ],
+   "args": [
+    "batch"
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0015",
+   "rules": [
+    "BT1"
+   ],
+   "description": "--batch spelling",
+   "args": [
+    "--batch"
+   ],
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    }
+   ],
+   "exit": 0,
+   "timings": false
+  },
+  {
+   "id": "bt-0016",
+   "rules": [
+    "timings"
+   ],
+   "description": "--timings adds elapsed_ns on ok and error",
+   "args": [
+    "batch",
+    "--timings"
+   ],
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n{\"schema_version\":\"1.0\",\"case_id\":\"e\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-07-01\",\"end\":\"2024-01-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    },
+    {
+     "status": "error",
+     "code": "E_DATE_ORDER",
+     "case_id": "e"
+    }
+   ],
+   "timings": true,
+   "exit": 0
+  },
+  {
+   "id": "bt-0017",
+   "rules": [
+    "timings"
+   ],
+   "description": "--batch --timings",
+   "args": [
+    "--batch",
+    "--timings"
+   ],
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "expected": [
+    {
+     "status": "ok",
+     "case_id": "a"
+    }
+   ],
+   "timings": true,
+   "exit": 0
+  },
+  {
+   "id": "bt-0018",
+   "rules": [
+    "args"
+   ],
+   "description": "unknown flag",
+   "args": [
+    "batch",
+    "--fast"
+   ],
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "exit": 64,
+   "expected": [],
+   "timings": false
+  },
+  {
+   "id": "bt-0019",
+   "rules": [
+    "args"
+   ],
+   "description": "flag before command",
+   "args": [
+    "--timings",
+    "batch"
+   ],
+   "segments": [
+    {
+     "text": "{\"schema_version\":\"1.0\",\"case_id\":\"a\",\"operation\":\"core.daycount.year_fraction\",\"inputs\":{\"convention\":\"ACT_360\",\"start\":\"2024-01-01\",\"end\":\"2024-07-01\"}}\n"
+    }
+   ],
+   "exit": 64,
+   "expected": [],
+   "timings": false
+  }
+ ],
+ "checks": {
+  "equivalence": "every 40th case of each golden suite, sent alone with run and as one batch stream: the result objects must be equal after parsing, with numbers compared as binary64",
+  "reorder": "the same sample in reverse order: results reverse and are otherwise equal",
+  "interactive": "write one line, read one result line before writing the next, three times, without closing stdin; 30 s limit per result",
+  "timings_identity": "the sample with and without --timings: outputs equal, elapsed_ns only with the flag"
+ }
+}
