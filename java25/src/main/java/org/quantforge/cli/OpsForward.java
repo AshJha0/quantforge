@@ -16,6 +16,15 @@ final class OpsForward {
 
     static final int MAX_LIST = 100;
 
+    /** Ruling C17: an empty list is E_INPUT, ahead of every other rule check. */
+    static void nonEmpty(int... lengths) {
+        for (int n : lengths) {
+            if (n == 0) {
+                throw new QfError("E_INPUT", "empty array");
+            }
+        }
+    }
+
     /** The inputs of eq.forward.outright as read. */
     record Input(double spot, LocalDate asOf, LocalDate expiry, StageB.CurveInput funding, StageB.CurveInput borrow,
                  List<EquityForward.Dividend> dividends) {

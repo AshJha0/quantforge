@@ -39,6 +39,7 @@ final class OpsSabr {
             Sabr.Params p = params(in);
             double s = shift(in);
             in.gate();
+            OpsForward.nonEmpty(k.length);
             double[] x = shifted(k, s);
             Sabr.check(t, p, f + s, x);
             double[] v = new double[x.length];
@@ -57,6 +58,7 @@ final class OpsSabr {
             double h = in.real("h_strike");
             OnNegative on = in.choice("on_negative", OnNegative.class);
             in.gate();
+            OpsForward.nonEmpty(k.length);
             double[] x = shifted(k, s);
             Sabr.check(t, p, f + s, x);
             if (h <= 0.0) {
@@ -85,6 +87,7 @@ final class OpsSabr {
             double[] w = in.hasKey("weights") ? in.reals("weights") : null;
             in.limit(k.length > OpsForward.MAX_LIST || v.length > OpsForward.MAX_LIST, "strikes");
             in.gate();
+            OpsForward.nonEmpty(k.length);
             if (k.length < 3 || v.length != k.length || (w != null && w.length != k.length)) {
                 throw new QfError("E_INPUT", "too few strikes, or lengths differ");
             }
@@ -115,6 +118,7 @@ final class OpsSabr {
             double[] k = in.reals("strikes");
             in.limit(k.length > OpsForward.MAX_LIST, "strikes");
             in.gate();
+            OpsForward.nonEmpty(k.length);
             double[] x = shifted(k, s);
             Sabr.check(t, p, f + s, x);
             if (p.beta() >= 1.0) {

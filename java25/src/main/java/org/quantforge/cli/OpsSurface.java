@@ -34,6 +34,7 @@ final class OpsSurface {
                 k[i] = pts.get(i).real("log_moneyness");
             }
             in.gate();
+            OpsForward.nonEmpty(t.length);
             s.check();
             List<Object> w = new ArrayList<>();
             List<Object> v = new ArrayList<>();
@@ -63,6 +64,7 @@ final class OpsSurface {
                         p.real("strike"), p.real("discount_factor"), p.real("expiry_years"), p.real("quantity")));
             }
             in.gate();
+            OpsForward.nonEmpty(book.size());
             s.check();
             for (Surface.Position p : book) {
                 if (p.forward() <= 0.0 || p.strike() <= 0.0 || p.discount() <= 0.0 || p.t() <= 0.0) {

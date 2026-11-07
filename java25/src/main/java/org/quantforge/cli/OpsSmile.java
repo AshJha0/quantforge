@@ -30,7 +30,10 @@ final class OpsSmile {
             }
             return 1.0;
         }
-        if (scale == null || scale <= 0.0) {
+        if (scale == null) {
+            throw new QfError("E_INPUT", "scale is null for SPOT", "scale");
+        }
+        if (scale <= 0.0) {
             throw domain("scale must be above 0");
         }
         return scale;
@@ -128,6 +131,7 @@ final class OpsSmile {
             in.limit(k.length > OpsForward.MAX_LIST, "log_moneyness");
             double t = in.real("expiry_years");
             in.gate();
+            OpsForward.nonEmpty(k.length);
             s.check();
             if (t <= 0.0) {
                 throw domain("expiry_years must be above 0");
@@ -151,6 +155,7 @@ final class OpsSmile {
             double[] wt = in.hasKey("weights") ? in.reals("weights") : null;
             in.limit(k.length > OpsForward.MAX_LIST || w.length > OpsForward.MAX_LIST, "log_moneyness");
             in.gate();
+            OpsForward.nonEmpty(k.length);
             Smile.SviFit f = Smile.calibrateSvi(k, w, wt);
             return Operations.out("svi", json(f.svi()), "rmse", f.rmse());
         });
@@ -160,6 +165,7 @@ final class OpsSmile {
             double[] k = in.reals("log_moneyness");
             in.limit(th.length > OpsForward.MAX_LIST || k.length > OpsForward.MAX_LIST, "thetas");
             in.gate();
+            OpsForward.nonEmpty(th.length, k.length);
             Smile.check(s);
             Smile.checkThetas(th);
             List<Object> rows = new ArrayList<>();
@@ -179,6 +185,7 @@ final class OpsSmile {
             double[][] w = in.anyMatrix("total_variance");
             in.limit(th.length > OpsForward.MAX_LIST || k.length > OpsForward.MAX_LIST, "thetas");
             in.gate();
+            OpsForward.nonEmpty(th.length, k.length);
             Smile.SsviFit f = Smile.calibrateSsvi(th, k, w);
             return Operations.out("rho", f.ssvi().rho(), "eta", f.ssvi().eta(), "gamma", f.ssvi().gamma(), "rmse", f.rmse());
         });
