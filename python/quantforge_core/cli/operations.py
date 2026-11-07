@@ -7,23 +7,31 @@ from types import ModuleType, SimpleNamespace
 from typing import Any
 
 from .. import black as _black
+from .. import bonds as _bonds
 from .. import calendars as calendars_module
 from .. import calibration as _calibration
 from .. import compounding as compounding_module
 from .. import conventions as _conventions
 from .. import cos as cos_module
+from .. import credit as _credit
+from .. import csa as _csa
+from .. import curve_fits as _curve_fits
 from .. import curves as _curves
 from .. import data_checks as data_checks_module
 from .. import daycount as daycount_module
 from .. import equity as _equity
+from .. import equity_d as _equity_d
+from .. import futures as _futures
 from .. import fx as _fx
 from .. import hedging as _hedging
+from .. import inflation as _inflation
 from .. import integrate as integrate_module
 from .. import interp as interp_module
 from .. import linalg as linalg_module
 from .. import money as _money
 from .. import monte_carlo as monte_carlo_module
 from .. import ois as _ois
+from .. import overnight as _overnight
 from .. import pde as pde_module
 from .. import projection as _projection
 from .. import rng as rng_module
@@ -34,11 +42,14 @@ from .. import sensitivities as _sensitivities
 from .. import smile as _smile
 from .. import snapshot as snapshot_module
 from .. import sobol as sobol_module
+from .. import stage_d3 as _stage_d3
 from .. import stats as stats_module
+from .. import steps as _steps
 from .. import store as store_module
 from .. import timezones as timezones_module
 from .. import usecases as _usecases
 from .. import vol_usecase as _vol_usecase
+from .. import xccy as _xccy
 from ..calendars import TENOR
 from ..daycount import check_conditional
 from ..errors import QfError
@@ -48,6 +59,7 @@ from .inputs import Inputs, format_seconds, parse_instant, parse_u64
 from .limits import check_limits
 from .stage_b import handlers as _stage_b_handlers
 from .stage_c import handlers as _stage_c_handlers
+from .stage_d import handlers as _stage_d_handlers
 
 Result = dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]
 OPTIONS = ("CALL", "PUT")
@@ -114,6 +126,10 @@ _STAGE_B = SimpleNamespace(
 
 _STAGE_C = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m) for m in (_black, _equity, _sabr, _smile, _vol_usecase)}
+)
+_STAGE_D = SimpleNamespace(
+    **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
+       for m in (_bonds, _credit, _csa, _curve_fits, _equity_d, _futures, _inflation, _overnight, _stage_d3, _steps, _xccy)}
 )
 
 
@@ -638,3 +654,4 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
 }
 OPERATIONS.update(_stage_b_handlers(_STAGE_B))
 OPERATIONS.update(_stage_c_handlers(_STAGE_C))
+OPERATIONS.update(_stage_d_handlers(_STAGE_D))

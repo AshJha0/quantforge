@@ -20,21 +20,36 @@ class CurveData:
     interpolation: str
     dates: tuple[date, ...]
     discount_factors: tuple[float, ...]
+    jumps: tuple[tuple[date, float], ...] = ()
 
 
 class Curve:
     def __init__(self, data: CurveData):
         self.as_of = data.as_of
         self.interpolation = data.interpolation
+        self.jumps = data.jumps
+        self.dates = data.dates
         self.times = [0.0, *(self.time(d) for d in data.dates)]
-        self.logs = [0.0, *(math.log(v) for v in data.discount_factors)]
+        self.logs = [0.0, *(math.log(v / self.jump(d))
+                            for d, v in zip(data.dates, data.discount_factors, strict=True))]
         self.zeros = [0.0, *(-x / t for x, t in zip(self.logs[1:], self.times[1:], strict=True))]
         self.zeros[0] = self.zeros[1]
 
     def time(self, d: date) -> float:
         return (d - self.as_of).days / 365
 
+    def jump(self, d: date) -> float:
+        """J(d): the product of jump factors dated strictly before d (ruling D2)."""
+        product = 1.0
+        for day, factor in self.jumps:
+            if day < d:
+                product *= factor
+        return product
+
     def discount(self, d: date) -> float:
+        return self._smooth(d) * self.jump(d)
+
+    def _smooth(self, d: date) -> float:
         t = self.time(d)
         if t < 0:
             raise QfError("E_OUT_OF_RANGE", f"{d} is before the curve date")
@@ -52,6 +67,16 @@ class Curve:
         return math.exp(-((1 - u) * self.zeros[i] + u * self.zeros[i + 1]) * t)
 
 
+def check_jumps(as_of: date, jumps: Sequence[tuple[date, float]]) -> None:
+    previous = as_of
+    for d, _ in jumps:
+        if d <= previous:
+            raise QfError("E_INPUT", "jump dates must be increasing and after as_of", "jumps")
+        previous = d
+    if any(not f > 0 for _, f in jumps):
+        raise QfError("E_DOMAIN", "jump factors must be positive", "jumps")
+
+
 def build(data: CurveData) -> Curve:
     previous = data.as_of
     if not data.dates:
@@ -62,6 +87,7 @@ def build(data: CurveData) -> Curve:
         previous = d
     if any(v <= 0 for v in data.discount_factors):
         raise QfError("E_DOMAIN", "discount factors must be positive", "pillars")
+    check_jumps(data.as_of, data.jumps)
     return Curve(data)
 
 
@@ -92,6 +118,7 @@ def solve_pillars(
     pillars: Sequence[date],
     models: Sequence[Model],
     targets: Sequence[float],
+    jumps: tuple[tuple[date, float], ...] = (),
 ) -> tuple[list[float], float]:
     """One unknown at a time. Every date quote j needs lies on or before pillar j, so each solve
     sees only pillars already fixed and its own. Returns (discount factors, largest error)."""
@@ -99,7 +126,7 @@ def solve_pillars(
 
     def curve_with(x: float, count: int) -> Curve:
         factors = (*(math.exp(v) for v in logs), math.exp(x))
-        return Curve(CurveData(as_of, interpolation, tuple(pillars[:count]), factors))
+        return Curve(CurveData(as_of, interpolation, tuple(pillars[:count]), factors, jumps))
 
     for j, (model, target) in enumerate(zip(models, targets, strict=True)):
         def error(x: float, model: Model = model, target: float = target, j: int = j) -> float:
@@ -110,7 +137,7 @@ def solve_pillars(
         logs.append(_solve(error, guess))
 
     final = Curve(CurveData(as_of, interpolation, tuple(pillars),
-                            tuple(math.exp(v) for v in logs)))
+                            tuple(math.exp(v) for v in logs), jumps))
     return [math.exp(v) for v in logs], repricing_error(final, models, targets)
 
 

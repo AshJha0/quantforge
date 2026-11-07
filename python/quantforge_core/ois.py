@@ -7,6 +7,7 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
+from typing import Protocol
 
 from . import calendars, curves, daycount, linalg, schedules
 from .conventions import REGISTRY
@@ -16,6 +17,10 @@ from .numeric import ordered_sum
 from .schedules import Period
 
 _MF = "MODIFIED_FOLLOWING"
+
+
+class Discounting(Protocol):
+    def discount(self, d: date) -> float: ...
 
 
 @dataclass(frozen=True)
@@ -64,7 +69,7 @@ def periods(convention: str, as_of: date, tenor: str) -> list[Period]:
     return schedules.generate(spot, end, c["fixed_months"], cal, eom, lag)
 
 
-def legs(convention: str, ps: Sequence[Period], curve: Curve) -> tuple[float, float]:
+def legs(convention: str, ps: Sequence[Period], curve: Discounting) -> tuple[float, float]:
     """Returns (annuity, floating), in the general form: never telescoped."""
     fixed_day_count = REGISTRY[convention]["fixed_day_count"]
     annuity = ordered_sum(
@@ -78,7 +83,7 @@ def legs(convention: str, ps: Sequence[Period], curve: Curve) -> tuple[float, fl
     return annuity, floating
 
 
-def par_rate(convention: str, ps: Sequence[Period], curve: Curve) -> float:
+def par_rate(convention: str, ps: Sequence[Period], curve: Discounting) -> float:
     annuity, floating = legs(convention, ps, curve)
     return floating / annuity
 
@@ -89,14 +94,15 @@ def _models(convention: str, swaps: Sequence[Sequence[Period]]) -> list[curves.M
 
 def _global_solve(
     as_of: date, interpolation: str, pillars: Sequence[date], models: Sequence[curves.Model],
-    targets: Sequence[float],
+    targets: Sequence[float], jumps: tuple[tuple[date, float], ...] = (),
 ) -> tuple[list[float], float]:
     """Newton on all pillars together, on log discount factors, with a bumped Jacobian."""
     n = len(pillars)
     xs = [-q * (d - as_of).days / 365 for q, d in zip(targets, pillars, strict=True)]
 
     def errors(x: Sequence[float]) -> list[float]:
-        data = CurveData(as_of, interpolation, tuple(pillars), tuple(math.exp(v) for v in x))
+        data = CurveData(as_of, interpolation, tuple(pillars), tuple(math.exp(v) for v in x),
+                         jumps)
         curve = Curve(data)
         return [m(curve) - q for m, q in zip(models, targets, strict=True)]
 
@@ -138,16 +144,17 @@ def _check_quotes(
 
 def bootstrap(
     convention: str, as_of: date, quotes: Sequence[Quote], interpolation: str,
-    method: str = "SEQUENTIAL",
+    method: str = "SEQUENTIAL", jumps: tuple[tuple[date, float], ...] = (),
 ) -> tuple[CurveData, float]:
     """Returns (curve, max_repricing_error)."""
+    curves.check_jumps(as_of, jumps)
     swaps, pillars = _check_quotes(convention, as_of, quotes)
     models = _models(convention, swaps)
     targets = [q.mid for q in quotes]
     solve = curves.solve_pillars if method == "SEQUENTIAL" else _global_solve
-    factors, error = solve(as_of, interpolation, pillars, models, targets)
+    factors, error = solve(as_of, interpolation, pillars, models, targets, jumps)
     curves.check_solved(error)
-    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors)), error
+    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors), jumps), error
 
 
 def compound(rates: Sequence[float], days: Sequence[int], denominator: int) -> float:
