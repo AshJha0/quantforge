@@ -22,4 +22,49 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | Smooth forward fit | 1e-10 plus 1e-8 relative | Exact rationals; NumPy | NumPy within 1e-9 |
 | Huber Nelson-Siegel | 1e-9; outlier set exact | IRLS at 50 digits; SciPy from three starts | Within 1e-8 |
 
+## Wave 2, D2: bonds and repo
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Price, accrued, durations, convexity from yield | `simple_analytic` | QuantLib `FixedRateBond`, `BondFunctions` | Within 1e-10; convexity 1e-8 |
+| Yield from price | `root_finding` | Known truth; QuantLib | Exact round trip |
+| Curve price, Z-spread | `interpolation`; Z-spread `root_finding` | QuantLib `zSpread` | Within 1e-10 |
+| Asset swap, bond-OIS spread | `interpolation` | Hand replay | No outside source |
+| FRN | `interpolation` | Replay; par identity | Par within 1e-11 |
+| Repo forward, special repo, implied repo | `simple_analytic` | Analytic | |
+| Conversion factor, CTD index | Exact | CBOT formula, hand | No outside library |
+| Sovereign fit, RV residuals | Betas within 1e-8 | Known truth; SciPy from three starts | Within 1e-9 |
+
+## Wave 2, D3: cross-currency and NDF
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Basis-adjusted foreign curve | Pillars within 1e-9 | Known truth | Replay within 1e-13 |
+| Cross-currency swap PV | 1e-9 per unit notional | QuantLib `OvernightLeg` NPV for coupons | Within 1e-6 on 1e7 |
+| NDF | `interpolation` | Analytic | |
+
+## Wave 2, D4: credit
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| ISDA CDS price, upfront, par spread | 1e-9 per unit notional | QuantLib `IsdaCdsEngine` | NPV within 7e-16 per unit |
+| Hazard bootstrap | Survival within 1e-9 | QuantLib fair spreads on the result | Within 2e-10 |
+| Index intrinsic, composite curves | 1e-9 | Through the above | |
+
+## Wave 2, D5: equity
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Implied dividends, futures basis, TRS | `simple_analytic` | Analytic | No outside library |
+| Implied borrow, financing spread | `root_finding` | Known truth | |
+| Index dividends, dividend futures, rebalance, corporate actions | `simple_analytic` | Exact rationals | |
+
+## Wave 3, D6: inflation
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| CPI curve with seasonality | `simple_analytic`; pillars reprice exactly | Analytic | |
+| ZCIS, linker from curve | `interpolation` | Analytic | |
+| Linker from real yield | `simple_analytic` | Exact-rational reference CPI; bond formulas checked against QuantLib in D2 | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).
