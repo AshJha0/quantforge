@@ -78,3 +78,23 @@ No other disagreement was seen. Checked in passing, from memory, and consistent:
 ## Follow-up after R1-3 and R1-4
 
 F1 is closed: ruling R1-3 adds the `contract` input (whole months for 2Y, 3Y, 5Y; quarters otherwise) and withdraws the half-even rounding claim. Sources added after the merge of r1: the CME conversion-factor document marked as the basis of R1-3 (`bonds.md` S3); TP ICAP's EUR OIS term sheet and Strata 2.12.78 for the `ESTR` payment lag (`conventions.md` S5, S6); the ISDA CDS Standard Model flat-forward assumption behind R1-4 (`credit.md` S5). All marked "(not opened)".
+
+## R2: opening the public sources (2026-11-07)
+
+Branch `r2-cite` from main `eaf6933`. Each public source was fetched once and the result applied to every spec that cites it. Only citation lines changed.
+
+| Result | Sources | Count |
+|---|---|---|
+| Opened, confirms | RFC 8259 (s.9 confirmed), RFC 8785, IANA tzdb, Joe-Kuo direction numbers page, SIFMA holiday schedule, UK BFDA 1971 Sch. 1, BoE SONIA key features, NY Fed reference-rate methodology page (title corrected), ECB €STR methodology (title corrected), CDS semi-annual roll note (wording corrected) | 10 |
+| Opened, partial | prng.di.unimi.it (code and SplitMix seeding; paper details not shown), cdsmodel.com (free source; step-in, settlement and flat-forward not found there) | 2 |
+| Contradicts a spec | none | 0 |
+| Not reachable | CME conversion factors (timeout), ARRC loan conventions (PDF not decodable), Bloomberg fallback rule book (signed redirect), eCFR 31 CFR 356 App. B (bot redirect), UK DMO formulae (404 and bot check), TP ICAP (TLS error), ECB TARGET closing days (404), SIFMA Uniform Practices ch. SF, S&P DJI Index Mathematics (403), Eurex FEXD, FIPS 180-4 (PDF not decodable), BoE WP 126, FEDS 95-1, SSRN 2219548, Strata 2.12.78 ESTR convention file, Fujii et al. | 16 |
+| Licensed, left "(not opened)" | ISDA 2006 and 2021 Definitions, Supplement 70, 2014 Credit Definitions, 2016 VM CSA, 1998 FX Definitions, ICMA Rule 251, ISO 4217 and 8601, all textbooks and journal papers | the rest |
+
+Corrections to citations (not to specs):
+
+- R2-C1, CDS roll (`credit.md`): the change took effect on 21 December 2015. The roll dates are 20 March and 20 September; maturities fall on 20 June and 20 December. The old citation wording blurred the two. The spec's rule agrees with the source.
+- R2-C2, ARRC (`overnight-compounding.md`): the linked loan-conventions PDF sits under a `2020` folder, while the citation says 2019. Not resolved, as the PDF could not be read.
+- R2-C3, UK holidays (`calendars.md`): BFDA Schedule 1 gives Easter Monday, the May and August Mondays and the 26/27 December rule. Good Friday, Christmas Day and 1 January come from common law and proclamation, which the citation already names.
+
+Human-confirmation items: everything still marked "(not opened)", first the 16 unreachable public sources, which a browser with a person at it can likely open (CME, eCFR, DMO, ARRC and TP ICAP above all).
