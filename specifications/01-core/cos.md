@@ -65,3 +65,10 @@ Numeric targets: Black-Scholes, `N = 256`, `L = 10`: error below 1e-10. Heston w
 
 Near-zero vol-of-vol: per plan section 8, Heston is tested near zero against Black-Scholes at the average
 variance, not at zero. `sigma` must be above 0 here.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Fang, F. and Oosterlee, C. W., "A novel pricing method for European options based on Fourier-cosine series expansions", *SIAM Journal on Scientific Computing* 31(2), 2008, 826-848 (not opened)
+- [S2] Heston, S. L., "A closed-form solution for options with stochastic volatility", *Review of Financial Studies* 6(2), 1993, 327-343 (not opened)

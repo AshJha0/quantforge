@@ -32,3 +32,11 @@ Single-period total return swap on `shares` `n`. Inputs: `spot`, `funding`, `bor
 ## Acceptance
 
 Index, rebalance, corporate actions: within 1e-12 relative of exact-rational goldens (`simple_analytic`); `ex_dates` exact. TRS: `simple_analytic`, analytic. Suites `stage_d/index_d`, `trs_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] S&P Dow Jones Indices, *Index Mathematics Methodology* (divisor, rebalancing, corporate-action adjustment) (not opened)
+- [S2] Eurex, EURO STOXX 50 Index Dividend Futures contract specifications (index dividend points) (not opened)
+- [S3] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Swaps" (total return swaps) and chapter "Determination of Forward and Futures Prices" (not opened)

@@ -73,3 +73,11 @@ Golden cases test this directly.
 Class `date_and_convention`, exact. Oracle: hand-written expected rows, with hashes from the oracle's canonical form.
 It has one source, by nature. Cases cover the inclusive limit, corrections, withdrawals, a value withdrawn and restored,
 late data, offsets, and an append that leaves earlier checkpoints unchanged.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Snodgrass, R. T., *Developing Time-Oriented Database Applications in SQL*, Morgan Kaufmann, 2000 (valid time and transaction time, the bitemporal model behind `event_time` and `knowledge_time`) (not opened)
+- [S2] NIST FIPS PUB 180-4, *Secure Hash Standard (SHS)*, 2015, SHA-256 (not opened)
+- [S3] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017 (not opened)

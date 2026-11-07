@@ -24,3 +24,14 @@ Spot lags count business days. The FX rule is in `02-curves/fx.md`.
 ## Acceptance
 
 Exact.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] ISDA, *2006 ISDA Definitions*, Sections 4.12 and 4.16 (business-day and day-count conventions referenced by the registry) (not opened)
+- [S2] Bank of England, *SONIA key features and policies* (not opened)
+- [S3] Federal Reserve Bank of New York, SOFR and reference-rate production methodology (statement on the Secured Overnight Financing Rate) (not opened)
+- [S4] European Central Bank, *Euro short-term rate (€STR) methodology and policies* (not opened)
+- [S5] TP ICAP, EUR OIS (€STR) term sheet, payment lag for `ESTR` (not opened)
+- [S6] OpenGamma Strata 2.12.78, `OvernightIndexConventions`/`FixedOvernightSwapConventions` for EUR €STR, payment lag (not opened)

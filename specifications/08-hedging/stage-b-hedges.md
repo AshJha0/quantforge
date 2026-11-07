@@ -23,3 +23,10 @@ The simple spread cost model. Inputs: `quantities`, `half_spreads` (`>= 0`, else
 ## Acceptance
 
 Oracle: exact enumeration of sign patterns, checked against the first-order conditions. `x` within 1e-8.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Press, W. H., Teukolsky, S. A., Vetterling, W. T. and Flannery, B. P., *Numerical Recipes: The Art of Scientific Computing*, 3rd ed., Cambridge University Press, 2007, chapter 15 (weighted linear least squares, normal equations) (not opened)
+- [S2] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Hedging Strategies Using Futures" (minimum-variance hedge) (not opened)

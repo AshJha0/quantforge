@@ -42,3 +42,10 @@ Each case has two checks:
 Numeric targets: `spot = strike = 100`, `r = 0.05`, `q = 0.02`, `sigma = 0.2`, `t = 1`, `N = 100000`: `PLAIN` `stderr`
 about 0.045. `ANTITHETIC` and `CONTROL_VARIATE` have lower `stderr` than `PLAIN`, and `SOBOL` with `N = 65536` has
 error below 0.01. Oracle-measured values are in `oracle/REPORT.md`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Glasserman, P., *Monte Carlo Methods in Financial Engineering*, Springer, 2003, chapter 3 (generating sample paths, GBM) and chapter 5 (quasi-Monte Carlo) (not opened)
+- [S2] Black, F. and Scholes, M., "The pricing of options and corporate liabilities", *Journal of Political Economy* 81(3), 1973, 637-654 (not opened)

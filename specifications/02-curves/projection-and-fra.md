@@ -45,3 +45,11 @@ The floating forward runs on accrual dates, not on a separate index end date.
 ## Acceptance
 
 Oracle: replay against QuantLib `DepositRateHelper`, `FraRateHelper`, `SwapRateHelper` with exogenous discounting, and `MakeVanillaSwap`. Measured: pillars within 1e-10; swap and FRA PVs about 1e-8 on 1e6, and the oracle asserts 1e-5. Basis spread has hand replay only. On an `as_of` that is not a business day QuantLib disagrees with itself: `DepositRateHelper` counts from `as_of`, `SwapRateHelper` adjusts first. So those dates have no outside check here.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] ISDA, *2006 ISDA Definitions*, Section 4.16 (day count) and the FRA discounting provisions (FRA Discounting) (not opened)
+- [S2] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Swaps" and chapter "Interest Rates" (FRAs) (not opened)
+- [S3] Ametrano, F. M. and Bianchetti, M., SSRN 2219548, 2013 (multi-curve projection and tenor basis) (not opened)

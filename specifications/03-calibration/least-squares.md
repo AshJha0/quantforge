@@ -54,3 +54,11 @@ The calibration sensitivity report. Inputs: as `rates.ois.bootstrap`, less `meth
 ## Acceptance
 
 Unique minima: parameters within 1e-6, objective with them. Known-truth cases: objective zero. `NELSON_SIEGEL` is judged on objective at 1e-10 only, because its parameters are poorly identified. Oracle: closed forms, NumPy, SciPy. `gen_stage_b.py` checks that plain Gauss-Newton, BFGS and Levenberg-Marquardt reach these minima, so no case rests on one solver's path.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Nocedal, J. and Wright, S. J., *Numerical Optimization*, 2nd ed., Springer, 2006, chapter 6 (BFGS) and chapter 10 (Gauss-Newton, Levenberg-Marquardt) (not opened)
+- [S2] Marquardt, D. W., "An algorithm for least-squares estimation of nonlinear parameters", *SIAM Journal on Applied Mathematics* 11(2), 1963, 431-441 (not opened)
+- [S3] Nelson, C. R. and Siegel, A. F., "Parsimonious modeling of yield curves", *Journal of Business* 60(4), 1987, 473-489 (not opened)

@@ -123,3 +123,12 @@ period end, which Strata reads as a final period counted forward from `start`. W
 
 `ACT/ACT YEAR`, ACT/366, 30/365, and Italian 30/360 are not offered. Long-stub splitting and ex-dividend
 periods arrive with schedules in stage B.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] ISDA, *2006 ISDA Definitions*, Section 4.16 (Day Count Fraction): ACT/ACT ISDA, ACT/365F, ACT/360, 30/360, 30E/360, 30E/360 (ISDA) (not opened)
+- [S2] ICMA, *Primary Market Handbook* / Rule 251 (accrued interest calculation, ACT/ACT ICMA) (not opened)
+- [S3] ISDA, *EMU and Market Conventions: Recent Developments*, 1998, the comparison of ACT/ACT methods (ISDA, ICMA, AFB) and the worked examples cited in this spec (not opened)
+- [S4] AFB / FBF (Fédération Bancaire Française) master agreement, ACT/ACT AFB definition (not opened)
