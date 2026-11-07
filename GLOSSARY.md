@@ -7,6 +7,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Term | Meaning |
 |---|---|
 | As-of view | What was known at a given instant |
+| Batch mode | Running many cases through one CLI process, one JSON document per line in and one result line out, each equal to what `run` gives (`specifications/cli-contract.md`, 1.6.0) |
 | Bitemporal | Tracking both when something happened and when it became known |
 | Business-day convention | How a date that falls on a holiday moves |
 | Canonical form | The one byte spelling of a document, used for hashing |
@@ -19,6 +20,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Discount factor | The value today of one unit paid later |
 | Evidence class | How a claim is backed: analytic, simulated, proxy or observed |
 | Forward log | An append-only, hash-chained record of dated entries |
+| Honest ceiling | What free public data can show (correct pricing and risk, curve quality, honest statistics) and what it cannot (tradable profitability) |
 | Golden case | A stored case with an independently obtained expected result |
 | Golden suite | A file of golden cases on one topic, such as `daycount` |
 | Knowledge time | The instant the store learned a value |

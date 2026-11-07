@@ -3,7 +3,12 @@
 Docs site: <https://ashjha0.github.io/quantforge/>
 ## Quantitative analytics and trading infrastructure
 
-QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Four stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3) and curves and fixed income (stage D, merged locally at `95cbf11`, not yet tagged as v0.4). See Status below.
+QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Four stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3) and curves and fixed income (stage D, v0.4). Phase R1, credibility hardening for v0.4.1, is in progress. See Status below.
+
+### What it can and cannot show
+On free public data, QuantForge can show correct pricing and risk, curve quality against published curves, and signals on fitted curves with honest statistics.
+
+It cannot show tradable profitability. That needs instrument-level prices, bid and ask, financing and execution data, which cost money. This is a deliberate limit of a zero-spend project. Today every golden case uses synthetic inputs, and there is no risk layer beyond DV01 and key-rate bumps.
 
 ### Toolchains
 - **Java 25:** JDK 25.0.5.
@@ -52,19 +57,19 @@ Stage B covers SONIA and minimal SOFR OIS curves, projection curves, FRAs, swaps
 
 Stage C covers equity forwards with borrow and discrete dividends, Black-Scholes, Black-76 and Bachelier prices and implied vols, Greeks, delta conventions, SVI and SSVI, vol surface checks, Hagan and arbitrage-free SABR, and use case 3. It was released as tag `v0.3` on 2026-11-07, after pull request #13 and main CI passed. On 2026-11-07 all four implementations passed all 5,183 golden cases locally, including 446 stage C cases in 11 suites, and the fuzz driver found nothing after a Java fix. All stage C inputs are synthetic.
 
-Stage D covers OIS curves (full SOFR and ESTR) with turn-of-year jumps, overnight compounding conventions and IBOR fallbacks, meeting-date steps, futures convexity, CSA discounting, index basis and joint and robust curve fits; bonds, repo and bond futures; cross-currency basis and NDFs; ISDA CDS; equity dividend, borrow and index work; inflation and linkers; caps and swaptions; commodity curves; and MBS. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases locally, 331 of them in stage D's 20 suites, and fuzzing with seed 17 found nothing (`conformance/README.md`). All stage D inputs are synthetic.
+Stage D was released as tag `v0.4` on 2026-11-07. It covers OIS curves (full SOFR and ESTR) with turn-of-year jumps, overnight compounding conventions and IBOR fallbacks, meeting-date steps, futures convexity, CSA discounting, index basis and joint and robust curve fits; bonds, repo and bond futures; cross-currency basis and NDFs; ISDA CDS; equity dividend, borrow and index work; inflation and linkers; caps and swaptions; commodity curves; and MBS. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases locally, 331 of them in stage D's 20 suites, and fuzzing with seed 17 found nothing (`conformance/README.md`). All stage D inputs are synthetic.
 
-What has run (observed, local): on 2026-11-06, after the evidence cleanup, all four implementations passed all 4,737 golden cases in 40 suites through the neutral runner, on one Windows machine. That is 4,388 cases in 21 stage A suites, and 343 cases in 18 stage B suites.
+What has run (observed, local): at `v0.4`, all four implementations passed all 5,514 golden cases in 71 suite files through the neutral runner, on one Windows machine. Batch mode, contract 1.6.0, is specified for R1 with 19 stream fixtures in `datasets/batch/streams.json`; on 2026-11-07 each v0.4 build passed 14 of the 19, the five failures being the new R1 items (`program/R1_HANDOVER.md`).
 
 What that does not show:
 - **Validation is self-assessment** until the human review after the project ends. Many golden cases have only hand or replay sources, which can share a misreading with the spec. For stage B, `specifications/stage-b-rulings.md` lists which suites have an outside oracle: `usecases` and `rulings_b` have none, and `risk` is hand and self-consistency only, as are tenor basis, FX outright points, FX swap PV and basis. FX forward PV and delta have QuantLib `FxForward` checks in `fx_deep`.
-- **CI.** Stages A and B and the evidence cleanup passed every workflow they triggered on GitHub, on their pull requests and on `main`. Fuzz and mutation workflows run on a schedule or by hand.
+- **CI.** Stages A to D passed every workflow they triggered on GitHub, on their pull requests and on `main`. Fuzz and mutation workflows run on a schedule or by hand.
 - **The recorder is built but not scheduled.** There is no daily record yet.
 - **No market data is used.** Golden cases are constructed test values. Stage B curve data is labelled synthetic for almost everything, because no free history of OIS, swap, FRA, basis or bid/ask quotes was found (`datasets/data-availability.md`). A passing curve case shows the method agrees with its oracle on those quotes. It says nothing about fit to a market.
 - **Trading is simulated only.** There are no live orders, and nothing here connects to a market: the hedges in stage B are calculations. QuantForge makes no HFT or latency claims. The only benchmark is one laptop run of CLI batch throughput on a stage A suite, in `benchmarks/`.
 
 ### Known issues
-- **Clang on Windows** is blocked at times by Windows Application Control, which stops freshly built binaries. Clang conformance therefore relies on CI, which has not yet run stage B.
+- **Clang on Windows** is blocked at times by Windows Application Control, which stops freshly built binaries. Clang conformance therefore relies on CI.
 - **Licence questions are open** on SONIA redistribution and on the Bank of England's forward and curve data. Raw data stays local (`oracle/LICENCES.md`).
 
 ### Licensing and market data

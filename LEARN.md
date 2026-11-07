@@ -160,7 +160,7 @@ Every number below is a golden value in `datasets/golden/stage_d/`, which all fo
 
 **Meeting steps.** Plain idea: the overnight forward is flat between meetings. Formal statement: `D(d) = exp(-integral f)`, `f` a step function. Case `steps_d-0001`: base 0.0425 until a step to 0.04 on 2026-12-10. The discount factor is 0.9961649070718093 on 2026-12-09 and 0.9960489220202466 on the step date; the forward reads 0.0425, then 0.04. A step takes effect on its date (ruling D6).
 
-**Bond from yield.** Plain idea: discount each cash flow at the yield, compounded at the coupon frequency. Formal statement in `bonds.md`. Case `bonds_d-0001`: 4.25% semi-annual bond to 2029-11-15, settled 2026-11-09, yield 0.041. Clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.74949144731416, convexity 9.306657676461866. QuantLib `FixedRateBond` agrees within 1e-10.
+**Bond from yield.** Plain idea: discount each cash flow at the yield, compounded at the coupon frequency. Formal statement in `bonds.md`. Case `bonds_d-0001`: 4.25% semi-annual bond to 2029-11-15, settled 2026-11-09, yield 0.041. Clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.7494914473141594, convexity 9.306657676461866. QuantLib `FixedRateBond` agrees within 1e-10.
 
 **ISDA CDS.** Plain idea: protection pays `1 - R` on default; the buyer pays a running coupon, and an upfront settles the difference. Formal statement in `credit.md`. Case `credit_d-0004`: buy 10 million of protection to 2031-12-20, coupon 100 bp, recovery 0.4. Par spread 0.011999999988591251, clean upfront 0.009002551543707455, PV 89977.4324589857. QuantLib's `IsdaCdsEngine` agrees within 7e-16 per unit.
 
@@ -177,6 +177,20 @@ Nothing in these examples is traded.
 ### Known limits
 
 Stage D is Implemented, not Validated. All inputs are synthetic. The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them.
+
+## Batch mode
+
+**Plain idea.** Starting a program costs time: a JVM can take far longer to start than to price one swap. Batch mode starts the CLI once and feeds it many cases, one JSON document per line, getting one result line back for each. The fuzz driver and the benchmarks depend on it.
+
+**Formal statement.** `specifications/cli-contract.md`, section "Batch mode", contract 1.6.0. Eight rules, BT1 to BT8. The ones worth knowing first:
+- a line in gives exactly one line out, in the same order, even when the line is empty or not JSON (BT3);
+- the result for a line equals what `run` gives for the same bytes, bit for bit (BT4), so batch is only a faster way to call `run`;
+- no state carries between lines, so reordering the input reorders the output and changes nothing else (BT7);
+- exit 0 at end of input whatever each case returned; exit 70 only for an internal fault (BT8).
+
+**Worked example.** `examples/batch.jsonl` holds four cases. Through the Rust build, the third gives Brent's root of the Wallis cubic, `2.094551481542327`, the same bits as `run` on that line alone, and the fourth gives `E_DATE_ORDER` while the exit code stays 0. The Cookbook's [Batch mode](COOKBOOK.md#batch-mode) recipe shows the full output.
+
+**Where it is checked.** `datasets/batch/streams.json` has 19 stream fixtures. `conformance/runner/batch_check.py` runs them, and also checks batch against `run`, reordering and interactive use (a caller writes one line and waits). On 2026-11-07 each v0.4 build passed 14 of the 19 streams; the five failures are the R1 additions: the over-long-line rule (BT5), `--batch` and `--timings`.
 
 ## Validate and backtest
 

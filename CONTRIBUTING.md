@@ -16,6 +16,7 @@
 - [ ] Normal, boundary, invalid and numerical stress cases tested.
 - [ ] Determinism and reproducibility verified.
 - [ ] Cross-language fixtures updated where applicable.
+- [ ] CLI changes pass `python conformance/runner/batch_check.py --impl <lang>` as well as the golden runner.
 - [ ] Independent expected values or external reference evidence supplied.
 - [ ] Performance impact measured where relevant.
 - [ ] Limitations and unsupported cases documented.
