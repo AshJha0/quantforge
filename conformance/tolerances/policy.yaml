@@ -1,6 +1,7 @@
 # There is no global default: every conformance case must name one of these classes.
 # Comparison for absolute/relative classes: |a - e| <= absolute + relative * max(|a|, |e|).
 # Each class gives its reason, as ADR-0007 asks.
+# Each class in money on a 10m notional (bp of DV01, price ticks): money.md, written by money_table.py.
 classes:
   date_and_convention:
     # Dates, booleans, integers, strings, flags. Nothing to round.
