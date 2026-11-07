@@ -42,6 +42,7 @@ from .. import sensitivities as _sensitivities
 from .. import smile as _smile
 from .. import snapshot as snapshot_module
 from .. import sobol as sobol_module
+from .. import stage_d3 as _stage_d3
 from .. import stats as stats_module
 from .. import steps as _steps
 from .. import store as store_module
@@ -128,7 +129,7 @@ _STAGE_C = SimpleNamespace(
 )
 _STAGE_D = SimpleNamespace(
     **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
-       for m in (_bonds, _credit, _csa, _curve_fits, _equity_d, _futures, _inflation, _overnight, _steps, _xccy)}
+       for m in (_bonds, _credit, _csa, _curve_fits, _equity_d, _futures, _inflation, _overnight, _stage_d3, _steps, _xccy)}
 )
 
 

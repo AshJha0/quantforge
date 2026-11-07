@@ -87,3 +87,12 @@ No golden turns on these, so none blocked work. Each is this build's reading, no
   gives `E_NOT_BRACKETED` outside it.
 - QD15, `eq.trs.pv`: `end <= start` gives `E_DATE_ORDER`, which is not listed.
 - QD16, `infl.*`: `seasonality` is taken as a required key that may be `null` (ruling C9 style).
+
+## Stage D wave 3 (open)
+
+- QD17, `mbs.cashflows`: golden `mbs_d-0011` has `wac` 0 and `net_coupon` 0.06 and expects `E_DOMAIN`, but the
+  listed order puts `net_coupon > wac` (`E_INPUT`) first. The code checks `wac <= 0` before `net_coupon > wac`.
+- QD18, `cmdty.storage.carry`: a forward price `<= 0` gives `E_DOMAIN` (it is not listed, and the log needs it).
+- QD19, `rates.swaption.price`: the vol check runs after the expiry check and before the curve-derived forward check.
+
+QD1 is closed by ruling D27: stage B `ois-0023` now sends `TONA`, and the code needs no change.

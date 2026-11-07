@@ -449,3 +449,67 @@ def _linker_curve(i: Inputs) -> Any:
     args = (_bond(i.object("bond")), i.date("settlement"), i.real("base_ref_cpi"),
             _cpi_curve(i.object("curve")), _curve(i, "discount"))
     return {"nominal_dirty": D.inflation.linker_price_curve(*args)}
+
+
+# Wave 3, D7 to D9: caps and swaptions, commodities, MBS
+
+_MODELS = ("BLACK_76", "BACHELIER")
+
+
+@op("rates.cap.price")
+def _cap(i: Inputs) -> Any:
+    t = i.object("trade")
+    raw = i.raw.get("vol")
+    vol: Any = i.reals("vol") if isinstance(raw, list) else i.real("vol")
+    args = (_curve(i, "discount"), _curve(i, "projection"), i.enum("model", _MODELS), vol,
+            t.enum("type", ("CAP", "FLOOR")), t.integer("start_months"), t.integer("tenor_months"),
+            t.real("strike"), t.real("notional"))
+    caplets, price = D.stage_d3.cap_price(*args)
+    return {"price": price, "caplets": caplets}
+
+
+@op("rates.swaption.price")
+def _swaption(i: Inputs) -> Any:
+    t = i.object("trade")
+    args = (_curve(i, "discount"), _curve(i, "projection"), i.enum("model", _MODELS),
+            i.real("vol"), t.enum("type", ("PAYER", "RECEIVER")), t.integer("expiry_months"),
+            t.integer("tenor_months"), t.real("strike"), t.real("notional"))
+    price, forward, annuity = D.stage_d3.swaption_price(*args)
+    return {"price": price, "forward_rate": forward, "annuity": annuity}
+
+
+@op("cmdty.curve.forward")
+def _cmdty_forward(i: Inputs) -> Any:
+    _present(i, "seasonality")
+    season = i.reals("seasonality") if i.has("seasonality") else None
+    quotes = [(_month_index(q, "month"), q.real("price")) for q in _objects(i, "quotes")]
+    months = [_month_index(Inputs({"m": m}), "m") for m in i.array("months")]
+    return {"forwards": D.stage_d3.commodity_forwards(quotes, season, months)}
+
+
+@op("cmdty.storage.carry")
+def _storage(i: Inputs) -> Any:
+    forwards = [(f.date("date"), f.real("price")) for f in _objects(i, "forwards")]
+    ys, values, flags = D.stage_d3.storage_carry(_curve(i, "funding"), forwards,
+                                                 i.real("storage_cost"))
+    return {"convenience_yields": ys, "carry_values": values, "arbitrage": flags}
+
+
+def _pool(i: Inputs) -> Any:
+    p = i.object("pool")
+    pre = p.object("prepayment")
+    model = pre.enum("model", ("CPR", "PSA"))
+    speed = pre.real("rate" if model == "CPR" else "speed")
+    return (p.real("balance"), p.real("wac"), p.real("net_coupon"), p.integer("wam"),
+            p.integer("age"), model, speed)
+
+
+@op("mbs.cashflows")
+def _mbs_cashflows(i: Inputs) -> Any:
+    return D.stage_d3.mbs_cashflows(_pool(i))
+
+
+@op("mbs.price")
+def _mbs_price(i: Inputs) -> Any:
+    price, duration, wal = D.stage_d3.mbs_price(_pool(i), i.real("yield"), i.integer("delay_days"))
+    return {"price": price, "modified_duration": duration, "wal": wal}
