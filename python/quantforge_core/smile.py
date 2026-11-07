@@ -6,7 +6,7 @@ from bisect import bisect_right
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-import numpy as np
+lazy import numpy as np
 
 from .black import big_n, black76_position, n_inverse
 from .errors import QfError
