@@ -1,6 +1,6 @@
 # CLI contract
 
-Version 1.5.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+Version 1.6.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
 The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
@@ -17,6 +17,7 @@ to start it from `conformance/runner/implementations.json`.
 |---|---|
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
+| `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
 | `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.0.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
@@ -25,6 +26,38 @@ the same result for the same case. No state may carry from one case to the next.
 
 Output on stdout is UTF-8 JSON with no byte order mark. Anything for humans goes to stderr; the
 runner ignores stderr. No command reads the clock, the environment, or any file for its numbers.
+
+## Batch mode (1.6.0, R1)
+
+`quantforge batch` and `quantforge --batch` are the same command. This section is normative for both.
+Fixtures: `datasets/batch/streams.json`, checked by `conformance/runner/batch_check.py`. They are
+not in `datasets/golden/`, because they test the stream, not an operation.
+
+**Framing.**
+
+| # | Rule |
+|---|---|
+| BT1 | Input is a byte stream split on LF (`0x0A`). One line is one case document. A CR (`0x0D`) directly before the LF is removed first, so CRLF input works |
+| BT2 | The last line may end without LF; it is still a case. An empty stream (zero bytes) gives zero results and exit 0 |
+| BT3 | Every line gives exactly one result line, in input order, even a line that is empty, all whitespace, not UTF-8, not JSON, or starts with a byte order mark. Those are `E_PARSE` with `case_id: "unknown"`. No line is skipped |
+| BT4 | A line is parsed with the same checks, in the same order, as `run` gives the same bytes: `E_PARSE`, `E_SCHEMA`, `E_LIMIT`, rule checks. The result for a line equals the `run` result for that line, key for key and bit for bit |
+| BT5 | A line longer than 16,777,216 bytes (after BT1) is `E_LIMIT` with `case_id: "unknown"`, decided on its length without parsing. The stream continues with the next line. A build may read and drop the rest of the line, but holds no more than the limit in memory |
+| BT6 | Output is one result document per line, UTF-8, no byte order mark, no blank lines, each ending in a single LF (never CRLF, also on Windows). Each line is flushed before the next input line is read beyond its end, so a caller that writes one line and waits gets its result without closing stdin |
+| BT7 | No state carries from one line to the next: not caches that change a number, not error state, not the random state. Reordering the lines reorders the results and changes nothing else |
+| BT8 | Exit 0 when stdin ends, whatever the status of each case. Exit 70 only for an internal fault; results already written stay valid. The runner treats a short stream as a crash |
+
+**Timings (optional flag).** `quantforge batch --timings` (and `quantforge --batch --timings`, and
+`quantforge run --timings`) adds one key to each result: `diagnostics.elapsed_ns`, a non-negative
+integer, the monotonic wall time in nanoseconds from the end of reading the line to the end of
+building the result, before writing it. It is present on `error` results too. Nothing else in the
+result changes, and `outputs` must be bit for bit the same as without the flag. Without the flag, a
+build must not write `elapsed_ns`. The runner never compares `diagnostics`; the benchmark harness
+reads `elapsed_ns` to publish per-operation timings. Any other argument, or an argument in another
+position, is exit 64 with empty stdout.
+
+**Throughput target (informative, not checked by conformance).** Start-up is paid once per stream.
+`benchmarks/targets.md` holds the numbers. The R1 acceptance line is Python fuzz at 50,000 inputs a
+minute or more through batch mode.
 
 ## Case document (input)
 
@@ -84,7 +117,7 @@ Extra keys in `outputs` are a failure; missing keys are a failure.
 
 A malformed case is still a result: `run` writes status `error` with `E_PARSE` or `E_SCHEMA` and
 exits 2, using `case_id: "unknown"` if none can be read. In `batch`, one bad line must not stop the
-stream. Any other exit code, or a timeout, is a crash.
+stream (BT3). Any other exit code, or a timeout, is a crash.
 
 ## Error codes
 
