@@ -119,6 +119,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("full_pnl", r.full_pnl.into()),
                 ("par_buckets", r.par_buckets.into()),
                 ("risk_pnl", r.risk_pnl.into()),
+                ("gross_risk_pnl", r.gross_risk_pnl.into()),
                 ("unexplained", r.unexplained.into()),
                 ("threshold", r.threshold.into()),
                 ("explained", r.explained.into()),

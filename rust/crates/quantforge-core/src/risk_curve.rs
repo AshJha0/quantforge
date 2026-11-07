@@ -294,6 +294,7 @@ pub struct PnlExplain {
     pub full_pnl: f64,
     pub par_buckets: Vec<f64>,
     pub risk_pnl: f64,
+    pub gross_risk_pnl: f64,
     pub unexplained: f64,
     pub threshold: f64,
     pub explained: bool,
@@ -328,21 +329,28 @@ pub fn pnl_explain(
     let q = OisCurveProblem::new(convention, as_of, end, interpolation)?;
     let value_end = Priced::new(product, as_of)?.value(&bootstrap(&q, &q.mids)?)?;
     let full_pnl = value_end - r.value;
-    let risk_pnl: f64 = r
+    let terms: Vec<f64> = r
         .par_buckets
         .iter()
         .zip(q.mids.iter().zip(&p.mids))
         .map(|(b, (e, s))| b * (e - s) / BP)
-        .sum();
+        .collect();
+    let risk_pnl: f64 = terms.iter().sum();
+    let gross_risk_pnl: f64 = terms.iter().map(|x| x.abs()).sum();
     let unexplained = full_pnl - risk_pnl;
-    let dv01: f64 = r.par_buckets.iter().sum();
-    let threshold = (0.05 * full_pnl.abs()).max(0.05 * dv01.abs());
+    let notional = match product {
+        Product::Ois(t) => t.notional,
+        Product::Bond { notional, .. } => *notional,
+    };
+    // Ruling R2-A3: the floor scales with the move; the last term is a numerical floor only.
+    let threshold = 0.05 * full_pnl.abs().max(gross_risk_pnl) + 1e-8 * notional.abs();
     Ok(PnlExplain {
         value_start: r.value,
         value_end,
         full_pnl,
         par_buckets: r.par_buckets,
         risk_pnl,
+        gross_risk_pnl,
         unexplained,
         threshold,
         explained: unexplained.abs() <= threshold,
@@ -482,6 +490,12 @@ mod tests {
         let r = pnl_explain(&sofr, as_of, m, &quotes(0.0), &quotes(0.0001), &b, 1.0).unwrap();
         assert!(r.explained && r.full_pnl < 0.0);
         assert!((r.full_pnl - (r.value_end - r.value_start)).abs() < 1e-9);
+        // A parallel move: every term has one sign, so gross equals |risk_pnl|.
+        assert!((r.gross_risk_pnl - r.risk_pnl.abs()).abs() < 1e-9 * r.gross_risk_pnl);
+        let want = 0.05 * r.full_pnl.abs().max(r.gross_risk_pnl) + 1e-8 * 1e6;
+        assert_eq!(r.threshold, want);
+        let still = pnl_explain(&sofr, as_of, m, &quotes(0.0), &quotes(0.0), &b, 1.0).unwrap();
+        assert!(still.explained && still.threshold == 1e-8 * 1e6);
         let mut other = quotes(0.0);
         other[2].tenor = (7, 'Y');
         let e = pnl_explain(&sofr, as_of, m, &quotes(0.0), &other, &b, 1.0).unwrap_err();
