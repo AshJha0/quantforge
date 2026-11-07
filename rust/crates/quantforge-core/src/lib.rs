@@ -21,6 +21,7 @@ pub mod data;
 pub mod dates;
 pub mod daycount;
 pub mod equity;
+pub mod equity_d;
 pub mod error;
 pub mod fx;
 pub mod greeks;

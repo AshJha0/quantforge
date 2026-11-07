@@ -10,9 +10,35 @@ use quantforge_core::credit::{self, CdsTrade, Hazard};
 use quantforge_core::curve::Curve;
 use quantforge_core::curve::CurveInput;
 use quantforge_core::dates::Date;
+use quantforge_core::equity_d::{self, Action, Constituent, Trs};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
 use quantforge_core::xccy::{self, Ndf, XccyTrade};
+
+fn ex_dividends(i: &Inputs) -> Result<Vec<(Date, f64)>> {
+    items(i, "dividends")?
+        .iter()
+        .map(|x| Ok((x.date("ex_date")?, x.f64("amount")?)))
+        .collect()
+}
+
+fn constituents(i: &Inputs, k: &str, with_dividends: bool) -> Result<Vec<Constituent>> {
+    items(i, k)?
+        .iter()
+        .map(|c| {
+            Ok(Constituent {
+                id: c.str("id")?.to_string(),
+                shares: c.f64("shares")?,
+                price: c.f64("price")?,
+                dividends: if with_dividends {
+                    ex_dividends(c)?
+                } else {
+                    Vec::new()
+                },
+            })
+        })
+        .collect()
+}
 
 type HazardInput = (Date, Vec<(Date, f64)>);
 
@@ -390,6 +416,125 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let h = credit::bootstrap(t, &c, &pil, r, &spreads)?;
             let s: Vec<f64> = spreads.iter().map(|x| x.1).collect();
             plain(obj([("spreads", s.into()), ("pillars", survival_json(&h))]))
+        }
+        "eq.dividend.implied" => {
+            let (s, f, b) = (
+                i.f64("spot")?,
+                curve_input(i, "funding")?,
+                i.f64("borrow_rate")?,
+            );
+            let mut fut = Vec::new();
+            for x in items(i, "futures")? {
+                fut.push((x.date("expiry")?, x.f64("price")?));
+            }
+            i.gate()?;
+            let r = equity_d::dividend_implied(s, &Curve::new(&f)?, b, &fut)?;
+            plain(obj([
+                ("pv_dividends", r.pv_dividends.into()),
+                ("period_pv_dividends", r.period_pv_dividends.into()),
+                ("dividend_yields", r.dividend_yields.into()),
+            ]))
+        }
+        "eq.borrow.implied" => {
+            let (s, f, dv) = (i.f64("spot")?, curve_input(i, "funding")?, ex_dividends(i)?);
+            let (e, fw) = (i.date("expiry")?, i.f64("forward")?);
+            i.gate()?;
+            let b = equity_d::borrow_implied(s, &Curve::new(&f)?, &dv, e, fw)?;
+            plain(obj([("borrow_rate", b.into())]))
+        }
+        "eq.futures.basis" => {
+            let (s, f) = (i.f64("spot")?, curve_input(i, "funding")?);
+            let (b, sp, dv) = (
+                i.f64("borrow_rate")?,
+                i.f64("financing_spread")?,
+                ex_dividends(i)?,
+            );
+            let (e, p) = (i.date("expiry")?, i.f64("futures_price")?);
+            i.gate()?;
+            let (fair, basis, implied) =
+                equity_d::futures_basis(s, &Curve::new(&f)?, b, sp, &dv, e, p)?;
+            plain(obj([
+                ("fair_price", fair.into()),
+                ("basis", basis.into()),
+                ("implied_financing_spread", implied.into()),
+            ]))
+        }
+        "eq.index.dividends" => {
+            let d = i.f64("divisor")?;
+            let cs = constituents(i, "constituents", true)?;
+            let mut periods = Vec::new();
+            for p in items(i, "periods")? {
+                periods.push((p.date("start")?, p.date("end")?));
+            }
+            let implied = i.reals("implied_period_points")?;
+            i.gate()?;
+            let r = equity_d::index_dividends(d, &cs, &periods, &implied)?;
+            let ex: Vec<Json> = r.ex_dates.iter().map(|d| d.to_string().into()).collect();
+            plain(obj([
+                ("level", r.level.into()),
+                ("ex_dates", ex.into()),
+                ("points", r.points.into()),
+                ("period_points", r.period_points.into()),
+                ("basis", r.basis.into()),
+            ]))
+        }
+        "eq.index.rebalance" => {
+            let d = i.f64("divisor")?;
+            let (old, new) = (
+                constituents(i, "constituents", false)?,
+                constituents(i, "new_constituents", false)?,
+            );
+            i.gate()?;
+            let (l, nd, w) = equity_d::rebalance(d, &old, &new)?;
+            plain(obj([
+                ("level", l.into()),
+                ("new_divisor", nd.into()),
+                ("weights", w.into()),
+            ]))
+        }
+        "eq.corporate_action.adjust" => {
+            let a = match i.str("action")? {
+                "SPLIT" | "REVERSE_SPLIT" => Action::Split(i.f64("ratio")?),
+                "RIGHTS" => Action::Rights {
+                    m: i.f64("new_per_old")?,
+                    k: i.f64("subscription_price")?,
+                },
+                "SPECIAL_DIVIDEND" => Action::SpecialDividend(i.f64("amount")?),
+                _ => return i.fail("action", "unknown action"),
+            };
+            let (p, n, k) = (i.f64("cum_price")?, i.f64("shares")?, i.f64("strike")?);
+            let (f, ex, ns, ks) = equity_d::corporate_action(a, p, n, k)?;
+            plain(obj([
+                ("factor", f.into()),
+                ("ex_price", ex.into()),
+                ("adjusted_shares", ns.into()),
+                ("adjusted_strike", ks.into()),
+            ]))
+        }
+        "eq.trs.pv" => {
+            let (s, f) = (i.f64("spot")?, curve_input(i, "funding")?);
+            let (b, dv) = (i.f64("borrow_rate")?, ex_dividends(i)?);
+            let t = sub(i, "trade")?;
+            let trade = Trs {
+                start: t.date("start")?,
+                end: t.date("end")?,
+                initial_price: t.f64("initial_price")?,
+                shares: t.f64("shares")?,
+                spread: t.f64("spread")?,
+                receive_equity: match t.str("side")? {
+                    "RECEIVE_EQUITY" => true,
+                    "PAY_EQUITY" => false,
+                    _ => return t.fail("side", "unknown side"),
+                },
+            };
+            let r = nullable_f64(i, "current_rate")?;
+            i.gate()?;
+            let (e, fl, pv) = equity_d::trs_pv(s, &Curve::new(&f)?, b, &dv, &trade, r)?;
+            plain(obj([
+                ("equity_leg", e.into()),
+                ("funding_leg", fl.into()),
+                ("pv", pv.into()),
+            ]))
         }
         _ => fail(
             "E_UNSUPPORTED_OPERATION",
