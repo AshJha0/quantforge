@@ -35,6 +35,7 @@ pub mod rng;
 pub mod root;
 pub mod schedule;
 pub mod sha256;
+pub mod smile;
 pub mod snapshot;
 pub mod sobol;
 pub mod stats;

@@ -7,6 +7,7 @@ use quantforge_core::dates::Date;
 use quantforge_core::equity::{self, Outright, ParityQuote};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::smile;
 use quantforge_core::black;
 use quantforge_core::greeks;
 use quantforge_core::ois::Valuation;
@@ -186,6 +187,17 @@ fn equity_price(i: &Inputs) -> Result<Outcome> {
     ]))
 }
 
+/// `convention` and `scale`, the latter a key that must be present.
+fn delta_scale(i: &Inputs) -> Result<(bool, Option<f64>)> {
+    present(i, "scale")?;
+    let spot = match i.str("convention")? {
+        "FORWARD" => false,
+        "SPOT" => true,
+        _ => return i.fail("convention", "unknown convention"),
+    };
+    Ok((spot, i.opt_f64("scale")?))
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
         "eq.forward.outright" => {
@@ -261,6 +273,40 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("vega", vega.into()),
                 ("volga", volga.into()),
                 ("vanna", vanna.into()),
+            ]))
+        }
+        "vol.delta.to_strike" | "vol.delta.from_strike" => {
+            let (f, v, t) = (i.f64("forward")?, i.f64("vol")?, i.f64("expiry_years")?);
+            let call = option_type(i)?;
+            let (spot, scale) = delta_scale(i)?;
+            if op == "vol.delta.to_strike" {
+                let d = i.f64("delta")?;
+                let s = smile::delta_scale(spot, scale)?;
+                plain(obj([("strike", smile::to_strike(f, v, t, call, d, s)?.into())]))
+            } else {
+                let k = i.f64("strike")?;
+                let s = smile::delta_scale(spot, scale)?;
+                plain(obj([("delta", smile::from_strike(f, v, t, call, k, s)?.into())]))
+            }
+        }
+        "vol.smile.rr_bf" => {
+            let (f, t) = (i.f64("forward")?, i.f64("expiry_years")?);
+            let (atm, rr, bf) = (i.f64("atm_vol")?, i.f64("rr")?, i.f64("bf")?);
+            let neutral = match i.str("atm_convention")? {
+                "ATM_FORWARD" => false,
+                "DELTA_NEUTRAL" => true,
+                _ => return i.fail("atm_convention", "unknown convention"),
+            };
+            let d = i.f64("delta")?;
+            let (spot, scale) = delta_scale(i)?;
+            let s = smile::delta_scale(spot, scale)?;
+            let r = smile::rr_bf(f, t, atm, neutral, rr, bf, d, s)?;
+            plain(obj([
+                ("atm_strike", r.atm_strike.into()),
+                ("call_vol", r.call_vol.into()),
+                ("put_vol", r.put_vol.into()),
+                ("call_strike", r.call_strike.into()),
+                ("put_strike", r.put_strike.into()),
             ]))
         }
         // next arm
