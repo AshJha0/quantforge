@@ -147,7 +147,8 @@ fn judge(case: &Json) -> Vec<String> {
                 num(chk.get("z")).unwrap() * num(outs.get(se_key)).unwrap_or(f64::NAN)
             }
         };
-        if !((a - e).abs() <= lim) {
+        let within = (a - e).abs() <= lim; // false for a NaN limit
+        if !within {
             msgs.push(format!("extra check {name}: {a} vs {e}, limit {lim}"));
         }
     }

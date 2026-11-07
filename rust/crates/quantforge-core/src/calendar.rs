@@ -9,6 +9,9 @@ pub enum CalendarId {
     Gblo,
     Euta,
     Usgs,
+    /// `USGS` with every Good Friday closed: the SOFR fixing calendar (ruling R1-6). Not a
+    /// calendar id on the wire.
+    UsgsSofr,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -162,12 +165,14 @@ fn euta(y: i32) -> Vec<Date> {
     h
 }
 
-fn usgs(y: i32) -> Vec<Date> {
+/// Years when SIFMA recommended an early close on Good Friday, a business day (ruling R1-6).
+const GOOD_FRIDAY_EARLY_CLOSE: [i32; 7] = [2007, 2010, 2012, 2015, 2021, 2023, 2026];
+
+fn usgs(y: i32, every_good_friday: bool) -> Vec<Date> {
     let mut h = vec![
         sunday_to_monday(Date::new(y, 1, 1)),
         nth_weekday(y, 1, 0, 3),
         nth_weekday(y, 2, 0, 3),
-        easter_sunday(y).add_days(-2),
         last_weekday(y, 5, 0),
         nearest_weekday(Date::new(y, 7, 4)),
         nth_weekday(y, 9, 0, 1),
@@ -176,6 +181,9 @@ fn usgs(y: i32) -> Vec<Date> {
         nth_weekday(y, 11, 3, 4),
         nearest_weekday(Date::new(y, 12, 25)),
     ];
+    if every_good_friday || !GOOD_FRIDAY_EARLY_CLOSE.contains(&y) {
+        h.push(easter_sunday(y).add_days(-2));
+    }
     if y >= 2022 {
         h.push(nearest_weekday(Date::new(y, 6, 19)));
     }
@@ -223,7 +231,8 @@ impl Calendar {
         let mut h = match self.id {
             CalendarId::Gblo => gblo(y),
             CalendarId::Euta => euta(y),
-            CalendarId::Usgs => usgs(y),
+            CalendarId::Usgs => usgs(y, false),
+            CalendarId::UsgsSofr => usgs(y, true),
         };
         h.retain(|d| !d.is_weekend());
         h.sort();
@@ -343,5 +352,27 @@ impl Calendar {
         };
         check_year(result.y)?;
         Ok(result)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn good_friday_early_closes() {
+        let (usgs, sofr) = (
+            Calendar::new(CalendarId::Usgs),
+            Calendar::new(CalendarId::UsgsSofr),
+        );
+        for y in GOOD_FRIDAY_EARLY_CLOSE {
+            let gf = easter_sunday(y).add_days(-2);
+            assert!(usgs.is_business_day(gf).unwrap(), "{gf}");
+            assert!(!sofr.is_business_day(gf).unwrap(), "{gf}");
+        }
+        let full_close = easter_sunday(2024).add_days(-2);
+        assert!(!usgs.is_business_day(full_close).unwrap());
+        assert!(!sofr.is_business_day(full_close).unwrap());
+        assert!(Calendar::parse("USGS_SOFR").is_none());
     }
 }
