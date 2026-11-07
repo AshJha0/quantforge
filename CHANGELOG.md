@@ -10,7 +10,7 @@ Work in progress on branch `r1`. Nothing here changes a golden value.
 - Batch mode sections in `COOKBOOK.md` and `LEARN.md`, and an R1 section in `ROADMAP.md`.
 
 ### Known issues
-- The calendar expiry test is red in the weekly job until SIFMA's December holiday release.
+- The calendar provenance check fails until SIFMA publishes its 2027 US holiday schedule (usually in December); the USGS calendar is confirmed only through 2027-01-01.
 
 ### Changed
 - Docs and gallery text follow rulings R1-1 to R1-5 (`specifications/r1-rulings.md`): cross-currency is a synthetic constant-notional basis swap; the ESTR payment lag of 2 is a Strata library choice; bond-future conversion factors take a `contract` input with CME rounding; credit operations need `LOG_LINEAR_DF` discount curves; cap and swaption conventions are stylised.

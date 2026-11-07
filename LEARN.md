@@ -37,6 +37,8 @@ Specs are in `specifications/01-core/`. Exercises are in `program/exercises/`.
 
 **Calendar.** Plain idea: one-off holidays are data, not rules. `core.calendar.is_business_day` gives `false` for `GBLO` on 2022-09-19, which `calendars.md` lists as a one-off.
 
+**Good Friday in the US bond calendar.** Plain idea: a market can stay open on a day that looks like a holiday. In `USGS`, Good Friday is a holiday, except in the seven years when SIFMA recommended an early close instead: 2007, 2010, 2012, 2015, 2021, 2023 and 2026, when it is a business day (ruling R1-6). SOFR is never published on Good Friday, even in those years, so SOFR compounding skips the day. For 2015 SIFMA's own records conflict; the archive page was followed. Sources and dates for each calendar are in `datasets/calendar_provenance.json`.
+
 **Snapshot hash.** Plain idea: to prove two languages read the same input, hash one agreed spelling of it. Formal statement: `sha256` of the canonical form in `snapshot-hash.md`. `{"b":1,"a":[true,null,"x"]}` has keys sorted and its number written as binary64 hex, giving `{"a":[true,null,"x"],"b":#3ff0000000000000}` and `sha256:f44e5e9e9da8644c95ac377821cec005c5a1118e581a0d8cfb217ae01d212aed`. This is the stage A demo: the same hash in all four.
 
 **Option price.** Plain idea: a method can be checked against a formula. For spot and strike 100, `r` 0.05, `q` 0.02, `sigma` 0.2 and `t` 1, the Black-Scholes value is 9.227006 (`oracle/REPORT.md`). `core.cos.european` with 256 terms gives 9.227005508154036, against a golden value of 9.227005508154049, inside class `fourier`. This is an analytic test on constructed inputs, not a market price.
