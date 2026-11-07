@@ -79,6 +79,7 @@ def vol_d():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     vol_d()
     note(f"stage D D7: {len(D.MUTANTS)} wrong-convention checks, each caught")

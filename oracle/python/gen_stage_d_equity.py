@@ -167,6 +167,7 @@ def trs_d():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     equity_d()
     index_d()
