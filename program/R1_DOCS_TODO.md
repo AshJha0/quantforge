@@ -17,5 +17,5 @@ Docs owed when the other R1 lanes land. The docs pass on `r1-docs` (2026-11-07) 
 
 Also at the end:
 - Date the CHANGELOG 0.4.1 section and update the site note's "Version 0.4.0" in `tools/site_home.html`.
-- `git grep -in interview` must return nothing.
+- Run the banned-word grep from the owner standard; it must return nothing.
 - Rerun the relative-link check over the top-level docs, `docs/` and `program/`.
