@@ -1,3 +1,8 @@
         {"eq.forward.flat", op_eq_flat},
         {"eq.forward.outright", op_eq_outright},
         {"eq.forward.parity", op_eq_parity},
+        {"vol.option.price", op_option_price},
+        {"vol.option.implied", op_option_implied},
+        {"risk.vol.greeks", op_vol_greeks},
+        {"risk.vol.bump_greeks", op_vol_bump_greeks},
+        {"vol.equity.price", op_equity_price},

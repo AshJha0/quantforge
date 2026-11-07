@@ -26,6 +26,7 @@ add_library(quantforge_core
   src/core/cos.cpp
   src/core/data_checks.cpp
   src/core/dates.cpp
+  src/core/black.cpp
   src/core/equity.cpp
   src/core/daycount.cpp
   src/core/fx.cpp
