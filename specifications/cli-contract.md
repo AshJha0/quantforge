@@ -50,7 +50,8 @@ not in `datasets/golden/`, because they test the stream, not an operation.
 `quantforge run --timings`) adds one key to each result: `diagnostics.elapsed_ns`, a non-negative
 integer, the monotonic wall time in nanoseconds from the end of reading the line to the end of
 building the result, before writing it. It is present on `error` results too. Nothing else in the
-result changes, and `outputs` must be bit for bit the same as without the flag. Without the flag, a
+result changes, and `outputs` must be bit for bit the same as without the flag. An empty
+`diagnostics` object and an absent one mean the same. Without the flag, a
 build must not write `elapsed_ns`. The runner never compares `diagnostics`; the benchmark harness
 reads `elapsed_ns` to publish per-operation timings. Any other argument, or an argument in another
 position, is exit 64 with empty stdout.

@@ -48,6 +48,7 @@ One-off: 2001-12-31.
 - One-offs: 2004-06-11, 2012-10-30, 2018-12-05.
 
 Future one-offs cannot be known. A new one changes this spec's version, and so the golden files.
+Sources, check dates and the expiry test: `calendar-provenance.md`.
 
 ## Business-day conventions
 
