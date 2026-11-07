@@ -150,3 +150,70 @@ python tools/build_gallery.py --check
 ```
 
 This reruns the Python CLI against the committed [gallery](docs/curves/README.md). Real last line, 2026-11-06: `4 curves checked against the Python CLI; 0 differences`. Without `--check` it needs all four CLIs: see the [guide](docs/developer-guides/curves-gallery.md).
+
+## Stage C recipes
+
+Equity vol slice, at Implemented, not Validated. All inputs are synthetic, and nothing is traded. Outputs below are real, from the Rust build on 2026-11-07. There are no stage C files in `examples/` yet, so these use golden-case inputs.
+
+### Run the stage C suites
+
+```bash
+python conformance/runner/runner.py --impl rust --suite sabr_deep
+```
+
+Real last line, 2026-11-07:
+
+```
+TOTAL {'cases': 13, 'pass': 13, 'fail': 0, 'not_implemented': 0}
+```
+
+The 11 suites are `equity_forward`, `equity_forward_deep`, `black`, `black_deep`, `greeks`, `smile`, `surface`, `sabr`, `sabr_deep`, `strata_vol` and `usecases_c`: 446 cases.
+
+### Equity forward, and the wrong form
+
+```bash
+echo '{"schema_version":"1.0","case_id":"f","operation":"eq.forward.flat",
+ "inputs":{"spot":100,"rate":0.04,"borrow":0.05,"expiry_years":1,
+ "dividends":[{"time_years":0.5,"amount":2}]}}' | tr -d '\n' |
+ rust/target/release/quantforge run
+```
+
+Output: `"forward":97.01495841653144`. The wrong form, `(S - PV_r(D)) e^{(r-b)T}`, would give 97.0640923.
+
+### Price, then solve the vol back
+
+```bash
+echo '{"schema_version":"1.0","case_id":"b","operation":"vol.option.price",
+ "inputs":{"model":"BLACK_76","option_type":"CALL","strike":100,
+ "expiry_years":1,"forward":100,"discount_factor":0.9704455335485082,
+ "vol":0.2}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Output: `"price":7.730149359277918`. Send the same inputs to `vol.option.implied` with `"price":7.730149359277918` in place of `vol`, and it returns `"vol":0.20000000000000007`. Set `model` to `BACHELIER` and `vol` to 20 for 7.743035083184538.
+
+### Greeks
+
+```bash
+echo '{"schema_version":"1.0","case_id":"g","operation":"risk.vol.greeks",
+ "inputs":{"model":"BLACK_SCHOLES","option_type":"CALL","strike":100,
+ "expiry_years":1,"spot":100,"rate":0.03,"yield":0.01,"vol":0.2}}' |
+ tr -d '\n' | rust/target/release/quantforge run
+```
+
+Output: delta 0.5734959790277754, gamma 0.01935758770796135, vega 38.715175415922694, theta -4.753689862887256, rho 48.5222766774254.
+
+### See Hagan SABR go negative
+
+```bash
+echo '{"schema_version":"1.0","case_id":"s","operation":"vol.sabr.density",
+ "inputs":{"forward":0.02,"strikes":[0.0005,0.002,0.008,0.02,0.05],
+ "expiry_years":20,"alpha":0.03,"beta":0.5,"rho":-0.3,"nu":0.5,
+ "h_strike":0.0002,"on_negative":"REPORT"}}' | tr -d '\n' |
+ rust/target/release/quantforge run
+```
+
+On the nine strikes of case `sabr-0013` the density at 0.0005 is -174.57449723243258, and `negative_density` is true. Change `on_negative` to `REJECT` to get `E_ARBITRAGE`. Use `vol.sabr.arbfree` for prices with a density that cannot go negative: see `specifications/05-volatility/sabr.md` for its grid inputs.
+
+### Any stage C case by hand
+
+The inputs of every case are in `datasets/golden/stage_c/*.json`. Wrap a case's `operation` and `inputs` in `{"schema_version":"1.0","case_id":"x",...}` and pipe it to the CLI. That is how the [Learn](LEARN.md#stage-c-equity-vol-slice) worked examples were made, including use case 3 (`usecases_c-0001`).
