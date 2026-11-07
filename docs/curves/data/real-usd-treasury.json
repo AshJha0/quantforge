@@ -1,6 +1,6 @@
 {
  "meta": {
-  "commit": "af081b9",
+  "commit": "3cf8739",
   "date": "2026-11-07",
   "reference_language": "python",
   "tolerance": {
@@ -17,15 +17,15 @@
   "cli": {
    "java": {
     "language": "java",
-    "implementation_version": "0.2.0",
+    "implementation_version": "0.4.0",
     "contract_version": "1.0.0",
     "toolchain": "JDK 25.0.5+8-LTS"
    },
    "cpp": {
     "language": "cpp",
-    "implementation_version": "0.2.0",
+    "implementation_version": "0.4.1",
     "contract_version": "1.0.0",
-    "toolchain": "GCC 16.2.0"
+    "toolchain": "GCC 15.2.0"
    },
    "python": {
     "language": "python",
@@ -35,7 +35,7 @@
    },
    "rust": {
     "language": "rust",
-    "implementation_version": "0.2.0",
+    "implementation_version": "0.4.1",
     "contract_version": "1.0.0",
     "toolchain": "rustc 1.99.1"
    }
@@ -222,5 +222,5 @@
    }
   ]
  },
- "agreement": 1.071365218763276e-14
+ "agreement": 1.0436096431476471e-14
 }

@@ -1,5 +1,5 @@
 name: Daily workflows
-# Plan 11.2.7 (a) and (c): real-data acceptance runs, one dated report each, pushed to branch forward-log under
+# Plan 11.2.7 (a), (b) and (c), and the R2 P&L explain job: real-data acceptance runs, one dated report each, pushed to branch forward-log under
 # reports/<date>/. Not on pull requests. Uses the Rust CLI because it is the fastest to run (benchmarks/README.md);
 # a failed fail-level check fails the job, after the report is pushed.
 on:
@@ -61,6 +61,14 @@ jobs:
         id: sofr
         continue-on-error: true
         run: python3 tools/workflows/sofr_check.py --impl "$IMPL" --out out/reports
+      - name: (b) Rich/cheap screen (scaffold until the R2 spec and a price source land)
+        id: richcheap
+        continue-on-error: true
+        run: python3 tools/workflows/rich_cheap.py --impl "$IMPL" --out out/reports
+      - name: P&L explain and calibration stability (R2)
+        id: pnl
+        continue-on-error: true
+        run: python3 tools/workflows/pnl_explain.py --impl "$IMPL" --days 20 --trades 20 --out out/reports
       - name: Push reports to forward-log
         env:
           GH_TOKEN: ${{ github.token }}
@@ -86,7 +94,7 @@ jobs:
           name: daily-reports
           path: out/reports/
       - name: Fail on a failed check
-        if: steps.eod.outcome == 'failure' || steps.sofr.outcome == 'failure'
+        if: steps.eod.outcome == 'failure' || steps.sofr.outcome == 'failure' || steps.richcheap.outcome == 'failure' || steps.pnl.outcome == 'failure'
         run: |
           echo "::error::a fail-level check failed; see the reports on branch forward-log"
           exit 1

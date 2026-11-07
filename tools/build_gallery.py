@@ -20,6 +20,7 @@ import hashlib
 import html
 import json
 import math
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -29,6 +30,7 @@ sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 from runner import resolve_command  # noqa: E402
 sys.path.insert(0, str(ROOT / "tools"))
 import gallery_real  # noqa: E402
+import gallery_pnl  # noqa: E402
 
 OUT = ROOT / "docs" / "curves"
 DATA = OUT / "data"
@@ -42,7 +44,9 @@ SYNTHETIC = "Synthetic inputs, not market data."
 # ---- running the CLIs ---------------------------------------------------------------------------
 
 def call(lang, verb, text=""):
-    impls = json.loads((ROOT / "conformance/runner/implementations.json").read_text(encoding="utf-8"))
+    # QF_IMPLEMENTATIONS overrides the file, e.g. for CLIs built in WSL (docs/developer-guides/r1-infra.md).
+    config = Path(os.environ.get("QF_IMPLEMENTATIONS", ROOT / "conformance/runner/implementations.json"))
+    impls = json.loads(config.read_text(encoding="utf-8"))
     base, cwd = resolve_command(impls[lang])
     p = subprocess.run(base + [verb], cwd=cwd, input=text.encode("utf-8"), capture_output=True, timeout=300)
     if p.returncode != 0:
@@ -656,8 +660,11 @@ def index_page(all_data):
     real = ""
     if gallery_real.SLUG in all_data:
         real = ("\n## Real data\n\n"
-                f"[US Treasury curve with sanity bands]({gallery_real.SLUG}.md): the one page built from real public data, "
+                f"[US Treasury curve with sanity bands]({gallery_real.SLUG}.md): a page built from real public data, "
                 f"snapshot of {all_data[gallery_real.SLUG]['inputs']['as_of']}. The same bands run daily in workflow (a).\n")
+        if gallery_pnl.SLUG in all_data:
+            real += (f"\n[P&L explain and calibration stability]({gallery_pnl.SLUG}.md): full revaluation against key-rate explain "
+                     "over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/pnl_explain.py`.\n")
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
@@ -692,6 +699,10 @@ def render_all(all_data):
         d = all_data[gallery_real.SLUG]
         versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
         pages[f"{gallery_real.SLUG}.md"] = gallery_real.page(d, chart, table, versions)
+    if gallery_pnl.SLUG in all_data:
+        d = all_data[gallery_pnl.SLUG]
+        versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
+        pages[f"{gallery_pnl.SLUG}.md"] = gallery_pnl.page(d, chart, table, versions)
     return pages
 
 
@@ -1033,6 +1044,15 @@ def generate_real(meta, refresh):
     return d
 
 
+def generate_pnl(meta, refresh):
+    path = DATA / f"{gallery_pnl.SLUG}.json"
+    inputs = gallery_pnl.fetch_inputs() if refresh or not path.is_file() else json.loads(path.read_text(encoding="utf-8"))["inputs"]
+    results = {lang: gallery_pnl.run(lang, inputs) for lang in LANGS}
+    d = {"meta": meta, "inputs": inputs, "reference": results["python"], "agreement": gallery_pnl.agreement(results)}
+    path.write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    return d
+
+
 def committed_slugs():
     return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()]
 
@@ -1041,9 +1061,9 @@ def refresh_evidence():
     """Recounts golden evidence for every page from datasets/golden and re-renders. No CLI runs and no change to run data,
     so it is the fix when only goldens were added: the run data stays as committed, and --check still compares it."""
     all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
-    real = DATA / f"{gallery_real.SLUG}.json"
-    if real.is_file():
-        all_data[gallery_real.SLUG] = json.loads(real.read_text(encoding="utf-8"))
+    for extra in (gallery_real.SLUG, gallery_pnl.SLUG):
+        if (DATA / f"{extra}.json").is_file():
+            all_data[extra] = json.loads((DATA / f"{extra}.json").read_text(encoding="utf-8"))
     changed = []
     for slug, d in all_data.items():
         if slug in CURVES:
@@ -1073,7 +1093,8 @@ def generate(refresh_real=False, real_only=False):
     if real_only:  # keep every synthetic page's committed data; rebuild only the real-data page and the index
         all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
         all_data[gallery_real.SLUG] = generate_real({**meta, "data": "real"}, refresh_real)
-        for name in ("README.md", f"{gallery_real.SLUG}.md"):
+        all_data[gallery_pnl.SLUG] = generate_pnl({**meta, "data": "real"}, refresh_real)
+        for name in ("README.md", f"{gallery_real.SLUG}.md", f"{gallery_pnl.SLUG}.md"):
             (OUT / name).write_text(render_all(all_data)[name], encoding="utf-8", newline="\n")
         print(f"real-data page written to {OUT}")
         return 0
@@ -1165,6 +1186,11 @@ def check():
     d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
     all_data[gallery_real.SLUG] = d
     compare(d["reference"], gallery_real.run("python", d["inputs"], batch), gallery_real.SLUG, bad)
+    d = json.loads((DATA / f"{gallery_pnl.SLUG}.json").read_text(encoding="utf-8"))
+    all_data[gallery_pnl.SLUG] = d
+    now = gallery_pnl.run("python", d["inputs"])  # P&L in USD at the risk tolerance; calibration at the curve tolerance
+    compare(d["reference"]["explain"], now["explain"], gallery_pnl.SLUG + "/risk/explain", bad)
+    compare(d["reference"]["calibration"], now["calibration"], gallery_pnl.SLUG + "/calibration", bad)
     for name, text in render_all(all_data).items():
         path = OUT / name
         if not path.is_file() or path.read_text(encoding="utf-8") != text:
