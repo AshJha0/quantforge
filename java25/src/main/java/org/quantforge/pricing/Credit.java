@@ -126,7 +126,7 @@ public final class Credit {
 
     private static List<Period> periods(LocalDate t, LocalDate maturity) {
         if (!maturity.isAfter(t)) {
-            throw new QfError("E_DATE_ORDER", "maturity is not after the trade date", "maturity");
+            throw new QfError("E_INPUT", "maturity is not after the trade date (ruling D52)", "maturity");
         }
         LocalDate d = LocalDate.of(t.getYear(), 12, 20);
         while (d.isAfter(t)) {

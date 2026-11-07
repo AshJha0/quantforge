@@ -66,4 +66,12 @@ class RulingsDTest {
     void d39XccyStartBeforeAsOf() {
         code("E_OUT_OF_RANGE", () -> Xccy.pv(D, D, D, 1.1, LocalDate.of(2026, 11, 4), 12, 1, 0, true));
     }
+
+    @Test
+    void d52CdsMaturityNotAfterTradeDate() {
+        Credit.Hazard h = new Credit.Hazard(AS_OF, new LocalDate[] {LocalDate.of(2030, 1, 1)}, new double[] {0.9});
+        code("E_INPUT", () -> Credit.price(AS_OF, D, h, 0.4, AS_OF, 0.01, 1, true, false));
+        code("E_INPUT", () -> new Credit.Hazard(AS_OF, new LocalDate[] {AS_OF}, new double[] {0.9}));
+        code("E_DOMAIN", () -> new Credit.Hazard(AS_OF, new LocalDate[] {LocalDate.of(2030, 1, 1)}, new double[] {1.1}));
+    }
 }

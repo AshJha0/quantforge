@@ -140,3 +140,18 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | new | D34, D35, D39, D40 | `1 + y/12 <= 0` `E_DOMAIN` (already so); conversion factor with maturity before delivery month now `E_DATE_ORDER`; `fx.xccy.pv` start before `as_of` now `E_OUT_OF_RANGE`; `tenor_months` 1 to 1200 (already so) |
 
 Still open: D-5 (huge lookback gives `E_DATE_RANGE`), D-9, D-10, D-11, D-13, D-19 (inflation_d-0009 limit at rounding noise), D-23, D-24. All pass conformance; none is pinned by a ruling.
+
+### Closed by rulings D47 to D63 (stage-d b566056)
+
+| # | Ruling | Outcome |
+|---|---|---|
+| D-5 | D50 | Confirmed: `E_DATE_RANGE` |
+| D-9, D-11 | D62 | Confirmed: block solve for `GLOBAL`; asset-swap dates by plain month steps |
+| D-10 | D47 | Confirmed: any overnight record, ESTR included |
+| D-13 | D61 | Confirmed: `delivery <= settlement` `E_DATE_ORDER`, past maturity `E_INPUT`, empty `E_INPUT` |
+| D-19 | D60 | Closed: ZCIS limit widened to 1e-9 per unit notional plus 1e-9 relative |
+| D-23 | D56 | Confirmed: other models `E_SCHEMA` |
+| D-24 | D58 | Confirmed: `E_DOMAIN` |
+| new | D52 | Changed: CDS trade maturity on or before `trade_date` is now `E_INPUT` (was `E_DATE_ORDER`) |
+
+No stage D question is open.
