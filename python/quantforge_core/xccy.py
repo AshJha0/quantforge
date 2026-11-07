@@ -30,7 +30,7 @@ def schedule(conventions: Sequence[str], start: date, months: int) -> list[date]
     cals = [REGISTRY[c]["calendar"] for c in conventions]
     if not _joint(cals, start):
         raise QfError("E_INPUT", "start must be a business day on both calendars", "start")
-    if months <= 0 or months % 3:
+    if not 0 < months <= 1200 or months % 3:
         raise QfError("E_INPUT", "months must be a positive multiple of 3", "months")
     return [_mod_following(cals, schedules.add_months(start, 3 * k))
             for k in range(1, months // 3 + 1)]

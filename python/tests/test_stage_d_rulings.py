@@ -111,3 +111,29 @@ def test_d45_convention_kinds():
             "jumps": []}
     assert _code("rates.ois.fit_steps", {**base, "convention": "USD-TERM-3M"}) == "E_INPUT"
     assert _code("rates.ois.fit_steps", {**base, "convention": "TONA"}) == "E_SCHEMA"
+
+
+# Second pass, D47 to D63
+
+def test_d52_hazard_and_maturity():
+    assert _code_of(credit.check_hazard, AS_OF, [date(2027, 1, 1)], [1.01]) == "E_DOMAIN"
+    hz = credit.check_hazard(AS_OF, [date(2031, 12, 20)], [0.9])
+    assert _code_of(credit.price, AS_OF, _flat(), hz, 0.4, AS_OF, 0.01, 1.0, "BUY_PROTECTION",
+                    "STANDARD") == "E_INPUT"
+    assert _code_of(credit.index_intrinsic, AS_OF, _flat(), [(hz, 0.4, 1.0)], AS_OF, 0.01,
+                    0.0) == "E_INPUT"
+
+
+def test_d54_years_limit():
+    from quantforge_core.inflation import CpiCurveData
+    data = CpiCurveData(inflation.index(2026, 8), 300.0, ((101, 0.02),), None)
+    assert _code_of(inflation.cpi, data, [data.base]) == "E_INPUT"
+
+
+def test_d59_xccy_months_limit():
+    assert _code_of(xccy.schedule, ("SOFR", "ESTR"), date(2026, 11, 10), 1203) == "E_INPUT"
+
+
+def test_d55_bachelier_negative_strike():
+    caplets, _ = stage_d3.cap_price(_flat(), _flat(), "BACHELIER", 0.01, "CAP", 3, 12, -0.01, 1.0)
+    assert all(c > 0 for c in caplets)

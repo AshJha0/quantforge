@@ -96,7 +96,7 @@ def check_hazard(as_of: date, dates: Sequence[date], survival: Sequence[float]) 
         if d <= previous:
             raise QfError("E_INPUT", "hazard pillars must be increasing and after as_of", "hazard")
         previous = d
-    if any(not q > 0 for q in survival):
+    if any(not 0 < q <= 1 for q in survival):
         raise QfError("E_DOMAIN", "survival must be positive", "hazard")
     return Hazard(as_of, dates, survival)
 
@@ -161,6 +161,11 @@ def _check_as_of(trade_date: date, *as_ofs: date) -> None:
         raise QfError("E_INPUT", "curve as_of must equal trade_date (ruling D36)", "discount")
 
 
+def _check_maturity(trade_date: date, mat: date) -> None:
+    if mat <= trade_date:
+        raise QfError("E_INPUT", "maturity is not after trade_date", "maturity")
+
+
 def _check_recovery(r: float) -> None:
     if not 0 <= r < 1:
         raise QfError("E_DOMAIN", "recovery must be in [0, 1)", "recovery")
@@ -195,6 +200,7 @@ def price(
     model = Model(trade_date, curves.build(discount), hazard)
     _check_as_of(trade_date, discount.as_of, hazard.as_of)
     _check_recovery(recovery)
+    _check_maturity(trade_date, mat)
     r = _price(model, mat, coupon, 1.0 if payout == "DIGITAL" else 1 - recovery)
     sign = 1 if side == "BUY_PROTECTION" else -1
     pv = sign * notional * (r.protection_leg - coupon * r.rpv01 + r.accrued * r.pcs)
@@ -244,6 +250,7 @@ def index_intrinsic(
     if not names:
         raise QfError("E_INPUT", "no names", "names")
     _check_as_of(trade_date, discount.as_of, *(h.as_of for h, _, _ in names))
+    _check_maturity(trade_date, mat)
     if any(w < 0 for _, _, w in names):
         raise QfError("E_DOMAIN", "weights must not be negative", "names")
     ups = []

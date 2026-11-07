@@ -28,7 +28,7 @@ class CpiCurveData:
 class CpiCurve:
     def __init__(self, data: CpiCurveData):
         years = [y for y, _ in data.quotes]
-        if not years or any(y <= 0 or y != int(y) for y in years) or any(
+        if not years or any(y <= 0 or y > 100 or y != int(y) for y in years) or any(
                 b <= a for a, b in itertools.pairwise(years)):
             raise QfError("E_INPUT", "years must be strictly increasing positive integers",
                           "quotes")

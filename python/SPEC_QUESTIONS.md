@@ -109,3 +109,12 @@ QD1 is closed by ruling D27: stage B `ois-0023` now sends `TONA`, and the code n
   D45 (a listed convention of the wrong kind is `E_INPUT` in the stage D operations).
 
 Still open: QD4, QD5, QD6, QD7, QD9, QD13 (in part), QD16, QD18, QD19.
+
+## Closed by rulings D47 to D63
+
+- QD4 by D48. QD5 by D62. QD6 by D49. QD7 by D51. QD9 by D62 (plain month steps). QD13 by D52 and D62
+  (survival must be in `(0, 1]`; a trade maturity on or before `trade_date` is `E_INPUT`). QD16 by D54. QD18 by
+  D58. QD19 by D57.
+- Also applied: D54 `years` at most 100, and D59 `months` at most 1200 in `fx.xccy.*`. Both are now `E_INPUT`.
+
+No stage D question is open.
