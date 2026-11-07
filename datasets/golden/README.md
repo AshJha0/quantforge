@@ -8,4 +8,4 @@ Each file in `core/`, `stage_b/` and `stage_c/` holds `suite`, `spec`, `spec_ver
 
 Stage A has 22 suites and 4,394 cases. Stage B has 18 suites and 343 cases, so 40 suites and 4,737 cases in all. Which stage B suites have an outside oracle is in `specifications/stage-b-rulings.md`.
 
-Stage C adds 11 suites and 428 cases, in `stage_c/`. Sources per suite are in `specifications/stage-c-rulings.md`.
+Stage C adds 11 suites and 446 cases, in `stage_c/`. Sources per suite are in `specifications/stage-c-rulings.md`.

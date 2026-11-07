@@ -474,6 +474,82 @@
     "invalid",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "sabr_deep-0012",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 100,
+    "cells_below": 25,
+    "steps": 50,
+    "strikes": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr_deep-0013",
+   "operation": "vol.sabr.arbfree",
+   "inputs": {
+    "forward": 1.0,
+    "expiry_years": 1.0,
+    "alpha": 0.3,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.5,
+    "shift": 0.0,
+    "cells": 100,
+    "cells_below": 25,
+    "steps": 50,
+    "strikes": [
+     1e-20,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "call_prices": [
+      1.0000000000000009,
+      0.1199666077089992
+     ],
+     "vols": [
+      null,
+      0.3018537698912655
+     ],
+     "mass": 1.0000000000000007,
+     "mean": 1.0000000000000009,
+     "absorbed": 0.0016164658349306204,
+     "min_density": 2.8669657257164814e-07
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "mass-and-mean"
+   ],
+   "tags": [
+    "ruling",
+    "boundary",
+    "synthetic"
+   ]
   }
  ]
 }

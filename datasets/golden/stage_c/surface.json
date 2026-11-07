@@ -1902,6 +1902,136 @@
     "invalid",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "surface-0013",
+   "operation": "risk.vol.surface_vega",
+   "inputs": {
+    "surface": {
+     "expiry_years": [
+      0.2,
+      0.4,
+      1.0,
+      2.0
+     ],
+     "log_moneyness": [
+      -0.4,
+      -0.2,
+      0.0,
+      0.2,
+      0.4
+     ],
+     "vols": [
+      [
+       0.32,
+       0.27,
+       0.23,
+       0.22,
+       0.23
+      ],
+      [
+       0.3,
+       0.26,
+       0.225,
+       0.215,
+       0.22
+      ],
+      [
+       0.285,
+       0.25,
+       0.22,
+       0.21,
+       0.215
+      ],
+      [
+       0.27,
+       0.24,
+       0.215,
+       0.205,
+       0.21
+      ]
+     ]
+    },
+    "positions": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surface-0014",
+   "operation": "vol.surface.query",
+   "inputs": {
+    "surface": {
+     "expiry_years": [
+      0.2,
+      0.4,
+      1.0,
+      2.0
+     ],
+     "log_moneyness": [
+      -0.4,
+      -0.2,
+      0.0,
+      0.2,
+      0.4
+     ],
+     "vols": [
+      [
+       0.32,
+       0.27,
+       0.23,
+       0.22,
+       0.23
+      ],
+      [
+       0.3,
+       0.26,
+       0.225,
+       0.215,
+       0.22
+      ],
+      [
+       0.285,
+       0.25,
+       0.22,
+       0.21,
+       0.215
+      ],
+      [
+       0.27,
+       0.24,
+       0.215,
+       0.205,
+       0.21
+      ]
+     ]
+    },
+    "points": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
   }
  ]
 }
