@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0: stage D, curves and fixed income (unreleased)
+## 0.4.0: stage D, curves and fixed income (2026-11-07)
 
 Not tagged yet. Stage D is at Implemented, not Validated. Figures are local runs on Windows, 2026-11-07, on branch `stage-d` at merge `95cbf11`.
 
