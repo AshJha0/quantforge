@@ -2,7 +2,7 @@
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on 2026-11-07 from commit `8dddd58`.
 
@@ -20,20 +20,24 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [SVI smile](svi-smile.md) | Implemented, not Validated | C | 2 golden cases for `vol.svi.evaluate`, 1 with an outside library in `verified_by` |
 | [SSVI surface](ssvi-surface.md) | Implemented, not Validated | C | 3 golden cases for `vol.ssvi.evaluate`, 0 with an outside library in `verified_by` |
 | [SABR](sabr.md) | Implemented, not Validated | C | 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
-| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 31 golden cases |
+| [Full SOFR, ESTR, SONIA OIS](ois-full.md) | Implemented, not Validated | D | 81 golden cases |
 | [Bond and sovereign fits](bond-fit.md) | Implemented, not Validated | D | 2 golden cases |
 | [Repo and special repo](repo.md) | Implemented, not Validated | D | 4 golden cases |
 | [Cross-currency](cross-currency.md) | Implemented, not Validated | D | 1 golden case |
 | [Credit and ISDA CDS](cds.md) | Implemented, not Validated | D | 5 golden cases |
 | [Dividend and borrow](dividend-borrow.md) | Implemented, not Validated | D | 4 golden cases |
 | [Inflation, with seasonality](inflation.md) | Implemented, not Validated | D | 2 golden cases |
-| [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 10 golden cases |
+| [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 22 golden cases |
 | [Commodity forwards](commodities.md) | Implemented, not Validated | D | 4 golden cases |
 | [MBS](mbs.md) | Implemented, not Validated | D | 3 golden cases |
 | Financing curves | Planned | D | None yet |
 | Sector and rating curves | Planned | D | None yet |
 | Funding curve | Planned | F | None yet |
 | Liquidity curves | Planned | H | None yet |
+
+## Real data
+
+[US Treasury curve with sanity bands](real-usd-treasury.md): the one page built from real public data, snapshot of 2026-11-06. The same bands run daily in workflow (a).
 
 ## How the gallery is built
 

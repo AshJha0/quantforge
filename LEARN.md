@@ -37,6 +37,8 @@ Specs are in `specifications/01-core/`. Exercises are in `program/exercises/`.
 
 **Calendar.** Plain idea: one-off holidays are data, not rules. `core.calendar.is_business_day` gives `false` for `GBLO` on 2022-09-19, which `calendars.md` lists as a one-off.
 
+**Good Friday in the US bond calendar.** Plain idea: a market can stay open on a day that looks like a holiday. In `USGS`, Good Friday is a holiday, except in the seven years when SIFMA recommended an early close instead: 2007, 2010, 2012, 2015, 2021, 2023 and 2026, when it is a business day (ruling R1-6). SOFR is never published on Good Friday, even in those years, so SOFR compounding skips the day. For 2015 SIFMA's own records conflict; the archive page was followed. Sources and dates for each calendar are in `datasets/calendar_provenance.json`.
+
 **Snapshot hash.** Plain idea: to prove two languages read the same input, hash one agreed spelling of it. Formal statement: `sha256` of the canonical form in `snapshot-hash.md`. `{"b":1,"a":[true,null,"x"]}` has keys sorted and its number written as binary64 hex, giving `{"a":[true,null,"x"],"b":#3ff0000000000000}` and `sha256:f44e5e9e9da8644c95ac377821cec005c5a1118e581a0d8cfb217ae01d212aed`. This is the stage A demo: the same hash in all four.
 
 **Option price.** Plain idea: a method can be checked against a formula. For spot and strike 100, `r` 0.05, `q` 0.02, `sigma` 0.2 and `t` 1, the Black-Scholes value is 9.227006 (`oracle/REPORT.md`). `core.cos.european` with 256 terms gives 9.227005508154036, against a golden value of 9.227005508154049, inside class `fourier`. This is an analytic test on constructed inputs, not a market price.
@@ -144,11 +146,11 @@ Stage C is Implemented, not Validated. All inputs are synthetic: the stage C dat
 | D1 meeting steps | Overnight rates move on central-bank dates and stay flat between them | `02-curves/meeting-steps.md` |
 | D1 convexity, CSA, basis, fits | Futures sit above forwards; collateral sets the discount curve; two indices differ by a spread; fits can be smoothed or made robust | `futures-convexity.md`, `csa-and-basis.md`, `03-calibration/curve-fits.md` |
 | D2 bonds, repo | A bond is its cash flows; repo finances it; a futures contract delivers the cheapest bond | `04-pricing/bonds.md` |
-| D3 cross-currency | Foreign cash flows under domestic collateral discount on a basis-adjusted curve | `02-curves/cross-currency.md` |
-| D4 credit | Survival probabilities from CDS spreads, by the ISDA model | `04-pricing/credit.md` |
+| D3 cross-currency | Foreign cash flows under domestic collateral discount on a basis-adjusted curve. The swap is a synthetic constant-notional basis swap, not the market's mark-to-market resetting one (ruling R1-1; register row E13, stage F) | `02-curves/cross-currency.md` |
+| D4 credit | Survival probabilities from CDS spreads, by the ISDA model. The discount curve must be `LOG_LINEAR_DF` (ruling R1-4) | `04-pricing/credit.md` |
 | D5 equity | Futures imply dividends and borrow; an index changes by its divisor | `02-curves/equity-curves.md`, `04-pricing/equity-index.md` |
 | D6 inflation | A CPI curve from zero-coupon swaps, with a monthly seasonal pattern | `02-curves/inflation.md` |
-| D7 caps, swaptions | Black or Bachelier on a forward rate, times an annuity | `05-volatility/caps-and-swaptions.md` |
+| D7 caps, swaptions | Black or Bachelier on a forward rate, times an annuity. Conventions are stylised: synthetic term index, no fixing lag, annual 30/360 fixed leg (ruling R1-5) | `05-volatility/caps-and-swaptions.md` |
 | D8 commodities | Forward curves with seasons; storage links two delivery dates | `02-curves/commodity.md` |
 | D9 MBS | A mortgage pool pays down early at a modelled speed | `04-pricing/mbs.md` |
 
@@ -160,7 +162,7 @@ Every number below is a golden value in `datasets/golden/stage_d/`, which all fo
 
 **Meeting steps.** Plain idea: the overnight forward is flat between meetings. Formal statement: `D(d) = exp(-integral f)`, `f` a step function. Case `steps_d-0001`: base 0.0425 until a step to 0.04 on 2026-12-10. The discount factor is 0.9961649070718093 on 2026-12-09 and 0.9960489220202466 on the step date; the forward reads 0.0425, then 0.04. A step takes effect on its date (ruling D6).
 
-**Bond from yield.** Plain idea: discount each cash flow at the yield, compounded at the coupon frequency. Formal statement in `bonds.md`. Case `bonds_d-0001`: 4.25% semi-annual bond to 2029-11-15, settled 2026-11-09, yield 0.041. Clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.74949144731416, convexity 9.306657676461866. QuantLib `FixedRateBond` agrees within 1e-10.
+**Bond from yield.** Plain idea: discount each cash flow at the yield, compounded at the coupon frequency. Formal statement in `bonds.md`. Case `bonds_d-0001`: 4.25% semi-annual bond to 2029-11-15, settled 2026-11-09, yield 0.041. Clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.7494914473141594, convexity 9.306657676461866. QuantLib `FixedRateBond` agrees within 1e-10.
 
 **ISDA CDS.** Plain idea: protection pays `1 - R` on default; the buyer pays a running coupon, and an upfront settles the difference. Formal statement in `credit.md`. Case `credit_d-0004`: buy 10 million of protection to 2031-12-20, coupon 100 bp, recovery 0.4. Par spread 0.011999999988591251, clean upfront 0.009002551543707455, PV 89977.4324589857. QuantLib's `IsdaCdsEngine` agrees within 7e-16 per unit.
 
@@ -176,8 +178,28 @@ Nothing in these examples is traded.
 
 ### Known limits
 
-Stage D is Implemented, not Validated. All inputs are synthetic. The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them.
+Stage D is Implemented, not Validated. All inputs are synthetic. The ESTR payment lag of 2 is a library choice (Strata), not a market standard; TP ICAP terms use 1 (ruling R1-2). From R1, bond-future conversion factors take an optional `contract` input with CME rounding; `null` keeps the stage D `TEN_YEAR` behaviour (ruling R1-3). The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 410 of the 647 stage D cases (63.4%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
+
+### What a tolerance means in money
+
+A tolerance such as 1e-10 says little to a desk. `conformance/tolerances/money.md` restates every class, and every per-case limit, as an error on a 10m notional: basis points of DV01 on a 10Y swap, 32nds of a bond price, and currency units. The widest class, `numerical_scheme`, allows about 1e-4 bp of a 10Y swap's DV01, under one currency unit on 10m. Present-value limits are 1e-9 of notional, which is 0.01 on 10m.
+
+## Batch mode
+
+**Plain idea.** Starting a program costs time: a JVM can take far longer to start than to price one swap. Batch mode starts the CLI once and feeds it many cases, one JSON document per line, getting one result line back for each. The fuzz driver and the benchmarks depend on it.
+
+**Formal statement.** `specifications/cli-contract.md`, section "Batch mode", contract 1.6.0. Eight rules, BT1 to BT8. The ones worth knowing first:
+- a line in gives exactly one line out, in the same order, even when the line is empty or not JSON (BT3);
+- the result for a line equals what `run` gives for the same bytes, bit for bit (BT4), so batch is only a faster way to call `run`;
+- no state carries between lines, so reordering the input reorders the output and changes nothing else (BT7);
+- exit 0 at end of input whatever each case returned; exit 70 only for an internal fault (BT8).
+
+**Worked example.** `examples/batch.jsonl` holds four cases. Through the Rust build, the third gives Brent's root of the Wallis cubic, `2.094551481542327`, the same bits as `run` on that line alone, and the fourth gives `E_DATE_ORDER` while the exit code stays 0. The Cookbook's [Batch mode](COOKBOOK.md#batch-mode) recipe shows the full output.
+
+**Where it is checked.** `datasets/batch/streams.json` has 19 stream fixtures. `conformance/runner/batch_check.py` runs them, and also checks batch against `run`, reordering and interactive use (a caller writes one line and waits). On the v0.4 builds, 14 of the 19 streams passed; the five failures were the R1 additions: the over-long-line rule (BT5), `--batch` and `--timings`. On `r1` at `3f5d97d` the Rust build passes every check, including the per-case `run` comparison, and the Python build passes every check with `--skip-run`; the other two were not rerun in this pass.
 
 ## Validate and backtest
 
 Stages A to C test correctness with analytic, hand and outside-library answers. Stages B and C add calibration on known truth. Later stages add backtests and new-model tests. `specifications/stage-b-rulings.md` says which stage B suites have an outside oracle. Evidence is always labelled analytic, simulated, proxy or observed, and validation reports are self-assessment until the human review at the end of the project.
+
+R1 adds the records that say how far each result goes. The [model inventory](docs/model-inventory.md) gives every model its spec, oracle, outside-checked share and limits. The [edge-case register](specifications/edge-case-register.md) lists boundary cases and whether a golden pins each one; a row marked out of scope names the stage that would bring it in. `conformance/tolerances/money.md` restates every tolerance as money on 10 million notional, so a reader can judge whether a pass is tight enough to matter. The R1 daily workflows are the first runs on observed public data, and their USD curve is labelled a proxy.

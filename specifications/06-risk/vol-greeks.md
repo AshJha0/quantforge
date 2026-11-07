@@ -52,3 +52,12 @@ Each position: Black-76 with vol from `vol.surface.query` at `(expiry_years, ln(
 ## Acceptance
 
 Analytic against bump is a target in `../05-volatility/stage-c-targets.md`. Suites `greeks`, `equity_forward_deep`, `surface`, `strata_vol`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "The Greek Letters" (not opened)
+- [S2] Black, F. and Scholes, M., "The pricing of options and corporate liabilities", *Journal of Political Economy* 81(3), 1973, 637-654 (not opened)
+- [S3] Black, F., "The pricing of commodity contracts", *Journal of Financial Economics* 3, 1976, 167-179 (not opened)
+- [S4] Bachelier, L., *Théorie de la spéculation*, Annales scientifiques de l'École Normale Supérieure, 1900 (not opened)

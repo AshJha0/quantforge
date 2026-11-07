@@ -32,3 +32,10 @@ Eigenvectors are not compared, because their signs are arbitrary.
 
 Class `quadrature` for differences, with oracle replay of the stencil at 50 digits and the per-case limit
 above. Class `interpolation` for linear algebra, against mpmath at 50 digits.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Press, W. H., Teukolsky, S. A., Vetterling, W. T. and Flannery, B. P., *Numerical Recipes: The Art of Scientific Computing*, 3rd ed., Cambridge University Press, 2007, chapter 2 (LU decomposition, Cholesky), chapter 11 (symmetric eigensystems), section 5.7 (numerical derivatives) (not opened)
+- [S2] Golub, G. H. and Van Loan, C. F., *Matrix Computations*, 4th ed., Johns Hopkins University Press, 2013 (not opened)

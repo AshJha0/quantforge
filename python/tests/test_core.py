@@ -5,6 +5,7 @@ import math
 from datetime import date
 from pathlib import Path
 
+import numpy as np
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
@@ -201,7 +202,8 @@ AT = [0.0, 0.3, 0.5, 1.1, 2.0, 3.3, 4.5]
     [
         ("cubic_natural", sp_interpolate.CubicSpline(X, Y, bc_type="natural"), {}),
         ("cubic_not_a_knot", sp_interpolate.CubicSpline(X, Y, bc_type="not-a-knot"), {}),
-        ("cubic_clamped", sp_interpolate.CubicSpline(X, Y, bc_type=((1, 0.5), (1, -1.0))),
+        ("cubic_clamped",
+         sp_interpolate.CubicSpline(X, Y, bc_type=((1, np.asarray(0.5)), (1, np.asarray(-1.0)))),
          {"slope_start": 0.5, "slope_end": -1.0}),
     ],
 )

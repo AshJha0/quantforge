@@ -40,7 +40,7 @@ class RulingsDTest {
     @Test
     void d35ConversionFactorDateOrder() {
         code("E_DATE_ORDER", () -> Bonds.conversionFactor(new Bonds.Bond(LocalDate.of(2026, 11, 15), 0.04, 2),
-                YearMonth.of(2026, 12), 0.06));
+                YearMonth.of(2026, 12), 0.06, Bonds.Contract.TEN_YEAR));
     }
 
     @Test

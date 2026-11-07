@@ -17,15 +17,64 @@ uv sync --locked --project python
 python conformance/runner/runner.py --impl rust
 ```
 
-`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full run, from 2026-11-06:
+`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Rust run on `r1` at `3f5d97d`, 2026-11-07:
 
 ```
-TOTAL {'cases': 4731, 'pass': 4731, 'fail': 0, 'not_implemented': 0}
+TOTAL {'cases': 5837, 'pass': 5837, 'fail': 0, 'not_implemented': 0}
 ```
 
 ## More on the CLI
 
-`quantforge operations` lists every operation. `specifications/cli-contract.md` has the full contract. `batch` takes one case per line.
+`quantforge operations` lists every operation. `specifications/cli-contract.md` has the full contract. `batch` takes one case per line; see [Batch mode](#batch-mode).
+
+## Batch mode
+
+`quantforge batch` reads one case document per line on stdin and writes one result line per input line, in order. Start-up is paid once for the whole stream, which matters on the JVM. The rules, BT1 to BT8, are in `specifications/cli-contract.md` (contract 1.6.0).
+
+```bash
+rust/target/release/quantforge batch < examples/batch.jsonl
+```
+
+Real output, Rust build:
+
+```json
+{"schema_version":"1.0","case_id":"example-daycount","status":"ok","outputs":{"year_fraction":0.5055555555555555},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"example-discount","status":"ok","outputs":{"discount_factor":0.9048374180359595},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"example-root","status":"ok","outputs":{"root":2.094551481542327},"diagnostics":{"iterations":6,"residual":3.552713678800501e-15,"termination":"X_TOL"}}
+{"schema_version":"1.0","case_id":"example-error","status":"error","error":{"code":"E_DATE_ORDER","message":"end is before start"}}
+```
+
+The fourth case is an error, and the exit code is still 0: batch exits 0 when stdin ends, whatever each case returned (BT8). A bad line is never skipped. It gets its own `E_PARSE` result with `case_id: "unknown"` (BT3):
+
+```bash
+printf 'not json
+' | rust/target/release/quantforge batch
+```
+
+```json
+{"schema_version":"1.0","case_id":"unknown","status":"error","error":{"code":"E_PARSE","message":"bad literal"}}
+```
+
+The message text is not part of the contract and differs by language; the code is.
+
+New in 1.6.0 (R1): `quantforge --batch` is the same command, and `--timings` on `batch`, `--batch` or `run` adds `diagnostics.elapsed_ns` to each result and changes nothing else. Check a build against the stream fixtures:
+
+```bash
+python conformance/runner/batch_check.py --impl rust
+```
+
+`--skip-run` leaves out the slow per-case `run` comparison.
+
+## Run the daily workflows
+
+Workflow (a) builds end-of-day curves and checks them against wide sanity bands; workflow (c) recomputes the NY Fed SOFR averages and checks the LIBOR fallback. Both send every case to one `quantforge --batch` process. Both fetch public data, so they need a network connection, or `--data DIR` to read saved files.
+
+```bash
+python tools/workflows/eod_curves.py --help
+python tools/workflows/sofr_check.py --help
+```
+
+Each run writes `reports/workflows/<as-of>/`. The USD curve in (a) is a proxy: Treasury par yields are not SOFR swap rates. GBP results are pass or fail only, because the Bank of England curves may not be redistributed. Details and the first runs are in [r1-infra.md](docs/developer-guides/r1-infra.md#daily-workflows-a-and-c).
 
 ## Regenerate golden files
 
@@ -69,7 +118,7 @@ Real output, Rust build:
 python tools/recorder/record.py
 ```
 
-This downloads from three public sources and appends to `tools/forward-log/log.jsonl`, so run it only when you mean to add to the record. Nothing schedules it yet.
+This downloads from the 15 public sources in `tools/recorder/sources.json` and appends to `tools/forward-log/log.jsonl`, so run it only when you mean to add to the record. From R1 the scheduled copy runs on GitHub Actions twice each weekday and writes to branch `forward-log` ([recorder-actions.md](docs/developer-guides/recorder-actions.md)). Its first run happens after the R1 push.
 
 ### Check the forward log
 
@@ -250,7 +299,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"bond.price.from_yield",
  "settlement":"2026-11-09","yield":0.041}}' | tr -d '\n' | rust/target/release/quantforge run
 ```
 
-Output (case `bonds_d-0001`): clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.74949144731416. `bond.yield.from_price` goes back.
+Output (case `bonds_d-0001`): clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.7494914473141594. `bond.yield.from_price` goes back.
 
 ### Price a pass-through MBS
 

@@ -27,3 +27,10 @@ Checks, in order: `len(quotes) != m + 1`: `E_INPUT`. Step dates as above: `E_INP
 ## Acceptance
 
 `step_curve`: class `simple_analytic`; QuantLib `ForwardCurve` (backward flat, with jumps) agrees within 2e-15. `fit_steps`: rates within 1e-10 of the known truth behind QuantLib `MakeOIS` par rates. Suite `stage_d/steps_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Central-bank meeting calendars, the source of step dates: Federal Reserve FOMC, Bank of England MPC, ECB Governing Council monetary-policy meetings (not opened)
+- [S2] Andersen, L. B. G. and Piterbarg, V. V., *Interest Rate Modeling*, 2010, vol. 1, chapter on curve construction (turn-of-year effects) (not opened)

@@ -1,0 +1,63 @@
+name: Recorder
+# Daily public-data recorder on a free public-repo runner (plan 11.1.4). It writes only the forward-log rows
+# (hash, size, time, licence) to branch forward-log. Raw bytes stay on the runner and are thrown away: no raw
+# source data is committed or uploaded as an artifact, because SONIA may not be redistributed yet.
+# The local Windows task "QuantForge Recorder" stays as a backup; docs/developer-guides/recorder-actions.md
+# says how the two logs reconcile.
+on:
+  schedule:
+    - cron: '30 23 * * 1-5' # after Treasury's end-of-day curve; SOFR for the day lands the next morning, so the next run picks it up
+    - cron: '30 14 * * 1-5' # after the NY Fed's 08:00 ET publication, so a missed evening run still leaves a row that day
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: recorder
+  cancel-in-progress: false
+jobs:
+  record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: code
+          persist-credentials: false
+      - name: Check out forward-log, or start it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if git ls-remote --exit-code --heads "$url" forward-log >/dev/null; then
+            git clone --branch forward-log "$url" log
+          else
+            git init -b forward-log log
+            git -C log remote add origin "$url"
+            printf '# forward-log\n\nRows written by .github/workflows/recorder.yml. Append-only; see docs/developer-guides/recorder-actions.md on main.\n' > log/README.md
+          fi
+      - name: Record
+        id: record
+        continue-on-error: true # a failed source is logged as a failure row, and the gap monitor judges it
+        run: python3 code/tools/recorder/record.py --data "$RUNNER_TEMP/raw" --log log/actions/log.jsonl
+      - run: python3 code/tools/forward-log/forward_log.py verify --log log/actions/log.jsonl
+      - name: Gap report
+        id: gaps
+        continue-on-error: true
+        run: python3 code/tools/recorder/gap_monitor.py gaps --log log/actions/log.jsonl --holidays code/tools/recorder/holidays.txt --out log/actions/gaps.md
+      - name: Push rows
+        run: |
+          cd log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -q -m "recorder: $(date -u +%Y-%m-%dT%H:%MZ) (main ${GITHUB_SHA::7})"
+          for i in 1 2 3; do git push origin forward-log && exit 0; git pull --rebase -q origin forward-log; done
+          exit 1
+      - name: Fail on recent gaps
+        if: steps.gaps.outcome == 'failure'
+        run: |
+          echo "::error::the gap monitor found missing business days; see actions/gaps.md on branch forward-log"
+          exit 1

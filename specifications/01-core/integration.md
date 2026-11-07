@@ -62,3 +62,11 @@ Fixed rules: class `quadrature`, oracle replays the recipe at 50 digits. Adaptiv
 
 Numeric targets: `gauss_legendre` with `n = 16` on `exp` over `[0, 1]`: error below 1e-14.
 `gauss_kronrod` with `tol = 1e-10`: error below 1e-9 on every registered function, including `inv_sqrt`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Press, W. H., Teukolsky, S. A., Vetterling, W. T. and Flannery, B. P., *Numerical Recipes: The Art of Scientific Computing*, 3rd ed., Cambridge University Press, 2007, chapter 4 (integration of functions: trapezoid, Simpson, Gaussian quadrature) (not opened)
+- [S2] Piessens, R., de Doncker-Kapenga, E., Überhuber, C. W. and Kahaner, D. K., *QUADPACK: A Subroutine Package for Automatic Integration*, Springer, 1983 (G7-K15 rule, globally adaptive bisection) (not opened)
+- [S3] Lyness, J. N., "Notes on the adaptive Simpson quadrature routine", *Journal of the ACM* 16(3), 1969, 483-495 (Richardson correction) (not opened)

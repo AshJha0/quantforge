@@ -56,3 +56,11 @@ Numeric targets, from the oracle run: at-the-money, `spot = strike = 100`, `r = 
   oracle, and through the stored per-grid cases.
 
 American exercise, barriers and local volatility are later stages.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Crank, J. and Nicolson, P., "A practical method for numerical evaluation of solutions of partial differential equations of the heat-conduction type", *Proc. Cambridge Philosophical Society* 43(1), 1947, 50-67 (not opened)
+- [S2] Rannacher, R., "Finite element solution of diffusion problems with irregular data", *Numerische Mathematik* 43, 1984, 309-327 (not opened)
+- [S3] Tavella, D. and Randall, C., *Pricing Financial Instruments: The Finite Difference Method*, Wiley, 2000 (not opened)

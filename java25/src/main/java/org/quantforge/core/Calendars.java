@@ -96,12 +96,18 @@ public final class Calendars {
         addIfYear(y, "2001-12-31", out);
     }
 
+    /** Years whose Good Friday SIFMA set as an early close, not a full close (datasets/calendar_provenance.json). */
+    private static final java.util.Set<Integer> GOOD_FRIDAY_EARLY_CLOSE =
+            java.util.Set.of(2007, 2010, 2012, 2015, 2021, 2023, 2026);
+
     private static void usgs(int y, List<LocalDate> out) {
         LocalDate ny = LocalDate.of(y, 1, 1);
         out.add(ny.getDayOfWeek() == DayOfWeek.SUNDAY ? ny.plusDays(1) : ny);
         out.add(nth(y, 1, DayOfWeek.MONDAY, 3));
         out.add(nth(y, 2, DayOfWeek.MONDAY, 3));
-        out.add(easter(y).minusDays(2));
+        if (!GOOD_FRIDAY_EARLY_CLOSE.contains(y)) { // ruling R1-6: an early close is a business day
+            out.add(easter(y).minusDays(2));
+        }
         out.add(last(y, 5, DayOfWeek.MONDAY));
         if (y >= 2022) {
             out.add(nearest(LocalDate.of(y, 6, 19)));

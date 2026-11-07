@@ -19,3 +19,10 @@ Inputs: `funding` (curve), `forwards` `[{date, price}]` (at least two, dates str
 ## Acceptance
 
 `simple_analytic`, analytic; `arbitrage` exact, and no golden carry value is within 1e-6 of zero. Suite `stage_d/commodity_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Determination of Forward and Futures Prices" (storage costs, convenience yield, cash and carry) (not opened)
+- [S2] Geman, H., *Commodities and Commodity Derivatives*, Wiley, 2005 (forward-curve seasonality) (not opened)

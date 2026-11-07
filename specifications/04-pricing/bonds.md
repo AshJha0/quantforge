@@ -60,7 +60,7 @@ Checks: `end <= start`: `E_DATE_ORDER`. `end >= maturity`: `E_INPUT`.
 
 ## `bond.futures.conversion_factor`
 
-CBOT Treasury formula, on a 6% notional coupon (`notional_coupon` must be 0.06, else `E_INPUT`). From the first day of `delivery_month` (`YYYY-MM`) to `maturity`: `n` whole years and `z` months, rounded down to a multiple of 3. `v = z` if `z < 7` else 3. `a = 1.03^(-v/6)`, `b = (coupon/2)(6-v)/6`, `C = 1.03^(-2n)` if `z < 7` else `1.03^(-2n-1)`. `CF = a (coupon/2 + (coupon/0.06)(1 - C) + C) - b`, rounded half-even to 4 decimals. Semi-annual bonds only (`E_INPUT` otherwise). No golden lies within 1e-10 of a rounding boundary.
+CME Treasury futures formula, on a 6% notional coupon (`notional_coupon` must be 0.06, else `E_INPUT`). Optional input `contract` (ruling R1-3): `TWO_YEAR`, `THREE_YEAR`, `FIVE_YEAR`, `TEN_YEAR`, `ULTRA_TEN_YEAR`, `BOND`, `ULTRA_BOND`, or `null`, which means `TEN_YEAR` (the stage D behaviour); another string is `E_SCHEMA`. First the coupon is rounded to the nearest 1/8 of 1%, ties up: `c = floor(coupon x 800 + 0.5)/800`. From the first day of `delivery_month` (`YYYY-MM`) to `maturity`: `n` whole years and `z` whole months. For `TEN_YEAR`, `ULTRA_TEN_YEAR`, `BOND` and `ULTRA_BOND`, `z` is then rounded down to a multiple of 3; for `TWO_YEAR`, `THREE_YEAR` and `FIVE_YEAR` it stays whole months. `v = z` if `z < 7` else `z - 6`. `a = 1.03^(-v/6)`, `b = (c/2)(6-v)/6`, `C = 1.03^(-2n)` if `z < 7` else `1.03^(-2n-1)`. `CF = a (c/2 + (c/0.06)(1 - C) + C) - b`, rounded to 4 decimals, as CME states. CME gives no tie rule; no golden lies within 1e-6 of a rounding boundary, so none is tested. Semi-annual bonds only (`E_INPUT` otherwise). Deliverable-basket eligibility is not checked.
 
 ## `bond.futures.basis`
 
@@ -77,3 +77,15 @@ Sovereign fit with a fixed `tau`, and relative value. Inputs: `settlement`, `tau
 ## Acceptance
 
 Price, accrued, durations: `simple_analytic`; QuantLib within 1e-10 (convexity 1e-8 absolute). Yield and Z-spread: `root_finding`, known truth, QuantLib within 1e-10. Curve price, asset swap, FRN: `interpolation`, replay; FRN par identity. Repo and futures basis: `simple_analytic`, analytic; `ctd` and conversion factors exact. Fit: betas within 1e-8 of known truth, reached by SciPy from three starts. Suites `stage_d/bonds_d`, `repo_d`, `bondfit_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] ICMA, *Primary Market Handbook* / Rule 251 (accrued interest calculation, ACT/ACT ICMA) (not opened)
+- [S2] UK Debt Management Office, *Formulae for calculating gilt prices from yields* (not opened)
+- [S3] CME Group, *Calculating U.S. Treasury Futures Conversion Factors* (conversion-factor formula) and CBOT Treasury futures contract specifications. Basis of ruling R1-3 (whole months for 2Y, 3Y, 5Y; quarters otherwise; coupon to the nearest 1/8; 4 decimals) (not opened)
+- [S4] Fabozzi, F. J. (ed.), *The Handbook of Fixed Income Securities*, 8th ed., McGraw-Hill, 2012 (yield, duration, convexity, repo) (not opened)
+- [S5] Burghardt, G., Belton, T., Lane, M. and Papa, J., *The Treasury Bond Basis*, 3rd ed., McGraw-Hill, 2005 (gross and net basis, implied repo, CTD) (not opened)
+- [S6] O'Kane, D., *Introduction to Asset Swaps*, Lehman Brothers Analytical Research Series, 2000 (par-par asset swap spread) (not opened)
+- [S7] Nelson, C. R. and Siegel, A. F., "Parsimonious modeling of yield curves", *Journal of Business* 60(4), 1987, 473-489 (not opened)

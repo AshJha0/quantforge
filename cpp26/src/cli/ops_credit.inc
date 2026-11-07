@@ -25,6 +25,12 @@ void write_survival(Out& out, const HazardCurve& h) {
     out.values.end_array();
 }
 
+// Ruling R1-4: ISDA flat forwards only, checked before every other rule check.
+void require_flat_forwards(const CurveInput& d) {
+    if (d.interpolation != CurveInterpolation::LogLinearDf)
+        throw Error("E_INPUT", "credit needs a LOG_LINEAR_DF discount curve", "discount");
+}
+
 std::vector<CdsQuote> cds_quotes_of(const In& in) {
     return rows_of<CdsQuote>(in, "quotes", [](const In& q) { return CdsQuote{parse_tenor(q.text("tenor")), q.real("spread")}; });
 }
@@ -44,6 +50,7 @@ void op_cds_price(const In& in, Out& out) {
     in.ready();
     d.limit();
     limit_if(h.dates.size() > max_quotes, "hazard");
+    require_flat_forwards(d);
     const CdsPrice p = cds_price(t, d.build(), h, r, m, coupon, notional, side, payout);
     out.key_real("protection_leg", p.protection_leg);
     out.key_real("rpv01", p.rpv01);
@@ -61,6 +68,7 @@ void op_cds_bootstrap(const In& in, Out& out) {
     in.ready();
     d.limit();
     limit_if(quotes.size() > max_quotes, "quotes");
+    require_flat_forwards(d);
     write_survival(out, cds_bootstrap(t, d.build(), r, quotes));
 }
 
@@ -82,6 +90,7 @@ void op_index_intrinsic(const In& in, Out& out) {
     in.ready();
     d.limit();
     limit_if(names.size() > max_quotes, "names");
+    require_flat_forwards(d);
     if (names.empty()) throw Error("E_INPUT", "no names", "names");
     const Curve c = d.build();
     Vec ups;
@@ -111,6 +120,7 @@ void op_credit_composite(const In& in, Out& out) {
     in.ready();
     d.limit();
     limit_if(cs.size() > max_quotes, "constituents");
+    require_flat_forwards(d);
     if (cs.empty() || cs[0].quotes.empty()) throw Error("E_INPUT", "no constituents", "constituents");
     for (const Constituent& c : cs) {
         if (c.quotes.size() != cs[0].quotes.size()) throw Error("E_INPUT", "constituents must share tenors", "constituents");

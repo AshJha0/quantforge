@@ -53,3 +53,11 @@ Nesting up to 64 levels must work. Beyond that: `E_LIMIT`, as for text over the 
 
 Class `date_and_convention`, exact on both outputs. Oracle: `canon` in `oracle/python/gen_data.py`, with
 the SHA-256 checked against the NIST `abc` vector and against the system `sha256sum`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] NIST FIPS PUB 180-4, *Secure Hash Standard (SHS)*, 2015, SHA-256 (not opened)
+- [S2] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017 (not opened)
+- [S3] IETF RFC 8785, *JSON Canonicalization Scheme (JCS)*, 2020: related prior art only; this spec's canonical form is its own and is not JCS (not opened)

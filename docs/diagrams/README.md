@@ -12,7 +12,11 @@ flowchart LR
   G --> N[neutral runner]
   J & C & P & R -->|result JSON| N
   N --> Rep[conformance report]
+  B[batch stream fixtures] --> BC[batch_check]
+  J & C & P & R -->|quantforge --batch| BC
 ```
+
+From R1 (contract 1.6.0), batch mode is checked on its own: `datasets/batch/streams.json` feeds `conformance/runner/batch_check.py`, apart from the goldens.
 
 ## Domain dependencies
 
@@ -39,6 +43,21 @@ flowchart LR
   Raw --> Chk[quote checks] --> Store[as-of store]
   Store --> Snap[snapshot and hash] --> Calc[calculation]
   Calc --> Res[result with provenance]
+```
+
+## R1 scheduled jobs
+
+GitHub Actions, free runners, no secrets beyond `GITHUB_TOKEN`. Raw data stays on the runner.
+
+```mermaid
+flowchart LR
+  Src[15 public sources] --> Rec[recorder.yml: record.py]
+  Rec --> FL[(forward-log branch)]
+  Rec --> Gap[gap_monitor.py] --> FL
+  Src --> WF[daily-workflows.yml: eod_curves, sofr_check]
+  WF -->|cases| CLI[quantforge --batch]
+  CLI -->|results| WF
+  WF --> Bands[sanity bands] --> FL
 ```
 
 ## Curve lifecycle

@@ -38,3 +38,9 @@ Outputs: `forwards`, `svi_rmse`, `arbitrage_free`, `vol`, `valuation` (`model` `
 ## Acceptance
 
 Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are checked against QuantLib. Use case 1's book PV and delta are checked against QuantLib `FxForward`. The hedge sums, and use case 2's, have no outside source. Trades, hedges and costs are calculations on synthetic data: nothing is traded. Real output is in `examples/README.md`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapters "Hedging Strategies Using Futures" and "Swaps" (not opened)

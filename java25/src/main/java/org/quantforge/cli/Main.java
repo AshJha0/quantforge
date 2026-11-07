@@ -46,18 +46,22 @@ public final class Main {
     }
 
     static int run(String[] args, InputStream in, OutputStream out) throws IOException {
-        if (args.length != 1) {
-            System.err.println("usage: quantforge run|batch|version|operations");
+        boolean timings = args.length == 2 && args[1].equals("--timings")
+                && (args[0].equals("run") || args[0].equals("batch") || args[0].equals("--batch"));
+        if (args.length != 1 && !timings) {
+            System.err.println("usage: quantforge run|batch|--batch [--timings] | version | operations");
             return 64;
         }
         switch (args[0]) {
             case "run" -> {
-                Reply r = handle(decode(in.readAllBytes()));
+                byte[] bytes = in.readAllBytes();
+                long t0 = System.nanoTime();
+                Reply r = handle(decode(bytes), timings, t0);
                 write(out, r.json());
                 return r.ok() ? 0 : 2;
             }
-            case "batch" -> {
-                batch(in, out);
+            case "batch", "--batch" -> {
+                batch(in, out, timings);
                 return 0;
             }
             case "version" -> {
@@ -80,21 +84,45 @@ public final class Main {
         }
     }
 
-    private static void batch(InputStream raw, OutputStream out) throws IOException {
-        BufferedInputStream in = new BufferedInputStream(raw);
+    /** BT5: the longest line (after a trailing CR is removed) that is parsed at all. */
+    static final int MAX_LINE_BYTES = 16_777_216;
+
+    private static void batch(InputStream raw, OutputStream out, boolean timings) throws IOException {
+        BufferedInputStream in = new BufferedInputStream(raw, 1 << 16);
         ByteArrayOutputStream line = new ByteArrayOutputStream();
+        long length = 0; // bytes seen on this line, a trailing CR included
+        int last = -1; // last byte seen on this line
         int b;
         while ((b = in.read()) >= 0) {
             if (b == '\n') {
-                write(out, handle(decode(line.toByteArray())).json());
+                endLine(out, line, length, last, timings);
                 line.reset();
+                length = 0;
+                last = -1;
             } else {
-                line.write(b);
+                length++;
+                last = b;
+                // Hold at most the limit plus one possible trailing CR; drop the rest of an overlong line.
+                if (length <= MAX_LINE_BYTES + 1L) {
+                    line.write(b);
+                }
             }
         }
-        if (line.size() > 0) {
-            write(out, handle(decode(line.toByteArray())).json());
+        if (length > 0) {
+            endLine(out, line, length, last, timings);
         }
+    }
+
+    private static void endLine(OutputStream out, ByteArrayOutputStream line, long length, int last, boolean timings)
+            throws IOException {
+        long t0 = System.nanoTime();
+        long content = last == '\r' ? length - 1 : length;
+        if (content > MAX_LINE_BYTES) {
+            QfError e = new QfError("E_LIMIT", "line is longer than " + MAX_LINE_BYTES + " bytes");
+            write(out, errorReply("unknown", e, timings, t0).json());
+            return;
+        }
+        write(out, handle(decode(line.toByteArray()), timings, t0).json());
     }
 
     private static void write(OutputStream out, String text) throws IOException {
@@ -123,6 +151,11 @@ public final class Main {
 
     /** Handles one case document. A calculation or schema failure is a result, never an exception. */
     static Reply handle(String text) {
+        return handle(text, false, 0L);
+    }
+
+    /** As {@link #handle(String)}; with {@code timings}, adds diagnostics.elapsed_ns measured from {@code t0}. */
+    static Reply handle(String text, boolean timings, long t0) {
         String caseId = "unknown";
         try {
             if (text == null) {
@@ -148,19 +181,42 @@ public final class Main {
             }
             Map<String, Object> r = header(caseId, "ok");
             r.put("outputs", result.outputs());
-            r.put("diagnostics", result.diagnostics());
+            Map<String, Object> diag = new LinkedHashMap<>();
+            if (result.diagnostics() != null) {
+                for (Map.Entry<?, ?> d : result.diagnostics().entrySet()) {
+                    diag.put(String.valueOf(d.getKey()), d.getValue());
+                }
+            }
+            if (timings) {
+                diag.put("elapsed_ns", elapsed(t0));
+            }
+            r.put("diagnostics", diag);
             return new Reply(json(r), true);
         } catch (QfError e) {
-            Map<String, Object> err = new LinkedHashMap<>();
-            err.put("code", e.code());
-            err.put("message", String.valueOf(e.getMessage()));
-            if (e.field() != null) {
-                err.put("field", e.field());
-            }
-            Map<String, Object> r = header(caseId, "error");
-            r.put("error", err);
-            return new Reply(json(r), false);
+            return errorReply(caseId, e, timings, t0);
         }
+    }
+
+    private static long elapsed(long t0) {
+        return Math.max(0L, System.nanoTime() - t0);
+    }
+
+    private static Reply errorReply(String caseId, QfError e, boolean timings, long t0) {
+        Map<String, Object> err = new LinkedHashMap<>();
+        err.put("code", e.code());
+        err.put("message", String.valueOf(e.getMessage()));
+        if (e.field() != null) {
+            err.put("field", e.field());
+        }
+        Map<String, Object> r = header(caseId, "error");
+        r.put("error", err);
+        // Always present (may be empty), so a --timings result minus elapsed_ns equals the untimed one.
+        Map<String, Object> diag = new LinkedHashMap<>();
+        if (timings) {
+            diag.put("elapsed_ns", elapsed(t0));
+        }
+        r.put("diagnostics", diag);
+        return new Reply(json(r), false);
     }
 
     /**

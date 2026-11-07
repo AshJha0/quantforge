@@ -362,9 +362,9 @@
    "rates.ois.bootstrap",
    "rates.ois.compound_dated"
   ],
-  "cases": 31,
+  "cases": 81,
   "by_source": {
-   "rates.ois.compound_dated: exact-rational, quantlib-1.44": 21,
+   "rates.ois.compound_dated: exact-rational, quantlib-1.44": 71,
    "rates.ois.bootstrap: independent-replay, quantlib-1.44": 10
   }
  }

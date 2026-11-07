@@ -21,10 +21,28 @@ FALLBACKS: dict[str, tuple[str, float]] = {
 _DENOMINATORS = {"ACT_360": 360, "ACT_365F": 365}
 
 
-def _business_days(cal: str, start: date, end: date) -> list[date]:
+def _is_fixing_day(cal: str, sofr: bool, d: date) -> bool:
+    """Ruling R1-6: SOFR is never published on Good Friday, even in a USGS early-close year."""
+    if sofr and d == calendars.good_friday(d.year):
+        return False
+    return calendars.is_business_day(cal, d)
+
+
+def _back(cal: str, sofr: bool, d: date, k: int) -> date:
+    if not sofr:
+        return calendars.add_business_days(cal, d, -k) if k else d
+    calendars.check_range(d)
+    while k:
+        d -= timedelta(days=1)
+        if _is_fixing_day(cal, sofr, d):
+            k -= 1
+    return d
+
+
+def _business_days(cal: str, start: date, end: date, sofr: bool = False) -> list[date]:
     days, d = [], start
     while d <= end:
-        if calendars.is_business_day(cal, d):
+        if _is_fixing_day(cal, sofr, d):
             days.append(d)
         d += timedelta(days=1)
     return days
@@ -40,13 +58,13 @@ def compound_dated(
         raise QfError("E_INPUT", "the convention is not overnight", "convention")
     if end <= start:
         raise QfError("E_DATE_ORDER", "end is not after start", "end")
-    cal, k = c["calendar"], shift_days
-    ds = _business_days(cal, start, end)
+    cal, k, sofr = c["calendar"], shift_days, convention == "SOFR"
+    ds = _business_days(cal, start, end, sofr)
     n = len(ds) - 1
     if (k < 0 or (method == "NONE" and k != 0)
             or (method == "LOCKOUT" and not 1 <= k <= n - 1)):
         raise QfError("E_INPUT", "shift_days is out of range for the method", "shift_days")
-    if not (calendars.is_business_day(cal, start) and calendars.is_business_day(cal, end)):
+    if not (_is_fixing_day(cal, sofr, start) and _is_fixing_day(cal, sofr, end)):
         raise QfError("E_INPUT", "start and end must be business days", "start")
     table: dict[date, float] = {}
     for d, r in fixings:
@@ -55,7 +73,7 @@ def compound_dated(
         table[d] = r
 
     def back(d: date) -> date:
-        return calendars.add_business_days(cal, d, -k) if k else d
+        return _back(cal, sofr, d, k)
 
     if method == "OBSERVATION_SHIFT":
         obs = [back(d) for d in ds]

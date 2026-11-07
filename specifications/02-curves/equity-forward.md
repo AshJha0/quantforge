@@ -52,3 +52,9 @@ Cash dividends only, paid on the ex-date. No proportional dividends, dividend cu
 ## Acceptance
 
 Targets in `../05-volatility/stage-c-targets.md`. Suites `equity_forward`, `equity_forward_deep`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Determination of Forward and Futures Prices" (forward with known cash income) and chapter "Put-Call Parity" material in "Properties of Stock Options" (not opened)

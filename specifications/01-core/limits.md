@@ -62,3 +62,9 @@ A result date beyond a calendar's years, from `add_tenor` or `add_business_days`
 ## Acceptance
 
 Suite `limits`: at the limit and one above, for each row except the `records` x `checkpoints` product, which needs a very large case. The 10,000,000-call limit on adaptive rules is a backstop with no golden case. Reaching it needs intervals whose Simpson difference is below rounding, so whether a run gets there depends on the maths library. A build must simply stop there. Golden no-convergence cases are forced by the mathematics, and `oracle/python/check_fragility.py` holds them to that.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017, Section 9 (parsers may set limits on size, nesting depth and number range) (not opened)

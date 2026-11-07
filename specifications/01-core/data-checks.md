@@ -56,3 +56,10 @@ An input `quote_status` other than `FIRM` or `INDICATIVE` is `E_SCHEMA`. Non-pos
 ## Acceptance
 
 Class `date_and_convention`, exact. Oracle: hand cases, one per rule and boundary.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Rousseeuw, P. J. and Croux, C., "Alternatives to the median absolute deviation", *Journal of the American Statistical Association* 88(424), 1993, 1273-1283 (MAD and the 1.4826 consistency factor) (not opened)
+- [S2] Hampel, F. R., "The influence curve and its role in robust estimation", *JASA* 69(346), 1974, 383-393 (not opened)

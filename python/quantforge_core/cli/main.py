@@ -4,6 +4,7 @@ import math
 import platform
 import re
 import sys
+import time
 from typing import Any
 
 from .. import __version__, strictjson
@@ -13,6 +14,8 @@ from .operations import OPERATIONS, execute
 CONTRACT_VERSION = "1.0.0"
 SCHEMA_VERSION = "1.0"
 MAX_CASE_DEPTH = 80
+MAX_LINE_BYTES = 16_777_216  # BT5
+_DRAIN_CHUNK = 1 << 20
 _ENVELOPE_KEYS = {"schema_version", "case_id", "operation", "inputs"}
 _SCHEMA_VERSION = re.compile(r"[0-9]+\.[0-9]+")
 _OPERATION = re.compile(r"[a-z0-9_]+(\.[a-z0-9_]+)+")
@@ -24,6 +27,7 @@ def _error(case_id: str, code: str, message: str, field: str | None = None) -> d
         error["field"] = field
     return {
         "schema_version": SCHEMA_VERSION, "case_id": case_id, "status": "error", "error": error,
+        "diagnostics": {},
     }
 
 
@@ -99,16 +103,45 @@ def _write(value: Any) -> None:
     sys.stdout.buffer.flush()
 
 
-def _run() -> int:
-    result = _decode_and_run(sys.stdin.buffer.read())
+def _timed(result: dict[str, Any], start: int, timings: bool) -> dict[str, Any]:
+    if timings:
+        result.setdefault("diagnostics", {})["elapsed_ns"] = max(0, time.monotonic_ns() - start)
+    return result
+
+
+def _run(timings: bool = False) -> int:
+    data = sys.stdin.buffer.read()
+    start = time.monotonic_ns()
+    result = _timed(_decode_and_run(data), start, timings)
     _write(result)
     return 0 if result["status"] == "ok" else 2
 
 
-def _batch() -> int:
-    for line in sys.stdin.buffer:
-        _write(_decode_and_run(line))
-    return 0
+def _too_long() -> dict[str, Any]:
+    return _error("unknown", "E_LIMIT", f"a batch line is over {MAX_LINE_BYTES} bytes")
+
+
+def _batch(timings: bool = False) -> int:
+    stdin = sys.stdin.buffer
+    while True:
+        # Read at most the limit plus LF and CR, so no more than that is ever held.
+        line = stdin.readline(MAX_LINE_BYTES + 2)
+        if not line:
+            return 0
+        if not line.endswith(b"\n") and len(line) == MAX_LINE_BYTES + 2:
+            start = time.monotonic_ns()
+            result = _too_long()
+            while True:  # BT5: drop the rest of the line
+                rest = stdin.readline(_DRAIN_CHUNK)
+                if not rest or rest.endswith(b"\n"):
+                    break
+        else:
+            start = time.monotonic_ns()
+            body = line[:-1] if line.endswith(b"\n") else line
+            if body.endswith(b"\r"):
+                body = body[:-1]
+            result = _too_long() if len(body) > MAX_LINE_BYTES else _decode_and_run(line)
+        _write(_timed(result, start, timings))
 
 
 def _version() -> int:
@@ -129,14 +162,20 @@ def _operations() -> int:
 
 
 COMMANDS = {"run": _run, "batch": _batch, "version": _version, "operations": _operations}
+_TIMED = {"run", "batch"}
 
 
 def main() -> int:
     args = sys.argv[1:]
-    if len(args) != 1 or args[0] not in COMMANDS:
-        print("usage: quantforge run|batch|version|operations", file=sys.stderr)
+    if args and args[0] == "--batch":
+        args = ["batch", *args[1:]]
+    timings = len(args) == 2 and args[0] in _TIMED and args[1] == "--timings"
+    if not timings and (len(args) != 1 or args[0] not in COMMANDS):
+        print("usage: quantforge run|batch|--batch [--timings] | version | operations", file=sys.stderr)
         return 64
     try:
+        if timings:
+            return _run(True) if args[0] == "run" else _batch(True)
         return COMMANDS[args[0]]()
     except Exception as e:  # noqa: BLE001 - the contract's internal fault
         print(f"internal fault: {e!r}", file=sys.stderr)

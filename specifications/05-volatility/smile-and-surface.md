@@ -66,3 +66,12 @@ Linear surface interpolation can create butterfly arbitrage between nodes: the c
 ## Acceptance
 
 Targets in `stage-c-targets.md`. Suites `smile`, `surface`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Gatheral, J., *The Volatility Surface: A Practitioner's Guide*, Wiley, 2006 (SVI) (not opened)
+- [S2] Gatheral, J. and Jacquier, A., "Arbitrage-free SVI volatility surfaces", *Quantitative Finance* 14(1), 2014, 59-71 (SSVI, density function g, calendar and butterfly conditions) (not opened)
+- [S3] Clark, I. J., *Foreign Exchange Option Pricing*, Wiley, 2011 (spot, forward and premium-adjusted delta conventions) (not opened)
+- [S4] Reiswich, D. and Wystup, U., "FX volatility smile construction", *Wilmott Journal* 2012 / Frankfurt School CPQF working paper 20, 2010 (delta conventions) (not opened)

@@ -24,7 +24,7 @@ Each quote is the spread on the foreign leg (EUR `ESTR` + spread, notional 1) th
 
 ## `fx.xccy.pv`
 
-Inputs: `domestic`, `foreign_projection`, `foreign_discount`, `spot` (USD per EUR), `trade` `{start, months, foreign_notional, spread, side}`, `side` `RECEIVE_FOREIGN` or `PAY_FOREIGN`. Outputs: `foreign_leg` (EUR, `N_f`, spread on it, `foreign_discount`), `domestic_leg` (USD, `N_f spot`, flat, `domestic` for both), `pv = sign (spot foreign_leg - domestic_leg)` in USD, sign +1 for `RECEIVE_FOREIGN`. Constant notional: no resets.
+Inputs: `domestic`, `foreign_projection`, `foreign_discount`, `spot` (USD per EUR), `trade` `{start, months, foreign_notional, spread, side}`, `side` `RECEIVE_FOREIGN` or `PAY_FOREIGN`. Outputs: `foreign_leg` (EUR, `N_f`, spread on it, `foreign_discount`), `domestic_leg` (USD, `N_f spot`, flat, `domestic` for both), `pv = sign (spot foreign_leg - domestic_leg)` in USD, sign +1 for `RECEIVE_FOREIGN`. Constant notional: no resets. **Synthetic instrument (R5, ruling R1-1):** this is a constant-notional basis swap. The market EUR/USD cross-currency basis swap resets the USD notional each period (mark-to-market), so the curve solved here is not the market xccy-implied curve and must never be described as one. The MTM-reset variant is row E13 of `../edge-case-register.md`.
 
 ## `fx.ndf.pv`
 
@@ -37,3 +37,13 @@ Checks, in order: `payment_date < fixing_date`: `E_DATE_ORDER`. `fixing_date <= 
 ## Acceptance
 
 Bootstrap pillars within 1e-9 of known truth; replay recovers it within 1e-13. PV: 1e-9 per unit notional; QuantLib `OvernightLeg` NPV of the foreign coupons agrees within 1e-6 on 1e7. NDF: class `interpolation`, analytic. Suite `stage_d/xccy_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Fujii, M., Shimada, Y. and Takahashi, A., "A note on construction of multiple swap curves with and without collateral", *FSA Research Review* 6, 2010 (collateralised cross-currency discounting) (not opened)
+- [S2] Andersen, L. B. G. and Piterbarg, V. V., *Interest Rate Modeling*, Atlantic Financial Press, 2010, vol. 1, chapter on multi-curve and cross-currency (not opened)
+- [S3] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Swaps" (currency swaps) (not opened)
+- [S4] Federal Reserve Bank of New York, SOFR and reference-rate production methodology (statement on the Secured Overnight Financing Rate) (not opened)
+- [S5] European Central Bank, *Euro short-term rate (€STR) methodology and policies* (not opened)

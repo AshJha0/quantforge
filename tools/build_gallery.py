@@ -3,6 +3,8 @@
 
     python tools/build_gallery.py           # runs all four CLIs, rewrites data and pages
     python tools/build_gallery.py --check   # reruns the Python CLI, changes nothing
+    python tools/build_gallery.py --refresh-real  # also fetches a new real-data snapshot (gallery_real.py)
+    python tools/build_gallery.py --evidence-only # recounts golden evidence after golden-only changes; no CLI runs
 
 Commands come from conformance/runner/implementations.json, so the CLIs must be built first. This
 file holds no financial logic: it sends cases, stores what comes back and draws it. Its only sums
@@ -25,6 +27,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 from runner import resolve_command  # noqa: E402
+sys.path.insert(0, str(ROOT / "tools"))
+import gallery_real  # noqa: E402
 
 OUT = ROOT / "docs" / "curves"
 DATA = OUT / "data"
@@ -244,21 +248,21 @@ PLANNED = [
 STAGE_D = {
     "ois-full": {"kind": "stage-d", "title": "OIS curves: full SOFR, ESTR and SONIA", "short": "Full SOFR, ESTR, SONIA OIS", "cli": "rates.ois.bootstrap", "examples": {"rates.ois.bootstrap": "estr_ois_d.json", "rates.ois.compound_dated": "real_sofr_compound_2026_10.json"},
                  "real": {"real_sofr_compound_2026_10.json": "Real data: SOFR fixings from 2026-09-21 to 2026-11-05, from the Federal Reserve Bank of New York markets API, fetched 2026-11-07, converted from percent to decimal (the only modification). The SOFR data is subject to the Terms of Use posted at newyorkfed.org; the New York Fed does not endorse this use, and SOFR is calculated using data licensed from DTCC Solutions LLC."},
-                 "shows": "Discount factors and forwards, with meeting-date steps and observation conventions, and compounding of published overnight fixings."},
+                 "shows": "Discount factors and forwards, with meeting-date steps and observation conventions, and compounding of published overnight fixings. The ESTR payment lag of 2 days is a library choice, from Strata 2.12.78, not a market standard; TP ICAP terms use 1 (ruling R1-2)."},
     "bond-fit": {"kind": "stage-d", "title": "Bond and sovereign curve fits", "short": "Bond and sovereign fits", "cli": "bond.fit.nelson_siegel", "examples": {"bond.fit.nelson_siegel": "bond_fit_ns_d.json"},
                  "shows": "A fitted yield curve against bond yields, with residuals per bond."},
     "repo": {"kind": "stage-d", "title": "Repo and special repo curves", "short": "Repo and special repo", "cli": "repo.forward", "examples": {"repo.forward": "repo_forward_d.json"},
              "shows": "General collateral repo rates by term, and specials against them."},
     "cross-currency": {"kind": "stage-d", "title": "Cross-currency basis curves", "short": "Cross-currency", "cli": "fx.xccy.bootstrap", "examples": {"fx.xccy.bootstrap": "xccy_bootstrap_d.json"},
-                       "shows": "Basis by tenor and the FX forwards it implies."},
+                       "shows": "Basis by tenor and the FX forwards it implies, on a synthetic constant-notional basis swap, not a market-implied curve. The market's mark-to-market resetting swap is edge-case register row E13, out of scope until stage F (ruling R1-1)."},
     "cds": {"kind": "stage-d", "title": "Credit curves and ISDA CDS", "short": "Credit and ISDA CDS", "cli": "credit.cds.bootstrap", "examples": {"credit.cds.bootstrap": "cds_bootstrap_d.json"},
-            "shows": "Survival probabilities and hazard rates from CDS quotes."},
+            "shows": "Survival probabilities and hazard rates from CDS quotes. Every credit operation needs a `LOG_LINEAR_DF` discount curve, the ISDA flat-forward rule; anything else is `E_INPUT` (ruling R1-4)."},
     "dividend-borrow": {"kind": "stage-d", "title": "Dividend and borrow curves", "short": "Dividend and borrow", "cli": "eq.dividend.implied", "examples": {"eq.dividend.implied": "dividend_implied_d.json", "eq.borrow.implied": "borrow_implied_d.json"},
                         "shows": "Dividend schedules and borrow cost by term, and their effect on equity forwards."},
     "inflation": {"kind": "stage-d", "title": "Inflation curves, with seasonality", "short": "Inflation, with seasonality", "cli": "infl.curve.cpi", "examples": {"infl.curve.cpi": "inflation_cpi_d.json"},
                   "shows": "Forward index levels with and without the seasonal adjustment."},
     "caps-swaptions": {"kind": "stage-d", "title": "Cap surface and swaption cube", "short": "Caps and swaptions", "cli": "rates.cap.price", "examples": {"rates.cap.price": "cap_price_d.json", "rates.swaption.price": "swaption_price_d.json"},
-                       "shows": "Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike."},
+                       "shows": "Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike. The conventions are stylised: a synthetic term index, no fixing lag and an annual 30/360 fixed leg (ruling R1-5)."},
     "commodities": {"kind": "stage-d", "title": "Commodity forward curves, with seasonality and storage carry", "short": "Commodity forwards", "cli": "cmdty.curve.forward", "examples": {"cmdty.curve.forward": "commodity_forward_d.json", "cmdty.storage.carry": "commodity_carry_d.json"},
                     "shows": "Forward prices by delivery month, with seasonality and carry shown apart."},
     "mbs": {"kind": "stage-d", "title": "MBS prepayment and valuation curves", "short": "MBS", "cli": "mbs.cashflows", "examples": {"mbs.cashflows": "mbs_cashflows_d.json"},
@@ -649,11 +653,16 @@ def index_page(all_data):
         rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "D",
                      f"{all_data[slug]['evidence']['cases']} golden case{'s' if all_data[slug]['evidence']['cases'] != 1 else ''}" if live and slug in all_data else "None yet"])
     rows += [[name, "Planned", stage, "None yet"] for name, stage in PLANNED]
+    real = ""
+    if gallery_real.SLUG in all_data:
+        real = ("\n## Real data\n\n"
+                f"[US Treasury curve with sanity bands]({gallery_real.SLUG}.md): the one page built from real public data, "
+                f"snapshot of {all_data[gallery_real.SLUG]['inputs']['as_of']}. The same bands run daily in workflow (a).\n")
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
@@ -662,7 +671,7 @@ Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown.
 
 {table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
-
+{real}
 ## How the gallery is built
 
 `tools/build_gallery.py` runs the CLIs and writes these pages and `docs/curves/data/`. CI reruns the Python CLI and fails if a committed number moves by more than {TOL['curve'][0]:g} plus {TOL['curve'][1]:g} relative, or {TOL['risk'][0]:g} plus {TOL['risk'][1]:g} relative for risk figures. See [the guide](../developer-guides/curves-gallery.md).
@@ -679,6 +688,10 @@ def render_all(all_data):
     for slug, spec in STAGE_D.items():
         live = is_live(spec) and slug in all_data
         pages[f"{slug}.md"] = RENDERERS[spec["kind"]](slug, spec, all_data[slug]) if live else planned_page(slug, spec)
+    if gallery_real.SLUG in all_data:
+        d = all_data[gallery_real.SLUG]
+        versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
+        pages[f"{gallery_real.SLUG}.md"] = gallery_real.page(d, chart, table, versions)
     return pages
 
 
@@ -1009,12 +1022,61 @@ def run_curve(lang, spec):
     return (rates_curve if spec["kind"] == "rates" else fx_curve)(lang, spec)
 
 
-def generate():
+def generate_real(meta, refresh):
+    path = DATA / f"{gallery_real.SLUG}.json"
+    inputs = gallery_real.fetch_inputs() if refresh or not path.is_file() else json.loads(path.read_text(encoding="utf-8"))["inputs"]
+    results = {lang: gallery_real.run(lang, inputs, batch) for lang in LANGS}
+    gap = max(abs(a["discount_factor"] - b["discount_factor"]) for lang in LANGS
+              for a, b in zip(results[lang]["pillars"], results["python"]["pillars"]))
+    d = {"meta": meta, "inputs": inputs, "reference": results["python"], "agreement": gap}
+    path.write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    return d
+
+
+def committed_slugs():
+    return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()]
+
+
+def refresh_evidence():
+    """Recounts golden evidence for every page from datasets/golden and re-renders. No CLI runs and no change to run data,
+    so it is the fix when only goldens were added: the run data stays as committed, and --check still compares it."""
+    all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
+    real = DATA / f"{gallery_real.SLUG}.json"
+    if real.is_file():
+        all_data[gallery_real.SLUG] = json.loads(real.read_text(encoding="utf-8"))
+    changed = []
+    for slug, d in all_data.items():
+        if slug in CURVES:
+            new = evidence(CURVES[slug])
+        elif slug in VOLS:
+            new = golden_c(VOLS[slug]["golden"])
+        elif slug in STAGE_D:
+            new = golden_d(STAGE_D[slug]["examples"])
+        else:
+            continue
+        if d["evidence"] != new:
+            d["evidence"] = new
+            changed.append(slug)
+            (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    for name, text in render_all(all_data).items():
+        (OUT / name).write_text(text, encoding="utf-8", newline="\n")
+    print(f"evidence recounted; changed: {', '.join(changed) or 'none'}")
+    return 0
+
+
+def generate(refresh_real=False, real_only=False):
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     meta = {"commit": commit, "date": dt.date.today().isoformat(), "reference_language": "python", "tolerance": TOL,
             "data": "synthetic", "cli": {lang: json.loads(call(lang, "version")) for lang in LANGS}}
     DATA.mkdir(parents=True, exist_ok=True)
     all_data = {}
+    if real_only:  # keep every synthetic page's committed data; rebuild only the real-data page and the index
+        all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
+        all_data[gallery_real.SLUG] = generate_real({**meta, "data": "real"}, refresh_real)
+        for name in ("README.md", f"{gallery_real.SLUG}.md"):
+            (OUT / name).write_text(render_all(all_data)[name], encoding="utf-8", newline="\n")
+        print(f"real-data page written to {OUT}")
+        return 0
     for slug, spec in CURVES.items():
         results = {lang: run_curve(lang, spec) for lang in LANGS}
         example = read_example(spec["example"])
@@ -1100,6 +1162,9 @@ def check():
         compare(d["reference"], d_run("python", spec), slug, bad)
         if d["evidence"] != golden_d(spec["examples"]):
             bad.append(f"{slug}: golden evidence changed")
+    d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
+    all_data[gallery_real.SLUG] = d
+    compare(d["reference"], gallery_real.run("python", d["inputs"], batch), gallery_real.SLUG, bad)
     for name, text in render_all(all_data).items():
         path = OUT / name
         if not path.is_file() or path.read_text(encoding="utf-8") != text:
@@ -1113,7 +1178,13 @@ def check():
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true", help="rerun the Python CLI and compare with committed data")
-    return check() if ap.parse_args().check else generate()
+    ap.add_argument("--refresh-real", action="store_true", help="fetch a new real-data snapshot before generating")
+    ap.add_argument("--real-only", action="store_true", help="rebuild only the real-data page and the index")
+    ap.add_argument("--evidence-only", action="store_true", help="recount golden evidence and re-render; no CLI runs")
+    a = ap.parse_args()
+    if a.evidence_only:
+        return refresh_evidence()
+    return check() if a.check else generate(a.refresh_real, a.real_only)
 
 
 if __name__ == "__main__":

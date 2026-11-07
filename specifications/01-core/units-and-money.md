@@ -23,3 +23,10 @@ Output form: no trailing zeros are required by `add_money`, which writes the sho
 ## Acceptance
 
 Exact. Oracle: Python `decimal`, and hand cases.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] ISO 4217, currency codes and minor units (not opened)
+- [S2] No other external convention: percent and basis-point scaling is definitional

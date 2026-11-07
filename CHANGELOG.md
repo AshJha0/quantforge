@@ -1,8 +1,31 @@
 # Changelog
 
+## 0.4.1: R1, credibility hardening (Unreleased)
+
+On branch `r1` at `3f5d97d`. No new pricing. No golden value changed except where a ruling below says so.
+
+### Added
+- Batch mode, CLI contract 1.6.0: `quantforge --batch` as a synonym of `quantforge batch`, framing rules BT1 to BT8, the optional `--timings` flag (`diagnostics.elapsed_ns`), and 19 stream fixtures in `datasets/batch/streams.json`, checked by `conformance/runner/batch_check.py`. The wire `contract_version` stays 1.0.0.
+- Rulings R1-1 to R1-6 (`specifications/r1-rulings.md`): cross-currency is a synthetic constant-notional basis swap; the ESTR payment lag of 2 is a Strata library choice, while TP ICAP terms use 1; bond-future conversion factors take an optional `contract` input with CME rounding; every credit operation needs a `LOG_LINEAR_DF` discount curve; cap and swaption conventions are stylised; USGS Good Fridays with a SIFMA early close are business days, and SOFR compounding skips every Good Friday.
+- The edge-case register (`specifications/edge-case-register.md`, 14 rows), the model inventory (`docs/model-inventory.md`), calendar provenance (`datasets/calendar_provenance.json`) and tolerances in money (`conformance/tolerances/money.md`). 5,837 golden cases in 74 suite files.
+- GitHub Actions jobs: recorder and gap monitor, cross-platform conformance (3 OS by 4 languages), daily workflows (a) and (c) through `--batch`, sanity bands including Bank of England GBP curves, per-stage mutation report, outside-oracle floor, calendar expiry. A local Linux C++ path under WSL. See `docs/developer-guides/r1-infra.md`.
+- Batch performance targets, written before measuring (`benchmarks/targets.md`), and a real-data gallery page (`docs/curves/real-usd-treasury.md`).
+- Three R3 preregistrations, signed by Claude under the owner's delegation; the holdout is unread.
+- The honest-ceiling statement in `README.md` and on the site home page. Batch mode sections in `COOKBOOK.md` and `LEARN.md`, an R1 section in `ROADMAP.md`.
+
+### Changed
+- Unit-test line coverage: C++ 94.2%, Java 97.3%, Rust 96.5% (language lanes), Python 97.2% (measured on `3f5d97d`).
+- Stage D outside-oracle coverage is 63.4% under rule 11.2.5, mostly fixed-rate bonds; every suite at 0% has a reason in `oracle/REPORT.md`.
+- `README.md` no longer says stage D is untagged.
+
+### Known issues
+- Python fuzz runs about 9,500 inputs a minute (coordinator check, seed 41, 90 s) against a 50,000 target.
+- The calendar provenance check fails until SIFMA publishes its 2027 US holiday schedule (usually in December); the USGS calendar is confirmed only through 2027-01-01.
+- The mutation report and cross-platform matrix first run after the push, so neither has a result yet.
+
 ## 0.4.0: stage D, curves and fixed income (2026-11-07)
 
-Not tagged yet. Stage D is at Implemented, not Validated. Figures are local runs on Windows, 2026-11-07, on branch `stage-d` at merge `95cbf11`.
+Tagged `v0.4` on `e4047a1` after pull request #15. Stage D is at Implemented, not Validated. Figures are local runs on Windows, 2026-11-07, on branch `stage-d` at merge `95cbf11`.
 
 ### Added
 - Stage D in all four implementations, from the specs alone: D1 rates core (SOFR and ESTR OIS, curve jumps, lookback, observation shift and lockout, IBOR fallbacks, meeting-date steps, Hull-White futures convexity, CSA discounting, OIS index basis, joint bootstrap, smoothness-regularised and Huber curve fits), D2 bonds, Z-spread, asset swap, FRN, repo and special repo, conversion factors and CTD, sovereign fits, D3 cross-currency basis and NDFs, D4 ISDA CDS, index CDS and composite curves, D5 implied dividends and borrow, futures basis, index dividends and dividend futures, rebalancing, corporate actions and TRS, D6 CPI curves with seasonality, zero-coupon inflation swaps and linkers, D7 caps, floors and swaptions on flat or quoted vol, D8 commodity curves with seasonality and storage carry, D9 MBS prepayment and pass-through pricing.
