@@ -111,8 +111,8 @@ class Report:
         tail = ["", "## Data notices", ""] + [f"- {n}" for n in notices] + [""]
         self.dir.mkdir(parents=True, exist_ok=True)
         slug = self.name.lower().replace(" ", "-")
-        (self.dir / f"{slug}.md").write_text("\n".join(head + self.lines + checks + tail), encoding="utf-8")
+        (self.dir / f"{slug}.md").write_text("\n".join(head + self.lines + checks + tail), encoding="utf-8", newline="\n")
         self.data["checks"] = self.checks
-        (self.dir / f"{slug}.json").write_text(json.dumps(self.data, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        (self.dir / f"{slug}.json").write_text(json.dumps(self.data, indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
         print(f"wrote {self.dir / slug}.md: {'FAIL' if bad else 'PASS'}")
         return 1 if bad else 0
