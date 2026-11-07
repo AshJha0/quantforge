@@ -15,17 +15,25 @@ Phase R2 (target v0.4.2). This builds on [r1-infra.md](r1-infra.md). Every job i
 
 This covers seven calibrations, C1 to C7, under 200 seeded noise draws from `core.rng.normals` (seed 20261107, stream = calibration number), scored on metrics S1 to S7.
 
-**First run, 2026-11-07, all four languages:** the gallery page is [calib-stability.md](../curves/calib-stability.md).
+**Run under rulings R2-A2 and R2-A7, 2026-11-07, all four languages: PASS on all 28 rows.** The gallery page is [calib-stability.md](../curves/calib-stability.md).
 
-- **Agreement and determinism:** all four languages give identical figures. S1 and S2 pass everywhere.
-- **Passing:** S3 noise amplification passes for every calibration, from 0.003 for C3 to 4.0 for C4. S6 is 1.00 for C5.
-- **S7 fails for C3, C6 and C7:** a 3-to-5-parameter fit cannot reprice 7 to 9 independently perturbed points much better than the noise. The worst errors observed are 2.6e-3 per 100 (C3), 2.6e-4 in total variance (C6) and 2.8e-4 in vol (C7), against thresholds of 1e-6 to 1e-8. This needs a spec ruling.
-- **C3 grid:** no operation evaluates a Nelson-Siegel curve from betas, so the tool evaluates the form stated in `curve-fits.md` on the grid. This is the one place a formula lives in the tool, and it is flagged in the code and on the page.
-- **C6 noise:** the spec states the vol noise in vol points, but SVI takes total variance. The run uses 1e-4 in total variance.
+| Cal | S3 A (threshold) | S7 (threshold) | Notes |
+|---|---|---|---|
+| C1 OIS LOG_LINEAR_DF | 1.55 (3) | 1.1e-14 (1e-12) | |
+| C2 OIS LINEAR_ZERO | 1.64 (3) | 1.1e-14 (1e-12) | |
+| C3 bond NS fit | 0.027 bp per 0.001 (20) | RMS 7.4e-4 (rms_0 + 1.5a = 1.5e-3) | S5: 3.7e-5, 0.0022, 0.0055 |
+| C4 smoothing spline | 4.02 (5) | — | |
+| C5 robust NS | 0.69 (5) | — | S6 1.00 (0.95) |
+| C6 SVI | 0.71 (10) | RMS 6.9e-5 vol (1.5e-4) | noise on sqrt(w), i.e. T = 1 |
+| C7 SABR | 0.98 (10) | RMS 7.6e-5 vol (1.5e-4) | S5: 2.6e-4, 0.0018, 0.0015 |
+
+- **Agreement:** S1 and S2 pass in every language, and S3 agrees across languages to within 2e-8.
+- **Earlier run:** under the original thresholds, S7 failed on C3, C6 and C7. That led to ruling R2-A2.
+- **C3 grid:** no operation evaluates a Nelson-Siegel curve from betas, so the tool evaluates the `curve-fits.md` form on the grid. This is flagged in the code and on the page.
 
 ## Rich/cheap: blocked on data
 
-`rich_cheap.py` implements the whole spec: T+1 settlement, filters, the ex-dividend drop for gilts (E9), the Nelson-Siegel fit with `tau` 2.5, yield residuals in bp, a trailing 60-day z-score, buckets, ranks and marks. It never fetches, because both free sources refuse automated use (terms checked 2026-11-07):
+`rich_cheap.py` implements the whole spec: T+1 settlement, filters, the ex-dividend drop for gilts (E9), 1/D_mod² weights (R2-A5), and weight 0 for US on-the-run and first off-the-run issues (R2-A6, taken from Fiscal Data's open auction API: "free, without restriction", no key, robots allows all). It also covers the Nelson-Siegel fit with `tau` 2.5, yield residuals in bp, a trailing 60-day z-score, buckets, ranks and marks. It never fetches, because both free sources refuse automated use (terms checked 2026-11-07):
 
 - **TreasuryDirect FedInvest:** `robots.txt` says `User-agent: * / Disallow: /`. The terms allow non-commercial personal use only, and distribution needs Fiscal Service's written consent.
 - **UK DMO gilt reference prices:** automated requests get an anti-bot challenge, so the terms could not be read by a script.

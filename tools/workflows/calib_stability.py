@@ -30,7 +30,8 @@ SEED = "20261107"
 LABEL = "Synthetic inputs; stability of the method, not of any market."
 POLICY = runner.load_policy(c.ROOT / "conformance" / "tolerances" / "policy.yaml")
 RATE_A, VOL_A, PRICE_A = 1e-5, 1e-4, 1e-3  # 0.1 bp, 0.01 vol points, 0.001 per 100
-TV_A = 1e-4  # C6 total variance: the spec states vol points; one vol point squared-per-year scale is taken as 1e-4 (raised with spec)
+# C6: SVI takes total variance w with no expiry. Noise goes on vol sigma = sqrt(w), i.e. at T = 1 (ruling R2-A7 gives a in vol;
+# the T = 1 reading is infra's and is stated in the report).
 
 
 def golden_case(case_id):
@@ -94,23 +95,25 @@ def cal_specs():
                    out=lambda i, o, ev: zeros_from_pillars(o["pillars"], i["as_of"]),
                    s7=lambda i, o, ev, d: d.get("max_repricing_error"), th=dict(S3=3, S7=1e-12)),
         "C3": dict(case="bondfit_d-0001", get=bonds_get, set=bonds_set, a=PRICE_A, out=c3_out,
-                   s7=lambda i, o, ev, d: max(abs(r) for r in o["residuals"]), s7_relative=True,
-                   params=lambda o: o["betas"], th=dict(S3=20, S7=1e-6)),
+                   s7=lambda i, o, ev, d: list(o["residuals"]), s7_rms=True, a_factor=1e4 * PRICE_A,  # A in bp of zero per 0.001 of price
+                   params=lambda o: o["betas"], th=dict(S3=20, S7="rms")),
         "C4": dict(case="fits_d-0001", get=key_get("zero_rates"), set=key_set("zero_rates"), a=RATE_A,
                    out=lambda i, o, ev: o["forwards"], th=dict(S3=5)),
         "C5": dict(case="fits_d-0009", get=key_get("zero_rates"), set=key_set("zero_rates"), a=RATE_A,
                    out=lambda i, o, ev: [y + r for y, r in zip(i["zero_rates"], o["residuals"])],
                    discrete=lambda o: sorted(o["outliers"]), th=dict(S3=5, S6=0.95)),
-        "C6": dict(case="smile-0034", get=key_get("total_variance"), set=key_set("total_variance"), a=TV_A,
+        "C6": dict(case="smile-0034", get=lambda i: [math.sqrt(w) for w in i["total_variance"]],
+                   set=lambda i, v: i.__setitem__("total_variance", [x * x for x in v]), a=VOL_A,
                    evaluate=lambda i, o: ("vol.svi.evaluate", {"svi": o["svi"], "log_moneyness": i["log_moneyness"], "expiry_years": 1.0}),
                    out=lambda i, o, ev: ev["total_variance"],
-                   s7=lambda i, o, ev, d: max(abs(w - y) for w, y in zip(ev["total_variance"], i["total_variance"])), th=dict(S3=10, S7=1e-8)),
+                   s7=lambda i, o, ev, d: [math.sqrt(max(w, 0.0)) - math.sqrt(y) for w, y in zip(ev["total_variance"], i["total_variance"])],
+                   s7_rms=True, th=dict(S3=10, S7="rms")),
         "C7": dict(case="sabr-0019", get=key_get("vols"), set=key_set("vols"), a=VOL_A,
                    evaluate=lambda i, o: ("vol.sabr.hagan", {"forward": i["forward"], "strikes": i["strikes"], "expiry_years": i["expiry_years"],
                                                             "alpha": o["alpha"], "beta": i["beta"], "rho": o["rho"], "nu": o["nu"]}),
                    out=lambda i, o, ev: ev["vols"],
-                   s7=lambda i, o, ev, d: max(abs(v - y) for v, y in zip(ev["vols"], i["vols"])),
-                   params=lambda o: [o["alpha"], o["rho"], o["nu"]], th=dict(S3=10, S7=1e-6)),
+                   s7=lambda i, o, ev, d: [v - y for v, y in zip(ev["vols"], i["vols"])], s7_rms=True,
+                   params=lambda o: [o["alpha"], o["rho"], o["nu"]], th=dict(S3=10, S7="rms")),
     }
 
 
@@ -164,13 +167,13 @@ def run_impl(impl, specs, noise, n_draws):
         base_vec = s["out"](base_in, res["base"]["outputs"], evals.get("base"))
         dvecs = [s["out"](inputs[f"d{k}"], res[f"d{k}"]["outputs"], evals.get(f"d{k}")) for k in range(n_draws) if res[f"d{k}"]["status"] == "ok"]
         stds = [statistics.pstdev(col) for col in zip(*dvecs)] if len(dvecs) > 1 else []
-        row["S3"] = max(stds) / s["a"] if stds else None
+        row["S3"] = max(stds) / s["a"] * s.get("a_factor", 1.0) if stds else None
         resp = []
         for j in range(n):
             t = f"b{j}"
             if res[t]["status"] == "ok":
                 v = s["out"](inputs[t], res[t]["outputs"], evals.get(t))
-                resp.append(max(abs(x - y) for x, y in zip(v, base_vec)) / s["a"])
+                resp.append(max(abs(x - y) for x, y in zip(v, base_vec)) / s["a"] * s.get("a_factor", 1.0))
             else:
                 resp.append(None)
         ok_resp = [(r_, j) for j, r_ in enumerate(resp) if r_ is not None]
@@ -189,11 +192,16 @@ def run_impl(impl, specs, noise, n_draws):
             if any(v is None for v in vals):
                 row["S7"] = None
                 row["S7_note"] = "diagnostic max_repricing_error not returned by this CLI"
+            elif s.get("s7_rms"):
+                # Ruling R2-A2: pooled RMS repricing error over the draws, against rms_0 + 1.5 a (rms_0: the noise-free fit).
+                errs = [e for v in vals for e in v]
+                base_errs = s["s7"](base_in, res["base"]["outputs"], evals.get("base"), res["base"].get("diagnostics") or {})
+                rms0 = math.sqrt(sum(e * e for e in base_errs) / len(base_errs))
+                row["S7"] = math.sqrt(sum(e * e for e in errs) / len(errs)) if errs else None
+                row["S7_rms0"], row["S7_limit"] = rms0, rms0 + 1.5 * s["a"]
+                row["S7_worst_draw_rms"] = max(math.sqrt(sum(e * e for e in v) / len(v)) for v in vals) if vals else None
             else:
-                worst = max(vals) if vals else None
-                if s.get("s7_relative") and worst is not None:
-                    worst -= s["s7"](base_in, res["base"]["outputs"], evals.get("base"), res["base"].get("diagnostics") or {})
-                row["S7"] = worst
+                row["S7"] = max(vals) if vals else None
         out[cid] = row
     return out
 
@@ -229,7 +237,8 @@ def judge(specs, results):
             if "S6" in th:
                 v["S6"] = row.get("S6") is not None and row["S6"] >= th["S6"]
             if "S7" in th:
-                v["S7"] = row.get("S7") is not None and row["S7"] <= th["S7"]
+                limit = row.get("S7_limit") if th["S7"] == "rms" else th["S7"]
+                v["S7"] = row.get("S7") is not None and limit is not None and row["S7"] <= limit
             row["verdict"] = v
             verdicts.append((cid, lang, all(v.values())))
     return verdicts
@@ -255,7 +264,9 @@ def main():
     verdicts = judge(specs, results)
     r = c.Report("Calibration stability", dt.date.today().isoformat(), a.out)
     r.p(f"{LABEL} Seed {SEED}, stream = calibration number (`core.rng.normals` via {a.impls[0]}), {a.draws} draws. "
-        f"Amplitudes: rates {RATE_A}, vols {VOL_A}, prices {PRICE_A} per 100, SVI total variance {TV_A}. "
+        f"Gaussian noise N(0, a^2): rates {RATE_A}, vols {VOL_A} (SVI: on sqrt(total variance), i.e. T = 1), prices {PRICE_A} per 100 (R2-A7). "
+        "A units: bp per bp (C1, C2, C4, C5), bp of zero per 0.001 of price (C3), total variance per 0.0001 of vol (C6), vol per vol (C7). "
+        "S7 for C3, C6, C7: pooled RMS against rms_0 + 1.5 a (R2-A2). "
         "Thresholds are the spec's provisional ones (`specifications/03-calibration/stability.md`); this is a first-run report.")
     head = ["Cal", "Language", "Base case", "S1", "S2", "S3 (A)", "S4 largest (input)", "S5 (std/base)", "S6", "S7", "Pass"]
     rows = []
@@ -272,7 +283,8 @@ def main():
                          f"{fmt(row.get('S4', {}).get('largest'))} (#{row.get('S4', {}).get('input_index')})",
                          ", ".join(fmt(x, "{:.2g}") for x in row["S5"]) if row.get("S5") else "",
                          mark("S6", f"{fmt(row.get('S6'), '{:.2f}')} ≥ {th['S6']}") if "S6" in th else "",
-                         mark("S7", f"{fmt(row.get('S7'), '{:.2e}')} ≤ {th['S7']:g}" if row.get("S7") is not None else row.get("S7_note", "—")) if "S7" in th else "",
+                         mark("S7", (f"{fmt(row.get('S7'), '{:.2e}')} ≤ " + (f"{row['S7_limit']:.2e}" if th['S7'] == "rms" else f"{th['S7']:g}"))
+                              if row.get("S7") is not None else row.get("S7_note", "—")) if "S7" in th else "",
                          "PASS" if all(v.values()) else "FAIL"])
             r.check(f"{cid} {lang}", "fail", all(v.values()), ", ".join(k for k, ok in v.items() if not ok) or "all judged metrics pass")
     r.h("Results")

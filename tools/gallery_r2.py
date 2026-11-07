@@ -16,8 +16,8 @@ CALIB = "calib-stability"
 RICH = "rich-cheap"
 NAMES = {"C1": "OIS bootstrap, LOG_LINEAR_DF", "C2": "OIS bootstrap, LINEAR_ZERO", "C3": "Bond Nelson-Siegel fit", "C4": "Smoothing spline",
          "C5": "Robust Nelson-Siegel", "C6": "SVI smile", "C7": "SABR smile"}
-TH = {"C1": {"S3": 3, "S7": 1e-12}, "C2": {"S3": 3, "S7": 1e-12}, "C3": {"S3": 20, "S7": 1e-6}, "C4": {"S3": 5}, "C5": {"S3": 5, "S6": 0.95},
-      "C6": {"S3": 10, "S7": 1e-8}, "C7": {"S3": 10, "S7": 1e-6}}
+TH = {"C1": {"S3": 3, "S7": "1e-12"}, "C2": {"S3": 3, "S7": "1e-12"}, "C3": {"S3": 20, "S7": "rms_0 + 1.5a"}, "C4": {"S3": 5}, "C5": {"S3": 5, "S6": 0.95},
+      "C6": {"S3": 10, "S7": "rms_0 + 1.5a (vol)"}, "C7": {"S3": 10, "S7": "rms_0 + 1.5a (vol)"}}
 
 
 def g(x, f="{:.3g}"):
@@ -44,7 +44,7 @@ def calib_page(d, table, bars):
     fails = sum(1 for r in rows if r[-1] != "PASS")
     return f"""# Calibration stability
 
-<p class="note">Status: Implemented, not Validated. <strong>Synthetic inputs; stability of the method, not of any market.</strong> The thresholds are the spec's provisional ones, and this is the first run, so a failure here is a finding about the threshold or the method, reported as it is.</p>
+<p class="note">Status: Implemented, not Validated. <strong>Synthetic inputs; stability of the method, not of any market.</strong> The thresholds are the spec's provisional ones, and this is the first run, so a failure is a finding about the threshold or the method, reported as it is.</p>
 
 From `tools/workflows/calib_stability.py` (spec `specifications/03-calibration/stability.md`), run on {d['as_of']} with {', '.join(langs)}: seed {d['seed']}, {d['draws']} noise draws per calibration from the library's own generator (`core.rng.normals`, stream = calibration number). {fails} of {len(rows)} rows fail a judged metric.
 
@@ -70,12 +70,12 @@ From `tools/workflows/calib_stability.py` (spec `specifications/03-calibration/s
 
 {table(['Cal', 'Method', 'S3 at most', 'S6 at least', 'S7 at most'], th_rows)}
 
-## Reading the first run
+## Reading the run
 
-- **S7 on fitted models (C3, C6, C7).** A model with 3 to 5 parameters cannot reprice 7 to 9 independently perturbed points to 1e-8. Its repricing error sits near the noise amplitude by construction. The spec's S7 thresholds for these fits look like targets for noise-free inputs, so they go back to the spec session for a ruling.
-- **C3 units.** S3 is in zero-rate units per unit of price (per 100), so the value is small against a threshold of 20. The spec should say which units the threshold means.
-- **C6 amplitude.** The spec gives the vol noise in vol points, but SVI takes total variance. The run uses 1e-4 in total variance and says so.
-- **C3 grid.** No operation evaluates a Nelson-Siegel curve from its betas, so the tool evaluates the form stated in `curve-fits.md` on the grid. The spec session has been asked whether to add an operation.
+- **Rulings applied (`specifications/r2-rulings.md`).** R2-A7: Gaussian noise `N(0, a^2)`. The amplitudes are 0.1 bp for rates, 0.0001 for vol and 0.001 per 100 for prices, and A is in the spec's units: bp per bp for C1, C2, C4 and C5; bp of zero per 0.001 of price for C3; total variance per 0.0001 of vol for C6; vol per vol for C7. R2-A2: S7 for the least-squares fits (C3, C6, C7) is the pooled RMS repricing error, which must be at most `rms_0 + 1.5 a`, where `rms_0` is the noise-free fit's RMS. C1 and C2 keep a 1e-12 solve tolerance.
+- **C6 noise on vol.** SVI calibration takes total variance and no expiry, so the noise goes on `sqrt(total variance)`, which is vol at T = 1. That reading is infra's and is stated here.
+- **C3 grid.** No operation evaluates a Nelson-Siegel curve from its betas, so the tool evaluates the form stated in `curve-fits.md` on the grid.
+- **An earlier run under the original thresholds** failed S7 on C3, C6 and C7. That is what led to ruling R2-A2.
 
 ## Limits
 
@@ -101,7 +101,7 @@ Until a source is cleared, the daily run writes a dated BLOCKED report. If a per
 
 1. Settlement T+1 on the market's calendar (`core.calendar.add_business_days`, USGS or GBLO).
 2. Universe filters: fixed-coupon nominal bonds with at least 1 year to maturity. Gilts in their ex-dividend period, 7 business days before a coupon, are dropped (edge register E9).
-3. Market yield and dirty price from `bond.yield.from_price`, then a Nelson-Siegel fit with `tau` = 2.5 (`bond.fit.nelson_siegel`). Its residuals are model minus market dirty price.
+3. Market yield and dirty price from `bond.yield.from_price`, and modified duration from `bond.price.from_yield`. Then a Nelson-Siegel fit with `tau` = 2.5 (`bond.fit.nelson_siegel`), weighted by 1/D_mod² (ruling R2-A5, after GSW 2007 and Anderson-Sleath 2001). US on-the-run and first off-the-run issues in each auction tenor (2, 3, 5, 7, 10, 20 and 30 years) get weight 0, but their residuals are still reported (R2-A6). They are identified from Fiscal Data's open auction API, which is free to use without restriction. No gilt is excluded. The residuals are model minus market dirty price.
 4. Yield residual in bp: market yield minus the yield at market clean plus residual. Positive means cheap. A z-score is computed against the bond's own trailing 60 days, once 20 days exist.
 5. Ranks within the 1-3, 3-7, 7-15 and 15+ year buckets, with the five cheapest and five richest bonds marked.
 

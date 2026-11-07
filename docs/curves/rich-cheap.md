@@ -17,7 +17,7 @@ Until a source is cleared, the daily run writes a dated BLOCKED report. If a per
 
 1. Settlement T+1 on the market's calendar (`core.calendar.add_business_days`, USGS or GBLO).
 2. Universe filters: fixed-coupon nominal bonds with at least 1 year to maturity. Gilts in their ex-dividend period, 7 business days before a coupon, are dropped (edge register E9).
-3. Market yield and dirty price from `bond.yield.from_price`, then a Nelson-Siegel fit with `tau` = 2.5 (`bond.fit.nelson_siegel`). Its residuals are model minus market dirty price.
+3. Market yield and dirty price from `bond.yield.from_price`, and modified duration from `bond.price.from_yield`. Then a Nelson-Siegel fit with `tau` = 2.5 (`bond.fit.nelson_siegel`), weighted by 1/D_mod² (ruling R2-A5, after GSW 2007 and Anderson-Sleath 2001). US on-the-run and first off-the-run issues in each auction tenor (2, 3, 5, 7, 10, 20 and 30 years) get weight 0, but their residuals are still reported (R2-A6). They are identified from Fiscal Data's open auction API, which is free to use without restriction. No gilt is excluded. The residuals are model minus market dirty price.
 4. Yield residual in bp: market yield minus the yield at market clean plus residual. Positive means cheap. A z-score is computed against the bond's own trailing 60 days, once 20 days exist.
 5. Ranks within the 1-3, 3-7, 7-15 and 15+ year buckets, with the five cheapest and five richest bonds marked.
 

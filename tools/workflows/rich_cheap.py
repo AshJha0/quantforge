@@ -21,10 +21,17 @@ Terms record:
   - Until a source is cleared, reports publish residuals and ranks only, never prices (spec: "Raw prices appear in the
     report only if the source's terms allow it").
 
+  - Fiscal Data "Treasury Securities Auctions Data" (https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query),
+    used only to mark on-the-run issues: the API documentation says the data "is offered free, without restriction", and the API
+    "does not require a user account or registration". fiscaldata.treasury.gov/robots.txt allows all; the API host has none.
+    Fetched once per run. TreasuryDirect's own auction service is not used (its robots.txt disallows all).
+
 Calculation, all through the CLI, with no pricing in this file:
   1. Settlement T+1: core.calendar.add_business_days (USGS, GBLO).
   2. bond.yield.from_price on market clean -> market yield and dirty; errors are dropped and listed.
-  3. bond.fit.nelson_siegel on dirty prices, tau 2.5, equal weights -> betas, residuals (model minus market dirty).
+  3. bond.price.from_yield at the market yield -> modified duration D_mod; weights w = 1 / D_mod^2 (ruling R2-A5). US Treasury
+     on-the-run and first off-the-run issues per auction tenor (2, 3, 5, 7, 10, 20, 30 years) get weight 0 but are still reported
+     (R2-A6); no gilt is excluded. bond.fit.nelson_siegel on dirty prices, tau 2.5 -> betas, residuals (model minus market dirty).
   4. model_clean = market_clean + residual; bond.yield.from_price at model_clean -> model yield.
   5. yield_residual_bp = (market yield - model yield) x 10,000: positive is cheap. z-score against the bond's trailing 60
      published days in --history (earlier JSON reports), or null with fewer than 20 days.
@@ -44,6 +51,10 @@ import common as c  # noqa: E402
 
 LABEL = "Fitted-curve residuals from end-of-day reference prices; not executable prices; tradability not established."
 TAU = 2.5
+AUCTIONS = ("https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query"
+            "?fields=cusip,security_type,original_security_term,auction_date,floating_rate,inflation_index_security"
+            "&filter=security_type:in:(Note,Bond),auction_date:gte:{since},auction_date:lte:{until}&sort=-auction_date&page[size]=1000")
+TENORS = ["2-Year", "3-Year", "5-Year", "7-Year", "10-Year", "20-Year", "30-Year"]
 MARKETS = {"ust": {"name": "US Treasury", "calendar": "USGS"}, "gilt": {"name": "UK gilts", "calendar": "GBLO"}}
 BUCKETS = [(1, 3), (3, 7), (7, 15), (15, 1000)]
 BLOCKED = [
@@ -68,6 +79,28 @@ def next_coupon(maturity, after):
     return d
 
 
+def benchmark_issues(date, auctions_file=None):
+    """{cusip: label} for the on-the-run and first off-the-run issue of each auction tenor, from auctions up to `date`."""
+    if auctions_file:
+        rows = json.loads(Path(auctions_file).read_text(encoding="utf-8"))["data"]
+    else:
+        since = (dt.date.fromisoformat(date) - dt.timedelta(days=3 * 366)).isoformat()
+        rows = json.loads(c.fetch(AUCTIONS.format(since=since, until=date)))["data"]
+    out = {}
+    for tenor in TENORS:
+        seen = []
+        for r in sorted(rows, key=lambda r: r["auction_date"], reverse=True):
+            if r["original_security_term"] != tenor or r.get("floating_rate") == "Yes" or r.get("inflation_index_security") == "Yes":
+                continue
+            if r["cusip"] not in seen:
+                seen.append(r["cusip"])
+            if len(seen) == 2:
+                break
+        for cusip, label in zip(seen, ("on-the-run", "first off-the-run")):
+            out[cusip] = f"{tenor} {label}"
+    return out
+
+
 def read_prices(path):
     with open(path, encoding="utf-8", newline="") as f:
         return [{"id": r["id"], "type": r["type"].strip().lower(), "coupon": float(r["coupon"]),
@@ -87,7 +120,7 @@ def history(hist_dir, market, before):
     return out
 
 
-def screen(market, rows, date, impl, hist):
+def screen(market, rows, date, impl, hist, benchmarks=None):
     m = MARKETS[market]
     dropped, keep = [], []
     settle = c.batch([c.case("s", "core.calendar.add_business_days", {"calendar": m["calendar"], "date": date, "days": 1})], impl)["s"]
@@ -129,7 +162,16 @@ def screen(market, rows, date, impl, hist):
     result = {"market": market, "settlement": settlement, "universe": len(good), "dropped": dropped, "bonds": []}
     if len(good) < 3:
         return result
-    fit = c.batch([c.case("fit", "bond.fit.nelson_siegel", {"settlement": settlement, "tau": TAU,
+    dur = c.batch([c.case(r["id"], "bond.price.from_yield", {"bond": bond(r), "settlement": settlement, "yield": r["yield"]}) for r in good], impl)
+    benchmarks = benchmarks or {}
+    weights = []
+    for r in good:
+        r["benchmark"] = benchmarks.get(r["id"], "") if market == "ust" else ""
+        d = dur[r["id"]]
+        r["d_mod"] = d["outputs"]["modified_duration"] if d["status"] == "ok" else None
+        weights.append(0.0 if r["benchmark"] or not r["d_mod"] else 1.0 / r["d_mod"] ** 2)
+    result["zero_weight"] = [(r["id"], r["benchmark"]) for r in good if r["benchmark"]]
+    fit = c.batch([c.case("fit", "bond.fit.nelson_siegel", {"settlement": settlement, "tau": TAU, "weights": weights,
                    "bonds": [{**bond(r), "dirty_price": r["dirty"]} for r in good]})], impl)["fit"]
     if fit["status"] != "ok":
         result["fit_error"] = fit["error"]
@@ -150,9 +192,10 @@ def screen(market, rows, date, impl, hist):
         bucket = next(f"{lo}-{hi}" if hi < 1000 else f"{lo}+" for lo, hi in BUCKETS if lo <= years < hi)
         result["bonds"].append({"id": r["id"], "coupon": r["coupon"], "maturity": r["maturity"].isoformat(), "years": years, "bucket": bucket,
                                 "market_clean": r["clean"], "model_clean": r["model_clean"], "price_residual": r["residual"],
-                                "yield_residual_bp": ybp, "zscore": z})
-    rms = (sum(e * e for e in res) / len(res)) ** 0.5
-    result["fit"] = {"betas": fit["outputs"]["betas"], "tau": TAU, "rms": rms, "worst": max(abs(e) for e in res)}
+                                "yield_residual_bp": ybp, "zscore": z, "d_mod": r["d_mod"], "benchmark": r["benchmark"]})
+    fitted = [e for r, e in zip(good, res) if not r["benchmark"]] or res
+    rms = (sum(e * e for e in fitted) / len(fitted)) ** 0.5
+    result["fit"] = {"betas": fit["outputs"]["betas"], "tau": TAU, "rms": rms, "worst": max(abs(e) for e in fitted), "weights": "1/D_mod^2"}
     order = sorted(result["bonds"], key=lambda b: b["yield_residual_bp"])
     rich, cheap = {b["id"] for b in order[:5]}, {b["id"] for b in order[-5:]}
     for bkt in {b["bucket"] for b in result["bonds"]}:
@@ -175,13 +218,16 @@ def write_market(market, date, res, out, impl, publish_prices):
         f = res["fit"]
         r.check("fit RMS below 0.25 per 100", "warn", f["rms"] < 0.25, f"RMS {f['rms']:.4f}, worst {f['worst']:.4f}")
         r.h("Fit")
-        r.p(f"Nelson-Siegel, tau {f['tau']}: betas {', '.join(f'{b:.6f}' for b in f['betas'])}; RMS {f['rms']:.4f} and worst {f['worst']:.4f} per 100.")
+        if res.get("zero_weight"):
+            r.p(f"Weight 0 (on-the-run and first off-the-run, reported but not fitted): {', '.join(f'{i} ({lbl})' for i, lbl in res['zero_weight'])}.")
+        r.p(f"Weights 1/D_mod² (R2-A5). Nelson-Siegel, tau {f['tau']}: betas {', '.join(f'{b:.6f}' for b in f['betas'])}; RMS {f['rms']:.4f} and worst {f['worst']:.4f} per 100.")
         for bkt in sorted({b["bucket"] for b in res["bonds"]}, key=lambda s: float(s.split("-")[0].rstrip("+"))):
             r.h(f"{bkt} years", 3)
             head = ["Id", "Coupon", "Maturity"] + (["Market clean", "Model clean"] if publish_prices else []) + ["Yield residual (bp)", "z-score", "Rank", ""]
             rows = sorted((b for b in res["bonds"] if b["bucket"] == bkt), key=lambda b: b["rank"])
             r.table(head, [[b["id"], f"{b['coupon'] * 100:.3f}%", b["maturity"]] + ([f"{b['market_clean']:.4f}", f"{b['model_clean']:.4f}"] if publish_prices else [])
-                           + [f"{b['yield_residual_bp']:+.1f}", "—" if b["zscore"] is None else f"{b['zscore']:+.2f}", b["rank"], b["mark"]] for b in rows])
+                           + [f"{b['yield_residual_bp']:+.1f}", "—" if b["zscore"] is None else f"{b['zscore']:+.2f}", b["rank"],
+                              " ".join(x for x in (b["mark"], f"weight 0: {b['benchmark']}" if b["benchmark"] else "") if x)] for b in rows])
     if res["dropped"]:
         r.h("Dropped")
         r.table(["Id", "Reason"], res["dropped"])
@@ -196,6 +242,7 @@ def main():
     ap.add_argument("--date", default=dt.date.today().isoformat())
     ap.add_argument("--data")
     ap.add_argument("--history")
+    ap.add_argument("--auctions", help="saved Fiscal Data auctions JSON, instead of fetching (tests, reruns)")
     ap.add_argument("--publish-prices", action="store_true", help="only when the source's terms allow it")
     ap.add_argument("--out", default=str(c.ROOT / "reports" / "workflows"))
     a = ap.parse_args()
@@ -209,8 +256,9 @@ def main():
         r.check("price data available", "warn", False, "no source cleared for automated use")
         return r.write([])
     rc = 0
+    bench = benchmark_issues(a.date, a.auctions) if "ust" in present else {}
     for mk, p in present.items():
-        res = screen(mk, read_prices(p), a.date, a.impl, history(a.history, mk, a.date))
+        res = screen(mk, read_prices(p), a.date, a.impl, history(a.history, mk, a.date), bench)
         rc |= write_market(mk, a.date, res, a.out, a.impl, a.publish_prices)
     return rc
 
