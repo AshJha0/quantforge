@@ -984,7 +984,7 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "price": 2.4687182088382107e-13,
+     "price": 2.4687182088380814e-13,
      "forward": 60.0
     }
    },
@@ -2415,7 +2415,7 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "price": 4.11453034806362e-13,
+     "price": 4.114530348063491e-13,
      "forward": 100.0
     }
    },
@@ -3846,7 +3846,7 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "price": 6.583248556902153e-13,
+     "price": 6.583248556901637e-13,
      "forward": 160.0
     }
    },
