@@ -20,3 +20,4 @@
         {"vol.sabr.density", op_sabr_density},
         {"vol.sabr.calibrate", op_sabr_calibrate},
         {"vol.sabr.arbfree", op_sabr_arbfree},
+        {"usecase.vol_surface", op_usecase_vol_surface},
