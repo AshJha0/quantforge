@@ -426,7 +426,9 @@ def verify_all(folder="stage_d", show=True):
             if ok:
                 n_ok += 1
                 reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": CM.LIBRARY, "version": CM.VERSION,
-                            "convention_rows": sorted(u.rows), "map_review": CM.REVIEW, "worst_abs_gap": worst})
+                            "convention_rows": sorted(u.rows), "map_review": CM.REVIEW})
+                # The raw worst gap is not stored: near 1e-16 it differs between libm builds
+                # (Windows against Linux CI), which made the committed register non-reproducible.
             elif show:
                 print(f"  not verified {c['case_id']} {c['operation']}: {why}")
         table.append((suite, n_ok, len(cases)))
