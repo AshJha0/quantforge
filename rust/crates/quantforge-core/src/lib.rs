@@ -40,6 +40,8 @@ pub mod snapshot;
 pub mod sobol;
 pub mod stats;
 pub mod store;
+pub mod surface;
+pub mod svi;
 pub mod time;
 pub mod ts;
 pub mod units;

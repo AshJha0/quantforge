@@ -1,12 +1,13 @@
 //! Stage C operations: read the inputs, call the library, shape the outputs.
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
-use crate::ops_b::{curve_input, items, snapshot_id};
+use crate::ops_b::{curve_input, items, snapshot_id, sub};
 use quantforge_core::curve::CurveInput;
 use quantforge_core::dates::Date;
 use quantforge_core::equity::{self, Outright, ParityQuote};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::svi::{self, Svi};
 use quantforge_core::smile;
 use quantforge_core::black;
 use quantforge_core::greeks;
@@ -198,6 +199,25 @@ fn delta_scale(i: &Inputs) -> Result<(bool, Option<f64>)> {
     Ok((spot, i.opt_f64("scale")?))
 }
 
+fn svi_json(s: &Svi) -> Json {
+    obj([
+        ("a", s.a.into()),
+        ("b", s.b.into()),
+        ("rho", s.rho.into()),
+        ("m", s.m.into()),
+        ("sigma", s.sigma.into()),
+    ])
+}
+
+fn rows(m: Vec<Vec<f64>>) -> Json {
+    Json::Arr(m.into_iter().map(Into::into).collect())
+}
+
+fn opt_weights(i: &Inputs) -> Result<Option<Vec<f64>>> {
+    no_null(i, "weights")?;
+    i.opt("weights").map(|_| i.reals("weights")).transpose()
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
         "eq.forward.outright" => {
@@ -307,6 +327,63 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("put_vol", r.put_vol.into()),
                 ("call_strike", r.call_strike.into()),
                 ("put_strike", r.put_strike.into()),
+            ]))
+        }
+        "vol.svi.evaluate" => {
+            let p = sub(i, "svi")?;
+            let s = Svi {
+                a: p.f64("a")?,
+                b: p.f64("b")?,
+                rho: p.f64("rho")?,
+                m: p.f64("m")?,
+                sigma: p.f64("sigma")?,
+            };
+            let (k, t) = (i.reals("log_moneyness")?, i.f64("expiry_years")?);
+            i.gate()?;
+            s.check()?;
+            if t <= 0.0 {
+                return fail("E_DOMAIN", "expiry_years must be above 0");
+            }
+            let w: Vec<f64> = k.iter().map(|&x| s.w(x)).collect();
+            let v: Vec<f64> = w.iter().map(|x| (x / t).sqrt()).collect();
+            let g: Vec<f64> = k.iter().map(|&x| s.g(x)).collect();
+            let min_g = g.iter().copied().fold(f64::INFINITY, f64::min);
+            plain(obj([
+                ("total_variance", w.into()),
+                ("implied_vol", v.into()),
+                ("g", g.into()),
+                ("min_g", min_g.into()),
+                ("butterfly_free", (min_g >= 0.0).into()),
+            ]))
+        }
+        "vol.svi.calibrate" => {
+            let (k, w) = (i.reals("log_moneyness")?, i.reals("total_variance")?);
+            let q = opt_weights(i)?;
+            i.gate()?;
+            let r = svi::calibrate(&k, &w, q.as_deref())?;
+            plain(obj([("svi", svi_json(&r.svi)), ("rmse", r.rmse.into())]))
+        }
+        "vol.ssvi.evaluate" => {
+            let (rho, eta, gamma) = (i.f64("rho")?, i.f64("eta")?, i.f64("gamma")?);
+            let (t, k) = (i.reals("thetas")?, i.reals("log_moneyness")?);
+            i.gate()?;
+            let r = svi::ssvi_evaluate(rho, eta, gamma, &t, &k)?;
+            plain(obj([
+                ("total_variance", rows(r.total_variance)),
+                ("butterfly_free", r.butterfly_free.into()),
+                ("calendar_free", r.calendar_free.into()),
+            ]))
+        }
+        "vol.ssvi.calibrate" => {
+            let (t, k) = (i.reals("thetas")?, i.reals("log_moneyness")?);
+            let w = i.matrix("total_variance")?;
+            i.gate()?;
+            let [rho, eta, gamma, rmse] = svi::ssvi_calibrate(&t, &k, &w)?;
+            plain(obj([
+                ("rho", rho.into()),
+                ("eta", eta.into()),
+                ("gamma", gamma.into()),
+                ("rmse", rmse.into()),
             ]))
         }
         // next arm

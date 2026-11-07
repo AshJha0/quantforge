@@ -127,6 +127,10 @@ pub const OPERATIONS: &[&str] = &[
     "vol.option.implied",
     "vol.option.price",
     "vol.smile.rr_bf",
+    "vol.ssvi.calibrate",
+    "vol.ssvi.evaluate",
+    "vol.svi.calibrate",
+    "vol.svi.evaluate",
 ];
 
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
