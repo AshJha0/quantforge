@@ -1,4 +1,5 @@
 """Equity spot, dividends and forward (specifications/02-curves/equity-forward.md)."""
+import itertools
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -46,7 +47,7 @@ def outright(
         raise QfError("E_DATE_ORDER", "expiry is before as_of", "expiry")
     if any(amount < 0 for _, amount in dividends):
         raise _domain("a dividend is negative", "dividends")
-    if any(a[0] >= b[0] for a, b in zip(dividends, dividends[1:], strict=False)):
+    if any(a[0] >= b[0] for a, b in itertools.pairwise(dividends)):
         raise QfError("E_INPUT", "ex_dates must be strictly increasing", "dividends")
 
     def carry(d: date) -> float:
@@ -74,7 +75,7 @@ def flat(
         raise _domain("expiry_years is negative", "expiry_years")
     if any(amount < 0 for _, amount in dividends):
         raise _domain("a dividend is negative", "dividends")
-    if any(a[0] >= b[0] for a, b in zip(dividends, dividends[1:], strict=False)):
+    if any(a[0] >= b[0] for a, b in itertools.pairwise(dividends)):
         raise QfError("E_INPUT", "time_years must be strictly increasing", "dividends")
     c = rate - borrow
     forward = spot * math.exp(c * expiry_years) - ordered_sum(
@@ -95,7 +96,7 @@ def parity(
             raise _domain("a strike or quote is out of range", "quotes")
     if discount_factor is not None and discount_factor <= 0:
         raise _domain("discount_factor must be positive", "discount_factor")
-    if any(a.strike >= b.strike for a, b in zip(quotes, quotes[1:], strict=False)):
+    if any(a.strike >= b.strike for a, b in itertools.pairwise(quotes)):
         raise QfError("E_INPUT", "strikes must be strictly increasing", "quotes")
     if any(q.call_bid > q.call_ask or q.put_bid > q.put_ask for q in quotes):
         raise QfError("E_INPUT", "a bid is above its ask", "quotes")
