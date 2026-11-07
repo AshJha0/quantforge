@@ -174,7 +174,7 @@ def ois():
     s.add(op, {**bq, "quotes": jq([("1Y", .03), ("12M", .03)])}, error="E_INPUT", cls=E, tags=["invalid"], description="same pillar date twice")
     s.add(op, {**bq, "quotes": []}, error="E_INPUT", cls=E, tags=["invalid"])
     s.add(op, {**bq, "quotes": [{"tenor": "1Y", "bid": .03, "ask": .02}]}, error="E_INPUT", cls=E, tags=["invalid"], description="crossed")
-    s.add(op, {**bq, "convention": "ESTR", "quotes": jq(SONIA_Q[:1])}, error="E_SCHEMA", cls=E, tags=["invalid"])
+    s.add(op, {**bq, "convention": "TONA", "quotes": jq(SONIA_Q[:1])}, error="E_SCHEMA", cls=E, tags=["invalid"])
 
     cp = "rates.ois.compound"
     r, n = [.05, .0502, .0504], [1, 1, 3]

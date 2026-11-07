@@ -2462,7 +2462,7 @@
    "case_id": "ois-0023",
    "operation": "rates.ois.bootstrap",
    "inputs": {
-    "convention": "ESTR",
+    "convention": "TONA",
     "as_of": "2026-11-06",
     "interpolation": "LOG_LINEAR_DF",
     "method": "GLOBAL",
