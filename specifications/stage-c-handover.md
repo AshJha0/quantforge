@@ -9,14 +9,13 @@ From the spec and oracle session, to the four language sessions. Date 2026-11-07
 - Numeric targets, written before any code.
 - Goldens in `datasets/golden/stage_c/`: 11 suites, with QuantLib, Strata, analytic and hand sources.
 - 30 wrong-convention checks, each shown to fail.
+- Full `run_all.py` rerun on 2026-11-07: stage C goldens unchanged; `REPORT.md` carries the stage C lines.
+- `check_invariants.py` covers `stage_c`: 446 cases, none breaks a rule.
+- Rulings C15 to C17 settle gaps the builds found.
 
 ## Not finished
 
-- Full `run_all.py` rerun on 2026-11-07: stage C goldens unchanged; `REPORT.md` carries the stage C lines.
-- `check_invariants.py` covers `stage_c`: 446 cases, none breaks a rule.
 - `vol.sabr.arbfree` at `nu > 0` has no tight outside source. See `stage-c-rulings.md`.
-- No implementation has run a case, so spec gaps may surface. Use each language's `SPEC_QUESTIONS.md`.
-- Runner, schemas: no change needed, as cases use the existing format. The runner must be pointed at `datasets/golden/stage_c/`; infrastructure work is with another session.
 
 ## What language sessions can start on
 
