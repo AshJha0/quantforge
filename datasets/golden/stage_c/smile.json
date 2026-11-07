@@ -1741,6 +1741,311 @@
     "invalid",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "smile-0047",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "convention": "SPOT",
+    "scale": null,
+    "delta": 0.25
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0048",
+   "operation": "vol.delta.from_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": 0.22,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "convention": "SPOT",
+    "scale": null,
+    "strike": 100.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0049",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": -0.1,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "convention": "SPOT",
+    "scale": null,
+    "delta": 0.25
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "scale pairing comes before domain checks"
+  },
+  {
+   "case_id": "smile-0050",
+   "operation": "vol.delta.to_strike",
+   "inputs": {
+    "forward": 100.0,
+    "vol": -0.1,
+    "expiry_years": 0.75,
+    "option_type": "CALL",
+    "convention": "SPOT",
+    "scale": 0.9,
+    "delta": 2.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0051",
+   "operation": "vol.smile.rr_bf",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "atm_vol": 0.2,
+    "atm_convention": "ATM_FORWARD",
+    "rr": -0.04,
+    "bf": 0.006,
+    "delta": 0.25,
+    "convention": "SPOT",
+    "scale": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0052",
+   "operation": "vol.smile.rr_bf",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "atm_vol": 0.2,
+    "atm_convention": "ATM_FORWARD",
+    "rr": -0.04,
+    "bf": 0.006,
+    "delta": 0.25,
+    "convention": "FORWARD",
+    "scale": 0.9
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0053",
+   "operation": "vol.smile.rr_bf",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "atm_vol": -1.0,
+    "atm_convention": "ATM_FORWARD",
+    "rr": -0.04,
+    "bf": 0.006,
+    "delta": 0.25,
+    "convention": "SPOT",
+    "scale": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0054",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": 0.03,
+     "b": 0.12,
+     "rho": -0.35,
+     "m": 0.02,
+     "sigma": 0.15
+    },
+    "log_moneyness": [],
+    "expiry_years": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0055",
+   "operation": "vol.svi.evaluate",
+   "inputs": {
+    "svi": {
+     "a": 0.03,
+     "b": -0.1,
+     "rho": -0.35,
+     "m": 0.02,
+     "sigma": 0.15
+    },
+    "log_moneyness": [],
+    "expiry_years": 1.5
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "an empty list comes before domain checks"
+  },
+  {
+   "case_id": "smile-0056",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": -0.4,
+    "eta": 1.0,
+    "gamma": 0.5,
+    "thetas": [
+     0.01,
+     0.04,
+     0.09,
+     0.16
+    ],
+    "log_moneyness": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "smile-0057",
+   "operation": "vol.ssvi.evaluate",
+   "inputs": {
+    "rho": -0.4,
+    "eta": 1.0,
+    "gamma": 0.5,
+    "thetas": [],
+    "log_moneyness": [
+     -0.4,
+     -0.1,
+     0.0,
+     0.1,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
   }
  ]
 }
