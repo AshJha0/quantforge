@@ -6,14 +6,19 @@ from typing import Any
 
 from .errors import QfError
 
-_TOKENS = re.compile(r'"(?:[^"\\]|\\.)*"?|[\[\]{}]', re.DOTALL)
+_STRINGS = re.compile(r'"(?:[^"\\]|\\.)*"?', re.DOTALL)
+_BRACKETS = re.compile(r"[\[\]{}]")
 
 
 def check_depth(text: str, limit: int) -> None:
-    """The lexical scan of limits.md B2: no syntax is checked, and strings are skipped."""
+    """The lexical scan of limits.md B2: no syntax is checked, and strings are skipped.
+
+    Strings are removed first, in C. A bracket never starts or ends a string, so these are the
+    strings that one left-to-right scan of strings and brackets would skip."""
+    if text.count("[") + text.count("{") <= limit:
+        return  # the depth cannot exceed the number of openers
     depth = 0
-    for token in _TOKENS.finditer(text):
-        ch = token[0]
+    for ch in _BRACKETS.findall(_STRINGS.sub("", text)):
         if ch in "[{":
             depth += 1
             if depth > limit:
@@ -36,6 +41,8 @@ def parse(text: str) -> tuple[Any, bool]:
 
     def on_int(s: str) -> int | float:
         nonlocal overflow
+        if len(s) < 300:  # an integer below 10^299 cannot overflow binary64
+            return int(s)
         value = float(s)
         if math.isinf(value):
             overflow = True

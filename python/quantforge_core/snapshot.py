@@ -1,5 +1,5 @@
 """Canonical form and hash of a snapshot (specifications/01-core/snapshot-hash.md)."""
-import hashlib
+
 import struct
 from collections.abc import Iterator
 from typing import Any
@@ -78,6 +78,8 @@ def canonical(value: Any) -> str:
 
 def hash_value(value: Any) -> tuple[str, str]:
     form = canonical(value)
+    import hashlib
+
     return form, "sha256:" + hashlib.sha256(form.encode("utf-8")).hexdigest()
 
 

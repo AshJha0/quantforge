@@ -34,6 +34,7 @@ class Curve:
                             for d, v in zip(data.dates, data.discount_factors, strict=True))]
         self.zeros = [0.0, *(-x / t for x, t in zip(self.logs[1:], self.times[1:], strict=True))]
         self.zeros[0] = self.zeros[1]
+        self._memo: dict[date, float] = {}
 
     def time(self, d: date) -> float:
         return (d - self.as_of).days / 365
@@ -47,7 +48,14 @@ class Curve:
         return product
 
     def discount(self, d: date) -> float:
-        return self._smooth(d) * self.jump(d)
+        # A curve is immutable, so a date's factor is memoised: swap legs ask for each period
+        # boundary more than once. The arithmetic is unchanged.
+        memo = self._memo
+        value = memo.get(d)
+        if value is None:
+            value = self._smooth(d) * self.jump(d) if self.jumps else self._smooth(d)
+            memo[d] = value
+        return value
 
     def _smooth(self, d: date) -> float:
         t = self.time(d)

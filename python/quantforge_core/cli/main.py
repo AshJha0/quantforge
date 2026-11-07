@@ -1,7 +1,6 @@
 """Commands, envelope handling and exit codes (specifications/cli-contract.md)."""
 import json
 import math
-import platform
 import re
 import sys
 import time
@@ -145,6 +144,8 @@ def _batch(timings: bool = False) -> int:
 
 
 def _version() -> int:
+    import platform  # lazy: it costs start-up on every batch process
+
     _write(
         {
             "language": "python",
