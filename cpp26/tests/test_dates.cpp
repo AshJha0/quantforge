@@ -1,6 +1,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+#include "quantforge/core/calendar.hpp"
 #include "quantforge/core/daycount.hpp"
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/timezone.hpp"
@@ -69,4 +70,12 @@ TEST_CASE("zones and cut-off") {
     CHECK(business_date(*parse_instant("2024-07-01T14:59:59Z"), Zone::London, c, Calendar::Gblo) == d("2024-07-01"));
     CHECK(business_date(*parse_instant("2024-07-01T15:00:00Z"), Zone::London, c, Calendar::Gblo) == d("2024-07-02"));
     CHECK(business_date(*parse_instant("2024-07-06T10:00:00Z"), Zone::London, c, Calendar::Gblo) == d("2024-07-08"));
+}
+
+TEST_CASE("USGS Good Friday early closes are business days (ruling R1-6)") {
+    using namespace quantforge;
+    for (const char* s : {"2007-04-06", "2010-04-02", "2012-04-06", "2015-04-03", "2021-04-02", "2023-04-07", "2026-04-03"})
+        CHECK(is_business_day(Calendar::Usgs, *parse_date(s)));
+    for (const char* s : {"2008-03-21", "2022-04-15", "2024-03-29", "2027-03-26"})
+        CHECK_FALSE(is_business_day(Calendar::Usgs, *parse_date(s)));
 }

@@ -282,3 +282,17 @@ TEST_CASE("Huber Nelson-Siegel") {
     CHECK(code_of([] { robust_fit({1, 2, 3}, {0.03, 0.04, 0.05}, 1, 0); }) == "E_DOMAIN");
     CHECK(code_of([] { robust_fit({0, 2, 3}, {0.03, 0.04, 0.05}, 1, 1e-3); }) == "E_DOMAIN");
 }
+
+TEST_CASE("SOFR compounding skips every Good Friday (ruling R1-6)") {
+    using namespace quantforge;
+    const auto sofr = *rate_convention("SOFR");
+    const Date gf = *parse_date("2021-04-02");  // a USGS business day, but no SOFR is published
+    REQUIRE(is_business_day(Calendar::Usgs, gf));
+    std::vector<Fixing> fx;
+    for (Date x = *parse_date("2021-03-25"); x <= *parse_date("2021-04-09"); x = Date(x + std::chrono::days(1)))
+        if (x != gf) fx.push_back({x, 0.0001});
+    // Missing the Good Friday fixing is fine: the day is not a compounding date.
+    const auto r = compound_dated(sofr, *parse_date("2021-03-31"), *parse_date("2021-04-06"), ShiftMethod::None, 0, fx);
+    CHECK(r.compounded_rate > 0.0);
+    CHECK_THROWS(compound_dated(sofr, gf, *parse_date("2021-04-06"), ShiftMethod::None, 0, fx));
+}

@@ -78,7 +78,9 @@ std::vector<Date> usgs(int y) {
     h.push_back(weekday_of(ny) == sun ? ny + days{1} : ny);
     h.push_back(nth_weekday(y, 1, mon, 3));
     h.push_back(nth_weekday(y, 2, mon, 3));
-    h.push_back(easter_sunday(y) - days{2});
+    // Ruling R1-6: in SIFMA early-close years Good Friday is a business day.
+    constexpr int early_close[] = {2007, 2010, 2012, 2015, 2021, 2023, 2026};
+    if (std::ranges::find(early_close, y) == std::end(early_close)) h.push_back(easter_sunday(y) - days{2});
     h.push_back(last_weekday(y, 5, mon));
     if (y >= 2022) h.push_back(nearest_weekday(make_date(y, 6, 19)));
     h.push_back(nearest_weekday(make_date(y, 7, 4)));
