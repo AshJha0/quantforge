@@ -104,3 +104,7 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | D-8 | `calib.curve.robust` when the points cannot fix the three betas (e.g. one maturity repeated) | `E_SINGULAR` from the linear solve; the spec lists no code for it |
 | D-9 | `rates.curve.joint_bootstrap` `GLOBAL` | Global Newton on the OIS block, then the term block on it: the system is block triangular (ruling D9), so this is the joint solution |
 | D-10 | `rates.basis.ois_spread`, `rates.curve.joint_bootstrap` with `ESTR` | Accepted, as for any overnight convention |
+| D-11 | `bond.spread.asset_swap` quarterly floating dates from a month-end maturity (e.g. 2031-02-28) | Plain month steps back from maturity, with no month-end rule (golden bonds_d-0041 needs this; the bond's own coupons keep the month-end rule) |
+| D-12 | `bond.yield.from_price` with `clean_price <= 0` but `clean + accrued > 0` | `E_DOMAIN`, as golden bonds_d-0048; the spec text only names `clean + accrued <= 0` |
+| D-13 | `bond.futures.basis` with `delivery >= maturity`, or `delivery <= settlement` | As `repo.forward`: `E_INPUT` and `E_DATE_ORDER`. Empty `bonds`: `E_INPUT` |
+| D-14 | `bond.fit.nelson_siegel` `weights` of the wrong length | `E_INPUT` |
