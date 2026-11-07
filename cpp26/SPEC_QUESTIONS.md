@@ -48,7 +48,7 @@ Settled by rulings: `SPOT` with null `scale` (C15, my `E_DOMAIN` was wrong), a p
 
 Each is answered here with the most conservative reading; none changes a golden result.
 
-1. **Stage B golden `ois-0023` against ESTR.** It expects `rates.ois.bootstrap` with `ESTR` to be `E_SCHEMA`. `ois-curves.md` 1.1.0 and contract 1.5.0 now list `ESTR`, so this build returns `ok` and that one stage B case fails. The spec wins; the case needs retiring or changing to `ok` by the oracle session.
+1. **Closed by ruling D27.** Stage B golden `ois-0023` against ESTR. It expects `rates.ois.bootstrap` with `ESTR` to be `E_SCHEMA`. `ois-curves.md` 1.1.0 and contract 1.5.0 now list `ESTR`, so this build returns `ok` and that one stage B case fails. The spec wins; the case needs retiring or changing to `ok` by the oracle session.
 2. **Unknown `convention` string in `rates.ois.compound_dated`, `rates.ois.fit_steps`, `rates.basis.ois_spread`.** The specs say "not `OVERNIGHT`: `E_INPUT`". A listed non-overnight record (`USD-TERM-3M`) gives `E_INPUT`; an unlisted string gives `E_SCHEMA`, as every other enum. `rates.curve.joint_bootstrap` keeps the bootstrap's rule (`E_SCHEMA` for anything not overnight).
 3. **Empty `step_dates` in `rates.ois.fit_steps`.** Ruling D12 makes empty date lists `E_INPUT`; with `m = 0` the fit would otherwise be a one-quote flat rate. This build returns `E_INPUT`, checked before the quote count.
 4. **Empty `dates` in `rates.ois.step_curve`, `rates.csa.discount`.** D12: `E_INPUT`, checked after the curve's own checks.
@@ -65,3 +65,6 @@ Each is answered here with the most conservative reading; none changes a golden 
 15. **`eq.trs.pv` with `end <= start`.** Not specified; `E_DATE_ORDER`.
 16. **Two CPI fixings for one month in `infl.linker.price`, two FX forwards for one date.** `E_INPUT`, as two fixings on one date in `rates.ois.compound_dated`.
 17. **`fx.xccy.bootstrap` with a convention other than SOFR/ESTR.** Ruling D17 allows only those; a listed other record gives `E_INPUT`, an unlisted string `E_SCHEMA`.
+18. **`mbs.cashflows` with `wac <= 0` and `net_coupon > wac` together** (`mbs_d-0011`: wac 0, net 0.06). `mbs.md` lists the `E_INPUT` checks first, yet the golden expects `E_DOMAIN`. This build checks `wac <= 0` before `net_coupon > wac`, as the comparison presumes a valid WAC.
+19. **Cap vol given as a list for one caplet, or `vol` neither number nor list.** A number is flat; any array is quoted (length must match, `E_INPUT`); anything else `E_SCHEMA`.
+20. **Swaption and cap `tenor_months < 1`.** Not specified; `E_INPUT`, as `start_months`.
