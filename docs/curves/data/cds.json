@@ -1,0 +1,141 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "cds_bootstrap_d.json": "sha256:cff4424e5ad48b9721e8c6e6161e039d62654ecbe2baf66e5e1296d1494d0d86"
+  }
+ },
+ "inputs": {
+  "credit.cds.bootstrap": {
+   "trade_date": "2026-11-06",
+   "discount": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2046-11-06",
+      "discount_factor": 0.458161174870904
+     }
+    ]
+   },
+   "recovery": 0.4,
+   "quotes": [
+    {
+     "tenor": "6M",
+     "spread": 0.0045
+    },
+    {
+     "tenor": "1Y",
+     "spread": 0.006
+    },
+    {
+     "tenor": "3Y",
+     "spread": 0.009
+    },
+    {
+     "tenor": "5Y",
+     "spread": 0.012
+    },
+    {
+     "tenor": "7Y",
+     "spread": 0.0135
+    },
+    {
+     "tenor": "10Y",
+     "spread": 0.015
+    }
+   ]
+  }
+ },
+ "reference": {
+  "credit.cds.bootstrap": {
+   "pillars": [
+    {
+     "date": "2027-06-20",
+     "survival": 0.9953278717430543
+    },
+    {
+     "date": "2027-12-20",
+     "survival": 0.9887181795921078
+    },
+    {
+     "date": "2029-12-20",
+     "survival": 0.9533184219921649
+    },
+    {
+     "date": "2031-12-20",
+     "survival": 0.8988961248330223
+    },
+    {
+     "date": "2033-12-20",
+     "survival": 0.8449964351776124
+    },
+    {
+     "date": "2036-12-20",
+     "survival": 0.7635674704223002
+    }
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "credit.cds.bootstrap: pillars",
+   "count": 6,
+   "largest_difference": 3.3306690738754696e-16,
+   "last": {
+    "java": 0.7635674704223003,
+    "cpp": 0.7635674704223001,
+    "python": 0.7635674704223002,
+    "rust": 0.7635674704223002
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "credit.cds.bootstrap"
+  ],
+  "cases": 5,
+  "by_source": {
+   "credit.cds.bootstrap: independent-replay, quantlib-1.44-isda-cds-engine": 5
+  }
+ }
+}

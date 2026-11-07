@@ -1,0 +1,50 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-inflation-cpi-d",
+ "operation": "infl.curve.cpi",
+ "inputs": {
+  "base_month": "2026-08",
+  "base_cpi": 322.15,
+  "quotes": [
+   {
+    "years": 1,
+    "rate": 0.0265
+   },
+   {
+    "years": 2,
+    "rate": 0.0255
+   },
+   {
+    "years": 3,
+    "rate": 0.025
+   },
+   {
+    "years": 5,
+    "rate": 0.0245
+   },
+   {
+    "years": 7,
+    "rate": 0.0245
+   },
+   {
+    "years": 10,
+    "rate": 0.025
+   },
+   {
+    "years": 20,
+    "rate": 0.0255
+   }
+  ],
+  "seasonality": null,
+  "months": [
+   "2026-08",
+   "2026-12",
+   "2027-01",
+   "2027-08",
+   "2028-03",
+   "2031-08",
+   "2036-11",
+   "2048-02"
+  ]
+ }
+}

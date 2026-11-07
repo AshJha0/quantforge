@@ -1,0 +1,249 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "xccy_bootstrap_d.json": "sha256:ad1f181517aac79fd65a1912e41b046a1dcbe8bae70eba9954ff4711509a7d5d"
+  }
+ },
+ "inputs": {
+  "fx.xccy.bootstrap": {
+   "domestic": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2026-11-19",
+      "discount_factor": 0.9986040008603395
+     },
+     {
+      "date": "2026-12-14",
+      "discount_factor": 0.9959394252774483
+     },
+     {
+      "date": "2027-02-12",
+      "discount_factor": 0.989673278797288
+     },
+     {
+      "date": "2027-05-12",
+      "discount_factor": 0.9807770908259003
+     },
+     {
+      "date": "2027-11-15",
+      "discount_factor": 0.9634397330592425
+     },
+     {
+      "date": "2028-11-14",
+      "discount_factor": 0.9318539967570951
+     },
+     {
+      "date": "2029-11-15",
+      "discount_factor": 0.9012037662703272
+     },
+     {
+      "date": "2031-11-13",
+      "discount_factor": 0.839287128565213
+     },
+     {
+      "date": "2033-11-15",
+      "discount_factor": 0.7766268603223262
+     },
+     {
+      "date": "2036-11-13",
+      "discount_factor": 0.6858387444275659
+     },
+     {
+      "date": "2041-11-14",
+      "discount_factor": 0.5536981725589005
+     },
+     {
+      "date": "2046-11-15",
+      "discount_factor": 0.449831073617216
+     },
+     {
+      "date": "2056-11-14",
+      "discount_factor": 0.31789224697028523
+     }
+    ]
+   },
+   "foreign_projection": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2026-11-19",
+      "discount_factor": 0.9991807943650066
+     },
+     {
+      "date": "2026-12-14",
+      "discount_factor": 0.9976187895421391
+     },
+     {
+      "date": "2027-02-12",
+      "discount_factor": 0.9939609880010525
+     },
+     {
+      "date": "2027-05-12",
+      "discount_factor": 0.9888433447909688
+     },
+     {
+      "date": "2027-11-12",
+      "discount_factor": 0.979288122109086
+     },
+     {
+      "date": "2028-11-14",
+      "discount_factor": 0.9621077025177938
+     },
+     {
+      "date": "2029-11-14",
+      "discount_factor": 0.9453565613174705
+     },
+     {
+      "date": "2031-11-12",
+      "discount_factor": 0.9086167288534558
+     },
+     {
+      "date": "2033-11-14",
+      "discount_factor": 0.8680406595029002
+     },
+     {
+      "date": "2036-11-12",
+      "discount_factor": 0.8042612131003805
+     },
+     {
+      "date": "2041-11-13",
+      "discount_factor": 0.7039030892201986
+     },
+     {
+      "date": "2046-11-14",
+      "discount_factor": 0.6196603907598699
+     },
+     {
+      "date": "2056-11-14",
+      "discount_factor": 0.5087217489424134
+     }
+    ]
+   },
+   "domestic_convention": "SOFR",
+   "foreign_convention": "ESTR",
+   "start": "2026-11-10",
+   "quotes": [
+    {
+     "months": 12,
+     "spread": 0.0010096188836398502
+    },
+    {
+     "months": 24,
+     "spread": 0.0013947896204213187
+    },
+    {
+     "months": 36,
+     "spread": 0.001684807530495905
+    },
+    {
+     "months": 60,
+     "spread": 0.002070064712703492
+    },
+    {
+     "months": 84,
+     "spread": 0.0022613526114204406
+    },
+    {
+     "months": 120,
+     "spread": 0.002449281536013717
+    }
+   ],
+   "interpolation": "LOG_LINEAR_DF"
+  }
+ },
+ "reference": {
+  "fx.xccy.bootstrap": {
+   "pillars": [
+    {
+     "date": "2027-11-10",
+     "discount_factor": 0.9784018610254287
+    },
+    {
+     "date": "2028-11-10",
+     "discount_factor": 0.9595837618865134
+    },
+    {
+     "date": "2029-11-13",
+     "discount_factor": 0.9405577315984668
+    },
+    {
+     "date": "2031-11-10",
+     "discount_factor": 0.8991982163399188
+    },
+    {
+     "date": "2033-11-10",
+     "discount_factor": 0.8543577792163143
+    },
+    {
+     "date": "2036-11-10",
+     "discount_factor": 0.7844757636238187
+    }
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "fx.xccy.bootstrap: pillars",
+   "count": 6,
+   "largest_difference": 4.440892098500626e-16,
+   "last": {
+    "java": 0.7844757636238187,
+    "cpp": 0.7844757636238185,
+    "python": 0.7844757636238187,
+    "rust": 0.7844757636238187
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "fx.xccy.bootstrap"
+  ],
+  "cases": 1,
+  "by_source": {
+   "fx.xccy.bootstrap: known-truth, independent-replay": 1
+  }
+ }
+}

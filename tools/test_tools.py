@@ -167,41 +167,54 @@ class GalleryVol(unittest.TestCase):
         self.assertIn(">0<", svg)
 
 
-    def test_stage_d_planned_pages(self):
+    def test_stage_d_pages_are_live_from_real_runs(self):
         out = ROOT / "docs/curves"
         self.assertEqual(set(self.bg.STAGE_D), {"ois-full", "bond-fit", "repo", "cross-currency", "cds", "dividend-borrow",
                                                 "inflation", "caps-swaptions", "commodities", "mbs"})
         index = (out / "README.md").read_text(encoding="utf-8")
         for slug, spec in self.bg.STAGE_D.items():
-            self.assertFalse(self.bg.is_live(spec), slug)
+            self.assertTrue(self.bg.is_live(spec), slug)
+            d = json.loads((out / "data" / f"{slug}.json").read_text(encoding="utf-8"))
             text = (out / f"{slug}.md").read_text(encoding="utf-8")
-            self.assertEqual(text, self.bg.planned_page(slug, spec))
-            self.assertIn("Planned, stage D (in progress)", text)
-            self.assertNotIn("<svg", text)
-            self.assertFalse(any(c.isdigit() for c in spec["shows"]), slug)
+            for head in ("Implemented, not Validated", "## Four-language agreement", "## Oracle evidence and limits", self.bg.SYNTHETIC):
+                self.assertIn(head, text, f"{slug}: {head}")
             self.assertNotIn("nterview", text)
-            self.assertIn(f"]({slug}.md) | Planned | D |", index)
+            self.assertIn(f"]({slug}.md) | Implemented, not Validated | D |", index)
+            self.assertEqual(set(d["reference"]), set(spec["examples"]))
+            for op, f in spec["examples"].items():
+                ex = json.loads((ROOT / "examples" / f).read_text(encoding="utf-8"))
+                self.assertEqual(ex["operation"], op)
+                self.assertTrue(ex["case_id"].startswith("example-synthetic-"))
+                self.assertEqual(d["meta"]["example_hashes"][f], self.bg.example_hash(f))
+            self.assertEqual(d["evidence"], self.bg.golden_d(spec["examples"]))
+            self.assertTrue(all(r["largest_difference"] is not None and r["largest_difference"] < 1e-6 for r in d["agreement"]), slug)
         planned = {n for n, _ in self.bg.PLANNED}
         for gone in ("Full SOFR", "ESTR", "Cross-currency", "Credit and ISDA CDS", "Swaption cube and cap surface"):
             self.assertNotIn(gone, planned)
+
+    def test_planned_page_has_no_numbers(self):
+        spec = {"title": "T", "shows": "Something.", "kind": "none"}
+        text = self.bg.planned_page("x", spec)
+        self.assertIn("Planned, stage D", text)
+        self.assertNotIn("<svg", text)
 
     def test_stage_d_renderer_hook_routes_live_entries(self):
         bg = self.bg
         saved = dict(bg.STAGE_D["repo"])
         try:
-            bg.STAGE_D["repo"]["cli"] = "rates.repo.curve"
-            self.assertNotIn("repo", bg.RENDERERS)
+            bg.STAGE_D["repo"]["kind"] = "repo-test"
             self.assertFalse(bg.is_live(bg.STAGE_D["repo"]))
-            bg.renderer("repo")(lambda slug, spec, d: f"LIVE {slug} {d['x']}")
+            bg.renderer("repo-test")(lambda slug, spec, d: f"LIVE {slug} {d['x']}")
             self.assertTrue(bg.is_live(bg.STAGE_D["repo"]))
             data = {s: json.loads((ROOT / "docs/curves/data" / f"{s}.json").read_text(encoding="utf-8"))
-                    for s in list(bg.CURVES) + list(bg.VOLS)}
-            self.assertEqual(bg.render_all({**data, "repo": {"x": 1}})["repo.md"], "LIVE repo 1")
-            self.assertIn("planned", bg.render_all(data)["repo.md"].lower())
+                    for s in list(bg.CURVES) + list(bg.VOLS) + list(bg.STAGE_D)}
+            self.assertEqual(bg.render_all({**data, "repo": {"x": 1, "evidence": {"cases": 1}}})["repo.md"], "LIVE repo 1")
+            data.pop("repo")
+            self.assertIn("planned", bg.render_all(data)["repo.md"].lower())  # live but no data: planned page
         finally:
             bg.STAGE_D["repo"].clear()
             bg.STAGE_D["repo"].update(saved)
-            bg.RENDERERS.pop("repo", None)
+            bg.RENDERERS.pop("repo-test", None)
 
 
 if __name__ == "__main__":
