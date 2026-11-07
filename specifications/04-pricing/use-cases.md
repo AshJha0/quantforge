@@ -1,4 +1,4 @@
-# Use cases 1 and 2
+# Use cases 1 to 3
 
 Spec version 1.0.0. Status: Implemented, not Validated. All data in the cases is synthetic.
 
@@ -22,6 +22,18 @@ Inputs: `as_of`, `quotes`, `interpolation`, `trade` (OIS, as `risk.ois.dv01`), `
 6. `hedge_cost = sum |x_h| * |sum(c_h)| * half_spread_bp`.
 
 The hedges must have key-rate exposure in the trade's buckets. In the golden case a 6Y trade, off the quoted tenors, is hedged with 5Y and 7Y. A 7Y trade hedged with 5Y and 10Y has no overlap, so this method gives units of zero, correctly: par-quote buckets do not reach across tenors.
+
+## Use case 3: `usecase.vol_surface`
+
+Added in stage C. Inputs: `as_of`, `funding_curve`, `slices`, array of `{expiry, quotes}`, in expiry order, with `quotes` as `eq.forward.parity`; `k_grid`; `target`: `{option_type, strike, expiry, quantity, side}`; `currency`.
+
+1. Per slice, `T = (expiry - as_of)/365`, `D = funding_curve(expiry)`, and `F` from `eq.forward.parity` with that `D`.
+2. Per strike, the mid of the out-of-the-money option (call if `K >= F`, else put), inverted with `BLACK_76` on `F`, `D`, gives `w = v^2 T` at `k = ln(K/F)`.
+3. Per slice, `vol.svi.calibrate` on `(k, w)`, unweighted.
+4. A surface on `k_grid` and the slices' times from the fitted SVI, and `vol.surface.check`.
+5. `target.expiry` must be a slice's, else `E_INPUT`. Vol from that slice's SVI at `ln(strike/F)`. Black-76 on `F`, `D`, with side and quantity as `vol.equity.price`. Here `delta` is against the forward: `sign q D phi N(phi d1)`.
+
+Outputs: `forwards`, `svi_rmse`, `arbitrage_free`, `vol`, `valuation` (`model` `BLACK_76_EQUITY`, `conventions` `EQUITY_FORWARD`), `delta`, `vega`.
 
 ## Acceptance
 
