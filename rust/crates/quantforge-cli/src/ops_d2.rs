@@ -14,7 +14,35 @@ use quantforge_core::equity_d::{self, Action, Constituent, Trs};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::inflation::{self, CpiCurve, Zcis, month_index};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::stage_d3::{self, CapTrade, Pool, Prepayment, SwaptionTrade};
 use quantforge_core::xccy::{self, Ndf, XccyTrade};
+
+/// `true` for `BACHELIER`, `false` for `BLACK_76`.
+fn vol_model(i: &Inputs) -> Result<bool> {
+    match i.str("model")? {
+        "BLACK_76" => Ok(false),
+        "BACHELIER" => Ok(true),
+        _ => i.fail("model", "unknown model"),
+    }
+}
+
+fn pool(i: &Inputs) -> Result<Pool> {
+    let p = sub(i, "pool")?;
+    let pre = sub(&p, "prepayment")?;
+    let prepayment = match pre.str("model")? {
+        "CPR" => Prepayment::Cpr(pre.f64("rate")?),
+        "PSA" => Prepayment::Psa(pre.f64("speed")?),
+        _ => return pre.fail("model", "unknown prepayment model"),
+    };
+    Ok(Pool {
+        balance: p.f64("balance")?,
+        wac: p.f64("wac")?,
+        net_coupon: p.f64("net_coupon")?,
+        wam: p.int("wam")?,
+        age: p.int("age")?,
+        prepayment,
+    })
+}
 
 fn month_of(s: &str) -> Option<i64> {
     let d = Date::parse(&format!("{s}-01"))?;
@@ -647,6 +675,115 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             i.gate()?;
             let v = inflation::linker_price_curve(&b, s, base, &c.build()?, &Curve::new(&d)?)?;
             plain(obj([("nominal_dirty", v.into())]))
+        }
+        "rates.cap.price" => {
+            let (d, p) = (curve_input(i, "discount")?, curve_input(i, "projection")?);
+            let normal = vol_model(i)?;
+            let vols = match i.req("vol")? {
+                Json::Arr(_) => i.reals("vol")?,
+                _ => vec![i.f64("vol")?],
+            };
+            let t = sub(i, "trade")?;
+            let trade = CapTrade {
+                cap: match t.str("type")? {
+                    "CAP" => true,
+                    "FLOOR" => false,
+                    _ => return t.fail("type", "unknown type"),
+                },
+                start_months: t.int("start_months")?,
+                tenor_months: t.int("tenor_months")?,
+                strike: t.f64("strike")?,
+                notional: t.f64("notional")?,
+            };
+            i.gate()?;
+            let c = stage_d3::cap_price(&Curve::new(&d)?, &Curve::new(&p)?, normal, &vols, &trade)?;
+            let total: f64 = c.iter().sum();
+            plain(obj([("price", total.into()), ("caplets", c.into())]))
+        }
+        "rates.swaption.price" => {
+            let (d, p) = (curve_input(i, "discount")?, curve_input(i, "projection")?);
+            let (normal, vol) = (vol_model(i)?, i.f64("vol")?);
+            let t = sub(i, "trade")?;
+            let trade = SwaptionTrade {
+                payer: match t.str("type")? {
+                    "PAYER" => true,
+                    "RECEIVER" => false,
+                    _ => return t.fail("type", "unknown type"),
+                },
+                expiry_months: t.int("expiry_months")?,
+                tenor_months: t.int("tenor_months")?,
+                strike: t.f64("strike")?,
+                notional: t.f64("notional")?,
+            };
+            i.gate()?;
+            let (pr, f, a) =
+                stage_d3::swaption_price(&Curve::new(&d)?, &Curve::new(&p)?, normal, vol, &trade)?;
+            plain(obj([
+                ("price", pr.into()),
+                ("forward_rate", f.into()),
+                ("annuity", a.into()),
+            ]))
+        }
+        "cmdty.curve.forward" => {
+            let mut q = Vec::new();
+            for x in items(i, "quotes")? {
+                let m = match month_of(x.str("month")?) {
+                    Some(m) => m,
+                    None => return x.fail("month", "expected YYYY-MM"),
+                };
+                q.push((m, x.f64("price")?));
+            }
+            let s = match i.0.get("seasonality") {
+                None => return i.fail("seasonality", "is required"),
+                Some(Json::Null) => None,
+                _ => Some(i.reals("seasonality")?),
+            };
+            let mut months = Vec::new();
+            for v in i.array("months")? {
+                match v.as_str().and_then(month_of) {
+                    Some(m) => months.push(m),
+                    None => return i.fail("months", "expected YYYY-MM"),
+                }
+            }
+            i.gate()?;
+            let f = stage_d3::commodity_forwards(&q, s.as_deref(), &months)?;
+            plain(obj([("forwards", f.into())]))
+        }
+        "cmdty.storage.carry" => {
+            let f = curve_input(i, "funding")?;
+            let mut fw = Vec::new();
+            for x in items(i, "forwards")? {
+                fw.push((x.date("date")?, x.f64("price")?));
+            }
+            let u = i.f64("storage_cost")?;
+            i.gate()?;
+            let (y, c, a) = stage_d3::storage_carry(&Curve::new(&f)?, &fw, u)?;
+            let a: Vec<Json> = a.into_iter().map(Json::Bool).collect();
+            plain(obj([
+                ("convenience_yields", y.into()),
+                ("carry_values", c.into()),
+                ("arbitrage", a.into()),
+            ]))
+        }
+        "mbs.cashflows" => {
+            let p = pool(i)?;
+            let f = stage_d3::mbs_cashflows(&p)?;
+            plain(obj([
+                ("balance", f.balance.into()),
+                ("interest", f.interest.into()),
+                ("scheduled_principal", f.scheduled_principal.into()),
+                ("prepayment", f.prepayment.into()),
+                ("wal", f.wal.into()),
+            ]))
+        }
+        "mbs.price" => {
+            let (p, y, dd) = (pool(i)?, i.f64("yield")?, i.int("delay_days")?);
+            let (pr, dur, wal) = stage_d3::mbs_price(&p, y, dd)?;
+            plain(obj([
+                ("price", pr.into()),
+                ("modified_duration", dur.into()),
+                ("wal", wal.into()),
+            ]))
         }
         _ => fail(
             "E_UNSUPPORTED_OPERATION",

@@ -70,3 +70,11 @@ None of these is reached by a golden. Rulings C15 and C16 settled the readings o
 - Credit: hazard pillars that do not increase or do not follow `as_of` are `E_INPUT`. A survival outside `(0, 1]` is `E_DOMAIN`. A maturity on or before the trade date is `E_INPUT`. In `credit.curve.composite`, `scale <= 0`, a negative weight, or a weight sum `<= 0` is `E_DOMAIN`. Discount nodes for the integration are the discount curve's pillar dates.
 - Equity D5: `eq.futures.basis` solves the financing spread on `[-1, 1]` and gives `E_NOT_BRACKETED` outside it. In `eq.dividend.implied` an empty `futures` list is `E_INPUT`. `eq.borrow.implied` with `expiry <= as_of` is `E_DATE_ORDER`. In `eq.index.rebalance`, the duplicate check runs before `divisor <= 0` (`E_DOMAIN`). In `eq.trs.pv`, `end <= start` is `E_DATE_ORDER`, and the side values are `RECEIVE_EQUITY` and `PAY_EQUITY`.
 - Inflation D6: `index_ratio` divides by the input `base_cpi`, not by `exp(ln base_cpi)`, and the fixed leg uses `powf`. Golden `inflation_d-0009` (pv near 0) needs this to 1 ulp. `seasonality` is a required key that may be `null`. `years` above 100 is `E_INPUT`. `base_cpi <= 0` or `base_ref_cpi <= 0` is `E_DOMAIN`. Two fixings for one month are `E_INPUT`.
+
+## Stage D wave 3, readings taken where the spec is silent
+
+- D27: no code change was needed. `TONA` is unlisted, so it is already `E_SCHEMA`. The earlier `ois-0023` conflict is closed.
+- `mbs.cashflows`: `wac <= 0` (`E_DOMAIN`) is checked before `net_coupon > wac` (`E_INPUT`). Golden `mbs_d-0011` (wac 0, net coupon 0.06) expects `E_DOMAIN`, while the spec lists the `E_INPUT` checks first. `wam` above 1200 is `E_INPUT`.
+- `mbs.price`: `1 + y/12 <= 0` is `E_DOMAIN`.
+- `rates.cap.price` and `rates.swaption.price`: `tenor_months` outside 1 to 1200 is `E_INPUT`. A swaption `vol < 0` is `E_DOMAIN`. Under `BACHELIER`, any strike and forward are accepted.
+- `cmdty.curve.forward`: `seasonality` is a required key that may be `null`, and an empty `quotes` list is `E_INPUT`. In `cmdty.storage.carry`, a forward price `<= 0` is `E_DOMAIN`.

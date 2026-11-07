@@ -45,6 +45,7 @@ pub mod sha256;
 pub mod smile;
 pub mod snapshot;
 pub mod sobol;
+pub mod stage_d3;
 pub mod stats;
 pub mod store;
 pub mod surface;
