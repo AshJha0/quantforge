@@ -1,6 +1,7 @@
 package org.quantforge.vol;
 
 import java.util.function.Function;
+import org.quantforge.core.QfError;
 
 /** Levenberg-Marquardt on unconstrained parameters, from many starts. Domains are kept by the caller's transform. */
 final class Fit {
@@ -133,6 +134,9 @@ final class Fit {
                 bestCost = c;
                 best = p;
             }
+        }
+        if (best == null) {
+            throw new QfError("E_NON_FINITE", "the fit's cost is not finite from any start");
         }
         return best;
     }

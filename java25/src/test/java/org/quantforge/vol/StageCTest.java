@@ -87,6 +87,17 @@ class StageCTest {
     }
 
     @Test
+    void fitsWithOverflowingQuotesGiveAContractError() {
+        double[] x = {60, 75, 90, 100, 110, 125, 150};
+        double[] v = {2e300, 0.37, 0.327, 0.304, 0.287, 0.27, 0.262};
+        QfError e = assertThrows(QfError.class, () -> Sabr.calibrate(100, 1, 0.5, x, v, null));
+        assertEquals("E_NON_FINITE", e.code());
+        double[] k = {-0.4, -0.2, 0.0, 0.2, 0.4};
+        double[] w = {2e300, 0.05, 0.04, 0.05, 0.06};
+        assertEquals("E_NON_FINITE", assertThrows(QfError.class, () -> Smile.calibrateSvi(k, w, null)).code());
+    }
+
+    @Test
     void haganAtTheMoneyWithoutVolOfVolIsAlphaForBetaOne() {
         assertEquals(0.2, Sabr.hagan(1.0, 1.0, 1.0, new Sabr.Params(0.2, 1.0, 0.0, 0.0)), 1e-14);
     }
