@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-Basis by tenor and the FX forwards it implies. Stage D, target v0.4.
+Basis by tenor and the FX forwards it implies, on a synthetic constant-notional basis swap, not a market-implied curve. The market's mark-to-market resetting swap is edge-case register row E13, out of scope until stage F (ruling R1-1). Stage D, target v0.4.
 
 ## Runs
 

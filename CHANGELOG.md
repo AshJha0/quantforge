@@ -1,8 +1,24 @@
 # Changelog
 
+## 0.4.1: R1, credibility hardening (unreleased)
+
+Work in progress on branch `r1`. Nothing here changes a golden value.
+
+### Added
+- Batch mode, CLI contract 1.6.0: `quantforge --batch` as a synonym of `quantforge batch`, framing rules BT1 to BT8 in `specifications/cli-contract.md`, the optional `--timings` flag, and 19 stream fixtures in `datasets/batch/streams.json`, checked by `conformance/runner/batch_check.py`. The wire `contract_version` stays 1.0.0. On 2026-11-07 each v0.4 build passed 14 of the 19 streams; the five failures are the new items.
+- The honest-ceiling statement in `README.md`: what free public data can and cannot show.
+- Batch mode sections in `COOKBOOK.md` and `LEARN.md`, and an R1 section in `ROADMAP.md`.
+
+### Known issues
+- The calendar provenance check fails until SIFMA publishes its 2027 US holiday schedule (usually in December); the USGS calendar is confirmed only through 2027-01-01.
+
+### Changed
+- Docs and gallery text follow rulings R1-1 to R1-5 (`specifications/r1-rulings.md`): cross-currency is a synthetic constant-notional basis swap; the ESTR payment lag of 2 is a Strata library choice; bond-future conversion factors take a `contract` input with CME rounding; credit operations need `LOG_LINEAR_DF` discount curves; cap and swaption conventions are stylised.
+- `README.md` no longer says stage D is untagged; it was released as `v0.4`.
+
 ## 0.4.0: stage D, curves and fixed income (2026-11-07)
 
-Not tagged yet. Stage D is at Implemented, not Validated. Figures are local runs on Windows, 2026-11-07, on branch `stage-d` at merge `95cbf11`.
+Tagged `v0.4` on `e4047a1` after pull request #15. Stage D is at Implemented, not Validated. Figures are local runs on Windows, 2026-11-07, on branch `stage-d` at merge `95cbf11`.
 
 ### Added
 - Stage D in all four implementations, from the specs alone: D1 rates core (SOFR and ESTR OIS, curve jumps, lookback, observation shift and lockout, IBOR fallbacks, meeting-date steps, Hull-White futures convexity, CSA discounting, OIS index basis, joint bootstrap, smoothness-regularised and Huber curve fits), D2 bonds, Z-spread, asset swap, FRN, repo and special repo, conversion factors and CTD, sovereign fits, D3 cross-currency basis and NDFs, D4 ISDA CDS, index CDS and composite curves, D5 implied dividends and borrow, futures basis, index dividends and dividend futures, rebalancing, corporate actions and TRS, D6 CPI curves with seasonality, zero-coupon inflation swaps and linkers, D7 caps, floors and swaptions on flat or quoted vol, D8 commodity curves with seasonality and storage carry, D9 MBS prepayment and pass-through pricing.
