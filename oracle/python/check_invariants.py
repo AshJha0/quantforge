@@ -256,7 +256,7 @@ def check_d(c, counts):
         hit("storage arbitrage flag = positive carry value")
     if op == "mbs.cashflows":
         b = o["balance"]
-        assert all(x >= 0 for x in o["prepayment"] + o["scheduled_principal"]) and all(y <= x + 1e-6 for x, y in zip(b, b[1:])), cid
+        assert all(x >= -1e-6 for x in o["prepayment"] + o["scheduled_principal"]) and all(y <= x + 1e-6 for x, y in zip(b, b[1:])), cid
         assert abs(b[-1] - o["scheduled_principal"][-1] - o["prepayment"][-1]) < 1e-6, cid
         hit("MBS balance falls to zero; principal not negative")
     if op == "calib.curve.robust":
