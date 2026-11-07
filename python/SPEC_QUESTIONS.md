@@ -130,3 +130,5 @@ No stage D question is open.
   just before the result is serialised.
 - R1-P4. `--batch` is accepted only as the first argument and is rewritten to `batch`; so `--batch batch` and
   `batch --batch` are exit 64.
+- R1-P5. R1-6 SOFR: the "USGS plus every Good Friday" calendar is used only inside `overnight.compound_dated`
+  (business days, start/end check, `back`). Other SOFR uses (swap schedules, curves) keep plain `USGS`.

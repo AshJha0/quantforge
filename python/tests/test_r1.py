@@ -189,3 +189,22 @@ def test_vol_surface_guards():
     assert _code(vol_surface, date(2026, 1, 5), curve, slices, [0.0], target)[1] == "as_of"
     unordered = [(date(2026, 9, 1), q), (date(2026, 6, 1), q)]
     assert _code(vol_surface, date(2026, 1, 2), curve, unordered, [0.0], target)[1] == "slices"
+
+
+# R1-6: USGS Good Friday early closes are business days; SOFR skips every Good Friday
+
+def test_usgs_good_friday_early_close_years():
+    from quantforge_core.calendars import is_business_day
+    for d in (date(2007, 4, 6), date(2021, 4, 2), date(2023, 4, 7), date(2026, 4, 3)):
+        assert is_business_day("USGS", d)
+    for d in (date(2024, 3, 29), date(2027, 3, 26), date(2022, 4, 15)):
+        assert not is_business_day("USGS", d)
+
+
+def test_sofr_skips_good_friday_in_open_years():
+    from quantforge_core.overnight import _back, _business_days
+    days = _business_days("USGS", date(2026, 4, 1), date(2026, 4, 7), sofr=True)
+    assert date(2026, 4, 3) not in days and len(days) == 4
+    assert date(2026, 4, 3) in _business_days("USGS", date(2026, 4, 1), date(2026, 4, 7))
+    assert _back("USGS", True, date(2026, 4, 6), 1) == date(2026, 4, 2)
+    assert _back("USGS", False, date(2026, 4, 6), 1) == date(2026, 4, 3)
