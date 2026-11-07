@@ -116,3 +116,15 @@ TEST_CASE("splines take the largest legal knot count") {
     }
     CHECK(run_case(wrap("core.interp.evaluate", R"({"method":"cubic_not_a_knot","x":)" + x + R"(],"y":)" + y + R"(],"at":[5.5]})")).ok);
 }
+
+TEST_CASE("stage D rulings D45 and D46 through the CLI") {
+    // D45: an unlisted id is E_SCHEMA, a listed id of the wrong kind E_INPUT.
+    const char* q = R"(,"as_of":"2026-11-06","quotes":[{"tenor":"1Y","rate":0.03}],"interpolation":"LOG_LINEAR_DF","method":"SEQUENTIAL"})";
+    CHECK(has(run_case(wrap("rates.ois.bootstrap", std::string(R"({"convention":"USD-TERM-3M")") + q)).json, "E_INPUT"));
+    CHECK(has(run_case(wrap("rates.ois.bootstrap", std::string(R"({"convention":"TONA")") + q)).json, "E_SCHEMA"));
+    // D46: the pillar checks come before the jump checks.
+    const char* curve = R"({"curve":{"as_of":"2026-11-06","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2027-11-06","discount_factor":0.0}],"jumps":[{"date":"2026-11-06","factor":1.0}]},"dates":["2027-01-01"]})";
+    CHECK(has(run_case(wrap("rates.curve.discount", curve)).json, "E_DOMAIN"));
+    const char* jumps = R"({"curve":{"as_of":"2026-11-06","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2027-11-06","discount_factor":0.9}],"jumps":[{"date":"2026-11-06","factor":0.0}]},"dates":["2027-01-01"]})";
+    CHECK(has(run_case(wrap("rates.curve.discount", jumps)).json, "E_INPUT"));
+}

@@ -192,7 +192,6 @@ void Curve::set_jumps(const std::vector<Jump>& jumps) {
 Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars,
              const std::vector<Jump>& jumps)
     : Curve(as_of, interpolation) {
-    set_jumps(jumps);
     if (pillars.empty()) throw Error("E_INPUT", "no pillars", "pillars");
     Date previous = as_of;
     for (const Pillar& p : pillars) {
@@ -201,8 +200,9 @@ Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pil
     }
     for (const Pillar& p : pillars) {
         if (p.discount_factor <= 0.0) throw Error("E_DOMAIN", "a discount factor is not positive", "pillars");
-        push(p.date, std::log(p.discount_factor / jump_product(jumps_, p.date)));
     }
+    set_jumps(jumps);  // after the pillar checks (ruling D46)
+    for (const Pillar& p : pillars) push(p.date, std::log(p.discount_factor / jump_product(jumps_, p.date)));
 }
 
 void Curve::push(Date d, double log_df) {

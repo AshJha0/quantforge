@@ -244,13 +244,15 @@ void write_valuation(Out& out, const Valuation& v) {
 
 const RateConvention* ois_convention_of(const Value& v, string_view key) {
     const RateConvention* c = rate_convention(to_string(v, key));
-    if (!c || c->months != 0) schema(key, "not listed");
+    if (!c) schema(key, "not listed");
+    if (c->months != 0) throw Error("E_INPUT", "an overnight convention is needed (ruling D45)", string(key));
     return c;
 }
 
 const RateConvention* index_of(const Value& v, string_view key) {
     const RateConvention* c = rate_convention(to_string(v, key));
-    if (!c || c->months == 0) schema(key, "not listed");
+    if (!c) schema(key, "not listed");
+    if (c->months == 0) throw Error("E_INPUT", "a term index is needed (ruling D45)", string(key));
     return c;
 }
 

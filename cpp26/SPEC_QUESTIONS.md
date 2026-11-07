@@ -49,22 +49,22 @@ Settled by rulings: `SPOT` with null `scale` (C15, my `E_DOMAIN` was wrong), a p
 Each is answered here with the most conservative reading; none changes a golden result.
 
 1. **Closed by ruling D27.** Stage B golden `ois-0023` against ESTR. It expects `rates.ois.bootstrap` with `ESTR` to be `E_SCHEMA`. `ois-curves.md` 1.1.0 and contract 1.5.0 now list `ESTR`, so this build returns `ok` and that one stage B case fails. The spec wins; the case needs retiring or changing to `ok` by the oracle session.
-2. **Unknown `convention` string in `rates.ois.compound_dated`, `rates.ois.fit_steps`, `rates.basis.ois_spread`.** The specs say "not `OVERNIGHT`: `E_INPUT`". A listed non-overnight record (`USD-TERM-3M`) gives `E_INPUT`; an unlisted string gives `E_SCHEMA`, as every other enum. `rates.curve.joint_bootstrap` keeps the bootstrap's rule (`E_SCHEMA` for anything not overnight).
+2. **Closed by ruling D45.** **Unknown `convention` string in `rates.ois.compound_dated`, `rates.ois.fit_steps`, `rates.basis.ois_spread`.** The specs say "not `OVERNIGHT`: `E_INPUT`". A listed non-overnight record (`USD-TERM-3M`) gives `E_INPUT`; an unlisted string gives `E_SCHEMA`, as every other enum. `rates.curve.joint_bootstrap` keeps the bootstrap's rule (`E_SCHEMA` for anything not overnight).
 3. **Empty `step_dates` in `rates.ois.fit_steps`.** Ruling D12 makes empty date lists `E_INPUT`; with `m = 0` the fit would otherwise be a one-quote flat rate. This build returns `E_INPUT`, checked before the quote count.
-4. **Empty `dates` in `rates.ois.step_curve`, `rates.csa.discount`.** D12: `E_INPUT`, checked after the curve's own checks.
-5. **Two forwards on one date in `rates.csa.discount`, two jumps on one date.** Forwards: `E_INPUT` (ambiguous data), after the `E_DOMAIN` checks. Jumps: already `E_INPUT` by the strictly increasing rule.
+4. **Closed by ruling D31.** **Empty `dates` in `rates.ois.step_curve`, `rates.csa.discount`.** D12: `E_INPUT`, checked after the curve's own checks.
+5. **Closed by ruling D42.** **Two forwards on one date in `rates.csa.discount`, two jumps on one date.** Forwards: `E_INPUT` (ambiguous data), after the `E_DOMAIN` checks. Jumps: already `E_INPUT` by the strictly increasing rule.
 6. **`GLOBAL` in `rates.curve.joint_bootstrap`.** The system is block triangular, so Newton on all pillars equals the discount block's `GLOBAL` Newton followed by the projection block's solve. This build does exactly that; `max_repricing_error` is the larger of the two blocks.
 7. **Order of `LOCKOUT` range check against business-day checks.** `n` is counted from the business days in `[start, end]` before `start`/`end` are checked, as the listed order puts `shift_days` first.
-8. **`bond.yield.from_price` with a negative clean price** (`bonds_d-0048`: clean -1, dirty +1.06). `bonds.md` makes only `clean_price + accrued <= 0` an `E_DOMAIN`, yet the golden expects `E_DOMAIN`. This build also rejects `clean_price <= 0`, the stricter reading the golden implies.
+8. **Closed by ruling D43.** **`bond.yield.from_price` with a negative clean price** (`bonds_d-0048`: clean -1, dirty +1.06). `bonds.md` makes only `clean_price + accrued <= 0` an `E_DOMAIN`, yet the golden expects `E_DOMAIN`. This build also rejects `clean_price <= 0`, the stricter reading the golden implies.
 9. **Asset swap floating dates on an end-of-month maturity.** `bonds.md` gives the end-of-month rule for the bond object only. The floating leg here steps back with plain month arithmetic (Feb 28 to Nov 28), which `bonds_d-0041` confirms.
-10. **`bond.futures.conversion_factor` with delivery on or after maturity.** Not specified; `E_DATE_ORDER`, as the common bond check.
-11. **Negative weight in `bond.fit.nelson_siegel`.** `E_DOMAIN`, checked after the positive-weight count and `tau`.
-12. **CDS curves not as of the trade date.** `credit.md` measures time from `T` and gives curves their own `as_of`. This build requires both the discount and hazard `as_of` to equal `trade_date` (`E_INPUT` otherwise).
-13. **Negative or all-zero weights in `credit.index.intrinsic` and `credit.curve.composite`.** Not specified; `E_DOMAIN`.
-14. **`eq.futures.basis` implied financing spread with no root.** "Unique, as for borrow": this build searches the same `[-0.5, 0.5]` and returns `E_NOT_BRACKETED` outside it.
-15. **`eq.trs.pv` with `end <= start`.** Not specified; `E_DATE_ORDER`.
-16. **Two CPI fixings for one month in `infl.linker.price`, two FX forwards for one date.** `E_INPUT`, as two fixings on one date in `rates.ois.compound_dated`.
-17. **`fx.xccy.bootstrap` with a convention other than SOFR/ESTR.** Ruling D17 allows only those; a listed other record gives `E_INPUT`, an unlisted string `E_SCHEMA`.
-18. **`mbs.cashflows` with `wac <= 0` and `net_coupon > wac` together** (`mbs_d-0011`: wac 0, net 0.06). `mbs.md` lists the `E_INPUT` checks first, yet the golden expects `E_DOMAIN`. This build checks `wac <= 0` before `net_coupon > wac`, as the comparison presumes a valid WAC.
+10. **Closed by ruling D35.** **`bond.futures.conversion_factor` with delivery on or after maturity.** Not specified; `E_DATE_ORDER`, as the common bond check.
+11. **Closed by ruling D37.** **Negative weight in `bond.fit.nelson_siegel`.** `E_DOMAIN`, checked after the positive-weight count and `tau`.
+12. **Closed by ruling D36.** **CDS curves not as of the trade date.** `credit.md` measures time from `T` and gives curves their own `as_of`. This build requires both the discount and hazard `as_of` to equal `trade_date` (`E_INPUT` otherwise).
+13. **Closed by ruling D37.** **Negative or all-zero weights in `credit.index.intrinsic` and `credit.curve.composite`.** Not specified; `E_DOMAIN`.
+14. **Closed by ruling D32.** **`eq.futures.basis` implied financing spread with no root.** "Unique, as for borrow": this build searches the same `[-0.5, 0.5]` and returns `E_NOT_BRACKETED` outside it.
+15. **Closed by ruling D41.** **`eq.trs.pv` with `end <= start`.** Not specified; `E_DATE_ORDER`.
+16. **Closed by ruling D42.** **Two CPI fixings for one month in `infl.linker.price`, two FX forwards for one date.** `E_INPUT`, as two fixings on one date in `rates.ois.compound_dated`.
+17. **Closed by ruling D45.** **`fx.xccy.bootstrap` with a convention other than SOFR/ESTR.** Ruling D17 allows only those; a listed other record gives `E_INPUT`, an unlisted string `E_SCHEMA`.
+18. **Closed by ruling D44.** **`mbs.cashflows` with `wac <= 0` and `net_coupon > wac` together** (`mbs_d-0011`: wac 0, net 0.06). `mbs.md` lists the `E_INPUT` checks first, yet the golden expects `E_DOMAIN`. This build checks `wac <= 0` before `net_coupon > wac`, as the comparison presumes a valid WAC.
 19. **Cap vol given as a list for one caplet, or `vol` neither number nor list.** A number is flat; any array is quoted (length must match, `E_INPUT`); anything else `E_SCHEMA`.
-20. **Swaption and cap `tenor_months < 1`.** Not specified; `E_INPUT`, as `start_months`.
+20. **Closed by ruling D40.** **Swaption and cap `tenor_months < 1`.** Not specified; `E_INPUT`, as `start_months`.
