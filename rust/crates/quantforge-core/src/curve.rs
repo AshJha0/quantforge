@@ -26,6 +26,35 @@ pub struct CurveInput {
     pub as_of: Date,
     pub interpolation: Interpolation,
     pub pillars: Vec<(Date, f64)>,
+    /// Stage D: `(date, factor)`, may be empty.
+    pub jumps: Vec<(Date, f64)>,
+}
+
+/// Anything that gives a discount factor for a date.
+pub trait Discount {
+    fn discount(&self, d: Date) -> Result<f64>;
+}
+
+impl Discount for Curve {
+    fn discount(&self, d: Date) -> Result<f64> {
+        Curve::discount(self, d)
+    }
+}
+
+/// Checks a jump list (`curve-framework.md`): dates first, then factors.
+pub fn check_jumps(as_of: Date, jumps: &[(Date, f64)]) -> Result<()> {
+    if jumps.first().is_some_and(|j| j.0 <= as_of) || jumps.windows(2).any(|w| w[1].0 <= w[0].0) {
+        return fail("E_INPUT", "jump dates must increase and follow as_of");
+    }
+    if jumps.iter().any(|j| j.1.is_nan() || j.1 <= 0.0) {
+        return fail("E_DOMAIN", "a jump factor is not positive");
+    }
+    Ok(())
+}
+
+/// `ln J(t)`: the sum of log factors whose time is strictly before `t`.
+fn log_jump(jumps: &[(f64, f64)], t: f64) -> f64 {
+    jumps.iter().take_while(|j| j.0 < t).map(|j| j.1).sum()
 }
 
 /// Market data: a frozen discount curve. Node 0 is the implied node at `as_of`.
@@ -34,7 +63,10 @@ pub struct Curve {
     pub as_of: Date,
     interpolation: Interpolation,
     times: Vec<f64>,
+    /// Logs of `S = D / J` at the nodes.
     logs: Vec<f64>,
+    /// `(time, ln factor)`.
+    jumps: Vec<(f64, f64)>,
 }
 
 pub fn curve_time(as_of: Date, d: Date) -> f64 {
@@ -52,22 +84,49 @@ impl Curve {
         if c.pillars.iter().any(|p| p.1 <= 0.0) {
             return fail("E_DOMAIN", "a discount factor is not positive");
         }
+        check_jumps(c.as_of, &c.jumps)?;
         let dates: Vec<Date> = c.pillars.iter().map(|p| p.0).collect();
         let logs: Vec<f64> = c.pillars.iter().map(|p| p.1.ln()).collect();
-        Ok(Curve::from_logs(c.as_of, c.interpolation, &dates, &logs))
+        Ok(Curve::from_logs_with_jumps(
+            c.as_of,
+            c.interpolation,
+            &dates,
+            &logs,
+            &c.jumps,
+        ))
     }
 
     /// From log discount factors at dates already known to be in order.
     pub fn from_logs(as_of: Date, i: Interpolation, dates: &[Date], logs: &[f64]) -> Curve {
+        Curve::from_logs_with_jumps(as_of, i, dates, logs, &[])
+    }
+
+    /// From full log discount factors, with checked jumps. Nodes keep `ln S = ln D - ln J`.
+    pub fn from_logs_with_jumps(
+        as_of: Date,
+        i: Interpolation,
+        dates: &[Date],
+        logs: &[f64],
+        jumps: &[(Date, f64)],
+    ) -> Curve {
+        let jumps: Vec<(f64, f64)> = jumps
+            .iter()
+            .map(|j| (curve_time(as_of, j.0), j.1.ln()))
+            .collect();
         let mut times = vec![0.0];
         times.extend(dates.iter().map(|d| curve_time(as_of, *d)));
         let mut l = vec![0.0];
-        l.extend_from_slice(logs);
+        l.extend(
+            logs.iter()
+                .zip(&times[1..])
+                .map(|(x, t)| x - log_jump(&jumps, *t)),
+        );
         Curve {
             as_of,
             interpolation: i,
             times,
             logs: l,
+            jumps,
         }
     }
 
@@ -104,7 +163,11 @@ impl Curve {
         if d < self.as_of {
             return fail("E_OUT_OF_RANGE", "date is before as_of");
         }
-        Ok(self.at_time(curve_time(self.as_of, d)))
+        let t = curve_time(self.as_of, d);
+        if self.jumps.is_empty() {
+            return Ok(self.at_time(t));
+        }
+        Ok(self.at_time(t) * log_jump(&self.jumps, t).exp())
     }
 
     /// Continuous zero rate; `None` at `as_of`.
@@ -159,9 +222,23 @@ pub fn solve_curve(
     model: &dyn Fn(&Curve, usize) -> Result<f64>,
     method: SolveMethod,
 ) -> Result<Solved> {
+    solve_curve_with_jumps(as_of, interpolation, dates, &[], quotes, model, method)
+}
+
+/// As `solve_curve`, on a curve with checked jumps. The unknowns are full log discount factors.
+pub fn solve_curve_with_jumps(
+    as_of: Date,
+    interpolation: Interpolation,
+    dates: &[Date],
+    jumps: &[(Date, f64)],
+    quotes: &[f64],
+    model: &dyn Fn(&Curve, usize) -> Result<f64>,
+    method: SolveMethod,
+) -> Result<Solved> {
     let start = |j: usize| -quotes[j] * curve_time(as_of, dates[j]);
     let mut logs: Vec<f64> = (0..dates.len()).map(start).collect();
-    let build = |l: &[f64]| Curve::from_logs(as_of, interpolation, &dates[..l.len()], l);
+    let build =
+        |l: &[f64]| Curve::from_logs_with_jumps(as_of, interpolation, &dates[..l.len()], l, jumps);
     match method {
         SolveMethod::Sequential => {
             for j in 0..dates.len() {

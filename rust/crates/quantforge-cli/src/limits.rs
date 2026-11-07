@@ -94,10 +94,14 @@ fn curve_points_above(i: &Json) -> bool {
         "projection",
         "base_curve",
         "quote_curve",
+        "projection_a",
+        "projection_b",
     ]
     .iter()
     .any(|k| pillars(k))
-        || len(i, "quotes").is_some_and(|n| n > 100)
+        || ["quotes", "ois_quotes", "term_quotes"]
+            .iter()
+            .any(|k| len(i, k).is_some_and(|n| n > 100))
         || len(i, "points").is_some_and(|n| n > 100)
 }
 

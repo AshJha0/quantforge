@@ -36,10 +36,23 @@ const SOFR: Overnight = Overnight {
     fixed_day_count: "ACT_360",
 };
 
+/// Stage D: Strata 2.12.78 `EUR-FIXED-1Y-ESTR-OIS` (ruling D1).
+const ESTR: Overnight = Overnight {
+    id: "ESTR",
+    currency: "EUR",
+    day_count: "ACT_360",
+    calendar: "EUTA",
+    spot_lag: 2,
+    payment_lag: 2,
+    fixed_months: 12,
+    fixed_day_count: "ACT_360",
+};
+
 pub fn overnight(id: &str) -> Option<Overnight> {
     match id {
         "SONIA" => Some(SONIA),
         "SOFR" => Some(SOFR),
+        "ESTR" => Some(ESTR),
         _ => None,
     }
 }
