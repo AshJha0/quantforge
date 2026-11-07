@@ -1,12 +1,16 @@
 //! Stage C operations: read the inputs, call the library, shape the outputs.
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
-use crate::ops_b::{curve_input, items};
+use crate::ops_b::{curve_input, items, snapshot_id};
 use quantforge_core::curve::CurveInput;
 use quantforge_core::dates::Date;
 use quantforge_core::equity::{self, Outright, ParityQuote};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::black;
+use quantforge_core::greeks;
+use quantforge_core::ois::Valuation;
+use quantforge_core::stats::{normal_cdf, normal_pdf};
 use quantforge_core::black::{Model, Option_};
 
 /// Ruling C9: the key must be present, and `null` carries meaning.
@@ -133,6 +137,55 @@ fn option_inputs(i: &Inputs) -> Result<Option_> {
     })
 }
 
+/// True for `BUY`.
+fn trade_side(i: &Inputs) -> Result<f64> {
+    match i.str("side")? {
+        "BUY" => Ok(1.0),
+        "SELL" => Ok(-1.0),
+        _ => i.fail("side", "unknown side"),
+    }
+}
+
+fn equity_valuation(pv: f64, currency: &str, id: Option<String>, as_of: Date) -> Json {
+    Valuation {
+        pv,
+        currency: currency.to_string(),
+        model: "BLACK_76_EQUITY",
+        data_version: id,
+        conventions: "EQUITY_FORWARD".to_string(),
+        as_of,
+    }
+    .to_json()
+}
+
+fn equity_price(i: &Inputs) -> Result<Outcome> {
+    let f = forward_inputs(i)?;
+    let call = option_type(i)?;
+    let (k, v, q) = (i.f64("strike")?, i.f64("vol")?, i.f64("quantity")?);
+    let sign = trade_side(i)?;
+    let currency = i.str("currency")?;
+    no_null(i, "snapshot_id")?;
+    let id = snapshot_id(i)?;
+    i.gate()?;
+    let r = outright(&f)?;
+    let t = (f.expiry.serial() - f.as_of.serial()) as f64 / 365.0;
+    if t == 0.0 || v <= 0.0 || k <= 0.0 || q <= 0.0 {
+        return fail("E_DOMAIN", "expiry, vol, strike or quantity is out of domain");
+    }
+    let (fw, d, c) = (r.forward, r.discount_factor, r.carry_factor);
+    let p = black::phi(call);
+    let d1 = black::d1_d2(fw, k, v, t).0;
+    let root = t.sqrt();
+    let pv = sign * q * black::black(call, fw, k, v, t, d);
+    plain(obj([
+        ("valuation", equity_valuation(pv, currency, id, f.as_of)),
+        ("forward", fw.into()),
+        ("delta", (sign * q * d * p * normal_cdf(p * d1) / c).into()),
+        ("gamma", (sign * q * d * normal_pdf(d1) / (fw * v * root * c * c)).into()),
+        ("vega", (sign * q * d * fw * normal_pdf(d1) * root).into()),
+    ]))
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
         "eq.forward.outright" => {
@@ -183,6 +236,32 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "vol.option.implied" => {
             let (o, p) = (option_inputs(i)?, i.f64("price")?);
             plain(obj([("vol", o.implied(p)?.into())]))
+        }
+        "vol.equity.price" => equity_price(i),
+        "risk.vol.greeks" => {
+            let (o, v) = (option_inputs(i)?, i.f64("vol")?);
+            let g = greeks::analytic(&o, v)?;
+            plain(obj([
+                ("price", g.price.into()),
+                ("delta", g.delta.into()),
+                ("gamma", g.gamma.into()),
+                ("vega", g.vega.into()),
+                ("theta", g.theta.into()),
+                ("rho", g.rho.into()),
+                ("vanna", g.vanna.into()),
+                ("volga", g.volga.into()),
+            ]))
+        }
+        "risk.vol.bump_greeks" => {
+            let (o, v) = (option_inputs(i)?, i.f64("vol")?);
+            let [delta, gamma, vega, volga, vanna] = greeks::bumped(&o, v)?;
+            plain(obj([
+                ("delta", delta.into()),
+                ("gamma", gamma.into()),
+                ("vega", vega.into()),
+                ("volga", volga.into()),
+                ("vanna", vanna.into()),
+            ]))
         }
         // next arm
         _ => fail(

@@ -20,6 +20,7 @@ pub mod daycount;
 pub mod equity;
 pub mod error;
 pub mod fx;
+pub mod greeks;
 pub mod hedge;
 pub mod integrate;
 pub mod interp;

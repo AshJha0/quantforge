@@ -117,8 +117,11 @@ pub const OPERATIONS: &[&str] = &[
     "rates.swap.pv",
     "risk.cashflows",
     "risk.ois.dv01",
+    "risk.vol.bump_greeks",
+    "risk.vol.greeks",
     "usecase.fx_hedge",
     "usecase.rates_hedge",
+    "vol.equity.price",
     "vol.option.implied",
     "vol.option.price",
 ];
