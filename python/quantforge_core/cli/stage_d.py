@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from typing import Any
 
 from .. import conventions, curves
+from ..bonds import CONTRACTS
 from ..calendars import TENOR
 from ..errors import QfError
 from ..overnight import FALLBACKS, METHODS
@@ -227,7 +228,8 @@ def _month(i: Inputs, key: str) -> tuple[int, int]:
 @op("bond.futures.conversion_factor")
 def _conversion(i: Inputs) -> Any:
     bond, (year, month) = _bond(i.object("bond")), _month(i, "delivery_month")
-    args = (bond, year, month, i.real("notional_coupon"))
+    contract = i.enum("contract", CONTRACTS) if i.has("contract") else "TEN_YEAR"
+    args = (bond, year, month, i.real("notional_coupon"), contract)
     return {"conversion_factor": D.bonds.conversion_factor(*args)}
 
 
@@ -288,6 +290,13 @@ def _ndf(i: Inputs) -> Any:
 
 # Wave 2, D4: credit
 
+def _isda(curve: Any) -> None:
+    """Ruling R1-4: the first rule check of every credit.* operation."""
+    if curve.interpolation != "LOG_LINEAR_DF":
+        raise QfError("E_INPUT", "credit needs LOG_LINEAR_DF discounting",
+                      "discount.interpolation")
+
+
 def _hazard(h: Inputs) -> Any:
     pillars = _objects(h, "pillars")
     dates = [p.date("date") for p in pillars]
@@ -306,6 +315,7 @@ def _cds_price(i: Inputs) -> Any:
             t.real("coupon"), t.real("notional"),
             t.enum("side", ("BUY_PROTECTION", "SELL_PROTECTION")),
             i.enum("payout", ("STANDARD", "DIGITAL")))
+    _isda(args[1])
     hazard = D.credit.check_hazard(as_of, dates, survival)
     return D.credit.price(args[0], args[1], hazard, *args[2:])
 
@@ -313,6 +323,7 @@ def _cds_price(i: Inputs) -> Any:
 @op("credit.cds.bootstrap")
 def _cds_bootstrap(i: Inputs) -> Any:
     args = (i.date("trade_date"), _curve(i, "discount"), i.real("recovery"), _cds_quotes(i))
+    _isda(args[1])
     pillars = D.credit.bootstrap(*args)
     return {"pillars": [{"date": d.isoformat(), "survival": q} for d, q in pillars]}
 
@@ -324,6 +335,7 @@ def _cds_index(i: Inputs) -> Any:
            for n in _objects(i, "names")]
     trade_date, disc = i.date("trade_date"), _curve(i, "discount")
     mat, coupon, quoted = t.date("maturity"), t.real("coupon"), i.real("quoted_upfront")
+    _isda(disc)
     names = [(D.credit.check_hazard(*h), r, w) for h, r, w in raw]
     ups, intrinsic, basis = D.credit.index_intrinsic(trade_date, disc, names, mat, coupon,
                                                      quoted)
@@ -335,6 +347,7 @@ def _cds_composite(i: Inputs) -> Any:
     constituents = [(_cds_quotes(c), c.real("weight")) for c in _objects(i, "constituents")]
     args = (i.date("trade_date"), _curve(i, "discount"), i.real("recovery"), constituents,
             i.real("scale"))
+    _isda(args[1])
     spreads, pillars = D.credit.composite(*args)
     return {"spreads": spreads,
             "pillars": [{"date": d.isoformat(), "survival": q} for d, q in pillars]}
