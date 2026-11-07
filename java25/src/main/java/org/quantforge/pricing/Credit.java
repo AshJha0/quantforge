@@ -183,6 +183,7 @@ public final class Credit {
         if (!(recovery >= 0.0 && recovery < 1.0)) {
             throw new QfError("E_DOMAIN", "recovery must be in [0, 1)", "recovery");
         }
+        checkAsOf(t, p, q);
         List<Period> periods = periods(t, maturity);
         double[] legs = legs(t, p, q, periods, maturity);
         double lgd = digital ? 1.0 : 1.0 - recovery;
@@ -255,10 +256,18 @@ public final class Credit {
         return new double[] {prot, rpv01, accruedPerCoupon};
     }
 
+    /** Ruling D36: every curve's as_of is the trade date. */
+    public static void checkAsOf(LocalDate t, Curve p, Hazard q) {
+        if (!p.asOf().equals(t) || (q != null && !q.t0.equals(t))) {
+            throw new QfError("E_INPUT", "curve as_of must equal trade_date", "trade_date");
+        }
+    }
+
     public static Hazard bootstrap(LocalDate t, Curve p, double recovery, String[] tenors, double[] spreads) {
         if (!(recovery >= 0.0 && recovery < 1.0)) {
             throw new QfError("E_DOMAIN", "recovery must be in [0, 1)", "recovery");
         }
+        checkAsOf(t, p, null);
         if (tenors.length == 0) {
             throw new QfError("E_INPUT", "no quotes", "quotes");
         }

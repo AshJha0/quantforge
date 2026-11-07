@@ -119,3 +119,24 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | D-23 | `rates.cap.price`, `rates.swaption.price` model `BLACK_SCHOLES` | `E_SCHEMA`; only `BLACK_76` and `BACHELIER` are listed |
 | D-24 | `cmdty.storage.carry` a forward price `<= 0` | `E_DOMAIN` (the logs need it) |
 | D-1 | (update) | Closed by ruling D27: `ois-0023` now sends `TONA`, which this build rejects with `E_SCHEMA`; no code change, and the test skip is removed |
+
+### Closed by rulings D31 to D46 (stage-d 2836b6b)
+
+| # | Ruling | Outcome |
+|---|---|---|
+| D-2, D-3 | D46 | Confirmed: pillars, then jump dates, then jump factors; bootstrap keeps jumps first |
+| D-4 | D31 | `steps: []` is a flat curve; `dates: []` is `E_INPUT`. Empty `step_dates` in `fit_steps` stays `E_INPUT` (D12) |
+| D-6 | D45 | Confirmed |
+| D-7 | D42 | Confirmed: duplicate forwards `E_INPUT` |
+| D-8 | D38 | Confirmed: `E_SINGULAR` |
+| D-12 | D43 | Confirmed: `clean_price <= 0` is `E_DOMAIN` |
+| D-14, D-16 | D37 | Changed: a zero weight sum is now `E_DOMAIN` (credit and Nelson-Siegel); negative `E_DOMAIN`; wrong length `E_INPUT` |
+| D-15 | D36 | Changed: discount and hazard `as_of` must equal `trade_date`, else `E_INPUT` |
+| D-17 | D32 | Confirmed |
+| D-18 | D41 | Confirmed |
+| D-20 | D42 | Confirmed for duplicate CPI fixings |
+| D-21 | D44 | Confirmed; `mbs.md` corrected |
+| D-22 | D33 | Changed: `wam > 1200` is `E_INPUT`, not `E_LIMIT` |
+| new | D34, D35, D39, D40 | `1 + y/12 <= 0` `E_DOMAIN` (already so); conversion factor with maturity before delivery month now `E_DATE_ORDER`; `fx.xccy.pv` start before `as_of` now `E_OUT_OF_RANGE`; `tenor_months` 1 to 1200 (already so) |
+
+Still open: D-5 (huge lookback gives `E_DATE_RANGE`), D-9, D-10, D-11, D-13, D-19 (inflation_d-0009 limit at rounding noise), D-23, D-24. All pass conformance; none is pinned by a ruling.

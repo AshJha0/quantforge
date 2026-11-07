@@ -39,7 +39,6 @@ final class StageD7 {
         double net = p.real("net_coupon");
         long wam = p.integer("wam");
         long age = p.integer("age");
-        in.limit(wam > 1200, "wam");
         In pre = p.object("prepayment");
         String model = choose(pre, "model", "CPR", "PSA");
         boolean psa = model.equals("PSA");

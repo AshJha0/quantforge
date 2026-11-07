@@ -94,10 +94,10 @@ public final class CmdtyMbs {
     public record Flows(double[] balance, double[] interest, double[] scheduled, double[] prepayment, double wal) {}
 
     public static Flows cashflows(Pool p) {
-        if (p.wam() >= 1 && p.age() >= 0 && !(p.wac() > 0.0)) {
+        if (p.wam() >= 1 && p.wam() <= 1200 && p.age() >= 0 && !(p.wac() > 0.0)) {
             throw new QfError("E_DOMAIN", "wac must be positive", "pool"); // Before net <= wac (mbs_d-0011).
         }
-        if (p.wam() < 1 || p.age() < 0 || p.net() > p.wac()) {
+        if (p.wam() < 1 || p.wam() > 1200 || p.age() < 0 || p.net() > p.wac()) {
             throw new QfError("E_INPUT", "wam >= 1, age >= 0 and net_coupon <= wac", "pool");
         }
         if (!(p.wac() > 0.0) || !(p.balance() > 0.0)) {

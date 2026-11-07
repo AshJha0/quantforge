@@ -124,7 +124,7 @@ final class StageD4 {
                 den += w[i];
             }
             if (!(den > 0.0)) {
-                throw new QfError("E_INPUT", "weights sum to zero", "names");
+                throw new QfError("E_DOMAIN", "weights sum to zero", "names");
             }
             double intrinsic = num / den;
             return Operations.out("intrinsic_upfront", intrinsic, "basis", quoted - intrinsic, "name_upfronts", u);
@@ -163,7 +163,7 @@ final class StageD4 {
                 den += v;
             }
             if (!(den > 0.0)) {
-                throw new QfError("E_INPUT", "weights sum to zero", "constituents");
+                throw new QfError("E_DOMAIN", "weights sum to zero", "constituents");
             }
             double[] s = new double[tenors.length];
             for (int k = 0; k < s.length; k++) {

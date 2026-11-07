@@ -95,6 +95,9 @@ public final class Xccy {
         if (!(spot > 0.0)) {
             throw new QfError("E_DOMAIN", "spot must be positive", "spot");
         }
+        if (start.isBefore(domestic.asOf())) {
+            throw new QfError("E_OUT_OF_RANGE", "start is before as_of", "start");
+        }
         List<LocalDate> dates = schedule(start, months);
         double f = notional * leg(dates, fProj, fDisc, spread);
         double d = notional * spot * leg(dates, domestic, domestic, 0.0);

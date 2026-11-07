@@ -222,7 +222,7 @@ public final class Bonds {
         long months = (b.maturity().getYear() * 12L + b.maturity().getMonthValue())
                 - (delivery.getYear() * 12L + delivery.getMonthValue());
         if (months < 0) {
-            throw new QfError("E_INPUT", "maturity is before the delivery month", "bond");
+            throw new QfError("E_DATE_ORDER", "maturity is before the delivery month", "bond");
         }
         long n = months / 12;
         long z = (months % 12) / 3 * 3;
@@ -318,6 +318,13 @@ public final class Bonds {
                 throw new QfError("E_DOMAIN", "weights must not be negative", "weights");
             }
             positive += v > 0.0 ? 1 : 0;
+        }
+        double total = 0.0;
+        for (double v : w) {
+            total += v;
+        }
+        if (!(total > 0.0)) {
+            throw new QfError("E_DOMAIN", "weights sum to zero", "weights");
         }
         if (positive < 3) {
             throw new QfError("E_INPUT", "need at least 3 positive weights", "bonds");

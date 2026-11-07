@@ -110,7 +110,7 @@ class StageD7to9Test {
         error("E_INPUT", "mbs.cashflows", "{\"pool\":" + pool.formatted(0.06, 0.07, 60, 0.1) + "}");
         error("E_INPUT", "mbs.cashflows", "{\"pool\":" + pool.formatted(0.06, 0.05, 0, 0.1) + "}");
         error("E_DOMAIN", "mbs.cashflows", "{\"pool\":" + pool.formatted(0.06, 0.05, 60, 1.0) + "}");
-        error("E_LIMIT", "mbs.cashflows", "{\"pool\":" + pool.formatted(0.06, 0.05, 100000, 0.1) + "}");
+        error("E_INPUT", "mbs.cashflows", "{\"pool\":" + pool.formatted(0.06, 0.05, 100000, 0.1) + "}");
         error("E_INPUT", "mbs.price", "{\"pool\":" + pool.formatted(0.06, 0.05, 60, 0.1) + ",\"yield\":0.05,\"delay_days\":-1}");
     }
 
