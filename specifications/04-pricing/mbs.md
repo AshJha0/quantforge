@@ -21,7 +21,7 @@ The last month's scheduled principal is the whole balance.
 
 Input: `pool`. Outputs: `balance` (`B_k`), `interest`, `scheduled_principal`, `prepayment` (each `wam` long), `wal = sum (k/12)(scheduled_principal_k + prepayment_k) / balance`.
 
-Checks, in order: `wam < 1`, `age < 0`, or `net_coupon > wac`: `E_INPUT`. `wac <= 0`, `balance <= 0`, `rate` outside `[0, 1)`, `speed < 0`: `E_DOMAIN`.
+Checks, in order (ruling D44): `wam` outside 1 to 1200, or `age < 0`: `E_INPUT`. `wac <= 0`: `E_DOMAIN`. `net_coupon > wac`: `E_INPUT`. `balance <= 0`, `rate` outside `[0, 1)`, `speed < 0`: `E_DOMAIN`. In `mbs.price`, `1 + y/12 <= 0`: `E_DOMAIN`.
 
 ## `mbs.price`
 

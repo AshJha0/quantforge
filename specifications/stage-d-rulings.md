@@ -46,6 +46,23 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 
 | D30 | MBS | PSA age is `age + k` for month `k`; net coupon at most WAC; delay measured in 30-day months; no servicing strip or guarantee fee beyond the WAC-net gap |
 
+| D31 | Empty `steps`, `dates` in `rates.ois.step_curve` | `steps: []` is a flat curve at `base_rate`. `dates: []` is `E_INPUT`. Cases `rulings_d-0001`, `-0002` |
+| D32 | No root for an implied rate in `eq.futures.basis`, `eq.borrow.implied` | Search `[-0.5, 0.5]` only; otherwise `E_NOT_BRACKETED`. Case `rulings_d-0003` (root near -0.65) |
+| D33 | `wam` above 1200 | `E_INPUT`, not `E_LIMIT`: `01-core/limits.md` lists no MBS limit. Case `rulings_d-0004` |
+| D34 | `mbs.price` with `1 + y/12 <= 0` | `E_DOMAIN`. Case `rulings_d-0005` |
+| D35 | `bond.futures.conversion_factor` with maturity before the delivery month | `E_DATE_ORDER`. Case `rulings_d-0006` |
+| D36 | CDS curves' `as_of` | Both `discount` and `hazard` (and every hazard in `credit.index.intrinsic`) must have `as_of = trade_date`, else `E_INPUT`. Cases `rulings_d-0007`, `-0008` |
+| D37 | Weights in `credit.index.intrinsic`, `credit.curve.composite`, `bond.fit.nelson_siegel` | A negative weight, or weights summing to 0: `E_DOMAIN`. Wrong length: `E_INPUT`. Cases `rulings_d-0009` to `-0012` |
+| D38 | `calib.curve.robust` when the maturities cannot fix three betas | `E_SINGULAR`. Case `rulings_d-0013` |
+| D39 | `fx.xccy.bootstrap`, `fx.xccy.pv` with `start` before `as_of` | `E_OUT_OF_RANGE`. Case `rulings_d-0014` |
+| D40 | `tenor_months` in caps and swaptions | 1 to 1200, else `E_INPUT`. Cases `rulings_d-0015`, `-0016` |
+| D41 | `eq.trs.pv` with `end <= start` | `E_DATE_ORDER`. Case `rulings_d-0017` |
+| D42 | Two forwards on one date in `rates.csa.discount`; two fixings for one month in `infl.linker.price` | `E_INPUT`. Case `rulings_d-0018` |
+| D43 | `bond.yield.from_price` with `clean_price <= 0` | `E_DOMAIN`, as well as `clean_price + accrued <= 0`. `bonds.md` corrected; case `bonds_d-0048` |
+| D44 | `mbs.*` check order | `wac <= 0` (`E_DOMAIN`) comes before `net_coupon > wac` (`E_INPUT`); `wam`, `age` first. `mbs.md` corrected; case `mbs_d-0011` |
+| D45 | Convention ids | An unlisted id is `E_SCHEMA`; a listed id of the wrong kind (`USD-TERM-3M` where an overnight index is needed, or not `SOFR`/`ESTR` in `fx.xccy.*`) is `E_INPUT`. Case `compound_d-0030` |
+| D46 | Check order for curves with `jumps` | The curve's pillar checks first, then jump dates (`E_INPUT`), then jump factors (`E_DOMAIN`). In `rates.ois.bootstrap` its own list stands (jumps first) |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
