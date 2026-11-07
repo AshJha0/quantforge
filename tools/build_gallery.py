@@ -3,6 +3,7 @@
 
     python tools/build_gallery.py           # runs all four CLIs, rewrites data and pages
     python tools/build_gallery.py --check   # reruns the Python CLI, changes nothing
+    python tools/build_gallery.py --refresh-real  # also fetches a new real-data snapshot (gallery_real.py)
 
 Commands come from conformance/runner/implementations.json, so the CLIs must be built first. This
 file holds no financial logic: it sends cases, stores what comes back and draws it. Its only sums
@@ -25,6 +26,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 from runner import resolve_command  # noqa: E402
+sys.path.insert(0, str(ROOT / "tools"))
+import gallery_real  # noqa: E402
 
 OUT = ROOT / "docs" / "curves"
 DATA = OUT / "data"
@@ -649,11 +652,16 @@ def index_page(all_data):
         rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "D",
                      f"{all_data[slug]['evidence']['cases']} golden case{'s' if all_data[slug]['evidence']['cases'] != 1 else ''}" if live and slug in all_data else "None yet"])
     rows += [[name, "Planned", stage, "None yet"] for name, stage in PLANNED]
+    real = ""
+    if gallery_real.SLUG in all_data:
+        real = ("\n## Real data\n\n"
+                f"[US Treasury curve with sanity bands]({gallery_real.SLUG}.md): the one page built from real public data, "
+                f"snapshot of {all_data[gallery_real.SLUG]['inputs']['as_of']}. The same bands run daily in workflow (a).\n")
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
@@ -662,7 +670,7 @@ Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown.
 
 {table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
-
+{real}
 ## How the gallery is built
 
 `tools/build_gallery.py` runs the CLIs and writes these pages and `docs/curves/data/`. CI reruns the Python CLI and fails if a committed number moves by more than {TOL['curve'][0]:g} plus {TOL['curve'][1]:g} relative, or {TOL['risk'][0]:g} plus {TOL['risk'][1]:g} relative for risk figures. See [the guide](../developer-guides/curves-gallery.md).
@@ -679,6 +687,10 @@ def render_all(all_data):
     for slug, spec in STAGE_D.items():
         live = is_live(spec) and slug in all_data
         pages[f"{slug}.md"] = RENDERERS[spec["kind"]](slug, spec, all_data[slug]) if live else planned_page(slug, spec)
+    if gallery_real.SLUG in all_data:
+        d = all_data[gallery_real.SLUG]
+        versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
+        pages[f"{gallery_real.SLUG}.md"] = gallery_real.page(d, chart, table, versions)
     return pages
 
 
@@ -1009,12 +1021,34 @@ def run_curve(lang, spec):
     return (rates_curve if spec["kind"] == "rates" else fx_curve)(lang, spec)
 
 
-def generate():
+def generate_real(meta, refresh):
+    path = DATA / f"{gallery_real.SLUG}.json"
+    inputs = gallery_real.fetch_inputs() if refresh or not path.is_file() else json.loads(path.read_text(encoding="utf-8"))["inputs"]
+    results = {lang: gallery_real.run(lang, inputs, batch) for lang in LANGS}
+    gap = max(abs(a["discount_factor"] - b["discount_factor"]) for lang in LANGS
+              for a, b in zip(results[lang]["pillars"], results["python"]["pillars"]))
+    d = {"meta": meta, "inputs": inputs, "reference": results["python"], "agreement": gap}
+    path.write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    return d
+
+
+def committed_slugs():
+    return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()]
+
+
+def generate(refresh_real=False, real_only=False):
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     meta = {"commit": commit, "date": dt.date.today().isoformat(), "reference_language": "python", "tolerance": TOL,
             "data": "synthetic", "cli": {lang: json.loads(call(lang, "version")) for lang in LANGS}}
     DATA.mkdir(parents=True, exist_ok=True)
     all_data = {}
+    if real_only:  # keep every synthetic page's committed data; rebuild only the real-data page and the index
+        all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
+        all_data[gallery_real.SLUG] = generate_real({**meta, "data": "real"}, refresh_real)
+        for name in ("README.md", f"{gallery_real.SLUG}.md"):
+            (OUT / name).write_text(render_all(all_data)[name], encoding="utf-8", newline="\n")
+        print(f"real-data page written to {OUT}")
+        return 0
     for slug, spec in CURVES.items():
         results = {lang: run_curve(lang, spec) for lang in LANGS}
         example = read_example(spec["example"])
@@ -1100,6 +1134,9 @@ def check():
         compare(d["reference"], d_run("python", spec), slug, bad)
         if d["evidence"] != golden_d(spec["examples"]):
             bad.append(f"{slug}: golden evidence changed")
+    d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
+    all_data[gallery_real.SLUG] = d
+    compare(d["reference"], gallery_real.run("python", d["inputs"], batch), gallery_real.SLUG, bad)
     for name, text in render_all(all_data).items():
         path = OUT / name
         if not path.is_file() or path.read_text(encoding="utf-8") != text:
@@ -1113,7 +1150,10 @@ def check():
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true", help="rerun the Python CLI and compare with committed data")
-    return check() if ap.parse_args().check else generate()
+    ap.add_argument("--refresh-real", action="store_true", help="fetch a new real-data snapshot before generating")
+    ap.add_argument("--real-only", action="store_true", help="rebuild only the real-data page and the index")
+    a = ap.parse_args()
+    return check() if a.check else generate(a.refresh_real, a.real_only)
 
 
 if __name__ == "__main__":

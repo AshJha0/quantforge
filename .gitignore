@@ -13,3 +13,4 @@ mutants/
 mutants.out*/
 .mutmut-cache
 site/
+reports/workflows/

@@ -2,7 +2,7 @@
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on 2026-11-07 from commit `8dddd58`.
 
@@ -34,6 +34,10 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | Sector and rating curves | Planned | D | None yet |
 | Funding curve | Planned | F | None yet |
 | Liquidity curves | Planned | H | None yet |
+
+## Real data
+
+[US Treasury curve with sanity bands](real-usd-treasury.md): the one page built from real public data, snapshot of 2026-11-06. The same bands run daily in workflow (a).
 
 ## How the gallery is built
 
