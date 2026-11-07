@@ -2,7 +2,7 @@
 
 Pull request #1 ran the workflows it triggers on GitHub, and all passed, including GCC, Clang (libc++) and sanitizers. Whether `fuzz.yml`, `mutation.yml` and `docs.yml` have run there was not checked. Stages A and B passed their pull request and `main` workflows on GitHub.
 
-CI minutes are capped at about 2,000 a month with a hard stop, so pull-request workflows run only when their paths change. Everything runs on Linux.
+Pull-request workflows run only when their paths change, so PRs stay fast. The repository is public, so standard runners are free; scheduled jobs that never run on a pull request add Windows and macOS (plan 11.1.5). See `r1-infra.md` for the scheduled jobs.
 
 | Workflow | Runs on | What it does |
 |---|---|---|
@@ -12,6 +12,10 @@ CI minutes are capped at about 2,000 a month with a hard stop, so pull-request w
 | `fuzz.yml` | Monday, manual | Three minutes of fuzzing per language; C++ uses the sanitizer build |
 | `mutation.yml` | Manual only | One language and one target per run |
 | `docs.yml` | Markdown, site script, gallery, example, Python or stage B golden change, manual | Reruns the Python CLI against the committed Curves gallery (`curves-gallery.md`), builds the static site with `tools/build_site.py`, fails on a broken relative link, and keeps the site as a 7-day artifact. On a public repository, a push to `main` also deploys to GitHub Pages. |
+| `cross-platform.yml` | Sunday, manual | Conformance on Linux, Windows and macOS for all four languages, 12 cells (`r1-infra.md`) |
+| `recorder.yml` | 14:30 and 23:30 UTC on weekdays, manual | Public-data recorder; pushes hash rows and a gap report to branch `forward-log` (`recorder-actions.md`) |
+| `daily-workflows.yml` | 15:00 UTC on weekdays, manual | Workflows (a) EOD curves and (c) SOFR check on real data; dated reports to `forward-log` (`r1-infra.md`) |
+| `mutation-stage.yml` | First of the month, manual | Every module of one stage in all four languages, then one report scored against the stage target (`r1-infra.md`) |
 | `security.yml` | Monday, lockfile change, manual | OSV scan of the Rust, Python and Java dependencies |
 
 Dependabot opens one grouped pull request per ecosystem each month. It does not track the Catch2 pin in `cpp26/CMakeLists.txt`, so update that by hand.

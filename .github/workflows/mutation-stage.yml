@@ -1,0 +1,118 @@
+name: Mutation by stage
+# Per-stage mutation report (plan 11.5.6): every module in conformance/mutation/stages.json for one stage,
+# in all four languages, then one report scored against the stage target (80% for stage D).
+# Manual and monthly only, never on pull requests: a full stage D run is about 30 jobs.
+on:
+  schedule:
+    - cron: '41 5 1 * *'
+  workflow_dispatch:
+    inputs:
+      stage:
+        default: D
+      max:
+        description: 'mutants sampled per module (python, rust, cpp)'
+        default: '40'
+      gate:
+        description: 'fail the run if the stage is below its target'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  STAGE: ${{ inputs.stage || 'D' }}
+  MAX: ${{ inputs.max || '40' }}
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: m
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          cfg = json.load(open("conformance/mutation/stages.json"))
+          inc = [{"lang": l, "module": m["module"], "target": m[l], "suite": m["suite"]}
+                 for m in cfg["stages"][os.environ["STAGE"]] for l in ("java", "cpp", "python", "rust") if m.get(l)]
+          print("matrix=" + json.dumps({"include": inc}))
+          PY
+  mutate:
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      TARGET: ${{ matrix.target }}
+      SUITE: ${{ matrix.suite }}
+      OUT: results/${{ matrix.lang }}--${{ matrix.module }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: mkdir -p results
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        if: matrix.lang == 'java'
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - if: matrix.lang == 'java'
+        run: |
+          mvn -B -Pmutation test-compile org.pitest:pitest-maven:mutationCoverage "-DtargetClasses=$TARGET" -DoutputFormats=XML -DtimestampedReports=false
+          cp target/pit-reports/mutations.xml "../$OUT.xml"
+        working-directory: java25
+      - if: matrix.lang == 'cpp'
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w -e TARGET -e SUITE -e MAX -e OUT gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
+            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --out "$OUT.json"'
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        if: matrix.lang == 'python'
+      - if: matrix.lang == 'rust'
+        run: |
+          (cd rust && rustup show)
+          cargo install cargo-mutants --version 27.1.0 --locked
+      - if: matrix.lang == 'python' || matrix.lang == 'rust'
+        run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --out "$OUT.json"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-${{ matrix.lang }}-${{ matrix.module }}
+          path: results/
+          if-no-files-found: ignore
+  report:
+    needs: mutate
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: results
+          pattern: mutation-*
+          merge-multiple: true
+      - name: Stage report
+        env:
+          GATE: ${{ inputs.gate && '--gate' || '' }}
+        run: |
+          # GATE is intentionally unquoted: empty means no flag.
+          # shellcheck disable=SC2086
+          python3 conformance/mutation/stage_report.py --stage "$STAGE" --results results --out mutation-report.md $GATE
+          cat mutation-report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-report-${{ env.STAGE }}
+          path: mutation-report.md

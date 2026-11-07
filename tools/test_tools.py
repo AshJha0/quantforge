@@ -113,6 +113,86 @@ class Recorder(unittest.TestCase):
             self.assertFalse(log.exists())
 
 
+class GapMonitor(unittest.TestCase):
+    GAP = ROOT / "tools/recorder/gap_monitor.py"
+
+    def write(self, path, days, sha="ab"):
+        for d in days:
+            fl.append(path, "recorder/x", f"{d}T23:30:00Z", {"kind": "recording", "sha256": sha, "bytes": 1})
+
+    def run_gap(self, *args):
+        return subprocess.run([sys.executable, str(self.GAP), *args], capture_output=True, text=True)
+
+    def test_gap_found_and_holiday_skipped(self):
+        with tempfile.TemporaryDirectory() as d:
+            log, hol = Path(d) / "a.jsonl", Path(d) / "h.txt"
+            hol.write_text("2026-11-11\n", encoding="utf-8")
+            self.write(log, ["2026-11-09", "2026-11-12"])  # Tue 10 missing, Wed 11 a holiday
+            r = self.run_gap("gaps", "--log", str(log), "--holidays", str(hol), "--until", "2026-11-13", "--recent", "1")
+            self.assertEqual(r.returncode, 1)  # Fri 13 is recent and missing
+            self.assertIn("2026-11-10", r.stdout)
+            self.assertNotIn("2026-11-11", r.stdout.split("Missing")[1].split("Recent")[0])
+            r = self.run_gap("gaps", "--log", str(log), "--holidays", str(hol), "--until", "2026-11-12", "--recent", "1")
+            self.assertEqual(r.returncode, 0)
+
+    def test_second_log_fills_gap_and_reconcile(self):
+        with tempfile.TemporaryDirectory() as d:
+            a, b = Path(d) / "a.jsonl", Path(d) / "b.jsonl"
+            self.write(a, ["2026-11-09"])
+            self.write(b, ["2026-11-09", "2026-11-10"], sha="cd")
+            r = self.run_gap("gaps", "--log", str(a), "--log", str(b), "--until", "2026-11-10")
+            self.assertEqual(r.returncode, 0)
+            r = self.run_gap("reconcile", "--log", str(a), "--log", str(b))
+            self.assertIn("| recorder/x | 2026-11-09 | both | differ |", r.stdout)
+            self.assertIn("| recorder/x | 2026-11-10 | second only | - |", r.stdout)
+
+
+class Workflows(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(ROOT / "tools/workflows"))
+        import sanity
+        import sofr_check
+        cls.sanity, cls.sofr = sanity, sofr_check
+
+    class Sink:
+        def __init__(self):
+            self.checks = []
+
+        def check(self, name, level, ok, detail):
+            self.checks.append((name, level, ok))
+
+    def failed(self, sink):
+        return [n for n, lvl, ok in sink.checks if lvl == "fail" and not ok]
+
+    def test_curve_bands_catch_a_unit_error(self):
+        good = [{"date": "2027-11-08", "discount_factor": 0.96}, {"date": "2031-11-06", "discount_factor": 0.80}]
+        s = self.Sink()
+        self.sanity.check_curve(s, "c", "2026-11-06", good)
+        self.assertEqual(self.failed(s), [])
+        bad = [{"date": "2027-11-08", "discount_factor": 0.6}]  # a 4% rate read as 40%
+        s = self.Sink()
+        self.sanity.check_curve(s, "c", "2026-11-06", bad)
+        self.assertIn("c zero rates in band", self.failed(s))
+
+    def test_quote_and_fixing_bands(self):
+        s = self.Sink()
+        self.sanity.check_quotes(s, "q", [{"tenor": "1Y", "rate": 4.2}], [{"tenor": "1Y", "rate": 0.042}])
+        self.assertIn("q quote levels", self.failed(s))
+        s = self.Sink()
+        self.sanity.check_fixings(s, "f", [("2026-11-05", 0.039), ("2026-11-06", 0.0392)], redact=True)
+        self.assertEqual(self.failed(s), [])
+
+    def test_sofr_window_weights_cover_the_calendar_days(self):
+        fix = [("2026-10-02", 0.04), ("2026-10-05", 0.041), ("2026-10-06", 0.042)]
+        c = self.sofr.window_case("x", "2026-10-07", 4, fix)  # starts Saturday 3 October: Friday's rate covers it
+        self.assertEqual(c["operation"], "rates.ois.compound")
+        self.assertEqual(c["inputs"]["rates"], [0.04, 0.041, 0.042])
+        self.assertEqual(c["inputs"]["days"], [2, 1, 1])
+        c = self.sofr.window_case("y", "2026-10-07", 2, fix)  # starts on a business day
+        self.assertEqual(c["operation"], "rates.ois.compound_dated")
+
+
 class GalleryVol(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
