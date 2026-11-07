@@ -74,7 +74,7 @@ public final class CurveRisk {
     }
 
     public record Explain(double valueStart, double valueEnd, double fullPnl, double[] parBuckets, double riskPnl,
-                          double unexplained, double threshold, boolean explained) {}
+                          double grossRiskPnl, double unexplained, double threshold, boolean explained) {}
 
     /** The two quote sets must have the same tenors in the same order, else E_INPUT. */
     public static void checkSameTenors(List<Ois.Quote> start, List<Ois.Quote> end) {
@@ -90,19 +90,21 @@ public final class CurveRisk {
     /** Market-move P&L explain on one as_of (06-risk/pnl-explain.md): full revaluation against par risk. */
     public static Explain explain(Conventions.RateIndex c, LocalDate asOf, Curve.Interpolation interp,
                                   List<Ois.Quote> start, List<Ois.Quote> end, ToDoubleFunction<Curve> product,
-                                  double bumpBp) {
+                                  double bumpBp, double notional) {
         Par par = par(c, asOf, start, interp, product, bumpBp, Scheme.CENTRAL);
         double valueEnd = product.applyAsDouble(rebuilt(c, asOf, end, interp, null));
         double full = valueEnd - par.value();
         double riskPnl = 0.0;
-        double dv01 = 0.0;
+        double gross = 0.0;
         for (int j = 0; j < start.size(); j++) {
-            riskPnl += par.parBuckets()[j] * (end.get(j).mid() - start.get(j).mid()) / BP;
-            dv01 += par.parBuckets()[j];
+            double move = (end.get(j).mid() - start.get(j).mid()) / BP;
+            riskPnl += par.parBuckets()[j] * move;
+            gross += Math.abs(par.parBuckets()[j]) * Math.abs(move);
         }
         double unexplained = full - riskPnl;
-        double threshold = Math.max(0.05 * Math.abs(full), 0.05 * Math.abs(dv01));
-        return new Explain(par.value(), valueEnd, full, par.parBuckets(), riskPnl, unexplained, threshold,
+        // Ruling R2-A3: scales with the move; the last term is a numerical floor, not a risk allowance.
+        double threshold = 0.05 * Math.max(Math.abs(full), gross) + 1e-8 * notional;
+        return new Explain(par.value(), valueEnd, full, par.parBuckets(), riskPnl, gross, unexplained, threshold,
                 Math.abs(unexplained) <= threshold);
     }
 

@@ -28,6 +28,11 @@ final class OpsRisk {
             }
         }
 
+        /** The product's notional: the OIS trade's, or the bond's face. */
+        double size() {
+            return trade != null ? trade.notional() : notional;
+        }
+
         /** The pricer for this product; an OIS keeps the periods of the curve's own as_of. */
         ToDoubleFunction<Curve> pricer(LocalDate asOf) {
             if (trade != null) {
@@ -110,9 +115,9 @@ final class OpsRisk {
             p.checkNotional();
             checkConvention(p, c);
             CurveRisk.checkSameTenors(start, end);
-            CurveRisk.Explain e = CurveRisk.explain(c, asOf, interp, start, end, p.pricer(asOf), bump);
+            CurveRisk.Explain e = CurveRisk.explain(c, asOf, interp, start, end, p.pricer(asOf), bump, p.size());
             return Operations.out("value_start", e.valueStart(), "value_end", e.valueEnd(), "full_pnl", e.fullPnl(),
-                    "par_buckets", e.parBuckets(), "risk_pnl", e.riskPnl(), "unexplained", e.unexplained(),
+                    "par_buckets", e.parBuckets(), "risk_pnl", e.riskPnl(), "gross_risk_pnl", e.grossRiskPnl(), "unexplained", e.unexplained(),
                     "threshold", e.threshold(), "explained", e.explained());
         });
         table.put("risk.curve.jacobian", in -> {
