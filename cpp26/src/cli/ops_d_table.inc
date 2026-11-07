@@ -33,3 +33,7 @@
         {"eq.index.dividends", op_index_dividends},
         {"eq.index.rebalance", op_index_rebalance},
         {"eq.trs.pv", op_trs_pv},
+        {"infl.curve.cpi", op_infl_cpi},
+        {"infl.linker.price", op_linker_price},
+        {"infl.linker.price_curve", op_linker_price_curve},
+        {"infl.zcis.pv", op_zcis_pv},

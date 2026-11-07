@@ -43,6 +43,7 @@ add_library(quantforge_core
   src/core/rates.cpp
   src/core/rates_d.cpp
   src/core/bonds.cpp
+  src/core/inflation.cpp
   src/core/equity_d.cpp
   src/core/credit.cpp
   src/core/rng.cpp
