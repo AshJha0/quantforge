@@ -155,3 +155,14 @@ Still open: D-5 (huge lookback gives `E_DATE_RANGE`), D-9, D-10, D-11, D-13, D-1
 | new | D52 | Changed: CDS trade maturity on or before `trade_date` is now `E_INPUT` (was `E_DATE_ORDER`) |
 
 No stage D question is open.
+
+## R1.7 batch mode (contract 1.6.0)
+
+Silent choices, all passing `batch_check.py`:
+
+| # | Choice |
+|---|---|
+| R1-1 | Error results now always carry `"diagnostics": {}` (with `elapsed_ns` under `--timings`). Without it, `timings_identity` fails: stripping `elapsed_ns` leaves an empty `diagnostics` that the untimed result lacked. The contract lets `diagnostics` be present on any result. Ask: should the contract say error results carry `diagnostics` always, or should the checker drop an empty `diagnostics`? |
+| R1-2 | `elapsed_ns` starts when the line's last byte (or EOF, for `run`) has been read, and ends just before the result is serialised to text. Serialisation is not inside the window |
+| R1-3 | BT5 keeps at most 16,777,217 bytes of a line (the limit plus a possible trailing CR) and drops the rest. The length check is made after a trailing CR is removed |
+| R1-4 | `--timings` is accepted only as the second argument after `run`, `batch` or `--batch`; anything else is exit 64 |
