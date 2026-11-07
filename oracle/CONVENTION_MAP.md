@@ -1,8 +1,8 @@
 # Convention map for outside-oracle checks
 
-Plan rule 11.2.5: a stage D case counts as "outside oracle" only if the QuantLib call uses QuantLib's own convention objects, and the mapping from a QuantForge spec convention to those objects lives in a separate, reviewed table. This is that table. The code copy is `oracle/python/qf_oracle/convmap.py`; `outside_d.py` takes every library convention from it and fails if a row here is missing.
+Plan rule 11.2.5: a stage D case counts as "outside oracle" only if the QuantLib call uses QuantLib's own convention objects, and the mapping from a QuantForge spec convention to those objects lives in a separate, reviewed table. This is that table, written from `oracle/python/qf_oracle/convmap.py` by `outside_d.py --write-map`; `outside_d.py` takes every library convention from it and fails if a row here is missing.
 
-Library: QuantLib 1.44 (Python wheel, pinned in `oracle/python/uv.lock`). The library version is also recorded on every counted case in `oracle/outside_register.json`.
+Library: QuantLib 1.44 (Python wheel, pinned in `oracle/python/uv.lock`). The version is recorded on every counted case in `oracle/outside_register.json`.
 
 Review: self-reviewed 2026-11-07. The spec session read each spec section and the QuantLib documentation or source for the object and found them equal. That is self-assessment, not an outside review. A row's review must be redone when its spec section or the QuantLib version changes.
 
@@ -14,6 +14,8 @@ Review: self-reviewed 2026-11-07. The spec session read each spec section and th
 | `OIS.LAGS` | 01-core/conventions.md spot_lag and payment_lag | `{"SOFR": (2, 2), "ESTR": (2, 2), "SONIA": (0, 0)}[conv]` | QuantLib OISRateHelper and MakeOIS take these as arguments; telescopic value dates on |
 | `CMPD.METHOD` | 02-curves/overnight-compounding.md NONE, LOOKBACK, OBSERVATION_SHIFT, LOCKOUT | `(k if method in ("LOOKBACK", "OBSERVATION_SHIFT") else 0, k - 1 if method == "LOCKOUT" else 0, method == "O...` | QuantLib (lookbackDays, lockoutDays, applyObservationShift). QuantLib lockoutDays = k locks k+1 days; the ARRC rule in the spec is QuantLib k-1 |
 | `ISDA.FALLBACK` | 02-curves/overnight-compounding.md fallbacks: ISDA 2020 IBOR Fallbacks Protocol, spreads fixed 2021-03-05 (Bloomberg ISDA fallback spread announcement) | `{"USD-LIBOR-1M": ("SOFR", 0.0011448), "USD-LIBOR-3M": ("SOFR", 0.0026161), "USD-LIBOR-6M": ("SOFR", 0.0042826` | rate in arrears with a 2 business-day observation shift; the spread is a published constant, not a QuantLib value |
+| `HW.CONVEXITY` | 02-curves/futures-convexity.md Hull-White futures convexity | `ql.HullWhite.convexityBias, "same closed form; QuantLib takes the quoted price"` | same closed form; QuantLib takes the quoted price |
+| `RATE.SIMPLE_ACT_360` | 04-pricing/bonds.md repo: simple interest on ACT/360 | `ql.InterestRate(r, ql.Actual360(), ql.Simple, ql.Annual), ""` |  |
 | `DC.ACT_360` | 01-core/daycount.md ACT_360 | `ql.Actual360(), ""` |  |
 | `DC.ACT_360_INCL_LAST` | 04-pricing/credit.md accrual on default, last day included | `ql.Actual360(True), "ISDA CDS standard model"` | ISDA CDS standard model |
 | `DC.ACT_365F` | 01-core/daycount.md ACT_365F; curve time in 02-curves/curve-framework.md | `ql.Actual365Fixed(), ""` |  |
@@ -42,8 +44,9 @@ Review: self-reviewed 2026-11-07. The spec session read each spec section and th
 
 ## Known mapping points
 
-- `CMPD.METHOD`: QuantLib's `lockoutDays = k` locks the last k+1 rates; the ARRC lockout in `02-curves/overnight-compounding.md` locks k, so the map passes k-1. This is the only row where the numbers differ.
-- `ISDA.FALLBACK`: the spread adjustments are published constants (fixed 2021-03-05), not QuantLib values. A fallback case counts because its compounded rate comes from QuantLib; the spread is an identity on a published input.
+- `CMPD.METHOD`: QuantLib's `lockoutDays = k` locks the last k+1 rates; the ARRC lockout in `02-curves/overnight-compounding.md` locks k, so the map passes k-1.
+- `ISDA.FALLBACK`: the spread adjustments are published constants (fixed 2021-03-05), not QuantLib values. A fallback case counts because its compounded rate comes from QuantLib.
 - `credit.cds.bootstrap` is counted by a reprice check: QuantLib's `cdsMaturity` gives the pillar dates, and the golden survivals priced in QuantLib's ISDA engine return each quoted spread within 1e-10.
-- `rates.ois.pv`: the strings in `valuation` (currency, model, conventions, as_of) are identities of the inputs and the spec's fixed strings; only the numbers come from QuantLib.
-- Strata and the ISDA C library are not used for stage D counting yet. Rows for them are added here when a check uses them.
+- `rates.ois.pv`: the strings in `valuation` are identities of the inputs and the spec's fixed strings; only the numbers come from QuantLib.
+- `repo.*`: QuantLib gives the bond's cash flows, accrued and the simple ACT/360 growth factors; the forward-price identity is the spec's own algebra on those objects.
+- Strata and the ISDA C library are not used for stage D counting yet.

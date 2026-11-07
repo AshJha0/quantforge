@@ -326,6 +326,41 @@ def h_cds_bootstrap(u, i, exp):
     return {"pillars": pil}
 
 
+def h_futures_convexity(u, i, exp):
+    fr = (100 - i["price"]) / 100
+    cvx = u("HW.CONVEXITY")(i["price"], i["start_years"], i["end_years"], i["sigma"], i["mean_reversion"])
+    return {"futures_rate": fr, "convexity": cvx, "forward_rate": fr - cvx}
+
+
+def _repo_parts(u, i):
+    st, en = D(i["start"]), D(i["end"])
+    qb, _, _ = bond(u, i["bond"], st)
+    rate = lambda r: u("RATE.SIMPLE_ACT_360", r)  # noqa: E731
+    dirty = i["clean_price"] + qb.accruedAmount(Q(st))
+    cpns = [(cf.date(), cf.amount()) for cf in qb.cashflows() if Q(st) < cf.date() <= Q(en)]
+    ai1 = qb.accruedAmount(Q(en))
+    return st, en, dirty, cpns, ai1, rate
+
+
+def h_repo_forward(u, i, exp):
+    st, en, dirty, cpns, ai1, rate = _repo_parts(u, i)
+    rr = i["repo_rate"]
+    fd = dirty * rate(rr).compoundFactor(Q(st), Q(en)) - sum(c * rate(rr).compoundFactor(d, Q(en)) for d, c in cpns)
+    tau = u("DC.ACT_360").yearFraction(Q(st), Q(en))
+    gc = i.get("gc_rate")
+    return {"dirty": dirty, "forward_dirty": fd, "forward_clean": fd - ai1, "interest": dirty * rr * tau,
+            "special_spread": None if gc is None else gc - rr, "specialness_value": None if gc is None else dirty * (gc - rr) * tau}
+
+
+def h_repo_implied(u, i, exp):
+    st, en, dirty, cpns, ai1, rate = _repo_parts(u, i)
+    dc = u("DC.ACT_360")
+    fd = i["forward_clean"] + ai1
+    num = fd - dirty + sum(c for _, c in cpns)
+    den = dirty * dc.yearFraction(Q(st), Q(en)) - sum(c * dc.yearFraction(d, Q(en)) for d, c in cpns)
+    return {"repo_rate": num / den}
+
+
 # ---------------------------------------------------------------- dispatch
 HANDLERS = {
     "bond.price.from_yield": h_price_from_yield,
@@ -336,6 +371,9 @@ HANDLERS = {
     "rates.cap.price": h_cap,
     "rates.swaption.price": h_swaption,
     "credit.cds.price": h_cds,
+    "rates.futures.convexity": h_futures_convexity,
+    "repo.forward": h_repo_forward,
+    "repo.implied_rate": h_repo_implied,
     "credit.cds.bootstrap": h_cds_bootstrap,
     "rates.ois.bootstrap": h_ois_bootstrap,
     "rates.ois.pv": h_ois_pv,
@@ -393,6 +431,51 @@ def verify_all(folder="stage_d", show=True):
     return reg, table
 
 
+NO_ORACLE = {
+    "bondfit_d": "Nelson-Siegel fit judged on repricing; QuantLib's FittedBondDiscountCurve fits by its own optimiser path, so it cannot reproduce a golden independently of iteration path",
+    "commodity_d": "no QuantLib object for monthly log-linear commodity forwards with additive seasonality or for storage carry",
+    "csa_d": "CSA discounting with FX forwards is a composition of curve ratios; QuantLib has no CSA-discount object, so a check would re-implement the spec",
+    "equity_d": "QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions",
+    "fits_d": "smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent",
+    "index_d": "index dividends, rebalancing and corporate actions have no QuantLib object",
+    "inflation_d": "QuantLib's inflation curves use other lag and interpolation conventions (spec 02-curves/inflation.md); ZCIS and linkers would need the spec's own CPI curve",
+    "mbs_d": "QuantLib has no agency MBS pool cash-flow model",
+    "rulings_d": "internal: spec rulings, mostly error and order cases",
+    "rulings2_d": "internal: spec rulings, mostly error and order cases",
+    "rulings_r1": "internal: spec rulings; CME conversion factors have no QuantLib object",
+    "steps_d": "meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit",
+    "trs_d": "QuantLib has no equity total return swap with these legs",
+    "xccy_d": "constant-notional xccy legs could be built from QuantLib OvernightLegs, deferred: the curve solve and NDF are compositions of the spec's own curves",
+}
+
+
+def write_map():
+    import inspect
+    import re
+    L = ["# Convention map for outside-oracle checks", "",
+         "Plan rule 11.2.5: a stage D case counts as \"outside oracle\" only if the QuantLib call uses QuantLib's own convention objects, and the mapping from a "
+         "QuantForge spec convention to those objects lives in a separate, reviewed table. This is that table, written from `oracle/python/qf_oracle/convmap.py` "
+         "by `outside_d.py --write-map`; `outside_d.py` takes every library convention from it and fails if a row here is missing.", "",
+         f"Library: QuantLib {CM.VERSION} (Python wheel, pinned in `oracle/python/uv.lock`). The version is recorded on every counted case in `oracle/outside_register.json`.", "",
+         f"Review: {CM.REVIEW}. The spec session read each spec section and the QuantLib documentation or source for the object and found them equal. "
+         "That is self-assessment, not an outside review. A row's review must be redone when its spec section or the QuantLib version changes.", "",
+         "| Row | Spec | QuantLib object | Note |", "|---|---|---|---|"]
+    for k, (spec, fn, nt) in CM.ROWS.items():
+        src = inspect.getsource(fn).strip()
+        m = re.search(r"lambda[^:]*:\s*(.*)", src)
+        body = (m.group(1).rstrip(" ),") if m else src).replace("|", "\\|")
+        body = body if len(body) <= 110 else body[:107] + "..."
+        L.append(f"| `{k}` | {spec} | `{body}` | {nt} |")
+    L += ["", "## Known mapping points", "",
+          "- `CMPD.METHOD`: QuantLib's `lockoutDays = k` locks the last k+1 rates; the ARRC lockout in `02-curves/overnight-compounding.md` locks k, so the map passes k-1.",
+          "- `ISDA.FALLBACK`: the spread adjustments are published constants (fixed 2021-03-05), not QuantLib values. A fallback case counts because its compounded rate comes from QuantLib.",
+          "- `credit.cds.bootstrap` is counted by a reprice check: QuantLib's `cdsMaturity` gives the pillar dates, and the golden survivals priced in QuantLib's ISDA engine return each quoted spread within 1e-10.",
+          "- `rates.ois.pv`: the strings in `valuation` are identities of the inputs and the spec's fixed strings; only the numbers come from QuantLib.",
+          "- `repo.*`: QuantLib gives the bond's cash flows, accrued and the simple ACT/360 growth factors; the forward-price identity is the spec's own algebra on those objects.",
+          "- Strata and the ISDA C library are not used for stage D counting yet.", ""]
+    (ROOT / "oracle" / "CONVENTION_MAP.md").write_text("\n".join(L), encoding="utf-8", newline="\n")
+
+
 def check_map():
     text = (ROOT / "oracle" / "CONVENTION_MAP.md").read_text(encoding="utf-8")
     missing = [r for r in CM.ROWS if f"`{r}`" not in text]
@@ -412,14 +495,19 @@ def coverage_section():
            "One row per counted case, with the library version and the convention rows used, is in `oracle/outside_register.json`. "
            "Error cases are in the denominator and never count. Older `verified_by` tags that name QuantLib are not counted here unless this check passes.", "",
            "| Suite | Outside-oracle cases | Cases | Share |", "|---|---|---|---|"]
-    out += [f"| `{s}` | {k} | {n} | {100 * k / n:.0f}% |" for s, k, n in table]
-    out += [f"| **stage D** | **{tot_ok}** | **{tot}** | **{100 * tot_ok / tot:.1f}%** |", ""]
+    out[-2] = "| Suite | Outside-oracle cases | Cases | Share | Why not more |"
+    out[-1] = "|---|---|---|---|---|"
+    out += [f"| `{s}` | {k} | {n} | {100 * k / n:.0f}% | {NO_ORACLE.get(s, '')} |" for s, k, n in table]
+    out += [f"| **stage D** | **{tot_ok}** | **{tot}** | **{100 * tot_ok / tot:.1f}%** | |", "",
+            "Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family.", ""]
     (ROOT / "oracle" / "outside_register.json").write_text(json.dumps({"rule": "plan 11.2.5", "library": CM.LIBRARY, "version": CM.VERSION,
                                                                        "map_review": CM.REVIEW, "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
     return out, tot_ok, tot
 
 
 def main():
+    if "--write-map" in sys.argv:
+        write_map()
     if not check_map():
         return 1
     out, k, n = coverage_section()

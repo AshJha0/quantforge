@@ -1398,6 +1398,72 @@
    "worst_abs_gap": 1.7867651802561113e-16
   },
   {
+   "case_id": "futures_d-0001",
+   "operation": "rates.futures.convexity",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HW.CONVEXITY"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "futures_d-0002",
+   "operation": "rates.futures.convexity",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HW.CONVEXITY"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "futures_d-0003",
+   "operation": "rates.futures.convexity",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HW.CONVEXITY"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "futures_d-0004",
+   "operation": "rates.futures.convexity",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HW.CONVEXITY"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "futures_d-0005",
+   "operation": "rates.futures.convexity",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HW.CONVEXITY"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
+   "case_id": "futures_d-0006",
+   "operation": "rates.futures.convexity",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HW.CONVEXITY"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 0.0
+  },
+  {
    "case_id": "ois_d-0001",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -6242,6 +6308,138 @@
    ],
    "map_review": "self-reviewed 2026-11-07",
    "worst_abs_gap": 6.05359673500061e-09
+  },
+  {
+   "case_id": "repo_d-0005",
+   "operation": "repo.forward",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD",
+    "RATE.SIMPLE_ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 5.551115123125783e-17
+  },
+  {
+   "case_id": "repo_d-0006",
+   "operation": "repo.implied_rate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 5.412337245047638e-16
+  },
+  {
+   "case_id": "repo_d-0007",
+   "operation": "repo.forward",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD",
+    "RATE.SIMPLE_ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 1.4210854715202004e-14
+  },
+  {
+   "case_id": "repo_d-0008",
+   "operation": "repo.implied_rate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 1.214306433183765e-16
+  },
+  {
+   "case_id": "repo_d-0009",
+   "operation": "repo.forward",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.1",
+    "GEN.BACKWARD",
+    "RATE.SIMPLE_ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 2.842170943040401e-14
+  },
+  {
+   "case_id": "repo_d-0010",
+   "operation": "repo.implied_rate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.1",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 5.412337245047638e-16
+  },
+  {
+   "case_id": "repo_d-0011",
+   "operation": "repo.forward",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD",
+    "RATE.SIMPLE_ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 1.4210854715202004e-14
+  },
+  {
+   "case_id": "repo_d-0012",
+   "operation": "repo.implied_rate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BDC.UNADJUSTED",
+    "CAL.NONE",
+    "DC.ACT_360",
+    "DC.ACT_ACT_ICMA",
+    "FREQ.2",
+    "GEN.BACKWARD"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 1.5959455978986625e-16
   },
   {
    "case_id": "rulings2_d-0015",

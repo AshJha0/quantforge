@@ -29,6 +29,8 @@ ROWS = {
                       lambda ibor: {"USD-LIBOR-1M": ("SOFR", 0.0011448), "USD-LIBOR-3M": ("SOFR", 0.0026161), "USD-LIBOR-6M": ("SOFR", 0.0042826),
                                     "GBP-LIBOR-1M": ("SONIA", 0.000326), "GBP-LIBOR-3M": ("SONIA", 0.001193), "GBP-LIBOR-6M": ("SONIA", 0.002766)}[ibor],
                       "rate in arrears with a 2 business-day observation shift; the spread is a published constant, not a QuantLib value"),
+    "HW.CONVEXITY": ("02-curves/futures-convexity.md Hull-White futures convexity", lambda: ql.HullWhite.convexityBias, "same closed form; QuantLib takes the quoted price"),
+    "RATE.SIMPLE_ACT_360": ("04-pricing/bonds.md repo: simple interest on ACT/360", lambda r: ql.InterestRate(r, ql.Actual360(), ql.Simple, ql.Annual), ""),
     # Day counts
     "DC.ACT_360": ("01-core/daycount.md ACT_360", lambda: ql.Actual360(), ""),
     "DC.ACT_360_INCL_LAST": ("04-pricing/credit.md accrual on default, last day included", lambda: ql.Actual360(True), "ISDA CDS standard model"),
