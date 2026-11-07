@@ -48,6 +48,7 @@ final class Operations {
         engines();
         store();
         StageB.register(TABLE);
+        OpsForward.register(TABLE);
     }
 
     static Set<String> names() {
