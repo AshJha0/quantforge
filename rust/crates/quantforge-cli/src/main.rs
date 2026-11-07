@@ -1,6 +1,8 @@
 //! The `quantforge` executable (`specifications/cli-contract.md`).
 
 mod functions;
+#[cfg(test)]
+mod golden_replay;
 mod input;
 mod limits;
 mod ops;
