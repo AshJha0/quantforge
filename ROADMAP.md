@@ -47,7 +47,7 @@ Before stage E, R1 works on how far the existing results can be trusted. It adds
 | Recorder | Scheduled on GitHub Actions with a gap monitor | Built; first run after push |
 | Conformance matrix | 3 OS by 4 languages on Actions; local Linux C++ under WSL | Built; first run after push. WSL C++ passed 5,514 v0.4 goldens |
 | Workflows (a) and (c) | EOD curves with sanity bands (USD proxy curve, BoE GBP pass or fail) and a SOFR averages check, through `--batch` | Built; first local runs passed 2026-11-07 |
-| Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Built; not yet measured |
+| Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Measured, except C++ mutation (TODO); Python T1 and T4 and Java T1 missed |
 | Coverage | Unit-test line coverage: C++ 94.2%, Java 97.3%, Python 97.2%, Rust 96.5% | Measured |
 | Citations | A `## Sources` section in 50 specs (`program/R1_CITATION_FINDINGS.md`) | Done. The citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened |
 | R3 preregistrations | Three studies in `research/preregs/` | Signed by Claude under the owner's delegation; holdout unread |
@@ -65,7 +65,7 @@ Risk before more products: par and key-rate risk, P&L explain, calibration stabi
 | Calibration stability | Seven calibrations, C1 to C7, judged on metrics S1 to S7, `03-calibration/stability.md` | Run: 28 of 28 pass, languages within 2e-8; C3 rerun under R2-A9 TODO |
 | Workflow (b) | Treasury and gilt rich/cheap screen, `1/D_mod^2` weights, on-the-run issues reported but not fitted, `04-pricing/workflow-b-rich-cheap.md` | BLOCKED on price data (R2-A11); manual `--data DIR` path |
 | Carried from R1 | Recorder and daily workflows | Live: the recorder pushes to `forward-log` with no gaps, and the daily workflows run |
-| Carried from R1 | Python fuzz rate, mutation scores, benchmarks, cross-platform matrix | TODO, fixes in flight |
+| Carried from R1 | Python fuzz rate, C++ stage D mutation, Rust T1 on native Linux, cross-platform matrix | TODO |
 
 Stage E follows R2.
 
