@@ -1,0 +1,76 @@
+# R1 citation backfill: findings
+
+Branch `r1-cite`, phase R1 (v0.4.1). Work list: section 3 of `R5_STAGE_D_AUDIT.md`. Plan 11.2.4 and 11.5 require primary-source citations in every spec.
+
+## What changed
+
+A `## Sources` section is appended to 50 specs in `specifications/01-core` to `08-hedging`. Nothing else changed: no normative text, number or golden. No spec used inline `[S1]` markers before, so none were added in the text; the list items carry `[S1]` labels so later edits can point at them.
+
+Every reference was checked from memory and is marked "(not opened)". Section numbers are given only where known (ISDA 2006 s.4.12 and s.4.16, RFC 8259 s.9, ICMA Rule 251, 31 CFR 356 Appendix B, SIFMA Uniform Practices chapter SF, ISDA Supplement 70). Textbooks are cited by edition and chapter title, not chapter number, where the number was not certain. A later pass that opens the documents should drop "(not opened)" item by item.
+
+Not touched, as they are not specs of a convention: `README.md` files, `rulings.md`, `clean-room-followups.md`, the `stage-*-targets.md`, `stage-*-rulings.md`, `stage-*-handover.md`, `stage-b-followups.md` and `cli-contract.md`.
+
+## Specs that may disagree with a source
+
+Reported to the coordinator, not fixed here.
+
+| # | Spec | Point | Source | Note |
+|---|---|---|---|---|
+| F1 | `04-pricing/bonds.md`, `bond.futures.conversion_factor` | Months to maturity are always rounded down to a multiple of 3 | CME Group, *Calculating U.S. Treasury Futures Conversion Factors* (not opened) | From memory, CME rounds to the quarter for the bond, Ultra bond and 10-year note contracts, but to the whole month for the 2-, 3- and 5-year note contracts (with `v = z - 6` when `z >= 7`). The spec is right for the long contracts but does not say it excludes the short ones. Suggest a scope sentence, or an input naming the contract. To confirm against the CME document. |
+
+No other disagreement was seen. Checked in passing, from memory, and consistent: TIPS reference CPI (31 CFR 356 App. B), PSA ramp and SMM (SIFMA SF), ISDA 2020 fallback (2-day observation shift, spread fixed 5 March 2021), CDS standard-model dates (step-in T+1, cash settlement T+3, 20th roll dates), CBOT conversion-factor formula itself, ARRC lockout.
+
+## Summary table
+
+| Spec | Families | Sources added |
+|---|---|---|
+| 01-core/asof-store | bitemporal store, hash | Snodgrass; FIPS 180-4; RFC 8259 |
+| 01-core/calendars | Easter, holidays, business days | Meeus; UK BFDA 1971; ECB TARGET; SIFMA; ISDA 2006 s.4.12 |
+| 01-core/compounding | compounding | Hull |
+| 01-core/conventions | registry | ISDA 2006 s.4.12, s.4.16; BoE, NY Fed, ECB |
+| 01-core/cos | Fourier pricing | Fang-Oosterlee 2008; Heston 1993 |
+| 01-core/data-checks | robust outliers | Rousseeuw-Croux 1993; Hampel 1974 |
+| 01-core/daycount | day counts | ISDA 2006 s.4.16; ICMA Rule 251; ISDA 1998 ACT/ACT note; AFB |
+| 01-core/differentiation-and-linalg | FD, LU, Cholesky, eigen | Numerical Recipes 3rd ed.; Golub-Van Loan |
+| 01-core/integration | quadrature | Numerical Recipes; QUADPACK; Lyness 1969 |
+| 01-core/interpolation | curve interpolation | Hagan-West 2006, 2008; Fritsch-Butland 1984 |
+| 01-core/limits | input limits | RFC 8259 s.9 |
+| 01-core/monte-carlo | MC, GBM | Glasserman; Black-Scholes |
+| 01-core/pde | finite differences | Crank-Nicolson 1947; Rannacher 1984; Tavella-Randall |
+| 01-core/rng | PRNG, normals | SplitMix (Steele et al.); xoshiro (Blackman-Vigna); AS 241; Glasserman |
+| 01-core/root-finders | roots | Brent 1973 ch.4; Numerical Recipes |
+| 01-core/snapshot-hash | canonical JSON, SHA-256 | FIPS 180-4; RFC 8259; RFC 8785 (related only) |
+| 01-core/sobol | QMC | Sobol 1967; Joe-Kuo 2008; Glasserman |
+| 01-core/statistics-and-time-series | stats, EWMA, Ljung-Box | Numerical Recipes; Ljung-Box 1978; RiskMetrics 1996; Hyndman-Fan; ISO 8601 |
+| 01-core/test-functions | registry | Numerical Recipes; Black-Scholes |
+| 01-core/timezone-and-cutoff | time zones | IANA tzdb; ISO 8601 |
+| 01-core/units-and-money | units, currency | ISO 4217 |
+| 02-curves/commodity | carry, seasonality | Hull; Geman |
+| 02-curves/cross-currency | xccy basis, NDF | Fujii-Shimada-Takahashi; Andersen-Piterbarg; Hull; NY Fed; ECB |
+| 02-curves/csa-and-basis | CSA discounting | Piterbarg 2010; Fujii et al.; ISDA 2016 VM CSA |
+| 02-curves/curve-framework | curves | Hull; Hagan-West |
+| 02-curves/equity-curves | dividends, borrow | Hull; Eurex/CME dividend futures |
+| 02-curves/equity-forward | equity forward | Hull |
+| 02-curves/futures-convexity | HW convexity | Hull; Brigo-Mercurio ch.3; Kirikos-Novak 1997 |
+| 02-curves/fx | FX spot and forwards | Clark 2011; 1998 FX Definitions |
+| 02-curves/inflation | CPI, linkers | 31 CFR 356 App. B; UK DMO; Kerkhof 2005; Brigo-Mercurio |
+| 02-curves/meeting-steps | step curves | FOMC/MPC/ECB calendars; Andersen-Piterbarg |
+| 02-curves/ois-curves | OIS | BoE; NY Fed; ECB; ISDA 2021; Ametrano-Bianchetti |
+| 02-curves/overnight-compounding | lookback, shift, lockout, fallbacks | ISDA 2021; ARRC; ISDA Supplement 70 and Bloomberg rule book; BoE; NY Fed; ECB |
+| 02-curves/projection-and-fra | FRA, swaps, basis | ISDA 2006 s.4.16; Hull; Ametrano-Bianchetti |
+| 02-curves/schedules | schedules | ISDA 2006 s.4.12 |
+| 03-calibration/curve-fits | smoothing, Huber NS | Nelson-Siegel 1987; Huber 1964; Fisher-Nychka-Zervos 1995; BoE (Anderson-Sleath 2001) |
+| 03-calibration/least-squares | GN, LM, BFGS | Nocedal-Wright 2nd ed.; Marquardt 1963; Nelson-Siegel |
+| 04-pricing/bonds | yields, repo, futures | ICMA Rule 251; UK DMO; CME conversion factors; Fabozzi; Burghardt; O'Kane asset swaps; Nelson-Siegel |
+| 04-pricing/credit | ISDA CDS | ISDA CDS Standard Model; 2014 Credit Definitions; O'Kane 2008; 2015 roll change |
+| 04-pricing/equity-index | index, TRS | S&P DJI Index Mathematics; Eurex dividend futures; Hull |
+| 04-pricing/mbs | PSA, pass-through | SIFMA Uniform Practices ch. SF; Fabozzi MBS handbook |
+| 04-pricing/pricing-framework | valuation record | internal contract; RFC 8259 |
+| 04-pricing/use-cases | hedging | Hull |
+| 05-volatility/black-models | Black, Bachelier | Black-Scholes 1973; Black 1976; Bachelier 1900; Hull |
+| 05-volatility/caps-and-swaptions | caps, swaptions | Hull; Brigo-Mercurio ch.1; Black 1976; Bachelier |
+| 05-volatility/sabr | SABR | Hagan et al. 2002, 2014; Breeden-Litzenberger 1978 |
+| 05-volatility/smile-and-surface | SVI, SSVI, delta | Gatheral 2006; Gatheral-Jacquier 2014; Clark; Reiswich-Wystup |
+| 06-risk/rates-sensitivities | DV01 | Hull; Andersen-Piterbarg |
+| 06-risk/vol-greeks | Greeks | Hull; Black-Scholes; Black; Bachelier |
+| 08-hedging/stage-b-hedges | weighted LS hedge | Numerical Recipes ch.15; Hull |

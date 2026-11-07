@@ -35,3 +35,10 @@ With `tau = (T - sp)/365`: `basis_bp = 10000 (-ln(implied_ratio)/tau + ln(A(T))/
 ## Acceptance
 
 Hand formulas, with forward PV and `fx_delta` also checked against QuantLib `FxForward`, whose source uses the same spot-normalised forward. Spot dates against QuantLib `JointCalendar`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Clark, I. J., *Foreign Exchange Option Pricing: A Practitioner's Guide*, Wiley, 2011, chapter 1 (spot dates, forward points, covered interest parity) (not opened)
+- [S2] ISDA / EMTA / ICOM, *1998 FX and Currency Option Definitions* (spot date, business days for currency pairs) (not opened)

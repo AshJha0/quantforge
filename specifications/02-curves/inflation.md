@@ -33,3 +33,12 @@ Inputs: `bond`, `settlement`, `base_ref_cpi`, `curve`, `discount`. Output: `nomi
 ## Acceptance
 
 `simple_analytic` for CPI and linker from yield; `interpolation` for PVs on a discount curve. Hand and exact-rational only: no outside library is run (QuantLib's inflation curves use other lag and interpolation conventions). Suite `stage_d/inflation_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] US Treasury, 31 CFR Part 356, Appendix B (index ratio and reference CPI for TIPS: three-month lag, daily interpolation) (not opened)
+- [S2] UK Debt Management Office, *Formulae for calculating gilt prices from yields* (index-linked gilts, 3-month lag) (not opened)
+- [S3] Kerkhof, J., *Inflation Derivatives Explained*, Lehman Brothers Fixed Income Quantitative Research, 2005 (zero-coupon inflation swaps, seasonality) (not opened)
+- [S4] Brigo, D. and Mercurio, F., *Interest Rate Models: Theory and Practice*, 2nd ed., Springer, 2006, chapter on inflation derivatives (not opened)

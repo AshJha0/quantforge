@@ -30,3 +30,10 @@ Inputs: `pool`, `yield` `y` (monthly compounding), `delay_days` (integer `>= 0`,
 ## Acceptance
 
 `simple_analytic`, widened for long pools to 1e-9 per unit balance plus 1e-10 relative. Analytic, by the standard PSA and level-pay formulas; no outside library is run. Suite `stage_d/mbs_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] SIFMA, *Uniform Practices for the Clearance and Settlement of Mortgage-Backed Securities and Other Related Securities*, Chapter SF, *Standard Formulas* (PSA prepayment benchmark, SMM from CPR, level-pay amortisation) (not opened)
+- [S2] Fabozzi, F. J. (ed.), *The Handbook of Mortgage-Backed Securities*, 7th ed., Oxford University Press, 2016 (not opened)

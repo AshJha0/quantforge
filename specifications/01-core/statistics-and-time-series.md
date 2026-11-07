@@ -80,3 +80,13 @@ A `null` takes the last non-null value if it is no more than `limit` steps back.
 Class `statistics`. Oracles: exact `Fraction` arithmetic where rational, otherwise mpmath at 50 digits, with NumPy
 and SciPy as second checks for quantile, OLS and ACF. Ljung-Box has one source. Normal: class `statistics`
 against mpmath, including `x = -37`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Press, W. H., Teukolsky, S. A., Vetterling, W. T. and Flannery, B. P., *Numerical Recipes: The Art of Scientific Computing*, 3rd ed., Cambridge University Press, 2007, chapter 14 (statistical description of data) and chapter 15 (modelling of data, least squares) (not opened)
+- [S2] Ljung, G. M. and Box, G. E. P., "On a measure of lack of fit in time series models", *Biometrika* 65(2), 1978, 297-303 (not opened)
+- [S3] J.P. Morgan/Reuters, *RiskMetrics Technical Document*, 4th ed., 1996 (EWMA variance) (not opened)
+- [S4] Hyndman, R. J. and Fan, Y., "Sample quantiles in statistical packages", *The American Statistician* 50(4), 1996, 361-365 (not opened)
+- [S5] ISO 8601 (week numbering for `WEEK` buckets) (not opened)

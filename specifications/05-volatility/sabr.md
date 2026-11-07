@@ -65,3 +65,11 @@ Backward Euler is first order in time, on purpose: it keeps `Q >= 0`. The result
 ## Acceptance
 
 Targets in `stage-c-targets.md`. Suites `sabr`, `sabr_deep`, `strata_vol`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Hagan, P. S., Kumar, D., Lesniewski, A. S. and Woodward, D. E., "Managing smile risk", *Wilmott Magazine*, September 2002, 84-108 (not opened)
+- [S2] Hagan, P. S., Kumar, D., Lesniewski, A. S. and Woodward, D. E., "Arbitrage-free SABR", *Wilmott Magazine*, January 2014, 60-75 (not opened)
+- [S3] Breeden, D. T. and Litzenberger, R. H., "Prices of state-contingent claims implicit in option prices", *Journal of Business* 51(4), 1978, 621-651 (density check) (not opened)

@@ -59,3 +59,10 @@ near the root, so the case asks for 1e-4 and says so. Error cases: no bracket, z
 
 Numeric target: for simple roots and `x_tol = 1e-12`, the error is at most 1e-10, in at most 60 bisection
 steps on a unit-sized bracket, 20 Brent steps or 20 Newton steps.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Brent, R. P., *Algorithms for Minimization without Derivatives*, Prentice-Hall, 1973, chapter 4 (zeroin) (not opened)
+- [S2] Press, W. H., Teukolsky, S. A., Vetterling, W. T. and Flannery, B. P., *Numerical Recipes: The Art of Scientific Computing*, 3rd ed., Cambridge University Press, 2007, chapter 9 (root finding: bisection, Brent, safeguarded Newton) (not opened)

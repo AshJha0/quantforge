@@ -21,3 +21,11 @@ Checks, in order: `T <= t`: `E_INPUT`. `t < 0`, `sigma < 0`, `a < 0`: `E_DOMAIN`
 ## Acceptance
 
 Class `simple_analytic`. QuantLib agrees within 1e-15 plus 1e-12 relative. Suite `stage_d/futures_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Interest Rate Futures" (convexity adjustment) (not opened)
+- [S2] Brigo, D. and Mercurio, F., *Interest Rate Models: Theory and Practice*, 2nd ed., Springer, 2006, chapter 3 (one-factor short-rate models, Hull-White) (not opened)
+- [S3] Kirikos, G. and Novak, D., "Convexity conundrums", *Risk*, March 1997, 60-61 (Hull-White futures-forward bias) (not opened)

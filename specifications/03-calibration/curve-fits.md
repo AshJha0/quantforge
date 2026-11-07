@@ -27,3 +27,12 @@ Checks, in order: unequal lengths or fewer than 3 points: `E_INPUT`. `tau <= 0`,
 ## Acceptance
 
 `smooth`: within 1e-10 plus 1e-8 relative of exact-rational goldens. `robust`: `betas`, `residuals`, `objective` within 1e-9; `outliers` exact. No golden residual is within 1e-6 of `delta`. SciPy `least_squares(loss="huber")` from three starts agrees within 1e-8. Suite `stage_d/fits_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Nelson, C. R. and Siegel, A. F., "Parsimonious modeling of yield curves", *Journal of Business* 60(4), 1987, 473-489 (not opened)
+- [S2] Huber, P. J., "Robust estimation of a location parameter", *Annals of Mathematical Statistics* 35(1), 1964, 73-101 (not opened)
+- [S3] Fisher, M., Nychka, D. and Zervos, D., "Fitting the term structure of interest rates with smoothing splines", Federal Reserve FEDS working paper 95-1, 1995 (roughness penalty) (not opened)
+- [S4] Bank of England, yield-curve estimation methodology (Anderson, N. and Sleath, J., "New estimates of the UK real and nominal yield curves", BoE working paper 126, 2001) (not opened)

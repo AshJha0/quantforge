@@ -28,3 +28,11 @@ One system: every OIS quote reprices on the discount curve, and every term quote
 ## Acceptance
 
 `csa.discount`: class `interpolation`, hand replay. `ois_spread`: 1e-10; equals the difference of QuantLib `MakeOIS` fair rates on the two projection curves within 1e-12. `joint_bootstrap`: pillars within 1e-9; QuantLib two-step build agrees within 1e-10. Suite `stage_d/csa_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Piterbarg, V., "Funding beyond discounting: collateral agreements and derivatives pricing", *Risk*, February 2010, 97-102 (not opened)
+- [S2] Fujii, M., Shimada, Y. and Takahashi, A., "A note on construction of multiple swap curves with and without collateral", *FSA Research Review* 6, 2010 (not opened)
+- [S3] ISDA, *2016 Credit Support Annex for Variation Margin* (collateral interest rate) (not opened)

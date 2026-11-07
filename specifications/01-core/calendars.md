@@ -97,3 +97,13 @@ Friday of a month from 2007 on: QuantLib treats them as open, because the bond m
 session on some of them. QuantLib projects that into the future. Here Good Friday is always closed.
 
 No early closes are modelled. A partial session counts as a full business day.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Meeus, J., *Astronomical Algorithms*, Willmann-Bell, 1991, chapter on the date of Easter (the anonymous Gregorian algorithm) (not opened)
+- [S2] UK *Banking and Financial Dealings Act 1971*, Schedule 1, and the annual UK Government bank-holiday proclamations (`GBLO`) (not opened)
+- [S3] European Central Bank, TARGET2 / T2 closing days (`EUTA`) (not opened)
+- [S4] SIFMA, *Holiday Schedule* recommendations for US bond markets (`USGS`) (not opened)
+- [S5] ISDA, *2006 ISDA Definitions*, Section 4.12 (Business Day Convention) and Section 1.4 (Business Day) (not opened)

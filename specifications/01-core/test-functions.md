@@ -34,3 +34,10 @@ Black-Scholes here: `C = S N(d1) - K exp(-rT) N(d2)`, `d1 = (ln(S/K) + (r + x^2/
 | `normal_pdf` | `exp(-x^2/2) / sqrt(2 pi)` |
 | `oscillatory` | `cos(50 x) exp(-x)` |
 | `poly5` | `x^5 - 3x^2 + 1` |
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Press, W. H., Teukolsky, S. A., Vetterling, W. T. and Flannery, B. P., *Numerical Recipes: The Art of Scientific Computing*, 3rd ed., Cambridge University Press, 2007, chapters 4 and 9 (standard test integrands and root-finding examples) (not opened)
+- [S2] Black, F. and Scholes, M., "The pricing of options and corporate liabilities", *Journal of Political Economy* 81(3), 1973, 637-654 (not opened)

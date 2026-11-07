@@ -106,3 +106,11 @@ extra parameters, so it is not a second source here: this method has a single so
 
 Numeric targets: all methods reproduce the knots to 1e-12. `monotone_pchip` on monotone data never overshoots.
 `monotone_convex` reprices each input zero rate to 1e-12.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] Hagan, P. S. and West, G., "Interpolation methods for curve construction", *Applied Mathematical Finance* 13(2), 2006, 89-129 (not opened)
+- [S2] Fritsch, F. N. and Butland, J., "A method for constructing local monotone piecewise cubic interpolants", *SIAM Journal on Scientific and Statistical Computing* 5(2), 1984, 300-304 (not opened)
+- [S3] Hagan, P. S. and West, G., "Methods for constructing a yield curve", *Wilmott Magazine*, May 2008 (monotone convex) (not opened)

@@ -39,3 +39,14 @@ Other values: `E_SCHEMA`. Checks as `rates.ois.compound_dated`.
 ## Acceptance
 
 `compounded_rate`, `fallback_rate` within 1e-12 absolute of exact-rational goldens. QuantLib `OvernightLeg` with `lookbackDays`, `lockoutDays`, `applyObservationShift` agrees within 5e-14 on every golden. Suite `stage_d/compound_d`.
+
+## Sources
+
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+
+- [S1] ISDA, *2021 ISDA Interest Rate Derivatives Definitions*, compounding methods for overnight rates (Compounding with Lookback, with Observation Period Shift, with Lockout) (not opened)
+- [S2] ARRC (Alternative Reference Rates Committee, NY Fed), *SOFR "In Arrears" Conventions for Syndicated Business Loans*, 2019, and the ARRC conventions matrix for SOFR products (not opened)
+- [S3] ISDA, *Supplement number 70 to the 2006 ISDA Definitions* (IBOR fallbacks), 2020, and Bloomberg Index Services, *IBOR Fallback Rate Adjustments Rule Book*; spread adjustments fixed by the FCA announcement of 5 March 2021 (not opened)
+- [S4] Bank of England, *SONIA key features and policies* (not opened)
+- [S5] Federal Reserve Bank of New York, SOFR and reference-rate production methodology (statement on the Secured Overnight Financing Rate) (not opened)
+- [S6] European Central Bank, *Euro short-term rate (€STR) methodology and policies* (not opened)
