@@ -295,6 +295,10 @@ fn vol_surface(i: &Inputs) -> Result<Outcome> {
     let sign = trade_side(&target)?;
     let currency = i.str("currency")?;
     i.gate()?;
+    nonempty(i, &["slices", "k_grid"])?;
+    if slices.iter().any(|x| x.1.is_empty()) {
+        return fail("E_INPUT", "a slice has no quotes");
+    }
     let curve = Curve::new(&funding)?;
     if funding.as_of != as_of {
         return fail("E_INPUT", "the curve as_of differs");
@@ -377,6 +381,16 @@ fn vol_surface(i: &Inputs) -> Result<Outcome> {
             (sign * q * d * f * normal_pdf(d1) * t.sqrt()).into(),
         ),
     ]))
+}
+
+/// Ruling C17: an empty list is `E_INPUT`, the first rule check.
+fn nonempty(i: &Inputs, keys: &[&str]) -> Result<()> {
+    for k in keys {
+        if i.array(k)?.is_empty() {
+            return fail("E_INPUT", format!("{k} is empty"));
+        }
+    }
+    Ok(())
 }
 
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
@@ -507,6 +521,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             };
             let (k, t) = (i.reals("log_moneyness")?, i.f64("expiry_years")?);
             i.gate()?;
+            nonempty(i, &["log_moneyness"])?;
             s.check()?;
             if t <= 0.0 {
                 return fail("E_DOMAIN", "expiry_years must be above 0");
@@ -527,6 +542,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let (k, w) = (i.reals("log_moneyness")?, i.reals("total_variance")?);
             let q = opt_weights(i)?;
             i.gate()?;
+            nonempty(i, &["log_moneyness"])?;
             let r = svi::calibrate(&k, &w, q.as_deref())?;
             plain(obj([("svi", svi_json(&r.svi)), ("rmse", r.rmse.into())]))
         }
@@ -534,6 +550,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let (rho, eta, gamma) = (i.f64("rho")?, i.f64("eta")?, i.f64("gamma")?);
             let (t, k) = (i.reals("thetas")?, i.reals("log_moneyness")?);
             i.gate()?;
+            nonempty(i, &["thetas", "log_moneyness"])?;
             let r = svi::ssvi_evaluate(rho, eta, gamma, &t, &k)?;
             plain(obj([
                 ("total_variance", rows(r.total_variance)),
@@ -545,6 +562,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let (t, k) = (i.reals("thetas")?, i.reals("log_moneyness")?);
             let w = i.matrix("total_variance")?;
             i.gate()?;
+            nonempty(i, &["thetas", "log_moneyness"])?;
             let [rho, eta, gamma, rmse] = svi::ssvi_calibrate(&t, &k, &w)?;
             plain(obj([
                 ("rho", rho.into()),
@@ -560,6 +578,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 p.push((x.f64("expiry_years")?, x.f64("log_moneyness")?));
             }
             i.gate()?;
+            nonempty(i, &["points"])?;
             let r = s.query(&p)?;
             let w: Vec<f64> = r.iter().map(|x| x.0).collect();
             let v: Vec<f64> = r.iter().map(|x| x.1).collect();
@@ -585,6 +604,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 });
             }
             i.gate()?;
+            nonempty(i, &["positions"])?;
             let r = s.vega(&p)?;
             plain(obj([
                 ("pv", r.pv.into()),
@@ -596,6 +616,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "vol.sabr.hagan" => {
             let (s, k) = (sabr_inputs(i)?, i.reals("strikes")?);
             i.gate()?;
+            nonempty(i, &["strikes"])?;
             plain(obj([("vols", s.hagan(&k)?.into())]))
         }
         "vol.sabr.density" => {
@@ -606,6 +627,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 _ => return i.fail("on_negative", "unknown choice"),
             };
             i.gate()?;
+            nonempty(i, &["strikes"])?;
             let (density, min) = s.density(&k, h)?;
             let negative = min < -1e-9;
             if reject && negative {
@@ -624,6 +646,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let shift = i.f64_or("shift", 0.0)?;
             let q = opt_weights(i)?;
             i.gate()?;
+            nonempty(i, &["strikes"])?;
             let [alpha, rho, nu, rmse] = sabr::calibrate(f, t, beta, shift, &k, &v, q.as_deref())?;
             plain(obj([
                 ("alpha", alpha.into()),
@@ -637,6 +660,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let (cells, below) = (i.int("cells")?, i.int("cells_below")?);
             let steps = i.int("steps")?;
             i.gate()?;
+            nonempty(i, &["strikes"])?;
             let r = sabr::arbfree(&s, cells, below, steps, &k)?;
             plain(obj([
                 ("call_prices", r.call_prices.into()),

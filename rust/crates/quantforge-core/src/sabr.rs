@@ -275,7 +275,8 @@ pub fn arbfree(s: &Sabr, cells: i64, below: i64, steps: i64, strikes: &[f64]) ->
         }
         price += (u_max - x) * p_r;
         call_prices.push(price);
-        vols.push(if price > (f0 - x).max(0.0) {
+        // Ruling C16: no finite vol at or below intrinsic, or at or above `f0`.
+        vols.push(if price > (f0 - x).max(0.0) && price < f0 {
             let o = Option_ {
                 model: Model::Black76 {
                     forward: f0,
