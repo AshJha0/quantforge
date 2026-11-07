@@ -37,6 +37,7 @@ pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
 .chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}.chart p{font-size:.85rem;margin:.3rem 0 0}
 .mermaid{background:#fff;border-radius:4px;padding:.5rem;overflow-x:auto;text-align:center}
+body{overflow-wrap:break-word}p,li,td,th,dd,.card{overflow-wrap:anywhere}.wrap{min-width:0}td code,li code,p code{word-break:break-all}
 @media(max-width:48rem){.inner,.wrap{padding-left:1rem;padding-right:1rem}.hero{padding:2rem 0}table{display:block;overflow-x:auto}}
 """
 PAGE = """<!doctype html>
