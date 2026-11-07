@@ -21,13 +21,13 @@ public final class CurveSolver {
     public record Solved(Curve curve, double maxRepricingError) {}
 
     private record Setup(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
-                         List<ToDoubleFunction<Curve>> models) {
+                         List<ToDoubleFunction<Curve>> models, Jumps jumps) {
         double years(int j) {
             return j < 0 ? 0.0 : ChronoUnit.DAYS.between(asOf, dates[j]) / 365.0;
         }
 
         double[] residuals(double[] x) {
-            Curve c = Curve.fromLogs(asOf, interp, dates, x);
+            Curve c = Curve.fromLogs(asOf, interp, dates, x, jumps);
             double[] r = new double[x.length];
             for (int j = 0; j < r.length; j++) {
                 r[j] = models.get(j).applyAsDouble(c) - quotes[j];
@@ -42,13 +42,18 @@ public final class CurveSolver {
 
     public static Solved solve(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
                                List<ToDoubleFunction<Curve>> models, Method method) {
-        Setup s = new Setup(asOf, interp, dates, quotes, models);
+        return solve(asOf, interp, dates, quotes, models, method, Jumps.NONE);
+    }
+
+    public static Solved solve(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
+                               List<ToDoubleFunction<Curve>> models, Method method, Jumps jumps) {
+        Setup s = new Setup(asOf, interp, dates, quotes, models, jumps);
         double[] x = method == Method.SEQUENTIAL ? sequential(s) : global(s);
         double worst = norm(s.residuals(x));
         if (!(worst < ACCEPT)) {
             throw new QfError("E_NO_CONVERGENCE", "curve solve stopped at repricing error " + worst);
         }
-        return new Solved(Curve.fromLogs(asOf, interp, dates, x), worst);
+        return new Solved(Curve.fromLogs(asOf, interp, dates, x, jumps), worst);
     }
 
     /** The largest absolute entry; NaN if any entry is NaN. */
@@ -71,7 +76,7 @@ public final class CurveSolver {
             int index = j;
             DoubleUnaryOperator error = v -> {
                 logs[index] = v;
-                return s.models().get(index).applyAsDouble(Curve.fromLogs(s.asOf(), s.interp(), prefix, logs))
+                return s.models().get(index).applyAsDouble(Curve.fromLogs(s.asOf(), s.interp(), prefix, logs, s.jumps()))
                         - s.quotes()[index];
             };
             double guess = (j == 0 ? 0.0 : x[j - 1]) - s.quotes()[j] * (s.years(j) - s.years(j - 1));

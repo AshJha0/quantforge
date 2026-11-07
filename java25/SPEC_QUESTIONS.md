@@ -89,3 +89,18 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | C-3 | `risk.vol.surface_vega`: a position's `forward`, `strike`, `discount_factor` or `expiry_years` `<= 0` | `E_DOMAIN`, as no check is listed |
 | C-4 | `usecase.vol_surface`: order of checks, and `strike` or `quantity <= 0` on `target` | Curve checks, then `E_DOMAIN` on target, then slices; a target expiry that is no slice's is `E_INPUT` after the fits |
 | C-5 | `vol.ssvi.calibrate`: `thetas` checks against the point count | Point count and ragged rows first |
+
+## Stage D wave 1 (D1 rates core)
+
+| # | Point | Reading taken |
+|---|---|---|
+| D-1 | `stage_b/ois.json` case `ois-0023` expects `ESTR` bootstrap to be `E_SCHEMA`; `ois-curves.md` 1.1.0 now accepts `ESTR` | Follows the stage D spec, so the runner shows this one case failing. Skipped in `GoldenSuiteTest` as superseded. Needs the oracle to retire or update the case (Rust noted the same) |
+| D-2 | Order of a curve's `jumps` checks against its pillar checks | Pillars first, then jumps. In `rates.ois.bootstrap` jumps come first, as its check list says |
+| D-3 | Within `jumps`: a bad date and a bad factor in one list | All dates checked first (`E_INPUT`), then all factors (`E_DOMAIN`) |
+| D-4 | `rates.ois.fit_steps` with empty `step_dates` | `E_INPUT` by ruling D12 (a date list), after the length check. `steps: []` in `rates.ois.step_curve` is allowed: it is not a date list, and gives a flat curve |
+| D-5 | `rates.ois.compound_dated` with a lookback or shift that runs past 2000 to 2099 | `E_DATE_RANGE`, from the calendar range, so a huge `shift_days` cannot loop |
+| D-6 | Convention that is a known non-overnight record (`USD-TERM-3M`, an FX pair) vs an unknown id, in `compound_dated` and `fit_steps` | Known non-overnight: `E_INPUT`; unknown: `E_SCHEMA` |
+| D-7 | `rates.csa.discount`: two forwards on one date | `E_INPUT`, after the `E_DOMAIN` checks. A date equal to `as_of` still needs its own forward |
+| D-8 | `calib.curve.robust` when the points cannot fix the three betas (e.g. one maturity repeated) | `E_SINGULAR` from the linear solve; the spec lists no code for it |
+| D-9 | `rates.curve.joint_bootstrap` `GLOBAL` | Global Newton on the OIS block, then the term block on it: the system is block triangular (ruling D9), so this is the joint solution |
+| D-10 | `rates.basis.ois_spread`, `rates.curve.joint_bootstrap` with `ESTR` | Accepted, as for any overnight convention |
