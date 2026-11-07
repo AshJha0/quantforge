@@ -12,8 +12,56 @@ use quantforge_core::curve::CurveInput;
 use quantforge_core::dates::Date;
 use quantforge_core::equity_d::{self, Action, Constituent, Trs};
 use quantforge_core::error::{Result, fail};
+use quantforge_core::inflation::{self, CpiCurve, Zcis, month_index};
 use quantforge_core::json::{Json, obj};
 use quantforge_core::xccy::{self, Ndf, XccyTrade};
+
+fn month_of(s: &str) -> Option<i64> {
+    let d = Date::parse(&format!("{s}-01"))?;
+    (s.len() == 7).then(|| month_index(d.y, d.m))
+}
+
+struct CpiInput {
+    base: i64,
+    base_cpi: f64,
+    quotes: Vec<(i64, f64)>,
+    seasonality: Option<Vec<f64>>,
+}
+
+impl CpiInput {
+    fn build(&self) -> Result<CpiCurve> {
+        CpiCurve::new(
+            self.base,
+            self.base_cpi,
+            &self.quotes,
+            self.seasonality.as_deref(),
+        )
+    }
+}
+
+/// The curve fields; `seasonality` is a required key that may be `null`.
+fn cpi_input(i: &Inputs) -> Result<CpiInput> {
+    let base = match month_of(i.str("base_month")?) {
+        Some(m) => m,
+        None => return i.fail("base_month", "expected YYYY-MM"),
+    };
+    let base_cpi = i.f64("base_cpi")?;
+    let mut quotes = Vec::new();
+    for q in items(i, "quotes")? {
+        quotes.push((q.int("years")?, q.f64("rate")?));
+    }
+    let seasonality = match i.0.get("seasonality") {
+        None => return i.fail("seasonality", "is required"),
+        Some(Json::Null) => None,
+        _ => Some(i.reals("seasonality")?),
+    };
+    Ok(CpiInput {
+        base,
+        base_cpi,
+        quotes,
+        seasonality,
+    })
+}
 
 fn ex_dividends(i: &Inputs) -> Result<Vec<(Date, f64)>> {
     items(i, "dividends")?
@@ -535,6 +583,70 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("funding_leg", fl.into()),
                 ("pv", pv.into()),
             ]))
+        }
+        "infl.curve.cpi" => {
+            let c = cpi_input(i)?;
+            let mut months = Vec::new();
+            for v in i.array("months")? {
+                match v.as_str().and_then(month_of) {
+                    Some(m) => months.push(m),
+                    None => return i.fail("months", "expected YYYY-MM"),
+                }
+            }
+            i.gate()?;
+            let c = c.build()?;
+            let v = months
+                .iter()
+                .map(|m| c.cpi(*m))
+                .collect::<Result<Vec<_>>>()?;
+            plain(obj([("cpi", v.into())]))
+        }
+        "infl.zcis.pv" => {
+            let (c, d) = (cpi_input(&sub(i, "curve")?)?, curve_input(i, "discount")?);
+            let t = sub(i, "trade")?;
+            let trade = Zcis {
+                years: t.int("years")?,
+                fixed_rate: t.f64("fixed_rate")?,
+                notional: t.f64("notional")?,
+                receive_inflation: match t.str("side")? {
+                    "RECEIVE_INFLATION" => true,
+                    "PAY_INFLATION" => false,
+                    _ => return t.fail("side", "unknown side"),
+                },
+                payment_date: t.date("payment_date")?,
+            };
+            i.gate()?;
+            let (pv, r) = inflation::zcis_pv(&c.build()?, &Curve::new(&d)?, &trade)?;
+            plain(obj([("pv", pv.into()), ("index_ratio", r.into())]))
+        }
+        "infl.linker.price" => {
+            let (b, s) = (bond(i)?, i.date("settlement")?);
+            let (y, base) = (i.f64("real_yield")?, i.f64("base_ref_cpi")?);
+            let mut fx = Vec::new();
+            for f in items(i, "cpi_fixings")? {
+                let m = match month_of(f.str("month")?) {
+                    Some(m) => m,
+                    None => return f.fail("month", "expected YYYY-MM"),
+                };
+                fx.push((m, f.f64("value")?));
+            }
+            i.gate()?;
+            let p = inflation::linker_price(&b, s, y, base, &fx)?;
+            plain(obj([
+                ("ref_cpi", p.ref_cpi.into()),
+                ("index_ratio", p.index_ratio.into()),
+                ("real_clean", p.real_clean.into()),
+                ("real_accrued", p.real_accrued.into()),
+                ("nominal_clean", p.nominal_clean.into()),
+                ("nominal_accrued", p.nominal_accrued.into()),
+            ]))
+        }
+        "infl.linker.price_curve" => {
+            let (b, s, base) = (bond(i)?, i.date("settlement")?, i.f64("base_ref_cpi")?);
+            let (c, d) = (cpi_input(&sub(i, "curve")?)?, curve_input(i, "discount")?);
+            i.gate()?;
+            let v = inflation::linker_price_curve(&b, s, base, &c.build()?, &Curve::new(&d)?)?;
+            plain(obj([("nominal_dirty", v.into())]))
         }
         _ => fail(
             "E_UNSUPPORTED_OPERATION",

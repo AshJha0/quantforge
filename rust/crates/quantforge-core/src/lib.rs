@@ -26,6 +26,7 @@ pub mod error;
 pub mod fx;
 pub mod greeks;
 pub mod hedge;
+pub mod inflation;
 pub mod integrate;
 pub mod interp;
 pub mod json;

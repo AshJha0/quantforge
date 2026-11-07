@@ -413,3 +413,97 @@ mod stage_d_tests {
         );
     }
 }
+
+#[cfg(test)]
+mod stage_d_wave2_tests {
+    use super::*;
+
+    fn code(op: &str, inputs: &str) -> Option<String> {
+        let text = format!(
+            r#"{{"schema_version":"1.0","case_id":"c","operation":"{op}","inputs":{inputs}}}"#
+        );
+        let r = run_case(text.as_bytes()).0;
+        Some(r.get("error")?.get("code")?.as_str()?.to_string())
+    }
+
+    const BOND: &str = r#"{"maturity":"2029-11-15","coupon":0.0425,"frequency":2}"#;
+    const CURVE: &str = r#"{"as_of":"2026-11-06","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2040-11-06","discount_factor":0.6}]}"#;
+
+    #[test]
+    fn bond_and_repo_keys() {
+        let y = |b: &str| {
+            code(
+                "bond.price.from_yield",
+                &format!(r#"{{"bond":{b},"settlement":"2026-11-09","yield":0.04}}"#),
+            )
+        };
+        assert_eq!(y(BOND), None);
+        assert_eq!(y(&BOND.replace(":2}", ":3}")).as_deref(), Some("E_SCHEMA"));
+        let r = |gc: &str| {
+            code(
+                "repo.forward",
+                &format!(
+                    r#"{{"bond":{BOND},"start":"2026-11-09","end":"2026-12-09","clean_price":100,"repo_rate":0.04{gc}}}"#
+                ),
+            )
+        };
+        assert_eq!(r(r#","gc_rate":null"#), None);
+        assert_eq!(r(r#","gc_rate":0.041"#), None);
+        assert_eq!(r("").as_deref(), Some("E_SCHEMA"));
+        let cf = code(
+            "bond.futures.conversion_factor",
+            &format!(r#"{{"bond":{BOND},"delivery_month":"2026-1","notional_coupon":0.06}}"#),
+        );
+        assert_eq!(cf.as_deref(), Some("E_SCHEMA"));
+    }
+
+    #[test]
+    fn ndf_trs_and_cpi_required_nullable_keys() {
+        let n = |f: &str| {
+            code(
+                "fx.ndf.pv",
+                &format!(
+                    r#"{{"usd_curve":{CURVE},"offshore_curve":{CURVE},"spot":88,"trade":{{"fixing_date":"2027-05-06","payment_date":"2027-05-10","strike":90,"usd_notional":1e6,"side":"BUY"}}{f}}}"#
+                ),
+            )
+        };
+        assert_eq!(n(r#","fixing":null"#), None);
+        assert_eq!(n("").as_deref(), Some("E_SCHEMA"));
+        let c = |s: &str| {
+            code(
+                "infl.curve.cpi",
+                &format!(
+                    r#"{{"base_month":"2026-08","base_cpi":300,"quotes":[{{"years":1,"rate":0.02}}]{s},"months":["2027-01"]}}"#
+                ),
+            )
+        };
+        assert_eq!(c(r#","seasonality":null"#), None);
+        assert_eq!(c("").as_deref(), Some("E_SCHEMA"));
+        let t = |r: &str| {
+            code(
+                "eq.trs.pv",
+                &format!(
+                    r#"{{"spot":100,"funding":{CURVE},"borrow_rate":0,"dividends":[],"trade":{{"start":"2026-11-06","end":"2027-11-06","initial_price":100,"shares":1,"spread":0,"side":"PAY_EQUITY"}}{r}}}"#
+                ),
+            )
+        };
+        assert_eq!(t(r#","current_rate":null"#), None);
+        assert_eq!(t("").as_deref(), Some("E_SCHEMA"));
+    }
+
+    #[test]
+    fn credit_and_index_inputs() {
+        let p = code(
+            "credit.cds.bootstrap",
+            &format!(
+                r#"{{"trade_date":"2026-11-06","discount":{CURVE},"recovery":0.4,"quotes":[{{"tenor":"5Y","spread":0.01}}]}}"#
+            ),
+        );
+        assert_eq!(p, None);
+        let ca = code(
+            "eq.corporate_action.adjust",
+            r#"{"action":"MERGER","cum_price":1,"shares":1,"strike":1}"#,
+        );
+        assert_eq!(ca.as_deref(), Some("E_SCHEMA"));
+    }
+}

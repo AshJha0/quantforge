@@ -175,6 +175,12 @@ fn periods(t: Date, maturity: Date) -> Result<Vec<Period>> {
     Ok(out)
 }
 
+/// `(t0, D, h, k, QP0)` for one integration piece.
+type Piece = (f64, f64, f64, f64, f64);
+
+/// A tenor quote: `(tenor, spread)`.
+pub type CdsQuote = ((i64, char), f64);
+
 struct Engine<'a> {
     t: Date,
     discount: &'a Curve,
@@ -200,7 +206,7 @@ impl Engine<'_> {
     }
 
     /// Pieces of `[a, b]` split at the nodes: `(t0, D, h, k, QP0)`.
-    fn pieces(&self, a: Date, b: Date) -> Result<Vec<(f64, f64, f64, f64, f64)>> {
+    fn pieces(&self, a: Date, b: Date) -> Result<Vec<Piece>> {
         let mut cuts = vec![a];
         cuts.extend(self.nodes.iter().copied().filter(|d| *d > a && *d < b));
         cuts.push(b);
@@ -424,7 +430,7 @@ pub fn index_intrinsic(
 
 /// `credit.curve.composite`: blended spreads, scaled.
 pub fn composite_spreads(
-    constituents: &[(Vec<((i64, char), f64)>, f64)],
+    constituents: &[(Vec<CdsQuote>, f64)],
     scale: f64,
 ) -> Result<Vec<((i64, char), f64)>> {
     if constituents.is_empty() {
