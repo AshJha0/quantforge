@@ -125,8 +125,11 @@ final class StageD2 {
                 throw new QfError("E_SCHEMA", "delivery_month must be YYYY-MM", "delivery_month");
             }
             double notional = in.real("notional_coupon");
+            Bonds.Contract contract = !in.has("contract") ? Bonds.Contract.TEN_YEAR
+                    : in.choice("contract", Bonds.Contract.class);
             in.gate();
-            return Operations.out("conversion_factor", Bonds.conversionFactor(b, YearMonth.parse(month), notional));
+            return Operations.out("conversion_factor",
+                    Bonds.conversionFactor(b, YearMonth.parse(month), notional, contract));
         });
         table.put("bond.futures.basis", in -> {
             double futures = in.real("futures_price");

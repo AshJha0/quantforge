@@ -78,7 +78,7 @@ class StageD2to6Test {
         assertEquals(0.0385, Bonds.impliedRepo(BOND, SETTLE, end, 100.4, r.forwardClean()), 1e-14);
         assertEquals(0.0015, r.specialSpread(), 1e-17);
         assertEquals(0.9040, Bonds.conversionFactor(new Bonds.Bond(LocalDate.of(2033, 11, 15), 0.0425, 2),
-                YearMonth.of(2026, 12), 0.06), 0.0);
+                YearMonth.of(2026, 12), 0.06, Bonds.Contract.TEN_YEAR), 0.0);
         String b = "{\"maturity\":\"2029-11-15\",\"coupon\":0.0425,\"frequency\":2}";
         error("E_DATE_ORDER", "repo.forward", "{\"bond\":" + b + ",\"start\":\"2026-11-09\",\"end\":\"2026-11-09\","
                 + "\"clean_price\":99,\"repo_rate\":0.04,\"gc_rate\":null}");
