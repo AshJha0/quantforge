@@ -49,3 +49,22 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Projection curve | A curve that forecasts floating rates, while another curve discounts |
 | Quote-driven basis | The gap between the FX-implied base rate and the base OIS rate, taken straight from quotes |
 | Zero rate | The continuously compounded rate from today to a date: `-ln(D)/t` |
+
+## Stage C: Equity vol slice
+
+| Term | Meaning |
+|---|---|
+| Arbitrage-free SABR | SABR prices from a one-dimensional forward equation for the density, absorbing at zero, so density cannot go negative (Hagan and others, 2014) |
+| Bachelier model | Option model with a normally distributed forward; vol is in price units |
+| Black-76 | Option model with a lognormal forward; Black-Scholes is Black-76 with the forward taken from spot |
+| Borrow curve | Discount factors `B` for the fee earned by lending the stock out |
+| Butterfly arbitrage | Call prices not convex in strike, which is a negative density |
+| Calendar arbitrage | Total variance falling as expiry rises, at fixed moneyness |
+| Carry factor | `C = D/B`: grows the stock and carries dividends to expiry (ruling C2) |
+| Delta convention | Whether a quoted delta is spot delta, with a discount factor, or forward delta, without one |
+| Greeks | Slopes of a price: delta, gamma, vega, theta, rho, vanna, volga |
+| Implied vol | The vol at which a model reprices a given option price |
+| Risk reversal, butterfly | Quotes of the call-put vol gap, and of the wings over ATM, at one delta |
+| SABR | Model in which the forward's vol is itself random; Hagan's 2002 formula approximates its Black vol |
+| SVI, SSVI | Smile shapes in total variance: SVI per expiry, SSVI across expiries with simple no-arbitrage conditions |
+| Total variance | `w = v^2 T`, the vol squared times time to expiry |
