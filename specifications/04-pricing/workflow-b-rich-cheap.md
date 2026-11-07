@@ -22,10 +22,10 @@ Conventions: Treasuries semi-annual, ACT/ACT ICMA. Gilts semi-annual, ACT/ACT IC
 ## Calculation (all through the CLI)
 
 1. `bond.fit.nelson_siegel` on the day's universe, per market, with `tau` fixed at 2.5 years (the stage D setting) and equal weights. The fit's repricing error is reported.
-2. Each bond's model dirty price comes from the fitted betas through `bond.price.from_curve`, on a curve object sampled from the fit at the bond's cash-flow dates.
+2. The fit's `residuals` output is model minus market dirty price for every bond (`bonds.md`), so the job computes no price itself. `model_clean = market_clean + residual`.
 3. Per bond:
-   - `price_residual = model_clean - market_clean` (per 100): positive means the bond is cheap against the curve;
-   - `yield_residual_bp` = (market yield - model yield) x 10,000, both from `bond.yield.from_price`;
+   - `price_residual = residual` (per 100): positive means the bond is cheap against the curve;
+   - `yield_residual_bp` = (market yield - model yield) x 10,000, with both yields from `bond.yield.from_price`, at `market_clean` and at `model_clean`;
    - `zscore` = the yield residual against that bond's own trailing 60 published days in the forward log, or `null` with fewer than 20 days.
 4. Rank by `yield_residual_bp` within maturity buckets: 1-3, 3-7, 7-15 and 15+ years.
 
