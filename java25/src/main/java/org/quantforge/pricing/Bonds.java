@@ -212,7 +212,19 @@ public final class Bonds {
         return (fwd + c[0] - dirty) / (dirty * days(start, end) / 360.0 - c[1]);
     }
 
-    public static double conversionFactor(Bond b, YearMonth delivery, double notional) {
+    /** CME Treasury futures contracts (ruling R1-3). The first three count whole months. */
+    public enum Contract {
+        TWO_YEAR(true), THREE_YEAR(true), FIVE_YEAR(true), TEN_YEAR(false), ULTRA_TEN_YEAR(false), BOND(false),
+        ULTRA_BOND(false);
+
+        final boolean wholeMonths;
+
+        Contract(boolean wholeMonths) {
+            this.wholeMonths = wholeMonths;
+        }
+    }
+
+    public static double conversionFactor(Bond b, YearMonth delivery, double notional, Contract contract) {
         if (notional != 0.06) {
             throw new QfError("E_INPUT", "notional_coupon must be 0.06", "notional_coupon");
         }
@@ -225,10 +237,10 @@ public final class Bonds {
             throw new QfError("E_DATE_ORDER", "maturity is before the delivery month", "bond");
         }
         long n = months / 12;
-        long z = (months % 12) / 3 * 3;
-        double v = z < 7 ? z : 3;
+        long z = contract.wholeMonths ? months % 12 : (months % 12) / 3 * 3;
+        double v = z < 7 ? z : z - 6;
         double a = Math.pow(1.03, -v / 6.0);
-        double cpn = b.coupon();
+        double cpn = Math.floor(b.coupon() * 800.0 + 0.5) / 800.0; // nearest 1/8 of 1%, ties up
         double bb = cpn / 2.0 * (6.0 - v) / 6.0;
         double c = z < 7 ? Math.pow(1.03, -2.0 * n) : Math.pow(1.03, -2.0 * n - 1.0);
         double cf = a * (cpn / 2.0 + cpn / 0.06 * (1.0 - c) + c) - bb;

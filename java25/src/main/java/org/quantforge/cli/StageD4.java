@@ -58,6 +58,13 @@ final class StageD4 {
         return out;
     }
 
+    /** Ruling R1-4: every credit.* operation needs ISDA flat forwards, checked before any other rule. */
+    private static void logLinear(StageB.CurveInput d) {
+        if (d.interp() != Curve.Interpolation.LOG_LINEAR_DF) {
+            throw new QfError("E_INPUT", "discount interpolation must be LOG_LINEAR_DF", "discount");
+        }
+    }
+
     static void register(Map<String, Function<In, Out>> table) {
         table.put("credit.cds.price", in -> {
             LocalDate t = in.date("trade_date");
@@ -77,6 +84,7 @@ final class StageD4 {
                 throw new QfError("E_SCHEMA", "unknown payout", "payout");
             }
             in.gate();
+            logLinear(d);
             Credit.Price p = Credit.price(t, d.build(), h.build(), r, m, coupon, notional,
                     side.equals("BUY_PROTECTION"), payout.equals("DIGITAL"));
             return Operations.out("pv", p.pv(), "upfront", p.upfront(), "accrued", p.accrued(),
@@ -88,6 +96,7 @@ final class StageD4 {
             double r = in.real("recovery");
             Quotes q = quotes(in);
             in.gate();
+            logLinear(d);
             return Operations.out("pillars", pillars(Credit.bootstrap(t, d.build(), r, q.tenors(), q.spreads())));
         });
         table.put("credit.index.intrinsic", in -> {
@@ -108,6 +117,7 @@ final class StageD4 {
             double coupon = tr.real("coupon");
             double quoted = in.real("quoted_upfront");
             in.gate();
+            logLinear(d);
             if (rec.length == 0) {
                 throw new QfError("E_INPUT", "no names", "names");
             }
@@ -143,6 +153,7 @@ final class StageD4 {
             }
             double scale = in.real("scale");
             in.gate();
+            logLinear(d);
             if (qs.isEmpty()) {
                 throw new QfError("E_INPUT", "no constituents", "constituents");
             }
