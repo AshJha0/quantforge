@@ -1083,6 +1083,7 @@ const std::map<string, Handler, std::less<>>& table() {
         {"risk.curve.jacobian", op_risk_jacobian},
         {"risk.curve.key_rate", op_risk_key_rate},
         {"risk.curve.par", op_risk_par},
+        {"risk.pnl.explain", op_pnl_explain},
         {"hedge.spread_cost", op_spread_cost},
         {"rates.basis.spread", op_basis_spread},
         {"rates.curve.discount", op_curve_discount},

@@ -1,5 +1,6 @@
 #include "quantforge/core/risk.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
@@ -43,6 +44,27 @@ ParRisk par_risk(const RateConvention& c, Date as_of, const std::vector<OisQuote
     };
     ParRisk out{v0, risk_of(std::size_t(-1)), {}};
     for (std::size_t j = 0; j < quotes.size(); ++j) out.buckets.push_back(risk_of(j));
+    return out;
+}
+
+PnlExplain pnl_explain(const RateConvention& c, Date as_of, const std::vector<OisQuote>& start,
+                       const std::vector<OisQuote>& end, CurveInterpolation interpolation, const CurvePricer& price,
+                       double bump_bp) {
+    bool same = start.size() == end.size();
+    for (std::size_t j = 0; same && j < start.size(); ++j)
+        same = start[j].tenor.count == end[j].tenor.count && start[j].tenor.unit == end[j].tenor.unit;
+    if (!same) throw Error("E_INPUT", "quotes_start and quotes_end must have the same tenors", "quotes_end");
+    const ParRisk par = par_risk(c, as_of, start, interpolation, price, bump_bp, BumpScheme::Central);
+    PnlExplain out{par.value, price(build(c, as_of, end, interpolation)), 0, 0, 0, 0, par.buckets, false};
+    out.full_pnl = out.value_end - out.value_start;
+    double dv01 = 0.0;
+    for (std::size_t j = 0; j < start.size(); ++j) {
+        out.risk_pnl += par.buckets[j] * (end[j].rate - start[j].rate) / bp;
+        dv01 += par.buckets[j];
+    }
+    out.unexplained = out.full_pnl - out.risk_pnl;
+    out.threshold = std::max(0.05 * std::fabs(out.full_pnl), 0.05 * std::fabs(dv01));
+    out.explained = std::fabs(out.unexplained) <= out.threshold;
     return out;
 }
 

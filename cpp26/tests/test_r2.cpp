@@ -89,3 +89,28 @@ TEST_CASE("risk checks") {
     CHECK(code_of([&] { check_key_dates(c, {d("2028-01-01"), d("2027-01-01")}); }) == "E_INPUT");
     CHECK(code_of([&] { check_key_dates(c, {d("2027-01-01"), d("2028-01-01")}); }) == "none");
 }
+
+TEST_CASE("P&L explain: small moves are explained, large ones leave second-order P&L") {
+    const auto q0 = quotes();
+    const auto shifted = [&](double bp_move) {
+        auto q = q0;
+        for (auto& x : q) x.rate += bp_move * 1e-4;
+        return q;
+    };
+    const auto pv = pv_of(receiver());
+    const PnlExplain small = pnl_explain(sofr, as_of, q0, shifted(1.0), CurveInterpolation::LogLinearDf, pv, 1.0);
+    double dv01 = 0.0;
+    for (const double b : small.par_buckets) dv01 += b;
+    CHECK(small.explained);
+    CHECK(small.full_pnl == Approx(small.value_end - small.value_start).epsilon(1e-15));
+    CHECK(small.risk_pnl == Approx(dv01).epsilon(1e-12));  // a 1 bp parallel move
+    CHECK(small.unexplained == Approx(small.full_pnl - small.risk_pnl).margin(1e-9));
+    CHECK(small.threshold == Approx(std::max(0.05 * std::fabs(small.full_pnl), 0.05 * std::fabs(dv01))));
+    // Convexity grows with the square of the move, so the relative gap grows with it.
+    const PnlExplain big = pnl_explain(sofr, as_of, q0, shifted(150.0), CurveInterpolation::LogLinearDf, pv, 1.0);
+    CHECK(std::fabs(big.unexplained / big.full_pnl) > std::fabs(small.unexplained / small.full_pnl));
+    auto other = q0;
+    other.back().tenor = Tenor{12, 'Y'};
+    CHECK(code_of([&] { pnl_explain(sofr, as_of, q0, other, CurveInterpolation::LogLinearDf, pv, 1.0); }) == "E_INPUT");
+    CHECK(code_of([&] { pnl_explain(sofr, as_of, q0, {q0.begin(), q0.end() - 1}, CurveInterpolation::LogLinearDf, pv, 1.0); }) == "E_INPUT");
+}

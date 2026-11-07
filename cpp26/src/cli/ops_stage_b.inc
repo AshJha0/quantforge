@@ -262,12 +262,12 @@ struct RawQuote {
     bool crossed;
 };
 
-std::vector<RawQuote> quotes_of(const In& in) {
-    const Value& a = in.need("quotes");
-    if (a.kind != Kind::Array) schema("quotes", "expected an array");
+std::vector<RawQuote> quotes_of(const In& in, string_view key = "quotes") {
+    const Value& a = in.need(key);
+    if (a.kind != Kind::Array) schema(key, "expected an array");
     std::vector<RawQuote> out;
     for (const Value& v : a.items) {
-        if (v.kind != Kind::Object) schema("quotes", "expected an object");
+        if (v.kind != Kind::Object) schema(key, "expected an object");
         const In q(v);
         const Tenor t = parse_tenor(q.text("tenor"));
         if (q.find("rate")) {

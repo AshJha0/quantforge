@@ -114,3 +114,30 @@ void op_risk_jacobian(const In& in, Out& out) {
     }
     out.values.end_array();
 }
+
+void op_pnl_explain(const In& in, Out& out) {
+    const Date as_of = in.date("as_of");
+    const RateConvention* c = ois_convention_of(in.need("convention"), "convention");
+    const auto interpolation = in.choice("interpolation", curve_interpolations);
+    const auto raw_start = quotes_of(in, "quotes_start"), raw_end = quotes_of(in, "quotes_end");
+    const RiskProduct product = product_of(in);
+    const double bump = bump_of(in);
+    in.ready();
+    const auto start = checked_quotes(raw_start), end = checked_quotes(raw_end);
+    check_bump(bump);
+    product.check();
+    if (product.kind == RiskProduct::Kind::Ois && product.trade.convention != c)
+        throw Error("E_INPUT", "the trade's convention differs from the curve's", "product");
+    check_crossed(raw_start);
+    check_crossed(raw_end);
+    const PnlExplain r = pnl_explain(*c, as_of, start, end, interpolation, pricer_of(product), bump);
+    out.key_real("value_start", r.value_start);
+    out.key_real("value_end", r.value_end);
+    out.key_real("full_pnl", r.full_pnl);
+    out.key_reals("par_buckets", r.par_buckets);
+    out.key_real("risk_pnl", r.risk_pnl);
+    out.key_real("unexplained", r.unexplained);
+    out.key_real("threshold", r.threshold);
+    out.values.key("explained");
+    out.values.boolean(r.explained);
+}
