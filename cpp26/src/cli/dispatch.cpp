@@ -14,6 +14,7 @@
 #include "quantforge/core/data_checks.hpp"
 #include "quantforge/core/dates.hpp"
 #include "quantforge/core/daycount.hpp"
+#include "quantforge/core/equity.hpp"
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/fx.hpp"
 #include "quantforge/core/integrate.hpp"
@@ -1038,6 +1039,7 @@ void op_store_chain(const In& in, Out& out) {
 }
 
 #include "ops_stage_b.inc"
+#include "ops_c_all.inc"
 
 // ---- dispatch ----
 
@@ -1045,6 +1047,7 @@ using Handler = void (*)(const In&, Out&);
 
 const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
+#include "ops_c_table.inc"
         {"calib.check_bid_ask", op_check_bid_ask},
         {"calib.curve_report", op_curve_report},
         {"calib.fit", op_calib_fit},
