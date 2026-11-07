@@ -19,7 +19,7 @@ On branch `r1` at `3f5d97d`. No new pricing. No golden value changed except wher
 - `README.md` no longer says stage D is untagged.
 
 ### Known issues
-- Python fuzz is about 2,760 cases a minute against a 50,000 target.
+- Python fuzz runs about 9,500 inputs a minute (coordinator check, seed 41, 90 s) against a 50,000 target.
 - The calendar provenance check fails until SIFMA publishes its 2027 US holiday schedule (usually in December); the USGS calendar is confirmed only through 2027-01-01.
 - The mutation report and cross-platform matrix first run after the push, so neither has a result yet.
 

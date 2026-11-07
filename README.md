@@ -83,7 +83,7 @@ What that does not show:
 ### Known issues
 - **Clang on Windows** is blocked at times by Windows Application Control, which stops freshly built binaries. Clang conformance therefore relies on CI; GCC runs locally under WSL.
 - **Licence questions are open** on SONIA redistribution and on the Bank of England's forward and curve data. Raw data stays local (`oracle/LICENCES.md`).
-- **Python fuzz is slow.** About 2,760 cases a minute through batch mode, against the R1 target of 50,000 (figure reported by the Python lane).
+- **Python fuzz is slow.** About 9,500 inputs a minute (coordinator check, seed 41, 90 s), against the R1 target of 50,000; the other three languages run 43,000 to 166,000 in the same check.
 - **First runs wait for the push.** The mutation report and the cross-platform matrix have never run.
 - The calendar provenance check fails until SIFMA publishes its 2027 US holiday schedule (usually in December); the USGS calendar is confirmed only through 2027-01-01.
 
