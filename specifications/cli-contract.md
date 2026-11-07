@@ -1,6 +1,6 @@
 # CLI contract
 
-Version 1.6.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+Version 1.7.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
 The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
@@ -241,6 +241,12 @@ Wave 2 adds:
 | `mbs.*` | `04-pricing/mbs.md` |
 
 `ESTR` joins `rates.ois.*`, and curve objects take optional `jumps` (`02-curves/curve-framework.md`).
+
+Phase R2 (contract 1.7.0) adds these, with no new error code:
+
+| Prefix | Spec |
+|---|---|
+| `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` | `06-risk/par-and-key-rate.md` |
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.
