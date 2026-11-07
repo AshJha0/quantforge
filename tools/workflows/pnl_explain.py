@@ -36,6 +36,46 @@ def book(as_of, quotes):
     return out
 
 
+def ranks(xs):
+    order = sorted(range(len(xs)), key=lambda i: xs[i])
+    r = [0.0] * len(xs)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and xs[order[j + 1]] == xs[order[i]]:
+            j += 1
+        for k in range(i, j + 1):
+            r[order[k]] = (i + j) / 2 + 1
+        i = j + 1
+    return r
+
+
+def spearman(a, b):
+    """Rank correlation, ties averaged. Reported, never judged (spec: FRTB-style statistic without its thresholds)."""
+    if len(a) < 3:
+        return float("nan")
+    ra, rb = ranks(a), ranks(b)
+    ma, mb = sum(ra) / len(ra), sum(rb) / len(rb)
+    num = sum((x - ma) * (y - mb) for x, y in zip(ra, rb))
+    den = (sum((x - ma) ** 2 for x in ra) * sum((y - mb) ** 2 for y in rb)) ** 0.5
+    return num / den if den else float("nan")
+
+
+def ks(a, b):
+    """Two-sample Kolmogorov-Smirnov statistic D. Reported, never judged."""
+    if not a or not b:
+        return float("nan")
+    sa, sb, i, j, d = sorted(a), sorted(b), 0, 0, 0.0
+    while i < len(sa) and j < len(sb):
+        x = min(sa[i], sb[j])
+        while i < len(sa) and sa[i] <= x:
+            i += 1
+        while j < len(sb) and sb[j] <= x:
+            j += 1
+        d = max(d, abs(i / len(sa) - j / len(sb)))
+    return d
+
+
 def pct(xs, p):
     xs = sorted(xs)
     return xs[min(len(xs) - 1, int(p * (len(xs) - 1) + 0.5))] if xs else float("nan")
@@ -67,7 +107,7 @@ def main():
             meta[cid] = (name, d0, d1, big)
     res = c.batch(cases, a.impl)
     r = c.Report("P&L explain", days[-1][0], a.out)
-    r.data.update({"label": LABEL, "impl": a.impl, "years": a.years, "pairs": len(days) - 1, "threshold": "max(5% |full|, 5% |par_dv01|)"})
+    r.data.update({"label": LABEL, "impl": a.impl, "years": a.years, "pairs": len(days) - 1, "threshold": "5% max(|full|, gross first-order P&L) + 1e-8 notional; a project choice, not FRTB PLA"})
     r.p(f"{LABEL} Years {a.years}, {len(days) - 1} day pairs, implementation {a.impl}. Threshold: spec `06-risk/pnl-explain.md`.")
     rows, by = [], {}
     for cid, out in res.items():
@@ -80,14 +120,17 @@ def main():
         ex = sum(1 for x in ok if x[1]["outputs"]["explained"])
         rel = [abs(x[1]["outputs"]["unexplained"]) / max(abs(x[1]["outputs"]["full_pnl"]), abs(sum(x[1]["outputs"]["par_buckets"])), 1e-12) for x in ok]
         share = ex / len(xs) if xs else 0.0
-        summary[name] = {"days": len(xs), "explained": ex, "errors": errs, "share": share, "p50": pct(rel, .5), "p95": pct(rel, .95), "p99": pct(rel, .99)}
-        rows.append((name, len(xs), ex, errs, f"{share * 100:.1f}%", f"{pct(rel, .5):.2e}", f"{pct(rel, .95):.2e}", f"{pct(rel, .99):.2e}"))
+        fulls = [x[1]["outputs"]["full_pnl"] for x in ok]
+        risks = [x[1]["outputs"]["risk_pnl"] for x in ok]
+        sp, kd = spearman(fulls, risks), ks(fulls, risks)
+        summary[name] = {"days": len(xs), "explained": ex, "errors": errs, "share": share, "p50": pct(rel, .5), "p95": pct(rel, .95), "p99": pct(rel, .99), "spearman": sp, "ks": kd}
+        rows.append((name, len(xs), ex, errs, f"{share * 100:.1f}%", f"{pct(rel, .5):.2e}", f"{pct(rel, .95):.2e}", f"{pct(rel, .99):.2e}", f"{sp:.4f}", f"{kd:.4f}"))
         r.check(f"{name} explained share >= {ACCEPT:.0%}", "fail", share >= ACCEPT and errs == 0, f"{share * 100:.1f}% of {len(xs)} days, {errs} errors")
         worst = sorted(ok, key=lambda x: -abs(x[1]["outputs"]["unexplained"]))[:5]
         summary[name]["worst"] = [{"start": x[2], "end": x[3], "unexplained": x[1]["outputs"]["unexplained"], "full_pnl": x[1]["outputs"]["full_pnl"],
                                    "largest_move_bp": round(x[4], 2)} for x in worst]
     r.h("Explained share by product")
-    r.table(["Product", "Days", "Explained", "Errors", "Share", "p50 rel", "p95 rel", "p99 rel"], rows)
+    r.table(["Product", "Days", "Explained", "Errors", "Share", "p50 rel", "p95 rel", "p99 rel", "Spearman (reported)", "KS D (reported)"], rows)
     r.h("Worst days")
     r.table(["Product", "Start", "End", "Unexplained", "Full P&L", "Largest move (bp)"],
             [(n, w["start"], w["end"], f"{w['unexplained']:.2f}", f"{w['full_pnl']:.2f}", w["largest_move_bp"]) for n, s in summary.items() for w in s["worst"]])
