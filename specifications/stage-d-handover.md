@@ -68,6 +68,6 @@ All of stage D is now specified.
 
 ## Rulings on the builds' spec questions
 
-Rulings D31 to D46, with goldens in `datasets/golden/stage_d/rulings_d.json` (18 cases). `bonds.md`, `mbs.md` and `meeting-steps.md` were corrected to match goldens already in place.
+Rulings D31 to D46, with goldens in `datasets/golden/stage_d/rulings_d.json` (18 cases). Second pass: D47 to D63, goldens in `rulings2_d.json` (24 cases); `inflation_d-0007` to `-0009` tolerance widened (D60). `bonds.md`, `mbs.md` and `meeting-steps.md` were corrected to match goldens already in place.
 
 Not for language sessions: anything under `oracle/`.

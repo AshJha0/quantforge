@@ -2586,6 +2586,35 @@
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
    }
+  },
+  {
+   "case_id": "ois_d-0025",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "ESTR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kind": "OVERNIGHT",
+     "currency": "EUR",
+     "day_count": "ACT_360",
+     "calendar": "EUTA",
+     "spot_lag": 2,
+     "payment_lag": 2,
+     "fixed_months": 12,
+     "fixed_day_count": "ACT_360",
+     "business_day_convention": "MODIFIED_FOLLOWING"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "strata-2.12.78-bytecode"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ]
   }
  ]
 }

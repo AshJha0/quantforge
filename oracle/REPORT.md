@@ -126,6 +126,151 @@ strata_vol: 32 cases
 suite usecases_c: 2 cases
 usecases_c: 2 cases
 stage C mutants: 30 caught; arbitrage-free against CEV [1.5084564432291114e-05], Hagan [0.005817758552876473], Doust [0.017899914994640886]
+ois_d: ESTR and SOFR pillars match QuantLib OISRateHelper within 5e-12, both interpolations, two dates
+ois_d: turn-of-year jump curves match QuantLib's jump mechanism within 5e-12 at pillars and around the turn
+ois_d: ESTR and SOFR swap PVs match QuantLib MakeOIS within 1e-9 per unit notional
+suite ois_d: 25 cases
+compound_d: lookback, observation shift and lockout match QuantLib OvernightIndexedCoupon within 5e-14 (lockout k as QuantLib k-1)
+compound_d: IBOR fallback rates match QuantLib with 2-day observation shift; spreads are ISDA's fixed 2021-03-05 values
+suite compound_d: 35 cases
+steps_d: step curves match QuantLib ForwardCurve (backward flat) with jumps within 2e-15
+steps_d: fit recovers the step rates behind QuantLib MakeOIS par rates within 1e-12
+suite steps_d: 11 cases
+futures_d: Hull-White convexity matches QuantLib HullWhite.convexityBias, including a = 0 by limit
+suite futures_d: 10 cases
+csa_d: OIS index basis equals the difference of QuantLib par rates on the two projection curves within 1e-12
+csa_d: joint bootstrap agrees with QuantLib's two-step build within 1e-10
+suite csa_d: 13 cases
+fits_d: smoothness-regularised forward fits solved in exact rationals; NumPy agrees within 1e-9
+fits_d: Huber Nelson-Siegel fits (fixed tau) agree with SciPy least_squares loss='huber' from three starts within 1e-8
+suite fits_d: 16 cases
+stage D: 65 wrong-convention checks, each caught
+  mutant ois_d: ESTR payment lag 1 instead of 2: gap 1.873e-04
+  mutant ois_d: SOFR turn of year ignored: gap 4.675e-07
+  mutant ois_d: jump applied on its own date: gap 1.362e-05
+  mutant ois_d: ESTR turn of year ignored: gap 4.695e-07
+  mutant ois_d: jump applied on its own date: gap 1.365e-05
+  mutant ois_d: ESTR 2Y telescoped floating leg: gap 1.359e+02
+  mutant ois_d: ESTR 10Y telescoped floating leg: gap 3.054e+01
+  mutant ois_d: ESTR 18M telescoped floating leg: gap 2.245e+01
+  mutant ois_d: ESTR 30Y telescoped floating leg: gap 8.002e+01
+  mutant ois_d: SOFR 2Y telescoped floating leg: gap 7.147e+02
+  mutant ois_d: SOFR 10Y telescoped floating leg: gap 1.135e+02
+  mutant ois_d: SOFR 18M telescoped floating leg: gap 7.348e+01
+  mutant ois_d: SOFR 30Y telescoped floating leg: gap 2.518e+02
+  mutant compound_d: SOFR LOOKBACK 2: lookback weights from observation period: gap 2.753e-05
+  mutant compound_d: SOFR LOOKBACK 5: lookback weights from observation period: gap 7.030e-05
+  mutant compound_d: SOFR OBSERVATION_SHIFT 2: shift weights from interest period: gap 2.753e-05
+  mutant compound_d: SOFR OBSERVATION_SHIFT 5: shift weights from interest period: gap 7.030e-05
+  mutant compound_d: SOFR LOCKOUT 2: lockout one day early: gap 6.593e-06
+  mutant compound_d: SOFR LOCKOUT 1: lockout one day early: gap 3.297e-06
+  mutant compound_d: ESTR LOOKBACK 2: lookback weights from observation period: gap 1.451e-05
+  mutant compound_d: ESTR LOOKBACK 5: lookback weights from observation period: gap 5.023e-05
+  mutant compound_d: ESTR OBSERVATION_SHIFT 2: shift weights from interest period: gap 1.451e-05
+  mutant compound_d: ESTR OBSERVATION_SHIFT 5: shift weights from interest period: gap 5.023e-05
+  mutant compound_d: ESTR LOCKOUT 2: lockout one day early: gap 4.019e-05
+  mutant compound_d: ESTR LOCKOUT 1: lockout one day early: gap 1.674e-05
+  mutant compound_d: SONIA LOOKBACK 2: lookback weights from observation period: gap 8.843e-06
+  mutant compound_d: SONIA LOOKBACK 5: lookback weights from observation period: gap 1.035e-04
+  mutant compound_d: SONIA OBSERVATION_SHIFT 2: shift weights from interest period: gap 8.843e-06
+  mutant compound_d: SONIA OBSERVATION_SHIFT 5: shift weights from interest period: gap 1.035e-04
+  mutant compound_d: SONIA LOCKOUT 2: lockout one day early: gap 3.236e-05
+  mutant compound_d: SONIA LOCKOUT 1: lockout one day early: gap 2.265e-05
+  mutant compound_d: USD-LIBOR-3M fallback with lookback, no shift: gap 2.753e-05
+  mutant compound_d: USD-LIBOR-3M fallback without spread adjustment: gap 2.616e-03
+  mutant compound_d: USD-LIBOR-1M fallback with lookback, no shift: gap 2.622e-06
+  mutant compound_d: USD-LIBOR-1M fallback without spread adjustment: gap 1.145e-03
+  mutant compound_d: GBP-LIBOR-3M fallback with lookback, no shift: gap 1.219e-05
+  mutant compound_d: GBP-LIBOR-3M fallback without spread adjustment: gap 1.193e-03
+  mutant compound_d: GBP-LIBOR-6M fallback with lookback, no shift: gap 7.272e-06
+  mutant compound_d: GBP-LIBOR-6M fallback without spread adjustment: gap 2.766e-03
+  mutant steps_d: step effective one day late: gap 1.912e-05
+  mutant steps_d: step effective one day late: gap 1.912e-05
+  mutant steps_d: step effective one day late: gap 4.133e-06
+  mutant futures_d: convexity added, not subtracted, t=0.25: gap 1.868e-05
+  mutant futures_d: Ho-Lee sigma^2 t T / 2 at t=2.0: gap 2.453e-06
+  mutant futures_d: convexity added, not subtracted, t=2.0: gap 6.529e-04
+  mutant futures_d: convexity added, not subtracted, t=5.0: gap 2.243e-03
+  mutant futures_d: Ho-Lee sigma^2 t T / 2 at t=1.0: gap 2.657e-06
+  mutant futures_d: convexity added, not subtracted, t=1.0: gap 8.531e-05
+  mutant futures_d: Ho-Lee sigma^2 t T / 2 at t=9.75: gap 8.673e-04
+  mutant futures_d: convexity added, not subtracted, t=9.75: gap 1.006e-02
+  mutant futures_d: Ho-Lee sigma^2 t T / 2 at t=1.0: gap 2.555e-06
+  mutant futures_d: convexity added, not subtracted, t=1.0: gap 1.134e-04
+  mutant csa_d: collateral spread sign flipped (0.0025): gap 3.435e-02
+  mutant csa_d: collateral spread sign flipped (-0.001): gap 1.374e-02
+  mutant csa_d: forward ratio inverted: gap 2.764e-01
+  mutant csa_d: forward ratio inverted: gap 2.798e-01
+  mutant csa_d: basis 2Y projected and discounted on leg B's curve: gap 4.283e-05
+  mutant csa_d: basis 5Y projected and discounted on leg B's curve: gap 8.460e-05
+  mutant csa_d: basis 10Y projected and discounted on leg B's curve: gap 1.656e-04
+  mutant csa_d: projection discounted on itself (single curve): gap 1.071e-05
+  mutant fits_d: smooth fit penalising levels, lambda 0.0001: gap 3.437e-05
+  mutant fits_d: smooth fit penalising levels, lambda 0.01: gap 3.023e-03
+  mutant fits_d: plain least squares instead of Huber ([4]): gap 2.846e-03
+  mutant fits_d: plain least squares instead of Huber ([2, 9]): gap 1.086e-03
+  mutant fits_d: plain least squares instead of Huber ([6]): gap 1.340e-03
+bonds_d: clean price, accrued, modified duration and convexity match QuantLib FixedRateBond (ACT/ACT ICMA, compounded) within 1e-10
+bonds_d: curve prices and Z-spreads match QuantLib BondFunctions.zSpread (continuous, ACT/365F) within 1e-10
+suite bonds_d: 49 cases
+repo_d: FRN at zero margins on its own curve, settled on a coupon date, prices at 100 within 1e-11
+repo_d: CTD is bond 2; implied repo gap to next 1.04e-01
+suite repo_d: 19 cases
+suite bondfit_d: 4 cases
+stage D wave 2: 26 wrong-convention checks, each caught
+  mutant bonds_d: accrued on ACT/365 for 2029-11-15: gap 1.690e-02
+  mutant bonds_d: accrued on ACT/365 for 2031-02-28: gap 5.960e-03
+  mutant bonds_d: accrued on ACT/365 for 2036-08-15: gap 8.644e-03
+  mutant bonds_d: accrued on ACT/365 for 2055-05-15: gap 1.888e-02
+  mutant bonds_d: accrued on ACT/365 for 2027-12-15: gap 6.210e-04
+  mutant bonds_d: curve price not forwarded to settlement 2029-11-15: gap 3.234e-02
+  mutant bonds_d: curve price not forwarded to settlement 2031-02-28: gap 3.148e-02
+  mutant bonds_d: curve price not forwarded to settlement 2036-08-15: gap 3.303e-02
+  mutant bonds_d: curve price not forwarded to settlement 2034-03-31: gap 3.003e-02
+  mutant bonds_d: curve price not forwarded to settlement 2055-05-15: gap 3.519e-02
+  mutant bonds_d: asset swap over the bond's own annuity 2029-11-15: gap 3.813e-04
+  mutant bonds_d: asset swap over the bond's own annuity 2031-02-28: gap 6.050e-05
+  mutant bonds_d: asset swap over the bond's own annuity 2036-08-15: gap 9.260e-06
+  mutant bonds_d: asset swap over the bond's own annuity 2034-03-31: gap 7.888e-05
+  mutant bonds_d: asset swap over the bond's own annuity 2055-05-15: gap 4.482e-06
+  mutant repo_d: FRN discount margin ignored: gap 5.911e-01
+  mutant repo_d: FRN discount margin ignored: gap 2.280e-01
+  mutant repo_d: coupon in repo term not reinvested 2029-11-15: gap 5.454e-03
+  mutant repo_d: repo on clean, not dirty 2029-11-15: gap 6.595e-03
+  mutant repo_d: coupon in repo term not reinvested 2036-08-15: gap 1.356e-03
+  mutant repo_d: repo on clean, not dirty 2036-08-15: gap 9.508e-03
+  mutant repo_d: coupon in repo term not reinvested 2034-03-31: gap 2.962e-03
+  mutant repo_d: repo on clean, not dirty 2034-03-31: gap 3.037e-02
+  mutant repo_d: coupon in repo term not reinvested 2031-02-28: gap 1.828e-03
+  mutant repo_d: repo on clean, not dirty 2031-02-28: gap 9.427e-03
+  mutant bondfit_d: zero-weight (rich) bond fitted as normal: gap 7.101e-03
+xccy_d: bootstrap recovers the basis-adjusted curve within 1e-13; foreign legs match QuantLib OvernightLeg NPVs within 1e-6 on 1e7
+suite xccy_d: 13 cases
+stage D D3: 12 wrong-convention checks, each caught
+credit_d: ISDA bootstrap replay reprices with QuantLib IsdaCdsEngine fair spreads within 1.9e-10
+credit_d: CDS NPV and upfront match QuantLib IsdaCdsEngine within 6.9e-16 per unit
+credit_d: on the SOFR curve, QuantLib's IsdaCdsEngine fair spreads agree with the replay within 1.2e-11
+suite credit_d: 19 cases
+stage D D4: 13 wrong-convention checks, each caught
+equity_d: forwards replayed through a QuantLib DiscountCurve within 1e-9 (interpolation only, not an outside model); implied borrow and financing spreads are known truth
+suite equity_d: 10 cases
+suite index_d: 12 cases
+suite trs_d: 3 cases
+stage D D5: 9 wrong-convention checks, each caught
+inflation_d: CPI pillars reprice every ZCIS quote with and without seasonality
+suite inflation_d: 13 cases
+stage D D6: 5 wrong-convention checks, each caught
+capswaption_d: option values from QuantLib blackFormula and bachelierBlackFormula; schedules and curves as stage B
+suite capswaption_d: 14 cases
+stage D D7: 9 wrong-convention checks, each caught
+commodity_d: seasonal curves reprice every quote; carry values kept at least 1e-6 from zero
+suite commodity_d: 10 cases
+stage D D8: 3 wrong-convention checks, each caught
+mbs_d: PSA ramp, SMM, level-pay amortisation by the standard formulas; the last month retires the balance within 1e-6
+suite mbs_d: 12 cases
+stage D D9: 10 wrong-convention checks, each caught
+suite rulings_d: 18 cases
+rulings_d: 18 cases
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4394 golden cases checked, none breaks a stated invariant
 invariants: 343 stage B cases checked, none breaks one
@@ -155,6 +300,34 @@ invariants:   parity residual not negative, breaches ascending: 3
 invariants:   surface flag matches violation lists: 4
 invariants:   surface variance positive: 1
 invariants:   use case 3 vol and forwards positive: 1
+invariants: 306 stage D cases checked, none breaks one
+invariants:   CDS legs positive: 5
+invariants:   CDS survival in (0, 1] and strictly falling: 7
+invariants:   CPI positive: 2
+invariants:   CSA discount factors positive: 5
+invariants:   CTD has the highest implied repo: 1
+invariants:   MBS balance falls to zero; principal not negative: 3
+invariants:   NDF forward positive, equal to the fixing once known: 3
+invariants:   OIS pillars strictly increasing, discount factors positive: 10
+invariants:   TRS pv = sign (equity - funding): 2
+invariants:   bond: dirty = clean + accrued; modified = Macaulay / (1 + y/f); duration and convexity positive: 18
+invariants:   cap = sum of non-negative caplets: 5
+invariants:   compounded rate within the fixings' range (plus compounding); interest = rate x accrual: 21
+invariants:   convexity not negative; forward = futures rate - convexity: 6
+invariants:   corporate action keeps shares x price: 4
+invariants:   fallback = compounded + positive fixed spread: 4
+invariants:   futures basis = market - fair: 3
+invariants:   implied dividends: period amounts sum to the cumulative: 1
+invariants:   index basis = quoted - intrinsic: 1
+invariants:   joint bootstrap pillars strictly increasing: 2
+invariants:   linker nominal = real x index ratio: 2
+invariants:   repo: special outputs null exactly when gc_rate is null: 4
+invariants:   robust fit: outliers are exactly the residuals beyond delta: 4
+invariants:   smooth fit: objective not negative and at least the weighted residual sum: 4
+invariants:   step curve positive; decreasing when all forwards are positive: 4
+invariants:   storage arbitrage flag = positive carry value: 2
+invariants:   swaption at least intrinsic on the annuity: 4
+invariants:   xccy pv = sign (spot foreign - domestic): 3
 fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps
 fragility: integrate-0095 error estimate 1.52e-01 against tol 1e-13
 fragility: root-0025 needs 7 Brent steps against max_iter 2; root-0026 has width 0.125 after 3 bisections against x_tol 1e-12

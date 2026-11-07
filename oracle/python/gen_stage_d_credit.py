@@ -298,6 +298,7 @@ def legs_window(T, disc, H, R):
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     credit_d()
     note(f"stage D D4: {len(D.MUTANTS)} wrong-convention checks, each caught")
