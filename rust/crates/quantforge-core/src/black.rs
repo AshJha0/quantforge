@@ -4,9 +4,20 @@ use crate::stats::{normal_cdf, normal_pdf};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Model {
-    BlackScholes { spot: f64, rate: f64, dividend: f64 },
-    Black76 { forward: f64, discount: f64, shift: f64 },
-    Bachelier { forward: f64, discount: f64 },
+    BlackScholes {
+        spot: f64,
+        rate: f64,
+        dividend: f64,
+    },
+    Black76 {
+        forward: f64,
+        discount: f64,
+        shift: f64,
+    },
+    Bachelier {
+        forward: f64,
+        discount: f64,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -51,14 +62,20 @@ impl Option_ {
     /// Forward, discount factor and strike, shifted where the model shifts.
     pub fn fdk(&self) -> (f64, f64, f64) {
         match self.model {
-            Model::BlackScholes { spot, rate, dividend } => (
+            Model::BlackScholes {
+                spot,
+                rate,
+                dividend,
+            } => (
                 spot * ((rate - dividend) * self.t).exp(),
                 (-rate * self.t).exp(),
                 self.strike,
             ),
-            Model::Black76 { forward, discount, shift } => {
-                (forward + shift, discount, self.strike + shift)
-            }
+            Model::Black76 {
+                forward,
+                discount,
+                shift,
+            } => (forward + shift, discount, self.strike + shift),
             Model::Bachelier { forward, discount } => (forward, discount, self.strike),
         }
     }
@@ -85,7 +102,11 @@ impl Option_ {
                     return fail("E_DOMAIN", "spot or strike is not positive");
                 }
             }
-            Model::Black76 { forward, discount, shift } => {
+            Model::Black76 {
+                forward,
+                discount,
+                shift,
+            } => {
                 if discount <= 0.0 || forward + shift <= 0.0 || self.strike + shift <= 0.0 {
                     return fail("E_DOMAIN", "discount, forward or strike is out of domain");
                 }
@@ -190,7 +211,11 @@ mod tests {
 
     fn b76(call: bool, k: f64) -> Option_ {
         Option_ {
-            model: Model::Black76 { forward: 100.0, discount: 0.97, shift: 0.0 },
+            model: Model::Black76 {
+                forward: 100.0,
+                discount: 0.97,
+                shift: 0.0,
+            },
             call,
             strike: k,
             t: 1.5,
@@ -207,7 +232,10 @@ mod tests {
     #[test]
     fn bachelier_round_trip_with_negative_forward() {
         let o = Option_ {
-            model: Model::Bachelier { forward: -0.5, discount: 1.0 },
+            model: Model::Bachelier {
+                forward: -0.5,
+                discount: 1.0,
+            },
             call: false,
             strike: 0.2,
             t: 2.0,

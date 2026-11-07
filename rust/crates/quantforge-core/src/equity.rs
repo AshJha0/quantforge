@@ -62,7 +62,10 @@ pub fn outright(
 
 pub fn flat(spot: f64, rate: f64, borrow: f64, t: f64, dividends: &[(f64, f64)]) -> Result<f64> {
     if spot <= 0.0 || t < 0.0 || dividends.iter().any(|v| v.1 < 0.0) {
-        return fail("E_DOMAIN", "spot, expiry_years or an amount is out of domain");
+        return fail(
+            "E_DOMAIN",
+            "spot, expiry_years or an amount is out of domain",
+        );
     }
     if dividends.windows(2).any(|w| w[1].0 <= w[0].0) {
         return fail("E_INPUT", "time_years must strictly increase");
@@ -105,13 +108,19 @@ pub fn parity(q: &[ParityQuote], given: Option<f64>) -> Result<Parity> {
         x.call_bid < 0.0 || x.call_ask < 0.0 || x.put_bid < 0.0 || x.put_ask < 0.0
     };
     if q.iter().any(|x| x.strike <= 0.0 || negative(x)) || given.is_some_and(|d| d <= 0.0) {
-        return fail("E_DOMAIN", "a strike, quote or discount factor is out of domain");
+        return fail(
+            "E_DOMAIN",
+            "a strike, quote or discount factor is out of domain",
+        );
     }
     if q.windows(2).any(|w| w[1].strike <= w[0].strike)
         || q.iter()
             .any(|x| x.call_bid > x.call_ask || x.put_bid > x.put_ask)
     {
-        return fail("E_INPUT", "strikes must increase and a bid must not pass its ask");
+        return fail(
+            "E_INPUT",
+            "strikes must increase and a bid must not pass its ask",
+        );
     }
     if given.is_none() && q.len() == 1 {
         return fail("E_INPUT", "one quote cannot fit a discount factor");
@@ -140,7 +149,10 @@ pub fn parity(q: &[ParityQuote], given: Option<f64>) -> Result<Parity> {
         }
     };
     if d <= 0.0 || f <= 0.0 {
-        return fail("E_DOMAIN", "fitted discount factor or forward is not positive");
+        return fail(
+            "E_DOMAIN",
+            "fitted discount factor or forward is not positive",
+        );
     }
     let mut max_residual: f64 = 0.0;
     let mut outside_spread = Vec::new();

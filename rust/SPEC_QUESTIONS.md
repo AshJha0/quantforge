@@ -40,3 +40,14 @@ changes of a stated choice were B0 (spot in OIS), B5, B7, B8, B9 and B10. B11 an
 ## Closed on `stage-c-rust`
 
 - B24: every operation that works on an array now stops at the limit after its typed reads, before any work.
+
+## Stage C, readings taken where the spec is silent
+
+None of these is reached by a golden. All 428 stage C cases pass with them.
+
+- `vol.delta.*`, `vol.smile.rr_bf`: `SPOT` with a `null` scale is `E_INPUT`. The spec gives `E_DOMAIN` only for a scale not above 0.
+- `vol.delta.*`: the scale checks run after the type reads and before the `forward`, `vol`, `expiry_years` checks, as the table states them first.
+- `vol.svi.calibrate`, `vol.sabr.calibrate`: a `weights` of another length is `E_INPUT`, and lengths are checked before order.
+- `risk.vol.surface_vega`: a position with `forward`, `strike`, `discount_factor` or `expiry_years` not above 0 is `E_DOMAIN`.
+- `vol.sabr.arbfree`: `vols` is `null` only where the price does not exceed intrinsic, as stated. A price at or above `f0` would be `E_DOMAIN` from the implied solve.
+- `usecase.vol_surface`: empty or out-of-order `slices` is `E_INPUT`; a slice expiry on or before `as_of`, or a target `strike` or `quantity` not above 0, is `E_DOMAIN`. The target check runs before any fit.

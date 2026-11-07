@@ -122,6 +122,7 @@ pub const OPERATIONS: &[&str] = &[
     "risk.vol.surface_vega",
     "usecase.fx_hedge",
     "usecase.rates_hedge",
+    "usecase.vol_surface",
     "vol.delta.from_strike",
     "vol.delta.to_strike",
     "vol.equity.price",

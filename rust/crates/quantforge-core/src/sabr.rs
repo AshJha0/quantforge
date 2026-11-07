@@ -31,7 +31,14 @@ impl Sabr {
 
     /// Lognormal vol at shifted strike `x`.
     fn vol_at(&self, x: f64) -> f64 {
-        let Sabr { t, alpha, beta, rho, nu, .. } = *self;
+        let Sabr {
+            t,
+            alpha,
+            beta,
+            rho,
+            nu,
+            ..
+        } = *self;
         let f = self.forward + self.shift;
         let a = (f * x).powf(1.0 - beta);
         let root = a.sqrt();
@@ -55,7 +62,10 @@ impl Sabr {
 
     pub fn hagan(&self, strikes: &[f64]) -> Result<Vec<f64>> {
         self.check(strikes)?;
-        Ok(strikes.iter().map(|k| self.vol_at(k + self.shift)).collect())
+        Ok(strikes
+            .iter()
+            .map(|k| self.vol_at(k + self.shift))
+            .collect())
     }
 
     /// `density`, `min_density`. The caller judges the sign.
@@ -100,7 +110,15 @@ pub fn calibrate(
     if vols.iter().any(|&v| v <= 0.0) || weights.is_some_and(|w| w.iter().any(|&x| x <= 0.0)) {
         return fail("E_DOMAIN", "a vol or weight is not positive");
     }
-    let model = |a: f64, r: f64, n: f64| Sabr { t, alpha: a, beta, rho: r, nu: n, forward, shift };
+    let model = |a: f64, r: f64, n: f64| Sabr {
+        t,
+        alpha: a,
+        beta,
+        rho: r,
+        nu: n,
+        forward,
+        shift,
+    };
     model(1.0, 0.0, 0.0).check(k)?;
     let ones = vec![1.0; k.len()];
     let wt = weights.unwrap_or(&ones);
@@ -122,7 +140,11 @@ pub fn calibrate(
     };
     let f = forward + shift;
     let nearest = (0..k.len())
-        .min_by(|&i, &j| (k[i] + shift - f).abs().total_cmp(&(k[j] + shift - f).abs()))
+        .min_by(|&i, &j| {
+            (k[i] + shift - f)
+                .abs()
+                .total_cmp(&(k[j] + shift - f).abs())
+        })
         .unwrap_or(0);
     let a0 = vols[nearest] * f.powf(1.0 - beta);
     let mut best: Option<(Vec<f64>, f64)> = None;
@@ -130,19 +152,18 @@ pub fn calibrate(
         for rho in [-0.7f64, -0.3, 0.0, 0.3, 0.7] {
             for nu in [0.1f64, 0.4, 1.0, 2.0] {
                 let x0 = [(a0 * scale).ln(), rho.atanh(), nu.ln()];
-                if let Some((x, c)) = minimise(&x0, &resid) {
-                    if best.as_ref().is_none_or(|p| c < p.1) {
-                        best = Some((x, c));
-                    }
+                if let Some((x, c)) = minimise(&x0, &resid)
+                    && best.as_ref().is_none_or(|p| c < p.1)
+                {
+                    best = Some((x, c));
                 }
             }
         }
     }
-    let Some((x, c)) = best else {
+    let Some((x, _)) = best else {
         return fail("E_NO_CONVERGENCE", "no start reached a fit");
     };
     let (a, r, n) = params(&x);
-    let _ = c;
     let s = model(a, r, n);
     let num: f64 = k
         .iter()
@@ -175,7 +196,13 @@ pub fn arbfree(s: &Sabr, cells: i64, below: i64, steps: i64, strikes: &[f64]) ->
         return fail("E_INPUT", "cells_below or steps is out of range");
     }
     let (n, c0) = (cells as usize, below as usize - 1);
-    let Sabr { alpha, beta, rho, nu, .. } = *s;
+    let Sabr {
+        alpha,
+        beta,
+        rho,
+        nu,
+        ..
+    } = *s;
     let f0 = s.forward + s.shift;
     let h = f0 / (below as f64 - 0.5);
     let u_max = cells as f64 * h;
@@ -187,7 +214,8 @@ pub fn arbfree(s: &Sabr, cells: i64, below: i64, steps: i64, strikes: &[f64]) ->
         .iter()
         .map(|&x| {
             let z = (x.powf(1.0 - beta) - f0.powf(1.0 - beta)) / (1.0 - beta);
-            (alpha * alpha + 2.0 * rho * alpha * nu * z + nu * nu * z * z) * x.powf(2.0 * beta) / 2.0
+            (alpha * alpha + 2.0 * rho * alpha * nu * z + nu * nu * z * z) * x.powf(2.0 * beta)
+                / 2.0
         })
         .collect();
     let g: Vec<f64> = (0..n)
@@ -249,7 +277,11 @@ pub fn arbfree(s: &Sabr, cells: i64, below: i64, steps: i64, strikes: &[f64]) ->
         call_prices.push(price);
         vols.push(if price > (f0 - x).max(0.0) {
             let o = Option_ {
-                model: Model::Black76 { forward: f0, discount: 1.0, shift: 0.0 },
+                model: Model::Black76 {
+                    forward: f0,
+                    discount: 1.0,
+                    shift: 0.0,
+                },
                 call: true,
                 strike: x,
                 t: s.t,
@@ -280,7 +312,15 @@ mod tests {
     use super::*;
 
     fn s() -> Sabr {
-        Sabr { t: 1.0, alpha: 0.3, beta: 0.5, rho: -0.4, nu: 0.5, forward: 1.0, shift: 0.0 }
+        Sabr {
+            t: 1.0,
+            alpha: 0.3,
+            beta: 0.5,
+            rho: -0.4,
+            nu: 0.5,
+            forward: 1.0,
+            shift: 0.0,
+        }
     }
 
     #[test]

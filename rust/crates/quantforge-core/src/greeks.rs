@@ -30,7 +30,11 @@ pub fn analytic(o: &Option_, v: f64) -> Result<Greeks> {
     let r = t.sqrt();
     let price = o.value(v);
     Ok(match o.model {
-        Model::BlackScholes { spot, rate, dividend } => {
+        Model::BlackScholes {
+            spot,
+            rate,
+            dividend,
+        } => {
             let q = (-dividend * t).exp();
             let (d1, d2) = d1_d2(f, k, v, t);
             let n1 = normal_pdf(d1);
@@ -118,14 +122,40 @@ mod tests {
     #[test]
     fn analytic_agrees_with_bump_on_each_model() {
         for model in [
-            Model::BlackScholes { spot: 100.0, rate: 0.03, dividend: 0.01 },
-            Model::Black76 { forward: 100.0, discount: 0.97, shift: 5.0 },
-            Model::Bachelier { forward: 100.0, discount: 0.97 },
+            Model::BlackScholes {
+                spot: 100.0,
+                rate: 0.03,
+                dividend: 0.01,
+            },
+            Model::Black76 {
+                forward: 100.0,
+                discount: 0.97,
+                shift: 5.0,
+            },
+            Model::Bachelier {
+                forward: 100.0,
+                discount: 0.97,
+            },
         ] {
-            let v = if matches!(model, Model::Bachelier { .. }) { 20.0 } else { 0.2 };
-            let o = Option_ { model, call: false, strike: 95.0, t: 1.2 };
+            let v = if matches!(model, Model::Bachelier { .. }) {
+                20.0
+            } else {
+                0.2
+            };
+            let o = Option_ {
+                model,
+                call: false,
+                strike: 95.0,
+                t: 1.2,
+            };
             let (a, b) = (analytic(&o, v).unwrap(), bumped(&o, v).unwrap());
-            let pairs = [(a.delta, b[0]), (a.gamma, b[1]), (a.vega, b[2]), (a.volga, b[3]), (a.vanna, b[4])];
+            let pairs = [
+                (a.delta, b[0]),
+                (a.gamma, b[1]),
+                (a.vega, b[2]),
+                (a.volga, b[3]),
+                (a.vanna, b[4]),
+            ];
             for (x, y) in pairs {
                 assert!((x - y).abs() < 2e-4 + 1e-4 * x.abs(), "{x} {y}");
             }

@@ -2,20 +2,21 @@
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
 use crate::ops_b::{curve_input, items, snapshot_id, sub};
+use quantforge_core::black;
+use quantforge_core::black::{Model, Option_};
+use quantforge_core::curve::Curve;
 use quantforge_core::curve::CurveInput;
 use quantforge_core::dates::Date;
 use quantforge_core::equity::{self, Outright, ParityQuote};
 use quantforge_core::error::{Result, fail};
+use quantforge_core::greeks;
 use quantforge_core::json::{Json, obj};
+use quantforge_core::ois::Valuation;
 use quantforge_core::sabr::{self, Sabr};
+use quantforge_core::smile;
+use quantforge_core::stats::{normal_cdf, normal_pdf};
 use quantforge_core::surface::{Check, Position, Surface};
 use quantforge_core::svi::{self, Svi};
-use quantforge_core::smile;
-use quantforge_core::black;
-use quantforge_core::greeks;
-use quantforge_core::ois::Valuation;
-use quantforge_core::stats::{normal_cdf, normal_pdf};
-use quantforge_core::black::{Model, Option_};
 
 /// Ruling C9: the key must be present, and `null` carries meaning.
 fn present(i: &Inputs, k: &str) -> Result<()> {
@@ -97,7 +98,14 @@ fn option_type(i: &Inputs) -> Result<bool> {
 
 /// Keys of other models are `E_SCHEMA`, whatever their value.
 fn only(i: &Inputs, keys: &[&str]) -> Result<()> {
-    for k in ["spot", "rate", "yield", "forward", "discount_factor", "shift"] {
+    for k in [
+        "spot",
+        "rate",
+        "yield",
+        "forward",
+        "discount_factor",
+        "shift",
+    ] {
         if !keys.contains(&k) && i.0.get(k).is_some() {
             return i.fail(k, "not an input of this model");
         }
@@ -174,7 +182,10 @@ fn equity_price(i: &Inputs) -> Result<Outcome> {
     let r = outright(&f)?;
     let t = (f.expiry.serial() - f.as_of.serial()) as f64 / 365.0;
     if t == 0.0 || v <= 0.0 || k <= 0.0 || q <= 0.0 {
-        return fail("E_DOMAIN", "expiry, vol, strike or quantity is out of domain");
+        return fail(
+            "E_DOMAIN",
+            "expiry, vol, strike or quantity is out of domain",
+        );
     }
     let (fw, d, c) = (r.forward, r.discount_factor, r.carry_factor);
     let p = black::phi(call);
@@ -185,7 +196,10 @@ fn equity_price(i: &Inputs) -> Result<Outcome> {
         ("valuation", equity_valuation(pv, currency, id, f.as_of)),
         ("forward", fw.into()),
         ("delta", (sign * q * d * p * normal_cdf(p * d1) / c).into()),
-        ("gamma", (sign * q * d * normal_pdf(d1) / (fw * v * root * c * c)).into()),
+        (
+            "gamma",
+            (sign * q * d * normal_pdf(d1) / (fw * v * root * c * c)).into(),
+        ),
         ("vega", (sign * q * d * fw * normal_pdf(d1) * root).into()),
     ]))
 }
@@ -221,7 +235,12 @@ fn opt_weights(i: &Inputs) -> Result<Option<Vec<f64>>> {
 }
 
 fn check_json(c: &Check) -> Json {
-    let at = |j: usize, i: usize| [("expiry_index", (j as i64).into()), ("k_index", (i as i64).into())];
+    let at = |j: usize, i: usize| {
+        [
+            ("expiry_index", (j as i64).into()),
+            ("k_index", (i as i64).into()),
+        ]
+    };
     let cal: Vec<Json> = c.calendar.iter().map(|&(j, i)| obj(at(j, i))).collect();
     let fly: Vec<Json> = c
         .butterfly
@@ -259,6 +278,105 @@ fn sabr_inputs(i: &Inputs) -> Result<Sabr> {
         forward: i.f64("forward")?,
         shift: i.f64_or("shift", 0.0)?,
     })
+}
+
+/// Use case 3 (`use-cases.md`): quotes to forwards, SVI slices, a checked surface, one price.
+fn vol_surface(i: &Inputs) -> Result<Outcome> {
+    let as_of = i.date("as_of")?;
+    let funding = curve_input(i, "funding_curve")?;
+    let mut slices = Vec::new();
+    for s in items(i, "slices")? {
+        slices.push((s.date("expiry")?, parity_quotes(&s)?));
+    }
+    let k_grid = i.reals("k_grid")?;
+    let target = sub(i, "target")?;
+    let (call, strike) = (option_type(&target)?, target.f64("strike")?);
+    let (expiry, q) = (target.date("expiry")?, target.f64("quantity")?);
+    let sign = trade_side(&target)?;
+    let currency = i.str("currency")?;
+    i.gate()?;
+    let curve = Curve::new(&funding)?;
+    if funding.as_of != as_of {
+        return fail("E_INPUT", "the curve as_of differs");
+    }
+    if slices.is_empty() || slices.windows(2).any(|w| w[1].0 <= w[0].0) {
+        return fail("E_INPUT", "slices must be in expiry order");
+    }
+    if slices[0].0 <= as_of {
+        return fail("E_DOMAIN", "a slice expiry is not after as_of");
+    }
+    let Some(index) = slices.iter().position(|s| s.0 == expiry) else {
+        return fail("E_INPUT", "target expiry is not a slice");
+    };
+    if strike <= 0.0 || q <= 0.0 {
+        return fail("E_DOMAIN", "target strike or quantity is out of domain");
+    }
+    let (mut times, mut discounts, mut forwards) = (Vec::new(), Vec::new(), Vec::new());
+    let (mut fits, mut rmse): (Vec<Svi>, Vec<f64>) = (Vec::new(), Vec::new());
+    for (date, quotes) in &slices {
+        let t = (date.serial() - as_of.serial()) as f64 / 365.0;
+        let d = curve.discount(*date)?;
+        let f = equity::parity(quotes, Some(d))?.forward;
+        let (mut ks, mut ws) = (Vec::new(), Vec::new());
+        for x in quotes {
+            let call = x.strike >= f;
+            let mid = if call {
+                (x.call_bid + x.call_ask) / 2.0
+            } else {
+                (x.put_bid + x.put_ask) / 2.0
+            };
+            let o = Option_ {
+                model: Model::Black76 {
+                    forward: f,
+                    discount: d,
+                    shift: 0.0,
+                },
+                call,
+                strike: x.strike,
+                t,
+            };
+            let v = o.implied(mid)?;
+            ks.push((x.strike / f).ln());
+            ws.push(v * v * t);
+        }
+        let r = svi::calibrate(&ks, &ws, None)?;
+        fits.push(r.svi);
+        rmse.push(r.rmse);
+        times.push(t);
+        discounts.push(d);
+        forwards.push(f);
+    }
+    let vols = fits
+        .iter()
+        .zip(&times)
+        .map(|(s, t)| k_grid.iter().map(|&k| (s.w(k) / t).sqrt()).collect())
+        .collect();
+    let surface = Surface {
+        t: times.clone(),
+        k: k_grid,
+        vols,
+    };
+    let check = surface.check()?;
+    let (f, d, t) = (forwards[index], discounts[index], times[index]);
+    let v = (fits[index].w((strike / f).ln()) / t).sqrt();
+    let p = black::phi(call);
+    let d1 = black::d1_d2(f, strike, v, t).0;
+    let pv = sign * q * black::black(call, f, strike, v, t, d);
+    plain(obj([
+        ("forwards", forwards.into()),
+        ("svi_rmse", rmse.into()),
+        (
+            "arbitrage_free",
+            (check.calendar.is_empty() && check.butterfly.is_empty()).into(),
+        ),
+        ("vol", v.into()),
+        ("valuation", equity_valuation(pv, currency, None, as_of)),
+        ("delta", (sign * q * d * p * normal_cdf(p * d1)).into()),
+        (
+            "vega",
+            (sign * q * d * f * normal_pdf(d1) * t.sqrt()).into(),
+        ),
+    ]))
 }
 
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
@@ -345,11 +463,17 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             if op == "vol.delta.to_strike" {
                 let d = i.f64("delta")?;
                 let s = smile::delta_scale(spot, scale)?;
-                plain(obj([("strike", smile::to_strike(f, v, t, call, d, s)?.into())]))
+                plain(obj([(
+                    "strike",
+                    smile::to_strike(f, v, t, call, d, s)?.into(),
+                )]))
             } else {
                 let k = i.f64("strike")?;
                 let s = smile::delta_scale(spot, scale)?;
-                plain(obj([("delta", smile::from_strike(f, v, t, call, k, s)?.into())]))
+                plain(obj([(
+                    "delta",
+                    smile::from_strike(f, v, t, call, k, s)?.into(),
+                )]))
             }
         }
         "vol.smile.rr_bf" => {
@@ -523,6 +647,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("min_density", r.min_density.into()),
             ]))
         }
+        "usecase.vol_surface" => vol_surface(i),
         // next arm
         _ => fail(
             "E_UNSUPPORTED_OPERATION",

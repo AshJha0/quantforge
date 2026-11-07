@@ -131,7 +131,10 @@ impl Surface {
                 }
             }
         }
-        Ok(Check { calendar, butterfly })
+        Ok(Check {
+            calendar,
+            butterfly,
+        })
     }
 
     fn pv(&self, p: &[Position]) -> f64 {
@@ -146,7 +149,9 @@ impl Surface {
     pub fn vega(&self, p: &[Position]) -> Result<SurfaceVega> {
         const H: f64 = 1e-4;
         self.validate()?;
-        if p.iter().any(|x| x.t <= 0.0 || x.forward <= 0.0 || x.strike <= 0.0 || x.discount <= 0.0) {
+        if p.iter()
+            .any(|x| x.t <= 0.0 || x.forward <= 0.0 || x.strike <= 0.0 || x.discount <= 0.0)
+        {
             return fail("E_DOMAIN", "a position is out of domain");
         }
         if self.vols.iter().flatten().any(|&v| v - H <= 0.0) {
@@ -186,12 +191,18 @@ mod tests {
     use super::*;
 
     fn flat() -> Surface {
-        Surface { t: vec![1.0, 2.0], k: vec![-0.2, 0.2], vols: vec![vec![0.2; 2]; 2] }
+        Surface {
+            t: vec![1.0, 2.0],
+            k: vec![-0.2, 0.2],
+            vols: vec![vec![0.2; 2]; 2],
+        }
     }
 
     #[test]
     fn flat_vol_in_both_directions() {
-        let r = flat().query(&[(0.5, -1.0), (3.0, 1.0), (1.5, 0.0)]).unwrap();
+        let r = flat()
+            .query(&[(0.5, -1.0), (3.0, 1.0), (1.5, 0.0)])
+            .unwrap();
         assert!(r.iter().all(|x| (x.1 - 0.2).abs() < 1e-14));
     }
 

@@ -168,9 +168,17 @@ pub fn calibrate(k: &[f64], w: &[f64], weights: Option<&[f64]>) -> Result<SviFit
         if !s.valid() || !s.b.is_finite() || !s.sigma.is_finite() {
             return None;
         }
-        Some(k.iter().zip(w).zip(&roots).map(|((&k, &w), r)| r * (s.w(k) - w)).collect())
+        Some(
+            k.iter()
+                .zip(w)
+                .zip(&roots)
+                .map(|((&k, &w), r)| r * (s.w(k) - w))
+                .collect(),
+        )
     };
-    let lowest = (0..k.len()).min_by(|&i, &j| w[i].total_cmp(&w[j])).unwrap_or(0);
+    let lowest = (0..k.len())
+        .min_by(|&i, &j| w[i].total_cmp(&w[j]))
+        .unwrap_or(0);
     let span = k[k.len() - 1] - k[0];
     let mut best: Option<(Vec<f64>, f64)> = None;
     for dm in [-0.25, -0.1, 0.0, 0.1, 0.25] {
@@ -188,11 +196,11 @@ pub fn calibrate(k: &[f64], w: &[f64], weights: Option<&[f64]>) -> Result<SviFit
                 let b = (sxy / sxx).max(1e-4);
                 let floor = 1e-8 - b * sigma * (1.0f64 - rho * rho).sqrt();
                 let a = (yb - b * xb).max(floor);
-                let x0 = [a, b.ln(), (rho as f64).atanh(), m, sigma.ln()];
-                if let Some((x, c)) = minimise(&x0, &resid) {
-                    if best.as_ref().is_none_or(|p| c < p.1) {
-                        best = Some((x, c));
-                    }
+                let x0 = [a, b.ln(), rho.atanh(), m, sigma.ln()];
+                if let Some((x, c)) = minimise(&x0, &resid)
+                    && best.as_ref().is_none_or(|p| c < p.1)
+                {
+                    best = Some((x, c));
                 }
             }
         }
@@ -201,10 +209,15 @@ pub fn calibrate(k: &[f64], w: &[f64], weights: Option<&[f64]>) -> Result<SviFit
         return fail("E_NO_CONVERGENCE", "no start reached a fit");
     };
     let svi = from_x(&x);
-    let num: f64 = k.iter().zip(w).zip(wt).map(|((&k, &w), q)| {
-        let e = svi.w(k) - w;
-        q * e * e
-    }).sum();
+    let num: f64 = k
+        .iter()
+        .zip(w)
+        .zip(wt)
+        .map(|((&k, &w), q)| {
+            let e = svi.w(k) - w;
+            q * e * e
+        })
+        .sum();
     Ok(SviFit {
         svi,
         rmse: (num / wt.iter().sum::<f64>()).sqrt(),
@@ -288,10 +301,10 @@ pub fn ssvi_calibrate(thetas: &[f64], k: &[f64], w: &[Vec<f64>]) -> Result<[f64;
         for eta in [0.3f64, 1.0, 3.0] {
             for gamma in [0.2f64, 0.5, 0.8] {
                 let x0 = [rho.atanh(), eta.ln(), (gamma / (1.0 - gamma)).ln()];
-                if let Some((x, c)) = minimise(&x0, &resid) {
-                    if best.as_ref().is_none_or(|p| c < p.1) {
-                        best = Some((x, c));
-                    }
+                if let Some((x, c)) = minimise(&x0, &resid)
+                    && best.as_ref().is_none_or(|p| c < p.1)
+                {
+                    best = Some((x, c));
                 }
             }
         }
@@ -309,7 +322,13 @@ mod tests {
 
     #[test]
     fn svi_fit_recovers_truth() {
-        let t = Svi { a: 0.03, b: 0.12, rho: -0.35, m: 0.02, sigma: 0.15 };
+        let t = Svi {
+            a: 0.03,
+            b: 0.12,
+            rho: -0.35,
+            m: 0.02,
+            sigma: 0.15,
+        };
         let k = [-0.6, -0.4, -0.25, -0.1, 0.0, 0.1, 0.25, 0.4, 0.6];
         let w: Vec<f64> = k.iter().map(|&x| t.w(x)).collect();
         let r = calibrate(&k, &w, None).unwrap();
