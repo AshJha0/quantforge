@@ -38,6 +38,7 @@
 #include "quantforge/core/snapshot.hpp"
 #include "quantforge/core/sobol.hpp"
 #include "quantforge/core/stats.hpp"
+#include "quantforge/core/risk.hpp"
 #include "quantforge/core/store.hpp"
 #include "quantforge/core/timeseries.hpp"
 #include "quantforge/core/timezone.hpp"
@@ -1056,6 +1057,7 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_misc_d.inc"
 #include "ops_equity_d.inc"
 #include "ops_credit.inc"
+#include "ops_r2.inc"
 
 // ---- dispatch ----
 
@@ -1078,6 +1080,9 @@ const std::map<string, Handler, std::less<>>& table() {
         {"fx.spot_date", op_fx_spot_date},
         {"fx.swap.pv", op_fx_swap_pv},
         {"hedge.solve", op_hedge_solve},
+        {"risk.curve.jacobian", op_risk_jacobian},
+        {"risk.curve.key_rate", op_risk_key_rate},
+        {"risk.curve.par", op_risk_par},
         {"hedge.spread_cost", op_spread_cost},
         {"rates.basis.spread", op_basis_spread},
         {"rates.curve.discount", op_curve_discount},

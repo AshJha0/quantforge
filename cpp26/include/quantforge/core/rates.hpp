@@ -80,6 +80,8 @@ public:
     void set_log_df(std::size_t pillar, double log_df) { log_df_[pillar + 1] = log_df; }
     double log_df(std::size_t pillar) const { return log_df_[pillar + 1]; }
     std::vector<Pillar> pillars() const;
+    /// The same curve times exp(-s(t) t) at every date: a continuously compounded zero shift s(t).
+    Curve with_zero_shift(std::function<double(double)> s) const;
 
 private:
     Date as_of_;
@@ -87,6 +89,7 @@ private:
     std::vector<Date> dates_;
     std::vector<double> t_, log_df_;  // index 0 is the node at as_of; ln of the jump-free curve
     std::vector<Jump> jumps_;
+    std::function<double(double)> zero_shift_;  // empty: no shift
     double plain_discount(double t) const;
 };
 

@@ -75,3 +75,12 @@ Each is answered here with the most conservative reading; none changes a golden 
 2. **`--timings` with `version` or `operations`.** Exit 64, empty stdout, as "any other argument".
 3. **BT5 at end of file.** A final line of exactly 16,777,216 bytes plus a CR and no LF is parsed, not `E_LIMIT`: the CR is removed before the length is checked. The line buffer is the limit plus 2 bytes, and the rest of a longer line is read and dropped.
 4. **Clock window.** `elapsed_ns` is measured with `steady_clock`, from just after the line is read to just before the result is written. For `run`, it starts after stdin reaches end of file.
+
+## R2.1 par and key-rate risk (silent choices)
+
+1. **Solve method.** `risk.curve.par` and `risk.curve.jacobian` take no `method`; the curve is built with `SEQUENTIAL`, no jumps.
+2. **Check order inside the rule checks.** After `E_SCHEMA` and `E_LIMIT` (quote count, pillar count, key-date count): `bump_bp`, then BOND `notional` (`E_DOMAIN`), then the OIS convention match, `key_dates` rules (`E_INPUT`), then the bootstrap's own checks (crossed quotes, then `ois_bootstrap`).
+3. **`TRIANGULAR` with `key_dates` null or empty.** `E_INPUT` ("at least 1").
+4. **Jacobian above the diagonal.** Not computed: written as exactly 0, on the rule that pillar `i` is solved from quotes `0..i`. This assumes one pillar per quote, in quote order, as `rates.ois.bootstrap` gives.
+5. **Bumped curves.** A `TRIANGULAR` or parallel bump multiplies `D(t)` by `exp(-s(t) t)` at every date, after interpolation and before jumps (jumps multiply, so the order does not matter). A `PILLAR` bump moves the stored jump-free log factor of pillar `i` by `-h t_i`, which is the same as moving `ln D(p_i)`.
+6. **OIS product value.** `valuation.pv` with no `snapshot_id`.
