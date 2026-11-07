@@ -52,3 +52,17 @@ No golden turns on these, so none blocked work. Each is this build's reading, no
 - Q47, `usecase.vol_surface` checks not listed: `as_of` differing from the curve's, empty `slices`, or expiries out of order `E_INPUT`; target `strike`, `quantity` not above 0 `E_DOMAIN`, after the expiry check.
 - Q48, `vol.ssvi.calibrate` has no listed check of `thetas`: it applies those of `vol.ssvi.evaluate`.
 - Q49, `gamma` at exactly 1 in `vol.ssvi.calibrate`: the fit keeps `gamma` below 1, so a true 1 is only approached.
+
+## Stage D wave 1 (open)
+
+- QD1, `stage_b/ois.json` case `ois-0023` sends `ESTR` to `rates.ois.bootstrap` and expects `E_SCHEMA`. Stage D
+  (`ois-curves.md` 1.1.0, contract 1.5.0) makes `ESTR` valid, so the code returns `ok` and this one old golden fails.
+  The golden needs retiring or changing; the code follows the stage D spec.
+- QD2, curve object check order: pillar checks run before jump checks (`curve-framework.md` lists no order).
+- QD3, `rates.csa.discount`: two forwards on one date is not covered; the code gives `E_INPUT`. Curve checks run
+  before the `fx` checks.
+- QD4, `rates.basis.ois_spread`: the three curves are checked as curves before the shared `as_of` check.
+- QD5, `rates.curve.joint_bootstrap`: the empty-list check runs first, then all OIS checks, then all term checks.
+  `GLOBAL` applies to the OIS block; the term block is always solved after it, which ruling D9 says is the same answer.
+- QD6, limits: `ois_quotes` and `term_quotes` are taken as quote lists, capped at 100 like `quotes`.
+- QD7, `rates.ois.fit_steps`: quotes out of tenor order are caught by the pillar rule as `E_INPUT`.
