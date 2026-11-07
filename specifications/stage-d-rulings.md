@@ -19,6 +19,11 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D11 | Time | Curve time `(date - as_of)/365` throughout, as stage B. Operations with `*_years` take them as given |
 | D12 | Empty arrays | `E_INPUT` for quote, fixing, date, maturity and knot lists. `jumps` may be empty |
 
+| D13 | Bond dates | Coupon dates unadjusted, no calendar, no odd first coupon, face 100. Business-day rolls on bond payments are not in stage D |
+| D14 | Bond time | Yield exponents count whole periods plus `w`; curve and Z-spread time is `(d - as_of)/365`; the fit uses `(d - settlement)/365` |
+| D15 | Repo | ACT/360 simple; coupons inside the term reinvested at the repo rate. `gc_rate` key required, may be `null` |
+| D16 | CTD | Highest implied repo. Conversion factors are inputs to `bond.futures.basis`, so a factor error does not move the basis case |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
@@ -30,6 +35,9 @@ Cases for rulings carry the `ruling` tag.
 | `steps_d` | QuantLib `ForwardCurve` with jumps; `MakeOIS` par rates for the fit | Exact integral |
 | `futures_d` | QuantLib `HullWhite::convexityBias` | Limit at `a = 0` |
 | `csa_d` | QuantLib for basis and joint build | CSA discount is hand replay only |
+| `bonds_d` | QuantLib `FixedRateBond`, `BondFunctions` (price, yield, duration, convexity, Z-spread) | Asset swap is replay only |
+| `repo_d` | None | FRN replay and par identity; repo analytic; CBOT formula by hand |
+| `bondfit_d` | SciPy `least_squares` | Known truth |
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.

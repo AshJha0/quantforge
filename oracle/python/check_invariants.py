@@ -196,6 +196,17 @@ def check_d(c, counts):
         res = sum(w * (f - y) ** 2 for f, y, w in zip(o["fitted"], i["zero_rates"], i.get("weights", [1] * len(i["zero_rates"]))))
         assert res <= o["objective"] * (1 + 1e-9) + 1e-18, cid
         hit("smooth fit: objective not negative and at least the weighted residual sum")
+    if op == "bond.price.from_yield":
+        assert abs(o["dirty"] - o["clean"] - o["accrued"]) < 1e-9 and o["accrued"] >= 0 and o["modified_duration"] > 0 and o["convexity"] > 0, cid
+        assert abs(o["macaulay_duration"] / (1 + i["yield"] / i["bond"]["frequency"]) - o["modified_duration"]) < 1e-9, cid
+        hit("bond: dirty = clean + accrued; modified = Macaulay / (1 + y/f); duration and convexity positive")
+    if op == "repo.forward":
+        assert (i["gc_rate"] is None) == (o["special_spread"] is None), cid
+        hit("repo: special outputs null exactly when gc_rate is null")
+    if op == "bond.futures.basis":
+        irs = [b["implied_repo"] for b in o["bonds"]]
+        assert irs[o["ctd"]] == max(irs), cid
+        hit("CTD has the highest implied repo")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid

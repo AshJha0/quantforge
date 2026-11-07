@@ -24,8 +24,22 @@ Read:
 - `specifications/02-curves/stage-d-targets.md`
 - `datasets/golden/stage_d/*.json`, through the runner
 
-## Waves 2 and 3
+## Wave 2
+
+### D2 bonds and repo (ready)
+
+New operations: `bond.price.from_yield`, `bond.yield.from_price`, `bond.price.from_curve`, `bond.spread.z`, `bond.spread.asset_swap`, `bond.frn.price`, `repo.forward`, `repo.implied_rate`, `bond.futures.conversion_factor`, `bond.futures.basis`, `bond.fit.nelson_siegel`.
+
+Goldens: `datasets/golden/stage_d/{bonds_d,repo_d,bondfit_d}.json`, 72 cases.
+
+Read, beyond wave 1: `specifications/04-pricing/bonds.md`; the wave 2 table in `02-curves/stage-d-targets.md`; rulings D13 to D16.
+
+### D3, D4, D5
 
 Not yet specified. Do not start them.
+
+## Wave 3
+
+Not yet specified.
 
 Not for language sessions: anything under `oracle/`.

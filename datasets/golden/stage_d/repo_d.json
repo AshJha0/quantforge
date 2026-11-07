@@ -1,0 +1,878 @@
+{
+ "schema_version": "1.0",
+ "suite": "repo_d",
+ "spec": "specifications/04-pricing/bonds.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "repo_d-0001",
+   "operation": "bond.frn.price",
+   "inputs": {
+    "settlement": "2026-11-16",
+    "maturity": "2029-11-16",
+    "frequency": 4,
+    "current_rate": 0.03765951712445884,
+    "margin": 0.0,
+    "discount_margin": 0.0,
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 100.00000000000003,
+     "accrued": 0.0,
+     "clean": 100.00000000000003
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "par-identity"
+   ],
+   "tags": [
+    "frn",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0002",
+   "operation": "bond.frn.price",
+   "inputs": {
+    "settlement": "2026-11-09",
+    "maturity": "2031-02-16",
+    "frequency": 4,
+    "current_rate": 0.0391,
+    "margin": 0.0025,
+    "discount_margin": 0.0025,
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 100.98881777469285,
+     "accrued": 0.9822222222222223,
+     "clean": 100.00659555247063
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "par-identity"
+   ],
+   "tags": [
+    "frn",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0003",
+   "operation": "bond.frn.price",
+   "inputs": {
+    "settlement": "2026-11-09",
+    "maturity": "2031-02-16",
+    "frequency": 4,
+    "current_rate": 0.0391,
+    "margin": 0.0025,
+    "discount_margin": 0.004,
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 100.39769535642176,
+     "accrued": 0.9822222222222223,
+     "clean": 99.41547313419954
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "par-identity"
+   ],
+   "tags": [
+    "frn",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0004",
+   "operation": "bond.frn.price",
+   "inputs": {
+    "settlement": "2026-11-09",
+    "maturity": "2028-05-31",
+    "frequency": 4,
+    "current_rate": 0.0402,
+    "margin": -0.0005,
+    "discount_margin": 0.001,
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9625125064617883
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9295078745906393
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      },
+      {
+       "date": "2036-11-06",
+       "discount_factor": 0.6768398800886711
+      },
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.4314622134705198
+      },
+      {
+       "date": "2056-11-06",
+       "discount_factor": 0.2920300327448017
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 100.55749340613484,
+     "accrued": 0.7719444444444444,
+     "clean": 99.7855489616904
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "par-identity"
+   ],
+   "tags": [
+    "frn",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0005",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2026-12-09",
+    "clean_price": 100.42085974293727,
+    "repo_rate": 0.0385,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 102.47656626467639,
+     "forward_dirty": 100.67489108144223,
+     "forward_clean": 100.39312312564113,
+     "interest": 0.32877898343250345,
+     "special_spread": null,
+     "specialness_value": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "repo",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0006",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2026-12-09",
+    "clean_price": 100.42085974293727,
+    "forward_clean": 100.39312312564113
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "repo_rate": 0.0385
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "repo",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0007",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-02-22",
+    "clean_price": 103.18692204507627,
+    "repo_rate": 0.031,
+    "gc_rate": 0.0385
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 104.23855247985888,
+     "forward_dirty": 102.9296864751976,
+     "forward_clean": 102.84266990061197,
+     "interest": 0.9424902453387239,
+     "special_spread": 0.0075,
+     "specialness_value": 0.22802183354969127
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "repo",
+    "special",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0008",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-02-22",
+    "clean_price": 103.18692204507627,
+    "forward_clean": 102.84266990061197
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "repo_rate": 0.031
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "repo",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0009",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "repo_rate": 0.0395,
+    "gc_rate": 0.0385
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 94.92648468881484,
+     "forward_dirty": 93.49626946083272,
+     "forward_clean": 93.42249896902945,
+     "interest": 1.5727472720178781,
+     "special_spread": -0.0010000000000000009,
+     "specialness_value": -0.03981638663336404
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "repo",
+    "special",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0010",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "repo_rate": 0.0395
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "repo",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0011",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dirty": 99.35167210230762,
+     "forward_dirty": 98.7664157146376,
+     "forward_clean": 98.67470375811587,
+     "interest": 1.291571737329999,
+     "special_spread": null,
+     "specialness_value": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "repo",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0012",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "forward_clean": 98.67470375811587
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "repo_rate": 0.039
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "known-truth"
+   ],
+   "tags": [
+    "repo",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0013",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2026-11-09",
+    "clean_price": 99.0,
+    "repo_rate": 0.04,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_ORDER"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0014",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2030-01-01",
+    "clean_price": 99.0,
+    "repo_rate": 0.04,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "repo ends after maturity"
+  },
+  {
+   "case_id": "repo_d-0015",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2033-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.904
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cbot-formula",
+    "hand"
+   ],
+   "tags": [
+    "bond-futures",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0016",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-02-15",
+     "coupon": 0.04,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.887
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cbot-formula",
+    "hand"
+   ],
+   "tags": [
+    "bond-futures",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0017",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2033-08-15",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.8804
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cbot-formula",
+    "hand"
+   ],
+   "tags": [
+    "bond-futures",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0018",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-05-15",
+     "coupon": 0.045,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.9128
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cbot-formula",
+    "hand"
+   ],
+   "tags": [
+    "bond-futures",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "repo_d-0019",
+   "operation": "bond.futures.basis",
+   "inputs": {
+    "futures_price": 104.40625,
+    "settlement": "2026-11-09",
+    "delivery": "2026-12-01",
+    "repo_rate": 0.0385,
+    "bonds": [
+     {
+      "maturity": "2033-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "clean_price": 100.60264911007368,
+      "conversion_factor": 0.904
+     },
+     {
+      "maturity": "2034-02-15",
+      "coupon": 0.04,
+      "frequency": 2,
+      "clean_price": 99.06219861837178,
+      "conversion_factor": 0.887
+     },
+     {
+      "maturity": "2033-08-15",
+      "coupon": 0.0375,
+      "frequency": 2,
+      "clean_price": 97.31102963325145,
+      "conversion_factor": 0.8804
+     },
+     {
+      "maturity": "2034-05-15",
+      "coupon": 0.045,
+      "frequency": 2,
+      "clean_price": 102.23947342167519,
+      "conversion_factor": 0.9128
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "bonds": [
+      {
+       "invoice": 94.57109530386741,
+       "gross_basis": 6.219399110073681,
+       "net_basis": 6.200156514668038,
+       "implied_repo": -0.9649041701266823
+      },
+      {
+       "invoice": 93.78225679347827,
+       "gross_basis": 6.453854868371778,
+       "net_basis": 6.449995108865082,
+       "implied_repo": -1.0169856078008477
+      },
+      {
+       "invoice": 93.01980597826088,
+       "gross_basis": 5.391767133251449,
+       "net_basis": 5.398595455961043,
+       "implied_repo": -0.861214865821733
+      },
+      {
+       "invoice": 95.5009200276243,
+       "gross_basis": 6.937448421675185,
+       "net_basis": 6.9070017176291145,
+       "implied_repo": -1.0611687112485761
+      }
+     ],
+     "ctd": 2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "hand"
+   ],
+   "tags": [
+    "bond-futures",
+    "ctd",
+    "synthetic"
+   ],
+   "output_classes": {
+    "ctd": "date_and_convention"
+   }
+  }
+ ]
+}
