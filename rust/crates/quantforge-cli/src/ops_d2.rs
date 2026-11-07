@@ -2,11 +2,26 @@
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
 use crate::ops_b::{curve_input, items, sub};
+use crate::ops_b::{interpolation, pillars_json, repricing};
 use quantforge_core::bonds::{self, Bond, Frn};
+use quantforge_core::conventions;
 use quantforge_core::curve::Curve;
 use quantforge_core::dates::Date;
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::xccy::{self, Ndf, XccyTrade};
+
+/// A convention id that must be `want`: another known id is `E_INPUT`, an unknown one `E_SCHEMA`.
+fn known_convention(i: &Inputs, k: &str, want: &str) -> Result<Result<()>> {
+    let id = i.str(k)?;
+    if id == want {
+        Ok(Ok(()))
+    } else if conventions::lookup(id).is_some() {
+        Ok(fail("E_INPUT", format!("{k} must be {want}")))
+    } else {
+        i.fail(k, "unknown convention")
+    }
+}
 
 pub(crate) fn bond_fields(b: &Inputs) -> Result<Bond> {
     let (m, c, f) = (b.date("maturity")?, b.f64("coupon")?, b.int("frequency")?);
@@ -183,6 +198,79 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("betas", beta.to_vec().into()),
                 ("residuals", res.into()),
             ]))
+        }
+        "fx.xccy.bootstrap" => {
+            let (_, f) = (
+                curve_input(i, "domestic")?,
+                curve_input(i, "foreign_projection")?,
+            );
+            let dc = known_convention(i, "domestic_convention", "SOFR")?;
+            let fc = known_convention(i, "foreign_convention", "ESTR")?;
+            let s = i.date("start")?;
+            let mut q = Vec::new();
+            for x in items(i, "quotes")? {
+                q.push((x.int("months")?, x.f64("spread")?));
+            }
+            let m = interpolation(i)?;
+            i.gate()?;
+            dc?;
+            fc?;
+            let r = xccy::bootstrap(&Curve::new(&f)?, s, &q, m)?;
+            Ok(Outcome {
+                outputs: pillars_json(&r.dates, &r.logs),
+                diagnostics: repricing(r.max_repricing_error),
+            })
+        }
+        "fx.xccy.pv" => {
+            let d = curve_input(i, "domestic")?;
+            let (fp, fd) = (
+                curve_input(i, "foreign_projection")?,
+                curve_input(i, "foreign_discount")?,
+            );
+            let spot = i.f64("spot")?;
+            let t = sub(i, "trade")?;
+            let trade = XccyTrade {
+                start: t.date("start")?,
+                months: t.int("months")?,
+                foreign_notional: t.f64("foreign_notional")?,
+                spread: t.f64("spread")?,
+                receive_foreign: match t.str("side")? {
+                    "RECEIVE_FOREIGN" => true,
+                    "PAY_FOREIGN" => false,
+                    _ => return t.fail("side", "unknown side"),
+                },
+            };
+            i.gate()?;
+            let (d, fp, fd) = (Curve::new(&d)?, Curve::new(&fp)?, Curve::new(&fd)?);
+            let (pv, f, dl) = xccy::pv(&d, &fp, &fd, spot, &trade)?;
+            plain(obj([
+                ("pv", pv.into()),
+                ("foreign_leg", f.into()),
+                ("domestic_leg", dl.into()),
+            ]))
+        }
+        "fx.ndf.pv" => {
+            let (u, o) = (
+                curve_input(i, "usd_curve")?,
+                curve_input(i, "offshore_curve")?,
+            );
+            let spot = i.f64("spot")?;
+            let t = sub(i, "trade")?;
+            let trade = Ndf {
+                fixing_date: t.date("fixing_date")?,
+                payment_date: t.date("payment_date")?,
+                strike: t.f64("strike")?,
+                usd_notional: t.f64("usd_notional")?,
+                buy: match t.str("side")? {
+                    "BUY" => true,
+                    "SELL" => false,
+                    _ => return t.fail("side", "unknown side"),
+                },
+            };
+            let fixing = nullable_f64(i, "fixing")?;
+            i.gate()?;
+            let (pv, f) = xccy::ndf_pv(&Curve::new(&u)?, &Curve::new(&o)?, spot, &trade, fixing)?;
+            plain(obj([("pv", pv.into()), ("forward", f.into())]))
         }
         _ => fail(
             "E_UNSUPPORTED_OPERATION",

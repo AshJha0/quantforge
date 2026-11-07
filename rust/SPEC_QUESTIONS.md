@@ -66,3 +66,4 @@ None of these is reached by a golden. Rulings C15 and C16 settled the readings o
 - `bond.spread.asset_swap`: floating dates step back by plain month arithmetic, with no month-end rule even for a month-end maturity. Golden `bonds_d-0041` needs this. The spec says only "unadjusted".
 - `bond.fit.nelson_siegel`: a `weights` of another length is `E_INPUT`, and a negative weight is `E_DOMAIN`. The `tau` check runs first.
 - `bond.futures.conversion_factor`: whole months from the first of the delivery month, less one if the maturity day is earlier (it never is). A maturity before delivery is `E_INPUT`. `bond.futures.basis` with no bonds is `E_INPUT`.
+- `fx.xccy.bootstrap`: a known convention id other than `SOFR` (domestic) or `ESTR` (foreign) is `E_INPUT`, and an unknown id is `E_SCHEMA`. A `start` before `as_of` is `E_OUT_OF_RANGE`. `months` above 1200 is `E_INPUT`. `fx.xccy.pv` uses the USGS and EUTA joint calendar without convention inputs.
