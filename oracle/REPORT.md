@@ -332,3 +332,36 @@ fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps
 fragility: integrate-0095 error estimate 1.52e-01 against tol 1e-13
 fragility: root-0025 needs 7 Brent steps against max_iter 2; root-0026 has width 0.125 after 3 bisections against x_tol 1e-12
 ```
+
+## Stage D outside-oracle coverage (rule 11.2.5)
+
+Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, built from its own convention objects through `qf_oracle/convmap.py` (reviewed copy: `oracle/CONVENTION_MAP.md`), reproduces every output of the case within the case's own tolerance. One row per counted case, with the library version and the convention rows used, is in `oracle/outside_register.json`. Error cases are in the denominator and never count. Older `verified_by` tags that name QuantLib are not counted here unless this check passes.
+
+| Suite | Outside-oracle cases | Cases | Share | Why not more |
+|---|---|---|---|---|
+| `bondfit_d` | 0 | 4 | 0% | Nelson-Siegel fit judged on repricing; QuantLib's FittedBondDiscountCurve fits by its own optimiser path, so it cannot reproduce a golden independently of iteration path |
+| `bonds_d` | 39 | 49 | 80% |  |
+| `capswaption_d` | 9 | 14 | 64% |  |
+| `commodity_d` | 0 | 10 | 0% | no QuantLib object for monthly log-linear commodity forwards with additive seasonality or for storage carry |
+| `compound_d` | 25 | 35 | 71% |  |
+| `credit_d` | 9 | 19 | 47% |  |
+| `csa_d` | 0 | 13 | 0% | CSA discounting with FX forwards is a composition of curve ratios; QuantLib has no CSA-discount object, so a check would re-implement the spec |
+| `edge_d` | 9 | 17 | 53% |  |
+| `equity_d` | 0 | 10 | 0% | QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions |
+| `fits_d` | 0 | 16 | 0% | smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent |
+| `futures_d` | 6 | 10 | 60% |  |
+| `index_d` | 0 | 12 | 0% | index dividends, rebalancing and corporate actions have no QuantLib object |
+| `inflation_d` | 0 | 13 | 0% | QuantLib's inflation curves use other lag and interpolation conventions (spec 02-curves/inflation.md); ZCIS and linkers would need the spec's own CPI curve |
+| `mbs_d` | 0 | 12 | 0% | QuantLib has no agency MBS pool cash-flow model |
+| `ois_d` | 20 | 25 | 80% |  |
+| `outside_d` | 284 | 284 | 100% |  |
+| `repo_d` | 8 | 19 | 42% |  |
+| `rulings2_d` | 1 | 25 | 4% | internal: spec rulings, mostly error and order cases |
+| `rulings_d` | 0 | 18 | 0% | internal: spec rulings, mostly error and order cases |
+| `rulings_r1` | 0 | 15 | 0% | internal: spec rulings; CME conversion factors have no QuantLib object |
+| `steps_d` | 0 | 11 | 0% | meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit |
+| `trs_d` | 0 | 3 | 0% | QuantLib has no equity total return swap with these legs |
+| `xccy_d` | 0 | 13 | 0% | constant-notional xccy legs could be built from QuantLib OvernightLegs, deferred: the curve solve and NDF are compositions of the spec's own curves |
+| **stage D** | **410** | **647** | **63.4%** | |
+
+Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family.

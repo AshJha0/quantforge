@@ -6,7 +6,7 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 
 | # | Point | Ruling |
 |---|---|---|
-| D1 | ESTR convention | Spot lag 2, payment lag 2, as Strata 2.12.78 `EUR-FIXED-1Y-ESTR-OIS`, read from its bytecode. Lag 1 is a wrong-convention check |
+| D1 | ESTR convention | Spot lag 2, payment lag 2, as Strata 2.12.78 `EUR-FIXED-1Y-ESTR-OIS`, read from its bytecode. Lag 1 is a wrong-convention check. The payment lag of 2 is a library choice, not a confirmed market standard: TP ICAP's EUR OIS terms use 1 (ruling R1-2) |
 | D2 | Jump date | A jump multiplies discount factors for dates strictly after its date, as QuantLib. On its own date it does not apply |
 | D3 | Lockout `k` | ARRC rule: the fixing of `d_{n-k}` applies from `d_{n-k}` to the end. QuantLib's `lockoutDays` is this `k` minus 1 |
 | D4 | `shift_days` | `NONE`: must be 0. `LOCKOUT`: 1 to `n-1`. Others: 0 or more. Else `E_INPUT` |
@@ -24,7 +24,7 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D15 | Repo | ACT/360 simple; coupons inside the term reinvested at the repo rate. `gc_rate` key required, may be `null` |
 | D16 | CTD | Highest implied repo. Conversion factors are inputs to `bond.futures.basis`, so a factor error does not move the basis case |
 
-| D17 | Cross-currency schedule | Quarterly, `MODIFIED_FOLLOWING` on the joint calendar, ACT/360, constant notional with exchanges. `start` must be a joint business day. Domestic USD, foreign EUR only |
+| D17 | Cross-currency schedule | Quarterly, `MODIFIED_FOLLOWING` on the joint calendar, ACT/360, constant notional with exchanges. `start` must be a joint business day. Domestic USD, foreign EUR only. A synthetic constant-notional swap, not the market MTM-reset instrument (ruling R1-1) |
 | D18 | NDF forward | At the payment date, from the two curves; no spot lag and no convexity. A fixing on or before `as_of` must be given |
 
 | D19 | CDS trade date | Not on an adjusted coupon date (`E_INPUT`); that edge moves accrual start and has no outside check here |
