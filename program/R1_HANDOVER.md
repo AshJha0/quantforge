@@ -37,3 +37,7 @@ Questions go in your `SPEC_QUESTIONS` file as before; the spec session rules on 
 New golden suite `datasets/golden/stage_d/outside_d.json`, 284 cases. It uses existing stage D operations only (`bond.*` price, yield, curve price and Z-spread; `rates.ois.compound_dated`; `rates.cap.price`; `rates.swaption.price`; `credit.cds.price`), so no new code should be needed. Run it through the runner as usual. Read nothing new beyond the specs you already have.
 
 Observed 2026-11-07: the stage D builds in the four language worktrees pass 284 of 284 (Rust, C++, Java, Python).
+
+## R1.8 edge-case suite (ready)
+
+New golden suite `datasets/golden/stage_d/edge_d.json`, 17 cases, existing operations only. It pins rows of `specifications/edge-case-register.md` (which you may read). Observed 2026-11-07: all four language-worktree builds pass 17 of 17.
