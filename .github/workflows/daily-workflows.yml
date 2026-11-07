@@ -65,10 +65,19 @@ jobs:
         id: richcheap
         continue-on-error: true
         run: python3 tools/workflows/rich_cheap.py --impl "$IMPL" --out out/reports
-      - name: Key-rate explain and calibration diagnostics (interim, until risk.pnl.explain is implemented)
+      - name: P&L explain (spec harness when the CLI has risk.pnl.explain; interim key-rate job otherwise)
         id: pnl
         continue-on-error: true
-        run: python3 tools/workflows/keyrate_explain.py --impl "$IMPL" --days 20 --trades 20 --out out/reports
+        run: |
+          # pnl_explain.py (specifications/06-risk/pnl-explain.md) over last year's real Treasury moves, once the CLI lists
+          # risk.pnl.explain; until the r2-lang branches are merged, the interim keyrate_explain.py runs instead.
+          ops=$(python3 -c "import sys,json; sys.path.insert(0,'tools/workflows'); import common as c, subprocess;             impls=json.load(open('conformance/runner/implementations.json')); base,cwd=c.resolve_command(impls['$IMPL']);             print(subprocess.run(base+['operations'],cwd=cwd,capture_output=True,text=True).stdout)")
+          if echo "$ops" | grep -q '"risk.pnl.explain"'; then
+            python3 tools/workflows/pnl_explain.py --impl "$IMPL" --out out/reports
+          else
+            echo "::notice::risk.pnl.explain not in this CLI yet; running the interim key-rate explain"
+            python3 tools/workflows/keyrate_explain.py --impl "$IMPL" --days 20 --trades 20 --out out/reports
+          fi
       - name: Push reports to forward-log
         env:
           GH_TOKEN: ${{ github.token }}
