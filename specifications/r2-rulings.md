@@ -12,3 +12,6 @@ Rulings by the spec session in phase R2, from the R2 audit (`R5_R2_AUDIT.md` sec
 | R2-A6 | Rich/cheap exclusions | Treasury on-the-run and first off-the-run issues per auction tenor get weight 0 in the fit; their residuals are still reported. Gilts: none excluded |
 | R2-A7 | Stability S3 | Gaussian noise `N(0, a^2)` from `core.rng`; a stated amplitude per input type; a units table for `A` |
 | R2-A8 | Jacobian basis | Rows are continuously compounded zeros on ACT/365F curve time; columns are par quotes as decimal rates |
+| R2-A9 | Stability C3 | Judged on model prices from the op's `residuals`; the tool evaluates no Nelson-Siegel formula. No new op in R2 |
+| R2-A10 | Stability C6 | Vol noise applied at `T = 1` (SVI calibration has no expiry input) |
+| R2-A11 | Workflow (b) data | Blocked: TreasuryDirect robots.txt and terms, and the DMO anti-bot page. Manual `--data` path; a BLOCKED report without it |

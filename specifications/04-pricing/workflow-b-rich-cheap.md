@@ -14,6 +14,16 @@ Spec version 1.0.0. Status: Specified (phase R2, plan 11.2.7(b)). Infra builds t
 
 Both are recorded by the Actions recorder under `tools/recorder/sources.json` rules: raw files are not committed until the owner reviews the source.
 
+## Known limitation: price data blocked (R2, 2026-11-07)
+
+The job cannot fetch its price inputs automatically.
+- TreasuryDirect's `robots.txt` disallows automated clients, and its terms allow non-commercial personal use only.
+- The DMO's gilt price page sits behind an anti-bot challenge.
+
+Neither may be scraped or worked around. Only the on-the-run list is automatic, from the Treasury Fiscal Data open API (auction results).
+
+So the job takes prices by hand: `--data DIR` reads price files the owner saved manually, one file per market per day, in the source's own download format. Without `--data` the job writes a report marked **BLOCKED: no price data** and exits 0. That is a known state, not a failure. Workflow (b) is therefore specified and built, but does not run daily until a permitted source exists. Plan 11.2.7(b)'s daily acceptance is open, and is listed in the README known issues.
+
 ## Universe and filters
 
 Keep fixed-coupon nominal bonds only. Drop bills, FRNs, TIPS and index-linked gilts, STRIPS, and callable or rump issues. Drop bonds with less than 1 year to maturity, which are dominated by money-market effects. Treasuries use the EOD price, or the buy/sell midpoint if EOD is missing; gilts use the clean reference price. Settlement: T+1 for both. Every bond goes through `bond.yield.from_price` first, and one that returns an error is dropped and listed.
