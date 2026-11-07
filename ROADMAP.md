@@ -48,7 +48,7 @@ Before stage E, R1 works on how far the existing results can be trusted. It adds
 | Targets and mutation | Throughput targets in `benchmarks/targets.md`; a mutation report | In progress |
 | Citations | A source and evidence class for every claim in the docs | In progress |
 
-The three R3 preregistrations in `research/preregs/` are signed by Claude under the owner's delegation, before any data was read, and the holdout is unread.
+The three R3 preregistrations in `research/preregs/` are signed by Claude under the owner's delegation, and the holdout is unread.
 
 R2, risk-first (par and key-rate risk, P&L explain, calibration stability), follows as v0.4.2, then stage E.
 
