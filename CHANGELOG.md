@@ -11,7 +11,7 @@ Not tagged yet. Stage D is at Implemented, not Validated. Figures are local runs
 - Stage D sections in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`.
 
 ### Changed
-- Stage C goldens regenerated: the committed values could not be reproduced on this machine by any generator version or venv, while reruns are byte-identical to each other. 31 output lines in 6 files moved, each by at most 1.4e-4 of its own tolerance (largest: `greeks-0014` volga, 2.7e-8 absolute), and two use-case quote inputs moved in the last bits. The cause is the platform's numerics, not seeding, threads, order or solver starts.
+- Stage C goldens regenerated: the committed values could not be reproduced on this machine by any generator version or venv, while reruns are byte-identical to each other. 31 output lines in 6 files moved, each by at most 1.4e-4 of its own tolerance (largest: `greeks-0014` volga, 2.7e-8 absolute), and quote inputs of `usecases_c-0001` and `-0002` moved in the last bits. The cause is the platform's numerics, not seeding, threads, order or solver starts.
 - Stage B case `ois-0023` now sends `TONA`, not `ESTR`, as its unlisted convention (ruling D27).
 
 ### Known issues
