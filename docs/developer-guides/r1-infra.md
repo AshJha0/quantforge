@@ -116,7 +116,7 @@ It is a light PR check: no CLI build, about 11 seconds of run time locally, and 
 
 ## Calendar expiry
 
-`calendar-expiry.yml` runs `oracle/python/check_calendar_provenance.py` every Monday. The script is standard library only. It fails when any calendar's confirmed coverage ends within 12 months, or was last checked over a year ago. **It is expected red** until SIFMA publishes the 2028 US calendar, usually in December: on 2026-11-07, USGS is confirmed only through 2027-01-01. A red run is the reminder to refresh `datasets/calendar_provenance.json` from the URL it prints. It is not a PR check, so it never blocks a merge.
+`calendar-expiry.yml` runs `oracle/python/check_calendar_provenance.py` every Monday. The script is standard library only. It fails when any calendar's confirmed coverage ends within 12 months, or was last checked over a year ago. **It is expected red** until SIFMA publishes the 2027 US calendar, usually in December: on 2026-11-07, USGS is confirmed only through 2027-01-01. A red run is the reminder to refresh `datasets/calendar_provenance.json` from the URL it prints. It is not a PR check, so it never blocks a merge.
 
 ## Post-push checks
 

@@ -17,10 +17,10 @@ uv sync --locked --project python
 python conformance/runner/runner.py --impl rust
 ```
 
-`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Rust run at `v0.4`, 2026-11-07:
+`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Rust run on `r1` at `3f5d97d`, 2026-11-07:
 
 ```
-TOTAL {'cases': 5514, 'pass': 5514, 'fail': 0, 'not_implemented': 0}
+TOTAL {'cases': 5837, 'pass': 5837, 'fail': 0, 'not_implemented': 0}
 ```
 
 ## More on the CLI
@@ -57,13 +57,24 @@ printf 'not json
 
 The message text is not part of the contract and differs by language; the code is.
 
-New in 1.6.0, and landing in R1: `quantforge --batch` is the same command, and `--timings` on `batch`, `--batch` or `run` adds `diagnostics.elapsed_ns` to each result and changes nothing else. Check a build against the stream fixtures:
+New in 1.6.0 (R1): `quantforge --batch` is the same command, and `--timings` on `batch`, `--batch` or `run` adds `diagnostics.elapsed_ns` to each result and changes nothing else. Check a build against the stream fixtures:
 
 ```bash
 python conformance/runner/batch_check.py --impl rust
 ```
 
 `--skip-run` leaves out the slow per-case `run` comparison.
+
+## Run the daily workflows
+
+Workflow (a) builds end-of-day curves and checks them against wide sanity bands; workflow (c) recomputes the NY Fed SOFR averages and checks the LIBOR fallback. Both send every case to one `quantforge --batch` process. Both fetch public data, so they need a network connection, or `--data DIR` to read saved files.
+
+```bash
+python tools/workflows/eod_curves.py --help
+python tools/workflows/sofr_check.py --help
+```
+
+Each run writes `reports/workflows/<as-of>/`. The USD curve in (a) is a proxy: Treasury par yields are not SOFR swap rates. GBP results are pass or fail only, because the Bank of England curves may not be redistributed. Details and the first runs are in [r1-infra.md](docs/developer-guides/r1-infra.md#daily-workflows-a-and-c).
 
 ## Regenerate golden files
 
@@ -107,7 +118,7 @@ Real output, Rust build:
 python tools/recorder/record.py
 ```
 
-This downloads from three public sources and appends to `tools/forward-log/log.jsonl`, so run it only when you mean to add to the record. Nothing schedules it yet.
+This downloads from the 15 public sources in `tools/recorder/sources.json` and appends to `tools/forward-log/log.jsonl`, so run it only when you mean to add to the record. From R1 the scheduled copy runs on GitHub Actions twice each weekday and writes to branch `forward-log` ([recorder-actions.md](docs/developer-guides/recorder-actions.md)). Its first run happens after the R1 push.
 
 ### Check the forward log
 
