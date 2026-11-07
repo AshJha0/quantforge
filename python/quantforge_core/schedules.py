@@ -1,10 +1,9 @@
 """Regular schedules with a short first stub (specifications/02-curves/schedules.md)."""
-import calendar as _cal
 import itertools
 from dataclasses import dataclass
 from datetime import date
 
-from . import calendars
+from . import _cal, calendars
 from .errors import QfError
 
 FREQUENCIES = (1, 2, 3, 4, 6, 12)

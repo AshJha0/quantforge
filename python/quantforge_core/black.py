@@ -2,14 +2,14 @@
 specifications/06-risk/vol-greeks.md)."""
 import math
 from dataclasses import dataclass, replace
-from statistics import NormalDist
+from functools import lru_cache
+from typing import Any
 
 from .equity import ForwardResult
 from .errors import QfError
 
 _SQRT2 = math.sqrt(2.0)
 _INV_SQRT_2PI = 1.0 / math.sqrt(2.0 * math.pi)
-_UNIT = NormalDist()
 BLACK_SCHOLES, BLACK_76, BACHELIER = "BLACK_SCHOLES", "BLACK_76", "BACHELIER"
 
 
@@ -21,8 +21,15 @@ def small_n(x: float) -> float:
     return math.exp(-0.5 * x * x) * _INV_SQRT_2PI
 
 
+@lru_cache(maxsize=1)
+def _unit() -> Any:
+    from statistics import NormalDist  # lazy: statistics is slow to import
+
+    return NormalDist()
+
+
 def n_inverse(p: float) -> float:
-    return _UNIT.inv_cdf(p)
+    return _unit().inv_cdf(p)
 
 
 def _domain(message: str, field: str | None = None) -> QfError:

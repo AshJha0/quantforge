@@ -1,11 +1,10 @@
 """Bonds, repo and bond futures (specifications/04-pricing/bonds.md)."""
-import calendar as _cal
 import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date
 
-from . import curves, linalg, roots, schedules
+from . import _cal, curves, linalg, roots, schedules
 from .curve_fits import _basis
 from .curves import Curve, CurveData
 from .errors import QfError

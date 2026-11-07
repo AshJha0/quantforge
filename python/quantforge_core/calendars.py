@@ -1,9 +1,9 @@
 """Holiday calendars and business-day rules (specifications/01-core/calendars.md)."""
-import calendar as _cal
 import re
 from datetime import date, timedelta
 from functools import lru_cache
 
+from . import _cal
 from .errors import QfError
 
 CALENDARS = ("GBLO", "EUTA", "USGS")

@@ -1,12 +1,11 @@
 """Inflation curves, seasonality and linkers (specifications/02-curves/inflation.md)."""
-import calendar as _cal
 import itertools
 import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date
 
-from . import bonds, curves
+from . import _cal, bonds, curves
 from .bonds import Bond
 from .curves import CurveData
 from .errors import QfError

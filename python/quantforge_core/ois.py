@@ -71,13 +71,20 @@ def periods(convention: str, as_of: date, tenor: str) -> list[Period]:
     return schedules.generate(spot, end, c["fixed_months"], cal, eom, lag)
 
 
-def legs(convention: str, ps: Sequence[Period], curve: Discounting) -> tuple[float, float]:
-    """Returns (annuity, floating), in the general form: never telescoped."""
+def _alphas(convention: str, ps: Sequence[Period]) -> list[float]:
     fixed_day_count = REGISTRY[convention]["fixed_day_count"]
-    annuity = ordered_sum(
-        daycount.year_fraction(fixed_day_count, p.start, p.end) * curve.discount(p.payment)
-        for p in ps
-    )
+    return [daycount.year_fraction(fixed_day_count, p.start, p.end) for p in ps]
+
+
+def legs(
+    convention: str, ps: Sequence[Period], curve: Discounting,
+    alphas: Sequence[float] | None = None,
+) -> tuple[float, float]:
+    """Returns (annuity, floating), in the general form: never telescoped. `alphas`, the fixed
+    year fractions, may be passed in precomputed; the sums are the same."""
+    if alphas is None:
+        alphas = _alphas(convention, ps)
+    annuity = ordered_sum(a * curve.discount(p.payment) for a, p in zip(alphas, ps, strict=True))
     floating = ordered_sum(
         (curve.discount(p.start) / curve.discount(p.end) - 1) * curve.discount(p.payment)
         for p in ps
@@ -92,7 +99,13 @@ def par_rate(convention: str, ps: Sequence[Period], curve: Discounting) -> float
 
 def _models(convention: str, swaps: Sequence[Sequence[Period]]) -> list[curves.Model]:
     def model(ps: Sequence[Period]) -> curves.Model:
-        return lambda c: par_rate(convention, ps, c)
+        alphas = _alphas(convention, ps)  # fixed for the whole solve
+
+        def rate(c: curves.Curve) -> float:
+            annuity, floating = legs(convention, ps, c, alphas)
+            return floating / annuity
+
+        return rate
 
     return [model(ps) for ps in swaps]
 
