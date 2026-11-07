@@ -80,6 +80,8 @@ def linker_price(bond: Bond, settlement: date, real_yield: float, base_ref: floa
                  fixings: Sequence[tuple[int, float]]) -> dict[str, float]:
     real = bonds.price_from_yield(bond, settlement, real_yield)
     table = dict(fixings)
+    if len(table) != len(fixings):
+        raise QfError("E_INPUT", "two fixings for one month", "cpi_fixings")
 
     def get(k: int) -> float:
         if k not in table:

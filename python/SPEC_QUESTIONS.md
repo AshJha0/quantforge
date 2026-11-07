@@ -96,3 +96,16 @@ No golden turns on these, so none blocked work. Each is this build's reading, no
 - QD19, `rates.swaption.price`: the vol check runs after the expiry check and before the curve-derived forward check.
 
 QD1 is closed by ruling D27: stage B `ois-0023` now sends `TONA`, and the code needs no change.
+
+## Closed by rulings D31 to D46
+
+- QD2 by D46 (pillars, then jump dates, then jump factors). QD3 by D42. QD8 by D43. QD10 by D37. QD11 by D35.
+  QD12 by D39 (now `E_OUT_OF_RANGE`). QD14 by D32. QD15 by D41. QD17 by D44.
+- QD13 in part: D36 requires every CDS curve's `as_of` to equal `trade_date`, so hazard time and the hazard
+  `as_of` agree. Still open: the hazard pillar checks, and the code also rejects a trade date on a payment date.
+- Also applied, with no earlier question: D31 (empty `steps` is flat, empty `dates` is `E_INPUT`), D33 (`wam` above
+  1200 is `E_INPUT`), D34 (`mbs.price` with `1 + y/12 <= 0` is `E_DOMAIN`), D38 (fewer than three distinct
+  maturities in `calib.curve.robust` is `E_SINGULAR`), D40 (`tenor_months` 1 to 1200 in caps and swaptions), and
+  D45 (a listed convention of the wrong kind is `E_INPUT` in the stage D operations).
+
+Still open: QD4, QD5, QD6, QD7, QD9, QD13 (in part), QD16, QD18, QD19.

@@ -156,6 +156,11 @@ class Model:
         return ordered_sum(total)
 
 
+def _check_as_of(trade_date: date, *as_ofs: date) -> None:
+    if any(a != trade_date for a in as_ofs):
+        raise QfError("E_INPUT", "curve as_of must equal trade_date (ruling D36)", "discount")
+
+
 def _check_recovery(r: float) -> None:
     if not 0 <= r < 1:
         raise QfError("E_DOMAIN", "recovery must be in [0, 1)", "recovery")
@@ -188,6 +193,7 @@ def price(
     coupon: float, notional: float, side: str, payout: str,
 ) -> dict[str, float]:
     model = Model(trade_date, curves.build(discount), hazard)
+    _check_as_of(trade_date, discount.as_of, hazard.as_of)
     _check_recovery(recovery)
     r = _price(model, mat, coupon, 1.0 if payout == "DIGITAL" else 1 - recovery)
     sign = 1 if side == "BUY_PROTECTION" else -1
@@ -200,6 +206,7 @@ def bootstrap(
     trade_date: date, discount: CurveData, recovery: float, quotes: Sequence[tuple[str, float]],
 ) -> list[tuple[date, float]]:
     disc = curves.build(discount)
+    _check_as_of(trade_date, discount.as_of)
     _check_recovery(recovery)
     if not quotes:
         raise QfError("E_INPUT", "no quotes", "quotes")
@@ -236,6 +243,9 @@ def index_intrinsic(
     disc = curves.build(discount)
     if not names:
         raise QfError("E_INPUT", "no names", "names")
+    _check_as_of(trade_date, discount.as_of, *(h.as_of for h, _, _ in names))
+    if any(w < 0 for _, _, w in names):
+        raise QfError("E_DOMAIN", "weights must not be negative", "names")
     ups = []
     for hazard, recovery, _ in names:
         _check_recovery(recovery)
@@ -252,6 +262,7 @@ def composite(
     constituents: Sequence[tuple[Sequence[tuple[str, float]], float]], scale: float,
 ) -> tuple[list[float], list[tuple[date, float]]]:
     curves.build(discount)
+    _check_as_of(trade_date, discount.as_of)
     if not constituents:
         raise QfError("E_INPUT", "no constituents", "constituents")
     tenors = [t for t, _ in constituents[0][0]]

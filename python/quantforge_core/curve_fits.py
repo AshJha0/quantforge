@@ -60,6 +60,8 @@ def robust(
         raise QfError("E_INPUT", "need at least 3 points of equal length")
     if tau <= 0 or delta <= 0 or any(m <= 0 for m in maturities):
         raise QfError("E_DOMAIN", "tau, delta and maturities must be positive")
+    if len(set(maturities)) < 3:
+        raise QfError("E_SINGULAR", "three distinct maturities are needed to fix three betas")
     xs = [_basis(m, tau) for m in maturities]
     ys = list(zero_rates)
 

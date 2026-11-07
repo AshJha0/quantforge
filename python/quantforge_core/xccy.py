@@ -36,6 +36,11 @@ def schedule(conventions: Sequence[str], start: date, months: int) -> list[date]
             for k in range(1, months // 3 + 1)]
 
 
+def _check_start(as_of: date, start: date) -> None:
+    if start < as_of:
+        raise QfError("E_OUT_OF_RANGE", "start is before the curve date", "start")
+
+
 def leg(notional: float, start: date, ends: Sequence[date], p: Curve, d: Curve,
         spread: float) -> float:
     starts = [start, *ends[:-1]]
@@ -49,8 +54,9 @@ def bootstrap(
     domestic: CurveData, foreign_projection: CurveData, dom_conv: str, for_conv: str,
     start: date, quotes: Sequence[tuple[int, float]], interpolation: str,
 ) -> tuple[CurveData, float]:
-    curves.build(domestic)
+    d = curves.build(domestic)
     p = curves.build(foreign_projection)
+    _check_start(d.as_of, start)
     if not quotes:
         raise QfError("E_INPUT", "no quotes", "quotes")
     tables = [schedule((dom_conv, for_conv), start, m) for m, _ in quotes]
@@ -74,6 +80,7 @@ def pv(
 ) -> tuple[float, float, float]:
     """Returns (foreign_leg, domestic_leg, pv)."""
     dd, pf, df = (curves.build(x) for x in (domestic, foreign_projection, foreign_discount))
+    _check_start(dd.as_of, start)
     ends = schedule(("SOFR", "ESTR"), start, months)
     foreign = leg(notional, start, ends, pf, df, spread)
     dom = leg(notional * spot, start, ends, dd, dd, 0.0)

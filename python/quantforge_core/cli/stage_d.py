@@ -27,6 +27,14 @@ def op(name: str) -> Callable[[Handler], Handler]:
     return register
 
 
+def _convention(i: Inputs, key: str, allowed: tuple[str, ...]) -> str:
+    """Ruling D45: an unlisted id is E_SCHEMA, a listed id of the wrong kind E_INPUT."""
+    value = i.enum(key, tuple(conventions.REGISTRY))
+    if value not in allowed:
+        raise QfError("E_INPUT", f"{value} is not allowed here", key)
+    return value
+
+
 def _fixings(i: Inputs) -> list[tuple[Any, float]]:
     return [(f.date("date"), f.real("rate")) for f in _objects(i, "fixings")]
 
@@ -60,7 +68,7 @@ def _step_curve(i: Inputs) -> Any:
 
 @op("rates.ois.fit_steps")
 def _fit_steps(i: Inputs) -> Any:
-    args = (i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), i.dates("step_dates"),
+    args = (_convention(i, "convention", conventions.OVERNIGHT), i.date("as_of"), i.dates("step_dates"),
             _quotes(i), jumps(i, required=True))
     base, rates, error = D.steps.fit_steps(*args)
     return {"base_rate": base, "step_rates": rates}, {"max_repricing_error": error}
@@ -94,7 +102,7 @@ def _tenor(i: Inputs) -> str:
 
 @op("rates.basis.ois_spread")
 def _ois_spread(i: Inputs) -> Any:
-    args = (i.enum("convention", conventions.OVERNIGHT), _tenor(i), _curve(i, "discount"),
+    args = (_convention(i, "convention", conventions.OVERNIGHT), _tenor(i), _curve(i, "discount"),
             _curve(i, "projection_a"), _curve(i, "projection_b"))
     return {"spread": D.csa.ois_spread(*args)}
 
@@ -108,7 +116,7 @@ def _term_quote(q: Inputs) -> ProjectionQuote:
 @op("rates.curve.joint_bootstrap")
 def _joint(i: Inputs) -> Any:
     ois_quotes = _quotes(Inputs({"quotes": i.array("ois_quotes")}, "ois_"))
-    args = (i.enum("convention", conventions.OVERNIGHT), i.enum("index", conventions.TERM),
+    args = (_convention(i, "convention", conventions.OVERNIGHT), _convention(i, "index", conventions.TERM),
             i.date("as_of"), ois_quotes, [_term_quote(q) for q in _objects(i, "term_quotes")],
             i.enum("interpolation", curves.INTERPOLATIONS), i.enum("method", _BOOT))
     disc, proj, error = D.csa.joint_bootstrap(*args)
@@ -249,7 +257,7 @@ def _bond_fit(i: Inputs) -> Any:
 def _xccy_bootstrap(i: Inputs) -> Any:
     quotes = [(q.integer("months"), q.real("spread")) for q in _objects(i, "quotes")]
     args = (_curve(i, "domestic"), _curve(i, "foreign_projection"),
-            i.enum("domestic_convention", ("SOFR",)), i.enum("foreign_convention", ("ESTR",)),
+            _convention(i, "domestic_convention", ("SOFR",)), _convention(i, "foreign_convention", ("ESTR",)),
             i.date("start"), quotes, i.enum("interpolation", curves.INTERPOLATIONS))
     data, error = D.xccy.bootstrap(*args)
     return {"pillars": _pillars(data)}, {"max_repricing_error": error}

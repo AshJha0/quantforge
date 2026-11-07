@@ -296,6 +296,8 @@ def fit_nelson_siegel(
     w = list(weights) if weights is not None else [1.0] * len(bonds)
     if any(v < 0 for v in w):
         raise QfError("E_DOMAIN", "weights must not be negative", "weights")
+    if sum(w) <= 0:
+        raise QfError("E_DOMAIN", "weights sum to 0", "weights")
     if sum(1 for v in w if v > 0) < 3:
         raise QfError("E_INPUT", "need at least 3 positive weights", "weights")
     if tau <= 0:

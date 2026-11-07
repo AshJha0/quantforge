@@ -25,6 +25,11 @@ def _check_black(model: str, strike: float, forwards: Sequence[float]) -> None:
         raise QfError("E_DOMAIN", "BLACK_76 needs a positive strike and forwards", "strike")
 
 
+def _check_tenor(months: int) -> None:
+    if not 1 <= months <= 1200:
+        raise QfError("E_INPUT", "tenor_months must be 1 to 1200", "tenor_months")
+
+
 def cap_price(
     discount: CurveData, proj: CurveData, model: str, vol: float | Sequence[float], kind: str,
     start_months: int, tenor_months: int, strike: float, notional: float,
@@ -33,6 +38,7 @@ def cap_price(
     if start_months < 1:
         raise QfError("E_INPUT", "start_months must be at least 1", "start_months")
     start = projection._plus_months(INDEX, projection._spot(INDEX, d.as_of), start_months)
+    _check_tenor(tenor_months)
     ps = projection._float_periods(INDEX, start, tenor_months)
     vols = [vol] * len(ps) if isinstance(vol, float) else list(vol)
     if len(vols) != len(ps):
@@ -58,6 +64,7 @@ def swaption_price(
     d, p = curves.build(discount), curves.build(proj)
     if expiry_months < 1:
         raise QfError("E_INPUT", "expiry_months must be at least 1", "expiry_months")
+    _check_tenor(tenor_months)
     s = projection._plus_months(INDEX, projection._spot(INDEX, d.as_of), expiry_months)
     if vol < 0:
         raise QfError("E_DOMAIN", "vol is negative", "vol")
@@ -136,7 +143,7 @@ def mbs_cashflows(pool: Pool) -> dict[str, object]:
 
 def _flows(pool: Pool) -> Flows:
     balance, wac, net, wam, age, model, speed = pool
-    if wam < 1 or age < 0:
+    if not 1 <= wam <= 1200 or age < 0:
         raise QfError("E_INPUT", "wam must be at least 1 and age at least 0", "pool")
     if wac <= 0:
         raise QfError("E_DOMAIN", "wac must be positive", "wac")
@@ -170,6 +177,8 @@ def mbs_price(pool: Pool, y: float, delay_days: int) -> tuple[float, float, floa
     _, ints, sched, pre, wal = _flows(pool)
     if delay_days < 0:
         raise QfError("E_INPUT", "delay_days must not be negative", "delay_days")
+    if not 1 + y / 12 > 0:
+        raise QfError("E_DOMAIN", "1 + yield/12 must be positive", "yield")
     v = 1 / (1 + y / 12)
     terms = []
     for k, (a, b, c) in enumerate(zip(ints, sched, pre, strict=True), start=1):

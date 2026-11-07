@@ -55,6 +55,8 @@ def step_curve(
 ) -> tuple[list[float], list[float]]:
     _check_step_dates(as_of, [d for d, _ in steps])
     curves.check_jumps(as_of, jumps)
+    if not dates:
+        raise QfError("E_INPUT", "no dates", "dates")
     curve = StepCurve(as_of, base_rate, steps, jumps)
     factors = [curve.discount(d) for d in dates]
     return factors, [curve.forward(d) for d in dates]
