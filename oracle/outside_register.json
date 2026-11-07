@@ -1398,6 +1398,30 @@
    "worst_abs_gap": 1.7867651802561113e-16
   },
   {
+   "case_id": "edge_d-0023",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.SOFR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 7.53563877964325e-15
+  },
+  {
+   "case_id": "edge_d-0024",
+   "operation": "rates.ois.compound_dated",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CMPD.METHOD",
+    "IDX.SOFR"
+   ],
+   "map_review": "self-reviewed 2026-11-07",
+   "worst_abs_gap": 4.579669976578771e-15
+  },
+  {
    "case_id": "futures_d-0001",
    "operation": "rates.futures.convexity",
    "library": "QuantLib",
