@@ -17,6 +17,7 @@
 #include "quantforge/core/equity.hpp"
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/smile.hpp"
+#include "quantforge/core/surface.hpp"
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/fx.hpp"
 #include "quantforge/core/integrate.hpp"

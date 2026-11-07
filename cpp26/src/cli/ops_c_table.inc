@@ -13,3 +13,6 @@
         {"vol.svi.calibrate", op_svi_calibrate},
         {"vol.ssvi.evaluate", op_ssvi_evaluate},
         {"vol.ssvi.calibrate", op_ssvi_calibrate},
+        {"vol.surface.query", op_surface_query},
+        {"vol.surface.check", op_surface_check},
+        {"risk.vol.surface_vega", op_surface_vega},
