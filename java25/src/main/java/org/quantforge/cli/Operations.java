@@ -62,6 +62,7 @@ final class Operations {
         OpsSurface.register(TABLE);
         OpsSabr.register(TABLE);
         OpsUseCase3.register(TABLE);
+        OpsRisk.register(TABLE);
     }
 
     static Set<String> names() {
