@@ -649,12 +649,14 @@ def strata_check():
             f, k, T, al, be, rho, nu = map(float, x[1:8])
             v = V.hagan(f, k, T, al, be, rho, nu)
             worst = max(worst, abs(v - float(x[8])))
+            assert abs(ql.sabrVolatility(k, f, T, al, be, nu, rho) - v) < 1e-10
             s.add("vol.sabr.hagan", dict(forward=f, strikes=[k], expiry_years=T, alpha=al, beta=be, rho=rho, nu=nu), {"vols": [v]}, cls=I, verified=[SV, QLV])
             continue
         t, F, K, v, T = x[1], *map(float, x[2:6])
         if x[0] == "NORMAL":
             p = V.bachelier(t, F, K, v, T)
             worst = max(worst, abs(p - float(x[6])))
+            assert abs(ql.bachelierBlackFormula(ql.Option.Call if t == "CALL" else ql.Option.Put, K, F, v * math.sqrt(T), 1.0) - p) < 1e-9
             s.add("vol.option.price", pinputs("BACHELIER", t, K, T, forward=F, discount_factor=1.0, vol=v), {"price": p, "forward": F}, cls=A, verified=[SV, QLV])
             continue
         g = V.greeks("BLACK_76", t, K, v, T, F=F, D=1.0)
