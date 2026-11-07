@@ -50,4 +50,19 @@ A target is met when the median of the repeats (or the p99 for T1) is at or unde
 
 ## Results
 
-None yet. Results go in `benchmarks/results/` with the machine, commit, input hash and toolchain, and in a table here that links each figure to its file.
+Measured 2026-11-07, after the targets above were written and with none of them moved. The machine is the reference laptop: Rust and C++ ran inside WSL 2 (Ubuntu 26.04, GCC 15.2, pinned to one core), because Windows blocks fresh native executables; Java and Python ran on Windows, not pinned. The code is `r2-infra` at 8215371 plus the harness (c64ea97), `benchmarks/batch_targets.py`, with 5 repeats (Python 3). Raw files are in `results/2026-11-07-*-batch-*.json`.
+
+| # | Target (stretch) | Rust | C++ | Java | Python |
+|---|---|---:|---:|---:|---:|
+| T1 bootstrap p99 | ≤ 5 ms (≤ 1 ms) | 16.1 ms **miss**¹ | 1.83 ms met, stretch missed | 10.7 ms **miss** | 190 ms **miss**² |
+| T2 10,000 PV | ≤ 60 s (≤ 10 s) | 1.09 s stretch met | 0.81 s stretch met | 4.71 s met | 13.0 s met |
+| T3 10,000 key-rate | ≤ 900 s (≤ 120 s) | 151 s met, stretch missed | 82 s stretch met | 110 s met | 12,000 s **miss** (scaled from 200 trades)³ |
+| T4 start-up | ≤ 0.1 s Rust/C++, ≤ 0.5 s Java, ≤ 1.0 s Python | 0.004 s met | 0.002 s met | 0.37 s met | 1.58 s **miss**² |
+| T5 peak RSS in T2 | ≤ 1 GiB (≤ 256 MiB) | 95 MiB stretch met | 97 MiB stretch met | not measured⁴ | not measured⁴ |
+
+1. Inside WSL, the p99 of the gap between result lines is dominated by VM scheduling jitter, about 16 ms. A repeat run gave C++ 15.7 ms and Rust 16.9 ms, while the median gap was 0.54 ms (C++) and 0.88 ms (Rust), and the mean per case 1.2 and 2.2 ms. Rust's and C++'s T1 need a native Linux rerun (a post-push check) before either miss stands.
+2. Python's first ~10 minutes overlapped another CPU-heavy run on the laptop, so T4 and T1 may read high. An earlier quiet smoke test gave a T4 of 3.7 s and a T1 of 119 ms, so Python misses either way. Python runs through `uv run`, which adds launcher time to T4.
+3. The 10,000-trade Python figure is scaled: start-up plus (200-trade time minus start-up) × 50, because a full run takes over three hours. Python key-rate risk is about 1.2 s per trade, against 8 to 15 ms in the compiled languages. This needs an issue for the Python lane.
+4. Peak RSS is read with `os.wait4`, which exists on Linux only.
+
+Misses to raise as issues, without moving the targets: Python on T1, T3 and T4; Java on T1, where the p99 is about 10 ms against a 5 ms target. Rerun Rust and C++ T1 natively before raising those. Results go in `benchmarks/results/` with the machine, commit, input hash and toolchain, and in a table here that links each figure to its file.

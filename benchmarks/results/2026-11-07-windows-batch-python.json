@@ -1,0 +1,27 @@
+{
+ "impl": "python",
+ "command": [
+  "C:\\Python312\\Scripts\\uv.EXE",
+  "run",
+  "--project",
+  "python",
+  "quantforge"
+ ],
+ "machine": {
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",
+  "cpus": 12,
+  "pinned_one_core": false
+ },
+ "date": "2026-11-07",
+ "book_sha256": "d134750abb03a1e578225a4fdfe3621ef42e5ea92fa6e17d8815979623f8922e",
+ "repeats": 3,
+ "commit": "59a7ad2",
+ "T4_startup_s": 1.5822076500007825,
+ "T1_bootstrap_p99_ms": 189.58220000058645,
+ "T2_pv_10000_s": 13.022404900002584,
+ "T5_peak_rss_mib": null,
+ "T3_keyrate_trades_measured": 200,
+ "T3_keyrate_10000_s": 11997.547150149814,
+ "T3_scaled": true
+}

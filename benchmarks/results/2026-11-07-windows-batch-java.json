@@ -1,0 +1,25 @@
+{
+ "impl": "java",
+ "command": [
+  "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.5.8-hotspot\\bin\\java.EXE",
+  "-jar",
+  "java25/target/quantforge-cli.jar"
+ ],
+ "machine": {
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",
+  "cpus": 12,
+  "pinned_one_core": false
+ },
+ "date": "2026-11-07",
+ "book_sha256": "d134750abb03a1e578225a4fdfe3621ef42e5ea92fa6e17d8815979623f8922e",
+ "repeats": 5,
+ "commit": "df2d468",
+ "T4_startup_s": 0.3666327500004627,
+ "T1_bootstrap_p99_ms": 10.683499998776824,
+ "T2_pv_10000_s": 4.712101099999927,
+ "T5_peak_rss_mib": null,
+ "T3_keyrate_trades_measured": 10000,
+ "T3_keyrate_10000_s": 110.08133360000102,
+ "T3_scaled": false
+}
