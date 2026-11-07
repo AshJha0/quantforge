@@ -16,7 +16,7 @@ use quantforge_core::risk;
 use quantforge_core::schedule;
 use quantforge_core::units;
 
-fn sub<'a>(i: &Inputs<'a>, k: &str) -> Result<Inputs<'a>> {
+pub(crate) fn sub<'a>(i: &Inputs<'a>, k: &str) -> Result<Inputs<'a>> {
     let v = i.req(k)?;
     if !matches!(v, Json::Obj(_)) {
         return i.fail(k, "expected an object");
@@ -24,7 +24,7 @@ fn sub<'a>(i: &Inputs<'a>, k: &str) -> Result<Inputs<'a>> {
     Ok(Inputs::new(v))
 }
 
-fn items<'a>(i: &Inputs<'a>, k: &str) -> Result<Vec<Inputs<'a>>> {
+pub(crate) fn items<'a>(i: &Inputs<'a>, k: &str) -> Result<Vec<Inputs<'a>>> {
     i.array(k)?
         .iter()
         .map(|v| match v {
@@ -41,7 +41,7 @@ fn interpolation(i: &Inputs) -> Result<Interpolation> {
     }
 }
 
-fn curve_input(i: &Inputs, k: &str) -> Result<CurveInput> {
+pub(crate) fn curve_input(i: &Inputs, k: &str) -> Result<CurveInput> {
     let c = sub(i, k)?;
     let mut pillars = Vec::new();
     for p in items(&c, "pillars")? {
@@ -122,7 +122,7 @@ fn ois_trade(i: &Inputs) -> Result<OisTrade> {
     })
 }
 
-fn snapshot_id(i: &Inputs) -> Result<Option<String>> {
+pub(crate) fn snapshot_id(i: &Inputs) -> Result<Option<String>> {
     let id = i.opt("snapshot_id").map(|_| i.str("snapshot_id"));
     Ok(id.transpose()?.map(str::to_string))
 }
@@ -612,10 +612,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("hedge_cost", r.hedge_cost.into()),
             ]))
         }
-        _ => fail(
-            "E_UNSUPPORTED_OPERATION",
-            format!("{op} is not in this build"),
-        ),
+        _ => crate::ops_c::dispatch(op, i),
     }
 }
 

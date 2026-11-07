@@ -115,12 +115,56 @@ fn value_too_deep(op: &str, i: &Json) -> bool {
         })
 }
 
+/// Stage C: 100 for any quote, strike, point, dividend or position list, and per surface grid
+/// (ruling C10); 20,000 cells or steps.
+fn stage_c_above(op: &str, i: &Json) -> bool {
+    if !(op.starts_with("eq.")
+        || op.starts_with("vol.")
+        || op.starts_with("risk.vol.")
+        || op == "usecase.vol_surface")
+    {
+        return false;
+    }
+    let long = |v: &Json, k: &str| len(v, k).is_some_and(|n| n > 100);
+    let lists = [
+        "dividends",
+        "quotes",
+        "strikes",
+        "vols",
+        "weights",
+        "points",
+        "positions",
+        "thetas",
+        "log_moneyness",
+        "total_variance",
+        "slices",
+        "k_grid",
+    ];
+    let surface = i
+        .get("surface")
+        .is_some_and(|s| long(s, "expiry_years") || long(s, "log_moneyness"));
+    let slices = i
+        .get("slices")
+        .and_then(Json::as_array)
+        .is_some_and(|a| a.iter().any(|s| long(s, "quotes")));
+    let curves = ["funding_curve", "borrow_curve"]
+        .iter()
+        .any(|k| i.get(k).is_some_and(|c| long(c, "pillars")));
+    lists.iter().any(|k| long(i, k))
+        || surface
+        || slices
+        || curves
+        || above(i, "cells", 20_000)
+        || above(i, "steps", 20_000)
+}
+
 /// The `E_LIMIT` this case breaks, if any.
 pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
     (too_long(inputs)
         || matrix_above(op, inputs)
         || curve_points_above(inputs)
         || value_too_deep(op, inputs)
-        || operation_above(op, inputs))
+        || operation_above(op, inputs)
+        || stage_c_above(op, inputs))
     .then(|| err("E_LIMIT", "an input is above its limit"))
 }

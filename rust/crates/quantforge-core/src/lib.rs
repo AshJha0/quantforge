@@ -16,6 +16,7 @@ pub mod curve;
 pub mod data;
 pub mod dates;
 pub mod daycount;
+pub mod equity;
 pub mod error;
 pub mod fx;
 pub mod hedge;
