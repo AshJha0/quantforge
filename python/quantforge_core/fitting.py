@@ -36,9 +36,10 @@ def levenberg_marquardt(
 ) -> tuple[np.ndarray, float] | None:
     """Returns the end point and its sum of squares, or None if the start cannot be evaluated."""
     x = np.array(start, dtype=float)
-    r = _safe(residual, x)
-    if r is None:
+    first = _safe(residual, x)
+    if first is None:
         return None
+    r: np.ndarray = first
     cost = float(r @ r)
     damping = 1e-3
     for _ in range(max_iter):
@@ -47,7 +48,7 @@ def levenberg_marquardt(
         jac = _jacobian(residual, x, r)
         a, g = jac.T @ jac, jac.T @ r
         scale = np.maximum(np.diag(a), 1e-12)
-        improved = False
+        r_new: np.ndarray | None = None
         while damping < 1e12:
             try:
                 step = np.linalg.solve(a + damping * np.diag(scale), -g)
@@ -57,10 +58,10 @@ def levenberg_marquardt(
             trial = x + step
             r_new = _safe(residual, trial)
             if r_new is not None and float(r_new @ r_new) < cost:
-                improved = True
                 break
+            r_new = None
             damping *= 4
-        if not improved:
+        if r_new is None:
             break
         new_cost = float(r_new @ r_new)
         small = cost - new_cost <= 1e-15 * cost and float(np.abs(step).max()) < 1e-10

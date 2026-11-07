@@ -1,11 +1,11 @@
 """Input limits (specifications/01-core/limits.md). Runs after every E_SCHEMA check has passed."""
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any
 
 from ..errors import QfError
 from ..snapshot import MAX_DEPTH, nesting_depth
 
-Raw = dict[str, Any]
+Raw = Mapping[str, Any]
 MAX_ARRAY = 100_000
 MAX_MATRIX_ROWS = 200
 MAX_TEXT_BYTES = 1_048_576

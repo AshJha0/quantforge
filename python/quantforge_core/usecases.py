@@ -1,6 +1,7 @@
 """Use cases 1 and 2 (specifications/04-pricing/use-cases.md): only the sums are new here."""
 from collections.abc import Sequence
 from datetime import date
+from typing import cast
 
 from . import curves, fx, hedging, ois, sensitivities
 from .errors import QfError
@@ -17,7 +18,7 @@ def fx_hedge(
     delta = ordered_sum(d for _, d in legs)
     hedge = -delta
     return {
-        "pv": ordered_sum(v["pv"] for v, _ in legs),
+        "pv": ordered_sum(cast(float, v["pv"]) for v, _ in legs),
         "fx_delta": delta,
         "hedge_spot_base": hedge,
         "residual_delta": 0.0,

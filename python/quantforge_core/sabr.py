@@ -191,7 +191,8 @@ def arbfree(
         p_right += 2 * dt * float(m[-1]) * q[-1] / h
 
     qa = np.array(q)
-    calls, vols = [], []
+    calls: list[float] = []
+    vols: list[float | None] = []
     for x in xs:
         c = math.floor(x / h) + 1  # 1-based cell holding x
         above = qa[c:]
