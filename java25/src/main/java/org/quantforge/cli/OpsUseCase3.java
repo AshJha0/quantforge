@@ -42,6 +42,10 @@ final class OpsUseCase3 {
             double sign = tg.choice("side", Pricing.FxSide.class) == Pricing.FxSide.BUY ? 1.0 : -1.0;
             String currency = in.string("currency");
             in.gate();
+            OpsForward.nonEmpty(slices.size(), grid.length);
+            for (Slice s : slices) {
+                OpsForward.nonEmpty(s.quotes().size());
+            }
             Curve curve = ci.build();
             if (!curve.asOf().equals(asOf)) {
                 throw new QfError("E_INPUT", "curve as_of differs");

@@ -174,7 +174,7 @@ public final class Sabr {
             }
             sum += (uMax - x[i]) * pr;
             calls[i] = sum;
-            vols[i] = sum > Math.max(f0 - x[i], 0.0) ? Double.valueOf(Black.solve(false, 1.0, f0, x[i], t, 1.0, sum)) : null;
+            vols[i] = sum > Math.max(f0 - x[i], 0.0) && sum < f0 ? Double.valueOf(Black.solve(false, 1.0, f0, x[i], t, 1.0, sum)) : null;
         }
         double mass = 0.0;
         double mean = 0.0;
