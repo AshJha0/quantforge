@@ -32,23 +32,27 @@ Done means built and passing locally through the neutral runner, at status Imple
 | D Curves and fixed income | Done, tag `v0.4` | D1 rates core (full SOFR, ESTR, jumps, compounding conventions, IBOR fallbacks, meeting steps, convexity, CSA, basis, joint and robust fits), D2 bonds and repo, D3 cross-currency and NDF, D4 ISDA CDS, D5 equity carry, index and TRS, D6 inflation, D7 caps and swaptions, D8 commodities, D9 MBS. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases locally, 331 of them in stage D's 20 suites, and fuzzing with seed 17 found nothing (`conformance/README.md`) | To later stages: monotone-convex and spline curves; term structures of borrow; cap and swaption surfaces (stage E). End of project: the human review | All inputs synthetic; the stage D data survey found no free swap, bond-level, special repo, cross-currency, CDS, borrow, commodity-curve or MBS data. Several suites have no outside oracle (`specifications/stage-d-rulings.md`) |
 | E to K | Planned | Nothing yet. Each domain's real specs are written before its own stage | | |
 
-## R1: credibility hardening (v0.4.1, in progress)
+## R1: credibility hardening (v0.4.1, merged on `r1`, not tagged)
 
 Before stage E, R1 works on how far the existing results can be trusted. It adds no new pricing.
 
 | Item | What it adds | State |
 |---|---|---|
-| Batch mode | Contract 1.6.0: `--batch`, `--timings`, rules BT1 to BT8, 19 stream fixtures | Specified; builds landing |
-| Edge cases | A register of edge cases per operation, each pinned by a fixture | In progress |
-| Model inventory | One list of every model: spec, oracle, evidence class, known limits | In progress |
-| Calendar provenance | The source of every holiday calendar | In progress |
-| Recorder | Scheduled daily recording of public data | In progress |
-| Conformance matrix | Which suites pass in which language and toolchain, and in CI | In progress |
-| Workflows (a) and (c) | Two end-to-end workflows on recorded public data | In progress |
-| Targets and mutation | Throughput targets in `benchmarks/targets.md`; a mutation report | In progress |
-| Citations | A source and evidence class for every claim in the docs | In progress |
+| Batch mode | Contract 1.6.0: `--batch`, `--timings`, rules BT1 to BT8, 19 stream fixtures | Built in all four languages |
+| Rulings | R1-1 to R1-6 in `specifications/r1-rulings.md` | Done |
+| Edge cases | [Register](specifications/edge-case-register.md) of 14 rows: 7 pinned, 3 pinned in part, 4 out of scope with the stage that brings them in | Done |
+| Model inventory | [One page per model](docs/model-inventory.md): spec, oracle, outside-checked share, limits, use restriction | Done |
+| Calendar provenance | Source and confirmed-through date for each calendar, `datasets/calendar_provenance.json`, checked weekly | Done; check red until SIFMA's 2027 schedule |
+| Money tolerances | Every tolerance restated as money on 10 million, `conformance/tolerances/money.md` | Done |
+| Recorder | Scheduled on GitHub Actions with a gap monitor | Built; first run after push |
+| Conformance matrix | 3 OS by 4 languages on Actions; local Linux C++ under WSL | Built; first run after push. WSL C++ passed 5,514 v0.4 goldens |
+| Workflows (a) and (c) | EOD curves with sanity bands (USD proxy curve, BoE GBP pass or fail) and a SOFR averages check, through `--batch` | Built; first local runs passed 2026-11-07 |
+| Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Built; not yet measured |
+| Coverage | Unit-test line coverage: C++ 94.2%, Java 97.3%, Python 97.2%, Rust 96.5% | Measured |
+| Citations | A `## Sources` section in 50 specs; references cited from memory and marked "(not opened)" (`program/R1_CITATION_FINDINGS.md`) | Done; sources not yet opened |
+| R3 preregistrations | Three studies in `research/preregs/` | Signed by Claude under the owner's delegation; holdout unread |
 
-The three R3 preregistrations in `research/preregs/` are signed by Claude under the owner's delegation, and the holdout is unread.
+Open at the end of R1: Python fuzz runs at about 2,760 cases a minute against the 50,000 target.
 
 R2, risk-first (par and key-rate risk, P&L explain, calibration stability), follows as v0.4.2, then stage E.
 

@@ -3,7 +3,7 @@
 Docs site: <https://ashjha0.github.io/quantforge/>
 ## Quantitative analytics and trading infrastructure
 
-QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Four stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3) and curves and fixed income (stage D, v0.4). Phase R1, credibility hardening for v0.4.1, is in progress. See Status below.
+QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Four stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3) and curves and fixed income (stage D, v0.4). Phase R1, credibility hardening for v0.4.1, is merged on branch `r1` and not yet tagged. See Status below.
 
 ### What it can and cannot show
 On free public data, QuantForge can show correct pricing and risk, curve quality against published curves, and signals on fitted curves with honest statistics.
@@ -59,19 +59,32 @@ Stage C covers equity forwards with borrow and discrete dividends, Black-Scholes
 
 Stage D was released as tag `v0.4` on 2026-11-07. It covers OIS curves (full SOFR and ESTR) with turn-of-year jumps, overnight compounding conventions and IBOR fallbacks, meeting-date steps, futures convexity, CSA discounting, index basis and joint and robust curve fits; bonds, repo and bond futures; cross-currency basis on a synthetic constant-notional basis swap, not a market-implied curve (ruling R1-1 in `specifications/r1-rulings.md`), and NDFs; ISDA CDS, which needs `LOG_LINEAR_DF` discount curves; equity dividend, borrow and index work; inflation and linkers; caps and swaptions on stylised conventions; commodity curves; and MBS. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases locally, 331 of them in stage D's 20 suites, and fuzzing with seed 17 found nothing (`conformance/README.md`). All stage D inputs are synthetic. The ESTR payment lag of 2 is a library choice taken from Strata, not a market standard (TP ICAP uses 1), and bond-future conversion factors take a `contract` input with CME rounding from R1 (rulings R1-2, R1-3).
 
-What has run (observed, local): at `v0.4`, all four implementations passed all 5,514 golden cases in 71 suite files through the neutral runner, on one Windows machine. Batch mode, contract 1.6.0, is specified for R1 with 19 stream fixtures in `datasets/batch/streams.json`; on 2026-11-07 each v0.4 build passed 14 of the 19, the five failures being the new R1 items (`program/R1_HANDOVER.md`).
+R1 (v0.4.1, unreleased) adds no new pricing. It adds:
+- batch mode, CLI contract 1.6.0 (`quantforge --batch`, `--timings`, rules BT1 to BT8), with 19 stream fixtures in `datasets/batch/streams.json`;
+- rulings R1-1 to R1-6 (`specifications/r1-rulings.md`) and an [edge-case register](specifications/edge-case-register.md) of 14 rows;
+- a [model inventory and limitations register](docs/model-inventory.md);
+- calendar provenance (`datasets/calendar_provenance.json`) and tolerances restated as money on 10 million notional (`conformance/tolerances/money.md`);
+- scheduled jobs on GitHub Actions: the recorder with a gap monitor, a 12-cell cross-platform conformance matrix, daily workflows (a) and (c) through `--batch`, sanity bands that include Bank of England GBP curves, a per-stage mutation report, an outside-oracle floor and a calendar expiry check ([R1 infrastructure](docs/developer-guides/r1-infra.md));
+- batch performance targets, written before measuring ([benchmarks/targets.md](benchmarks/targets.md));
+- three R3 preregistrations, signed by Claude under the owner's delegation, with the holdout unread (`research/preregs/`).
+
+There are now 5,837 golden cases in 74 suite files. Unit-test line coverage is C++ 94.2%, Java 97.3%, Rust 96.5% (reported by the language lanes) and Python 97.2% (5,806 of 5,976 lines of `quantforge_core`, coverage.py over 365 tests, measured on `r1` at `3f5d97d`).
+
+What has run (observed, local): at `v0.4`, all four implementations passed all 5,514 golden cases through the neutral runner, on one Windows machine. On `r1` at `3f5d97d`, this docs pass reran the Rust build: 5,837 of 5,837 goldens and every batch check passed. The Python build passed the batch checks with `--skip-run`. Java and C++ were not rerun in this pass.
 
 What that does not show:
 - **Validation is self-assessment** until the human review after the project ends. Many golden cases have only hand or replay sources, which can share a misreading with the spec. For stage B, `specifications/stage-b-rulings.md` lists which suites have an outside oracle: `usecases` and `rulings_b` have none, and `risk` is hand and self-consistency only, as are tenor basis, FX outright points, FX swap PV and basis. FX forward PV and delta have QuantLib `FxForward` checks in `fx_deep`.
 - **CI.** Stages A to D passed every workflow they triggered on GitHub, on their pull requests and on `main`. Fuzz and mutation workflows run on a schedule or by hand.
 - **Outside-oracle coverage is partial.** 63.4% of stage D cases are outside-oracle checked under rule 11.2.5; most counted cases are fixed-rate bonds. Every suite still at 0% has a reason why not in the [coverage table](oracle/REPORT.md#stage-d-outside-oracle-coverage-rule-1125).
-- **The recorder is built but not scheduled.** There is no daily record yet.
+- **The scheduled jobs have not run yet.** The recorder, the cross-platform matrix, the daily workflows and the mutation report run on GitHub, and their first runs happen after the R1 branch is pushed. Until then there is no daily record, no stage D mutation score and no macOS or Linux result for Java, Python or Rust. C++ has passed all 5,514 v0.4 goldens on Linux, with GCC 15.2 under WSL (`docs/developer-guides/r1-infra.md`).
 - **No market data is used.** Golden cases are constructed test values. Stage B curve data is labelled synthetic for almost everything, because no free history of OIS, swap, FRA, basis or bid/ask quotes was found (`datasets/data-availability.md`). A passing curve case shows the method agrees with its oracle on those quotes. It says nothing about fit to a market.
-- **Trading is simulated only.** There are no live orders, and nothing here connects to a market: the hedges in stage B are calculations. QuantForge makes no HFT or latency claims. The only benchmark is one laptop run of CLI batch throughput on a stage A suite, in `benchmarks/`.
+- **Trading is simulated only.** There are no live orders, and nothing here connects to a market: the hedges in stage B are calculations. QuantForge makes no HFT or latency claims. The only benchmark result is one laptop run of CLI batch throughput on a stage A suite, in `benchmarks/`; the R1 targets in `benchmarks/targets.md` are not yet measured.
 
 ### Known issues
-- **Clang on Windows** is blocked at times by Windows Application Control, which stops freshly built binaries. Clang conformance therefore relies on CI.
+- **Clang on Windows** is blocked at times by Windows Application Control, which stops freshly built binaries. Clang conformance therefore relies on CI; GCC runs locally under WSL.
 - **Licence questions are open** on SONIA redistribution and on the Bank of England's forward and curve data. Raw data stays local (`oracle/LICENCES.md`).
+- **Python fuzz is slow.** About 2,760 cases a minute through batch mode, against the R1 target of 50,000 (figure reported by the Python lane).
+- **First runs wait for the push.** The mutation report and the cross-platform matrix have never run.
 - The calendar provenance check fails until SIFMA publishes its 2027 US holiday schedule (usually in December); the USGS calendar is confirmed only through 2027-01-01.
 
 ### Licensing and market data
