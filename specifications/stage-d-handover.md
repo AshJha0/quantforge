@@ -24,7 +24,35 @@ Read:
 - `specifications/02-curves/stage-d-targets.md`
 - `datasets/golden/stage_d/*.json`, through the runner
 
-## Waves 2 and 3
+## Wave 2
+
+### D2 bonds and repo (ready)
+
+New operations: `bond.price.from_yield`, `bond.yield.from_price`, `bond.price.from_curve`, `bond.spread.z`, `bond.spread.asset_swap`, `bond.frn.price`, `repo.forward`, `repo.implied_rate`, `bond.futures.conversion_factor`, `bond.futures.basis`, `bond.fit.nelson_siegel`.
+
+Goldens: `datasets/golden/stage_d/{bonds_d,repo_d,bondfit_d}.json`, 72 cases.
+
+Read, beyond wave 1: `specifications/04-pricing/bonds.md`; the wave 2 table in `02-curves/stage-d-targets.md`; rulings D13 to D16.
+
+### D3 cross-currency and NDF (ready)
+
+New operations: `fx.xccy.bootstrap`, `fx.xccy.pv`, `fx.ndf.pv`. Goldens: `datasets/golden/stage_d/xccy_d.json`, 13 cases. Read: `specifications/02-curves/cross-currency.md`; the D3 table in `stage-d-targets.md`; rulings D17, D18.
+
+### D4 credit (ready)
+
+New operations: `credit.cds.price`, `credit.cds.bootstrap`, `credit.index.intrinsic`, `credit.curve.composite`. Goldens: `datasets/golden/stage_d/credit_d.json`, 19 cases. Read: `specifications/04-pricing/credit.md`; the D4 table in `stage-d-targets.md`; rulings D19 to D21.
+
+### D5 equity (ready)
+
+New operations: `eq.dividend.implied`, `eq.borrow.implied`, `eq.futures.basis`, `eq.index.dividends`, `eq.index.rebalance`, `eq.corporate_action.adjust`, `eq.trs.pv`. Goldens: `datasets/golden/stage_d/{equity_d,index_d,trs_d}.json`, 25 cases. Read: `specifications/02-curves/equity-curves.md`, `specifications/04-pricing/equity-index.md`; the D5 table in `stage-d-targets.md`; rulings D22 to D24.
+
+## Wave 3
+
+### D6 inflation and linkers (ready)
+
+New operations: `infl.curve.cpi`, `infl.zcis.pv`, `infl.linker.price`, `infl.linker.price_curve`. Goldens: `datasets/golden/stage_d/inflation_d.json`, 13 cases. Read: `specifications/02-curves/inflation.md`; the D6 table in `stage-d-targets.md`; rulings D25, D26.
+
+### D7, D8, D9
 
 Not yet specified. Do not start them.
 
