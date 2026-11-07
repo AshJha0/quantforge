@@ -70,6 +70,8 @@ def fit_steps(
     if REGISTRY[convention]["kind"] != "OVERNIGHT":
         raise QfError("E_INPUT", "the convention is not overnight", "convention")
     m = len(step_dates)
+    if m == 0:
+        raise QfError("E_INPUT", "no step dates (ruling D64)", "step_dates")
     if len(quotes) != m + 1:
         raise QfError("E_INPUT", "need one more quote than step dates", "quotes")
     _check_step_dates(as_of, step_dates)

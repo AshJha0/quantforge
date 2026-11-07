@@ -137,3 +137,9 @@ def test_d59_xccy_months_limit():
 def test_d55_bachelier_negative_strike():
     caplets, _ = stage_d3.cap_price(_flat(), _flat(), "BACHELIER", 0.01, "CAP", 3, 12, -0.01, 1.0)
     assert all(c > 0 for c in caplets)
+
+
+def test_d64_empty_step_dates_before_quote_count():
+    from quantforge_core.ois import Quote
+    assert _code_of(steps.fit_steps, "SOFR", AS_OF, [], [Quote("1M", 0.04), Quote("2M", 0.04)],
+                    ()) == "E_INPUT"
