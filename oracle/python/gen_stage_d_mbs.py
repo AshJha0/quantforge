@@ -70,6 +70,7 @@ def mbs_d():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     mbs_d()
     note(f"stage D D9: {len(D.MUTANTS)} wrong-convention checks, each caught")

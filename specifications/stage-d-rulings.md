@@ -63,6 +63,24 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D45 | Convention ids | An unlisted id is `E_SCHEMA`; a listed id of the wrong kind (`USD-TERM-3M` where an overnight index is needed, or not `SOFR`/`ESTR` in `fx.xccy.*`) is `E_INPUT`. Case `compound_d-0030` |
 | D46 | Check order for curves with `jumps` | The curve's pillar checks first, then jump dates (`E_INPUT`), then jump factors (`E_DOMAIN`). In `rates.ois.bootstrap` its own list stands (jumps first) |
 
+| D47 | Overnight conventions in `rates.basis.ois_spread`, `rates.curve.joint_bootstrap` | Any `OVERNIGHT` record, `ESTR` included. Case `rulings2_d-0001` |
+| D48 | `rates.basis.ois_spread` check order | Each curve's own checks first, then the shared `as_of`. Case `rulings2_d-0002` |
+| D49 | `ois_quotes`, `term_quotes` | Quote lists: 100 at most, else `E_LIMIT`. Case `rulings2_d-0003` |
+| D50 | A lookback or shift reaching outside the calendar range | `E_DATE_RANGE`. Case `rulings2_d-0004` |
+| D51 | `rates.ois.fit_steps` quotes out of tenor order | `E_INPUT`, by the pillar rule. Case `rulings2_d-0005` |
+| D52 | Hazard curve checks | Survival outside `(0, 1]`: `E_DOMAIN`. Pillars not strictly increasing after `as_of`: `E_INPUT`. A trade maturity on or before `trade_date`: `E_INPUT`. Cases `rulings2_d-0006` to `-0008` |
+| D53 | Equity checks | Empty `futures`: `E_INPUT`. `eq.borrow.implied` with `expiry <= as_of`: `E_DATE_ORDER`. `eq.index.rebalance`: duplicate ids (`E_INPUT`) before `divisor <= 0` (`E_DOMAIN`). Cases `rulings2_d-0009` to `-0011` |
+| D54 | `seasonality`; `years` | `seasonality` is a required key that may be `null` (in `infl.*` and `cmdty.curve.forward`); absent is `E_SCHEMA`. `years` at most 100, else `E_INPUT`. Cases `rulings2_d-0012` to `-0014` |
+| D55 | `BACHELIER` caps and floors | Any strike and forward, negative included. Case `rulings2_d-0015` |
+| D56 | Cap and swaption `model`, `vol` type | Only `BLACK_76`, `BACHELIER`; anything else `E_SCHEMA`. `vol` a number (flat) or an array (quoted, any length checked); any other JSON type `E_SCHEMA`. Cases `rulings2_d-0016`, `-0017` |
+| D57 | Swaption check order | `expiry_months` and `tenor_months` (`E_INPUT`) before `vol` (`E_DOMAIN`), before curve-derived checks. Case `rulings2_d-0018` |
+| D58 | `cmdty.storage.carry` price `<= 0` | `E_DOMAIN`. Case `rulings2_d-0019` |
+| D59 | `fx.xccy.*` | `months` above 1200: `E_INPUT`. `fx.xccy.pv` with `start` before `as_of`: `E_OUT_OF_RANGE` (as D39). Cases `rulings2_d-0020`, `-0021` |
+| D60 | ZCIS pv tolerance | 1e-9 per unit notional plus 1e-9 relative: a par swap's pv is rounding noise (`inflation_d-0009`). Widened in `inflation_d-0007` to `-0009`; values unchanged |
+| D61 | `bond.futures.basis` | `delivery <= settlement`: `E_DATE_ORDER`. `delivery` after a bond's maturity: `E_INPUT`. Empty `bonds`: `E_INPUT`. Cases `rulings2_d-0022` to `-0024` |
+| D62 | Need no golden | Asset-swap dates by plain month steps (pinned by `bonds_d-0041`). `joint_bootstrap` `GLOBAL` as block solve: same answer to solver tolerance (D9). Lockout `n` counted before business-day checks, and joint-bootstrap list order: every branch gives `E_INPUT`, so no output differs. Robust fit: at full rank the Huber minimum exists and is unique, so `E_NO_CONVERGENCE` cannot be a golden outcome (C12); rank deficiency is `E_SINGULAR` (D38). Discount pillars as CDS integration nodes: pinned by the multi-node case in `credit_d`. TRS side names: listed in the spec |
+| D63 | `jumps` in `rates.curve.joint_bootstrap` | Not an input, so ignored like any key the operation does not read (`01-core/limits.md` B3 counts such keys only for the array limit) |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage

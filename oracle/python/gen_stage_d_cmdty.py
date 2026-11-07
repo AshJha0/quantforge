@@ -70,6 +70,7 @@ def cmdty_d():
 
 
 def main():
+    D.estr()
     D.MUTANTS.clear()
     cmdty_d()
     note(f"stage D D8: {len(D.MUTANTS)} wrong-convention checks, each caught")

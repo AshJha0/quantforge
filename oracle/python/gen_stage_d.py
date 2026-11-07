@@ -28,7 +28,12 @@ AS_OF = date(2026, 11, 6)
 QLV = "quantlib-1.44"
 MUTANTS = []
 Q = lambda d: ql.Date(d.day, d.month, d.year)  # noqa: E731
-RT.CONV["ESTR"] = dict(currency="EUR", day_count="ACT_360", calendar="EUTA", spot_lag=2, payment_lag=2, fixed_months=12, fixed_day_count="ACT_360")
+ESTR = dict(currency="EUR", day_count="ACT_360", calendar="EUTA", spot_lag=2, payment_lag=2, fixed_months=12, fixed_day_count="ACT_360")
+
+
+def estr():
+    """Adds ESTR to the shared convention table. Called from main, never at import, so stage B output does not depend on import order."""
+    RT.CONV.setdefault("ESTR", dict(ESTR))
 DEN = {"SOFR": 360, "ESTR": 360, "SONIA": 365}
 DFLIM = B.DFLIM
 PVLIM = B.PVLIM
@@ -180,6 +185,8 @@ def ois_d():
             tele = (cv.df(p[0][0]) - cv.df(p[-1][1]))
             caught("ois_d", f"{conv} {tenor} telescoped floating leg", abs(N * (fl - tele)), 1e-9 * N + 1e-9 * abs(val))
     note("ois_d: ESTR and SOFR swap PVs match QuantLib MakeOIS within 1e-9 per unit notional")
+    s.add("core.conventions.lookup", {"id": "ESTR"}, {"kind": "OVERNIGHT", "currency": "EUR", "day_count": "ACT_360", "calendar": "EUTA", "spot_lag": 2, "payment_lag": 2, "fixed_months": 12,
+          "fixed_day_count": "ACT_360", "business_day_convention": "MODIFIED_FOLLOWING"}, cls=E, verified=["strata-2.12.78-bytecode"], tags=["ESTR"])
     write(s)
 
 
@@ -660,6 +667,7 @@ def wave1():
 
 
 def main():
+    estr()
     MUTANTS.clear()
     wave1()
     note(f"stage D: {len(MUTANTS)} wrong-convention checks, each caught")
