@@ -1,0 +1,26 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-sabr-density",
+ "operation": "vol.sabr.density",
+ "inputs": {
+  "forward": 0.02,
+  "strikes": [
+   0.0005,
+   0.001,
+   0.002,
+   0.004,
+   0.008,
+   0.012,
+   0.02,
+   0.03,
+   0.05
+  ],
+  "expiry_years": 20.0,
+  "alpha": 0.03,
+  "beta": 0.5,
+  "rho": -0.3,
+  "nu": 0.5,
+  "h_strike": 0.0002,
+  "on_negative": "REPORT"
+ }
+}

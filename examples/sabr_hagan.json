@@ -1,0 +1,32 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-sabr-hagan",
+ "operation": "vol.sabr.hagan",
+ "inputs": {
+  "forward": 0.03,
+  "strikes": [
+   0.012,
+   0.015,
+   0.018,
+   0.021,
+   0.024,
+   0.027,
+   0.03,
+   0.033,
+   0.036,
+   0.039,
+   0.042,
+   0.045,
+   0.048,
+   0.051,
+   0.054,
+   0.057,
+   0.06
+  ],
+  "expiry_years": 2.0,
+  "alpha": 0.04,
+  "beta": 0.5,
+  "rho": -0.3,
+  "nu": 0.4
+ }
+}

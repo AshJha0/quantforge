@@ -2,7 +2,7 @@
 
 <p class="note">Status: Implemented, not Validated. Validation is self-assessment until the human review at the end of the project. Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>
 
-Generated on 2026-11-06 from commit `c2379f1`, by Java 0.2.0 (JDK 25.0.5+8-LTS), C++ 0.2.0 (GCC 16.2.0), Python 0.2.0 (CPython 3.15.2), Rust 0.2.0 (rustc 1.99.1), on one Windows machine.
+Generated on 2026-11-07 from commit `a4c371f`, by Java 0.3.0 (JDK 25.0.5+8-LTS), C++ 0.3.0 (GCC 16.2.0), Python 0.3.0 (CPython 3.15.2), Rust 0.3.0 (rustc 1.99.1), on one Windows machine.
 
 ## What it is
 

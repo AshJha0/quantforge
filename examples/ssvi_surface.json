@@ -1,0 +1,27 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-ssvi-surface",
+ "operation": "vol.ssvi.evaluate",
+ "inputs": {
+  "rho": -0.4,
+  "eta": 1.0,
+  "gamma": 0.5,
+  "thetas": [
+   0.01,
+   0.04,
+   0.09,
+   0.16
+  ],
+  "log_moneyness": [
+   -0.4,
+   -0.3,
+   -0.2,
+   -0.1,
+   0.0,
+   0.1,
+   0.2,
+   0.3,
+   0.4
+  ]
+ }
+}
