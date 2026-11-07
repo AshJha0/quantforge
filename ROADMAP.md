@@ -61,10 +61,11 @@ Risk before more products: par and key-rate risk, P&L explain, calibration stabi
 | Item | What it adds | State |
 |---|---|---|
 | Par and key-rate risk | `risk.curve.par`, `risk.curve.key_rate` (`TRIANGULAR`, `PILLAR`), `risk.curve.jacobian`; spec `06-risk/par-and-key-rate.md`; 41 goldens in `risk_r2`, re-priced in QuantLib | Specified; language builds landing |
-| P&L explain | `risk.pnl.explain` with a threshold of 5% of the larger of full and gross first-order P&L, a project choice (rulings R2-A3, R2-A4); spec `06-risk/pnl-explain.md`; 44 goldens in `pnl_r2`; real-move run `tools/workflows/pnl_explain.py` | Specified; share of days explained TODO |
-| Calibration stability | Seven calibrations, C1 to C7, judged on metrics S1 to S7, `03-calibration/stability.md` | Specified; first run TODO |
-| Workflow (b) | Treasury and gilt rich/cheap screen, `1/D_mod^2` weights, on-the-run issues reported but not fitted, `04-pricing/workflow-b-rich-cheap.md` | Specified; first report TODO |
-| Carried from R1 | Python fuzz rate, stage D mutation scores, cross-platform matrix | TODO, waiting on language and infra results |
+| P&L explain | `risk.pnl.explain` with a threshold of 5% of the larger of full and gross first-order P&L, a project choice (rulings R2-A3, R2-A4); spec `06-risk/pnl-explain.md`; 44 goldens in `pnl_r2`; real-move run `tools/workflows/pnl_explain.py` | Run: 100% of 2025 days explained on every product, Java and Python |
+| Calibration stability | Seven calibrations, C1 to C7, judged on metrics S1 to S7, `03-calibration/stability.md` | Run: 28 of 28 pass, languages within 2e-8; C3 rerun under R2-A9 TODO |
+| Workflow (b) | Treasury and gilt rich/cheap screen, `1/D_mod^2` weights, on-the-run issues reported but not fitted, `04-pricing/workflow-b-rich-cheap.md` | BLOCKED on price data (R2-A11); manual `--data DIR` path |
+| Carried from R1 | Recorder and daily workflows | Live: the recorder pushes to `forward-log` with no gaps, and the daily workflows run |
+| Carried from R1 | Python fuzz rate, mutation scores, benchmarks, cross-platform matrix | TODO, fixes in flight |
 
 Stage E follows R2.
 

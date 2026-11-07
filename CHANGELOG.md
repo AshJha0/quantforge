@@ -13,11 +13,15 @@ On branch `r2`. No golden value of an earlier stage changed.
 
 ### Changed
 - Stage D outside-oracle coverage is 64.1% (419 of 654 cases) under rule 11.2.5, up from 63.4%: CSA (no FX) and cross-currency PV and bootstrap are now counted through QuantLib.
+- P&L explain on real 2025 Treasury moves: 100% of days explained on every product, against a 95% target, in Java and Python. Spearman and KS are reported, not judged (2Y OIS 0.997 and 0.044; 10Y OIS 0.9998 and 0.028).
+- Calibration stability: 28 of 28 pass, languages within 2e-8; C3 is being rerun under R2-A9.
+- The Actions recorder is live and pushes to `forward-log` with no gaps; the daily workflows run.
 - Citations: the citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened.
 
 ### Known issues
 - The calendar provenance check still fails: SIFMA has not published its 2027 US holiday schedule, usually out in December, so the check stays red until then.
-- To fill in before the tag (TODO): P&L explain share of days explained on real moves; calibration stability first run; rich/cheap first report; Python fuzz rate; stage D mutation scores; cross-platform matrix results.
+- Workflow (b), rich/cheap, is blocked on price data (R2-A11): TreasuryDirect's robots.txt and terms, and the DMO's anti-bot page. Manual path: `--data DIR`.
+- To fill in before the tag (TODO): calibration stability C3 rerun (R2-A9); Python fuzz rate; mutation scores; benchmarks; cross-platform matrix results.
 
 ## 0.4.1: R1, credibility hardening (2026-11-07)
 
