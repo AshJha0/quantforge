@@ -59,3 +59,9 @@ Each is answered here with the most conservative reading; none changes a golden 
 9. **Asset swap floating dates on an end-of-month maturity.** `bonds.md` gives the end-of-month rule for the bond object only. The floating leg here steps back with plain month arithmetic (Feb 28 to Nov 28), which `bonds_d-0041` confirms.
 10. **`bond.futures.conversion_factor` with delivery on or after maturity.** Not specified; `E_DATE_ORDER`, as the common bond check.
 11. **Negative weight in `bond.fit.nelson_siegel`.** `E_DOMAIN`, checked after the positive-weight count and `tau`.
+12. **CDS curves not as of the trade date.** `credit.md` measures time from `T` and gives curves their own `as_of`. This build requires both the discount and hazard `as_of` to equal `trade_date` (`E_INPUT` otherwise).
+13. **Negative or all-zero weights in `credit.index.intrinsic` and `credit.curve.composite`.** Not specified; `E_DOMAIN`.
+14. **`eq.futures.basis` implied financing spread with no root.** "Unique, as for borrow": this build searches the same `[-0.5, 0.5]` and returns `E_NOT_BRACKETED` outside it.
+15. **`eq.trs.pv` with `end <= start`.** Not specified; `E_DATE_ORDER`.
+16. **Two CPI fixings for one month in `infl.linker.price`, two FX forwards for one date.** `E_INPUT`, as two fixings on one date in `rates.ois.compound_dated`.
+17. **`fx.xccy.bootstrap` with a convention other than SOFR/ESTR.** Ruling D17 allows only those; a listed other record gives `E_INPUT`, an unlisted string `E_SCHEMA`.
