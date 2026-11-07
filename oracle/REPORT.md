@@ -271,6 +271,14 @@ suite mbs_d: 12 cases
 stage D D9: 10 wrong-convention checks, each caught
 suite rulings_d: 18 cases
 rulings_d: 18 cases
+suite rulings2_d: 25 cases
+rulings2_d: 25 cases
+suite outside_d: 284 cases
+outside_d: all 284 cases re-priced in QuantLib 1.44 through the convention map
+suite edge_d: 24 cases
+edge_d: 24 edge-case register cases
+suite rulings_r1: 15 cases
+rulings_r1: 15 cases (R1-3 conversion factor, R1-4 CDS discount interpolation)
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4394 golden cases checked, none breaks a stated invariant
 invariants: 343 stage B cases checked, none breaks one
@@ -300,8 +308,8 @@ invariants:   parity residual not negative, breaches ascending: 3
 invariants:   surface flag matches violation lists: 4
 invariants:   surface variance positive: 1
 invariants:   use case 3 vol and forwards positive: 1
-invariants: 306 stage D cases checked, none breaks one
-invariants:   CDS legs positive: 5
+invariants: 654 stage D cases checked, none breaks one
+invariants:   CDS legs positive: 25
 invariants:   CDS survival in (0, 1] and strictly falling: 7
 invariants:   CPI positive: 2
 invariants:   CSA discount factors positive: 5
@@ -310,9 +318,9 @@ invariants:   MBS balance falls to zero; principal not negative: 3
 invariants:   NDF forward positive, equal to the fixing once known: 3
 invariants:   OIS pillars strictly increasing, discount factors positive: 10
 invariants:   TRS pv = sign (equity - funding): 2
-invariants:   bond: dirty = clean + accrued; modified = Macaulay / (1 + y/f); duration and convexity positive: 18
-invariants:   cap = sum of non-negative caplets: 5
-invariants:   compounded rate within the fixings' range (plus compounding); interest = rate x accrual: 21
+invariants:   bond: dirty = clean + accrued; modified = Macaulay / (1 + y/f); duration and convexity positive: 110
+invariants:   cap = sum of non-negative caplets: 12
+invariants:   compounded rate within the fixings' range (plus compounding); interest = rate x accrual: 71
 invariants:   convexity not negative; forward = futures rate - convexity: 6
 invariants:   corporate action keeps shares x price: 4
 invariants:   fallback = compounded + positive fixed spread: 4
@@ -320,13 +328,13 @@ invariants:   futures basis = market - fair: 3
 invariants:   implied dividends: period amounts sum to the cumulative: 1
 invariants:   index basis = quoted - intrinsic: 1
 invariants:   joint bootstrap pillars strictly increasing: 2
-invariants:   linker nominal = real x index ratio: 2
+invariants:   linker nominal = real x index ratio: 5
 invariants:   repo: special outputs null exactly when gc_rate is null: 4
 invariants:   robust fit: outliers are exactly the residuals beyond delta: 4
 invariants:   smooth fit: objective not negative and at least the weighted residual sum: 4
 invariants:   step curve positive; decreasing when all forwards are positive: 4
 invariants:   storage arbitrage flag = positive carry value: 2
-invariants:   swaption at least intrinsic on the annuity: 4
+invariants:   swaption at least intrinsic on the annuity: 10
 invariants:   xccy pv = sign (spot foreign - domestic): 3
 fragility: 18 adaptive cases keep their outcome under noise of up to 8 ulps
 fragility: integrate-0095 error estimate 1.52e-01 against tol 1e-13
@@ -346,7 +354,7 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `compound_d` | 25 | 35 | 71% |  |
 | `credit_d` | 9 | 19 | 47% |  |
 | `csa_d` | 0 | 13 | 0% | CSA discounting with FX forwards is a composition of curve ratios; QuantLib has no CSA-discount object, so a check would re-implement the spec |
-| `edge_d` | 9 | 17 | 53% |  |
+| `edge_d` | 11 | 24 | 46% |  |
 | `equity_d` | 0 | 10 | 0% | QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions |
 | `fits_d` | 0 | 16 | 0% | smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent |
 | `futures_d` | 6 | 10 | 60% |  |
@@ -362,6 +370,6 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `steps_d` | 0 | 11 | 0% | meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit |
 | `trs_d` | 0 | 3 | 0% | QuantLib has no equity total return swap with these legs |
 | `xccy_d` | 0 | 13 | 0% | constant-notional xccy legs could be built from QuantLib OvernightLegs, deferred: the curve solve and NDF are compositions of the spec's own curves |
-| **stage D** | **410** | **647** | **63.4%** | |
+| **stage D** | **412** | **654** | **63.0%** | |
 
 Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family.

@@ -8,7 +8,7 @@ The rules in `calendars.md` run from 2000 to 2099, but a rule is only as good as
 |---|---|---|---|---|
 | `GBLO` | UK Government, England and Wales bank holidays, `gov.uk/bank-holidays.json` | 2026-11-07 | 2028-12-31 | No one-offs 2026 to 2028 for England and Wales (2026-06-15 is Scotland only) |
 | `EUTA` | ECB, T2 closing days | 2026-11-07 | standing rule (2099) | Read through a page summary, not verbatim; recheck the wording at the next refresh |
-| `USGS` | SIFMA US fixed income holiday recommendations, 17 Dec 2025 release | 2026-11-07 | 2027-01-01 | **Fails the 12-month test now.** SIFMA usually publishes the next year in December. SIFMA lists Good Friday 2026-04-03 as an early close (12:00), not a full close; `calendars.md` treats every Good Friday as a holiday. That difference is a ruling candidate and is not changed here |
+| `USGS` | SIFMA US fixed income holiday recommendations, 17 Dec 2025 release | 2026-11-07 | 2027-01-01 | **Fails the 12-month test now.** SIFMA usually publishes the next year in December. Good Fridays with a SIFMA early close (2007, 2010, 2012, 2015, 2021, 2023, 2026) are business days, each with its SIFMA source in the JSON (ruling R1-6) |
 
 ## Test
 

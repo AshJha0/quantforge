@@ -153,7 +153,8 @@ def sat_fri_sun_mon(d):
 GBLO_ONEOFF = {date(2002, 6, 3), date(2011, 4, 29), date(2012, 6, 5), date(2022, 6, 3),
                date(2022, 9, 19), date(2023, 5, 8)}
 USGS_ONEOFF = {date(2004, 6, 11), date(2012, 10, 30), date(2018, 12, 5)}
-USGS_REMOVED = set()
+# Good Fridays with a SIFMA early close, not a full close: business days (ruling R1-6, datasets/calendar_provenance.json).
+USGS_REMOVED = {date(2007, 4, 6), date(2010, 4, 2), date(2012, 4, 6), date(2015, 4, 3), date(2021, 4, 2), date(2023, 4, 7), date(2026, 4, 3)}
 EUTA_ONEOFF = {date(2001, 12, 31)}
 
 
@@ -189,6 +190,9 @@ def holidays(cal, y):
         if y >= 2022:
             h.add(sat_fri_sun_mon(date(y, 6, 19)))
         return (h - USGS_REMOVED) | {d for d in USGS_ONEOFF if d.year == y}
+    if cal == "USGS_SOFR":
+        # SOFR publication days (02-curves/overnight-compounding.md, ruling R1-6): USGS, with every Good Friday closed.
+        return holidays("USGS", y) | {gf}
     raise KeyError(cal)
 
 

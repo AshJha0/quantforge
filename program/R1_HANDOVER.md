@@ -50,3 +50,12 @@ Behaviour to build:
 1. `bond.futures.conversion_factor` takes an optional `contract` (`TWO_YEAR`, `THREE_YEAR`, `FIVE_YEAR`, `TEN_YEAR`, `ULTRA_TEN_YEAR`, `BOND`, `ULTRA_BOND`, or `null` = `TEN_YEAR`; another string `E_SCHEMA`). It rounds the coupon to the nearest 1/8 of 1% (ties up) first. 2Y, 3Y and 5Y use whole months. `v = z - 6` for `z >= 7`.
 2. Every `credit.*` operation: `discount.interpolation` other than `LOG_LINEAR_DF` is `E_INPUT`, before every other rule check.
 R1-1, R1-2 and R1-5 change only labels.
+
+## Ruling R1-6: USGS Good Friday early closes (ready)
+
+Read `specifications/01-core/calendars.md` (USGS, version 1.1.0), `specifications/02-curves/overnight-compounding.md` (SOFR calendar), `specifications/r1-rulings.md` R1-6 and register row E14.
+
+1. `USGS`: Good Friday is a holiday except 2007-04-06, 2010-04-02, 2012-04-06, 2015-04-03, 2021-04-02, 2023-04-07 and 2026-04-03, which are business days (SIFMA early closes).
+2. SOFR compounding (`rates.ois.compound_dated`, `rates.fallback.rate` on SOFR) treats every Good Friday as a non-business day, because the NY Fed publishes no SOFR then.
+
+Changed goldens: `core/calendar.json` cases `calendar-0033`, `-0035`, `-0037`, `-0040` (USGS holidays for 2012, 2021, 2023, 2026). New: `stage_d/edge_d` cases `edge_d-0018` to `edge_d-0024`. No other golden changed (full `run_all.py` regeneration, 2026-11-07).
