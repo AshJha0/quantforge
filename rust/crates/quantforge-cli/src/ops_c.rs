@@ -508,6 +508,21 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("rmse", rmse.into()),
             ]))
         }
+        "vol.sabr.arbfree" => {
+            let (s, k) = (sabr_inputs(i)?, i.reals("strikes")?);
+            let (cells, below) = (i.int("cells")?, i.int("cells_below")?);
+            let steps = i.int("steps")?;
+            i.gate()?;
+            let r = sabr::arbfree(&s, cells, below, steps, &k)?;
+            plain(obj([
+                ("call_prices", r.call_prices.into()),
+                ("vols", r.vols.into()),
+                ("mass", r.mass.into()),
+                ("mean", r.mean.into()),
+                ("absorbed", r.absorbed.into()),
+                ("min_density", r.min_density.into()),
+            ]))
+        }
         // next arm
         _ => fail(
             "E_UNSUPPORTED_OPERATION",

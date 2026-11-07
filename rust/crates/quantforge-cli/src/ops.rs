@@ -127,6 +127,7 @@ pub const OPERATIONS: &[&str] = &[
     "vol.equity.price",
     "vol.option.implied",
     "vol.option.price",
+    "vol.sabr.arbfree",
     "vol.sabr.calibrate",
     "vol.sabr.density",
     "vol.sabr.hagan",
