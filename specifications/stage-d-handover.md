@@ -42,9 +42,9 @@ New operations: `fx.xccy.bootstrap`, `fx.xccy.pv`, `fx.ndf.pv`. Goldens: `datase
 
 New operations: `credit.cds.price`, `credit.cds.bootstrap`, `credit.index.intrinsic`, `credit.curve.composite`. Goldens: `datasets/golden/stage_d/credit_d.json`, 19 cases. Read: `specifications/04-pricing/credit.md`; the D4 table in `stage-d-targets.md`; rulings D19 to D21.
 
-### D5
+### D5 equity (ready)
 
-Not yet specified. Do not start it.
+New operations: `eq.dividend.implied`, `eq.borrow.implied`, `eq.futures.basis`, `eq.index.dividends`, `eq.index.rebalance`, `eq.corporate_action.adjust`, `eq.trs.pv`. Goldens: `datasets/golden/stage_d/{equity_d,index_d,trs_d}.json`, 25 cases. Read: `specifications/02-curves/equity-curves.md`, `specifications/04-pricing/equity-index.md`; the D5 table in `stage-d-targets.md`; rulings D22 to D24.
 
 ## Wave 3
 

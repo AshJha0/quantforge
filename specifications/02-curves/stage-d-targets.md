@@ -51,4 +51,12 @@ Calibration is judged on repricing, and on parameters only where the minimum is 
 | Hazard bootstrap | Survival within 1e-9 | QuantLib fair spreads on the result | Within 2e-10 |
 | Index intrinsic, composite curves | 1e-9 | Through the above | |
 
+## Wave 2, D5: equity
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Implied dividends, futures basis, TRS | `simple_analytic` | Analytic | No outside library |
+| Implied borrow, financing spread | `root_finding` | Known truth | |
+| Index dividends, dividend futures, rebalance, corporate actions | `simple_analytic` | Exact rationals | |
+
 Every target is wide enough for libm and solver differences, and narrow enough to catch each of the 65 wrong conventions the generator lists (the smallest gap is 2.6e-6).

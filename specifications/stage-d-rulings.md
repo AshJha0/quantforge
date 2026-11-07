@@ -31,6 +31,10 @@ Spec version 1.0.0. Normative: this page is part of every stage D spec, and wins
 | D20 | Hazard pillars | At each quote's maturity (ISDA). QuantLib's `SpreadCdsHelper` puts them a day after the last payment; that is a wrong-convention check here |
 | D21 | Observation day | Coupon survival and accrual-on-default end at payment date minus 1 day, as QuantLib's `IsdaCdsEngine` source. Read from QuantLib 1.44 `isdacdsengine.cpp` |
 
+| D22 | Borrow and financing | Flat continuous rates on top of the funding curve, in `C`. Term structures of borrow are later work |
+| D23 | Dividend futures | Fair price is the sum of known index dividend points in the period, ex-dates inclusive at both ends; no discounting (futures, deterministic dividends) |
+| D24 | TRS | One period, paid at `end`, dividends paid at `end`. `current_rate` key required |
+
 Cases for rulings carry the `ruling` tag.
 
 ## Oracle coverage
@@ -47,6 +51,7 @@ Cases for rulings carry the `ruling` tag.
 | `bondfit_d` | SciPy `least_squares` | Known truth |
 | `xccy_d` | QuantLib `OvernightLeg` NPV of foreign coupons | Bootstrap is known truth; NDF analytic |
 | `credit_d` | QuantLib `IsdaCdsEngine` (the ISDA model as QuantLib implements it) | Index and composite curves are sums of checked parts |
+| `equity_d`, `index_d`, `trs_d` | None: analytic and exact rationals only | All |
 | `fits_d` | SciPy `least_squares` (Huber) | Exact rationals; NumPy |
 
 The generator stops if a tolerance would let one of its 65 wrong conventions through. All stage D data is synthetic.

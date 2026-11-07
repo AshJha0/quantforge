@@ -224,6 +224,19 @@ def check_d(c, counts):
     if op == "credit.index.intrinsic":
         assert abs(o["basis"] - (i["quoted_upfront"] - o["intrinsic_upfront"])) < 1e-15, cid
         hit("index basis = quoted - intrinsic")
+    if op == "eq.dividend.implied":
+        assert all(abs(a - b) < 1e-9 for a, b in zip(o["pv_dividends"], [sum(o["period_pv_dividends"][:k + 1]) for k in range(len(o["pv_dividends"]))])), cid
+        hit("implied dividends: period amounts sum to the cumulative")
+    if op == "eq.futures.basis":
+        assert abs(o["basis"] - (i["futures_price"] - o["fair_price"])) < 1e-9, cid
+        hit("futures basis = market - fair")
+    if op == "eq.corporate_action.adjust":
+        assert abs(o["adjusted_shares"] * o["ex_price"] - i["shares"] * i["cum_price"]) < 1e-6 * i["shares"] * i["cum_price"], cid
+        hit("corporate action keeps shares x price")
+    if op == "eq.trs.pv":
+        sg = 1 if i["trade"]["side"] == "RECEIVE_EQUITY" else -1
+        assert abs(o["pv"] - sg * (o["equity_leg"] - o["funding_leg"])) < 1e-9 * abs(o["equity_leg"]) + 1e-9, cid
+        hit("TRS pv = sign (equity - funding)")
     if op == "calib.curve.robust":
         d = i["delta"]
         assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid
