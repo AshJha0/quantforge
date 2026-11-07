@@ -247,6 +247,7 @@ Phase R2 (contract 1.7.0) adds these, with no new error code:
 | Prefix | Spec |
 |---|---|
 | `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` | `06-risk/par-and-key-rate.md` |
+| `risk.pnl.explain` | `06-risk/pnl-explain.md` |
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.

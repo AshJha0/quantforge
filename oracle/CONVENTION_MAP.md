@@ -16,6 +16,9 @@ Review: self-reviewed 2026-11-07. The spec session read each spec section and th
 | `ISDA.FALLBACK` | 02-curves/overnight-compounding.md fallbacks: ISDA 2020 IBOR Fallbacks Protocol, spreads fixed 2021-03-05 (Bloomberg ISDA fallback spread announcement) | `{"USD-LIBOR-1M": ("SOFR", 0.0011448), "USD-LIBOR-3M": ("SOFR", 0.0026161), "USD-LIBOR-6M": ("SOFR", 0.0042826` | rate in arrears with a 2 business-day observation shift; the spread is a published constant, not a QuantLib value |
 | `HW.CONVEXITY` | 02-curves/futures-convexity.md Hull-White futures convexity | `ql.HullWhite.convexityBias, "same closed form; QuantLib takes the quoted price"` | same closed form; QuantLib takes the quoted price |
 | `RATE.SIMPLE_ACT_360` | 04-pricing/bonds.md repo: simple interest on ACT/360 | `ql.InterestRate(r, ql.Actual360(), ql.Simple, ql.Annual), ""` |  |
+| `CRV.ZERO_SPREAD` | 02-curves/csa-and-basis.md CSA spread: D(d) = Dc(d) exp(-s t), s continuous on curve time | `ql.ZeroSpreadedTermStructure(h, ql.QuoteHandle(ql.SimpleQuote(s)), ql.Continuous, ql.NoFrequency, ql.Actual...` |  |
+| `CAL.JOINT_USGS_EUTA` | 02-curves/cross-currency.md joint calendar: a business day on both USGS and EUTA | `ql.JointCalendar(ql.UnitedStates(ql.UnitedStates.GovernmentBond), ql.TARGET()), "QuantLib JoinHolidays is t...` | QuantLib JoinHolidays is the default rule |
+| `GEN.FORWARD` | 02-curves/cross-currency.md dates start + 3k months from start, each adjusted | `ql.DateGeneration.Forward, ""` |  |
 | `DC.ACT_360` | 01-core/daycount.md ACT_360 | `ql.Actual360(), ""` |  |
 | `DC.ACT_360_INCL_LAST` | 04-pricing/credit.md accrual on default, last day included | `ql.Actual360(True), "ISDA CDS standard model"` | ISDA CDS standard model |
 | `DC.ACT_365F` | 01-core/daycount.md ACT_365F; curve time in 02-curves/curve-framework.md | `ql.Actual365Fixed(), ""` |  |
