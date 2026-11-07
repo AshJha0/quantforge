@@ -98,5 +98,74 @@ class Recorder(unittest.TestCase):
             self.assertFalse(log.exists())
 
 
+class GalleryVol(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sp = importlib.util.spec_from_file_location("build_gallery", ROOT / "tools/build_gallery.py")
+        cls.bg = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(cls.bg)
+
+    def test_smile_renders_only_given_numbers(self):
+        svg = self.bg.smile_chart("t", [{"name": "1y", "strikes": [90, 100, 110], "vols": [0.31, 0.25, 0.22]}], "c")
+        self.assertIn("<polyline", svg)
+        self.assertIn("</svg>", svg)
+
+    def test_smile_refuses_empty_or_ragged(self):
+        with self.assertRaises(ValueError):
+            self.bg.smile_chart("t", [], "c")
+        with self.assertRaises(ValueError):
+            self.bg.smile_chart("t", [{"name": "x", "strikes": [1, 2], "vols": [0.2]}], "c")
+
+    def test_surface_grid(self):
+        svg = self.bg.surface_svg("t", [90, 100], ["3m", "1y"], [[0.3, 0.25], [0.28, 0.24]], "c")
+        self.assertEqual(svg.count("<rect"), 4)
+        with self.assertRaises(ValueError):
+            self.bg.surface_svg("t", [90, 100], ["3m"], [[0.3]], "c")
+
+    def test_stage_c_moved_from_planned_to_pages(self):
+        planned = {n for n, _ in self.bg.PLANNED}
+        for n in ("Implied volatility smile", "Implied volatility surface"):
+            self.assertNotIn(n, planned)
+        self.assertEqual(set(self.bg.VOLS), {"equity-forward", "svi-smile", "ssvi-surface", "sabr"})
+
+    def test_stage_c_pages_have_every_section_and_label(self):
+        out = ROOT / "docs/curves"
+        for slug, spec in self.bg.VOLS.items():
+            text = (out / f"{slug}.md").read_text(encoding="utf-8")
+            for head in ("Implemented, not Validated", "## What it is", "## Inputs", "## Command", "## Charts", "## Numbers",
+                         "## Four-language agreement", "## Oracle evidence and limits", "Limits:", "Synthetic inputs, not market data."):
+                self.assertIn(head, text, f"{slug}: {head}")
+            self.assertIn("<svg", text)
+            self.assertNotIn("nterview", text)
+            for v in spec["examples"].values():
+                self.assertTrue((ROOT / "examples" / v).is_file())
+
+    def test_stage_c_data_matches_inputs_and_goldens(self):
+        out = ROOT / "docs/curves/data"
+        for slug, spec in self.bg.VOLS.items():
+            d = json.loads((out / f"{slug}.json").read_text(encoding="utf-8"))
+            for v in spec["examples"].values():
+                self.assertEqual(d["meta"]["example_hashes"][v], self.bg.example_hash(v))
+            self.assertEqual(d["evidence"], self.bg.golden_c(spec["golden"]))
+            self.assertGreater(d["evidence"]["cases"], 0)
+            for r in d["agreement"]:
+                self.assertIsNotNone(r["largest_difference"], r["output"])
+
+    def test_agreement_flatten_and_flags(self):
+        self.assertEqual(self.bg.flatten({"a": [[1, 2], [3]], "b": True, "c": "x"}), [1.0, 2.0, 3.0])
+        same = {"python": {"r": {"v": [1.0, 2.0], "ok": True}}}
+        res = {lang: same["python"] for lang in self.bg.LANGS}
+        rows = self.bg.vol_agreement({**res, "python": same["python"]})
+        self.assertEqual([r["largest_difference"] for r in rows], [0.0, 0.0])
+        res["java"] = {"r": {"v": [1.0, 2.5], "ok": False}}
+        rows = self.bg.vol_agreement({**res, "python": same["python"]})
+        self.assertEqual(rows[0]["largest_difference"], 0.5)
+        self.assertIsNone(rows[1]["largest_difference"])
+
+    def test_density_chart_has_a_zero_line_and_only_given_numbers(self):
+        svg = self.bg.chart("t", "x", "y", [{"name": "d", "colour": 1, "shape": "line", "pts": [(1, -2.0), (2, 3.0)]}], "c", y_zero=True, x_lo=1)
+        self.assertIn(">0<", svg)
+
+
 if __name__ == "__main__":
     unittest.main()

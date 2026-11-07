@@ -1,0 +1,4303 @@
+{
+ "schema_version": "1.0",
+ "suite": "black_deep",
+ "spec": "specifications/05-volatility/black-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "black_deep-0001",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.976023984008195,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0002",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.99196074112928,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0003",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 11.99196074112928
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0004",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12.944933095066844,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0005",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 12.944933095066844
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0006",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.78585847156186,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0007",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 11.78585847156186
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0008",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13.841026773728728,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0009",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 13.841026773728728
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0010",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 21.0631629272151,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0011",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 21.0631629272151
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0012",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.734246708223774,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0013",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 11.734246708223774
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0014",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 18.06994243141557,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0015",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 18.06994243141557
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0016",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31.538827795681044,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0017",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 48.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 31.538827795681044
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0018",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.7553959150026712,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0019",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 0.7553959150026712
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0020",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.2654326008266117,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0021",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 2.2654326008266117
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0022",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5.277215222632119,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0023",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 5.277215222632119
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0024",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.345278923611242,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0025",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 2.345278923611242
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0026",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.012461956030638,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0027",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 7.012461956030638
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0028",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 16.094546730004947,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0029",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 16.094546730004947
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0030",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.411887315798295,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0031",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 4.411887315798295
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0032",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13.061515349798158,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0033",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 13.061515349798158
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0034",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 28.583708471374578,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0035",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 60.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 28.583708471374578
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0036",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.4687182088382107e-13,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0037",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.019920946401600817,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0038",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 0.019920946401600817
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0039",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.2111363888235542,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0040",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 0.1,
+    "forward": 60.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 1.2111363888235542
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0041",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.029342989851000083,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0042",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 0.029342989851000083
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0043",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.5983033675595792,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0044",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 2.5983033675595792
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0045",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.625973559417545,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0046",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 1.0,
+    "forward": 60.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 11.625973559417545
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0047",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.8210631894801635,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0048",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 0.8210631894801635
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0049",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.740682843469926,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0050",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 8.740682843469926
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0051",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 25.576789548801774,
+     "forward": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0052",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 75.0,
+    "expiry_years": 4.0,
+    "forward": 60.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 25.576789548801774
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0053",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19.960039973347,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0054",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19.98660123521546,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0055",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 19.98660123521546
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0056",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 21.574888491778065,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0057",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 21.574888491778065
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0058",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19.643097452603104,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0059",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 19.643097452603104
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0060",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23.068377956214555,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0061",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 23.068377956214555
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0062",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 35.1052715453585,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0063",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 35.1052715453585
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0064",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19.55707784703963,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0065",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 19.55707784703963
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0066",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 30.116570719025958,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0067",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 30.116570719025958
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0068",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 52.56471299280174,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0069",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 80.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 52.56471299280174
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0070",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.2589931916711234,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0071",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 1.2589931916711234
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0072",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3.775721001377697,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0073",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 3.775721001377697
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0074",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.795358704386857,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0075",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 8.795358704386857
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0076",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3.908798206018734,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0077",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 3.908798206018734
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0078",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.687436593384392,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0079",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 11.687436593384392
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0080",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26.82424455000825,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0081",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 26.82424455000825
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0082",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.353145526330497,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0083",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 7.353145526330497
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0084",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 21.769192249663604,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0085",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 21.769192249663604
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0086",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 47.63951411895762,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0087",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 47.63951411895762
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0088",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.11453034806362e-13,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0089",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.033201577336001216,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0090",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 0.033201577336001216
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0091",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.0185606480392577,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0092",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 0.1,
+    "forward": 100.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 2.0185606480392577
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0093",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.0489049830850001,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0094",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 0.0489049830850001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0095",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.3305056125993,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0096",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 4.3305056125993
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0097",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19.376622599029243,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0098",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 19.376622599029243
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0099",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.3684386491336047,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0100",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 1.3684386491336047
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0101",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14.56780473911655,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0102",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 14.56780473911655
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0103",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 42.62798258133628,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0104",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 125.0,
+    "expiry_years": 4.0,
+    "forward": 100.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 42.62798258133628
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0105",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31.9360639573552,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0106",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31.978561976344725,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0107",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 31.978561976344725
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0108",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 34.51982158684491,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0109",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 34.51982158684491
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0110",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31.42895592416496,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0111",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 31.42895592416496
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0112",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 36.9094047299433,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0113",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 36.9094047299433
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0114",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 56.16843447257361,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0115",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 56.16843447257361
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0116",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31.291324555263397,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0117",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 31.291324555263397
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0118",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 48.18651315044153,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0119",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 48.18651315044153
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0120",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 84.10354078848277,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0121",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 128.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 84.10354078848277
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0122",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.0143891066737805,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0123",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 2.0143891066737805
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0124",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.041153602204312,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0125",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 6.041153602204312
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0126",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14.072573927018992,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0127",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 14.072573927018992
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0128",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.254077129629997,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0129",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 6.254077129629997
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0130",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 18.699898549415014,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0131",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 18.699898549415014
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0132",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 42.918791280013195,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0133",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 42.918791280013195
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0134",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.765032842128779,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0135",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 11.765032842128779
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0136",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 34.83070759946176,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0137",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 34.83070759946176
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0138",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 76.2232225903322,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0139",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 160.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 76.2232225903322
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0140",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.583248556902153e-13,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0141",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.05312252373760203,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0142",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 0.05312252373760203
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0143",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3.2296970368628135,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0144",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 0.1,
+    "forward": 160.0,
+    "discount_factor": 0.9980019986673331,
+    "price": 3.2296970368628135
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0145",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.07824797293600051,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0146",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 0.07824797293600051
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0147",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.928808980158883,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0148",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 6.928808980158883
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0149",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31.0025961584468,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0150",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 1.0,
+    "forward": 160.0,
+    "discount_factor": 0.9801986733067553,
+    "price": 31.0025961584468
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0151",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.189501838613768,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0152",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 2.189501838613768
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0153",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23.308487582586483,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0154",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 23.308487582586483
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0155",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "vol": 0.7
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 68.20477213013805,
+     "forward": 160.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "put-call-parity"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "black_deep-0156",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 200.0,
+    "expiry_years": 4.0,
+    "forward": 160.0,
+    "discount_factor": 0.9231163463866358,
+    "price": 68.20477213013805
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.7
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  }
+ ]
+}

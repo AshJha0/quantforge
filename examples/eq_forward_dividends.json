@@ -1,0 +1,44 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-eq-forward",
+ "operation": "eq.forward.outright",
+ "inputs": {
+  "spot": 100.0,
+  "as_of": "2026-11-06",
+  "expiry": "2027-11-06",
+  "funding_curve": {
+   "as_of": "2026-11-06",
+   "interpolation": "LOG_LINEAR_DF",
+   "pillars": [
+    {
+     "date": "2046-11-01",
+     "discount_factor": 0.44932896411722156
+    }
+   ]
+  },
+  "borrow_curve": {
+   "as_of": "2026-11-06",
+   "interpolation": "LOG_LINEAR_DF",
+   "pillars": [
+    {
+     "date": "2046-11-01",
+     "discount_factor": 0.8187307530779818
+    }
+   ]
+  },
+  "dividends": [
+   {
+    "ex_date": "2027-01-18",
+    "amount": 1.5
+   },
+   {
+    "ex_date": "2027-04-01",
+    "amount": 1.5
+   },
+   {
+    "ex_date": "2027-11-06",
+    "amount": 1.0
+   }
+  ]
+ }
+}

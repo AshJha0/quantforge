@@ -1,0 +1,1544 @@
+{
+ "schema_version": "1.0",
+ "suite": "greeks",
+ "spec": "specifications/06-risk/vol-greeks.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "greeks-0001",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.827321225352126,
+     "delta": 0.5734959790277754,
+     "gamma": 0.01935758770796135,
+     "vega": 38.715175415922694,
+     "theta": -4.753689862887256,
+     "rho": 48.5222766774254,
+     "vanna": 3.76096692555143e-16,
+     "volga": -7.521933851102852e-15
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0002",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.5734959725749889,
+     "gamma": 0.019357587248691743,
+     "vega": 38.71517515779743,
+     "volga": 1.687538997430238e-06,
+     "vanna": -1.4654943925052064e-07
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0003",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.72660043174363,
+     "delta": 0.5236330021587181,
+     "gamma": 0.01925219855263507,
+     "vega": 38.504397105270144,
+     "theta": -3.8504397105270147,
+     "rho": -7.72660043174363,
+     "vanna": 0.1925219855263507,
+     "volga": -1.9252198552635074
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0004",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.5236329973461462,
+     "gamma": 0.019252198084629413,
+     "vega": 38.50439704173203,
+     "volga": -1.9252202276831554,
+     "vanna": 0.19252201044483994
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0005",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.739480239787794,
+     "delta": 0.485,
+     "gamma": 0.019348700599469484,
+     "vega": 0.3869740119893897,
+     "theta": -3.8697401198938968,
+     "rho": -7.739480239787794,
+     "vanna": -0.0,
+     "volga": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0006",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.48500000000024635,
+     "gamma": 0.019348700197596713,
+     "vega": 0.38697401198939385,
+     "volga": -2.220446049250313e-12,
+     "vanna": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0007",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.86689120528615,
+     "delta": -0.4165538547213928,
+     "gamma": 0.01935758770796135,
+     "vega": 38.715175415922694,
+     "theta": -2.8324030959909,
+     "rho": -48.522276677425424,
+     "vanna": 3.76096692555143e-16,
+     "volga": -7.521933851102852e-15
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0008",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.41655386117449567,
+     "gamma": 0.01935758717763747,
+     "vega": 38.715175157830735,
+     "volga": 1.3988810110276972e-06,
+     "vanna": -1.4388490399142026e-07
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0009",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.72660043174363,
+     "delta": -0.44636699784128187,
+     "gamma": 0.01925219855263507,
+     "vega": 38.504397105270144,
+     "theta": -3.8504397105270147,
+     "rho": -7.72660043174363,
+     "vanna": 0.1925219855263507,
+     "volga": -1.9252198552635074
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0010",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.4463670026543465,
+     "gamma": 0.019252198084629413,
+     "vega": 38.50439704173203,
+     "volga": -1.9252202276831554,
+     "vanna": 0.19252200955666152
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0011",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.739480239787794,
+     "delta": -0.485,
+     "gamma": 0.019348700599469484,
+     "vega": 0.3869740119893897,
+     "theta": -3.8697401198938968,
+     "rho": -7.739480239787794,
+     "vanna": -0.0,
+     "volga": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0012",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.48500000000024635,
+     "gamma": 0.019348700197596713,
+     "vega": 0.38697401198939385,
+     "volga": -2.220446049250313e-12,
+     "vanna": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0013",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.4986301369863014,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.6823333272413835,
+     "delta": 0.08944244834643225,
+     "gamma": 0.009144708015245844,
+     "vega": 11.399567525854408,
+     "theta": -3.016136151639949,
+     "rho": 4.11963806670448,
+     "vanna": 0.9802170584225163,
+     "volga": 92.84987281519514
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0014",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.4986301369863014,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.08944245840364906,
+     "gamma": 0.009144707860953005,
+     "vega": 11.399563738201834,
+     "volga": 92.84985507918009,
+     "vanna": 0.9802163455918665
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0015",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.4986301369863014,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.5887859451171077,
+     "delta": 0.07863554318527996,
+     "gamma": 0.00825094550170946,
+     "vega": 10.285425214459739,
+     "theta": -2.5784204692842065,
+     "rho": -0.29358641646935235,
+     "vanna": 0.9173284251592411,
+     "volga": 90.5520840380782
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0016",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.4986301369863014,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.07863555269936873,
+     "gamma": 0.008250945484622463,
+     "vega": 10.285422146361078,
+     "volga": 90.55206137276173,
+     "vanna": 0.9173277012330948
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0017",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.4986301369863014,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 25.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.31362611018074393,
+     "delta": 0.04328456038077311,
+     "gamma": 0.005173094209981863,
+     "vega": 0.06448651686415748,
+     "theta": -1.6165919406193325,
+     "rho": -0.15638343028190518,
+     "vanna": 0.006207713051978235,
+     "volga": 0.0074492556623738816
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0018",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.4986301369863014,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 25.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.04328456868047115,
+     "gamma": 0.005173094489996366,
+     "vega": 0.06448651338513023,
+     "volga": 0.007449252156899176,
+     "vanna": 0.006207706936545154
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0019",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.35
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.685718380356054,
+     "delta": -0.1442009126063033,
+     "gamma": 0.0045576544194639666,
+     "vega": 31.90358093624777,
+     "theta": -2.3625899552983913,
+     "rho": -38.211619281972766,
+     "vanna": -0.3570270414138998,
+     "volga": 52.95985548876371
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0020",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.35
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.1442009149760004,
+     "gamma": 0.004557654555981117,
+     "vega": 31.903572160438188,
+     "volga": 52.959889194252064,
+     "vanna": -0.3570272504939607
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0021",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.35
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5.4461738793056975,
+     "delta": -0.16150724472643782,
+     "gamma": 0.0048932017901561565,
+     "vega": 34.2524125310931,
+     "theta": -2.997086096470645,
+     "rho": -10.892347758611395,
+     "vanna": -0.32739007282592075,
+     "volga": 44.822034226416605
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0022",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.35
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.16150724713712705,
+     "gamma": 0.004893201914768497,
+     "vega": 34.2524044860986,
+     "volga": 44.82206769731253,
+     "vanna": -0.3273903316066854
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0023",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 35.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.018493800643615,
+     "delta": -0.2640601789782308,
+     "gamma": 0.006506244559179811,
+     "vega": 0.4554371191425869,
+     "theta": -3.9850747924976337,
+     "rho": -16.03698760128723,
+     "vanna": -0.005576781050725552,
+     "volga": 0.004780098043479045
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0024",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 35.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.26406018030646905,
+     "gamma": 0.006506244556447882,
+     "vega": 0.45543704573383076,
+     "volga": 0.00478010156373376,
+     "vanna": -0.005576784261052125
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0025",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "spot": 50.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23.420404899730446,
+     "delta": 0.7626150564752968,
+     "gamma": 0.005444607003324223,
+     "vega": 24.500731514958996,
+     "theta": -2.5100760609792836,
+     "rho": 44.13104377210319,
+     "vanna": 0.11654020161363679,
+     "volga": -7.994109618926914
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0026",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "spot": 50.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.7626150556760081,
+     "gamma": 0.005444606756555004,
+     "vega": 24.500729659561554,
+     "volga": -7.994105653984385,
+     "vanna": 0.11654004961059174
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0027",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "forward": 50.0,
+    "discount_factor": 0.97,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 22.52579600987316,
+     "delta": 0.7455689395003613,
+     "gamma": 0.0056872674823998685,
+     "vega": 25.592703670799406,
+     "theta": -2.559270367079941,
+     "rho": -67.57738802961948,
+     "vanna": 0.15017061476661636,
+     "volga": -9.550144688002812
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0028",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "forward": 50.0,
+    "discount_factor": 0.97,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.7455689386915765,
+     "gamma": 0.005687267332632473,
+     "vega": 25.592702142981004,
+     "volga": -9.550141813166295,
+     "vanna": 0.15017048700845712
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0029",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "forward": 50.0,
+    "discount_factor": 0.97,
+    "vol": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 25.328980380911485,
+     "delta": 0.5590160150519435,
+     "gamma": 0.007310674159404463,
+     "vega": 0.6579606743464016,
+     "theta": -3.289803371732008,
+     "rho": -75.98694114273445,
+     "vanna": -0.0024368913864681544,
+     "volga": 0.000812297128822718
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0030",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "forward": 50.0,
+    "discount_factor": 0.97,
+    "vol": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.5590160149392176,
+     "gamma": 0.007310674021709929,
+     "vega": 0.6579606623123624,
+     "volga": 0.0008122979188050926,
+     "vanna": -0.002436893714966952
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0031",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.2493150684931507,
+    "spot": 1500.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 147.93440800894078,
+     "delta": -0.8765140448865695,
+     "gamma": 0.001789648431982842,
+     "vega": 150.58788347198092,
+     "theta": -14.56702234770038,
+     "rho": -364.6745157693982,
+     "vanna": 1.666675835265763,
+     "volga": 1458.6594228391693
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0032",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.2493150684931507,
+    "spot": 1500.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.8765139795574821,
+     "gamma": 0.0017896484779258673,
+     "vega": 150.5878269156824,
+     "volga": 1458.6595537164412,
+     "vanna": 1.6666744897975152
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0033",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.2493150684931507,
+    "forward": 1500.0,
+    "discount_factor": 0.97,
+    "vol": 0.15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 151.01213984115373,
+     "delta": -0.8648549321008749,
+     "gamma": 0.0016064748781933272,
+     "vega": 135.17495807263717,
+     "theta": -40.6638953542686,
+     "rho": -37.64960198779449,
+     "vanna": 1.5761924142749153,
+     "volga": 1458.062865638676
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0034",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.2493150684931507,
+    "forward": 1500.0,
+    "discount_factor": 0.97,
+    "vol": 0.15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.8648548698874947,
+     "gamma": 0.0016064749464324755,
+     "vega": 135.17490756887204,
+     "volga": 1458.0628696118465,
+     "vanna": 1.5761910507055494
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0035",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.2493150684931507,
+    "forward": 1500.0,
+    "discount_factor": 0.97,
+    "vol": 225.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 150.10186276501204,
+     "delta": -0.8818159350783195,
+     "gamma": 0.0014126186327372472,
+     "vega": 0.07924210001450722,
+     "theta": -35.75690914116157,
+     "rho": -37.422656196208486,
+     "vanna": 0.0009417457551581647,
+     "volga": 0.0006278305034387766
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0036",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.2493150684931507,
+    "forward": 1500.0,
+    "discount_factor": 0.97,
+    "vol": 225.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": -0.8818158721231839,
+     "gamma": 0.0014126187983897075,
+     "vega": 0.0792420713539362,
+     "volga": 0.0006278304574803814,
+     "vanna": 0.0009417448963075811
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0037",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.934763194915589,
+     "delta": 0.6623902932100367,
+     "gamma": 0.02974302253304637,
+     "vega": 74.35755633261593,
+     "theta": -1.4885254722356855,
+     "rho": 296.52133063044045,
+     "vanna": -2.6744828203812965,
+     "volga": 307.35068758156734
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0038",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_SCHOLES",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "spot": 100.0,
+    "rate": 0.03,
+    "yield": 0.01,
+    "vol": 0.05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.6623902654662395,
+     "gamma": 0.029743021574546447,
+     "vega": 74.35754902322067,
+     "volga": 307.35094433964605,
+     "vanna": -2.6744839400905103
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0039",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.422292484403242,
+     "delta": 0.34123684702366736,
+     "gamma": 0.032195092913261135,
+     "vega": 80.48773228315284,
+     "theta": -0.4024386614157642,
+     "rho": -12.11146242201621,
+     "vanna": 3.5440463987920223,
+     "volga": 301.5286312573942
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0040",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 0.05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.34123685991882535,
+     "gamma": 0.03219509089991135,
+     "vega": 80.48772504792633,
+     "volga": 301.5288955410256,
+     "vanna": 3.544047782799708
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0041",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.327081925789704,
+     "delta": 0.3175396103190098,
+     "gamma": 0.031318239819078025,
+     "vega": 0.7829559954769507,
+     "theta": -0.39147799773847525,
+     "rho": -11.635409628948521,
+     "vanna": 0.031318239819078025,
+     "volga": 0.031318239819078025
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0042",
+   "operation": "risk.vol.bump_greeks",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "forward": 100.0,
+    "discount_factor": 0.97,
+    "vol": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "delta": 0.3175396311979606,
+     "gamma": 0.031318238140620736,
+     "vega": 0.7829559224009408,
+     "volga": 0.03131826652236214,
+     "vanna": 0.031318252338152774
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 1e-06,
+    "reason": "volga divides rounding of about 1e-15 by a bump squared"
+   }
+  },
+  {
+   "case_id": "greeks-0043",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": -0.01,
+    "expiry_years": 2.0,
+    "forward": 0.01,
+    "discount_factor": 0.98,
+    "shift": 0.03,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.019618138824696468,
+     "delta": 0.9753253378125363,
+     "gamma": 1.2010473637303167,
+     "vega": 0.0007686703127874029,
+     "theta": -3.843351563937014e-05,
+     "rho": -0.039236277649392935,
+     "vanna": -0.15689213986788234,
+     "volga": 0.023005005999230915
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-bump"
+   ],
+   "tags": [
+    "shift",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0044",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "greeks-0045",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 0.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

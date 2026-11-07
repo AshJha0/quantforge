@@ -1,0 +1,1459 @@
+{
+ "schema_version": "1.0",
+ "suite": "equity_forward",
+ "spec": "specifications/02-curves/equity-forward.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "equity_forward-0001",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.04,
+    "borrow": 0.05,
+    "expiry_years": 1.0,
+    "dividends": [
+     {
+      "time_years": 0.5,
+      "amount": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 97.01495841653144
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-rolled",
+    "plan-section-8"
+   ],
+   "tags": [
+    "wrong-convention",
+    "synthetic"
+   ],
+   "description": "plan check case: 97.015 true, 97.064 wrong"
+  },
+  {
+   "case_id": "equity_forward-0002",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.03,
+    "borrow": 0.0,
+    "expiry_years": 2.0,
+    "dividends": [
+     {
+      "time_years": 0.5,
+      "amount": 1.0
+     },
+     {
+      "time_years": 1.5,
+      "amount": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 104.12251373001152
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-rolled"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0003",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 250.0,
+    "rate": 0.01,
+    "borrow": 0.002,
+    "expiry_years": 0.75,
+    "dividends": [
+     {
+      "time_years": 0.25,
+      "amount": 3.0
+     },
+     {
+      "time_years": 0.75,
+      "amount": 3.0
+     },
+     {
+      "time_years": 0.8,
+      "amount": 3.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 245.4924849814842
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-rolled"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0004",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 80.0,
+    "rate": -0.005,
+    "borrow": 0.01,
+    "expiry_years": 3.0,
+    "dividends": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 76.479798546648
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-rolled"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0005",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.05,
+    "borrow": -0.01,
+    "expiry_years": 1.0,
+    "dividends": [
+     {
+      "time_years": 1e-09,
+      "amount": 5.0
+     },
+     {
+      "time_years": 1.0,
+      "amount": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 98.87447192212771
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-rolled"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0006",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 0.0,
+    "rate": 0.04,
+    "borrow": 0.05,
+    "expiry_years": 1.0,
+    "dividends": [
+     {
+      "time_years": 0.5,
+      "amount": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0007",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.04,
+    "borrow": 0.05,
+    "expiry_years": -1.0,
+    "dividends": [
+     {
+      "time_years": 0.5,
+      "amount": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0008",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.04,
+    "borrow": 0.05,
+    "expiry_years": 1.0,
+    "dividends": [
+     {
+      "time_years": 0.5,
+      "amount": -1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0009",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.04,
+    "borrow": 0.05,
+    "expiry_years": 1.0,
+    "dividends": [
+     {
+      "time_years": 0.5,
+      "amount": 1.0
+     },
+     {
+      "time_years": 0.5,
+      "amount": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0010",
+   "operation": "eq.forward.flat",
+   "inputs": {
+    "spot": 100.0,
+    "rate": 0.04,
+    "borrow": 0.05,
+    "expiry_years": 1.0,
+    "dividends": [
+     {
+      "time_years": 0.5,
+      "amount": 200.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0011",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-01-18",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2027-04-01",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2027-11-06",
+      "amount": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 98.98177345393107,
+     "discount_factor": 0.9607894391523232,
+     "carry_factor": 0.970445533548508,
+     "pv_dividends": 3.943580048922307
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic-rolled"
+   ],
+   "tags": [
+    "dividend-on-expiry",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0012",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2026-11-06",
+      "amount": 9.0
+     },
+     {
+      "ex_date": "2027-11-07",
+      "amount": 9.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 103.0454533953517,
+     "discount_factor": 0.9607894391523232,
+     "carry_factor": 0.970445533548508,
+     "pv_dividends": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary",
+    "synthetic"
+   ],
+   "description": "dividends on as_of and after expiry are ignored"
+  },
+  {
+   "case_id": "equity_forward-0013",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": null,
+    "dividends": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 104.08107741923882,
+     "discount_factor": 0.9607894391523232,
+     "carry_factor": 0.9607894391523232,
+     "pv_dividends": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0014",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2026-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 100.0,
+     "discount_factor": 1.0,
+     "carry_factor": 1.0,
+     "pv_dividends": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "boundary",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0015",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2026-11-05",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-01-18",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2027-04-01",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2027-11-06",
+      "amount": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_ORDER"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0016",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-07",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-01-18",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2027-04-01",
+      "amount": 1.5
+     },
+     {
+      "ex_date": "2027-11-06",
+      "amount": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0017",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-01-18",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-19",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-20",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-21",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-22",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-23",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-24",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-25",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-26",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-27",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-28",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-29",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-30",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-01-31",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-01",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-02",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-03",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-04",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-05",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-06",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-07",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-08",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-09",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-10",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-11",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-12",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-13",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-14",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-15",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-16",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-17",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-18",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-19",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-20",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-21",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-22",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-23",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-24",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-25",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-26",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-27",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-02-28",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-01",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-02",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-03",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-04",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-05",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-06",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-07",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-08",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-09",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-10",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-11",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-12",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-13",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-14",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-15",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-16",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-17",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-18",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-19",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-20",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-21",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-22",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-23",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-24",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-25",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-26",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-27",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-28",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-29",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-30",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-03-31",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-01",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-02",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-03",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-04",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-05",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-06",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-07",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-08",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-09",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-10",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-11",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-12",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-13",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-14",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-15",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-16",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-17",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-18",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-19",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-20",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-21",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-22",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-23",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-24",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-25",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-26",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-27",
+      "amount": 0.01
+     },
+     {
+      "ex_date": "2027-04-28",
+      "amount": 0.01
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0018",
+   "operation": "eq.forward.outright",
+   "inputs": {
+    "spot": 100.0,
+    "as_of": "2026-11-06",
+    "expiry": "2027-11-06",
+    "funding_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.44932896411722156
+      }
+     ]
+    },
+    "borrow_curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-01",
+       "discount_factor": 0.8187307530779818
+      }
+     ]
+    },
+    "dividends": [
+     {
+      "ex_date": "2027-04-01",
+      "amount": 1.0
+     },
+     {
+      "ex_date": "2027-01-18",
+      "amount": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0019",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [
+     {
+      "strike": 80.0,
+      "call_bid": 22.630862858915307,
+      "call_ask": 22.83086285891531,
+      "put_bid": 0.8058628589153004,
+      "put_ask": 1.0058628589153005
+     },
+     {
+      "strike": 90.0,
+      "call_bid": 14.910816357811315,
+      "call_ask": 15.110816357811315,
+      "put_bid": 2.7858163578113153,
+      "put_ask": 2.9858163578113155
+     },
+     {
+      "strike": 100.0,
+      "call_bid": 8.995030200613487,
+      "call_ask": 9.195030200613486,
+      "put_bid": 6.570030200613486,
+      "put_ask": 6.770030200613485
+     },
+     {
+      "strike": 110.0,
+      "call_bid": 4.976558218117638,
+      "call_ask": 5.176558218117638,
+      "put_bid": 12.251558218117639,
+      "put_ask": 12.451558218117638
+     },
+     {
+      "strike": 120.0,
+      "call_bid": 2.53307473299498,
+      "call_ask": 2.73307473299498,
+      "put_bid": 19.50807473299498,
+      "put_ask": 19.708074732994984
+     }
+    ],
+    "discount_factor": 0.97
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 102.5,
+     "discount_factor": 0.97,
+     "max_residual": 0.0,
+     "outside_spread": []
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "residual is a rounding-sized number"
+   }
+  },
+  {
+   "case_id": "equity_forward-0020",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [
+     {
+      "strike": 80.0,
+      "call_bid": 22.630862858915307,
+      "call_ask": 22.83086285891531,
+      "put_bid": 0.8058628589153004,
+      "put_ask": 1.0058628589153005
+     },
+     {
+      "strike": 90.0,
+      "call_bid": 14.910816357811315,
+      "call_ask": 15.110816357811315,
+      "put_bid": 2.7858163578113153,
+      "put_ask": 2.9858163578113155
+     },
+     {
+      "strike": 100.0,
+      "call_bid": 8.995030200613487,
+      "call_ask": 9.195030200613486,
+      "put_bid": 6.570030200613486,
+      "put_ask": 6.770030200613485
+     },
+     {
+      "strike": 110.0,
+      "call_bid": 4.976558218117638,
+      "call_ask": 5.176558218117638,
+      "put_bid": 12.251558218117639,
+      "put_ask": 12.451558218117638
+     },
+     {
+      "strike": 120.0,
+      "call_bid": 2.53307473299498,
+      "call_ask": 2.73307473299498,
+      "put_bid": 19.50807473299498,
+      "put_ask": 19.708074732994984
+     }
+    ],
+    "discount_factor": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 102.5,
+     "discount_factor": 0.97,
+     "max_residual": 0.0,
+     "outside_spread": []
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic",
+    "numpy"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "residual is a rounding-sized number"
+   }
+  },
+  {
+   "case_id": "equity_forward-0021",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [
+     {
+      "strike": 80.0,
+      "call_bid": 23.030862858915306,
+      "call_ask": 23.23086285891531,
+      "put_bid": 0.8058628589153004,
+      "put_ask": 1.0058628589153005
+     },
+     {
+      "strike": 90.0,
+      "call_bid": 14.510816357811315,
+      "call_ask": 14.710816357811314,
+      "put_bid": 2.7858163578113153,
+      "put_ask": 2.9858163578113155
+     },
+     {
+      "strike": 100.0,
+      "call_bid": 9.395030200613487,
+      "call_ask": 9.595030200613486,
+      "put_bid": 6.570030200613486,
+      "put_ask": 6.770030200613485
+     },
+     {
+      "strike": 110.0,
+      "call_bid": 4.576558218117638,
+      "call_ask": 4.776558218117637,
+      "put_bid": 12.251558218117639,
+      "put_ask": 12.451558218117638
+     },
+     {
+      "strike": 120.0,
+      "call_bid": 2.93307473299498,
+      "call_ask": 3.13307473299498,
+      "put_bid": 19.50807473299498,
+      "put_ask": 19.708074732994984
+     }
+    ],
+    "discount_factor": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward": 102.58247422680411,
+     "discount_factor": 0.9700000000000008,
+     "max_residual": 0.4799999999999951,
+     "outside_spread": [
+      80.0,
+      90.0,
+      100.0,
+      110.0,
+      120.0
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "numpy"
+   ],
+   "tags": [
+    "noisy",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0022",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [],
+    "discount_factor": 0.97
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0023",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [
+     {
+      "strike": 100.0,
+      "call_bid": 8.995030200613487,
+      "call_ask": 9.195030200613486,
+      "put_bid": 6.570030200613486,
+      "put_ask": 6.770030200613485
+     }
+    ],
+    "discount_factor": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0024",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [
+     {
+      "strike": 100.0,
+      "call_bid": 8.995030200613487,
+      "call_ask": 9.195030200613486,
+      "put_bid": 6.570030200613486,
+      "put_ask": 6.770030200613485
+     },
+     {
+      "strike": 90.0,
+      "call_bid": 14.910816357811315,
+      "call_ask": 15.110816357811315,
+      "put_bid": 2.7858163578113153,
+      "put_ask": 2.9858163578113155
+     }
+    ],
+    "discount_factor": 0.97
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0025",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [
+     {
+      "strike": 100.0,
+      "call_bid": 8.995030200613487,
+      "call_ask": 9.195030200613486,
+      "put_bid": 6.570030200613486,
+      "put_ask": 6.770030200613485
+     }
+    ],
+    "discount_factor": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "equity_forward-0026",
+   "operation": "eq.forward.parity",
+   "inputs": {
+    "quotes": [
+     {
+      "strike": 100.0,
+      "call_bid": 10.195030200613486,
+      "call_ask": 9.195030200613486,
+      "put_bid": 6.570030200613486,
+      "put_ask": 6.770030200613485
+     }
+    ],
+    "discount_factor": 0.97
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

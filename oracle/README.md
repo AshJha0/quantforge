@@ -18,7 +18,7 @@ A hand or replay source is written by the same author as the spec, so it can sha
 Where a case has no outside library in `verified_by`, this risk stands. These results are self-assessment until
 the human review at the end of the project.
 
-`REPORT.md`'s invariant line counts 4,388 cases because that check reads `datasets/golden/core/` only; stage B cases are not covered by it. Stage B's outside and hand sources, suite by suite, are in `specifications/stage-b-rulings.md`.
+`REPORT.md`'s invariant lines cover all three folders: 4,394 stage A cases, 343 stage B cases and 446 stage C cases. Most stage B and C cases have no stated invariant, so for them the check only confirms that none is broken; the lines below each total count the cases that do have one. Stage B's outside and hand sources, suite by suite, are in `specifications/stage-b-rulings.md`.
 
 ## Oracle map
 
@@ -40,7 +40,8 @@ the human review at the end of the project.
 | As-of store, replay | A | Hand rows, own canonical form | In use. Single source |
 | Stage B rates, FX, hedges | B | Per suite in `specifications/stage-b-rulings.md`. Mutants in `MUTANTS.md` | In use. Strata checks schedules and OIS PVs, not curve building. `usecases`, `rulings_b` and `risk` have no outside source |
 | Calibration | B | Closed forms, known truth, NumPy, SciPy | In use |
-| Vol curves, further pricing | C-E | QuantLib, Strata | Planned |
+| Equity forward, Black models, smile, surface, SABR, Greeks | C | Per suite in `specifications/stage-c-rulings.md`. Mutants in `MUTANTS_C.md` | In use. Arbitrage-free SABR at `nu > 0` has no tight outside source |
+| Further vol, pricing | D, E | QuantLib, Strata | Planned |
 | CDS | D | ISDA CDS Standard Model | Planned; licence text to read first |
 | Exposure, xVA | G | Open Source Risk Engine | Planned; licence to verify |
 | SIMM-style margin | G | Hand cases on own parameters | See `LICENCES.md` |

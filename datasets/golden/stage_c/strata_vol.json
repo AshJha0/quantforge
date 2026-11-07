@@ -1,0 +1,1002 @@
+{
+ "schema_version": "1.0",
+ "suite": "strata_vol",
+ "spec": "specifications/05-volatility/black-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "strata_vol-0001",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.965567455405804,
+     "delta": 0.539827837277029,
+     "gamma": 0.01984762737385059,
+     "vega": 39.69525474770118,
+     "theta": -3.969525474770118,
+     "rho": -7.965567455405804,
+     "vanna": 0.19847627373850588,
+     "volga": -1.9847627373850592
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0002",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.965567455405804,
+     "delta": -0.460172162722971,
+     "gamma": 0.01984762737385059,
+     "vega": 39.69525474770118,
+     "theta": -3.969525474770118,
+     "rho": -7.965567455405804,
+     "vanna": 0.19847627373850588,
+     "volga": -1.9847627373850592
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0003",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.5,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.6106401395940217,
+     "delta": 0.08139217625310641,
+     "gamma": 0.008520118737836502,
+     "vega": 10.65014842229563,
+     "theta": -2.662537105573907,
+     "rho": -0.3053200697970109,
+     "vanna": 0.9474006164427429,
+     "volga": 93.50437250285198
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0004",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 0.35
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5.614612246706905,
+     "delta": -0.16650231415096683,
+     "gamma": 0.005044537927996037,
+     "vega": 35.31176549597227,
+     "theta": -3.0897794808975725,
+     "rho": -11.22922449341381,
+     "vanna": -0.33751553899579456,
+     "volga": 46.20828270764598
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0005",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "forward": 50.0,
+    "discount_factor": 1.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23.2224701132713,
+     "delta": 0.7686277726807849,
+     "gamma": 0.005863162352989556,
+     "vega": 26.384230588452997,
+     "theta": -2.6384230588452997,
+     "rho": -69.6674103398139,
+     "vanna": 0.1548150667697076,
+     "volga": -9.845509987631765
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0006",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.25,
+    "forward": 1500.0,
+    "discount_factor": 1.0,
+    "vol": 0.15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 155.71134392756903,
+     "delta": -0.8912685181051374,
+     "gamma": 0.0016575591395775113,
+     "vega": 139.85655240185253,
+     "theta": -41.95696572055576,
+     "rho": -38.92783598189226,
+     "vanna": 1.6264414470949644,
+     "volga": 1504.4206019387284
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0007",
+   "operation": "risk.vol.greeks",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 0.05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.497208746807466,
+     "delta": 0.3517905639419251,
+     "gamma": 0.03319081743635168,
+     "vega": 82.97704359087922,
+     "theta": -0.4148852179543961,
+     "rho": -12.486043734037331,
+     "vanna": 3.653656081228889,
+     "volga": 310.8542590282415
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "analytic-bump"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0008",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.978845608028654,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0009",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 20.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.978845608028654,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0010",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 130.0,
+    "expiry_years": 0.5,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 25.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.3256118422166514,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0011",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 70.0,
+    "expiry_years": 2.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 35.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.266488454271768,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0012",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 40.0,
+    "expiry_years": 3.0,
+    "forward": 50.0,
+    "discount_factor": 1.0,
+    "vol": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26.11235090815617,
+     "forward": 50.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0013",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "strike": 1650.0,
+    "expiry_years": 0.25,
+    "forward": 1500.0,
+    "discount_factor": 1.0,
+    "vol": 225.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 154.7694504421691,
+     "forward": 1500.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0014",
+   "operation": "vol.option.price",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "strike": 105.0,
+    "expiry_years": 5.0,
+    "forward": 100.0,
+    "discount_factor": 1.0,
+    "vol": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.3990535317419632,
+     "forward": 100.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0015",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.018
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.3132312101373863
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0016",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.024
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.2658807994902696
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0017",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.028499999999999998
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.24132005765247522
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0018",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.0315
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.22935760129447622
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0019",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.0375
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.21449644252696756
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0020",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.048
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.20823170937759167
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0021",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     60.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.4277311493595516
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0022",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     80.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.354442247779285
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0023",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     95.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.31493795645311107
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0024",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     105.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.29519840099340056
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0025",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     125.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.27059495038968
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0026",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     160.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.2620746513880662
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0027",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 1.0,
+    "strikes": [
+     0.6
+    ],
+    "expiry_years": 10.0,
+    "alpha": 0.25,
+    "beta": 0.25,
+    "rho": 0.1,
+    "nu": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.33678949501794603
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0028",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 1.0,
+    "strikes": [
+     0.8
+    ],
+    "expiry_years": 10.0,
+    "alpha": 0.25,
+    "beta": 0.25,
+    "rho": 0.1,
+    "nu": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.2969850427971178
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0029",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 1.0,
+    "strikes": [
+     0.95
+    ],
+    "expiry_years": 10.0,
+    "alpha": 0.25,
+    "beta": 0.25,
+    "rho": 0.1,
+    "nu": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.27808937972605113
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0030",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 1.0,
+    "strikes": [
+     1.05
+    ],
+    "expiry_years": 10.0,
+    "alpha": 0.25,
+    "beta": 0.25,
+    "rho": 0.1,
+    "nu": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.26913755182380533
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0031",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 1.0,
+    "strikes": [
+     1.25
+    ],
+    "expiry_years": 10.0,
+    "alpha": 0.25,
+    "beta": 0.25,
+    "rho": 0.1,
+    "nu": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.25740124975847484
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "strata_vol-0032",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 1.0,
+    "strikes": [
+     1.6
+    ],
+    "expiry_years": 10.0,
+    "alpha": 0.25,
+    "beta": 0.25,
+    "rho": 0.1,
+    "nu": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.24860352897487104
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "strata-2.12.78",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  }
+ ]
+}

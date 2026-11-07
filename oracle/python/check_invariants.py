@@ -1,3 +1,4 @@
+import math
 """Checks every golden file against the invariants the specs state, and sweeps day counts by brute force."""
 import json
 from datetime import date, timedelta
@@ -149,6 +150,66 @@ def check_b(c, counts):
         hit("hedge cuts key-rate risk")
 
 
+def check_c(c, counts):
+    """Stage C invariants, from the specs. Counts how many each rule saw."""
+    op, i, e = c["operation"], c["inputs"], c["expected"]
+    if e["status"] != "ok":
+        return
+    o, cid = e["outputs"], c["case_id"]
+
+    def hit(k):
+        counts[k] = counts.get(k, 0) + 1
+    if op == "vol.option.price":
+        F = o["forward"]
+        D = i.get("discount_factor", math.exp(-i.get("rate", 0) * i["expiry_years"]))
+        K, ph = i["strike"], 1 if i["option_type"] == "CALL" else -1
+        lo = D * max(ph * (F - K), 0)
+        assert o["price"] >= lo - 1e-12 * max(1, abs(lo)), cid
+        if i["model"] != "BACHELIER":
+            assert o["price"] <= D * (F + i.get("shift", 0) if ph == 1 else K + i.get("shift", 0)) + 1e-12, cid
+        hit("option price within no-arbitrage bounds")
+    if op == "vol.option.implied":
+        assert o["vol"] >= 0, cid
+        hit("implied vol not negative")
+    if op in ("risk.vol.greeks", "vol.equity.price") or (op == "risk.vol.bump_greeks"):
+        sign = -1 if i.get("side") == "SELL" else 1
+        assert sign * o["gamma"] >= -1e-9 and sign * o["vega"] >= -1e-9, cid
+        hit("gamma and vega not negative for a long option")
+    if op == "eq.forward.outright":
+        assert 0 < o["discount_factor"] and 0 < o["carry_factor"] and o["pv_dividends"] >= 0 and o["forward"] > 0, cid
+        hit("forward positive, factors positive, dividends not negative")
+    if op == "eq.forward.parity":
+        assert o["max_residual"] >= 0 and o["outside_spread"] == sorted(o["outside_spread"]), cid
+        hit("parity residual not negative, breaches ascending")
+    if op == "vol.svi.evaluate":
+        assert all(w > 0 for w in o["total_variance"]) and o["butterfly_free"] == (o["min_g"] >= 0) and o["min_g"] == min(o["g"]), cid
+        hit("SVI variance positive, flag matches min g")
+    if op == "vol.ssvi.evaluate" and 0.0 in i["log_moneyness"]:
+        j = i["log_moneyness"].index(0.0)
+        assert all(abs(r[j] - t) < 1e-14 for r, t in zip(o["total_variance"], i["thetas"])), cid
+        hit("SSVI ATM total variance equals theta")
+    if op == "vol.surface.query":
+        assert all(w > 0 for w in o["total_variance"]), cid
+        hit("surface variance positive")
+    if op == "vol.surface.check":
+        assert o["arbitrage_free"] == (not o["calendar_violations"] and not o["butterfly_violations"]), cid
+        hit("surface flag matches violation lists")
+    if op == "vol.sabr.density":
+        assert o["negative_density"] == (o["min_density"] < -1e-9) and o["min_density"] == min(o["density"]), cid
+        hit("SABR density flag matches minimum")
+    if op == "vol.sabr.arbfree":
+        f = i["forward"] + i["shift"]
+        xs = [k + i["shift"] for k in i["strikes"]]
+        cs = o["call_prices"]
+        assert abs(o["mass"] - 1) < 1e-10 and abs(o["mean"] - f) < 1e-9 * f and o["min_density"] >= 0 and o["absorbed"] >= 0, cid
+        assert all(max(f - x, 0) - 1e-12 <= p <= f + 1e-12 for x, p in zip(xs, cs)), cid
+        assert all(cs[j + 1] <= cs[j] + 1e-12 for j in range(len(cs) - 1)), cid
+        hit("arbitrage-free SABR: mass 1, mean f, density not negative, calls bounded and decreasing")
+    if op == "usecase.vol_surface":
+        assert o["vol"] > 0 and all(f > 0 for f in o["forwards"]), cid
+        hit("use case 3 vol and forwards positive")
+
+
 def main():
     sweep()
     n = 0
@@ -163,6 +224,14 @@ def main():
             check_b(c, counts)
             m += 1
     note(f"invariants: {m} stage B cases checked, none breaks one")
+    for k, v in sorted(counts.items()):
+        note(f"invariants:   {k}: {v}")
+    counts, m = {}, 0
+    for p in sorted((GOLDEN.parent / "stage_c").glob("*.json")):
+        for c in json.loads(p.read_text(encoding="utf-8"))["cases"]:
+            check_c(c, counts)
+            m += 1
+    note(f"invariants: {m} stage C cases checked, none breaks one")
     for k, v in sorted(counts.items()):
         note(f"invariants:   {k}: {v}")
 

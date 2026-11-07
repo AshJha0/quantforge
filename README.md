@@ -3,7 +3,7 @@
 Docs site: <https://ashjha0.github.io/quantforge/>
 ## Quantitative analytics and trading infrastructure
 
-QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Two stages are built so far: Foundation (released as v0.1) and the FX and rates slices (released as v0.2). See Status below.
+QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Three stages are built so far: Foundation (released as v0.1), the FX and rates slices (released as v0.2) and the equity vol slice (stage C, merged locally, not yet tagged as v0.3). See Status below.
 
 ### Toolchains
 - **Java 25:** JDK 25.0.5.
@@ -46,9 +46,11 @@ QuantForge is a quantitative library written four times, in Java, C++, Python an
 4. [Curves gallery](docs/curves/README.md): every implemented curve, with charts from real CLI runs on synthetic inputs.
 
 ### Status
-Each capability moves through `Proposed → Specified → Implemented → Validated → Benchmarked → Operationally tested`. Stage A (domain 01) and the stage B slices of domains 02, 03, 04, 06 and 08 are at Implemented. Nothing is claimed as Validated, Benchmarked or Operationally tested. The rest of those domains, and domains 05, 07 and 09 to 12, are capability lists only.
+Each capability moves through `Proposed → Specified → Implemented → Validated → Benchmarked → Operationally tested`. Stage A (domain 01), the stage B slices of domains 02, 03, 04, 06 and 08, and the stage C slices of domains 02, 04, 05 and 06 are at Implemented. Nothing is claimed as Validated, Benchmarked or Operationally tested. The rest of those domains, and domains 07 and 09 to 12, are capability lists only.
 
 Stage B covers SONIA and minimal SOFR OIS curves, projection curves, FRAs, swaps, FX forwards and swaps, quote-driven basis, Gauss-Newton, Levenberg-Marquardt and BFGS fits, DV01 and key-rate risk, and hedges with a spread-based cost. It was released as v0.2, tag on `fe33b40`. v0.1 was released on 2026-11-06.
+
+Stage C covers equity forwards with borrow and discrete dividends, Black-Scholes, Black-76 and Bachelier prices and implied vols, Greeks, delta conventions, SVI and SSVI, vol surface checks, Hagan and arbitrage-free SABR, and use case 3. It is on branch `stage-c` and has not been tagged or run by CI. On 2026-11-07 all four implementations passed all 5,183 golden cases locally, including 446 stage C cases in 11 suites, and the fuzz driver found nothing after a Java fix. All stage C inputs are synthetic.
 
 What has run (observed, local): on 2026-11-06, after the evidence cleanup, all four implementations passed all 4,737 golden cases in 40 suites through the neutral runner, on one Windows machine. That is 4,388 cases in 21 stage A suites, and 343 cases in 18 stage B suites.
 

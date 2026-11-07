@@ -1,0 +1,171 @@
+{
+ "meta": {
+  "commit": "a4c371f",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "examples": {
+   "main": "examples/ssvi_surface.json"
+  },
+  "example_hashes": {
+   "ssvi_surface.json": "sha256:843534d50e9c21599a654b64830e52aa319f786ba6cfef370823649d69c05c70"
+  }
+ },
+ "inputs": {
+  "main": {
+   "rho": -0.4,
+   "eta": 1.0,
+   "gamma": 0.5,
+   "thetas": [
+    0.01,
+    0.04,
+    0.09,
+    0.16
+   ],
+   "log_moneyness": [
+    -0.4,
+    -0.3,
+    -0.2,
+    -0.1,
+    0.0,
+    0.1,
+    0.2,
+    0.3,
+    0.4
+   ]
+  }
+ },
+ "reference": {
+  "main": {
+   "total_variance": [
+    [
+     0.035335341190401444,
+     0.02850517420022563,
+     0.02177903107917145,
+     0.015335924789558916,
+     0.01,
+     0.00847359942420315,
+     0.010196365467433188,
+     0.01274364012971967,
+     0.015517706394966413
+    ],
+    [
+     0.08634531879296155,
+     0.07343306151427592,
+     0.06098678174035767,
+     0.04947710218262603,
+     0.04,
+     0.03449671467825325,
+     0.033853962116484046,
+     0.03642356028429099,
+     0.04051692282720563
+    ],
+    [
+     0.15399165093288086,
+     0.13595977672862106,
+     0.11882481034189381,
+     0.10317450974618779,
+     0.09,
+     0.0806558903106293,
+     0.07612340130840811,
+     0.07604079609026368,
+     0.07909848553173927
+    ],
+    [
+     0.23882764360494826,
+     0.21660228753511235,
+     0.195633653793597,
+     0.1764967629457208,
+     0.16,
+     0.14711329876589196,
+     0.13864546148309034,
+     0.13477561328565948,
+     0.13492585785786426
+    ]
+   ],
+   "butterfly_free": true,
+   "calendar_free": true
+  }
+ },
+ "agreement": [
+  {
+   "output": "main: total_variance",
+   "count": 36,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.13492585785786426,
+    "cpp": 0.13492585785786426,
+    "python": 0.13492585785786426,
+    "rust": 0.13492585785786426
+   }
+  },
+  {
+   "output": "main: butterfly_free",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": true,
+    "cpp": true,
+    "python": true,
+    "rust": true
+   }
+  },
+  {
+   "output": "main: calendar_free",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": true,
+    "cpp": true,
+    "python": true,
+    "rust": true
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "vol.ssvi.evaluate"
+  ],
+  "cases": 3,
+  "by_source": {
+   "vol.ssvi.evaluate: analytic, atm-equals-theta": 1,
+   "vol.ssvi.evaluate: analytic": 2
+  }
+ }
+}

@@ -1,0 +1,330 @@
+{
+ "meta": {
+  "commit": "a4c371f",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.3.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "examples": {
+   "hagan": "examples/sabr_hagan.json",
+   "density": "examples/sabr_density.json",
+   "arbfree": "examples/sabr_arbfree.json"
+  },
+  "example_hashes": {
+   "sabr_hagan.json": "sha256:e735d6a0fe87a45be55116a108e171ed2603fb95bdd0ffe4c1fa23b4c1cb5975",
+   "sabr_density.json": "sha256:1a3d8fc60b365cf90fa6e0a2f9c664acd5df5d87f75f9b07d46034972a86d6e9",
+   "sabr_arbfree.json": "sha256:1e6e88102c61bac5b941ee3b06aa724d5dc5fc7b018c39e3cafaff5f14a3ca0f"
+  }
+ },
+ "inputs": {
+  "hagan": {
+   "forward": 0.03,
+   "strikes": [
+    0.012,
+    0.015,
+    0.018,
+    0.021,
+    0.024,
+    0.027,
+    0.03,
+    0.033,
+    0.036,
+    0.039,
+    0.042,
+    0.045,
+    0.048,
+    0.051,
+    0.054,
+    0.057,
+    0.06
+   ],
+   "expiry_years": 2.0,
+   "alpha": 0.04,
+   "beta": 0.5,
+   "rho": -0.3,
+   "nu": 0.4
+  },
+  "density": {
+   "forward": 0.02,
+   "strikes": [
+    0.0005,
+    0.001,
+    0.002,
+    0.004,
+    0.008,
+    0.012,
+    0.02,
+    0.03,
+    0.05
+   ],
+   "expiry_years": 20.0,
+   "alpha": 0.03,
+   "beta": 0.5,
+   "rho": -0.3,
+   "nu": 0.5,
+   "h_strike": 0.0002,
+   "on_negative": "REPORT"
+  },
+  "arbfree": {
+   "forward": 1.0,
+   "expiry_years": 1.0,
+   "alpha": 0.3,
+   "beta": 0.5,
+   "rho": -0.3,
+   "nu": 0.4,
+   "shift": 0.0,
+   "cells": 2000,
+   "cells_below": 500,
+   "steps": 1000,
+   "strikes": [
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.0,
+    1.1,
+    1.2,
+    1.35,
+    1.5,
+    1.75,
+    2.0
+   ]
+  }
+ },
+ "reference": {
+  "hagan": {
+   "vols": [
+    0.3848835866995331,
+    0.3450907067776042,
+    0.3132312101373863,
+    0.2872116803720879,
+    0.2658807994902696,
+    0.24858490513522943,
+    0.23492372627921312,
+    0.22458064100738545,
+    0.21720450115594048,
+    0.21236178229663047,
+    0.2095629701091013,
+    0.20832630537077312,
+    0.20823170937759167,
+    0.20894405962227625,
+    0.21021126428792442,
+    0.21185034256686164,
+    0.21373111846197942
+   ]
+  },
+  "density": {
+   "density": [
+    -174.57449723243258,
+    -136.37248758805592,
+    -95.58399617654727,
+    -56.625225555717584,
+    -23.736961640100777,
+    -4.214178303107302,
+    43.79727575653039,
+    19.603041425124598,
+    0.9313033021195529
+   ],
+   "min_density": -174.57449723243258,
+   "negative_density": true
+  },
+  "arbfree": {
+   "call_prices": [
+    0.5060040244406397,
+    0.41274314949012897,
+    0.32490914203569393,
+    0.24515416397650963,
+    0.17620712473493455,
+    0.12013156633591428,
+    0.07760251640425335,
+    0.047637302209191455,
+    0.021148934166029906,
+    0.008787580641447423,
+    0.001923957270174921,
+    0.0004332139065810953
+   ],
+   "vols": [
+    0.4197159265934692,
+    0.38568285459512297,
+    0.35815772714983657,
+    0.33564864938651257,
+    0.31722871291555466,
+    0.30227200280192856,
+    0.29030776102014993,
+    0.2809367583108969,
+    0.27093747192025397,
+    0.2647692670980877,
+    0.2602696807142938,
+    0.26005100598966585
+   ],
+   "mass": 0.999999999999998,
+   "mean": 0.9999999999999978,
+   "absorbed": 0.0002559617098430114,
+   "min_density": 4.9112023424180915e-09
+  }
+ },
+ "agreement": [
+  {
+   "output": "hagan: vols",
+   "count": 17,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.21373111846197942,
+    "cpp": 0.21373111846197942,
+    "python": 0.21373111846197942,
+    "rust": 0.21373111846197942
+   }
+  },
+  {
+   "output": "density: density",
+   "count": 9,
+   "largest_difference": 3.469473597306205e-10,
+   "last": {
+    "java": 0.9313033019243966,
+    "cpp": 0.9313033020978689,
+    "python": 0.9313033021195529,
+    "rust": 0.9313033020978689
+   }
+  },
+  {
+   "output": "density: min_density",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": -174.57449723243258,
+    "cpp": -174.57449723243258,
+    "python": -174.57449723243258,
+    "rust": -174.57449723243258
+   }
+  },
+  {
+   "output": "density: negative_density",
+   "count": 1,
+   "largest_difference": 0.0,
+   "last": {
+    "java": true,
+    "cpp": true,
+    "python": true,
+    "rust": true
+   }
+  },
+  {
+   "output": "arbfree: call_prices",
+   "count": 12,
+   "largest_difference": 1.1102230246251565e-15,
+   "last": {
+    "java": 0.000433213906581095,
+    "cpp": 0.00043321390658109367,
+    "python": 0.0004332139065810953,
+    "rust": 0.0004332139065810959
+   }
+  },
+  {
+   "output": "arbfree: vols",
+   "count": 12,
+   "largest_difference": 1.5931700403370996e-14,
+   "last": {
+    "java": 0.26005100598966563,
+    "cpp": 0.2600510059896658,
+    "python": 0.26005100598966585,
+    "rust": 0.2600510059896657
+   }
+  },
+  {
+   "output": "arbfree: mass",
+   "count": 1,
+   "largest_difference": 1.887379141862766e-15,
+   "last": {
+    "java": 0.9999999999999961,
+    "cpp": 0.9999999999999977,
+    "python": 0.999999999999998,
+    "rust": 0.9999999999999962
+   }
+  },
+  {
+   "output": "arbfree: mean",
+   "count": 1,
+   "largest_difference": 1.7763568394002505e-15,
+   "last": {
+    "java": 0.9999999999999967,
+    "cpp": 0.9999999999999984,
+    "python": 0.9999999999999978,
+    "rust": 0.9999999999999967
+   }
+  },
+  {
+   "output": "arbfree: absorbed",
+   "count": 1,
+   "largest_difference": 1.6263032587282567e-19,
+   "last": {
+    "java": 0.0002559617098430113,
+    "cpp": 0.00025596170984301127,
+    "python": 0.0002559617098430114,
+    "rust": 0.00025596170984301144
+   }
+  },
+  {
+   "output": "arbfree: min_density",
+   "count": 1,
+   "largest_difference": 4.963083675318166e-24,
+   "last": {
+    "java": 4.9112023424180915e-09,
+    "cpp": 4.9112023424180866e-09,
+    "python": 4.9112023424180915e-09,
+    "rust": 4.9112023424180915e-09
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "vol.sabr.hagan",
+   "vol.sabr.density",
+   "vol.sabr.arbfree"
+  ],
+  "cases": 32,
+  "by_source": {
+   "vol.sabr.hagan: quantlib-1.44": 5,
+   "vol.sabr.density: analytic-replay": 3,
+   "vol.sabr.arbfree: quantlib-1.44-cev": 2,
+   "vol.sabr.arbfree: hagan-formula-near, quantlib-1.44-noarbsabr-near": 1,
+   "vol.sabr.arbfree: mass-and-mean": 3,
+   "vol.sabr.hagan: strata-2.12.78, quantlib-1.44": 18
+  }
+ }
+}

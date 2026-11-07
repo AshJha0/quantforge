@@ -1,6 +1,6 @@
 # CLI contract
 
-Version 1.3.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+Version 1.4.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
 The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
@@ -109,6 +109,7 @@ These are the same in all four languages. A case that expects an error passes on
 | `E_AMBIGUOUS_LOCAL_TIME` | A local time falls in a daylight-saving overlap and no choice was given |
 | `E_NON_FINITE` | A result would be NaN or infinite |
 | `E_CURRENCY_MISMATCH` | Two amounts in different currencies were combined |
+| `E_ARBITRAGE` | A model result breaks no-arbitrage and the case asked to reject it (`vol.sabr.density`) |
 | `E_LIMIT` | A size-like input is above its limit in `01-core/limits.md`. No work is started |
 
 Order of checks: `E_PARSE`, then `E_SCHEMA`, then `E_LIMIT` (with the text-size and depth exceptions in `01-core/limits.md` B1 and B2), then the rule checks in the order the operation's spec
@@ -141,7 +142,7 @@ differ in the last bits. Tolerance classes are in `conformance/tolerances/policy
 ## Operations
 
 Operation names are `<domain>.<area>.<verb>`. Each spec file defines its inputs, outputs, and
-errors. Stages A and B:
+errors. Stages A, B and C:
 
 | Prefix | Spec |
 |---|---|
@@ -173,6 +174,13 @@ errors. Stages A and B:
 | `risk.*` | `06-risk/rates-sensitivities.md` |
 | `hedge.*` | `08-hedging/stage-b-hedges.md` |
 | `usecase.*` | `04-pricing/use-cases.md` |
+| `eq.forward.*` | `02-curves/equity-forward.md` |
+| `vol.option.*` | `05-volatility/black-models.md` |
+| `vol.delta.*`, `vol.smile.*`, `vol.svi.*`, `vol.ssvi.*`, `vol.surface.*` | `05-volatility/smile-and-surface.md` |
+| `vol.sabr.*` | `05-volatility/sabr.md` |
+| `vol.equity.price`, `risk.vol.*` | `06-risk/vol-greeks.md` |
+
+Stage C adds `E_ARBITRAGE` and these operations, and breaks nothing in the wire format. `stage-c-rulings.md` is normative for them.
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.

@@ -30,13 +30,13 @@ final class StageB {
     private static final int MAX_QUOTES = 100;
 
     /** A curve as read. Its rule checks wait until {@link #build()}. */
-    private record CurveInput(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] factors) {
+    record CurveInput(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] factors) {
         Curve build() {
             return Curve.of(asOf, interp, dates, factors);
         }
     }
 
-    private static CurveInput curve(In in, String key) {
+    static CurveInput curve(In in, String key) {
         In c = in.object(key);
         LocalDate asOf = c.date("as_of");
         Curve.Interpolation interp = c.choice("interpolation", Curve.Interpolation.class);

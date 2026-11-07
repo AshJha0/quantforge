@@ -1,0 +1,942 @@
+{
+ "schema_version": "1.0",
+ "suite": "sabr",
+ "spec": "specifications/05-volatility/sabr.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "sabr-0001",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.018,
+     0.024,
+     0.028499999999999998,
+     0.03,
+     0.0315,
+     0.0375,
+     0.048
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.3132312101373863,
+      0.2658807994902696,
+      0.24132005765247522,
+      0.23492372627921312,
+      0.22935760129447622,
+      0.21449644252696756,
+      0.20823170937759167
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0002",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     60.0,
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     125.0,
+     160.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.4277311493595516,
+      0.354442247779285,
+      0.31493795645311107,
+      0.30442125000000003,
+      0.29519840099340056,
+      0.27059495038968,
+      0.2620746513880662
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0003",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     60.0,
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     125.0,
+     160.0
+    ],
+    "expiry_years": 0.5,
+    "alpha": 0.25,
+    "beta": 1.0,
+    "rho": -0.6,
+    "nu": 0.8
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.38526489121109186,
+      0.3079055333966916,
+      0.26203593970701966,
+      0.24931666666666666,
+      0.23817697278909827,
+      0.21314391052705223,
+      0.22540875770527766
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0004",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.01,
+    "strikes": [
+     -0.005999999999999998,
+     0.0020000000000000018,
+     0.008,
+     0.010000000000000002,
+     0.012000000000000004,
+     0.020000000000000004,
+     0.034
+    ],
+    "expiry_years": 5.0,
+    "alpha": 0.02,
+    "beta": 0.3,
+    "rho": 0.2,
+    "nu": 0.35,
+    "shift": 0.03
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.24483129626457256,
+      0.21442043683627077,
+      0.20321501848226864,
+      0.20115447715499948,
+      0.19975541794633328,
+      0.19885198337525423,
+      0.20541735968672825
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shift",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0005",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 1.0,
+    "strikes": [
+     0.6,
+     0.8,
+     0.95,
+     1.0,
+     1.05,
+     1.25,
+     1.6
+    ],
+    "expiry_years": 10.0,
+    "alpha": 0.25,
+    "beta": 0.0,
+    "rho": 0.1,
+    "nu": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols": [
+      0.36139815841930345,
+      0.30786592958890335,
+      0.2817640055876211,
+      0.27497916666666666,
+      0.2689840745055014,
+      0.25131838266285805,
+      0.2357871635946757
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0006",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.02,
+     0.03
+    ],
+    "expiry_years": 0.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0007",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.02,
+     0.03
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.0,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0008",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.02,
+     0.03
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 1.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0009",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.02,
+     0.03
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -1.0,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0010",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     0.02,
+     0.03
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": -0.1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0011",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": -0.01,
+    "strikes": [
+     0.02,
+     0.03
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0012",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [
+     -0.01,
+     0.03
+    ],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0013",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 0.02,
+    "strikes": [
+     0.0005,
+     0.001,
+     0.002,
+     0.004,
+     0.008,
+     0.012,
+     0.02,
+     0.03,
+     0.05
+    ],
+    "expiry_years": 20.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.5,
+    "h_strike": 0.0002,
+    "on_negative": "REPORT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "density": [
+      -174.57449723243258,
+      -136.37248758805592,
+      -95.58399617654727,
+      -56.62522555554411,
+      -23.73696164001404,
+      -4.21417830336751,
+      43.797275756487025,
+      19.603041425254702,
+      0.9313033021195529
+     ],
+     "min_density": -174.57449723243258,
+     "negative_density": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-replay"
+   ],
+   "tags": [
+    "arbitrage",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-06,
+    "reason": "second difference: rounding of 1e-16 over h squared"
+   }
+  },
+  {
+   "case_id": "sabr-0014",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 0.02,
+    "strikes": [
+     0.0005,
+     0.001,
+     0.002,
+     0.004,
+     0.008,
+     0.012,
+     0.02,
+     0.03,
+     0.05
+    ],
+    "expiry_years": 20.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.5,
+    "h_strike": 0.0002,
+    "on_negative": "REJECT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "arbitrage",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0015",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 0.01,
+    "strikes": [
+     -0.0095,
+     -0.009000000000000001,
+     -0.008,
+     -0.006,
+     -0.002,
+     0.002,
+     0.01,
+     0.019999999999999997,
+     0.04
+    ],
+    "expiry_years": 20.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.5,
+    "h_strike": 0.0002,
+    "on_negative": "REPORT",
+    "shift": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "density": [
+      -174.57449723243258,
+      -136.37248758805592,
+      -95.58399617654727,
+      -56.62522555554411,
+      -23.73696164001404,
+      -4.21417830336751,
+      43.797275756487025,
+      19.603041425254702,
+      0.9313033021195529
+     ],
+     "min_density": -174.57449723243258,
+     "negative_density": true
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-replay"
+   ],
+   "tags": [
+    "arbitrage",
+    "shift",
+    "synthetic"
+   ],
+   "description": "a shift does not cure negative density",
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-06,
+    "reason": "second difference: rounding of 1e-16 over h squared"
+   }
+  },
+  {
+   "case_id": "sabr-0016",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 0.01,
+    "strikes": [
+     -0.0095,
+     -0.009000000000000001,
+     -0.008,
+     -0.006,
+     -0.002,
+     0.002,
+     0.01,
+     0.019999999999999997,
+     0.04
+    ],
+    "expiry_years": 20.0,
+    "alpha": 0.03,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.5,
+    "h_strike": 0.0002,
+    "on_negative": "REJECT",
+    "shift": 0.01
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "arbitrage",
+    "shift",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0017",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     60.0,
+     80.0,
+     100.0,
+     120.0,
+     150.0
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6,
+    "h_strike": 0.5,
+    "on_negative": "REJECT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "density": [
+      0.004626859734599975,
+      0.009617017639527603,
+      0.014205247989821146,
+      0.011470337519781992,
+      0.002792110702618089
+     ],
+     "min_density": 0.002792110702618089,
+     "negative_density": false
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic-replay"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-06,
+    "reason": "second difference: rounding of 1e-16 over h squared"
+   }
+  },
+  {
+   "case_id": "sabr-0018",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [
+     0.2
+    ],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6,
+    "h_strike": 0.5,
+    "on_negative": "REJECT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0019",
+   "operation": "vol.sabr.calibrate",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "beta": 0.5,
+    "strikes": [
+     60.0,
+     75.0,
+     90.0,
+     100.0,
+     110.0,
+     125.0,
+     150.0
+    ],
+    "vols": [
+     0.4277311493595516,
+     0.3703805829578223,
+     0.32676467971358686,
+     0.30442125000000003,
+     0.28724831699910025,
+     0.27059495038968,
+     0.26158130822689635
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "alpha": 3.0,
+     "rho": -0.4,
+     "nu": 0.6,
+     "rmse": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "known-truth",
+    "scipy"
+   ],
+   "tags": [
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "stage-c-targets: languages use different solvers; minimum checked unique from several starts"
+   }
+  },
+  {
+   "case_id": "sabr-0020",
+   "operation": "vol.sabr.calibrate",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "beta": 0.5,
+    "strikes": [
+     60.0,
+     75.0,
+     90.0,
+     100.0,
+     110.0,
+     125.0,
+     150.0
+    ],
+    "vols": [
+     0.42793114935955157,
+     0.3701805829578223,
+     0.32686467971358685,
+     0.30432125000000004,
+     0.28744831699910023,
+     0.27039495038968003,
+     0.26164130822689635
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "alpha": 2.9995699975123347,
+     "rho": -0.39988324677900083,
+     "nu": 0.6008189969393584,
+     "rmse": 0.00015616032207478708
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "scipy"
+   ],
+   "tags": [
+    "noisy",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.0001,
+    "relative": 0.0,
+    "reason": "noisy fit; rmse held by the extra check"
+   },
+   "extra_checks": [
+    {
+     "output": "rmse",
+     "expected": 0.00015616032207478708,
+     "method": "absolute",
+     "limit": 1e-08
+    }
+   ]
+  },
+  {
+   "case_id": "sabr-0021",
+   "operation": "vol.sabr.calibrate",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "beta": 0.5,
+    "strikes": [
+     60.0,
+     75.0
+    ],
+    "vols": [
+     0.4277311493595516,
+     0.3703805829578223
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0022",
+   "operation": "vol.sabr.calibrate",
+   "inputs": {
+    "forward": 100.0,
+    "expiry_years": 1.0,
+    "beta": 0.5,
+    "strikes": [
+     60.0,
+     75.0,
+     90.0,
+     100.0,
+     110.0,
+     125.0,
+     150.0
+    ],
+    "vols": [
+     0.0,
+     0.3703805829578223,
+     0.32676467971358686,
+     0.30442125000000003,
+     0.28724831699910025,
+     0.27059495038968,
+     0.26158130822689635
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0023",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [],
+    "expiry_years": 1.0,
+    "alpha": 3.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6,
+    "h_strike": 0.5,
+    "on_negative": "REJECT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "sabr-0024",
+   "operation": "vol.sabr.density",
+   "inputs": {
+    "forward": 100.0,
+    "strikes": [],
+    "expiry_years": 1.0,
+    "alpha": 0.0,
+    "beta": 0.5,
+    "rho": -0.4,
+    "nu": 0.6,
+    "h_strike": 0.5,
+    "on_negative": "REJECT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "an empty list comes before domain checks"
+  },
+  {
+   "case_id": "sabr-0025",
+   "operation": "vol.sabr.hagan",
+   "inputs": {
+    "forward": 0.03,
+    "strikes": [],
+    "expiry_years": 2.0,
+    "alpha": 0.04,
+    "beta": 0.5,
+    "rho": -0.3,
+    "nu": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  }
+ ]
+}
