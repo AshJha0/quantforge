@@ -27,7 +27,7 @@ Each run writes `conformance/reports/NAME.json`, which git ignores, and prints p
 
 Stage B result (observed, local, Windows, 2026-11-06, at commit `13d9871`): Java, C++, Python and Rust each passed 4,731 of 4,731 cases in 39 suites. CI has not run stage B, as the branch is not pushed. Stage A's cases passed in CI on pull request #1.
 
-Stage C result (observed, local, Windows, 2026-11-07, at commit `39bc3db`): Java, C++, Python and Rust each passed 5,183 of 5,183 cases in 51 suites, 446 of them in stage C's 11 suites. Fuzzing for 60 seconds per language with seed 13 found nothing. CI had not run stage C when this was written.
+Stage C result (observed, local, Windows, 2026-11-07, at commit `39bc3db`): Java, C++, Python and Rust each passed 5,183 of 5,183 cases in 51 suites, 446 of them in stage C's 11 suites. Fuzzing for 60 seconds per language with seed 13 found nothing. Pull request #13 and main CI then passed, and the tree was tagged `v0.3`.
 
 ## Running
 
