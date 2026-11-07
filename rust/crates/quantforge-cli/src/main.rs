@@ -507,3 +507,52 @@ mod stage_d_wave2_tests {
         assert_eq!(ca.as_deref(), Some("E_SCHEMA"));
     }
 }
+
+#[cfg(test)]
+mod stage_d_rulings2_tests {
+    use super::*;
+
+    fn code(op: &str, inputs: &str) -> Option<String> {
+        let text = format!(
+            r#"{{"schema_version":"1.0","case_id":"c","operation":"{op}","inputs":{inputs}}}"#
+        );
+        let r = run_case(text.as_bytes()).0;
+        Some(r.get("error")?.get("code")?.as_str()?.to_string())
+    }
+
+    const CURVE: &str = r#"{"as_of":"2026-11-06","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2040-11-06","discount_factor":0.6}]}"#;
+
+    #[test]
+    fn d47_estr_basis_and_d56_vol_type() {
+        let b = format!(
+            r#"{{"convention":"ESTR","tenor":"1Y","discount":{CURVE},"projection_a":{CURVE},"projection_b":{CURVE}}}"#
+        );
+        assert_eq!(code("rates.basis.ois_spread", &b), None);
+        let cap = |m: &str, v: &str| {
+            code(
+                "rates.cap.price",
+                &format!(
+                    r#"{{"discount":{CURVE},"projection":{CURVE},"model":"{m}","vol":{v},"trade":{{"type":"CAP","start_months":3,"tenor_months":12,"strike":-0.01,"notional":1}}}}"#
+                ),
+            )
+        };
+        assert_eq!(cap("BACHELIER", "0.01"), None);
+        assert_eq!(cap("BACHELIER", r#""0.01""#).as_deref(), Some("E_SCHEMA"));
+        assert_eq!(cap("SABR", "0.01").as_deref(), Some("E_SCHEMA"));
+    }
+
+    #[test]
+    fn d61_futures_basis_dates() {
+        let b = |d: &str| {
+            code(
+                "bond.futures.basis",
+                &format!(
+                    r#"{{"futures_price":110,"settlement":"2026-11-09","delivery":"{d}","repo_rate":0.04,"bonds":[{{"maturity":"2027-11-15","coupon":0.04,"frequency":2,"clean_price":100,"conversion_factor":0.9}}]}}"#
+                ),
+            )
+        };
+        assert_eq!(b("2026-12-01"), None);
+        assert_eq!(b("2026-11-09").as_deref(), Some("E_DATE_ORDER"));
+        assert_eq!(b("2028-01-03").as_deref(), Some("E_INPUT"));
+    }
+}

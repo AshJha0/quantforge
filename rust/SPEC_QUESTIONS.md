@@ -88,14 +88,15 @@ None of these is reached by a golden. Rulings C15 and C16 settled the readings o
   - D36: CDS curves must have `as_of = trade_date`, else `E_INPUT`.
   - D37: in `credit.index.intrinsic` and `bond.fit.nelson_siegel`, a negative weight or a zero sum is `E_DOMAIN`.
 - Closed, confirming the reading already taken: D33 (`wam` above 1200), D34 (`mbs.price` domain), D38 (robust singular), D39 (xccy `start`), D40 (`tenor_months`), D41 (TRS dates), D42 (duplicate forwards and fixings), D43 (`bonds_d-0048`), D44 (`mbs_d-0011`), D45 (convention ids), D46 (jump check order), D12 (empty `dates`).
-- Still open, each with the reading recorded above:
-  - Asset-swap floating dates with no month-end rule (`bonds_d-0041`).
-  - `index_ratio` over the input `base_cpi`, with `powf` (`inflation_d-0009`).
-  - The `joint_bootstrap` `GLOBAL` path, and `jumps` not read there.
-  - The 100-item limit on `ois_quotes` and `term_quotes`.
-  - Credit details: survival in `(0, 1]`, a maturity on or before the trade date, and the discount pillars as integration nodes.
-  - Equity details: empty `futures`, an expiry on or before `as_of`, the rebalance check order, and the TRS side names.
-  - Inflation and commodity: `seasonality` required but nullable, and `years` above 100.
-  - `BACHELIER` caps accepting any strike.
-  - `months` above 1200 in xccy.
-  - Robust fit non-convergence as `E_NO_CONVERGENCE`.
+- All of the entries above that were still open are now answered by rulings D47 to D63 (merged from `stage-d` b566056). Each one confirms the reading already taken, with no code change:
+  - D62: asset-swap dates (`bonds_d-0041`), the joint `GLOBAL` path, robust non-convergence and the CDS integration nodes.
+  - D63: `jumps` in `joint_bootstrap`.
+  - D49: the quote-list limit.
+  - D52: the credit checks.
+  - D53: the equity checks.
+  - D54: `seasonality` and `years`.
+  - D55: `BACHELIER` strikes.
+  - D59: `months` in xccy.
+  - D60: the `inflation_d-0009` tolerance is widened, so the `powf` and `base_cpi` choice no longer matters.
+
+No stage D question is open.
