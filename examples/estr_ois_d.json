@@ -1,0 +1,65 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-estr-ois-d",
+ "operation": "rates.ois.bootstrap",
+ "inputs": {
+  "convention": "ESTR",
+  "as_of": "2026-11-06",
+  "quotes": [
+   {
+    "tenor": "1W",
+    "rate": 0.022699999999999998
+   },
+   {
+    "tenor": "1M",
+    "rate": 0.022600000000000002
+   },
+   {
+    "tenor": "3M",
+    "rate": 0.0223
+   },
+   {
+    "tenor": "6M",
+    "rate": 0.021700000000000004
+   },
+   {
+    "tenor": "1Y",
+    "rate": 0.020500000000000004
+   },
+   {
+    "tenor": "2Y",
+    "rate": 0.019000000000000003
+   },
+   {
+    "tenor": "3Y",
+    "rate": 0.018500000000000003
+   },
+   {
+    "tenor": "5Y",
+    "rate": 0.019000000000000003
+   },
+   {
+    "tenor": "7Y",
+    "rate": 0.020000000000000004
+   },
+   {
+    "tenor": "10Y",
+    "rate": 0.0215
+   },
+   {
+    "tenor": "15Y",
+    "rate": 0.023
+   },
+   {
+    "tenor": "20Y",
+    "rate": 0.0235
+   },
+   {
+    "tenor": "30Y",
+    "rate": 0.0225
+   }
+  ],
+  "interpolation": "LOG_LINEAR_DF",
+  "method": "SEQUENTIAL"
+ }
+}

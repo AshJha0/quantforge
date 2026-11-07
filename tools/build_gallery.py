@@ -233,14 +233,66 @@ CURVES = {
 }
 
 # Curves named in the plan's stage rows that have no page. Stage from the plan.
+# Stage D curves are in STAGE_D below, each with a planned page.
 PLANNED = [
-    ("Dividend curves", "D"), ("Borrow curves", "D"), ("Financing curves", "D"),
-    ("Full SOFR", "D"), ("ESTR", "D"), ("Sovereign fits", "D"), ("Repo and special repo", "D"),
-    ("Inflation, with seasonality", "D"), ("Cross-currency", "D"),
-    ("Credit and ISDA CDS", "D"), ("Sector and rating curves", "D"),
-    ("Commodity forward curves, with seasonality and storage carry", "D"),
-    ("Swaption cube and cap surface", "E"), ("Funding curve", "F"), ("Liquidity curves", "H"),
+    ("Financing curves", "D"), ("Sector and rating curves", "D"),
+    ("Funding curve", "F"), ("Liquidity curves", "H"),
 ]
+
+# Stage D curves. Each gets a page: a planned page until `cli` names a CLI operation and a renderer
+# is registered for its `kind`, then the renderer's page. Text here is plain description, no numbers.
+STAGE_D = {
+    "ois-full": {"kind": "stage-d", "title": "OIS curves: full SOFR, ESTR and SONIA", "short": "Full SOFR, ESTR, SONIA OIS", "cli": "rates.ois.bootstrap", "examples": {"rates.ois.bootstrap": "estr_ois_d.json"},
+                 "shows": "Discount factors and forwards, with meeting-date steps and observation conventions."},
+    "bond-fit": {"kind": "stage-d", "title": "Bond and sovereign curve fits", "short": "Bond and sovereign fits", "cli": "bond.fit.nelson_siegel", "examples": {"bond.fit.nelson_siegel": "bond_fit_ns_d.json"},
+                 "shows": "A fitted yield curve against bond yields, with residuals per bond."},
+    "repo": {"kind": "stage-d", "title": "Repo and special repo curves", "short": "Repo and special repo", "cli": "repo.forward", "examples": {"repo.forward": "repo_forward_d.json"},
+             "shows": "General collateral repo rates by term, and specials against them."},
+    "cross-currency": {"kind": "stage-d", "title": "Cross-currency basis curves", "short": "Cross-currency", "cli": "fx.xccy.bootstrap", "examples": {"fx.xccy.bootstrap": "xccy_bootstrap_d.json"},
+                       "shows": "Basis by tenor and the FX forwards it implies."},
+    "cds": {"kind": "stage-d", "title": "Credit curves and ISDA CDS", "short": "Credit and ISDA CDS", "cli": "credit.cds.bootstrap", "examples": {"credit.cds.bootstrap": "cds_bootstrap_d.json"},
+            "shows": "Survival probabilities and hazard rates from CDS quotes."},
+    "dividend-borrow": {"kind": "stage-d", "title": "Dividend and borrow curves", "short": "Dividend and borrow", "cli": "eq.dividend.implied", "examples": {"eq.dividend.implied": "dividend_implied_d.json", "eq.borrow.implied": "borrow_implied_d.json"},
+                        "shows": "Dividend schedules and borrow cost by term, and their effect on equity forwards."},
+    "inflation": {"kind": "stage-d", "title": "Inflation curves, with seasonality", "short": "Inflation, with seasonality", "cli": "infl.curve.cpi", "examples": {"infl.curve.cpi": "inflation_cpi_d.json"},
+                  "shows": "Forward index levels with and without the seasonal adjustment."},
+    "caps-swaptions": {"kind": "stage-d", "title": "Cap surface and swaption cube", "short": "Caps and swaptions", "cli": "rates.cap.price", "examples": {"rates.cap.price": "cap_price_d.json", "rates.swaption.price": "swaption_price_d.json"},
+                       "shows": "Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike."},
+    "commodities": {"kind": "stage-d", "title": "Commodity forward curves, with seasonality and storage carry", "short": "Commodity forwards", "cli": "cmdty.curve.forward", "examples": {"cmdty.curve.forward": "commodity_forward_d.json", "cmdty.storage.carry": "commodity_carry_d.json"},
+                    "shows": "Forward prices by delivery month, with seasonality and carry shown apart."},
+    "mbs": {"kind": "stage-d", "title": "MBS prepayment and valuation curves", "short": "MBS", "cli": "mbs.cashflows", "examples": {"mbs.cashflows": "mbs_cashflows_d.json"},
+            "shows": "Prepayment speeds by month and the resulting cash flows."},
+}
+
+# Renderer hooks: kind -> function(slug, spec, data) returning page text. A language session that ships a
+# stage D CLI adds its renderer with @renderer("kind") and sets `cli` above.
+RENDERERS = {}
+
+
+def renderer(kind):
+    def register(fn):
+        RENDERERS[kind] = fn
+        return fn
+    return register
+
+
+def is_live(spec):
+    return bool(spec.get("cli")) and spec["kind"] in RENDERERS
+
+
+def planned_page(slug, spec):
+    return f"""# {spec['title']}
+
+<p class="note">Status: Planned, stage D (in progress). No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.</p>
+
+## What it will show
+
+{spec['shows']}
+
+## When this page fills in
+
+When a CLI operation for this curve exists in all four languages, `tools/build_gallery.py` gets a renderer for kind `{spec['kind']}` and this page is generated from real CLI output, like the stage B and C pages. See [the gallery index](README.md).
+"""
 
 
 # ---- charts -------------------------------------------------------------------------------------
@@ -591,12 +643,16 @@ def index_page(all_data):
         outside = sum(v for k, v in e["by_source"].items() if "quantlib" in k or "strata" in k)
         rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated", "C",
                      f"{e['cases']} golden cases for {', '.join('`' + o + '`' for o in e['operations'])}, {outside} with an outside library in `verified_by`"])
+    for slug, spec in STAGE_D.items():
+        live = is_live(spec) and slug in all_data
+        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "D",
+                     f"{all_data[slug]['evidence']['cases']} golden case{'s' if all_data[slug]['evidence']['cases'] != 1 else ''}" if live and slug in all_data else "None yet"])
     rows += [[name, "Planned", stage, "None yet"] for name, stage in PLANNED]
     return f"""# Curves
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market. Stages B and C are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
@@ -619,6 +675,9 @@ def render_all(all_data):
         pages[f"{slug}.md"] = make(slug, spec, all_data[slug])
     for slug, spec in VOLS.items():
         pages[f"{slug}.md"] = vol_page(slug, spec, all_data[slug])
+    for slug, spec in STAGE_D.items():
+        live = is_live(spec) and slug in all_data
+        pages[f"{slug}.md"] = RENDERERS[spec["kind"]](slug, spec, all_data[slug]) if live else planned_page(slug, spec)
     return pages
 
 
@@ -850,6 +909,96 @@ Limits:
 """
 
 
+# ---- stage D pages: one generic renderer over every operation's outputs -------------------------
+
+STAGE_D_GOLDEN = ROOT / "datasets" / "golden" / "stage_d"
+
+
+def golden_d(ops):
+    counts, total = {}, 0
+    for path in sorted(STAGE_D_GOLDEN.glob("*.json")):
+        for c in json.loads(path.read_text(encoding="utf-8"))["cases"]:
+            if c["operation"] not in ops or c["expected"].get("status") != "ok":
+                continue
+            key = f"{c['operation']}: {', '.join(c['verified_by'])}"
+            counts[key] = counts.get(key, 0) + 1
+            total += 1
+    return {"operations": list(ops), "cases": total, "by_source": counts}
+
+
+def d_run(lang, spec):
+    return {op: batch(lang, [read_example(f)])[0]["outputs"] for op, f in spec["examples"].items()}
+
+
+def d_series(outs):
+    """Numeric lists with three or more values, and lists of dated records, as chartable series."""
+    found = []
+    for key, v in outs.items():
+        if isinstance(v, list) and len(v) >= 3 and all(isinstance(x, (int, float)) and not isinstance(x, bool) for x in v):
+            found.append((key, [(i + 1, float(x)) for i, x in enumerate(v)], "Index"))
+        elif isinstance(v, list) and len(v) >= 3 and all(isinstance(x, dict) for x in v):
+            for field in v[0]:
+                if all(isinstance(x.get(field), (int, float)) and not isinstance(x.get(field), bool) for x in v):
+                    found.append((f"{key}: {field}", [(i + 1, float(x[field])) for i, x in enumerate(v)], f"{key} number"))
+    return [f for f in found if max(y for _, y in f[1]) - min(y for _, y in f[1]) > 1e-12 * max(1.0, max(abs(y) for _, y in f[1]))]
+
+
+def d_value(v):
+    if isinstance(v, list):
+        return f"{len(v)} values" if v else "none"
+    return f"`{v!r}`"
+
+
+@renderer("stage-d")
+def stage_d_page(slug, spec, d):
+    parts = []
+    for op, outs in d["reference"].items():
+        ex = spec["examples"][op]
+        rows = [[f"`{k}`", d_value(v)] for k, v in outs.items()]
+        charts = "\n\n".join(chart(name, xlabel, name, [{"name": name, "colour": 1, "shape": "line", "pts": pts}],
+                                   f"{name}, Python CLI, from examples/{ex}. {SYNTHETIC}")
+                             for name, pts, xlabel in d_series(outs)[:3])
+        parts.append(f"""### `{op}`
+
+Input: [`examples/{ex}`](../../examples/{ex}). Command: `quantforge batch < examples/{ex}` (wrap as one line).
+
+{table(['Output', 'Python value'], rows)}
+
+{charts}
+""")
+    agree = [[r["output"], r["count"]] + [repr(r["last"][k]) if not isinstance(r["last"][k], (list, dict)) else "list" for k in LANGS]
+             + ["differ" if r["largest_difference"] is None else f"{r['largest_difference']:.3g}"] for r in d["agreement"]]
+    ev = d["evidence"]
+    ev_rows = [[k, n] for k, n in sorted(ev["by_source"].items())]
+    return f"""# {spec['title']}
+
+{status_block(d)}
+
+## What it is
+
+{spec['shows']} Stage D, target v0.4.
+
+## Runs
+
+{SYNTHETIC} The inputs are copied from a golden case's inputs, so the method is shown, not a market.
+
+{''.join(parts)}
+## Four-language agreement
+
+Each CLI built these numbers on its own, from the same input file. Agreement shows only that the four agree. It does not show that they are right, which is what the oracle is for.
+
+{table(['Output', 'Values', 'Last value: Java', 'C++', 'Python', 'Rust', 'Largest difference, any value'], agree)}
+
+## Oracle evidence and limits
+
+{ev['cases']} golden cases with status ok in `datasets/golden/stage_d` for {', '.join('`' + o + '`' for o in ev['operations'])}, by `verified_by`:
+
+{table(['Operation: sources', 'Cases'], ev_rows)}
+
+Limits: one synthetic input per operation; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+"""
+
+
 # ---- generate and check -------------------------------------------------------------------------
 
 def run_curve(lang, spec):
@@ -881,6 +1030,15 @@ def generate():
         d = {"meta": {**meta, "examples": {k: f"examples/{v}" for k, v in spec["examples"].items()},
                       "example_hashes": {v: example_hash(v) for v in spec["examples"].values()}},
              "inputs": inputs, "reference": results["python"], "agreement": vol_agreement(results), "evidence": golden_c(spec["golden"])}
+        all_data[slug] = d
+        (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    for slug, spec in STAGE_D.items():
+        if not is_live(spec):
+            continue
+        results = {lang: d_run(lang, spec) for lang in LANGS}
+        d = {"meta": {**meta, "example_hashes": {v: example_hash(v) for v in spec["examples"].values()}},
+             "inputs": {op: read_example(f)["inputs"] for op, f in spec["examples"].items()},
+             "reference": results["python"], "agreement": vol_agreement(results), "evidence": golden_d(spec["examples"])}
         all_data[slug] = d
         (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
     for name, text in render_all(all_data).items():
@@ -926,6 +1084,17 @@ def check():
                 bad.append(f"{slug}: {v} changed")
         compare(d["reference"], vol_run("python", slug, spec), slug, bad)
         if d["evidence"] != golden_c(spec["golden"]):
+            bad.append(f"{slug}: golden evidence changed")
+    for slug, spec in STAGE_D.items():
+        if not is_live(spec):
+            continue
+        d = json.loads((DATA / f"{slug}.json").read_text(encoding="utf-8"))
+        all_data[slug] = d
+        for v in spec["examples"].values():
+            if d["meta"]["example_hashes"].get(v) != example_hash(v):
+                bad.append(f"{slug}: {v} changed")
+        compare(d["reference"], d_run("python", spec), slug, bad)
+        if d["evidence"] != golden_d(spec["examples"]):
             bad.append(f"{slug}: golden evidence changed")
     for name, text in render_all(all_data).items():
         path = OUT / name

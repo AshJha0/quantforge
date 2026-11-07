@@ -1,0 +1,1690 @@
+{
+ "schema_version": "1.0",
+ "suite": "credit_d",
+ "spec": "specifications/04-pricing/credit.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "credit_d-0001",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9953278717430543
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887181795921078
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533184219921649
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8988961248330224
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8449964351776124
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7635674704223004
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
+  },
+  {
+   "case_id": "credit_d-0002",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.25,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.018
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.024
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.036
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.048
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.054
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.06
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9851258609044374
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9642817630498415
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.8571531465087603
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.7044398409169544
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.5702594500772052
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.39704771889922247
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
+  },
+  {
+   "case_id": "credit_d-0003",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "1Y",
+      "spread": 0.0042
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.006299999999999999
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.0084
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.00945
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.010499999999999999
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9921195815027349
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9671517009117284
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.9283694562373445
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8893390629638799
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.8291269678582948
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve; spreads reprice below 1e-13"
+   }
+  },
+  {
+   "case_id": "credit_d-0004",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9953278717430543
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887181795921078
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533184219921649
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8988961248330224
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8449964351776124
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7635674704223004
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 89977.4324589857,
+     "upfront": 0.009002551543707455,
+     "accrued": 0.0013055555555555557,
+     "par_spread": 0.011999999988591251,
+     "protection_leg": 0.05398645973202393,
+     "rpv01": 4.629357473937871
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   }
+  },
+  {
+   "case_id": "credit_d-0005",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9851258609044374
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9642817630498415
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.8571531465087603
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.7044398409169544
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.5702594500772052
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.39704771889922247
+      }
+     ]
+    },
+    "recovery": 0.25,
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.05,
+     "notional": 5000000.0,
+     "side": "SELL_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 41217.87939225879,
+     "upfront": -0.00824798115728118,
+     "accrued": 0.006527777777777778,
+     "par_spread": 0.047999999805353126,
+     "protection_leg": 0.19784580102551447,
+     "rpv01": 4.252273363404659
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.005,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   }
+  },
+  {
+   "case_id": "credit_d-0006",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9953278717430543
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887181795921078
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533184219921649
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8988961248330224
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8449964351776124
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7635674704223004
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2029-06-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": -32656.771657246733,
+     "upfront": -0.003267422308693455,
+     "accrued": 0.0013055555555555557,
+     "par_spread": 0.008680134831887724,
+     "protection_leg": 0.021476828694895752,
+     "rpv01": 2.6047364113873774
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   }
+  },
+  {
+   "case_id": "credit_d-0007",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9953278717430543
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887181795921078
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533184219921649
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8988961248330224
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8449964351776124
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7635674704223004
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2036-12-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "SELL_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": -381414.2889394197,
+     "upfront": 0.03816181126582863,
+     "accrued": 0.0013055555555555557,
+     "par_spread": 0.014999999999999998,
+     "protection_leg": 0.11442428668182597,
+     "rpv01": 7.7587716041137345
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   }
+  },
+  {
+   "case_id": "credit_d-0008",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9953278717430543
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887181795921078
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533184219921649
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8988961248330224
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8449964351776124
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7635674704223004
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "DIGITAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 449887.1640058119,
+     "upfront": 0.045012757889717044,
+     "accrued": 0.0013055555555555557,
+     "par_spread": 0.01999999998098542,
+     "protection_leg": 0.08997743288670655,
+     "rpv01": 4.629357473937871
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "digital",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "ISDA replay against QuantLib within 2e-10 per unit"
+   }
+  },
+  {
+   "case_id": "credit_d-0009",
+   "operation": "credit.index.intrinsic",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "names": [
+     {
+      "hazard": {
+       "as_of": "2026-11-06",
+       "pillars": [
+        {
+         "date": "2027-06-20",
+         "survival": 0.9953278717430543
+        },
+        {
+         "date": "2027-12-20",
+         "survival": 0.9887181795921078
+        },
+        {
+         "date": "2029-12-20",
+         "survival": 0.9533184219921649
+        },
+        {
+         "date": "2031-12-20",
+         "survival": 0.8988961248330224
+        },
+        {
+         "date": "2033-12-20",
+         "survival": 0.8449964351776124
+        },
+        {
+         "date": "2036-12-20",
+         "survival": 0.7635674704223004
+        }
+       ]
+      },
+      "recovery": 0.4,
+      "weight": 1.0
+     },
+     {
+      "hazard": {
+       "as_of": "2026-11-06",
+       "pillars": [
+        {
+         "date": "2027-12-20",
+         "survival": 0.9921195815027349
+        },
+        {
+         "date": "2029-12-20",
+         "survival": 0.9671517009117284
+        },
+        {
+         "date": "2031-12-20",
+         "survival": 0.9283694562373445
+        },
+        {
+         "date": "2033-12-20",
+         "survival": 0.8893390629638799
+        },
+        {
+         "date": "2036-12-20",
+         "survival": 0.8291269678582948
+        }
+       ]
+      },
+      "recovery": 0.4,
+      "weight": 1.0
+     },
+     {
+      "hazard": {
+       "as_of": "2026-11-06",
+       "pillars": [
+        {
+         "date": "2027-06-20",
+         "survival": 0.9851258609044374
+        },
+        {
+         "date": "2027-12-20",
+         "survival": 0.9642817630498415
+        },
+        {
+         "date": "2029-12-20",
+         "survival": 0.8571531465087603
+        },
+        {
+         "date": "2031-12-20",
+         "survival": 0.7044398409169544
+        },
+        {
+         "date": "2033-12-20",
+         "survival": 0.5702594500772052
+        },
+        {
+         "date": "2036-12-20",
+         "survival": 0.39704771889922247
+        }
+       ]
+      },
+      "recovery": 0.25,
+      "weight": 0.5
+     }
+    ],
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01
+    },
+    "quoted_upfront": 0.03352777961337278
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "intrinsic_upfront": 0.032027779613372775,
+     "basis": 0.0015000000000000013,
+     "name_upfronts": [
+      0.009002551543707455,
+      -0.0072889154772282855,
+      0.15671162593390553
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "index-cds",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "sum of ISDA prices"
+   }
+  },
+  {
+   "case_id": "credit_d-0010",
+   "operation": "credit.index.intrinsic",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "names": [],
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01
+    },
+    "quoted_upfront": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "credit_d-0011",
+   "operation": "credit.curve.composite",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "constituents": [
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.0045
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.006
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.009
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.012
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.0135
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.015
+       }
+      ],
+      "weight": 2.0
+     },
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.00585
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.0078000000000000005
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.0117
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.015600000000000001
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.01755
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.0195
+       }
+      ],
+      "weight": 1.0
+     },
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.0036
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.0048000000000000004
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.0072
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.009600000000000001
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.0108
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.012
+       }
+      ],
+      "weight": 1.0
+     }
+    ],
+    "scale": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spreads": [
+      0.0046125,
+      0.00615,
+      0.009225,
+      0.0123,
+      0.013837499999999999,
+      0.015375
+     ],
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9952113485609257
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9884375397513033
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9521758343425821
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8964761262017943
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8413849562364609
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7583012931616856
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "sector-curve",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve"
+   }
+  },
+  {
+   "case_id": "credit_d-0012",
+   "operation": "credit.curve.composite",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "constituents": [
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.0045
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.006
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.009
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.012
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.0135
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.015
+       }
+      ],
+      "weight": 2.0
+     },
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.00585
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.0078000000000000005
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.0117
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.015600000000000001
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.01755
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.0195
+       }
+      ],
+      "weight": 1.0
+     },
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.0036
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.0048000000000000004
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.0072
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.009600000000000001
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.0108
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.012
+       }
+      ],
+      "weight": 1.0
+     }
+    ],
+    "scale": 1.75
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spreads": [
+      0.008071875000000001,
+      0.0107625,
+      0.016143750000000002,
+      0.021525,
+      0.024215624999999998,
+      0.02690625
+     ],
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9916349101568664
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9798411511376999
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9176102272551174
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8245066732583233
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.7361504031035453
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.6099209746639757
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "sector-curve",
+    "rating",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve"
+   }
+  },
+  {
+   "case_id": "credit_d-0013",
+   "operation": "credit.curve.composite",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "constituents": [
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.0045
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.006
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.009
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.012
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.0135
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.015
+       }
+      ],
+      "weight": 1.0
+     },
+     {
+      "quotes": [
+       {
+        "tenor": "1Y",
+        "spread": 0.01
+       }
+      ],
+      "weight": 1.0
+     }
+    ],
+    "scale": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "constituents on different tenors"
+  },
+  {
+   "case_id": "credit_d-0014",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 1.0,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "credit_d-0015",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "credit_d-0016",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "5Y",
+      "spread": -0.001
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "credit_d-0017",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-12-21",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "trade date on an adjusted coupon date"
+  },
+  {
+   "case_id": "credit_d-0018",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2027-02-10",
+    "discount": {
+     "as_of": "2027-02-10",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2028-02-10",
+       "discount_factor": 0.9627129408911995
+      },
+      {
+       "date": "2030-02-09",
+       "discount_factor": 0.8922579558824083
+      },
+      {
+       "date": "2032-02-09",
+       "discount_factor": 0.8269591339433623
+      },
+      {
+       "date": "2037-02-07",
+       "discount_factor": 0.6838614092123558
+      },
+      {
+       "date": "2042-02-06",
+       "discount_factor": 0.5655254386995371
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.997310139097766
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9913685455624913
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9572918319517785
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.9042131958915132
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8508848976554871
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7699163098943487
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "roll-date",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve"
+   }
+  },
+  {
+   "case_id": "credit_d-0019",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.995326670878391
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887164897229775
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533394989688196
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8990864842101756
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8453221834775759
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7639754894864467
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44-isda-cds-engine"
+   ],
+   "tags": [
+    "isda-cds",
+    "multi-node-discount",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "curve solve"
+   }
+  }
+ ]
+}

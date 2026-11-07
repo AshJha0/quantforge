@@ -1,0 +1,271 @@
+{
+ "schema_version": "1.0",
+ "suite": "futures_d",
+ "spec": "specifications/02-curves/futures-convexity.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "futures_d-0001",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 96.0,
+    "start_years": 0.25,
+    "end_years": 0.5,
+    "sigma": 0.01,
+    "mean_reversion": 0.03
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "futures_rate": 0.04,
+     "convexity": 9.33955888783533e-06,
+     "forward_rate": 0.039990660441112165
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "hull-white",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0002",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 96.5,
+    "start_years": 2.0,
+    "end_years": 2.25,
+    "sigma": 0.012,
+    "mean_reversion": 0.05
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "futures_rate": 0.035,
+     "convexity": 0.0003264528420152485,
+     "forward_rate": 0.034673547157984756
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "hull-white",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0003",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 97.2,
+    "start_years": 5.0,
+    "end_years": 5.25,
+    "sigma": 0.009,
+    "mean_reversion": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "futures_rate": 0.027999999999999973,
+     "convexity": 0.0011213901242236857,
+     "forward_rate": 0.026878609875776286
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "hull-white",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0004",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 101.0,
+    "start_years": 1.0,
+    "end_years": 1.25,
+    "sigma": 0.008,
+    "mean_reversion": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "futures_rate": -0.01,
+     "convexity": 4.265679187672067e-05,
+     "forward_rate": -0.010042656791876721
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "hull-white",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0005",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 95.5,
+    "start_years": 9.75,
+    "end_years": 10.0,
+    "sigma": 0.011,
+    "mean_reversion": 0.02
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "futures_rate": 0.045,
+     "convexity": 0.00503140436927383,
+     "forward_rate": 0.03996859563072617
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "hull-white",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0006",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 96.0,
+    "start_years": 1.0,
+    "end_years": 1.0833333333333333,
+    "sigma": 0.01,
+    "mean_reversion": 0.03
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "futures_rate": 0.04,
+     "convexity": 5.6721688091316884e-05,
+     "forward_rate": 0.039943278311908685
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "hull-white",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0007",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 96.0,
+    "start_years": 1.0,
+    "end_years": 1.0,
+    "sigma": 0.01,
+    "mean_reversion": 0.03
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "end must be after start"
+  },
+  {
+   "case_id": "futures_d-0008",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 96.0,
+    "start_years": -0.1,
+    "end_years": 1.25,
+    "sigma": 0.01,
+    "mean_reversion": 0.03
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0009",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 96.0,
+    "start_years": 1.0,
+    "end_years": 1.25,
+    "sigma": -0.01,
+    "mean_reversion": 0.03
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "futures_d-0010",
+   "operation": "rates.futures.convexity",
+   "inputs": {
+    "price": 96.0,
+    "start_years": 1.0,
+    "end_years": 1.25,
+    "sigma": 0.01,
+    "mean_reversion": -0.01
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

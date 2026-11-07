@@ -89,3 +89,69 @@ Points the spec leaves open, with what Java does. None changes a golden.
 | C-3 | `risk.vol.surface_vega`: a position's `forward`, `strike`, `discount_factor` or `expiry_years` `<= 0` | `E_DOMAIN`, as no check is listed |
 | C-4 | `usecase.vol_surface`: order of checks, and `strike` or `quantity <= 0` on `target` | Curve checks, then `E_DOMAIN` on target, then slices; a target expiry that is no slice's is `E_INPUT` after the fits |
 | C-5 | `vol.ssvi.calibrate`: `thetas` checks against the point count | Point count and ragged rows first |
+
+## Stage D wave 1 (D1 rates core)
+
+| # | Point | Reading taken |
+|---|---|---|
+| D-1 | `stage_b/ois.json` case `ois-0023` expects `ESTR` bootstrap to be `E_SCHEMA`; `ois-curves.md` 1.1.0 now accepts `ESTR` | Follows the stage D spec, so the runner shows this one case failing. Skipped in `GoldenSuiteTest` as superseded. Needs the oracle to retire or update the case (Rust noted the same) |
+| D-2 | Order of a curve's `jumps` checks against its pillar checks | Pillars first, then jumps. In `rates.ois.bootstrap` jumps come first, as its check list says |
+| D-3 | Within `jumps`: a bad date and a bad factor in one list | All dates checked first (`E_INPUT`), then all factors (`E_DOMAIN`) |
+| D-4 | `rates.ois.fit_steps` with empty `step_dates` | `E_INPUT` by ruling D12 (a date list), after the length check. `steps: []` in `rates.ois.step_curve` is allowed: it is not a date list, and gives a flat curve |
+| D-5 | `rates.ois.compound_dated` with a lookback or shift that runs past 2000 to 2099 | `E_DATE_RANGE`, from the calendar range, so a huge `shift_days` cannot loop |
+| D-6 | Convention that is a known non-overnight record (`USD-TERM-3M`, an FX pair) vs an unknown id, in `compound_dated` and `fit_steps` | Known non-overnight: `E_INPUT`; unknown: `E_SCHEMA` |
+| D-7 | `rates.csa.discount`: two forwards on one date | `E_INPUT`, after the `E_DOMAIN` checks. A date equal to `as_of` still needs its own forward |
+| D-8 | `calib.curve.robust` when the points cannot fix the three betas (e.g. one maturity repeated) | `E_SINGULAR` from the linear solve; the spec lists no code for it |
+| D-9 | `rates.curve.joint_bootstrap` `GLOBAL` | Global Newton on the OIS block, then the term block on it: the system is block triangular (ruling D9), so this is the joint solution |
+| D-10 | `rates.basis.ois_spread`, `rates.curve.joint_bootstrap` with `ESTR` | Accepted, as for any overnight convention |
+| D-11 | `bond.spread.asset_swap` quarterly floating dates from a month-end maturity (e.g. 2031-02-28) | Plain month steps back from maturity, with no month-end rule (golden bonds_d-0041 needs this; the bond's own coupons keep the month-end rule) |
+| D-12 | `bond.yield.from_price` with `clean_price <= 0` but `clean + accrued > 0` | `E_DOMAIN`, as golden bonds_d-0048; the spec text only names `clean + accrued <= 0` |
+| D-13 | `bond.futures.basis` with `delivery >= maturity`, or `delivery <= settlement` | As `repo.forward`: `E_INPUT` and `E_DATE_ORDER`. Empty `bonds`: `E_INPUT` |
+| D-14 | `bond.fit.nelson_siegel` `weights` of the wrong length | `E_INPUT` |
+| D-15 | `credit.*` hazard `as_of` different from `trade_date` | Survival is anchored at the hazard's `as_of` (Q = 1 there); integration time counts from `trade_date`. No golden has them differ |
+| D-16 | `credit.index.intrinsic`, `credit.curve.composite` weights that are negative or sum to 0 | `E_DOMAIN` for a negative weight, `E_INPUT` for a zero sum |
+| D-17 | `eq.futures.basis` implied spread with no root | `E_NOT_BRACKETED` on `[-0.5, 0.5]`, as `eq.borrow.implied` |
+| D-18 | `eq.trs.pv` with `end <= start`; `current_rate` given when `start >= as_of` | `E_DATE_ORDER`; a given rate is used |
+| D-19 | inflation_d-0009: a par ZCIS whose expected `pv` is 2e-9 on 1e7, judged at 1e-10 absolute | That is rounding noise (2e-16 in the index ratio). The build passes by dividing by the given `base_cpi`, not `exp(ln base_cpi)`; the limit may be too tight for other correct forms |
+| D-20 | `infl.curve.cpi` empty `months`; `infl.linker.price` two fixings for one month | `E_INPUT` both (ruling D12 style) |
+| D-21 | `mbs.*` with `wac <= 0` and `net_coupon > wac` | `E_DOMAIN`, as golden mbs_d-0011, so `wac <= 0` is checked before `net_coupon > wac` (the spec's order would give `E_INPUT`). `wam < 1` and `age < 0` still come first |
+| D-22 | `mbs.*` `wam` above 1200 | `E_LIMIT` |
+| D-23 | `rates.cap.price`, `rates.swaption.price` model `BLACK_SCHOLES` | `E_SCHEMA`; only `BLACK_76` and `BACHELIER` are listed |
+| D-24 | `cmdty.storage.carry` a forward price `<= 0` | `E_DOMAIN` (the logs need it) |
+| D-1 | (update) | Closed by ruling D27: `ois-0023` now sends `TONA`, which this build rejects with `E_SCHEMA`; no code change, and the test skip is removed |
+
+### Closed by rulings D31 to D46 (stage-d 2836b6b)
+
+| # | Ruling | Outcome |
+|---|---|---|
+| D-2, D-3 | D46 | Confirmed: pillars, then jump dates, then jump factors; bootstrap keeps jumps first |
+| D-4 | D31 | `steps: []` is a flat curve; `dates: []` is `E_INPUT`. Empty `step_dates` in `fit_steps` stays `E_INPUT` (D12) |
+| D-6 | D45 | Confirmed |
+| D-7 | D42 | Confirmed: duplicate forwards `E_INPUT` |
+| D-8 | D38 | Confirmed: `E_SINGULAR` |
+| D-12 | D43 | Confirmed: `clean_price <= 0` is `E_DOMAIN` |
+| D-14, D-16 | D37 | Changed: a zero weight sum is now `E_DOMAIN` (credit and Nelson-Siegel); negative `E_DOMAIN`; wrong length `E_INPUT` |
+| D-15 | D36 | Changed: discount and hazard `as_of` must equal `trade_date`, else `E_INPUT` |
+| D-17 | D32 | Confirmed |
+| D-18 | D41 | Confirmed |
+| D-20 | D42 | Confirmed for duplicate CPI fixings |
+| D-21 | D44 | Confirmed; `mbs.md` corrected |
+| D-22 | D33 | Changed: `wam > 1200` is `E_INPUT`, not `E_LIMIT` |
+| new | D34, D35, D39, D40 | `1 + y/12 <= 0` `E_DOMAIN` (already so); conversion factor with maturity before delivery month now `E_DATE_ORDER`; `fx.xccy.pv` start before `as_of` now `E_OUT_OF_RANGE`; `tenor_months` 1 to 1200 (already so) |
+
+Still open: D-5 (huge lookback gives `E_DATE_RANGE`), D-9, D-10, D-11, D-13, D-19 (inflation_d-0009 limit at rounding noise), D-23, D-24. All pass conformance; none is pinned by a ruling.
+
+### Closed by rulings D47 to D63 (stage-d b566056)
+
+| # | Ruling | Outcome |
+|---|---|---|
+| D-5 | D50 | Confirmed: `E_DATE_RANGE` |
+| D-9, D-11 | D62 | Confirmed: block solve for `GLOBAL`; asset-swap dates by plain month steps |
+| D-10 | D47 | Confirmed: any overnight record, ESTR included |
+| D-13 | D61 | Confirmed: `delivery <= settlement` `E_DATE_ORDER`, past maturity `E_INPUT`, empty `E_INPUT` |
+| D-19 | D60 | Closed: ZCIS limit widened to 1e-9 per unit notional plus 1e-9 relative |
+| D-23 | D56 | Confirmed: other models `E_SCHEMA` |
+| D-24 | D58 | Confirmed: `E_DOMAIN` |
+| new | D52 | Changed: CDS trade maturity on or before `trade_date` is now `E_INPUT` (was `E_DATE_ORDER`) |
+
+No stage D question is open.

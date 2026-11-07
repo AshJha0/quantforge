@@ -1,0 +1,289 @@
+{
+ "schema_version": "1.0",
+ "suite": "bondfit_d",
+ "spec": "specifications/04-pricing/bonds.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "bondfit_d-0001",
+   "operation": "bond.fit.nelson_siegel",
+   "inputs": {
+    "settlement": "2026-11-09",
+    "tau": 2.5,
+    "bonds": [
+     {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "dirty_price": 102.75380817452188
+     },
+     {
+      "maturity": "2031-02-28",
+      "coupon": 0.0375,
+      "frequency": 2,
+      "dirty_price": 99.48042470379795
+     },
+     {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2,
+      "dirty_price": 103.64770306088552
+     },
+     {
+      "maturity": "2034-03-31",
+      "coupon": 0.03,
+      "frequency": 1,
+      "dirty_price": 94.36134741120536
+     },
+     {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2,
+      "dirty_price": 111.16369088023866
+     },
+     {
+      "maturity": "2032-05-15",
+      "coupon": 0.04,
+      "frequency": 2,
+      "dirty_price": 101.4052635206421
+     },
+     {
+      "maturity": "2041-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "dirty_price": 102.6371178909484
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.042,
+      -0.006,
+      0.004
+     ],
+     "residuals": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "known-truth",
+    "scipy-least-squares"
+   ],
+   "tags": [
+    "sovereign-fit",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "known truth with zero weighted residual; unique minimum from three starts"
+   }
+  },
+  {
+   "case_id": "bondfit_d-0002",
+   "operation": "bond.fit.nelson_siegel",
+   "inputs": {
+    "settlement": "2026-11-09",
+    "tau": 2.5,
+    "bonds": [
+     {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "dirty_price": 102.75380817452188
+     },
+     {
+      "maturity": "2031-02-28",
+      "coupon": 0.0375,
+      "frequency": 2,
+      "dirty_price": 99.48042470379795
+     },
+     {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2,
+      "dirty_price": 104.39770306088552
+     },
+     {
+      "maturity": "2034-03-31",
+      "coupon": 0.03,
+      "frequency": 1,
+      "dirty_price": 94.36134741120536
+     },
+     {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2,
+      "dirty_price": 111.16369088023866
+     },
+     {
+      "maturity": "2032-05-15",
+      "coupon": 0.04,
+      "frequency": 2,
+      "dirty_price": 101.4052635206421
+     },
+     {
+      "maturity": "2041-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "dirty_price": 102.6371178909484
+     }
+    ],
+    "weights": [
+     1,
+     1,
+     0,
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "betas": [
+      0.042,
+      -0.006,
+      0.004
+     ],
+     "residuals": [
+      0.0,
+      0.0,
+      -0.75,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "known-truth",
+    "scipy-least-squares"
+   ],
+   "tags": [
+    "sovereign-fit",
+    "relative-value",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 0.0,
+    "reason": "known truth with zero weighted residual; unique minimum from three starts"
+   }
+  },
+  {
+   "case_id": "bondfit_d-0003",
+   "operation": "bond.fit.nelson_siegel",
+   "inputs": {
+    "settlement": "2026-11-09",
+    "tau": 2.5,
+    "bonds": [
+     {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "dirty_price": 102.75380817452188
+     },
+     {
+      "maturity": "2031-02-28",
+      "coupon": 0.0375,
+      "frequency": 2,
+      "dirty_price": 99.48042470379795
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "fewer than 3 bonds with weight"
+  },
+  {
+   "case_id": "bondfit_d-0004",
+   "operation": "bond.fit.nelson_siegel",
+   "inputs": {
+    "settlement": "2026-11-09",
+    "tau": 0.0,
+    "bonds": [
+     {
+      "maturity": "2029-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "dirty_price": 102.75380817452188
+     },
+     {
+      "maturity": "2031-02-28",
+      "coupon": 0.0375,
+      "frequency": 2,
+      "dirty_price": 99.48042470379795
+     },
+     {
+      "maturity": "2036-08-15",
+      "coupon": 0.045,
+      "frequency": 2,
+      "dirty_price": 103.64770306088552
+     },
+     {
+      "maturity": "2034-03-31",
+      "coupon": 0.03,
+      "frequency": 1,
+      "dirty_price": 94.36134741120536
+     },
+     {
+      "maturity": "2055-05-15",
+      "coupon": 0.0475,
+      "frequency": 2,
+      "dirty_price": 111.16369088023866
+     },
+     {
+      "maturity": "2032-05-15",
+      "coupon": 0.04,
+      "frequency": 2,
+      "dirty_price": 101.4052635206421
+     },
+     {
+      "maturity": "2041-11-15",
+      "coupon": 0.0425,
+      "frequency": 2,
+      "dirty_price": 102.6371178909484
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

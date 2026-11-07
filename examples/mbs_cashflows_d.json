@@ -1,0 +1,18 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-mbs-cashflows-d",
+ "operation": "mbs.cashflows",
+ "inputs": {
+  "pool": {
+   "balance": 1000000.0,
+   "wac": 0.065,
+   "net_coupon": 0.06,
+   "wam": 60,
+   "age": 0,
+   "prepayment": {
+    "model": "PSA",
+    "speed": 150.0
+   }
+  }
+ }
+}

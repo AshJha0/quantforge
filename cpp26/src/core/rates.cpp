@@ -14,9 +14,10 @@ namespace {
 constexpr auto modified_following = BusinessDayConvention::ModifiedFollowing;
 
 const RateConvention table[] = {
-    {"SONIA", "GBP", Calendar::Gblo, 0, 0, 12, DayCount::Act365F, 0},
-    {"SOFR", "USD", Calendar::Usgs, 2, 2, 12, DayCount::Act360, 0},
-    {"USD-TERM-3M", "USD", Calendar::Usgs, 2, 0, 12, DayCount::Thirty360Bond, 3},
+    {"SONIA", "GBP", Calendar::Gblo, 0, 0, 12, DayCount::Act365F, 0, 365.0},
+    {"SOFR", "USD", Calendar::Usgs, 2, 2, 12, DayCount::Act360, 0, 360.0},
+    {"ESTR", "EUR", Calendar::Euta, 2, 2, 12, DayCount::Act360, 0, 360.0},
+    {"USD-TERM-3M", "USD", Calendar::Usgs, 2, 0, 12, DayCount::Thirty360Bond, 3, 360.0},
 };
 
 double sign_of(FixedSide s) { return s == FixedSide::Pay ? 1.0 : -1.0; }
@@ -166,7 +167,30 @@ std::vector<Period> generate_schedule(Date start, Date end, long long frequency_
 Curve::Curve(Date as_of, CurveInterpolation interpolation)
     : as_of_(as_of), interpolation_(interpolation), t_{0.0}, log_df_{0.0} {}
 
-Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars)
+void check_jumps(Date as_of, const std::vector<Jump>& jumps) {
+    Date previous = as_of;
+    for (const Jump& j : jumps) {
+        if (j.date <= previous) throw Error("E_INPUT", "jump dates must increase and follow as_of", "jumps");
+        previous = j.date;
+    }
+    for (const Jump& j : jumps)
+        if (!(j.factor > 0.0)) throw Error("E_DOMAIN", "a jump factor is not positive", "jumps");
+}
+
+double jump_product(const std::vector<Jump>& jumps, Date d) {
+    double p = 1.0;
+    for (const Jump& j : jumps)
+        if (j.date < d) p *= j.factor;
+    return p;
+}
+
+void Curve::set_jumps(const std::vector<Jump>& jumps) {
+    check_jumps(as_of_, jumps);
+    jumps_ = jumps;
+}
+
+Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars,
+             const std::vector<Jump>& jumps)
     : Curve(as_of, interpolation) {
     if (pillars.empty()) throw Error("E_INPUT", "no pillars", "pillars");
     Date previous = as_of;
@@ -176,8 +200,9 @@ Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pil
     }
     for (const Pillar& p : pillars) {
         if (p.discount_factor <= 0.0) throw Error("E_DOMAIN", "a discount factor is not positive", "pillars");
-        push(p.date, std::log(p.discount_factor));
     }
+    set_jumps(jumps);  // after the pillar checks (ruling D46)
+    for (const Pillar& p : pillars) push(p.date, std::log(p.discount_factor / jump_product(jumps_, p.date)));
 }
 
 void Curve::push(Date d, double log_df) {
@@ -188,7 +213,7 @@ void Curve::push(Date d, double log_df) {
 
 std::vector<Pillar> Curve::pillars() const {
     std::vector<Pillar> out;
-    for (std::size_t i = 0; i < dates_.size(); ++i) out.push_back({dates_[i], std::exp(log_df_[i + 1])});
+    for (std::size_t i = 0; i < dates_.size(); ++i) out.push_back({dates_[i], std::exp(log_df_[i + 1]) * jump_product(jumps_, dates_[i])});
     return out;
 }
 
@@ -196,6 +221,11 @@ double Curve::discount(Date d) const {
     const double t = time(d);
     if (t < 0.0) throw Error("E_OUT_OF_RANGE", "the date is before as_of");
     if (t == 0.0) return 1.0;
+    const double s = plain_discount(t);
+    return jumps_.empty() ? s : s * jump_product(jumps_, d);
+}
+
+double Curve::plain_discount(double t) const {
     const std::size_t n = t_.size() - 1;
     if (t >= t_[n]) {
         if (t == t_[n]) return std::exp(log_df_[n]);
@@ -216,8 +246,10 @@ double simple_forward(const Curve& c, Date start, Date end, DayCount day_count) 
 }
 
 SolvedCurve solve_curve(Date as_of, CurveInterpolation interpolation, const std::vector<Date>& dates,
-                        const std::vector<double>& targets, const ModelRate& model, SolveMethod method) {
+                        const std::vector<double>& targets, const ModelRate& model, SolveMethod method,
+                        const std::vector<Jump>& jumps) {
     Curve c(as_of, interpolation);
+    c.set_jumps(jumps);
     double previous_t = 0.0, previous_x = 0.0;
     for (std::size_t j = 0; j < dates.size(); ++j) {
         const double t = c.time(dates[j]);
@@ -246,18 +278,23 @@ std::vector<Period> ois_periods(const RateConvention& c, Date as_of, Tenor tenor
     return generate_schedule(spot, add_months(spot, int(months)), c.fixed_months, c.calendar, eom, c.payment_lag);
 }
 
-Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const Curve& curve) {
+Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const std::function<double(Date)>& discount) {
     Legs v{0.0, 0.0};
     for (const Period& p : periods) {
-        const double pay = curve.discount(p.payment);
+        const double pay = discount(p.payment);
         v.annuity += year_fraction(c.fixed_day_count, p.start, p.end) * pay;
-        v.floating += (curve.discount(p.start) / curve.discount(p.end) - 1.0) * pay;
+        v.floating += (discount(p.start) / discount(p.end) - 1.0) * pay;
     }
     return v;
 }
 
+Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const Curve& curve) {
+    return ois_legs(c, periods, [&](Date d) { return curve.discount(d); });
+}
+
 SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
-                          CurveInterpolation interpolation, SolveMethod method) {
+                          CurveInterpolation interpolation, SolveMethod method, const std::vector<Jump>& jumps) {
+    check_jumps(as_of, jumps);
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     std::vector<std::vector<Period>> swaps;
     std::vector<Date> dates;
@@ -270,7 +307,7 @@ SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector
             throw Error("E_INPUT", "pillars must strictly increase", "quotes");
     }
     return solve_curve(as_of, interpolation, dates, targets,
-                       [&](std::size_t j, const Curve& curve) { return ois_legs(c, swaps[j], curve).par(); }, method);
+                       [&](std::size_t j, const Curve& curve) { return ois_legs(c, swaps[j], curve).par(); }, method, jumps);
 }
 
 double ois_compound(const std::vector<double>& rates, const std::vector<long long>& days, double denominator) {

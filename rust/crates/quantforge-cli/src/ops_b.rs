@@ -34,7 +34,7 @@ pub(crate) fn items<'a>(i: &Inputs<'a>, k: &str) -> Result<Vec<Inputs<'a>>> {
         .collect()
 }
 
-fn interpolation(i: &Inputs) -> Result<Interpolation> {
+pub(crate) fn interpolation(i: &Inputs) -> Result<Interpolation> {
     match Interpolation::parse(i.str("interpolation")?) {
         Some(v) => Ok(v),
         None => i.fail("interpolation", "unknown interpolation"),
@@ -51,10 +51,24 @@ pub(crate) fn curve_input(i: &Inputs, k: &str) -> Result<CurveInput> {
         as_of: c.date("as_of")?,
         interpolation: interpolation(&c)?,
         pillars,
+        jumps: jumps(&c, false)?,
     })
 }
 
-fn tenor(i: &Inputs, k: &str) -> Result<(i64, char)> {
+/// Stage D `jumps`: may be absent unless `required`; `null` is `E_SCHEMA` (ruling D10).
+pub(crate) fn jumps(i: &Inputs, required: bool) -> Result<Vec<(Date, f64)>> {
+    match i.0.get("jumps") {
+        None if !required => return Ok(Vec::new()),
+        None | Some(Json::Null) => return i.fail("jumps", "is required and not null"),
+        _ => {}
+    }
+    items(i, "jumps")?
+        .iter()
+        .map(|j| Ok((j.date("date")?, j.f64("factor")?)))
+        .collect()
+}
+
+pub(crate) fn tenor(i: &Inputs, k: &str) -> Result<(i64, char)> {
     tenor_text(i, k, i.str(k)?)
 }
 
@@ -65,14 +79,14 @@ fn tenor_text(i: &Inputs, k: &str, s: &str) -> Result<(i64, char)> {
     }
 }
 
-fn overnight(i: &Inputs, k: &str) -> Result<Overnight> {
+pub(crate) fn overnight(i: &Inputs, k: &str) -> Result<Overnight> {
     match conventions::overnight(i.str(k)?) {
         Some(c) => Ok(c),
         None => i.fail(k, "unknown convention"),
     }
 }
 
-fn index(i: &Inputs) -> Result<()> {
+pub(crate) fn index(i: &Inputs) -> Result<()> {
     if i.str("index")? != TERM_INDEX {
         return i.fail("index", "unknown index");
     }
@@ -86,8 +100,20 @@ fn pair(i: &Inputs) -> Result<FxPair> {
     }
 }
 
-fn ois_quotes(i: &Inputs) -> Result<Vec<OisQuote>> {
-    items(i, "quotes")?
+pub(crate) fn solve_method(i: &Inputs) -> Result<SolveMethod> {
+    match i.str("method")? {
+        "SEQUENTIAL" => Ok(SolveMethod::Sequential),
+        "GLOBAL" => Ok(SolveMethod::Global),
+        _ => i.fail("method", "unknown method"),
+    }
+}
+
+pub(crate) fn ois_quotes(i: &Inputs) -> Result<Vec<OisQuote>> {
+    ois_quotes_at(i, "quotes")
+}
+
+pub(crate) fn ois_quotes_at(i: &Inputs, k: &str) -> Result<Vec<OisQuote>> {
+    items(i, k)?
         .iter()
         .map(|q| {
             let t = tenor(q, "tenor")?;
@@ -127,7 +153,7 @@ pub(crate) fn snapshot_id(i: &Inputs) -> Result<Option<String>> {
     Ok(id.transpose()?.map(str::to_string))
 }
 
-fn pillars_json(dates: &[Date], logs: &[f64]) -> Json {
+pub(crate) fn pillars_json(dates: &[Date], logs: &[f64]) -> Json {
     let rows: Vec<Json> = dates
         .iter()
         .zip(logs)
@@ -141,7 +167,7 @@ fn pillars_json(dates: &[Date], logs: &[f64]) -> Json {
     obj([("pillars", rows.into())])
 }
 
-fn repricing(e: f64) -> Json {
+pub(crate) fn repricing(e: f64) -> Json {
     obj([("max_repricing_error", e.into())])
 }
 
@@ -235,8 +261,12 @@ fn calib_fit(i: &Inputs) -> Result<Outcome> {
     })
 }
 
-fn projection_quotes(i: &Inputs) -> Result<Vec<ProjectionQuote>> {
-    items(i, "quotes")?
+pub(crate) fn projection_quotes(i: &Inputs) -> Result<Vec<ProjectionQuote>> {
+    projection_quotes_at(i, "quotes")
+}
+
+pub(crate) fn projection_quotes_at(i: &Inputs, k: &str) -> Result<Vec<ProjectionQuote>> {
+    items(i, k)?
         .iter()
         .map(|q| {
             let rate = q.f64("rate")?;
@@ -335,13 +365,10 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "rates.ois.bootstrap" => {
             let c = overnight(i, "convention")?;
             let (t, q, m) = (i.date("as_of")?, ois_quotes(i)?, interpolation(i)?);
-            let method = match i.str("method")? {
-                "SEQUENTIAL" => SolveMethod::Sequential,
-                "GLOBAL" => SolveMethod::Global,
-                _ => return i.fail("method", "unknown method"),
-            };
+            let method = solve_method(i)?;
+            let j = jumps(i, false)?;
             i.gate()?;
-            let p = OisCurveProblem::new(&c, t, &q, m)?;
+            let p = OisCurveProblem::with_jumps(&c, t, &q, m, &j)?;
             let s = p.solve(&p.mids, method)?;
             Ok(Outcome {
                 outputs: pillars_json(&s.dates, &s.logs),

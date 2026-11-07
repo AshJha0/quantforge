@@ -111,7 +111,7 @@ Every number below is from the Rust CLI on 2026-11-07, on the inputs of the name
 
 **Equity forward.** Plain idea: holding the stock to expiry costs funding at `r`, earns the borrow fee `b` if lent out, and pays out the dividends. So the forward is the stock grown at `r - b`, less each dividend grown from its date to expiry. Formal statement, flat rates: `F = S e^{(r-b)T} - sum A_i e^{(r-b)(T - t_i)}`. With curves, dividends are carried on `C = D/B` (ruling C2), and option PVs are discounted on `D` alone (C3). A common slip is `(S - PV(D)) e^{(r-b)T}` with `PV` taken at `r`: it discounts each dividend at `r`, then grows it back at `r - b`, which matches only when `b = 0`. Take the PV at `r - b` and the two forms agree. Case `equity_forward-0001`: `S = 100`, `r = 0.04`, `b = 0.05`, a dividend of 2 at `t = 0.5`, `T = 1`. `eq.forward.flat` gives 97.01495841653144. The wrong form gives 97.0640923: close enough to pass a glance, so it is a named check (tag `wrong-convention`). QuantLib's `AnalyticDividendEuropeanEngine` agrees with the right form (C14).
 
-**Black, Black-76 and Bachelier.** Plain idea: all three price a call as the expected payoff on a driftless forward, discounted. Black-Scholes and Black-76 make the forward lognormal, so vol is a percentage. Bachelier makes it normal, so vol is in price units and the forward may go negative. Formal statement: Black-76 call `D (F N(d1) - K N(d2))`, `d1,2 = (ln(F/K) ± v^2 T/2) / (v sqrt T)`. Black-Scholes is Black-76 with `F` from spot, rate and yield. Bachelier call `D ((F - K) N(d) + v sqrt(T) n(d))`, `d = (F - K) / (v sqrt T)`. Case `black-0001`: `F = K = 100`, `T = 1`, `D = 0.9704455335485082`, vol 0.2. Black-76 gives 7.730149359277918, and `vol.option.implied` on that price returns 0.20000000000000007. Case `black-0005`: the same under Bachelier with vol 20 gives 7.743035083184538, close to Black-76 because 20 in price units is 20% of 100 at the money.
+**Black, Black-76 and Bachelier.** Plain idea: all three price a call as the expected payoff on a driftless forward, discounted. Black-Scholes and Black-76 make the forward lognormal, so vol is a percentage. Bachelier makes it normal, so vol is in price units and the forward may go negative. Formal statement: Black-76 call `D (F N(d1) - K N(d2))`, `d1,2 = (ln(F/K) ± v^2 T/2) / (v sqrt T)`. Black-Scholes is Black-76 with `F = S e^{(r-q)T}` and `D = e^{-rT}`, from spot, rate and yield. Bachelier call `D ((F - K) N(d) + v sqrt(T) n(d))`, `d = (F - K) / (v sqrt T)`. Case `black-0001`: `F = K = 100`, `T = 1`, `D = 0.9704455335485082`, vol 0.2. Black-76 gives 7.730149359277918; case `black-0002` sends that price to `vol.option.implied` and expects 0.2. Case `black-0005`: the same under Bachelier with vol 20 gives 7.743035083184538, close to Black-76 because 20 in price units is 20% of 100 at the money.
 
 **Greeks.** Plain idea: delta, gamma, vega, theta and rho are slopes of the price to spot, spot again, vol, time and rate; vanna and volga are second slopes involving vol. Formal statement: closed forms in `vol-greeks.md`, per 1.00 of vol (C7), checked against bumps in the oracle. Case `greeks-0001`: Black-Scholes call, `S = K = 100`, `r = 0.03`, yield 0.01, vol 0.2, `T = 1`. Price 8.827321225352126, delta 0.5734959790277754, gamma 0.01935758770796135, vega 38.715175415922694, theta -4.753689862887256, rho 48.5222766774254. Vanna and volga print as about 4e-16 and -8e-15. They are zero up to rounding: both scale with `d2`, and here `d2 = 0`.
 
@@ -130,6 +130,53 @@ Nothing in these examples is traded.
 ### Known limits
 
 Stage C is Implemented, not Validated. All inputs are synthetic: the stage C data survey found no free history of option quotes, vol surfaces, borrow cost or dividends. European options only (C1). Arbitrage checks run on the given points only. `vol.sabr.arbfree` at `nu > 0` lacks a tight outside source. See `specifications/stage-c-rulings.md`.
+
+## Stage D: Curves and fixed income
+
+**Status: built, target v0.4.** Implemented, not Validated. At merge `95cbf11` on 2026-11-07, each of the four implementations passed 5,514 of 5,514 golden cases locally, 331 of them in stage D's 20 suites (`conformance/README.md`). `specifications/stage-d-handover.md` lists every stage D spec; rulings D1 to D64 are in `specifications/stage-d-rulings.md`.
+
+### Learning path
+
+| Item | Plain idea | Formal statement |
+|---|---|---|
+| D1 OIS, ESTR, jumps | One discount curve from overnight swap quotes; a year-end jump is a one-off factor | `02-curves/ois-curves.md`, `curve-framework.md` |
+| D1 compounding | A coupon compounds one fixing a day; the window may be shifted so the amount is known early | `02-curves/overnight-compounding.md` |
+| D1 meeting steps | Overnight rates move on central-bank dates and stay flat between them | `02-curves/meeting-steps.md` |
+| D1 convexity, CSA, basis, fits | Futures sit above forwards; collateral sets the discount curve; two indices differ by a spread; fits can be smoothed or made robust | `futures-convexity.md`, `csa-and-basis.md`, `03-calibration/curve-fits.md` |
+| D2 bonds, repo | A bond is its cash flows; repo finances it; a futures contract delivers the cheapest bond | `04-pricing/bonds.md` |
+| D3 cross-currency | Foreign cash flows under domestic collateral discount on a basis-adjusted curve | `02-curves/cross-currency.md` |
+| D4 credit | Survival probabilities from CDS spreads, by the ISDA model | `04-pricing/credit.md` |
+| D5 equity | Futures imply dividends and borrow; an index changes by its divisor | `02-curves/equity-curves.md`, `04-pricing/equity-index.md` |
+| D6 inflation | A CPI curve from zero-coupon swaps, with a monthly seasonal pattern | `02-curves/inflation.md` |
+| D7 caps, swaptions | Black or Bachelier on a forward rate, times an annuity | `05-volatility/caps-and-swaptions.md` |
+| D8 commodities | Forward curves with seasons; storage links two delivery dates | `02-curves/commodity.md` |
+| D9 MBS | A mortgage pool pays down early at a modelled speed | `04-pricing/mbs.md` |
+
+### Worked examples
+
+Every number below is a golden value in `datasets/golden/stage_d/`, which all four builds match within tolerance.
+
+**Lookback.** Plain idea: a SOFR coupon compounds daily fixings, but with a 2-day lookback each day uses the fixing of two business days earlier, so the amount is known before payment. Formal statement: `growth = prod(1 + r_i w_i/360)`, rate `(growth - 1) 360 / sum w_i`, with weights from the interest period. Case `compound_d-0002`: 2026-11-10 to 2027-02-10, lookback 2: compounded rate 0.04333939898551821, accrual 0.25555555555555554, interest 0.011075624185187987 per unit. QuantLib's `OvernightLeg` agrees within 5e-14 (`oracle/REPORT.md`).
+
+**Meeting steps.** Plain idea: the overnight forward is flat between meetings. Formal statement: `D(d) = exp(-integral f)`, `f` a step function. Case `steps_d-0001`: base 0.0425 until a step to 0.04 on 2026-12-10. The discount factor is 0.9961649070718093 on 2026-12-09 and 0.9960489220202466 on the step date; the forward reads 0.0425, then 0.04. A step takes effect on its date (ruling D6).
+
+**Bond from yield.** Plain idea: discount each cash flow at the yield, compounded at the coupon frequency. Formal statement in `bonds.md`. Case `bonds_d-0001`: 4.25% semi-annual bond to 2029-11-15, settled 2026-11-09, yield 0.041. Clean 100.42085974293727, accrued 2.0557065217391304, modified duration 2.74949144731416, convexity 9.306657676461866. QuantLib `FixedRateBond` agrees within 1e-10.
+
+**ISDA CDS.** Plain idea: protection pays `1 - R` on default; the buyer pays a running coupon, and an upfront settles the difference. Formal statement in `credit.md`. Case `credit_d-0004`: buy 10 million of protection to 2031-12-20, coupon 100 bp, recovery 0.4. Par spread 0.011999999988591251, clean upfront 0.009002551543707455, PV 89977.4324589857. QuantLib's `IsdaCdsEngine` agrees within 7e-16 per unit.
+
+**Inflation swap.** Plain idea: one payment swaps realised inflation for a fixed rate. Formal statement in `inflation.md`. Case `inflation_d-0007`: receive 5-year inflation against 2.6% fixed on 10 million. Index ratio 1.1286513715776638, below `1.026^5`, so receiving inflation is worth -69569.4851246751.
+
+**Swaption.** Plain idea: Black on the forward swap rate, times the annuity. Case `capswaption_d-0010`: 1y into 5y payer, strike 3.7%, vol 0.21. Forward rate 0.0357181339683658, annuity 4.351040526247382, price 106969.44213342607 on 10 million.
+
+**Storage.** Plain idea: a later forward above the earlier one plus financing and storage means cash and carry earns money. Case `commodity_d-0007`: from the March to the June 2027 forward the convenience yield is -0.03607983964691383, and buying forward, storing and selling forward earns 0.6708164887620427 a unit, so `arbitrage` is true for that segment.
+
+**MBS.** Plain idea: a pool pays principal early at a speed, here 150% PSA, which shortens its life. Case `mbs_d-0004`: 60-month pool, 6.5% WAC, 6% net, yield 5.5%, 24-day delay. Price 100.76748931062598, WAL 2.4872786417395525 years.
+
+Nothing in these examples is traded.
+
+### Known limits
+
+Stage D is Implemented, not Validated. All inputs are synthetic. The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them.
 
 ## Validate and backtest
 

@@ -68,3 +68,29 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | SABR | Model in which the forward's vol is itself random; Hagan's 2002 formula approximates its Black vol |
 | SVI, SSVI | Smile shapes in total variance: SVI per expiry, SSVI across expiries with simple no-arbitrage conditions |
 | Total variance | `w = v^2 T`, the vol squared times time to expiry |
+
+## Stage D: Curves and fixed income
+
+| Term | Meaning |
+|---|---|
+| ESTR | Euro short-term rate, the euro overnight rate |
+| Lookback, observation shift, lockout | Ways to move an overnight coupon's fixing window so the amount is known before payment (`overnight-compounding.md`) |
+| IBOR fallback | The ISDA rule replacing a LIBOR fixing by compounded overnight rates plus a fixed spread |
+| Turn of year | A one-off jump in discount factors over year end |
+| Convexity adjustment | The gap between a futures rate and the forward rate, from daily settlement |
+| CSA discounting | Discounting at the rate paid on the collateral |
+| Z-spread | A constant spread over the curve that reprices a bond |
+| Asset swap spread | The spread over the floating leg that swaps a bond to floating at par |
+| Repo, special repo | A sale with an agreed buy-back, in effect a secured loan; special when one bond lends below the general rate |
+| CTD | Cheapest to deliver: the bond a futures seller delivers, here the one with the highest implied repo |
+| Cross-currency basis | The spread on one leg of a cross-currency swap that makes it par |
+| NDF | Non-deliverable forward: settled in USD on the fixing, without delivering the other currency |
+| CDS | Credit default swap: protection against a named borrower's default, paid for with a running premium |
+| Hazard rate | The default rate per year, given survival so far |
+| Index ratio | Reference CPI over base CPI, scaling an inflation-linked bond |
+| Seasonality | A repeating monthly pattern in CPI or commodity prices |
+| Convenience yield | The benefit of holding a commodity, implied by its forward curve |
+| CPR, SMM, PSA | Annual and monthly prepayment rates, and the standard ramp of CPR by loan age |
+| MBS | Mortgage-backed security: a bond paid from a pool of mortgages, whose cash flows depend on prepayment |
+| WAL | Weighted average life: the average time to repayment of principal |
+

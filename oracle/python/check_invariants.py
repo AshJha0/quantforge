@@ -150,6 +150,121 @@ def check_b(c, counts):
         hit("hedge cuts key-rate risk")
 
 
+def check_d(c, counts):
+    """Stage D invariants, from the specs. Counts how many each rule saw."""
+    op, i, e = c["operation"], c["inputs"], c["expected"]
+    if e["status"] != "ok":
+        return
+    o, cid = e["outputs"], c["case_id"]
+
+    def hit(k):
+        counts[k] = counts.get(k, 0) + 1
+    if op == "rates.ois.bootstrap":
+        ds = [p["date"] for p in o["pillars"]]
+        assert ds == sorted(set(ds)) and all(p["discount_factor"] > 0 for p in o["pillars"]), cid
+        hit("OIS pillars strictly increasing, discount factors positive")
+    if op == "rates.ois.compound_dated":
+        rs = [f["rate"] for f in i["fixings"]]
+        assert min(rs) - 1e-15 <= o["compounded_rate"] <= max(rs) * 1.01 + 1e-15, cid
+        assert abs(o["interest"] - o["compounded_rate"] * o["accrual"]) < 1e-15, cid
+        hit("compounded rate within the fixings' range (plus compounding); interest = rate x accrual")
+    if op == "rates.fallback.rate":
+        assert abs(o["fallback_rate"] - o["compounded_rate"] - o["spread_adjustment"]) < 1e-15 and o["spread_adjustment"] > 0, cid
+        hit("fallback = compounded + positive fixed spread")
+    if op == "rates.ois.step_curve":
+        dfs, ds = o["discount_factors"], i["dates"]
+        assert all(v > 0 for v in dfs), cid
+        if i["base_rate"] > 0 and all(st["rate"] > 0 for st in i["steps"]):
+            order = sorted(range(len(ds)), key=lambda k: ds[k])
+            assert all(dfs[order[k + 1]] <= dfs[order[k]] for k in range(len(order) - 1)), cid
+        hit("step curve positive; decreasing when all forwards are positive")
+    if op == "rates.futures.convexity":
+        assert o["convexity"] >= 0 and abs(o["futures_rate"] - o["convexity"] - o["forward_rate"]) < 1e-15, cid
+        assert abs(o["futures_rate"] - (100 - i["price"]) / 100) < 1e-15, cid
+        hit("convexity not negative; forward = futures rate - convexity")
+    if op == "rates.csa.discount":
+        if i["fx"] is None and i["collateral_spread"] > 0:
+            assert all(0 < v < 1 for v in o["discount_factors"]), cid
+        hit("CSA discount factors positive")
+    if op == "rates.curve.joint_bootstrap":
+        for k in ("discount_pillars", "projection_pillars"):
+            ds = [p["date"] for p in o[k]]
+            assert ds == sorted(set(ds)), cid
+        hit("joint bootstrap pillars strictly increasing")
+    if op == "calib.curve.smooth":
+        assert len(o["forwards"]) == len(i["knots"]) and o["objective"] >= 0, cid
+        res = sum(w * (f - y) ** 2 for f, y, w in zip(o["fitted"], i["zero_rates"], i.get("weights", [1] * len(i["zero_rates"]))))
+        assert res <= o["objective"] * (1 + 1e-9) + 1e-18, cid
+        hit("smooth fit: objective not negative and at least the weighted residual sum")
+    if op == "bond.price.from_yield":
+        assert abs(o["dirty"] - o["clean"] - o["accrued"]) < 1e-9 and o["accrued"] >= 0 and o["modified_duration"] > 0 and o["convexity"] > 0, cid
+        assert abs(o["macaulay_duration"] / (1 + i["yield"] / i["bond"]["frequency"]) - o["modified_duration"]) < 1e-9, cid
+        hit("bond: dirty = clean + accrued; modified = Macaulay / (1 + y/f); duration and convexity positive")
+    if op == "repo.forward":
+        assert (i["gc_rate"] is None) == (o["special_spread"] is None), cid
+        hit("repo: special outputs null exactly when gc_rate is null")
+    if op == "bond.futures.basis":
+        irs = [b["implied_repo"] for b in o["bonds"]]
+        assert irs[o["ctd"]] == max(irs), cid
+        hit("CTD has the highest implied repo")
+    if op == "fx.ndf.pv":
+        assert o["forward"] > 0 and (i["fixing"] is None or o["forward"] == i["fixing"]), cid
+        hit("NDF forward positive, equal to the fixing once known")
+    if op == "fx.xccy.pv":
+        sg = 1 if i["trade"]["side"] == "RECEIVE_FOREIGN" else -1
+        assert abs(o["pv"] - sg * (i["spot"] * o["foreign_leg"] - o["domestic_leg"])) < 1e-6, cid
+        hit("xccy pv = sign (spot foreign - domestic)")
+    if op in ("credit.cds.bootstrap", "credit.curve.composite"):
+        sv = [p["survival"] for p in o["pillars"]]
+        assert all(0 < v <= 1 for v in sv) and all(b < a for a, b in zip(sv, sv[1:])), cid
+        hit("CDS survival in (0, 1] and strictly falling")
+    if op == "credit.cds.price":
+        assert o["protection_leg"] > 0 and o["rpv01"] > 0 and o["accrued"] >= 0, cid
+        hit("CDS legs positive")
+    if op == "credit.index.intrinsic":
+        assert abs(o["basis"] - (i["quoted_upfront"] - o["intrinsic_upfront"])) < 1e-15, cid
+        hit("index basis = quoted - intrinsic")
+    if op == "eq.dividend.implied":
+        assert all(abs(a - b) < 1e-9 for a, b in zip(o["pv_dividends"], [sum(o["period_pv_dividends"][:k + 1]) for k in range(len(o["pv_dividends"]))])), cid
+        hit("implied dividends: period amounts sum to the cumulative")
+    if op == "eq.futures.basis":
+        assert abs(o["basis"] - (i["futures_price"] - o["fair_price"])) < 1e-9, cid
+        hit("futures basis = market - fair")
+    if op == "eq.corporate_action.adjust":
+        assert abs(o["adjusted_shares"] * o["ex_price"] - i["shares"] * i["cum_price"]) < 1e-6 * i["shares"] * i["cum_price"], cid
+        hit("corporate action keeps shares x price")
+    if op == "eq.trs.pv":
+        sg = 1 if i["trade"]["side"] == "RECEIVE_EQUITY" else -1
+        assert abs(o["pv"] - sg * (o["equity_leg"] - o["funding_leg"])) < 1e-9 * abs(o["equity_leg"]) + 1e-9, cid
+        hit("TRS pv = sign (equity - funding)")
+    if op == "infl.curve.cpi":
+        assert all(v > 0 for v in o["cpi"]), cid
+        hit("CPI positive")
+    if op == "infl.linker.price":
+        assert abs(o["nominal_clean"] - o["real_clean"] * o["index_ratio"]) < 1e-9 * o["nominal_clean"], cid
+        hit("linker nominal = real x index ratio")
+    if op == "rates.cap.price":
+        assert all(c >= 0 for c in o["caplets"]) and abs(sum(o["caplets"]) - o["price"]) < 1e-9 * max(1, o["price"]), cid
+        hit("cap = sum of non-negative caplets")
+    if op == "rates.swaption.price":
+        K, Sw, A, N = i["trade"]["strike"], o["forward_rate"], o["annuity"], i["trade"]["notional"]
+        intr = N * A * max(Sw - K if i["trade"]["type"] == "PAYER" else K - Sw, 0)
+        assert o["price"] >= intr - 1e-9 * N and A > 0, cid
+        hit("swaption at least intrinsic on the annuity")
+    if op == "cmdty.storage.carry":
+        assert o["arbitrage"] == [v > 0 for v in o["carry_values"]], cid
+        hit("storage arbitrage flag = positive carry value")
+    if op == "mbs.cashflows":
+        b = o["balance"]
+        assert all(x >= -1e-6 for x in o["prepayment"] + o["scheduled_principal"]) and all(y <= x + 1e-6 for x, y in zip(b, b[1:])), cid
+        assert abs(b[-1] - o["scheduled_principal"][-1] - o["prepayment"][-1]) < 1e-6, cid
+        hit("MBS balance falls to zero; principal not negative")
+    if op == "calib.curve.robust":
+        d = i["delta"]
+        assert o["outliers"] == [j for j, r in enumerate(o["residuals"]) if abs(r) > d], cid
+        hit("robust fit: outliers are exactly the residuals beyond delta")
+
+
 def check_c(c, counts):
     """Stage C invariants, from the specs. Counts how many each rule saw."""
     op, i, e = c["operation"], c["inputs"], c["expected"]
@@ -232,6 +347,14 @@ def main():
             check_c(c, counts)
             m += 1
     note(f"invariants: {m} stage C cases checked, none breaks one")
+    for k, v in sorted(counts.items()):
+        note(f"invariants:   {k}: {v}")
+    counts, m = {}, 0
+    for p in sorted((GOLDEN.parent / "stage_d").glob("*.json")):
+        for c in json.loads(p.read_text(encoding="utf-8"))["cases"]:
+            check_d(c, counts)
+            m += 1
+    note(f"invariants: {m} stage D cases checked, none breaks one")
     for k, v in sorted(counts.items()):
         note(f"invariants:   {k}: {v}")
 

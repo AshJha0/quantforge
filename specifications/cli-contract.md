@@ -1,6 +1,6 @@
 # CLI contract
 
-Version 1.4.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+Version 1.5.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
 The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
@@ -181,6 +181,32 @@ errors. Stages A, B and C:
 | `vol.equity.price`, `risk.vol.*` | `06-risk/vol-greeks.md` |
 
 Stage C adds `E_ARBITRAGE` and these operations, and breaks nothing in the wire format. `stage-c-rulings.md` is normative for them.
+
+Stage D (contract 1.5.0, wave 1) adds these, with no new error code. `stage-d-rulings.md` is normative for them.
+
+| Prefix | Spec |
+|---|---|
+| `rates.ois.compound_dated`, `rates.fallback.rate` | `02-curves/overnight-compounding.md` |
+| `rates.ois.step_curve`, `rates.ois.fit_steps` | `02-curves/meeting-steps.md` |
+| `rates.futures.convexity` | `02-curves/futures-convexity.md` |
+| `rates.csa.discount`, `rates.basis.ois_spread`, `rates.curve.joint_bootstrap` | `02-curves/csa-and-basis.md` |
+| `calib.curve.smooth`, `calib.curve.robust` | `03-calibration/curve-fits.md` |
+
+Wave 2 adds:
+
+| Prefix | Spec |
+|---|---|
+| `bond.*`, `repo.*` | `04-pricing/bonds.md` |
+| `fx.xccy.*`, `fx.ndf.*` | `02-curves/cross-currency.md` |
+| `credit.*` | `04-pricing/credit.md` |
+| `eq.dividend.*`, `eq.borrow.*`, `eq.futures.*` | `02-curves/equity-curves.md` |
+| `eq.index.*`, `eq.corporate_action.*`, `eq.trs.*` | `04-pricing/equity-index.md` |
+| `infl.*` | `02-curves/inflation.md` |
+| `rates.cap.*`, `rates.swaption.*` | `05-volatility/caps-and-swaptions.md` |
+| `cmdty.*` | `02-curves/commodity.md` |
+| `mbs.*` | `04-pricing/mbs.md` |
+
+`ESTR` joins `rates.ois.*`, and curve objects take optional `jumps` (`02-curves/curve-framework.md`).
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.

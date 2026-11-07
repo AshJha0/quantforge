@@ -1,0 +1,600 @@
+{
+ "schema_version": "1.0",
+ "suite": "steps_d",
+ "spec": "specifications/02-curves/meeting-steps.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "steps_d-0001",
+   "operation": "rates.ois.step_curve",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "base_rate": 0.0425,
+    "steps": [
+     {
+      "date": "2026-12-10",
+      "rate": 0.04
+     },
+     {
+      "date": "2027-01-28",
+      "rate": 0.038
+     },
+     {
+      "date": "2027-03-18",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-05-06",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-06-17",
+      "rate": 0.035
+     }
+    ],
+    "jumps": [],
+    "dates": [
+     "2026-11-06",
+     "2026-12-09",
+     "2026-12-10",
+     "2026-12-11",
+     "2026-12-31",
+     "2027-01-01",
+     "2027-06-17",
+     "2028-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      1.0,
+      0.9961649070718093,
+      0.9960489220202466,
+      0.9959397719549326,
+      0.9937592807153228,
+      0.9936503815558554,
+      0.9767445380885168,
+      0.9303053012870462
+     ],
+     "overnight_forwards": [
+      0.0425,
+      0.0425,
+      0.04,
+      0.04,
+      0.04,
+      0.04,
+      0.035,
+      0.035
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "meeting-steps",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "steps_d-0002",
+   "operation": "rates.ois.step_curve",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "base_rate": 0.0425,
+    "steps": [
+     {
+      "date": "2026-12-10",
+      "rate": 0.04
+     },
+     {
+      "date": "2027-01-28",
+      "rate": 0.038
+     },
+     {
+      "date": "2027-03-18",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-05-06",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-06-17",
+      "rate": 0.035
+     }
+    ],
+    "jumps": [
+     {
+      "date": "2026-12-31",
+      "factor": 0.999989041155939
+     }
+    ],
+    "dates": [
+     "2026-11-06",
+     "2026-12-09",
+     "2026-12-10",
+     "2026-12-11",
+     "2026-12-31",
+     "2027-01-01",
+     "2027-06-17",
+     "2028-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      1.0,
+      0.9961649070718093,
+      0.9960489220202466,
+      0.9959397719549326,
+      0.9937592807153228,
+      0.9936394922962728,
+      0.9767338340974364,
+      0.9302951062163203
+     ],
+     "overnight_forwards": [
+      0.0425,
+      0.0425,
+      0.04,
+      0.04,
+      0.04,
+      0.04,
+      0.035,
+      0.035
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "meeting-steps",
+    "turn-of-year",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "steps_d-0003",
+   "operation": "rates.ois.step_curve",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "base_rate": -0.004,
+    "steps": [
+     {
+      "date": "2027-01-20",
+      "rate": -0.005
+     },
+     {
+      "date": "2027-03-03",
+      "rate": -0.0025
+     }
+    ],
+    "jumps": [],
+    "dates": [
+     "2026-11-06",
+     "2026-12-09",
+     "2026-12-10",
+     "2026-12-11",
+     "2026-12-31",
+     "2027-01-01",
+     "2027-06-17",
+     "2028-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      1.0,
+      1.0003617092366321,
+      1.0003726721647492,
+      1.0003836352130087,
+      1.0006029214101169,
+      1.0006138869816696,
+      1.0021255434427683,
+      1.0056184644256627
+     ],
+     "overnight_forwards": [
+      -0.004,
+      -0.004,
+      -0.004,
+      -0.004,
+      -0.004,
+      -0.004,
+      -0.0025,
+      -0.0025
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "meeting-steps",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "steps_d-0004",
+   "operation": "rates.ois.step_curve",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "base_rate": 0.0425,
+    "steps": [
+     {
+      "date": "2027-06-17",
+      "rate": 0.035
+     },
+     {
+      "date": "2027-05-06",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-03-18",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-01-28",
+      "rate": 0.038
+     },
+     {
+      "date": "2026-12-10",
+      "rate": 0.04
+     }
+    ],
+    "jumps": [],
+    "dates": [
+     "2027-01-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "step dates strictly increasing"
+  },
+  {
+   "case_id": "steps_d-0005",
+   "operation": "rates.ois.step_curve",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "base_rate": 0.0425,
+    "steps": [
+     {
+      "date": "2026-12-10",
+      "rate": 0.04
+     },
+     {
+      "date": "2027-01-28",
+      "rate": 0.038
+     },
+     {
+      "date": "2027-03-18",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-05-06",
+      "rate": 0.0365
+     },
+     {
+      "date": "2027-06-17",
+      "rate": 0.035
+     }
+    ],
+    "jumps": [],
+    "dates": [
+     "2026-11-05"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_OUT_OF_RANGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "steps_d-0006",
+   "operation": "rates.ois.step_curve",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "base_rate": 0.0425,
+    "steps": [
+     {
+      "date": "2026-11-06",
+      "rate": 0.04
+     }
+    ],
+    "jumps": [],
+    "dates": [
+     "2027-01-01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "step on as_of"
+  },
+  {
+   "case_id": "steps_d-0007",
+   "operation": "rates.ois.fit_steps",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "step_dates": [
+     "2026-12-10",
+     "2027-01-28",
+     "2027-03-18",
+     "2027-05-06",
+     "2027-06-17"
+    ],
+    "quotes": [
+     {
+      "tenor": "3W",
+      "rate": 0.04196909884320199
+     },
+     {
+      "tenor": "2M",
+      "rate": 0.04078775187202405
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.040182277859476305
+     },
+     {
+      "tenor": "5M",
+      "rate": 0.03906039634403006
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.03868734851500869
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.03724257537026882
+     }
+    ],
+    "jumps": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "base_rate": 0.0425,
+     "step_rates": [
+      0.04,
+      0.038,
+      0.0365,
+      0.0365,
+      0.035
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth",
+    "independent-replay"
+   ],
+   "tags": [
+    "SOFR",
+    "meeting-steps",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 0.0,
+    "reason": "known truth; QuantLib quotes carry about 1e-16 of rounding, amplified by short accruals"
+   }
+  },
+  {
+   "case_id": "steps_d-0008",
+   "operation": "rates.ois.fit_steps",
+   "inputs": {
+    "convention": "ESTR",
+    "as_of": "2026-11-06",
+    "step_dates": [
+     "2026-12-17",
+     "2027-02-04"
+    ],
+    "quotes": [
+     {
+      "tenor": "1M",
+      "rate": 0.018754366036048967
+     },
+     {
+      "tenor": "2M",
+      "rate": 0.018235379763221652
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.016879212129772243
+     }
+    ],
+    "jumps": [
+     {
+      "date": "2026-12-31",
+      "factor": 0.999989041155939
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "base_rate": 0.019,
+     "step_rates": [
+      0.0175,
+      0.016
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "known-truth",
+    "independent-replay"
+   ],
+   "tags": [
+    "ESTR",
+    "meeting-steps",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 0.0,
+    "reason": "known truth; QuantLib quotes carry about 1e-16 of rounding, amplified by short accruals"
+   }
+  },
+  {
+   "case_id": "steps_d-0009",
+   "operation": "rates.ois.fit_steps",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "step_dates": [
+     "2026-12-10",
+     "2027-01-28"
+    ],
+    "quotes": [
+     {
+      "tenor": "3W",
+      "rate": 0.0425
+     },
+     {
+      "tenor": "2M",
+      "rate": 0.042
+     }
+    ],
+    "jumps": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "quotes must number steps + 1"
+  },
+  {
+   "case_id": "steps_d-0010",
+   "operation": "rates.ois.fit_steps",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "step_dates": [
+     "2026-12-10",
+     "2027-01-28"
+    ],
+    "quotes": [
+     {
+      "tenor": "3W",
+      "rate": 0.0425
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.042
+     },
+     {
+      "tenor": "4M",
+      "rate": 0.041
+     }
+    ],
+    "jumps": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "quote 1's pillar is past step 2"
+  },
+  {
+   "case_id": "steps_d-0011",
+   "operation": "rates.ois.fit_steps",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "step_dates": [
+     "2026-12-10",
+     "2027-01-28"
+    ],
+    "quotes": [
+     {
+      "tenor": "2W",
+      "rate": 0.0425
+     },
+     {
+      "tenor": "3W",
+      "rate": 0.042
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.041
+     }
+    ],
+    "jumps": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "quote 1's pillar is not after step 1"
+  }
+ ]
+}

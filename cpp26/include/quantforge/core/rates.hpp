@@ -25,6 +25,7 @@ struct RateConvention {
     int spot_lag, payment_lag, fixed_months;
     DayCount fixed_day_count;
     int months;  // term index tenor; 0 for overnight
+    double denominator;  // floating day-count denominator: 360 or 365
 };
 
 /// SONIA, SOFR or USD-TERM-3M; nullptr otherwise.
@@ -43,6 +44,16 @@ std::vector<Period> generate_schedule(Date start, Date end, long long frequency_
 
 enum class CurveInterpolation { LogLinearDf, LinearZero };
 
+/// A curve jump (curve-framework.md): multiplies discount factors for dates strictly after `date`.
+struct Jump {
+    Date date;
+    double factor;
+};
+/// E_INPUT unless dates strictly increase after as_of; E_DOMAIN on a factor <= 0.
+void check_jumps(Date as_of, const std::vector<Jump>& jumps);
+/// Product of the factors dated strictly before d.
+double jump_product(const std::vector<Jump>& jumps, Date d);
+
 struct Pillar {
     Date date;
     double discount_factor;
@@ -53,7 +64,10 @@ public:
     /// An empty curve, holding only the implied node at as_of.
     Curve(Date as_of, CurveInterpolation interpolation);
     /// Checks pillars: E_INPUT on order, E_DOMAIN on a factor <= 0.
-    Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars);
+    Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars,
+          const std::vector<Jump>& jumps = {});
+    /// Checks jumps; call before any push. Stored values are then ln(D/J).
+    void set_jumps(const std::vector<Jump>& jumps);
 
     Date as_of() const { return as_of_; }
     CurveInterpolation interpolation() const { return interpolation_; }
@@ -71,7 +85,9 @@ private:
     Date as_of_;
     CurveInterpolation interpolation_;
     std::vector<Date> dates_;
-    std::vector<double> t_, log_df_;  // index 0 is the node at as_of
+    std::vector<double> t_, log_df_;  // index 0 is the node at as_of; ln of the jump-free curve
+    std::vector<Jump> jumps_;
+    double plain_discount(double t) const;
 };
 
 double simple_forward(const Curve& c, Date start, Date end, DayCount day_count);
@@ -90,7 +106,8 @@ using ModelRate = std::function<double(std::size_t, const Curve&)>;
 /// Finds pillars at `dates` so that model(j, curve) = targets[j]. Each model(j) may read only dates
 /// up to pillar j. Throws E_NO_CONVERGENCE unless every error is below 1e-13.
 SolvedCurve solve_curve(Date as_of, CurveInterpolation interpolation, const std::vector<Date>& dates,
-                        const std::vector<double>& targets, const ModelRate& model, SolveMethod method);
+                        const std::vector<double>& targets, const ModelRate& model, SolveMethod method,
+                        const std::vector<Jump>& jumps = {});
 
 // ---- OIS ----
 
@@ -106,9 +123,10 @@ struct Legs {
     double par() const { return floating / annuity; }
 };
 Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const Curve& curve);
+Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const std::function<double(Date)>& discount);
 
 SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
-                          CurveInterpolation interpolation, SolveMethod method);
+                          CurveInterpolation interpolation, SolveMethod method, const std::vector<Jump>& jumps = {});
 
 /// rates and days must be checked by this call: E_INPUT.
 double ois_compound(const std::vector<double>& rates, const std::vector<long long>& days, double denominator);

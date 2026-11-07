@@ -1,0 +1,1788 @@
+{
+ "schema_version": "1.0",
+ "suite": "csa_d",
+ "spec": "specifications/02-curves/csa-and-basis.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "csa_d-0001",
+   "operation": "rates.csa.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "collateral_spread": 0.0,
+    "fx": null,
+    "dates": [
+     "2027-05-06",
+     "2028-11-06",
+     "2031-11-06",
+     "2036-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9813743119305507,
+      0.9325350614068323,
+      0.8398617406536392,
+      0.6863845118876307
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "csa",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "csa_d-0002",
+   "operation": "rates.csa.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "collateral_spread": 0.0025,
+    "fx": null,
+    "dates": [
+     "2027-05-06",
+     "2028-11-06",
+     "2031-11-06",
+     "2036-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.980158430489092,
+      0.9278776680362542,
+      0.8294231295538887,
+      0.6694238624805673
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "csa",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "csa_d-0003",
+   "operation": "rates.csa.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "collateral_spread": -0.001,
+    "fx": null,
+    "dates": [
+     "2027-05-06",
+     "2028-11-06",
+     "2031-11-06",
+     "2036-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9818610867248998,
+      0.9344045578527512,
+      0.8440738776756822,
+      0.6932884891542238
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay"
+   ],
+   "tags": [
+    "csa",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "csa_d-0004",
+   "operation": "rates.csa.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "collateral_spread": 0.0,
+    "fx": {
+     "spot": 1.085,
+     "forwards": [
+      {
+       "date": "2027-05-06",
+       "forward": 1.094289212044751
+      },
+      {
+       "date": "2028-11-06",
+       "forward": 1.122532953582297
+      },
+      {
+       "date": "2031-11-06",
+       "forward": 1.1812769910354433
+      },
+      {
+       "date": "2036-11-06",
+       "forward": 1.2872324398780064
+      }
+     ]
+    },
+    "dates": [
+     "2027-05-06",
+     "2028-11-06",
+     "2031-11-06",
+     "2036-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9807905007185901,
+      0.9302966022987553,
+      0.8348349128640855,
+      0.6781904313082101
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "analytic"
+   ],
+   "tags": [
+    "csa",
+    "cross-currency-collateral",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "csa_d-0005",
+   "operation": "rates.csa.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "collateral_spread": 0.0005,
+    "fx": {
+     "spot": 1.085,
+     "forwards": [
+      {
+       "date": "2027-05-06",
+       "forward": 1.094289212044751
+      },
+      {
+       "date": "2028-11-06",
+       "forward": 1.122532953582297
+      },
+      {
+       "date": "2031-11-06",
+       "forward": 1.1812769910354433
+      },
+      {
+       "date": "2036-11-06",
+       "forward": 1.2872324398780064
+      }
+     ]
+    },
+    "dates": [
+     "2027-05-06",
+     "2028-11-06",
+     "2031-11-06",
+     "2036-11-06"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9805473485618085,
+      0.9293654975854537,
+      0.8327492915151014,
+      0.67480516924311
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "analytic"
+   ],
+   "tags": [
+    "csa",
+    "cross-currency-collateral",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "csa_d-0006",
+   "operation": "rates.csa.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "collateral_spread": 0.0,
+    "fx": {
+     "spot": 1.085,
+     "forwards": [
+      {
+       "date": "2027-05-06",
+       "forward": 1.094289212044751
+      }
+     ]
+    },
+    "dates": [
+     "2028-11-06"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "a date with no forward"
+  },
+  {
+   "case_id": "csa_d-0007",
+   "operation": "rates.csa.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "collateral_spread": 0.0,
+    "fx": {
+     "spot": 0.0,
+     "forwards": [
+      {
+       "date": "2027-05-06",
+       "forward": 1.094289212044751
+      }
+     ]
+    },
+    "dates": [
+     "2027-05-06"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "csa_d-0008",
+   "operation": "rates.basis.ois_spread",
+   "inputs": {
+    "convention": "SOFR",
+    "tenor": "2Y",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection_a": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection_b": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9985755478914277
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9958564792562664
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9894607252283577
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803751889396731
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9626503000378274
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9303458702903746
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.8990237657765715
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.8359220280130701
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7722712853463591
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6803590107621854
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5470791126494815
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.44267746522039564
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.3103427745156272
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": -0.0008174045548138831
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "index-basis",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 0.0,
+    "reason": "curve tolerance"
+   }
+  },
+  {
+   "case_id": "csa_d-0009",
+   "operation": "rates.basis.ois_spread",
+   "inputs": {
+    "convention": "SOFR",
+    "tenor": "5Y",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection_a": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection_b": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9985755478914277
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9958564792562664
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9894607252283577
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803751889396731
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9626503000378274
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9303458702903746
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.8990237657765715
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.8359220280130701
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7722712853463591
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6803590107621854
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5470791126494815
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.44267746522039564
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.3103427745156272
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": -0.0008173835769176936
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "index-basis",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 0.0,
+    "reason": "curve tolerance"
+   }
+  },
+  {
+   "case_id": "csa_d-0010",
+   "operation": "rates.basis.ois_spread",
+   "inputs": {
+    "convention": "SOFR",
+    "tenor": "10Y",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection_a": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection_b": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9985755478914277
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9958564792562664
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9894607252283577
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9803751889396731
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9626503000378274
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9303458702903746
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.8990237657765715
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.8359220280130701
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7722712853463591
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6803590107621854
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5470791126494815
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.44267746522039564
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.3103427745156272
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "spread": -0.0008193947287563313
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "index-basis",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 0.0,
+    "reason": "curve tolerance"
+   }
+  },
+  {
+   "case_id": "csa_d-0011",
+   "operation": "rates.curve.joint_bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "index": "USD-TERM-3M",
+    "as_of": "2026-11-06",
+    "ois_quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "term_quotes": [
+     {
+      "type": "DEPOSIT",
+      "months": 3,
+      "rate": 0.0395
+     },
+     {
+      "type": "FRA",
+      "start_months": 3,
+      "rate": 0.0385
+     },
+     {
+      "type": "FRA",
+      "start_months": 6,
+      "rate": 0.0375
+     },
+     {
+      "type": "FRA",
+      "start_months": 9,
+      "rate": 0.037
+     },
+     {
+      "type": "SWAP",
+      "months": 24,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 36,
+      "rate": 0.035
+     },
+     {
+      "type": "SWAP",
+      "months": 60,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 120,
+      "rate": 0.038
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ],
+     "projection_pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "joint",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "csa_d-0012",
+   "operation": "rates.curve.joint_bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "index": "USD-TERM-3M",
+    "as_of": "2026-11-06",
+    "ois_quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "term_quotes": [
+     {
+      "type": "DEPOSIT",
+      "months": 3,
+      "rate": 0.0395
+     },
+     {
+      "type": "FRA",
+      "start_months": 3,
+      "rate": 0.0385
+     },
+     {
+      "type": "FRA",
+      "start_months": 6,
+      "rate": 0.0375
+     },
+     {
+      "type": "FRA",
+      "start_months": 9,
+      "rate": 0.037
+     },
+     {
+      "type": "SWAP",
+      "months": 24,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 36,
+      "rate": 0.035
+     },
+     {
+      "type": "SWAP",
+      "months": 60,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 120,
+      "rate": 0.038
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "GLOBAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ],
+     "projection_pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "joint",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "csa_d-0013",
+   "operation": "rates.curve.joint_bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "index": "USD-TERM-3M",
+    "as_of": "2026-11-06",
+    "ois_quotes": [],
+    "term_quotes": [
+     {
+      "type": "DEPOSIT",
+      "months": 3,
+      "rate": 0.0395
+     },
+     {
+      "type": "FRA",
+      "start_months": 3,
+      "rate": 0.0385
+     },
+     {
+      "type": "FRA",
+      "start_months": 6,
+      "rate": 0.0375
+     },
+     {
+      "type": "FRA",
+      "start_months": 9,
+      "rate": 0.037
+     },
+     {
+      "type": "SWAP",
+      "months": 24,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 36,
+      "rate": 0.035
+     },
+     {
+      "type": "SWAP",
+      "months": 60,
+      "rate": 0.0355
+     },
+     {
+      "type": "SWAP",
+      "months": 120,
+      "rate": 0.038
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "GLOBAL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

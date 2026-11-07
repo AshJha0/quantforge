@@ -15,6 +15,7 @@ import org.quantforge.core.Money;
 import org.quantforge.core.QfError;
 import org.quantforge.curves.Curve;
 import org.quantforge.curves.CurveSolver;
+import org.quantforge.curves.Jumps;
 import org.quantforge.curves.Ois;
 import org.quantforge.curves.Projection;
 import org.quantforge.curves.Schedule;
@@ -30,10 +31,26 @@ final class StageB {
     private static final int MAX_QUOTES = 100;
 
     /** A curve as read. Its rule checks wait until {@link #build()}. */
-    record CurveInput(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] factors) {
+    record CurveInput(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] factors, Jumps jumps) {
         Curve build() {
-            return Curve.of(asOf, interp, dates, factors);
+            return Curve.of(asOf, interp, dates, factors, jumps);
         }
+    }
+
+    /** Optional jumps: absent is none, null is E_SCHEMA (ruling D10). Rule checks wait for the build. */
+    static Jumps jumps(In in, boolean required) {
+        if (!required && !in.hasKey("jumps")) {
+            return Jumps.NONE;
+        }
+        List<In> list = in.objects("jumps");
+        in.limit(list.size() > MAX_QUOTES, "jumps");
+        LocalDate[] d = new LocalDate[list.size()];
+        double[] f = new double[d.length];
+        for (int i = 0; i < d.length; i++) {
+            d[i] = list.get(i).date("date");
+            f[i] = list.get(i).real("factor");
+        }
+        return new Jumps(d, f);
     }
 
     static CurveInput curve(In in, String key) {
@@ -48,13 +65,17 @@ final class StageB {
             dates[i] = pillars.get(i).date("date");
             factors[i] = pillars.get(i).real("discount_factor");
         }
-        return new CurveInput(asOf, interp, dates, factors);
+        return new CurveInput(asOf, interp, dates, factors, jumps(c, false));
     }
 
-    private static List<Ois.Quote> quotes(In in) {
+    static List<Ois.Quote> quotes(In in) {
+        return quotes(in, "quotes");
+    }
+
+    static List<Ois.Quote> quotes(In in, String key) {
         List<Ois.Quote> out = new ArrayList<>();
-        List<In> list = in.objects("quotes");
-        in.limit(list.size() > MAX_QUOTES, "quotes");
+        List<In> list = in.objects(key);
+        in.limit(list.size() > MAX_QUOTES, key);
         for (In q : list) {
             String tenor = q.string("tenor");
             Ois.checkTenor(tenor);
@@ -67,6 +88,18 @@ final class StageB {
         return out;
     }
 
+    static List<Projection.Quote> termQuotes(In in, String key) {
+        List<In> list = in.objects(key);
+        in.limit(list.size() > MAX_QUOTES, key);
+        List<Projection.Quote> quotes = new ArrayList<>();
+        for (In q : list) {
+            Projection.QuoteType type = q.choice("type", Projection.QuoteType.class);
+            long months = q.integer(type == Projection.QuoteType.FRA ? "start_months" : "months");
+            quotes.add(new Projection.Quote(type, months, q.real("rate")));
+        }
+        return quotes;
+    }
+
     private static Pricing.OisTrade oisTrade(In t) {
         Conventions.RateIndex c = Conventions.overnight(t.string("convention"));
         String tenor = t.string("tenor");
@@ -74,7 +107,7 @@ final class StageB {
         return new Pricing.OisTrade(c, tenor, t.real("fixed_rate"), t.real("notional"), t.choice("side", Pricing.Side.class));
     }
 
-    private static List<Map<String, Object>> pillars(Curve c) {
+    static List<Map<String, Object>> pillars(Curve c) {
         LocalDate[] d = c.dates();
         double[] f = c.discountFactors();
         List<Map<String, Object>> out = new ArrayList<>();
@@ -180,8 +213,9 @@ final class StageB {
             List<Ois.Quote> quotes = quotes(in);
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             CurveSolver.Method method = in.choice("method", CurveSolver.Method.class);
+            Jumps jumps = jumps(in, false);
             in.gate();
-            CurveSolver.Solved s = Ois.bootstrap(c, asOf, quotes, interp, method, null);
+            CurveSolver.Solved s = Ois.bootstrap(c, asOf, quotes, interp, method, null, jumps);
             return new Out(Operations.out("pillars", pillars(s.curve())).outputs(),
                     Operations.out("max_repricing_error", s.maxRepricingError()).outputs());
         });
@@ -204,14 +238,7 @@ final class StageB {
             Conventions.RateIndex ix = Conventions.term(in.string("index"));
             LocalDate asOf = in.date("as_of");
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
-            List<In> list = in.objects("quotes");
-            in.limit(list.size() > MAX_QUOTES, "quotes");
-            List<Projection.Quote> quotes = new ArrayList<>();
-            for (In q : list) {
-                Projection.QuoteType type = q.choice("type", Projection.QuoteType.class);
-                long months = q.integer(type == Projection.QuoteType.FRA ? "start_months" : "months");
-                quotes.add(new Projection.Quote(type, months, q.real("rate")));
-            }
+            List<Projection.Quote> quotes = termQuotes(in, "quotes");
             in.gate();
             CurveSolver.Solved s = Projection.bootstrap(d.build(), ix, asOf, quotes, interp);
             return new Out(Operations.out("pillars", pillars(s.curve())).outputs(),

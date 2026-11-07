@@ -672,10 +672,6 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             ]))
         }
         "usecase.vol_surface" => vol_surface(i),
-        // next arm
-        _ => fail(
-            "E_UNSUPPORTED_OPERATION",
-            format!("{op} is not in this build"),
-        ),
+        _ => crate::ops_d::dispatch(op, i),
     }
 }

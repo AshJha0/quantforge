@@ -17,18 +17,18 @@ public final class Ois {
 
     /** A quote as given: a rate, or a bid and ask. */
     public record Quote(String tenor, Double rate, Double bid, Double ask) {
-        double mid() {
+        public double mid() {
             return rate != null ? rate : (bid + ask) / 2.0;
         }
 
-        boolean crossed() {
+        public boolean crossed() {
             return rate == null && bid > ask;
         }
     }
 
     /** The shared periods of both legs, with fixed accruals. */
     public record Legs(List<Schedule.Period> periods, double[] alpha) {
-        public double annuity(Curve d) {
+        public double annuity(Discounting d) {
             double a = 0.0;
             for (int i = 0; i < alpha.length; i++) {
                 a += alpha[i] * d.discount(periods.get(i).payment());
@@ -37,7 +37,7 @@ public final class Ois {
         }
 
         /** The general form. The telescoped form is wrong under a payment lag. */
-        public double floating(Curve d) {
+        public double floating(Discounting d) {
             double f = 0.0;
             for (Schedule.Period p : periods) {
                 f += (d.discount(p.start()) / d.discount(p.end()) - 1.0) * d.discount(p.payment());
@@ -45,7 +45,16 @@ public final class Ois {
             return f;
         }
 
-        public double parRate(Curve d) {
+        /** Projected on {@code p}, discounted on {@code d}. */
+        public double floating(Discounting p, Discounting d) {
+            double f = 0.0;
+            for (Schedule.Period q : periods) {
+                f += (p.discount(q.start()) / p.discount(q.end()) - 1.0) * d.discount(q.payment());
+            }
+            return f;
+        }
+
+        public double parRate(Discounting d) {
             return floating(d) / annuity(d);
         }
     }
@@ -89,6 +98,14 @@ public final class Ois {
     /** Builds a curve from quotes; {@code bump} is added to each quote's mid, and may be null. */
     public static CurveSolver.Solved bootstrap(Conventions.RateIndex c, LocalDate asOf, List<Quote> quotes,
                                                Curve.Interpolation interp, CurveSolver.Method method, double[] bump) {
+        return bootstrap(c, asOf, quotes, interp, method, bump, Jumps.NONE);
+    }
+
+    /** As above, solving on a curve that carries {@code jumps}; pillars hold the full discount factor. */
+    public static CurveSolver.Solved bootstrap(Conventions.RateIndex c, LocalDate asOf, List<Quote> quotes,
+                                               Curve.Interpolation interp, CurveSolver.Method method, double[] bump,
+                                               Jumps jumps) {
+        jumps.check(asOf);
         if (quotes.isEmpty()) {
             throw new QfError("E_INPUT", "no quotes", "quotes");
         }
@@ -110,7 +127,7 @@ public final class Ois {
             }
             target[j] = quotes.get(j).mid() + (bump == null ? 0.0 : bump[j]);
         }
-        return CurveSolver.solve(asOf, interp, dates, target, models, method);
+        return CurveSolver.solve(asOf, interp, dates, target, models, method, jumps);
     }
 
     /** Compounded in arrears from actual fixings. */

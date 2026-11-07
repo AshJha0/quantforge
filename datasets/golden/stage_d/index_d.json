@@ -1,0 +1,636 @@
+{
+ "schema_version": "1.0",
+ "suite": "index_d",
+ "spec": "specifications/04-pricing/equity-index.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "index_d-0001",
+   "operation": "eq.index.dividends",
+   "inputs": {
+    "divisor": 104.25,
+    "constituents": [
+     {
+      "id": "A",
+      "shares": 1200.0,
+      "price": 185.25,
+      "dividends": [
+       {
+        "ex_date": "2026-12-11",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-03-12",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-06-11",
+        "amount": 0.86
+       }
+      ]
+     },
+     {
+      "id": "B",
+      "shares": 800.0,
+      "price": 412.1,
+      "dividends": [
+       {
+        "ex_date": "2027-02-19",
+        "amount": 3.1
+       },
+       {
+        "ex_date": "2027-08-20",
+        "amount": 3.25
+       }
+      ]
+     },
+     {
+      "id": "C",
+      "shares": 2500.0,
+      "price": 61.4,
+      "dividends": [
+       {
+        "ex_date": "2026-12-18",
+        "amount": 0.45
+       },
+       {
+        "ex_date": "2027-12-17",
+        "amount": 0.95
+       }
+      ]
+     }
+    ],
+    "periods": [
+     {
+      "start": "2026-12-01",
+      "end": "2027-12-31"
+     },
+     {
+      "start": "2027-01-01",
+      "end": "2027-06-30"
+     },
+     {
+      "start": "2027-07-01",
+      "end": "2027-12-31"
+     }
+    ],
+    "implied_period_points": [
+     113.30071942446042,
+     43.98964028776979,
+     48.67625899280576
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "level": 6767.194244604317,
+     "ex_dates": [
+      "2026-12-11",
+      "2026-12-18",
+      "2027-02-19",
+      "2027-03-12",
+      "2027-06-11",
+      "2027-08-20",
+      "2027-12-17"
+     ],
+     "points": [
+      9.43884892086331,
+      10.79136690647482,
+      23.78896882494005,
+      9.43884892086331,
+      9.899280575539569,
+      24.940047961630697,
+      22.781774580335732
+     ],
+     "period_points": [
+      111.07913669064747,
+      43.12709832134293,
+      47.721822541966425
+     ],
+     "basis": [
+      2.2215827338129515,
+      0.8625419664268605,
+      0.9544364508393315
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "index-dividends",
+    "dividend-futures",
+    "synthetic"
+   ],
+   "output_classes": {
+    "ex_dates": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "index_d-0002",
+   "operation": "eq.index.dividends",
+   "inputs": {
+    "divisor": 0.0,
+    "constituents": [
+     {
+      "id": "A",
+      "shares": 1200.0,
+      "price": 185.25,
+      "dividends": [
+       {
+        "ex_date": "2026-12-11",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-03-12",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-06-11",
+        "amount": 0.86
+       }
+      ]
+     },
+     {
+      "id": "B",
+      "shares": 800.0,
+      "price": 412.1,
+      "dividends": [
+       {
+        "ex_date": "2027-02-19",
+        "amount": 3.1
+       },
+       {
+        "ex_date": "2027-08-20",
+        "amount": 3.25
+       }
+      ]
+     },
+     {
+      "id": "C",
+      "shares": 2500.0,
+      "price": 61.4,
+      "dividends": [
+       {
+        "ex_date": "2026-12-18",
+        "amount": 0.45
+       },
+       {
+        "ex_date": "2027-12-17",
+        "amount": 0.95
+       }
+      ]
+     }
+    ],
+    "periods": [],
+    "implied_period_points": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0003",
+   "operation": "eq.index.dividends",
+   "inputs": {
+    "divisor": 104.25,
+    "constituents": [
+     {
+      "id": "A",
+      "shares": 1200.0,
+      "price": 185.25,
+      "dividends": [
+       {
+        "ex_date": "2026-12-11",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-03-12",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-06-11",
+        "amount": 0.86
+       }
+      ]
+     },
+     {
+      "id": "B",
+      "shares": 800.0,
+      "price": 412.1,
+      "dividends": [
+       {
+        "ex_date": "2027-02-19",
+        "amount": 3.1
+       },
+       {
+        "ex_date": "2027-08-20",
+        "amount": 3.25
+       }
+      ]
+     },
+     {
+      "id": "C",
+      "shares": 2500.0,
+      "price": 61.4,
+      "dividends": [
+       {
+        "ex_date": "2026-12-18",
+        "amount": 0.45
+       },
+       {
+        "ex_date": "2027-12-17",
+        "amount": 0.95
+       }
+      ]
+     }
+    ],
+    "periods": [
+     {
+      "start": "2027-06-30",
+      "end": "2027-01-01"
+     }
+    ],
+    "implied_period_points": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DATE_ORDER"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0004",
+   "operation": "eq.index.dividends",
+   "inputs": {
+    "divisor": 104.25,
+    "constituents": [
+     {
+      "id": "A",
+      "shares": 1200.0,
+      "price": 185.25,
+      "dividends": [
+       {
+        "ex_date": "2026-12-11",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-03-12",
+        "amount": 0.82
+       },
+       {
+        "ex_date": "2027-06-11",
+        "amount": 0.86
+       }
+      ]
+     },
+     {
+      "id": "B",
+      "shares": 800.0,
+      "price": 412.1,
+      "dividends": [
+       {
+        "ex_date": "2027-02-19",
+        "amount": 3.1
+       },
+       {
+        "ex_date": "2027-08-20",
+        "amount": 3.25
+       }
+      ]
+     },
+     {
+      "id": "C",
+      "shares": 2500.0,
+      "price": 61.4,
+      "dividends": [
+       {
+        "ex_date": "2026-12-18",
+        "amount": 0.45
+       },
+       {
+        "ex_date": "2027-12-17",
+        "amount": 0.95
+       }
+      ]
+     }
+    ],
+    "periods": [
+     {
+      "start": "2027-01-01",
+      "end": "2027-06-30"
+     }
+    ],
+    "implied_period_points": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "one implied value per period"
+  },
+  {
+   "case_id": "index_d-0005",
+   "operation": "eq.index.rebalance",
+   "inputs": {
+    "divisor": 104.25,
+    "constituents": [
+     {
+      "id": "A",
+      "shares": 1200.0,
+      "price": 185.25
+     },
+     {
+      "id": "B",
+      "shares": 800.0,
+      "price": 412.1
+     },
+     {
+      "id": "C",
+      "shares": 2500.0,
+      "price": 61.4
+     }
+    ],
+    "new_constituents": [
+     {
+      "id": "A",
+      "shares": 1100.0,
+      "price": 185.25
+     },
+     {
+      "id": "B",
+      "shares": 850.0,
+      "price": 412.1
+     },
+     {
+      "id": "D",
+      "shares": 600.0,
+      "price": 97.8
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "level": 6767.194244604317,
+     "new_divisor": 90.54564977036911,
+     "weights": [
+      0.33256356692887684,
+      0.5716698762933707,
+      0.09576655677775238
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "rebalance",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0006",
+   "operation": "eq.index.rebalance",
+   "inputs": {
+    "divisor": 104.25,
+    "constituents": [
+     {
+      "id": "A",
+      "shares": 1200.0,
+      "price": 185.25
+     },
+     {
+      "id": "B",
+      "shares": 800.0,
+      "price": 412.1
+     },
+     {
+      "id": "C",
+      "shares": 2500.0,
+      "price": 61.4
+     }
+    ],
+    "new_constituents": [
+     {
+      "id": "A",
+      "shares": 1100.0,
+      "price": 185.25
+     },
+     {
+      "id": "A",
+      "shares": 1100.0,
+      "price": 185.25
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "duplicate id"
+  },
+  {
+   "case_id": "index_d-0007",
+   "operation": "eq.corporate_action.adjust",
+   "inputs": {
+    "action": "SPLIT",
+    "cum_price": 185.25,
+    "shares": 1200.0,
+    "strike": 180.0,
+    "ratio": 3.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "factor": 0.3333333333333333,
+     "ex_price": 61.75,
+     "adjusted_shares": 3600.0,
+     "adjusted_strike": 60.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "hand"
+   ],
+   "tags": [
+    "corporate-action",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0008",
+   "operation": "eq.corporate_action.adjust",
+   "inputs": {
+    "action": "RIGHTS",
+    "cum_price": 185.25,
+    "shares": 1200.0,
+    "strike": 180.0,
+    "new_per_old": 0.25,
+    "subscription_price": 150.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "factor": 0.9619433198380567,
+     "ex_price": 178.2,
+     "adjusted_shares": 1247.4747474747476,
+     "adjusted_strike": 173.1497975708502
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "hand"
+   ],
+   "tags": [
+    "corporate-action",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0009",
+   "operation": "eq.corporate_action.adjust",
+   "inputs": {
+    "action": "SPECIAL_DIVIDEND",
+    "cum_price": 185.25,
+    "shares": 1200.0,
+    "strike": 180.0,
+    "amount": 12.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "factor": 0.9325236167341431,
+     "ex_price": 172.75,
+     "adjusted_shares": 1286.8306801736614,
+     "adjusted_strike": 167.85425101214574
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "hand"
+   ],
+   "tags": [
+    "corporate-action",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0010",
+   "operation": "eq.corporate_action.adjust",
+   "inputs": {
+    "action": "REVERSE_SPLIT",
+    "cum_price": 185.25,
+    "shares": 1200.0,
+    "strike": 180.0,
+    "ratio": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "factor": 10.0,
+     "ex_price": 1852.5,
+     "adjusted_shares": 120.0,
+     "adjusted_strike": 1800.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "hand"
+   ],
+   "tags": [
+    "corporate-action",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0011",
+   "operation": "eq.corporate_action.adjust",
+   "inputs": {
+    "action": "SPLIT",
+    "cum_price": 185.25,
+    "shares": 1200.0,
+    "strike": 180.0,
+    "ratio": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "index_d-0012",
+   "operation": "eq.corporate_action.adjust",
+   "inputs": {
+    "action": "SPECIAL_DIVIDEND",
+    "cum_price": 185.25,
+    "shares": 1200.0,
+    "strike": 180.0,
+    "amount": 200.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "amount at or above the price"
+  }
+ ]
+}

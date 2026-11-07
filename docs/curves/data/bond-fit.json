@@ -1,0 +1,148 @@
+{
+ "meta": {
+  "commit": "95cbf11",
+  "date": "2026-11-07",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "bond_fit_ns_d.json": "sha256:5e48c55da07dab59e00b2741c13daaca978f6a330382f3483bdab2e25e5d8b6f"
+  }
+ },
+ "inputs": {
+  "bond.fit.nelson_siegel": {
+   "settlement": "2026-11-09",
+   "tau": 2.5,
+   "bonds": [
+    {
+     "maturity": "2029-11-15",
+     "coupon": 0.0425,
+     "frequency": 2,
+     "dirty_price": 102.75380817452188
+    },
+    {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2,
+     "dirty_price": 99.48042470379795
+    },
+    {
+     "maturity": "2036-08-15",
+     "coupon": 0.045,
+     "frequency": 2,
+     "dirty_price": 103.64770306088552
+    },
+    {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1,
+     "dirty_price": 94.36134741120536
+    },
+    {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2,
+     "dirty_price": 111.16369088023866
+    },
+    {
+     "maturity": "2032-05-15",
+     "coupon": 0.04,
+     "frequency": 2,
+     "dirty_price": 101.4052635206421
+    },
+    {
+     "maturity": "2041-11-15",
+     "coupon": 0.0425,
+     "frequency": 2,
+     "dirty_price": 102.6371178909484
+    }
+   ]
+  }
+ },
+ "reference": {
+  "bond.fit.nelson_siegel": {
+   "betas": [
+    0.04199999999999998,
+    -0.005999999999999975,
+    0.004000000000000049
+   ],
+   "residuals": [
+    0.0,
+    0.0,
+    -1.4210854715202004e-14,
+    0.0,
+    0.0,
+    0.0,
+    1.4210854715202004e-14
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "bond.fit.nelson_siegel: betas",
+   "count": 3,
+   "largest_difference": 5.785302792382652e-16,
+   "last": {
+    "java": 0.003999999999999921,
+    "cpp": 0.004000000000000049,
+    "python": 0.004000000000000049,
+    "rust": 0.0040000000000005
+   }
+  },
+  {
+   "output": "bond.fit.nelson_siegel: residuals",
+   "count": 7,
+   "largest_difference": 1.4210854715202004e-14,
+   "last": {
+    "java": 1.4210854715202004e-14,
+    "cpp": 1.4210854715202004e-14,
+    "python": 1.4210854715202004e-14,
+    "rust": 1.4210854715202004e-14
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "bond.fit.nelson_siegel"
+  ],
+  "cases": 2,
+  "by_source": {
+   "bond.fit.nelson_siegel: known-truth, scipy-least-squares": 2
+  }
+ }
+}

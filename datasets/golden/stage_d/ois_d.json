@@ -1,0 +1,2620 @@
+{
+ "schema_version": "1.0",
+ "suite": "ois_d",
+ "spec": "specifications/02-curves/ois-curves.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "ois_d-0001",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "ESTR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0002",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "ESTR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "interpolation": "LINEAR_ZERO",
+    "method": "GLOBAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976201430664698
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.993962752854365
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888468917471659
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9792951014578003
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621235640077211
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453590276960838
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086096539033162
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680169328875543
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042035954578901
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.703741269206794
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6194868570269758
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5088626519694002
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0003",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "ESTR",
+    "as_of": "2026-12-31",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-01-14",
+       "discount_factor": 0.9991178063508928
+      },
+      {
+       "date": "2027-02-09",
+       "discount_factor": 0.9974933832428505
+      },
+      {
+       "date": "2027-04-07",
+       "discount_factor": 0.9940208589642483
+      },
+      {
+       "date": "2027-07-07",
+       "discount_factor": 0.9887808468255147
+      },
+      {
+       "date": "2028-01-07",
+       "discount_factor": 0.979226389881088
+      },
+      {
+       "date": "2029-01-09",
+       "discount_factor": 0.9620470515623504
+      },
+      {
+       "date": "2030-01-09",
+       "discount_factor": 0.945296966368101
+      },
+      {
+       "date": "2032-01-07",
+       "discount_factor": 0.9085594499694054
+      },
+      {
+       "date": "2034-01-09",
+       "discount_factor": 0.8679859385184985
+      },
+      {
+       "date": "2037-01-07",
+       "discount_factor": 0.804210512747785
+      },
+      {
+       "date": "2042-01-08",
+       "discount_factor": 0.703858715406996
+      },
+      {
+       "date": "2047-01-09",
+       "discount_factor": 0.6196213275770966
+      },
+      {
+       "date": "2057-01-09",
+       "discount_factor": 0.5086896792959738
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0004",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "ESTR",
+    "as_of": "2026-12-31",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "interpolation": "LINEAR_ZERO",
+    "method": "GLOBAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-01-14",
+       "discount_factor": 0.9991178063508928
+      },
+      {
+       "date": "2027-02-09",
+       "discount_factor": 0.9974947023915837
+      },
+      {
+       "date": "2027-04-07",
+       "discount_factor": 0.9940226073897799
+      },
+      {
+       "date": "2027-07-07",
+       "discount_factor": 0.98878439298577
+      },
+      {
+       "date": "2028-01-07",
+       "discount_factor": 0.9792333674318321
+      },
+      {
+       "date": "2029-01-09",
+       "discount_factor": 0.9620629247532118
+      },
+      {
+       "date": "2030-01-09",
+       "discount_factor": 0.945299439272492
+      },
+      {
+       "date": "2032-01-07",
+       "discount_factor": 0.9085524008875865
+      },
+      {
+       "date": "2034-01-09",
+       "discount_factor": 0.8679622481543837
+      },
+      {
+       "date": "2037-01-07",
+       "discount_factor": 0.8041529450063484
+      },
+      {
+       "date": "2042-01-08",
+       "discount_factor": 0.7036969752311231
+      },
+      {
+       "date": "2047-01-09",
+       "discount_factor": 0.6194478698504804
+      },
+      {
+       "date": "2057-01-09",
+       "discount_factor": 0.5088305895350299
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0005",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0006",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LINEAR_ZERO",
+    "method": "GLOBAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959411385932585
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896754555117744
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807812103558239
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634600695348675
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318688650620037
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012061385466713
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.8392757070930014
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7765930418261396
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6857523237276096
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5534776389211076
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.44961241337655117
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31810249676614555
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0007",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-12-31",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-01-14",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-02-09",
+       "discount_factor": 0.995725986525258
+      },
+      {
+       "date": "2027-04-07",
+       "discount_factor": 0.9897755686390438
+      },
+      {
+       "date": "2027-07-08",
+       "discount_factor": 0.9805707245567336
+      },
+      {
+       "date": "2028-01-07",
+       "discount_factor": 0.9636119649694928
+      },
+      {
+       "date": "2029-01-09",
+       "discount_factor": 0.9317541498361324
+      },
+      {
+       "date": "2030-01-09",
+       "discount_factor": 0.9011908845090373
+      },
+      {
+       "date": "2032-01-07",
+       "discount_factor": 0.839279533200699
+      },
+      {
+       "date": "2034-01-09",
+       "discount_factor": 0.7766268360552259
+      },
+      {
+       "date": "2037-01-07",
+       "discount_factor": 0.6858434886563447
+      },
+      {
+       "date": "2042-01-08",
+       "discount_factor": 0.5536977278115611
+      },
+      {
+       "date": "2047-01-09",
+       "discount_factor": 0.449831911099467
+      },
+      {
+       "date": "2057-01-09",
+       "discount_factor": 0.31785843656564794
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0008",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-12-31",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LINEAR_ZERO",
+    "method": "GLOBAL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2027-01-14",
+       "discount_factor": 0.9984966970659208
+      },
+      {
+       "date": "2027-02-09",
+       "discount_factor": 0.9957276692767558
+      },
+      {
+       "date": "2027-04-07",
+       "discount_factor": 0.9897777056476137
+      },
+      {
+       "date": "2027-07-08",
+       "discount_factor": 0.9805748684328798
+      },
+      {
+       "date": "2028-01-07",
+       "discount_factor": 0.9636199579915065
+      },
+      {
+       "date": "2029-01-09",
+       "discount_factor": 0.931769405757155
+      },
+      {
+       "date": "2030-01-09",
+       "discount_factor": 0.9011932344075404
+      },
+      {
+       "date": "2032-01-07",
+       "discount_factor": 0.8392693917224618
+      },
+      {
+       "date": "2034-01-09",
+       "discount_factor": 0.7765952555299497
+      },
+      {
+       "date": "2037-01-07",
+       "discount_factor": 0.6857601316320511
+      },
+      {
+       "date": "2042-01-08",
+       "discount_factor": 0.5534765946259261
+      },
+      {
+       "date": "2047-01-09",
+       "discount_factor": 0.44961272143865333
+      },
+      {
+       "date": "2057-01-09",
+       "discount_factor": 0.31806847784394904
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0009",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.036500000000000005
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.0345
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.036000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0375
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.039
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0395
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0385
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL",
+    "jumps": [
+     {
+      "date": "2026-12-31",
+      "factor": 0.9999863014636888
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896737462859571
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770801756407
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397333466599
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967544461
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662708959
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.8392871285655894
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603224002
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444272286
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725582367
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.4498310736165437
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697005636
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "turn-of-year",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0010",
+   "operation": "rates.curve.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9896737462859571
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770801756407
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397333466599
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967544461
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662708959
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.8392871285655894
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603224002
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444272286
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725582367
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.4498310736165437
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697005636
+      }
+     ],
+     "jumps": [
+      {
+       "date": "2026-12-31",
+       "factor": 0.9999863014636888
+      }
+     ]
+    },
+    "dates": [
+     "2026-12-30",
+     "2026-12-31",
+     "2027-01-01",
+     "2027-01-04",
+     "2030-06-28"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9942683412173662,
+      0.9941639916109545,
+      0.9940460357939027,
+      0.9937330898146365,
+      0.8815947948910772
+     ],
+     "zero_rates": [
+      0.03885322107315609,
+      0.03884332942271497,
+      0.0389230767597884,
+      0.03889186168550431,
+      0.034585189352136746
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "turn-of-year",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ois_d-0011",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "ESTR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.022699999999999998
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.022600000000000002
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0223
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.021700000000000004
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.020500000000000004
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.018500000000000003
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.019000000000000003
+     },
+     {
+      "tenor": "7Y",
+      "rate": 0.020000000000000004
+     },
+     {
+      "tenor": "10Y",
+      "rate": 0.0215
+     },
+     {
+      "tenor": "15Y",
+      "rate": 0.023
+     },
+     {
+      "tenor": "20Y",
+      "rate": 0.0235
+     },
+     {
+      "tenor": "30Y",
+      "rate": 0.0225
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL",
+    "jumps": [
+     {
+      "date": "2026-12-31",
+      "factor": 0.9999863014636888
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939614575150926
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433340531175
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9792881222259441
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025167102
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613177081
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288536201
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029431
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.804261213100251
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892199183
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907595666
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489422733
+      }
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "turn-of-year",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "stage-b-targets: discount factors within 1e-9; curve solves stop at 1e-13 in rate"
+   }
+  },
+  {
+   "case_id": "ois_d-0012",
+   "operation": "rates.curve.discount",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939614575150926
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433340531175
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.9792881222259441
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025167102
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613177081
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288536201
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029431
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.804261213100251
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892199183
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907595666
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489422733
+      }
+     ],
+     "jumps": [
+      {
+       "date": "2026-12-31",
+       "factor": 0.9999863014636888
+      }
+     ]
+    },
+    "dates": [
+     "2026-12-30",
+     "2026-12-31",
+     "2027-01-01",
+     "2027-01-04",
+     "2030-06-28"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factors": [
+      0.9966458279214737,
+      0.9965850493366953,
+      0.9965106235344269,
+      0.9963283236333241,
+      0.9337948026125092
+     ],
+     "zero_rates": [
+      0.022709826338770264,
+      0.022701638990244515,
+      0.022783029761308613,
+      0.022756410731234005,
+      0.01879847762569333
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "turn-of-year",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ois_d-0013",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL",
+    "jumps": [
+     {
+      "date": "2026-12-31",
+      "factor": 0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "factor must be > 0"
+  },
+  {
+   "case_id": "ois_d-0014",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL",
+    "jumps": [
+     {
+      "date": "2026-11-06",
+      "factor": 0.99
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "jump date must be after as_of"
+  },
+  {
+   "case_id": "ois_d-0015",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL",
+    "jumps": [
+     {
+      "date": "2027-12-31",
+      "factor": 0.99
+     },
+     {
+      "date": "2026-12-31",
+      "factor": 0.99
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "jump dates strictly increasing"
+  },
+  {
+   "case_id": "ois_d-0016",
+   "operation": "rates.ois.bootstrap",
+   "inputs": {
+    "convention": "SOFR",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0387
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0386
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0383
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.037700000000000004
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF",
+    "method": "SEQUENTIAL",
+    "jumps": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ois_d-0017",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "trade": {
+     "convention": "ESTR",
+     "tenor": "2Y",
+     "fixed_rate": 0.021,
+     "notional": 25000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 98551.60884601997,
+      "currency": "EUR",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "ESTR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.01899999999999996,
+     "annuity": 1.971032176920358
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.025,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0018",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "trade": {
+     "convention": "ESTR",
+     "tenor": "10Y",
+     "fixed_rate": 0.024,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -22714.40623100676,
+      "currency": "EUR",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "ESTR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.021500000000000005,
+     "annuity": 9.085762492402715
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0019",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "trade": {
+     "convention": "ESTR",
+     "tenor": "18M",
+     "fixed_rate": 0.022,
+     "notional": 7500000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -28140.080160388912,
+      "currency": "EUR",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "ESTR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.01947186290240236,
+     "annuity": 1.48410095782274
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.007500000000000001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0020",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9991807943650066
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9976187895421391
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.9939609880010525
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9888433447909688
+      },
+      {
+       "date": "2027-11-12",
+       "discount_factor": 0.979288122109086
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9621077025177938
+      },
+      {
+       "date": "2029-11-14",
+       "discount_factor": 0.9453565613174705
+      },
+      {
+       "date": "2031-11-12",
+       "discount_factor": 0.9086167288534558
+      },
+      {
+       "date": "2033-11-14",
+       "discount_factor": 0.8680406595029002
+      },
+      {
+       "date": "2036-11-12",
+       "discount_factor": 0.8042612131003805
+      },
+      {
+       "date": "2041-11-13",
+       "discount_factor": 0.7039030892201986
+      },
+      {
+       "date": "2046-11-14",
+       "discount_factor": 0.6196603907598699
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.5087217489424134
+      }
+     ]
+    },
+    "trade": {
+     "convention": "ESTR",
+     "tenor": "30Y",
+     "fixed_rate": 0.025,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 54537.35478418098,
+      "currency": "EUR",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "ESTR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.02250000000000001,
+     "annuity": 21.814941913672453
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0021",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "2Y",
+     "fixed_rate": 0.035500000000000004,
+     "notional": 25000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 24052.571714576476,
+      "currency": "USD",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "SOFR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.03499999999999995,
+     "annuity": 1.9242057371658898
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.025,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0022",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "10Y",
+     "fixed_rate": 0.0385,
+     "notional": 1000000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -8356.911974036486,
+      "currency": "USD",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "SOFR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.03749999999999999,
+     "annuity": 8.356911974036459
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0023",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "18M",
+     "fixed_rate": 0.0365,
+     "notional": 7500000.0,
+     "side": "PAY"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": -12010.672458673873,
+      "currency": "USD",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "SOFR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.03540067128387437,
+     "annuity": 1.4567280659544264
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.007500000000000001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0024",
+   "operation": "rates.ois.pv",
+   "inputs": {
+    "curve": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "trade": {
+     "convention": "SOFR",
+     "tenor": "30Y",
+     "fixed_rate": 0.0395,
+     "notional": 1000000.0,
+     "side": "RECEIVE"
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "valuation": {
+      "pv": 17696.242106489903,
+      "currency": "USD",
+      "model": "OIS_DISCOUNTING",
+      "data_version": null,
+      "conventions": "SOFR",
+      "as_of": "2026-11-06"
+     },
+     "par_rate": 0.038500000000000006,
+     "annuity": 17.69624210649001
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "SOFR",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   }
+  },
+  {
+   "case_id": "ois_d-0025",
+   "operation": "core.conventions.lookup",
+   "inputs": {
+    "id": "ESTR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "kind": "OVERNIGHT",
+     "currency": "EUR",
+     "day_count": "ACT_360",
+     "calendar": "EUTA",
+     "spot_lag": 2,
+     "payment_lag": 2,
+     "fixed_months": 12,
+     "fixed_day_count": "ACT_360",
+     "business_day_convention": "MODIFIED_FOLLOWING"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "strata-2.12.78-bytecode"
+   ],
+   "tags": [
+    "ESTR",
+    "synthetic"
+   ]
+  }
+ ]
+}
