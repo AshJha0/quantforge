@@ -7,6 +7,7 @@ use quantforge_core::dates::Date;
 use quantforge_core::equity::{self, Outright, ParityQuote};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::surface::{Check, Position, Surface};
 use quantforge_core::svi::{self, Svi};
 use quantforge_core::smile;
 use quantforge_core::black;
@@ -218,6 +219,34 @@ fn opt_weights(i: &Inputs) -> Result<Option<Vec<f64>>> {
     i.opt("weights").map(|_| i.reals("weights")).transpose()
 }
 
+fn check_json(c: &Check) -> Json {
+    let at = |j: usize, i: usize| [("expiry_index", (j as i64).into()), ("k_index", (i as i64).into())];
+    let cal: Vec<Json> = c.calendar.iter().map(|&(j, i)| obj(at(j, i))).collect();
+    let fly: Vec<Json> = c
+        .butterfly
+        .iter()
+        .map(|&(j, i, kind)| {
+            let [a, b] = at(j, i);
+            obj([a, b, ("kind", kind.into())])
+        })
+        .collect();
+    let free = cal.is_empty() && fly.is_empty();
+    obj([
+        ("calendar_violations", cal.into()),
+        ("butterfly_violations", fly.into()),
+        ("arbitrage_free", free.into()),
+    ])
+}
+
+fn surface_input(i: &Inputs) -> Result<Surface> {
+    let s = sub(i, "surface")?;
+    Ok(Surface {
+        t: s.reals("expiry_years")?,
+        k: s.reals("log_moneyness")?,
+        vols: s.matrix("vols")?,
+    })
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
         "eq.forward.outright" => {
@@ -384,6 +413,46 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("eta", eta.into()),
                 ("gamma", gamma.into()),
                 ("rmse", rmse.into()),
+            ]))
+        }
+        "vol.surface.query" => {
+            let s = surface_input(i)?;
+            let mut p = Vec::new();
+            for x in items(i, "points")? {
+                p.push((x.f64("expiry_years")?, x.f64("log_moneyness")?));
+            }
+            i.gate()?;
+            let r = s.query(&p)?;
+            let w: Vec<f64> = r.iter().map(|x| x.0).collect();
+            let v: Vec<f64> = r.iter().map(|x| x.1).collect();
+            plain(obj([("total_variance", w.into()), ("vols", v.into())]))
+        }
+        "vol.surface.check" => {
+            let s = surface_input(i)?;
+            i.gate()?;
+            let r = s.check()?;
+            plain(check_json(&r))
+        }
+        "risk.vol.surface_vega" => {
+            let s = surface_input(i)?;
+            let mut p = Vec::new();
+            for x in items(i, "positions")? {
+                p.push(Position {
+                    call: option_type(&x)?,
+                    forward: x.f64("forward")?,
+                    strike: x.f64("strike")?,
+                    discount: x.f64("discount_factor")?,
+                    t: x.f64("expiry_years")?,
+                    quantity: x.f64("quantity")?,
+                });
+            }
+            i.gate()?;
+            let r = s.vega(&p)?;
+            plain(obj([
+                ("pv", r.pv.into()),
+                ("bucket_vega", rows(r.bucket)),
+                ("parallel_vega", r.parallel.into()),
+                ("bucket_sum", r.bucket_sum.into()),
             ]))
         }
         // next arm

@@ -119,6 +119,7 @@ pub const OPERATIONS: &[&str] = &[
     "risk.ois.dv01",
     "risk.vol.bump_greeks",
     "risk.vol.greeks",
+    "risk.vol.surface_vega",
     "usecase.fx_hedge",
     "usecase.rates_hedge",
     "vol.delta.from_strike",
@@ -129,6 +130,8 @@ pub const OPERATIONS: &[&str] = &[
     "vol.smile.rr_bf",
     "vol.ssvi.calibrate",
     "vol.ssvi.evaluate",
+    "vol.surface.check",
+    "vol.surface.query",
     "vol.svi.calibrate",
     "vol.svi.evaluate",
 ];
