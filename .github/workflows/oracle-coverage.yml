@@ -31,7 +31,7 @@ jobs:
         working-directory: oracle/python
       - name: Register matches the committed copy
         run: |
-          if ! git diff --exit-code --stat oracle/outside_register.json; then
+          if ! git diff --exit-code oracle/outside_register.json; then
             echo "::error::oracle/outside_register.json differs from a fresh run; rerun outside_d.py and commit the register"
             exit 1
           fi
