@@ -161,3 +161,11 @@ TEST_CASE("CPI curve, ZCIS and linkers") {
     CHECK(linker_price_curve(bond, d("2026-11-16"), 300.0, c, disc) > 0.0);
     CHECK(code_of([&] { linker_price_curve(bond, d("2026-11-16"), 300.0, CpiCurve{b + 12, 300, {{1, 0.03}}, std::nullopt}, disc); }) == "E_OUT_OF_RANGE");
 }
+
+TEST_CASE("ruling D52: hazard survival range and maturity") {
+    const Curve p = flat(0.035);
+    CHECK(code_of([] { HazardCurve{as_of, {d("2027-01-01")}, {1.01}}.check(); }) == "E_DOMAIN");
+    HazardCurve{as_of, {d("2027-01-01")}, {1.0}}.check();
+    const HazardCurve h{as_of, {d("2031-12-20")}, {0.9}};
+    CHECK(code_of([&] { cds_price(as_of, p, h, 0.4, as_of, 0.01, 1, CdsSide::Buy, CdsPayout::Standard); }) == "E_INPUT");
+}

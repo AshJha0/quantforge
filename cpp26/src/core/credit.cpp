@@ -28,7 +28,7 @@ struct CdsSchedule {
 };
 
 CdsSchedule cds_schedule(Date t, Date maturity) {
-    if (maturity <= t) throw Error("E_DATE_ORDER", "maturity must follow trade_date", "maturity");
+    if (maturity <= t) throw Error("E_INPUT", "maturity must follow trade_date (ruling D52)", "maturity");
     const int y = year_of(t);
     const unsigned q = month_of(t) / 3 * 3;  // 0, 3, 6, 9 or 12
     Date u = q == 0 ? make_date(y - 1, 12, 20) : make_date(y, q, 20);
@@ -122,7 +122,7 @@ void HazardCurve::check() const {
         previous = d;
     }
     for (const double s : survival)
-        if (!(s > 0.0)) throw Error("E_DOMAIN", "a survival probability is not positive", "hazard");
+        if (!(s > 0.0 && s <= 1.0)) throw Error("E_DOMAIN", "survival must be in (0, 1] (ruling D52)", "hazard");
 }
 
 double HazardCurve::q(Date d) const {
