@@ -95,7 +95,7 @@ _STAGE_C = SimpleNamespace(
 )
 _STAGE_D = SimpleNamespace(
     **{m: _Core(m)
-       for m in ("bonds", "credit", "csa", "curve_fits", "equity_d", "futures", "inflation", "overnight", "stage_d3", "steps", "xccy")}
+       for m in ("bonds", "credit", "csa", "curve_fits", "equity_d", "futures", "inflation", "overnight", "risk_curve", "stage_d3", "steps", "xccy")}
 )
 
 
