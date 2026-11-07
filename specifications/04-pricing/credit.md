@@ -14,7 +14,7 @@ Accrual periods run between 20 March, June, September, December, from the last s
 
 ## Curves
 
-`discount`: a curve object (`curve-framework.md`). `hazard`: `{as_of, pillars: [{date, survival}]}`, hazard flat between pillars (`-ln` of survival linear in time) and flat after the last. Time `t = (d - T)/365`. The integration nodes are the union of both curves' pillar dates.
+`discount`: a curve object (`curve-framework.md`) with `interpolation` `LOG_LINEAR_DF`, which gives the flat forwards the ISDA model assumes. Any other interpolation is `E_INPUT`, in every `credit.*` operation, checked before any other rule check (ruling R1-4). `hazard`: `{as_of, pillars: [{date, survival}]}`, hazard flat between pillars (`-ln` of survival linear in time) and flat after the last. Time `t = (d - T)/365`. The integration nodes are the union of both curves' pillar dates.
 
 ## Legs, per unit notional
 
