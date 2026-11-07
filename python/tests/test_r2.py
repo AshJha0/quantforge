@@ -158,3 +158,28 @@ def test_conversion_factor_maturity_just_inside_the_delivery_month():
 def test_smooth_fit_rejects_repeated_knots():
     from quantforge_core.curve_fits import smooth
     assert _code(smooth, [1.0, 2.0, 2.0, 5.0], [1.0, 3.0], [0.03, 0.035], 0.1)[0] == "E_INPUT"
+
+
+def test_nelson_siegel_recovers_a_known_curve():
+    """Prices from known betas must fit back to those betas: a wrong objective cannot."""
+    import math
+
+    from quantforge_core.bonds import fit_nelson_siegel, flows
+    from quantforge_core.curve_fits import _basis
+    # below the solver's 3% start, so the fit must raise prices: a flipped objective refuses
+    settlement, tau, truth = date(2026, 1, 6), 1.8, [0.02, -0.01, 0.015]
+    bonds = [Bond(date(2026 + k, 2, 15), c, 2)
+             for k, c in [(1, 0.03), (2, 0.035), (3, 0.04), (5, 0.04), (7, 0.045), (10, 0.05)]]
+
+    def price(bond):
+        fl = flows(bond, settlement)
+        total = 0.0
+        for d, cf in zip(fl.dates, fl.amounts, strict=True):
+            t = (d - settlement).days / 365
+            z = sum(b * e for b, e in zip(truth, _basis(t, tau), strict=True))
+            total += cf * math.exp(-t * z)
+        return total
+
+    beta, residuals = fit_nelson_siegel(settlement, tau, [(b, price(b)) for b in bonds], None)
+    assert beta == pytest.approx(truth, abs=1e-7)
+    assert max(abs(r) for r in residuals) < 1e-8
