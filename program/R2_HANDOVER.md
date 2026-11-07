@@ -29,8 +29,13 @@ python conformance/runner/runner.py --impl <lang> --suite risk_r2
 
 Questions go in `SPEC_QUESTIONS` as before.
 
-## R2.2 P&L explain (ready)
+## R2.2 P&L explain (ready; changed by ruling R2-A3)
 
 New operation `risk.pnl.explain`: full revaluation between two quote sets on one `as_of`, against par buckets times the quote moves, with the fixed threshold `max(5% |full|, 5% |par_dv01|)` and a boolean `explained`. Read `specifications/06-risk/pnl-explain.md`. Golden suite `r2/pnl_r2`, 44 cases.
 
 Once it passes, the real-data run is `python tools/workflows/pnl_explain.py --impl <lang> --years 2025`, which calls your CLI in batch mode. That is infra's job to schedule; you only need the goldens.
+
+## R2 audit rulings (read `specifications/r2-rulings.md`)
+
+- `risk.pnl.explain` gains the output `gross_risk_pnl = sum_j |par_buckets[j]| |dq_j| / 0.0001`. Now `threshold = 0.05 max(|full_pnl|, gross_risk_pnl) + 1e-8 N`, with `N` the product's notional. `r2/pnl_r2` is regenerated: 42 of 44 cases change, and no `explained` flag changes.
+- `risk.curve.*`: no value changes. The sign text now says risk = dV/dbp (a receiver is negative), and the Jacobian basis is stated.

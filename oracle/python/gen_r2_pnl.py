@@ -43,13 +43,14 @@ def main():
             full = v1 - v0
             rp = sum(b * m / BP for b, m in zip(bk, mv))
             un = full - rp
-            th = max(.05 * abs(full), .05 * abs(dv01))
-            assert abs(abs(un) - th) > .1 * th, (prod, name, un, th)
+            gross = sum(abs(b) * abs(m) / BP for b, m in zip(bk, mv))
+            th = .05 * max(abs(full), gross) + 1e-8 * N
+            assert abs(abs(un) - th) > .1 * th and (abs(un) < .5 * th or abs(un) > 2e-7 * N), (prod, name, un, th)
             worst = max(worst, abs(un) / th)
             s.add("risk.pnl.explain", {"as_of": str(R.AS_OF), "convention": conv, "interpolation": "LOG_LINEAR_DF",
                                        "quotes_start": [{"tenor": t, "rate": r} for t, r in q0], "quotes_end": [{"tenor": t, "rate": r} for t, r in q1],
                                        "product": prod, "bump_bp": 1.0},
-                  {"value_start": v0, "value_end": v1, "full_pnl": full, "par_buckets": bk, "risk_pnl": rp, "unexplained": un, "threshold": th, "explained": abs(un) <= th},
+                  {"value_start": v0, "value_end": v1, "full_pnl": full, "par_buckets": bk, "risk_pnl": rp, "gross_risk_pnl": gross, "unexplained": un, "threshold": th, "explained": abs(un) <= th},
                   cls="interpolation", verified=["independent-replay", D.QLV], tags=["r2", "pnl-explain", prod["kind"].lower(), name.split()[0]],
                   output_classes={"explained": "date_and_convention"}, limit=lim(N), description=name)
     b = s.cases[0]["inputs"]

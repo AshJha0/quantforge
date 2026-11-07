@@ -16,10 +16,13 @@ Outputs:
 - `par_buckets`: `risk.curve.par` buckets at the start curve, central, with `bump_bp`;
 - `risk_pnl = sum_j par_buckets[j] (q_end[j] - q_start[j]) / 0.0001`: first order in par quotes;
 - `unexplained = full_pnl - risk_pnl`;
-- `threshold = max(0.05 |full_pnl|, 0.05 |par_dv01|)`, with `par_dv01` the sum of `par_buckets`;
+- `gross_risk_pnl = sum_j |par_buckets[j]| |q_end[j] - q_start[j]| / 0.0001`: the first-order P&L with every term counted as a loss or gain in full, so offsetting buckets cannot hide a move;
+- `threshold = 0.05 max(|full_pnl|, gross_risk_pnl) + 1e-8 N`, with `N` the product's notional. The last term is a numerical floor equal to the golden tolerance, not a risk allowance;
 - `explained`: `true` when `|unexplained| <= threshold`.
 
-The threshold is 5% of the day's P&L, with a floor of 5% of one basis point of DV01, so quiet days are not failed on noise. A day fails when second-order terms (convexity, cross-gamma) exceed that, as they do on large moves for long-dated products. Plan 11.2.1 asks for a stated threshold; this is it, and it is fixed here, not tuned per product.
+The threshold scales with the size of the day's move (ruling R2-A3). A quiet day has a small threshold, so it cannot pass vacuously. A day with no move to which the product is exposed has only the numerical floor as its threshold, and counts as explained when risk and revaluation agree to rounding. A day fails when second-order terms (convexity, cross-gamma) exceed 5% of the larger of the realised P&L and the gross first-order P&L, as they do on large moves for long-dated products.
+
+The 5% level is a **project choice**, fixed here and not tuned per product (ruling R2-A4). It is not the Basel FRTB P&L attribution test, which compares risk-theoretical and hypothetical P&L over a 250-day window with Spearman correlation and Kolmogorov-Smirnov statistics. The real-data run reports those two statistics alongside, unjudged.
 
 Checks: those of `risk.curve.par`, then the tenor match (`E_INPUT`).
 
@@ -30,7 +33,8 @@ Checks: those of `risk.curve.par`, then the tenor match (`E_INPUT`).
 Report, dated, per product:
 - days run, days explained, and the explained share;
 - percentiles (50, 95, 99) of `|unexplained| / max(|full_pnl|, |par_dv01|)`;
-- the five worst days, with their largest quote move.
+- the five worst days, with their largest quote move;
+- over the window, the Spearman rank correlation and the two-sample Kolmogorov-Smirnov statistic between daily `full_pnl` and `risk_pnl`. These are reported and not judged, in the style of the FRTB attribution test but without its thresholds.
 
 Acceptance (R2): at least 95% of days explained for every product in the book, over every year run. A product below that is reported, not hidden, with its worst days. Every report is labelled *real moves of a proxy curve; synthetic product terms*.
 

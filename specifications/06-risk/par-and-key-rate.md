@@ -2,7 +2,7 @@
 
 Spec version 1.0.0. Status: Specified (phase R2). Builds on `rates-sensitivities.md` (stage B) and keeps its sign and bump rules. Goldens: `datasets/golden/r2/risk_r2.json`, written by `oracle/python/gen_r2_risk.py`.
 
-All risk is bump and revalue (ADR-0010): no AD. Every number is **money per basis point**: the change in the product's value, in its currency, for a +1 bp move, with the sign of that change. A receiver of fixed gains when rates fall, so its DV01 is positive.
+All risk is bump and revalue (ADR-0010): no AD. Every number is **money per basis point**: the change in the product's value, in its currency, for a +1 bp move, with the sign of that change. Risk is `dV/d(bp)`: the value change for rates **up** 1 bp. A receiver of fixed loses when rates rise, so its DV01 is **negative**; a payer's is positive; a long bond's is negative. This is the sign of `rates-sensitivities.md` and of every golden (ruling R2-A1).
 
 ## Products
 
@@ -70,7 +70,7 @@ How the bootstrapped zero rates move with the par quotes.
 
 Inputs: `as_of`, `convention`, `quotes`, `interpolation`, `bump_bp`; the scheme is always central.
 
-Let `z_i = -ln D(p_i) / t_i` be the continuously compounded zero rate at pillar `i`, with pillars as `rates.ois.bootstrap`.
+**Basis (ruling R2-A8).** Rows are continuously compounded zero rates on ACT/365F curve time, `z_i = -ln D(p_i) / t_i` at pillar `i` (pillars as `rates.ois.bootstrap`). Columns are the par quotes as decimal rates on their own day counts. Neither is a simply compounded or annually compounded zero, and the matrix changes if either basis changes.
 
 Outputs:
 - `pillar_dates`;
