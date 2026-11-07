@@ -1,0 +1,782 @@
+{
+ "schema_version": "1.0",
+ "suite": "rulings_r1",
+ "spec": "specifications/r1-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r1_rulings.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "rulings_r1-0001",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-10-31",
+     "coupon": 0.04125,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "FIVE_YEAR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.9223
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "whole months, z = 10"
+  },
+  {
+   "case_id": "rulings_r1-0002",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-11-30",
+     "coupon": 0.04,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "FIVE_YEAR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.9159
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "whole months, z = 11"
+  },
+  {
+   "case_id": "rulings_r1-0003",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2028-11-30",
+     "coupon": 0.03875,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "TWO_YEAR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.962
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "whole months, z = 11"
+  },
+  {
+   "case_id": "rulings_r1-0004",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2029-11-15",
+     "coupon": 0.035,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "THREE_YEAR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.934
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "whole months, z = 11"
+  },
+  {
+   "case_id": "rulings_r1-0005",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-10-31",
+     "coupon": 0.04125,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "TEN_YEAR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.9234
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "same bond as the first, z rounded down to 9"
+  },
+  {
+   "case_id": "rulings_r1-0006",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2033-11-15",
+     "coupon": 0.0425,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": null
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.904
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "null means TEN_YEAR (stage D value)"
+  },
+  {
+   "case_id": "rulings_r1-0007",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2055-05-15",
+     "coupon": 0.0475,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "ULTRA_BOND"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.8308
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "z rounded down to a multiple of 3"
+  },
+  {
+   "case_id": "rulings_r1-0008",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2033-11-15",
+     "coupon": 0.0421,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "TEN_YEAR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.904
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "coupon 4.21% rounds to 4.25%"
+  },
+  {
+   "case_id": "rulings_r1-0009",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2033-11-15",
+     "coupon": 0.0418,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "TEN_YEAR"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "conversion_factor": 0.8971
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "cme-formula",
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "bond-futures",
+    "synthetic"
+   ],
+   "description": "coupon 4.18% rounds to 4.125%"
+  },
+  {
+   "case_id": "rulings_r1-0010",
+   "operation": "bond.futures.conversion_factor",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-10-31",
+     "coupon": 0.04125,
+     "frequency": 2
+    },
+    "delivery_month": "2026-12",
+    "notional_coupon": 0.06,
+    "contract": "SEVEN_YEAR"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-3",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "contract not listed"
+  },
+  {
+   "case_id": "rulings_r1-0011",
+   "operation": "credit.cds.bootstrap",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-4",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "LINEAR_ZERO discount curve (from credit_d-0001)"
+  },
+  {
+   "case_id": "rulings_r1-0012",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9953278717430543
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887181795921078
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533184219921649
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8988961248330224
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8449964351776124
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7635674704223004
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-4",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "LINEAR_ZERO discount curve (from credit_d-0004)"
+  },
+  {
+   "case_id": "rulings_r1-0013",
+   "operation": "credit.cds.price",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-06-20",
+       "survival": 0.9953278717430543
+      },
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887181795921078
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533184219921649
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8988961248330224
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8449964351776124
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7635674704223004
+      }
+     ]
+    },
+    "recovery": 1.5,
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01,
+     "notional": 10000000.0,
+     "side": "BUY_PROTECTION"
+    },
+    "payout": "STANDARD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-4",
+    "invalid",
+    "order",
+    "synthetic"
+   ],
+   "description": "interpolation is checked before recovery (which alone would be E_DOMAIN)"
+  },
+  {
+   "case_id": "rulings_r1-0014",
+   "operation": "credit.index.intrinsic",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "names": [
+     {
+      "hazard": {
+       "as_of": "2026-11-06",
+       "pillars": [
+        {
+         "date": "2027-06-20",
+         "survival": 0.9953278717430543
+        },
+        {
+         "date": "2027-12-20",
+         "survival": 0.9887181795921078
+        },
+        {
+         "date": "2029-12-20",
+         "survival": 0.9533184219921649
+        },
+        {
+         "date": "2031-12-20",
+         "survival": 0.8988961248330224
+        },
+        {
+         "date": "2033-12-20",
+         "survival": 0.8449964351776124
+        },
+        {
+         "date": "2036-12-20",
+         "survival": 0.7635674704223004
+        }
+       ]
+      },
+      "recovery": 0.4,
+      "weight": 1.0
+     },
+     {
+      "hazard": {
+       "as_of": "2026-11-06",
+       "pillars": [
+        {
+         "date": "2027-12-20",
+         "survival": 0.9921195815027349
+        },
+        {
+         "date": "2029-12-20",
+         "survival": 0.9671517009117284
+        },
+        {
+         "date": "2031-12-20",
+         "survival": 0.9283694562373445
+        },
+        {
+         "date": "2033-12-20",
+         "survival": 0.8893390629638799
+        },
+        {
+         "date": "2036-12-20",
+         "survival": 0.8291269678582948
+        }
+       ]
+      },
+      "recovery": 0.4,
+      "weight": 1.0
+     },
+     {
+      "hazard": {
+       "as_of": "2026-11-06",
+       "pillars": [
+        {
+         "date": "2027-06-20",
+         "survival": 0.9851258609044374
+        },
+        {
+         "date": "2027-12-20",
+         "survival": 0.9642817630498415
+        },
+        {
+         "date": "2029-12-20",
+         "survival": 0.8571531465087603
+        },
+        {
+         "date": "2031-12-20",
+         "survival": 0.7044398409169544
+        },
+        {
+         "date": "2033-12-20",
+         "survival": 0.5702594500772052
+        },
+        {
+         "date": "2036-12-20",
+         "survival": 0.39704771889922247
+        }
+       ]
+      },
+      "recovery": 0.25,
+      "weight": 0.5
+     }
+    ],
+    "trade": {
+     "maturity": "2031-12-20",
+     "coupon": 0.01
+    },
+    "quoted_upfront": 0.03352777961337278
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-4",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "LINEAR_ZERO discount curve (from credit_d-0009)"
+  },
+  {
+   "case_id": "rulings_r1-0015",
+   "operation": "credit.curve.composite",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "constituents": [
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.0045
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.006
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.009
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.012
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.0135
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.015
+       }
+      ],
+      "weight": 2.0
+     },
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.00585
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.0078000000000000005
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.0117
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.015600000000000001
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.01755
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.0195
+       }
+      ],
+      "weight": 1.0
+     },
+     {
+      "quotes": [
+       {
+        "tenor": "6M",
+        "spread": 0.0036
+       },
+       {
+        "tenor": "1Y",
+        "spread": 0.0048000000000000004
+       },
+       {
+        "tenor": "3Y",
+        "spread": 0.0072
+       },
+       {
+        "tenor": "5Y",
+        "spread": 0.009600000000000001
+       },
+       {
+        "tenor": "7Y",
+        "spread": 0.0108
+       },
+       {
+        "tenor": "10Y",
+        "spread": 0.012
+       }
+      ],
+      "weight": 1.0
+     }
+    ],
+    "scale": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "R1-4",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "LINEAR_ZERO discount curve (from credit_d-0011)"
+  }
+ ]
+}

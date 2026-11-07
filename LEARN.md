@@ -176,7 +176,11 @@ Nothing in these examples is traded.
 
 ### Known limits
 
-Stage D is Implemented, not Validated. All inputs are synthetic. The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them.
+Stage D is Implemented, not Validated. All inputs are synthetic. The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 410 of the 647 stage D cases (63.4%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
+
+### What a tolerance means in money
+
+A tolerance such as 1e-10 says little to a desk. `conformance/tolerances/money.md` restates every class, and every per-case limit, as an error on a 10m notional: basis points of DV01 on a 10Y swap, 32nds of a bond price, and currency units. The widest class, `numerical_scheme`, allows about 1e-4 bp of a 10Y swap's DV01, under one currency unit on 10m. Present-value limits are 1e-9 of notional, which is 0.01 on 10m.
 
 ## Batch mode
 

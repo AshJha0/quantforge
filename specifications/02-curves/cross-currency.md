@@ -24,7 +24,7 @@ Each quote is the spread on the foreign leg (EUR `ESTR` + spread, notional 1) th
 
 ## `fx.xccy.pv`
 
-Inputs: `domestic`, `foreign_projection`, `foreign_discount`, `spot` (USD per EUR), `trade` `{start, months, foreign_notional, spread, side}`, `side` `RECEIVE_FOREIGN` or `PAY_FOREIGN`. Outputs: `foreign_leg` (EUR, `N_f`, spread on it, `foreign_discount`), `domestic_leg` (USD, `N_f spot`, flat, `domestic` for both), `pv = sign (spot foreign_leg - domestic_leg)` in USD, sign +1 for `RECEIVE_FOREIGN`. Constant notional: no resets.
+Inputs: `domestic`, `foreign_projection`, `foreign_discount`, `spot` (USD per EUR), `trade` `{start, months, foreign_notional, spread, side}`, `side` `RECEIVE_FOREIGN` or `PAY_FOREIGN`. Outputs: `foreign_leg` (EUR, `N_f`, spread on it, `foreign_discount`), `domestic_leg` (USD, `N_f spot`, flat, `domestic` for both), `pv = sign (spot foreign_leg - domestic_leg)` in USD, sign +1 for `RECEIVE_FOREIGN`. Constant notional: no resets. **Synthetic instrument (R5, ruling R1-1):** this is a constant-notional basis swap. The market EUR/USD cross-currency basis swap resets the USD notional each period (mark-to-market), so the curve solved here is not the market xccy-implied curve and must never be described as one. The MTM-reset variant is row E13 of `../edge-case-register.md`.
 
 ## `fx.ndf.pv`
 
