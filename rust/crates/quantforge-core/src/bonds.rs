@@ -1,5 +1,5 @@
 //! Bonds, repo and bond futures (`04-pricing/bonds.md`).
-use crate::curve::{Curve, curve_time};
+use crate::curve::{Curve, Discount, curve_time};
 use crate::dates::{Date, days_in_month};
 use crate::error::{Result, err, fail};
 use crate::linalg::solve;
@@ -175,15 +175,26 @@ pub fn yield_from_price(b: &Bond, settlement: Date, clean: f64) -> Result<(f64, 
 
 /// Dirty price on the curve with a continuous spread `z`, and its derivative in `z`.
 fn curve_dirty(b: &Bond, settlement: Date, c: &Curve, z: f64) -> Result<(f64, f64, f64)> {
-    if settlement < c.as_of {
+    dirty_on(b, settlement, c.as_of, c, z)
+}
+
+/// `(dirty, d dirty / d z, accrued)` on any discount function whose time origin is `as_of`.
+pub fn dirty_on<C: Discount + ?Sized>(
+    b: &Bond,
+    settlement: Date,
+    as_of: Date,
+    c: &C,
+    z: f64,
+) -> Result<(f64, f64, f64)> {
+    if settlement < as_of {
         return fail("E_OUT_OF_RANGE", "settlement is before the curve's as_of");
     }
     let fl = b.flows(settlement)?;
-    let ts = curve_time(c.as_of, settlement);
+    let ts = curve_time(as_of, settlement);
     let ds = c.discount(settlement)? * (-z * ts).exp();
     let (mut sum, mut dsum) = (0.0, 0.0);
     for (d, cf) in &fl.flows {
-        let t = curve_time(c.as_of, *d);
+        let t = curve_time(as_of, *d);
         let pv = cf * c.discount(*d)? * (-z * t).exp();
         sum += pv;
         dsum -= (t - ts) * pv;

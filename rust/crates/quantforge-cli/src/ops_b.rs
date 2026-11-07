@@ -137,7 +137,7 @@ fn side(i: &Inputs, yes: &str, no: &str) -> Result<bool> {
     }
 }
 
-fn ois_trade(i: &Inputs) -> Result<OisTrade> {
+pub(crate) fn ois_trade(i: &Inputs) -> Result<OisTrade> {
     let t = sub(i, "trade")?;
     Ok(OisTrade {
         convention: overnight(&t, "convention")?,

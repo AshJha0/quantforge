@@ -106,3 +106,11 @@ No stage D question is open.
 - **Error results always carry `diagnostics: {}`.** `batch_check.py` timings_identity strips only `elapsed_ns`, so an error result that gained `diagnostics` under `--timings` left an empty object behind and failed. The contract allows `diagnostics` on every result ("may always be present"), so the Rust build now writes it on every error result, with or without the flag. Suggest the spec state this, or have the checker drop an empty `diagnostics`.
 - **BT1 CR removal:** exactly one CR before the LF is removed (v0.4 removed every trailing CR/LF). A last line without LF keeps a trailing CR removed too, as before.
 - **BT5 memory:** the reader keeps at most 16,777,217 bytes (room for the CRLF's CR) and drops the rest of the line; the `E_LIMIT` message is "the line is longer than 16 MiB". Under `--timings` it carries `elapsed_ns` like any other result.
+
+## R2.1 par and key-rate risk (silent choices, 2026-11-07)
+
+- **Optional keys:** `bump_bp` (default 1) and `scheme` (default `CENTRAL`) may be absent. `key_dates` may be absent, which counts as `null`. A `key_dates` that is neither `null` nor an array of dates is `E_SCHEMA`.
+- **Mode against key_dates:** `TRIANGULAR` with `null` key_dates is `E_INPUT`, the same as an empty list. `PILLAR` with an array is `E_INPUT`, as specified. Both come after the `bump_bp` and `notional` checks (`E_DOMAIN`).
+- **Jacobian above the diagonal** is set to exactly 0 rather than computed. The sequential bootstrap already gives 0 there; setting it makes "exactly 0" hold by construction.
+- **Convention check** applies to `risk.curve.par` only. `risk.curve.key_rate` takes a curve object that carries no convention, so an `OIS` product is priced on it whatever its convention.
+- **Bond value** uses the bond pricer's `dirty`, scaled by `notional / 100`, on the bumped discount function with the curve's `as_of` as time origin. Settlement before `as_of` is `E_OUT_OF_RANGE`, as `bond.price.from_curve`.
