@@ -40,13 +40,24 @@ public final class DatedCompounding {
         return c.dayCount() == DayCount.Convention.ACT_360 ? 360 : 365;
     }
 
+    /**
+     * A business day of the index's compounding calendar. For SOFR that is USGS with every Good Friday closed, since
+     * the New York Fed publishes no SOFR then, even in USGS early-close years (ruling R1-6).
+     */
+    private static boolean open(Conventions.RateIndex c, LocalDate d) {
+        if (c == Conventions.SOFR && d.equals(Calendars.easter(d.getYear()).minusDays(2))) {
+            return false;
+        }
+        return Calendars.isBusinessDay(c.calendar(), d);
+    }
+
     /** {@code d} moved {@code k} business days earlier, inside the calendar's range. */
-    private static LocalDate back(Calendars.Id cal, LocalDate d, long k) {
+    private static LocalDate back(Conventions.RateIndex c, LocalDate d, long k) {
         LocalDate x = d;
         for (long left = k; left > 0; ) {
             x = x.minusDays(1);
             Calendars.checkRange(x);
-            if (Calendars.isBusinessDay(cal, x)) {
+            if (open(c, x)) {
                 left--;
             }
         }
@@ -60,10 +71,9 @@ public final class DatedCompounding {
         }
         Calendars.checkRange(start);
         Calendars.checkRange(end);
-        Calendars.Id cal = c.calendar();
         List<LocalDate> days = new ArrayList<>();
         for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
-            if (Calendars.isBusinessDay(cal, d) || d.equals(start) || d.equals(end)) {
+            if (open(c, d) || d.equals(start) || d.equals(end)) {
                 days.add(d);
             }
         }
@@ -71,7 +81,7 @@ public final class DatedCompounding {
         if (k < 0 || (method == Method.NONE && k != 0) || (method == Method.LOCKOUT && (k < 1 || k > n - 1))) {
             throw new QfError("E_INPUT", "shift_days not allowed for " + method, "shift_days");
         }
-        if (!Calendars.isBusinessDay(cal, start) || !Calendars.isBusinessDay(cal, end)) {
+        if (!open(c, start) || !open(c, end)) {
             throw new QfError("E_INPUT", "start and end must be business days", "start");
         }
         Map<LocalDate, Double> fixings = new HashMap<>();
@@ -82,7 +92,7 @@ public final class DatedCompounding {
         }
         LocalDate[] obs = new LocalDate[n + 1];
         for (int i = 0; i <= n; i++) {
-            obs[i] = method == Method.LOOKBACK || method == Method.OBSERVATION_SHIFT ? back(cal, days.get(i), k) : days.get(i);
+            obs[i] = method == Method.LOOKBACK || method == Method.OBSERVATION_SHIFT ? back(c, days.get(i), k) : days.get(i);
         }
         int b = denominator(c);
         double growth = 1.0;
