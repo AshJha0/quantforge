@@ -1,6 +1,6 @@
 # Calendars and business-day rules
 
-Spec version 1.0.0. Status: Specified.
+Spec version 1.1.0 (R1: Good Friday early closes, ruling R1-6). Status: Specified.
 
 All calendars are valid for years 2000 to 2099. A date outside is `E_DATE_RANGE`. Saturdays and
 Sundays are non-business days in every calendar. An unknown calendar or convention is `E_SCHEMA`.
@@ -37,7 +37,7 @@ One-off: 2001-12-31.
 
 - New Year: 1 January, or Monday 2 January if a Sunday. If a Saturday, there is no holiday in lieu.
 - Martin Luther King Day: third Monday of January. Presidents' Day: third Monday of February.
-- Good Friday, every year.
+- Good Friday, except in years when SIFMA recommended an early close instead of a full close: 2007, 2010, 2012, 2015, 2021, 2023 and 2026. The market is open on an early close, so it is a business day for settlement, accrual and schedules (ruling R1-6). Sources per year: `datasets/calendar_provenance.json`.
 - Memorial Day: last Monday of May.
 - Juneteenth: 19 June from 2022 on, Friday if a Saturday, Monday if a Sunday.
 - Independence Day: 4 July, Friday if a Saturday, Monday if a Sunday.
@@ -93,8 +93,6 @@ Class `date_and_convention`, exact. Oracle: the rules above, checked for every w
 
 Measured result: `GBLO` and `EUTA` match both libraries on every date. `USGS` matches Strata except
 2004-06-11 (QuantLib has it, Strata does not; kept because the market closure is documented, not
-confirmed against a primary source). Against QuantLib, `USGS` differs only on Good Fridays that fall on the first
-Friday of a month from 2007 on: QuantLib treats them as open, because the bond market had a partial
-session on some of them. QuantLib projects that into the future. Here Good Friday is always closed.
+confirmed against a primary source). Since ruling R1-6 (2026-11-07), `USGS` matches QuantLib on every date to 2026, including the seven Good Friday early closes. After 2026 it differs on Good Fridays that fall on a jobs-report Friday (2034, 2037, 2042, 2045, 2048): QuantLib projects an early close, while here a future Good Friday is a holiday until SIFMA publishes. Strata treats every Good Friday as a holiday, so it differs on the seven early-close years.
 
 No early closes are modelled. A partial session counts as a full business day.

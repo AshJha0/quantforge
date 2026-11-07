@@ -2520,6 +2520,497 @@
     "month-boundary",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "edge_d-0018",
+   "operation": "core.calendar.is_business_day",
+   "inputs": {
+    "calendar": "USGS",
+    "date": "2026-04-03"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "is_business_day": true
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "sifma",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "edge-E14",
+    "good-friday",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "edge_d-0019",
+   "operation": "core.calendar.is_business_day",
+   "inputs": {
+    "calendar": "USGS",
+    "date": "2027-03-26"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "is_business_day": false
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "sifma",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "edge-E14",
+    "good-friday",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "edge_d-0020",
+   "operation": "core.calendar.is_business_day",
+   "inputs": {
+    "calendar": "USGS",
+    "date": "2023-04-07"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "is_business_day": true
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "sifma",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "edge-E14",
+    "good-friday",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "edge_d-0021",
+   "operation": "core.calendar.is_business_day",
+   "inputs": {
+    "calendar": "USGS",
+    "date": "2024-03-29"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "is_business_day": false
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "sifma",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "edge-E14",
+    "good-friday",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "edge_d-0022",
+   "operation": "core.calendar.add_business_days",
+   "inputs": {
+    "calendar": "USGS",
+    "date": "2026-04-02",
+    "days": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "date": "2026-04-03"
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "sifma",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "edge-E14",
+    "good-friday",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "edge_d-0023",
+   "operation": "rates.ois.compound_dated",
+   "inputs": {
+    "convention": "SOFR",
+    "start": "2026-03-30",
+    "end": "2026-04-30",
+    "method": "NONE",
+    "shift_days": 0,
+    "fixings": [
+     {
+      "date": "2026-03-10",
+      "rate": 0.0434
+     },
+     {
+      "date": "2026-03-11",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-03-12",
+      "rate": 0.0436
+     },
+     {
+      "date": "2026-03-13",
+      "rate": 0.0427
+     },
+     {
+      "date": "2026-03-16",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-03-17",
+      "rate": 0.0435
+     },
+     {
+      "date": "2026-03-18",
+      "rate": 0.0428
+     },
+     {
+      "date": "2026-03-19",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-03-20",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-03-23",
+      "rate": 0.0436
+     },
+     {
+      "date": "2026-03-24",
+      "rate": 0.0427
+     },
+     {
+      "date": "2026-03-25",
+      "rate": 0.0432
+     },
+     {
+      "date": "2026-03-26",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-03-27",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-03-30",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-03-31",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-01",
+      "rate": 0.0434
+     },
+     {
+      "date": "2026-04-02",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-04-06",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-04-07",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-04-08",
+      "rate": 0.0435
+     },
+     {
+      "date": "2026-04-09",
+      "rate": 0.0428
+     },
+     {
+      "date": "2026-04-10",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-13",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-04-14",
+      "rate": 0.0436
+     },
+     {
+      "date": "2026-04-15",
+      "rate": 0.0427
+     },
+     {
+      "date": "2026-04-16",
+      "rate": 0.0432
+     },
+     {
+      "date": "2026-04-17",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-04-20",
+      "rate": 0.0428
+     },
+     {
+      "date": "2026-04-21",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-22",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-23",
+      "rate": 0.0434
+     },
+     {
+      "date": "2026-04-24",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-04-27",
+      "rate": 0.0432
+     },
+     {
+      "date": "2026-04-28",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-04-29",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-04-30",
+      "rate": 0.0435
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "compounded_rate": 0.04317175665379546,
+     "accrual": 0.08611111111111111,
+     "interest": 0.0037175679340768313
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "edge-E14",
+    "good-friday",
+    "none",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 0.0,
+    "reason": "stage-d-targets: exact-rational compounding; only the final division rounds"
+   }
+  },
+  {
+   "case_id": "edge_d-0024",
+   "operation": "rates.ois.compound_dated",
+   "inputs": {
+    "convention": "SOFR",
+    "start": "2026-03-30",
+    "end": "2026-04-30",
+    "method": "LOOKBACK",
+    "shift_days": 2,
+    "fixings": [
+     {
+      "date": "2026-03-10",
+      "rate": 0.0434
+     },
+     {
+      "date": "2026-03-11",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-03-12",
+      "rate": 0.0436
+     },
+     {
+      "date": "2026-03-13",
+      "rate": 0.0427
+     },
+     {
+      "date": "2026-03-16",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-03-17",
+      "rate": 0.0435
+     },
+     {
+      "date": "2026-03-18",
+      "rate": 0.0428
+     },
+     {
+      "date": "2026-03-19",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-03-20",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-03-23",
+      "rate": 0.0436
+     },
+     {
+      "date": "2026-03-24",
+      "rate": 0.0427
+     },
+     {
+      "date": "2026-03-25",
+      "rate": 0.0432
+     },
+     {
+      "date": "2026-03-26",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-03-27",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-03-30",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-03-31",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-01",
+      "rate": 0.0434
+     },
+     {
+      "date": "2026-04-02",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-04-06",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-04-07",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-04-08",
+      "rate": 0.0435
+     },
+     {
+      "date": "2026-04-09",
+      "rate": 0.0428
+     },
+     {
+      "date": "2026-04-10",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-13",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-04-14",
+      "rate": 0.0436
+     },
+     {
+      "date": "2026-04-15",
+      "rate": 0.0427
+     },
+     {
+      "date": "2026-04-16",
+      "rate": 0.0432
+     },
+     {
+      "date": "2026-04-17",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-04-20",
+      "rate": 0.0428
+     },
+     {
+      "date": "2026-04-21",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-22",
+      "rate": 0.0431
+     },
+     {
+      "date": "2026-04-23",
+      "rate": 0.0434
+     },
+     {
+      "date": "2026-04-24",
+      "rate": 0.0429
+     },
+     {
+      "date": "2026-04-27",
+      "rate": 0.0432
+     },
+     {
+      "date": "2026-04-28",
+      "rate": 0.0433
+     },
+     {
+      "date": "2026-04-29",
+      "rate": 0.043
+     },
+     {
+      "date": "2026-04-30",
+      "rate": 0.0435
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "compounded_rate": 0.043191171779034206,
+     "accrual": 0.08611111111111111,
+     "interest": 0.0037192397920835013
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "edge-E14",
+    "good-friday",
+    "lookback",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 0.0,
+    "reason": "stage-d-targets: exact-rational compounding; only the final division rounds"
+   }
   }
  ]
 }

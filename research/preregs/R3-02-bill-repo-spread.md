@@ -1,6 +1,13 @@
 # R3-02: Overnight funding against Treasury bills (OIS against T-bill and repo)
 
-Status: draft, unsigned. Common rules: `README.md`. This replaces the futures-against-cash-carry study, because no free, redistributable futures settlement history exists (plan 11.1.2).
+Status: **signed**. Signed by Claude (signing delegated by the owner, 2026-11-07) on 2026-11-07.
+- SHA-256 of the body below the marker line: `48c3759c6d936305fd3f79f672c7afbe2957f87723d6440953939a956955af6a`
+- SHA-256 of the common rules (`README.md` body): `53566e4c3060d1adfd386a543b8d789b1de0b9b53393a8ffa03e0c3f4b5d58aa`
+- Holdout data has not been read, downloaded or summarised. No study data of any period has been downloaded at signing.
+- This file is not edited after signing; a change is a new prereg.
+
+<!-- body -->
+Common rules: `README.md`. This replaces the futures-against-cash-carry study, because no free, redistributable futures settlement history exists (plan 11.1.2).
 
 **Label:** signal on a fitted curve; tradability not established.
 
@@ -24,8 +31,10 @@ Does the spread between 3-month Treasury bill yields and expected overnight fund
 
 ## Statistics and pass rule
 - Monthly non-overlapping outcomes. Sharpe standard error from a stationary block bootstrap, mean block 3 months, 10,000 draws.
-- Holdout T = 3.83 years, MDS = 1.27. **Low power, stated in advance:** a true annualised Sharpe below about 1.3 is unlikely to be detected. **Threshold:** holdout deflated Sharpe ratio above 0.95 probability, and holdout net Sharpe at least 1.27.
+- Holdout T = 3.83 years, MDS = 1.27. **Low power, stated in advance:** a true annualised Sharpe below about 1.3 is unlikely to be detected. **Threshold:** holdout deflated Sharpe ratio above 0.95, and holdout net Sharpe at least 1.27.
 - Regime note: the 2023 holdout includes the debt-ceiling episode and reserve changes. Sub-period sign stability is the guard.
+- **Pass rule (all three, per `research/TEMPLATE.md` section 5):** (1) holdout deflated Sharpe ratio above 0.95 and holdout net Sharpe at least the MDS above; (2) holdout net Sharpe still above 0 at 2x costs; (3) the holdout Sharpe has the same sign in each third of the holdout. Otherwise the study fails and is published as a null result.
+- **Forward log:** live paper out-of-sample from the signing date, 2026-11-07, judged on the same rule after 250 US business days.
 
 ## Known limits
 Bill coupon-equivalent yields are not executable prices. Repo is a published average, not a dealer's rate. No balance-sheet or SLR modelling.

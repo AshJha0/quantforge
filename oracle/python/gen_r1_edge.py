@@ -82,6 +82,22 @@ def main():
         s.add("infl.linker.price", {"bond": b, "settlement": str(setl), "real_yield": ry, "base_ref_cpi": base_ref, "cpi_fixings": [{"month": m, "value": v} for m, v in fix.items()]},
               {"ref_cpi": float(rc), "index_ratio": float(ir), "real_clean": r["clean"], "real_accrued": r["accrued"], "nominal_clean": r["clean"] * float(ir),
                "nominal_accrued": r["accrued"] * float(ir)}, cls=A, verified=["analytic", "exact-rational"], tags=["edge-E7", "month-boundary"])
+    # E14 USGS Good Friday early closes (ruling R1-6): 2026-04-03 is a business day; 2027-03-26 is a holiday.
+    for d, b in (("2026-04-03", True), ("2027-03-26", False), ("2023-04-07", True), ("2024-03-29", False)):
+        s.add("core.calendar.is_business_day", {"calendar": "USGS", "date": d}, {"is_business_day": b}, cls="date_and_convention", verified=["sifma", "quantlib-1.44"],
+              tags=["edge-E14", "good-friday"])
+    s.add("core.calendar.add_business_days", {"calendar": "USGS", "date": "2026-04-02", "days": 1}, {"date": "2026-04-03"}, cls="date_and_convention",
+          verified=["sifma", "quantlib-1.44"], tags=["edge-E14", "good-friday"])
+    S0, E0 = date(2026, 3, 30), date(2026, 4, 30)
+    fl = D.fixings("SOFR", S0 - timedelta(20), E0)
+    assert all(d != date(2026, 4, 3) for d, _ in fl)  # no SOFR is published on Good Friday, early close or not
+    for method, k in (("NONE", 0), ("LOOKBACK", 2)):
+        rr, _, _ = D.compound("SOFR", S0, E0, method, k, dict(fl))
+        acc = Fr((E0 - S0).days, 360)
+        s.add("rates.ois.compound_dated", {"convention": "SOFR", "start": str(S0), "end": str(E0), "method": method, "shift_days": k,
+                                            "fixings": [{"date": str(d), "rate": v} for d, v in fl]},
+              {"compounded_rate": float(rr), "accrual": float(acc), "interest": float(rr * acc)}, cls=A, verified=["exact-rational", QLV],
+              tags=["edge-E14", "good-friday", method.lower()], limit=D.RATELIM)
     write(s)
     note(f"edge_d: {len(s.cases)} edge-case register cases")
 
