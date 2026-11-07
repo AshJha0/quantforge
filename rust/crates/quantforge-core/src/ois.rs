@@ -2,7 +2,9 @@
 //! (`pricing-framework.md`).
 use crate::calendar::{Bdc, Calendar};
 use crate::conventions::Overnight;
-use crate::curve::{Curve, Interpolation, SolveMethod, Solved, solve_curve};
+use crate::curve::{
+    Curve, Discount, Interpolation, SolveMethod, Solved, check_jumps, solve_curve_with_jumps,
+};
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
 use crate::error::{Result, fail};
@@ -96,22 +98,31 @@ impl OisLegs {
         Ok(OisLegs { periods })
     }
 
-    fn last_payment(&self) -> Date {
+    pub fn last_payment(&self) -> Date {
         self.periods.last().expect("at least one period").0.payment
     }
 
     /// `(F, A)`. The general floating form, never the telescoped one.
-    pub fn legs(&self, curve: &Curve) -> Result<(f64, f64)> {
+    pub fn legs<C: Discount + ?Sized>(&self, curve: &C) -> Result<(f64, f64)> {
+        self.legs_on(curve, curve)
+    }
+
+    /// `(F, A)` with the floating growth read on `projection` and discounting on `discount`.
+    pub fn legs_on<C: Discount + ?Sized, P: Discount + ?Sized>(
+        &self,
+        discount: &C,
+        projection: &P,
+    ) -> Result<(f64, f64)> {
         let (mut f, mut a) = (0.0, 0.0);
         for (p, alpha) in &self.periods {
-            let d = curve.discount(p.payment)?;
+            let d = discount.discount(p.payment)?;
             a += alpha * d;
-            f += (curve.discount(p.start)? / curve.discount(p.end)? - 1.0) * d;
+            f += (projection.discount(p.start)? / projection.discount(p.end)? - 1.0) * d;
         }
         Ok((f, a))
     }
 
-    pub fn par_rate(&self, curve: &Curve) -> Result<f64> {
+    pub fn par_rate<C: Discount + ?Sized>(&self, curve: &C) -> Result<f64> {
         let (f, a) = self.legs(curve)?;
         Ok(f / a)
     }
@@ -124,6 +135,7 @@ pub struct OisCurveProblem {
     interpolation: Interpolation,
     swaps: Vec<OisLegs>,
     dates: Vec<Date>,
+    jumps: Vec<(Date, f64)>,
     pub mids: Vec<f64>,
 }
 
@@ -134,6 +146,18 @@ impl OisCurveProblem {
         quotes: &[OisQuote],
         interpolation: Interpolation,
     ) -> Result<OisCurveProblem> {
+        OisCurveProblem::with_jumps(c, as_of, quotes, interpolation, &[])
+    }
+
+    /// Stage D: the solve is on the curve with these jumps.
+    pub fn with_jumps(
+        c: &Overnight,
+        as_of: Date,
+        quotes: &[OisQuote],
+        interpolation: Interpolation,
+        jumps: &[(Date, f64)],
+    ) -> Result<OisCurveProblem> {
+        check_jumps(as_of, jumps)?;
         if quotes.is_empty() {
             return fail("E_INPUT", "no quotes");
         }
@@ -153,16 +177,18 @@ impl OisCurveProblem {
             interpolation,
             swaps,
             dates,
+            jumps: jumps.to_vec(),
             mids: quotes.iter().map(OisQuote::mid).collect(),
         })
     }
 
     pub fn solve(&self, quotes: &[f64], method: SolveMethod) -> Result<Solved> {
         let model = |c: &Curve, j: usize| self.swaps[j].par_rate(c);
-        solve_curve(
+        solve_curve_with_jumps(
             self.as_of,
             self.interpolation,
             &self.dates,
+            &self.jumps,
             quotes,
             &model,
             method,
@@ -207,4 +233,21 @@ pub fn pv_of_legs(legs: &OisLegs, curve: &Curve, trade: &OisTrade) -> Result<f64
     let (f, a) = legs.legs(curve)?;
     let sign = if trade.pay { 1.0 } else { -1.0 };
     Ok(sign * trade.notional * (f - trade.fixed_rate * a))
+}
+
+/// `rates.basis.ois_spread`: `(F_a - F_b) / A`, both legs discounted on `discount`.
+pub fn ois_spread(
+    c: &Overnight,
+    tenor: (i64, char),
+    discount: &Curve,
+    a: &Curve,
+    b: &Curve,
+) -> Result<f64> {
+    if a.as_of != discount.as_of || b.as_of != discount.as_of {
+        return fail("E_INPUT", "curves have different as_of dates");
+    }
+    let legs = OisLegs::new(c, discount.as_of, tenor)?;
+    let (fa, annuity) = legs.legs_on(discount, a)?;
+    let (fb, _) = legs.legs_on(discount, b)?;
+    Ok((fa - fb) / annuity)
 }
