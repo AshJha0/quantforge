@@ -204,7 +204,12 @@
     "slv",
     "svi-surface",
     "synthetic"
-   ]
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-07,
+    "relative": 1e-07,
+    "reason": "ruling E-A29: first-order recipe; an independent re-implementation agrees to 1.6e-9"
+   }
   },
   {
    "case_id": "slv_e-0002",
@@ -405,7 +410,12 @@
     "svi-surface",
     "zero-rho",
     "synthetic"
-   ]
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-07,
+    "relative": 1e-07,
+    "reason": "ruling E-A29: first-order recipe; an independent re-implementation agrees to 1.6e-9"
+   }
   },
   {
    "case_id": "slv_e-0003",
@@ -596,7 +606,12 @@
     "flat-vol",
     "small-vol-of-vol",
     "synthetic"
-   ]
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-07,
+    "relative": 1e-07,
+    "reason": "ruling E-A29: first-order recipe; an independent re-implementation agrees to 1.6e-9"
+   }
   },
   {
    "case_id": "slv_e-0004",

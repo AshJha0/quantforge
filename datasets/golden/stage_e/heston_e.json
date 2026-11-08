@@ -34,11 +34,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      31.83253432684349,
-      14.928948484688933,
-      8.113489032310287,
-      3.306260863369551,
-      0.06085547503236377
+      31.83253432685984,
+      14.928948484707494,
+      8.11348903232974,
+      3.306260863390038,
+      0.06085547505554093
      ]
     }
    },
@@ -46,7 +46,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -86,11 +86,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      0.7587383003222641,
-      3.2640631291378686,
-      6.153059012244305,
-      11.05028617878865,
-      36.91824679690671
+      0.7587383003386067,
+      3.264063129156425,
+      6.1530590122637525,
+      11.050286178809133,
+      36.91824679692988
      ]
     }
    },
@@ -98,7 +98,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -138,11 +138,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      31.004881950258575,
-      12.857185554657205,
-      5.90810818198436,
-      1.8387297706209667,
-      0.019861184267241518
+      31.004881950275173,
+      12.857185554676,
+      5.908108182004256,
+      1.8387297706418206,
+      0.019861184290757068
      ]
     }
    },
@@ -150,7 +150,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -190,11 +190,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      0.13769550639838002,
-      1.7422315554083827,
-      4.669270405041225,
-      10.476008215983518,
-      38.28548829654685
+      0.13769550641497477,
+      1.7422315554271754,
+      4.669270405061116,
+      10.476008216004368,
+      38.285488296570364
      ]
     }
    },
@@ -202,7 +202,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -242,11 +242,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      30.581082149553826,
-      16.08134633646154,
-      10.771305458127623,
-      6.8990896835991125,
-      1.6346180741487257
+      30.581082149569728,
+      16.08134633647958,
+      10.771305458146614,
+      6.899089683619064,
+      1.6346180741712446
      ]
     }
    },
@@ -254,7 +254,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -294,11 +294,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      1.757398974984131,
-      6.473451944938308,
-      10.771305458127623,
-      16.506984075122343,
-      40.06619564024165
+      1.757398975000031,
+      6.473451944956349,
+      10.771305458146614,
+      16.506984075142295,
+      40.066195640264176
      ]
     }
    },
@@ -306,7 +306,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -346,11 +346,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      34.17431233099839,
-      19.777601336207116,
-      13.851778663480655,
-      8.949595649157084,
-      1.0708807217733949
+      34.17431233101503,
+      19.77760133622592,
+      13.851778663500484,
+      8.949595649177827,
+      1.0708807217968028
      ]
     }
    },
@@ -358,7 +358,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -399,11 +399,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      5.946370767708412,
-      12.055962183405715,
-      16.383290715923543,
-      21.73425890684426,
-      44.61499759519344
+      5.946370767725049,
+      12.055962183424516,
+      16.383290715943367,
+      21.734258906864998,
+      44.61499759521684
      ]
     }
    },
@@ -411,7 +411,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -452,11 +452,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      29.972234154331716,
-      12.408697214121593,
-      6.646582629728921,
-      3.3854375925235276,
-      0.4709653811073362
+      29.972234154348133,
+      12.408697214140139,
+      6.646582629748519,
+      3.3854375925441618,
+      0.4709653811304892
      ]
     }
    },
@@ -464,7 +464,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -504,11 +504,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      0.07465860623014109,
-      2.116169351912447,
-      6.1565786104659885,
-      12.697957416206808,
-      39.19105673362925
+      0.07465860624656641,
+      2.1161693519310005,
+      6.156578610485594,
+      12.697957416227451,
+      39.19105673365242
      ]
     }
    },
@@ -516,7 +516,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "heston",
@@ -1065,11 +1065,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      32.00407643643493,
-      15.580612070434537,
-      9.03996849291532,
-      4.23298759907286,
-      0.1609767795963496
+      32.00407643645122,
+      15.580612070453025,
+      9.039968492934864,
+      4.232987599093318,
+      0.16097677961951942
      ]
     }
    },
@@ -1077,7 +1077,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "bates",
@@ -1122,11 +1122,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      0.9302804099137028,
-      3.9157267148834727,
-      7.079538472849337,
-      11.977012914491958,
-      37.01836810147069
+      0.9302804099299902,
+      3.9157267149019552,
+      7.079538472868877,
+      11.977012914512411,
+      37.018368101493856
      ]
     }
    },
@@ -1134,7 +1134,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "bates",
@@ -1179,11 +1179,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      31.04120935438099,
-      13.128989879804417,
-      6.328001515830807,
-      2.18578431797358,
-      0.03578417858805238
+      31.04120935439752,
+      13.128989879823255,
+      6.328001515850552,
+      2.1857843179942567,
+      0.035784178611642035
      ]
     }
    },
@@ -1191,7 +1191,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "bates",
@@ -1236,11 +1236,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      0.17402291052079377,
-      2.0140358805555945,
-      5.089163738887671,
-      10.82306276333613,
-      38.30141129086766
+      0.17402291053732122,
+      2.0140358805744305,
+      5.089163738907413,
+      10.823062763356804,
+      38.301411290891245
      ]
     }
    },
@@ -1248,7 +1248,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "bates",
@@ -1293,11 +1293,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      30.741057821731047,
-      16.50653188251723,
-      11.323516752210137,
-      7.522698906780696,
-      2.110792510512836
+      30.74105782174705,
+      16.50653188253526,
+      11.323516752229121,
+      7.522698906800653,
+      2.110792510535339
      ]
     }
    },
@@ -1305,7 +1305,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "bates",
@@ -1350,11 +1350,11 @@
     "status": "ok",
     "outputs": {
      "prices": [
-      1.9173746471613526,
-      6.898637490993998,
-      11.323516752210137,
-      17.13059329830393,
-      40.54237007660576
+      1.9173746471773527,
+      6.8986374910120265,
+      11.323516752229121,
+      17.130593298323888,
+      40.542370076628266
      ]
     }
    },
@@ -1362,7 +1362,7 @@
    "verified_by": [
     "quantlib-1.44",
     "mpmath-lewis-30-digits",
-    "lewis-gauss-legendre-256-on-0-200"
+    "lewis-gauss-legendre-1024"
    ],
    "tags": [
     "bates",
@@ -1861,6 +1861,500 @@
     "invalid",
     "synthetic"
    ]
+  },
+  {
+   "case_id": "heston_e-0039",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 0.019178082191780823,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      20.026837917584803,
+      5.090938672912959,
+      1.1189955590525047,
+      0.023378646839601495,
+      4.113864070408388e-18
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "heston",
+    "ruling",
+    "short-expiry",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0040",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 0.005479452054794521,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      2.524354896707238e-28,
+      0.0003692261376743363,
+      0.58435142615769,
+      4.988257400688087,
+      19.985754895766785
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "heston",
+    "ruling",
+    "short-expiry",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0041",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 0.0821917808219178,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 4.0,
+     "theta": 0.06,
+     "xi": 0.9,
+     "rho": -0.8
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      20.33873438217789,
+      6.766803558441267,
+      3.4248460262191895,
+      1.2199103345997822,
+      0.0011900086049550307
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "heston",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0042",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 0.7506849315068493,
+    "rate": 0.01,
+    "dividend_yield": 0.03,
+    "heston": {
+     "v0": 0.02,
+     "kappa": 0.5,
+     "theta": 0.05,
+     "xi": 0.25,
+     "rho": -0.2
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.5187836817768322,
+      3.506553997225062,
+      5.828894000537895,
+      8.988166175726153,
+      21.77843576488252
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "heston",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0043",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 3.0,
+    "rate": 0.025,
+    "dividend_yield": 0.015,
+    "heston": {
+     "v0": 0.06,
+     "kappa": 1.2,
+     "theta": 0.035,
+     "xi": 0.6,
+     "rho": 0.1
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      24.881809321145106,
+      15.67579959040067,
+      13.325770174901082,
+      11.336249929897509,
+      7.166645687071691
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "heston",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0044",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 10.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 0.3,
+     "theta": 0.05,
+     "xi": 0.35,
+     "rho": -0.6
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      7.08455332444188,
+      10.475700269786792,
+      11.802211719401644,
+      13.23391786582708,
+      18.198481039789247
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "heston",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0045",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 0.0821917808219178,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.05,
+     "kappa": 2.0,
+     "theta": 0.05,
+     "xi": 0.6,
+     "rho": -0.6
+    },
+    "jumps": {
+     "intensity": 2.0,
+     "mean_log_jump": -0.08,
+     "log_jump_vol": 0.12
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.14040219082446598,
+      1.4604718665408858,
+      3.0425389031170385,
+      5.915233250265983,
+      19.81866705219935
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "bates",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0046",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 1.5013698630136987,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.03,
+     "kappa": 1.0,
+     "theta": 0.04,
+     "xi": 0.4,
+     "rho": -0.5
+    },
+    "jumps": {
+     "intensity": 0.5,
+     "mean_log_jump": -0.15,
+     "log_jump_vol": 0.25
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      26.197804855911,
+      16.299282599247153,
+      13.51151552273239,
+      11.010986821795587,
+      5.4002165562001645
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "bates",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0047",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     80.0,
+     95.0,
+     100.0,
+     105.0,
+     120.0
+    ],
+    "expiry_years": 5.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "jumps": {
+     "intensity": 0.2,
+     "mean_log_jump": 0.0,
+     "log_jump_vol": 0.1
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      5.5125149757132474,
+      9.626060647184074,
+      11.34698125223312,
+      13.252064247358282,
+      20.089488707833734
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-1024"
+   ],
+   "tags": [
+    "bates",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
   }
  ]
 }

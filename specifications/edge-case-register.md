@@ -50,3 +50,6 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | EA15 | Negative rates in exotics | Pinned | Digitals on the `rate` -0.5% market in `exotic_e` | |
 | EA16 | Arithmetic Asians; discrete barrier monitoring | Out of scope | | Arithmetic Asians need Monte Carlo or an approximation (Turnbull-Wakeman); discrete monitoring needs the Broadie-Glasserman shift. Both with the stage J simulation work |
 | EA17 | Lookback at zero carry | Pinned | The `exotic_e` case tagged `ruling` with `dividend_yield` equal to `rate` (`E_DOMAIN`) | Ruling E-A20 |
+| EA18 | Heston and Bates at very short expiry | Pinned | The `heston_e` cases tagged `short-expiry` (7 and 2 days) | Ruling E-A26: the quadrature range grows as `T` falls |
+| EA19 | Lookback with carry near zero | Pinned | The `exotic_e` cases tagged `small-carry` (`b = 1e-5` priced; `b = 1e-12` `E_DOMAIN`) | Ruling E-A28 |
+| EA20 | BAW at a negative rate | Pinned | The `american_e` case with `rate` -1% (`E_DOMAIN`) | Ruling E-A30 |

@@ -6,7 +6,7 @@ Quote convention: `spot` is domestic currency per unit of foreign (EURUSD 1.0850
 
 Sources:
 - [GK83] M. Garman, S. Kohlhagen, "Foreign currency option values", *Journal of International Money and Finance* 2(3), 1983, pp. 231-237.
-- [RW12] D. Reiswich, U. Wystup, "FX volatility smile construction", *Wilmott* 2012(60), pp. 58-69: section 2 (delta types), section 3 (ATM types), section 2.3 (premium-adjusted call delta is not monotone; its maximum).
+- [RW12] D. Reiswich, U. Wystup, "FX volatility smile construction", Centre for Practical Quantitative Finance working paper No. 20, 2009 (published in *Wilmott* 2012): section 1.3 (delta types), section 1.4 (ATM types, Table 3), section 1.5 (strike from delta; two strikes for one premium-adjusted call delta, the larger one used). Section numbers checked by the R5 audit (ruling E-A32).
 - [Cla11] I. Clark, *Foreign Exchange Option Pricing: A Practitioner's Guide*, Wiley, 2011, chapter 3 (market quotes: ATM, risk reversal, strangle).
 
 Common checks: `spot`, `expiry_years`, `vol`, `strike` (where present), `notional` above 0, else `E_DOMAIN`. Unlisted enum: `E_SCHEMA`.
@@ -19,7 +19,7 @@ Per unit foreign [GK83]: `p = phi Dd (F N(phi d1) - K N(phi d2))`, in domestic c
 
 Outputs: `price = notional p` (domestic); `premium_pct_foreign = p/S` (the premium as a fraction of foreign notional); `forward = F`; `delta = notional phi Df N(phi d1)` (spot delta, foreign units); `gamma = notional Df n(d1)/(S v sqrt T)`; `vega = notional S Df n(d1) sqrt T` (per unit vol, domestic).
 
-## Delta types [RW12 section 2]
+## Delta types [RW12 section 1.3]
 
 | `delta_type` | Delta |
 |---|---|
@@ -38,7 +38,7 @@ Inputs: `spot`, `strike`, `expiry_years`, `domestic_rate`, `foreign_rate`, `vol`
 
 Inputs as above with `delta` and `delta_type` in place of `strike`. Output `strike`, the `K` with delta(`K`) = `delta`.
 
-Range, else `E_DOMAIN`: a call delta must be above 0, a put delta below 0. Non-PA: `|delta|` below `Df` (`SPOT`) or 1 (`FORWARD`). PA put: any negative delta. PA call: delta below the maximum `delta(K*)`, where `K*` solves `v sqrt T N(d2) = n(d2)`, that is `K* = F exp(-v sqrt T d2* - v^2 T/2)`. A PA call delta below the maximum has two strikes; the result is the one above `K*` (ruling E-A10, [RW12 section 2.3]).
+Range, else `E_DOMAIN`: a call delta must be above 0, a put delta below 0. Non-PA: `|delta|` below `Df` (`SPOT`) or 1 (`FORWARD`). PA put: any negative delta. PA call: delta below the maximum `delta(K*)`, where `K*` solves `v sqrt T N(d2) = n(d2)`, that is `K* = F exp(-v sqrt T d2* - v^2 T/2)`. A PA call delta below the maximum has two strikes; the result is the one above `K*` (ruling E-A10, [RW12 section 1.5]).
 
 Any root finder; the result must match to the stated tolerance.
 
@@ -50,7 +50,7 @@ Inputs: `spot`, `expiry_years`, `domestic_rate`, `foreign_rate`, `vol`, `atm_typ
 |---|---|
 | `SPOT` | `S` |
 | `FORWARD` | `F` |
-| `DNS` (delta-neutral straddle) | `F e^{+v^2 T/2}` for `SPOT`, `FORWARD`; `F e^{-v^2 T/2}` for `SPOT_PA`, `FORWARD_PA` [RW12 section 3] |
+| `DNS` (delta-neutral straddle) | `F e^{+v^2 T/2}` for `SPOT`, `FORWARD`; `F e^{-v^2 T/2}` for `SPOT_PA`, `FORWARD_PA` [RW12 section 1.4] |
 
 `delta_type` is required for every `atm_type` and only changes `DNS`.
 

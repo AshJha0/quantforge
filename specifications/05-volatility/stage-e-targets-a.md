@@ -34,11 +34,11 @@ Outside-oracle share (E3): 114 of 125 (91%); spec A running total in `oracle/OUT
 
 | Item | Target | Oracle | Oracle measured |
 |---|---|---|---|
-| `vol.heston.price`, `vol.bates.price` | 1e-8 absolute plus 1e-9 relative per unit at spot 100 (1e-3 currency units on 100,000 units) | QuantLib `AnalyticHestonEngine`, `BatesEngine` at relative 1e-13; 30-digit mpmath Lewis integral | QuantLib within 1e-9; reference recipe within 2.4e-11 |
-| Small vol of variance (`xi` 1e-3, 1e-2) | As above | 30-digit mpmath; QuantLib within 1e-12; Black-Scholes at average variance within 0.05 `xi` | The binary64 recipe is about 1e-9 off at `xi = 1e-3` (cancellation), inside the target |
+| `vol.heston.price`, `vol.bates.price` | 1e-8 absolute plus 1e-9 relative per unit at spot 100 (1e-3 currency units on 100,000 units) | QuantLib `AnalyticHestonEngine`, `BatesEngine` at relative 1e-13; 30-digit mpmath Lewis integral | Goldens are 30-digit values; QuantLib within 1e-9; reference recipe (1024 nodes, scaled range) within 2e-9 from 2 days to 10 years |
+| Small vol of variance (`xi` 1e-3, 1e-2) | As above | 30-digit mpmath; QuantLib within 1e-12; Black-Scholes at average variance within 3 `xi` in price at spot 100, strikes 70 to 140 (measured about 2.2 `xi`; ruling E-A33) | The binary64 recipe is about 1e-9 off at `xi = 1e-3` (cancellation), inside the target |
 | `vol.heston.cf` | `fourier` | 30-digit mpmath | Within 1e-13 |
 | `vol.merton.price` | As Heston | Poisson series, Lewis at 256 nodes, 30-digit mpmath (no QuantLib engine in the Python wheel) | Within 1e-9 |
-| `vol.slv.leverage` | `numerical_scheme` (1e-8) | Reference scheme; 1e-12 input perturbation moves leverage under 1e-8; grid refinement within 2% at the spot; flat-vol, zero-correlation limit within 3% of 1 near the money | Holds; mass at `T` 0.988 to 1.000 |
+| `vol.slv.leverage` | 1e-7 absolute and relative (ruling E-A29) | Reference scheme; 1e-12 input perturbation moves leverage under 1e-8; grid refinement within 2% at the spot; flat-vol, zero-correlation limit within 3% of 1 near the money | Holds; mass at `T` 0.988 to 1.000 |
 
 Outside-oracle share (E2): 18 of 46 (Heston and Bates value cases); spec A running total in `oracle/OUTSIDE_E_A.md`.
 
@@ -53,3 +53,5 @@ Outside-oracle share (E2): 18 of 46 (Heston and Bates value cases); spec A runni
 | FD | `numerical_scheme` | Recipe; 2000-step tree within 2e-2; 1e-12 spot perturbation moves the price under 1e-9 | Holds |
 
 Outside-oracle share (E5): 115 of 164 (70%). Spec A total after E5: 263 of 410 (64.1%), counted under ruling E-A17.
+
+After the second R5 audit (rulings E-A25 to E-A33): 16 more QuantLib-object cases (6 Heston, 3 Bates, 7 barriers with rebates). Spec A: 279 of 429 (65.0

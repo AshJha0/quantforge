@@ -7,11 +7,11 @@ Common inputs: `spot` (> 0), `expiry_years` `T` (> 0), `rate` `r` and `dividend_
 Sources:
 - [Hes93] S. Heston, "A closed-form solution for options with stochastic volatility", *Review of Financial Studies* 6(2), 1993, pp. 327-343.
 - [Alb07] H. Albrecher, P. Mayer, W. Schoutens, J. Tistaert, "The little Heston trap", *Wilmott* 2007(1), pp. 83-92: the continuous form of the characteristic function used below.
-- [Lew01] A. Lewis, "A simple option formula for general jump-diffusion and other exponential Levy processes", 2001, equation (2.10): the single-integral call price.
+- [Lew01] A. Lewis, "A simple option formula for general jump-diffusion and other exponential Levy processes", 2001: the single-integral call price (equation number not verified; not opened).
 - [Bat96] D. Bates, "Jumps and stochastic volatility", *Review of Financial Studies* 9(1), 1996, pp. 69-107.
 - [Mer76] R. Merton, "Option pricing when underlying stock returns are discontinuous", *Journal of Financial Economics* 3, 1976, pp. 125-144.
-- [Hull] J. Hull, *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "More on Models and Numerical Procedures" (Merton mixed jump-diffusion) (not opened; edition as the stage B to D specs)
-- [GHL] P. Henry-Labordere, "Calibration of local stochastic volatility models to market smiles", *Risk*, September 2009: leverage `L(t,x)^2 = sigma_LV(t,x)^2 / E[v | x_t = x]`.
+- [Hull] J. Hull, *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, Merton mixed jump-diffusion (chapter not verified; not opened; edition as the stage B to D specs)
+- [Gyo86] I. Gyongy, "Mimicking the one-dimensional marginal distributions of processes having an Ito differential", *Probability Theory and Related Fields* 71, 1986, and B. Dupire, "A unified theory of volatility", 2004: the identity `L(t,x)^2 = sigma_LV(t,x)^2 / E[v | x_t = x]` (not opened). Solving for the density on a grid follows Y. Ren, D. Madan, M. Qian, "Calibrating and pricing with embedded local volatility models", *Risk*, September 2007 (not opened); the scheme below is this spec's own recipe (ruling E-A31).
 
 ## Object `heston`
 
@@ -31,7 +31,7 @@ For a characteristic function `phi` of `X = ln(S_T/F)`, with `k = ln(F/K)`:
 
 `call = e^{-rT} (F - (sqrt(F K)/pi) Int_0^inf Re[e^{i u k} phi(u - i/2)] / (u^2 + 1/4) du)` [Lew01], `put = call - e^{-rT}(F - K)`.
 
-Reference recipe (ruling E-A13): Gauss-Legendre with 256 nodes on `u` in `[0, 200]`. On every golden this is within 2.4e-11 of QuantLib's adaptive engine at relative tolerance 1e-13; a build may use any quadrature that meets the target. Near `xi = 1e-3` the `kappa/xi^2` factor cancels to about 1e-9 in binary64, which is inside the target; goldens there come from 30-digit arithmetic.
+Reference recipe (rulings E-A13, E-A26): Gauss-Legendre with 1024 nodes on `u` in `[0, U]`, `U = 200/sqrt(min(T, 1))`. The integrand decays more slowly at short expiry, so the range grows as `T` falls. On every golden, from 2 days to 10 years, this is within 2e-9 of the 30-digit value. A build may use any quadrature that meets the target. Goldens are the 30-digit values (ruling E-A27), which QuantLib's adaptive engine at relative tolerance 1e-13 reproduces within 1e-9. Near `xi = 1e-3` the `kappa/xi^2` factor cancels to about 1e-9 in binary64, which is inside the target.
 
 ### `vol.heston.price`
 
@@ -53,7 +53,7 @@ Inputs: common, `strikes`, `vol` (> 0), `jumps`. Merton's series [Mer76]: with `
 
 ## `vol.slv.leverage` (fixed PDE grid)
 
-The leverage function of a Heston stochastic-local vol model `dS/S = (r-q)dt + L(t, x) sqrt(v) dW1`, `x = ln S`, calibrated so the model reprices the local vol surface: `L(t,x)^2 = sigma_LV(t,x)^2 / E[v | x_t = x]` [GHL]. `sigma_LV` is `vol.local.dupire` on `slices` at `k = x - ln F(t)` (`local-and-forward-vol.md`); any `E_ARBITRAGE` there is returned.
+The leverage function of a Heston stochastic-local vol model `dS/S = (r-q)dt + L(t, x) sqrt(v) dW1`, `x = ln S`, calibrated so the model reprices the local vol surface: `L(t,x)^2 = sigma_LV(t,x)^2 / E[v | x_t = x]` [Gyo86]. `sigma_LV` is `vol.local.dupire` on `slices` at `k = x - ln F(t)` (`local-and-forward-vol.md`); any `E_ARBITRAGE` there is returned.
 
 Inputs: `spot`, `expiry_years`, `rate`, `dividend_yield`, `heston`, `slices`, `grid`: `{nx, nv, nt, x_min, x_max, v_max}`. Checks: `nx`, `nv` at least 5, `nt` at least 2, else `E_INPUT`; `x_min < ln(spot) < x_max`, else `E_INPUT`; `v_max > 0`, else `E_DOMAIN`; `nx`, `nv` above 1000 or `nt` above 10,000: `E_LIMIT`.
 
