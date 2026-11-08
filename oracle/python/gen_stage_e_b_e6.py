@@ -46,7 +46,43 @@ def dual(Am):
     r = minimize(fg, np.zeros(n), jac=True, method="BFGS", options={"gtol": 1e-14, "maxiter": 10000})
     X = psd_proj(Am + np.diag(r.x))
     np.fill_diagonal(X, 1.0)
-    return X
+    return X, r.x
+
+
+def exact_ncm(Am, y0):
+    """The golden: semismooth Newton on the dual (Qi and Sun 2006) in mpmath at 40 digits, from the float dual solution.
+    Pure-Python arithmetic, so the result does not depend on BLAS, LAPACK or threading; Newton converges to the unique
+    minimiser to 1e-30, so it does not depend on where the float solvers stopped. Returns (X rows as floats, distance,
+    number of zero eigenvalues)."""
+    with mp.workdps(40):
+        n = len(Am)
+        A = mp.matrix([[mp.mpf(x) for x in r] for r in Am])
+        y = [mp.mpf(float(v)) for v in y0]
+        for _ in range(60):
+            M = A.copy()
+            for i in range(n):
+                M[i, i] += y[i]
+            E, Qm = mp.eigsy(M)
+            lam = [E[i] for i in range(n)]
+            lp = [max(l, 0) for l in lam]
+            P = [[mp.fsum(Qm[i, a] * lp[a] * Qm[j, a] for a in range(n)) for j in range(n)] for i in range(n)]
+            F = [P[i][i] - 1 for i in range(n)]
+            if max(abs(v) for v in F) < mp.mpf(10) ** -32:
+                break
+            Om = [[(1 if lam[a] > 0 and lam[b] > 0 else 0 if lam[a] <= 0 and lam[b] <= 0 else (lp[a] - lp[b]) / (lam[a] - lam[b])) for b in range(n)] for a in range(n)]
+            J = mp.matrix(n, n)
+            for i in range(n):
+                for k in range(i, n):
+                    w = [Qm[i, a] * Qm[k, a] for a in range(n)]
+                    J[i, k] = J[k, i] = mp.fsum(w[a] * mp.fsum(Om[a][b] * w[b] for b in range(n)) for a in range(n))
+            d = mp.lu_solve(J, mp.matrix(F))
+            y = [y[i] - d[i] for i in range(n)]
+        else:
+            raise RuntimeError("exact NCM Newton did not converge")
+        dist = mp.sqrt(mp.fsum(((P[i][j] if i != j else 1) - A[i, j]) ** 2 for i in range(n) for j in range(n)))
+        rows = [[1.0 if i == j else float(P[i][j]) for j in range(n)] for i in range(n)]
+        zeros = sum(1 for l in lam if l < mp.mpf(10) ** -20)
+        return rows, float(dist), zeros
 
 
 def naive(Am):
@@ -127,12 +163,15 @@ def corr_e():
         s.add(vop, {"matrix": Mf}, {"symmetric": sym, "unit_diagonal": diag, "in_range": rng, "min_eigenvalue": me, "psd": psd, "valid": sym and diag and rng and psd},
               cls=I, verified=["mpmath-50 eigsy"], tags=["corr", "validate", key])
         X = higham(Am)
-        X2 = dual(Am)
+        X2, y2 = dual(Am)
         assert np.max(np.abs(X - X2)) < 1e-6, f"{key}: Higham and dual disagree {np.max(np.abs(X - X2)):.2e}"
         assert np.min(np.linalg.eigvalsh(X)) > -1e-12
         dist = float(np.sqrt(np.sum((X - Am) ** 2)))
-        out = {"matrix": [[float(x) for x in row] for row in X], "frobenius_distance": dist}
-        s.add(nop, {"matrix": Mf}, out, cls=I, verified=["independent-replay Higham-Dykstra", "dual BFGS (Qi-Sun)"], tags=["corr", "nearest", key],
+        rows, dist, _ = exact_ncm(Am, y2)
+        assert max(abs(rows[i][j] - X[i][j]) for i in range(len(X)) for j in range(len(X))) < 1e-9, f"{key}: exact NCM and Higham disagree"
+        X = np.array(rows)
+        out = {"matrix": rows, "frobenius_distance": dist}
+        s.add(nop, {"matrix": Mf}, out, cls=I, verified=["independent-replay Higham-Dykstra", "dual BFGS (Qi-Sun)", "mpmath-40 semismooth Newton (golden)"], tags=["corr", "nearest", key],
               limit=ENT)
         if me < 0:
             caught("corr_e", f"{key}: eigenvalue clip and rescale", float(np.max(np.abs(naive(Am) - X))), 2e-5)
@@ -157,15 +196,21 @@ def corr_e():
         Am = np.array(M, dtype=float)
         X = higham(Am, tol=1e-13)
         if len(M) > 1:
-            X2 = dual(Am)
+            X2, y2 = dual(Am)
             assert np.max(np.abs(X - X2)) < 1e-6, f"{key}: solvers disagree {np.max(np.abs(X - X2)):.1e}"
         ev = np.linalg.eigvalsh(X)
         assert ev.min() > -1e-10
-        out = {"matrix": X.tolist(), "frobenius_distance": float(np.sqrt(np.sum((X - Am) ** 2)))}
-        s.add(nop, {"matrix": [[float(x) for x in r] for r in M]}, out, cls=I, verified=["independent-replay Higham-Dykstra", "dual BFGS (Qi-Sun)"],
-              tags=["corr", "nearest", "edge", key] + (["rank-deficient"] if int((ev < 1e-8).sum()) >= 3 else []), limit=ENT)
+        if len(M) > 1:
+            rows, dist, nz = exact_ncm(Am, y2)
+            assert max(abs(rows[i][j] - X[i][j]) for i in range(len(M)) for j in range(len(M))) < 1e-9, f"{key}: exact NCM and Higham disagree"
+        else:
+            rows, dist, nz = [[1.0]], abs(1.0 - float(M[0][0])), 0
+        X = np.array(rows)
+        out = {"matrix": rows, "frobenius_distance": dist}
+        s.add(nop, {"matrix": [[float(x) for x in r] for r in M]}, out, cls=I, verified=["independent-replay Higham-Dykstra", "dual BFGS (Qi-Sun)", "mpmath-40 semismooth Newton (golden)"],
+              tags=["corr", "nearest", "edge", key] + (["rank-deficient"] if nz >= 3 else []), limit=ENT)
         if key == "rankdef20":
-            note(f"corr_e rankdef20: {int((ev < 1e-8).sum())} zero eigenvalues in the answer")
+            note(f"corr_e rankdef20: {nz} zero eigenvalues in the answer (40-digit Newton)")
             caught("corr_e", "rankdef20: eigenvalue clip and rescale", float(np.max(np.abs(naive(Am) - X))), 2e-5)
     # hand: 2x2 already valid; the Higham 3x3 values
     X3 = s.cases[1]["expected"]["outputs"]["matrix"]
