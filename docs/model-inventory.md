@@ -234,4 +234,9 @@ Entries added by the stage E spec A session. Status is "Specified" until the fou
 - **Purpose:** forward vol between expiries; scenario repricing under sticky-strike or sticky-delta; a historical vol-of-vol measure.
 - **Limitations:** smile dynamics are the two textbook regimes only, at fixed expiry; no sticky-local-vol regime, no time decay. Vol of vol is historical, not implied (no VVIX-style index; that is spec B's E-slice for VIX-style indices).
 - **Validation:** QuantLib `BlackVarianceCurve`, `SviSmileSection`, `blackFormula`, `BlackCalculator`, `IncrementalStatistics`. **Review:** 2026-11-08.
+| ME-A4 | FX smile: delta and ATM conventions, RR/BF strikes, Garman-Kohlhagen | `05-volatility/fx-smile.md` | E3 | Specified, outside-checked | 114 of 114 value cases |
 
+### ME-A4 FX smile and Garman-Kohlhagen
+- **Purpose:** FX vanilla prices and Greeks; strikes from delta quotes under the four market delta types and three ATM types.
+- **Limitations:** flat continuous rates; no spot lag, premium or delivery date (ruling E-A9); smile strangle only, no broker strangle (E-A11); no smile interpolation between the quoted pillars.
+- **Validation:** QuantLib `BlackDeltaCalculator`, Black-Scholes-Merton engine. **Review:** 2026-11-08.
