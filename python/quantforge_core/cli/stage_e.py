@@ -459,3 +459,45 @@ def _fd(i: Inputs) -> Any:
     args = (*_option_common(i), i.enum("exercise", ("AMERICAN", "EUROPEAN")), g.integer("nx"),
             g.integer("nt"), g.real("width"))
     return E.exotics.fd(*args)
+
+
+# E8: CDS options, copulas, large pool (04-pricing/credit-options-and-copulas.md)
+
+def _cds_option(i: Inputs) -> tuple[Any, ...]:
+    return (i.date("as_of"), i.date("expiry"), i.date("maturity"), i.real("rate"),
+            i.real("hazard_rate"), i.real("recovery"), i.enum("type", ("PAYER", "RECEIVER")),
+            i.real("strike"), i.real("notional"))
+
+
+@op("credit.cdsoption.price")
+def _cds_option_price(i: Inputs) -> Any:
+    args = (*_cds_option(i), i.real("vol"), i.boolean("knock_out"))
+    return E.credit_e8.cds_option_price(*args)
+
+
+@op("credit.cdsoption.implied_vol")
+def _cds_option_implied(i: Inputs) -> Any:
+    args = (*_cds_option(i), i.real("premium"), i.boolean("knock_out"))
+    return {"vol": E.credit_e8.cds_option_implied(*args)}
+
+
+@op("credit.copula.joint_default")
+def _joint_default(i: Inputs) -> Any:
+    args = (i.enum("copula", ("GAUSSIAN", "STUDENT_T")), i.reals("default_probabilities"),
+            i.real("correlation"), i.opt_real("degrees_of_freedom"))
+    return E.credit_e8.joint_default(*args)
+
+
+def _pool(i: Inputs) -> tuple[float, float, float]:
+    return i.real("default_probability"), i.real("correlation"), i.real("recovery")
+
+
+@op("credit.lhp.tranche_loss")
+def _tranche_loss(i: Inputs) -> Any:
+    args = (*_pool(i), i.real("attachment"), i.real("detachment"))
+    return {"expected_loss_fraction": E.credit_e8.tranche_loss(*args)}
+
+
+@op("credit.lhp.loss_cdf")
+def _loss_cdf(i: Inputs) -> Any:
+    return {"cdf": E.credit_e8.loss_cdf(*_pool(i), i.reals("losses"))}

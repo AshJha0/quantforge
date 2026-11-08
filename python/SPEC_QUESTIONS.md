@@ -176,3 +176,12 @@ Choices made where a stage E spec was silent or two rules pull apart. No golden 
   ruling or a corrected golden (for example `x_min = 4.61`) is asked for. No other check is added to fit it.
 - E-Q11 (E2, array caps). `strikes` and `u` fall under the stage C cap of 100 (every `vol.` operation, as
   E-Q2); the E2 page names no limit except the SLV grid (`nx`, `nv` 1000, `nt` 10,000), checked at the gate.
+- E-Q12 (E8, `credit.cdsoption.implied_vol`, golden `creditopt_e-0055`). The page says `E_DOMAIN` for a
+  premium "at or below the zero-vol value, or at or above the upper bound". The golden is an out-of-the-money
+  knock-out payer (forward 1.18877% against a 1.20% strike), so the zero-vol value is 0, with `premium = 1.0`
+  on 10m notional. By the page that premium has an implied vol: Python finds 0.5397%, which reprices to
+  1.0 within 1e-12. The golden expects `E_DOMAIN` ("premium below the zero-vol value"). Python follows the
+  page and fails this one golden. Either the golden needs a premium at or below 0, or the page needs a stated
+  lower vol bound (as E-B10 gives for the cap strip), which Python would then apply.
+- E-Q13 (E8, `credit.copula.joint_default`). `default_probabilities` must hold exactly two values
+  (`E_INPUT` otherwise); the page does not say, and this check runs first.
