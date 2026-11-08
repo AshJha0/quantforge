@@ -53,3 +53,7 @@ Read:
 - `specifications/edge-case-register.md` (rows EA10 to EA13)
 
 Notes for builds: use the little-trap characteristic function; prices are judged to 1e-8 per unit. The SLV goldens are a recipe check: follow the scheme in `heston-family.md` step by step, including the floor and the smooth conditional-variance estimate.
+
+### E1 rulings on the R5 audit (2026-11-08)
+
+Rulings E-A15 to E-A18 in `specifications/stage-e-rulings.md`. Changes builds must make: the Lee wing test is `>= 2` (was `> 2`). New goldens appended to `surf_e.json` (`surf_e-0029` to `-0032`) and `lv_e.json` (`lv_e-0040` to `-0043`); no existing case changed. Re-read `05-volatility/arb-free-surfaces.md` (wing rule, citations) and `local-and-forward-vol.md` (citations only).

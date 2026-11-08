@@ -8,7 +8,7 @@ Set before any stage E code (plan section 8). "Oracle measured" is from `oracle/
 
 | Item | Target | Oracle | Oracle measured |
 |---|---|---|---|
-| `vol.svi.surface_check` lists, flag | Exact | QuantLib `SviSmileSection` total variance (calendar) and the sign of its numerical density (butterfly); wing algebra on inputs; Vogt counterexample [GJ14 section 5] | 9 of 9 value cases reproduced by QuantLib |
+| `vol.svi.surface_check` lists, flag | Exact (partly outside: wing lists are algebra on inputs) | QuantLib `SviSmileSection` total variance (calendar) and the sign of its numerical density (butterfly); wing algebra on inputs; Vogt counterexample [GJ14 Example 3.1] | 9 of 9 value cases reproduced by QuantLib |
 | `vol.ssvi.to_svi` | `simple_analytic` | Closed form; replay through stage C SSVI evaluate | Within 1e-15 at five `k` per case |
 | `vol.svi.fit_surface` | Parameters and `rmse` within 1e-6 absolute; lists exact | Known truth, SciPy, four starts | Truth within 1e-7, starts agree within 1e-7 |
 | `vol.local.dupire` | `interpolation` | Closed form; 40-digit price-based Dupire `2 C_T/(K^2 C_KK)` from Black prices | Within 1e-9 relative at every point |
@@ -18,7 +18,7 @@ Set before any stage E code (plan section 8). "Oracle measured" is from `oracle/
 
 Guards: `|g| > 1e-6` and calendar gaps above 1e-9 on every check-grid point; `|g| > 1e-4` and `w_T > 1e-6` at every Dupire point of a value case; Lee slopes and wing slope gaps 1e-6 from their thresholds.
 
-Outside-oracle share (E1): 31 of 67 cases (46%); error cases are in the denominator. The stage floor of 60% applies to the stage as a whole; E2, E3 and E5 are mostly QuantLib engines and carry the share. The running total is in `oracle/OUTSIDE_E_A.md`.
+Outside-oracle share (E1), recounted under ruling E-A17: 16 of 75 cases (21%): forward vol, sticky-strike dynamics and vol of vol. The 9 surface checks and 6 sticky-delta cases match QuantLib but carry outputs from the spec's own algebra, so they are listed as partly outside and not counted. Error cases are in the denominator. The stage floor of 60% applies to the stage as a whole; E2, E3 and E5 are mostly QuantLib engines and carry the share. The running total is in `oracle/OUTSIDE_E_A.md`.
 
 ## E3 FX smile
 
@@ -28,7 +28,7 @@ Outside-oracle share (E1): 31 of 67 cases (46%); error cases are in the denomina
 | `fx.delta.from_strike`, `fx.atm.strike` | `simple_analytic` | QuantLib `BlackDeltaCalculator` (`deltaFromStrike`, `atmStrike`) | All reproduced |
 | `fx.delta.to_strike`, `fx.smile.from_quotes` | 1e-10 absolute plus 1e-9 relative on strikes (far below a pip) | QuantLib `strikeFromDelta`; oracle solve to 1e-15 with a conditioning guard | QuantLib agrees within 2e-10 relative |
 
-Outside-oracle share (E3): 114 of 125 (91%); spec A running total in `oracle/OUTSIDE_E_A.md` (145 of 192, 75.5%).
+Outside-oracle share (E3): 114 of 125 (91%); spec A running total in `oracle/OUTSIDE_E_A.md`.
 
 ## E2 Heston, Bates, Merton, SLV
 

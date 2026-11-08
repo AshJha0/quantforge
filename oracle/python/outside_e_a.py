@@ -29,8 +29,10 @@ SUITES = ["surf_e", "lv_e", "fxs_e", "heston_e", "slv_e"]  # spec A suites; late
 
 
 class Used:
+    """Records the map rows a handler used, and any output it had to compute by the spec's own algebra (ruling E-A17)."""
     def __init__(self):
         self.rows = set()
+        self.self_outputs = set()
 
     def __call__(self, row, *a):
         self.rows.add(row)
@@ -41,6 +43,7 @@ class Used:
 def h_surface_check(u, x):
     """Total variance from QuantLib SviSmileSection; butterfly from the sign of QuantLib's numerical density;
     wing rules are the spec's algebra on the input parameters (asymptotic slopes, not a QuantLib quantity)."""
+    u.self_outputs |= {"wing_violations", "arbitrage_free"}
     secs = [u("SVI.RAW", s["expiry_years"], 1.0, s["svi"]) for s in x["slices"]]
     ks = x["log_moneyness"]
     bf, cal, wing = [], [], []
@@ -59,7 +62,7 @@ def h_surface_check(u, x):
     for j, s in enumerate(x["slices"]):
         sl, cl, sr, cr = asym(s["svi"])
         for side, v in (("LEFT", sl), ("RIGHT", sr)):
-            if v > 2:
+            if v >= 2:
                 wing.append({"expiry_index": j, "side": side, "kind": "LEE"})
         if j:
             pl, pcl, pr, pcr = asym(x["slices"][j - 1]["svi"])
@@ -96,6 +99,7 @@ def h_dynamics(u, x):
         bc = u("OPT.BLACK_CALC", x["option_type"], K, F0, v0 * math.sqrt(T), D)
         dvds = 0.0
         if x["rule"] == "STICKY_DELTA":
+            u.self_outputs.add("deltas")
             # spec: d sigma/dS = -(dsigma/dk)/S at fixed K; dsigma/dk from QuantLib's own smile, 4-point difference in k
             h = 1e-4
             vol = lambda kk: sec0.volatility(F0 * math.exp(kk))  # noqa: E731
@@ -233,6 +237,8 @@ def judge(case, got):
 
 def verify(show=True):
     reg, table = [], []
+    global partial
+    partial = []
     for suite in SUITES:
         p = ROOT / "datasets" / "golden" / "stage_e" / f"{suite}.json"
         if not p.exists():
@@ -248,7 +254,9 @@ def verify(show=True):
                 ok, why = judge(c, h(u, c["inputs"]))
             except (NotImplementedError, RuntimeError) as e:
                 ok, why = False, str(e)
-            if ok:
+            if ok and u.self_outputs:
+                partial.append({"case_id": c["case_id"], "operation": c["operation"], "outputs_self": sorted(u.self_outputs)})
+            elif ok:
                 k += 1
                 reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": CM.LIBRARY, "version": CM.VERSION,
                             "convention_rows": sorted(u.rows), "map_review": CM.REVIEW})
@@ -273,15 +281,17 @@ def main():
     reg, table = verify()
     k, n = sum(t[1] for t in table), sum(t[2] for t in table)
     L = ["# Stage E spec A: outside-oracle coverage", "", "Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, "
-         "reproduces every output within the case's own tolerance. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.", "",
+         "reproduces every output within the case's own tolerance, and every output is a QuantLib value or plain arithmetic on QuantLib values (ruling E-A17). "
+         "Cases where QuantLib matches but some output is the spec's own algebra (SVI wing lists, the sticky-delta smile term) are listed as partly outside and not counted. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.", "",
          "| Suite | Outside-oracle cases | Cases | Share |", "|---|---|---|---|"]
     L += [f"| `{s}` | {a} | {b} | {100 * a / b:.0f}% |" for s, a, b in table]
+    L += [f"| partly outside, not counted | {len(partial)} | | |"]
     L += [f"| **spec A total** | **{k}** | **{n}** | **{100 * k / max(n, 1):.1f}%** |", "", "Operations with no QuantLib route:", ""]
     L += [f"- `{op}`: {why}" for op, why in NO_ORACLE.items()]
     L += [""] + map_lines() + [""]
     (ROOT / "oracle" / "OUTSIDE_E_A.md").write_text("\n".join(L), encoding="utf-8", newline="\n")
     (ROOT / "oracle" / "outside_register_e_a.json").write_text(json.dumps({"rule": "plan 11.2.5", "library": CM.LIBRARY, "version": CM.VERSION, "map_review": CM.REVIEW,
-                                                                         "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
+                                                                         "cases": reg, "partly_outside_not_counted": partial}, indent=1) + "\n", encoding="utf-8", newline="\n")
     print("\n".join(L[:len(table) + 8]))
     return 0
 

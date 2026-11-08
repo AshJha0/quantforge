@@ -187,9 +187,9 @@ Entries added by the stage E spec A session. Status is "Specified" until the fou
 
 | # | Model | Spec | Stage | Status | Outside-checked |
 |---|---|---|---|---|---|
-| ME-A1 | SVI surface arbitrage checks, SSVI to SVI, SVI surface fit | `05-volatility/arb-free-surfaces.md` | E1 | Specified, outside-checked | `vol.svi.surface_check` 9 of 9 value cases |
+| ME-A1 | SVI surface arbitrage checks, SSVI to SVI, SVI surface fit | `05-volatility/arb-free-surfaces.md` | E1 | Specified, outside-checked partly outside: 9 surface checks (wing lists are own algebra), not counted (E-A17) |
 | ME-A2 | Dupire local vol on SVI slices | `05-volatility/local-and-forward-vol.md` | E1 | Specified | none (40-digit independent route) |
-| ME-A3 | Forward vol, smile dynamics, vol of vol | `05-volatility/local-and-forward-vol.md` | E1 | Specified, outside-checked | 22 of 22 value cases |
+| ME-A3 | Forward vol, smile dynamics, vol of vol | `05-volatility/local-and-forward-vol.md` | E1 | Specified, outside-checked | 16 of 22 value cases; 6 sticky-delta cases partly outside (E-A17) |
 
 ### ME-A1 SVI surface checks and fit
 - **Purpose:** reject SVI surfaces with butterfly, calendar or wing arbitrage before they reach pricing.

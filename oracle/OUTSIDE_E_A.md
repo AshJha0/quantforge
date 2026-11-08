@@ -1,15 +1,16 @@
 # Stage E spec A: outside-oracle coverage
 
-Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, reproduces every output within the case's own tolerance. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.
+Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, reproduces every output within the case's own tolerance, and every output is a QuantLib value or plain arithmetic on QuantLib values (ruling E-A17). Cases where QuantLib matches but some output is the spec's own algebra (SVI wing lists, the sticky-delta smile term) are listed as partly outside and not counted. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.
 
 | Suite | Outside-oracle cases | Cases | Share |
 |---|---|---|---|
-| `surf_e` | 9 | 28 | 32% |
-| `lv_e` | 22 | 39 | 56% |
+| `surf_e` | 0 | 32 | 0% |
+| `lv_e` | 16 | 43 | 37% |
 | `fxs_e` | 114 | 125 | 91% |
 | `heston_e` | 18 | 38 | 47% |
 | `slv_e` | 0 | 8 | 0% |
-| **spec A total** | **163** | **238** | **68.5%** |
+| partly outside, not counted | 16 | | |
+| **spec A total** | **148** | **246** | **60.2%** |
 
 Operations with no QuantLib route:
 

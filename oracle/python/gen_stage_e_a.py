@@ -96,9 +96,9 @@ def surface_check(slices, ks, guard=True):
     for j, P in enumerate(Ps):
         sl, cl, sr, cr = wings(P)
         for side, s_ in (("LEFT", sl), ("RIGHT", sr)):
-            if guard:
+            if guard and s_ != 2.0:
                 away(s_, 2, 1e-6, "Lee slope")
-            if s_ > 2:
+            if s_ >= 2:   # ruling E-A15: GJ14 Lemma 2.2 needs slope strictly below 2
                 wing.append({"expiry_index": j, "side": side, "kind": "LEE"})
         if j:
             pl, pcl, pr, pcr = wings(Ps[j - 1])
@@ -260,6 +260,15 @@ def e1_surf():
               limit={"absolute": 1e-6, "relative": 0.0, "reason": "fit from exact quotes: parameters within 1e-6 (stage C SVI target); lists exact"})
     s.add(op, {"expiry_years": [1.0], "log_moneyness": kf[:4], "total_variance": [[0.04] * 4], "reject": False}, error="E_INPUT", cls=E, tags=["invalid"], description="fewer than 5 points")
     s.add(op, {"expiry_years": [1.0, 0.5], "log_moneyness": kf, "total_variance": [[0.04] * 9, [0.03] * 9], "reject": False}, error="E_INPUT", cls=E, tags=["invalid"])
+    # Audit rulings (R5, 2026-11-08), appended so earlier case ids stay put.
+    op = "vol.svi.surface_check"
+    edge = svi(0.02, 2.0, 0.0, 0.0, 0.05)   # b(1 +- rho) = 2 exactly in binary64
+    o = add([{"expiry_years": 0.5, "svi": edge}], [-0.05, 0.0, 0.05], ["wing", "lee", "boundary", "ruling"], "slope exactly 2: flagged on both sides (E-A15)")
+    assert o["wing_violations"] == [{"expiry_index": 0, "side": "LEFT", "kind": "LEE"}, {"expiry_index": 0, "side": "RIGHT", "kind": "LEE"}], o
+    caught("surf_e", "Lee test strict (> 2) passes a slope of exactly 2", len(o["wing_violations"]), 0)
+    s.add(op, {"slices": [{"expiry_years": 0.01 * (i + 1), "svi": SVI_A} for i in range(101)], "log_moneyness": KS, "reject": False}, error="E_LIMIT", cls=E, tags=["invalid", "limit", "ruling"], description="101 slices")
+    s.add(op, {"slices": SURF, "log_moneyness": [i * 1e-4 for i in range(10001)], "reject": False}, error="E_LIMIT", cls=E, tags=["invalid", "limit", "ruling"], description="10,001 grid points")
+    s.add(op, {"slices": SURF, "log_moneyness": KS}, error="E_SCHEMA", cls=E, tags=["invalid", "ruling"], description="reject missing")
     write(s)
 
 
@@ -360,6 +369,11 @@ def e1_lv():
     s.add(op, {"vols": [0.2, 0.21], "periods_per_year": 252, "method": "LOG"}, error="E_INPUT", cls=E, tags=["invalid"], description="at least 3 observations")
     s.add(op, {"vols": [0.2, 0.0, 0.21], "periods_per_year": 252, "method": "LOG"}, error="E_DOMAIN", cls=E, tags=["invalid"])
     s.add(op, {"vols": [0.2, 0.22, 0.21], "periods_per_year": 0, "method": "LOG"}, error="E_DOMAIN", cls=E, tags=["invalid"])
+    # Audit rulings (R5, 2026-11-08), appended.
+    s.add("vol.local.dupire", {"slices": SURF, "points": [{"expiry_years": 1.0, "log_moneyness": 0.0}] * 10001}, error="E_LIMIT", cls=E, tags=["invalid", "limit", "ruling"], description="10,001 points")
+    s.add("vol.smile.dynamics", {**base, "rule": "STICKY_MONEYNESS"}, error="E_SCHEMA", cls=E, tags=["invalid", "ruling"], description="unlisted rule")
+    s.add("vol.volofvol.measure", {"vols": ser, "periods_per_year": 252, "method": "PERCENT"}, error="E_SCHEMA", cls=E, tags=["invalid", "ruling"])
+    s.add("vol.forward.vol", {"expiry_years": [], "vols": []}, error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="empty term structure")
     write(s)
 
 

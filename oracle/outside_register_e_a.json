@@ -5,105 +5,6 @@
  "map_review": "self-reviewed 2026-11-08",
  "cases": [
   {
-   "case_id": "surf_e-0001",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0002",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0003",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0004",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0005",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0007",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0009",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0010",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0011",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
    "case_id": "lv_e-0007",
    "operation": "vol.forward.vol",
    "library": "QuantLib",
@@ -188,30 +89,6 @@
    "map_review": "self-reviewed 2026-11-08"
   },
   {
-   "case_id": "lv_e-0020",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0021",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
    "case_id": "lv_e-0022",
    "operation": "vol.smile.dynamics",
    "library": "QuantLib",
@@ -236,30 +113,6 @@
    "map_review": "self-reviewed 2026-11-08"
   },
   {
-   "case_id": "lv_e-0024",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0025",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
    "case_id": "lv_e-0026",
    "operation": "vol.smile.dynamics",
    "library": "QuantLib",
@@ -273,30 +126,6 @@
   },
   {
    "case_id": "lv_e-0027",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0028",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0029",
    "operation": "vol.smile.dynamics",
    "library": "QuantLib",
    "version": "1.44",
@@ -1834,6 +1663,130 @@
     "TS.FLAT_CONT"
    ],
    "map_review": "self-reviewed 2026-11-08"
+  }
+ ],
+ "partly_outside_not_counted": [
+  {
+   "case_id": "surf_e-0001",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0002",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0003",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0004",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0005",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0007",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0009",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0010",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0011",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0029",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "lv_e-0020",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0021",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0024",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0025",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0028",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0029",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
   }
  ]
 }
