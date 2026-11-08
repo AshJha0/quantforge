@@ -12,7 +12,7 @@ Sources:
 
 Array of `{expiry_years, svi}`, `svi` the stage C parameter object `{a, b, rho, m, sigma}`.
 
-Checks, in this order: array empty, or `expiry_years` not strictly increasing: `E_INPUT`. An `expiry_years <= 0`: `E_DOMAIN`. An `svi` outside the stage C domain: `E_DOMAIN`. More than 100 slices: `E_LIMIT`.
+Checks, in this order: array empty, or `expiry_years` not strictly increasing: `E_INPUT`. An `expiry_years <= 0`: `E_DOMAIN`. An `svi` outside the stage C domain: `E_DOMAIN`. More than 100 slices: `E_LIMIT`, checked at the gate before every rule check (`01-core/limits.md` B3; ruling E-A34).
 
 ## `vol.svi.surface_check`
 

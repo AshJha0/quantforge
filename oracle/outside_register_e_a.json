@@ -3277,6 +3277,16 @@
     "OPT.TYPE"
    ],
    "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "rulings_e_a-0003",
+   "operation": "vol.volofvol.measure",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "STAT.SAMPLE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
   }
  ],
  "partly_outside_not_counted": [

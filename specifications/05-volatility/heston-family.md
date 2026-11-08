@@ -2,7 +2,7 @@
 
 Spec version 1.0.0. Status: Specified. Stage E, slice E2 (spec A). `stage-e-rulings.md` is normative.
 
-Common inputs: `spot` (> 0), `expiry_years` `T` (> 0), `rate` `r` and `dividend_yield` `q` (flat continuous, any sign), `option_type` (`CALL`, `PUT`). `F = S e^{(r-q)T}`. Errors in input order; `E_INPUT` for array shape before `E_DOMAIN` for values.
+Common inputs: `spot` (> 0), `expiry_years` `T` (> 0), `rate` `r` and `dividend_yield` `q` (flat continuous, any sign), `option_type` (`CALL`, `PUT`). `F = S e^{(r-q)T}`. Every `E_INPUT` rule of an operation comes before every `E_DOMAIN` rule; within each code, input order (ruling E-A37). `strikes` and `u` are capped at 100 (stage C ruling C10; `E_LIMIT` at the gate, ruling E-A35).
 
 Sources:
 - [Hes93] S. Heston, "A closed-form solution for options with stochastic volatility", *Review of Financial Studies* 6(2), 1993, pp. 327-343.

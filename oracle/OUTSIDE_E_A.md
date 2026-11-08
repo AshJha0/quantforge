@@ -11,8 +11,9 @@ Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built
 | `slv_e` | 0 | 8 | 0% |
 | `exotic_e` | 110 | 128 | 86% |
 | `american_e` | 12 | 46 | 26% |
+| `rulings_e_a` | 1 | 17 | 6% |
 | partly outside, not counted | 16 | | |
-| **spec A total** | **279** | **429** | **65.0%** |
+| **spec A total** | **280** | **446** | **62.8%** |
 
 Operations with no QuantLib route:
 

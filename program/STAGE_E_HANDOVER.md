@@ -85,3 +85,14 @@ Rulings E-A25 to E-A33 in `specifications/stage-e-rulings.md`. What builds must 
 - SLV goldens are now judged to 1e-7.
 
 New goldens are appended to `heston_e`, `exotic_e` and `american_e`; no existing case id moved. Re-read `heston-family.md`, `exotics.md`, `fx-smile.md` (citations only) and `stage-e-targets-a.md`.
+
+### Rulings E-A34 to E-A40 on the cross-language spec questions (2026-11-08)
+
+New suite `datasets/golden/stage_e/rulings_e_a.json` (17 cases). What builds must change:
+- C++, Java: `E_LIMIT` at the gate (E-A34).
+- C++, Java, Rust: the cap of 100 on unstated `vol.*` lists, and 10,000 on vol-of-vol series (E-A35).
+- Python, Rust: `vol.forward.vol` first expiry `<= 0` is `E_DOMAIN` (E-A36).
+- C++: SLV `E_INPUT` rules before `E_DOMAIN` (E-A37).
+- Rust: Asian checks in input order (E-A38).
+- Others than Rust: the Kirk, basket and FD checks (E-A39, E-A40).
+Re-read `stage-e-rulings.md`, `arb-free-surfaces.md`, `local-and-forward-vol.md`, `heston-family.md`, `exotics.md`.
