@@ -54,12 +54,20 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 
 | # | Edge case | State | Golden cases | Notes |
 |---|---|---|---|---|
-| EA1 | Butterfly arbitrage in a quoted smile | Pinned | `surf_e-0005`, `surf_e-0006` (reject), `lv_e-0004` (local vol refused) | Vogt parameters, the published counterexample in Gatheral-Jacquier 2014 section 5 |
+| EA1 | Butterfly arbitrage in a quoted smile | Pinned | `surf_e-0005`, `surf_e-0006` (reject), `lv_e-0004` (local vol refused) | Vogt parameters, the published counterexample in Gatheral-Jacquier 2014 Example 3.1 |
 | EA2 | Calendar arbitrage, inside the grid and beyond it | Pinned | Inside: `surf_e-0007`, `surf_e-0008`, `surf_e-0025`, `surf_e-0026`, `lv_e-0003`, `lv_e-0013`. Beyond the grid (wing slopes): `surf_e-0010`; tie on equal slopes: `surf_e-0011` | Ruling E-A2 |
-| EA3 | Wings steeper than the moment bound | Pinned | `surf_e-0009` | Lee 2004: total-variance wing slope at most 2 |
+| EA3 | Wings at or above the moment bound | Pinned | Above: `surf_e-0009` (2.25). Exactly 2: `surf_e-0029` | Lee 2004 bounds the slope by 2; a slope of exactly 2 is flagged (ruling E-A15) |
 | EA4 | Zero forward variance between expiries | Pinned | `lv_e-0017` | Allowed, returns 0 (ruling E-A5) |
 | EA5 | Negative rates in smile dynamics | Pinned | `lv_e-0026` to `lv_e-0029` (`rate` -0.5%) | Forward below spot; no special case |
 | EA6 | Local vol at an expiry node and outside the slice range | Pinned | `lv_e-0001` (points at 1y and 2y nodes, at 0.1y and 3y) | Right-hand derivative at nodes, flat vol outside (ruling E-A4) |
 | EA7 | Premium-adjusted call delta: two strikes, and a delta no strike reaches | Pinned | Upper root: the `fx.delta.to_strike` cases tagged `spot_pa`, `forward_pa` in `fxs_e`; above the maximum: the `fxs_e` case tagged `premium-adjusted` (`E_DOMAIN`) | Ruling E-A10 |
 | EA8 | Broker (market) strangle | Out of scope | | Needs a fitted smile and a solve against it (ruling E-A11); planned with the SABR/SVI FX smile fit in a later stage. Stage E quotes are smile strangles |
 | EA9 | Domestic rate below foreign (negative carry), long-dated FX | Pinned | USDJPY-like and 5-year cases in `fxs_e` (`domestic_rate` 0.10% against 4.50%; expiry 1825 days) | |
+| EA10 | Heston near zero vol of variance | Pinned | The `heston_e` cases tagged `small-vol-of-vol` (`xi` 1e-3, 1e-2) | Plan section 8: average variance, near zero not at it. `xi = 0` is `E_DOMAIN` (ruling E-A12) |
+| EA11 | Heston at long maturity with high vol of variance (branch cut) | Pinned | 5-year, `xi = 1`, `rho = -0.9` cases in `heston_e` | Ruling E-A13 |
+| EA12 | Merton with no jumps | Pinned | The `heston_e` cases tagged `no-jumps` | Equals Black-Scholes |
+| EA13 | Feller condition broken in SLV | Out of scope | | The SLV reference scheme puts a no-flux boundary at `v = dv/2`; goldens keep `2 kappa theta > xi^2`. Accumulation at `v = 0` needs a different `v` grid; with the stage G model work |
+| EA14 | Barrier already touched at valuation | Pinned | The `exotic_e` cases tagged `knocked` (`E_DOMAIN`, on and beyond the barrier) | Ruling E-A19 |
+| EA15 | Negative rates in exotics | Pinned | Digitals on the `rate` -0.5% market in `exotic_e` | |
+| EA16 | Arithmetic Asians; discrete barrier monitoring | Out of scope | | Arithmetic Asians need Monte Carlo or an approximation (Turnbull-Wakeman); discrete monitoring needs the Broadie-Glasserman shift. Both with the stage J simulation work |
+| EA17 | Lookback at zero carry | Pinned | The `exotic_e` case tagged `ruling` with `dividend_yield` equal to `rate` (`E_DOMAIN`) | Ruling E-A20 |

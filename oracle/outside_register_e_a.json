@@ -5,105 +5,6 @@
  "map_review": "self-reviewed 2026-11-08",
  "cases": [
   {
-   "case_id": "surf_e-0001",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0002",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0003",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0004",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0005",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0007",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0009",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0010",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "surf_e-0011",
-   "operation": "vol.svi.surface_check",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "SVI.DENSITY",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
    "case_id": "lv_e-0007",
    "operation": "vol.forward.vol",
    "library": "QuantLib",
@@ -188,30 +89,6 @@
    "map_review": "self-reviewed 2026-11-08"
   },
   {
-   "case_id": "lv_e-0020",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0021",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
    "case_id": "lv_e-0022",
    "operation": "vol.smile.dynamics",
    "library": "QuantLib",
@@ -236,30 +113,6 @@
    "map_review": "self-reviewed 2026-11-08"
   },
   {
-   "case_id": "lv_e-0024",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0025",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
    "case_id": "lv_e-0026",
    "operation": "vol.smile.dynamics",
    "library": "QuantLib",
@@ -273,30 +126,6 @@
   },
   {
    "case_id": "lv_e-0027",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0028",
-   "operation": "vol.smile.dynamics",
-   "library": "QuantLib",
-   "version": "1.44",
-   "convention_rows": [
-    "OPT.BLACK_CALC",
-    "OPT.BLACK_FORMULA",
-    "SVI.RAW"
-   ],
-   "map_review": "self-reviewed 2026-11-08"
-  },
-  {
-   "case_id": "lv_e-0029",
    "operation": "vol.smile.dynamics",
    "library": "QuantLib",
    "version": "1.44",
@@ -1618,6 +1447,1762 @@
     "FX.DELTA_TYPE"
    ],
    "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0001",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0002",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0003",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0004",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0005",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0006",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0007",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0008",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0009",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0010",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0011",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0012",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0023",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0024",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0025",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0026",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0027",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0028",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0001",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0002",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0003",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0004",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0005",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0006",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0007",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0008",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0009",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0010",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0011",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0012",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0013",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0014",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0015",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0016",
+   "operation": "exotic.digital.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "OPT.TYPE",
+    "PAY.DIGITAL"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0018",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0019",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0020",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0021",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0022",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0023",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0024",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0025",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0026",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0027",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0028",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0029",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0030",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0031",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0032",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0033",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0034",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0035",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0036",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0037",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0038",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0039",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0040",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0041",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0042",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0043",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0044",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0045",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0046",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0047",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0048",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0049",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0050",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0051",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0052",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0053",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0054",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0055",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0056",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0057",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0058",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0059",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0060",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0061",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0062",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0063",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0064",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0065",
+   "operation": "exotic.barrier.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BARRIER.TYPE",
+    "BSM.PROCESS",
+    "ENG.BARRIER",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0069",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_CONT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0070",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_DISC",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0071",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_CONT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0072",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_DISC",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0073",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_CONT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0074",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_DISC",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0075",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_CONT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0076",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_DISC",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0077",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_CONT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0078",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_DISC",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0079",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_CONT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0080",
+   "operation": "exotic.asian.geometric",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.ASIAN_GEO_DISC",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0083",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0084",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0085",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0086",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0087",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0088",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0089",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0090",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0091",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0092",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0093",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0094",
+   "operation": "exotic.lookback.floating",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.LOOKBACK_FLOAT",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0097",
+   "operation": "exotic.quanto.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.QUANTO",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0098",
+   "operation": "exotic.quanto.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.QUANTO",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0099",
+   "operation": "exotic.quanto.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.QUANTO",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0100",
+   "operation": "exotic.quanto.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.QUANTO",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0101",
+   "operation": "exotic.quanto.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.QUANTO",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0102",
+   "operation": "exotic.quanto.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.QUANTO",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0104",
+   "operation": "exotic.chooser.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.CHOOSER"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0105",
+   "operation": "exotic.chooser.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.CHOOSER"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0106",
+   "operation": "exotic.chooser.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.CHOOSER"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0107",
+   "operation": "exotic.chooser.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.CHOOSER"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0108",
+   "operation": "exotic.chooser.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.CHOOSER"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0109",
+   "operation": "exotic.chooser.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.CHOOSER"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0111",
+   "operation": "exotic.spread.kirk",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "ENG.KIRK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0112",
+   "operation": "exotic.spread.kirk",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "ENG.KIRK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "exotic_e-0113",
+   "operation": "exotic.spread.kirk",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "ENG.KIRK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0022",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0023",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0024",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0025",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0026",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0027",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0028",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0029",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0030",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0031",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0032",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "american_e-0033",
+   "operation": "exotic.american.baw",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BSM.PROCESS",
+    "ENG.BAW",
+    "OPT.TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  }
+ ],
+ "partly_outside_not_counted": [
+  {
+   "case_id": "surf_e-0001",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0002",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0003",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0004",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0005",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0007",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0009",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0010",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0011",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "surf_e-0029",
+   "operation": "vol.svi.surface_check",
+   "outputs_self": [
+    "arbitrage_free",
+    "wing_violations"
+   ]
+  },
+  {
+   "case_id": "lv_e-0020",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0021",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0024",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0025",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0028",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
+  },
+  {
+   "case_id": "lv_e-0029",
+   "operation": "vol.smile.dynamics",
+   "outputs_self": [
+    "deltas"
+   ]
   }
  ]
 }

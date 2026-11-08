@@ -96,9 +96,9 @@ def surface_check(slices, ks, guard=True):
     for j, P in enumerate(Ps):
         sl, cl, sr, cr = wings(P)
         for side, s_ in (("LEFT", sl), ("RIGHT", sr)):
-            if guard:
+            if guard and s_ != 2.0:
                 away(s_, 2, 1e-6, "Lee slope")
-            if s_ > 2:
+            if s_ >= 2:   # ruling E-A15: GJ14 Lemma 2.2 needs slope strictly below 2
                 wing.append({"expiry_index": j, "side": side, "kind": "LEE"})
         if j:
             pl, pcl, pr, pcr = wings(Ps[j - 1])
@@ -260,6 +260,15 @@ def e1_surf():
               limit={"absolute": 1e-6, "relative": 0.0, "reason": "fit from exact quotes: parameters within 1e-6 (stage C SVI target); lists exact"})
     s.add(op, {"expiry_years": [1.0], "log_moneyness": kf[:4], "total_variance": [[0.04] * 4], "reject": False}, error="E_INPUT", cls=E, tags=["invalid"], description="fewer than 5 points")
     s.add(op, {"expiry_years": [1.0, 0.5], "log_moneyness": kf, "total_variance": [[0.04] * 9, [0.03] * 9], "reject": False}, error="E_INPUT", cls=E, tags=["invalid"])
+    # Audit rulings (R5, 2026-11-08), appended so earlier case ids stay put.
+    op = "vol.svi.surface_check"
+    edge = svi(0.02, 2.0, 0.0, 0.0, 0.05)   # b(1 +- rho) = 2 exactly in binary64
+    o = add([{"expiry_years": 0.5, "svi": edge}], [-0.05, 0.0, 0.05], ["wing", "lee", "boundary", "ruling"], "slope exactly 2: flagged on both sides (E-A15)")
+    assert o["wing_violations"] == [{"expiry_index": 0, "side": "LEFT", "kind": "LEE"}, {"expiry_index": 0, "side": "RIGHT", "kind": "LEE"}], o
+    caught("surf_e", "Lee test strict (> 2) passes a slope of exactly 2", len(o["wing_violations"]), 0)
+    s.add(op, {"slices": [{"expiry_years": 0.01 * (i + 1), "svi": SVI_A} for i in range(101)], "log_moneyness": KS, "reject": False}, error="E_LIMIT", cls=E, tags=["invalid", "limit", "ruling"], description="101 slices")
+    s.add(op, {"slices": SURF, "log_moneyness": [i * 1e-4 for i in range(10001)], "reject": False}, error="E_LIMIT", cls=E, tags=["invalid", "limit", "ruling"], description="10,001 grid points")
+    s.add(op, {"slices": SURF, "log_moneyness": KS}, error="E_SCHEMA", cls=E, tags=["invalid", "ruling"], description="reject missing")
     write(s)
 
 
@@ -360,6 +369,11 @@ def e1_lv():
     s.add(op, {"vols": [0.2, 0.21], "periods_per_year": 252, "method": "LOG"}, error="E_INPUT", cls=E, tags=["invalid"], description="at least 3 observations")
     s.add(op, {"vols": [0.2, 0.0, 0.21], "periods_per_year": 252, "method": "LOG"}, error="E_DOMAIN", cls=E, tags=["invalid"])
     s.add(op, {"vols": [0.2, 0.22, 0.21], "periods_per_year": 0, "method": "LOG"}, error="E_DOMAIN", cls=E, tags=["invalid"])
+    # Audit rulings (R5, 2026-11-08), appended.
+    s.add("vol.local.dupire", {"slices": SURF, "points": [{"expiry_years": 1.0, "log_moneyness": 0.0}] * 10001}, error="E_LIMIT", cls=E, tags=["invalid", "limit", "ruling"], description="10,001 points")
+    s.add("vol.smile.dynamics", {**base, "rule": "STICKY_MONEYNESS"}, error="E_SCHEMA", cls=E, tags=["invalid", "ruling"], description="unlisted rule")
+    s.add("vol.volofvol.measure", {"vols": ser, "periods_per_year": 252, "method": "PERCENT"}, error="E_SCHEMA", cls=E, tags=["invalid", "ruling"])
+    s.add("vol.forward.vol", {"expiry_years": [], "vols": []}, error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="empty term structure")
     write(s)
 
 
@@ -560,7 +574,746 @@ def e3_fx():
     write(s)
 
 
-SLICES = {"E1": (e1_surf, e1_lv), "E3": (e3_fx,)}
+# ---------------------------------------------------------------- E2 Heston, Bates, Merton, SLV (spec 05-volatility/heston-family.md)
+import cmath  # noqa: E402
+
+import QuantLib as ql  # noqa: E402
+
+GL_T, GL_W = np.polynomial.legendre.leggauss(256)
+GL_T, GL_W = (GL_T + 1) * 100, GL_W * 100   # nodes on (0, 200)
+
+
+def phi_heston(u, T, v0, kappa, theta, xi, rho):
+    """E[exp(i u X)], X = ln(S_T/F): Albrecher et al. 'little trap' form."""
+    iu = 1j * u
+    b = kappa - rho * xi * iu
+    d = cmath.sqrt(b * b + xi * xi * (iu + u * u))
+    g = (b - d) / (b + d)
+    e = cmath.exp(-d * T)
+    C = kappa / xi ** 2 * ((b - d) * T - 2 * cmath.log((1 - g * e) / (1 - g)))
+    D = (b - d) / xi ** 2 * (1 - e) / (1 - g * e)
+    return cmath.exp(C * theta + D * v0)
+
+
+def phi_jump(u, T, lam, mu, delta):
+    kbar = math.exp(mu + delta * delta / 2) - 1
+    return cmath.exp(lam * T * (cmath.exp(1j * u * mu - delta * delta * u * u / 2) - 1 - 1j * u * kbar))
+
+
+def lewis(phi, S, K, T, r, q, ot):
+    """Call by Lewis (2001) single integral; Gauss-Legendre 256 nodes on u in (0, 200). Put by parity."""
+    F = S * math.exp((r - q) * T)
+    k = math.log(F / K)
+    tot = 0.0
+    for u, w in zip(GL_T, GL_W):
+        tot += w * (cmath.exp(1j * u * k) * phi(u - 0.5j)).real / (u * u + 0.25)
+    c = math.exp(-r * T) * (F - math.sqrt(F * K) / math.pi * tot)
+    return c if ot == "CALL" else c - math.exp(-r * T) * (F - K)
+
+
+def mp_lewis(phi_mp, S, K, T, r, q, ot):
+    mp.mp.dps = 30
+    F = mp.mpf(S) * mp.e ** ((mp.mpf(r) - q) * T)
+    k = mp.log(F / K)
+    I_ = mp.quad(lambda u: mp.re(mp.e ** (1j * u * k) * phi_mp(u - 0.5j)) / (u * u + 0.25), [0, 1, 10, 100, mp.inf])
+    c = mp.e ** (-mp.mpf(r) * T) * (F - mp.sqrt(F * K) / mp.pi * I_)
+    return float(c if ot == "CALL" else c - mp.e ** (-mp.mpf(r) * T) * (F - K))
+
+
+def mp_phi_heston(T, v0, kappa, theta, xi, rho, lam=0.0, mu=0.0, delta=0.0):
+    def f(u):
+        iu = 1j * u
+        b = kappa - rho * xi * iu
+        d = mp.sqrt(b * b + xi * xi * (iu + u * u))
+        g = (b - d) / (b + d)
+        e = mp.e ** (-d * T)
+        C = kappa / mp.mpf(xi) ** 2 * ((b - d) * T - 2 * mp.log((1 - g * e) / (1 - g)))
+        D = (b - d) / mp.mpf(xi) ** 2 * (1 - e) / (1 - g * e)
+        out = mp.e ** (C * theta + D * v0)
+        if lam:
+            kb = mp.e ** (mp.mpf(mu) + mp.mpf(delta) ** 2 / 2) - 1
+            out *= mp.e ** (lam * T * (mp.e ** (1j * u * mu - mp.mpf(delta) ** 2 * u * u / 2) - 1 - 1j * u * kb))
+        return out
+    return f
+
+
+def ql_heston(S, K, T, r, q, ot, v0, kappa, theta, xi, rho, jumps=None):
+    ref = ql.Date(6, 11, 2026)
+    ql.Settings.instance().evaluationDate = ref
+    d = round(T * 365)
+    assert d / 365 == T
+    rt = ql.YieldTermStructureHandle(ql.FlatForward(ref, r, ql.Actual365Fixed(), ql.Continuous))
+    qt = ql.YieldTermStructureHandle(ql.FlatForward(ref, q, ql.Actual365Fixed(), ql.Continuous))
+    sq = ql.QuoteHandle(ql.SimpleQuote(S))
+    if jumps:
+        lam, mu, de = jumps
+        eng = ql.BatesEngine(ql.BatesModel(ql.BatesProcess(rt, qt, sq, v0, kappa, theta, xi, rho, lam, mu, de)), 1e-13, 1000000)
+    else:
+        eng = ql.AnalyticHestonEngine(ql.HestonModel(ql.HestonProcess(rt, qt, sq, v0, kappa, theta, xi, rho)), 1e-13, 1000000)
+    o = ql.VanillaOption(ql.PlainVanillaPayoff(ql.Option.Call if ot == "CALL" else ql.Option.Put, K), ql.EuropeanExercise(ref + d))
+    o.setPricingEngine(eng)
+    return o.NPV()
+
+
+def merton(S, K, T, r, q, ot, v, lam, mu, delta):
+    kbar = math.exp(mu + delta * delta / 2) - 1
+    lp = lam * (1 + kbar)
+    tot, n, cum = 0.0, 0, 0.0
+    while True:
+        wgt = math.exp(-lp * T + n * math.log(lp * T) - math.lgamma(n + 1)) if lp > 0 else (1.0 if n == 0 else 0.0)
+        vn = math.sqrt(v * v + n * delta * delta / T)
+        rn = r - lam * kbar + n * math.log(1 + kbar) / T
+        tot += wgt * bs(ot, S, K, T, rn, q, vn)[0]
+        cum += wgt
+        n += 1
+        if cum >= 1 - 1e-16 or n > 200:
+            break
+    return tot
+
+
+def ql_merton(S, K, T, r, q, ot, v, lam, mu, delta):
+    ref = ql.Date(6, 11, 2026)
+    ql.Settings.instance().evaluationDate = ref
+    d = round(T * 365)
+    rt = ql.YieldTermStructureHandle(ql.FlatForward(ref, r, ql.Actual365Fixed(), ql.Continuous))
+    qt = ql.YieldTermStructureHandle(ql.FlatForward(ref, q, ql.Actual365Fixed(), ql.Continuous))
+    vt = ql.BlackVolTermStructureHandle(ql.BlackConstantVol(ref, ql.NullCalendar(), v, ql.Actual365Fixed()))
+    pr = ql.Merton76Process(ql.QuoteHandle(ql.SimpleQuote(S)), qt, rt, vt, ql.QuoteHandle(ql.SimpleQuote(lam)), ql.QuoteHandle(ql.SimpleQuote(mu)), ql.QuoteHandle(ql.SimpleQuote(delta)))
+    o = ql.VanillaOption(ql.PlainVanillaPayoff(ql.Option.Call if ot == "CALL" else ql.Option.Put, K), ql.EuropeanExercise(ref + d))
+    o.setPricingEngine(ql.JumpDiffusionEngine(pr, 1e-14, 1000))
+    return o.NPV()
+
+
+HP = [  # S, days, r, q, v0, kappa, theta, xi, rho
+    (100.0, 365, 0.03, 0.01, 0.04, 1.5, 0.04, 0.5, -0.7),
+    (100.0, 91, 0.05, 0.0, 0.09, 3.0, 0.05, 0.8, -0.5),
+    (100.0, 730, 0.02, 0.02, 0.03, 0.8, 0.06, 0.3, -0.3),
+    (100.0, 1825, -0.005, 0.0, 0.05, 2.0, 0.045, 1.0, -0.9),
+    (100.0, 182, 0.04, 0.03, 0.0625, 1.0, 0.04, 0.4, 0.3),
+]
+HK = [70.0, 90.0, 100.0, 110.0, 140.0]
+PLIM = {"absolute": 1e-8, "relative": 1e-9, "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"}
+
+
+def e2_heston():
+    s = S("heston_e", "05-volatility/heston-family.md")
+    vq = [QLV, "mpmath-lewis-30-digits", "lewis-gauss-legendre-256-on-0-200"]
+    op = "vol.heston.price"
+    for S0, days, r, q, v0, ka, th, xi, rho in HP:
+        T = days / 365
+        prm = {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": rho}
+        for ot in ("CALL", "PUT"):
+            ph = lambda u: phi_heston(u, T, v0, ka, th, xi, rho)  # noqa: E731
+            pr = [lewis(ph, S0, K, T, r, q, ot) for K in HK]
+            for K, p in zip(HK, pr):
+                a1 = mp_lewis(mp_phi_heston(T, v0, ka, th, xi, rho), S0, K, T, r, q, ot)
+                a2 = ql_heston(S0, K, T, r, q, ot, v0, ka, th, xi, rho)
+                assert abs(p - a1) < 1e-10 and abs(p - a2) < 1e-9, (K, p, a1, a2)
+            s.add(op, {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": prm, "option_type": ot}, {"prices": pr},
+                  cls=Q, verified=vq, tags=["heston"] + (["negative-rate"] if r < 0 else []), limit=PLIM)
+    # Near-zero vol of vol (plan section 8): Black-Scholes with average variance, not v0, not theta.
+    S0, T, r, q, v0, ka, th = 100.0, 1.0, 0.03, 0.0, 0.09, 2.0, 0.04
+    for xi in (1e-3, 1e-2):
+        ph = lambda u: phi_heston(u, T, v0, ka, th, xi, -0.5)  # noqa: E731
+        # golden from 30-digit mpmath: in binary64 the kappa/xi^2 factor cancels about 1e-9 away at xi = 1e-3, inside the 1e-8 limit
+        pr = [mp_lewis(mp_phi_heston(T, v0, ka, th, xi, -0.5), S0, K, T, r, q, "CALL") for K in HK]
+        for K, p in zip(HK, pr):
+            assert abs(p - ql_heston(S0, K, T, r, q, "CALL", v0, ka, th, xi, -0.5)) < 1e-12
+            assert abs(p - lewis(ph, S0, K, T, r, q, "CALL")) < 5e-9
+        s.add(op, {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": -0.5}, "option_type": "CALL"},
+              {"prices": pr}, cls=Q, verified=[QLV, "mpmath-lewis-30-digits"], tags=["heston", "small-vol-of-vol"], limit=PLIM)
+        vbar = th + (v0 - th) * (1 - math.exp(-ka * T)) / (ka * T)
+        bsa = bs("CALL", S0, 100.0, T, r, q, math.sqrt(vbar))[0]
+        assert abs(pr[2] - bsa) < 0.05 * xi * 10, (xi, pr[2] - bsa)
+        if xi == 1e-3:
+            caught("heston_e", "small vol-of-vol limit = BS at sqrt(v0)", abs(bs("CALL", S0, 100.0, T, r, q, 0.3)[0] - pr[2]), 1e-8)
+            caught("heston_e", "small vol-of-vol limit = BS at sqrt(theta)", abs(bs("CALL", S0, 100.0, T, r, q, 0.2)[0] - pr[2]), 1e-8)
+    S0, days, r, q, v0, ka, th, xi, rho = HP[0]
+    T = days / 365
+    caught("heston_e", "rho sign flipped", abs(lewis(lambda u: phi_heston(u, T, v0, ka, th, xi, -rho), S0, 70.0, T, r, q, "PUT") - lewis(lambda u: phi_heston(u, T, v0, ka, th, xi, rho), S0, 70.0, T, r, q, "PUT")), 1e-8)
+    caught("heston_e", "xi^2 read as xi (variance of variance)", abs(lewis(lambda u: phi_heston(u, T, v0, ka, th, math.sqrt(xi), rho), S0, 70.0, T, r, q, "PUT") - lewis(lambda u: phi_heston(u, T, v0, ka, th, xi, rho), S0, 70.0, T, r, q, "PUT")), 1e-8)
+    b = {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": rho}, "option_type": "CALL"}
+    for k_, val in (("v0", 0.0), ("kappa", 0.0), ("theta", -0.01), ("xi", 0.0), ("rho", 1.0)):
+        s.add(op, {**b, "heston": {**b["heston"], k_: val}}, error="E_DOMAIN", cls=E, tags=["invalid"])
+    s.add(op, {**b, "strikes": []}, error="E_INPUT", cls=E, tags=["invalid"])
+    s.add(op, {**b, "strikes": [100.0, 0.0]}, error="E_DOMAIN", cls=E, tags=["invalid"])
+
+    # Characteristic function values, for builds to localise errors.
+    op = "vol.heston.cf"
+    us = [0.0, 0.5, 1.0, 5.0, 20.0]
+    for S0, days, r, q, v0, ka, th, xi, rho in HP[:3]:
+        T = days / 365
+        f = mp_phi_heston(T, v0, ka, th, xi, rho)
+        ph = [phi_heston(u, T, v0, ka, th, xi, rho) for u in us]
+        for u, z in zip(us, ph):
+            assert abs(complex(f(mp.mpf(u))) - z) < 1e-13
+        s.add(op, {"expiry_years": T, "heston": {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": rho}, "u": us},
+              {"re": [z.real for z in ph], "im": [z.imag for z in ph]}, cls=F, verified=["mpmath-30-digits", "analytic"], tags=["heston", "cf"])
+
+    # Bates.
+    op = "vol.bates.price"
+    for (S0, days, r, q, v0, ka, th, xi, rho), (lam, mu, de) in zip(HP[:3], ((0.3, -0.10, 0.15), (1.0, -0.05, 0.10), (0.1, 0.05, 0.20))):
+        T = days / 365
+        for ot in ("CALL", "PUT"):
+            ph = lambda u: phi_heston(u, T, v0, ka, th, xi, rho) * phi_jump(u, T, lam, mu, de)  # noqa: E731
+            pr = [lewis(ph, S0, K, T, r, q, ot) for K in HK]
+            for K, p in zip(HK, pr):
+                a1 = mp_lewis(mp_phi_heston(T, v0, ka, th, xi, rho, lam, mu, de), S0, K, T, r, q, ot)
+                a2 = ql_heston(S0, K, T, r, q, ot, v0, ka, th, xi, rho, (lam, mu, de))
+                assert abs(p - a1) < 1e-10 and abs(p - a2) < 1e-9, (K, p, a1, a2)
+            s.add(op, {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": rho},
+                       "jumps": {"intensity": lam, "mean_log_jump": mu, "log_jump_vol": de}, "option_type": ot}, {"prices": pr}, cls=Q, verified=vq, tags=["bates"], limit=PLIM)
+    S0, days, r, q, v0, ka, th, xi, rho = HP[0]
+    T = days / 365
+    good = lewis(lambda u: phi_heston(u, T, v0, ka, th, xi, rho) * phi_jump(u, T, .3, -.1, .15), S0, 70.0, T, r, q, "PUT")
+    caught("bates_e", "jump compensator omitted (not a martingale)", abs(lewis(lambda u: phi_heston(u, T, v0, ka, th, xi, rho) * cmath.exp(.3 * T * (cmath.exp(1j * u * -.1 - .15 ** 2 * u * u / 2) - 1)), S0, 70.0, T, r, q, "PUT") - good), 1e-8)
+    s.add(op, {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": rho},
+               "jumps": {"intensity": -0.1, "mean_log_jump": 0.0, "log_jump_vol": 0.1}, "option_type": "CALL"}, error="E_DOMAIN", cls=E, tags=["invalid"])
+
+    # Merton jump diffusion.
+    op = "vol.merton.price"
+    for S0, days, r, q, v, lam, mu, de in ((100.0, 365, 0.03, 0.01, 0.2, 0.5, -0.1, 0.2), (100.0, 91, 0.05, 0.0, 0.15, 2.0, -0.02, 0.05), (100.0, 1095, 0.02, 0.0, 0.25, 0.2, 0.1, 0.3), (100.0, 365, 0.03, 0.0, 0.2, 0.0, 0.0, 0.1)):
+        T = days / 365
+        for ot in ("CALL", "PUT"):
+            pr = [merton(S0, K, T, r, q, ot, v, lam, mu, de) for K in HK]
+            for K, p in zip(HK, pr):
+                a2 = mp_lewis(lambda u: mp.e ** (-mp.mpf(v) ** 2 * T / 2 * (u * u + 1j * u)) * mp.e ** (lam * T * (mp.e ** (1j * u * mu - mp.mpf(de) ** 2 * u * u / 2) - 1 - 1j * u * (mp.e ** (mp.mpf(mu) + mp.mpf(de) ** 2 / 2) - 1))), S0, K, T, r, q, ot)
+                a1 = lewis(lambda u: cmath.exp(-v * v * T / 2 * (u * u + 1j * u)) * phi_jump(u, T, lam, mu, de), S0, K, T, r, q, ot)
+                assert abs(p - a2) < 1e-9 and abs(p - a1) < 1e-9, (K, p, a1, a2)
+            s.add(op, {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "vol": v,
+                       "jumps": {"intensity": lam, "mean_log_jump": mu, "log_jump_vol": de}, "option_type": ot}, {"prices": pr}, cls=Q, verified=["mpmath-lewis-30-digits", "lewis-gauss-legendre-256-on-0-200", "poisson-series"],
+                      tags=["merton"] + (["no-jumps"] if lam == 0 else []), limit=PLIM)
+    mixed = sum(math.exp(-.5 * (1 + math.exp(-.1 + .02) - 1) * 1 + n * math.log(.5 * math.exp(-.08)) - math.lgamma(n + 1)) * bs("CALL", 100, 100, 1, .03 - .5 * (math.exp(-.08) - 1) + n * (-.08), .01, math.sqrt(.04 + n * .04))[0] * math.exp((-.5 * (math.exp(-.08) - 1) + n * (-.08)) * 1) for n in range(60))
+    caught("heston_e", "Merton weights at lambda' with terms re-discounted (two conventions mixed)", abs(mixed - merton(100, 100, 1, .03, .01, "CALL", .2, .5, -.1, .2)), 1e-8)
+    caught("heston_e", "Merton drift without -lambda k", abs(merton(100, 100, 1, .03, .01, "CALL", .2, .5, -.1, .2) - merton(100, 100, 1, .03 + .5 * (math.exp(-.1 + .02) - 1), .01, "CALL", .2, .5, -.1, .2)), 1e-8)
+    s.add(op, {"spot": 100.0, "strikes": HK, "expiry_years": 1.0, "rate": 0.03, "dividend_yield": 0.0, "vol": 0.2, "jumps": {"intensity": 0.5, "mean_log_jump": 0.0, "log_jump_vol": -0.1}, "option_type": "CALL"},
+          error="E_DOMAIN", cls=E, tags=["invalid"])
+    write(s)
+
+
+# ---------------------------------------------------------------- SLV leverage on a fixed grid
+def thomas(a, b, c, d):
+    n = len(d)
+    cp, dp = np.zeros(n), np.zeros(n)
+    cp[0], dp[0] = c[0] / b[0], d[0] / b[0]
+    for i in range(1, n):
+        m = b[i] - a[i] * cp[i - 1]
+        cp[i] = c[i] / m if i < n - 1 else 0.0
+        dp[i] = (d[i] - a[i] * dp[i - 1]) / m
+    x = np.zeros(n)
+    x[-1] = dp[-1]
+    for i in range(n - 2, -1, -1):
+        x[i] = dp[i] - cp[i] * x[i + 1]
+    return x
+
+
+def fp_rows(mu, dd, h, dt, noflux=False):
+    """Rows of (I - dt A), A p = -D[mu p] + 1/2 D2[dd p]. Diffusion central on the product; drift by upwind fluxes at the
+    cell faces, face drift the mean of its two nodes (the node itself at the two outer faces), density 0 beyond the grid (ruling E-A14)."""
+    n = len(mu)
+    a, b, c = np.zeros(n), np.ones(n), np.zeros(n)
+    face = [mu[0]] + [(mu[i] + mu[i + 1]) / 2 for i in range(n - 1)] + [mu[-1]]   # face k sits between nodes k-1 and k
+    if noflux:   # zero flux through both outer faces: drift and diffusion (mass kept)
+        face[0] = face[-1] = 0.0
+    for i in range(n):
+        edge = noflux and i in (0, n - 1)
+        b[i] += dt * dd[i] / (h * h) / (2 if edge else 1)
+        if i > 0:
+            a[i] -= dt * dd[i - 1] / (2 * h * h)
+        if i < n - 1:
+            c[i] -= dt * dd[i + 1] / (2 * h * h)
+        up, lo = face[i + 1], face[i]
+        b[i] += dt * (max(up, 0.0) - min(lo, 0.0)) / h
+        if i < n - 1:
+            c[i] += dt * min(up, 0.0) / h
+        if i > 0:
+            a[i] -= dt * max(lo, 0.0) / h
+    return a, b, c
+
+
+def slv(inp, guard=True):
+    S0, r, q = inp["spot"], inp["rate"], inp["dividend_yield"]
+    h = inp["heston"]
+    v0, ka, th, xi, rho = h["v0"], h["kappa"], h["theta"], h["xi"], h["rho"]
+    gr = inp["grid"]
+    nx, nv, nt, T = gr["nx"], gr["nv"], gr["nt"], inp["expiry_years"]
+    xs = np.linspace(gr["x_min"], gr["x_max"], nx)
+    dv = gr["v_max"] / (nv + 1)
+    vs = np.array([dv * (j + 1) for j in range(nv)])
+    dx, dt = xs[1] - xs[0], T / nt
+    sl = inp["slices"]
+
+    def lv2(t):
+        lnF = math.log(S0) + (r - q) * t
+        out = np.zeros(nx)
+        for i, x in enumerate(xs):
+            w, g, wT = dupire(sl, t, x - lnF)
+            if guard:
+                assert g > 1e-4 and wT > 1e-6
+            out[i] = wT / g
+        return out
+
+    def lev2(t, p):
+        m = p.sum(axis=1)
+        mv = (p * vs[None, :]).sum(axis=1)
+        eps = 1e-10 * m.max()
+        ev = (mv + eps * (mv.sum() / m.sum())) / (m + eps)   # smooth: no branch, so no knife edge (ruling E-A14)
+        return lv2(t) / ev
+    # initial density at t1 = dt: bivariate normal
+    t1 = dt
+    lnF0 = math.log(S0)
+    w, g, wT = dupire(sl, t1, 0.0)
+    L0 = wT / g / v0
+    mx, mv_ = lnF0 + (r - q - 0.5 * L0 * v0) * t1, v0 + ka * (th - v0) * t1
+    sx, sv = max(math.sqrt(L0 * v0 * t1), 2 * dx), max(xi * math.sqrt(v0 * t1), 2 * dv)   # at least two cells wide (ruling E-A14)
+    c = rho
+    X, Vv = np.meshgrid(xs, vs, indexing="ij")
+    zx, zv = (X - mx) / sx, (Vv - mv_) / sv
+    p = np.exp(-(zx * zx - 2 * c * zx * zv + zv * zv) / (2 * (1 - c * c)))
+    p /= p.sum() * dx * dv
+    for n in range(1, nt):
+        t = n * dt
+        L2 = lev2(t, p)
+        # 1 mixed term, explicit
+        f = rho * xi * np.sqrt(L2)[:, None] * vs[None, :] * p
+        ps = p.copy()
+        ps[1:-1, 1:-1] += dt * (f[2:, 2:] - f[2:, :-2] - f[:-2, 2:] + f[:-2, :-2]) / (4 * dx * dv)
+        # 2 x implicit: p_t = -D_x[(r-q-L2 v/2) p] + 1/2 D_xx[L2 v p], Dirichlet 0 at both ends
+        pp = np.zeros_like(p)
+        for j in range(nv):
+            a, b_, cc = fp_rows(r - q - 0.5 * L2 * vs[j], L2 * vs[j], dx, dt)
+            a[0] = cc[0] = a[-1] = cc[-1] = 0.0
+            b_[0] = b_[-1] = 1.0
+            rhs = ps[:, j].copy()
+            rhs[0] = rhs[-1] = 0.0
+            pp[:, j] = thomas(a, b_, cc, rhs)
+        # 3 v implicit: p_t = -D_v[ka(th-v) p] + 1/2 D_vv[xi^2 v p], density 0 at v = 0 and v_max (outside the grid)
+        a, b_, cc = fp_rows(ka * (th - vs), xi * xi * vs, dv, dt, noflux=True)
+        p = np.array([thomas(a, b_, cc, pp[i, :]) for i in range(nx)])
+        p = np.maximum(p, 0.0)   # positivity floor after each full step (ruling E-A14)
+    L2 = lev2(T, p)
+    return {"x": xs.tolist(), "leverage": np.sqrt(L2).tolist(), "mass": float(p.sum() * dx * dv)}
+
+
+def flat_slices(vol, Ts=(0.5, 1.0)):
+    return [{"expiry_years": t, "svi": svi(vol * vol * t, 1e-9, 0.0, 0.0, 0.1)} for t in Ts]
+
+
+def e2_slv():
+    s = S("slv_e", "05-volatility/heston-family.md")
+    op = "vol.slv.leverage"
+    G0 = {"nx": 61, "nv": 50, "nt": 50, "x_min": math.log(100) - 1.2, "x_max": math.log(100) + 1.2, "v_max": 0.25}
+    hp = {"v0": 0.04, "kappa": 2.0, "theta": 0.04, "xi": 0.3, "rho": -0.7}
+    cases = [({"spot": 100.0, "expiry_years": 1.0, "rate": 0.02, "dividend_yield": 0.0, "heston": hp, "slices": SURF, "grid": G0}, ["svi-surface"]),
+             ({"spot": 100.0, "expiry_years": 0.5, "rate": 0.0, "dividend_yield": 0.0, "heston": {**hp, "rho": 0.0, "xi": 0.35}, "slices": SURF, "grid": {**G0, "nt": 40}}, ["svi-surface", "zero-rho"]),
+             ({"spot": 100.0, "expiry_years": 1.0, "rate": 0.02, "dividend_yield": 0.01, "heston": {**hp, "xi": 0.15, "rho": 0.0}, "slices": flat_slices(0.2), "grid": G0}, ["flat-vol", "small-vol-of-vol"])]
+    for inp, tags in cases:
+        out = slv(inp)
+        # stability of the recipe: 1e-10 input perturbation moves leverage by < 1e-7 (no near-threshold branch)
+        pert = slv({**inp, "spot": inp["spot"] * (1 + 1e-12)}, guard=False)
+        assert max(abs(a - b) for a, b in zip(out["leverage"], pert["leverage"])) < 1e-8
+        assert 0.98 < out["mass"] < 1.01, out["mass"]
+        note(f"slv_e: mass at T {out['mass']:.4f}")
+        # grid refinement sanity near the spot (not a golden): within 2%
+        fine = slv({**inp, "grid": {**inp["grid"], "nx": 121, "nv": 80, "nt": 100}}, guard=False)
+        i0 = len(out["x"]) // 2
+        assert abs(out["leverage"][i0] - fine["leverage"][len(fine["x"]) // 2]) < 0.02 * fine["leverage"][len(fine["x"]) // 2], "grid not converged"
+        if "flat-vol" in tags:
+            body = [l for x, l in zip(out["x"], out["leverage"]) if abs(x - math.log(100)) < 0.25]
+            assert max(abs(l - 1.0) for l in body) < 0.03, body  # sigma_LV / sqrt(E[v|x]) ~ 0.2/0.2
+        s.add(op, inp, out, cls=N, verified=["reference-scheme", "grid-refinement-2pc", "flat-vol-limit"], tags=["slv"] + tags)
+    inp = cases[0][0]
+    o = slv(inp)
+    w = slv({**inp, "heston": {**hp, "rho": 0.7}}, guard=False)
+    caught("slv_e", "mixed-term sign (rho flipped)", max(abs(a - b) for a, b in zip(o["leverage"], w["leverage"])), 1e-8)
+    s.add(op, {**inp, "grid": {**G0, "nx": 2}}, error="E_INPUT", cls=E, tags=["invalid"], description="nx at least 5")
+    s.add(op, {**inp, "grid": {**G0, "x_min": 5.0, "x_max": 4.0}}, error="E_INPUT", cls=E, tags=["invalid"])
+    s.add(op, {**inp, "grid": {**G0, "x_min": 4.6, "x_max": 4.7}}, error="E_INPUT", cls=E, tags=["invalid"], description="spot outside the x grid interior")
+    s.add(op, {**inp, "grid": {**G0, "nx": 2001}}, error="E_LIMIT", cls=E, tags=["invalid"])
+    s.add(op, {**inp, "heston": {**hp, "xi": 0.0}}, error="E_DOMAIN", cls=E, tags=["invalid"])
+    write(s)
+
+
+# ---------------------------------------------------------------- E5 exotics (spec 04-pricing/exotics.md). Closed forms written from Haug (2007);
+# QuantLib checks are in outside_e_a.py, not here, so the two routes stay apart. Here: second routes by mpmath or limits.
+N_ = ncdf
+
+
+def gbs(ot, S, K, T, r, b, v):
+    """Generalised Black-Scholes, cost of carry b."""
+    sd = v * math.sqrt(T)
+    d1 = (math.log(S / K) + (b + v * v / 2) * T) / sd
+    d2 = d1 - sd
+    if ot == "CALL":
+        return S * math.exp((b - r) * T) * N_(d1) - K * math.exp(-r * T) * N_(d2)
+    return K * math.exp(-r * T) * N_(-d2) - S * math.exp((b - r) * T) * N_(-d1)
+
+
+def digital(kind, ot, S, K, T, r, q, v, cash):
+    sd = v * math.sqrt(T)
+    d1 = (math.log(S / K) + (r - q + v * v / 2) * T) / sd
+    d2 = d1 - sd
+    p = 1 if ot == "CALL" else -1
+    if kind == "CASH_OR_NOTHING":
+        return cash * math.exp(-r * T) * N_(p * d2)
+    return S * math.exp(-q * T) * N_(p * d1)
+
+
+def barrier(btype, ot, S, K, H, R, T, r, q, v):
+    b = r - q
+    sd = v * math.sqrt(T)
+    mu = (b - v * v / 2) / (v * v)
+    lam = math.sqrt(mu * mu + 2 * r / (v * v))
+    phi = 1 if ot == "CALL" else -1
+    eta = 1 if btype.startswith("DOWN") else -1
+    x1 = math.log(S / K) / sd + (1 + mu) * sd
+    x2 = math.log(S / H) / sd + (1 + mu) * sd
+    y1 = math.log(H * H / (S * K)) / sd + (1 + mu) * sd
+    y2 = math.log(H / S) / sd + (1 + mu) * sd
+    z = math.log(H / S) / sd + lam * sd
+    ebr, er = math.exp((b - r) * T), math.exp(-r * T)
+    A = phi * S * ebr * N_(phi * x1) - phi * K * er * N_(phi * x1 - phi * sd)
+    B = phi * S * ebr * N_(phi * x2) - phi * K * er * N_(phi * x2 - phi * sd)
+    C = phi * S * ebr * (H / S) ** (2 * (mu + 1)) * N_(eta * y1) - phi * K * er * (H / S) ** (2 * mu) * N_(eta * y1 - eta * sd)
+    D = phi * S * ebr * (H / S) ** (2 * (mu + 1)) * N_(eta * y2) - phi * K * er * (H / S) ** (2 * mu) * N_(eta * y2 - eta * sd)
+    E_ = R * er * (N_(eta * x2 - eta * sd) - (H / S) ** (2 * mu) * N_(eta * y2 - eta * sd))
+    F_ = R * ((H / S) ** (mu + lam) * N_(eta * z) + (H / S) ** (mu - lam) * N_(eta * z - 2 * eta * lam * sd))
+    hi = K > H
+    tab = {("DOWN_IN", "CALL"): (C + E_) if hi else (A - B + D + E_), ("UP_IN", "CALL"): (A + E_) if hi else (B - C + D + E_),
+           ("DOWN_IN", "PUT"): (B - C + D + E_) if hi else (A + E_), ("UP_IN", "PUT"): (A - B + D + E_) if hi else (C + E_),
+           ("DOWN_OUT", "CALL"): (A - C + F_) if hi else (B - D + F_), ("UP_OUT", "CALL"): F_ if hi else (A - B + C - D + F_),
+           ("DOWN_OUT", "PUT"): (A - B + C - D + F_) if hi else F_, ("UP_OUT", "PUT"): (B - D + F_) if hi else (A - C + F_)}
+    return tab[(btype, ot)]
+
+
+def geo_asian_cont(ot, S, K, T, r, q, v):
+    return gbs(ot, S, K, T, r, ((r - q) - v * v / 6) / 2, v / math.sqrt(3))
+
+
+def geo_asian_disc(ot, S, K, T, r, q, v, times):
+    n = len(times)
+    m = math.log(S) + sum((r - q - v * v / 2) * t for t in times) / n
+    V = v * v * sum(min(a, b) for a in times for b in times) / (n * n)
+    sd = math.sqrt(V)
+    d1 = (m - math.log(K) + V) / sd
+    d2 = d1 - sd
+    fw = math.exp(m + V / 2)
+    if ot == "CALL":
+        return math.exp(-r * T) * (fw * N_(d1) - K * N_(d2))
+    return math.exp(-r * T) * (K * N_(-d2) - fw * N_(-d1))
+
+
+def lookback_float(ot, S, ext, T, r, q, v):
+    b = r - q
+    sd = v * math.sqrt(T)
+    if ot == "CALL":
+        m = ext
+        a1 = (math.log(S / m) + (b + v * v / 2) * T) / sd
+        a2 = a1 - sd
+        return (S * math.exp((b - r) * T) * N_(a1) - m * math.exp(-r * T) * N_(a2)
+                + S * math.exp(-r * T) * v * v / (2 * b) * ((S / m) ** (-2 * b / (v * v)) * N_(-a1 + 2 * b * math.sqrt(T) / v) - math.exp(b * T) * N_(-a1)))
+    M = ext
+    b1 = (math.log(S / M) + (b + v * v / 2) * T) / sd
+    b2 = b1 - sd
+    return (-S * math.exp((b - r) * T) * N_(-b1) + M * math.exp(-r * T) * N_(-b2)
+            + S * math.exp(-r * T) * v * v / (2 * b) * (-(S / M) ** (-2 * b / (v * v)) * N_(b1 - 2 * b * math.sqrt(T) / v) + math.exp(b * T) * N_(b1)))
+
+
+def quanto(ot, S, K, T, rd, rf, q, v, vx, rho):
+    return gbs(ot, S, K, T, rd, rf - q - rho * v * vx, v)
+
+
+def chooser(S, K, t, T, r, q, v):
+    b = r - q
+    d = (math.log(S / K) + (b + v * v / 2) * T) / (v * math.sqrt(T))
+    y = (math.log(S / K) + b * T + v * v * t / 2) / (v * math.sqrt(t))
+    return (S * math.exp((b - r) * T) * N_(d) - K * math.exp(-r * T) * N_(d - v * math.sqrt(T))
+            - S * math.exp((b - r) * T) * N_(-y) + K * math.exp(-r * T) * N_(-y + v * math.sqrt(t)))
+
+
+def kirk(F1, F2, K, T, r, v1, v2, rho):
+    f = F2 / (F2 + K)
+    s = math.sqrt(v1 * v1 - 2 * rho * v1 * v2 * f + v2 * v2 * f * f)
+    d1 = (math.log(F1 / (F2 + K)) + s * s * T / 2) / (s * math.sqrt(T))
+    return math.exp(-r * T) * (F1 * N_(d1) - (F2 + K) * N_(d1 - s * math.sqrt(T)))
+
+
+def basket_mm(ot, Fs, ws, vs, corr, K, T, r):
+    M1 = sum(w * F for w, F in zip(ws, Fs))
+    M2 = sum(ws[i] * ws[j] * Fs[i] * Fs[j] * math.exp(corr[i][j] * vs[i] * vs[j] * T) for i in range(len(Fs)) for j in range(len(Fs)))
+    sb = math.sqrt(math.log(M2 / (M1 * M1)) / T)
+    return gbs(ot, M1, K, T, r, 0.0, sb), M1, sb
+
+
+def crr(ot, ex, S, K, T, r, q, v, n):
+    dt = T / n
+    u = math.exp(v * math.sqrt(dt))
+    d = 1 / u
+    p = (math.exp((r - q) * dt) - d) / (u - d)
+    disc = math.exp(-r * dt)
+    phi = 1 if ot == "CALL" else -1
+    V = [max(phi * (S * u ** (n - 2 * j) - K), 0.0) for j in range(n + 1)]
+    for i in range(n - 1, -1, -1):
+        V = [disc * (p * V[j] + (1 - p) * V[j + 1]) for j in range(i + 1)]
+        if ex == "AMERICAN":
+            V = [max(V[j], phi * (S * u ** (i - 2 * j) - K)) for j in range(i + 1)]
+    return V[0]
+
+
+def baw(ot, S, K, T, r, q, v):
+    b = r - q
+    if ot == "CALL" and b >= r:
+        return gbs("CALL", S, K, T, r, b, v), None
+    M, Nn, Kk = 2 * r / (v * v), 2 * b / (v * v), 1 - math.exp(-r * T)
+    root = math.sqrt((Nn - 1) ** 2 + 4 * M / Kk)
+    qq = (-(Nn - 1) + root) / 2 if ot == "CALL" else (-(Nn - 1) - root) / 2
+    sd = v * math.sqrt(T)
+
+    def d1(x):
+        return (math.log(x / K) + (b + v * v / 2) * T) / sd
+    if ot == "CALL":
+        f = lambda x: x - K - gbs("CALL", x, K, T, r, b, v) - (1 - math.exp((b - r) * T) * N_(d1(x))) * x / qq  # noqa: E731
+        Sx = brentq(f, K * (1 + 1e-12), K * 100, xtol=1e-14, rtol=1e-15)
+        A = Sx / qq * (1 - math.exp((b - r) * T) * N_(d1(Sx)))
+        return (gbs("CALL", S, K, T, r, b, v) + A * (S / Sx) ** qq if S < Sx else S - K), Sx
+    f = lambda x: K - x - gbs("PUT", x, K, T, r, b, v) + (1 - math.exp((b - r) * T) * N_(-d1(x))) * x / qq  # noqa: E731
+    Sx = brentq(f, K * 1e-3, K * (1 - 1e-12), xtol=1e-14, rtol=1e-15)
+    A = -Sx / qq * (1 - math.exp((b - r) * T) * N_(-d1(Sx)))
+    return (gbs("PUT", S, K, T, r, b, v) + A * (S / Sx) ** qq if S > Sx else K - S), Sx
+
+
+def fd_american(ot, ex, S, K, T, r, q, v, nx, nt, width):
+    """Backward Euler in x = ln S, central differences, Dirichlet payoff at both ends, projection after each step."""
+    x0 = math.log(S)
+    h = width * v * math.sqrt(T)
+    xs = np.linspace(x0 - h, x0 + h, nx)
+    dx, dt = xs[1] - xs[0], T / nt
+    phi = 1 if ot == "CALL" else -1
+    pay = np.maximum(phi * (np.exp(xs) - K), 0.0)
+    V = pay.copy()
+    mu, s2 = r - q - v * v / 2, v * v
+    lo = -dt * (s2 / (2 * dx * dx) - mu / (2 * dx))
+    di = 1 + dt * (s2 / (dx * dx) + r)
+    up = -dt * (s2 / (2 * dx * dx) + mu / (2 * dx))
+    a, bb, c = np.full(nx, lo), np.full(nx, di), np.full(nx, up)
+    a[0] = c[0] = a[-1] = c[-1] = 0.0
+    bb[0] = bb[-1] = 1.0
+    for n in range(nt):
+        tau = (n + 1) * dt
+        rhs = V.copy()
+        if ex == "AMERICAN":
+            rhs[0], rhs[-1] = pay[0], pay[-1]
+        else:
+            rhs[0] = max(phi * (math.exp(xs[0]) * math.exp(-q * tau) - K * math.exp(-r * tau)), 0.0)
+            rhs[-1] = max(phi * (math.exp(xs[-1]) * math.exp(-q * tau) - K * math.exp(-r * tau)), 0.0)
+        V = thomas(a, bb, c, rhs)
+        if ex == "AMERICAN":
+            V = np.maximum(V, pay)
+    i = nx // 2
+    Sm, S0_, Sp = math.exp(xs[i - 1]), math.exp(xs[i]), math.exp(xs[i + 1])
+    dV = (V[i + 1] - V[i - 1]) / (2 * dx)
+    d2V = (V[i + 1] - 2 * V[i] + V[i - 1]) / (dx * dx)
+    return {"price": float(V[i]), "delta": float(dV / S0_), "gamma": float((d2V - dV) / (S0_ * S0_))}
+
+
+EX = [  # S, days, r, q, vol
+    (100.0, 365, 0.05, 0.02, 0.25),
+    (100.0, 182, 0.03, 0.00, 0.20),
+    (100.0, 730, 0.02, 0.04, 0.30),
+    (100.0, 91, -0.005, 0.0, 0.15),
+]
+MLIM = {"absolute": 1e-9, "relative": 1e-10, "reason": "1e-9 per unit at spot 100: 1e-4 currency units on 100,000 units"}
+
+
+def e5_exotics():
+    s = S("exotic_e", "04-pricing/exotics.md")
+    vq = [QLV, "analytic-haug"]
+
+    def base(S0, days, r, q, v):
+        return {"spot": S0, "expiry_years": days / 365, "rate": r, "dividend_yield": q, "vol": v}
+
+    # Digitals.
+    op = "exotic.digital.price"
+    for m in EX:
+        S0, days, r, q, v = m
+        T = days / 365
+        for kind in ("CASH_OR_NOTHING", "ASSET_OR_NOTHING"):
+            for ot, K in (("CALL", 105.0), ("PUT", 95.0)):
+                pr = digital(kind, ot, S0, K, T, r, q, v, 10.0)
+                s.add(op, {**base(*m), "strike": K, "option_type": ot, "payoff": kind, "cash": 10.0}, {"price": pr}, cls=A, verified=vq, tags=["digital", kind.lower()], limit=MLIM)
+    c, p = digital("CASH_OR_NOTHING", "CALL", 100, 100, 1, .05, .02, .25, 1), digital("CASH_OR_NOTHING", "PUT", 100, 100, 1, .05, .02, .25, 1)
+    assert abs(c + p - math.exp(-.05)) < 1e-15
+    caught("exotic_e", "cash digital on N(d1)", abs(math.exp(-.05) * N_((math.log(100 / 105) + (.03 + .03125)) / .25) - digital("CASH_OR_NOTHING", "CALL", 100, 105, 1, .05, .02, .25, 1)), 1e-9)
+    s.add(op, {**base(*EX[0]), "strike": 100.0, "option_type": "CALL", "payoff": "CASH_OR_NOTHING", "cash": -1.0}, error="E_DOMAIN", cls=E, tags=["invalid"])
+
+    # Barriers.
+    op = "exotic.barrier.price"
+    for m in EX[:3]:
+        S0, days, r, q, v = m
+        T = days / 365
+        for bt, H in (("DOWN_IN", 90.0), ("DOWN_OUT", 90.0), ("UP_IN", 115.0), ("UP_OUT", 115.0)):
+            for ot in ("CALL", "PUT"):
+                for K, R in ((100.0, 0.0), (85.0 if bt.startswith("DOWN") else 120.0, 2.0)):
+                    pr = barrier(bt, ot, S0, K, H, R, T, r, q, v)
+                    s.add(op, {**base(*m), "strike": K, "barrier": H, "rebate": R, "barrier_type": bt, "option_type": ot}, {"price": pr}, cls=A, verified=vq,
+                          tags=["barrier", bt.lower()] + (["rebate"] if R else []), limit=MLIM)
+    S0, days, r, q, v = EX[0]
+    T = days / 365
+    for ot in ("CALL", "PUT"):
+        for bt, H in (("DOWN", 90.0), ("UP", 115.0)):
+            inn, out = barrier(bt + "_IN", ot, S0, 100.0, H, 0.0, T, r, q, v), barrier(bt + "_OUT", ot, S0, 100.0, H, 0.0, T, r, q, v)
+            assert abs(inn + out - gbs(ot, S0, 100.0, T, r, r - q, v)) < 1e-12, "in-out parity"
+    caught("exotic_e", "barrier mu with r instead of b", abs(barrier("DOWN_OUT", "CALL", 100, 100, 90, 0, 1, .05, .0, .25) - barrier("DOWN_OUT", "CALL", 100, 100, 90, 0, 1, .05, .02, .25)), 1e-9)
+    caught("exotic_e", "knock-in rebate omitted", abs(barrier("DOWN_IN", "CALL", 100, 85, 90, 2, 1, .05, .02, .25) - barrier("DOWN_IN", "CALL", 100, 85, 90, 0, 1, .05, .02, .25)), 1e-9)
+    b0 = {**base(*EX[0]), "strike": 100.0, "barrier": 90.0, "rebate": 0.0, "barrier_type": "DOWN_OUT", "option_type": "CALL"}
+    s.add(op, {**b0, "spot": 89.0}, error="E_DOMAIN", cls=E, tags=["invalid", "knocked"], description="spot already beyond the barrier")
+    s.add(op, {**b0, "spot": 90.0}, error="E_DOMAIN", cls=E, tags=["invalid", "knocked"], description="spot on the barrier")
+    s.add(op, {**b0, "rebate": -1.0}, error="E_DOMAIN", cls=E, tags=["invalid"])
+
+    # Geometric Asians.
+    op = "exotic.asian.geometric"
+    for m in EX[:3]:
+        S0, days, r, q, v = m
+        T = days / 365
+        for ot, K in (("CALL", 100.0), ("PUT", 95.0)):
+            s.add(op, {**base(*m), "strike": K, "option_type": ot, "averaging": "CONTINUOUS", "fixing_years": []}, {"price": geo_asian_cont(ot, S0, K, T, r, q, v)}, cls=A, verified=vq, tags=["asian", "continuous"], limit=MLIM)
+            fx = [round(days * (i + 1) / 12) / 365 for i in range(12)]
+            s.add(op, {**base(*m), "strike": K, "option_type": ot, "averaging": "DISCRETE", "fixing_years": fx}, {"price": geo_asian_disc(ot, S0, K, T, r, q, v, fx)}, cls=A, verified=vq, tags=["asian", "discrete"], limit=MLIM)
+    fx = [i / 2000 for i in range(1, 2001)]
+    assert abs(geo_asian_disc("CALL", 100, 100, 1, .05, .02, .25, fx) - geo_asian_cont("CALL", 100, 100, 1, .05, .02, .25)) < 4e-3, "discrete -> continuous, error O(1/n)"
+    caught("exotic_e", "continuous geometric vol sigma/2 (not /sqrt 3)", abs(gbs("CALL", 100, 100, 1, .05, (.03 - .25 ** 2 / 6) / 2, .125) - geo_asian_cont("CALL", 100, 100, 1, .05, .02, .25)), 1e-9)
+    s.add(op, {**base(*EX[0]), "strike": 100.0, "option_type": "CALL", "averaging": "DISCRETE", "fixing_years": [0.5, 0.25]}, error="E_INPUT", cls=E, tags=["invalid"], description="fixings not increasing")
+    s.add(op, {**base(*EX[0]), "strike": 100.0, "option_type": "CALL", "averaging": "DISCRETE", "fixing_years": [0.5, 1.5]}, error="E_INPUT", cls=E, tags=["invalid"], description="fixing after expiry")
+
+    # Floating-strike lookbacks.
+    op = "exotic.lookback.floating"
+    for m in EX[:3]:
+        S0, days, r, q, v = m
+        T = days / 365
+        for ot, ext in (("CALL", 100.0), ("CALL", 92.0), ("PUT", 100.0), ("PUT", 108.0)):
+            s.add(op, {**base(*m), "option_type": ot, "running_extreme": ext}, {"price": lookback_float(ot, S0, ext, T, r, q, v)}, cls=A, verified=vq, tags=["lookback"], limit=MLIM)
+    caught("exotic_e", "lookback without the reflection term", abs(100 * math.exp(-.03) * N_((.03 + .03125) / .25) - 100 * math.exp(-.05) * N_((.03 + .03125) / .25 - .25) - lookback_float("CALL", 100, 100, 1, .05, .02, .25)), 1e-9)
+    s.add(op, {**base(*EX[0]), "option_type": "CALL", "running_extreme": 101.0}, error="E_DOMAIN", cls=E, tags=["invalid"], description="running minimum above spot")
+    s.add(op, {**base(*EX[0]), "dividend_yield": 0.05, "option_type": "CALL", "running_extreme": 100.0}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="zero carry: formula divides by b")
+
+    # Quanto.
+    op = "exotic.quanto.price"
+    for m, (rf, vx, rho) in zip(EX[:3], ((0.01, 0.10, 0.3), (0.04, 0.08, -0.5), (0.0, 0.12, 0.0))):
+        S0, days, r, q, v = m
+        T = days / 365
+        for ot, K in (("CALL", 100.0), ("PUT", 105.0)):
+            s.add(op, {"spot": S0, "expiry_years": T, "domestic_rate": r, "foreign_rate": rf, "dividend_yield": q, "vol": v, "fx_vol": vx, "correlation": rho, "strike": K, "option_type": ot},
+                  {"price": quanto(ot, S0, K, T, r, rf, q, v, vx, rho)}, cls=A, verified=vq, tags=["quanto"], limit=MLIM)
+    caught("exotic_e", "quanto adjustment sign (+rho)", abs(quanto("CALL", 100, 100, 1, .05, .01, .02, .25, .1, -.3) - quanto("CALL", 100, 100, 1, .05, .01, .02, .25, .1, .3)), 1e-9)
+    s.add(op, {"spot": 100.0, "expiry_years": 1.0, "domestic_rate": .05, "foreign_rate": .01, "dividend_yield": .0, "vol": .25, "fx_vol": .1, "correlation": 1.5, "strike": 100.0, "option_type": "CALL"},
+          error="E_DOMAIN", cls=E, tags=["invalid"])
+
+    # Simple chooser.
+    op = "exotic.chooser.price"
+    for m in EX[:3]:
+        S0, days, r, q, v = m
+        T = days / 365
+        for K, frac in ((100.0, 0.5), (90.0, 0.25)):
+            t = round(days * frac) / 365
+            s.add(op, {**base(*m), "strike": K, "choose_years": t}, {"price": chooser(S0, K, t, T, r, q, v)}, cls=A, verified=vq, tags=["chooser"], limit=MLIM)
+    caught("exotic_e", "chooser = call + put (choice ignored)", abs(gbs("CALL", 100, 100, 1, .05, .03, .25) + gbs("PUT", 100, 100, 1, .05, .03, .25) - chooser(100, 100, .5, 1, .05, .02, .25)), 1e-9)
+    s.add(op, {**base(*EX[0]), "strike": 100.0, "choose_years": 2.0}, error="E_INPUT", cls=E, tags=["invalid"], description="choice after expiry")
+
+    # Kirk spread.
+    op = "exotic.spread.kirk"
+    for F1, F2, K, days, r, v1, v2, rho in ((110.0, 100.0, 5.0, 365, 0.03, 0.30, 0.25, 0.7), (50.0, 48.0, 1.0, 182, 0.05, 0.35, 0.30, 0.9), (100.0, 95.0, 0.0, 730, 0.02, 0.2, 0.2, 0.0)):
+        T = days / 365
+        s.add(op, {"forward_1": F1, "forward_2": F2, "strike": K, "expiry_years": T, "rate": r, "vol_1": v1, "vol_2": v2, "correlation": rho},
+              {"price": kirk(F1, F2, K, T, r, v1, v2, rho)}, cls=A, verified=vq + ["margrabe-at-zero-strike"], tags=["spread", "kirk"], limit=MLIM)
+    marg = kirk(100, 95, 0, 2, .02, .2, .2, 0.0)
+    sm = math.sqrt(.08)
+    d1 = (math.log(100 / 95) + sm * sm * 2 / 2) / (sm * math.sqrt(2))
+    assert abs(marg - math.exp(-.04) * (100 * N_(d1) - 95 * N_(d1 - sm * math.sqrt(2)))) < 1e-12, "Kirk at K = 0 is Margrabe"
+    sw = math.sqrt(.09 - 2 * .7 * .3 * .25 + .0625)
+    dw = (math.log(110 / 105) + sw * sw / 2) / sw
+    caught("exotic_e", "Kirk without the F2/(F2+K) weight", abs(math.exp(-.03) * (110 * N_(dw) - 105 * N_(dw - sw)) - kirk(110, 100, 5, 1, .03, .3, .25, .7)), 1e-9)
+    s.add(op, {"forward_1": 110.0, "forward_2": 100.0, "strike": -101.0, "expiry_years": 1.0, "rate": .03, "vol_1": .3, "vol_2": .25, "correlation": .7}, error="E_DOMAIN", cls=E, tags=["invalid"], description="F2 + K <= 0")
+
+    # Moment-matched basket.
+    op = "exotic.basket.moment"
+    for Fs, ws, vs, rho, K, days, r, ot in (([100.0, 50.0, 80.0], [0.3, 0.5, 0.2], [0.2, 0.3, 0.25], 0.5, 71.0, 365, 0.03, "CALL"),
+                                            ([100.0, 100.0], [0.5, 0.5], [0.2, 0.2], 1.0, 100.0, 365, 0.03, "CALL"),
+                                            ([60.0, 40.0], [1.0, 1.0], [0.35, 0.15], -0.3, 98.0, 182, 0.02, "PUT")):
+        n = len(Fs)
+        corr = [[1.0 if i == j else rho for j in range(n)] for i in range(n)]
+        T = days / 365
+        pr, M1, sb = basket_mm(ot, Fs, ws, vs, corr, K, T, r)
+        mp.mp.dps = 30
+        M2 = mp.fsum(mp.mpf(ws[i]) * ws[j] * Fs[i] * Fs[j] * mp.e ** (mp.mpf(corr[i][j]) * vs[i] * vs[j] * T) for i in range(n) for j in range(n))
+        assert abs(float(mp.sqrt(mp.log(M2 / mp.mpf(M1) ** 2) / T)) - sb) < 1e-13
+        if rho == 1.0:
+            assert abs(sb - 0.2) < 1e-12, "perfect correlation, equal vols: basket vol is the common vol"
+        s.add(op, {"forwards": Fs, "weights": ws, "vols": vs, "correlation": corr, "strike": K, "expiry_years": T, "rate": r, "option_type": ot},
+              {"price": pr, "basket_forward": M1, "basket_vol": sb}, cls=A, verified=["analytic", "mpmath-30-digits", "perfect-correlation-limit"], tags=["basket"], limit=MLIM)
+    caught("exotic_e", "basket vol from weighted vols (no correlation)", abs(basket_mm("CALL", [100., 50., 80.], [.3, .5, .2], [.2, .3, .25], [[1, .5, .5], [.5, 1, .5], [.5, .5, 1]], 71, 1, .03)[2]
+                                                                            - (.3 * 100 * .2 + .5 * 50 * .3 + .2 * 80 * .25) / 71), 1e-9)
+    s.add(op, {"forwards": [100.0, 50.0], "weights": [0.5, 0.5], "vols": [0.2, 0.3], "correlation": [[1.0, 0.5], [0.4, 1.0]], "strike": 75.0, "expiry_years": 1.0, "rate": 0.03, "option_type": "CALL"},
+          error="E_INPUT", cls=E, tags=["invalid"], description="correlation not symmetric")
+    s.add(op, {"forwards": [100.0, 50.0], "weights": [0.5, -0.5], "vols": [0.2, 0.3], "correlation": [[1.0, 0.5], [0.5, 1.0]], "strike": 25.0, "expiry_years": 1.0, "rate": 0.03, "option_type": "CALL"},
+          error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="negative weight: use Kirk for spreads")
+    write(s)
+
+
+def e5_american():
+    s = S("american_e", "04-pricing/exotics.md")
+    op = "exotic.american.crr"
+    for m in EX[:3]:
+        S0, days, r, q, v = m
+        T = days / 365
+        for ot, K in (("PUT", 100.0), ("PUT", 110.0), ("CALL", 100.0)):
+            for n in (50, 200):
+                pa = crr(ot, "AMERICAN", S0, K, T, r, q, v, n)
+                pe = crr(ot, "EUROPEAN", S0, K, T, r, q, v, n)
+                assert abs(pe - gbs(ot, S0, K, T, r, r - q, v)) < 0.5 / n * S0 * v, "European tree converges"
+                s.add(op, {"spot": S0, "strike": K, "expiry_years": T, "rate": r, "dividend_yield": q, "vol": v, "option_type": ot, "steps": n},
+                      {"american": pa, "european": pe, "early_exercise_premium": pa - pe}, cls=N, verified=["independent-replay", "bs-limit"], tags=["american", "crr"])
+    caught("american_e", "tree probability with r instead of r - q", abs(crr("PUT", "AMERICAN", 100, 100, 1, .05, .0, .25, 50) - crr("PUT", "AMERICAN", 100, 100, 1, .05, .02, .25, 50)), 1e-8)
+    b = {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": 0.05, "dividend_yield": 0.02, "vol": 0.25, "option_type": "PUT", "steps": 0}
+    s.add(op, b, error="E_INPUT", cls=E, tags=["invalid"])
+    s.add(op, {**b, "steps": 20001}, error="E_LIMIT", cls=E, tags=["invalid"])
+    s.add(op, {**b, "steps": 2, "vol": 0.01, "rate": 0.5}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="up-move probability outside (0, 1)")
+
+    op = "exotic.american.baw"
+    for m in EX[:3]:
+        S0, days, r, q, v = m
+        T = days / 365
+        for ot, K in (("PUT", 100.0), ("PUT", 110.0), ("CALL", 100.0), ("CALL", 90.0)):
+            pr, Sx = baw(ot, S0, K, T, r, q, v)
+            s.add(op, {"spot": S0, "strike": K, "expiry_years": T, "rate": r, "dividend_yield": q, "vol": v, "option_type": ot},
+                  {"price": pr}, cls=R, verified=[QLV, "analytic-haug"], tags=["american", "baw"] + (["no-early-exercise"] if Sx is None else []),
+                  limit={"absolute": 1e-5, "relative": 1e-8, "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"})
+    pr, _ = baw("PUT", 100, 100, 1, .05, .02, .25)
+    assert pr > gbs("PUT", 100, 100, 1, .05, .03, .25)
+    caught("american_e", "BAW put with the call root q2", abs(pr - gbs("PUT", 100, 100, 1, .05, .03, .25)), 1e-6)
+    s.add(op, {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": 0.0, "dividend_yield": 0.02, "vol": 0.25, "option_type": "PUT"}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"],
+          description="r = 0: BAW divides by 1 - exp(-rT)")
+
+    op = "exotic.american.fd"
+    for m in EX[:3]:
+        S0, days, r, q, v = m
+        T = days / 365
+        for ot, K, ex in (("PUT", 100.0, "AMERICAN"), ("PUT", 110.0, "AMERICAN"), ("PUT", 100.0, "EUROPEAN")):
+            g = {"nx": 201, "nt": 200, "width": 5.0}
+            o = fd_american(ot, ex, S0, K, T, r, q, v, g["nx"], g["nt"], g["width"])
+            ref = crr(ot, ex, S0, K, T, r, q, v, 2000)
+            assert abs(o["price"] - ref) < 0.02, (o["price"], ref)
+            pert = fd_american(ot, ex, S0 * (1 + 1e-12), K, T, r, q, v, g["nx"], g["nt"], g["width"])
+            assert abs(pert["price"] - o["price"]) < 1e-9
+            s.add(op, {"spot": S0, "strike": K, "expiry_years": T, "rate": r, "dividend_yield": q, "vol": v, "option_type": ot, "exercise": ex, "grid": g},
+                  o, cls=N, verified=["reference-scheme", "crr-2000-within-2e-2"], tags=["american", "fd", ex.lower()])
+    caught("american_e", "FD without early-exercise projection", abs(fd_american("PUT", "EUROPEAN", 100, 110, 1, .05, .02, .25, 201, 200, 5)["price"] - fd_american("PUT", "AMERICAN", 100, 110, 1, .05, .02, .25, 201, 200, 5)["price"]), 1e-8)
+    g = {"nx": 200, "nt": 200, "width": 5.0}
+    s.add(op, {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": .05, "dividend_yield": .02, "vol": .25, "option_type": "PUT", "exercise": "AMERICAN", "grid": g}, error="E_INPUT", cls=E, tags=["invalid"], description="nx must be odd")
+    s.add(op, {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": .05, "dividend_yield": .02, "vol": .25, "option_type": "PUT", "exercise": "AMERICAN", "grid": {**g, "nx": 2001}}, error="E_LIMIT", cls=E, tags=["invalid"])
+    write(s)
+
+
+SLICES = {"E1": (e1_surf, e1_lv), "E3": (e3_fx,), "E2": (e2_heston, e2_slv), "E5": (e5_exotics, e5_american)}
 
 
 def main():
