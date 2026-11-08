@@ -177,24 +177,84 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 - **Limitations:** linear costs only, no impact, no integer lot sizes.
 - **Validation:** optimality conditions only. **Review:** 2026-11-07.
 
-## Stage E models, spec B (E4, E6, E7, E8)
+## Stage E models (E1 to E8)
 
-Numbered EB so spec A's stage E rows can be added without renumbering. Status *Specified* means spec and goldens exist and the language builds have not yet run them. Outside-checked counts are from `oracle/outside_register_e_b.json`.
+Stage E is Implemented: all four languages pass every stage E golden (6,817 of 6,817 cases in the full set at merge `597abf2`, 2026-11-08). 557 of the 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28. Every input is synthetic; no entry is Validated. Last full review of these entries: 2026-11-08.
+
+### Slices E1, E2, E3, E5 (entries ME-A)
+
+Outside-checked counts are from `oracle/outside_register_e_a.json`.
 
 | # | Model | Spec | Stage | Status | Outside-checked |
 |---|---|---|---|---|---|
-| EB1 | GARCH(1,1) likelihood, forecast, fit | `05-volatility/garch.md` | E7 | Specified | 0 of 27 (no QuantLib object in the Python wheel) |
-| EB2 | Variance swap: replication and realized variance | `05-volatility/variance-swaps.md` | E7 | Specified, outside-checked | `fair_strike` 18 of 27; realized 0 of 4 |
-| EB3 | VIX-style index from a given strip | `05-volatility/vix-index.md` | E7 | Specified | 0 of 14 (hand case is the outside reference) |
-| EB4 | SABR swaption cube | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked | 42 of 48 |
-| EB5 | Caplet stripping | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (reprice) | 8 of 14 |
-| EB6 | Bond futures options, price and yield vol | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 10 of 12 |
-| EB8 | Correlation validation and nearest correlation (Higham) | `06-risk/correlation.md` | E6 | Specified, outside-checked | validate 15 of 17; nearest 10 of 18 |
-| EB9 | Implied correlation and dispersion | `06-risk/correlation.md` | E6 | Specified | 0 of 14 (closed forms, hand cases) |
-| EB10 | CDS options (Black on the forward spread) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked | 168 of 176 |
-| EB11 | Gaussian and Student-t default copulas | `04-pricing/credit-options-and-copulas.md` | E8 | Specified (Gaussian re-evaluated in QuantLib, not counted: E-B28) | 0 of 14 |
-| EB12 | Large homogeneous pool (Vasicek) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified (re-evaluated in QuantLib, not counted: E-B28) | 0 of 26 |
-| EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula, YoY only) | 4 of 11 |
+| ME-A1 | SVI surface arbitrage checks, SSVI to SVI, SVI surface fit | `05-volatility/arb-free-surfaces.md` | E1 | Implemented, outside-checked partly outside: 9 surface checks (wing lists are own algebra), not counted (E-A17) |
+| ME-A2 | Dupire local vol on SVI slices | `05-volatility/local-and-forward-vol.md` | E1 | Implemented | none (40-digit independent route) |
+| ME-A3 | Forward vol, smile dynamics, vol of vol | `05-volatility/local-and-forward-vol.md` | E1 | Implemented, outside-checked | 16 of 22 value cases; 6 sticky-delta cases partly outside (E-A17) |
+
+### ME-A1 SVI surface checks and fit
+- **Purpose:** reject SVI surfaces with butterfly, calendar or wing arbitrage before they reach pricing.
+- **Inputs:** SVI slices by expiry; a check grid in forward log-moneyness.
+- **Limitations:** checks the grid and the asymptotes only, not every `k` between grid points. The fit reports arbitrage but does not remove it (ruling E-A3).
+- **Validation:** QuantLib `SviSmileSection` and its density; published Vogt counterexample. **Review:** 2026-11-08.
+
+### ME-A2 Dupire local vol
+- **Purpose:** local vol from an SVI-slice surface, as input to local-vol and SLV pricing.
+- **Limitations:** total variance is linear in time between slices, so local vol jumps at slice dates; `w_T` is one-sided at nodes. Undefined (`E_ARBITRAGE`) where the surface has arbitrage. No rates term structure: forward log-moneyness only.
+- **Validation:** closed form against a 40-digit price-based Dupire. No outside library. **Review:** 2026-11-08.
+
+### ME-A3 Forward vol, smile dynamics, vol of vol
+- **Purpose:** forward vol between expiries; scenario repricing under sticky-strike or sticky-delta; a historical vol-of-vol measure.
+- **Limitations:** smile dynamics are the two textbook regimes only, at fixed expiry; no sticky-local-vol regime, no time decay. Vol of vol is historical, not implied (no VVIX-style index; that is spec B's E-slice for VIX-style indices).
+- **Validation:** QuantLib `BlackVarianceCurve`, `SviSmileSection`, `blackFormula`, `BlackCalculator`, `IncrementalStatistics`. **Review:** 2026-11-08.
+| ME-A4 | FX smile: delta and ATM conventions, RR/BF strikes, Garman-Kohlhagen | `05-volatility/fx-smile.md` | E3 | Implemented, outside-checked | 114 of 114 value cases |
+
+### ME-A4 FX smile and Garman-Kohlhagen
+- **Purpose:** FX vanilla prices and Greeks; strikes from delta quotes under the four market delta types and three ATM types.
+- **Limitations:** flat continuous rates; no spot lag, premium or delivery date (ruling E-A9); smile strangle only, no broker strangle (E-A11); no smile interpolation between the quoted pillars.
+- **Validation:** QuantLib `BlackDeltaCalculator`, Black-Scholes-Merton engine. **Review:** 2026-11-08.
+| ME-A5 | Heston, Bates, Merton | `05-volatility/heston-family.md` | E2 | Implemented, outside-checked | Heston and Bates 18 of 18 value cases; Merton none |
+| ME-A6 | SLV leverage, reference PDE scheme | `05-volatility/heston-family.md` | E2 | Implemented | none |
+
+### ME-A5 Heston, Bates, Merton
+- **Purpose:** European prices under stochastic vol, with or without log-normal jumps; jump diffusion alone.
+- **Limitations:** flat rates and dividend yield; European exercise only; no calibration operation in stage E; `xi = 0` refused.
+- **Validation:** QuantLib analytic Heston and Bates engines; 30-digit mpmath; Merton by two routes inside the oracle only. **Review:** 2026-11-08.
+
+### ME-A6 SLV leverage
+- **Purpose:** leverage function of a Heston SLV model fitted to an SVI-slice local vol surface.
+- **Limitations:** first-order reference scheme, not converged (about 1% at the spot against a doubled grid); positivity floor and boundaries change mass by up to about 1%; Feller condition assumed; no repricing check of vanillas under the SLV model.
+- **Validation:** grid refinement and the flat-vol limit only. No outside library. **Review:** 2026-11-08.
+| ME-A7 | Exotics: digitals, barriers, geometric Asians, lookbacks, quanto, chooser, Kirk, moment-matched basket | `04-pricing/exotics.md` | E5 | Implemented, outside-checked | 103 of 109 value cases (basket not outside) |
+| ME-A8 | American: CRR, BAW, FD | `04-pricing/exotics.md` | E5 | Implemented, outside-checked | BAW 12 of 12; CRR and FD none |
+
+### ME-A7 Exotics
+- **Purpose:** closed-form prices of the standard exotic options on one or two lognormal assets.
+- **Limitations:** flat rates and vols; continuous barrier and lookback monitoring; geometric (not arithmetic) Asians; floating-strike lookbacks only; moment matching for positive-weight baskets only; Kirk is an approximation.
+- **Validation:** QuantLib analytic engines; parity and limit checks. **Review:** 2026-11-08.
+
+### ME-A8 American options
+- **Purpose:** early-exercise prices by tree, by BAW approximation and by a fixed-grid FD scheme.
+- **Limitations:** BAW is an approximation (errors near 1e-2); the FD scheme is first order in time; no discrete dividends.
+- **Validation:** QuantLib BAW; tree and FD by replay, the Black-Scholes limit and cross-method agreement within 2e-2. **Review:** 2026-11-08.
+
+### Slices E4, E6, E7, E8 (entries EB)
+
+Outside-checked counts are from `oracle/outside_register_e_b.json`.
+
+| # | Model | Spec | Stage | Status | Outside-checked |
+|---|---|---|---|---|---|
+| EB1 | GARCH(1,1) likelihood, forecast, fit | `05-volatility/garch.md` | E7 | Implemented | 0 of 27 (no QuantLib object in the Python wheel) |
+| EB2 | Variance swap: replication and realized variance | `05-volatility/variance-swaps.md` | E7 | Implemented, outside-checked | `fair_strike` 18 of 27; realized 0 of 4 |
+| EB3 | VIX-style index from a given strip | `05-volatility/vix-index.md` | E7 | Implemented | 0 of 14 (hand case is the outside reference) |
+| EB4 | SABR swaption cube | `05-volatility/rates-vol-cube.md` | E4 | Implemented, outside-checked | 42 of 48 |
+| EB5 | Caplet stripping | `05-volatility/rates-vol-cube.md` | E4 | Implemented, outside-checked (reprice) | 8 of 14 |
+| EB6 | Bond futures options, price and yield vol | `05-volatility/rates-vol-cube.md` | E4 | Implemented, outside-checked (formula) | 10 of 12 |
+| EB8 | Correlation validation and nearest correlation (Higham) | `06-risk/correlation.md` | E6 | Implemented, outside-checked | validate 15 of 17; nearest 10 of 18 |
+| EB9 | Implied correlation and dispersion | `06-risk/correlation.md` | E6 | Implemented | 0 of 14 (closed forms, hand cases) |
+| EB10 | CDS options (Black on the forward spread) | `04-pricing/credit-options-and-copulas.md` | E8 | Implemented, outside-checked | 168 of 176 |
+| EB11 | Gaussian and Student-t default copulas | `04-pricing/credit-options-and-copulas.md` | E8 | Implemented (Gaussian re-evaluated in QuantLib, not counted: E-B28) | 0 of 14 |
+| EB12 | Large homogeneous pool (Vasicek) | `04-pricing/credit-options-and-copulas.md` | E8 | Implemented (re-evaluated in QuantLib, not counted: E-B28) | 0 of 26 |
+| EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Implemented, outside-checked (formula, YoY only) | 4 of 11 |
 
 ### EB1 GARCH(1,1)
 - **Purpose:** conditional variance path and Gaussian log-likelihood at given parameters; multi-step variance forecast; maximum-likelihood fit.
@@ -260,59 +320,3 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.
-
-## Stage E, spec A
-
-Entries added by the stage E spec A session. Status is "Specified" until the four builds pass; outside-checked counts are from `oracle/outside_register_e_a.json`.
-
-| # | Model | Spec | Stage | Status | Outside-checked |
-|---|---|---|---|---|---|
-| ME-A1 | SVI surface arbitrage checks, SSVI to SVI, SVI surface fit | `05-volatility/arb-free-surfaces.md` | E1 | Specified, outside-checked partly outside: 9 surface checks (wing lists are own algebra), not counted (E-A17) |
-| ME-A2 | Dupire local vol on SVI slices | `05-volatility/local-and-forward-vol.md` | E1 | Specified | none (40-digit independent route) |
-| ME-A3 | Forward vol, smile dynamics, vol of vol | `05-volatility/local-and-forward-vol.md` | E1 | Specified, outside-checked | 16 of 22 value cases; 6 sticky-delta cases partly outside (E-A17) |
-
-### ME-A1 SVI surface checks and fit
-- **Purpose:** reject SVI surfaces with butterfly, calendar or wing arbitrage before they reach pricing.
-- **Inputs:** SVI slices by expiry; a check grid in forward log-moneyness.
-- **Limitations:** checks the grid and the asymptotes only, not every `k` between grid points. The fit reports arbitrage but does not remove it (ruling E-A3).
-- **Validation:** QuantLib `SviSmileSection` and its density; published Vogt counterexample. **Review:** 2026-11-08.
-
-### ME-A2 Dupire local vol
-- **Purpose:** local vol from an SVI-slice surface, as input to local-vol and SLV pricing.
-- **Limitations:** total variance is linear in time between slices, so local vol jumps at slice dates; `w_T` is one-sided at nodes. Undefined (`E_ARBITRAGE`) where the surface has arbitrage. No rates term structure: forward log-moneyness only.
-- **Validation:** closed form against a 40-digit price-based Dupire. No outside library. **Review:** 2026-11-08.
-
-### ME-A3 Forward vol, smile dynamics, vol of vol
-- **Purpose:** forward vol between expiries; scenario repricing under sticky-strike or sticky-delta; a historical vol-of-vol measure.
-- **Limitations:** smile dynamics are the two textbook regimes only, at fixed expiry; no sticky-local-vol regime, no time decay. Vol of vol is historical, not implied (no VVIX-style index; that is spec B's E-slice for VIX-style indices).
-- **Validation:** QuantLib `BlackVarianceCurve`, `SviSmileSection`, `blackFormula`, `BlackCalculator`, `IncrementalStatistics`. **Review:** 2026-11-08.
-| ME-A4 | FX smile: delta and ATM conventions, RR/BF strikes, Garman-Kohlhagen | `05-volatility/fx-smile.md` | E3 | Specified, outside-checked | 114 of 114 value cases |
-
-### ME-A4 FX smile and Garman-Kohlhagen
-- **Purpose:** FX vanilla prices and Greeks; strikes from delta quotes under the four market delta types and three ATM types.
-- **Limitations:** flat continuous rates; no spot lag, premium or delivery date (ruling E-A9); smile strangle only, no broker strangle (E-A11); no smile interpolation between the quoted pillars.
-- **Validation:** QuantLib `BlackDeltaCalculator`, Black-Scholes-Merton engine. **Review:** 2026-11-08.
-| ME-A5 | Heston, Bates, Merton | `05-volatility/heston-family.md` | E2 | Specified, outside-checked | Heston and Bates 18 of 18 value cases; Merton none |
-| ME-A6 | SLV leverage, reference PDE scheme | `05-volatility/heston-family.md` | E2 | Specified | none |
-
-### ME-A5 Heston, Bates, Merton
-- **Purpose:** European prices under stochastic vol, with or without log-normal jumps; jump diffusion alone.
-- **Limitations:** flat rates and dividend yield; European exercise only; no calibration operation in stage E; `xi = 0` refused.
-- **Validation:** QuantLib analytic Heston and Bates engines; 30-digit mpmath; Merton by two routes inside the oracle only. **Review:** 2026-11-08.
-
-### ME-A6 SLV leverage
-- **Purpose:** leverage function of a Heston SLV model fitted to an SVI-slice local vol surface.
-- **Limitations:** first-order reference scheme, not converged (about 1% at the spot against a doubled grid); positivity floor and boundaries change mass by up to about 1%; Feller condition assumed; no repricing check of vanillas under the SLV model.
-- **Validation:** grid refinement and the flat-vol limit only. No outside library. **Review:** 2026-11-08.
-| ME-A7 | Exotics: digitals, barriers, geometric Asians, lookbacks, quanto, chooser, Kirk, moment-matched basket | `04-pricing/exotics.md` | E5 | Specified, outside-checked | 103 of 109 value cases (basket not outside) |
-| ME-A8 | American: CRR, BAW, FD | `04-pricing/exotics.md` | E5 | Specified, outside-checked | BAW 12 of 12; CRR and FD none |
-
-### ME-A7 Exotics
-- **Purpose:** closed-form prices of the standard exotic options on one or two lognormal assets.
-- **Limitations:** flat rates and vols; continuous barrier and lookback monitoring; geometric (not arithmetic) Asians; floating-strike lookbacks only; moment matching for positive-weight baskets only; Kirk is an approximation.
-- **Validation:** QuantLib analytic engines; parity and limit checks. **Review:** 2026-11-08.
-
-### ME-A8 American options
-- **Purpose:** early-exercise prices by tree, by BAW approximation and by a fixed-grid FD scheme.
-- **Limitations:** BAW is an approximation (errors near 1e-2); the FD scheme is first order in time; no discrete dividends.
-- **Validation:** QuantLib BAW; tree and FD by replay, the Black-Scholes limit and cross-method agreement within 2e-2. **Review:** 2026-11-08.

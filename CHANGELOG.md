@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.5.0: stage E, full volatility and exotics (unreleased)
+
+Undated until the tag. Two spec sessions wrote slices E1 to E8 in parallel; each language was built from the specs alone. No golden value of an earlier stage changed.
+
+### Added
+- E1 arbitrage-free SVI surfaces (butterfly, calendar and wing checks, SSVI to SVI, surface fit), Dupire local vol on SVI slices, forward vol, smile dynamics and vol of vol (`05-volatility/arb-free-surfaces.md`, `local-and-forward-vol.md`).
+- E2 Heston, Bates and Merton prices by the Lewis integral, and SLV leverage by a reference PDE scheme (`05-volatility/heston-family.md`).
+- E3 FX smile: four delta types, three ATM types, risk-reversal and butterfly strikes, Garman-Kohlhagen (`05-volatility/fx-smile.md`).
+- E4 SABR swaption cube on the D7 swaption, caplet stripping, bond futures options with yield vol, YoY and ZC inflation caps (`05-volatility/rates-vol-cube.md`).
+- E5 digitals, barriers, geometric Asians, lookbacks, quanto, chooser, Kirk spread, moment-matched baskets; American options by CRR, BAW and FD (`04-pricing/exotics.md`).
+- E6 correlation validation, Higham nearest correlation, implied correlation and dispersion (`06-risk/correlation.md`).
+- E7 GARCH(1,1) likelihood, forecast and fit; variance swap replication and realised variance; a VIX-style index from caller strips, following Cboe's methodology v5.0 (`05-volatility/garch.md`, `variance-swaps.md`, `vix-index.md`).
+- E8 CDS options with front-end protection, Gaussian and Student-t copulas, large-pool Vasicek tranches (`04-pricing/credit-options-and-copulas.md`).
+- 895 stage E goldens in `datasets/golden/stage_e/` (446) and `stage_e_b/` (449); 6,817 goldens in all. Rulings E-A1 to E-A40 (`specifications/stage-e-rulings.md`) and E-B1 to E-B40 (`specifications/stage-e-rulings-b.md`), including two independent audits and the cross-language spec questions. Stage E rows in the model inventory and the edge-case register; stage E sections in `LEARN.md`, `COOKBOOK.md`, `ARCHITECTURE.md`, `GLOSSARY.md` and `ROADMAP.md`.
+- Outside-oracle verifiers with their own convention maps: `oracle/OUTSIDE_E_A.md` and `oracle/CONVENTION_MAP_E_B.md`; registers `oracle/outside_register_e_a.json` and `oracle/outside_register_e_b.json`.
+
+### Changed
+- Versions are 0.5.0 in all four builds, the oracle (`oracle/python/pyproject.toml`, `uv.lock`) and `oracle/strata/pom.xml`.
+- New tolerance class `likelihood_sum` in `conformance/tolerances/policy.yaml`; stage E goldens give non-money outputs their own class through `output_classes` (ruling E-B14).
+- The outside-oracle count is stricter from stage E: a case counts only if every output is a QuantLib value or plain arithmetic on QuantLib values (rulings E-A17, E-B28). Under it, 557 of 895 stage E cases count (62.2%).
+
+### Verified on the merged tree (`597abf2`, 2026-11-08)
+- C++, Java and Rust each reported 6,817 of 6,817 golden cases passing in their final stage E commits (`5af077d`, `a9cd195`, `141245d`; reported). Java's commit also reports unit tests, batch checks and fuzz passing.
+- Python passed 6,817 of 6,817 through the neutral runner (observed, local, Windows).
+- Outside oracle: spec A 280 of 446, spec B 277 of 449, stage E 557 of 895 (62.2%), every counted row on QuantLib 1.44.
+
+### Known issues (carried)
+- Python misses performance targets T1 (bootstrap p99 129 ms against 5 ms) and T4 (start-up 1.84 s against 1.0 s, mostly `uv run`), and its fuzz rate (about 12,800 inputs a minute at R2) is short of the 50,000 target (`benchmarks/targets.md`; R2 figures, not re-measured for stage E).
+- Rust T1 was measured under WSL; a native Linux rerun is still owed.
+- The calendar provenance check stays red until SIFMA publishes its 2027 US holiday schedule (usually in December).
+- Licensed citations (books such as Hull, Clark, O'Kane) are not opened and need a human to confirm them; equation numbers in paywalled papers are given from memory and unverified (`specifications/stage-e-sources.md`).
+- Workflow (b) still takes prices by hand (`--data DIR`): the recorder's Fiscal Data auction feed gives a price per note or bond only on its auction day, at most two a day, so it cannot price the universe for a curve fit (checked 2026-11-08).
+- GARCH, the VIX method, the Student-t copula, the large-pool model, SLV and the American FD scheme have no outside library; SLV and FD goldens test agreement between builds, not convergence.
+
+
 ## 0.4.2: R2, risk first (2026-11-08)
 
 Released as tag `v0.4.2` (PR #19). No golden value of an earlier stage changed.

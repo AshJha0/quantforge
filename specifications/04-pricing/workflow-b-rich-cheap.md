@@ -22,6 +22,8 @@ The job cannot fetch its price inputs automatically.
 
 Neither may be scraped or worked around. Only the on-the-run list is automatic, from the Treasury Fiscal Data open API (auction results).
 
+Checked again at stage E (2026-11-08): the recorder's Fiscal Data auction feed (`fiscaldata-treasury-auctions`, open licence) gives a note or bond's `price_per100` only on its own auction day, and from 2026-08-01 to 2026-11-08 at most two notes or bonds were auctioned on any day (23 auctions on 21 days). A fit needs the whole coupon universe priced on one date, so the feed does not qualify as a price source; it stays in use for the on-the-run list. The manual `--data` path stays.
+
 So the job takes prices by hand: `--data DIR` reads price files the owner saved manually, one file per market per day, in the source's own download format. Without `--data` the job writes a report marked **BLOCKED: no price data** and exits 0. That is a known state, not a failure. Workflow (b) is therefore specified and built, but does not run daily until a permitted source exists. Plan 11.2.7(b)'s daily acceptance is open, and is listed in the README known issues.
 
 ## Universe and filters

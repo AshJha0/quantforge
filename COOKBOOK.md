@@ -67,7 +67,7 @@ python conformance/runner/batch_check.py --impl rust
 
 ## R2 risk recipes
 
-The language builds of these operations are landing, so no CLI output is shown yet. Each recipe sends golden cases through batch mode; the expected values are the oracle's, from `datasets/golden/r2/`. This shell function turns golden cases into batch input lines:
+All four builds pass these goldens (5,922 of 5,922 at the R2 merge). Each recipe sends golden cases through batch mode; the expected values are the oracle's, from `datasets/golden/r2/`. This shell function turns golden cases into batch input lines:
 
 ```bash
 pick() { python -c "import json,sys; f,ids=sys.argv[1],sys.argv[2:]; [print(json.dumps({'schema_version':'1.0','case_id':c['case_id'],'operation':c['operation'],'inputs':c['inputs']})) for c in json.load(open(f))['cases'] if c['case_id'] in ids]" "$@"; }
@@ -377,7 +377,10 @@ Copy the inputs of the named case from `datasets/golden/stage_d/`:
 | Caps and swaptions | `rates.cap.price`, `rates.swaption.price` | `capswaption_d-0001`, `capswaption_d-0010` |
 | Commodity curve and storage | `cmdty.*` | `commodity_d-0001`, `commodity_d-0007` |
 
-### Stage E recipes (spec A)
+## Stage E recipes
+
+Slices E1, E2, E3 and E5:
+
 
 Copy the inputs of the named case from `datasets/golden/stage_e/`:
 
@@ -398,11 +401,9 @@ Copy the inputs of the named case from `datasets/golden/stage_e/`:
 | American put: tree, BAW, FD | `exotic.american.crr`, `.baw`, `.fd` | `american_e-0002`; `american_e` cases tagged `baw`, `fd` |
 
 
-## Stage E recipes, spec B
+Slices E4, E6, E7 and E8. The outputs quoted are the golden values (`datasets/golden/stage_e_b/`), which all four builds reproduce. Replace the binary with any build's CLI.
 
-The outputs quoted are the golden expected values (`datasets/golden/stage_e_b/`); the four builds are being written against them. Replace the binary with any build's CLI.
-
-### GARCH likelihood by hand
+#### GARCH likelihood by hand
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"vol.garch.loglik",
@@ -411,7 +412,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"vol.garch.loglik",
 
 Expected (case `garch_e-0009`): `loglik` 5.410998350356715, `variances` [0.00025, 0.00022], `next_variance` 0.000226. Worked in `specifications/05-volatility/garch.md`.
 
-### A VIX term from five strikes
+#### A VIX term from five strikes
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"vol.vix.term_variance",
@@ -425,7 +426,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"vol.vix.term_variance",
 
 Expected (case `vix_e-0001`): `forward` 99.9, `k0` 95, `variance` 0.08188158767696967. Set `call_bid` at 100 to 0 and the forward moves to 98.45 (case `vix_e-0018`): a zero bid still counts when choosing the forward, but that call drops out of the sum.
 
-### Implied correlation
+#### Implied correlation
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.implied",
@@ -434,7 +435,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.implied",
 
 Expected (case `corr_e-0036`): `correlation` 0.53.
 
-### Repair Higham's matrix
+#### Repair Higham's matrix
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.nearest",
@@ -443,7 +444,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.nearest",
 
 Expected (case `corr_e-0002`): off-diagonals 0.76069 and 0.15730, unit diagonal, within 2e-5 per entry.
 
-### Joint default under two copulas
+#### Joint default under two copulas
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"credit.copula.joint_default",
@@ -452,7 +453,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"credit.copula.joint_def
 
 Expected (case `creditopt_e-0151`): `joint_default_probability` 0.005101673899339225. With `"copula":"GAUSSIAN"` and no `degrees_of_freedom` (case `creditopt_e-0147`): 0.0022875610978654965.
 
-### An equity tranche in the large pool
+#### An equity tranche in the large pool
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"credit.lhp.tranche_loss",
@@ -461,7 +462,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"credit.lhp.tranche_loss
 
 Expected (case `creditopt_e-0161`): `expected_loss_fraction` 0.5410575024827762.
 
-### A CDS option
+#### A CDS option
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"credit.cdsoption.price",
@@ -471,7 +472,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"credit.cdsoption.price"
 
 Expected (case `creditopt_e-0001`): `price` 59847.84260792966, `forward_spread` 0.011887730437307897, `risky_annuity` 4.328652217279409, `front_end_protection` 43333.06144966937.
 
-### A zero-coupon inflation floor at 0%
+#### A zero-coupon inflation floor at 0%
 
 ```bash
 echo '{"schema_version":"1.0","case_id":"x","operation":"infl.cap.zc_price",
@@ -481,6 +482,6 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"infl.cap.zc_price",
 
 Expected (case `ratesvol_e-0081`): `price` 5993.010165883334, `strike_ratio` 1.0: deflation protection over five years.
 
-### Recipes that need curves or long arrays
+#### Recipes that need curves or long arrays
 
 The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves or hundreds of numbers. Copy the `inputs` of `ratesvol_e-0001`, `ratesvol_e-0049`, `varswap_e-0001` or `garch_e-0027` from the golden file into a case document and run it the same way.

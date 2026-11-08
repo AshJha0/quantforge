@@ -100,7 +100,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | MBS | Mortgage-backed security: a bond paid from a pool of mortgages, whose cash flows depend on prepayment |
 | WAL | Weighted average life: the average time to repayment of principal |
 
-## Stage E (spec A): full vol and exotics
+## Stage E: full volatility, exotics, rates vol, correlation and credit
 
 | Term | Meaning |
 |---|---|
@@ -126,12 +126,6 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Chooser | An option whose holder decides at a set date whether it is a call or a put |
 | Kirk approximation | A closed form for an option on the spread of two forwards |
 | BAW | Barone-Adesi-Whaley: a quadratic approximation to American option prices |
-
-
-## Stage E, spec B: rates vol, correlation, GARCH and variance, credit options
-
-| Term | Meaning |
-|---|---|
 | Swaption cube | Swaption vols by expiry, swap length and strike; here, SABR parameters per (expiry, length) node (`rates-vol-cube.md`) |
 | Caplet stripping | Turning flat cap vols into one vol per caplet so every cap reprices |
 | Price vol, yield vol | Vol of a bond futures price, and of the cheapest-to-deliver's yield; linked by duration times yield |
@@ -153,4 +147,4 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Large homogeneous pool (LHP) | Vasicek's limit of a very large pool of identical names: losses depend on one common factor only |
 | Tranche, attachment, detachment | A slice of pool losses between two levels; the slice's expected loss as a fraction of its width |
 
-Stage E spec B is Specified, not Implemented: goldens exist and the four builds are being written against them. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, so those goldens rest on hand cases and high-precision replicas; 277 of 449 cases (61.7%) are outside-checked under rule 11.2.5 and ruling E-B28 (`specifications/stage-e-rulings-b.md`).
+Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at merge `597abf2`), not Validated. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, and no SLV or American FD reference, so those goldens rest on hand cases and high-precision replicas; 557 of 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28.

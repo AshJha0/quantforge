@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(quantforge_cpp26 VERSION 0.4.2 LANGUAGES CXX)
+project(quantforge_cpp26 VERSION 0.5.0 LANGUAGES CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 26)
