@@ -8,9 +8,6 @@ import cmath
 import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from functools import cache
-
-lazy import numpy as np
 
 from . import vol_e1
 from .black import big_n
@@ -116,11 +113,11 @@ def heston_cf(t: float, h: Heston, us: Floats) -> tuple[list[float], list[float]
     return [v.real for v in values], [v.imag for v in values]
 
 
-@cache
 def _unit_rule() -> tuple[tuple[float, ...], tuple[float, ...]]:
-    """Gauss-Legendre, 1024 nodes on [-1, 1]."""
-    x, w = np.polynomial.legendre.leggauss(1024)
-    return tuple(float(v) for v in x), tuple(float(v) for v in w)
+    """Gauss-Legendre, 1024 nodes on [-1, 1]: numpy's leggauss values, shipped as data."""
+    from ._legendre_1024 import NODES, WEIGHTS
+
+    return NODES, WEIGHTS
 
 
 def _nodes(t: float) -> tuple[list[float], list[float]]:
