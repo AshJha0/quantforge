@@ -87,10 +87,10 @@ public final class Surfaces {
         }
         for (int j = 0; j < slices.size(); j++) {
             Smile.Svi s = slices.get(j).svi();
-            if (leftSlope(s) > 2.0) {
+            if (leftSlope(s) >= 2.0) { // slope 2 is flagged (ruling E-A15)
                 wings.add(new Wing(j, "LEFT", "LEE"));
             }
-            if (rightSlope(s) > 2.0) {
+            if (rightSlope(s) >= 2.0) {
                 wings.add(new Wing(j, "RIGHT", "LEE"));
             }
             if (j >= 1) {

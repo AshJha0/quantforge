@@ -58,6 +58,7 @@ final class Operations {
         StageE.register(TABLE);
         StageE3.register(TABLE);
         StageE4.register(TABLE);
+        StageE2.register(TABLE);
         OpsForward.register(TABLE);
         OpsBlack.register(TABLE);
         OpsGreeks.register(TABLE);
