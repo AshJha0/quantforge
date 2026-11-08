@@ -169,3 +169,10 @@ Choices made where a stage E spec was silent or two rules pull apart. No golden 
 - E-Q9 (E4, `rates.cap.strip`). The page lists the strip's own checks but not their order against D7's
   (`start_months`, tenor range, `BLACK_76` strike and forwards). Python runs the strip checks (tenors, count,
   flat vols), then D7's.
+- E-Q10 (E2, `vol.slv.leverage`, golden `slv_e-0006`). The spec's check is `x_min < ln(spot) < x_max`, else
+  `E_INPUT`. The golden has `spot = 100`, `x_min = 4.6`, `x_max = 4.7`; `ln 100 = 4.60517` lies inside, and
+  also inside the node interior (`x_1 = 4.60167`), so by the page the case is valid, but the golden expects
+  `E_INPUT` ("spot outside the x grid interior"). Python follows the page and fails this one golden; a
+  ruling or a corrected golden (for example `x_min = 4.61`) is asked for. No other check is added to fit it.
+- E-Q11 (E2, array caps). `strikes` and `u` fall under the stage C cap of 100 (every `vol.` operation, as
+  E-Q2); the E2 page names no limit except the SLV grid (`nx`, `nv` 1000, `nt` 10,000), checked at the gate.

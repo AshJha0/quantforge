@@ -98,6 +98,13 @@ _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
 _LAGS = _caps(max_lag=1000)
 
+def _slv_grid(raw: Raw) -> None:
+    grid = raw.get("grid")
+    if isinstance(grid, dict):
+        for key, limit in (("nx", 1000), ("nv", 1000), ("nt", 10_000)):
+            _cap(grid, key, limit)
+
+
 _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.integrate.trapezoid": _POINTS,
     "core.integrate.simpson": _POINTS,
@@ -133,6 +140,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "hedge.solve": _hedge,
     "rates.schedule.generate": _caps(payment_lag=30_000),
     "usecase.rates_hedge": _hedge_tenors,
+    "vol.slv.leverage": _slv_grid,
     "vol.sabr.arbfree": _caps(cells=20_000, steps=20_000),
 }
 STAGE_C_ARRAY = 100

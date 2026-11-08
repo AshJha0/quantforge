@@ -293,3 +293,60 @@ def _zc(i: Inputs) -> Any:
             i.real("discount_factor"), i.real("vol"), i.real("notional"))
     price, ratio = E.rates_vol.zc_price(*args)
     return {"price": price, "strike_ratio": ratio}
+
+
+# E2: Heston, Bates, Merton, SLV (heston-family.md)
+
+def _heston(i: Inputs) -> Any:
+    from ..heston import Heston
+
+    h = i.object("heston")
+    return Heston(*(h.real(k) for k in ("v0", "kappa", "theta", "xi", "rho")))
+
+
+def _jumps(i: Inputs) -> Any:
+    from ..heston import Jumps
+
+    j = i.object("jumps")
+    return Jumps(*(j.real(k) for k in ("intensity", "mean_log_jump", "log_jump_vol")))
+
+
+def _common(i: Inputs) -> tuple[float, list[float], float, float, float]:
+    return (i.real("spot"), i.reals("strikes"), i.real("expiry_years"), i.real("rate"),
+            i.real("dividend_yield"))
+
+
+@op("vol.heston.price")
+def _heston_price(i: Inputs) -> Any:
+    args = (*_common(i), _heston(i), i.enum("option_type", _OPTION_TYPES))
+    return {"prices": E.heston.heston_price(*args)}
+
+
+@op("vol.heston.cf")
+def _heston_cf(i: Inputs) -> Any:
+    re, im = E.heston.heston_cf(i.real("expiry_years"), _heston(i), i.reals("u"))
+    return {"re": re, "im": im}
+
+
+@op("vol.bates.price")
+def _bates_price(i: Inputs) -> Any:
+    args = (*_common(i), _heston(i), _jumps(i), i.enum("option_type", _OPTION_TYPES))
+    return {"prices": E.heston.bates_price(*args)}
+
+
+@op("vol.merton.price")
+def _merton_price(i: Inputs) -> Any:
+    args = (*_common(i), i.real("vol"), _jumps(i), i.enum("option_type", _OPTION_TYPES))
+    return {"prices": E.heston.merton_price(*args)}
+
+
+@op("vol.slv.leverage")
+def _slv(i: Inputs) -> Any:
+    from ..heston import Grid
+
+    g = i.object("grid")
+    grid = Grid(g.integer("nx"), g.integer("nv"), g.integer("nt"), g.real("x_min"),
+                g.real("x_max"), g.real("v_max"))
+    args = (i.real("spot"), i.real("expiry_years"), i.real("rate"), i.real("dividend_yield"),
+            _heston(i), _slices(i), grid)
+    return E.heston.slv_leverage(*args)
