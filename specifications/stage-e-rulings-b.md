@@ -1,6 +1,6 @@
 # Stage E rulings, spec B (E4, E6, E7, E8)
 
-Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`garch.md`, `variance-swaps.md`, `vix-index.md` and the E4, E6 and E8 pages as they land), and wins where it is more exact. Spec A's rulings are in `stage-e-rulings.md` with prefix E-A; the two sets do not overlap.
+Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`garch.md`, `variance-swaps.md`, `vix-index.md`, `rates-vol-cube.md` and the E6 and E8 pages as they land), and wins where it is more exact. Spec A's rulings are in `stage-e-rulings.md` with prefix E-A; the two sets do not overlap.
 
 ## E7 rulings
 
@@ -14,8 +14,19 @@ Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`
 | E-B6 | VIX interpolation | Two terms with `N1 < N2` and `N1 <= 43200 <= N2`; otherwise `E_INPUT`. No extrapolation and no single-term index |
 | E-B7 | Error order | Each operation lists its checks in order; the first broken rule wins, as `cli-contract.md`. Schema errors (missing key, `null`, wrong type) come first, as everywhere |
 
+## E4 rulings
+
+| # | Point | Ruling |
+|---|---|---|
+| E-B8 | Cube interpolation | The four SABR parameters are each bilinear in (expiry time ACT/365F from `as_of` to the adjusted node date, tenor in years = months/12). Vols are never interpolated (a wrong-convention check). No extrapolation: outside the node grid is `E_INPUT`. The smile is read at the swaption's own forward (D7: exercise at swap start), unshifted Hagan |
+| E-B9 | Caplet stripping shape | Piecewise-constant caplet vol on each segment between successive cap maturities, all caps starting at the same date and strike. Caplet-by-caplet stripping from an interpolated term-vol surface (QuantLib `OptionletStripper1`) is a different rule and not used |
+| E-B10 | Stripping arbitrage | If a segment needs a caplet vol at or below zero (the longer cap is cheaper than the caplets already fixed by shorter caps), the result is `E_ARBITRAGE`, not a clipped vol. Search lower bound: 1e-6 (Black) or 1e-7 (Bachelier) |
+| E-B11 | Bond futures options | Black-76 on the futures price, premium paid at the given discount date; futures-style margined options are out of scope. `yield_vol = price_vol / (modified_duration x yield)`, first order, CTD duration and yield given by the caller |
+| E-B12 | YoY caplet time | Option time to the fixing (`expiry_years`), discounting to payment; YoY forwards are inputs (no ZC-to-YoY convexity here) |
+| E-B13 | ZC inflation cap strike | `(1 + K)^T`, compounded annually over `T` years (a real number); the simple `1 + KT` is a wrong-convention check |
+
 ## Oracle coverage
 
 Outside-oracle cases are verified by `oracle/python/outside_e_b.py` against QuantLib 1.44, every convention object taken from `oracle/python/qf_oracle/convmap_e_b.py` (reviewed copy `oracle/CONVENTION_MAP_E_B.md`), with one register row per counted case in `oracle/outside_register_e_b.json` (library, version, convention rows, review state). The stage E floor of 60% applies to spec B's suites taken together once E4, E6 and E8 land; the running share is in `program/STAGE_E_HANDOVER_B.md`.
 
-E7 alone is below the floor, for stated reasons: QuantLib's Python wheel has no `Garch11` and no VIX method. Those suites are pinned by hand cases, 50-digit or exact-rational replicas, and a separately written float replay, and carry most of the 74 caught wrong-convention checks.
+E4: all 35 non-error cases are outside-checked (70% of the suite, errors in the denominator). E7 alone is below the floor, for stated reasons: QuantLib's Python wheel has no `Garch11` and no VIX method. Those suites are pinned by hand cases, 50-digit or exact-rational replicas, and a separately written float replay, and carry most of the 74 caught wrong-convention checks.

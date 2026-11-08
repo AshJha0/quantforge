@@ -15,3 +15,16 @@ Spec version 1.0.0. One table per slice, added as each slice lands. Tolerances a
 | `vix_e` | `vol.vix.index` | 2 / 1 | 1e-8 abs + 1e-10 rel | index points, published to 0.01 | exact rationals; float replay |
 
 Wrong-convention checks: 74 for E7, each with a gap above its tolerance (`gen_stage_e_b.py` stops otherwise). None of the goldens depend on unseeded Monte Carlo, on a solver path, or on the last digit of a maths-library call. Seeds are used only to make input series (GARCH returns, a realized price path), which are then fixed in the case.
+
+## E4 rates and inflation vol
+
+| Suite | Operation | Cases (ok / error) | Tolerance | In money | Oracle |
+|---|---|---|---|---|---|
+| `ratesvol_e` | `rates.swaption.price_cube` | 12 / 6 | 1e-9 per unit notional + 1e-9 rel | 0.01 currency on 10m | mpmath-50; QuantLib `BilinearInterpolation` + `SabrSmileSection` + `BlackSwaptionEngine`, all 12 |
+| `ratesvol_e` | `rates.cap.strip` | 4 / 5 | caplet vols class `root_finding`; cap prices 1e-9 per unit notional | 0.01 currency on 10m | mpmath-50 root; QuantLib cap-engine reprice check, all 4 |
+| `ratesvol_e` | `rates.bondfut.option_price` | 5 / 1 | 1e-9 per 100 face + 1e-10 rel | 1e-6 currency per 100k contract | mpmath-50; QuantLib `blackFormula`, all 5 |
+| `ratesvol_e` | `rates.bondfut.implied_vol` | 5 / 1 | class `root_finding` | 1e-10 in vol | mpmath-50 root; QuantLib `blackFormulaImpliedStdDev`, all 5 |
+| `ratesvol_e` | `infl.cap.yoy_price` | 4 / 1 | 1e-12 per unit notional + 1e-10 rel | 1e-5 currency on 10m | mpmath-50; QuantLib formulas, all 4 |
+| `ratesvol_e` | `infl.cap.zc_price` | 5 / 1 | 1e-12 per unit notional + 1e-10 rel | 1e-5 currency on 10m | mpmath-50; QuantLib formulas, all 5 |
+
+Wrong-convention checks: 34 for E4, each caught. Outside-oracle share: 35 of 50 (70%; error cases are in the denominator and never count).

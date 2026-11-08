@@ -60,7 +60,96 @@ def h_varswap(u, i, exp):
     return {"fair_variance": v, "fair_vol": math.sqrt(v), "pv": vs.NPV()}
 
 
-HANDLERS = {"vol.varswap.fair_strike": h_varswap}
+# ---------------------------------------------------------------- E4 (QuantLib)
+def _od():
+    import outside_d as OD
+    return OD
+
+
+def _ot(u, cp):
+    return ql.Option.Call if cp else ql.Option.Put
+
+
+def h_cube(u, i, exp):
+    OD = _od()
+    disc, t0 = OD.curve(u, i["discount"])
+    proj, _ = OD.curve(u, i["projection"])
+    disc.enableExtrapolation()
+    proj.enableExtrapolation()
+    ql.Settings.instance().evaluationDate = QD(t0)
+    tr, cb = i["trade"], i["cube"]
+    spot = OD._spot(u, t0)
+    cal, mf, dc = u("CAL.USGS"), u("BDC.MODIFIED_FOLLOWING"), u("DC.ACT_365F")
+    ex = lambda m: cal.adjust(QD(OD.add_months(spot, m)), mf)  # noqa: E731
+    ts = [dc.yearFraction(QD(t0), ex(m)) for m in cb["expiries_months"]]
+    ls = [m / 12 for m in cb["tenors_months"]]
+    st = D(ex(tr["expiry_months"]).ISO())
+    t, L = dc.yearFraction(QD(t0), QD(st)), tr["tenor_months"] / 12
+    par = {}
+    for k in ("alpha", "beta", "rho", "nu"):
+        M = ql.Matrix(len(ls), len(ts))
+        for a in range(len(ts)):
+            for b in range(len(ls)):
+                M[b][a] = cb[k][a][b]
+        par[k] = u("INTERP.BILINEAR", ts, ls, M)(t, L)
+    fx, fl = OD._sched(u, st, tr["tenor_months"], 12), OD._sched(u, st, tr["tenor_months"], 3)
+    idx = OD._ibor(u, proj, 3)
+    sw = ql.VanillaSwap(ql.Swap.Payer if tr["type"] == "PAYER" else ql.Swap.Receiver, tr["notional"], fx, tr["strike"], u("DC.THIRTY_360_BOND"), fl, idx, 0.0, u("DC.ACT_360"))
+    dh = ql.YieldTermStructureHandle(disc)
+    sw.setPricingEngine(ql.DiscountingSwapEngine(dh))
+    Aa, Sr = abs(sw.fixedLegBPS()) / 1e-4 / tr["notional"], sw.fairRate()
+    vol = u("SABR.SECTION", t, Sr, par["alpha"], par["beta"], par["rho"], par["nu"]).volatility(tr["strike"])
+    so = ql.Swaption(sw, ql.EuropeanExercise(QD(st)))
+    so.setPricingEngine(u("SWO.BLACK_ENGINE", dh, vol))
+    return {"price": so.NPV(), "forward_rate": Sr, "annuity": Aa, "vol": vol, "sabr": par}
+
+
+def h_strip(u, i, exp):
+    """Counted by a reprice check, as stage D credit.cds.bootstrap: each cap at the golden caplet vols, priced in QuantLib's
+    cap engine, equals the same cap at its flat vol in QuantLib within the case tolerance."""
+    OD = _od()
+    gv = exp["caplet_vols"]
+    prices = []
+    for M, fv in zip(i["cap_tenors_months"], i["flat_vols"]):
+        trade = {"type": "CAP", "start_months": i["start_months"], "tenor_months": M, "strike": i["strike"], "notional": i["notional"]}
+        base = {"discount": i["discount"], "projection": i["projection"], "model": i["model"], "trade": trade}
+        flat = OD.h_cap(u, {**base, "vol": fv}, None)["price"]
+        quoted = OD.h_cap(u, {**base, "vol": gv[:M // 3]}, None)["price"]
+        if abs(flat - quoted) > 1e-9 * i["notional"]:
+            return {"caplet_vols": [None] * len(gv), "cap_prices": []}
+        prices.append(flat)
+    return {"caplet_vols": gv, "cap_prices": prices}
+
+
+def h_bf_price(u, i, exp):
+    p = u("OPT.BLACK_FORMULA")(_ot(u, i["type"] == "CALL"), i["strike"], i["futures_price"], i["vol"] * math.sqrt(i["expiry_years"]), i["discount_factor"])
+    return {"price": p, "contract_value": p * i["contract_size"] / 100}
+
+
+def h_bf_iv(u, i, exp):
+    sd = u("OPT.BLACK_IMPLIED")(_ot(u, i["type"] == "CALL"), i["strike"], i["futures_price"], i["premium"], i["discount_factor"], 0.0, 0.2, 1e-14, 1000)
+    v = sd / math.sqrt(i["expiry_years"])
+    return {"price_vol": v, "yield_vol": v / (i["ctd_modified_duration"] * i["ctd_yield"])}
+
+
+def _fml(u, model, cp, F, K, v, t, Dd):
+    if model == "BLACK_76":
+        return u("OPT.BLACK_FORMULA")(_ot(u, cp), K, F, v * math.sqrt(t), Dd)
+    return u("OPT.BACHELIER_FORMULA")(_ot(u, cp), K, F, v * math.sqrt(t), Dd)
+
+
+def h_yoy(u, i, exp):
+    c = [i["notional"] * p["accrual"] * _fml(u, i["model"], i["type"] == "CAP", p["yoy_forward"], i["strike"], p["vol"], p["expiry_years"], p["discount_factor"]) for p in i["periods"]]
+    return {"caplets": c, "price": math.fsum(c)}
+
+
+def h_zc(u, i, exp):
+    Kr = (1 + i["strike"]) ** i["years"]
+    return {"price": i["notional"] * _fml(u, i["model"], i["type"] == "CAP", i["forward_index_ratio"], Kr, i["vol"], i["years"], i["discount_factor"]), "strike_ratio": Kr}
+
+
+HANDLERS = {"vol.varswap.fair_strike": h_varswap, "rates.swaption.price_cube": h_cube, "rates.cap.strip": h_strip, "rates.bondfut.option_price": h_bf_price,
+            "rates.bondfut.implied_vol": h_bf_iv, "infl.cap.yoy_price": h_yoy, "infl.cap.zc_price": h_zc}
 
 
 # ---------------------------------------------------------------- second-route float replays (self-check, not counted)
@@ -156,6 +245,7 @@ def load():
 NO_ORACLE = {
     "garch_e": "QuantLib's Garch11 is not in the Python wheel; checked by mpmath replica and a separate float replay",
     "varswap_e": "q != 0 cases: QuantLib's drift term omits q (ruling E-B3); realized-variance cases have no QuantLib object",
+    "ratesvol_e": "only error cases are not counted",
     "vix_e": "no QuantLib object for the CBOE strip method; hand case plus exact-rational replica and a float replay",
 }
 
