@@ -87,7 +87,7 @@ def _check(slices: Sequence[Slice], ks: Floats, reject: bool) -> dict[str, objec
         previous = ws
         sides = _wings(s.svi)
         for side, (slope, _) in zip(("LEFT", "RIGHT"), sides, strict=True):
-            if slope > 2:
+            if slope >= 2:  # ruling E-A15: a slope of exactly 2 is flagged
                 wings.append({"expiry_index": j, "side": side, "kind": "LEE"})
         if j:
             before = _wings(slices[j - 1].svi)
