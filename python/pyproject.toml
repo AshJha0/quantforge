@@ -37,3 +37,8 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_goldens_stage_d.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
 do_not_mutate = ["quantforge_core/_sobol_data.py"]
+
+[tool.uv]
+# A plain path .pth instead of setuptools' import-hook finder: the finder pulls in pathlib and
+# importlib.util at every interpreter start, about 0.1 s of T4 on the reference laptop.
+config-settings = { editable_mode = "compat" }
