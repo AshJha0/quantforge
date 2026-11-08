@@ -42,6 +42,8 @@
 #include "quantforge/core/store.hpp"
 #include "quantforge/core/timeseries.hpp"
 #include "quantforge/core/timezone.hpp"
+#include "quantforge/core/arb_surface.hpp"
+#include "quantforge/core/vol_stats.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -1058,6 +1060,8 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_equity_d.inc"
 #include "ops_credit.inc"
 #include "ops_r2.inc"
+#include "ops_e1.inc"
+#include "ops_e7.inc"
 
 // ---- dispatch ----
 
@@ -1067,6 +1071,20 @@ const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
 #include "ops_c_table.inc"
 #include "ops_d_table.inc"
+        {"vol.forward.vol", op_forward_vol},
+        {"vol.local.dupire", op_local_dupire},
+        {"vol.smile.dynamics", op_smile_dynamics},
+        {"vol.ssvi.to_svi", op_ssvi_to_svi},
+        {"vol.svi.fit_surface", op_svi_fit_surface},
+        {"vol.svi.surface_check", op_svi_surface_check},
+        {"vol.volofvol.measure", op_volofvol},
+        {"vol.garch.fit", op_garch_fit},
+        {"vol.garch.forecast", op_garch_forecast},
+        {"vol.garch.loglik", op_garch_loglik},
+        {"vol.varswap.fair_strike", op_varswap_fair},
+        {"vol.varswap.realized", op_varswap_realized},
+        {"vol.vix.index", op_vix_index},
+        {"vol.vix.term_variance", op_vix_term},
         {"calib.check_bid_ask", op_check_bid_ask},
         {"calib.curve_report", op_curve_report},
         {"calib.fit", op_calib_fit},

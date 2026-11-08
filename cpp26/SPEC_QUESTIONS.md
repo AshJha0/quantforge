@@ -84,3 +84,15 @@ Each is answered here with the most conservative reading; none changes a golden 
 4. **Jacobian above the diagonal.** Not computed: written as exactly 0, on the rule that pillar `i` is solved from quotes `0..i`. This assumes one pillar per quote, in quote order, as `rates.ois.bootstrap` gives.
 5. **Bumped curves.** A `TRIANGULAR` or parallel bump multiplies `D(t)` by `exp(-s(t) t)` at every date, after interpolation and before jumps (jumps multiply, so the order does not matter). A `PILLAR` bump moves the stored jump-free log factor of pillar `i` by `-h t_i`, which is the same as moving `ln D(p_i)`.
 6. **OIS product value.** `valuation.pv` with no `snapshot_id`.
+
+## Stage E (silent choices)
+
+E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `variance-swaps.md`, `vix-index.md`). Every golden passes, so none of these is pinned against a golden case.
+
+1. **VIX selection leaves only `K0`.** If zero bids exclude every neighbour of `K0`, `dK` is undefined. Written as `E_INPUT` ("fewer than 2 strikes are selected"). The spec has no rule for it.
+2. **VIX zero-bid count.** The count of consecutive zero bids starts afresh on each side, from the first strike beyond `K0`. `K0`'s own bids never count.
+3. **`vol.vix.index` check order.** After schema, the `N1 < N2`, `N1 <= 43200 <= N2` rule is checked before either term's own checks (near first, then next).
+4. **`vol.varswap.fair_strike` `K_min`.** `K_min - dk <= 0` uses the lowest put strike (the put walk's extension).
+5. **`vol.garch.fit` convergence.** Nelder-Mead in unconstrained coordinates (`omega = e^u`, `alpha` and `beta` as softmax shares with a slack term, so `alpha + beta < 1`), from five starts, then restarted from the best point until a restart gains under 1e-12 relative. `E_NO_CONVERGENCE` if the last restart's simplex has not collapsed. Fitted parameters are written to diagnostics, not to values.
+6. **`slices` above 100.** `E_LIMIT` comes after the `E_INPUT` and `E_DOMAIN` slice checks, as the spec lists them. This is unlike the general limits rule, where `E_LIMIT` comes right after schema.
+7. **Dupire at a point.** `w_T <= 0` is tested before `g <= 0`. Both give `E_ARBITRAGE`, so only the message differs.
