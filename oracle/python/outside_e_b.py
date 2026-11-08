@@ -32,6 +32,10 @@ D = date.fromisoformat
 QD = lambda d: ql.Date(d.day, d.month, d.year)  # noqa: E731
 
 
+class PartlyOutside(Exception):
+    """Ruling E-B28 (as spec A's E-A17): QuantLib supplies functions, but an output is the spec's own algebra. Recorded, not counted."""
+
+
 class Used:
     def __init__(self):
         self.rows = set()
@@ -144,6 +148,7 @@ def h_yoy(u, i, exp):
 
 
 def h_zc(u, i, exp):
+    raise PartlyOutside("QuantLib functions with the spec's own algebra (E-B28)")
     Kr = (1 + i["strike"]) ** i["years"]
     return {"price": i["notional"] * _fml(u, i["model"], i["type"] == "CAP", i["forward_index_ratio"], Kr, i["vol"], i["years"], i["discount_factor"]), "strike_ratio": Kr}
 
@@ -156,7 +161,7 @@ def _qm(M):
 def h_validate(u, i, exp):
     M = i["matrix"]
     n = len(M)
-    me = min(u("CORR.EIGEN", _qm(M)).eigenvalues())
+    me = min(u("CORR.EIGEN", _qm([[(M[a][b] + M[b][a]) / 2 for b in range(n)] for a in range(n)])).eigenvalues())
     sym = all(M[a][b] == M[b][a] for a in range(n) for b in range(n))
     dg = all(M[a][a] == 1.0 for a in range(n))
     rg = all(-1 <= x <= 1 for r in M for x in r)
@@ -190,8 +195,10 @@ def _cdso(u, i, vol):
 
 def h_cdso(u, i, exp):
     o, cds, dp, disc = _cdso(u, i, i["vol"])
-    ex = QD(D(i["expiry"]))
-    fep = i["notional"] * (1 - i["recovery"]) * dp.defaultProbability(ex) * disc.discount(ex)
+    # front-end protection as QuantLib's own value: non-knock-out payer minus knock-out payer, same inputs
+    pay = {**i, "type": "PAYER"}
+    fep = _cdso(u, {**pay, "knock_out": False}, i["vol"])[0].NPV() - _cdso(u, {**pay, "knock_out": True}, i["vol"])[0].NPV()
+    o, cds, dp, disc = _cdso(u, i, i["vol"])
     return {"price": o.NPV(), "forward_spread": o.atmRate(), "risky_annuity": o.riskyAnnuity() / i["notional"], "front_end_protection": fep}
 
 
@@ -207,6 +214,7 @@ def _ninv(u, p):
 
 
 def h_joint(u, i, exp):
+    raise PartlyOutside("QuantLib functions with the spec's own algebra (E-B28)")
     if i["copula"] != "GAUSSIAN":
         raise NotImplementedError("no bivariate Student t in the QuantLib wheel")
     p1, p2 = i["default_probabilities"]
@@ -223,6 +231,7 @@ def _elmin(u, p, rho, k):
 
 
 def h_tranche(u, i, exp):
+    raise PartlyOutside("QuantLib functions with the spec's own algebra (E-B28)")
     lgd = 1 - i["recovery"]
     a, d, p, rho = i["attachment"], i["detachment"], i["default_probability"], i["correlation"]
     hi = _elmin(u, p, rho, min(d / lgd, 1))
@@ -231,6 +240,7 @@ def h_tranche(u, i, exp):
 
 
 def h_cdf(u, i, exp):
+    raise PartlyOutside("QuantLib functions with the spec's own algebra (E-B28)")
     p, rho, lgd = i["default_probability"], i["correlation"], 1 - i["recovery"]
     c = _ninv(u, p)
     cdf = u("NORM.INVERSE")[1]
@@ -334,16 +344,18 @@ def load():
 
 NO_ORACLE = {
     "corr_e": "implied correlation and dispersion have no QuantLib object (closed forms, hand-checked); on 4 harder matrices QuantLib's Higham stops at its iteration cap before convergence",
-    "creditopt_e": "Student t copula: no bivariate t in the QuantLib wheel; LHP and Gaussian copula are checked at formula level with QuantLib's bivariate normal",
+    "creditopt_e": "Gaussian copula, LHP and loss CDF are partly outside (spec algebra on QuantLib functions, E-B28); Student t has no QuantLib object",
     "garch_e": "QuantLib's Garch11 is not in the Python wheel; checked by mpmath replica and a separate float replay",
     "varswap_e": "q != 0 cases: QuantLib's drift term omits q (ruling E-B3); realized-variance cases have no QuantLib object",
-    "ratesvol_e": "only error cases are not counted",
+    "ratesvol_e": "error cases, and ZC cases whose strike ratio is the spec algebra (E-B28)",
     "vix_e": "no QuantLib object for the Cboe strip method; hand case plus exact-rational replica and a float replay",
 }
 
 
 def verify_all(show=True):
     reg, table, bad = [], [], []
+    global partly
+    partly = []
     for suite, cases in load():
         k = 0
         for c in cases:
@@ -361,6 +373,9 @@ def verify_all(show=True):
                 ok, why = judge(c, h(u, c["inputs"], c["expected"]["outputs"]))
             except NotImplementedError as e:
                 ok, why = False, f"not mapped: {e}"
+            except PartlyOutside as e:
+                ok, why = False, f"not mapped: partly outside: {e}"
+                partly.append(c["case_id"])
             except RuntimeError as e:
                 ok, why = False, f"QuantLib refused: {e}"
             if ok:
@@ -408,7 +423,7 @@ def main():
         print(f"| `{s}` | {a} | {b} | {100 * a / b:.0f}% | {NO_ORACLE.get(s, '')} |")
     print(f"| **stage E spec B** | **{k}** | **{n}** | **{100 * k / n:.1f}%** | |")
     (ROOT / "oracle" / "outside_register_e_b.json").write_text(json.dumps({"rule": "plan 11.2.5", "library": CM.LIBRARY, "version": CM.VERSION, "map_review": CM.REVIEW,
-                                                                         "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
+                                                                         "partly_outside_not_counted": partly, "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
     return 1 if bad else 0
 
 
