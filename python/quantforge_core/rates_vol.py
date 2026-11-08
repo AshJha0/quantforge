@@ -195,6 +195,10 @@ def bondfut_implied(kind: str, f: float, k: float, t: float, df: float, premium:
         high *= 2
         if high > 1e6:
             raise QfError("E_NO_CONVERGENCE", "no implied vol bracket", "premium")
+    if not ctd_yield > 0:  # ruling E-B38, after the premium bounds
+        raise _domain("ctd_yield must be above 0", "ctd_yield")
+    if not duration > 0:
+        raise _domain("ctd_modified_duration must be above 0", "ctd_modified_duration")
     price_vol = _solve(gap, 0.0, high)
     return price_vol, price_vol / (duration * ctd_yield)
 

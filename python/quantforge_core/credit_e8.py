@@ -96,9 +96,9 @@ def cds_option_price(as_of: date, expiry: date, maturity: date, rate: float, haz
 def cds_option_implied(as_of: date, expiry: date, maturity: date, rate: float, hazard: float,
                        recovery: float, kind: str, strike: float, notional: float,
                        premium: float, knock_out: bool) -> float:
-    _check_option(as_of, expiry, maturity, hazard, recovery, strike)
-    if not knock_out:
+    if not knock_out:  # ruling E-B40: before the dates
         raise _input("implied vol is defined for knock-out options only", "knock_out")
+    _check_option(as_of, expiry, maturity, hazard, recovery, strike)
     forward, annuity, _, option = _terms(as_of, expiry, maturity, rate, hazard, recovery, kind,
                                          strike, notional)
     scale = notional * annuity
@@ -258,6 +258,8 @@ def tranche_loss(p: float, rho: float, recovery: float, attachment: float,
 
 
 def loss_cdf(p: float, rho: float, recovery: float, losses: list[float]) -> list[float]:
+    if not losses:  # ruling E-B40
+        raise _input("losses is empty", "losses")
     _check_pool(p, rho, recovery)
     scale = 1 - recovery
     if any(not 0 < x < scale for x in losses):

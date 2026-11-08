@@ -349,10 +349,10 @@ def vix_term_variance(minutes: int, rate: float,
 def vix_index(near: tuple[int, float, Sequence[Quote]],
               next_: tuple[int, float, Sequence[Quote]]) -> tuple[float, float, float]:
     n1, n2 = near[0], next_[0]
+    if not (n1 < n2 and n1 <= MINUTES_30D <= n2):  # ruling E-B34: the bracket first
+        raise _input("the terms must bracket 30 days with near before next", "near")
     v1 = vix_term_variance(*near)[2]
     v2 = vix_term_variance(*next_)[2]
-    if not (n1 < n2 and n1 <= MINUTES_30D <= n2):
-        raise _input("the terms must bracket 30 days with near before next", "near")
     t1, t2 = n1 / MINUTES_PER_YEAR, n2 / MINUTES_PER_YEAR
     bracket = (t1 * v1 * (n2 - MINUTES_30D) / (n2 - n1)
                + t2 * v2 * (MINUTES_30D - n1) / (n2 - n1))

@@ -92,10 +92,15 @@ def _names(weights: Sequence[float], *lists: Sequence[float]) -> None:
 
 def implied(weights: Sequence[float], vols: Sequence[float], index_vol: float) -> float:
     _names(weights, vols)
-    if any(w < 0 for w in weights) or sum(1 for w in weights if w > 0) < 2:
-        raise _domain("weights must be >= 0 with at least two positive", "weights")
-    if any(s <= 0 for s in vols) or index_vol <= 0:
+    # Ruling E-B39 order: negative weight, member vols, index_vol, two positive weights.
+    if any(w < 0 for w in weights):
+        raise _domain("a weight is negative", "weights")
+    if any(s <= 0 for s in vols):
         raise _domain("a vol is not above 0", "vols")
+    if index_vol <= 0:
+        raise _domain("index_vol must be above 0", "index_vol")
+    if sum(1 for w in weights if w > 0) < 2:
+        raise _domain("at least two weights must be positive", "weights")
     # A zero weight drops its name (ruling E-B33).
     kept = [(w, s) for w, s in zip(weights, vols, strict=True) if w > 0]
     return _implied([w for w, _ in kept], [s for _, s in kept], index_vol)

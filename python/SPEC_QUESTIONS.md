@@ -189,3 +189,7 @@ Choices made where a stage E spec was silent or two rules pull apart. No golden 
 Closed by rulings (2026-11-08): E-Q1 by E-A34 (`E_LIMIT` at the gate, as built); E-Q2 by E-A35 (stage C cap
 kept, vol-of-vol series raised to 10,000, now built); E-Q6 by E-A36 (first `expiry_years <= 0` is `E_DOMAIN`,
 now built); E-Q10 by E-A24 (golden corrected); E-Q12 by E-B27 (golden corrected).
+Closed by spec B rulings (2026-11-08): E-Q3 by E-B35 (as built); E-Q4 by E-B36 (as built); E-Q5 by E-B34
+(bracket now checked first); E-Q8 by E-B37 (as built); E-Q9 by E-B40 (as built); E-Q13 by E-B40 (as built).
+Still open: E-Q7 (cube domain checks on every node, as the golden needs) and E-Q11 (E2 array caps), both
+upheld in effect by goldens and E-A35.
