@@ -165,6 +165,17 @@
       "redistribute_raw": "yes with acknowledgement; held back from git by the rule above",
       "notice": "Source: U.S. Energy Information Administration, natural gas bulk file, with the date fetched.",
       "enabled": true
+    },
+    {
+      "id": "fiscaldata-treasury-auctions",
+      "url": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query?filter=auction_date:gte:{year}-01-01&page%5Bsize%5D=10000&format=csv",
+      "licence": "Fiscal Data: free to copy, adapt, redistribute or otherwise use for non-commercial and commercial purposes",
+      "licence_url": "https://fiscaldata.treasury.gov/about-us/",
+      "terms_checked": "2026-11-08: About Us page read (reuse clause quoted above). API tested with no key, CSV returned. Security-level auction results by CUSIP, including price_per100. Auction prices only, not daily secondary-market prices",
+      "attribution": "US Department of the Treasury, Bureau of the Fiscal Service",
+      "redistribute_raw": "yes per the Fiscal Data terms; held back from git by the rule above",
+      "notice": "Source: US Department of the Treasury, Bureau of the Fiscal Service, Fiscal Data (fiscaldata.treasury.gov), Treasury Securities Auctions Data.",
+      "enabled": true
     }
   ]
 }
