@@ -14,7 +14,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
-  FUZZ_ARGS: --seconds ${{ inputs.seconds || '180' }} --seed ${{ github.run_number }}
+  # Half the draws come from the current stage's goldens (conformance/quality/stage_e.json); no-op until they exist.
+  FUZZ_ARGS: --seconds ${{ inputs.seconds || '180' }} --seed ${{ github.run_number }} --focus-config conformance/quality/stage_e.json
 jobs:
   java:
     runs-on: ubuntu-24.04

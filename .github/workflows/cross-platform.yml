@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       golden:
-        description: 'golden folder to run'
+        description: 'golden folder to run, for example datasets/golden/stage_e for stage E alone'
         default: datasets/golden
 permissions:
   contents: read

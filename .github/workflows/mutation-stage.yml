@@ -30,6 +30,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       matrix: ${{ steps.m.outputs.matrix }}
+      any: ${{ steps.m.outputs.any }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -42,9 +43,11 @@ jobs:
           inc = [{"lang": l, "module": m["module"], "target": m[l], "suite": m.get(l + "_suite", m["suite"])}
                  for m in cfg["stages"][os.environ["STAGE"]] for l in ("java", "cpp", "python", "rust") if m.get(l)]
           print("matrix=" + json.dumps({"include": inc}))
+          print("any=" + ("true" if inc else "false"))  # stage E starts with every target null
           PY
   mutate:
     needs: plan
+    if: needs.plan.outputs.any == 'true'
     strategy:
       fail-fast: false
       max-parallel: 8

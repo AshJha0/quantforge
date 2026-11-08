@@ -1,0 +1,18 @@
+{
+  "note": "Stage E code-quality scope, one place for the coverage gate, the lint and test scope check, and the fuzz focus. Mutation modules live in conformance/mutation/stages.json under stage E, with the same module names. Language sessions replace each TODO with a real path when the module lands; an entry left as TODO is skipped by every tool, and tools/quality_gate.py --check-config lists what is still TODO. Paths are repository-relative globs of source files. Module names are placeholders until the stage E spec fixes them; rename freely, keeping stages.json in step.",
+  "stage": "E",
+  "coverage_min": 0.85,
+  "modules": [
+    {"module": "svi_ssvi_surface", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "local_vol", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "heston", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "fx_smile", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "swaption_cube", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "exotics", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "garch", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "variance_swaps", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"},
+    {"module": "copula", "java": "TODO", "cpp": "TODO", "python": "TODO", "rust": "TODO"}
+  ],
+  "python_tests": ["TODO"],
+  "fuzz": {"golden": "datasets/golden/stage_e", "share": 0.5}
+}

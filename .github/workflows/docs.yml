@@ -5,9 +5,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'tools/test_tools.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'tools/test_tools.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   pull_request:
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'tools/test_tools.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'tools/test_tools.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   workflow_dispatch:
 permissions:
   contents: read

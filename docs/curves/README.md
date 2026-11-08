@@ -2,7 +2,7 @@
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated, and stage E pages are Planned until their CLI operations land: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on 2026-11-07 from commit `8dddd58`.
 
@@ -30,6 +30,10 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 22 golden cases |
 | [Commodity forwards](commodities.md) | Implemented, not Validated | D | 4 golden cases |
 | [MBS](mbs.md) | Implemented, not Validated | D | 3 golden cases |
+| [Implied vol surface](vol-surface.md) | Planned | E | None yet |
+| [Local volatility](local-vol.md) | Planned | E | None yet |
+| [Swaption cube](swaption-cube.md) | Planned | E | None yet |
+| [Vol term structure](vol-term-structure.md) | Planned | E | None yet |
 | Financing curves | Planned | D | None yet |
 | Sector and rating curves | Planned | D | None yet |
 | Funding curve | Planned | F | None yet |
