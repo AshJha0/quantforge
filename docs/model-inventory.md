@@ -177,6 +177,34 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 - **Limitations:** linear costs only, no impact, no integer lot sizes.
 - **Validation:** optimality conditions only. **Review:** 2026-11-07.
 
+## Stage E models, spec B (E4, E6, E7, E8)
+
+Numbered EB so spec A's stage E rows can be added without renumbering. Status *Specified* means spec and goldens exist and the language builds have not yet run them. Outside-checked counts are from `oracle/outside_register_e_b.json`.
+
+| # | Model | Spec | Stage | Status | Outside-checked |
+|---|---|---|---|---|---|
+| EB1 | GARCH(1,1) likelihood, forecast, fit | `05-volatility/garch.md` | E7 | Specified | 0 of 27 (no QuantLib object in the Python wheel) |
+| EB2 | Variance swap: replication and realized variance | `05-volatility/variance-swaps.md` | E7 | Specified, outside-checked | `fair_strike` 18 of 27; realized 0 of 4 |
+| EB3 | VIX-style index from a given strip | `05-volatility/vix-index.md` | E7 | Specified | 0 of 14 (hand case is the outside reference) |
+
+### EB1 GARCH(1,1)
+- **Purpose:** conditional variance path and Gaussian log-likelihood at given parameters; multi-step variance forecast; maximum-likelihood fit.
+- **Inputs:** a return series (used as given, no mean), parameters, an initial-variance rule.
+- **Limitations:** Gaussian innovations only (no Student-t), no mean equation, no leverage term (GJR, EGARCH), one asset. The fit is judged on the likelihood, so two languages may report different parameters on a flat likelihood. Synthetic series only.
+- **Validation:** 50-digit replica, float replay, hand case; fit optimum checked by gradient and Hessian. **Review:** 2026-11-08.
+
+### EB2 Variance swap
+- **Purpose:** fair variance strike from an option strip; realized variance and payoff.
+- **Inputs:** spot, flat r and q, strike lists with one Black vol each, extension step; or a price series.
+- **Limitations:** discrete strip with linear weights, so the result depends on the strikes given (a coarse strip is biased: see the density grid in the goldens). No jumps or caps on realized variance, no volatility swap convexity, no dividends in the realized series. Flat rates.
+- **Validation:** QuantLib `ReplicatingVarianceSwapEngine` agrees on all `q = 0` cases; differs by design at `q != 0` (ruling E-B3). **Review:** 2026-11-08.
+
+### EB3 VIX-style index
+- **Purpose:** the Cboe white-paper index from two caller-given strips.
+- **Inputs:** minutes to expiry, a rate per term, call and put bids and asks by strike.
+- **Limitations:** the caller picks the expiries and the rate; no Treasury interpolation, no special-opening-quotation handling, no data cleaning beyond the zero-bid rule. Not the official index and not licensed as one.
+- **Validation:** hand-worked case; exact-rational replica; float replay. **Review:** 2026-11-08.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.
