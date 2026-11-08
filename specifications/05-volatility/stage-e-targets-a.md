@@ -54,4 +54,4 @@ Outside-oracle share (E2): 18 of 46 (Heston and Bates value cases); spec A runni
 
 Outside-oracle share (E5): 115 of 164 (70%). Spec A total after E5: 263 of 410 (64.1%), counted under ruling E-A17.
 
-After the second R5 audit (rulings E-A25 to E-A33): 16 more QuantLib-object cases (6 Heston, 3 Bates, 7 barriers with rebates). Spec A: 279 of 429 (65.0
+After the second R5 audit (rulings E-A25 to E-A33): 16 more QuantLib-object cases (6 Heston, 3 Bates, 7 barriers with rebates). Spec A: 279 of 429 (65.0 percent), counted under E-A17; the stage figure combines both registers (E-A25).
