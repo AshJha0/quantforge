@@ -229,6 +229,19 @@ def credit_e():
                          ("correlation 0 (degenerate pool)", {"correlation": 0.0}, "E_DOMAIN"), ("probability 1", {"default_probability": 1.0}, "E_DOMAIN")):
         s.add(top, {"default_probability": .05, "correlation": .3, "recovery": .4, "attachment": .03, "detachment": .07, **bad}, error=code, cls=E, tags=["invalid"], description=d)
     s.add(cop_, {"default_probability": .05, "correlation": .3, "recovery": .4, "losses": [.7]}, error="E_DOMAIN", cls=E, tags=["invalid"], description="loss at or above 1 - recovery")
+    # Margin block (appended so no earlier case id moves): two more schedules, all priced by QuantLib's CdsOption.
+    for pi, (exs, mats) in enumerate((("2027-04-30", "2031-07-31"), ("2027-07-15", "2033-01-15"))):
+        for hi, (h, r) in enumerate(((.012, .025), (.035, .045), (.08, .02))):
+            for typ, mult, v, ko in (("PAYER", .9, .5, True), ("RECEIVER", 1.1, .6, True), ("PAYER", 1.05, .8, False)):
+                i = {"as_of": "2026-11-06", "expiry": exs, "maturity": mats, "rate": r, "hazard_rate": h, "recovery": .4, "type": typ,
+                     "strike": round(h * .6 * mult, 5), "notional": 1e7, "vol": v, "knock_out": ko}
+                out = cds_option(i)
+                s.add(op, i, out, cls=R, verified=["independent-replay", "mpmath-50"], tags=["cdsoption", typ.lower(), "schedule", "margin"],
+                      output_classes={"forward_spread": A, "risky_annuity": A}, limit=LIM)
+                caught("creditopt_e", f"cdsoption margin {pi}/{hi} {typ}: no-accrual", abs(cds_option(i, "no-accrual")["price"] - out["price"]), 1e-2 + 1e-9 * out["price"])
+                if ko:
+                    s.add(iop, {k: v_ for k, v_ in i.items() if k != "vol"} | {"premium": out["price"]}, {"vol": v}, cls=R, verified=["independent-replay", "mpmath-50 root"],
+                          tags=["cdsoption", "implied", "schedule", "margin"])
     note("creditopt_e: CDS options on mid-point legs; copulas and LHP by mpmath quadrature; LHP cross-checked by fixed Gauss-Legendre")
     write(s)
 

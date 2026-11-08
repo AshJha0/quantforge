@@ -5008,7 +5008,7 @@
     "zero-weight",
     "synthetic"
    ],
-   "description": "a zero weight drops the name: same as corr_e-0028"
+   "description": "a zero weight drops the name: same value as the two-name case with weights 0.5, 0.5"
   },
   {
    "case_id": "corr_e-0043",

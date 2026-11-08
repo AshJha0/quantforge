@@ -191,7 +191,7 @@ def corr_e():
     wm, vm = [mp.mpf(.5), mp.mpf(.5), mp.mpf(0)], [mp.mpf(.2), mp.mpf(.3), mp.mpf(.25)]
     rho0 = (mp.mpf(.22) ** 2 - mp.fsum(a * a * b * b for a, b in zip(wm, vm))) / mp.fsum(wm[i] * wm[j] * vm[i] * vm[j] for i in range(3) for j in range(3) if i != j)
     s.add(iop, {"weights": [.5, .5, 0.0], "vols": [.2, .3, .25], "index_vol": .22}, {"correlation": f(rho0)}, cls=A, verified=["hand", "mpmath-50"], tags=["corr", "implied", "zero-weight"],
-          description="a zero weight drops the name: same as corr_e-0028")
+          description="a zero weight drops the name: same value as the two-name case with weights 0.5, 0.5")
     s.add(iop, {"weights": [1.0, 0.0], "vols": [.2, .3], "index_vol": .2}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="one positive weight: zero denominator")
     s.add(iop, {"weights": [.6, -.4], "vols": [.2, .3], "index_vol": .2}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="negative weight")
     s.add(iop, {"weights": [.5, .5], "vols": [.2, 0.0], "index_vol": .2}, error="E_DOMAIN", cls=E, tags=["invalid"], description="vols must be positive")
