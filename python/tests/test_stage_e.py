@@ -145,7 +145,7 @@ def test_vix_zero_bids_skip_and_stop():
     used = vol_e7.vix_term_variance(43200, 0.01, strip)[3]
     assert used == [90, 100, 110, 120]
     strip[3] = vol_e7.Quote(90, 11, 11.2, 0.0, 0.2)  # 90 zero too: second zero at 80 stops
-    assert vol_e7.vix_term_variance(43200, 0.01, strip)[3] == [100, 110, 120]
+    assert code(vol_e7.vix_term_variance, 43200, 0.01, strip) == "E_INPUT"  # E-B15: no put
 
 
 def test_vix_errors():

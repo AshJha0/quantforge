@@ -325,6 +325,8 @@ def vix_term_variance(minutes: int, rate: float,
     i0 = ordered.index(k0)
     puts = _side(ordered[i0 - 1::-1] if i0 else [], lambda q: q.put_bid)
     calls = _side(ordered[i0 + 1:], lambda q: q.call_bid)
+    if not puts or not calls:  # ruling E-B15, Cboe methodology 3(a)(iii)
+        raise _input("no out-of-the-money put or no out-of-the-money call is selected", "strip")
     chosen = [(q.strike, q.put) for q in reversed(puts)]
     chosen.append((k0.strike, (k0.call + k0.put) / 2))
     chosen += [(q.strike, q.call) for q in calls]
