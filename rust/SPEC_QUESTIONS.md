@@ -128,3 +128,5 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - **E7 strip order:** the strip may come in any order; the build sorts it by strike. Duplicates are found after sorting.
 - **E7 `vol.vix.index` order:** after schema reads of both terms, the `N1 < N2`, `N1 <= 43200 <= N2` bracket is checked before either term's rule checks.
 - **E7 zero-bid counter:** "consecutive" resets on any quote with a non-zero bid; `K0` itself does not count towards either side's run.
+- **E3 check order:** the common checks (`spot`, `expiry_years`, `vol` above 0) come first, then `strike` and `notional`; in `fx.delta.to_strike` the sign of the delta comes before its reach; in `fx.smile.from_quotes` the `delta` interval comes before the wing vols.
+- **E3 PA call maximum:** a delta exactly equal to the maximum is `E_DOMAIN` (ruling E-A10 "at or above"). The peak is found by bisection on `d2`, so a delta within a few ulps of the maximum may land on either side.

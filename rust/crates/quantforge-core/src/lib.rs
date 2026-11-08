@@ -24,6 +24,7 @@ pub mod equity;
 pub mod equity_d;
 pub mod error;
 pub mod fx;
+pub mod fx_smile;
 pub mod garch;
 pub mod greeks;
 pub mod hedge;

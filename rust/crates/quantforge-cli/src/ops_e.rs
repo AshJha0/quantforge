@@ -1,10 +1,11 @@
-//! Stage E operations: E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
+//! Stage E operations: E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
 //! (`garch.md`, `variance-swaps.md`, `vix-index.md`).
 
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
 use crate::ops_b::{items, sub};
 use quantforge_core::error::{Result, fail};
+use quantforge_core::fx_smile::{self, AtmType, DeltaType};
 use quantforge_core::garch::{self, Start};
 use quantforge_core::json::{Json, obj};
 use quantforge_core::surface_e::{self, Check, Dynamics, Rule, Side, Slice, WingKind};
@@ -121,8 +122,91 @@ fn check_fields(c: &Check, reject: bool) -> Result<Vec<(&'static str, Json)>> {
     ])
 }
 
+fn fx_market(i: &Inputs) -> Result<fx_smile::Market> {
+    Ok(fx_smile::Market {
+        spot: i.f64("spot")?,
+        expiry_years: i.f64("expiry_years")?,
+        domestic_rate: i.f64("domestic_rate")?,
+        foreign_rate: i.f64("foreign_rate")?,
+    })
+}
+
+fn option_type(i: &Inputs) -> Result<bool> {
+    match i.str("option_type")? {
+        "CALL" => Ok(true),
+        "PUT" => Ok(false),
+        _ => i.fail("option_type", "must be CALL or PUT"),
+    }
+}
+
+fn delta_type(i: &Inputs) -> Result<DeltaType> {
+    let s = i.str("delta_type")?;
+    DeltaType::parse(s).map_or_else(|| i.fail("delta_type", "unknown delta type"), Ok)
+}
+
+fn atm_type(i: &Inputs) -> Result<AtmType> {
+    match i.str("atm_type")? {
+        "SPOT" => Ok(AtmType::Spot),
+        "FORWARD" => Ok(AtmType::Forward),
+        "DNS" => Ok(AtmType::Dns),
+        _ => i.fail("atm_type", "unknown ATM type"),
+    }
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
+        "fx.option.price" => {
+            let (m, k, v) = (fx_market(i)?, i.f64("strike")?, i.f64("vol")?);
+            let (call, n) = (option_type(i)?, i.f64("notional")?);
+            let p = fx_smile::price(&m, k, v, call, n)?;
+            plain(obj([
+                ("price", p.price.into()),
+                ("premium_pct_foreign", p.premium_pct_foreign.into()),
+                ("forward", p.forward.into()),
+                ("delta", p.delta.into()),
+                ("gamma", p.gamma.into()),
+                ("vega", p.vega.into()),
+            ]))
+        }
+        "fx.delta.from_strike" => {
+            let (m, k, v) = (fx_market(i)?, i.f64("strike")?, i.f64("vol")?);
+            let d = fx_smile::deltas(&m, k, v, option_type(i)?)?;
+            let pairs = DeltaType::ALL
+                .iter()
+                .zip(d)
+                .map(|(t, x)| (t.name().to_string(), x.into()))
+                .collect();
+            plain(obj([("deltas", Json::Obj(pairs))]))
+        }
+        "fx.delta.to_strike" => {
+            let (m, v, call) = (fx_market(i)?, i.f64("vol")?, option_type(i)?);
+            let (d, t) = (i.f64("delta")?, delta_type(i)?);
+            let k = fx_smile::strike_from_delta(&m, v, call, d, t)?;
+            plain(obj([("strike", k.into())]))
+        }
+        "fx.atm.strike" => {
+            let (m, v) = (fx_market(i)?, i.f64("vol")?);
+            let (a, t) = (atm_type(i)?, delta_type(i)?);
+            plain(obj([("strike", fx_smile::atm_strike(&m, v, a, t)?.into())]))
+        }
+        "fx.smile.from_quotes" => {
+            let m = fx_market(i)?;
+            let q = fx_smile::Quotes {
+                atm_vol: i.f64("atm_vol")?,
+                rr: i.f64("rr")?,
+                bf: i.f64("bf")?,
+                delta: i.f64("delta")?,
+            };
+            let (t, a) = (delta_type(i)?, atm_type(i)?);
+            let s = fx_smile::smile(&m, &q, t, a)?;
+            plain(obj([
+                ("atm_strike", s.atm_strike.into()),
+                ("call_vol", s.call_vol.into()),
+                ("put_vol", s.put_vol.into()),
+                ("call_strike", s.call_strike.into()),
+                ("put_strike", s.put_strike.into()),
+            ]))
+        }
         "vol.svi.surface_check" => {
             let s = slices(i)?;
             let (k, reject) = (i.reals("log_moneyness")?, i.bool_or("reject", false)?);
