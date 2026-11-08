@@ -132,3 +132,29 @@ No stage D question is open.
   `batch --batch` are exit 64.
 - R1-P5. R1-6 SOFR: the "USGS plus every Good Friday" calendar is used only inside `overnight.compound_dated`
   (business days, start/end check, `back`). Other SOFR uses (swap schedules, curves) keep plain `USGS`.
+
+## Stage E (open)
+
+Choices made where a stage E spec was silent or two rules pull apart. No golden depends on any of them.
+
+- E-Q1 (E1, `slices` count). `arb-free-surfaces.md` lists "more than 100 slices: `E_LIMIT`" last, after the
+  `E_INPUT` and `E_DOMAIN` slice checks, but `01-core/limits.md` B3 puts `E_LIMIT` before every rule check.
+  Python follows B3: the slice cap (100), the grid cap (`log_moneyness`, 10,000) and the point cap (`points`,
+  10,000) are checked at the gate, before any rule check. `vol.svi.fit_surface` caps `expiry_years` at 100 the
+  same way.
+- E-Q2 (E1, other arrays). The stage C cap of 100 (ruling C10, every `vol.` operation) would cap the E1 grid
+  at 100, against the 10,000 stated in E1. Python lifts the stage C cap for the three E1 operations with a
+  stated grid (`vol.svi.surface_check`, `vol.svi.fit_surface`, `vol.local.dupire`) and keeps it for the other
+  E1 operations (`vol.forward.vol` expiries, `vol.smile.dynamics` strikes, `vol.volofvol.measure` vols), whose
+  pages name no limit. A 100-long cap on a vol-of-vol series is tight; a ruling is asked for.
+- E-Q3 (E7, arrays). `returns`, `prices` and `strip` "count towards limits.md like any array" (cli-contract,
+  spec B): read as the 100,000 cap only, so the stage C cap of 100 does not apply to `vol.garch.*`,
+  `vol.varswap.*` and `vol.vix.*`.
+- E-Q4 (E7, `vol.varswap.fair_strike`). A replicated `fair_variance` below 0 (possible on a coarse strip with
+  a large carry) has no `sqrt`. The page lists no check for it; Python returns `E_DOMAIN` on field `vols`
+  rather than crash.
+- E-Q5 (E7, `vol.vix.index`). The bracket rule (`N1 < N2`, `N1 <= 43200 <= N2`) is the only listed check;
+  its order against the two term inputs' own checks is not stated. Python checks both terms first (near, then
+  next), then the bracket, then a negative bracket under the root (`E_DOMAIN`).
+- E-Q6 (E1, `vol.forward.vol`). No check on `expiry_years <= 0` is listed; Python takes them as given (a
+  first expiry of 0 then divides by `T_1 - 0` only from the second point on).
