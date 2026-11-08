@@ -346,6 +346,1278 @@
     "STAT.SAMPLE"
    ],
    "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0001",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0002",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0003",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0004",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0005",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0006",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0007",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0008",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0009",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0010",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0011",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0012",
+   "operation": "fx.option.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.GK"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0018",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0019",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0020",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0021",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0022",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0023",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0024",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0025",
+   "operation": "fx.delta.from_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0026",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0027",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0028",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0029",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0030",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0031",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0032",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0033",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0034",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0035",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0036",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0037",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0038",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0039",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0040",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0041",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0042",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0043",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0044",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0045",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0046",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0047",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0048",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0049",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0050",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0051",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0052",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0053",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0054",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0055",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0056",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0057",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0058",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0059",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0060",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0061",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0062",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0063",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0064",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0065",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0066",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0067",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0068",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0069",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0070",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0071",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0072",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0073",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0074",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0075",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0076",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0077",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0078",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0079",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0080",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0081",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0082",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0083",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0084",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0085",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0086",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0087",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0088",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0089",
+   "operation": "fx.delta.to_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0094",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0095",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0096",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0097",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0098",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0099",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0100",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0101",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0102",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0103",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0104",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0105",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0106",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0107",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0108",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0109",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0110",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0111",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0112",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0113",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0114",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0115",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0116",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0117",
+   "operation": "fx.atm.strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0118",
+   "operation": "fx.smile.from_quotes",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0119",
+   "operation": "fx.smile.from_quotes",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0120",
+   "operation": "fx.smile.from_quotes",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0121",
+   "operation": "fx.smile.from_quotes",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0122",
+   "operation": "fx.smile.from_quotes",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "fxs_e-0123",
+   "operation": "fx.smile.from_quotes",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "FX.ATM_TYPE",
+    "FX.DELTA_CALC",
+    "FX.DELTA_TYPE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
   }
  ]
 }

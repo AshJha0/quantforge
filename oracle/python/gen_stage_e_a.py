@@ -409,7 +409,158 @@ def dyn(P, T, S0, S1, r, q, Ks, rule, ot):
     return {"vols_base": vb, "vols_shifted": vs, "prices_base": pb, "prices_shifted": ps, "deltas": de}
 
 
-SLICES = {"E1": (e1_surf, e1_lv)}
+# ---------------------------------------------------------------- E3 FX smile (spec 05-volatility/fx-smile.md)
+from scipy.optimize import brentq  # noqa: E402
+
+DT = ("SPOT", "FORWARD", "SPOT_PA", "FORWARD_PA")
+
+
+def fxm(S, T, rd, rf):
+    return S * math.exp((rd - rf) * T), math.exp(-rd * T), math.exp(-rf * T)
+
+
+def fx_delta(ot, dt, S, K, T, rd, rf, v):
+    F, Dd, Df = fxm(S, T, rd, rf)
+    p = 1 if ot == "CALL" else -1
+    sd = v * math.sqrt(T)
+    d1 = math.log(F / K) / sd + sd / 2
+    d2 = d1 - sd
+    return {"SPOT": p * Df * ncdf(p * d1), "FORWARD": p * ncdf(p * d1),
+            "SPOT_PA": p * Df * K / F * ncdf(p * d2), "FORWARD_PA": p * K / F * ncdf(p * d2)}[dt]
+
+
+def pa_kmax(S, T, rd, rf, v):
+    """Strike of the largest premium-adjusted call delta: sd N(d2) = n(d2)."""
+    F = fxm(S, T, rd, rf)[0]
+    sd = v * math.sqrt(T)
+    d2 = brentq(lambda d: sd * ncdf(d) - math.exp(-d * d / 2) / math.sqrt(2 * math.pi), -10, 10, xtol=1e-15)
+    return F * math.exp(-sd * d2 - sd * sd / 2)
+
+
+def fx_strike(ot, dt, S, T, rd, rf, v, delta):
+    F = fxm(S, T, rd, rf)[0]
+    f = lambda K: fx_delta(ot, dt, S, K, T, rd, rf, v) - delta  # noqa: E731
+    lo, hi = F * 1e-4, F * 1e4
+    if ot == "CALL" and dt.endswith("PA"):
+        lo = pa_kmax(S, T, rd, rf, v)
+        assert f(lo) > 1e-6, "PA call delta above its maximum"
+    K = brentq(f, lo, hi, xtol=1e-15, rtol=1e-15, maxiter=500)
+    h = K * 1e-6
+    assert abs(f(K + h) - f(K - h)) / (2 * h) * K > 1e-3, "flat delta: strike ill-conditioned"
+    return K
+
+
+def atm_strike(at, dt, S, T, rd, rf, v):
+    F = fxm(S, T, rd, rf)[0]
+    if at == "SPOT":
+        return S
+    if at == "FORWARD":
+        return F
+    return F * math.exp((-0.5 if dt.endswith("PA") else 0.5) * v * v * T)
+
+
+def gk(ot, S, K, T, rd, rf, v, N):
+    F, Dd, Df = fxm(S, T, rd, rf)
+    p = 1 if ot == "CALL" else -1
+    sd = v * math.sqrt(T)
+    d1 = math.log(F / K) / sd + sd / 2
+    d2 = d1 - sd
+    pr = p * Dd * (F * ncdf(p * d1) - K * ncdf(p * d2))
+    nd1 = math.exp(-d1 * d1 / 2) / math.sqrt(2 * math.pi)
+    return {"price": N * pr, "premium_pct_foreign": pr / S, "forward": F, "delta": N * p * Df * ncdf(p * d1),
+            "gamma": N * Df * nd1 / (S * sd), "vega": N * S * Df * nd1 * math.sqrt(T)}
+
+
+FXM = [  # spot, days, rd, rf, vol: EURUSD-like, USDJPY-like (rd < rf), high-carry EM, long dated
+    (1.0850, 91, 0.0430, 0.0310, 0.075),
+    (151.20, 182, 0.0010, 0.0450, 0.105),
+    (18.40, 365, 0.1050, 0.0430, 0.160),
+    (1.2650, 1825, 0.0380, 0.0420, 0.090),
+]
+
+
+def e3_fx():
+    s = S("fxs_e", "05-volatility/fx-smile.md")
+    vq = [QLV, "analytic"]
+    op = "fx.option.price"
+    for S0, days, rd, rf, v in FXM:
+        T = days / 365
+        F = fxm(S0, T, rd, rf)[0]
+        for ot, K in (("CALL", F * 1.03), ("PUT", F * 0.97), ("CALL", F * 0.9)):
+            K = round(K, 4)
+            s.add(op, {"spot": S0, "strike": K, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "vol": v, "option_type": ot, "notional": 1e6},
+                  gk(ot, S0, K, T, rd, rf, v, 1e6), cls=A, verified=vq, tags=["garman-kohlhagen"],
+                  limit={"absolute": 1e-6, "relative": 1e-10, "reason": "1e-6 currency units on 1m foreign notional"})
+    S0, days, rd, rf, v = FXM[0]
+    T = days / 365
+    g = gk("CALL", S0, 1.10, T, rd, rf, v, 1e6)
+    caught("fxs_e", "rates swapped (rf as domestic)", abs(gk("CALL", S0, 1.10, T, rf, rd, v, 1e6)["price"] - g["price"]), 1e-6 + 1e-10 * g["price"])
+    caught("fxs_e", "delta discounted at rd", abs(g["delta"] * math.exp((rf - rd) * T) - g["delta"]), 1e-6 + 1e-10 * g["delta"])
+    b = {"spot": S0, "strike": 1.1, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "vol": v, "option_type": "CALL", "notional": 1e6}
+    for k_, val in (("strike", 0.0), ("vol", 0.0), ("expiry_years", 0.0), ("spot", -1.0), ("notional", 0.0)):
+        s.add(op, {**b, k_: val}, error="E_DOMAIN", cls=E, tags=["invalid"])
+
+    op = "fx.delta.from_strike"
+    for S0, days, rd, rf, v in FXM:
+        T = days / 365
+        F = fxm(S0, T, rd, rf)[0]
+        for ot, K in (("CALL", F * 1.04), ("PUT", F * 0.95)):
+            K = round(K, 4)
+            out = {"deltas": {dt: fx_delta(ot, dt, S0, K, T, rd, rf, v) for dt in DT}}
+            s.add(op, {"spot": S0, "strike": K, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "vol": v, "option_type": ot}, out, cls=A, verified=vq, tags=["delta"])
+    d = fx_delta("CALL", "SPOT", 18.4, 19.5, 1, .105, .043, .16)
+    caught("fxs_e", "spot delta = forward delta (no foreign discount)", abs(fx_delta("CALL", "FORWARD", 18.4, 19.5, 1, .105, .043, .16) - d), 1e-10)
+    caught("fxs_e", "premium adjustment omitted", abs(fx_delta("CALL", "SPOT_PA", 18.4, 19.5, 1, .105, .043, .16) - d), 1e-10)
+
+    op = "fx.delta.to_strike"
+    for S0, days, rd, rf, v in FXM:
+        T = days / 365
+        for ot, dl in (("CALL", 0.25), ("PUT", -0.25), ("CALL", 0.10), ("PUT", -0.10)):
+            for dt in DT:
+                K = fx_strike(ot, dt, S0, T, rd, rf, v, dl)
+                s.add(op, {"spot": S0, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "vol": v, "option_type": ot, "delta": dl, "delta_type": dt},
+                      {"strike": K}, cls=R, verified=vq, tags=["delta", dt.lower()], limit={"absolute": 1e-10, "relative": 1e-9, "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"})
+    S0, days, rd, rf, v = FXM[2]
+    T = days / 365
+    kmax = pa_kmax(S0, T, rd, rf, v)
+    dmax = fx_delta("CALL", "FORWARD_PA", S0, kmax, T, rd, rf, v)
+    s.add(op, {"spot": S0, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "vol": v, "option_type": "CALL", "delta": round(dmax + 0.01, 2), "delta_type": "FORWARD_PA"},
+          error="E_DOMAIN", cls=E, tags=["invalid", "premium-adjusted"], description="premium-adjusted call delta above its maximum")
+    caught("fxs_e", "PA call root on the low-strike branch", abs(brentq(lambda K: fx_delta("CALL", "FORWARD_PA", S0, K, T, rd, rf, v) - .25, S0 * 1e-3, kmax) - fx_strike("CALL", "FORWARD_PA", S0, T, rd, rf, v, .25)), 1e-6)
+    bb = {"spot": S0, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "vol": v, "option_type": "CALL", "delta": 0.25, "delta_type": "SPOT"}
+    s.add(op, {**bb, "delta": -0.25}, error="E_DOMAIN", cls=E, tags=["invalid"], description="call delta must be positive")
+    s.add(op, {**bb, "delta": 0.97}, error="E_DOMAIN", cls=E, tags=["invalid"], description="spot call delta at or above exp(-rf T)")
+    s.add(op, {**bb, "option_type": "PUT", "delta": -1.0, "delta_type": "FORWARD"}, error="E_DOMAIN", cls=E, tags=["invalid"])
+
+    op = "fx.atm.strike"
+    for S0, days, rd, rf, v in FXM:
+        T = days / 365
+        for at, dt in (("DNS", "SPOT"), ("DNS", "FORWARD"), ("DNS", "SPOT_PA"), ("DNS", "FORWARD_PA"), ("FORWARD", "SPOT"), ("SPOT", "SPOT")):
+            s.add(op, {"spot": S0, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "vol": v, "atm_type": at, "delta_type": dt},
+                  {"strike": atm_strike(at, dt, S0, T, rd, rf, v)}, cls=A, verified=vq, tags=["atm", at.lower()])
+    caught("fxs_e", "PA DNS with +sigma^2 T/2", abs(atm_strike("DNS", "SPOT", 18.4, 1.0, .105, .043, .16) - atm_strike("DNS", "SPOT_PA", 18.4, 1.0, .105, .043, .16)), 1e-10)
+
+    op = "fx.smile.from_quotes"
+    for (S0, days, rd, rf, atm), rr, bf, dl, dt, at in (
+            (FXM[0], -0.0045, 0.0020, 0.25, "SPOT", "DNS"), (FXM[0], -0.0080, 0.0065, 0.10, "SPOT", "DNS"),
+            (FXM[1], -0.0150, 0.0035, 0.25, "SPOT_PA", "DNS"), (FXM[1], -0.0300, 0.0110, 0.10, "FORWARD_PA", "DNS"),
+            (FXM[2], 0.0250, 0.0060, 0.25, "FORWARD_PA", "DNS"), (FXM[3], -0.0060, 0.0030, 0.25, "FORWARD", "FORWARD")):
+        T = days / 365
+        cv, pv = atm + bf + rr / 2, atm + bf - rr / 2
+        out = {"atm_strike": atm_strike(at, dt, S0, T, rd, rf, atm), "call_vol": cv, "put_vol": pv,
+               "call_strike": fx_strike("CALL", dt, S0, T, rd, rf, cv, dl), "put_strike": fx_strike("PUT", dt, S0, T, rd, rf, pv, -dl)}
+        s.add(op, {"spot": S0, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "atm_vol": atm, "rr": rr, "bf": bf, "delta": dl, "delta_type": dt, "atm_type": at},
+              out, cls=R, verified=vq, tags=["rr-bf", dt.lower()], limit={"absolute": 1e-10, "relative": 1e-9, "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"})
+    S0, days, rd, rf, atm = FXM[1]
+    T = days / 365
+    caught("fxs_e", "RR sign: call vol = atm + bf - rr/2", abs(fx_strike("CALL", "SPOT_PA", S0, T, rd, rf, atm + .0035 + .0075, .25) - fx_strike("CALL", "SPOT_PA", S0, T, rd, rf, atm + .0035 - .0075, .25)), 1e-8)
+    q = {"spot": S0, "expiry_years": T, "domestic_rate": rd, "foreign_rate": rf, "atm_vol": atm, "rr": -0.015, "bf": 0.0035, "delta": 0.25, "delta_type": "SPOT", "atm_type": "DNS"}
+    s.add(op, {**q, "bf": -0.2}, error="E_DOMAIN", cls=E, tags=["invalid"], description="a wing vol <= 0")
+    s.add(op, {**q, "delta": 0.5}, error="E_DOMAIN", cls=E, tags=["invalid"], description="delta must be in (0, 0.5)")
+    write(s)
+
+
+SLICES = {"E1": (e1_surf, e1_lv), "E3": (e3_fx,)}
 
 
 def main():

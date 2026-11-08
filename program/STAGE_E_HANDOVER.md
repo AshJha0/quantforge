@@ -22,3 +22,18 @@ Read:
 - `specifications/edge-case-register.md` (rows EA1 to EA6)
 
 Notes for builds: `vol.svi.fit_surface` is judged on parameters within 1e-6 from exact quotes, so any proven least-squares solver with several starts works; `vol.svi.surface_check` lists are exact, and the goldens keep every compared quantity well away from its threshold.
+
+### E3 FX smile (ready, 2026-11-08)
+
+New operations: `fx.option.price`, `fx.delta.from_strike`, `fx.delta.to_strike`, `fx.atm.strike`, `fx.smile.from_quotes`. No new error code.
+
+Goldens: `datasets/golden/stage_e/fxs_e.json` (125 cases).
+
+Read:
+- `specifications/cli-contract.md` (block "Stage E, spec A", E3 row)
+- `specifications/stage-e-rulings.md` (E-A9 to E-A11)
+- `specifications/05-volatility/fx-smile.md`
+- `specifications/05-volatility/stage-e-targets-a.md` (E3 table)
+- `specifications/edge-case-register.md` (rows EA7 to EA9)
+
+Notes for builds: premium-adjusted call strikes need the upper root (bracket from the strike of maximum delta); strikes are judged to 1e-9 relative.
