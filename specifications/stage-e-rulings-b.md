@@ -1,6 +1,6 @@
 # Stage E rulings, spec B (E4, E6, E7, E8)
 
-Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`garch.md`, `variance-swaps.md`, `vix-index.md`, `rates-vol-cube.md` and the E6 and E8 pages as they land), and wins where it is more exact. Spec A's rulings are in `stage-e-rulings.md` with prefix E-A; the two sets do not overlap.
+Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`garch.md`, `variance-swaps.md`, `vix-index.md`, `rates-vol-cube.md`, `06-risk/correlation.md` and the E8 pages as they land), and wins where it is more exact. Spec A's rulings are in `stage-e-rulings.md` with prefix E-A; the two sets do not overlap.
 
 ## E7 rulings
 
@@ -24,6 +24,15 @@ Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`
 | E-B11 | Bond futures options | Black-76 on the futures price, premium paid at the given discount date; futures-style margined options are out of scope. `yield_vol = price_vol / (modified_duration x yield)`, first order, CTD duration and yield given by the caller |
 | E-B12 | YoY caplet time | Option time to the fixing (`expiry_years`), discounting to payment; YoY forwards are inputs (no ZC-to-YoY convexity here) |
 | E-B13 | ZC inflation cap strike | `(1 + K)^T`, compounded annually over `T` years (a real number); the simple `1 + KT` is a wrong-convention check |
+
+## E6 rulings
+
+| # | Point | Ruling |
+|---|---|---|
+| E-B18 | Nearest correlation | Unweighted Frobenius norm, symmetric input required (exact equality, else `E_INPUT`). The golden is the unique minimiser; acceptance is 2e-5 on every entry and on the distance, a convergence tolerance and not an iteration path. Weighted norms (H-weighted, W-weighted) are out of scope for stage E |
+| E-B19 | Validation thresholds | `psd` means smallest eigenvalue of the symmetrised matrix `>= -1e-10`; symmetry and unit diagonal are exact comparisons of the given numbers. Goldens keep the smallest eigenvalue at least 1e-4 from 0 |
+| E-B20 | Implied correlation range | Not clipped: a value above 1 or below -1 says the quotes are inconsistent, and the caller should see it |
+| E-B21 | Dispersion notionals | Variance notionals `N w_i / (2 K_i)` on members (long) and `N / (2 K_I)` on the index (short): vega-weighted at the strikes. Realised variance per `variance-swaps.md` is an input here (as realised vols) |
 
 ## R5 audit rulings on E7 (2026-11-08)
 

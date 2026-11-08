@@ -5,6 +5,186 @@
  "map_review": "self-reviewed 2026-11-08",
  "cases": [
   {
+   "case_id": "corr_e-0001",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0002",
+   "operation": "risk.corr.nearest",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.HIGHAM"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0003",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0004",
+   "operation": "risk.corr.nearest",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.HIGHAM"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0005",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0006",
+   "operation": "risk.corr.nearest",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.HIGHAM"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0007",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0009",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0010",
+   "operation": "risk.corr.nearest",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.HIGHAM"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0011",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0012",
+   "operation": "risk.corr.nearest",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.HIGHAM"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0013",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0015",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0016",
+   "operation": "risk.corr.nearest",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.HIGHAM"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0017",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0018",
+   "operation": "risk.corr.nearest",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.HIGHAM"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0019",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "corr_e-0021",
+   "operation": "risk.corr.validate",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CORR.EIGEN"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
    "case_id": "ratesvol_e-0001",
    "operation": "rates.swaption.price_cube",
    "library": "QuantLib",
