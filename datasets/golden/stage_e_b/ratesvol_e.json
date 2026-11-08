@@ -241,6 +241,12 @@
     "node",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -482,6 +488,12 @@
     "node",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -723,6 +735,12 @@
     "node",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -964,6 +982,12 @@
     "node",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -1205,6 +1229,12 @@
     "node",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -1446,6 +1476,12 @@
     "interpolated",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -1687,6 +1723,12 @@
     "interpolated",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -1928,6 +1970,12 @@
     "interpolated",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -2169,6 +2217,12 @@
     "node",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -2410,6 +2464,12 @@
     "interpolated",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -2651,6 +2711,12 @@
     "interpolated",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -2892,6 +2958,12 @@
     "node",
     "synthetic"
    ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
    "tolerance_limit": {
     "absolute": 0.01,
     "relative": 1e-09,
@@ -6333,6 +6405,9 @@
     "zc",
     "synthetic"
    ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
    "tolerance_limit": {
     "absolute": 9.999999999999999e-06,
     "relative": 1e-10,
@@ -6369,6 +6444,9 @@
     "zc",
     "synthetic"
    ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
    "tolerance_limit": {
     "absolute": 9.999999999999999e-06,
     "relative": 1e-10,
@@ -6405,6 +6483,9 @@
     "zc",
     "synthetic"
    ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
    "tolerance_limit": {
     "absolute": 9.999999999999999e-06,
     "relative": 1e-10,
@@ -6441,6 +6522,9 @@
     "zc",
     "synthetic"
    ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
    "tolerance_limit": {
     "absolute": 9.999999999999999e-06,
     "relative": 1e-10,
@@ -6477,6 +6561,9 @@
     "zc",
     "synthetic"
    ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
    "tolerance_limit": {
     "absolute": 9.999999999999999e-06,
     "relative": 1e-10,

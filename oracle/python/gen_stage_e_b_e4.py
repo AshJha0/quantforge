@@ -148,7 +148,8 @@ def ratesvol_e():
         out = cube_price(V, CUBE, tr)
         node = em in CUBE["expiries_months"] and tm in CUBE["tenors_months"]
         s.add(op, {"discount": jd, "projection": jp, "cube": CUBE, "trade": tr}, out, cls=I, verified=["independent-replay", "mpmath-50"],
-              tags=["cube", "sabr", "node" if node else "interpolated"], limit=LIM)
+              tags=["cube", "sabr", "node" if node else "interpolated"], limit=LIM,
+              output_classes={"forward_rate": I, "annuity": I, "vol": I, "sabr": I})
         for m in ("interp-vols", "expiry-months-axis"):
             gap = abs(cube_price(V, CUBE, tr, m)["price"] - out["price"])
             if gap > 0:
@@ -219,7 +220,7 @@ def ratesvol_e():
         Kr = (1 + mp.mpf(K)) ** mp.mpf(T)
         pr = 1e7 * opt_mp(model, typ == "CAP", FI, Kr, v, T, D)
         s.add(zop, {"model": model, "type": typ, "forward_index_ratio": FI, "years": T, "strike": K, "discount_factor": D, "vol": v, "notional": 1e7},
-              {"price": f(pr), "strike_ratio": f(Kr)}, cls=A, verified=["independent-replay", "mpmath-50"], tags=["inflation", "zc"],
+              {"price": f(pr), "strike_ratio": f(Kr)}, cls=A, verified=["independent-replay", "mpmath-50"], tags=["inflation", "zc"], output_classes={"strike_ratio": A},
               limit={"absolute": 1e-12 * 1e7, "relative": 1e-10, "reason": "1e-12 per unit notional"})
         if K:
             caught("ratesvol_e", f"zc {typ} {T}y: simple strike 1 + KT", abs(f(1e7 * opt_mp(model, typ == "CAP", FI, 1 + mp.mpf(K) * T, v, T, D) - pr)), 1e-5 + 1e-10 * f(pr))

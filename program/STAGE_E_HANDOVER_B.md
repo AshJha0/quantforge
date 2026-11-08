@@ -38,3 +38,15 @@ Read:
 Easy to get wrong (wrong-convention checks): interpolate the SABR parameters, not the vols, on ACT/365F expiry time (not months/12); caplet vols piecewise constant per segment between cap maturities, with `E_ARBITRAGE` when a segment has no positive root; yield vol divides by duration times yield; YoY option time is to the fixing; ZC strike is `(1+K)^T`.
 
 Oracle: 35 of 50 cases (70%) outside-checked by QuantLib 1.44; 34 wrong-convention checks caught. Running spec B outside share (E7 + E4): 53 of 122 (43.4%).
+
+## E7 update after the R5 audit (2026-11-08)
+
+Rulings E-B14 to E-B17 in `specifications/stage-e-rulings-b.md`. Re-read `garch.md`, `variance-swaps.md`, `vix-index.md` (changed sections: checks, acceptance, sources) and the E7 table in `stage-e-targets-b.md`.
+
+What changes for a build:
+- Goldens now give non-money outputs their own tolerance through `output_classes` (the existing case format: an output named there uses its class, not the case limit). Variance outputs are compared at 1e-12, not 1e-6. New policy class `likelihood_sum` in `conformance/tolerances/policy.yaml`.
+- `vol.vix.term_variance`: the strip may be in any order; if no out-of-the-money put or no out-of-the-money call is selected, `E_INPUT`. A zero bid at the ATM strike still counts for the forward.
+- New goldens: `garch_e` 29 cases (was 27), `varswap_e` 33 (was 31), `vix_e` 22 (was 14). Case ids after the insertions moved; refer to them by tag and description, or re-read the files.
+- E4 goldens got the same per-output treatment (`ratesvol_e`): no value changed, tolerances on `forward_rate`, `annuity`, `vol`, `sabr`, `strike_ratio` tightened.
+
+Outside share: E7 18 of 84 (21.4%); spec B so far 53 of 134 (39.6%).
