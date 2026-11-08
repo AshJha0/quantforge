@@ -5,6 +5,7 @@
     python tools/build_gallery.py --check   # reruns the Python CLI, changes nothing
     python tools/build_gallery.py --refresh-real  # also fetches a new real-data snapshot (gallery_real.py)
     python tools/build_gallery.py --evidence-only # recounts golden evidence after golden-only changes; no CLI runs
+    python tools/build_gallery.py --stage-e-only  # runs only the stage E pages, keeping other committed data
 
 Commands come from conformance/runner/implementations.json, so the CLIs must be built first. This
 file holds no financial logic: it sends cases, stores what comes back and draws it. Its only sums
@@ -1104,12 +1105,40 @@ def refresh_evidence():
     return 0
 
 
-def generate(refresh_real=False, real_only=False):
+def e_run(lang, spec):
+    return gallery_e.run_cube(lang, spec, batch, read_example) if spec.get("runner") == "cube" else d_run(lang, spec)
+
+
+def generate_e(meta, all_data):
+    """Runs the four CLIs for every live stage E page and writes its data file."""
+    for slug, spec in gallery_e.STAGE_E.items():
+        if not gallery_e.is_live(spec):
+            continue
+        results = {lang: e_run(lang, spec) for lang in LANGS}
+        for op in spec["examples"]:
+            gallery_e.shape(spec, read_example(spec["examples"][op])["inputs"], results["python"][op])
+        d = {"meta": {**meta, "example_hashes": {v: example_hash(v) for v in spec["examples"].values()}},
+             "inputs": {op: read_example(f)["inputs"] for op, f in spec["examples"].items()},
+             "reference": results["python"], "agreement": vol_agreement(results), "evidence": gallery_e.golden(spec["examples"])}
+        all_data[slug] = d
+        (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+
+
+def generate(refresh_real=False, real_only=False, stage_e_only=False):
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     meta = {"commit": commit, "date": dt.date.today().isoformat(), "reference_language": "python", "tolerance": TOL,
             "data": "synthetic", "cli": {lang: json.loads(call(lang, "version")) for lang in LANGS}}
     DATA.mkdir(parents=True, exist_ok=True)
     all_data = {}
+    if stage_e_only:  # keep every other page's committed data; run the stage E pages and re-render
+        all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs() if s not in gallery_e.STAGE_E}
+        for extra in (gallery_real.SLUG, gallery_pnl.SLUG):
+            all_data[extra] = json.loads((DATA / f"{extra}.json").read_text(encoding="utf-8"))
+        generate_e(meta, all_data)
+        for name, text in render_all(all_data).items():
+            (OUT / name).write_text(text, encoding="utf-8", newline="\n")
+        print(f"stage E pages written to {OUT}")
+        return 0
     if real_only:  # keep every synthetic page's committed data; rebuild only the real-data page and the index
         all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs()}
         all_data[gallery_real.SLUG] = generate_real({**meta, "data": "real"}, refresh_real)
@@ -1148,17 +1177,7 @@ def generate(refresh_real=False, real_only=False):
              "reference": results["python"], "agreement": vol_agreement(results), "evidence": golden_d(spec["examples"])}
         all_data[slug] = d
         (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
-    for slug, spec in gallery_e.STAGE_E.items():
-        if not gallery_e.is_live(spec):
-            continue
-        results = {lang: d_run(lang, spec) for lang in LANGS}
-        for op in spec["examples"]:
-            gallery_e.check_contract(spec["kind"], results["python"][op])
-        d = {"meta": {**meta, "example_hashes": {v: example_hash(v) for v in spec["examples"].values()}},
-             "inputs": {op: read_example(f)["inputs"] for op, f in spec["examples"].items()},
-             "reference": results["python"], "agreement": vol_agreement(results), "evidence": gallery_e.golden(spec["examples"])}
-        all_data[slug] = d
-        (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    generate_e(meta, all_data)
     for name, text in render_all(all_data).items():
         (OUT / name).write_text(text, encoding="utf-8", newline="\n")
     print(f"{len(all_data)} pages of data, {len(all_data) + 1} pages written to {OUT}")
@@ -1226,7 +1245,7 @@ def check():
         for v in spec["examples"].values():
             if d["meta"]["example_hashes"].get(v) != example_hash(v):
                 bad.append(f"{slug}: {v} changed")
-        compare(d["reference"], d_run("python", spec), slug, bad)
+        compare(d["reference"], e_run("python", spec), slug, bad)
         if d["evidence"] != gallery_e.golden(spec["examples"]):
             bad.append(f"{slug}: golden evidence changed")
     d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
@@ -1253,10 +1272,11 @@ def main():
     ap.add_argument("--refresh-real", action="store_true", help="fetch a new real-data snapshot before generating")
     ap.add_argument("--real-only", action="store_true", help="rebuild only the real-data page and the index")
     ap.add_argument("--evidence-only", action="store_true", help="recount golden evidence and re-render; no CLI runs")
+    ap.add_argument("--stage-e-only", action="store_true", help="run only the stage E pages; keep other committed data")
     a = ap.parse_args()
     if a.evidence_only:
         return refresh_evidence()
-    return check() if a.check else generate(a.refresh_real, a.real_only)
+    return check() if a.check else generate(a.refresh_real, a.real_only, a.stage_e_only)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,96 @@
+{
+ "meta": {
+  "commit": "597abf2",
+  "date": "2026-11-08",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.4.2",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.4.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.4.2",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "vol_forward_term_e.json": "sha256:6fd4bc8ba276984b0af1450141ac900878dbef4949148ed34052a92f34ebb859"
+  }
+ },
+ "inputs": {
+  "vol.forward.vol": {
+   "expiry_years": [
+    0.2,
+    0.4986301369863014,
+    1.0,
+    2.0
+   ],
+   "vols": [
+    0.2,
+    0.21,
+    0.215,
+    0.22
+   ]
+  }
+ },
+ "reference": {
+  "vol.forward.vol": {
+   "forward_vols": [
+    0.2,
+    0.21643907124092224,
+    0.2198599280863661,
+    0.2248888614404902
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "vol.forward.vol: forward_vols",
+   "count": 4,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.2248888614404902,
+    "cpp": 0.2248888614404902,
+    "python": 0.2248888614404902,
+    "rust": 0.2248888614404902
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "vol.forward.vol"
+  ],
+  "cases": 7,
+  "by_source": {
+   "vol.forward.vol: quantlib-1.44, analytic": 6,
+   "vol.forward.vol: analytic": 1
+  }
+ }
+}

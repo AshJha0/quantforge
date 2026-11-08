@@ -30,10 +30,10 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 22 golden cases |
 | [Commodity forwards](commodities.md) | Implemented, not Validated | D | 4 golden cases |
 | [MBS](mbs.md) | Implemented, not Validated | D | 3 golden cases |
-| [Implied vol surface](vol-surface.md) | Planned | E | None yet |
-| [Local volatility](local-vol.md) | Planned | E | None yet |
-| [Swaption cube](swaption-cube.md) | Planned | E | None yet |
-| [Vol term structure](vol-term-structure.md) | Planned | E | None yet |
+| [Implied vol surface](vol-surface.md) | Implemented, not Validated | E | 2 golden cases |
+| [Local volatility](local-vol.md) | Implemented, not Validated | E | 2 golden cases |
+| [Swaption cube](swaption-cube.md) | Implemented, not Validated | E | 42 golden cases |
+| [Vol term structure](vol-term-structure.md) | Implemented, not Validated | E | 7 golden cases |
 | Financing curves | Planned | D | None yet |
 | Sector and rating curves | Planned | D | None yet |
 | Funding curve | Planned | F | None yet |

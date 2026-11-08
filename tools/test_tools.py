@@ -349,14 +349,22 @@ class GalleryStageE(unittest.TestCase):
         out = ROOT / "docs/curves"
         index = (out / "README.md").read_text(encoding="utf-8")
         self.assertEqual(set(self.ge.STAGE_E), {"vol-surface", "local-vol", "swaption-cube", "vol-term-structure"})
+        self.assertEqual({k for k, v in self.ge.STAGE_E.items() if self.ge.is_live(v)}, set(self.ge.STAGE_E))
         for slug, spec in self.ge.STAGE_E.items():
             text = (out / f"{slug}.md").read_text(encoding="utf-8")
             for head in ("## What it is", "## Inputs", "## Command", "## Charts", "## Numbers",
                          "## Four-language agreement", "## Oracle evidence and limits", self.ge.SYNTHETIC):
                 self.assertIn(head, text, f"{slug}: {head}")
             self.assertNotIn("nterview", text)
-            if not self.ge.is_live(spec):
-                self.assertIn("Planned, stage E", text)
+            if self.ge.is_live(spec):
+                d = json.loads((out / "data" / f"{slug}.json").read_text(encoding="utf-8"))
+                self.assertIn("Implemented, not Validated", text)
+                self.assertIn("<svg", text)
+                self.assertGreater(d["evidence"]["cases"], 0)
+                self.assertTrue(all(r["largest_difference"] is not None and r["largest_difference"] < 1e-9 for r in d["agreement"]), slug)
+                self.assertIn(f"]({slug}.md) | Implemented, not Validated | E |", index)
+            else:
+                self.assertIn("Status: Planned", text)
                 self.assertNotIn("<svg", text)
                 self.assertIn(f"]({slug}.md) | Planned | E |", index)
 
@@ -407,9 +415,11 @@ class GalleryStageE(unittest.TestCase):
             ge.is_live = lambda s: True
             op = next(iter(spec["examples"]))
             meta = {"date": "2026-11-08", "commit": "abc", "cli": {k: {"implementation_version": "0", "toolchain": "t"} for k in bg.LANGS}}
-            d = {"meta": meta, "reference": {op: self.surface()}, "agreement": [], "evidence": {"operations": [op], "cases": 0, "by_source": {}}}
+            pts = [{"expiry_years": t, "log_moneyness": k} for t in self.surface()["expiries"] for k in self.surface()["strikes"]]
+            outs = {"implied_vol": [v for row in self.surface()["vols"] for v in row]}
+            d = {"meta": meta, "inputs": {op: {"points": pts}}, "reference": {op: outs}, "agreement": [], "evidence": {"operations": [op], "cases": 0, "by_source": {}}}
             text = ge.page("vol-surface", spec, d, bg)
-            for want in ("Implemented, not Validated", "<svg", "## Numbers", "examples/vol_surface_grid_e.json"):
+            for want in ("Implemented, not Validated", "<svg", "## Numbers", "examples/vol_dupire_grid_e.json"):
                 self.assertIn(want, text)
         finally:
             ge.is_live = live
@@ -424,15 +434,15 @@ class QualityGate(unittest.TestCase):
         cls.cfg = json.loads((ROOT / "conformance/quality/stage_e.json").read_text(encoding="utf-8"))
 
     def test_shipped_config_is_valid_and_matches_mutation_modules(self):
-        bad, _ = self.qg.check_config(self.cfg)
-        self.assertEqual(bad, [])
+        bad, todo, _ = self.qg.check_config(self.cfg)
+        self.assertEqual((bad, todo), ([], []))
         self.assertGreaterEqual(self.cfg["coverage_min"], 0.85)
         stages = json.loads((ROOT / "conformance/mutation/stages.json").read_text(encoding="utf-8"))
         self.assertEqual([m["module"] for m in stages["stages"]["E"]], [m["module"] for m in self.cfg["modules"]])
 
     def test_config_check_catches_bad_paths(self):
         cfg = {"modules": [{"module": "m", "python": "python/nowhere/*.py", "rust": "rust/Cargo.toml", "cpp": "TODO", "java": "TODO"}]}
-        bad, todo = self.qg.check_config(cfg)
+        bad, todo, _ = self.qg.check_config(cfg)
         self.assertTrue(any("no file matches" in b for b in bad))
         self.assertTrue(any("workspace member" in b for b in bad))
         self.assertIn("m/cpp", todo)
@@ -481,9 +491,11 @@ class SiteHome(unittest.TestCase):
         figures = sf.home_figures()
         self.assertNotIn("{{", sf.render_home(template, figures))
         version = figures["version"]
-        for manifest, pattern in (("rust/Cargo.toml", f'version = "{version}"'), ("java25/pom.xml", f"<version>{version}</version>"),
-                                  ("cpp26/CMakeLists.txt", f"VERSION {version}")):
-            self.assertIn(pattern, (ROOT / manifest).read_text(encoding="utf-8"), manifest)
+        import re
+        found = {re.search(pattern, (ROOT / manifest).read_text(encoding="utf-8")).group(1) for manifest, pattern in (
+            ("python/pyproject.toml", r'(?m)^version = "([^"]+)"'), ("rust/Cargo.toml", r'(?m)^version = "([^"]+)"'),
+            ("java25/pom.xml", r"<artifactId>quantforge</artifactId><version>([^<]+)</version>"), ("cpp26/CMakeLists.txt", r"project\(\w+ VERSION (\S+)"))}
+        self.assertEqual(len(found), 1, found)  # the manifests agree with each other; site_facts.json may name the release ahead of the bump
         for literal in (version, figures["golden_cases"], figures["released"]):
             self.assertNotIn(literal, template)  # no release figure hard-coded in the template
         with self.assertRaisesRegex(ValueError, "nope"):

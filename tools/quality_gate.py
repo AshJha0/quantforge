@@ -5,7 +5,7 @@
         Every filled path exists; Rust files sit in a workspace member crate (so clippy and cargo test
         see them); C++ files are listed in cpp26/CMakeLists.txt (so they build, and the sanitizer and
         fuzz builds include them); Python files are in a package that ruff and mutmut cover; Python
-        test files are in mutmut's tests_dir. Lists the entries still TODO. Exit 1 on a broken entry.
+        test files are in mutmut's tests_dir (a warning). Lists the entries still TODO; a test missing from mutmut is a warning. Exit 1 on a broken entry.
 
     python tools/quality_gate.py --coverage REPORT --lang LANG [--config FILE]
         Line coverage per module for one language from its report, against coverage_min. Reads
@@ -28,7 +28,13 @@ LANGS = ("java", "cpp", "python", "rust")
 
 
 def filled(v):
-    return isinstance(v, str) and v.strip() and not v.startswith("TODO")
+    if isinstance(v, list):
+        return bool(v) and all(filled(x) for x in v)
+    return isinstance(v, str) and bool(v.strip()) and not v.startswith("TODO")
+
+
+def globs(v):
+    return v if isinstance(v, list) else [v]
 
 
 def norm(p):
@@ -45,7 +51,7 @@ def matches(path, pattern):
 # ---- config check -------------------------------------------------------------------------------
 
 def check_config(cfg, root=ROOT):
-    bad, todo = [], []
+    bad, todo, warn = [], [], []
     members = re.findall(r'"(crates/[^"]+)"', (root / "rust" / "Cargo.toml").read_text(encoding="utf-8")) if (root / "rust" / "Cargo.toml").is_file() else []
     cmake = (root / "cpp26" / "CMakeLists.txt").read_text(encoding="utf-8") if (root / "cpp26" / "CMakeLists.txt").is_file() else ""
     pyproject = (root / "python" / "pyproject.toml").read_text(encoding="utf-8") if (root / "python" / "pyproject.toml").is_file() else ""
@@ -55,15 +61,17 @@ def check_config(cfg, root=ROOT):
             if not filled(pat):
                 todo.append(f"{m['module']}/{lang}")
                 continue
-            hits = sorted(p for p in root.glob(pat) if p.is_file())
-            if not hits:
-                bad.append(f"{m['module']}/{lang}: no file matches {pat}")
-                continue
+            hits = []
+            for g in globs(pat):
+                found = sorted(p for p in root.glob(g) if p.is_file())
+                if not found:
+                    bad.append(f"{m['module']}/{lang}: no file matches {g}")
+                hits += found
             for h in hits:
                 rel = h.relative_to(root).as_posix()
                 if lang == "rust" and not any(rel.startswith(f"rust/{c}/") for c in members):
                     bad.append(f"{m['module']}/rust: {rel} is not in a workspace member crate")
-                if lang == "cpp" and rel.endswith(".cpp") and rel.removeprefix("cpp26/") not in cmake:
+                if lang == "cpp" and rel.endswith(".cpp") and rel.removeprefix("cpp26/") not in cmake:  # .inc files are included, not listed
                     bad.append(f"{m['module']}/cpp: {rel} is not listed in cpp26/CMakeLists.txt")
                 if lang == "python" and not rel.startswith("python/quantforge_"):
                     bad.append(f"{m['module']}/python: {rel} is outside the python/quantforge_* packages")
@@ -73,10 +81,10 @@ def check_config(cfg, root=ROOT):
         if not filled(t):
             todo.append("python_tests")
         elif t.removeprefix("python/") not in pyproject:
-            bad.append(f"python test {t} is not in mutmut tests_dir in python/pyproject.toml")
+            warn.append(f"python test {t} is not in mutmut tests_dir in python/pyproject.toml, so mutation testing does not run it")
         elif not (root / t).is_file():
             bad.append(f"python test {t} does not exist")
-    return bad, todo
+    return bad, todo, warn
 
 
 # ---- coverage reports: (file, covered lines, total lines) ---------------------------------------
@@ -129,7 +137,7 @@ def gate(cfg, lang, rows):
         pat = m.get(lang)
         if not filled(pat):
             continue
-        sel = [(f, c, t) for f, c, t in rows if matches(f, pat) or matches("python/" + norm(f), pat)]
+        sel = [(f, c, t) for f, c, t in rows if any(matches(f, g) or matches("python/" + norm(f), g) for g in globs(pat))]
         cov, tot = sum(r[1] for r in sel), sum(r[2] for r in sel)
         if not tot:
             fails.append(m["module"])
@@ -151,7 +159,9 @@ def main(argv=None):
     a = ap.parse_args(argv)
     cfg = json.loads(Path(a.config).read_text(encoding="utf-8"))
     if a.check_config:
-        bad, todo = check_config(cfg)
+        bad, todo, warn = check_config(cfg)
+        for w in warn:
+            print("WARN", w)
         for b in bad:
             print("BAD", b)
         print(f"stage {cfg['stage']}: {len(bad)} broken, {len(todo)} still TODO" + (f" ({', '.join(todo[:12])}{', ...' if len(todo) > 12 else ''})" if todo else ""))

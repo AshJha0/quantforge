@@ -17,7 +17,9 @@ def home_figures(root=ROOT):
     suites = sorted((root / "datasets" / "golden").rglob("*.json"))
     cases = sum(len(json.loads(p.read_text(encoding="utf-8"))["cases"]) for p in suites)
     sources = len(json.loads((root / "tools" / "recorder" / "sources.json").read_text(encoding="utf-8"))["sources"])
-    return {**facts, "version": version, "golden_cases": f"{cases:,}", "suite_files": str(len(suites)), "sources": str(sources)}
+    stage_e = [c for p in sorted((root / "datasets" / "golden").glob("stage_e*/*.json")) for c in json.loads(p.read_text(encoding="utf-8"))["cases"]]
+    counted = {"version": version, "stage_e_cases": f"{len(stage_e):,}", "stage_e_operations": str(len({c["operation"] for c in stage_e}))}
+    return {**counted, **facts, "golden_cases": f"{cases:,}", "suite_files": str(len(suites)), "sources": str(sources)}
 
 
 def render_home(template, figures):

@@ -53,7 +53,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
-          shared=false java=false cpp=false python=false rust=false stage_d=false stage_e=false
+          shared=false java=false cpp=false python=false rust=false stage_d=false stage_e=false e_dirs=
           base=
           [ "$EVENT" = pull_request ] && base=HEAD^1 # the merge ref's first parent is the base branch
           [ "$EVENT" = push ] && base=$BEFORE
@@ -65,7 +65,9 @@ jobs:
                 python/*) python=true ;;
                 rust/*) rust=true ;;
                 datasets/golden/stage_d/*|specifications/*stage-d*) stage_d=true ;;
-                datasets/golden/stage_e/*|specifications/*stage-e*) stage_e=true ;;
+                datasets/golden/stage_e/*) stage_e=true; e_dirs="$e_dirs stage_e" ;;
+                datasets/golden/stage_e_b/*) stage_e=true; e_dirs="$e_dirs stage_e_b" ;;
+                specifications/*stage-e*) stage_e=true; e_dirs="$e_dirs mixed" ;;
                 conformance/runner/*|conformance/tolerances/*|datasets/*|specifications/*|.github/workflows/conformance.yml) shared=true ;;
               esac
             done
@@ -78,8 +80,8 @@ jobs:
           langs="$shared$java$cpp$python$rust"
           if [ "$stage_d$stage_e" = truefalse ] && [ "$langs" = falsefalsefalsefalsefalse ]; then
             golden=datasets/golden/stage_d java=true cpp=true python=true rust=true
-          elif [ "$stage_d$stage_e" = falsetrue ] && [ "$langs" = falsefalsefalsefalsefalse ]; then
-            golden=datasets/golden/stage_e java=true cpp=true python=true rust=true
+          elif [ "$stage_d$stage_e" = falsetrue ] && [ "$langs" = falsefalsefalsefalsefalse ] && [ "$(echo $e_dirs | tr ' ' '\n' | sort -u | wc -l)" = 1 ] && [ "${e_dirs# }" != mixed ]; then
+            golden=datasets/golden/$(echo $e_dirs | cut -d' ' -f1) java=true cpp=true python=true rust=true
           elif [ "$stage_d" = true ] || [ "$stage_e" = true ]; then
             shared=true
           fi

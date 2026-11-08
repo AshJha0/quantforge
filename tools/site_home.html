@@ -23,7 +23,7 @@
   <p class="note"><b>Honest ceiling.</b> On free public data, QuantForge can show correct pricing and risk, curve quality against published curves, and signals on fitted curves with honest statistics. It cannot show tradable profitability. That needs instrument-level prices, bid and ask, financing and execution data, which cost money. This is a deliberate limit of a zero-spend project.</p>
   <div class="cards">
     <div class="card"><b>4 languages</b><span>{{languages}}</span></div>
-    <div class="card"><b>{{golden_cases}} golden cases</b><span>{{suite_files}} suite files, run by a neutral runner against each language</span></div>
+    <div class="card"><b>{{golden_cases}} golden cases</b><span>{{suite_files}} suite files, all passed by each language through a neutral runner; {{outside_share}} checked against an outside library</span></div>
     <div class="card"><b>{{domains}} domains</b><span>Delivered in {{stages}}</span></div>
     <div class="card"><b>Daily recorder</b><span>{{sources}} public sources, hashed into a forward log, scheduled on GitHub Actions</span></div>
   </div>
@@ -36,7 +36,8 @@
       <tr><td>B</td><td>FX and rates slices: OIS, FX forwards, hedges</td><td>Released, v0.2. <a href="docs/curves/README.html">Curves gallery</a>, <a href="ROADMAP.html#stage-status">done and carried</a></td></tr>
       <tr><td>C</td><td>Equity volatility: forwards, SVI, SSVI, SABR, surfaces</td><td>Released, v0.3. <a href="docs/curves/README.html">Curves gallery</a>, <a href="ROADMAP.html#stage-status">done and carried</a></td></tr>
       <tr><td>D</td><td>Curves and fixed income: OIS, bonds, repo, cross-currency, CDS, inflation, caps and swaptions, commodities, MBS</td><td>Released, v0.4. <a href="docs/curves/README.html">Curves gallery</a>, <a href="ROADMAP.html#stage-status">done and carried</a></td></tr>
-      <tr><td>E to K</td><td>Exotics, risk, xVA, execution, hedging, research, platform</td><td>Planned; see <a href="ROADMAP.html">Roadmap</a></td></tr>
+      <tr><td>E</td><td>Full volatility and exotics: SVI and SSVI surfaces, local and stochastic volatility, FX smile, exotics. {{stage_e_cases}} golden cases over {{stage_e_operations}} operations</td><td>Implemented, v{{version}}. <a href="docs/curves/README.html">Curves gallery</a></td></tr>
+      <tr><td>F to K</td><td>Risk, xVA, execution, hedging, research, platform</td><td>Planned; see <a href="ROADMAP.html">Roadmap</a></td></tr>
     </tbody>
   </table>
 

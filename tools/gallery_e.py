@@ -19,7 +19,7 @@ import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-GOLDEN = ROOT / "datasets" / "golden" / "stage_e"
+GOLDEN = [ROOT / "datasets" / "golden" / "stage_e", ROOT / "datasets" / "golden" / "stage_e_b"]
 SYNTHETIC = "Synthetic inputs, not market data."
 
 # Output contracts. Keys are the CLI output fields the renderer reads; the CLI may return more.
@@ -31,38 +31,82 @@ CONTRACTS = {
 
 STAGE_E = {
     "vol-surface": {
-        "kind": "surface", "title": "Implied volatility surface, calibrated", "short": "Implied vol surface",
-        "cli": None, "examples": {"vol.surface.grid": "vol_surface_grid_e.json"},  # PLACEHOLDER operation and file
-        "value": "Implied volatility",
-        "shows": "A full implied volatility surface calibrated to option quotes, as a heat grid by expiry and strike, with smile slices at three expiries. The surface is checked for calendar and butterfly arbitrage on its grid.",
-        "inputs": "Synthetic option quotes on a strike and expiry grid, a spot, and flat funding and dividend curves, copied from a golden case.",
-        "oracle": "Calibrated surfaces are compared with QuantLib where it has the same parametrisation, and with hand cases for the arbitrage checks. Targets are set in the stage E spec.",
+        "kind": "surface", "title": "Implied volatility surface from SVI slices", "short": "Implied vol surface",
+        "cli": "vol.local.dupire", "examples": {"vol.local.dupire": "vol_dupire_grid_e.json"}, "adapt": "points:implied_vol",
+        "value": "Implied volatility", "xlabel": "Log-moneyness",
+        "shows": "Implied volatility across expiry and log-moneyness `k = ln(K/F)`, from three SVI slices joined in total variance, as a heat grid with smile slices at three expiries. The grid is the set of points sent to `vol.local.dupire`, which returns implied and local volatility at each point.",
+        "inputs": "Three SVI slices (0.25, 1 and 2 years) copied from golden case `lv_e-0001`, evaluated on a grid of six expiries and nine log-moneyness points.",
+        "oracle": "`vol.local.dupire` cases are checked analytically and against a 40-digit mpmath price-based Dupire reference (`specifications/05-volatility/`, stage E). The implied volatility here is the total-variance interpolation those cases use.",
     },
     "local-vol": {
         "kind": "surface", "title": "Local volatility (Dupire)", "short": "Local volatility",
-        "cli": None, "examples": {"vol.local.grid": "vol_local_grid_e.json"},  # PLACEHOLDER operation and file
-        "value": "Local volatility",
-        "shows": "Dupire local volatility derived from an arbitrage-free implied surface, as a heat grid by time and spot level, with slices at three times. Local volatility is the diffusion coefficient that reprices every vanilla on the surface.",
-        "inputs": "A synthetic implied surface, the same parameters as a golden case, evaluated on a time and strike grid.",
-        "oracle": "Compared with QuantLib `LocalVolSurface` on the same implied surface, and with the flat-surface hand case, where local and implied volatility are equal.",
+        "cli": "vol.local.dupire", "examples": {"vol.local.dupire": "vol_dupire_grid_e.json"}, "adapt": "points:local_vol",
+        "value": "Local volatility", "xlabel": "Log-moneyness",
+        "shows": "Dupire local volatility from the same SVI surface, as a heat grid by expiry and log-moneyness, with slices at three expiries. Local volatility is the diffusion coefficient that reprices every vanilla on the surface; its skew is steeper than the implied skew.",
+        "inputs": "The same input as the implied surface page: three SVI slices from golden case `lv_e-0001` on a six by nine grid.",
+        "oracle": "Golden cases are analytic and a 40-digit mpmath reference that differentiates call prices directly, an independent route to the same Dupire formula.",
     },
     "swaption-cube": {
-        "kind": "cube", "title": "Swaption volatility cube", "short": "Swaption cube",
-        "cli": None, "examples": {"rates.swaption.cube": "swaption_cube_e.json"},  # PLACEHOLDER operation and file
-        "value": "Normal volatility",
-        "shows": "Swaption volatilities by option expiry, underlying swap tenor and strike: the at-the-money matrix as a heat grid, and smiles for the shortest and longest tenor at a middle expiry.",
-        "inputs": "A synthetic at-the-money matrix and SABR smile parameters per expiry and tenor, copied from a golden case.",
-        "oracle": "Compared with QuantLib `SabrSwaptionVolatilityCube` where the conventions match, and with hand cases at the at-the-money strike.",
+        "kind": "cube", "title": "Swaption volatility cube (SABR)", "short": "Swaption cube",
+        "cli": "rates.swaption.price_cube", "examples": {"rates.swaption.price_cube": "swaption_cube_e.json"}, "runner": "cube",
+        "value": "Black volatility",
+        "shows": "Swaption volatilities from a SABR cube by option expiry, underlying swap tenor and strike: the at-the-money matrix as a heat grid, and smiles for the shortest and longest tenor at a middle expiry. `rates.swaption.price_cube` interpolates the SABR parameters between cube nodes and returns the volatility, forward rate and price of one swaption; the gallery sends one case per expiry, tenor and strike.",
+        "inputs": "Discount and projection curves and a four by three SABR cube copied from golden case `ratesvol_e-0001`. Each case changes only the trade: expiry and tenor at the cube nodes, and strike at the forward rate plus -100, -50, 0, 50 and 100 bp, the forward read from a first run of the same case.",
+        "oracle": "`rates.swaption.price_cube` cases are checked by an independent replay and by 50-digit mpmath arithmetic.",
     },
     "vol-term-structure": {
-        "kind": "term", "title": "Volatility term structures", "short": "Vol term structure",
-        "cli": None, "examples": {"vol.surface.term": "vol_term_structure_e.json"},  # PLACEHOLDER operation and file
+        "kind": "term", "title": "Volatility term structure and forward volatility", "short": "Vol term structure",
+        "cli": "vol.forward.vol", "examples": {"vol.forward.vol": "vol_forward_term_e.json"}, "adapt": "term",
         "value": "Volatility",
-        "shows": "At-the-money implied volatility by expiry, and the forward volatility between consecutive expiries that it implies. A negative forward variance would mean calendar arbitrage.",
-        "inputs": "A synthetic surface's at-the-money total variance by expiry, copied from a golden case.",
-        "oracle": "Forward variance is checked against hand cases. The at-the-money volatilities come from the same surface as the implied surface page.",
+        "shows": "At-the-money implied volatility by expiry, and the forward volatility between consecutive expiries that `vol.forward.vol` returns. A negative forward variance would mean calendar arbitrage.",
+        "inputs": "Four expiries and their volatilities, copied from golden case `lv_e-0007`.",
+        "oracle": "Forward volatility golden cases are checked against QuantLib 1.44 and analytic cases.",
     },
 }
+
+
+OFFSETS_BP = [-100, -50, 0, 50, 100]
+
+
+def run_cube(lang, spec, batch, read_example):
+    """Sends one case per cube node to find the forward rate, then one per node and strike offset. Returns the
+    cube contract. Its only sums are months to years and forward plus an offset in bp, which build inputs."""
+    op, ex = next(iter(spec["examples"].items()))
+    base = read_example(ex)["inputs"]
+    e_m, t_m = base["cube"]["expiries_months"], base["cube"]["tenors_months"]
+
+    def case(e, t, strike=None):
+        trade = {**base["trade"], "expiry_months": e, "tenor_months": t}
+        if strike is not None:
+            trade["strike"] = strike
+        return {"schema_version": "1.0", "case_id": f"cube-{e}-{t}-{strike}", "operation": op, "inputs": {**base, "trade": trade}}
+
+    fwd = {(e, t): r["outputs"]["forward_rate"] for (e, t), r in
+           zip([(e, t) for e in e_m for t in t_m], batch(lang, [case(e, t) for e in e_m for t in t_m]))}
+    keys = [(e, t, o) for e in e_m for t in t_m for o in OFFSETS_BP]
+    vols = {k: r["outputs"]["vol"] for k, r in zip(keys, batch(lang, [case(e, t, fwd[(e, t)] + o / 1e4) for e, t, o in keys]))}
+    return {op: {"expiries": [e / 12 for e in e_m], "tenors": [t / 12 for t in t_m], "strikes": [float(o) for o in OFFSETS_BP],
+                 "forward_rates": [[fwd[(e, t)] for t in t_m] for e in e_m],
+                 "vols": [[[vols[(e, t, o)] for o in OFFSETS_BP] for t in t_m] for e in e_m]}}
+
+
+def shape(spec, inputs, outputs):
+    """CLI inputs and outputs rearranged into the renderer's contract. Rearranging only, no sums:
+    `points:<field>` lays a list of per-point values onto the expiry by log-moneyness grid of the points sent."""
+    adapt = spec.get("adapt", "")
+    if adapt.startswith("points:"):
+        pts, vals = inputs["points"], outputs[adapt.split(":", 1)[1]]
+        if len(pts) != len(vals):
+            raise ValueError("one output value per point")
+        e = sorted({p["expiry_years"] for p in pts})
+        k = sorted({p["log_moneyness"] for p in pts})
+        at = {(p["expiry_years"], p["log_moneyness"]): v for p, v in zip(pts, vals)}
+        if len(at) != len(e) * len(k):
+            raise ValueError("points must form a full expiry by log-moneyness grid")
+        return check_contract("surface", {"expiries": e, "strikes": k, "vols": [[at[(t, x)] for x in k] for t in e]})
+    if adapt == "term":
+        return check_contract("term", {"expiries": inputs["expiry_years"], "atm_vols": inputs["vols"], "forward_vols": outputs["forward_vols"]})
+    return check_contract(spec["kind"], outputs)
 
 
 def is_live(spec):
@@ -72,7 +116,7 @@ def is_live(spec):
 def golden(ops):
     import json
     counts, total = {}, 0
-    for path in sorted(GOLDEN.glob("*.json")) if GOLDEN.is_dir() else []:
+    for path in sorted(p for g in GOLDEN if g.is_dir() for p in g.glob("*.json")):
         for c in json.loads(path.read_text(encoding="utf-8"))["cases"]:
             if c["operation"] not in ops or c["expected"].get("status") != "ok":
                 continue
@@ -230,8 +274,8 @@ def _pick(n, k=3):
 def charts(kind, spec, g, caption):
     if kind == "surface":
         e, k, v = g["expiries"], g["strikes"], g["vols"]
-        out = [heatmap(f"{spec['value']} surface", k, [f"{t:g}y" for t in e], v, "Strike", caption, unit=spec["value"].split()[0])]
-        out.append(lines(f"{spec['value']} slices", "Strike", spec["value"], [(f"{e[i]:g}y", list(zip(k, v[i]))) for i in _pick(len(e))], caption))
+        out = [heatmap(f"{spec['value']} surface", k, [f"{t:g}y" for t in e], v, spec.get("xlabel", "Strike"), caption, unit=spec["value"].split()[0])]
+        out.append(lines(f"{spec['value']} slices", spec.get("xlabel", "Strike"), spec["value"], [(f"{e[i]:g}y", list(zip(k, v[i]))) for i in _pick(len(e))], caption))
         return out
     if kind == "term":
         s = [("ATM implied", list(zip(g["expiries"], g["atm_vols"])))]
@@ -240,7 +284,7 @@ def charts(kind, spec, g, caption):
         return [lines("Volatility term structure", "Expiry, years", spec["value"], s, caption)]
     e, t, k, v = g["expiries"], g["tenors"], g["strikes"], g["vols"]
     atm = k.index(0.0)
-    out = [heatmap("ATM normal volatility, expiry by tenor", t, [f"{x:g}y" for x in e], [[v[i][j][atm] for j in range(len(t))] for i in range(len(e))],
+    out = [heatmap(f"ATM {spec['value'].lower()}, expiry by tenor", t, [f"{x:g}y" for x in e], [[v[i][j][atm] for j in range(len(t))] for i in range(len(e))],
                    "Swap tenor, years", caption, unit="Vol")]
     mid = len(e) // 2
     out.append(lines(f"Smiles at {e[mid]:g}y expiry", "Strike offset, bp", spec["value"],
@@ -266,7 +310,7 @@ def planned_page(slug, spec, evidence):
     op, ex = next(iter(spec["examples"].items()))
     return f"""# {spec['title']}
 
-<p class="note">Status: Planned, stage E (in progress, target v0.5). No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.</p>
+<p class="note">{spec.get('planned', 'Status: Planned, stage E. No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.')}</p>
 
 ## What it is
 
@@ -294,17 +338,17 @@ None yet. The page fills in when all four CLIs answer the operation.
 
 ## Oracle evidence and limits
 
-{spec['oracle']} Golden cases with an `ok` result in `datasets/golden/stage_e/` so far: {evidence['cases']}.
+{spec['oracle']} Golden cases with an `ok` result in `datasets/golden/stage_e*/` so far: {evidence['cases']}.
 
 ## Output contract
 
-The renderer reads {CONTRACTS[spec['kind']]} from the operation's outputs. Operation name `{op}` is a placeholder until the stage E spec fixes it. See [the gallery index](README.md).
+The renderer reads {CONTRACTS[spec['kind']]} from the operation's outputs. Operation name `{op}` is a placeholder until a spec fixes it. See [the gallery index](README.md).
 """
 
 
 def live_page(slug, spec, d, bg):
     op, ex = next(iter(spec["examples"].items()))
-    g = check_contract(spec["kind"], d["reference"][op])
+    g = shape(spec, d["inputs"][op], d["reference"][op])
     cap = f"{SYNTHETIC} From the Python CLI; exact values are in the tables and data file."
     e = d["evidence"]
     agree = [[r["output"], r["count"]] + [repr(r["last"][k]) if not isinstance(r["last"][k], (list, dict)) else "list" for k in bg.LANGS]
@@ -350,7 +394,7 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 {spec['oracle']}
 
-{e['cases']} golden cases with status ok in `datasets/golden/stage_e` for {', '.join('`' + o + '`' for o in e['operations'])}, by `verified_by`:
+{e['cases']} golden cases with status ok in `datasets/golden/stage_e*/` for {', '.join('`' + o + '`' for o in e['operations'])}, by `verified_by`:
 
 {bg.table(['Operation: sources', 'Cases'], ev_rows)}
 

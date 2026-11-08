@@ -65,8 +65,9 @@ def focus_seeds(seeds, config):
     (conformance/quality/stage_<x>.json): about `share` of draws come from that folder. A missing or empty
     folder leaves the list unchanged, so the option is safe before the stage has goldens."""
     cfg = json.loads(Path(config).read_text(encoding="utf-8")).get("fuzz", {})
-    folder, share = ROOT / cfg.get("golden", ""), float(cfg.get("share", 0))
-    focus = load_seeds(folder) if cfg.get("golden") and folder.is_dir() else []
+    folders = cfg.get("golden") or []
+    share = float(cfg.get("share", 0))
+    focus = [s for f in ([folders] if isinstance(folders, str) else folders) if (ROOT / f).is_dir() for s in load_seeds(ROOT / f)]
     if not focus or not 0 < share < 1:
         return seeds
     copies = max(1, round(share * len(seeds) / ((1 - share) * len(focus))))
