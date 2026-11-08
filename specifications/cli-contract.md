@@ -252,6 +252,18 @@ Phase R2 (contract 1.7.0) adds these, with no new error code:
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.
 
+## Stage E operations, spec B (contract 1.8.0)
+
+Stage E spec B adds these, with no new error code and no change to the wire format or to `--batch` (each new operation is one line in, one line out, as BT1 to BT4). `stage-e-rulings-b.md` is normative for them. Spec A's stage E operations are in their own section. Rows are added as each slice lands.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `vol.garch.loglik`, `vol.garch.forecast`, `vol.garch.fit` | `05-volatility/garch.md` | E7 |
+| `vol.varswap.fair_strike`, `vol.varswap.realized` | `05-volatility/variance-swaps.md` | E7 |
+| `vol.vix.term_variance`, `vol.vix.index` | `05-volatility/vix-index.md` | E7 |
+
+Batch notes for these operations: `vol.garch.fit` is the only one that iterates; a line that fails to converge returns `E_NO_CONVERGENCE` for that line and the batch goes on. Array inputs (`returns`, `prices`, `strip`) count towards `01-core/limits.md` like any array. `initial_variance` is a string or a number: any other JSON type is `E_SCHEMA`.
+
 ## Versioning
 
 Adding an operation or an error code is a minor version. Changing the meaning of a key, a code or an
