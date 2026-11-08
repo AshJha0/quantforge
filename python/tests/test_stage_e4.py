@@ -141,3 +141,8 @@ def test_yoy_and_zc():
                                        "infl.cap.yoy_price", "infl.cap.zc_price"])
 def test_cli(operation):
     assert run(operation, _base(operation))["status"] == "ok"
+
+
+def test_strip_root_above_search_bound():  # ruling E-B32
+    inputs = {**_base("rates.cap.strip"), "flat_vols": [0.24, 0.235, 0.228, 0.222, 4.9]}
+    assert error("rates.cap.strip", inputs) == "E_DOMAIN"

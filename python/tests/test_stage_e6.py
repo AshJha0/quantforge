@@ -70,3 +70,10 @@ def test_cli(operation, inputs, key):
     r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
                              "inputs": inputs}))
     assert r["status"] == "ok" and key in r["outputs"], r
+
+
+def test_implied_weights_rule():  # ruling E-B33
+    three = corr.implied([0.5, 0.0, 0.5], [0.2, 0.9, 0.3], 0.22)
+    assert three == pytest.approx(corr.implied([0.5, 0.5], [0.2, 0.3], 0.22), rel=1e-15)
+    assert code(corr.implied, [0.5, -0.1], [0.2, 0.3], 0.22) == "E_DOMAIN"
+    assert code(corr.implied, [1.0, 0.0], [0.2, 0.3], 0.22) == "E_DOMAIN"

@@ -57,6 +57,8 @@ def nearest(m: Matrix) -> tuple[list[list[float]], float]:
     target = np.array(m, dtype=float)
     y = target.copy()
     correction = np.zeros_like(y)
+    # Higham's stopping rule (ruling E-B31): relative change of Y in the Frobenius norm at or
+    # below 1e-12, and the result positive semidefinite to -1e-10.
     for _ in range(_MAX_SWEEPS):
         r = y - correction
         w, v = np.linalg.eigh(r)
@@ -66,7 +68,8 @@ def nearest(m: Matrix) -> tuple[list[list[float]], float]:
         previous = y
         y = x.copy()
         np.fill_diagonal(y, 1.0)
-        if float(np.abs(y - previous).max()) <= 1e-15:
+        change = float(np.linalg.norm(y - previous)) / float(np.linalg.norm(y))
+        if change <= 1e-12 and float(np.linalg.eigvalsh(y)[0]) >= PSD_FLOOR:
             break
     else:
         raise QfError("E_NO_CONVERGENCE", "the nearest correlation iteration did not settle",
@@ -89,9 +92,13 @@ def _names(weights: Sequence[float], *lists: Sequence[float]) -> None:
 
 def implied(weights: Sequence[float], vols: Sequence[float], index_vol: float) -> float:
     _names(weights, vols)
+    if any(w < 0 for w in weights) or sum(1 for w in weights if w > 0) < 2:
+        raise _domain("weights must be >= 0 with at least two positive", "weights")
     if any(s <= 0 for s in vols) or index_vol <= 0:
         raise _domain("a vol is not above 0", "vols")
-    return _implied(weights, vols, index_vol)
+    # A zero weight drops its name (ruling E-B33).
+    kept = [(w, s) for w, s in zip(weights, vols, strict=True) if w > 0]
+    return _implied([w for w, _ in kept], [s for _, s in kept], index_vol)
 
 
 def dispersion(weights: Sequence[float], strikes: Sequence[float], index_strike: float,

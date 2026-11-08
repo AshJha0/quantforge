@@ -130,7 +130,7 @@ def cap_strip(
         scale, f, t = terms[n]
         return scale * _option(model, True, f, strike, vol, t)
 
-    low = 1e-6 if model == black.BLACK_76 else 1e-7
+    low, high = 1e-10, 5.0 if model == black.BLACK_76 else 0.5  # ruling E-B32
     vols: list[float] = []
     targets = []
     for count_months, flat in zip(tenors, flat_vols, strict=True):
@@ -152,11 +152,9 @@ def cap_strip(
         if gap(low) >= 0:
             raise QfError("E_ARBITRAGE", "a caplet segment needs a vol at or below zero",
                           "flat_vols")
-        high = max(flat_vols) * 2
-        while gap(high) < 0:
-            high *= 2
-            if high > 1e6:
-                raise QfError("E_NO_CONVERGENCE", "no caplet vol bracket", "flat_vols")
+        if gap(high) < 0:
+            raise QfError("E_DOMAIN", "a caplet segment needs a vol above the search bound",
+                          "flat_vols")
         vols += [_solve(gap, low, high)] * (n - first)
     return vols, targets
 
