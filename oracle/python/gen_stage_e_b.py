@@ -142,7 +142,7 @@ def garch_e():
         s2, ll = garch_path(rm, mp.mpf(om), mp.mpf(al), mp.mpf(be), init)
         out = {"loglik": f(ll), "variances": [f(x) for x in s2[:-1]], "next_variance": f(s2[-1])}
         s.add(lop, {"returns": r, "omega": om, "alpha": al, "beta": be, "initial_variance": init}, out, cls=STAT, verified=["independent-replay", "mpmath-50"],
-              tags=["garch", f"series-{key}"] + (["integrated"] if al + be >= 1 else []), output_classes=None, limit=LIM if len(r) > 10 else None)
+              tags=["garch", f"series-{key}"] + (["integrated"] if al + be >= 1 else []), output_classes={"loglik": "likelihood_sum" if len(r) > 10 else STAT}, limit=VLIM)
         if init == "SAMPLE":
             _, l2 = garch_path(rm, mp.mpf(om), mp.mpf(al), mp.mpf(be), rm[0] ** 2)
             caught("garch_e", f"{key}: init r_1^2 instead of sample variance", abs(f(l2 - ll)), 1e-9 + 1e-10 * abs(f(ll)))
@@ -156,7 +156,7 @@ def garch_e():
     s2, ll = garch_path([mp.mpf(x) for x in r], mp.mpf("1e-5"), mp.mpf(".1"), mp.mpf(".8"), "SAMPLE")
     assert abs(s2[0] - mp.mpf("2.5e-4")) < 1e-18 and abs(s2[1] - mp.mpf("2.2e-4")) < 1e-18 and abs(s2[2] - mp.mpf("2.26e-4")) < 1e-18
     s.add(lop, {"returns": r, "omega": 1e-5, "alpha": .1, "beta": .8, "initial_variance": "SAMPLE"}, {"loglik": f(ll), "variances": [f(x) for x in s2[:-1]], "next_variance": f(s2[-1])},
-          cls=STAT, verified=["hand", "mpmath-50"], tags=["garch", "hand"])
+          cls=STAT, verified=["hand", "mpmath-50"], tags=["garch", "hand"], output_classes={"loglik": STAT}, limit=VLIM)
     b = {"returns": series["C"], "omega": 1e-5, "alpha": .1, "beta": .85, "initial_variance": "SAMPLE"}
     for d, bad, code in (("omega must be positive", {"omega": 0.0}, "E_DOMAIN"), ("alpha negative", {"alpha": -.01}, "E_DOMAIN"), ("beta negative", {"beta": -.01}, "E_DOMAIN"),
                          ("initial variance must be positive", {"initial_variance": 0.0}, "E_DOMAIN"), ("unknown initial variance rule", {"initial_variance": "FIRST"}, "E_INPUT"),
@@ -176,13 +176,15 @@ def garch_e():
     s.add(fop, {"omega": 1e-5, "alpha": .1, "beta": .9, "next_variance": 1e-4, "horizon": 5, "periods_per_year": 252}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"],
           description="alpha + beta = 1: no long-run variance")
     s.add(fop, {"omega": 1e-5, "alpha": .1, "beta": .8, "next_variance": 1e-4, "horizon": 0, "periods_per_year": 252}, error="E_INPUT", cls=E, tags=["invalid"], description="horizon at least 1")
+    s.add(fop, {"omega": 0.0, "alpha": .1, "beta": .8, "next_variance": 1e-4, "horizon": 5, "periods_per_year": 252}, error="E_DOMAIN", cls=E, tags=["invalid"], description="omega must be positive")
+    s.add(fop, {"omega": 1e-5, "alpha": .1, "beta": .8, "next_variance": 0.0, "horizon": 5, "periods_per_year": 252}, error="E_DOMAIN", cls=E, tags=["invalid"], description="next_variance must be positive")
     # Fit: judged on the log-likelihood at the optimum (policy class calibration: objective, not parameters).
     pop = "vol.garch.fit"
     for key in ("A", "B"):
         r = series[key]
         p, ll = garch_fit(r)
         s.add(pop, {"returns": r, "initial_variance": "SAMPLE"}, {"loglik": f(ll)}, cls=R, verified=["independent-replay", "mpmath-50 Newton", "scipy multi-start"],
-              tags=["garch", "fit", "calibration"], limit={"absolute": 1e-6, "relative": 0.0, "reason": "objective at the optimum, not parameters (policy calibration); see garch.md"},
+              tags=["garch", "fit", "calibration"], limit={"absolute": 1e-6, "relative": 0.0, "reason": "objective at the optimum, not parameters (garch.md, ruling E-B16): class root_finding with this limit"},
               description=f"maximum at omega={p[0]:.6e}, alpha={p[1]:.6f}, beta={p[2]:.6f} (informative, not compared)")
         rm = [mp.mpf(x) for x in r]
         llp = garch_path(rm, mp.mpf(p[0]) * 1.05, mp.mpf(p[1]), mp.mpf(p[2]), "SAMPLE")[1]
@@ -262,6 +264,7 @@ def varswap_e():
                "vols": [{"strike": float(k), "vol": smile(k, S0, a, b)} for k in ks], "extension_step": dk, "variance_strike": Kv, "variance_notional": 1e6}
         out, (port, D, T, rr, qq, F, S_) = varswap(inp)
         s.add(op, inp, out, cls=A, verified=["independent-replay", "mpmath-50"] + (["quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"] if q == 0 else []),
+              output_classes={"fair_variance": A, "fair_vol": A},
               tags=["varswap"] + (["dividend"] if q else []) + (["negative-rate"] if r < 0 else []),
               limit={"absolute": 1e-12 * 1e6, "relative": 1e-10, "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"})
         tol = 1e-6 + 1e-10 * abs(out["pv"])
@@ -276,13 +279,15 @@ def varswap_e():
     for d, bad, code in (("put strike above spot", {"put_strikes": [80.0, 90.0, 105.0]}, "E_INPUT"), ("call strike below spot", {"call_strikes": [95.0, 110.0, 120.0]}, "E_INPUT"),
                          ("missing vol for a strike", {"vols": base["vols"][:-1]}, "E_INPUT"), ("extension step not positive", {"extension_step": 0.0}, "E_DOMAIN"),
                          ("maturity not after as_of", {"maturity": AS_OF.isoformat()}, "E_INPUT"), ("extension takes the lowest put to zero", {"extension_step": 80.0}, "E_DOMAIN"),
-                         ("duplicate strike in a list", {"put_strikes": [80.0, 90.0, 90.0, 100.0]}, "E_INPUT")):
+                         ("duplicate strike in a list", {"put_strikes": [80.0, 90.0, 90.0, 100.0]}, "E_INPUT"),
+                         ("spot not positive", {"spot": 0.0, "put_strikes": [0.0], "call_strikes": [0.0], "vols": [{"strike": 0.0, "vol": .2}]}, "E_DOMAIN"),
+                         ("vol not positive", {"vols": base["vols"][:-1] + [{"strike": 120.0, "vol": 0.0}]}, "E_DOMAIN")):
         s.add(op, {**base, **bad}, error=code, cls=E, tags=["invalid"], description=d)
     rop = "vol.varswap.realized"
     px = [100.0, 101.0, 99.5, 100.25, 102.0, 101.5]
     out, lr = realized({"prices": px, "periods_per_year": 252, "variance_strike": .04, "variance_notional": 1e6})
     s.add(rop, {"prices": px, "periods_per_year": 252, "variance_strike": .04, "variance_notional": 1e6}, out, cls=A, verified=["hand", "mpmath-50"], tags=["varswap", "realized", "hand"],
-          limit={"absolute": 1e-6, "relative": 1e-10, "reason": "1e-12 in variance on 1e6 variance notional"})
+          output_classes={"realized_variance": A, "realized_vol": A}, limit={"absolute": 1e-6, "relative": 1e-10, "reason": "1e-12 in variance on 1e6 variance notional"})
     m = mp.fsum(lr) / len(lr)
     caught("varswap_e", "realized: demeaned with n-1", abs(f(1e6 * (252 / mp.mpf(len(lr) - 1) * mp.fsum((x - m) ** 2 for x in lr) - out["realized_variance"]))), 1e-6)
     g = np.random.default_rng(11)
@@ -291,7 +296,7 @@ def varswap_e():
         px2.append(round(px2[-1] * math.exp(.18 / math.sqrt(252) * z), 2))
     o2, _ = realized({"prices": px2, "periods_per_year": 252, "variance_strike": .0324, "variance_notional": 2.5e6})
     s.add(rop, {"prices": px2, "periods_per_year": 252, "variance_strike": .0324, "variance_notional": 2.5e6}, o2, cls=A, verified=["independent-replay", "mpmath-50"], tags=["varswap", "realized"],
-          limit={"absolute": 2.5e-6, "relative": 1e-10, "reason": "1e-12 in variance on the variance notional"})
+          output_classes={"realized_variance": A, "realized_vol": A}, limit={"absolute": 2.5e-6, "relative": 1e-10, "reason": "1e-12 in variance on the variance notional"})
     s.add(rop, {"prices": [100.0], "periods_per_year": 252, "variance_strike": .04, "variance_notional": 1e6}, error="E_INPUT", cls=E, tags=["invalid"], description="at least two prices")
     s.add(rop, {"prices": [100.0, 0.0], "periods_per_year": 252, "variance_strike": .04, "variance_notional": 1e6}, error="E_DOMAIN", cls=E, tags=["invalid"], description="prices positive")
     note("varswap_e: DDKZ weights and Black prices in mpmath; q=0 cases re-priced by QuantLib ReplicatingVarianceSwapEngine in outside_e_b.py")
@@ -331,6 +336,8 @@ def vix_term(inp, mutant=None):
             zeros = 0
             sel[i] = q[i]
     ks = sorted(sel)
+    if not any(i < i0 for i in ks) or not any(i > i0 for i in ks):
+        raise ValueError("all out-of-the-money puts or calls excluded")
     if mutant == "full-strip-dk":
         allk = list(range(len(K)))
         dK = {i: (K[min(i + 1, len(K) - 1)] - K[max(i - 1, 0)]) / (2 if 0 < i < len(K) - 1 else 1) for i in allk}
@@ -420,11 +427,13 @@ def vix_e():
             ov = vix_term(inp, m)[0]
             if ov["variance"] != o["variance"]:
                 caught("vix_e", f"{mins}: {m}", abs(ov["variance"] - o["variance"]), 1e-12 + 1e-10 * o["variance"])
-    for a, b in ((0, 1), (2, 3)):
+    t30 = {"minutes_to_expiry": N30, "rate": .045, "strip": make_strip(4500.0, .045, N30, [3800 + 25 * i for i in range(57)], .17, .25, zero_wings=(3850, 3875, 5100))}
+    terms += [t30]
+    for a, b, tg in ((0, 1, []), (2, 3, []), (5, 1, ["boundary", "near-at-30d"]), (0, 5, ["boundary", "next-at-30d"])):
         inp = {"near": terms[a], "next": terms[b]}
         o = vix_index(inp)
-        s.add(iop, inp, o, cls=A, verified=["independent-replay", "exact-rational"], tags=["vix", "index"],
-              limit={"absolute": 1e-8, "relative": 1e-10, "reason": "index points; 1e-8 is far inside the 0.01 published precision"})
+        s.add(iop, inp, o, cls=A, verified=["independent-replay", "exact-rational"], tags=["vix", "index"] + tg,
+              output_classes={"near_variance": A, "next_variance": A}, limit={"absolute": 1e-8, "relative": 1e-10, "reason": "index points; 1e-8 is far inside the 0.01 published precision"})
         for m in ("no-correction", "days"):
             caught("vix_e", f"index {a}/{b}: {m}", abs(vix_index(inp, m)["index"] - o["index"]), 1e-8 + 1e-10 * o["index"])
     t0 = terms[0]
@@ -433,7 +442,35 @@ def vix_e():
                          ("duplicate strike", {"strip": t0["strip"] + [t0["strip"][5]]}, "E_INPUT")):
         s.add(top, {**t0, **bad}, error=code, cls=E, tags=["invalid"], description=d)
     s.add(iop, {"near": terms[1], "next": terms[0]}, error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="near must expire before next, bracketing 30 days")
-    note("vix_e: CBOE white-paper method; strike sums in exact rationals, exp and sqrt in mpmath")
+    # R5 audit additions (ruling E-B14)
+    rev = {**t0, "strip": t0["strip"][::-1]}
+    s.add(top, rev, vix_term(t0)[0], cls=A, verified=["independent-replay", "exact-rational"], tags=["vix", "unsorted", "ruling"], limit=LIM, description="strip in descending order: same result")
+    z = [dict(x) for x in hand["strip"]]
+    z[2]["call_bid"] = 0.0
+    oz = vix_term({**hand, "strip": z})[0]
+    assert oz["forward"] == 98.45 and oz["k0"] == 95.0
+    s.add(top, {**hand, "strip": z}, oz, cls=A, verified=["hand", "exact-rational"], tags=["vix", "hand", "zero-bid-atm", "ruling"], limit=LIM,
+          description="zero call bid at the ATM strike: still an ATM candidate (Cboe v5.0 3(a)(ii)), excluded from the call walk")
+    np_ = [dict(x) for x in hand["strip"]]
+    np_[0]["put_bid"] = 0.0
+    for d, inp, code in (("negative quote", {**hand, "strip": [hand["strip"][0] | {"put_bid": -0.05}] + hand["strip"][1:]}, "E_DOMAIN"),
+                         ("no strike at or below the forward", {**hand, "strip": hand["strip"][2:]}, "E_INPUT"),
+                         ("all out-of-the-money puts excluded", {**hand, "strip": np_}, "E_INPUT")):
+        if code == "E_INPUT":
+            try:
+                vix_term(inp)
+                raise AssertionError(d)
+            except ValueError:
+                pass
+        s.add(top, inp, error=code, cls=E, tags=["invalid", "ruling"], description=d)
+    neg = {"minutes_to_expiry": 34560, "rate": 0.0, "strip": [
+        {"strike": 45.0, "call_bid": 54.0, "call_ask": 56.0, "put_bid": 0.05, "put_ask": 0.1},
+        {"strike": 50.0, "call_bid": 49.0, "call_ask": 51.0, "put_bid": 0.1, "put_ask": 0.2},
+        {"strike": 100.0, "call_bid": 2.9, "call_ask": 3.1, "put_bid": 2.9, "put_ask": 3.3},
+        {"strike": 101.0, "call_bid": 2.5, "call_ask": 2.7, "put_bid": 3.4, "put_ask": 3.8}]}
+    assert vix_term(neg)[1] < 0
+    s.add(iop, {"near": neg, "next": terms[1]}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="near-term variance so negative that the bracket under the root is below 0")
+    note("vix_e: Cboe methodology v5.0; strike sums in exact rationals, exp and sqrt in mpmath")
     write(s)
 
 

@@ -30,6 +30,10 @@ classes:
     # Stable sums over short series. The ill-conditioned 1e9-offset case stays inside this.
     absolute: 1.0e-11
     relative: 1.0e-10
+  likelihood_sum:
+    # Stage E spec B (garch.md): a log-likelihood summed over hundreds of terms. Each ln may differ in its last bit across libms.
+    absolute: 1.0e-9
+    relative: 1.0e-10
   numerical_scheme:
     # The same grid recipe in another language: rounding through hundreds of tridiagonal solves.
     absolute: 1.0e-8
