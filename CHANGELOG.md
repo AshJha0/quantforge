@@ -14,9 +14,9 @@ On branch `r2`. No golden value of an earlier stage changed.
 ### Changed
 - Stage D outside-oracle coverage is 64.1% (419 of 654 cases) under rule 11.2.5, up from 63.4%: CSA (no FX) and cross-currency PV and bootstrap are now counted through QuantLib.
 - P&L explain on real 2025 Treasury moves: 100% of days explained on every product, against a 95% target, in Java and Python. Spearman and KS are reported, not judged (2Y OIS 0.997 and 0.044; 10Y OIS 0.9998 and 0.028).
-- Calibration stability: 28 of 28 pass, languages within 2e-8; C3 is being rerun under R2-A9.
+- Calibration stability: 28 of 28 pass, languages within 2e-8; C3 was rerun under R2-A9 and passes (all four languages, 2026-11-08).
 - The Actions recorder is live and pushes to `forward-log` with no gaps; the daily workflows run.
-- Stage D mutation score: Rust 93.4%, Java 86.2% (credit now 83.3%, from 73.8%), Python 74.2% on unit tests plus the stage D goldens (65.0% on unit tests alone, 89.0% leaving out mutants that change only error-message text, which the contract does not compare), C++ TODO.
+- Stage D mutation score: Rust 93.4%, Java 86.2% (credit now 83.3%, from 73.8%), Python 74.2% on unit tests plus the stage D goldens (65.0% on unit tests alone, 89.0% leaving out mutants that change only error-message text, which the contract does not compare), C++ 82.5% with unit tests.
 - Benchmarks against `benchmarks/targets.md`: C++ meets every target. Python meets T3 (10,000-trade key-rate risk in 214 s against 900 s, down from about 20,900 s once curve rebuilds were cached) and misses T1 (bootstrap p99 129 ms against 5 ms; p50 14.6 ms) and T4 (start-up 1.84 s against 1.0 s, of which `uv run` is about 1.1 s and QuantForge 0.1 s; `uv run` stays for reproducibility). Java misses T1 (p99 10.7 ms against 5 ms), put down to CPU contention on the test machine rather than code cost. Rust's T1 was measured under WSL and needs a rerun on native Linux.
 - Citations: the citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened.
 
@@ -24,7 +24,14 @@ On branch `r2`. No golden value of an earlier stage changed.
 - The calendar provenance check still fails: SIFMA has not published its 2027 US holiday schedule, usually out in December, so the check stays red until then.
 - Workflow (b), rich/cheap, is blocked on price data (R2-A11): TreasuryDirect's robots.txt and terms, and the DMO's anti-bot page. Manual path: `--data DIR`.
 - Performance targets missed: Python T1 (bootstrap p99 129 ms against 5 ms) and T4 (start-up 1.84 s against 1.0 s, mostly `uv run`); Java T1 (p99 10.7 ms against 5 ms, CPU contention). Rust T1 needs a rerun on native Linux.
-- To fill in before the tag (TODO): calibration stability C3 rerun (R2-A9); C++ stage D mutation score; Python fuzz rate; cross-platform matrix results.
+- Rust T1 was measured under WSL; a native Linux rerun is still owed.
+- The licensed citations have not been opened and need a human to confirm them.
+- The cross-platform matrix runs on main after the merge; its result is checked then, not before the PR.
+
+### Verified on the merged tree (observed, local, Windows, 2026-11-08, `r2`)
+- Java, C++, Python and Rust each pass 5,922 of 5,922 golden cases and every batch check; unit tests pass in all four.
+- Fuzzing 60 seconds per language with seed 53 found nothing. Inputs a minute: Rust 126,600, C++ 92,600, Python 12,800 (up from about 9,500 at R1, still short of the 50,000 target), Java 8,600.
+- Calibration stability 28 of 28; P&L explain on 2025 Treasury moves PASS; stage D outside-oracle coverage 64.1%; `run_all.py` regenerated every golden byte-identical.
 
 ## 0.4.1: R1, credibility hardening (2026-11-07)
 

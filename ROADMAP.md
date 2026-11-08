@@ -47,25 +47,25 @@ Before stage E, R1 works on how far the existing results can be trusted. It adds
 | Recorder | Scheduled on GitHub Actions with a gap monitor | Built; first run after push |
 | Conformance matrix | 3 OS by 4 languages on Actions; local Linux C++ under WSL | Built; first run after push. WSL C++ passed 5,514 v0.4 goldens |
 | Workflows (a) and (c) | EOD curves with sanity bands (USD proxy curve, BoE GBP pass or fail) and a SOFR averages check, through `--batch` | Built; first local runs passed 2026-11-07 |
-| Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Measured, except C++ mutation (TODO); Python T1 and T4 and Java T1 missed |
+| Targets and mutation | [Targets](benchmarks/targets.md) written before measuring; per-stage mutation report | Measured (C++ stage D mutation 82.5%, measured in R2); Python T1 and T4 and Java T1 missed |
 | Coverage | Unit-test line coverage: C++ 94.2%, Java 97.3%, Python 97.2%, Rust 96.5% | Measured |
 | Citations | A `## Sources` section in 50 specs (`program/R1_CITATION_FINDINGS.md`) | Done. The citations lane reports 10 sources opened and confirmed, 2 partly confirmed and 16 unreachable; licensed sources are still not opened |
 | R3 preregistrations | Three studies in `research/preregs/` | Signed by Claude under the owner's delegation; holdout unread |
 
 Open at the end of R1: Python fuzz runs at about 2,760 cases a minute against the 50,000 target.
 
-## R2: risk first (target v0.4.2, in progress)
+## R2: risk first (tag `v0.4.2`)
 
 Risk before more products: par and key-rate risk, P&L explain, calibration stability and workflow (b). Contract 1.7.0 adds operations and no error code.
 
 | Item | What it adds | State |
 |---|---|---|
-| Par and key-rate risk | `risk.curve.par`, `risk.curve.key_rate` (`TRIANGULAR`, `PILLAR`), `risk.curve.jacobian`; spec `06-risk/par-and-key-rate.md`; 41 goldens in `risk_r2`, re-priced in QuantLib | Specified; language builds landing |
+| Par and key-rate risk | `risk.curve.par`, `risk.curve.key_rate` (`TRIANGULAR`, `PILLAR`), `risk.curve.jacobian`; spec `06-risk/par-and-key-rate.md`; 41 goldens in `risk_r2`, re-priced in QuantLib | Done: all four languages pass 5,922 of 5,922 |
 | P&L explain | `risk.pnl.explain` with a threshold of 5% of the larger of full and gross first-order P&L, a project choice (rulings R2-A3, R2-A4); spec `06-risk/pnl-explain.md`; 44 goldens in `pnl_r2`; real-move run `tools/workflows/pnl_explain.py` | Run: 100% of 2025 days explained on every product, Java and Python |
-| Calibration stability | Seven calibrations, C1 to C7, judged on metrics S1 to S7, `03-calibration/stability.md` | Run: 28 of 28 pass, languages within 2e-8; C3 rerun under R2-A9 TODO |
+| Calibration stability | Seven calibrations, C1 to C7, judged on metrics S1 to S7, `03-calibration/stability.md` | Run: 28 of 28 pass, languages within 2e-8; C3 rerun under R2-A9 passes |
 | Workflow (b) | Treasury and gilt rich/cheap screen, `1/D_mod^2` weights, on-the-run issues reported but not fitted, `04-pricing/workflow-b-rich-cheap.md` | BLOCKED on price data (R2-A11); manual `--data DIR` path |
 | Carried from R1 | Recorder and daily workflows | Live: the recorder pushes to `forward-log` with no gaps, and the daily workflows run |
-| Carried from R1 | Python fuzz rate, C++ stage D mutation, Rust T1 on native Linux, cross-platform matrix | TODO |
+| Carried from R1 | Python fuzz rate, C++ stage D mutation, Rust T1 on native Linux, cross-platform matrix | Python fuzz 12,800 a minute (target 50,000, still short); C++ mutation 82.5%; Rust T1 native Linux still owed; cross-platform matrix checked on main after merge |
 
 Stage E follows R2.
 

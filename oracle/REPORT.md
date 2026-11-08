@@ -279,6 +279,10 @@ suite edge_d: 24 cases
 edge_d: 24 edge-case register cases
 suite rulings_r1: 15 cases
 rulings_r1: 15 cases (R1-3 conversion factor, R1-4 CDS discount interpolation)
+suite risk_r2: 41 cases
+risk_r2: QuantLib worst gaps per unit notional: par 1.8e-12, key-rate 3.7e-16; Jacobian 1.7e-08; par-from-zero identity worst 5.0e-06 of par DV01
+suite pnl_r2: 44 cases
+pnl_r2: 44 cases, 4 not explained (large moves on long products); largest |unexplained|/threshold 3.24; no case within 0.9-1.1
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4394 golden cases checked, none breaks a stated invariant
 invariants: 343 stage B cases checked, none breaks one
