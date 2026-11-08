@@ -25,12 +25,14 @@ sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 import runner  # noqa: E402  (tolerance comparison only)
 
 POLICY = runner.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
-SUITES = ["surf_e", "lv_e", "fxs_e"]  # spec A suites; later slices append
+SUITES = ["surf_e", "lv_e", "fxs_e", "heston_e", "slv_e", "exotic_e", "american_e"]  # spec A suites; later slices append
 
 
 class Used:
+    """Records the map rows a handler used, and any output it had to compute by the spec's own algebra (ruling E-A17)."""
     def __init__(self):
         self.rows = set()
+        self.self_outputs = set()
 
     def __call__(self, row, *a):
         self.rows.add(row)
@@ -41,6 +43,7 @@ class Used:
 def h_surface_check(u, x):
     """Total variance from QuantLib SviSmileSection; butterfly from the sign of QuantLib's numerical density;
     wing rules are the spec's algebra on the input parameters (asymptotic slopes, not a QuantLib quantity)."""
+    u.self_outputs |= {"wing_violations", "arbitrage_free"}
     secs = [u("SVI.RAW", s["expiry_years"], 1.0, s["svi"]) for s in x["slices"]]
     ks = x["log_moneyness"]
     bf, cal, wing = [], [], []
@@ -59,7 +62,7 @@ def h_surface_check(u, x):
     for j, s in enumerate(x["slices"]):
         sl, cl, sr, cr = asym(s["svi"])
         for side, v in (("LEFT", sl), ("RIGHT", sr)):
-            if v > 2:
+            if v >= 2:
                 wing.append({"expiry_index": j, "side": side, "kind": "LEE"})
         if j:
             pl, pcl, pr, pcr = asym(x["slices"][j - 1]["svi"])
@@ -96,6 +99,7 @@ def h_dynamics(u, x):
         bc = u("OPT.BLACK_CALC", x["option_type"], K, F0, v0 * math.sqrt(T), D)
         dvds = 0.0
         if x["rule"] == "STICKY_DELTA":
+            u.self_outputs.add("deltas")
             # spec: d sigma/dS = -(dsigma/dk)/S at fixed K; dsigma/dk from QuantLib's own smile, 4-point difference in k
             h = 1e-4
             vol = lambda kk: sec0.volatility(F0 * math.exp(kk))  # noqa: E731
@@ -174,7 +178,130 @@ def h_fx_smile(u, x):
 HANDLERS.update({"fx.option.price": h_fx_price, "fx.delta.from_strike": h_fx_from_strike, "fx.delta.to_strike": h_fx_to_strike,
                  "fx.atm.strike": h_fx_atm, "fx.smile.from_quotes": h_fx_smile})
 
+
+# ---------------------------------------------------------------- E2
+def _opt_prices(x, eng, ref):
+    d = round(x["expiry_years"] * 365)
+    if d / 365 != x["expiry_years"]:
+        raise NotImplementedError("expiry not whole days")
+    out = []
+    for K in x["strikes"]:
+        o = ql.VanillaOption(ql.PlainVanillaPayoff(ql.Option.Call if x["option_type"] == "CALL" else ql.Option.Put, K), ql.EuropeanExercise(ref + d))
+        o.setPricingEngine(eng)
+        out.append(o.NPV())
+    return {"prices": out}
+
+
+def _curves(u, x):
+    ref = ql.Date(6, 11, 2026)
+    ql.Settings.instance().evaluationDate = ref
+    return ref, u("TS.FLAT_CONT", ref, x["rate"]), u("TS.FLAT_CONT", ref, x["dividend_yield"])
+
+
+def h_heston(u, x):
+    ref, rt, qt = _curves(u, x)
+    return _opt_prices(x, u("HESTON.ENGINE", ql.HestonModel(u("HESTON.PROCESS", rt, qt, x["spot"], x["heston"]))), ref)
+
+
+def h_bates(u, x):
+    ref, rt, qt = _curves(u, x)
+    return _opt_prices(x, u("BATES.ENGINE", ql.BatesModel(u("BATES.PROCESS", rt, qt, x["spot"], x["heston"], x["jumps"]))), ref)
+
+
+
+
+HANDLERS.update({"vol.heston.price": h_heston, "vol.bates.price": h_bates})
+
+
+# ---------------------------------------------------------------- E5
+REF = ql.Date(6, 11, 2026)
+
+
+def _days(t):
+    d = round(t * 365)
+    if d / 365 != t:
+        raise NotImplementedError("time not whole days")
+    return d
+
+
+def _bsm(u, x):
+    ql.Settings.instance().evaluationDate = REF
+    return u("BSM.PROCESS", REF, x["spot"], x["rate"], x["dividend_yield"], x["vol"])
+
+
+def h_digital(u, x):
+    o = ql.VanillaOption(u("PAY.DIGITAL", x["payoff"], u("OPT.TYPE", x["option_type"]), x["strike"], x["cash"]), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(ql.AnalyticEuropeanEngine(_bsm(u, x)))
+    return {"price": o.NPV()}
+
+
+def h_barrier(u, x):
+    pr = _bsm(u, x)
+    o = ql.BarrierOption(u("BARRIER.TYPE", x["barrier_type"]), x["barrier"], x["rebate"], ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"]),
+                         ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.BARRIER", pr))
+    return {"price": o.NPV()}
+
+
+def h_asian(u, x):
+    pr = _bsm(u, x)
+    pay = ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"])
+    ex = ql.EuropeanExercise(REF + _days(x["expiry_years"]))
+    if x["averaging"] == "CONTINUOUS":
+        o = ql.ContinuousAveragingAsianOption(ql.Average.Geometric, pay, ex)
+        o.setPricingEngine(u("ENG.ASIAN_GEO_CONT", pr))
+    else:
+        o = ql.DiscreteAveragingAsianOption(ql.Average.Geometric, 1.0, 0, [REF + _days(t) for t in x["fixing_years"]], pay, ex)
+        o.setPricingEngine(u("ENG.ASIAN_GEO_DISC", pr))
+    return {"price": o.NPV()}
+
+
+def h_lookback(u, x):
+    pr = _bsm(u, x)
+    o = ql.ContinuousFloatingLookbackOption(x["running_extreme"], ql.FloatingTypePayoff(u("OPT.TYPE", x["option_type"])), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.LOOKBACK_FLOAT", pr))
+    return {"price": o.NPV()}
+
+
+def h_quanto(u, x):
+    ql.Settings.instance().evaluationDate = REF
+    pr = u("BSM.PROCESS", REF, x["spot"], x["domestic_rate"], x["dividend_yield"], x["vol"])
+    o = ql.QuantoVanillaOption(ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"]), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.QUANTO", pr, REF, x["foreign_rate"], x["fx_vol"], x["correlation"]))
+    return {"price": o.NPV()}
+
+
+def h_chooser(u, x):
+    pr = _bsm(u, x)
+    o = ql.SimpleChooserOption(REF + _days(x["choose_years"]), x["strike"], ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.CHOOSER", pr))
+    return {"price": o.NPV()}
+
+
+def h_kirk(u, x):
+    ql.Settings.instance().evaluationDate = REF
+    o = ql.BasketOption(ql.SpreadBasketPayoff(ql.PlainVanillaPayoff(ql.Option.Call, x["strike"])), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.KIRK", REF, x["forward_1"], x["forward_2"], x["rate"], x["vol_1"], x["vol_2"], x["correlation"]))
+    return {"price": o.NPV()}
+
+
+def h_baw(u, x):
+    pr = _bsm(u, x)
+    o = ql.VanillaOption(ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"]), ql.AmericanExercise(REF, REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.BAW", pr))
+    return {"price": o.NPV()}
+
+
+HANDLERS.update({"exotic.digital.price": h_digital, "exotic.barrier.price": h_barrier, "exotic.asian.geometric": h_asian, "exotic.lookback.floating": h_lookback,
+                 "exotic.quanto.price": h_quanto, "exotic.chooser.price": h_chooser, "exotic.spread.kirk": h_kirk, "exotic.american.baw": h_baw})
+
 NO_ORACLE = {
+    "exotic.american.crr": "spec uses the Hull CRR probability (e^{(r-q)dt} - d)/(u - d); the QuantLib crr tree uses 1/2 + drift dt/(2 dx), so values differ. Checked by replay and the Black-Scholes limit",
+    "exotic.american.fd": "reference scheme judged as a recipe; checked against a 2000-step tree within 2e-2",
+    "exotic.basket.moment": "QuantLib has no moment-matched arithmetic basket engine; 30-digit mpmath and the perfect-correlation limit",
+    "vol.merton.price": "the QuantLib 1.44 Python wheel does not expose JumpDiffusionEngine or Merton76Process pricing; checked by Poisson series, Lewis at 256 nodes and 30-digit mpmath",
+    "vol.heston.cf": "QuantLib does not expose the characteristic function; checked against 30-digit mpmath",
+    "vol.slv.leverage": "a reference scheme, judged as a recipe; QuantLib HestonSLVFDMModel uses another grid and scheme, so it cannot reproduce the numbers",
     "vol.ssvi.to_svi": "QuantLib has no SSVI; checked by replay through vol.ssvi.evaluate",
     "vol.svi.fit_surface": "fit judged on known-truth parameters; QuantLib's SviInterpolatedSmileSection fits by its own optimiser path",
     "vol.local.dupire": "QuantLib's LocalVolSurface needs a BlackVolTermStructure; none reproduces SVI slices linear in total variance. Checked by a 40-digit price-based Dupire",
@@ -196,6 +323,8 @@ def judge(case, got):
 
 def verify(show=True):
     reg, table = [], []
+    global partial
+    partial = []
     for suite in SUITES:
         p = ROOT / "datasets" / "golden" / "stage_e" / f"{suite}.json"
         if not p.exists():
@@ -211,7 +340,9 @@ def verify(show=True):
                 ok, why = judge(c, h(u, c["inputs"]))
             except (NotImplementedError, RuntimeError) as e:
                 ok, why = False, str(e)
-            if ok:
+            if ok and u.self_outputs:
+                partial.append({"case_id": c["case_id"], "operation": c["operation"], "outputs_self": sorted(u.self_outputs)})
+            elif ok:
                 k += 1
                 reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": CM.LIBRARY, "version": CM.VERSION,
                             "convention_rows": sorted(u.rows), "map_review": CM.REVIEW})
@@ -236,15 +367,17 @@ def main():
     reg, table = verify()
     k, n = sum(t[1] for t in table), sum(t[2] for t in table)
     L = ["# Stage E spec A: outside-oracle coverage", "", "Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, "
-         "reproduces every output within the case's own tolerance. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.", "",
+         "reproduces every output within the case's own tolerance, and every output is a QuantLib value or plain arithmetic on QuantLib values (ruling E-A17). "
+         "Cases where QuantLib matches but some output is the spec's own algebra (SVI wing lists, the sticky-delta smile term) are listed as partly outside and not counted. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.", "",
          "| Suite | Outside-oracle cases | Cases | Share |", "|---|---|---|---|"]
     L += [f"| `{s}` | {a} | {b} | {100 * a / b:.0f}% |" for s, a, b in table]
+    L += [f"| partly outside, not counted | {len(partial)} | | |"]
     L += [f"| **spec A total** | **{k}** | **{n}** | **{100 * k / max(n, 1):.1f}%** |", "", "Operations with no QuantLib route:", ""]
     L += [f"- `{op}`: {why}" for op, why in NO_ORACLE.items()]
     L += [""] + map_lines() + [""]
     (ROOT / "oracle" / "OUTSIDE_E_A.md").write_text("\n".join(L), encoding="utf-8", newline="\n")
     (ROOT / "oracle" / "outside_register_e_a.json").write_text(json.dumps({"rule": "plan 11.2.5", "library": CM.LIBRARY, "version": CM.VERSION, "map_review": CM.REVIEW,
-                                                                         "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
+                                                                         "cases": reg, "partly_outside_not_counted": partial}, indent=1) + "\n", encoding="utf-8", newline="\n")
     print("\n".join(L[:len(table) + 8]))
     return 0
 

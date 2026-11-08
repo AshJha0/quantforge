@@ -258,6 +258,8 @@ Stage E (target contract 1.8.0, set by the coordinator at merge) adds these, wit
 | `vol.svi.surface_check`, `vol.ssvi.to_svi`, `vol.svi.fit_surface` | `05-volatility/arb-free-surfaces.md` | E1 |
 | `vol.local.dupire`, `vol.forward.vol`, `vol.smile.dynamics`, `vol.volofvol.measure` | `05-volatility/local-and-forward-vol.md` | E1 |
 | `fx.option.price`, `fx.delta.from_strike`, `fx.delta.to_strike`, `fx.atm.strike`, `fx.smile.from_quotes` | `05-volatility/fx-smile.md` | E3 |
+| `vol.heston.price`, `vol.heston.cf`, `vol.bates.price`, `vol.merton.price`, `vol.slv.leverage` | `05-volatility/heston-family.md` | E2 |
+| `exotic.*` | `04-pricing/exotics.md` | E5 |
 
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.

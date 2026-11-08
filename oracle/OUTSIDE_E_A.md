@@ -1,16 +1,27 @@
 # Stage E spec A: outside-oracle coverage
 
-Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, reproduces every output within the case's own tolerance. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.
+Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, reproduces every output within the case's own tolerance, and every output is a QuantLib value or plain arithmetic on QuantLib values (ruling E-A17). Cases where QuantLib matches but some output is the spec's own algebra (SVI wing lists, the sticky-delta smile term) are listed as partly outside and not counted. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.
 
 | Suite | Outside-oracle cases | Cases | Share |
 |---|---|---|---|
-| `surf_e` | 9 | 28 | 32% |
-| `lv_e` | 22 | 39 | 56% |
+| `surf_e` | 0 | 32 | 0% |
+| `lv_e` | 16 | 43 | 37% |
 | `fxs_e` | 114 | 125 | 91% |
-| **spec A total** | **145** | **192** | **75.5%** |
+| `heston_e` | 18 | 38 | 47% |
+| `slv_e` | 0 | 8 | 0% |
+| `exotic_e` | 103 | 119 | 87% |
+| `american_e` | 12 | 45 | 27% |
+| partly outside, not counted | 16 | | |
+| **spec A total** | **263** | **410** | **64.1%** |
 
 Operations with no QuantLib route:
 
+- `exotic.american.crr`: spec uses the Hull CRR probability (e^{(r-q)dt} - d)/(u - d); the QuantLib crr tree uses 1/2 + drift dt/(2 dx), so values differ. Checked by replay and the Black-Scholes limit
+- `exotic.american.fd`: reference scheme judged as a recipe; checked against a 2000-step tree within 2e-2
+- `exotic.basket.moment`: QuantLib has no moment-matched arithmetic basket engine; 30-digit mpmath and the perfect-correlation limit
+- `vol.merton.price`: the QuantLib 1.44 Python wheel does not expose JumpDiffusionEngine or Merton76Process pricing; checked by Poisson series, Lewis at 256 nodes and 30-digit mpmath
+- `vol.heston.cf`: QuantLib does not expose the characteristic function; checked against 30-digit mpmath
+- `vol.slv.leverage`: a reference scheme, judged as a recipe; QuantLib HestonSLVFDMModel uses another grid and scheme, so it cannot reproduce the numbers
 - `vol.ssvi.to_svi`: QuantLib has no SSVI; checked by replay through vol.ssvi.evaluate
 - `vol.svi.fit_surface`: fit judged on known-truth parameters; QuantLib's SviInterpolatedSmileSection fits by its own optimiser path
 - `vol.local.dupire`: QuantLib's LocalVolSurface needs a BlackVolTermStructure; none reproduces SVI slices linear in total variance. Checked by a 40-digit price-based Dupire
@@ -32,3 +43,20 @@ QuantLib 1.44. Review: self-reviewed 2026-11-08, self-assessment, not an outside
 | `FX.ATM_TYPE` | 05-volatility/fx-smile.md ATM SPOT, FORWARD, DNS | `{"SPOT": ql.DeltaVolQuote.AtmSpot, "FORWARD": ql.DeltaVolQuote.AtmFwd, "DNS": ql.DeltaVolQuote.AtmDeltaNeutral` | QuantLib AtmDeltaNeutral depends on the delta type, as the spec |
 | `FX.DELTA_CALC` | 05-volatility/fx-smile.md deltas and strikes; discount factors exp(-r T), continuous | `ql.BlackDeltaCalculator(ql.Option.Call if ot == "CALL" else ql.Option.Put, dtq, S, Dd, Df, sd), ""` |  |
 | `FX.GK` | 05-volatility/fx-smile.md Garman-Kohlhagen: flat continuous rd, rf on ACT/365F, expiry days/365 | `ql.BlackScholesMertonProcess(ql.QuoteHandle(ql.SimpleQuote(S` | Garman-Kohlhagen is BlackScholesMertonProcess with the foreign curve as dividend curve (the SWIG wheel has no GarmanKohlhagenProcess); engine AnalyticEuropeanEngine; vega per unit vol |
+| `TS.FLAT_CONT` | 05-volatility/heston-family.md flat continuous r, q on ACT/365F; expiry days/365 | `ql.YieldTermStructureHandle(ql.FlatForward(ref, r, ql.Actual365Fixed(), ql.Continuous)), ""` |  |
+| `HESTON.PROCESS` | 05-volatility/heston-family.md heston {v0, kappa, theta, xi, rho} | `ql.HestonProcess(rt, qt, ql.QuoteHandle(ql.SimpleQuote(S)), h["v0"], h["kappa"], h["theta"], h["xi"], h["rho"]` | QuantLib argument order (v0, kappa, theta, sigma, rho); sigma = xi |
+| `HESTON.ENGINE` | 05-volatility/heston-family.md Lewis price, target 1e-8 | `ql.AnalyticHestonEngine(m, 1e-13, 1000000), "adaptive Gauss-Lobatto, relative 1e-13"` | adaptive Gauss-Lobatto, relative 1e-13 |
+| `BATES.PROCESS` | 05-volatility/heston-family.md jumps {intensity, mean_log_jump, log_jump_vol}, compensated | `ql.BatesProcess(rt, qt, ql.QuoteHandle(ql.SimpleQuote(S)), h["v0"], h["kappa"], h["theta"], h["xi"], h["rho"],` | QuantLib (lambda, nu, delta): nu is the mean of ln(1+J) |
+| `BATES.ENGINE` | 05-volatility/heston-family.md Bates price | `ql.BatesEngine(m, 1e-13, 1000000), ""` |  |
+| `BSM.PROCESS` | 04-pricing/exotics.md flat continuous r, q, vol on ACT/365F; expiry days/365 | `ql.BlackScholesMertonProcess(ql.QuoteHandle(ql.SimpleQuote(S` |  |
+| `OPT.TYPE` | 04-pricing/exotics.md option_type CALL, PUT | `ql.Option.Call if ot == "CALL" else ql.Option.Put, ""` |  |
+| `PAY.DIGITAL` | 04-pricing/exotics.md CASH_OR_NOTHING pays cash, ASSET_OR_NOTHING pays S_T | `ql.CashOrNothingPayoff(t, K, cash) if kind == "CASH_OR_NOTHING" else ql.AssetOrNothingPayoff(t, K), ""` |  |
+| `BARRIER.TYPE` | 04-pricing/exotics.md barrier_type | `{"DOWN_IN": ql.Barrier.DownIn, "DOWN_OUT": ql.Barrier.DownOut, "UP_IN": ql.Barrier.UpIn, "UP_OUT": ql.Barrier.` | continuous monitoring; knock-in rebate paid at expiry, knock-out rebate at the hit, as QuantLib AnalyticBarrierEngine |
+| `ENG.BARRIER` | 04-pricing/exotics.md Reiner-Rubinstein | `ql.AnalyticBarrierEngine(pr), ""` |  |
+| `ENG.ASIAN_GEO_CONT` | 04-pricing/exotics.md continuous geometric average price (Kemna-Vorst) | `ql.AnalyticContinuousGeometricAveragePriceAsianEngine(pr), ""` |  |
+| `ENG.ASIAN_GEO_DISC` | 04-pricing/exotics.md discrete geometric average price, no past fixings | `ql.AnalyticDiscreteGeometricAveragePriceAsianEngine(pr), "fixing dates must be whole days"` | fixing dates must be whole days |
+| `ENG.LOOKBACK_FLOAT` | 04-pricing/exotics.md floating-strike lookback, continuous monitoring | `ql.AnalyticContinuousFloatingLookbackEngine(pr), ""` |  |
+| `ENG.QUANTO` | 04-pricing/exotics.md quanto: drift reduced by rho vol fx_vol, paid in domestic at a fixed rate of 1 | `ql.QuantoEuropeanEngine(pr, ql.YieldTermStructureHandle(ql.FlatForward(ref, rf, ql.Actual365Fixed(), ql.Contin` | process risk-free curve is the domestic rate; correlation between the asset and the FX rate in domestic per foreign |
+| `ENG.CHOOSER` | 04-pricing/exotics.md simple chooser (Rubinstein) | `ql.AnalyticSimpleChooserEngine(pr), ""` |  |
+| `ENG.KIRK` | 04-pricing/exotics.md Kirk spread on two forwards | `ql.KirkEngine(*[ql.BlackProcess(ql.QuoteHandle(ql.SimpleQuote(F)), ql.YieldTermStructureHandle(ql.FlatForward(` | BlackProcess: the quote is the forward |
+| `ENG.BAW` | 04-pricing/exotics.md Barone-Adesi-Whaley | `ql.BaroneAdesiWhaleyApproximationEngine(pr), "QuantLib solves the critical price to about 1e-6"` | QuantLib solves the critical price to about 1e-6 |
