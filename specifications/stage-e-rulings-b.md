@@ -43,6 +43,7 @@ Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`
 | E-B24 | Copula functions | Bivariate normal and bivariate t CDFs to 1e-12 absolute plus 1e-9 relative, any method. The t copula uses one `nu` for both margins and a scale matrix with off-diagonal `rho`; at `rho = 0` it is not independence, and the goldens pin that |
 | E-B25 | LHP closed form | Expected tranche loss through `E[min(P(M), k)] = p - Phi_2(c, m*; sqrt(rho)) + k Phi(m*)`; attachment points scaled by `1 - R`; `rho` is the asset correlation (factor loading `sqrt(rho)`). Fixed quadrature is allowed if split at `m*` |
 | E-B26 | Credit oracle split | CDS options count against QuantLib's `CdsOption` engines; Gaussian copula and LHP count at formula level against QuantLib's bivariate normal, with the quantile refined by one Newton step in QuantLib's own normal functions; the t copula is internal only |
+| E-B27 | Implied-vol error case (SPEC_QUESTION from C++, 2026-11-08) | `creditopt_e-0055` was a knock-out payer struck at 1.20% with forward 1.18877%, so its zero-vol value is 0 and a premium of 1.0 has a root (vol about 0.54%): the golden contradicted its own description. Corrected to a receiver on the same underlying: zero-vol value `N A (K - F) = 4,859.76`, premium 1.0 below it, `E_DOMAIN`. The generator now asserts that every "below the zero-vol value" case is. The other implied-vol `E_DOMAIN` case, `ratesvol_e-0038` (call, premium 11.0 below discounted intrinsic 11.207), was right. No spec text changes |
 
 ## R5 audit rulings on E7 (2026-11-08)
 

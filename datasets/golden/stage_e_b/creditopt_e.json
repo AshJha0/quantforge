@@ -2248,7 +2248,7 @@
     "rate": 0.035,
     "hazard_rate": 0.02,
     "recovery": 0.4,
-    "type": "PAYER",
+    "type": "RECEIVER",
     "strike": 0.012,
     "notional": 10000000.0,
     "knock_out": true,
@@ -2264,9 +2264,10 @@
    ],
    "tags": [
     "invalid",
+    "ruling",
     "synthetic"
    ],
-   "description": "premium below the zero-vol value: no implied vol"
+   "description": "receiver, F < K: premium 1.0 is below the zero-vol value N A (K - F) = 4859.76, so no implied vol (ruling E-B27)"
   },
   {
    "case_id": "creditopt_e-0056",

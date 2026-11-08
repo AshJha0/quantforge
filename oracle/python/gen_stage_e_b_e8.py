@@ -154,7 +154,11 @@ def credit_e():
                          ("recovery outside [0, 1)", {"recovery": 1.0}, "E_DOMAIN"), ("hazard negative", {"hazard_rate": -.01}, "E_DOMAIN"),
                          ("strike not positive", {"strike": 0.0}, "E_DOMAIN"), ("vol negative", {"vol": -.1}, "E_DOMAIN")):
         s.add(op, {**b, **bad}, error=code, cls=E, tags=["invalid"], description=d)
-    s.add(iop, {k: v_ for k, v_ in b.items() if k != "vol"} | {"premium": 1.0}, error="E_DOMAIN", cls=E, tags=["invalid"], description="premium below the zero-vol value: no implied vol")
+    rcv = {k: v_ for k, v_ in b.items() if k != "vol"} | {"type": "RECEIVER", "premium": 1.0}
+    zv = cds_option(rcv | {"vol": 0.0001})["price"]  # receiver with F < K: zero-vol value N A (K - F), about 4,866
+    assert zv > 1000 * rcv["premium"], "premium is not below the zero-vol value"
+    s.add(iop, rcv, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"],
+          description=f"receiver, F < K: premium 1.0 is below the zero-vol value N A (K - F) = {zv:.2f}, so no implied vol (ruling E-B27)")
     s.add(iop, {k: v_ for k, v_ in b.items() if k != "vol"} | {"premium": 5e4, "knock_out": False}, error="E_INPUT", cls=E, tags=["invalid", "ruling"],
           description="implied vol only for knock-out options (ruling E-B23)")
     # Gaussian and Student-t copula joint default

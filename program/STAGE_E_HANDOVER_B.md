@@ -84,3 +84,7 @@ Easy to get wrong (wrong-convention checks): accrual on default runs ACT/360 to 
 Oracle: 74 of 96 (77%) outside-checked by QuantLib 1.44; 164 wrong-convention checks.
 
 Spec B outside share, all slices: 145 of 268 (54.1%). Stage-wide with spec A (263 of 410 at b11809f): 408 of 678 (60.2%).
+
+## E8 correction (2026-11-08)
+
+Ruling E-B27: `creditopt_e-0055` (`credit.cdsoption.implied_vol`, `E_DOMAIN`) is now a RECEIVER on the same underlying, premium 1.0 below its zero-vol value 4,859.76. Re-run `creditopt_e`; no other case and no spec text changed.
