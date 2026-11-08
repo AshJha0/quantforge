@@ -177,6 +177,9 @@ pub const OPERATIONS: &[&str] = &[
     "vol.delta.from_strike",
     "vol.delta.to_strike",
     "vol.equity.price",
+    "vol.garch.fit",
+    "vol.garch.forecast",
+    "vol.garch.loglik",
     "vol.option.implied",
     "vol.option.price",
     "vol.sabr.arbfree",
@@ -190,6 +193,10 @@ pub const OPERATIONS: &[&str] = &[
     "vol.surface.query",
     "vol.svi.calibrate",
     "vol.svi.evaluate",
+    "vol.varswap.fair_strike",
+    "vol.varswap.realized",
+    "vol.vix.index",
+    "vol.vix.term_variance",
 ];
 
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
