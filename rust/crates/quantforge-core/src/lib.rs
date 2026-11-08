@@ -51,6 +51,7 @@ pub mod stage_d3;
 pub mod stats;
 pub mod store;
 pub mod surface;
+pub mod surface_e;
 pub mod svi;
 pub mod time;
 pub mod ts;

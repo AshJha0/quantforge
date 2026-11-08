@@ -63,6 +63,14 @@ fn operation_above(op: &str, i: &Json) -> bool {
             product_above(int(i, "space_steps"), int(i, "time_steps"), 10_000_000)
         }
         "core.cos.european" => above(i, "terms", 100_000),
+        "vol.svi.surface_check" => {
+            len(i, "slices").is_some_and(|n| n > 100)
+                || len(i, "log_moneyness").is_some_and(|n| n > 10_000)
+        }
+        "vol.local.dupire" => {
+            len(i, "slices").is_some_and(|n| n > 100)
+                || len(i, "points").is_some_and(|n| n > 10_000)
+        }
         "core.calendar.add_business_days" => int(i, "days").is_some_and(|d| d.abs() > 30_000),
         "core.ts.rolling" => above(i, "window", 1_000),
         "core.ts.autocorrelation" | "core.ts.ljung_box" => above(i, "max_lag", 1_000),

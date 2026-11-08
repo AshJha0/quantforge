@@ -1,4 +1,5 @@
-//! Stage E operations: E7 (`garch.md`, `variance-swaps.md`, `vix-index.md`).
+//! Stage E operations: E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
+//! (`garch.md`, `variance-swaps.md`, `vix-index.md`).
 
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
@@ -6,6 +7,8 @@ use crate::ops_b::{items, sub};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::garch::{self, Start};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::surface_e::{self, Check, Dynamics, Rule, Side, Slice, WingKind};
+use quantforge_core::svi::Svi;
 use quantforge_core::varswap::{self, Replication};
 use quantforge_core::vix::{self, Quote};
 
@@ -41,8 +44,182 @@ fn strip(i: &Inputs) -> Result<(i64, f64, Vec<Quote>)> {
     Ok((n, r, s))
 }
 
+fn svi_of(p: &Inputs) -> Result<Svi> {
+    Ok(Svi {
+        a: p.f64("a")?,
+        b: p.f64("b")?,
+        rho: p.f64("rho")?,
+        m: p.f64("m")?,
+        sigma: p.f64("sigma")?,
+    })
+}
+
+fn svi_json(s: &Svi) -> Json {
+    obj([
+        ("a", s.a.into()),
+        ("b", s.b.into()),
+        ("rho", s.rho.into()),
+        ("m", s.m.into()),
+        ("sigma", s.sigma.into()),
+    ])
+}
+
+fn slices(i: &Inputs) -> Result<Vec<Slice>> {
+    items(i, "slices")?
+        .iter()
+        .map(|s| {
+            Ok(Slice {
+                expiry_years: s.f64("expiry_years")?,
+                svi: svi_of(&sub(s, "svi")?)?,
+            })
+        })
+        .collect()
+}
+
+fn fields(v: Vec<(&str, Json)>) -> Json {
+    Json::Obj(v.into_iter().map(|(k, x)| (k.to_string(), x)).collect())
+}
+
+fn index(j: usize) -> Json {
+    i64::try_from(j).unwrap_or(i64::MAX).into()
+}
+
+/// The four check outputs, or `E_ARBITRAGE` when `reject` is set and the surface is not clean.
+fn check_fields(c: &Check, reject: bool) -> Result<Vec<(&'static str, Json)>> {
+    if reject && !c.arbitrage_free() {
+        return fail("E_ARBITRAGE", "the surface has arbitrage");
+    }
+    let at = |v: &[(usize, usize)]| -> Json {
+        Json::Arr(
+            v.iter()
+                .map(|&(j, k)| obj([("expiry_index", index(j)), ("k_index", index(k))]))
+                .collect(),
+        )
+    };
+    let wings = c
+        .wings
+        .iter()
+        .map(|&(j, side, kind)| {
+            let side = if side == Side::Left { "LEFT" } else { "RIGHT" };
+            let kind = if kind == WingKind::Lee {
+                "LEE"
+            } else {
+                "CALENDAR"
+            };
+            obj([
+                ("expiry_index", index(j)),
+                ("side", side.into()),
+                ("kind", kind.into()),
+            ])
+        })
+        .collect();
+    Ok(vec![
+        ("butterfly_violations", at(&c.butterfly)),
+        ("calendar_violations", at(&c.calendar)),
+        ("wing_violations", Json::Arr(wings)),
+        ("arbitrage_free", c.arbitrage_free().into()),
+    ])
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
+        "vol.svi.surface_check" => {
+            let s = slices(i)?;
+            let (k, reject) = (i.reals("log_moneyness")?, i.bool_or("reject", false)?);
+            i.gate()?;
+            surface_e::check_slices(&s)?;
+            let c = surface_e::surface_check(&s, &k)?;
+            plain(fields(check_fields(&c, reject)?))
+        }
+        "vol.ssvi.to_svi" => {
+            let (rho, eta) = (i.f64("rho")?, i.f64("eta")?);
+            let (gamma, theta) = (i.f64("gamma")?, i.f64("theta")?);
+            let s = surface_e::ssvi_to_svi(rho, eta, gamma, theta)?;
+            plain(obj([("svi", svi_json(&s))]))
+        }
+        "vol.svi.fit_surface" => {
+            let (t, k) = (i.reals("expiry_years")?, i.reals("log_moneyness")?);
+            let (w, reject) = (i.matrix("total_variance")?, i.bool_or("reject", false)?);
+            i.gate()?;
+            let f = surface_e::fit_surface(&t, &k, &w)?;
+            let fitted = f
+                .slices
+                .iter()
+                .map(|s| {
+                    obj([
+                        ("expiry_years", s.expiry_years.into()),
+                        ("svi", svi_json(&s.svi)),
+                    ])
+                })
+                .collect();
+            let mut out = vec![("slices", Json::Arr(fitted)), ("rmse", f.rmse.into())];
+            out.extend(check_fields(&f.check, reject)?);
+            plain(fields(out))
+        }
+        "vol.local.dupire" => {
+            let s = slices(i)?;
+            let p = items(i, "points")?
+                .iter()
+                .map(|p| Ok((p.f64("expiry_years")?, p.f64("log_moneyness")?)))
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let r = surface_e::dupire(&s, &p)?;
+            plain(obj([
+                ("total_variance", r.total_variance.into()),
+                ("implied_vol", r.implied_vol.into()),
+                ("local_vol", r.local_vol.into()),
+            ]))
+        }
+        "vol.forward.vol" => {
+            let (t, v) = (i.reals("expiry_years")?, i.reals("vols")?);
+            i.gate()?;
+            let f = surface_e::forward_vols(&t, &v)?;
+            plain(obj([("forward_vols", f.into())]))
+        }
+        "vol.smile.dynamics" => {
+            let svi = svi_of(&sub(i, "svi")?)?;
+            let k = i.reals("strikes")?;
+            let rule = match i.str("rule")? {
+                "STICKY_STRIKE" => Rule::StickyStrike,
+                "STICKY_DELTA" => Rule::StickyDelta,
+                _ => return i.fail("rule", "must be STICKY_STRIKE or STICKY_DELTA"),
+            };
+            let x = Dynamics {
+                svi,
+                expiry_years: i.f64("expiry_years")?,
+                spot: i.f64("spot")?,
+                spot_shifted: i.f64("spot_shifted")?,
+                rate: i.f64("rate")?,
+                dividend_yield: i.f64("dividend_yield")?,
+                strikes: &k,
+                rule,
+                call: match i.str("option_type")? {
+                    "CALL" => true,
+                    "PUT" => false,
+                    _ => return i.fail("option_type", "must be CALL or PUT"),
+                },
+            };
+            i.gate()?;
+            let o = surface_e::smile_dynamics(&x)?;
+            plain(obj([
+                ("vols_base", o.vols_base.into()),
+                ("vols_shifted", o.vols_shifted.into()),
+                ("prices_base", o.prices_base.into()),
+                ("prices_shifted", o.prices_shifted.into()),
+                ("deltas", o.deltas.into()),
+            ]))
+        }
+        "vol.volofvol.measure" => {
+            let (v, a) = (i.reals("vols")?, i.f64("periods_per_year")?);
+            let log = match i.str("method")? {
+                "LOG" => true,
+                "ABSOLUTE" => false,
+                _ => return i.fail("method", "must be LOG or ABSOLUTE"),
+            };
+            i.gate()?;
+            let (vv, m) = surface_e::vol_of_vol(&v, a, log)?;
+            plain(obj([("vol_of_vol", vv.into()), ("mean_change", m.into())]))
+        }
         "vol.garch.loglik" => {
             let r = i.reals("returns")?;
             let (o, a, b) = (i.f64("omega")?, i.f64("alpha")?, i.f64("beta")?);
