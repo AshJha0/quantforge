@@ -12,7 +12,10 @@ from quantforge_core import black, rates_vol
 from quantforge_core.cli.main import run_case
 from quantforge_core.errors import QfError
 
-GOLDEN = Path(__file__).resolve().parents[2] / "datasets/golden/stage_e_b/ratesvol_e.json"
+# Found by walking up, so the file is also found from mutmut's copy of python/.
+GOLDEN = next(p / "datasets/golden/stage_e_b/ratesvol_e.json"
+              for p in Path(__file__).resolve().parents
+              if (p / "datasets/golden/stage_e_b/ratesvol_e.json").exists())
 
 
 def _base(operation):
