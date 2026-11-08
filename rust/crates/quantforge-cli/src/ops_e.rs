@@ -356,7 +356,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "vol.svi.surface_check" => {
             let s = slices(i)?;
-            let (k, reject) = (i.reals("log_moneyness")?, i.bool_or("reject", false)?);
+            let (k, reject) = (i.reals("log_moneyness")?, i.bool("reject")?);
             i.gate()?;
             surface_e::check_slices(&s)?;
             let c = surface_e::surface_check(&s, &k)?;
@@ -370,7 +370,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         }
         "vol.svi.fit_surface" => {
             let (t, k) = (i.reals("expiry_years")?, i.reals("log_moneyness")?);
-            let (w, reject) = (i.matrix("total_variance")?, i.bool_or("reject", false)?);
+            let (w, reject) = (i.matrix("total_variance")?, i.bool("reject")?);
             i.gate()?;
             let f = surface_e::fit_surface(&t, &k, &w)?;
             let fitted = f

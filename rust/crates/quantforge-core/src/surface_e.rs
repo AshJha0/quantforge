@@ -92,7 +92,8 @@ pub fn surface_check(slices: &[Slice], k: &[f64]) -> Result<Check> {
     for (j, s) in slices.iter().enumerate() {
         let now = wings(&s.svi);
         for (side, (slope, _)) in [Side::Left, Side::Right].into_iter().zip(now) {
-            if slope > 2.0 {
+            // `>= 2`: at slope 2, d+ no longer tends to -inf (ruling E-A15).
+            if slope >= 2.0 {
                 c.wings.push((j, side, WingKind::Lee));
             }
         }
@@ -416,6 +417,18 @@ mod tests {
         }];
         let c = surface_check(&steep, &k).unwrap();
         assert_eq!(c.wings, vec![(0, Side::Right, WingKind::Lee)]);
+        let edge = vec![Slice {
+            expiry_years: 1.0,
+            svi: sv(0.01, 2.0, 0.0, 0.0, 0.1),
+        }];
+        let c = surface_check(&edge, &k).unwrap();
+        assert_eq!(
+            c.wings,
+            vec![
+                (0, Side::Left, WingKind::Lee),
+                (0, Side::Right, WingKind::Lee)
+            ]
+        );
         assert_eq!(surface_check(&steep, &[]).unwrap_err().code, "E_INPUT");
         assert_eq!(
             surface_check(&steep, &[0.1, 0.0]).unwrap_err().code,

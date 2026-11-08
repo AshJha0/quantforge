@@ -119,7 +119,7 @@ No stage D question is open.
 
 E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e 14). Readings taken where the spec is silent:
 
-- **E1 `reject`** is read with default `false` when absent (`surface_check`, `fit_surface`); the spec lists it as an input but not as required.
+- **E1 `reject`** is required (`E_SCHEMA` when missing), as ruling E-A18 settled.
 - **E1 `vol.svi.fit_surface` row count:** a `total_variance` with a different number of rows from `expiry_years` is `E_INPUT` (the stage C "ragged rows" rule), checked after the expiry order.
 - **E1 `vol.forward.vol` expiry sign:** no `expiry_years <= 0` check is specified, so none is made; strict increase is the only expiry rule. Suggest the spec say whether `T_0 <= 0` is `E_DOMAIN`.
 - **E1 enums:** an unknown `rule`, `option_type` or `method` is `E_SCHEMA`, as for enums elsewhere in the contract.

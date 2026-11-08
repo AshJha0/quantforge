@@ -83,6 +83,11 @@ impl<'a> Inputs<'a> {
         Ok(self.opt_int(k)?.unwrap_or(default))
     }
 
+    pub fn bool(&self, k: &str) -> Result<bool> {
+        self.req(k)?;
+        self.bool_or(k, false)
+    }
+
     pub fn bool_or(&self, k: &str, default: bool) -> Result<bool> {
         match self.opt(k) {
             None => Ok(default),
