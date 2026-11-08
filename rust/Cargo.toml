@@ -5,7 +5,7 @@ members = ["crates/quantforge-core", "crates/quantforge-cli"]
 [workspace.package]
 edition = "2024"
 license = "MIT"
-version = "0.4.2"
+version = "0.5.0"
 
 # Clippy pedantic is on for every crate. The allows below are deliberate for numerical code
 # written against specifications: formula variable names (s, k, t, r, q) mirror the spec text,
