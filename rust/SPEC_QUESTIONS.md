@@ -124,7 +124,7 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - **E1 `vol.forward.vol` expiry sign:** no `expiry_years <= 0` check is specified, so none is made; strict increase is the only expiry rule. Suggest the spec say whether `T_0 <= 0` is `E_DOMAIN`.
 - **E1 enums:** an unknown `rule`, `option_type` or `method` is `E_SCHEMA`, as for enums elsewhere in the contract.
 - **E1 `vol.smile.dynamics` order:** empty `strikes` (`E_INPUT`), then the SVI domain, then the positivity of `expiry_years`, `spot`, `spot_shifted` and strikes (`E_DOMAIN`).
-- **E7 `vol.vix.term_variance` with a single selected strike:** if both walks stop at once, so only `K0` is selected, the gap rule has no neighbour. The build uses `dK = 0` (variance is the correction term alone). Suggest the spec make this `E_INPUT`, or say what it should be.
+- **E7 `vol.vix.term_variance` with no OTM put or call selected:** settled by ruling E-B15, `E_INPUT` (implemented).
 - **E7 strip order:** the strip may come in any order; the build sorts it by strike. Duplicates are found after sorting.
 - **E7 `vol.vix.index` order:** after schema reads of both terms, the `N1 < N2`, `N1 <= 43200 <= N2` bracket is checked before either term's rule checks.
 - **E7 zero-bid counter:** "consecutive" resets on any quote with a non-zero bid; `K0` itself does not count towards either side's run.

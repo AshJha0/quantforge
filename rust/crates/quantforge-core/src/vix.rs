@@ -87,16 +87,20 @@ pub fn term_variance(minutes: i64, rate: f64, strip: &[Quote]) -> Result<Term> {
     };
     let k0 = s[i0].strike;
     let mut used = walk(s[..i0].iter().rev(), |q| q.put_bid, Quote::put_mid);
+    let calls = walk(s[i0 + 1..].iter(), |q| q.call_bid, Quote::call_mid);
+    if used.is_empty() || calls.is_empty() {
+        // Methodology 3(a)(iii), ruling E-B15: no out-of-the-money put or call left.
+        return fail("E_INPUT", "no out-of-the-money put or no out-of-the-money call is selected");
+    }
     used.reverse();
     used.push((k0, (s[i0].call_mid() + s[i0].put_mid()) / 2.0));
-    used.extend(walk(s[i0 + 1..].iter(), |q| q.call_bid, Quote::call_mid));
+    used.extend(calls);
     let k: Vec<f64> = used.iter().map(|u| u.0).collect();
     let n = k.len();
-    let gap = |i: usize| match (i, n) {
-        (_, 1) => 0.0,
-        (0, _) => k[1] - k[0],
-        (i, n) if i == n - 1 => k[i] - k[i - 1],
-        (i, _) => (k[i + 1] - k[i - 1]) / 2.0,
+    let gap = |i: usize| match i {
+        0 => k[1] - k[0],
+        i if i == n - 1 => k[i] - k[i - 1],
+        i => (k[i + 1] - k[i - 1]) / 2.0,
     };
     let sum: f64 = used
         .iter()
@@ -213,7 +217,10 @@ mod tests {
             x.call_bid += 50.0;
             x.call_ask += 50.0;
         }
-        assert!(term_variance(10, 0.0, &low).is_ok());
+        assert_eq!(code(term_variance(10, 0.0, &low)), "E_INPUT");
+        let mut no_put = example();
+        no_put[1].put_bid = 0.0;
+        assert_eq!(code(term_variance(43_200, 0.0, &no_put)), "E_INPUT");
         let mut high = e;
         for x in &mut high {
             x.put_bid += 50.0;
