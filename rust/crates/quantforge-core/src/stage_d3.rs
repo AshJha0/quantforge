@@ -13,25 +13,25 @@ fn usgs() -> Calendar {
 }
 
 /// `adjust(spot + months)` with spot two USGS business days after `as_of`.
-fn forward_start(as_of: Date, months: i64) -> Result<Date> {
+pub(crate) fn forward_start(as_of: Date, months: i64) -> Result<Date> {
     let cal = usgs();
     let spot = cal.add_business_days(as_of, 2)?;
     cal.adjust(add_months(spot, months), Bdc::ModifiedFollowing)
 }
 
-fn periods(start: Date, months: i64, every: i64) -> Result<Vec<Period>> {
+pub(crate) fn periods(start: Date, months: i64, every: i64) -> Result<Vec<Period>> {
     if months <= 0 || months > 1200 {
         return fail("E_INPUT", "tenor_months must be 1 to 1200");
     }
     generate(start, add_months(start, months), every, &usgs(), false, 0)
 }
 
-fn years(as_of: Date, d: Date) -> f64 {
+pub(crate) fn years(as_of: Date, d: Date) -> f64 {
     (d.serial() - as_of.serial()) as f64 / 365.0
 }
 
 /// Undiscounted option on a forward.
-fn option(normal: bool, call: bool, f: f64, k: f64, v: f64, t: f64) -> Result<f64> {
+pub(crate) fn option(normal: bool, call: bool, f: f64, k: f64, v: f64, t: f64) -> Result<f64> {
     if normal {
         return Ok(bachelier(call, f, k, v, t, 1.0));
     }
@@ -106,9 +106,21 @@ pub fn swaption_price(
         return fail("E_DOMAIN", "vol is negative");
     }
     let as_of = discount.as_of;
-    let s = forward_start(as_of, t.expiry_months)?;
-    let fixed = periods(s, t.tenor_months, 12)?;
-    let floating = periods(s, t.tenor_months, 3)?;
+    let (s, f, a) = swap_forward(discount, projection, t.expiry_months, t.tenor_months)?;
+    let o = option(normal, t.payer, f, t.strike, vol, years(as_of, s))?;
+    Ok((t.notional * a * o, f, a))
+}
+
+/// Swap start (and exercise) date, forward swap rate and annuity of the D7 swaption.
+pub(crate) fn swap_forward(
+    discount: &Curve,
+    projection: &Curve,
+    expiry_months: i64,
+    tenor_months: i64,
+) -> Result<(Date, f64, f64)> {
+    let s = forward_start(discount.as_of, expiry_months)?;
+    let fixed = periods(s, tenor_months, 12)?;
+    let floating = periods(s, tenor_months, 3)?;
     let none = DayCountInputs::default();
     let mut a = 0.0;
     for p in &fixed {
@@ -119,9 +131,7 @@ pub fn swaption_price(
         fl += (projection.discount(p.start)? / projection.discount(p.end)? - 1.0)
             * discount.discount(p.end)?;
     }
-    let f = fl / a;
-    let o = option(normal, t.payer, f, t.strike, vol, years(as_of, s))?;
-    Ok((t.notional * a * o, f, a))
+    Ok((s, fl / a, a))
 }
 
 /// `cmdty.curve.forward`. Quotes and months are month indices.

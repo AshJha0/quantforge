@@ -1,13 +1,15 @@
-//! Stage E operations: E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
+//! Stage E operations: E4 (`rates-vol-cube.md`), E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
 //! (`garch.md`, `variance-swaps.md`, `vix-index.md`).
 
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
-use crate::ops_b::{items, sub};
+use crate::ops_b::{curve_input, items, sub};
+use quantforge_core::curve::{Curve, CurveInput};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::fx_smile::{self, AtmType, DeltaType};
 use quantforge_core::garch::{self, Start};
 use quantforge_core::json::{Json, obj};
+use quantforge_core::rates_e;
 use quantforge_core::surface_e::{self, Check, Dynamics, Rule, Side, Slice, WingKind};
 use quantforge_core::svi::Svi;
 use quantforge_core::varswap::{self, Replication};
@@ -153,8 +155,153 @@ fn atm_type(i: &Inputs) -> Result<AtmType> {
     }
 }
 
+fn model(i: &Inputs) -> Result<bool> {
+    match i.str("model")? {
+        "BLACK_76" => Ok(false),
+        "BACHELIER" => Ok(true),
+        _ => i.fail("model", "must be BLACK_76 or BACHELIER"),
+    }
+}
+
+fn kind(i: &Inputs, yes: &str, no: &str) -> Result<bool> {
+    let s = i.str("type")?;
+    if s == yes {
+        Ok(true)
+    } else if s == no {
+        Ok(false)
+    } else {
+        i.fail("type", "unknown type")
+    }
+}
+
+fn ints(i: &Inputs, k: &str) -> Result<Vec<i64>> {
+    i.array(k)?
+        .iter()
+        .map(|v| {
+            v.as_int()
+                .map_or_else(|| i.fail(k, "expected integers"), Ok)
+        })
+        .collect()
+}
+
+fn curves(i: &Inputs) -> Result<(CurveInput, CurveInput)> {
+    Ok((curve_input(i, "discount")?, curve_input(i, "projection")?))
+}
+
+fn futures_option(i: &Inputs) -> Result<rates_e::FuturesOption> {
+    Ok(rates_e::FuturesOption {
+        call: kind(i, "CALL", "PUT")?,
+        futures_price: i.f64("futures_price")?,
+        strike: i.f64("strike")?,
+        expiry_years: i.f64("expiry_years")?,
+        discount_factor: i.f64("discount_factor")?,
+    })
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
+        "rates.swaption.price_cube" => {
+            let (d, p) = curves(i)?;
+            let c = sub(i, "cube")?;
+            let cube = rates_e::Cube {
+                expiries_months: ints(&c, "expiries_months")?,
+                tenors_months: ints(&c, "tenors_months")?,
+                alpha: c.matrix("alpha")?,
+                beta: c.matrix("beta")?,
+                rho: c.matrix("rho")?,
+                nu: c.matrix("nu")?,
+            };
+            let t = sub(i, "trade")?;
+            let trade = rates_e::CubeTrade {
+                payer: kind(&t, "PAYER", "RECEIVER")?,
+                expiry_months: t.int("expiry_months")?,
+                tenor_months: t.int("tenor_months")?,
+                strike: t.f64("strike")?,
+                notional: t.f64("notional")?,
+            };
+            i.gate()?;
+            let r = rates_e::price_cube(&Curve::new(&d)?, &Curve::new(&p)?, &cube, &trade)?;
+            plain(obj([
+                ("price", r.price.into()),
+                ("forward_rate", r.forward_rate.into()),
+                ("annuity", r.annuity.into()),
+                ("vol", r.vol.into()),
+                (
+                    "sabr",
+                    obj([
+                        ("alpha", r.sabr.alpha.into()),
+                        ("beta", r.sabr.beta.into()),
+                        ("rho", r.sabr.rho.into()),
+                        ("nu", r.sabr.nu.into()),
+                    ]),
+                ),
+            ]))
+        }
+        "rates.cap.strip" => {
+            let (d, p) = curves(i)?;
+            let (tenors, vols) = (ints(i, "cap_tenors_months")?, i.reals("flat_vols")?);
+            let x = rates_e::Strip {
+                normal: model(i)?,
+                start_months: i.int("start_months")?,
+                strike: i.f64("strike")?,
+                cap_tenors_months: &tenors,
+                flat_vols: &vols,
+                notional: i.f64("notional")?,
+            };
+            i.gate()?;
+            let (cv, prices) = rates_e::strip_caplets(&Curve::new(&d)?, &Curve::new(&p)?, &x)?;
+            plain(obj([
+                ("caplet_vols", cv.into()),
+                ("cap_prices", prices.into()),
+            ]))
+        }
+        "rates.bondfut.option_price" => {
+            let o = futures_option(i)?;
+            let (v, n) = (i.f64("vol")?, i.f64("contract_size")?);
+            let (p, cv) = rates_e::futures_option_price(&o, v, n)?;
+            plain(obj([("price", p.into()), ("contract_value", cv.into())]))
+        }
+        "rates.bondfut.implied_vol" => {
+            let o = futures_option(i)?;
+            let (pr, y) = (i.f64("premium")?, i.f64("ctd_yield")?);
+            let dm = i.f64("ctd_modified_duration")?;
+            let (pv, yv) = rates_e::futures_implied_vol(&o, pr, y, dm)?;
+            plain(obj([("price_vol", pv.into()), ("yield_vol", yv.into())]))
+        }
+        "infl.cap.yoy_price" => {
+            let (normal, cap) = (model(i)?, kind(i, "CAP", "FLOOR")?);
+            let (k, n) = (i.f64("strike")?, i.f64("notional")?);
+            let periods = items(i, "periods")?
+                .iter()
+                .map(|p| {
+                    Ok(rates_e::YoyPeriod {
+                        accrual: p.f64("accrual")?,
+                        discount_factor: p.f64("discount_factor")?,
+                        yoy_forward: p.f64("yoy_forward")?,
+                        expiry_years: p.f64("expiry_years")?,
+                        vol: p.f64("vol")?,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let c = rates_e::yoy_caplets(normal, cap, k, n, &periods)?;
+            let total: f64 = c.iter().sum();
+            plain(obj([("caplets", c.into()), ("price", total.into())]))
+        }
+        "infl.cap.zc_price" => {
+            let z = rates_e::ZeroCoupon {
+                normal: model(i)?,
+                cap: kind(i, "CAP", "FLOOR")?,
+                forward_index_ratio: i.f64("forward_index_ratio")?,
+                years: i.f64("years")?,
+                strike: i.f64("strike")?,
+                discount_factor: i.f64("discount_factor")?,
+                vol: i.f64("vol")?,
+                notional: i.f64("notional")?,
+            };
+            let (p, r) = rates_e::zc_cap(&z)?;
+            plain(obj([("price", p.into()), ("strike_ratio", r.into())]))
+        }
         "fx.option.price" => {
             let (m, k, v) = (fx_market(i)?, i.f64("strike")?, i.f64("vol")?);
             let (call, n) = (option_type(i)?, i.f64("notional")?);

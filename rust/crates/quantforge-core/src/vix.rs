@@ -90,7 +90,10 @@ pub fn term_variance(minutes: i64, rate: f64, strip: &[Quote]) -> Result<Term> {
     let calls = walk(s[i0 + 1..].iter(), |q| q.call_bid, Quote::call_mid);
     if used.is_empty() || calls.is_empty() {
         // Methodology 3(a)(iii), ruling E-B15: no out-of-the-money put or call left.
-        return fail("E_INPUT", "no out-of-the-money put or no out-of-the-money call is selected");
+        return fail(
+            "E_INPUT",
+            "no out-of-the-money put or no out-of-the-money call is selected",
+        );
     }
     used.reverse();
     used.push((k0, (s[i0].call_mid() + s[i0].put_mid()) / 2.0));

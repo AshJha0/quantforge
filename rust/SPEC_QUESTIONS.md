@@ -130,3 +130,7 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - **E7 zero-bid counter:** "consecutive" resets on any quote with a non-zero bid; `K0` itself does not count towards either side's run.
 - **E3 check order:** the common checks (`spot`, `expiry_years`, `vol` above 0) come first, then `strike` and `notional`; in `fx.delta.to_strike` the sign of the delta comes before its reach; in `fx.smile.from_quotes` the `delta` interval comes before the wing vols.
 - **E3 PA call maximum:** a delta exactly equal to the maximum is `E_DOMAIN` (ruling E-A10 "at or above"). The peak is found by bisection on `d2`, so a delta within a few ulps of the maximum may land on either side.
+- **E4 cube domain** is checked on every node (not only the interpolated point), after the shape, node-order and grid checks; then strike and forward. A one-node axis needs the trade exactly on that node.
+- **E4 cube `expiry_months < 1`** is `E_INPUT`, as D7's swaption.
+- **E4 strip schedule:** every cap uses the prefix of the longest cap's quarterly schedule (cap `k` holds the first `M_k/3` caplets). `start_months < 1` is `E_INPUT`, as D7, checked after the flat-vol checks. A bracket that cannot reach a cap price below vol 1e6 is `E_NO_CONVERGENCE` (unspecified; cannot occur for a finite price below the bound).
+- **E4 bond futures:** a negative `vol` is `E_DOMAIN`; `ctd_yield` and `ctd_modified_duration` are not checked (the spec lists no rule), so a zero gives an infinite `yield_vol`. Suggest the spec require both above 0.

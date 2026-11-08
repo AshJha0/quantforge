@@ -38,6 +38,7 @@ pub mod ois;
 pub mod pde;
 pub mod projection;
 pub mod rates_d;
+pub mod rates_e;
 pub mod risk;
 pub mod risk_curve;
 pub mod rng;
