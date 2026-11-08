@@ -41,3 +41,9 @@ Spec version 1.0.0. Normative: this page is part of every spec A stage E spec, a
 | E-A17 | Outside count (rule 11.2.5) | A case counts only if every output is a QuantLib value or plain arithmetic on QuantLib values. Where QuantLib matches but an output is the spec's own algebra (SVI wing lists and the flag built on them; the sticky-delta smile term `vega dv/dS`), the case is listed in `oracle/outside_register_e_a.json` under `partly_outside_not_counted` and not counted. E1 falls from 31 to 16 counted; spec A from 75.5% to 60.2% (148 of 246) across E1 to E3 and E2. The convention map remains self-reviewed, and the register says so; that is not an outside review |
 | E-A18 | Error codes without goldens | Added: `E_LIMIT` for 101 slices (`surf_e-0030`), 10,001 check points (`surf_e-0031`) and 10,001 Dupire points (`lv_e-0040`); `E_SCHEMA` for a missing `reject` (`surf_e-0032`), an unlisted `rule` (`lv_e-0041`) and `method` (`lv_e-0042`); `E_INPUT` for an empty forward-vol term structure (`lv_e-0043`) |
 
+### Rulings on build questions
+
+| # | Point | Ruling |
+|---|---|---|
+| E-A24 | `vol.slv.leverage` grid position (C++ question on `slv_e-0006`) | The rule stays as written: `x_min < ln(spot) < x_max`, else `E_INPUT`; no cell margin. The golden was wrong: `ln(100) = 4.6052` lies inside `[4.6, 4.7]`, so the spec accepts it. `slv_e-0006` now uses `x_min = 4.61`, which puts `ln(spot)` below the grid, and still expects `E_INPUT`. No other case changes |
+

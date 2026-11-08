@@ -72,3 +72,7 @@ Read:
 - `specifications/edge-case-register.md` (rows EA14 to EA17)
 
 Notes for builds: the CRR tree uses Hull's probability, not QuantLib's; the FD goldens are a recipe check, so follow the scheme exactly, including the odd `nx` and the centre-node Greeks.
+
+### Ruling E-A24 (2026-11-08)
+
+`slv_e-0006` input corrected (`x_min` 4.6 to 4.61); the expected `E_INPUT` and the spec rule are unchanged. Pull `datasets/golden/stage_e/slv_e.json` and `specifications/stage-e-rulings.md`.
