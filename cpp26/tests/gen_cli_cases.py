@@ -7,6 +7,8 @@ from runner import load_policy  # the runner's own tolerance classes
 
 classes = load_policy("../conformance/tolerances/policy.yaml")
 
+# Goldens under an open question in SPEC_QUESTIONS.md; they stay with the conformance runner.
+OPEN: set[str] = set()
 MAX_INPUT = 6000  # bytes of case or outputs JSON; larger cases stay with the conformance runner
 per_op = collections.defaultdict(list)
 for f in sorted(glob.glob("../datasets/golden/*/*.json")):
@@ -22,18 +24,25 @@ for op in sorted(per_op):
     seen, ok = set(), 0
     for c in per_op[op]:
         e, text = c["expected"], doc(c)
+        if c["case_id"] in OPEN:
+            continue
         if len(text) > MAX_INPUT:
             continue
         if e["status"] == "ok":
             if ok >= 2:
                 continue
-            ok += 1
-            if c.get("output_classes") or c.get("extra_checks") or len(json.dumps(e["outputs"])) > MAX_INPUT:
+            if c.get("extra_checks") or len(json.dumps(e["outputs"])) > MAX_INPUT:
                 continue
+            ok += 1
             cls, lim = classes[c["tolerance_class"]], c.get("tolerance_limit") or {}
             exact = cls.get("exact", False)
             a = 0.0 if exact else lim.get("absolute", cls.get("absolute"))
             r = 0.0 if exact else lim.get("relative", cls.get("relative", 0.0))
+            # Per-output classes (ruling E-B14): one tolerance per case here, so take the loosest.
+            for name in set((c.get("output_classes") or {}).values()):
+                oc = classes[name]
+                if not oc.get("exact", False):
+                    a, r = max(a, oc.get("absolute") or 0.0), max(r, oc.get("relative", 0.0))
             rows.append((text, "ok", json.dumps(e["outputs"], separators=(",", ":")),
                          float(a), float(r)))
         elif e["error_code"] not in seen and len(seen) < 2:

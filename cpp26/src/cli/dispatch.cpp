@@ -42,6 +42,13 @@
 #include "quantforge/core/store.hpp"
 #include "quantforge/core/timeseries.hpp"
 #include "quantforge/core/timezone.hpp"
+#include "quantforge/core/arb_surface.hpp"
+#include "quantforge/core/fx_smile.hpp"
+#include "quantforge/core/credit_e.hpp"
+#include "quantforge/core/exotics.hpp"
+#include "quantforge/core/correlation.hpp"
+#include "quantforge/core/heston.hpp"
+#include "quantforge/core/vol_stats.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -1058,6 +1065,14 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_equity_d.inc"
 #include "ops_credit.inc"
 #include "ops_r2.inc"
+#include "ops_e1.inc"
+#include "ops_e2.inc"
+#include "ops_e3.inc"
+#include "ops_e4.inc"
+#include "ops_e6.inc"
+#include "ops_e5.inc"
+#include "ops_e7.inc"
+#include "ops_e8.inc"
 
 // ---- dispatch ----
 
@@ -1067,6 +1082,56 @@ const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
 #include "ops_c_table.inc"
 #include "ops_d_table.inc"
+        {"infl.cap.yoy_price", op_yoy_cap_price},
+        {"infl.cap.zc_price", op_zc_cap_price},
+        {"rates.bondfut.implied_vol", op_bondfut_implied_vol},
+        {"rates.bondfut.option_price", op_bondfut_option_price},
+        {"rates.cap.strip", op_cap_strip},
+        {"rates.swaption.price_cube", op_swaption_price_cube},
+        {"fx.atm.strike", op_fx_atm_strike},
+        {"fx.delta.from_strike", op_fx_delta_from_strike},
+        {"fx.delta.to_strike", op_fx_delta_to_strike},
+        {"fx.option.price", op_fx_option_price},
+        {"fx.smile.from_quotes", op_fx_smile_from_quotes},
+        {"vol.bates.price", op_bates_price},
+        {"vol.heston.cf", op_heston_cf},
+        {"vol.heston.price", op_heston_price},
+        {"vol.merton.price", op_merton_price},
+        {"vol.slv.leverage", op_slv_leverage},
+        {"risk.corr.dispersion", op_corr_dispersion},
+        {"risk.corr.implied", op_corr_implied},
+        {"risk.corr.nearest", op_corr_nearest},
+        {"risk.corr.validate", op_corr_validate},
+        {"exotic.american.baw", op_american_baw},
+        {"exotic.american.crr", op_american_crr},
+        {"exotic.american.fd", op_american_fd},
+        {"exotic.asian.geometric", op_asian_geometric},
+        {"exotic.barrier.price", op_barrier},
+        {"exotic.basket.moment", op_basket},
+        {"exotic.chooser.price", op_chooser},
+        {"exotic.digital.price", op_digital},
+        {"exotic.lookback.floating", op_lookback},
+        {"exotic.quanto.price", op_quanto},
+        {"exotic.spread.kirk", op_kirk},
+        {"credit.cdsoption.implied_vol", op_cds_option_implied_vol},
+        {"credit.cdsoption.price", op_cds_option_price},
+        {"credit.copula.joint_default", op_copula_joint_default},
+        {"credit.lhp.loss_cdf", op_lhp_loss_cdf},
+        {"credit.lhp.tranche_loss", op_lhp_tranche_loss},
+        {"vol.forward.vol", op_forward_vol},
+        {"vol.local.dupire", op_local_dupire},
+        {"vol.smile.dynamics", op_smile_dynamics},
+        {"vol.ssvi.to_svi", op_ssvi_to_svi},
+        {"vol.svi.fit_surface", op_svi_fit_surface},
+        {"vol.svi.surface_check", op_svi_surface_check},
+        {"vol.volofvol.measure", op_volofvol},
+        {"vol.garch.fit", op_garch_fit},
+        {"vol.garch.forecast", op_garch_forecast},
+        {"vol.garch.loglik", op_garch_loglik},
+        {"vol.varswap.fair_strike", op_varswap_fair},
+        {"vol.varswap.realized", op_varswap_realized},
+        {"vol.vix.index", op_vix_index},
+        {"vol.vix.term_variance", op_vix_term},
         {"calib.check_bid_ask", op_check_bid_ask},
         {"calib.curve_report", op_curve_report},
         {"calib.fit", op_calib_fit},

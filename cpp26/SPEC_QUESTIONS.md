@@ -84,3 +84,27 @@ Each is answered here with the most conservative reading; none changes a golden 
 4. **Jacobian above the diagonal.** Not computed: written as exactly 0, on the rule that pillar `i` is solved from quotes `0..i`. This assumes one pillar per quote, in quote order, as `rates.ois.bootstrap` gives.
 5. **Bumped curves.** A `TRIANGULAR` or parallel bump multiplies `D(t)` by `exp(-s(t) t)` at every date, after interpolation and before jumps (jumps multiply, so the order does not matter). A `PILLAR` bump moves the stored jump-free log factor of pillar `i` by `-h t_i`, which is the same as moving `ln D(p_i)`.
 6. **OIS product value.** `valuation.pv` with no `snapshot_id`.
+
+## Stage E (silent choices)
+
+E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `variance-swaps.md`, `vix-index.md`). Every golden passes, so none of these is pinned against a golden case.
+
+1. **VIX selection.** Settled by ruling E-B15: no selected out-of-the-money put, or no selected out-of-the-money call, is `E_INPUT` (puts are checked first).
+2. **VIX zero-bid count.** The count of consecutive zero bids starts afresh on each side, from the first strike beyond `K0`. `K0`'s own bids never count.
+3. **`vol.vix.index` check order.** After schema, the `N1 < N2`, `N1 <= 43200 <= N2` rule is checked before either term's own checks (near first, then next).
+4. **`vol.varswap.fair_strike` `K_min`.** `K_min - dk <= 0` uses the lowest put strike (the put walk's extension).
+5. **`vol.garch.fit` convergence.** Nelder-Mead in unconstrained coordinates (`omega = e^u`, `alpha` and `beta` as softmax shares with a slack term, so `alpha + beta < 1`), from five starts, then restarted from the best point until a restart gains under 1e-12 relative. `E_NO_CONVERGENCE` if the last restart's simplex has not collapsed. Fitted parameters are written to diagnostics, not to values.
+6. **`slices` above 100.** Settled by ruling E-A34: every E_LIMIT comes right after E_SCHEMA.
+7. **Dupire at a point.** `w_T <= 0` is tested before `g <= 0`. Both give `E_ARBITRAGE`, so only the message differs.
+8. **E3 common checks, order.** The common checks run in input order: `spot`, `strike`, `expiry_years`, `vol`, `notional`. `fx.delta.to_strike` then checks the sign of `delta`, then its reachable range. `fx.smile.from_quotes` checks `atm_vol`, then `delta` in `(0, 0.5)`, then `call_vol` and `put_vol`, then each strike solve (so a PA call delta above its maximum is `E_DOMAIN` from that solve).
+9. **E3 PA solves.** Both PA solves bisect in `ln K` to the last representable step. For the PA call, the solve first finds `K*` from `sd N(d2) = n(d2)`, then takes the root between `K*` and `ln F + 40 sd + 2`.
+10. **E4 cube domain.** Every node's SABR parameters are checked (`E_DOMAIN`), not only the four that are interpolated. This runs after the grid checks (`E_INPUT`). It matches the goldens.
+11. **E4 smaller checks.** A negative `vol` is `E_DOMAIN` in the bond-futures, YoY and ZC options; zero is allowed. `ctd_yield` and `ctd_modified_duration` must be above 0 (`E_DOMAIN`), checked after the premium bounds. In `rates.cap.strip`, `start_months` is range-checked after the flat-vol checks.
+12. **E2 `slv_e-0006`.** Settled by ruling E-A24: the spec rule stands and the golden input was corrected (`x_min` 4.61).
+13. **E2 check order.** `strikes` empty (`E_INPUT`) first, then `spot`, `expiry_years`, strikes above 0, `heston`, then `jumps` (or `vol`, then `jumps`, for Merton). SLV: `spot`, `expiry_years`, `heston`, `slices`, then the grid rules in the spec's order.
+14. **E8 implied-vol error case.** Settled by ruling E-B27: the golden (now `creditopt_e-0145`) is a receiver.
+15. **E8 output names and checks.** `credit.copula.joint_default` writes `joint_default_probability` and `default_correlation`; the goldens accept them. `default_probabilities` must have exactly 2 entries (`E_INPUT`). `credit.lhp.loss_cdf` with an empty `losses` is `E_INPUT`. `credit.cdsoption.implied_vol` checks `knock_out` before the date checks.
+16. **Second audit (E-B29 to E-B33).** Nearest correlation stops when the largest absolute change in `Y` is below 1e-14, which is stricter than the 1e-12 relative test of E-B31. In `risk.corr.implied`, a negative weight is `E_DOMAIN`, then the vols, then fewer than two positive weights (`E_DOMAIN`). The cap strip searches `[1e-10, 5]` (Black) or `[1e-10, 0.5]` (Bachelier).
+17. **Spec A second audit (E-A26, E-A28, E-A30).** Heston and Bates use Gauss-Legendre 1024 on `[0, 200/sqrt(min(T, 1))]`. In the lookback, `|b| <= 1e-8 v^2` is `E_DOMAIN`, checked after `running_extreme`. In BAW, `r <= 0` is `E_DOMAIN`, checked after the common checks.
+18. **Cross-language rulings (E-A34 to E-A40).** The C10 cap of 100 applies to the forward-vol lists, smile-dynamics strikes, Heston, Bates and Merton strikes, Heston `u`, Asian fixings, basket lists, and the fit-surface expiries and grid. The vol-of-vol series is capped at 10,000. SLV runs its E_LIMIT checks, then the slice and grid E_INPUT rules, then E_DOMAIN. An SLV spot of 0 or below fails the `ln(spot)` grid rule (E_INPUT) first.
+19. **Spec B cross-language rulings (E-B34 to E-B40).** All applied. Replicated variance below 0 is `E_DOMAIN` (E-B36). The three malformed goldens (`rulings_e_b-0008`, `-0009`, `-0015`) were rebuilt upstream and pass.
