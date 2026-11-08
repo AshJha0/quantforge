@@ -1,0 +1,6601 @@
+{
+ "schema_version": "1.0",
+ "suite": "ratesvol_e",
+ "spec": "specifications/05-volatility/rates-vol-cube.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "ratesvol_e-0001",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 133536.0472901635,
+     "forward_rate": 0.03571813396836591,
+     "annuity": 4.351040526247382,
+     "vol": 0.2526480319689076,
+     "sabr": {
+      "alpha": 0.048,
+      "beta": 0.5,
+      "rho": -0.27,
+      "nu": 0.44
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "node",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0002",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "RECEIVER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.033,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 107567.85984937145,
+     "forward_rate": 0.03571813396836591,
+     "annuity": 4.351040526247382,
+     "vol": 0.26739883070472464,
+     "sabr": {
+      "alpha": 0.048,
+      "beta": 0.5,
+      "rho": -0.27,
+      "nu": 0.44
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "node",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0003",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.045,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 35935.27285358451,
+     "forward_rate": 0.03571813396836591,
+     "annuity": 4.351040526247382,
+     "vol": 0.23561591486244873,
+     "sabr": {
+      "alpha": 0.048,
+      "beta": 0.5,
+      "rho": -0.27,
+      "nu": 0.44
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "node",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0004",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 24,
+     "tenor_months": 120,
+     "strike": 0.038,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 423543.69643359655,
+     "forward_rate": 0.03912949630526074,
+     "annuity": 7.629870143318716,
+     "vol": 0.2284726363226026,
+     "sabr": {
+      "alpha": 0.044,
+      "beta": 0.5,
+      "rho": -0.33,
+      "nu": 0.35
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "node",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0005",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "RECEIVER",
+     "expiry_months": 6,
+     "tenor_months": 24,
+     "strike": 0.035,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 62294.66793884173,
+     "forward_rate": 0.033938388211773224,
+     "annuity": 1.8648946313270875,
+     "vol": 0.28420037318825664,
+     "sabr": {
+      "alpha": 0.0525,
+      "beta": 0.5,
+      "rho": -0.2,
+      "nu": 0.55
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "node",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0006",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 18,
+     "tenor_months": 60,
+     "strike": 0.036,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 205137.02679990014,
+     "forward_rate": 0.03662826515598781,
+     "annuity": 4.273365701916364,
+     "vol": 0.252661490877108,
+     "sabr": {
+      "alpha": 0.047254098360655736,
+      "beta": 0.5,
+      "rho": -0.27994535519125685,
+      "nu": 0.4151366120218579
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "interpolated",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0007",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 36,
+     "tenor_months": 84,
+     "strike": 0.04,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 326456.700530175,
+     "forward_rate": 0.039550172313673394,
+     "annuity": 5.439300303506294,
+     "vol": 0.22710919688362832,
+     "sabr": {
+      "alpha": 0.04455899543378995,
+      "beta": 0.5,
+      "rho": -0.3127214611872146,
+      "nu": 0.35517990867579907
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "interpolated",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0008",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "RECEIVER",
+     "expiry_months": 48,
+     "tenor_months": 36,
+     "strike": 0.03,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 89570.01054363402,
+     "forward_rate": 0.03939696321122241,
+     "annuity": 2.4278708450152395,
+     "vol": 0.2740916224388966,
+     "sabr": {
+      "alpha": 0.04571552511415525,
+      "beta": 0.5,
+      "rho": -0.2811598173515982,
+      "nu": 0.37431050228310503
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "interpolated",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0009",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 60,
+     "tenor_months": 120,
+     "strike": 0.042,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 480459.67454159114,
+     "forward_rate": 0.04102647589834272,
+     "annuity": 6.757217337987096,
+     "vol": 0.20643092262001989,
+     "sabr": {
+      "alpha": 0.0415,
+      "beta": 0.5,
+      "rho": -0.35,
+      "nu": 0.3
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "node",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0010",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 9,
+     "tenor_months": 30,
+     "strike": 0.0355,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 57152.85487465565,
+     "forward_rate": 0.03368689918325224,
+     "annuity": 2.2982651021621305,
+     "vol": 0.2764381128510795,
+     "sabr": {
+      "alpha": 0.05120833333333333,
+      "beta": 0.5,
+      "rho": -0.21833333333333335,
+      "nu": 0.5141666666666667
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "interpolated",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0011",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "RECEIVER",
+     "expiry_months": 30,
+     "tenor_months": 96,
+     "strike": 0.028,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 110910.880636796,
+     "forward_rate": 0.039221492325968575,
+     "annuity": 6.2220735920061365,
+     "vol": 0.2743331057221514,
+     "sabr": {
+      "alpha": 0.04455369863013699,
+      "beta": 0.5,
+      "rho": -0.31730593607305935,
+      "nu": 0.3570739726027397
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "interpolated",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0012",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 24,
+     "strike": 0.06,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 947.8272134384044,
+     "forward_rate": 0.032813344055461637,
+     "annuity": 1.841074354654999,
+     "vol": 0.26779221701101225,
+     "sabr": {
+      "alpha": 0.051,
+      "beta": 0.5,
+      "rho": -0.22,
+      "nu": 0.5
+     }
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cube",
+    "sabr",
+    "node",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_rate": "interpolation",
+    "annuity": "interpolation",
+    "vol": "interpolation",
+    "sabr": "interpolation"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "curve tolerance on notional, as D7"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0013",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 3,
+     "tenor_months": 60,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "expiry before the first node"
+  },
+  {
+   "case_id": "ratesvol_e-0014",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 240,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "tenor beyond the last node"
+  },
+  {
+   "case_id": "ratesvol_e-0015",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "matrix shape"
+  },
+  {
+   "case_id": "ratesvol_e-0016",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      24,
+      12,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "node expiries not increasing"
+  },
+  {
+   "case_id": "ratesvol_e-0017",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -1.0,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.037,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "rho outside (-1, 1)"
+  },
+  {
+   "case_id": "ratesvol_e-0018",
+   "operation": "rates.swaption.price_cube",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 12,
+     "tenor_months": 60,
+     "strike": 0.0,
+     "notional": 10000000.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "strike not positive"
+  },
+  {
+   "case_id": "ratesvol_e-0019",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     24,
+     36,
+     48,
+     60
+    ],
+    "flat_vols": [
+     0.24,
+     0.235,
+     0.228,
+     0.222,
+     0.215
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplet_vols": [
+      0.24,
+      0.24,
+      0.24,
+      0.24,
+      0.23142729092444056,
+      0.23142729092444056,
+      0.23142729092444056,
+      0.23142729092444056,
+      0.2195608666718841,
+      0.2195608666718841,
+      0.2195608666718841,
+      0.2195608666718841,
+      0.2109609398453949,
+      0.2109609398453949,
+      0.2109609398453949,
+      0.2109609398453949,
+      0.1970625196447583,
+      0.1970625196447583,
+      0.1970625196447583,
+      0.1970625196447583
+     ],
+     "cap_prices": [
+      23622.053500086593,
+      41208.485580685345,
+      73308.3687656579,
+      117273.50366759236,
+      168134.20888326506
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "strip",
+    "black_76",
+    "synthetic"
+   ],
+   "output_classes": {
+    "caplet_vols": "root_finding"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "cap prices: curve tolerance on notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0020",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.042,
+    "cap_tenors_months": [
+     12,
+     24,
+     36,
+     48,
+     60
+    ],
+    "flat_vols": [
+     0.22,
+     0.225,
+     0.222,
+     0.218,
+     0.212
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplet_vols": [
+      0.22,
+      0.22,
+      0.22,
+      0.22,
+      0.22866273768044515,
+      0.22866273768044515,
+      0.22866273768044515,
+      0.22866273768044515,
+      0.21898842359847698,
+      0.21898842359847698,
+      0.21898842359847698,
+      0.21898842359847698,
+      0.21182216125165487,
+      0.21182216125165487,
+      0.21182216125165487,
+      0.21182216125165487,
+      0.19872487457803084,
+      0.19872487457803084,
+      0.19872487457803084,
+      0.19872487457803084
+     ],
+     "cap_prices": [
+      7040.292991888038,
+      15828.67695594317,
+      35695.473105722565,
+      65821.69536080201,
+      102418.88981746284
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "strip",
+    "black_76",
+    "synthetic"
+   ],
+   "output_classes": {
+    "caplet_vols": "root_finding"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "cap prices: curve tolerance on notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0021",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BACHELIER",
+    "start_months": 3,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     24,
+     36,
+     48,
+     60
+    ],
+    "flat_vols": [
+     0.009,
+     0.0093,
+     0.0095,
+     0.0096,
+     0.0095
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplet_vols": [
+      0.009,
+      0.009,
+      0.009,
+      0.009,
+      0.009494545436152552,
+      0.009494545436152552,
+      0.009494545436152552,
+      0.009494545436152552,
+      0.009747824566174847,
+      0.009747824566174847,
+      0.009747824566174847,
+      0.009747824566174847,
+      0.00979353746588484,
+      0.00979353746588484,
+      0.00979353746588484,
+      0.00979353746588484,
+      0.00923107050033932,
+      0.00923107050033932,
+      0.00923107050033932,
+      0.00923107050033932
+     ],
+     "cap_prices": [
+      24448.077467246316,
+      48895.36487462009,
+      92682.67880004195,
+      151456.2490652683,
+      217236.9200459105
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "strip",
+    "bachelier",
+    "synthetic"
+   ],
+   "output_classes": {
+    "caplet_vols": "root_finding"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "cap prices: curve tolerance on notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0022",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.03,
+    "cap_tenors_months": [
+     12,
+     24,
+     36,
+     48,
+     60
+    ],
+    "flat_vols": [
+     0.26,
+     0.25,
+     0.24,
+     0.23,
+     0.22
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplet_vols": [
+      0.26,
+      0.26,
+      0.26,
+      0.26,
+      0.2457863233429343,
+      0.2457863233429343,
+      0.2457863233429343,
+      0.2457863233429343,
+      0.22837258604526747,
+      0.22837258604526747,
+      0.22837258604526747,
+      0.22837258604526747,
+      0.21084003909149637,
+      0.21084003909149637,
+      0.21084003909149637,
+      0.21084003909149637,
+      0.19310052272978157,
+      0.19310052272978157,
+      0.19310052272978157,
+      0.19310052272978157
+     ],
+     "cap_prices": [
+      67975.02357345576,
+      111607.27144151271,
+      173118.61861198905,
+      246452.9352325664,
+      326053.1449885733
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "strip",
+    "black_76",
+    "synthetic"
+   ],
+   "output_classes": {
+    "caplet_vols": "root_finding"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "cap prices: curve tolerance on notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0023",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     24,
+     36
+    ],
+    "flat_vols": [
+     0.3,
+     0.3,
+     0.12
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "arbitrage",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "flat vol falls so fast that the last segment needs a caplet vol at or below zero"
+  },
+  {
+   "case_id": "ratesvol_e-0024",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     20,
+     36
+    ],
+    "flat_vols": [
+     0.24,
+     0.235,
+     0.228
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "tenor not a multiple of 3"
+  },
+  {
+   "case_id": "ratesvol_e-0025",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     24,
+     12,
+     36
+    ],
+    "flat_vols": [
+     0.24,
+     0.235,
+     0.228
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "tenors not increasing"
+  },
+  {
+   "case_id": "ratesvol_e-0026",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     24,
+     36
+    ],
+    "flat_vols": [
+     0.3,
+     0.3
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "one flat vol per tenor"
+  },
+  {
+   "case_id": "ratesvol_e-0027",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "model": "BLACK_76",
+    "start_months": 3,
+    "strike": 0.037,
+    "cap_tenors_months": [
+     12,
+     24,
+     36
+    ],
+    "flat_vols": [
+     0.3,
+     0.0,
+     0.3
+    ],
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "flat vol not positive"
+  },
+  {
+   "case_id": "ratesvol_e-0028",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 111.25,
+    "strike": 112.0,
+    "expiry_years": 0.1,
+    "discount_factor": 0.9962,
+    "vol": 0.055,
+    "contract_size": 100000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.4548612768592552,
+     "contract_value": 454.8612768592552
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "bondfut",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per 100 face: 1e-6 currency on a 100k contract"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0029",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 111.25,
+    "strike": 112.0,
+    "expiry_years": 0.1,
+    "discount_factor": 0.9962,
+    "premium": 0.4548612768592552,
+    "ctd_yield": 0.0425,
+    "ctd_modified_duration": 6.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price_vol": 0.055,
+     "yield_vol": 0.20220588235294115
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "bondfut",
+    "implied",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ratesvol_e-0030",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "PUT",
+    "futures_price": 111.25,
+    "strike": 110.0,
+    "expiry_years": 0.1,
+    "discount_factor": 0.9962,
+    "vol": 0.058,
+    "contract_size": 100000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.3320988252636374,
+     "contract_value": 332.0988252636374
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "bondfut",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per 100 face: 1e-6 currency on a 100k contract"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0031",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "type": "PUT",
+    "futures_price": 111.25,
+    "strike": 110.0,
+    "expiry_years": 0.1,
+    "discount_factor": 0.9962,
+    "premium": 0.3320988252636374,
+    "ctd_yield": 0.0425,
+    "ctd_modified_duration": 6.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price_vol": 0.058,
+     "yield_vol": 0.21323529411764705
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "bondfut",
+    "implied",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ratesvol_e-0032",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 118.5,
+    "strike": 118.5,
+    "expiry_years": 0.25,
+    "discount_factor": 0.9905,
+    "vol": 0.072,
+    "contract_size": 100000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.6856288099474581,
+     "contract_value": 1685.6288099474582
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "bondfut",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per 100 face: 1e-6 currency on a 100k contract"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0033",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 118.5,
+    "strike": 118.5,
+    "expiry_years": 0.25,
+    "discount_factor": 0.9905,
+    "premium": 1.6856288099474581,
+    "ctd_yield": 0.0395,
+    "ctd_modified_duration": 8.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price_vol": 0.072,
+     "yield_vol": 0.2250351617440225
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "bondfut",
+    "implied",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ratesvol_e-0034",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "PUT",
+    "futures_price": 98.75,
+    "strike": 101.0,
+    "expiry_years": 0.5,
+    "discount_factor": 0.981,
+    "vol": 0.049,
+    "contract_size": 100000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.7344261053952588,
+     "contract_value": 2734.4261053952587
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "bondfut",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per 100 face: 1e-6 currency on a 100k contract"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0035",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "type": "PUT",
+    "futures_price": 98.75,
+    "strike": 101.0,
+    "expiry_years": 0.5,
+    "discount_factor": 0.981,
+    "premium": 2.7344261053952588,
+    "ctd_yield": 0.048,
+    "ctd_modified_duration": 4.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price_vol": 0.049,
+     "yield_vol": 0.24305555555555558
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "bondfut",
+    "implied",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ratesvol_e-0036",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 131.0,
+    "strike": 140.0,
+    "expiry_years": 0.2,
+    "discount_factor": 0.9925,
+    "vol": 0.09,
+    "contract_size": 100000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.1114018359184852,
+     "contract_value": 111.40183591848519
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "bondfut",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per 100 face: 1e-6 currency on a 100k contract"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0037",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 131.0,
+    "strike": 140.0,
+    "expiry_years": 0.2,
+    "discount_factor": 0.9925,
+    "premium": 0.1114018359184852,
+    "ctd_yield": 0.043,
+    "ctd_modified_duration": 15.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price_vol": 0.09,
+     "yield_vol": 0.1341681574239714
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "bondfut",
+    "implied",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "ratesvol_e-0038",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 111.25,
+    "strike": 100.0,
+    "expiry_years": 0.1,
+    "discount_factor": 0.9962,
+    "premium": 11.0,
+    "ctd_yield": 0.0425,
+    "ctd_modified_duration": 6.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "premium below discounted intrinsic: no implied vol"
+  },
+  {
+   "case_id": "ratesvol_e-0039",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 111.25,
+    "strike": 112.0,
+    "expiry_years": 0.0,
+    "discount_factor": 0.9962,
+    "vol": 0.05,
+    "contract_size": 100000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "expiry_years must be positive"
+  },
+  {
+   "case_id": "ratesvol_e-0040",
+   "operation": "infl.cap.yoy_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "CAP",
+    "strike": 0.03,
+    "notional": 10000000.0,
+    "periods": [
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9636761353490535,
+      "yoy_forward": 0.0285,
+      "expiry_years": 0.75,
+      "vol": 0.35
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9286716938412872,
+      "yoy_forward": 0.0262,
+      "expiry_years": 1.75,
+      "vol": 0.33
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.894938748929031,
+      "yoy_forward": 0.0248,
+      "expiry_years": 2.75,
+      "vol": 0.31
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8624311149420455,
+      "yoy_forward": 0.0241,
+      "expiry_years": 3.75,
+      "vol": 0.3
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8311042838521256,
+      "yoy_forward": 0.0238,
+      "expiry_years": 4.75,
+      "vol": 0.29
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplets": [
+      27208.77662914513,
+      29559.329930079697,
+      29758.915350141095,
+      31496.7254601231,
+      33221.35803523228
+     ],
+     "price": 151245.1054047213
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "yoy",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0041",
+   "operation": "infl.cap.yoy_price",
+   "inputs": {
+    "model": "BACHELIER",
+    "type": "CAP",
+    "strike": 0.03,
+    "notional": 10000000.0,
+    "periods": [
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9636761353490535,
+      "yoy_forward": 0.0285,
+      "expiry_years": 0.75,
+      "vol": 0.0105
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9286716938412872,
+      "yoy_forward": 0.0262,
+      "expiry_years": 1.75,
+      "vol": 0.0102
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.894938748929031,
+      "yoy_forward": 0.0248,
+      "expiry_years": 2.75,
+      "vol": 0.01
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8624311149420455,
+      "yoy_forward": 0.0241,
+      "expiry_years": 3.75,
+      "vol": 0.0098
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8311042838521256,
+      "yoy_forward": 0.0238,
+      "expiry_years": 4.75,
+      "vol": 0.0096
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplets": [
+      28206.1573363183,
+      34315.59361338717,
+      38825.329017628384,
+      42983.0382482383,
+      46631.376053178225
+     ],
+     "price": 190961.49426875036
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "yoy",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0042",
+   "operation": "infl.cap.yoy_price",
+   "inputs": {
+    "model": "BACHELIER",
+    "type": "FLOOR",
+    "strike": 0.0,
+    "notional": 10000000.0,
+    "periods": [
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9636761353490535,
+      "yoy_forward": 0.0285,
+      "expiry_years": 0.75,
+      "vol": 0.0105
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9286716938412872,
+      "yoy_forward": 0.0262,
+      "expiry_years": 1.75,
+      "vol": 0.0102
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.894938748929031,
+      "yoy_forward": 0.0248,
+      "expiry_years": 2.75,
+      "vol": 0.01
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8624311149420455,
+      "yoy_forward": 0.0241,
+      "expiry_years": 3.75,
+      "vol": 0.0098
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8311042838521256,
+      "yoy_forward": 0.0238,
+      "expiry_years": 4.75,
+      "vol": 0.0096
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplets": [
+      20.681706255966805,
+      1242.1153435547383,
+      4394.23502018107,
+      7940.980338290169,
+      11073.391993919216
+     ],
+     "price": 24671.40440220116
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "yoy",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0043",
+   "operation": "infl.cap.yoy_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "FLOOR",
+    "strike": 0.02,
+    "notional": 10000000.0,
+    "periods": [
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9636761353490535,
+      "yoy_forward": 0.0285,
+      "expiry_years": 0.75,
+      "vol": 0.38
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9286716938412872,
+      "yoy_forward": 0.0262,
+      "expiry_years": 1.75,
+      "vol": 0.36
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.894938748929031,
+      "yoy_forward": 0.0248,
+      "expiry_years": 2.75,
+      "vol": 0.34
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8624311149420455,
+      "yoy_forward": 0.0241,
+      "expiry_years": 3.75,
+      "vol": 0.33
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8311042838521256,
+      "yoy_forward": 0.0238,
+      "expiry_years": 4.75,
+      "vol": 0.32
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplets": [
+      5396.849178877619,
+      17743.175402976947,
+      26124.19669544849,
+      31929.4492482958,
+      35312.68374448937
+     ],
+     "price": 116506.35427008822
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "yoy",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0044",
+   "operation": "infl.cap.yoy_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "FLOOR",
+    "strike": 0.0,
+    "notional": 10000000.0,
+    "periods": [
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9636761353490535,
+      "yoy_forward": 0.0285,
+      "expiry_years": 0.75,
+      "vol": 0.38
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.9286716938412872,
+      "yoy_forward": 0.0262,
+      "expiry_years": 1.75,
+      "vol": 0.36
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.894938748929031,
+      "yoy_forward": 0.0248,
+      "expiry_years": 2.75,
+      "vol": 0.34
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8624311149420455,
+      "yoy_forward": 0.0241,
+      "expiry_years": 3.75,
+      "vol": 0.33
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.8311042838521256,
+      "yoy_forward": 0.0238,
+      "expiry_years": 4.75,
+      "vol": 0.32
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "Black needs a positive strike"
+  },
+  {
+   "case_id": "ratesvol_e-0045",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "CAP",
+    "forward_index_ratio": 1.1268,
+    "years": 5.0,
+    "strike": 0.025,
+    "discount_factor": 0.8305,
+    "vol": 0.028,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 215544.83863637337,
+     "strike_ratio": 1.131408212890625
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "zc",
+    "synthetic"
+   ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0046",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "FLOOR",
+    "forward_index_ratio": 1.1268,
+    "years": 5.0,
+    "strike": 0.0,
+    "discount_factor": 0.8305,
+    "vol": 0.028,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5993.010165883334,
+     "strike_ratio": 1.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "zc",
+    "synthetic"
+   ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0047",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "CAP",
+    "forward_index_ratio": 1.2593,
+    "years": 10.0,
+    "strike": 0.02,
+    "discount_factor": 0.6905,
+    "vol": 0.035,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 532939.3557028621,
+     "strike_ratio": 1.218994419994757
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "zc",
+    "synthetic"
+   ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0048",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "FLOOR",
+    "forward_index_ratio": 1.0512,
+    "years": 2.0,
+    "strike": 0.03,
+    "discount_factor": 0.9284,
+    "vol": 0.022,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 171980.37284879872,
+     "strike_ratio": 1.0609
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "zc",
+    "synthetic"
+   ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0049",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BACHELIER",
+    "type": "CAP",
+    "forward_index_ratio": 1.1268,
+    "years": 5.0,
+    "strike": 0.025,
+    "discount_factor": 0.8305,
+    "vol": 0.031,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 211037.5486840398,
+     "strike_ratio": 1.131408212890625
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "inflation",
+    "zc",
+    "synthetic"
+   ],
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 9.999999999999999e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "ratesvol_e-0050",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "CAP",
+    "forward_index_ratio": 1.1268,
+    "years": 0.0,
+    "strike": 0.02,
+    "discount_factor": 1.0,
+    "vol": 0.03,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "years must be positive"
+  }
+ ]
+}

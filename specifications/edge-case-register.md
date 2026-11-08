@@ -34,7 +34,13 @@ Numbered EB so spec A's block can be added without renumbering. Pinned means nam
 | EB5 | Coarse strike strip | Pinned | Density grid `varswap_e-0009` to `varswap_e-0020` | Shows the strip bias; the spec prices the strip given and never fills strikes |
 | EB6 | VIX zero bids: isolated and consecutive | Pinned | `vix_e-0002`, `vix_e-0003`, `vix_e-0005`, `vix_e-0006` | An isolated zero is skipped; two in a row stop the walk; strikes beyond are excluded (checked) |
 | EB7 | VIX forward between strikes, K0 below the at-the-money strike | Pinned | `vix_e-0001` (F = 99.9, K0 = 95) | |
-| EB8 | VIX term outside 30 days | Pinned | `vix_e-0014` (`E_INPUT`) | No extrapolation, ruling E-B6 |
+| EB8 | VIX term outside 30 days | Pinned | `vix_e-0016` (`E_INPUT`) | No extrapolation, ruling E-B6 |
+| EB13 | VIX near or next term exactly 30 days | Pinned | `vix_e-0009` (`N1 = 43200`), `vix_e-0010` (`N2 = 43200`) | Weights 1 and 0 |
+| EB14 | Unsorted strip; zero bid at the ATM strike; no OTM puts | Pinned | `vix_e-0017`, `vix_e-0018`, `vix_e-0021` (`E_INPUT`) | Ruling E-B15 against Cboe v5.0 3(a) |
+| EB9 | Swaption exactly on a cube node | Pinned | `ratesvol_e-0001` to `ratesvol_e-0005`, `ratesvol_e-0009`, `ratesvol_e-0012` | Parameters equal the node's; checks the time axis |
+| EB10 | Cap quotes with calendar arbitrage | Pinned | `ratesvol_e-0023` (`E_ARBITRAGE`) | Ruling E-B10: rejected, not clipped |
+| EB11 | Zero-strike inflation floor | Pinned | Bachelier YoY floor at 0%: `ratesvol_e-0042`; ZC floor at 0% (`strike_ratio = 1`): `ratesvol_e-0046`; Black YoY floor at 0%: `ratesvol_e-0044` (`E_DOMAIN`) | Deflation protection |
+| EB12 | Implied vol with premium below intrinsic | Pinned | `ratesvol_e-0038` (`E_DOMAIN`) | |
 
 ## Rules for adding a row
 
