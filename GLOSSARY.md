@@ -126,3 +126,30 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Chooser | An option whose holder decides at a set date whether it is a call or a put |
 | Kirk approximation | A closed form for an option on the spread of two forwards |
 | BAW | Barone-Adesi-Whaley: a quadratic approximation to American option prices |
+
+## Stage E, spec B: rates vol, correlation, GARCH and variance, credit options
+
+| Term | Meaning |
+|---|---|
+| Swaption cube | Swaption vols by expiry, swap length and strike; here, SABR parameters per (expiry, length) node (`rates-vol-cube.md`) |
+| Caplet stripping | Turning flat cap vols into one vol per caplet so every cap reprices |
+| Price vol, yield vol | Vol of a bond futures price, and of the cheapest-to-deliver's yield; linked by duration times yield |
+| YoY and ZC inflation cap | Options on one year's inflation, and on cumulative inflation to maturity |
+| GARCH(1,1) | A variance recursion: constant, plus a share of the last squared return, plus a share of the last variance (`garch.md`) |
+| Long-run variance | `omega/(1 - alpha - beta)`, the level a stationary GARCH forecast returns to |
+| Variance swap | Pays realised variance minus a fixed strike, times a variance notional (`variance-swaps.md`) |
+| Log contract, strip | The payoff whose value is expected variance, and the weighted puts and calls that copy it |
+| VIX-style index | 100 times the square root of 30-day variance from two option strips (Cboe methodology v5.0) |
+| K0 | The listed strike at or immediately below the forward, in the VIX method |
+| Nearest correlation matrix | The valid correlation matrix closest in the Frobenius norm (Higham 2002; `correlation.md`) |
+| Dykstra's correction | The step that makes alternating projections reach the nearest point, not just a feasible one |
+| Implied correlation | The single average correlation that makes index vol consistent with member vols |
+| Dispersion trade | Long member variance, short index variance; a bet that realised correlation stays below implied |
+| CDS option, payer, receiver | The right to buy (payer) or sell (receiver) protection at a fixed spread on a future date (`credit-options-and-copulas.md`) |
+| Knock-out, front-end protection | A knock-out option dies on default before expiry; otherwise a payer is also owed the protection lost before the forward CDS starts |
+| Risky annuity | The value of 1 per year of premium paid while the name survives |
+| Copula | A rule joining single-name default probabilities into joint ones; Gaussian (no tail dependence) or Student t |
+| Large homogeneous pool (LHP) | Vasicek's limit of a very large pool of identical names: losses depend on one common factor only |
+| Tranche, attachment, detachment | A slice of pool losses between two levels; the slice's expected loss as a fraction of its width |
+
+Stage E spec B is Specified, not Implemented: goldens exist and the four builds are being written against them. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, so those goldens rest on hand cases and high-precision replicas; 145 of 268 cases (54.1%) are outside-checked under rule 11.2.5 (`specifications/stage-e-rulings-b.md`).

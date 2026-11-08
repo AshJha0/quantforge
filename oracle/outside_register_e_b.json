@@ -185,6 +185,1009 @@
    "map_review": "self-reviewed 2026-11-08"
   },
   {
+   "case_id": "creditopt_e-0001",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0002",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0003",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0004",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0005",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0006",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0007",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0008",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0009",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0010",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0011",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0012",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0013",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0014",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0015",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0016",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0017",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0018",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0019",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0020",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0021",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0022",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0023",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0024",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0025",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0026",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0027",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0028",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0029",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0030",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0031",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0032",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0033",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0034",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0035",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0036",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0037",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0038",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0039",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0040",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0041",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0042",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0043",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0044",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0045",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0046",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0047",
+   "operation": "credit.cdsoption.implied_vol",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0048",
+   "operation": "credit.cdsoption.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CDS.MIDPOINT",
+    "CDS.SCHEDULE",
+    "CDSO.BLACK",
+    "CRV.FLAT_CONT_365F",
+    "CRV.FLAT_HAZARD_365F",
+    "DC.ACT_360"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0057",
+   "operation": "credit.copula.joint_default",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0058",
+   "operation": "credit.copula.joint_default",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0059",
+   "operation": "credit.copula.joint_default",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0060",
+   "operation": "credit.copula.joint_default",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0065",
+   "operation": "credit.copula.joint_default",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0071",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0072",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0073",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0074",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0075",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0076",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0077",
+   "operation": "credit.lhp.loss_cdf",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0078",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0079",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0080",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0081",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0082",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0083",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0084",
+   "operation": "credit.lhp.loss_cdf",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0085",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0086",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0087",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0088",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0089",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0090",
+   "operation": "credit.lhp.tranche_loss",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.BIVARIATE",
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "creditopt_e-0091",
+   "operation": "credit.lhp.loss_cdf",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NORM.INVERSE"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
    "case_id": "ratesvol_e-0001",
    "operation": "rates.swaption.price_cube",
    "library": "QuantLib",

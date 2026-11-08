@@ -39,3 +39,27 @@ Wrong-convention checks: 34 for E4, each caught. Outside-oracle share: 35 of 50 
 | `corr_e` | `risk.corr.dispersion` | 3 / 1 | 1e-12 per unit vega notional + 1e-10 rel | 1e-7 currency on 100k | hand, mpmath-50 |
 
 Wrong-convention checks: 29 for E6, each caught. Outside-oracle share: 18 of 38 (47%).
+
+## E8 credit options and copulas
+
+| Suite | Operation | Cases (ok / error) | Tolerance | In money | Oracle |
+|---|---|---|---|---|---|
+| `creditopt_e` | `credit.cdsoption.price` | 36 / 6 | price 1e-9 per unit notional + 1e-9 rel; spread and annuity class `simple_analytic` | 0.01 currency on 10m | mpmath-50; QuantLib `CdsOption` + `BlackCdsOptionEngine`, all 36 |
+| `creditopt_e` | `credit.cdsoption.implied_vol` | 12 / 2 | class `root_finding` | 1e-10 in vol | QuantLib `CdsOption.impliedVolatility`, all 12 |
+| `creditopt_e` | `credit.copula.joint_default` | 9 / 5 | 1e-12 abs + 1e-9 rel | n/a | mpmath-50 quadrature; QuantLib bivariate normal on the 5 Gaussian cases |
+| `creditopt_e` | `credit.lhp.tranche_loss` | 18 / 4 | 1e-12 abs + 1e-9 rel | 1e-5 currency on a 10m tranche | closed form, split Gauss-Legendre cross-check; QuantLib bivariate normal, all 18 |
+| `creditopt_e` | `credit.lhp.loss_cdf` | 3 / 1 | 1e-12 abs + 1e-9 rel | n/a | closed form; QuantLib normal functions, all 3 |
+
+Wrong-convention checks: 164 for E8, each caught. Outside-oracle share: 74 of 96 (77%).
+
+## Spec B outside-oracle share (rule 11.2.5)
+
+| Slice | Suites | Outside / cases | Share |
+|---|---|---|---|
+| E7 | `garch_e`, `varswap_e`, `vix_e` | 18 / 84 | 21.4% |
+| E4 | `ratesvol_e` | 35 / 50 | 70.0% |
+| E6 | `corr_e` | 18 / 38 | 47.4% |
+| E8 | `creditopt_e` | 74 / 96 | 77.1% |
+| **Spec B** | | **145 / 268** | **54.1%** |
+
+Error cases are in every denominator and never count. Stage-wide with spec A (263 / 410 at spec A commit b11809f): 408 / 678 = 60.2%.

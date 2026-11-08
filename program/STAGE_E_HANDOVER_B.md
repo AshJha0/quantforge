@@ -66,3 +66,21 @@ Read:
 Easy to get wrong (wrong-convention checks): the nearest matrix needs Dykstra's correction (plain alternating projections, or clipping eigenvalues and rescaling, land elsewhere); converge well past 2e-5 on entries; the implied-correlation denominator counts each pair twice and squares the weights only in the numerator's own-variance term; dispersion legs are variance notionals `N w_i / (2 K_i)`.
 
 Oracle: 18 of 38 (47%) outside-checked by QuantLib 1.44; 29 wrong-convention checks. Running spec B share (E7 + E4 + E6): 71 of 172 (41.3%).
+
+## E8 CDS options, copulas, large pool (ready, 2026-11-08)
+
+New operations: `credit.cdsoption.price`, `credit.cdsoption.implied_vol`, `credit.copula.joint_default`, `credit.lhp.tranche_loss`, `credit.lhp.loss_cdf`.
+
+Goldens: `datasets/golden/stage_e_b/creditopt_e.json`, 96 cases (78 ok, 18 error).
+
+Read:
+- `specifications/cli-contract.md`, section "Stage E operations, spec B" (E8 row and batch notes)
+- `specifications/stage-e-rulings-b.md` (E-B22 to E-B26)
+- `specifications/04-pricing/credit-options-and-copulas.md`
+- `specifications/05-volatility/stage-e-targets-b.md`, E8 table
+
+Easy to get wrong (wrong-convention checks): accrual on default runs ACT/360 to the mid date (not half the period); premium ACT/360; option time to expiry; front-end protection only on non-knock-out payers; the t copula is not independence at zero correlation; LHP attachment points are divided by `1 - R`, and `rho` is the asset correlation (loading `sqrt(rho)`); split any fixed quadrature at the kink `m*`.
+
+Oracle: 74 of 96 (77%) outside-checked by QuantLib 1.44; 164 wrong-convention checks.
+
+Spec B outside share, all slices: 145 of 268 (54.1%). Stage-wide with spec A (263 of 410 at b11809f): 408 of 678 (60.2%).
