@@ -1,0 +1,4220 @@
+{
+ "schema_version": "1.0",
+ "suite": "fxs_e",
+ "spec": "specifications/05-volatility/fx-smile.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_a.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "fxs_e-0001",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 1.1209,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5011.244156242836,
+     "premium_pct_foreign": 0.004618658208518743,
+     "forward": 1.0882509428211085,
+     "delta": 218766.13483889608,
+     "gamma": 7239878.2498358125,
+     "vega": 159367.78278335542
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0002",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 1.0556,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4660.790794773252,
+     "premium_pct_foreign": 0.004295659718685025,
+     "forward": 1.0882509428211085,
+     "delta": -201095.92384811322,
+     "gamma": 6891469.751326532,
+     "vega": 151698.44249968955
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0003",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 0.9794,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 107717.9854745033,
+     "premium_pct_foreign": 0.0992792492852565,
+     "forward": 1.0882509428211085,
+     "delta": 990012.3856501296,
+     "gamma": 176202.563707104,
+     "vega": 3878.6580284524707
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0004",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 151.2,
+    "strike": 152.3564,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2567933.065571742,
+     "premium_pct_foreign": 0.016983684296109407,
+     "forward": 147.91883892710226,
+     "delta": 350866.4027178517,
+     "gamma": 32594.4032818687,
+     "vega": 39013457.40758003
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0005",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 151.2,
+    "strike": 143.4813,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2447084.3021071623,
+     "premium_pct_foreign": 0.016184419987481234,
+     "forward": 147.91883892710226,
+     "delta": -319862.01643314847,
+     "gamma": 31475.751713140748,
+     "vega": 37674501.60731331
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0006",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 151.2,
+    "strike": 133.127,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15148306.299225304,
+     "premium_pct_foreign": 0.10018721097371233,
+     "forward": 147.91883892710226,
+     "delta": 907009.5680363226,
+     "gamma": 12019.249549067848,
+     "vega": 14386288.231712343
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0007",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 18.4,
+    "strike": 20.1642,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 895701.9011955946,
+     "premium_pct_foreign": 0.04867945115193449,
+     "forward": 19.576907142995818,
+     "delta": 439002.96270387946,
+     "gamma": 129096.80043093089,
+     "vega": 6993122.040623353
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0008",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 18.4,
+    "strike": 18.9896,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 862567.6308153856,
+     "premium_pct_foreign": 0.0468786755877927,
+     "forward": 19.576907142995818,
+     "delta": -376878.5496750052,
+     "gamma": 125148.06673270985,
+     "vega": 6779220.7156842
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0009",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 18.4,
+    "strike": 17.6192,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2171685.877738157,
+     "premium_pct_foreign": 0.11802640639881289,
+     "forward": 19.576907142995818,
+     "delta": 737493.5032933815,
+     "gamma": 98824.9137111926,
+     "vega": 5353306.045769818
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0010",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.265,
+    "strike": 1.2771,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 68948.86389347035,
+     "premium_pct_foreign": 0.05450503074582637,
+     "forward": 1.2399513217330453,
+     "delta": 390402.0897279808,
+     "gamma": 1268906.0507445347,
+     "vega": 913740.8332737028
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0011",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.265,
+    "strike": 1.2028,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 66512.61578182934,
+     "premium_pct_foreign": 0.05257914291053704,
+     "forward": 1.2399513217330453,
+     "delta": -324724.23942621256,
+     "gamma": 1230621.2947608551,
+     "vega": 886171.9326339102
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0012",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.265,
+    "strike": 1.116,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 139736.3646011916,
+     "premium_pct_foreign": 0.11046352932900523,
+     "forward": 1.2399513217330453,
+     "delta": 594706.123137117,
+     "gamma": 1045554.7345096521,
+     "vega": 752905.2712638186
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "garman-kohlhagen",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-6 currency units on 1m foreign notional"
+   }
+  },
+  {
+   "case_id": "fxs_e-0013",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 0.0,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0014",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 1.1,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.0,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0015",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 1.1,
+    "expiry_years": 0.0,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0016",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": -1.0,
+    "strike": 1.1,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0017",
+   "operation": "fx.option.price",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 1.1,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "notional": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0018",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 1.1318,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": 0.1505609181748888,
+      "FORWARD": 0.15172907684762527,
+      "SPOT_PA": 0.14768079822546942,
+      "FORWARD_PA": 0.1488266108794766
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0019",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 1.085,
+    "strike": 1.0338,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": -0.08171928715791198,
+      "FORWARD": -0.08235332350134388,
+      "SPOT_PA": -0.08313527321360625,
+      "FORWARD_PA": -0.08378029578381921
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0020",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 151.2,
+    "strike": 153.8356,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": 0.3044836962584133,
+      "FORWARD": 0.31139303711644506,
+      "SPOT_PA": 0.2905147338004109,
+      "FORWARD_PA": 0.2971070911081199
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0021",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 151.2,
+    "strike": 140.5229,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": -0.22786849596732148,
+      "FORWARD": -0.23303928549987188,
+      "SPOT_PA": -0.2381018128640319,
+      "FORWARD_PA": -0.24350481671681187
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0022",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 18.4,
+    "strike": 20.36,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": 0.4161349483581605,
+      "FORWARD": 0.43441904196278647,
+      "SPOT_PA": 0.37113464789771883,
+      "FORWARD_PA": 0.387441523032468
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0023",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 18.4,
+    "strike": 18.5981,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": -0.3298742950173089,
+      "FORWARD": -0.3443682771056994,
+      "SPOT_PA": -0.36850630000410817,
+      "FORWARD_PA": -0.3846976910654769
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0024",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 1.265,
+    "strike": 1.2895,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": 0.37491499496797015,
+      "FORWARD": 0.46252440364077757,
+      "SPOT_PA": 0.32359624904603096,
+      "FORWARD_PA": 0.3992135927323866
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0025",
+   "operation": "fx.delta.from_strike",
+   "inputs": {
+    "spot": 1.265,
+    "strike": 1.178,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "deltas": {
+      "SPOT": -0.29276683791273994,
+      "FORWARD": -0.3611800246158593,
+      "SPOT_PA": -0.3378988564073322,
+      "FORWARD_PA": -0.4168584056341998
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0026",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1166169625962503
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0027",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1168717085014341
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0028",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.115874034375735
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0029",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1161332002298125
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0030",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0620939539845127
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0031",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0618517022705165
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0032",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0613941468053272
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0033",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0611562530381013
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0034",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1423644344772212
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0035",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1425530453182158
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0036",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1419310378919
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0037",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.142121172353638
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0038",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0381556787810486
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0039",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0379843016914152
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0040",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.03776129270242
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0041",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0375914138190514
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0042",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 155.72728378342256
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0043",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 155.93232482112575
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0044",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 155.31453595357922
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0045",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 155.52654297693763
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0046",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 141.2764453435762
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0047",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 141.09067585037144
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0048",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 140.90939352298952
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0049",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 140.73039680171289
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0050",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 162.95620663232853
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0051",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 163.1112287832796
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0052",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 162.71241976998985
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0053",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 162.86983116990857
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0054",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 135.00926138745567
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0055",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 134.88094755980117
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0056",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 134.80678658657726
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0057",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 134.68078483548402
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0058",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 21.96830625200564
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0059",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 22.088763153991152
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0060",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 21.690130278319202
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0061",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 21.819103576603297
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0062",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 17.898206986510655
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0063",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 17.800602491878685
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0064",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 17.68156672800253
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0065",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 17.591976120745834
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0066",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 24.246097275152184
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0067",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 24.341894396106333
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0068",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 24.076142203151186
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0069",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 24.17482120860522
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0070",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 16.21676626878851
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0071",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 16.152945454580035
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0072",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 16.10255251647158
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0073",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 16.0414264917564
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0074",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.399356728045623
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0075",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.4492708472962035
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0076",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.366416677359569
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0077",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.4212073964547847
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0078",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1441152069904998
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0079",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1047109072457921
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0080",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.1193239788834188
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0081",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.25,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.084388149244331
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0082",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.5974817292575518
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0083",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.637596142416915
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0084",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.5782154991231734
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0085",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "CALL",
+    "delta": 0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.6198609284528778
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0086",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.002218230881152
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0087",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 0.9776679799688136
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0088",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 0.9901340725189144
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0089",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "option_type": "PUT",
+    "delta": -0.1,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 0.9670017005191568
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "delta",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0090",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.74,
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "premium-adjusted",
+    "synthetic"
+   ],
+   "description": "premium-adjusted call delta above its maximum"
+  },
+  {
+   "case_id": "fxs_e-0091",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": -0.25,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "call delta must be positive"
+  },
+  {
+   "case_id": "fxs_e-0092",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "CALL",
+    "delta": 0.97,
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "spot call delta at or above exp(-rf T)"
+  },
+  {
+   "case_id": "fxs_e-0093",
+   "operation": "fx.delta.to_strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "option_type": "PUT",
+    "delta": -1.0,
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0094",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "atm_type": "DNS",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0890142904893527
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0095",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0890142904893527
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0096",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "atm_type": "DNS",
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0874881302235861
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0097",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0874881302235861
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0098",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "atm_type": "FORWARD",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.0882509428211085
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "forward",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0099",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "vol": 0.075,
+    "atm_type": "SPOT",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.085
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "spot",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0100",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "atm_type": "DNS",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 148.32598253823326
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0101",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 148.32598253823326
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0102",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "atm_type": "DNS",
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 147.51281289441064
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0103",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 147.51281289441064
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0104",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "atm_type": "FORWARD",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 147.91883892710226
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "forward",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0105",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "vol": 0.105,
+    "atm_type": "SPOT",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 151.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "spot",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0106",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "atm_type": "DNS",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 19.829102159236886
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0107",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 19.829102159236886
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0108",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "atm_type": "DNS",
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 19.327919651014096
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0109",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 19.327919651014096
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0110",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "atm_type": "FORWARD",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 19.576907142995818
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "forward",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0111",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "vol": 0.16,
+    "atm_type": "SPOT",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 18.4
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "spot",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0112",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "atm_type": "DNS",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.2653162895345444
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0113",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.2653162895345444
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0114",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "atm_type": "DNS",
+    "delta_type": "SPOT_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.2150948288455994
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0115",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "atm_type": "DNS",
+    "delta_type": "FORWARD_PA"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.2150948288455994
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "dns",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0116",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "atm_type": "FORWARD",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.2399513217330453
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "forward",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0117",
+   "operation": "fx.atm.strike",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "vol": 0.09,
+    "atm_type": "SPOT",
+    "delta_type": "SPOT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "strike": 1.265
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "atm",
+    "spot",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "fxs_e-0118",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "atm_vol": 0.075,
+    "rr": -0.0045,
+    "bf": 0.002,
+    "delta": 0.25,
+    "delta_type": "SPOT",
+    "atm_type": "DNS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 1.0890142904893527,
+     "call_vol": 0.07475,
+     "put_vol": 0.07925,
+     "call_strike": 1.1165185905985535,
+     "put_strike": 1.060675224075441
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "rr-bf",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0119",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 1.085,
+    "expiry_years": 0.2493150684931507,
+    "domestic_rate": 0.043,
+    "foreign_rate": 0.031,
+    "atm_vol": 0.075,
+    "rr": -0.008,
+    "bf": 0.0065,
+    "delta": 0.1,
+    "delta_type": "SPOT",
+    "atm_type": "DNS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 1.0890142904893527,
+     "call_vol": 0.0775,
+     "put_vol": 0.0855,
+     "call_strike": 1.1442414701204198,
+     "put_strike": 1.0314442682833684
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "rr-bf",
+    "spot",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0120",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "atm_vol": 0.105,
+    "rr": -0.015,
+    "bf": 0.0035,
+    "delta": 0.25,
+    "delta_type": "SPOT_PA",
+    "atm_type": "DNS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 147.51281289441064,
+     "call_vol": 0.101,
+     "put_vol": 0.11599999999999999,
+     "call_strike": 155.0257510505172,
+     "put_strike": 140.19739207985253
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "rr-bf",
+    "spot_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0121",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "atm_vol": 0.105,
+    "rr": -0.03,
+    "bf": 0.011,
+    "delta": 0.1,
+    "delta_type": "FORWARD_PA",
+    "atm_type": "DNS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 147.51281289441064,
+     "call_vol": 0.10099999999999999,
+     "put_vol": 0.131,
+     "call_strike": 162.26595468013286,
+     "put_strike": 131.64133933319007
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "rr-bf",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0122",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 18.4,
+    "expiry_years": 1.0,
+    "domestic_rate": 0.105,
+    "foreign_rate": 0.043,
+    "atm_vol": 0.16,
+    "rr": 0.025,
+    "bf": 0.006,
+    "delta": 0.25,
+    "delta_type": "FORWARD_PA",
+    "atm_type": "DNS"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 19.327919651014096,
+     "call_vol": 0.17850000000000002,
+     "put_vol": 0.1535,
+     "call_strike": 22.094927790689617,
+     "put_strike": 17.667712215460043
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "rr-bf",
+    "forward_pa",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0123",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 1.265,
+    "expiry_years": 5.0,
+    "domestic_rate": 0.038,
+    "foreign_rate": 0.042,
+    "atm_vol": 0.09,
+    "rr": -0.006,
+    "bf": 0.003,
+    "delta": 0.25,
+    "delta_type": "FORWARD",
+    "atm_type": "FORWARD"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "atm_strike": 1.2399513217330453,
+     "call_vol": 0.09,
+     "put_vol": 0.096,
+     "call_strike": 1.4492708472962035,
+     "put_strike": 1.0978178631248965
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "rr-bf",
+    "forward",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "strike to 1e-9 relative: far below a pip; QuantLib strikeFromDelta solves to about 1e-10 relative"
+   }
+  },
+  {
+   "case_id": "fxs_e-0124",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "atm_vol": 0.105,
+    "rr": -0.015,
+    "bf": -0.2,
+    "delta": 0.25,
+    "delta_type": "SPOT",
+    "atm_type": "DNS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "a wing vol <= 0"
+  },
+  {
+   "case_id": "fxs_e-0125",
+   "operation": "fx.smile.from_quotes",
+   "inputs": {
+    "spot": 151.2,
+    "expiry_years": 0.4986301369863014,
+    "domestic_rate": 0.001,
+    "foreign_rate": 0.045,
+    "atm_vol": 0.105,
+    "rr": -0.015,
+    "bf": 0.0035,
+    "delta": 0.5,
+    "delta_type": "SPOT",
+    "atm_type": "DNS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "delta must be in (0, 0.5)"
+  }
+ ]
+}

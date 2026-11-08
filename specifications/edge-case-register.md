@@ -39,4 +39,6 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | EA4 | Zero forward variance between expiries | Pinned | `lv_e-0017` | Allowed, returns 0 (ruling E-A5) |
 | EA5 | Negative rates in smile dynamics | Pinned | `lv_e-0026` to `lv_e-0029` (`rate` -0.5%) | Forward below spot; no special case |
 | EA6 | Local vol at an expiry node and outside the slice range | Pinned | `lv_e-0001` (points at 1y and 2y nodes, at 0.1y and 3y) | Right-hand derivative at nodes, flat vol outside (ruling E-A4) |
-
+| EA7 | Premium-adjusted call delta: two strikes, and a delta no strike reaches | Pinned | Upper root: the `fx.delta.to_strike` cases tagged `spot_pa`, `forward_pa` in `fxs_e`; above the maximum: the `fxs_e` case tagged `premium-adjusted` (`E_DOMAIN`) | Ruling E-A10 |
+| EA8 | Broker (market) strangle | Out of scope | | Needs a fitted smile and a solve against it (ruling E-A11); planned with the SABR/SVI FX smile fit in a later stage. Stage E quotes are smile strangles |
+| EA9 | Domestic rate below foreign (negative carry), long-dated FX | Pinned | USDJPY-like and 5-year cases in `fxs_e` (`domestic_rate` 0.10% against 4.50%; expiry 1825 days) | |
