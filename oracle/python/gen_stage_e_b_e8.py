@@ -17,8 +17,10 @@ D_ = date.fromisoformat
 
 
 def add_m(d, m):
+    """Calendar months from d, the day clipped to the month end (ruling E-B30)."""
+    import calendar
     y, mo = divmod(d.month - 1 + m, 12)
-    return date(d.year + y, mo + 1, d.day)
+    return date(d.year + y, mo + 1, min(d.day, calendar.monthrange(d.year + y, mo + 1)[1]))
 
 
 def cds_legs(i, mutant=None):
@@ -148,13 +150,33 @@ def credit_e():
         if ko and n % 2 == 0:
             j = {k: v_ for k, v_ in i.items() if k != "vol"} | {"premium": out["price"]}
             s.add(iop, j, {"vol": v}, cls=R, verified=["independent-replay", "mpmath-50 root"], tags=["cdsoption", "implied"])
+    # Ruling E-B30: month ends, leap days and short final stubs (R5 audit B3), all priced by QuantLib's own CdsOption.
+    pairs = (("2027-01-31", "2032-01-31"), ("2027-02-26", "2031-04-26"), ("2028-02-29", "2033-02-28"), ("2027-05-31", "2030-09-15"),
+             ("2027-08-30", "2032-11-30"), ("2027-11-30", "2029-12-31"))
+    for pi, (exs, mats) in enumerate(pairs):
+        for hi, (h, r) in enumerate(((.015, .03), (.03, .04), (.06, .01))):
+            for typ, mult, v, ko in (("PAYER", 1.0, .45, True), ("RECEIVER", .85, .55, True), ("PAYER", 1.2, .7, False)):
+                i = {"as_of": "2026-11-06", "expiry": exs, "maturity": mats, "rate": r, "hazard_rate": h, "recovery": [.4, .25, .4][hi], "type": typ,
+                     "strike": round(h * (1 - [.4, .25, .4][hi]) * mult, 5), "notional": 1e7, "vol": v, "knock_out": ko}
+                out = cds_option(i)
+                s.add(op, i, out, cls=R, verified=["independent-replay", "mpmath-50"], tags=["cdsoption", typ.lower(), "schedule", "knock-out" if ko else "front-end-protection"],
+                      output_classes={"forward_spread": A, "risky_annuity": A}, limit=LIM)
+                for m in ("no-accrual", "time-to-maturity"):
+                    caught("creditopt_e", f"cdsoption sched {pi}/{hi} {typ}: {m}", abs(cds_option(i, m)["price"] - out["price"]), 1e-2 + 1e-9 * out["price"])
+                if ko:
+                    j = {k: v_ for k, v_ in i.items() if k != "vol"} | {"premium": out["price"]}
+                    s.add(iop, j, {"vol": v}, cls=R, verified=["independent-replay", "mpmath-50 root"], tags=["cdsoption", "implied", "schedule"])
     b = {"as_of": "2026-11-06", "expiry": "2027-03-20", "maturity": "2032-03-20", "rate": .035, "hazard_rate": .02, "recovery": .4, "type": "PAYER", "strike": .012,
          "notional": 1e7, "vol": .5, "knock_out": True}
     for d, bad, code in (("expiry not after as_of", {"expiry": "2026-11-06"}, "E_INPUT"), ("maturity not after expiry", {"maturity": "2027-03-20"}, "E_INPUT"),
                          ("recovery outside [0, 1)", {"recovery": 1.0}, "E_DOMAIN"), ("hazard negative", {"hazard_rate": -.01}, "E_DOMAIN"),
                          ("strike not positive", {"strike": 0.0}, "E_DOMAIN"), ("vol negative", {"vol": -.1}, "E_DOMAIN")):
         s.add(op, {**b, **bad}, error=code, cls=E, tags=["invalid"], description=d)
-    s.add(iop, {k: v_ for k, v_ in b.items() if k != "vol"} | {"premium": 1.0}, error="E_DOMAIN", cls=E, tags=["invalid"], description="premium below the zero-vol value: no implied vol")
+    rcv = {k: v_ for k, v_ in b.items() if k != "vol"} | {"type": "RECEIVER", "premium": 1.0}
+    zv = cds_option(rcv | {"vol": 0.0001})["price"]  # receiver with F < K: zero-vol value N A (K - F), about 4,866
+    assert zv > 1000 * rcv["premium"], "premium is not below the zero-vol value"
+    s.add(iop, rcv, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"],
+          description=f"receiver, F < K: premium 1.0 is below the zero-vol value N A (K - F) = {zv:.2f}, so no implied vol (ruling E-B27)")
     s.add(iop, {k: v_ for k, v_ in b.items() if k != "vol"} | {"premium": 5e4, "knock_out": False}, error="E_INPUT", cls=E, tags=["invalid", "ruling"],
           description="implied vol only for knock-out options (ruling E-B23)")
     # Gaussian and Student-t copula joint default

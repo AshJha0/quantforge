@@ -376,3 +376,90 @@ Copy the inputs of the named case from `datasets/golden/stage_d/`:
 | CPI curve, ZCIS, linkers | `infl.*` | `inflation_d-0001`, `inflation_d-0007` |
 | Caps and swaptions | `rates.cap.price`, `rates.swaption.price` | `capswaption_d-0001`, `capswaption_d-0010` |
 | Commodity curve and storage | `cmdty.*` | `commodity_d-0001`, `commodity_d-0007` |
+
+## Stage E recipes, spec B
+
+The outputs quoted are the golden expected values (`datasets/golden/stage_e_b/`); the four builds are being written against them. Replace the binary with any build's CLI.
+
+### GARCH likelihood by hand
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"vol.garch.loglik",
+ "inputs":{"returns":[0.01,-0.02],"omega":1e-5,"alpha":0.1,"beta":0.8,"initial_variance":"SAMPLE"}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `garch_e-0009`): `loglik` 5.410998350356715, `variances` [0.00025, 0.00022], `next_variance` 0.000226. Worked in `specifications/05-volatility/garch.md`.
+
+### A VIX term from five strikes
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"vol.vix.term_variance",
+ "inputs":{"minutes_to_expiry":43200,"rate":0.0,"strip":[
+ {"strike":90,"call_bid":10.5,"call_ask":11.5,"put_bid":0.5,"put_ask":0.7},
+ {"strike":95,"call_bid":6.0,"call_ask":6.6,"put_bid":1.4,"put_ask":1.6},
+ {"strike":100,"call_bid":2.9,"call_ask":3.1,"put_bid":2.9,"put_ask":3.3},
+ {"strike":105,"call_bid":1.0,"call_ask":1.2,"put_bid":5.8,"put_ask":6.6},
+ {"strike":110,"call_bid":0.3,"call_ask":0.5,"put_bid":10.0,"put_ask":11.0}]}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `vix_e-0001`): `forward` 99.9, `k0` 95, `variance` 0.08188158767696967. Set `call_bid` at 100 to 0 and the forward moves to 98.45 (case `vix_e-0018`): a zero bid still counts when choosing the forward, but that call drops out of the sum.
+
+### Implied correlation
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.implied",
+ "inputs":{"weights":[0.5,0.5],"vols":[0.2,0.3],"index_vol":0.22}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `corr_e-0036`): `correlation` 0.53.
+
+### Repair Higham's matrix
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.nearest",
+ "inputs":{"matrix":[[1,1,0],[1,1,1],[0,1,1]]}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `corr_e-0002`): off-diagonals 0.76069 and 0.15730, unit diagonal, within 2e-5 per entry.
+
+### Joint default under two copulas
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"credit.copula.joint_default",
+ "inputs":{"copula":"STUDENT_T","default_probabilities":[0.02,0.03],"correlation":0.3,"degrees_of_freedom":4}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `creditopt_e-0151`): `joint_default_probability` 0.005101673899339225. With `"copula":"GAUSSIAN"` and no `degrees_of_freedom` (case `creditopt_e-0147`): 0.0022875610978654965.
+
+### An equity tranche in the large pool
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"credit.lhp.tranche_loss",
+ "inputs":{"default_probability":0.05,"correlation":0.3,"recovery":0.4,"attachment":0,"detachment":0.03}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `creditopt_e-0161`): `expected_loss_fraction` 0.5410575024827762.
+
+### A CDS option
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"credit.cdsoption.price",
+ "inputs":{"as_of":"2026-11-06","expiry":"2027-03-20","maturity":"2032-03-20","rate":0.035,"hazard_rate":0.02,
+ "recovery":0.4,"type":"PAYER","strike":0.012,"notional":1e7,"vol":0.5,"knock_out":true}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `creditopt_e-0001`): `price` 59847.84260792966, `forward_spread` 0.011887730437307897, `risky_annuity` 4.328652217279409, `front_end_protection` 43333.06144966937.
+
+### A zero-coupon inflation floor at 0%
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"infl.cap.zc_price",
+ "inputs":{"model":"BLACK_76","type":"FLOOR","forward_index_ratio":1.1268,"years":5.0,"strike":0.0,
+ "discount_factor":0.8305,"vol":0.028,"notional":1e7}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `ratesvol_e-0081`): `price` 5993.010165883334, `strike_ratio` 1.0: deflation protection over five years.
+
+### Recipes that need curves or long arrays
+
+The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves or hundreds of numbers. Copy the `inputs` of `ratesvol_e-0001`, `ratesvol_e-0049`, `varswap_e-0001` or `garch_e-0027` from the golden file into a case document and run it the same way.

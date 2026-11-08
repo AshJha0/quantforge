@@ -84,3 +84,20 @@ Easy to get wrong (wrong-convention checks): accrual on default runs ACT/360 to 
 Oracle: 74 of 96 (77%) outside-checked by QuantLib 1.44; 164 wrong-convention checks.
 
 Spec B outside share, all slices: 145 of 268 (54.1%). Stage-wide with spec A (263 of 410 at b11809f): 408 of 678 (60.2%).
+
+## E8 correction (2026-11-08)
+
+Ruling E-B27: `creditopt_e-0145` (`credit.cdsoption.implied_vol`, `E_DOMAIN`) is now a RECEIVER on the same underlying, premium 1.0 below its zero-vol value 4,859.76. Re-run `creditopt_e`; no other case and no spec text changed.
+
+## Second R5 audit: E4, E6, E8 additions (2026-11-08)
+
+Rulings E-B28 to E-B33 in `specifications/stage-e-rulings-b.md`. Re-read `rates-vol-cube.md` (strip search bounds, YoY zero strike, Bachelier units), `correlation.md` (Higham stopping rule, asymmetric validation, implied-correlation weights) and `credit-options-and-copulas.md` (CDS option schedule: month-end clipping, short final stub).
+
+What changes for a build:
+- `rates.cap.strip`: search `[1e-10, 5]` (Black) or `[1e-10, 0.5]` (Bachelier); a root above the upper bound is `E_DOMAIN`.
+- `risk.corr.validate`: eigenvalue of `(M + M^T)/2`; flags can be false. `risk.corr.nearest`: stop as Higham with `tol <= 1e-12`; the result must have smallest eigenvalue `>= -1e-10`.
+- `risk.corr.implied`: negative weights and fewer than two positive weights are `E_DOMAIN`.
+- `credit.cdsoption.*`: schedule dates counted from expiry with the day clipped to the month end; short final stub.
+- Goldens grew: `ratesvol_e` 85 (was 50), `corr_e` 49 (was 38), `creditopt_e` 186 (was 96). Case ids moved where cases were inserted (for example the E-B27 case is now `creditopt_e-0145`); docs are updated, so refer to cases by the files.
+
+Outside share under E-B28: spec B 245 of 404 (60.6%); stage-wide with spec A 508 of 814 (62.4%).
