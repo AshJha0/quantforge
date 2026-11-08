@@ -788,7 +788,7 @@
      "nx": 61,
      "nv": 50,
      "nt": 50,
-     "x_min": 4.6,
+     "x_min": 4.61,
      "x_max": 4.7,
      "v_max": 0.25
     }
@@ -803,9 +803,10 @@
    ],
    "tags": [
     "invalid",
+    "ruling",
     "synthetic"
    ],
-   "description": "spot outside the x grid interior"
+   "description": "ln(spot) = 4.6052 below x_min = 4.61 (ruling E-A24)"
   },
   {
    "case_id": "slv_e-0007",
