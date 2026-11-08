@@ -275,7 +275,8 @@ CapStrip cap_strip(const Curve& discount, const Curve& projection, RateVolModel 
             if (!(f > 0.0)) throw Error("E_DOMAIN", "BLACK_76 needs positive forwards", "projection");
     }
     const auto caplet = [&](std::size_t i, double v) { return scale[i] * option(model, fwd[i], strike, v, time[i], 1.0); };
-    const double lower = model == RateVolModel::Black76 ? 1e-6 : 1e-7;
+    // Search interval, ruling E-B32: below it is E_ARBITRAGE, above it E_DOMAIN.
+    const double lower = 1e-10, upper = model == RateVolModel::Black76 ? 5.0 : 0.5;
     CapStrip out;
     double known = 0.0;
     std::size_t done = 0;
@@ -290,9 +291,8 @@ CapStrip cap_strip(const Curve& discount, const Curve& projection, RateVolModel 
             return sum - target;
         };
         if (gap(lower) > 0) throw Error("E_ARBITRAGE", "a cap segment has no positive caplet vol");
-        double hi = flat[k];
-        for (int g = 0; gap(hi) < 0 && g < 200; ++g) hi *= 2;
-        const double v = bisect_up(gap, lower, hi);
+        if (gap(upper) < 0) throw Error("E_DOMAIN", "a cap segment needs a caplet vol above the search interval");
+        const double v = bisect_up(gap, lower, upper);
         for (std::size_t i = done; i < n; ++i) {
             out.caplet_vols.push_back(v);
             known += caplet(i, v);

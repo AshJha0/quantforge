@@ -130,9 +130,14 @@ NearestCorr corr_nearest(const Matrix& m) {
 
 double corr_implied(const std::vector<double>& w, const std::vector<double>& vols, double index_vol) {
     if (w.size() < 2 || w.size() != vols.size()) throw Error("E_INPUT", "two names or more, with lists of one length");
+    for (const double x : w)
+        if (!(x >= 0)) throw Error("E_DOMAIN", "a weight is negative", "weights");
     for (const double s : vols)
         if (!(s > 0)) throw Error("E_DOMAIN", "a vol is not above 0", "vols");
     if (!(index_vol > 0)) throw Error("E_DOMAIN", "index_vol is not above 0", "index_vol");
+    // Ruling E-B33: a zero weight drops its name; fewer than two positive weights leave a zero denominator.
+    if (std::count_if(w.begin(), w.end(), [](double x) { return x > 0; }) < 2)
+        throw Error("E_DOMAIN", "at least two weights must be positive", "weights");
     return pair_correlation(w, vols, index_vol);
 }
 
