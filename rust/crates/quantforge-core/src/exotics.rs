@@ -181,8 +181,12 @@ pub fn lookback_floating(x: &Vanilla, extreme: f64) -> Result<f64> {
             "running minimum must be at most spot (call), maximum at least spot (put)",
         );
     }
-    if b == 0.0 {
-        return fail("E_DOMAIN", "zero carry: the closed form divides by b");
+    if b.abs() <= 1e-8 * v * v {
+        // Ruling E-A28: near zero carry the closed form loses all accuracy.
+        return fail(
+            "E_DOMAIN",
+            "carry too close to zero: the closed form divides by b",
+        );
     }
     let sq = t.sqrt();
     let e1 = (s / extreme).ln() + (b + v * v / 2.0) * t;
@@ -397,8 +401,9 @@ fn bisect(f: &dyn Fn(f64) -> f64, mut lo: f64, mut hi: f64) -> f64 {
 pub fn baw(x: &Vanilla) -> Result<f64> {
     x.check()?;
     let (s, k, t, r, b, v) = (x.spot, x.strike, x.expiry_years, x.rate, x.carry(), x.vol);
-    if r == 0.0 {
-        return fail("E_DOMAIN", "r = 0: BAW divides by 1 - exp(-rT)");
+    if r.is_nan() || r <= 0.0 {
+        // Ruling E-A30: 1 - e^{-rT} <= 0 and the put critical price has no root.
+        return fail("E_DOMAIN", "BAW needs r > 0");
     }
     if x.call && b >= r {
         return Ok(gbs(true, s, k, t, r, b, v));

@@ -190,18 +190,20 @@ impl Market {
 
 fn rule() -> &'static [(f64, f64)] {
     static RULE: OnceLock<Vec<(f64, f64)>> = OnceLock::new();
-    RULE.get_or_init(|| gauss_legendre_rule(256))
+    RULE.get_or_init(|| gauss_legendre_rule(1024))
 }
 
-/// Lewis single-integral prices [Lew01], Gauss-Legendre 256 nodes on `[0, 200]` (ruling E-A13).
+/// Lewis single-integral prices [Lew01], Gauss-Legendre 1024 nodes on `[0, 200/sqrt(min(T, 1))]`
+/// (ruling E-A26).
 fn lewis(m: &Market, strikes: &[f64], phi: &dyn Fn(C) -> C) -> Vec<f64> {
     let (f, t) = (m.forward(), m.expiry_years);
     let disc = (-m.rate * t).exp();
+    let half = 100.0 / t.min(1.0).sqrt();
     let nodes: Vec<(f64, f64, C)> = rule()
         .iter()
         .map(|&(x, w)| {
-            let u = 100.0 * (x + 1.0);
-            (u, 100.0 * w, phi(c(u, -0.5)))
+            let u = half * (x + 1.0);
+            (u, half * w, phi(c(u, -0.5)))
         })
         .collect();
     strikes
