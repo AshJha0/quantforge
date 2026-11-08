@@ -51,7 +51,15 @@
     "garch",
     "series-C",
     "synthetic"
-   ]
+   ],
+   "output_classes": {
+    "loglik": "statistics"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
+   }
   },
   {
    "case_id": "garch_e-0002",
@@ -98,7 +106,15 @@
     "garch",
     "series-C",
     "synthetic"
-   ]
+   ],
+   "output_classes": {
+    "loglik": "statistics"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
+   }
   },
   {
    "case_id": "garch_e-0003",
@@ -1130,10 +1146,13 @@
     "series-A",
     "synthetic"
    ],
+   "output_classes": {
+    "loglik": "likelihood_sum"
+   },
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-10,
-    "reason": "sum of n logs; libm last digits move each term by 1e-16 relative"
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
    }
   },
   {
@@ -2166,10 +2185,13 @@
     "series-A",
     "synthetic"
    ],
+   "output_classes": {
+    "loglik": "likelihood_sum"
+   },
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-10,
-    "reason": "sum of n logs; libm last digits move each term by 1e-16 relative"
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
    }
   },
   {
@@ -3202,10 +3224,13 @@
     "series-A",
     "synthetic"
    ],
+   "output_classes": {
+    "loglik": "likelihood_sum"
+   },
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-10,
-    "reason": "sum of n logs; libm last digits move each term by 1e-16 relative"
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
    }
   },
   {
@@ -3738,10 +3763,13 @@
     "series-B",
     "synthetic"
    ],
+   "output_classes": {
+    "loglik": "likelihood_sum"
+   },
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-10,
-    "reason": "sum of n logs; libm last digits move each term by 1e-16 relative"
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
    }
   },
   {
@@ -4274,10 +4302,13 @@
     "series-B",
     "synthetic"
    ],
+   "output_classes": {
+    "loglik": "likelihood_sum"
+   },
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-10,
-    "reason": "sum of n logs; libm last digits move each term by 1e-16 relative"
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
    }
   },
   {
@@ -4811,10 +4842,13 @@
     "integrated",
     "synthetic"
    ],
+   "output_classes": {
+    "loglik": "likelihood_sum"
+   },
    "tolerance_limit": {
-    "absolute": 1e-09,
-    "relative": 1e-10,
-    "reason": "sum of n logs; libm last digits move each term by 1e-16 relative"
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
    }
   },
   {
@@ -4850,7 +4884,15 @@
     "garch",
     "hand",
     "synthetic"
-   ]
+   ],
+   "output_classes": {
+    "loglik": "statistics"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-16,
+    "relative": 1e-11,
+    "reason": "variances near 1e-4: 1e-11 relative is 1e-9 in annualised vol"
+   }
   },
   {
    "case_id": "garch_e-0010",
@@ -5638,6 +5680,56 @@
   },
   {
    "case_id": "garch_e-0025",
+   "operation": "vol.garch.forecast",
+   "inputs": {
+    "omega": 0.0,
+    "alpha": 0.1,
+    "beta": 0.8,
+    "next_variance": 0.0001,
+    "horizon": 5,
+    "periods_per_year": 252
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "omega must be positive"
+  },
+  {
+   "case_id": "garch_e-0026",
+   "operation": "vol.garch.forecast",
+   "inputs": {
+    "omega": 1e-05,
+    "alpha": 0.1,
+    "beta": 0.8,
+    "next_variance": 0.0,
+    "horizon": 5,
+    "periods_per_year": 252
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "next_variance must be positive"
+  },
+  {
+   "case_id": "garch_e-0027",
    "operation": "vol.garch.fit",
    "inputs": {
     "returns": [
@@ -6166,11 +6258,11 @@
    "tolerance_limit": {
     "absolute": 1e-06,
     "relative": 0.0,
-    "reason": "objective at the optimum, not parameters (policy calibration); see garch.md"
+    "reason": "objective at the optimum, not parameters (garch.md, ruling E-B16): class root_finding with this limit"
    }
   },
   {
-   "case_id": "garch_e-0026",
+   "case_id": "garch_e-0028",
    "operation": "vol.garch.fit",
    "inputs": {
     "returns": [
@@ -6449,11 +6541,11 @@
    "tolerance_limit": {
     "absolute": 1e-06,
     "relative": 0.0,
-    "reason": "objective at the optimum, not parameters (policy calibration); see garch.md"
+    "reason": "objective at the optimum, not parameters (garch.md, ruling E-B16): class root_finding with this limit"
    }
   },
   {
-   "case_id": "garch_e-0027",
+   "case_id": "garch_e-0029",
    "operation": "vol.garch.fit",
    "inputs": {
     "returns": [

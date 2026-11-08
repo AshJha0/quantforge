@@ -186,6 +186,10 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 | EB1 | GARCH(1,1) likelihood, forecast, fit | `05-volatility/garch.md` | E7 | Specified | 0 of 27 (no QuantLib object in the Python wheel) |
 | EB2 | Variance swap: replication and realized variance | `05-volatility/variance-swaps.md` | E7 | Specified, outside-checked | `fair_strike` 18 of 27; realized 0 of 4 |
 | EB3 | VIX-style index from a given strip | `05-volatility/vix-index.md` | E7 | Specified | 0 of 14 (hand case is the outside reference) |
+| EB4 | SABR swaption cube | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked | 12 of 18 |
+| EB5 | Caplet stripping | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (reprice) | 4 of 9 |
+| EB6 | Bond futures options, price and yield vol | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 10 of 12 |
+| EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 9 of 11 |
 
 ### EB1 GARCH(1,1)
 - **Purpose:** conditional variance path and Gaussian log-likelihood at given parameters; multi-step variance forecast; maximum-likelihood fit.
@@ -204,6 +208,26 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 - **Inputs:** minutes to expiry, a rate per term, call and put bids and asks by strike.
 - **Limitations:** the caller picks the expiries and the rate; no Treasury interpolation, no special-opening-quotation handling, no data cleaning beyond the zero-bid rule. Not the official index and not licensed as one.
 - **Validation:** hand-worked case; exact-rational replica; float replay. **Review:** 2026-11-08.
+### EB4 SABR swaption cube
+- **Purpose:** swaption prices off a cube of SABR parameters per expiry and tenor.
+- **Inputs:** D7 curves, node grid and parameter matrices, trade.
+- **Limitations:** parameters are inputs (no calibration to market quotes here); no shift, so no negative forwards; Hagan's expansion is not arbitrage-free in the wings (`sabr.md`); bilinear interpolation has kinks at nodes; no extrapolation; stylised D7 swap.
+- **Validation:** QuantLib smile, interpolation and swaption engine objects agree on all 12 cases. **Review:** 2026-11-08.
+
+### EB5 Caplet stripping
+- **Purpose:** caplet vols from flat cap vols at one strike.
+- **Limitations:** piecewise-constant shape (a smoother shape gives other caplet vols from the same quotes); one strike at a time; rejects rather than repairs arbitrage.
+- **Validation:** reprice check in QuantLib cap engines. **Review:** 2026-11-08.
+
+### EB6 Bond futures options
+- **Purpose:** Black-76 price and implied price vol; yield vol through CTD duration.
+- **Limitations:** premium-paid only; no delivery option or CTD switch; first-order yield-vol link.
+- **Validation:** QuantLib Black formula and implied standard deviation. **Review:** 2026-11-08.
+
+### EB7 Inflation caps
+- **Purpose:** YoY caplets on given forwards; ZC caps on a forward index ratio.
+- **Limitations:** forwards and vols are inputs (no YoY curve, convexity or seasonality); Black or Bachelier only.
+- **Validation:** QuantLib Black and Bachelier formulas. **Review:** 2026-11-08.
 
 ## Review cycle
 
