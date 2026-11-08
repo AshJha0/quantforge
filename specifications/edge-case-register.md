@@ -37,6 +37,9 @@ Numbered EB so spec A's block can be added without renumbering. Pinned means nam
 | EB8 | VIX term outside 30 days | Pinned | `vix_e-0016` (`E_INPUT`) | No extrapolation, ruling E-B6 |
 | EB13 | VIX near or next term exactly 30 days | Pinned | `vix_e-0009` (`N1 = 43200`), `vix_e-0010` (`N2 = 43200`) | Weights 1 and 0 |
 | EB14 | Unsorted strip; zero bid at the ATM strike; no OTM puts | Pinned | `vix_e-0017`, `vix_e-0018`, `vix_e-0021` (`E_INPUT`) | Ruling E-B15 against Cboe v5.0 3(a) |
+| EB15 | Correlation matrix already valid | Pinned | `corr_e-0010`, `corr_e-0012`, `corr_e-0018` | Nearest returns the input |
+| EB16 | Correlation with an entry near -1 after repair | Pinned | `corr_e-0020` | |
+| EB17 | Implied correlation exactly 1 (equal vols, index vol equal) | Pinned | `corr_e-0032` | Not clipped (E-B20) |
 | EB9 | Swaption exactly on a cube node | Pinned | `ratesvol_e-0001` to `ratesvol_e-0005`, `ratesvol_e-0009`, `ratesvol_e-0012` | Parameters equal the node's; checks the time axis |
 | EB10 | Cap quotes with calendar arbitrage | Pinned | `ratesvol_e-0023` (`E_ARBITRAGE`) | Ruling E-B10: rejected, not clipped |
 | EB11 | Zero-strike inflation floor | Pinned | Bachelier YoY floor at 0%: `ratesvol_e-0042`; ZC floor at 0% (`strike_ratio = 1`): `ratesvol_e-0046`; Black YoY floor at 0%: `ratesvol_e-0044` (`E_DOMAIN`) | Deflation protection |

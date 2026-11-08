@@ -19,3 +19,5 @@ Review: self-reviewed 2026-11-08. Self-assessment, not an outside review.
 | `OPT.BLACK_FORMULA` | 05-volatility/black-models.md BLACK_76, discounted | `ql.blackFormula, "formula level"` | formula level |
 | `OPT.BACHELIER_FORMULA` | 05-volatility/black-models.md BACHELIER, discounted | `ql.bachelierBlackFormula, "formula level"` | formula level |
 | `OPT.BLACK_IMPLIED` | 05-volatility/rates-vol-cube.md implied Black vol from a premium | `ql.blackFormulaImpliedStdDev, "returns the standard deviation; divided by sqrt(t)"` | returns the standard deviation; divided by sqrt(t) |
+| `CORR.EIGEN` | 06-risk/correlation.md validation: eigenvalues of the symmetric input | `ql.SymmetricSchurDecomposition(M), "Jacobi rotations"` | Jacobi rotations |
+| `CORR.HIGHAM` | 06-risk/correlation.md nearest correlation, unweighted Frobenius norm (Higham 2002) | `ql.pseudoSqrt(M, ql.SalvagingAlgorithm.Higham), "returns a square root S; the repaired matrix is S S^T. Qua...` | returns a square root S; the repaired matrix is S S^T. QuantLib stops near 1e-6 in the iterate |
