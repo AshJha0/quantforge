@@ -179,3 +179,8 @@ Silent choices, all passing `risk_r2`:
 | R2-4 | The `E_DOMAIN` checks (`bump_bp`, then `notional`) run after every `E_SCHEMA` check, and the curve's own rule checks (`key_rate`) run after them, just before `key_dates`, as "Checks, in order" lists |
 | R2-5 | The bumped curves use the same SEQUENTIAL bootstrap as stage B risk. So Jacobian entries above the diagonal, and par buckets for quotes beyond a product's last date, come out as exact zeros |
 | R2-6 | `risk.pnl.explain`: a quote's move is taken on its mid (`rate`, or `(bid+ask)/2` when bid and ask are given), the same value the bootstrap uses. The checks run in this order: `bump_bp`, `notional`, convention, tenor match, then the bootstrap's own quote checks |
+
+## Stage E
+
+- **E7, `vol.vix.term_variance`, one selected strike.** Step 4 gives `dK` from neighbours, but if the zero-bid stop rules leave only `K0` selected there is no neighbour. Java uses `dK = 0` (the strip sum is then 0 and only the correction term is left). No golden reaches this case. Should it be `E_INPUT` instead?
+- **E1, error order across inputs.** `vol.svi.surface_check` checks `slices` (all its rules, `E_LIMIT` last) before `log_moneyness`; `vol.svi.fit_surface` checks `expiry_years`, then row count, then the slice limit, then each row's fit. The goldens agree, but the spec lists checks per object rather than across them.
