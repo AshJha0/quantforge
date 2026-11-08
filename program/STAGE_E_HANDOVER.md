@@ -57,3 +57,18 @@ Notes for builds: use the little-trap characteristic function; prices are judged
 ### E1 rulings on the R5 audit (2026-11-08)
 
 Rulings E-A15 to E-A18 in `specifications/stage-e-rulings.md`. Changes builds must make: the Lee wing test is `>= 2` (was `> 2`). New goldens appended to `surf_e.json` (`surf_e-0029` to `-0032`) and `lv_e.json` (`lv_e-0040` to `-0043`); no existing case changed. Re-read `05-volatility/arb-free-surfaces.md` (wing rule, citations) and `local-and-forward-vol.md` (citations only).
+
+### E5 exotics (ready, 2026-11-08)
+
+New operations: `exotic.digital.price`, `exotic.barrier.price`, `exotic.asian.geometric`, `exotic.lookback.floating`, `exotic.quanto.price`, `exotic.chooser.price`, `exotic.spread.kirk`, `exotic.basket.moment`, `exotic.american.crr`, `exotic.american.baw`, `exotic.american.fd`. No new error code.
+
+Goldens: `datasets/golden/stage_e/exotic_e.json` (119 cases), `datasets/golden/stage_e/american_e.json` (45 cases).
+
+Read:
+- `specifications/cli-contract.md` (block "Stage E, spec A", E5 row)
+- `specifications/stage-e-rulings.md` (E-A19 to E-A23)
+- `specifications/04-pricing/exotics.md`
+- `specifications/05-volatility/stage-e-targets-a.md` (E5 table)
+- `specifications/edge-case-register.md` (rows EA14 to EA17)
+
+Notes for builds: the CRR tree uses Hull's probability, not QuantLib's; the FD goldens are a recipe check, so follow the scheme exactly, including the odd `nx` and the centre-node Greeks.

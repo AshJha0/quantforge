@@ -41,3 +41,15 @@ Outside-oracle share (E3): 114 of 125 (91%); spec A running total in `oracle/OUT
 | `vol.slv.leverage` | `numerical_scheme` (1e-8) | Reference scheme; 1e-12 input perturbation moves leverage under 1e-8; grid refinement within 2% at the spot; flat-vol, zero-correlation limit within 3% of 1 near the money | Holds; mass at `T` 0.988 to 1.000 |
 
 Outside-oracle share (E2): 18 of 46 (Heston and Bates value cases); spec A running total in `oracle/OUTSIDE_E_A.md`.
+
+## E5 exotics
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| Digitals, barriers, geometric Asians, floating lookbacks, quanto, chooser, Kirk | `simple_analytic`, price limit 1e-9 absolute per unit (1e-4 currency units on 100,000 units) plus 1e-10 relative | QuantLib `AnalyticEuropeanEngine` (digital payoffs), `AnalyticBarrierEngine`, `AnalyticContinuousGeometricAveragePriceAsianEngine`, `AnalyticDiscreteGeometricAveragePriceAsianEngine`, `AnalyticContinuousFloatingLookbackEngine`, `QuantoEuropeanEngine`, `AnalyticSimpleChooserEngine`, `KirkEngine`; in-out parity; Margrabe at `K = 0` | 103 of 103 value cases reproduced |
+| Moment-matched basket | As above | 30-digit mpmath; perfect-correlation limit | Within 1e-13 on the basket vol |
+| BAW | 1e-5 absolute per unit plus 1e-8 relative (ruling E-A22) | QuantLib `BaroneAdesiWhaleyApproximationEngine` | Within 5e-6 |
+| CRR tree | `numerical_scheme` | Replay; European tree within `0.5 S v/n` of Black-Scholes | Holds |
+| FD | `numerical_scheme` | Recipe; 2000-step tree within 2e-2; 1e-12 spot perturbation moves the price under 1e-9 | Holds |
+
+Outside-oracle share (E5): 115 of 164 (70%). Spec A total after E5: 263 of 410 (64.1%), counted under ruling E-A17.
