@@ -359,6 +359,7 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let continuous = pick(i, "averaging", &[("CONTINUOUS", true), ("DISCRETE", false)])?;
             let f = i.reals("fixing_years")?;
             i.gate()?;
+            x.check()?;
             if continuous && !f.is_empty() {
                 return fail("E_INPUT", "CONTINUOUS averaging takes fixing_years []");
             }

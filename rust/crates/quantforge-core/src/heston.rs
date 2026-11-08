@@ -359,12 +359,13 @@ pub fn slv_leverage(m: &Market, h: &Heston, slices: &[Slice], g: &Grid) -> Resul
     if g.nx < 5 || g.nv < 5 || g.nt < 2 {
         return fail("E_INPUT", "nx and nv must be at least 5 and nt at least 2");
     }
+    // Every E_INPUT rule before every E_DOMAIN rule (ruling E-A37).
+    let x0 = m.spot.ln();
+    if m.spot > 0.0 && !(g.x_min < x0 && x0 < g.x_max) {
+        return fail("E_INPUT", "ln(spot) must lie strictly inside the x grid");
+    }
     if !(m.spot > 0.0 && m.expiry_years > 0.0) {
         return fail("E_DOMAIN", "spot and expiry_years must be above 0");
-    }
-    let x0 = m.spot.ln();
-    if !(g.x_min < x0 && x0 < g.x_max) {
-        return fail("E_INPUT", "ln(spot) must lie strictly inside the x grid");
     }
     if g.v_max.is_nan() || g.v_max <= 0.0 {
         return fail("E_DOMAIN", "v_max must be above 0");

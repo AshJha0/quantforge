@@ -256,8 +256,9 @@ pub fn forward_vols(t: &[f64], v: &[f64]) -> Result<Vec<f64>> {
             "expiry_years must strictly increase, with one vol each",
         );
     }
-    if v.iter().any(|x| x.is_nan() || *x <= 0.0) {
-        return fail("E_DOMAIN", "vols must be above 0");
+    if t[0].is_nan() || t[0] <= 0.0 || v.iter().any(|x| x.is_nan() || *x <= 0.0) {
+        // A first expiry at or below 0 is E_DOMAIN (ruling E-A36).
+        return fail("E_DOMAIN", "expiries and vols must be above 0");
     }
     let mut out = vec![v[0]];
     for i in 1..t.len() {
@@ -584,6 +585,10 @@ mod tests {
             "E_INPUT"
         );
         assert_eq!(forward_vols(&[1.0], &[0.0]).unwrap_err().code, "E_DOMAIN");
+        assert_eq!(
+            forward_vols(&[0.0, 1.0], &[0.2, 0.2]).unwrap_err().code,
+            "E_DOMAIN"
+        );
     }
 
     fn dyn_case(rule: Rule, call: bool, strikes: &[f64]) -> Dynamics<'_> {

@@ -20,7 +20,7 @@ pub struct Vanilla {
 }
 
 impl Vanilla {
-    fn check(&self) -> Result<()> {
+    pub fn check(&self) -> Result<()> {
         if [self.spot, self.strike, self.expiry_years, self.vol]
             .iter()
             .all(|v| *v > 0.0)
@@ -131,6 +131,8 @@ pub fn barrier(x: &Vanilla, h: f64, rebate: f64, kind: BarrierType) -> Result<f6
 /// Geometric average-price Asian: continuous (Kemna-Vorst) when `fixings` is `None`.
 pub fn asian_geometric(x: &Vanilla, fixings: Option<&[f64]>) -> Result<f64> {
     let (s, k, t, r, b, v) = (x.spot, x.strike, x.expiry_years, x.rate, x.carry(), x.vol);
+    // Input order (ruling E-A38): the common checks come before `fixing_years`.
+    x.check()?;
     if let Some(f) = fixings {
         let bad = f.is_empty()
             || f.windows(2).any(|w| w[1] <= w[0])
@@ -139,7 +141,6 @@ pub fn asian_geometric(x: &Vanilla, fixings: Option<&[f64]>) -> Result<f64> {
             return fail("E_INPUT", "fixings must increase strictly, each in (0, T]");
         }
     }
-    x.check()?;
     let Some(f) = fixings else {
         return Ok(gbs(
             x.call,

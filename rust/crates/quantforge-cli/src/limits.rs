@@ -88,6 +88,7 @@ fn operation_above(op: &str, i: &Json) -> bool {
             };
             g("nx").is_some_and(|n| n > 1001) || g("nt").is_some_and(|n| n > 10_000)
         }
+        "vol.volofvol.measure" => len(i, "vols").is_some_and(|n| n > 10_000),
         "vol.local.dupire" => {
             len(i, "slices").is_some_and(|n| n > 100)
                 || len(i, "points").is_some_and(|n| n > 10_000)
@@ -153,6 +154,7 @@ fn value_too_deep(op: &str, i: &Json) -> bool {
 fn stage_c_above(op: &str, i: &Json) -> bool {
     if !(op.starts_with("eq.")
         || op.starts_with("vol.")
+        || op.starts_with("exotic.")
         || op.starts_with("risk.vol.")
         || op == "usecase.vol_surface")
     {
@@ -172,7 +174,19 @@ fn stage_c_above(op: &str, i: &Json) -> bool {
         "total_variance",
         "slices",
         "k_grid",
+        "expiry_years",
+        "u",
+        "fixing_years",
+        "forwards",
+        "correlation",
     ];
+    // Stated stage E limits win over C10 (ruling E-A35); they are checked in `operation_above`.
+    let stated: &[&str] = match op {
+        "vol.svi.surface_check" => &["log_moneyness"],
+        "vol.local.dupire" => &["points"],
+        "vol.volofvol.measure" => &["vols"],
+        _ => &[],
+    };
     let surface = i
         .get("surface")
         .is_some_and(|s| long(s, "expiry_years") || long(s, "log_moneyness"));
@@ -183,7 +197,10 @@ fn stage_c_above(op: &str, i: &Json) -> bool {
     let curves = ["funding_curve", "borrow_curve"]
         .iter()
         .any(|k| i.get(k).is_some_and(|c| long(c, "pillars")));
-    lists.iter().any(|k| long(i, k))
+    lists
+        .iter()
+        .filter(|k| !stated.contains(k))
+        .any(|k| long(i, k))
         || surface
         || slices
         || curves
