@@ -222,22 +222,30 @@ pub fn dupire(slices: &[Slice], points: &[(f64, f64)]) -> Result<LocalVol> {
     }
     let mut out = LocalVol::default();
     for &(t, k) in points {
-        let (w, wk, wkk, wt) = surface_at(slices, t, k);
-        let g = density(k, w, wk, wkk);
-        if wt.is_nan() || wt <= 0.0 {
-            return fail(
-                "E_ARBITRAGE",
-                "total variance does not increase in time (calendar)",
-            );
-        }
-        if g.is_nan() || g <= 0.0 {
-            return fail("E_ARBITRAGE", "negative density (butterfly)");
-        }
+        let (w, _, _, _) = surface_at(slices, t, k);
+        let lv = local_variance(slices, t, k)?;
         out.total_variance.push(w);
         out.implied_vol.push((w / t).sqrt());
-        out.local_vol.push((wt / g).sqrt());
+        out.local_vol.push(lv.sqrt());
     }
     Ok(out)
+}
+
+/// Dupire local variance `w_T / g` at `(t, k)`; `w_T <= 0` or `g <= 0` is `E_ARBITRAGE`.
+/// `slices` must already be checked.
+pub fn local_variance(slices: &[Slice], t: f64, k: f64) -> Result<f64> {
+    let (w, wk, wkk, wt) = surface_at(slices, t, k);
+    let g = density(k, w, wk, wkk);
+    if wt.is_nan() || wt <= 0.0 {
+        return fail(
+            "E_ARBITRAGE",
+            "total variance does not increase in time (calendar)",
+        );
+    }
+    if g.is_nan() || g <= 0.0 {
+        return fail("E_ARBITRAGE", "negative density (butterfly)");
+    }
+    Ok(wt / g)
 }
 
 /// Forward vols between consecutive expiries; a zero forward variance gives 0 (ruling E-A5).

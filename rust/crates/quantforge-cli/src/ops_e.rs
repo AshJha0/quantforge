@@ -1,4 +1,4 @@
-//! Stage E operations: E4 (`rates-vol-cube.md`), E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
+//! Stage E operations: E2 (`heston-family.md`), E4 (`rates-vol-cube.md`), E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
 //! (`garch.md`, `variance-swaps.md`, `vix-index.md`).
 
 use crate::input::Inputs;
@@ -8,6 +8,7 @@ use quantforge_core::curve::{Curve, CurveInput};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::fx_smile::{self, AtmType, DeltaType};
 use quantforge_core::garch::{self, Start};
+use quantforge_core::heston;
 use quantforge_core::json::{Json, obj};
 use quantforge_core::rates_e;
 use quantforge_core::surface_e::{self, Check, Dynamics, Rule, Side, Slice, WingKind};
@@ -198,8 +199,84 @@ fn futures_option(i: &Inputs) -> Result<rates_e::FuturesOption> {
     })
 }
 
+fn heston_of(i: &Inputs) -> Result<heston::Heston> {
+    let h = sub(i, "heston")?;
+    Ok(heston::Heston {
+        v0: h.f64("v0")?,
+        kappa: h.f64("kappa")?,
+        theta: h.f64("theta")?,
+        xi: h.f64("xi")?,
+        rho: h.f64("rho")?,
+    })
+}
+
+fn jumps_of(i: &Inputs) -> Result<heston::Jumps> {
+    let j = sub(i, "jumps")?;
+    Ok(heston::Jumps {
+        intensity: j.f64("intensity")?,
+        mean_log_jump: j.f64("mean_log_jump")?,
+        log_jump_vol: j.f64("log_jump_vol")?,
+    })
+}
+
+fn heston_market(i: &Inputs, with_type: bool) -> Result<heston::Market> {
+    Ok(heston::Market {
+        spot: i.f64("spot")?,
+        expiry_years: i.f64("expiry_years")?,
+        rate: i.f64("rate")?,
+        dividend_yield: i.f64("dividend_yield")?,
+        call: if with_type { option_type(i)? } else { true },
+    })
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
+        "vol.heston.price" | "vol.bates.price" | "vol.merton.price" => {
+            let (m, k) = (heston_market(i, true)?, i.reals("strikes")?);
+            let p = match op {
+                "vol.heston.price" => {
+                    let h = heston_of(i)?;
+                    i.gate()?;
+                    heston::heston_price(&m, &k, &h)?
+                }
+                "vol.bates.price" => {
+                    let (h, j) = (heston_of(i)?, jumps_of(i)?);
+                    i.gate()?;
+                    heston::bates_price(&m, &k, &h, &j)?
+                }
+                _ => {
+                    let (v, j) = (i.f64("vol")?, jumps_of(i)?);
+                    i.gate()?;
+                    heston::merton_price(&m, &k, v, &j)?
+                }
+            };
+            plain(obj([("prices", p.into())]))
+        }
+        "vol.heston.cf" => {
+            let (t, h, u) = (i.f64("expiry_years")?, heston_of(i)?, i.reals("u")?);
+            i.gate()?;
+            let (re, im) = heston::heston_cf(t, &h, &u)?;
+            plain(obj([("re", re.into()), ("im", im.into())]))
+        }
+        "vol.slv.leverage" => {
+            let (m, h, s) = (heston_market(i, false)?, heston_of(i)?, slices(i)?);
+            let g = sub(i, "grid")?;
+            let grid = heston::Grid {
+                nx: g.int("nx")?,
+                nv: g.int("nv")?,
+                nt: g.int("nt")?,
+                x_min: g.f64("x_min")?,
+                x_max: g.f64("x_max")?,
+                v_max: g.f64("v_max")?,
+            };
+            i.gate()?;
+            let r = heston::slv_leverage(&m, &h, &s, &grid)?;
+            plain(obj([
+                ("x", r.x.into()),
+                ("leverage", r.leverage.into()),
+                ("mass", r.mass.into()),
+            ]))
+        }
         "rates.swaption.price_cube" => {
             let (d, p) = curves(i)?;
             let c = sub(i, "cube")?;

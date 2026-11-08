@@ -28,6 +28,7 @@ pub mod fx_smile;
 pub mod garch;
 pub mod greeks;
 pub mod hedge;
+pub mod heston;
 pub mod inflation;
 pub mod integrate;
 pub mod interp;
