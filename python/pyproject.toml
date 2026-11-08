@@ -36,7 +36,7 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_r1.py", "tests/test_r2.py", "tests/test_fast_paths.py",
              "tests/test_goldens_stage_d.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
-do_not_mutate = ["quantforge_core/_sobol_data.py"]
+do_not_mutate = ["quantforge_core/_sobol_data.py", "quantforge_core/_legendre_1024.py"]
 
 [tool.uv]
 # A plain path .pth instead of setuptools' import-hook finder: the finder pulls in pathlib and
