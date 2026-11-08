@@ -1,0 +1,2750 @@
+{
+ "schema_version": "1.0",
+ "suite": "rulings_e_b",
+ "spec": "specifications/stage-e-rulings-b.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "rulings_e_b-0001",
+   "operation": "vol.vix.index",
+   "inputs": {
+    "near": {
+     "minutes_to_expiry": 50400,
+     "rate": 0.046,
+     "strip": [
+      {
+       "strike": 3700.0,
+       "call_bid": 800.1,
+       "call_ask": 832.8,
+       "put_bid": 0.1,
+       "put_ask": 0.2
+      },
+      {
+       "strike": 3725.0,
+       "call_bid": 775.75,
+       "call_ask": 807.45,
+       "put_bid": 0.15,
+       "put_ask": 0.25
+      },
+      {
+       "strike": 3750.0,
+       "call_bid": 751.4,
+       "call_ask": 782.1,
+       "put_bid": 0.2,
+       "put_ask": 0.3
+      },
+      {
+       "strike": 3775.0,
+       "call_bid": 727.05,
+       "call_ask": 756.8,
+       "put_bid": 0.3,
+       "put_ask": 0.4
+      },
+      {
+       "strike": 3800.0,
+       "call_bid": 702.75,
+       "call_ask": 731.5,
+       "put_bid": 0.0,
+       "put_ask": 0.45
+      },
+      {
+       "strike": 3825.0,
+       "call_bid": 678.5,
+       "call_ask": 706.25,
+       "put_bid": 0.0,
+       "put_ask": 0.6
+      },
+      {
+       "strike": 3850.0,
+       "call_bid": 654.25,
+       "call_ask": 681.0,
+       "put_bid": 0.6,
+       "put_ask": 0.7
+      },
+      {
+       "strike": 3875.0,
+       "call_bid": 630.05,
+       "call_ask": 655.8,
+       "put_bid": 0.8,
+       "put_ask": 0.9
+      },
+      {
+       "strike": 3900.0,
+       "call_bid": 605.85,
+       "call_ask": 630.65,
+       "put_bid": 1.0,
+       "put_ask": 1.1
+      },
+      {
+       "strike": 3925.0,
+       "call_bid": 581.75,
+       "call_ask": 605.55,
+       "put_bid": 1.3,
+       "put_ask": 1.4
+      },
+      {
+       "strike": 3950.0,
+       "call_bid": 557.7,
+       "call_ask": 580.5,
+       "put_bid": 1.65,
+       "put_ask": 1.75
+      },
+      {
+       "strike": 3975.0,
+       "call_bid": 533.7,
+       "call_ask": 555.55,
+       "put_bid": 2.05,
+       "put_ask": 2.2
+      },
+      {
+       "strike": 4000.0,
+       "call_bid": 509.85,
+       "call_ask": 530.7,
+       "put_bid": 2.6,
+       "put_ask": 2.75
+      },
+      {
+       "strike": 4025.0,
+       "call_bid": 486.05,
+       "call_ask": 505.95,
+       "put_bid": 3.2,
+       "put_ask": 3.4
+      },
+      {
+       "strike": 4050.0,
+       "call_bid": 462.45,
+       "call_ask": 481.4,
+       "put_bid": 4.0,
+       "put_ask": 4.2
+      },
+      {
+       "strike": 4075.0,
+       "call_bid": 439.0,
+       "call_ask": 456.95,
+       "put_bid": 4.9,
+       "put_ask": 5.15
+      },
+      {
+       "strike": 4100.0,
+       "call_bid": 415.75,
+       "call_ask": 432.75,
+       "put_bid": 6.05,
+       "put_ask": 6.35
+      },
+      {
+       "strike": 4125.0,
+       "call_bid": 392.65,
+       "call_ask": 408.75,
+       "put_bid": 7.4,
+       "put_ask": 7.75
+      },
+      {
+       "strike": 4150.0,
+       "call_bid": 369.9,
+       "call_ask": 385.05,
+       "put_bid": 9.0,
+       "put_ask": 9.4
+      },
+      {
+       "strike": 4175.0,
+       "call_bid": 347.4,
+       "call_ask": 361.65,
+       "put_bid": 10.9,
+       "put_ask": 11.4
+      },
+      {
+       "strike": 4200.0,
+       "call_bid": 325.25,
+       "call_ask": 338.6,
+       "put_bid": 13.15,
+       "put_ask": 13.75
+      },
+      {
+       "strike": 4225.0,
+       "call_bid": 303.55,
+       "call_ask": 316.0,
+       "put_bid": 15.8,
+       "put_ask": 16.5
+      },
+      {
+       "strike": 4250.0,
+       "call_bid": 282.25,
+       "call_ask": 293.8,
+       "put_bid": 18.9,
+       "put_ask": 19.7
+      },
+      {
+       "strike": 4275.0,
+       "call_bid": 261.45,
+       "call_ask": 272.15,
+       "put_bid": 22.5,
+       "put_ask": 23.45
+      },
+      {
+       "strike": 4300.0,
+       "call_bid": 241.2,
+       "call_ask": 251.1,
+       "put_bid": 26.65,
+       "put_ask": 27.8
+      },
+      {
+       "strike": 4325.0,
+       "call_bid": 221.55,
+       "call_ask": 230.65,
+       "put_bid": 31.4,
+       "put_ask": 32.75
+      },
+      {
+       "strike": 4350.0,
+       "call_bid": 202.6,
+       "call_ask": 210.9,
+       "put_bid": 36.8,
+       "put_ask": 38.35
+      },
+      {
+       "strike": 4375.0,
+       "call_bid": 184.35,
+       "call_ask": 191.9,
+       "put_bid": 42.95,
+       "put_ask": 44.75
+      },
+      {
+       "strike": 4400.0,
+       "call_bid": 166.85,
+       "call_ask": 173.7,
+       "put_bid": 49.85,
+       "put_ask": 51.95
+      },
+      {
+       "strike": 4425.0,
+       "call_bid": 150.2,
+       "call_ask": 156.4,
+       "put_bid": 57.6,
+       "put_ask": 60.0
+      },
+      {
+       "strike": 4450.0,
+       "call_bid": 134.45,
+       "call_ask": 140.0,
+       "put_bid": 66.25,
+       "put_ask": 69.0
+      },
+      {
+       "strike": 4475.0,
+       "call_bid": 119.55,
+       "call_ask": 124.5,
+       "put_bid": 75.8,
+       "put_ask": 78.95
+      },
+      {
+       "strike": 4500.0,
+       "call_bid": 105.7,
+       "call_ask": 110.05,
+       "put_bid": 86.3,
+       "put_ask": 89.85
+      },
+      {
+       "strike": 4525.0,
+       "call_bid": 92.75,
+       "call_ask": 96.6,
+       "put_bid": 97.75,
+       "put_ask": 101.8
+      },
+      {
+       "strike": 4550.0,
+       "call_bid": 80.85,
+       "call_ask": 84.2,
+       "put_bid": 110.2,
+       "put_ask": 114.75
+      },
+      {
+       "strike": 4575.0,
+       "call_bid": 69.95,
+       "call_ask": 72.85,
+       "put_bid": 123.7,
+       "put_ask": 128.8
+      },
+      {
+       "strike": 4600.0,
+       "call_bid": 60.0,
+       "call_ask": 62.5,
+       "put_bid": 138.15,
+       "put_ask": 143.85
+      },
+      {
+       "strike": 4625.0,
+       "call_bid": 51.05,
+       "call_ask": 53.2,
+       "put_bid": 153.6,
+       "put_ask": 159.9
+      },
+      {
+       "strike": 4650.0,
+       "call_bid": 43.05,
+       "call_ask": 44.85,
+       "put_bid": 170.0,
+       "put_ask": 177.0
+      },
+      {
+       "strike": 4675.0,
+       "call_bid": 36.0,
+       "call_ask": 37.5,
+       "put_bid": 187.3,
+       "put_ask": 195.0
+      },
+      {
+       "strike": 4700.0,
+       "call_bid": 29.8,
+       "call_ask": 31.05,
+       "put_bid": 205.5,
+       "put_ask": 213.95
+      },
+      {
+       "strike": 4725.0,
+       "call_bid": 24.4,
+       "call_ask": 25.45,
+       "put_bid": 224.55,
+       "put_ask": 233.75
+      },
+      {
+       "strike": 4750.0,
+       "call_bid": 19.8,
+       "call_ask": 20.65,
+       "put_bid": 244.35,
+       "put_ask": 254.35
+      },
+      {
+       "strike": 4775.0,
+       "call_bid": 15.9,
+       "call_ask": 16.6,
+       "put_bid": 264.8,
+       "put_ask": 275.65
+      },
+      {
+       "strike": 4800.0,
+       "call_bid": 12.6,
+       "call_ask": 13.15,
+       "put_bid": 285.9,
+       "put_ask": 297.6
+      },
+      {
+       "strike": 4825.0,
+       "call_bid": 9.9,
+       "call_ask": 10.35,
+       "put_bid": 307.55,
+       "put_ask": 320.15
+      },
+      {
+       "strike": 4850.0,
+       "call_bid": 7.65,
+       "call_ask": 8.0,
+       "put_bid": 329.75,
+       "put_ask": 343.25
+      },
+      {
+       "strike": 4875.0,
+       "call_bid": 5.85,
+       "call_ask": 6.15,
+       "put_bid": 352.3,
+       "put_ask": 366.75
+      },
+      {
+       "strike": 4900.0,
+       "call_bid": 4.4,
+       "call_ask": 4.65,
+       "put_bid": 375.3,
+       "put_ask": 390.65
+      },
+      {
+       "strike": 4925.0,
+       "call_bid": 3.25,
+       "call_ask": 3.45,
+       "put_bid": 398.55,
+       "put_ask": 414.85
+      },
+      {
+       "strike": 4950.0,
+       "call_bid": 2.4,
+       "call_ask": 2.55,
+       "put_bid": 422.05,
+       "put_ask": 439.35
+      },
+      {
+       "strike": 4975.0,
+       "call_bid": 1.75,
+       "call_ask": 1.85,
+       "put_bid": 445.75,
+       "put_ask": 464.0
+      },
+      {
+       "strike": 5000.0,
+       "call_bid": 0.0,
+       "call_ask": 1.35,
+       "put_bid": 469.7,
+       "put_ask": 488.9
+      },
+      {
+       "strike": 5025.0,
+       "call_bid": 0.85,
+       "call_ask": 0.95,
+       "put_bid": 493.7,
+       "put_ask": 513.9
+      },
+      {
+       "strike": 5050.0,
+       "call_bid": 0.6,
+       "call_ask": 0.7,
+       "put_bid": 517.8,
+       "put_ask": 539.0
+      },
+      {
+       "strike": 5075.0,
+       "call_bid": 0.4,
+       "call_ask": 0.5,
+       "put_bid": 542.0,
+       "put_ask": 564.15
+      },
+      {
+       "strike": 5100.0,
+       "call_bid": 0.25,
+       "call_ask": 0.35,
+       "put_bid": 566.3,
+       "put_ask": 589.45
+      },
+      {
+       "strike": 5125.0,
+       "call_bid": 0.15,
+       "call_ask": 0.25,
+       "put_bid": 590.55,
+       "put_ask": 614.7
+      },
+      {
+       "strike": 5150.0,
+       "call_bid": 0.1,
+       "call_ask": 0.2,
+       "put_bid": 614.9,
+       "put_ask": 640.05
+      },
+      {
+       "strike": 5175.0,
+       "call_bid": 0.05,
+       "call_ask": 0.15,
+       "put_bid": 639.25,
+       "put_ask": 665.4
+      },
+      {
+       "strike": 5200.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 663.6,
+       "put_ask": 690.75
+      }
+     ]
+    },
+    "next": {
+     "minutes_to_expiry": 34560,
+     "rate": 0.045,
+     "strip": [
+      {
+       "strike": 3800.0,
+       "call_bid": 697.05,
+       "call_ask": 725.55,
+       "put_bid": -0.05,
+       "put_ask": 0.15
+      },
+      {
+       "strike": 3825.0,
+       "call_bid": 672.65,
+       "call_ask": 700.15,
+       "put_bid": 0.05,
+       "put_ask": 0.15
+      },
+      {
+       "strike": 3850.0,
+       "call_bid": 648.25,
+       "call_ask": 674.75,
+       "put_bid": 0.0,
+       "put_ask": 0.15
+      },
+      {
+       "strike": 3875.0,
+       "call_bid": 623.85,
+       "call_ask": 649.35,
+       "put_bid": 0.0,
+       "put_ask": 0.2
+      },
+      {
+       "strike": 3900.0,
+       "call_bid": 599.5,
+       "call_ask": 624.0,
+       "put_bid": 0.15,
+       "put_ask": 0.25
+      },
+      {
+       "strike": 3925.0,
+       "call_bid": 575.15,
+       "call_ask": 598.65,
+       "put_bid": 0.25,
+       "put_ask": 0.35
+      },
+      {
+       "strike": 3950.0,
+       "call_bid": 550.8,
+       "call_ask": 573.35,
+       "put_bid": 0.0,
+       "put_ask": 0.45
+      },
+      {
+       "strike": 3975.0,
+       "call_bid": 526.5,
+       "call_ask": 548.05,
+       "put_bid": 0.5,
+       "put_ask": 0.6
+      },
+      {
+       "strike": 4000.0,
+       "call_bid": 502.25,
+       "call_ask": 522.8,
+       "put_bid": 0.65,
+       "put_ask": 0.75
+      },
+      {
+       "strike": 4025.0,
+       "call_bid": 478.05,
+       "call_ask": 497.6,
+       "put_bid": 0.9,
+       "put_ask": 1.0
+      },
+      {
+       "strike": 4050.0,
+       "call_bid": 453.95,
+       "call_ask": 472.55,
+       "put_bid": 1.2,
+       "put_ask": 1.3
+      },
+      {
+       "strike": 4075.0,
+       "call_bid": 429.9,
+       "call_ask": 447.5,
+       "put_bid": 1.6,
+       "put_ask": 1.7
+      },
+      {
+       "strike": 4100.0,
+       "call_bid": 406.0,
+       "call_ask": 422.6,
+       "put_bid": 2.15,
+       "put_ask": 2.3
+      },
+      {
+       "strike": 4125.0,
+       "call_bid": 382.25,
+       "call_ask": 397.9,
+       "put_bid": 2.8,
+       "put_ask": 2.95
+      },
+      {
+       "strike": 4150.0,
+       "call_bid": 358.65,
+       "call_ask": 373.35,
+       "put_bid": 3.65,
+       "put_ask": 3.85
+      },
+      {
+       "strike": 4175.0,
+       "call_bid": 335.35,
+       "call_ask": 349.1,
+       "put_bid": 4.75,
+       "put_ask": 5.0
+      },
+      {
+       "strike": 4200.0,
+       "call_bid": 312.25,
+       "call_ask": 325.05,
+       "put_bid": 6.1,
+       "put_ask": 6.4
+      },
+      {
+       "strike": 4225.0,
+       "call_bid": 289.55,
+       "call_ask": 301.4,
+       "put_bid": 7.8,
+       "put_ask": 8.15
+      },
+      {
+       "strike": 4250.0,
+       "call_bid": 267.2,
+       "call_ask": 278.15,
+       "put_bid": 9.9,
+       "put_ask": 10.35
+      },
+      {
+       "strike": 4275.0,
+       "call_bid": 245.35,
+       "call_ask": 255.4,
+       "put_bid": 12.5,
+       "put_ask": 13.05
+      },
+      {
+       "strike": 4300.0,
+       "call_bid": 224.05,
+       "call_ask": 233.25,
+       "put_bid": 15.6,
+       "put_ask": 16.3
+      },
+      {
+       "strike": 4325.0,
+       "call_bid": 203.35,
+       "call_ask": 211.7,
+       "put_bid": 19.35,
+       "put_ask": 20.2
+      },
+      {
+       "strike": 4350.0,
+       "call_bid": 183.4,
+       "call_ask": 190.95,
+       "put_bid": 23.85,
+       "put_ask": 24.85
+      },
+      {
+       "strike": 4375.0,
+       "call_bid": 164.3,
+       "call_ask": 171.05,
+       "put_bid": 29.1,
+       "put_ask": 30.35
+      },
+      {
+       "strike": 4400.0,
+       "call_bid": 146.05,
+       "call_ask": 152.05,
+       "put_bid": 35.3,
+       "put_ask": 36.8
+      },
+      {
+       "strike": 4425.0,
+       "call_bid": 128.75,
+       "call_ask": 134.05,
+       "put_bid": 42.45,
+       "put_ask": 44.25
+      },
+      {
+       "strike": 4450.0,
+       "call_bid": 112.55,
+       "call_ask": 117.2,
+       "put_bid": 50.7,
+       "put_ask": 52.8
+      },
+      {
+       "strike": 4475.0,
+       "call_bid": 97.5,
+       "call_ask": 101.55,
+       "put_bid": 60.05,
+       "put_ask": 62.55
+      },
+      {
+       "strike": 4500.0,
+       "call_bid": 83.6,
+       "call_ask": 87.05,
+       "put_bid": 70.55,
+       "put_ask": 73.5
+      },
+      {
+       "strike": 4525.0,
+       "call_bid": 70.95,
+       "call_ask": 73.9,
+       "put_bid": 82.35,
+       "put_ask": 85.75
+      },
+      {
+       "strike": 4550.0,
+       "call_bid": 59.5,
+       "call_ask": 62.0,
+       "put_bid": 95.35,
+       "put_ask": 99.3
+      },
+      {
+       "strike": 4575.0,
+       "call_bid": 49.35,
+       "call_ask": 51.4,
+       "put_bid": 109.6,
+       "put_ask": 114.1
+      },
+      {
+       "strike": 4600.0,
+       "call_bid": 40.35,
+       "call_ask": 42.05,
+       "put_bid": 125.05,
+       "put_ask": 130.2
+      },
+      {
+       "strike": 4625.0,
+       "call_bid": 32.6,
+       "call_ask": 34.0,
+       "put_bid": 141.7,
+       "put_ask": 147.55
+      },
+      {
+       "strike": 4650.0,
+       "call_bid": 25.95,
+       "call_ask": 27.05,
+       "put_bid": 159.5,
+       "put_ask": 166.05
+      },
+      {
+       "strike": 4675.0,
+       "call_bid": 20.35,
+       "call_ask": 21.25,
+       "put_bid": 178.3,
+       "put_ask": 185.65
+      },
+      {
+       "strike": 4700.0,
+       "call_bid": 15.7,
+       "call_ask": 16.4,
+       "put_bid": 198.1,
+       "put_ask": 206.25
+      },
+      {
+       "strike": 4725.0,
+       "call_bid": 11.9,
+       "call_ask": 12.45,
+       "put_bid": 218.75,
+       "put_ask": 227.75
+      },
+      {
+       "strike": 4750.0,
+       "call_bid": 8.9,
+       "call_ask": 9.3,
+       "put_bid": 240.15,
+       "put_ask": 250.0
+      },
+      {
+       "strike": 4775.0,
+       "call_bid": 6.5,
+       "call_ask": 6.8,
+       "put_bid": 262.2,
+       "put_ask": 272.95
+      },
+      {
+       "strike": 4800.0,
+       "call_bid": 4.65,
+       "call_ask": 4.9,
+       "put_bid": 284.8,
+       "put_ask": 296.45
+      },
+      {
+       "strike": 4825.0,
+       "call_bid": 3.3,
+       "call_ask": 3.5,
+       "put_bid": 307.85,
+       "put_ask": 320.45
+      },
+      {
+       "strike": 4850.0,
+       "call_bid": 2.25,
+       "call_ask": 2.4,
+       "put_bid": 331.25,
+       "put_ask": 344.8
+      },
+      {
+       "strike": 4875.0,
+       "call_bid": 1.55,
+       "call_ask": 1.65,
+       "put_bid": 354.9,
+       "put_ask": 369.45
+      },
+      {
+       "strike": 4900.0,
+       "call_bid": 1.0,
+       "call_ask": 1.1,
+       "put_bid": 378.8,
+       "put_ask": 394.3
+      },
+      {
+       "strike": 4925.0,
+       "call_bid": 0.65,
+       "call_ask": 0.75,
+       "put_bid": 402.9,
+       "put_ask": 419.4
+      },
+      {
+       "strike": 4950.0,
+       "call_bid": 0.4,
+       "call_ask": 0.5,
+       "put_bid": 427.05,
+       "put_ask": 444.55
+      },
+      {
+       "strike": 4975.0,
+       "call_bid": 0.25,
+       "call_ask": 0.35,
+       "put_bid": 451.35,
+       "put_ask": 469.8
+      },
+      {
+       "strike": 5000.0,
+       "call_bid": 0.1,
+       "call_ask": 0.2,
+       "put_bid": 475.7,
+       "put_ask": 495.15
+      },
+      {
+       "strike": 5025.0,
+       "call_bid": 0.05,
+       "call_ask": 0.15,
+       "put_bid": 500.05,
+       "put_ask": 520.5
+      },
+      {
+       "strike": 5050.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 524.45,
+       "put_ask": 545.9
+      },
+      {
+       "strike": 5075.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 548.85,
+       "put_ask": 571.3
+      },
+      {
+       "strike": 5100.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 573.25,
+       "put_ask": 596.7
+      },
+      {
+       "strike": 5125.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 597.65,
+       "put_ask": 622.1
+      },
+      {
+       "strike": 5150.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 622.1,
+       "put_ask": 647.55
+      },
+      {
+       "strike": 5175.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 646.5,
+       "put_ask": 672.95
+      },
+      {
+       "strike": 5200.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 670.95,
+       "put_ask": 698.4
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B34",
+    "order",
+    "synthetic"
+   ],
+   "description": "bracket broken (near after next) and a negative quote in a term: the bracket E_INPUT comes first"
+  },
+  {
+   "case_id": "rulings_e_b-0002",
+   "operation": "vol.vix.index",
+   "inputs": {
+    "near": {
+     "minutes_to_expiry": 34560,
+     "rate": 0.045,
+     "strip": [
+      {
+       "strike": 3800.0,
+       "call_bid": 697.05,
+       "call_ask": 725.55,
+       "put_bid": -0.05,
+       "put_ask": 0.15
+      },
+      {
+       "strike": 3825.0,
+       "call_bid": 672.65,
+       "call_ask": 700.15,
+       "put_bid": 0.05,
+       "put_ask": 0.15
+      },
+      {
+       "strike": 3850.0,
+       "call_bid": 648.25,
+       "call_ask": 674.75,
+       "put_bid": 0.0,
+       "put_ask": 0.15
+      },
+      {
+       "strike": 3875.0,
+       "call_bid": 623.85,
+       "call_ask": 649.35,
+       "put_bid": 0.0,
+       "put_ask": 0.2
+      },
+      {
+       "strike": 3900.0,
+       "call_bid": 599.5,
+       "call_ask": 624.0,
+       "put_bid": 0.15,
+       "put_ask": 0.25
+      },
+      {
+       "strike": 3925.0,
+       "call_bid": 575.15,
+       "call_ask": 598.65,
+       "put_bid": 0.25,
+       "put_ask": 0.35
+      },
+      {
+       "strike": 3950.0,
+       "call_bid": 550.8,
+       "call_ask": 573.35,
+       "put_bid": 0.0,
+       "put_ask": 0.45
+      },
+      {
+       "strike": 3975.0,
+       "call_bid": 526.5,
+       "call_ask": 548.05,
+       "put_bid": 0.5,
+       "put_ask": 0.6
+      },
+      {
+       "strike": 4000.0,
+       "call_bid": 502.25,
+       "call_ask": 522.8,
+       "put_bid": 0.65,
+       "put_ask": 0.75
+      },
+      {
+       "strike": 4025.0,
+       "call_bid": 478.05,
+       "call_ask": 497.6,
+       "put_bid": 0.9,
+       "put_ask": 1.0
+      },
+      {
+       "strike": 4050.0,
+       "call_bid": 453.95,
+       "call_ask": 472.55,
+       "put_bid": 1.2,
+       "put_ask": 1.3
+      },
+      {
+       "strike": 4075.0,
+       "call_bid": 429.9,
+       "call_ask": 447.5,
+       "put_bid": 1.6,
+       "put_ask": 1.7
+      },
+      {
+       "strike": 4100.0,
+       "call_bid": 406.0,
+       "call_ask": 422.6,
+       "put_bid": 2.15,
+       "put_ask": 2.3
+      },
+      {
+       "strike": 4125.0,
+       "call_bid": 382.25,
+       "call_ask": 397.9,
+       "put_bid": 2.8,
+       "put_ask": 2.95
+      },
+      {
+       "strike": 4150.0,
+       "call_bid": 358.65,
+       "call_ask": 373.35,
+       "put_bid": 3.65,
+       "put_ask": 3.85
+      },
+      {
+       "strike": 4175.0,
+       "call_bid": 335.35,
+       "call_ask": 349.1,
+       "put_bid": 4.75,
+       "put_ask": 5.0
+      },
+      {
+       "strike": 4200.0,
+       "call_bid": 312.25,
+       "call_ask": 325.05,
+       "put_bid": 6.1,
+       "put_ask": 6.4
+      },
+      {
+       "strike": 4225.0,
+       "call_bid": 289.55,
+       "call_ask": 301.4,
+       "put_bid": 7.8,
+       "put_ask": 8.15
+      },
+      {
+       "strike": 4250.0,
+       "call_bid": 267.2,
+       "call_ask": 278.15,
+       "put_bid": 9.9,
+       "put_ask": 10.35
+      },
+      {
+       "strike": 4275.0,
+       "call_bid": 245.35,
+       "call_ask": 255.4,
+       "put_bid": 12.5,
+       "put_ask": 13.05
+      },
+      {
+       "strike": 4300.0,
+       "call_bid": 224.05,
+       "call_ask": 233.25,
+       "put_bid": 15.6,
+       "put_ask": 16.3
+      },
+      {
+       "strike": 4325.0,
+       "call_bid": 203.35,
+       "call_ask": 211.7,
+       "put_bid": 19.35,
+       "put_ask": 20.2
+      },
+      {
+       "strike": 4350.0,
+       "call_bid": 183.4,
+       "call_ask": 190.95,
+       "put_bid": 23.85,
+       "put_ask": 24.85
+      },
+      {
+       "strike": 4375.0,
+       "call_bid": 164.3,
+       "call_ask": 171.05,
+       "put_bid": 29.1,
+       "put_ask": 30.35
+      },
+      {
+       "strike": 4400.0,
+       "call_bid": 146.05,
+       "call_ask": 152.05,
+       "put_bid": 35.3,
+       "put_ask": 36.8
+      },
+      {
+       "strike": 4425.0,
+       "call_bid": 128.75,
+       "call_ask": 134.05,
+       "put_bid": 42.45,
+       "put_ask": 44.25
+      },
+      {
+       "strike": 4450.0,
+       "call_bid": 112.55,
+       "call_ask": 117.2,
+       "put_bid": 50.7,
+       "put_ask": 52.8
+      },
+      {
+       "strike": 4475.0,
+       "call_bid": 97.5,
+       "call_ask": 101.55,
+       "put_bid": 60.05,
+       "put_ask": 62.55
+      },
+      {
+       "strike": 4500.0,
+       "call_bid": 83.6,
+       "call_ask": 87.05,
+       "put_bid": 70.55,
+       "put_ask": 73.5
+      },
+      {
+       "strike": 4525.0,
+       "call_bid": 70.95,
+       "call_ask": 73.9,
+       "put_bid": 82.35,
+       "put_ask": 85.75
+      },
+      {
+       "strike": 4550.0,
+       "call_bid": 59.5,
+       "call_ask": 62.0,
+       "put_bid": 95.35,
+       "put_ask": 99.3
+      },
+      {
+       "strike": 4575.0,
+       "call_bid": 49.35,
+       "call_ask": 51.4,
+       "put_bid": 109.6,
+       "put_ask": 114.1
+      },
+      {
+       "strike": 4600.0,
+       "call_bid": 40.35,
+       "call_ask": 42.05,
+       "put_bid": 125.05,
+       "put_ask": 130.2
+      },
+      {
+       "strike": 4625.0,
+       "call_bid": 32.6,
+       "call_ask": 34.0,
+       "put_bid": 141.7,
+       "put_ask": 147.55
+      },
+      {
+       "strike": 4650.0,
+       "call_bid": 25.95,
+       "call_ask": 27.05,
+       "put_bid": 159.5,
+       "put_ask": 166.05
+      },
+      {
+       "strike": 4675.0,
+       "call_bid": 20.35,
+       "call_ask": 21.25,
+       "put_bid": 178.3,
+       "put_ask": 185.65
+      },
+      {
+       "strike": 4700.0,
+       "call_bid": 15.7,
+       "call_ask": 16.4,
+       "put_bid": 198.1,
+       "put_ask": 206.25
+      },
+      {
+       "strike": 4725.0,
+       "call_bid": 11.9,
+       "call_ask": 12.45,
+       "put_bid": 218.75,
+       "put_ask": 227.75
+      },
+      {
+       "strike": 4750.0,
+       "call_bid": 8.9,
+       "call_ask": 9.3,
+       "put_bid": 240.15,
+       "put_ask": 250.0
+      },
+      {
+       "strike": 4775.0,
+       "call_bid": 6.5,
+       "call_ask": 6.8,
+       "put_bid": 262.2,
+       "put_ask": 272.95
+      },
+      {
+       "strike": 4800.0,
+       "call_bid": 4.65,
+       "call_ask": 4.9,
+       "put_bid": 284.8,
+       "put_ask": 296.45
+      },
+      {
+       "strike": 4825.0,
+       "call_bid": 3.3,
+       "call_ask": 3.5,
+       "put_bid": 307.85,
+       "put_ask": 320.45
+      },
+      {
+       "strike": 4850.0,
+       "call_bid": 2.25,
+       "call_ask": 2.4,
+       "put_bid": 331.25,
+       "put_ask": 344.8
+      },
+      {
+       "strike": 4875.0,
+       "call_bid": 1.55,
+       "call_ask": 1.65,
+       "put_bid": 354.9,
+       "put_ask": 369.45
+      },
+      {
+       "strike": 4900.0,
+       "call_bid": 1.0,
+       "call_ask": 1.1,
+       "put_bid": 378.8,
+       "put_ask": 394.3
+      },
+      {
+       "strike": 4925.0,
+       "call_bid": 0.65,
+       "call_ask": 0.75,
+       "put_bid": 402.9,
+       "put_ask": 419.4
+      },
+      {
+       "strike": 4950.0,
+       "call_bid": 0.4,
+       "call_ask": 0.5,
+       "put_bid": 427.05,
+       "put_ask": 444.55
+      },
+      {
+       "strike": 4975.0,
+       "call_bid": 0.25,
+       "call_ask": 0.35,
+       "put_bid": 451.35,
+       "put_ask": 469.8
+      },
+      {
+       "strike": 5000.0,
+       "call_bid": 0.1,
+       "call_ask": 0.2,
+       "put_bid": 475.7,
+       "put_ask": 495.15
+      },
+      {
+       "strike": 5025.0,
+       "call_bid": 0.05,
+       "call_ask": 0.15,
+       "put_bid": 500.05,
+       "put_ask": 520.5
+      },
+      {
+       "strike": 5050.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 524.45,
+       "put_ask": 545.9
+      },
+      {
+       "strike": 5075.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 548.85,
+       "put_ask": 571.3
+      },
+      {
+       "strike": 5100.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 573.25,
+       "put_ask": 596.7
+      },
+      {
+       "strike": 5125.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 597.65,
+       "put_ask": 622.1
+      },
+      {
+       "strike": 5150.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 622.1,
+       "put_ask": 647.55
+      },
+      {
+       "strike": 5175.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 646.5,
+       "put_ask": 672.95
+      },
+      {
+       "strike": 5200.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 670.95,
+       "put_ask": 698.4
+      }
+     ]
+    },
+    "next": {
+     "minutes_to_expiry": 50400,
+     "rate": 0.046,
+     "strip": [
+      {
+       "strike": 3700.0,
+       "call_bid": 800.1,
+       "call_ask": 832.8,
+       "put_bid": 0.1,
+       "put_ask": 0.2
+      },
+      {
+       "strike": 3725.0,
+       "call_bid": 775.75,
+       "call_ask": 807.45,
+       "put_bid": 0.15,
+       "put_ask": 0.25
+      },
+      {
+       "strike": 3750.0,
+       "call_bid": 751.4,
+       "call_ask": 782.1,
+       "put_bid": 0.2,
+       "put_ask": 0.3
+      },
+      {
+       "strike": 3775.0,
+       "call_bid": 727.05,
+       "call_ask": 756.8,
+       "put_bid": 0.3,
+       "put_ask": 0.4
+      },
+      {
+       "strike": 3800.0,
+       "call_bid": 702.75,
+       "call_ask": 731.5,
+       "put_bid": 0.0,
+       "put_ask": 0.45
+      },
+      {
+       "strike": 3825.0,
+       "call_bid": 678.5,
+       "call_ask": 706.25,
+       "put_bid": 0.0,
+       "put_ask": 0.6
+      },
+      {
+       "strike": 3850.0,
+       "call_bid": 654.25,
+       "call_ask": 681.0,
+       "put_bid": 0.6,
+       "put_ask": 0.7
+      },
+      {
+       "strike": 3875.0,
+       "call_bid": 630.05,
+       "call_ask": 655.8,
+       "put_bid": 0.8,
+       "put_ask": 0.9
+      },
+      {
+       "strike": 3900.0,
+       "call_bid": 605.85,
+       "call_ask": 630.65,
+       "put_bid": 1.0,
+       "put_ask": 1.1
+      },
+      {
+       "strike": 3925.0,
+       "call_bid": 581.75,
+       "call_ask": 605.55,
+       "put_bid": 1.3,
+       "put_ask": 1.4
+      },
+      {
+       "strike": 3950.0,
+       "call_bid": 557.7,
+       "call_ask": 580.5,
+       "put_bid": 1.65,
+       "put_ask": 1.75
+      },
+      {
+       "strike": 3975.0,
+       "call_bid": 533.7,
+       "call_ask": 555.55,
+       "put_bid": 2.05,
+       "put_ask": 2.2
+      },
+      {
+       "strike": 4000.0,
+       "call_bid": 509.85,
+       "call_ask": 530.7,
+       "put_bid": 2.6,
+       "put_ask": 2.75
+      },
+      {
+       "strike": 4025.0,
+       "call_bid": 486.05,
+       "call_ask": 505.95,
+       "put_bid": 3.2,
+       "put_ask": 3.4
+      },
+      {
+       "strike": 4050.0,
+       "call_bid": 462.45,
+       "call_ask": 481.4,
+       "put_bid": 4.0,
+       "put_ask": 4.2
+      },
+      {
+       "strike": 4075.0,
+       "call_bid": 439.0,
+       "call_ask": 456.95,
+       "put_bid": 4.9,
+       "put_ask": 5.15
+      },
+      {
+       "strike": 4100.0,
+       "call_bid": 415.75,
+       "call_ask": 432.75,
+       "put_bid": 6.05,
+       "put_ask": 6.35
+      },
+      {
+       "strike": 4125.0,
+       "call_bid": 392.65,
+       "call_ask": 408.75,
+       "put_bid": 7.4,
+       "put_ask": 7.75
+      },
+      {
+       "strike": 4150.0,
+       "call_bid": 369.9,
+       "call_ask": 385.05,
+       "put_bid": 9.0,
+       "put_ask": 9.4
+      },
+      {
+       "strike": 4175.0,
+       "call_bid": 347.4,
+       "call_ask": 361.65,
+       "put_bid": 10.9,
+       "put_ask": 11.4
+      },
+      {
+       "strike": 4200.0,
+       "call_bid": 325.25,
+       "call_ask": 338.6,
+       "put_bid": 13.15,
+       "put_ask": 13.75
+      },
+      {
+       "strike": 4225.0,
+       "call_bid": 303.55,
+       "call_ask": 316.0,
+       "put_bid": 15.8,
+       "put_ask": 16.5
+      },
+      {
+       "strike": 4250.0,
+       "call_bid": 282.25,
+       "call_ask": 293.8,
+       "put_bid": 18.9,
+       "put_ask": 19.7
+      },
+      {
+       "strike": 4275.0,
+       "call_bid": 261.45,
+       "call_ask": 272.15,
+       "put_bid": 22.5,
+       "put_ask": 23.45
+      },
+      {
+       "strike": 4300.0,
+       "call_bid": 241.2,
+       "call_ask": 251.1,
+       "put_bid": 26.65,
+       "put_ask": 27.8
+      },
+      {
+       "strike": 4325.0,
+       "call_bid": 221.55,
+       "call_ask": 230.65,
+       "put_bid": 31.4,
+       "put_ask": 32.75
+      },
+      {
+       "strike": 4350.0,
+       "call_bid": 202.6,
+       "call_ask": 210.9,
+       "put_bid": 36.8,
+       "put_ask": 38.35
+      },
+      {
+       "strike": 4375.0,
+       "call_bid": 184.35,
+       "call_ask": 191.9,
+       "put_bid": 42.95,
+       "put_ask": 44.75
+      },
+      {
+       "strike": 4400.0,
+       "call_bid": 166.85,
+       "call_ask": 173.7,
+       "put_bid": 49.85,
+       "put_ask": 51.95
+      },
+      {
+       "strike": 4425.0,
+       "call_bid": 150.2,
+       "call_ask": 156.4,
+       "put_bid": 57.6,
+       "put_ask": 60.0
+      },
+      {
+       "strike": 4450.0,
+       "call_bid": 134.45,
+       "call_ask": 140.0,
+       "put_bid": 66.25,
+       "put_ask": 69.0
+      },
+      {
+       "strike": 4475.0,
+       "call_bid": 119.55,
+       "call_ask": 124.5,
+       "put_bid": 75.8,
+       "put_ask": 78.95
+      },
+      {
+       "strike": 4500.0,
+       "call_bid": 105.7,
+       "call_ask": 110.05,
+       "put_bid": 86.3,
+       "put_ask": 89.85
+      },
+      {
+       "strike": 4525.0,
+       "call_bid": 92.75,
+       "call_ask": 96.6,
+       "put_bid": 97.75,
+       "put_ask": 101.8
+      },
+      {
+       "strike": 4550.0,
+       "call_bid": 80.85,
+       "call_ask": 84.2,
+       "put_bid": 110.2,
+       "put_ask": 114.75
+      },
+      {
+       "strike": 4575.0,
+       "call_bid": 69.95,
+       "call_ask": 72.85,
+       "put_bid": 123.7,
+       "put_ask": 128.8
+      },
+      {
+       "strike": 4600.0,
+       "call_bid": 60.0,
+       "call_ask": 62.5,
+       "put_bid": 138.15,
+       "put_ask": 143.85
+      },
+      {
+       "strike": 4625.0,
+       "call_bid": 51.05,
+       "call_ask": 53.2,
+       "put_bid": 153.6,
+       "put_ask": 159.9
+      },
+      {
+       "strike": 4650.0,
+       "call_bid": 43.05,
+       "call_ask": 44.85,
+       "put_bid": 170.0,
+       "put_ask": 177.0
+      },
+      {
+       "strike": 4675.0,
+       "call_bid": 36.0,
+       "call_ask": 37.5,
+       "put_bid": 187.3,
+       "put_ask": 195.0
+      },
+      {
+       "strike": 4700.0,
+       "call_bid": 29.8,
+       "call_ask": 31.05,
+       "put_bid": 205.5,
+       "put_ask": 213.95
+      },
+      {
+       "strike": 4725.0,
+       "call_bid": 24.4,
+       "call_ask": 25.45,
+       "put_bid": 224.55,
+       "put_ask": 233.75
+      },
+      {
+       "strike": 4750.0,
+       "call_bid": 19.8,
+       "call_ask": 20.65,
+       "put_bid": 244.35,
+       "put_ask": 254.35
+      },
+      {
+       "strike": 4775.0,
+       "call_bid": 15.9,
+       "call_ask": 16.6,
+       "put_bid": 264.8,
+       "put_ask": 275.65
+      },
+      {
+       "strike": 4800.0,
+       "call_bid": 12.6,
+       "call_ask": 13.15,
+       "put_bid": 285.9,
+       "put_ask": 297.6
+      },
+      {
+       "strike": 4825.0,
+       "call_bid": 9.9,
+       "call_ask": 10.35,
+       "put_bid": 307.55,
+       "put_ask": 320.15
+      },
+      {
+       "strike": 4850.0,
+       "call_bid": 7.65,
+       "call_ask": 8.0,
+       "put_bid": 329.75,
+       "put_ask": 343.25
+      },
+      {
+       "strike": 4875.0,
+       "call_bid": 5.85,
+       "call_ask": 6.15,
+       "put_bid": 352.3,
+       "put_ask": 366.75
+      },
+      {
+       "strike": 4900.0,
+       "call_bid": 4.4,
+       "call_ask": 4.65,
+       "put_bid": 375.3,
+       "put_ask": 390.65
+      },
+      {
+       "strike": 4925.0,
+       "call_bid": 3.25,
+       "call_ask": 3.45,
+       "put_bid": 398.55,
+       "put_ask": 414.85
+      },
+      {
+       "strike": 4950.0,
+       "call_bid": 2.4,
+       "call_ask": 2.55,
+       "put_bid": 422.05,
+       "put_ask": 439.35
+      },
+      {
+       "strike": 4975.0,
+       "call_bid": 1.75,
+       "call_ask": 1.85,
+       "put_bid": 445.75,
+       "put_ask": 464.0
+      },
+      {
+       "strike": 5000.0,
+       "call_bid": 0.0,
+       "call_ask": 1.35,
+       "put_bid": 469.7,
+       "put_ask": 488.9
+      },
+      {
+       "strike": 5025.0,
+       "call_bid": 0.85,
+       "call_ask": 0.95,
+       "put_bid": 493.7,
+       "put_ask": 513.9
+      },
+      {
+       "strike": 5050.0,
+       "call_bid": 0.6,
+       "call_ask": 0.7,
+       "put_bid": 517.8,
+       "put_ask": 539.0
+      },
+      {
+       "strike": 5075.0,
+       "call_bid": 0.4,
+       "call_ask": 0.5,
+       "put_bid": 542.0,
+       "put_ask": 564.15
+      },
+      {
+       "strike": 5100.0,
+       "call_bid": 0.25,
+       "call_ask": 0.35,
+       "put_bid": 566.3,
+       "put_ask": 589.45
+      },
+      {
+       "strike": 5125.0,
+       "call_bid": 0.15,
+       "call_ask": 0.25,
+       "put_bid": 590.55,
+       "put_ask": 614.7
+      },
+      {
+       "strike": 5150.0,
+       "call_bid": 0.1,
+       "call_ask": 0.2,
+       "put_bid": 614.9,
+       "put_ask": 640.05
+      },
+      {
+       "strike": 5175.0,
+       "call_bid": 0.05,
+       "call_ask": 0.15,
+       "put_bid": 639.25,
+       "put_ask": 665.4
+      },
+      {
+       "strike": 5200.0,
+       "call_bid": 0.0,
+       "call_ask": 0.1,
+       "put_bid": 663.6,
+       "put_ask": 690.75
+      }
+     ]
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B34",
+    "order",
+    "synthetic"
+   ],
+   "description": "bracket fine, negative quote in the near term: E_DOMAIN from the term checks"
+  },
+  {
+   "case_id": "rulings_e_b-0003",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.2,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     100.0
+    ],
+    "call_strikes": [
+     130.0
+    ],
+    "vols": [
+     {
+      "strike": 100.0,
+      "vol": 0.01
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.01
+     }
+    ],
+    "extension_step": 5.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B36",
+    "synthetic"
+   ],
+   "description": "coarse strip with large carry: replicated variance -0.0428, below 0"
+  },
+  {
+   "case_id": "rulings_e_b-0004",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "CAP",
+    "forward_index_ratio": 1.1268,
+    "years": 5.5,
+    "strike": -1.5,
+    "discount_factor": 0.83,
+    "vol": 0.03,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B37",
+    "synthetic"
+   ],
+   "description": "1 + K <= 0: no strike ratio"
+  },
+  {
+   "case_id": "rulings_e_b-0005",
+   "operation": "infl.cap.zc_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "FLOOR",
+    "forward_index_ratio": 1.1268,
+    "years": 5.0,
+    "strike": -0.01,
+    "discount_factor": 0.8305,
+    "vol": 0.028,
+    "notional": 10000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 553.1424809100597,
+     "strike_ratio": 0.9509900499
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "ruling",
+    "E-B37",
+    "synthetic"
+   ],
+   "description": "negative ZC strike with 1 + K > 0 is priced under Black (the strike rule is YoY only)",
+   "output_classes": {
+    "strike_ratio": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "rulings_e_b-0006",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 111.25,
+    "strike": 110.0,
+    "expiry_years": 0.1,
+    "discount_factor": 0.9962,
+    "contract_size": 100000.0,
+    "vol": -0.01
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B38",
+    "synthetic"
+   ],
+   "description": "negative vol"
+  },
+  {
+   "case_id": "rulings_e_b-0007",
+   "operation": "rates.bondfut.option_price",
+   "inputs": {
+    "type": "CALL",
+    "futures_price": 111.25,
+    "strike": 110.0,
+    "expiry_years": 0.1,
+    "discount_factor": 0.9962,
+    "contract_size": 100000.0,
+    "vol": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.24525,
+     "contract_value": 1245.25
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B38",
+    "synthetic"
+   ],
+   "description": "zero vol: discounted intrinsic",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per 100 face"
+   }
+  },
+  {
+   "case_id": "rulings_e_b-0008",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 27,
+     "tenor_months": 108,
+     "strike": 0.041,
+     "notional": 10000000.0
+    },
+    "ctd_yield": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B38",
+    "synthetic"
+   ],
+   "description": "ctd_yield must be above 0"
+  },
+  {
+   "case_id": "rulings_e_b-0009",
+   "operation": "rates.bondfut.implied_vol",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 27,
+     "tenor_months": 108,
+     "strike": 0.041,
+     "notional": 10000000.0
+    },
+    "ctd_modified_duration": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B38",
+    "synthetic"
+   ],
+   "description": "ctd_modified_duration must be above 0"
+  },
+  {
+   "case_id": "rulings_e_b-0010",
+   "operation": "infl.cap.yoy_price",
+   "inputs": {
+    "model": "BLACK_76",
+    "type": "CAP",
+    "strike": 0.027,
+    "notional": 10000000.0,
+    "periods": [
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.96,
+      "yoy_forward": 0.0285,
+      "expiry_years": 0.75,
+      "vol": 0.0
+     },
+     {
+      "accrual": 1.0,
+      "discount_factor": 0.93,
+      "yoy_forward": 0.0262,
+      "expiry_years": 1.75,
+      "vol": 0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "caplets": [
+      14400.000000000013,
+      0.0
+     ],
+     "price": 14400.000000000013
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B38",
+    "synthetic"
+   ],
+   "description": "zero vol: discounted intrinsic per caplet",
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-10,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "rulings_e_b-0011",
+   "operation": "risk.corr.implied",
+   "inputs": {
+    "weights": [
+     0.5,
+     0.5
+    ],
+    "vols": [
+     0.2,
+     0.3
+    ],
+    "index_vol": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B39",
+    "synthetic"
+   ],
+   "description": "index_vol must be above 0"
+  },
+  {
+   "case_id": "rulings_e_b-0012",
+   "operation": "credit.copula.joint_default",
+   "inputs": {
+    "copula": "GAUSSIAN",
+    "default_probabilities": [
+     0.02,
+     0.03,
+     0.04
+    ],
+    "correlation": 0.3
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B40",
+    "synthetic"
+   ],
+   "description": "exactly two default probabilities"
+  },
+  {
+   "case_id": "rulings_e_b-0013",
+   "operation": "credit.copula.joint_default",
+   "inputs": {
+    "copula": "GAUSSIAN",
+    "default_probabilities": [
+     0.02,
+     0.03
+    ],
+    "correlation": 0.3,
+    "degrees_of_freedom": 4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "joint_default_probability": 0.0022875610978654965,
+     "default_correlation": 0.07066184538742745
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-50 quad"
+   ],
+   "tags": [
+    "ruling",
+    "E-B40",
+    "synthetic"
+   ],
+   "description": "degrees_of_freedom is ignored for GAUSSIAN",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "probabilities; quantiles carry about 1e-12 relative"
+   }
+  },
+  {
+   "case_id": "rulings_e_b-0014",
+   "operation": "credit.lhp.loss_cdf",
+   "inputs": {
+    "default_probability": 0.05,
+    "correlation": 0.3,
+    "recovery": 0.4,
+    "losses": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B40",
+    "synthetic"
+   ],
+   "description": "empty losses"
+  },
+  {
+   "case_id": "rulings_e_b-0015",
+   "operation": "rates.cap.strip",
+   "inputs": {
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2026-11-19",
+       "discount_factor": 0.9986040008603395
+      },
+      {
+       "date": "2026-12-14",
+       "discount_factor": 0.9959394252774483
+      },
+      {
+       "date": "2027-02-12",
+       "discount_factor": 0.989673278797288
+      },
+      {
+       "date": "2027-05-12",
+       "discount_factor": 0.9807770908259003
+      },
+      {
+       "date": "2027-11-15",
+       "discount_factor": 0.9634397330592425
+      },
+      {
+       "date": "2028-11-14",
+       "discount_factor": 0.9318539967570951
+      },
+      {
+       "date": "2029-11-15",
+       "discount_factor": 0.9012037662703272
+      },
+      {
+       "date": "2031-11-13",
+       "discount_factor": 0.839287128565213
+      },
+      {
+       "date": "2033-11-15",
+       "discount_factor": 0.7766268603223262
+      },
+      {
+       "date": "2036-11-13",
+       "discount_factor": 0.6858387444275659
+      },
+      {
+       "date": "2041-11-14",
+       "discount_factor": 0.5536981725589005
+      },
+      {
+       "date": "2046-11-15",
+       "discount_factor": 0.449831073617216
+      },
+      {
+       "date": "2056-11-14",
+       "discount_factor": 0.31789224697028523
+      }
+     ]
+    },
+    "projection": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-02-10",
+       "discount_factor": 0.9895742049842318
+      },
+      {
+       "date": "2027-05-10",
+       "discount_factor": 0.9802441863604426
+      },
+      {
+       "date": "2027-08-10",
+       "discount_factor": 0.9709393509141818
+      },
+      {
+       "date": "2027-11-10",
+       "discount_factor": 0.9618445760891611
+      },
+      {
+       "date": "2028-11-10",
+       "discount_factor": 0.9323166788327014
+      },
+      {
+       "date": "2029-11-13",
+       "discount_factor": 0.9014506533357646
+      },
+      {
+       "date": "2031-11-10",
+       "discount_factor": 0.8396105741150829
+      },
+      {
+       "date": "2036-11-10",
+       "discount_factor": 0.6867313481800761
+      }
+     ]
+    },
+    "cube": {
+     "expiries_months": [
+      6,
+      12,
+      24,
+      60
+     ],
+     "tenors_months": [
+      24,
+      60,
+      120
+     ],
+     "alpha": [
+      [
+       0.0525,
+       0.049,
+       0.046
+      ],
+      [
+       0.051,
+       0.048,
+       0.045
+      ],
+      [
+       0.049,
+       0.0465,
+       0.044
+      ],
+      [
+       0.045,
+       0.0435,
+       0.0415
+      ]
+     ],
+     "beta": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "rho": [
+      [
+       -0.2,
+       -0.25,
+       -0.3
+      ],
+      [
+       -0.22,
+       -0.27,
+       -0.31
+      ],
+      [
+       -0.25,
+       -0.29,
+       -0.33
+      ],
+      [
+       -0.28,
+       -0.31,
+       -0.35
+      ]
+     ],
+     "nu": [
+      [
+       0.55,
+       0.48,
+       0.42
+      ],
+      [
+       0.5,
+       0.44,
+       0.39
+      ],
+      [
+       0.44,
+       0.39,
+       0.35
+      ],
+      [
+       0.36,
+       0.33,
+       0.3
+      ]
+     ]
+    },
+    "trade": {
+     "type": "PAYER",
+     "expiry_months": 15,
+     "tenor_months": 30,
+     "strike": 0.041,
+     "notional": 10000000.0
+    },
+    "flat_vols": [
+     0.24,
+     0.0,
+     0.228,
+     0.222,
+     0.215
+    ],
+    "start_months": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "ruling",
+    "E-B40",
+    "order",
+    "synthetic"
+   ],
+   "description": "flat vol 0 and start_months 0: the strip's own checks (E_DOMAIN) come before D7's start_months (E_INPUT)"
+  }
+ ]
+}

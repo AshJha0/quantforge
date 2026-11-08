@@ -191,7 +191,7 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 | EB6 | Bond futures options, price and yield vol | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 10 of 12 |
 | EB8 | Correlation validation and nearest correlation (Higham) | `06-risk/correlation.md` | E6 | Specified, outside-checked | validate 15 of 17; nearest 10 of 18 |
 | EB9 | Implied correlation and dispersion | `06-risk/correlation.md` | E6 | Specified | 0 of 14 (closed forms, hand cases) |
-| EB10 | CDS options (Black on the forward spread) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked | 138 of 146 |
+| EB10 | CDS options (Black on the forward spread) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked | 168 of 176 |
 | EB11 | Gaussian and Student-t default copulas | `04-pricing/credit-options-and-copulas.md` | E8 | Specified (Gaussian re-evaluated in QuantLib, not counted: E-B28) | 0 of 14 |
 | EB12 | Large homogeneous pool (Vasicek) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified (re-evaluated in QuantLib, not counted: E-B28) | 0 of 26 |
 | EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula, YoY only) | 4 of 11 |

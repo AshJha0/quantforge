@@ -7320,6 +7320,1272 @@
     "synthetic"
    ],
    "description": "loss at or above 1 - recovery"
+  },
+  {
+   "case_id": "creditopt_e-0187",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.00648,
+    "notional": 10000000.0,
+    "vol": 0.5,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 50466.167558189474,
+     "forward_spread": 0.007123686550874618,
+     "risky_annuity": 3.9090332711363454,
+     "front_end_protection": 34011.309610348944
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0188",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.00648,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 50466.167558189474
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.5
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0189",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.00792,
+    "notional": 10000000.0,
+    "vol": 0.6,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 65490.54871413097,
+     "forward_spread": 0.007123686550874618,
+     "risky_annuity": 3.9090332711363454,
+     "front_end_protection": 34011.309610348944
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "receiver",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0190",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.00792,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 65490.54871413097
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.6
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0191",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.00756,
+    "notional": 10000000.0,
+    "vol": 0.8,
+    "knock_out": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 88455.8928852746,
+     "forward_spread": 0.007123686550874618,
+     "risky_annuity": 3.9090332711363454,
+     "front_end_protection": 34011.309610348944
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0192",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0189,
+    "notional": 10000000.0,
+    "vol": 0.5,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 132979.29774231662,
+     "forward_spread": 0.020829355418940102,
+     "risky_annuity": 3.4990417564341167,
+     "front_end_protection": 97713.73482273435
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0193",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0189,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 132979.29774231662
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.5
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0194",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0231,
+    "notional": 10000000.0,
+    "vol": 0.6,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 170039.18780273528,
+     "forward_spread": 0.020829355418940102,
+     "risky_annuity": 3.4990417564341167,
+     "front_end_protection": 97713.73482273435
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "receiver",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0195",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0231,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 170039.18780273528
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.6
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0196",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.02205,
+    "notional": 10000000.0,
+    "vol": 0.8,
+    "knock_out": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 240888.00393510843,
+     "forward_spread": 0.020829355418940102,
+     "risky_annuity": 3.4990417564341167,
+     "front_end_protection": 97713.73482273435
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0197",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0432,
+    "notional": 10000000.0,
+    "vol": 0.5,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 286841.6088799267,
+     "forward_spread": 0.04746056731823031,
+     "risky_annuity": 3.3407505973819736,
+     "front_end_protection": 223624.63284852338
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0198",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0432,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 286841.6088799267
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.5
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0199",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0528,
+    "notional": 10000000.0,
+    "vol": 0.6,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 373663.6958389455,
+     "forward_spread": 0.04746056731823031,
+     "risky_annuity": 3.3407505973819736,
+     "front_end_protection": 223624.63284852338
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "receiver",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0200",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0528,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 373663.6958389455
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.6
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0201",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-04-30",
+    "maturity": "2031-07-31",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0504,
+    "notional": 10000000.0,
+    "vol": 0.8,
+    "knock_out": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 533240.7931254874,
+     "forward_spread": 0.04746056731823031,
+     "risky_annuity": 3.3407505973819736,
+     "front_end_protection": 223624.63284852338
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0202",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.00648,
+    "notional": 10000000.0,
+    "vol": 0.5,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 72073.27595735587,
+     "forward_spread": 0.007123711689699659,
+     "risky_annuity": 4.911156695762985,
+     "front_end_protection": 48468.14285118917
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0203",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.00648,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 72073.27595735587
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.5
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0204",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.00792,
+    "notional": 10000000.0,
+    "vol": 0.6,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 93734.74491234467,
+     "forward_spread": 0.007123711689699659,
+     "risky_annuity": 4.911156695762985,
+     "front_end_protection": 48468.14285118917
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "receiver",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0205",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.00792,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 93734.74491234467
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.6
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0206",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.025,
+    "hazard_rate": 0.012,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.00756,
+    "notional": 10000000.0,
+    "vol": 0.8,
+    "knock_out": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 131824.41944646373,
+     "forward_spread": 0.007123711689699659,
+     "risky_annuity": 4.911156695762985,
+     "front_end_protection": 48468.14285118917
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0207",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0189,
+    "notional": 10000000.0,
+    "vol": 0.5,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 183468.83713956826,
+     "forward_spread": 0.02082944649310184,
+     "risky_annuity": 4.251769324006622,
+     "front_end_protection": 138339.08393004845
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0208",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0189,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 183468.83713956826
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.5
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0209",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0231,
+    "notional": 10000000.0,
+    "vol": 0.6,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 235615.67978956492,
+     "forward_spread": 0.02082944649310184,
+     "risky_annuity": 4.251769324006622,
+     "front_end_protection": 138339.08393004845
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "receiver",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0210",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0231,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 235615.67978956492
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.6
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0211",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.045,
+    "hazard_rate": 0.035,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.02205,
+    "notional": 10000000.0,
+    "vol": 0.8,
+    "knock_out": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 350136.5492315115,
+     "forward_spread": 0.02082944649310184,
+     "risky_annuity": 4.251769324006622,
+     "front_end_protection": 138339.08393004845
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0212",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0432,
+    "notional": 10000000.0,
+    "vol": 0.5,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 390465.83115885954,
+     "forward_spread": 0.0474604541624808,
+     "risky_annuity": 3.9994753518202306,
+     "front_end_protection": 316779.99687145266
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0213",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0432,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 390465.83115885954
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.5
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0214",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0528,
+    "notional": 10000000.0,
+    "vol": 0.6,
+    "knock_out": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 509497.1590624262,
+     "forward_spread": 0.0474604541624808,
+     "risky_annuity": 3.9994753518202306,
+     "front_end_protection": 316779.99687145266
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "receiver",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "creditopt_e-0215",
+   "operation": "credit.cdsoption.implied_vol",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.0528,
+    "notional": 10000000.0,
+    "knock_out": true,
+    "premium": 509497.1590624262
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.6
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50 root"
+   ],
+   "tags": [
+    "cdsoption",
+    "implied",
+    "schedule",
+    "margin",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "creditopt_e-0216",
+   "operation": "credit.cdsoption.price",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "expiry": "2027-07-15",
+    "maturity": "2033-01-15",
+    "rate": 0.02,
+    "hazard_rate": 0.08,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.0504,
+    "notional": 10000000.0,
+    "vol": 0.8,
+    "knock_out": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 768592.4463361412,
+     "forward_spread": 0.0474604541624808,
+     "risky_annuity": 3.9994753518202306,
+     "front_end_protection": 316779.99687145266
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "cdsoption",
+    "payer",
+    "schedule",
+    "margin",
+    "synthetic"
+   ],
+   "output_classes": {
+    "forward_spread": "simple_analytic",
+    "risky_annuity": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
   }
  ]
 }

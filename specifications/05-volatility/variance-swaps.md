@@ -25,7 +25,7 @@ pv            = N_var D (fair_variance - K_var)                            (long
 
 Outputs: `fair_variance`, `fair_vol`, `pv`.
 
-Checks, in order: `maturity <= as_of`: `E_INPUT`. An empty strike list, or a repeated strike within one list: `E_INPUT`. A put strike above `S0` or a call strike below `S0`: `E_INPUT`. `vols` not listing each strike of the union exactly once: `E_INPUT`. `S0 <= 0`, a vol `<= 0`, `dk <= 0`, or `K_min - dk <= 0`: `E_DOMAIN`.
+Checks, in order: `maturity <= as_of`: `E_INPUT`. An empty strike list, or a repeated strike within one list: `E_INPUT`. A put strike above `S0` or a call strike below `S0`: `E_INPUT`. `vols` not listing each strike of the union exactly once: `E_INPUT`. `S0 <= 0`, a vol `<= 0`, `dk <= 0`, or `K_min - dk <= 0` (`K_min` the lowest put strike): `E_DOMAIN`. After replication, `fair_variance < 0` (possible on a coarse strip with a large carry): `E_DOMAIN` (ruling E-B36).
 
 ## `vol.varswap.realized`
 
