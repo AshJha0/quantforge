@@ -174,7 +174,71 @@ def h_nearest(u, i, exp):
     return {"matrix": X, "frobenius_distance": math.sqrt(sum((X[a][b] - M[a][b]) ** 2 for a in range(n) for b in range(n)))}
 
 
-HANDLERS = {"risk.corr.validate": h_validate, "risk.corr.nearest": h_nearest, "vol.varswap.fair_strike": h_varswap, "rates.swaption.price_cube": h_cube, "rates.cap.strip": h_strip, "rates.bondfut.option_price": h_bf_price,
+# ---------------------------------------------------------------- E8 (QuantLib)
+def _cdso(u, i, vol):
+    a, ex, mat = QD(D(i["as_of"])), QD(D(i["expiry"])), QD(D(i["maturity"]))
+    ql.Settings.instance().evaluationDate = a
+    disc = u("CRV.FLAT_CONT_365F", a, i["rate"])
+    dp = u("CRV.FLAT_HAZARD_365F", a, i["hazard_rate"])
+    side = ql.Protection.Buyer if i["type"] == "PAYER" else ql.Protection.Seller
+    cds = ql.CreditDefaultSwap(side, i["notional"], i["strike"], u("CDS.SCHEDULE", ex, mat), ql.Unadjusted, u("DC.ACT_360"), True, True, ex)
+    cds.setPricingEngine(u("CDS.MIDPOINT", dp, i["recovery"], disc))
+    o = ql.CdsOption(cds, ql.EuropeanExercise(ex), i["knock_out"])
+    o.setPricingEngine(u("CDSO.BLACK", dp, i["recovery"], disc, vol))
+    return o, cds, dp, disc
+
+
+def h_cdso(u, i, exp):
+    o, cds, dp, disc = _cdso(u, i, i["vol"])
+    ex = QD(D(i["expiry"]))
+    fep = i["notional"] * (1 - i["recovery"]) * dp.defaultProbability(ex) * disc.discount(ex)
+    return {"price": o.NPV(), "forward_spread": o.atmRate(), "risky_annuity": o.riskyAnnuity() / i["notional"], "front_end_protection": fep}
+
+
+def h_cdso_iv(u, i, exp):
+    o, cds, dp, disc = _cdso(u, i, 0.3)
+    return {"vol": o.impliedVolatility(i["premium"], disc, dp, i["recovery"], 1e-14, 500, 1e-6, 4.0)}
+
+
+def _ninv(u, p):
+    inv, cdf, pdf = u("NORM.INVERSE")
+    x = inv(p)
+    return x - (cdf(x) - p) / pdf(x)
+
+
+def h_joint(u, i, exp):
+    if i["copula"] != "GAUSSIAN":
+        raise NotImplementedError("no bivariate Student t in the QuantLib wheel")
+    p1, p2 = i["default_probabilities"]
+    j = u("NORM.BIVARIATE", i["correlation"])(_ninv(u, p1), _ninv(u, p2))
+    return {"joint_default_probability": j, "default_correlation": (j - p1 * p2) / math.sqrt(p1 * (1 - p1) * p2 * (1 - p2))}
+
+
+def _elmin(u, p, rho, k):
+    if k >= 1:
+        return p
+    c = _ninv(u, p)
+    ms = (c - math.sqrt(1 - rho) * _ninv(u, k)) / math.sqrt(rho)
+    return p - (u("NORM.BIVARIATE", math.sqrt(rho))(c, ms) - k * u("NORM.INVERSE")[1](ms))
+
+
+def h_tranche(u, i, exp):
+    lgd = 1 - i["recovery"]
+    a, d, p, rho = i["attachment"], i["detachment"], i["default_probability"], i["correlation"]
+    hi = _elmin(u, p, rho, min(d / lgd, 1))
+    lo = _elmin(u, p, rho, min(a / lgd, 1)) if a > 0 else 0.0
+    return {"expected_loss_fraction": lgd * (hi - lo) / (d - a)}
+
+
+def h_cdf(u, i, exp):
+    p, rho, lgd = i["default_probability"], i["correlation"], 1 - i["recovery"]
+    c = _ninv(u, p)
+    cdf = u("NORM.INVERSE")[1]
+    return {"cdf": [cdf((math.sqrt(1 - rho) * _ninv(u, x / lgd) - c) / math.sqrt(rho)) for x in i["losses"]]}
+
+
+HANDLERS = {"credit.cdsoption.price": h_cdso, "credit.cdsoption.implied_vol": h_cdso_iv, "credit.copula.joint_default": h_joint, "credit.lhp.tranche_loss": h_tranche,
+            "credit.lhp.loss_cdf": h_cdf, "risk.corr.validate": h_validate, "risk.corr.nearest": h_nearest, "vol.varswap.fair_strike": h_varswap, "rates.swaption.price_cube": h_cube, "rates.cap.strip": h_strip, "rates.bondfut.option_price": h_bf_price,
             "rates.bondfut.implied_vol": h_bf_iv, "infl.cap.yoy_price": h_yoy, "infl.cap.zc_price": h_zc}
 
 
@@ -270,6 +334,7 @@ def load():
 
 NO_ORACLE = {
     "corr_e": "implied correlation and dispersion have no QuantLib object (closed forms, hand-checked); on 4 harder matrices QuantLib's Higham stops at its iteration cap before convergence",
+    "creditopt_e": "Student t copula: no bivariate t in the QuantLib wheel; LHP and Gaussian copula are checked at formula level with QuantLib's bivariate normal",
     "garch_e": "QuantLib's Garch11 is not in the Python wheel; checked by mpmath replica and a separate float replay",
     "varswap_e": "q != 0 cases: QuantLib's drift term omits q (ruling E-B3); realized-variance cases have no QuantLib object",
     "ratesvol_e": "only error cases are not counted",

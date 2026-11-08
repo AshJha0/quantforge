@@ -39,6 +39,18 @@ NEW = {
     "CORR.EIGEN": ("06-risk/correlation.md validation: eigenvalues of the symmetric input", lambda M: ql.SymmetricSchurDecomposition(M), "Jacobi rotations"),
     "CORR.HIGHAM": ("06-risk/correlation.md nearest correlation, unweighted Frobenius norm (Higham 2002)",
                     lambda M: ql.pseudoSqrt(M, ql.SalvagingAlgorithm.Higham), "returns a square root S; the repaired matrix is S S^T. QuantLib stops near 1e-6 in the iterate"),
+    # E8 credit options and copulas
+    "CDS.MIDPOINT": ("04-pricing/credit-options-and-copulas.md underlying legs: mid-point default, accrual on default ACT/360 to the mid date",
+                     lambda dp, R, h: ql.MidPointCdsEngine(dp, R, h), "the CdsOption builds its own MidPointCdsEngine on the underlying"),
+    "CDSO.BLACK": ("04-pricing/credit-options-and-copulas.md Black on the forward spread with risky annuity; front-end protection for non-knock-out payers",
+                   lambda dp, R, h, v: ql.BlackCdsOptionEngine(dp, R, h, ql.QuoteHandle(ql.SimpleQuote(v))), ""),
+    "CDS.SCHEDULE": ("04-pricing/credit-options-and-copulas.md quarterly from expiry, unadjusted, no calendar, forward generation",
+                     lambda a, b: ql.Schedule(a, b, ql.Period(3, ql.Months), ql.NullCalendar(), ql.Unadjusted, ql.Unadjusted, ql.DateGeneration.Forward, False), ""),
+    "CRV.FLAT_HAZARD_365F": ("04-pricing/credit-options-and-copulas.md flat hazard on ACT/365F", lambda a, h: ql.DefaultProbabilityTermStructureHandle(
+        ql.FlatHazardRate(a, ql.QuoteHandle(ql.SimpleQuote(h)), ql.Actual365Fixed())), ""),
+    "NORM.BIVARIATE": ("04-pricing/credit-options-and-copulas.md bivariate normal CDF", lambda rho: ql.BivariateCumulativeNormalDistributionWe04DP(rho), "West (2004) double precision"),
+    "NORM.INVERSE": ("04-pricing/credit-options-and-copulas.md normal quantile", lambda: (ql.InverseCumulativeNormal(), ql.CumulativeNormalDistribution(), ql.NormalDistribution()),
+                     "QuantLib's inverse is good to about 3e-9; one Newton step with QuantLib's own CDF and density brings it to rounding"),
 }
 ROWS = {**base.ROWS, **NEW}
 

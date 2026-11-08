@@ -262,9 +262,10 @@ Stage E spec B adds these, with no new error code and no change to the wire form
 | `vol.varswap.fair_strike`, `vol.varswap.realized` | `05-volatility/variance-swaps.md` | E7 |
 | `vol.vix.term_variance`, `vol.vix.index` | `05-volatility/vix-index.md` | E7 |
 | `risk.corr.validate`, `risk.corr.nearest`, `risk.corr.implied`, `risk.corr.dispersion` | `06-risk/correlation.md` | E6 |
+| `credit.cdsoption.price`, `credit.cdsoption.implied_vol`, `credit.copula.joint_default`, `credit.lhp.tranche_loss`, `credit.lhp.loss_cdf` | `04-pricing/credit-options-and-copulas.md` | E8 |
 | `rates.swaption.price_cube`, `rates.cap.strip`, `rates.bondfut.option_price`, `rates.bondfut.implied_vol`, `infl.cap.yoy_price`, `infl.cap.zc_price` | `05-volatility/rates-vol-cube.md` | E4 |
 
-Batch notes for these operations: `vol.garch.fit`, `rates.cap.strip`, `rates.bondfut.implied_vol` and `risk.corr.nearest` iterate; a line that fails to converge returns `E_NO_CONVERGENCE` for that line and the batch goes on. Array inputs (`returns`, `prices`, `strip`) count towards `01-core/limits.md` like any array. `initial_variance` is a string or a number: any other JSON type is `E_SCHEMA`.
+Batch notes for these operations: `vol.garch.fit`, `rates.cap.strip`, `rates.bondfut.implied_vol` `risk.corr.nearest` and `credit.cdsoption.implied_vol` iterate; a line that fails to converge returns `E_NO_CONVERGENCE` for that line and the batch goes on. Array inputs (`returns`, `prices`, `strip`) count towards `01-core/limits.md` like any array. `initial_variance` is a string or a number: any other JSON type is `E_SCHEMA`. `knock_out` must be a JSON boolean; `copula` must be `GAUSSIAN` or `STUDENT_T` (`E_SCHEMA` otherwise).
 
 ## Versioning
 

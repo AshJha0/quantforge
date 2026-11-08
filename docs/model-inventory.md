@@ -191,6 +191,9 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 | EB6 | Bond futures options, price and yield vol | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 10 of 12 |
 | EB8 | Correlation validation and nearest correlation (Higham) | `06-risk/correlation.md` | E6 | Specified, outside-checked | validate 11 of 13; nearest 7 of 14 |
 | EB9 | Implied correlation and dispersion | `06-risk/correlation.md` | E6 | Specified | 0 of 11 (closed forms, hand cases) |
+| EB10 | CDS options (Black on the forward spread) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked | 48 of 56 |
+| EB11 | Gaussian and Student-t default copulas | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked (Gaussian, formula) | 5 of 14 |
+| EB12 | Large homogeneous pool (Vasicek) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked (formula) | 21 of 26 |
 | EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 9 of 11 |
 
 ### EB1 GARCH(1,1)
@@ -239,6 +242,20 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 - **Purpose:** one average correlation from index and member vols; P&L of a vega-weighted variance dispersion trade.
 - **Limitations:** a single average correlation (no pairwise structure); no cap on variance payoffs; the P&L takes realised vols as inputs.
 - **Validation:** hand cases. **Review:** 2026-11-08.
+### EB10 CDS options
+- **Purpose:** European options on a forward CDS, with or without knock-out; implied vol.
+- **Limitations:** stylised underlying (flat hazard and rate, mid-point legs, no IMM roll, no upfront or standard coupon); Black on the spread ignores the annuity measure's dependence on default; index options (with the index's own front-end and loss settlement) are not covered.
+- **Validation:** QuantLib `BlackCdsOptionEngine` on all cases. **Review:** 2026-11-08.
+
+### EB11 Default copulas
+- **Purpose:** joint default probability of two names under a Gaussian or Student-t copula.
+- **Limitations:** two names, static horizon, one `nu`; no calibration; the copula choice drives tail risk and is a model assumption, not an output.
+- **Validation:** 50-digit quadrature; QuantLib bivariate normal for the Gaussian. **Review:** 2026-11-08.
+
+### EB12 Large homogeneous pool
+- **Purpose:** loss distribution and tranche expected loss for a large pool under the one-factor Gaussian copula.
+- **Limitations:** infinitely granular, homogeneous pool; one correlation for all tranches (so no base-correlation skew); single horizon, no tranche premium leg. Known to underprice senior tranches against market quotes.
+- **Validation:** closed form against a split fixed quadrature; QuantLib bivariate normal. **Review:** 2026-11-08.
 
 ## Review cycle
 

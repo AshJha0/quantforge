@@ -482,7 +482,13 @@ def e7():
     note(f"stage E E7: {len(MUTANTS)} wrong-convention checks, each caught")
 
 
-SLICES = {"E7": e7}
+def _lazy(mod, fn):
+    def run():
+        return getattr(__import__(mod), fn)()
+    return run
+
+
+SLICES = {"E7": e7, "E4": _lazy("gen_stage_e_b_e4", "e4"), "E6": _lazy("gen_stage_e_b_e6", "e6"), "E8": _lazy("gen_stage_e_b_e8", "e8")}
 
 
 def main():
