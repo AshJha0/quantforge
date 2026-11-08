@@ -431,7 +431,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.implied",
  "inputs":{"weights":[0.5,0.5],"vols":[0.2,0.3],"index_vol":0.22}}' | tr -d '\n' | rust/target/release/quantforge run
 ```
 
-Expected (case `corr_e-0028`): `correlation` 0.53.
+Expected (case `corr_e-0036`): `correlation` 0.53.
 
 ### Repair Higham's matrix
 
@@ -449,7 +449,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"credit.copula.joint_def
  "inputs":{"copula":"STUDENT_T","default_probabilities":[0.02,0.03],"correlation":0.3,"degrees_of_freedom":4}}' | tr -d '\n' | rust/target/release/quantforge run
 ```
 
-Expected (case `creditopt_e-0061`): `joint_default_probability` 0.005101673899339225. With `"copula":"GAUSSIAN"` and no `degrees_of_freedom` (case `creditopt_e-0057`): 0.0022875610978654965.
+Expected (case `creditopt_e-0151`): `joint_default_probability` 0.005101673899339225. With `"copula":"GAUSSIAN"` and no `degrees_of_freedom` (case `creditopt_e-0147`): 0.0022875610978654965.
 
 ### An equity tranche in the large pool
 
@@ -458,7 +458,7 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"credit.lhp.tranche_loss
  "inputs":{"default_probability":0.05,"correlation":0.3,"recovery":0.4,"attachment":0,"detachment":0.03}}' | tr -d '\n' | rust/target/release/quantforge run
 ```
 
-Expected (case `creditopt_e-0071`): `expected_loss_fraction` 0.5410575024827762.
+Expected (case `creditopt_e-0161`): `expected_loss_fraction` 0.5410575024827762.
 
 ### A CDS option
 
@@ -478,8 +478,8 @@ echo '{"schema_version":"1.0","case_id":"x","operation":"infl.cap.zc_price",
  "discount_factor":0.8305,"vol":0.028,"notional":1e7}}' | tr -d '\n' | rust/target/release/quantforge run
 ```
 
-Expected (case `ratesvol_e-0046`): `price` 5993.010165883334, `strike_ratio` 1.0: deflation protection over five years.
+Expected (case `ratesvol_e-0081`): `price` 5993.010165883334, `strike_ratio` 1.0: deflation protection over five years.
 
 ### Recipes that need curves or long arrays
 
-The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves or hundreds of numbers. Copy the `inputs` of `ratesvol_e-0001`, `ratesvol_e-0019`, `varswap_e-0001` or `garch_e-0027` from the golden file into a case document and run it the same way.
+The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves or hundreds of numbers. Copy the `inputs` of `ratesvol_e-0001`, `ratesvol_e-0049`, `varswap_e-0001` or `garch_e-0027` from the golden file into a case document and run it the same way.

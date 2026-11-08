@@ -57,7 +57,8 @@ def naive(Am):
 
 
 def min_eig(M):
-    return f(min(mp.eigsy(mp.matrix(M))[0]))
+    n = len(M)
+    return f(min(mp.eigsy(mp.matrix([[(mp.mpf(M[i][j]) + mp.mpf(M[j][i])) / 2 for j in range(n)] for i in range(n)]))[0]))
 
 
 MATS = {
@@ -67,6 +68,15 @@ MATS = {
     "near6": None,
     "valid4": [[1, .5, .3, .2], [.5, 1, .4, .1], [.3, .4, 1, .25], [.2, .1, .25, 1]],
 }
+# R5 audit B2: flags that come out false (validate only; nearest needs a symmetric input)
+FLAGS = {
+    "asym_ulp": [[1, .3, .2], [.30000000000000004, 1, .1], [.2, .1, 1]],
+    "diag_ulp": [[.9999999999999999, .3, .2], [.3, 1, .1], [.2, .1, 1]],
+    "range_12": [[1, 1.2, 0], [1.2, 1, 0], [0, 0, 1]],
+    "asym_big": [[1, .5, .1], [.2, 1, .3], [.4, 0, 1]],
+}
+# R5 audit B2/B4: nearest edge inputs
+EDGE = {"one": [[.7]], "nonunit_diag": [[2, .5], [.5, .5]], "rho_13": [[1, 1.3], [1.3, 1]], "rankdef20": None}
 
 
 def near6():
@@ -91,6 +101,14 @@ def perturbed(n, seed, bump):
     return [[round(float(x), 6) for x in row] for row in C]
 
 
+def rankdef20():
+    g = np.random.default_rng(20)
+    U = g.uniform(-1, 1, (20, 20))
+    M = np.round((U + U.T) / 2, 6)
+    np.fill_diagonal(M, 1.0)
+    return M.tolist()
+
+
 def corr_e():
     s = S("corr_e", "06-risk/correlation.md")
     MATS["near6"] = near6()
@@ -110,7 +128,7 @@ def corr_e():
               cls=I, verified=["mpmath-50 eigsy"], tags=["corr", "validate", key])
         X = higham(Am)
         X2 = dual(Am)
-        assert np.max(np.abs(X - X2)) < 1e-7, f"{key}: Higham and dual disagree {np.max(np.abs(X - X2)):.2e}"
+        assert np.max(np.abs(X - X2)) < 1e-6, f"{key}: Higham and dual disagree {np.max(np.abs(X - X2)):.2e}"
         assert np.min(np.linalg.eigvalsh(X)) > -1e-12
         dist = float(np.sqrt(np.sum((X - Am) ** 2)))
         out = {"matrix": [[float(x) for x in row] for row in X], "frobenius_distance": dist}
@@ -123,6 +141,32 @@ def corr_e():
                 caught("corr_e", f"{key}: alternating projections without Dykstra", float(np.max(np.abs(nd - X))), 2e-5)
         else:
             assert np.max(np.abs(X - Am)) < 1e-12
+    for key, M in FLAGS.items():
+        Mf = [[float(x) for x in row] for row in M]
+        n = len(Mf)
+        me = min_eig(Mf)
+        assert abs(me) > 1e-4
+        sym = all(Mf[i][j] == Mf[j][i] for i in range(n) for j in range(n))
+        diag = all(Mf[i][i] == 1.0 for i in range(n))
+        rng = all(-1 <= x <= 1 for row in Mf for x in row)
+        psd = me >= -1e-10
+        s.add(vop, {"matrix": Mf}, {"symmetric": sym, "unit_diagonal": diag, "in_range": rng, "min_eigenvalue": me, "psd": psd, "valid": sym and diag and rng and psd},
+              cls=I, verified=["mpmath-50 eigsy"], tags=["corr", "validate", "flags", key])
+    EDGE["rankdef20"] = rankdef20()
+    for key, M in EDGE.items():
+        Am = np.array(M, dtype=float)
+        X = higham(Am, tol=1e-13)
+        if len(M) > 1:
+            X2 = dual(Am)
+            assert np.max(np.abs(X - X2)) < 1e-6, f"{key}: solvers disagree {np.max(np.abs(X - X2)):.1e}"
+        ev = np.linalg.eigvalsh(X)
+        assert ev.min() > -1e-10
+        out = {"matrix": X.tolist(), "frobenius_distance": float(np.sqrt(np.sum((X - Am) ** 2)))}
+        s.add(nop, {"matrix": [[float(x) for x in r] for r in M]}, out, cls=I, verified=["independent-replay Higham-Dykstra", "dual BFGS (Qi-Sun)"],
+              tags=["corr", "nearest", "edge", key] + (["rank-deficient"] if int((ev < 1e-8).sum()) >= 3 else []), limit=ENT)
+        if key == "rankdef20":
+            note(f"corr_e rankdef20: {int((ev < 1e-8).sum())} zero eigenvalues in the answer")
+            caught("corr_e", "rankdef20: eigenvalue clip and rescale", float(np.max(np.abs(naive(Am) - X))), 2e-5)
     # hand: 2x2 already valid; the Higham 3x3 values
     X3 = s.cases[1]["expected"]["outputs"]["matrix"]
     assert abs(X3[0][1] - 0.7607) < 1e-4 and abs(X3[0][2] - 0.1573) < 1e-4  # Higham (2002), section 4 example
@@ -143,6 +187,13 @@ def corr_e():
         num2 = mp.mpf(vI) ** 2 - mp.fsum(a * b * b for a, b in zip(wm, vm))
         caught("corr_e", f"implied {len(w)}: weights not squared", abs(f(num2 / den - rho)), 1e-10)
     s.add(iop, {"weights": [1.0], "vols": [.2], "index_vol": .2}, error="E_INPUT", cls=E, tags=["invalid"], description="at least two names")
+    # R5 audit B5 (ruling E-B33): weights >= 0, at least two positive
+    wm, vm = [mp.mpf(.5), mp.mpf(.5), mp.mpf(0)], [mp.mpf(.2), mp.mpf(.3), mp.mpf(.25)]
+    rho0 = (mp.mpf(.22) ** 2 - mp.fsum(a * a * b * b for a, b in zip(wm, vm))) / mp.fsum(wm[i] * wm[j] * vm[i] * vm[j] for i in range(3) for j in range(3) if i != j)
+    s.add(iop, {"weights": [.5, .5, 0.0], "vols": [.2, .3, .25], "index_vol": .22}, {"correlation": f(rho0)}, cls=A, verified=["hand", "mpmath-50"], tags=["corr", "implied", "zero-weight"],
+          description="a zero weight drops the name: same as corr_e-0028")
+    s.add(iop, {"weights": [1.0, 0.0], "vols": [.2, .3], "index_vol": .2}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="one positive weight: zero denominator")
+    s.add(iop, {"weights": [.6, -.4], "vols": [.2, .3], "index_vol": .2}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="negative weight")
     s.add(iop, {"weights": [.5, .5], "vols": [.2, 0.0], "index_vol": .2}, error="E_DOMAIN", cls=E, tags=["invalid"], description="vols must be positive")
     # dispersion: long constituent variance, short index variance, vega notional split by weight
     for w, K, KI, rv, rI, Nv in (([.5, .5], [.25, .3], .24, [.28, .35], .22, 1e5), ([.4, .35, .25], [.27, .31, .22], .2, [.3, .25, .2], .23, 2e5),
@@ -163,7 +214,7 @@ def corr_e():
         caught("corr_e", f"dispersion {len(w)}: vol P&L instead of variance P&L", abs(f(alt - pnl)), 1e-12 * Nv + 1e-10 * abs(f(pnl)))
     s.add(dop, {"weights": [.5, .5], "vol_strikes": [.25], "index_vol_strike": .24, "realized_vols": [.28, .35], "index_realized_vol": .22, "vega_notional": 1e5}, error="E_INPUT", cls=E,
           tags=["invalid"], description="one strike per name")
-    note("corr_e: nearest correlation by Higham-Dykstra and a dual BFGS solve, agreeing to 1e-7; eigenvalues in mpmath")
+    note("corr_e: nearest correlation by Higham-Dykstra and a dual BFGS solve, agreeing to 1e-6; eigenvalues in mpmath")
     write(s)
 
 

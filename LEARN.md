@@ -292,7 +292,7 @@ Specified, with goldens; the four builds are in progress, so nothing below is "i
 
 ## Stage E, spec B: rates vol, correlation, GARCH and variance, credit options
 
-**What is being built.** Four slices of stage E (target v0.5): E4 rates and inflation vol, E6 correlation, E7 GARCH, variance swaps and a VIX-style index, E8 CDS options, copulas and the large-pool model. Specs: `specifications/05-volatility/rates-vol-cube.md`, `garch.md`, `variance-swaps.md`, `vix-index.md`, `specifications/06-risk/correlation.md`, `specifications/04-pricing/credit-options-and-copulas.md`; rulings E-B1 to E-B26 in `specifications/stage-e-rulings-b.md`. Goldens: `datasets/golden/stage_e_b/`, 268 cases, 145 of them re-priced in QuantLib 1.44 (`oracle/outside_register_e_b.json`). The language builds are landing, so the numbers below are the oracle's expected values, not yet CLI output. All inputs are synthetic.
+**What is being built.** Four slices of stage E (target v0.5): E4 rates and inflation vol, E6 correlation, E7 GARCH, variance swaps and a VIX-style index, E8 CDS options, copulas and the large-pool model. Specs: `specifications/05-volatility/rates-vol-cube.md`, `garch.md`, `variance-swaps.md`, `vix-index.md`, `specifications/06-risk/correlation.md`, `specifications/04-pricing/credit-options-and-copulas.md`; rulings E-B1 to E-B26 in `specifications/stage-e-rulings-b.md`. Goldens: `datasets/golden/stage_e_b/`, 404 cases, 245 of them re-priced in QuantLib 1.44 under ruling E-B28 (`oracle/outside_register_e_b.json`). The language builds are landing, so the numbers below are the oracle's expected values, not yet CLI output. All inputs are synthetic.
 
 ### Why a swaption cube interpolates parameters, not vols
 
@@ -308,7 +308,7 @@ Specified, with goldens; the four builds are in progress, so nothing below is "i
 
 **Formal statement.** Caplet vols are constant on each segment between cap maturities. Segment `k` solves `known caplets + new caplets at v_k = cap k at its flat vol`; the left side rises with `v_k`, so the root is unique when it exists. No positive root gives `E_ARBITRAGE` (rulings E-B9, E-B10). Brigo and Mercurio (2006), chapter 6, describe caplet stripping from cap quotes.
 
-**Worked example.** `ratesvol_e-0019`: flat vols 24.0, 23.5, 22.8, 22.2, 21.5% give caplet vols 24.00, 23.14, 21.96, 21.10, 19.71%. The first segment equals the first quote; later ones fall faster than the quotes, as they must. `ratesvol_e-0023` quotes 30%, 30%, 12%: the third cap is cheaper than the caplets the first two already fix, so the result is `E_ARBITRAGE`.
+**Worked example.** `ratesvol_e-0049`: flat vols 24.0, 23.5, 22.8, 22.2, 21.5% give caplet vols 24.00, 23.14, 21.96, 21.10, 19.71%. The first segment equals the first quote; later ones fall faster than the quotes, as they must. `ratesvol_e-0058` quotes 30%, 30%, 12%: the third cap is cheaper than the caplets the first two already fix, so the result is `E_ARBITRAGE`.
 
 ### GARCH(1,1): volatility that remembers
 
@@ -348,7 +348,7 @@ Specified, with goldens; the four builds are in progress, so nothing below is "i
 
 **Formal statement.** `rho = (sigma_I^2 - sum w_i^2 sigma_i^2) / sum_{i != j} w_i w_j sigma_i sigma_j`, not clipped (ruling E-B20); dispersion legs are variance notionals `N w_i/(2 K_i)` long and `N/(2 K_I)` short (ruling E-B21; `correlation.md`).
 
-**Worked example.** `corr_e-0028`: weights 0.5 and 0.5, vols 20% and 30%, index 22%: `(0.0484 - 0.0325)/0.03 = 0.53`. Dispersion `corr_e-0035`: implied correlation at the strikes 0.519, realised -0.037; P&L `1,590 + 2,708.33 + 1,916.67 = 6,215` on 100,000 of vega.
+**Worked example.** `corr_e-0036`: weights 0.5 and 0.5, vols 20% and 30%, index 22%: `(0.0484 - 0.0325)/0.03 = 0.53`. Dispersion `corr_e-0046`: implied correlation at the strikes 0.519, realised -0.037; P&L `1,590 + 2,708.33 + 1,916.67 = 6,215` on 100,000 of vega.
 
 ### CDS options and front-end protection
 
@@ -364,8 +364,8 @@ Specified, with goldens; the four builds are in progress, so nothing below is "i
 
 **Formal statement.** Joint default `Phi_2(Phi^-1 p1, Phi^-1 p2; rho)`, or the bivariate t version. In the pool, `P(M) = Phi((Phi^-1 p - sqrt(rho) M)/sqrt(1 - rho))`, loss `(1 - R) P(M)`, and `E[min(P, k)] = p - Phi_2(c, m*; sqrt rho) + k Phi(m*)` (`credit-options-and-copulas.md`, rulings E-B24, E-B25; Li 2000; Demarta and McNeil 2005; Vasicek 1991, 2002).
 
-**Worked example.** `creditopt_e-0057` and `-0061`: default probabilities 2% and 3%, correlation 0.3. Gaussian joint default 0.229%, t with 4 degrees of freedom 0.510%: more than twice as likely. Pool `creditopt_e-0071` to `-0076` (p 5%, rho 0.3, recovery 40%): the 0-3% tranche expects to lose 54.1% of its notional, the 30-100% tranche 0.008%.
+**Worked example.** `creditopt_e-0147` and `-0151`: default probabilities 2% and 3%, correlation 0.3. Gaussian joint default 0.229%, t with 4 degrees of freedom 0.510%: more than twice as likely. Pool `creditopt_e-0161` to `-0166` (p 5%, rho 0.3, recovery 40%): the 0-3% tranche expects to lose 54.1% of its notional, the 30-100% tranche 0.008%.
 
 ### What is not checked by an outside library
 
-QuantLib's Python wheel has no GARCH, no VIX method, no bivariate t and no large-pool loss model, so those goldens rest on hand cases, 50-digit or exact-rational replicas and separate float replays. Spec B's outside share is 145 of 268 (54.1%); stage-wide with spec A it is 408 of 678 (60.2%) (`specifications/05-volatility/stage-e-targets-b.md`).
+QuantLib's Python wheel has no GARCH, no VIX method, no bivariate t and no large-pool loss model (the Gaussian copula and pool formulas can be re-evaluated with its bivariate normal, but that checks the spec's algebra with itself, so it does not count), so those goldens rest on hand cases, 50-digit or exact-rational replicas and separate float replays. Spec B's outside share is 245 of 404 (60.6%), counting a case only if every output is a QuantLib value; stage-wide with spec A it is 508 of 814 (62.4%) (`specifications/05-volatility/stage-e-targets-b.md`).
