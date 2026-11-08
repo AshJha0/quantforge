@@ -1,16 +1,22 @@
 # Stage E spec A: outside-oracle coverage
 
-Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, reproduces every output within the case's own tolerance. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.
+Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, reproduces every output within the case's own tolerance, and every output is a QuantLib value or plain arithmetic on QuantLib values (ruling E-A17). Cases where QuantLib matches but some output is the spec's own algebra (SVI wing lists, the sticky-delta smile term) are listed as partly outside and not counted. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.
 
 | Suite | Outside-oracle cases | Cases | Share |
 |---|---|---|---|
-| `surf_e` | 9 | 28 | 32% |
-| `lv_e` | 22 | 39 | 56% |
+| `surf_e` | 0 | 32 | 0% |
+| `lv_e` | 16 | 43 | 37% |
 | `fxs_e` | 114 | 125 | 91% |
-| **spec A total** | **145** | **192** | **75.5%** |
+| `heston_e` | 18 | 38 | 47% |
+| `slv_e` | 0 | 8 | 0% |
+| partly outside, not counted | 16 | | |
+| **spec A total** | **148** | **246** | **60.2%** |
 
 Operations with no QuantLib route:
 
+- `vol.merton.price`: the QuantLib 1.44 Python wheel does not expose JumpDiffusionEngine or Merton76Process pricing; checked by Poisson series, Lewis at 256 nodes and 30-digit mpmath
+- `vol.heston.cf`: QuantLib does not expose the characteristic function; checked against 30-digit mpmath
+- `vol.slv.leverage`: a reference scheme, judged as a recipe; QuantLib HestonSLVFDMModel uses another grid and scheme, so it cannot reproduce the numbers
 - `vol.ssvi.to_svi`: QuantLib has no SSVI; checked by replay through vol.ssvi.evaluate
 - `vol.svi.fit_surface`: fit judged on known-truth parameters; QuantLib's SviInterpolatedSmileSection fits by its own optimiser path
 - `vol.local.dupire`: QuantLib's LocalVolSurface needs a BlackVolTermStructure; none reproduces SVI slices linear in total variance. Checked by a 40-digit price-based Dupire
@@ -32,3 +38,8 @@ QuantLib 1.44. Review: self-reviewed 2026-11-08, self-assessment, not an outside
 | `FX.ATM_TYPE` | 05-volatility/fx-smile.md ATM SPOT, FORWARD, DNS | `{"SPOT": ql.DeltaVolQuote.AtmSpot, "FORWARD": ql.DeltaVolQuote.AtmFwd, "DNS": ql.DeltaVolQuote.AtmDeltaNeutral` | QuantLib AtmDeltaNeutral depends on the delta type, as the spec |
 | `FX.DELTA_CALC` | 05-volatility/fx-smile.md deltas and strikes; discount factors exp(-r T), continuous | `ql.BlackDeltaCalculator(ql.Option.Call if ot == "CALL" else ql.Option.Put, dtq, S, Dd, Df, sd), ""` |  |
 | `FX.GK` | 05-volatility/fx-smile.md Garman-Kohlhagen: flat continuous rd, rf on ACT/365F, expiry days/365 | `ql.BlackScholesMertonProcess(ql.QuoteHandle(ql.SimpleQuote(S` | Garman-Kohlhagen is BlackScholesMertonProcess with the foreign curve as dividend curve (the SWIG wheel has no GarmanKohlhagenProcess); engine AnalyticEuropeanEngine; vega per unit vol |
+| `TS.FLAT_CONT` | 05-volatility/heston-family.md flat continuous r, q on ACT/365F; expiry days/365 | `ql.YieldTermStructureHandle(ql.FlatForward(ref, r, ql.Actual365Fixed(), ql.Continuous)), ""` |  |
+| `HESTON.PROCESS` | 05-volatility/heston-family.md heston {v0, kappa, theta, xi, rho} | `ql.HestonProcess(rt, qt, ql.QuoteHandle(ql.SimpleQuote(S)), h["v0"], h["kappa"], h["theta"], h["xi"], h["rho"]` | QuantLib argument order (v0, kappa, theta, sigma, rho); sigma = xi |
+| `HESTON.ENGINE` | 05-volatility/heston-family.md Lewis price, target 1e-8 | `ql.AnalyticHestonEngine(m, 1e-13, 1000000), "adaptive Gauss-Lobatto, relative 1e-13"` | adaptive Gauss-Lobatto, relative 1e-13 |
+| `BATES.PROCESS` | 05-volatility/heston-family.md jumps {intensity, mean_log_jump, log_jump_vol}, compensated | `ql.BatesProcess(rt, qt, ql.QuoteHandle(ql.SimpleQuote(S)), h["v0"], h["kappa"], h["theta"], h["xi"], h["rho"],` | QuantLib (lambda, nu, delta): nu is the mean of ln(1+J) |
+| `BATES.ENGINE` | 05-volatility/heston-family.md Bates price | `ql.BatesEngine(m, 1e-13, 1000000), ""` |  |

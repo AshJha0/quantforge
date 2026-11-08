@@ -5,8 +5,8 @@ Spec version 1.0.0. Status: Specified. Stage E, slice E1 (spec A). `stage-e-ruli
 Builds on `smile-and-surface.md` (stage C): raw SVI, its domain, `g`, SSVI and the power law `phi` are defined there and are not repeated. Log-moneyness `k = ln(K/F(T))` at each expiry's own forward. Total variance `w = sigma^2 T`.
 
 Sources:
-- [GJ14] J. Gatheral, A. Jacquier, "Arbitrage-free SVI volatility surfaces", *Quantitative Finance* 14(1), 2014, pp. 59-71. Section 2.2 (calendar: `w(k, T)` non-decreasing in `T` at fixed `k`, Lemma 2.1), section 2.3 (butterfly: `g(k) >= 0` and `d_+(k) -> -inf`, Lemma 2.2), section 3 (SSVI and its SVI slices), section 5 (Vogt counterexample).
-- [Lee04] R. Lee, "The moment formula for implied volatility at extreme strikes", *Mathematical Finance* 14(3), 2004, pp. 469-480. Theorem 3.2: `limsup w(k)/|k| <= 2` in both wings.
+- [GJ14] J. Gatheral, A. Jacquier, "Arbitrage-free SVI volatility surfaces", *Quantitative Finance* 14(1), 2014, pp. 59-71. Section 2.1 (calendar: `w(k, T)` non-decreasing in `T` at fixed `k`, Lemma 2.1), section 2.2 (butterfly: `g(k) >= 0` and `d_+(k) -> -inf`, Lemma 2.2), section 4 (SSVI, eq. 4.1; its slices are raw SVI), Example 3.1 (section 3.4, parameters eq. 3.8: the Vogt smile; revisited in Example 5.1). Section numbers as the arXiv version 1204.0646, checked by the R5 audit.
+- [Lee04] R. Lee, "The moment formula for implied volatility at extreme strikes", *Mathematical Finance* 14(3), 2004, pp. 469-480. Theorem 3.2: `limsup w(k)/|k| <= 2` in both wings (not opened: paywalled; the bound is restated in [GJ14] section 2.2).
 
 ## Object `slices`
 
@@ -27,7 +27,7 @@ Outputs:
 | `wing_violations` | `{expiry_index, side, kind}`; see below |
 | `arbitrage_free` | all three lists empty |
 
-Comparisons are strict, with no tolerance (ruling E-A1). Lists are ordered by `expiry_index`, then `k_index`.
+Comparisons have no tolerance (ruling E-A1); each is strict as written, and the Lee test is `>= 2` (ruling E-A15). Lists are ordered by `expiry_index`, then `k_index`.
 
 **Wings** (grid-free). For slice `P = (a, b, rho, m, sigma)` the asymptotes of `w` in `|k|` are
 
@@ -36,12 +36,12 @@ Comparisons are strict, with no tolerance (ruling E-A1). Lists are ordered by `e
 
 computed in binary64 exactly as written. Per slice, in this order:
 
-1. `{j, "LEFT", "LEE"}` if `sL > 2`; `{j, "RIGHT", "LEE"}` if `sR > 2` [Lee04].
+1. `{j, "LEFT", "LEE"}` if `sL >= 2`; `{j, "RIGHT", "LEE"}` if `sR >= 2`. [Lee04] bounds the slope by 2; [GJ14] Lemma 2.2 also needs `d_+(k) -> -inf`, which fails at a slope of exactly 2 (`d_+` tends to 0), so 2 itself is flagged (ruling E-A15).
 2. For `j >= 1`, per side (LEFT then RIGHT), with `s, c` this slice's and `s', c'` the previous slice's: `{j, side, "CALENDAR"}` if `s < s'`, or if `s == s'` and `c < c'`. A smaller slope means the later slice crosses below the earlier one far out in that wing, wherever the grid ends (ruling E-A2).
 
 If `reject` is true and `arbitrage_free` is false: `E_ARBITRAGE`, no outputs.
 
-This is a check on the given grid plus the asymptotes. It is not a proof of no arbitrage between grid points; a caller who needs that uses a finer grid. [GJ14] Lemma 2.2 also needs `d_+ -> -inf`, which holds for raw SVI with `sR < 2`.
+This is a check on the given grid plus the asymptotes. It is not a proof of no arbitrage between grid points; a caller who needs that uses a finer grid. With `sL, sR < 2` (enforced above) raw SVI has `d_+ -> -inf`, the second condition of [GJ14] Lemma 2.2.
 
 ## `vol.ssvi.to_svi`
 
@@ -51,7 +51,7 @@ With `phi = eta theta^-gamma (1+theta)^(gamma-1)`, output `svi`:
 
 `a = theta (1 - rho^2)/2`, `b = theta phi/2`, `rho = rho`, `m = -rho/phi`, `sigma = sqrt(1 - rho^2)/phi`.
 
-This SVI slice equals the SSVI slice at every `k` ([GJ14] section 3; check by substitution: `b (rho (k-m) + sqrt((k-m)^2 + sigma^2)) = theta/2 (rho phi k + rho^2 + sqrt((phi k + rho)^2 + 1 - rho^2))`).
+This SVI slice equals the SSVI slice at every `k` ([GJ14] section 4; check by substitution: `b (rho (k-m) + sqrt((k-m)^2 + sigma^2)) = theta/2 (rho phi k + rho^2 + sqrt((phi k + rho)^2 + 1 - rho^2))`).
 
 ## `vol.svi.fit_surface`
 

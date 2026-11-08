@@ -5,11 +5,11 @@ Spec version 1.0.0. Status: Specified. Stage E, slice E1 (spec A). `stage-e-ruli
 Notation as `arb-free-surfaces.md`: `k = ln(K/F(T))`, `w = sigma^2 T`, `slices` the SVI slice object with its checks.
 
 Sources:
-- [Dup94] B. Dupire, "Pricing with a smile", *Risk* 7(1), 1994, pp. 18-20.
-- [Gat06] J. Gatheral, *The Volatility Surface*, Wiley, 2006, chapter 1, equation (1.10): local variance in total-variance form.
+- [Dup94] B. Dupire, "Pricing with a smile", *Risk* 7(1), 1994, pp. 18-20 (not opened).
+- [Gat06] J. Gatheral, *The Volatility Surface*, Wiley, 2006, chapter 1, equation (1.10): local variance in total-variance form (not opened; the formula is checked here by a 40-digit price-based Dupire).
 - [GJ14] as `arb-free-surfaces.md`, equation (2.1), the function `g`.
-- [Der99] E. Derman, "Regimes of volatility", *Risk* 12(4), 1999, pp. 55-59: sticky-strike and sticky-delta (sticky-moneyness) regimes.
-- [Hull] J. Hull, *Options, Futures, and Other Derivatives*, 11th ed., Pearson, 2021, chapter 20 (volatility term structures: variance is additive over time).
+- [Der99] E. Derman, "Regimes of volatility", *Risk* 12(4), 1999, pp. 55-59: sticky-strike and sticky-delta (sticky-moneyness) regimes (not opened).
+- [Hull] J. Hull, *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Volatility Smiles and Volatility Surfaces" (volatility term structure; variance is additive over time) (not opened; 10th edition as every other spec).
 
 ## Surface between slices (ruling E-A4)
 
@@ -42,7 +42,7 @@ Inputs: `expiry_years` (strictly increasing, at least 1, else `E_INPUT`), `vols`
 
 Output `forward_vols`: `forward_vols[0] = vols[0]`, and for `i >= 1`
 
-`forward_vols[i] = sqrt((vols[i]^2 T_i - vols[i-1]^2 T_{i-1}) / (T_i - T_{i-1}))` [Hull ch. 20].
+`forward_vols[i] = sqrt((vols[i]^2 T_i - vols[i-1]^2 T_{i-1}) / (T_i - T_{i-1}))` [Hull].
 
 A negative radicand is calendar arbitrage: `E_ARBITRAGE`. Zero is allowed and gives 0 (ruling E-A5).
 
