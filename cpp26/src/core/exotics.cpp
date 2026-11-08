@@ -102,6 +102,7 @@ double barrier_price(const ExoticMarket& m, double h, double rebate, BarrierType
 }
 
 double asian_geometric(const ExoticMarket& m, bool continuous, const std::vector<double>& fix) {
+    check_common(m);  // input order: the common checks come before the fixing rules (ruling E-A38)
     if (continuous) {
         if (!fix.empty()) throw Error("E_INPUT", "CONTINUOUS takes no fixing_years", "fixing_years");
     } else {
@@ -109,7 +110,6 @@ double asian_geometric(const ExoticMarket& m, bool continuous, const std::vector
         for (std::size_t i = 1; i < fix.size(); ++i)
             if (!(fix[i - 1] < fix[i])) throw Error("E_INPUT", "fixing_years must increase", "fixing_years");
     }
-    check_common(m);
     const double t = m.expiry_years, v = m.vol, b = m.rate - m.dividend_yield;
     if (!continuous)
         for (const double f : fix)
@@ -211,8 +211,8 @@ BasketPrice basket_moment(const std::vector<double>& f, const std::vector<double
 }
 
 AmericanTree american_crr(const ExoticMarket& m, long long steps) {
-    if (steps < 1) throw Error("E_INPUT", "steps must be at least 1", "steps");
     if (steps > 20000) throw Error("E_LIMIT", "steps is above its limit", "steps");
+    if (steps < 1) throw Error("E_INPUT", "steps must be at least 1", "steps");
     check_common(m);
     const std::size_t n = std::size_t(steps);
     const double dt = m.expiry_years / double(n), u = std::exp(m.vol * std::sqrt(dt)), d = 1 / u;
@@ -265,10 +265,10 @@ double american_baw(const ExoticMarket& m) {
 }
 
 FdResult american_fd(const ExoticMarket& m, bool american, const FdGrid& g) {
-    if (g.nx < 5 || g.nx % 2 == 0) throw Error("E_INPUT", "nx must be odd and at least 5", "grid");
     if (g.nx > 1001) throw Error("E_LIMIT", "nx is above its limit", "grid");
-    if (g.nt < 1) throw Error("E_INPUT", "nt must be at least 1", "grid");
     if (g.nt > 10000) throw Error("E_LIMIT", "nt is above its limit", "grid");
+    if (g.nx < 5 || g.nx % 2 == 0) throw Error("E_INPUT", "nx must be odd and at least 5", "grid");
+    if (g.nt < 1) throw Error("E_INPUT", "nt must be at least 1", "grid");
     check_common(m);
     positive(g.width, "width");
     const std::size_t nx = std::size_t(g.nx), c = (nx - 1) / 2;

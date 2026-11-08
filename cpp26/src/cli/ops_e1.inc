@@ -41,6 +41,8 @@ void op_svi_surface_check(const In& in, Out& out) {
     const Vec k = in.reals("log_moneyness");
     const bool reject = in.boolean("reject");
     in.ready();
+    limit_if(slices.size() > 100, "slices");
+    limit_if(k.size() > 10000, "log_moneyness");
     write_check(out, svi_surface_check(slices, k, reject));
 }
 
@@ -55,6 +57,8 @@ void op_svi_fit_surface(const In& in, Out& out) {
     const Matrix w = in.matrix("total_variance");
     const bool reject = in.boolean("reject");
     in.ready();
+    limit_if(t.size() > 100, "expiry_years");
+    limit_if(k.size() > max_quotes, "log_moneyness");
     const SurfaceFit f = svi_fit_surface(t, k, w, reject);
     out.values.key("slices");
     out.values.begin_array();
@@ -74,6 +78,8 @@ void op_local_dupire(const In& in, Out& out) {
     const auto points = rows_of<LocalVolPoint>(
         in, "points", [](const In& p) { return LocalVolPoint{p.real("expiry_years"), p.real("log_moneyness")}; });
     in.ready();
+    limit_if(slices.size() > 100, "slices");
+    limit_if(points.size() > 10000, "points");
     const LocalVol r = local_vol_dupire(slices, points);
     out.key_reals("total_variance", r.total_variance);
     out.key_reals("implied_vol", r.implied_vol);
@@ -83,6 +89,7 @@ void op_local_dupire(const In& in, Out& out) {
 void op_forward_vol(const In& in, Out& out) {
     const Vec t = in.reals("expiry_years"), v = in.reals("vols");
     in.ready();
+    limit_if(t.size() > max_quotes || v.size() > max_quotes, "expiry_years");
     out.key_reals("forward_vols", forward_vols(t, v));
 }
 
@@ -98,6 +105,7 @@ void op_smile_dynamics(const In& in, Out& out) {
     s.rule = in.choice<SmileRule>("rule", {{"STICKY_STRIKE", SmileRule::StickyStrike}, {"STICKY_DELTA", SmileRule::StickyDelta}});
     s.type = in.choice("option_type", option_types);
     in.ready();
+    limit_if(s.strikes.size() > max_quotes, "strikes");
     const SmileDynamics r = smile_dynamics(s);
     out.key_reals("vols_base", r.vols_base);
     out.key_reals("vols_shifted", r.vols_shifted);
@@ -111,6 +119,7 @@ void op_volofvol(const In& in, Out& out) {
     const double ppy = in.real("periods_per_year");
     const VolChange m = in.choice<VolChange>("method", {{"LOG", VolChange::Log}, {"ABSOLUTE", VolChange::Absolute}});
     in.ready();
+    limit_if(v.size() > 10000, "vols");
     const VolOfVol r = vol_of_vol(v, ppy, m);
     out.key_real("mean_change", r.mean_change);
     out.key_real("vol_of_vol", r.vol_of_vol);

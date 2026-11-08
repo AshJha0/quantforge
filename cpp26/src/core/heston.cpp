@@ -180,16 +180,19 @@ std::vector<double> merton_price(const EquityOption& o, double vol, const Jumps&
 
 SlvLeverage slv_leverage(double spot, double t, double r, double q, const HestonParams& h,
                          const std::vector<SviSlice>& slices, const SlvGrid& g) {
-    if (!(spot > 0)) domain("spot is not above 0", "spot");
-    if (!(t > 0)) domain("expiry_years is not above 0", "expiry_years");
-    check_heston(h);
-    check_slices(slices);
+    // E_LIMIT right after schema (ruling E-A34), then every E_INPUT rule, then E_DOMAIN, each in input order (E-A37).
+    if (slices.size() > 100) throw Error("E_LIMIT", "slices is above its limit", "slices");
+    if (g.nx > (long long)max_grid || g.nv > (long long)max_grid || g.nt > (long long)max_steps)
+        throw Error("E_LIMIT", "the grid is above its limit", "grid");
+    check_slices_input(slices);
     if (g.nx < 5 || g.nv < 5 || g.nt < 2) throw Error("E_INPUT", "nx and nv need 5, nt needs 2", "grid");
     if (!(g.x_min < std::log(spot) && std::log(spot) < g.x_max))
         throw Error("E_INPUT", "x_min < ln(spot) < x_max is needed", "grid");
+    if (!(spot > 0)) domain("spot is not above 0", "spot");
+    if (!(t > 0)) domain("expiry_years is not above 0", "expiry_years");
+    check_heston(h);
+    check_slices_domain(slices);
     if (!(g.v_max > 0)) domain("v_max is not above 0", "grid");
-    if (std::size_t(g.nx) > max_grid || std::size_t(g.nv) > max_grid || std::size_t(g.nt) > max_steps)
-        throw Error("E_LIMIT", "the grid is above its limit", "grid");
 
     const std::size_t nx = std::size_t(g.nx), nv = std::size_t(g.nv);
     const double dx = (g.x_max - g.x_min) / double(nx - 1), dv = g.v_max / double(nv + 1), dt = t / double(g.nt);

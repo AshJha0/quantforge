@@ -15,6 +15,9 @@ struct SviSlice {
 };
 /// The slices object checks, in the spec's order (E_INPUT, E_DOMAIN, then E_LIMIT above 100 slices).
 void check_slices(const std::vector<SviSlice>& slices);
+/// The two halves of check_slices, for operations that put every E_INPUT rule first (ruling E-A37).
+void check_slices_input(const std::vector<SviSlice>& slices);
+void check_slices_domain(const std::vector<SviSlice>& slices);
 
 struct GridViolation {
     std::size_t expiry_index, k_index;

@@ -54,20 +54,28 @@ double black_forward(double f, double k, double v, double t, double d, OptionTyp
 }  // namespace
 
 void check_slices(const std::vector<SviSlice>& sl) {
+    if (sl.size() > max_slices) throw Error("E_LIMIT", "slices is above its limit", "slices");  // ruling E-A34
+    check_slices_input(sl);
+    check_slices_domain(sl);
+}
+
+void check_slices_input(const std::vector<SviSlice>& sl) {
     if (sl.empty()) throw Error("E_INPUT", "slices is empty", "slices");
     for (std::size_t j = 1; j < sl.size(); ++j)
         if (!(sl[j - 1].expiry_years < sl[j].expiry_years))
             throw Error("E_INPUT", "expiry_years is not strictly increasing", "slices");
+}
+
+void check_slices_domain(const std::vector<SviSlice>& sl) {
     for (const SviSlice& s : sl)
         if (s.expiry_years <= 0) throw Error("E_DOMAIN", "expiry_years is not above 0", "slices");
     for (const SviSlice& s : sl) check_svi(s.svi);
-    if (sl.size() > max_slices) throw Error("E_LIMIT", "slices is above its limit", "slices");
 }
 
 SviSurfaceCheck svi_surface_check(const std::vector<SviSlice>& sl, const std::vector<double>& k, bool reject) {
+    if (k.size() > max_points) throw Error("E_LIMIT", "log_moneyness is above its limit", "log_moneyness");
     check_slices(sl);
     check_increasing(k, "log_moneyness", 1);
-    if (k.size() > max_points) throw Error("E_LIMIT", "log_moneyness is above its limit", "log_moneyness");
     SviSurfaceCheck c;
     for (std::size_t j = 0; j < sl.size(); ++j)
         for (std::size_t i = 0; i < k.size(); ++i)
@@ -116,9 +124,9 @@ SurfaceFit svi_fit_surface(const std::vector<double>& t, const std::vector<doubl
 }
 
 LocalVol local_vol_dupire(const std::vector<SviSlice>& sl, const std::vector<LocalVolPoint>& pts) {
+    if (pts.size() > max_points) throw Error("E_LIMIT", "points is above its limit", "points");
     check_slices(sl);
     if (pts.empty()) throw Error("E_INPUT", "points is empty", "points");
-    if (pts.size() > max_points) throw Error("E_LIMIT", "points is above its limit", "points");
     for (const LocalVolPoint& p : pts)
         if (p.expiry_years <= 0) throw Error("E_DOMAIN", "a point's expiry_years is not above 0", "points");
     LocalVol out;
@@ -139,6 +147,7 @@ LocalVol local_vol_dupire(const std::vector<SviSlice>& sl, const std::vector<Loc
 std::vector<double> forward_vols(const std::vector<double>& t, const std::vector<double>& v) {
     check_increasing(t, "expiry_years", 1);
     if (v.size() != t.size()) throw Error("E_INPUT", "vols and expiry_years differ in length", "vols");
+    if (!(t[0] > 0)) throw Error("E_DOMAIN", "the first expiry is not above 0", "expiry_years");  // ruling E-A36
     for (const double x : v)
         if (x <= 0) throw Error("E_DOMAIN", "a vol is not above 0", "vols");
     std::vector<double> out{v[0]};

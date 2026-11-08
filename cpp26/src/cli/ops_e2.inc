@@ -30,6 +30,7 @@ void op_heston_cf(const In& in, Out& out) {
     const HestonParams h = heston_of(in);
     const Vec u = in.reals("u");
     in.ready();
+    limit_if(u.size() > max_quotes, "u");
     if (u.empty()) throw Error("E_INPUT", "u is empty", "u");
     if (!(t > 0)) throw Error("E_DOMAIN", "expiry_years is not above 0", "expiry_years");
     check_heston(h);
@@ -49,6 +50,7 @@ void op_heston_price(const In& in, Out& out) {
     const EquityOption o = equity_option_of(in);
     const HestonParams h = heston_of(in);
     in.ready();
+    limit_if(o.strikes.size() > max_quotes, "strikes");
     out.key_reals("prices", heston_price(o, h));
 }
 
@@ -57,6 +59,7 @@ void op_bates_price(const In& in, Out& out) {
     const HestonParams h = heston_of(in);
     const Jumps j = jumps_of(in);
     in.ready();
+    limit_if(o.strikes.size() > max_quotes, "strikes");
     out.key_reals("prices", bates_price(o, h, j));
 }
 
@@ -65,6 +68,7 @@ void op_merton_price(const In& in, Out& out) {
     const double vol = in.real("vol");
     const Jumps j = jumps_of(in);
     in.ready();
+    limit_if(o.strikes.size() > max_quotes, "strikes");
     out.key_reals("prices", merton_price(o, vol, j));
 }
 

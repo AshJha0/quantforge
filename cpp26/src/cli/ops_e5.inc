@@ -37,6 +37,7 @@ void op_asian_geometric(const In& in, Out& out) {
     const bool continuous = in.choice<bool>("averaging", {{"CONTINUOUS", true}, {"DISCRETE", false}});
     const Vec fix = in.reals("fixing_years");
     in.ready();
+    limit_if(fix.size() > max_quotes, "fixing_years");
     out.key_real("price", asian_geometric(m, continuous, fix));
 }
 
@@ -83,6 +84,7 @@ void op_basket(const In& in, Out& out) {
     const double k = in.real("strike"), t = in.real("expiry_years"), r = in.real("rate");
     const OptionType type = in.choice("option_type", option_types);
     in.ready();
+    limit_if(f.size() > max_quotes || w.size() > max_quotes || v.size() > max_quotes || c.size() > max_quotes, "forwards");
     const BasketPrice b = basket_moment(f, w, v, c, k, t, r, type);
     out.key_real("price", b.price);
     out.key_real("basket_forward", b.basket_forward);
