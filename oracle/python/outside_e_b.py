@@ -348,6 +348,7 @@ NO_ORACLE = {
     "garch_e": "QuantLib's Garch11 is not in the Python wheel; checked by mpmath replica and a separate float replay",
     "varswap_e": "q != 0 cases: QuantLib's drift term omits q (ruling E-B3); realized-variance cases have no QuantLib object",
     "ratesvol_e": "error cases, and ZC cases whose strike ratio is the spec algebra (E-B28)",
+    "rulings_e_b": "mostly error cases pinning check order and codes",
     "vix_e": "no QuantLib object for the Cboe strip method; hand case plus exact-rational replica and a float replay",
 }
 

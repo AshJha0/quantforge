@@ -38,7 +38,7 @@ Outputs: `caplet_vols` (one per caplet), `cap_prices` (the targets). Checks: ten
 
 `implied_vol`: inputs as above with `premium` instead of `vol`, plus `ctd_yield` `y` and `ctd_modified_duration` `Dm` (from `04-pricing/bonds.md`). `price_vol` solves `Black(...) D = premium`; `yield_vol = price_vol / (Dm y)` (the first-order link between relative price and relative yield moves, ruling E-B11).
 
-Checks: `t <= 0`, `F <= 0`, `K <= 0`, `D <= 0`: `E_DOMAIN`; a premium at or below discounted intrinsic, or at or above the no-arbitrage bound: `E_DOMAIN`.
+Checks: `t <= 0`, `F <= 0`, `K <= 0`, `D <= 0`, `vol < 0`: `E_DOMAIN` (`vol = 0` gives discounted intrinsic); a premium at or below discounted intrinsic, or at or above the no-arbitrage bound: `E_DOMAIN`; then `ctd_yield <= 0` or `ctd_modified_duration <= 0`: `E_DOMAIN` (ruling E-B38).
 
 ## `infl.cap.yoy_price`, `infl.cap.zc_price`
 
@@ -48,7 +48,7 @@ Checks: `t <= 0`, `F <= 0`, `K <= 0`, `D <= 0`: `E_DOMAIN`; a premium at or belo
 
 `zc_price`: inputs `model`, `type`, `forward_index_ratio` `F_I` (forward `I(T)/I(0)`), `years` `T`, `strike` `K`, `discount_factor`, `vol`, `notional`. `strike_ratio = (1+K)^T` (compounded, ruling E-B13); `price = N D option(F_I, strike_ratio, vol, T)`. Outputs `price`, `strike_ratio`.
 
-Checks: `BLACK_76` with a strike `<= 0` (YoY) or a forward `<= 0`: `E_DOMAIN`, so a YoY floor at 0% needs `BACHELIER` (ruling E-B32); for `zc_price` the strike ratio at 0% is 1, which Black accepts. Under `BACHELIER`, `vol` is a normal vol of the quantity optioned: of the YoY rate for `yoy_price`, of the index ratio `I(T)/I(0)` for `zc_price`; `T <= 0` or an `expiry_years <= 0`: `E_DOMAIN`; an empty `periods`: `E_INPUT`.
+Checks: `BLACK_76` with a strike `<= 0` (YoY) or a forward `<= 0`: `E_DOMAIN`, so a YoY floor at 0% needs `BACHELIER` (ruling E-B32); for `zc_price` the strike ratio at 0% is 1, which Black accepts. Under `BACHELIER`, `vol` is a normal vol of the quantity optioned: of the YoY rate for `yoy_price`, of the index ratio `I(T)/I(0)` for `zc_price`; `T <= 0` or an `expiry_years <= 0`: `E_DOMAIN`; an empty `periods`: `E_INPUT`. A `vol < 0`: `E_DOMAIN`; `vol = 0` gives discounted intrinsic (ruling E-B38). For `zc_price`, `1 + K <= 0`: `E_DOMAIN`, after the forward check and before `years`; a negative `K` with `1 + K > 0` is priced under both models (ruling E-B37).
 
 ## Worked examples
 

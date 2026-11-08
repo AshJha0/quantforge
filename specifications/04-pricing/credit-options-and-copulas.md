@@ -38,7 +38,7 @@ STUDENT_T: joint = T_2,nu( t_nu^-1(p1), t_nu^-1(p2); rho )
 default_correlation = (joint - p1 p2) / sqrt(p1 (1 - p1) p2 (1 - p2))
 ```
 
-`Phi_2` and `T_2,nu` are the bivariate normal and bivariate Student t CDFs with correlation `rho` (for the t: scale matrix with off-diagonal `rho`). Any method accurate to the tolerance may be used (ruling E-B24). Checks: `copula` not listed: `E_SCHEMA`; `STUDENT_T` without `degrees_of_freedom`: `E_INPUT`; `p` outside `(0, 1)`, `|rho| >= 1`, `nu <= 0`: `E_DOMAIN`.
+`Phi_2` and `T_2,nu` are the bivariate normal and bivariate Student t CDFs with correlation `rho` (for the t: scale matrix with off-diagonal `rho`). Any method accurate to the tolerance may be used (ruling E-B24). Checks: `copula` not listed: `E_SCHEMA`; `default_probabilities` not exactly two values: `E_INPUT`; `STUDENT_T` without `degrees_of_freedom`: `E_INPUT` (it is ignored for `GAUSSIAN`, ruling E-B40); `p` outside `(0, 1)`, `|rho| >= 1`, `nu <= 0`: `E_DOMAIN`.
 
 ## `credit.lhp.tranche_loss`, `credit.lhp.loss_cdf`
 
@@ -57,7 +57,7 @@ expected_loss_fraction = (1 - R) ( E[min(P, k_d)] - E[min(P, k_a)] ) / (d - a)  
 
 (ruling E-B25). The tranches of any partition of `[0, 1]`, weighted by width, add up to the pool loss `(1 - R) p`; the goldens check this to 1e-18. A fixed quadrature over `M` reaches the tolerance if it is split at `m*` (the kink of `min(P, k)`); the oracle uses two 200-node Gauss-Legendre rules on `[-12, m*]` and `[m*, 12]` as a cross-check.
 
-Checks: `d <= a`, `a < 0` or `d > 1`: `E_INPUT`; `p` outside `(0, 1)`, `rho` outside `(0, 1)`, `R` outside `[0, 1)`: `E_DOMAIN`; a loss `x_j` not in `(0, 1 - R)`: `E_DOMAIN`.
+Checks: `d <= a`, `a < 0` or `d > 1`: `E_INPUT`; `p` outside `(0, 1)`, `rho` outside `(0, 1)`, `R` outside `[0, 1)`: `E_DOMAIN`; an empty `losses`: `E_INPUT`; a loss `x_j` not in `(0, 1 - R)`: `E_DOMAIN`.
 
 ## Worked examples
 
