@@ -1,0 +1,1517 @@
+{
+ "schema_version": "1.0",
+ "suite": "surf_e",
+ "spec": "specifications/05-volatility/arb-free-surfaces.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_a.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "surf_e-0001",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [],
+     "wing_violations": [],
+     "arbitrage_free": true
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "clean",
+    "synthetic"
+   ],
+   "description": "three SVI slices, no arbitrage"
+  },
+  {
+   "case_id": "surf_e-0002",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [],
+     "wing_violations": [],
+     "arbitrage_free": true
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "clean",
+    "reject",
+    "synthetic"
+   ],
+   "description": "reject on a clean surface returns the result"
+  },
+  {
+   "case_id": "surf_e-0003",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.3,
+     -0.05,
+     0.0,
+     0.05,
+     0.3
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [],
+     "wing_violations": [],
+     "arbitrage_free": true
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "clean",
+    "synthetic"
+   ],
+   "description": "two slices, fine grid near the money"
+  },
+  {
+   "case_id": "surf_e-0004",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "log_moneyness": [
+     -1.0,
+     -0.5,
+     0.0,
+     0.5,
+     1.0
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [],
+     "wing_violations": [],
+     "arbitrage_free": true
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "clean",
+    "one-slice",
+    "synthetic"
+   ],
+   "description": "one slice: butterfly and Lee only"
+  },
+  {
+   "case_id": "surf_e-0005",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": -0.041,
+       "b": 0.1331,
+       "rho": 0.306,
+       "m": 0.3586,
+       "sigma": 0.4153
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.4,
+     0.0,
+     0.4,
+     0.8,
+     1.0,
+     1.2,
+     1.6
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [
+      {
+       "expiry_index": 0,
+       "k_index": 3
+      },
+      {
+       "expiry_index": 0,
+       "k_index": 4
+      },
+      {
+       "expiry_index": 0,
+       "k_index": 5
+      }
+     ],
+     "calendar_violations": [],
+     "wing_violations": [],
+     "arbitrage_free": false
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "published-counterexample",
+    "analytic"
+   ],
+   "tags": [
+    "arbitrage",
+    "butterfly",
+    "synthetic"
+   ],
+   "description": "Vogt parameters: butterfly arbitrage"
+  },
+  {
+   "case_id": "surf_e-0006",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": -0.041,
+       "b": 0.1331,
+       "rho": 0.306,
+       "m": 0.3586,
+       "sigma": 0.4153
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.4,
+     0.0,
+     0.4,
+     0.8,
+     1.0,
+     1.2,
+     1.6
+    ],
+    "reject": true
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "arbitrage",
+    "butterfly",
+    "reject",
+    "synthetic"
+   ],
+   "description": "Vogt parameters rejected"
+  },
+  {
+   "case_id": "surf_e-0007",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.03,
+       "b": 0.06,
+       "rho": -0.1,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [
+      {
+       "expiry_index": 1,
+       "k_index": 0
+      },
+      {
+       "expiry_index": 1,
+       "k_index": 1
+      },
+      {
+       "expiry_index": 1,
+       "k_index": 2
+      },
+      {
+       "expiry_index": 1,
+       "k_index": 3
+      }
+     ],
+     "wing_violations": [
+      {
+       "expiry_index": 1,
+       "side": "LEFT",
+       "kind": "CALENDAR"
+      },
+      {
+       "expiry_index": 1,
+       "side": "RIGHT",
+       "kind": "CALENDAR"
+      }
+     ],
+     "arbitrage_free": false
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "arbitrage",
+    "calendar",
+    "synthetic"
+   ],
+   "description": "1y slice below 3m in the left wing"
+  },
+  {
+   "case_id": "surf_e-0008",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.03,
+       "b": 0.06,
+       "rho": -0.1,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": true
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "arbitrage",
+    "calendar",
+    "reject",
+    "synthetic"
+   ],
+   "description": "calendar crossing rejected"
+  },
+  {
+   "case_id": "surf_e-0009",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.5,
+      "svi": {
+       "a": 0.02,
+       "b": 1.5,
+       "rho": 0.5,
+       "m": 0.0,
+       "sigma": 0.05
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.05,
+     0.0,
+     0.05
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [],
+     "wing_violations": [
+      {
+       "expiry_index": 0,
+       "side": "RIGHT",
+       "kind": "LEE"
+      }
+     ],
+     "arbitrage_free": false
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "arbitrage",
+    "wing",
+    "lee",
+    "synthetic"
+   ],
+   "description": "b(1+rho) = 2.25 > 2: Lee moment bound"
+  },
+  {
+   "case_id": "surf_e-0010",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.5,
+      "svi": {
+       "a": 0.03,
+       "b": 0.2,
+       "rho": 0.0,
+       "m": 0.0,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.05,
+       "b": 0.15,
+       "rho": 0.0,
+       "m": 0.0,
+       "sigma": 0.2
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.2,
+     0.0,
+     0.2
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [],
+     "wing_violations": [
+      {
+       "expiry_index": 1,
+       "side": "LEFT",
+       "kind": "CALENDAR"
+      },
+      {
+       "expiry_index": 1,
+       "side": "RIGHT",
+       "kind": "CALENDAR"
+      }
+     ],
+     "arbitrage_free": false
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "arbitrage",
+    "wing",
+    "calendar",
+    "synthetic"
+   ],
+   "description": "later slice has flatter wings: crosses beyond the grid"
+  },
+  {
+   "case_id": "surf_e-0011",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.5,
+      "svi": {
+       "a": 0.02,
+       "b": 0.5,
+       "rho": 0.25,
+       "m": 0.0,
+       "sigma": 0.1
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.03,
+       "b": 0.5,
+       "rho": 0.25,
+       "m": 0.1,
+       "sigma": 0.1
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.1,
+     0.0,
+     0.1
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "butterfly_violations": [],
+     "calendar_violations": [
+      {
+       "expiry_index": 1,
+       "k_index": 2
+      }
+     ],
+     "wing_violations": [
+      {
+       "expiry_index": 1,
+       "side": "RIGHT",
+       "kind": "CALENDAR"
+      }
+     ],
+     "arbitrage_free": false
+    }
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "wing",
+    "tie",
+    "synthetic"
+   ],
+   "description": "equal wing slopes: constants decide"
+  },
+  {
+   "case_id": "surf_e-0012",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "expiries not increasing"
+  },
+  {
+   "case_id": "surf_e-0013",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "log_moneyness": [
+     0.1,
+     0.0
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "grid not increasing"
+  },
+  {
+   "case_id": "surf_e-0014",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "log_moneyness": [],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0015",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0016",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": 1.0,
+       "m": 0.0,
+       "sigma": 0.2
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0017",
+   "operation": "vol.svi.surface_check",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.0,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     }
+    ],
+    "log_moneyness": [
+     -0.6,
+     -0.4,
+     -0.2,
+     -0.1,
+     0.0,
+     0.1,
+     0.2,
+     0.4,
+     0.6
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0018",
+   "operation": "vol.ssvi.to_svi",
+   "inputs": {
+    "rho": -0.7,
+    "eta": 1.2,
+    "gamma": 0.4,
+    "theta": 0.04
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "svi": {
+      "a": 0.0102,
+      "b": 0.0849507547233902,
+      "rho": -0.7,
+      "m": 0.16480136104247303,
+      "sigma": 0.16813101783018158
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "replay-ssvi-evaluate"
+   ],
+   "tags": [
+    "ssvi",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0019",
+   "operation": "vol.ssvi.to_svi",
+   "inputs": {
+    "rho": -0.3,
+    "eta": 0.8,
+    "gamma": 0.5,
+    "theta": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "svi": {
+      "a": 0.11375,
+      "b": 0.17888543819998318,
+      "rho": -0.3,
+      "m": 0.20963137289060527,
+      "sigma": 0.6665852814906732
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "replay-ssvi-evaluate"
+   ],
+   "tags": [
+    "ssvi",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0020",
+   "operation": "vol.ssvi.to_svi",
+   "inputs": {
+    "rho": 0.0,
+    "eta": 1.0,
+    "gamma": 1.0,
+    "theta": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "svi": {
+      "a": 0.05,
+      "b": 0.5,
+      "rho": 0.0,
+      "m": -0.0,
+      "sigma": 0.1
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "replay-ssvi-evaluate"
+   ],
+   "tags": [
+    "ssvi",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0021",
+   "operation": "vol.ssvi.to_svi",
+   "inputs": {
+    "rho": 0.4,
+    "eta": 1.5,
+    "gamma": 0.2,
+    "theta": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "svi": {
+      "a": 0.0042,
+      "b": 0.018689778928322267,
+      "rho": 0.4,
+      "m": -0.10701036152809834,
+      "sigma": 0.24519154092355044
+     }
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic",
+    "replay-ssvi-evaluate"
+   ],
+   "tags": [
+    "ssvi",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0022",
+   "operation": "vol.ssvi.to_svi",
+   "inputs": {
+    "rho": 1.0,
+    "eta": 1.0,
+    "gamma": 0.5,
+    "theta": 0.04
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0023",
+   "operation": "vol.ssvi.to_svi",
+   "inputs": {
+    "rho": 0.0,
+    "eta": 1.0,
+    "gamma": 0.5,
+    "theta": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0024",
+   "operation": "vol.svi.fit_surface",
+   "inputs": {
+    "expiry_years": [
+     0.25,
+     1.0,
+     2.0
+    ],
+    "log_moneyness": [
+     -0.5,
+     -0.3,
+     -0.15,
+     -0.05,
+     0.0,
+     0.05,
+     0.15,
+     0.3,
+     0.5
+    ],
+    "total_variance": [
+     [
+      0.0965135531087365,
+      0.07053592452822642,
+      0.05304880949681337,
+      0.0439896201004171,
+      0.04089975124224178,
+      0.03902374841615669,
+      0.03865372088375313,
+      0.04320930106817051,
+      0.0528
+     ],
+     [
+      0.1198653754255279,
+      0.09324553139786579,
+      0.07581642796164861,
+      0.06695369044649471,
+      0.06385229228643119,
+      0.0618178596487658,
+      0.060883934172496504,
+      0.06508141288454303,
+      0.07546385927850713
+     ],
+     [
+      0.15356853701510642,
+      0.12665176343402224,
+      0.10945267417095528,
+      0.10082510343207798,
+      0.09775859028101173,
+      0.0956599944475287,
+      0.09438370874080909,
+      0.0982786397790701,
+      0.10934174504518071
+     ]
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      {
+       "expiry_years": 0.25,
+       "svi": {
+        "a": 0.02,
+        "b": 0.1,
+        "rho": -0.4,
+        "m": 0.02,
+        "sigma": 0.2
+       }
+      },
+      {
+       "expiry_years": 1.0,
+       "svi": {
+        "a": 0.035,
+        "b": 0.11,
+        "rho": -0.35,
+        "m": 0.03,
+        "sigma": 0.25
+       }
+      },
+      {
+       "expiry_years": 2.0,
+       "svi": {
+        "a": 0.06,
+        "b": 0.12,
+        "rho": -0.3,
+        "m": 0.04,
+        "sigma": 0.3
+       }
+      }
+     ],
+     "rmse": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "butterfly_violations": [],
+     "calendar_violations": [],
+     "wing_violations": [],
+     "arbitrage_free": true
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "known-truth",
+    "scipy-least-squares-4-starts"
+   ],
+   "tags": [
+    "fit",
+    "clean",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "fit from exact quotes: parameters within 1e-6 (stage C SVI target); lists exact"
+   }
+  },
+  {
+   "case_id": "surf_e-0025",
+   "operation": "vol.svi.fit_surface",
+   "inputs": {
+    "expiry_years": [
+     0.25,
+     1.0
+    ],
+    "log_moneyness": [
+     -0.5,
+     -0.3,
+     -0.15,
+     -0.05,
+     0.0,
+     0.05,
+     0.15,
+     0.3,
+     0.5
+    ],
+    "total_variance": [
+     [
+      0.0965135531087365,
+      0.07053592452822642,
+      0.05304880949681337,
+      0.0439896201004171,
+      0.04089975124224178,
+      0.03902374841615669,
+      0.03865372088375313,
+      0.04320930106817051,
+      0.0528
+     ],
+     [
+      0.06834020477756067,
+      0.056820289853381334,
+      0.04956350616089923,
+      0.04622928569808803,
+      0.045287613974417,
+      0.044927923444781345,
+      0.045918509548634454,
+      0.05045804339156892,
+      0.0591211959700948
+     ]
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "slices": [
+      {
+       "expiry_years": 0.25,
+       "svi": {
+        "a": 0.02,
+        "b": 0.1,
+        "rho": -0.4,
+        "m": 0.02,
+        "sigma": 0.2
+       }
+      },
+      {
+       "expiry_years": 1.0,
+       "svi": {
+        "a": 0.03,
+        "b": 0.06,
+        "rho": -0.1,
+        "m": 0.03,
+        "sigma": 0.25
+       }
+      }
+     ],
+     "rmse": [
+      0.0,
+      0.0
+     ],
+     "butterfly_violations": [],
+     "calendar_violations": [
+      {
+       "expiry_index": 1,
+       "k_index": 0
+      },
+      {
+       "expiry_index": 1,
+       "k_index": 1
+      },
+      {
+       "expiry_index": 1,
+       "k_index": 2
+      }
+     ],
+     "wing_violations": [
+      {
+       "expiry_index": 1,
+       "side": "LEFT",
+       "kind": "CALENDAR"
+      },
+      {
+       "expiry_index": 1,
+       "side": "RIGHT",
+       "kind": "CALENDAR"
+      }
+     ],
+     "arbitrage_free": false
+    }
+   },
+   "tolerance_class": "calibration",
+   "verified_by": [
+    "known-truth",
+    "scipy-least-squares-4-starts"
+   ],
+   "tags": [
+    "fit",
+    "calendar",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 0.0,
+    "reason": "fit from exact quotes: parameters within 1e-6 (stage C SVI target); lists exact"
+   }
+  },
+  {
+   "case_id": "surf_e-0026",
+   "operation": "vol.svi.fit_surface",
+   "inputs": {
+    "expiry_years": [
+     0.25,
+     1.0
+    ],
+    "log_moneyness": [
+     -0.5,
+     -0.3,
+     -0.15,
+     -0.05,
+     0.0,
+     0.05,
+     0.15,
+     0.3,
+     0.5
+    ],
+    "total_variance": [
+     [
+      0.0965135531087365,
+      0.07053592452822642,
+      0.05304880949681337,
+      0.0439896201004171,
+      0.04089975124224178,
+      0.03902374841615669,
+      0.03865372088375313,
+      0.04320930106817051,
+      0.0528
+     ],
+     [
+      0.06834020477756067,
+      0.056820289853381334,
+      0.04956350616089923,
+      0.04622928569808803,
+      0.045287613974417,
+      0.044927923444781345,
+      0.045918509548634454,
+      0.05045804339156892,
+      0.0591211959700948
+     ]
+    ],
+    "reject": true
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "fit",
+    "reject",
+    "calendar",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "surf_e-0027",
+   "operation": "vol.svi.fit_surface",
+   "inputs": {
+    "expiry_years": [
+     1.0
+    ],
+    "log_moneyness": [
+     -0.5,
+     -0.3,
+     -0.15,
+     -0.05
+    ],
+    "total_variance": [
+     [
+      0.04,
+      0.04,
+      0.04,
+      0.04
+     ]
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "fewer than 5 points"
+  },
+  {
+   "case_id": "surf_e-0028",
+   "operation": "vol.svi.fit_surface",
+   "inputs": {
+    "expiry_years": [
+     1.0,
+     0.5
+    ],
+    "log_moneyness": [
+     -0.5,
+     -0.3,
+     -0.15,
+     -0.05,
+     0.0,
+     0.05,
+     0.15,
+     0.3,
+     0.5
+    ],
+    "total_variance": [
+     [
+      0.04,
+      0.04,
+      0.04,
+      0.04,
+      0.04,
+      0.04,
+      0.04,
+      0.04,
+      0.04
+     ],
+     [
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03
+     ]
+    ],
+    "reject": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

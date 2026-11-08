@@ -249,6 +249,15 @@ Phase R2 (contract 1.7.0) adds these, with no new error code:
 | `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` | `06-risk/par-and-key-rate.md` |
 | `risk.pnl.explain` | `06-risk/pnl-explain.md` |
 
+### Stage E, spec A (E1, E2, E3, E5)
+
+Stage E (target contract 1.8.0, set by the coordinator at merge) adds these, with no new error code; `E_ARBITRAGE` now also covers surface checks with `reject: true`, local vol and forward vol. `stage-e-rulings.md` is normative for them. All are batch operations under the 1.6.0 batch rules, with no change to the stream format.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `vol.svi.surface_check`, `vol.ssvi.to_svi`, `vol.svi.fit_surface` | `05-volatility/arb-free-surfaces.md` | E1 |
+| `vol.local.dupire`, `vol.forward.vol`, `vol.smile.dynamics`, `vol.volofvol.measure` | `05-volatility/local-and-forward-vol.md` | E1 |
+
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.
 
