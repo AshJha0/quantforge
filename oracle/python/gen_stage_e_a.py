@@ -1365,7 +1365,53 @@ def e5_american():
     write(s)
 
 
-SLICES = {"E1": (e1_surf, e1_lv), "E3": (e3_fx,), "E2": (e2_heston, e2_slv), "E5": (e5_exotics, e5_american)}
+# ---------------------------------------------------------------- Rulings on cross-language SPEC_QUESTIONS (E-A34 to E-A41)
+def e_rulings():
+    s = S("rulings_e_a", "stage-e-rulings.md")
+    R_ = ["invalid", "ruling"]
+    # E-A34: E_LIMIT at the gate (limits.md B3), before any rule check.
+    bad = [{"expiry_years": 0.01 * (101 - i), "svi": svi(0.02, 0.1, 1.0, 0.0, 0.2)} for i in range(101)]
+    s.add("vol.svi.surface_check", {"slices": bad, "log_moneyness": KS, "reject": False}, error="E_LIMIT", cls=E, tags=R_, description="101 slices, unsorted and out of domain: E_LIMIT first (E-A34)")
+    s.add("vol.local.dupire", {"slices": [SURF[1], SURF[0]], "points": [{"expiry_years": 1.0, "log_moneyness": 0.0}] * 10001}, error="E_LIMIT", cls=E, tags=R_, description="E_LIMIT before the slice order rule (E-A34)")
+    # E-A35: array caps. Stage C cap of 100 (ruling C10) for vol.* lists with no stated limit; vol-of-vol series raised to 10,000.
+    ser = [0.2 + 0.01 * math.sin(i) for i in range(300)]
+    x = [math.log(b / a) for a, b in zip(ser, ser[1:])]
+    m = math.fsum(x) / len(x)
+    sd = math.sqrt(math.fsum((u - m) ** 2 for u in x) / (len(x) - 1))
+    s.add("vol.volofvol.measure", {"vols": ser, "periods_per_year": 252, "method": "LOG"}, {"vol_of_vol": math.sqrt(252) * sd, "mean_change": m}, cls="statistics", verified=["analytic", "mpmath"],
+          tags=["ruling", "limit"], description="300 observations: above the stage C cap of 100, inside the stated 10,000 (E-A35)")
+    s.add("vol.volofvol.measure", {"vols": [0.2] * 10001, "periods_per_year": 252, "method": "LOG"}, error="E_LIMIT", cls=E, tags=R_)
+    s.add("vol.forward.vol", {"expiry_years": [0.01 * (i + 1) for i in range(101)], "vols": [0.2] * 101}, error="E_LIMIT", cls=E, tags=R_, description="101 expiries (E-A35)")
+    hp = {"v0": 0.04, "kappa": 1.5, "theta": 0.04, "xi": 0.5, "rho": -0.7}
+    s.add("vol.heston.price", {"spot": 100.0, "strikes": [50.0 + i for i in range(101)], "expiry_years": 1.0, "rate": 0.03, "dividend_yield": 0.01, "heston": hp, "option_type": "CALL"},
+          error="E_LIMIT", cls=E, tags=R_, description="101 strikes (E-A35)")
+    # E-A36: forward vol expiries must be above 0.
+    s.add("vol.forward.vol", {"expiry_years": [0.0, 1.0], "vols": [0.2, 0.2]}, error="E_DOMAIN", cls=E, tags=R_, description="first expiry 0 (E-A36)")
+    s.add("vol.forward.vol", {"expiry_years": [-0.5, 1.0], "vols": [0.2, 0.2]}, error="E_DOMAIN", cls=E, tags=R_)
+    # E-A37: E2 order, all E_INPUT rules before E_DOMAIN rules (as heston-family.md states).
+    G0 = {"nx": 2, "nv": 50, "nt": 50, "x_min": math.log(100) - 1.2, "x_max": math.log(100) + 1.2, "v_max": 0.25}
+    s.add("vol.slv.leverage", {"spot": 100.0, "expiry_years": 1.0, "rate": 0.02, "dividend_yield": 0.0, "heston": {**hp, "xi": 0.0}, "slices": SURF, "grid": G0},
+          error="E_INPUT", cls=E, tags=R_, description="nx = 2 (E_INPUT) with xi = 0 (E_DOMAIN): E_INPUT first (E-A37)")
+    s.add("vol.slv.leverage", {"spot": 100.0, "expiry_years": 0.0, "rate": 0.02, "dividend_yield": 0.0, "heston": hp, "slices": SURF, "grid": {**G0, "nx": 61, "x_min": 4.61}},
+          error="E_INPUT", cls=E, tags=R_, description="spot outside the grid (E_INPUT) with expiry 0 (E_DOMAIN) (E-A37)")
+    # E-A38: E5 order is input order (exotics.md), so an earlier E_DOMAIN beats a later E_INPUT.
+    b = {"spot": 100.0, "expiry_years": 1.0, "rate": 0.05, "dividend_yield": 0.02, "vol": 0.0, "strike": 100.0, "option_type": "CALL", "averaging": "DISCRETE", "fixing_years": [0.5, 0.25]}
+    s.add("exotic.asian.geometric", b, error="E_DOMAIN", cls=E, tags=R_, description="vol 0 comes before the fixing order rule (E-A38)")
+    # E-A39: Kirk and basket checks.
+    k = {"forward_1": 110.0, "forward_2": 100.0, "strike": 5.0, "expiry_years": 1.0, "rate": 0.03, "vol_1": 0.3, "vol_2": 0.25, "correlation": 0.7}
+    s.add("exotic.spread.kirk", {**k, "vol_1": 0.0}, error="E_DOMAIN", cls=E, tags=R_)
+    s.add("exotic.spread.kirk", {**k, "correlation": 1.5}, error="E_DOMAIN", cls=E, tags=R_)
+    s.add("exotic.basket.moment", {"forwards": [100.0, 50.0], "weights": [0.5, 0.5, 0.0], "vols": [0.2, 0.3], "correlation": [[1.0, 0.5], [0.5, 1.0]], "strike": 75.0, "expiry_years": 1.0,
+                                   "rate": 0.03, "option_type": "CALL"}, error="E_INPUT", cls=E, tags=R_, description="weights length differs (E-A39)")
+    # E-A40: FD grid codes.
+    f = {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": .05, "dividend_yield": .02, "vol": .25, "option_type": "PUT", "exercise": "AMERICAN", "grid": {"nx": 201, "nt": 200, "width": 5.0}}
+    s.add("exotic.american.fd", {**f, "grid": {"nx": 201, "nt": 0, "width": 5.0}}, error="E_INPUT", cls=E, tags=R_)
+    s.add("exotic.american.fd", {**f, "grid": {"nx": 201, "nt": 200, "width": 0.0}}, error="E_DOMAIN", cls=E, tags=R_)
+    s.add("exotic.american.fd", {**f, "grid": {"nx": 201, "nt": 10001, "width": 5.0}}, error="E_LIMIT", cls=E, tags=R_)
+    write(s)
+
+
+SLICES = {"E1": (e1_surf, e1_lv), "E3": (e3_fx,), "E2": (e2_heston, e2_slv), "E5": (e5_exotics, e5_american), "RUL": (e_rulings,)}
 
 
 def main():

@@ -62,3 +62,19 @@ Spec version 1.0.0. Normative: this page is part of every spec A stage E spec, a
 | E-A33 | Small vol-of-vol claim | The targets table now says within 3 `xi` in price (measured 2.2 `xi`), not 0.05 `xi`. The goldens and their wrong-convention checks are unchanged |
 
 Also added after the audit: one `E_SCHEMA` golden for a missing `cash` on an asset-or-nothing digital; six barrier goldens with rebates, including up-and-out and up-and-in. Up-barrier rebate cases already existed (`exotic_e` cases tagged `up_out`, `up_in` and `rebate`). All new cases are appended, so no case id moved.
+
+### Rulings on the cross-language SPEC_QUESTIONS (2026-11-08)
+
+Read from `SPEC_QUESTIONS.md` on `stage-e-lang-{cpp,java,python,rust}`. Each ruling pins a point where builds read the spec differently. Goldens are in `datasets/golden/stage_e/rulings_e_a.json` (`rulings_e_a-0001` to `-0017`).
+
+| # | Divergence | Ruling |
+|---|---|---|
+| E-A34 | `E_LIMIT` order. C++ and Java check the 100-slice limit after the slice `E_INPUT` and `E_DOMAIN` rules, as `arb-free-surfaces.md` listed it; Python checks it at the gate | `01-core/limits.md` B3 governs: every `E_LIMIT` comes right after `E_SCHEMA`, before any rule check. The stage E text listing it last was wrong. Cases `-0001`, `-0002` |
+| E-A35 | Array caps. Python applies the stage C cap of 100 (ruling C10) to stage E `vol.*` lists with no stated limit, and lifts it for the stated grids; the others apply no cap | Python is right: C10 holds for every list without a stated limit (forward-vol expiries, smile strikes, Heston `strikes` and `u`, exotic lists). Stated limits win: check grid and Dupire points 10,000; vol-of-vol series raised to 10,000 because 100 days is too short. Cases `-0003` to `-0006` |
+| E-A36 | `vol.forward.vol` with a first expiry `<= 0`. Python and Rust accept it | `E_DOMAIN`. Cases `-0007`, `-0008` |
+| E-A37 | SLV check order. C++ goes by input order (`heston` before `grid`); Rust puts the grid `E_INPUT` rules before `E_DOMAIN` | As `heston-family.md` states: all `E_INPUT` rules first, then `E_DOMAIN`, each in input order. Rust is right. Cases `-0009`, `-0010` |
+| E-A38 | Asian check order. Rust checks `fixing_years` before the common `E_DOMAIN` checks | `exotics.md` is input order whatever the code, so `vol = 0` comes before the fixing-order rule. Unlike E2 (E-A37), by design: each page states its own rule. Case `-0011` |
+| E-A39 | Kirk `vol_1`, `vol_2` and `correlation`; basket length mismatch. Rust added checks the page did not state | Kirk: vols above 0 and correlation in `[-1, 1]`, else `E_DOMAIN`. Basket: `weights` (and `vols`, `correlation`) of another length than `forwards` is `E_INPUT`. Cases `-0012` to `-0014` |
+| E-A40 | FD `nt < 1`, `width <= 0`, `nt` above 10,000. Codes not stated | `E_INPUT`, `E_DOMAIN`, `E_LIMIT`. Cases `-0015` to `-0017` |
+
+Not divergent, no change: the order between two rules with the same code (Dupire `w_T` against `g`; the E3 common checks; smile-dynamics positivity), which changes only the message. The PA call delta exactly at its maximum is `E_DOMAIN` (E-A10), and no golden can sit within a few ulps of it. Rust's cancellation-free form of the Heston function is an allowed implementation of [Alb07].
