@@ -44,6 +44,7 @@
 #include "quantforge/core/timezone.hpp"
 #include "quantforge/core/arb_surface.hpp"
 #include "quantforge/core/fx_smile.hpp"
+#include "quantforge/core/credit_e.hpp"
 #include "quantforge/core/exotics.hpp"
 #include "quantforge/core/correlation.hpp"
 #include "quantforge/core/heston.hpp"
@@ -1071,6 +1072,7 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_e6.inc"
 #include "ops_e5.inc"
 #include "ops_e7.inc"
+#include "ops_e8.inc"
 
 // ---- dispatch ----
 
@@ -1111,6 +1113,11 @@ const std::map<string, Handler, std::less<>>& table() {
         {"exotic.lookback.floating", op_lookback},
         {"exotic.quanto.price", op_quanto},
         {"exotic.spread.kirk", op_kirk},
+        {"credit.cdsoption.implied_vol", op_cds_option_implied_vol},
+        {"credit.cdsoption.price", op_cds_option_price},
+        {"credit.copula.joint_default", op_copula_joint_default},
+        {"credit.lhp.loss_cdf", op_lhp_loss_cdf},
+        {"credit.lhp.tranche_loss", op_lhp_tranche_loss},
         {"vol.forward.vol", op_forward_vol},
         {"vol.local.dupire", op_local_dupire},
         {"vol.smile.dynamics", op_smile_dynamics},

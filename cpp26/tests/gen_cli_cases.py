@@ -7,6 +7,8 @@ from runner import load_policy  # the runner's own tolerance classes
 
 classes = load_policy("../conformance/tolerances/policy.yaml")
 
+# Goldens under an open question in SPEC_QUESTIONS.md; they stay with the conformance runner.
+OPEN = {"creditopt_e-0055"}
 MAX_INPUT = 6000  # bytes of case or outputs JSON; larger cases stay with the conformance runner
 per_op = collections.defaultdict(list)
 for f in sorted(glob.glob("../datasets/golden/*/*.json")):
@@ -22,6 +24,8 @@ for op in sorted(per_op):
     seen, ok = set(), 0
     for c in per_op[op]:
         e, text = c["expected"], doc(c)
+        if c["case_id"] in OPEN:
+            continue
         if len(text) > MAX_INPUT:
             continue
         if e["status"] == "ok":
