@@ -189,6 +189,8 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 | EB4 | SABR swaption cube | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked | 12 of 18 |
 | EB5 | Caplet stripping | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (reprice) | 4 of 9 |
 | EB6 | Bond futures options, price and yield vol | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 10 of 12 |
+| EB8 | Correlation validation and nearest correlation (Higham) | `06-risk/correlation.md` | E6 | Specified, outside-checked | validate 11 of 13; nearest 7 of 14 |
+| EB9 | Implied correlation and dispersion | `06-risk/correlation.md` | E6 | Specified | 0 of 11 (closed forms, hand cases) |
 | EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 9 of 11 |
 
 ### EB1 GARCH(1,1)
@@ -228,6 +230,15 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 - **Purpose:** YoY caplets on given forwards; ZC caps on a forward index ratio.
 - **Limitations:** forwards and vols are inputs (no YoY curve, convexity or seasonality); Black or Bachelier only.
 - **Validation:** QuantLib Black and Bachelier formulas. **Review:** 2026-11-08.
+### EB8 Correlation repair
+- **Purpose:** test a correlation matrix and replace it by the nearest valid one.
+- **Limitations:** unweighted Frobenius norm only, so all pairs are trusted equally; no rank or factor constraint; no fixed entries. The nearest matrix is usually singular (on the PSD boundary), which can make later Cholesky steps fail without a floor.
+- **Validation:** two internal solvers; QuantLib Higham where it converges. **Review:** 2026-11-08.
+
+### EB9 Implied correlation and dispersion
+- **Purpose:** one average correlation from index and member vols; P&L of a vega-weighted variance dispersion trade.
+- **Limitations:** a single average correlation (no pairwise structure); no cap on variance payoffs; the P&L takes realised vols as inputs.
+- **Validation:** hand cases. **Review:** 2026-11-08.
 
 ## Review cycle
 

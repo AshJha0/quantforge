@@ -28,3 +28,14 @@ E7 outside-oracle share: 18 of 84 (21.4%). Wrong-convention checks: 78 for E7, e
 | `ratesvol_e` | `infl.cap.zc_price` | 5 / 1 | 1e-12 per unit notional + 1e-10 rel | 1e-5 currency on 10m | mpmath-50; QuantLib formulas, all 5 |
 
 Wrong-convention checks: 34 for E4, each caught. Outside-oracle share: 35 of 50 (70%; error cases are in the denominator and never count).
+
+## E6 correlation
+
+| Suite | Operation | Cases (ok / error) | Tolerance | In money | Oracle |
+|---|---|---|---|---|---|
+| `corr_e` | `risk.corr.validate` | 11 / 2 | booleans exact; `min_eigenvalue` 1e-10 | n/a | mpmath eigenvalues; QuantLib `SymmetricSchurDecomposition`, all 11 |
+| `corr_e` | `risk.corr.nearest` | 11 / 3 | 2e-5 on entries and distance (convergence tolerance) | under 1e-5 relative on a basket vol | Higham-Dykstra and dual solve agree to 1e-7; QuantLib Higham on the 7 cases where it converges |
+| `corr_e` | `risk.corr.implied` | 5 / 2 | 1e-12 abs + 1e-10 rel | n/a | hand, mpmath-50 |
+| `corr_e` | `risk.corr.dispersion` | 3 / 1 | 1e-12 per unit vega notional + 1e-10 rel | 1e-7 currency on 100k | hand, mpmath-50 |
+
+Wrong-convention checks: 29 for E6, each caught. Outside-oracle share: 18 of 38 (47%).
