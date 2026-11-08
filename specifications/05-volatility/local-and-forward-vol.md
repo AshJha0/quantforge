@@ -38,7 +38,7 @@ Outputs, arrays in point order: `total_variance`, `implied_vol` (`sqrt(w/T)`), `
 
 ## `vol.forward.vol`
 
-Inputs: `expiry_years` (strictly increasing, at least 1, else `E_INPUT`), `vols` (same length, else `E_INPUT`; each above 0, else `E_DOMAIN`). Vols are at one fixed moneyness (for example ATM forward).
+Inputs: `expiry_years` (strictly increasing, at least 1, else `E_INPUT`; the first above 0, else `E_DOMAIN`, ruling E-A36; at most 100, else `E_LIMIT`), `vols` (same length, else `E_INPUT`; each above 0, else `E_DOMAIN`). Vols are at one fixed moneyness (for example ATM forward).
 
 Output `forward_vols`: `forward_vols[0] = vols[0]`, and for `i >= 1`
 
@@ -66,7 +66,7 @@ Outputs, arrays in strike order: `vols_base`, `vols_shifted`, `prices_base` (at 
 
 ## `vol.volofvol.measure`
 
-Inputs: `vols` (a time series of one implied vol, oldest first, at least 3, else `E_INPUT`; each > 0, else `E_DOMAIN`), `periods_per_year` (> 0, else `E_DOMAIN`), `method` (`LOG` or `ABSOLUTE`).
+Inputs: `vols` (a time series of one implied vol, oldest first, at least 3, else `E_INPUT`; at most 10,000, else `E_LIMIT`, which lifts the stage C cap of 100 for this list (ruling E-A35); each > 0, else `E_DOMAIN`), `periods_per_year` (> 0, else `E_DOMAIN`), `method` (`LOG` or `ABSOLUTE`).
 
 Changes `x_i = ln(v_i/v_{i-1})` (`LOG`) or `v_i - v_{i-1}` (`ABSOLUTE`). Outputs: `mean_change` (mean of `x`, not annualised) and `vol_of_vol = sqrt(periods_per_year) * s`, with `s` the sample standard deviation, divisor `n - 1` (ruling E-A7).
 

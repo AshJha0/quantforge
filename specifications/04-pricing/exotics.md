@@ -2,7 +2,7 @@
 
 Spec version 1.0.0. Status: Specified. Stage E, slice E5 (spec A). `specifications/stage-e-rulings.md` is normative.
 
-Common inputs, unless an operation says otherwise: `spot` `S` (> 0), `strike` `K` (> 0), `expiry_years` `T` (> 0), `rate` `r`, `dividend_yield` `q` (flat continuous, any sign), `vol` `v` (> 0), `option_type` (`CALL`, `PUT`). Cost of carry `b = r - q`. A value outside its range: `E_DOMAIN`; an array or shape rule: `E_INPUT`; checks in input order. Prices are per unit of underlying.
+Common inputs, unless an operation says otherwise: `spot` `S` (> 0), `strike` `K` (> 0), `expiry_years` `T` (> 0), `rate` `r`, `dividend_yield` `q` (flat continuous, any sign), `vol` `v` (> 0), `option_type` (`CALL`, `PUT`). Cost of carry `b = r - q`. A value outside its range: `E_DOMAIN`; an array or shape rule: `E_INPUT`; all checks in input order, whatever their code (ruling E-A38). Lists are capped at 100 (stage C ruling C10), `E_LIMIT` at the gate. Prices are per unit of underlying.
 
 `GBS(type, S, K, T, r, b, v)` is generalised Black-Scholes: `d1 = (ln(S/K) + (b + v^2/2)T)/(v sqrt T)`, `d2 = d1 - v sqrt T`; call `S e^{(b-r)T} N(d1) - K e^{-rT} N(d2)`, put `K e^{-rT} N(-d2) - S e^{(b-r)T} N(-d1)`.
 
@@ -56,7 +56,7 @@ Output `price`. Arithmetic Asians are not in stage E (they need Monte Carlo or a
 
 ## `exotic.lookback.floating`
 
-Inputs: common less `strike`, `running_extreme`: the minimum so far for a call (`<= S`), the maximum so far for a put (`>= S`), else `E_DOMAIN`. Continuous monitoring. `b = 0`: `E_DOMAIN` (the formula divides by `b`; ruling E-A20). Goldman-Sosin-Gatto [Haug ch. 4]: with `m` the minimum,
+Inputs: common less `strike`, `running_extreme`: the minimum so far for a call (`<= S`), the maximum so far for a put (`>= S`), else `E_DOMAIN`. Continuous monitoring. `|b| <= 1e-8 v^2`: `E_DOMAIN` (the formula divides by `b`; rulings E-A20, E-A28). Near that bound binary64 loses digits: at `b = 1e-5` the golden is judged to 1e-8. Goldman-Sosin-Gatto [Haug ch. 4]: with `m` the minimum,
 
 call `= S e^{(b-r)T} N(a1) - m e^{-rT} N(a2) + S e^{-rT} (v^2/(2b)) ((S/m)^{-2b/v^2} N(-a1 + 2b sqrt T/v) - e^{bT} N(-a1))`, `a1 = (ln(S/m) + (b + v^2/2)T)/(v sqrt T)`, `a2 = a1 - v sqrt T`;
 
@@ -74,11 +74,11 @@ Inputs: common, `choose_years` `t` (in `(0, T]`, else `E_INPUT`). Simple chooser
 
 ## `exotic.spread.kirk`
 
-Inputs: `forward_1`, `forward_2` (> 0), `strike` (any sign, with `forward_2 + strike > 0`, else `E_DOMAIN`), `expiry_years`, `rate`, `vol_1`, `vol_2`, `correlation`. Call on `F1 - F2 - K` [Kirk95]: `f = F2/(F2 + K)`, `s = sqrt(v1^2 - 2 rho v1 v2 f + v2^2 f^2)`, `d1 = (ln(F1/(F2 + K)) + s^2 T/2)/(s sqrt T)`, price `e^{-rT}(F1 N(d1) - (F2 + K) N(d1 - s sqrt T))`. At `K = 0` this is Margrabe's exchange option. Output `price`.
+Inputs: `forward_1`, `forward_2` (> 0), `strike` (any sign, with `forward_2 + strike > 0`, else `E_DOMAIN`), `expiry_years`, `rate`, `vol_1`, `vol_2` (> 0), `correlation` (in `[-1, 1]`), else `E_DOMAIN` (ruling E-A39). Call on `F1 - F2 - K` [Kirk95]: `f = F2/(F2 + K)`, `s = sqrt(v1^2 - 2 rho v1 v2 f + v2^2 f^2)`, `d1 = (ln(F1/(F2 + K)) + s^2 T/2)/(s sqrt T)`, price `e^{-rT}(F1 N(d1) - (F2 + K) N(d1 - s sqrt T))`. At `K = 0` this is Margrabe's exchange option. Output `price`.
 
 ## `exotic.basket.moment`
 
-Inputs: `forwards`, `weights` (each >= 0, not all 0, else `E_DOMAIN`), `vols`, `correlation` (square, symmetric, unit diagonal, entries in `[-1, 1]`, else `E_INPUT`), `strike`, `expiry_years`, `rate`, `option_type`. Lognormal moment matching [Levy92]: `M1 = sum w_i F_i`, `M2 = sum_i sum_j w_i w_j F_i F_j e^{rho_ij v_i v_j T}`, `v_B = sqrt(ln(M2/M1^2)/T)`, price `GBS(type, M1, K, T, r, 0, v_B)`. Outputs `price`, `basket_forward` (`M1`), `basket_vol` (`v_B`). Negative weights (spreads) are refused: use Kirk (ruling E-A21).
+Inputs: `forwards`, `weights` (same length as `forwards`, else `E_INPUT`; each >= 0, not all 0, else `E_DOMAIN`), `vols`, `correlation` (square, symmetric, unit diagonal, entries in `[-1, 1]`, else `E_INPUT`), `strike`, `expiry_years`, `rate`, `option_type`. Lognormal moment matching [Levy92]: `M1 = sum w_i F_i`, `M2 = sum_i sum_j w_i w_j F_i F_j e^{rho_ij v_i v_j T}`, `v_B = sqrt(ln(M2/M1^2)/T)`, price `GBS(type, M1, K, T, r, 0, v_B)`. Outputs `price`, `basket_forward` (`M1`), `basket_vol` (`v_B`). Negative weights (spreads) are refused: use Kirk (ruling E-A21).
 
 ## American options
 
@@ -88,7 +88,7 @@ Inputs: common, `steps` `n` (1 to 20,000, else `E_INPUT` / `E_LIMIT`). Cox-Ross-
 
 ### `exotic.american.baw`
 
-Inputs: common. Barone-Adesi-Whaley [BAW87], [Haug ch. 3]: `M = 2r/v^2`, `N = 2b/v^2`, `K_T = 1 - e^{-rT}`. `r = 0`: `E_DOMAIN` (ruling E-A22). A call with `b >= r` is European (`GBS`).
+Inputs: common. Barone-Adesi-Whaley [BAW87], [Haug ch. 3]: `M = 2r/v^2`, `N = 2b/v^2`, `K_T = 1 - e^{-rT}`. `r <= 0`: `E_DOMAIN` (rulings E-A22, E-A30). A call with `b >= r` is European (`GBS`).
 
 - Call: `q2 = (-(N-1) + sqrt((N-1)^2 + 4M/K_T))/2`; critical price `S*` solves `S* - K = GBS(call, S*) + (1 - e^{(b-r)T} N(d1(S*))) S*/q2`; `A2 = (S*/q2)(1 - e^{(b-r)T} N(d1(S*)))`; price `GBS(call, S) + A2 (S/S*)^{q2}` if `S < S*`, else `S - K`.
 - Put: `q1 = (-(N-1) - sqrt((N-1)^2 + 4M/K_T))/2`; `S**` solves `K - S** = GBS(put, S**) - (1 - e^{(b-r)T} N(-d1(S**))) S**/q1`; `A1 = -(S**/q1)(1 - e^{(b-r)T} N(-d1(S**)))`; price `GBS(put, S) + A1 (S/S**)^{q1}` if `S > S**`, else `K - S`.
@@ -97,7 +97,7 @@ Any root finder; output `price`, judged to 1e-5 per unit (ruling E-A22).
 
 ### `exotic.american.fd`
 
-Inputs: common, `exercise` (`AMERICAN`, `EUROPEAN`), `grid` `{nx, nt, width}`: `nx` odd, at least 5, else `E_INPUT`; at most 1001, else `E_LIMIT`; `nt` 1 to 10,000; `width` > 0.
+Inputs: common, `exercise` (`AMERICAN`, `EUROPEAN`), `grid` `{nx, nt, width}`: `nx` odd, at least 5, else `E_INPUT`; at most 1001, else `E_LIMIT`; `nt` at least 1, else `E_INPUT`, at most 10,000, else `E_LIMIT`; `width` > 0, else `E_DOMAIN` (ruling E-A40).
 
 Reference scheme (ruling E-A23): `x = ln S`; `x_i = ln S - h + i dx`, `h = width v sqrt T`, `dx = 2h/(nx-1)` (so `x_{(nx-1)/2} = ln S`); `dt = T/nt`. Backward Euler in time-to-expiry on `V_tau = (v^2/2) V_xx + (r - q - v^2/2) V_x - r V`, central differences: row `i` (interior) `V_{i-1}: -dt(v^2/(2dx^2) - mu/(2dx))`, `V_i: 1 + dt(v^2/dx^2 + r)`, `V_{i+1}: -dt(v^2/(2dx^2) + mu/(2dx))`, `mu = r - q - v^2/2`. Start at the payoff. Boundary rows: American, the intrinsic value; European, `max(phi(e^{x} e^{-q tau} - K e^{-r tau}), 0)` at `tau = (n+1)dt`. American: after each solve, `V = max(V, payoff)`. Outputs at the centre node `i`: `price = V_i`, `delta = (V_{i+1} - V_{i-1})/(2 dx S)`, `gamma = ((V_{i+1} - 2V_i + V_{i-1})/dx^2 - (V_{i+1} - V_{i-1})/(2dx))/S^2`.
 

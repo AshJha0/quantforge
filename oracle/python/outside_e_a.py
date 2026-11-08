@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 import runner  # noqa: E402  (tolerance comparison only)
 
 POLICY = runner.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
-SUITES = ["surf_e", "lv_e", "fxs_e", "heston_e", "slv_e", "exotic_e", "american_e"]  # spec A suites; later slices append
+SUITES = ["surf_e", "lv_e", "fxs_e", "heston_e", "slv_e", "exotic_e", "american_e", "rulings_e_a"]  # spec A suites; later slices append
 
 
 class Used:
