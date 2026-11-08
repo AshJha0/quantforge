@@ -26,3 +26,17 @@ Each row is a real-world edge case. It is either **pinned**: named golden cases 
 - A row is pinned only by golden cases that every language passes. Name them by `case_id`.
 - Out of scope needs a reason and the stage that would bring it in.
 - A new case avoids libm-tail and iteration-path sensitivity, as `oracle/README.md` asks.
+
+### Stage E, spec A slices
+
+Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pinned" here means named goldens in `datasets/golden/stage_e/`; the language builds have not run yet, so every row is pinned in the goldens only until the stage E builds pass.
+
+| # | Edge case | State | Golden cases | Notes |
+|---|---|---|---|---|
+| EA1 | Butterfly arbitrage in a quoted smile | Pinned | `surf_e-0005`, `surf_e-0006` (reject), `lv_e-0004` (local vol refused) | Vogt parameters, the published counterexample in Gatheral-Jacquier 2014 section 5 |
+| EA2 | Calendar arbitrage, inside the grid and beyond it | Pinned | Inside: `surf_e-0007`, `surf_e-0008`, `surf_e-0025`, `surf_e-0026`, `lv_e-0003`, `lv_e-0013`. Beyond the grid (wing slopes): `surf_e-0010`; tie on equal slopes: `surf_e-0011` | Ruling E-A2 |
+| EA3 | Wings steeper than the moment bound | Pinned | `surf_e-0009` | Lee 2004: total-variance wing slope at most 2 |
+| EA4 | Zero forward variance between expiries | Pinned | `lv_e-0017` | Allowed, returns 0 (ruling E-A5) |
+| EA5 | Negative rates in smile dynamics | Pinned | `lv_e-0026` to `lv_e-0029` (`rate` -0.5%) | Forward below spot; no special case |
+| EA6 | Local vol at an expiry node and outside the slice range | Pinned | `lv_e-0001` (points at 1y and 2y nodes, at 0.1y and 3y) | Right-hand derivative at nodes, flat vol outside (ruling E-A4) |
+

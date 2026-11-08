@@ -1,0 +1,201 @@
+"""Outside-oracle verifier for stage E, spec A slices (plan rule 11.2.5).
+
+As outside_d.py: for each golden case it reads only the case's inputs, builds the result from QuantLib's own
+objects (taken only from qf_oracle/convmap_e_a.py), and compares every output with the golden under the
+case's own tolerance. A case counts only if every output is matched, or is the spec's stated algebra on
+matched QuantLib values or inputs, which the handler names. Nothing here reads the generator's replays.
+
+Writes oracle/outside_register_e_a.json and oracle/OUTSIDE_E_A.md (coverage per suite, and the map).
+
+    cd oracle/python && uv run python -W ignore outside_e_a.py [--write-map]
+"""
+import inspect
+import json
+import math
+import re
+import sys
+from pathlib import Path
+
+import QuantLib as ql
+
+from qf_oracle import convmap_e_a as CM
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "conformance" / "runner"))
+import runner  # noqa: E402  (tolerance comparison only)
+
+POLICY = runner.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
+SUITES = ["surf_e", "lv_e"]  # spec A suites; later slices append
+
+
+class Used:
+    def __init__(self):
+        self.rows = set()
+
+    def __call__(self, row, *a):
+        self.rows.add(row)
+        return CM.obj(row, *a)
+
+
+# ---------------------------------------------------------------- E1
+def h_surface_check(u, x):
+    """Total variance from QuantLib SviSmileSection; butterfly from the sign of QuantLib's numerical density;
+    wing rules are the spec's algebra on the input parameters (asymptotic slopes, not a QuantLib quantity)."""
+    secs = [u("SVI.RAW", s["expiry_years"], 1.0, s["svi"]) for s in x["slices"]]
+    ks = x["log_moneyness"]
+    bf, cal, wing = [], [], []
+    for j, sec in enumerate(secs):
+        for i, k in enumerate(ks):
+            if u("SVI.DENSITY", sec, math.exp(k)) < 0:
+                bf.append({"expiry_index": j, "k_index": i})
+    for j in range(1, len(secs)):
+        for i, k in enumerate(ks):
+            if secs[j].variance(math.exp(k)) < secs[j - 1].variance(math.exp(k)):
+                cal.append({"expiry_index": j, "k_index": i})
+
+    def asym(p):
+        b, rho, a, m = p["b"], p["rho"], p["a"], p["m"]
+        return b * (1 - rho), a + b * (1 - rho) * m, b * (1 + rho), a - b * (1 + rho) * m
+    for j, s in enumerate(x["slices"]):
+        sl, cl, sr, cr = asym(s["svi"])
+        for side, v in (("LEFT", sl), ("RIGHT", sr)):
+            if v > 2:
+                wing.append({"expiry_index": j, "side": side, "kind": "LEE"})
+        if j:
+            pl, pcl, pr, pcr = asym(x["slices"][j - 1]["svi"])
+            for side, v, c, pv, pc in (("LEFT", sl, cl, pl, pcl), ("RIGHT", sr, cr, pr, pcr)):
+                if (c < pc) if v == pv else (v < pv):
+                    wing.append({"expiry_index": j, "side": side, "kind": "CALENDAR"})
+    return {"butterfly_violations": bf, "calendar_violations": cal, "wing_violations": wing, "arbitrage_free": not (bf or cal or wing)}
+
+
+def h_forward_vol(u, x):
+    ref = ql.Date(6, 11, 2026)
+    ql.Settings.instance().evaluationDate = ref
+    days = [round(t * 365) for t in x["expiry_years"]]
+    if any(abs(d / 365 - t) > 0 for d, t in zip(days, x["expiry_years"])):
+        raise NotImplementedError("expiries not whole days on ACT/365F")
+    c = u("VOL.CURVE", ref, [ref + d for d in days], x["vols"])
+    Ts = x["expiry_years"]
+    return {"forward_vols": [c.blackVol(Ts[0], 1.0)] + [c.blackForwardVol(Ts[i - 1], Ts[i], 1.0) for i in range(1, len(Ts))]}
+
+
+def h_dynamics(u, x):
+    T, S0, S1, r, q = x["expiry_years"], x["spot"], x["spot_shifted"], x["rate"], x["dividend_yield"]
+    D = math.exp(-r * T)
+    F0, F1 = S0 * math.exp((r - q) * T), S1 * math.exp((r - q) * T)
+    sec0 = u("SVI.RAW", T, F0, x["svi"])
+    sec1 = sec0 if x["rule"] == "STICKY_STRIKE" else u("SVI.RAW", T, F1, x["svi"])
+    out = {"vols_base": [], "vols_shifted": [], "prices_base": [], "prices_shifted": [], "deltas": []}
+    for K in x["strikes"]:
+        v0, v1 = sec0.volatility(K), sec1.volatility(K)
+        out["vols_base"].append(v0)
+        out["vols_shifted"].append(v1)
+        out["prices_base"].append(u("OPT.BLACK_FORMULA", x["option_type"], K, F0, v0 * math.sqrt(T), D))
+        out["prices_shifted"].append(u("OPT.BLACK_FORMULA", x["option_type"], K, F1, v1 * math.sqrt(T), D))
+        bc = u("OPT.BLACK_CALC", x["option_type"], K, F0, v0 * math.sqrt(T), D)
+        dvds = 0.0
+        if x["rule"] == "STICKY_DELTA":
+            # spec: d sigma/dS = -(dsigma/dk)/S at fixed K; dsigma/dk from QuantLib's own smile, 4-point difference in k
+            h = 1e-4
+            vol = lambda kk: sec0.volatility(F0 * math.exp(kk))  # noqa: E731
+            k0 = math.log(K / F0)
+            dv = (-vol(k0 + 2 * h) + 8 * vol(k0 + h) - 8 * vol(k0 - h) + vol(k0 - 2 * h)) / (12 * h)
+            dvds = -dv / S0
+        out["deltas"].append(bc.delta(S0) + bc.vega(T) * dvds)
+    return out
+
+
+def h_volofvol(u, x):
+    v = x["vols"]
+    ch = [math.log(b / a) if x["method"] == "LOG" else b - a for a, b in zip(v, v[1:])]
+    st = u("STAT.SAMPLE")
+    for c in ch:
+        st.add(c)
+    return {"vol_of_vol": math.sqrt(x["periods_per_year"]) * st.standardDeviation(), "mean_change": st.mean()}
+
+
+HANDLERS = {
+    "vol.svi.surface_check": h_surface_check,
+    "vol.forward.vol": h_forward_vol,
+    "vol.smile.dynamics": h_dynamics,
+    "vol.volofvol.measure": h_volofvol,
+}
+
+NO_ORACLE = {
+    "vol.ssvi.to_svi": "QuantLib has no SSVI; checked by replay through vol.ssvi.evaluate",
+    "vol.svi.fit_surface": "fit judged on known-truth parameters; QuantLib's SviInterpolatedSmileSection fits by its own optimiser path",
+    "vol.local.dupire": "QuantLib's LocalVolSurface needs a BlackVolTermStructure; none reproduces SVI slices linear in total variance. Checked by a 40-digit price-based Dupire",
+}
+
+
+def judge(case, got):
+    exp = case["expected"]["outputs"]
+    if set(got) != set(exp):
+        return False, f"keys {sorted(got)} vs {sorted(exp)}"
+    cls = POLICY[case["tolerance_class"]]
+    per = case.get("output_classes", {})
+    msgs = []
+    for k, e in exp.items():
+        c = POLICY[per[k]] if k in per else cls
+        msgs += runner.compare(got[k], e, c, None if k in per else case.get("tolerance_limit"), k)
+    return not msgs, "; ".join(msgs[:2])
+
+
+def verify(show=True):
+    reg, table = [], []
+    for suite in SUITES:
+        p = ROOT / "datasets" / "golden" / "stage_e" / f"{suite}.json"
+        if not p.exists():
+            continue
+        cases = json.loads(p.read_text(encoding="utf-8"))["cases"]
+        k = 0
+        for c in cases:
+            h = HANDLERS.get(c["operation"])
+            if not h or c["expected"]["status"] != "ok":
+                continue
+            u = Used()
+            try:
+                ok, why = judge(c, h(u, c["inputs"]))
+            except (NotImplementedError, RuntimeError) as e:
+                ok, why = False, str(e)
+            if ok:
+                k += 1
+                reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": CM.LIBRARY, "version": CM.VERSION,
+                            "convention_rows": sorted(u.rows), "map_review": CM.REVIEW})
+            elif show:
+                print(f"  not verified {c['case_id']} {c['operation']}: {why}")
+        table.append((suite, k, len(cases)))
+    return reg, table
+
+
+def map_lines():
+    L = ["## Convention map (rule 11.2.5)", "", f"QuantLib {CM.VERSION}. Review: {CM.REVIEW}, self-assessment, not an outside review. "
+         "Written from `oracle/python/qf_oracle/convmap_e_a.py`.", "", "| Row | Spec | QuantLib object | Note |", "|---|---|---|---|"]
+    for k, (spec, fn, nt) in CM.ROWS.items():
+        src = inspect.getsource(fn).strip()
+        m = re.search(r"lambda[^:]*:\s*(.*)", src)
+        body = (m.group(1).rstrip(" ),") if m else src).replace("|", "\\|")
+        L.append(f"| `{k}` | {spec} | `{body[:110]}` | {nt} |")
+    return L
+
+
+def main():
+    reg, table = verify()
+    k, n = sum(t[1] for t in table), sum(t[2] for t in table)
+    L = ["# Stage E spec A: outside-oracle coverage", "", "Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built from the objects in the map below, "
+         "reproduces every output within the case's own tolerance. Error cases are in the denominator and never count. Register: `oracle/outside_register_e_a.json`.", "",
+         "| Suite | Outside-oracle cases | Cases | Share |", "|---|---|---|---|"]
+    L += [f"| `{s}` | {a} | {b} | {100 * a / b:.0f}% |" for s, a, b in table]
+    L += [f"| **spec A total** | **{k}** | **{n}** | **{100 * k / max(n, 1):.1f}%** |", "", "Operations with no QuantLib route:", ""]
+    L += [f"- `{op}`: {why}" for op, why in NO_ORACLE.items()]
+    L += [""] + map_lines() + [""]
+    (ROOT / "oracle" / "OUTSIDE_E_A.md").write_text("\n".join(L), encoding="utf-8", newline="\n")
+    (ROOT / "oracle" / "outside_register_e_a.json").write_text(json.dumps({"rule": "plan 11.2.5", "library": CM.LIBRARY, "version": CM.VERSION, "map_review": CM.REVIEW,
+                                                                         "cases": reg}, indent=1) + "\n", encoding="utf-8", newline="\n")
+    print("\n".join(L[:len(table) + 8]))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
