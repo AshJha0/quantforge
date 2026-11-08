@@ -34,8 +34,10 @@ final class StageE2 {
     /** spot, expiry_years, rate, dividend_yield, option_type, strikes: shape before values. */
     private record Common(double spot, double t, double r, double q, boolean call, double[] strikes) {
         static Common read(In in) {
-            return new Common(in.real("spot"), in.real("expiry_years"), in.real("rate"), in.real("dividend_yield"),
+            Common c = new Common(in.real("spot"), in.real("expiry_years"), in.real("rate"), in.real("dividend_yield"),
                     in.choice("option_type", Black.OptionType.class) == Black.OptionType.CALL, in.reals("strikes"));
+            in.limit(c.strikes.length > OpsForward.MAX_LIST, "strikes"); // C10 (ruling E-A35)
+            return c;
         }
 
         void check() {
@@ -82,7 +84,9 @@ final class StageE2 {
         table.put("vol.heston.cf", in -> {
             double t = in.real("expiry_years");
             Heston.Params h = heston(in);
-            double[] u = in.gate(in.reals("u"));
+            double[] u = in.reals("u");
+            in.limit(u.length > OpsForward.MAX_LIST, "u"); // C10 (ruling E-A35)
+            in.gate();
             if (u.length == 0) {
                 throw new QfError("E_INPUT", "u is empty", "u");
             }
@@ -115,12 +119,17 @@ final class StageE2 {
             In g = in.object("grid");
             Slv.Grid grid = new Slv.Grid(g.integer("nx"), g.integer("nv"), g.integer("nt"), g.real("x_min"),
                     g.real("x_max"), g.real("v_max"));
+            in.limit(slices.size() > Surfaces.MAX_SLICES, "slices");
+            in.limit(grid.overLimit(), "grid");
             in.gate();
+            // all E_INPUT rules first, then E_DOMAIN, each in input order (ruling E-A37)
+            Surfaces.checkSliceShape(slices);
+            grid.checkShape(s);
             positive(s, "spot");
             positive(t, "expiry_years");
             h.check();
-            Surfaces.checkSlices(slices);
-            grid.check(s);
+            Surfaces.checkSliceValues(slices);
+            grid.checkValues();
             Slv.Result res = Slv.leverage(s, t, r, q, h, slices, grid);
             return Operations.out("x", OpsSmile.list(res.x()), "leverage", OpsSmile.list(res.leverage()), "mass",
                     res.mass());

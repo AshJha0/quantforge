@@ -92,7 +92,10 @@ final class StageE {
         table.put("vol.svi.surface_check", in -> {
             List<Surfaces.Slice> s = slices(in);
             double[] k = in.reals("log_moneyness");
-            boolean reject = in.gate(in.bool("reject"));
+            boolean reject = in.bool("reject");
+            in.limit(s.size() > Surfaces.MAX_SLICES, "slices");
+            in.limit(k.length > Surfaces.MAX_POINTS, "log_moneyness");
+            in.gate();
             Surfaces.checkSlices(s);
             Surfaces.checkGrid(k);
             return Operations.out(checkOutputs(Surfaces.check(s, k), reject).toArray());
@@ -108,7 +111,10 @@ final class StageE {
             double[] t = in.reals("expiry_years");
             double[] k = in.reals("log_moneyness");
             double[][] w = in.anyMatrix("total_variance");
-            boolean reject = in.gate(in.bool("reject"));
+            boolean reject = in.bool("reject");
+            in.limit(t.length > Surfaces.MAX_SLICES, "expiry_years");
+            in.limit(k.length > Surfaces.MAX_POINTS, "log_moneyness");
+            in.gate();
             increasing(t, "expiry_years");
             if (w.length != t.length) {
                 throw input("total_variance", "one row per expiry");
@@ -140,6 +146,8 @@ final class StageE {
                 t[i] = pts.get(i).real("expiry_years");
                 k[i] = pts.get(i).real("log_moneyness");
             }
+            in.limit(s.size() > Surfaces.MAX_SLICES, "slices");
+            in.limit(t.length > Surfaces.MAX_POINTS, "points");
             in.gate();
             Surfaces.checkSlices(s);
             if (t.length == 0) {
@@ -159,10 +167,15 @@ final class StageE {
         });
         table.put("vol.forward.vol", in -> {
             double[] t = in.reals("expiry_years");
-            double[] v = in.gate(in.reals("vols"));
+            double[] v = in.reals("vols");
+            in.limit(t.length > OpsForward.MAX_LIST || v.length > OpsForward.MAX_LIST, "expiry_years"); // C10
+            in.gate();
             increasing(t, "expiry_years");
             if (v.length != t.length) {
                 throw input("vols", "vols and expiry_years differ in length");
+            }
+            if (!(t[0] > 0.0)) {
+                throw domain("expiry_years", "the first expiry must be above 0 (ruling E-A36)");
             }
             for (double x : v) {
                 if (!(x > 0.0)) {
@@ -175,7 +188,9 @@ final class StageE {
         table.put("vol.volofvol.measure", in -> {
             double[] v = in.reals("vols");
             double ppy = in.real("periods_per_year");
-            Method m = in.gate(in.choice("method", Method.class));
+            Method m = in.choice("method", Method.class);
+            in.limit(v.length > Surfaces.MAX_POINTS, "vols"); // stated 10,000 (ruling E-A35)
+            in.gate();
             if (v.length < 3) {
                 throw input("vols", "need at least 3 vols");
             }
@@ -201,7 +216,9 @@ final class StageE {
         double q = in.real("dividend_yield");
         double[] k = in.reals("strikes");
         Rule rule = in.choice("rule", Rule.class);
-        Black.OptionType type = in.gate(in.choice("option_type", Black.OptionType.class));
+        Black.OptionType type = in.choice("option_type", Black.OptionType.class);
+        in.limit(k.length > OpsForward.MAX_LIST, "strikes"); // C10 (ruling E-A35)
+        in.gate();
         if (k.length == 0) {
             throw input("strikes", "strikes is empty");
         }

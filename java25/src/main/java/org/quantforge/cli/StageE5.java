@@ -73,7 +73,10 @@ final class StageE5 {
         table.put("exotic.asian.geometric", in -> {
             Common c = Common.read(in, true);
             Averaging a = in.choice("averaging", Averaging.class);
-            double[] fix = in.gate(in.reals("fixing_years"));
+            double[] fix = in.reals("fixing_years");
+            in.limit(fix.length > OpsForward.MAX_LIST, "fixing_years"); // C10 (ruling E-A35)
+            in.gate();
+            c.check(); // input order: the common values before the fixing rule (ruling E-A38)
             if (a == Averaging.CONTINUOUS ? fix.length != 0 : fix.length == 0) {
                 throw new QfError("E_INPUT", "fixing_years must be [] for CONTINUOUS and given for DISCRETE",
                         "fixing_years");
@@ -83,7 +86,6 @@ final class StageE5 {
                     throw new QfError("E_INPUT", "fixings must increase within (0, T]", "fixing_years");
                 }
             }
-            c.check();
             return Operations.out("price", a == Averaging.CONTINUOUS
                     ? Exotics.asianContinuous(c.phi, c.s, c.k, c.t, c.r, c.q, c.v)
                     : Exotics.asianDiscrete(c.phi, c.s, c.k, c.t, c.r, c.q, c.v, fix));
@@ -158,7 +160,10 @@ final class StageE5 {
             double k = in.real("strike");
             double t = in.real("expiry_years");
             double r = in.real("rate");
-            double phi = in.gate(Black.phi(in.choice("option_type", Black.OptionType.class)));
+            double phi = Black.phi(in.choice("option_type", Black.OptionType.class));
+            in.limit(f.length > OpsForward.MAX_LIST || w.length > OpsForward.MAX_LIST || v.length > OpsForward.MAX_LIST
+                    || rho.length > OpsForward.MAX_LIST, "forwards"); // C10 (ruling E-A35)
+            in.gate();
             int n = f.length;
             if (n == 0 || w.length != n || v.length != n || rho.length != n) {
                 throw new QfError("E_INPUT", "forwards, weights, vols and correlation must match", "forwards");
@@ -192,13 +197,12 @@ final class StageE5 {
         });
         table.put("exotic.american.crr", in -> {
             Common c = Common.read(in, true);
-            long steps = in.gate(in.integer("steps"));
+            long steps = in.integer("steps");
+            in.limit(steps > 20_000, "steps"); // at the gate (ruling E-A34)
+            in.gate();
             c.check();
             if (steps < 1) {
                 throw new QfError("E_INPUT", "steps must be at least 1", "steps");
-            }
-            if (steps > 20_000) {
-                throw new QfError("E_LIMIT", "steps must be at most 20,000", "steps");
             }
             double[] r = Exotics.crr(c.phi, c.s, c.k, c.t, c.r, c.q, c.v, (int) steps);
             return Operations.out("american", r[0], "european", r[1], "early_exercise_premium", r[0] - r[1]);
@@ -214,13 +218,12 @@ final class StageE5 {
             In g = in.object("grid");
             long nx = g.integer("nx");
             long nt = g.integer("nt");
-            double width = in.gate(g.real("width"));
+            double width = g.real("width");
+            in.limit(nx > 1001 || nt > 10_000, "grid"); // at the gate (ruling E-A34)
+            in.gate();
             c.check();
             if (nx < 5 || nx % 2 == 0 || nt < 1) {
                 throw new QfError("E_INPUT", "nx must be odd and at least 5, nt at least 1", "grid");
-            }
-            if (nx > 1001 || nt > 10_000) {
-                throw new QfError("E_LIMIT", "grid is above its limit", "grid");
             }
             positive(width, "width");
             double[] r = Exotics.fd(c.phi, e == Exercise.AMERICAN, c.s, c.k, c.t, c.r, c.q, c.v, (int) nx, (int) nt,

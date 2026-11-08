@@ -8,7 +8,13 @@ public final class Slv {
     private Slv() {}
 
     public record Grid(long nx, long nv, long nt, double xMin, double xMax, double vMax) {
-        public void check(double spot) {
+        /** Above the grid limits: raised at the input gate (ruling E-A34). */
+        public boolean overLimit() {
+            return nx > 1000 || nv > 1000 || nt > 10_000;
+        }
+
+        /** The E_INPUT rules; the E_DOMAIN rule is checkValues (ruling E-A37). */
+        public void checkShape(double spot) {
             if (nx < 5 || nv < 5 || nt < 2) {
                 throw new QfError("E_INPUT", "need nx, nv at least 5 and nt at least 2", "grid");
             }
@@ -16,12 +22,20 @@ public final class Slv {
             if (!(xMin < s && s < xMax)) {
                 throw new QfError("E_INPUT", "x_min < ln(spot) < x_max is needed", "grid");
             }
+        }
+
+        public void checkValues() {
             if (!(vMax > 0.0)) {
                 throw new QfError("E_DOMAIN", "v_max must be above 0", "grid");
             }
-            if (nx > 1000 || nv > 1000 || nt > 10_000) {
+        }
+
+        public void check(double spot) {
+            if (overLimit()) {
                 throw new QfError("E_LIMIT", "grid is above its limit", "grid");
             }
+            checkShape(spot);
+            checkValues();
         }
     }
 

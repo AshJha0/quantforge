@@ -25,8 +25,14 @@ public final class Surfaces {
         }
     }
 
-    /** Checks the slices object, in the order of arb-free-surfaces.md. */
+    /** Checks the slices object (its E_LIMIT is raised at the input gate, ruling E-A34). */
     public static void checkSlices(List<Slice> slices) {
+        checkSliceShape(slices);
+        checkSliceValues(slices);
+    }
+
+    /** The E_INPUT rules of the slices object. */
+    public static void checkSliceShape(List<Slice> slices) {
         if (slices.isEmpty()) {
             throw new QfError("E_INPUT", "slices is empty", "slices");
         }
@@ -35,6 +41,10 @@ public final class Surfaces {
                 throw new QfError("E_INPUT", "expiry_years must increase", "slices");
             }
         }
+    }
+
+    /** The E_DOMAIN rules of the slices object. */
+    public static void checkSliceValues(List<Slice> slices) {
         for (Slice s : slices) {
             if (!(s.expiry() > 0.0)) {
                 throw new QfError("E_DOMAIN", "expiry_years must be above 0", "slices");
