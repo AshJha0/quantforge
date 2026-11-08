@@ -8,7 +8,7 @@ from runner import load_policy  # the runner's own tolerance classes
 classes = load_policy("../conformance/tolerances/policy.yaml")
 
 # Goldens under an open question in SPEC_QUESTIONS.md; they stay with the conformance runner.
-OPEN = {"rulings_e_b-0008", "rulings_e_b-0009", "rulings_e_b-0015"}
+OPEN: set[str] = set()
 MAX_INPUT = 6000  # bytes of case or outputs JSON; larger cases stay with the conformance runner
 per_op = collections.defaultdict(list)
 for f in sorted(glob.glob("../datasets/golden/*/*.json")):
