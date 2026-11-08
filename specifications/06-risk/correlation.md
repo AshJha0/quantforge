@@ -34,7 +34,7 @@ Inputs: `weights` `w_i`, `vols` `sigma_i` (at least two names), `index_vol` `sig
 correlation = (sigma_I^2 - sum_i w_i^2 sigma_i^2) / (sum_{i != j} w_i w_j sigma_i sigma_j)
 ```
 
-The sum over `i != j` counts each pair twice. The result is not clipped to [-1, 1] (ruling E-B20). Weights must be `>= 0` with at least two positive; a zero weight drops its name (ruling E-B33). Checks: fewer than two names, or lists of different length: `E_INPUT`; a vol `<= 0`, a negative weight, or fewer than two positive weights (zero denominator): `E_DOMAIN`.
+The sum over `i != j` counts each pair twice. The result is not clipped to [-1, 1] (ruling E-B20). Weights must be `>= 0` with at least two positive; a zero weight drops its name (ruling E-B33). Checks: fewer than two names, or lists of different length: `E_INPUT`; then, all `E_DOMAIN`, in this order: a negative weight, a member vol `<= 0`, `index_vol <= 0`, fewer than two positive weights (zero denominator) (rulings E-B33, E-B39).
 
 ## `risk.corr.dispersion`
 

@@ -101,3 +101,15 @@ What changes for a build:
 - Goldens grew: `ratesvol_e` 85 (was 50), `corr_e` 49 (was 38), `creditopt_e` 186 (was 96). Case ids moved where cases were inserted (for example the E-B27 case is now `creditopt_e-0145`); docs are updated, so refer to cases by the files.
 
 Outside share under E-B28: spec B 245 of 404 (60.6%); stage-wide with spec A 508 of 814 (62.4%).
+
+## Cross-language SPEC_QUESTIONS rulings (2026-11-08)
+
+Rulings E-B34 to E-B40 in `specifications/stage-e-rulings-b.md`; new suite `datasets/golden/stage_e_b/rulings_e_b.json` (15 cases). Builds change only where a ruling picked another build's reading:
+- C++ and Rust: no change for E-B34 (bracket first); Python moves the `vol.vix.index` bracket before the term checks.
+- Rust: check `ctd_yield` and `ctd_modified_duration` above 0 (E-B38).
+- C++, Java, Rust: `fair_variance < 0` is `E_DOMAIN` (E-B36); `1 + K <= 0` in `zc_price` is `E_DOMAIN` (E-B37).
+- Java, Python, C++: `index_vol <= 0` is `E_DOMAIN` (E-B39).
+- Every build: negative vol `E_DOMAIN`, zero vol intrinsic, in `rates.bondfut.*` and `infl.cap.*` (E-B38).
+`creditopt_e` gained 30 CDS option cases at the end (ids `creditopt_e-0187` onwards; no earlier id moved).
+
+Outside share after these rulings: spec B 277 of 449 (61.7%); stage-wide with spec A at dc16b77 557 of 895 (62.2%).

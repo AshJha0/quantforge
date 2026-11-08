@@ -488,7 +488,7 @@ def _lazy(mod, fn):
     return run
 
 
-SLICES = {"E7": e7, "E4": _lazy("gen_stage_e_b_e4", "e4"), "E6": _lazy("gen_stage_e_b_e6", "e6"), "E8": _lazy("gen_stage_e_b_e8", "e8")}
+SLICES = {"E7": e7, "E4": _lazy("gen_stage_e_b_e4", "e4"), "E6": _lazy("gen_stage_e_b_e6", "e6"), "E8": _lazy("gen_stage_e_b_e8", "e8"), "RULINGS": _lazy("gen_stage_e_b_rulings", "rulings_e_b")}
 
 
 def main():
