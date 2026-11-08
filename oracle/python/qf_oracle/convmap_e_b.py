@@ -35,6 +35,10 @@ NEW = {
     "OPT.BLACK_FORMULA": ("05-volatility/black-models.md BLACK_76, discounted", lambda: ql.blackFormula, "formula level"),
     "OPT.BACHELIER_FORMULA": ("05-volatility/black-models.md BACHELIER, discounted", lambda: ql.bachelierBlackFormula, "formula level"),
     "OPT.BLACK_IMPLIED": ("05-volatility/rates-vol-cube.md implied Black vol from a premium", lambda: ql.blackFormulaImpliedStdDev, "returns the standard deviation; divided by sqrt(t)"),
+    # E6 correlation
+    "CORR.EIGEN": ("06-risk/correlation.md validation: eigenvalues of the symmetric input", lambda M: ql.SymmetricSchurDecomposition(M), "Jacobi rotations"),
+    "CORR.HIGHAM": ("06-risk/correlation.md nearest correlation, unweighted Frobenius norm (Higham 2002)",
+                    lambda M: ql.pseudoSqrt(M, ql.SalvagingAlgorithm.Higham), "returns a square root S; the repaired matrix is S S^T. QuantLib stops near 1e-6 in the iterate"),
 }
 ROWS = {**base.ROWS, **NEW}
 

@@ -148,7 +148,33 @@ def h_zc(u, i, exp):
     return {"price": i["notional"] * _fml(u, i["model"], i["type"] == "CAP", i["forward_index_ratio"], Kr, i["vol"], i["years"], i["discount_factor"]), "strike_ratio": Kr}
 
 
-HANDLERS = {"vol.varswap.fair_strike": h_varswap, "rates.swaption.price_cube": h_cube, "rates.cap.strip": h_strip, "rates.bondfut.option_price": h_bf_price,
+# ---------------------------------------------------------------- E6 (QuantLib)
+def _qm(M):
+    return ql.Matrix([[float(x) for x in r] for r in M])
+
+
+def h_validate(u, i, exp):
+    M = i["matrix"]
+    n = len(M)
+    me = min(u("CORR.EIGEN", _qm(M)).eigenvalues())
+    sym = all(M[a][b] == M[b][a] for a in range(n) for b in range(n))
+    dg = all(M[a][a] == 1.0 for a in range(n))
+    rg = all(-1 <= x <= 1 for r in M for x in r)
+    psd = me >= -1e-10
+    return {"symmetric": sym, "unit_diagonal": dg, "in_range": rg, "min_eigenvalue": me, "psd": psd, "valid": sym and dg and rg and psd}
+
+
+def h_nearest(u, i, exp):
+    M = i["matrix"]
+    n = len(M)
+    Sq = u("CORR.HIGHAM", _qm(M))
+    X = [[sum(Sq[a][k] * Sq[b][k] for k in range(n)) for b in range(n)] for a in range(n)]
+    if max(abs(X[a][a] - 1) for a in range(n)) > 2e-5:
+        raise NotImplementedError("QuantLib's Higham stopped at its iteration cap before the unit diagonal held; not a check of the golden")
+    return {"matrix": X, "frobenius_distance": math.sqrt(sum((X[a][b] - M[a][b]) ** 2 for a in range(n) for b in range(n)))}
+
+
+HANDLERS = {"risk.corr.validate": h_validate, "risk.corr.nearest": h_nearest, "vol.varswap.fair_strike": h_varswap, "rates.swaption.price_cube": h_cube, "rates.cap.strip": h_strip, "rates.bondfut.option_price": h_bf_price,
             "rates.bondfut.implied_vol": h_bf_iv, "infl.cap.yoy_price": h_yoy, "infl.cap.zc_price": h_zc}
 
 
@@ -243,6 +269,7 @@ def load():
 
 
 NO_ORACLE = {
+    "corr_e": "implied correlation and dispersion have no QuantLib object (closed forms, hand-checked); on 4 harder matrices QuantLib's Higham stops at its iteration cap before convergence",
     "garch_e": "QuantLib's Garch11 is not in the Python wheel; checked by mpmath replica and a separate float replay",
     "varswap_e": "q != 0 cases: QuantLib's drift term omits q (ruling E-B3); realized-variance cases have no QuantLib object",
     "ratesvol_e": "only error cases are not counted",

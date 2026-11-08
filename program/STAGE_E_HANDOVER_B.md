@@ -50,3 +50,19 @@ What changes for a build:
 - E4 goldens got the same per-output treatment (`ratesvol_e`): no value changed, tolerances on `forward_rate`, `annuity`, `vol`, `sabr`, `strike_ratio` tightened.
 
 Outside share: E7 18 of 84 (21.4%); spec B so far 53 of 134 (39.6%).
+
+## E6 correlation (ready, 2026-11-08)
+
+New operations: `risk.corr.validate`, `risk.corr.nearest`, `risk.corr.implied`, `risk.corr.dispersion`.
+
+Goldens: `datasets/golden/stage_e_b/corr_e.json`, 38 cases (30 ok, 8 error).
+
+Read:
+- `specifications/cli-contract.md`, section "Stage E operations, spec B" (E6 row)
+- `specifications/stage-e-rulings-b.md` (E-B18 to E-B21)
+- `specifications/06-risk/correlation.md`
+- `specifications/05-volatility/stage-e-targets-b.md`, E6 table
+
+Easy to get wrong (wrong-convention checks): the nearest matrix needs Dykstra's correction (plain alternating projections, or clipping eigenvalues and rescaling, land elsewhere); converge well past 2e-5 on entries; the implied-correlation denominator counts each pair twice and squares the weights only in the numerator's own-variance term; dispersion legs are variance notionals `N w_i / (2 K_i)`.
+
+Oracle: 18 of 38 (47%) outside-checked by QuantLib 1.44; 29 wrong-convention checks. Running spec B share (E7 + E4 + E6): 71 of 172 (41.3%).
