@@ -118,9 +118,11 @@ def strip(V, inp, mutant=None):
             vols += [mp.mpf(fv)] * len(seg)
         else:
             g = lambda v: known + mp.fsum(cpl(p, v) for p in seg) - target  # noqa: E731
-            lo, hi = (mp.mpf("1e-6"), mp.mpf(3)) if model == "BLACK_76" else (mp.mpf("1e-7"), mp.mpf("0.1"))
+            lo, hi = (mp.mpf("1e-10"), mp.mpf(5)) if model == "BLACK_76" else (mp.mpf("1e-10"), mp.mpf("0.5"))
             if g(lo) > 0:
                 raise ArithmeticError("no positive caplet vol")
+            if g(hi) < 0:
+                raise OverflowError("caplet vol above the search bound")
             v = mp.findroot(g, (lo, hi), solver="anderson")
             assert abs(g(v)) < 1e-30
             vols += [v] * len(seg)
@@ -143,7 +145,8 @@ def ratesvol_e():
     LIM = {"absolute": 1e-9 * 1e7, "relative": 1e-9, "reason": "curve tolerance on notional, as D7"}
     for typ, em, tm, K in (("PAYER", 12, 60, .037), ("RECEIVER", 12, 60, .033), ("PAYER", 12, 60, .045), ("PAYER", 24, 120, .038), ("RECEIVER", 6, 24, .035),
                            ("PAYER", 18, 60, .036), ("PAYER", 36, 84, .040), ("RECEIVER", 48, 36, .030), ("PAYER", 60, 120, .042), ("PAYER", 9, 30, .0355),
-                           ("RECEIVER", 30, 96, .028), ("PAYER", 12, 24, .060)):
+                           ("RECEIVER", 30, 96, .028), ("PAYER", 12, 24, .060)) + tuple(
+            (typ, em, tm, K) for em in (7, 15, 27, 42, 54) for tm in (30, 72, 108) for typ, K in (("PAYER", .041), ("RECEIVER", .032))):
         tr = {"type": typ, "expiry_months": em, "tenor_months": tm, "strike": K, "notional": 1e7}
         out = cube_price(V, CUBE, tr)
         node = em in CUBE["expiries_months"] and tm in CUBE["tenors_months"]
@@ -172,6 +175,21 @@ def ratesvol_e():
               output_classes={"caplet_vols": R}, limit={"absolute": 1e-9 * 1e7, "relative": 1e-9, "reason": "cap prices: curve tolerance on notional"})
         o2 = strip(V, inp, "flat-is-caplet")
         caught("ratesvol_e", f"strip {model} K={K}: flat vol used as caplet vol", max(abs(x - y) for x, y in zip(o2["caplet_vols"], out["caplet_vols"])), 1e-10 + 1e-10 * max(out["caplet_vols"]))
+    # Non-annual caps (R5 audit B6): a 6-month first cap gives a 2-caplet first segment.
+    for model, K, tens, flats in (("BLACK_76", .037, [6, 12, 18, 24, 36], [.25, .245, .24, .236, .23]), ("BACHELIER", .036, [6, 9, 15, 24, 33], [.0088, .0090, .0092, .0094, .0095]),
+                                  ("BLACK_76", .040, [3, 12, 21, 48], [.21, .215, .22, .21]), ("BLACK_76", .034, [9, 18, 30, 45, 60], [.27, .26, .25, .24, .235])):
+        inp = {"discount": jd, "projection": jp, "model": model, "start_months": 3, "strike": K, "cap_tenors_months": tens, "flat_vols": flats, "notional": 1e7}
+        out = strip(V, inp)
+        s.add(sop, inp, out, cls=R, verified=["independent-replay", "mpmath-50 root"], tags=["strip", model.lower(), "non-annual"],
+              output_classes={"caplet_vols": R}, limit={"absolute": 1e-9 * 1e7, "relative": 1e-9, "reason": "cap prices: curve tolerance on notional"})
+        caught("ratesvol_e", f"strip non-annual {model} K={K}: flat vol used as caplet vol", max(abs(x - y) for x, y in zip(strip(V, inp, "flat-is-caplet")["caplet_vols"], out["caplet_vols"])), 1e-10)
+    hi_ = {"discount": jd, "projection": jp, "model": "BLACK_76", "start_months": 3, "strike": .037, "cap_tenors_months": [12, 24], "flat_vols": [6.0, 6.0], "notional": 1e7}
+    try:
+        strip(V, hi_)
+        raise AssertionError("upper-bound case stripped")
+    except OverflowError:
+        pass
+    s.add(sop, hi_, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="caplet vol above the search bound 5 (Black): E_DOMAIN (ruling E-B32)")
     bad = {"discount": jd, "projection": jp, "model": "BLACK_76", "start_months": 3, "strike": .037, "cap_tenors_months": [12, 24, 36], "flat_vols": [.30, .30, .12], "notional": 1e7}
     try:
         strip(V, bad)

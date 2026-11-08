@@ -39,15 +39,20 @@ Numbered EB so spec A's block can be added without renumbering. Pinned means nam
 | EB14 | Unsorted strip; zero bid at the ATM strike; no OTM puts | Pinned | `vix_e-0017`, `vix_e-0018`, `vix_e-0021` (`E_INPUT`) | Ruling E-B15 against Cboe v5.0 3(a) |
 | EB15 | Correlation matrix already valid | Pinned | `corr_e-0010`, `corr_e-0012`, `corr_e-0018` | Nearest returns the input |
 | EB16 | Correlation with an entry near -1 after repair | Pinned | `corr_e-0020` | |
-| EB17 | Implied correlation exactly 1 (equal vols, index vol equal) | Pinned | `corr_e-0032` | Not clipped (E-B20) |
+| EB17 | Implied correlation exactly 1 (equal vols, index vol equal) | Pinned | `corr_e-0040` | Not clipped (E-B20) |
 | EB18 | Default of the reference name before expiry | Pinned | Non-knock-out payers (`front-end-protection` tag in `creditopt_e`) and knock-out payers at the same inputs | Ruling E-B23 |
 | EB19 | Negative rate under a CDS option | Pinned | `creditopt_e` cases with `rate = -0.2%` | |
-| EB20 | Zero correlation in copulas | Pinned | Gaussian `creditopt_e-0065` (exact independence), Student t `creditopt_e-0064` (not independence) | |
-| EB21 | Senior tranche far out of the money | Pinned | `creditopt_e-0083` (expected loss 1.4e-9) | Relative tolerance keeps it meaningful |
+| EB20 | Zero correlation in copulas | Pinned | Gaussian `creditopt_e-0155` (exact independence), Student t `creditopt_e-0154` (not independence) | |
+| EB21 | Senior tranche far out of the money | Pinned | `creditopt_e-0173` (expected loss 1.4e-9) | Relative tolerance keeps it meaningful |
+| EB22 | Validation flags false (asymmetric by one ulp, diagonal one ulp below 1, entry 1.2, asymmetric) | Pinned | `corr_e-0023` to `corr_e-0026` | Ruling E-B29 |
+| EB23 | Nearest correlation: 1 by 1, non-unit diagonal, `\|rho\| > 1`, rank-deficient 20 by 20 | Pinned | `corr_e-0027` to `corr_e-0030` | Rulings E-B29, E-B31 |
+| EB24 | CDS option schedules on month ends, 29 February and short final stubs | Pinned | `creditopt_e-0049` to `creditopt_e-0138` (`schedule` tag) | Ruling E-B30 |
+| EB25 | Non-annual caps; caplet vol above the search bound | Pinned | `ratesvol_e-0053` to `ratesvol_e-0056`; `ratesvol_e-0057` (`E_DOMAIN`) | Ruling E-B32 |
+| EB26 | Implied correlation with a zero or negative weight | Pinned | `corr_e-0042`, `corr_e-0043`, `corr_e-0044` | Ruling E-B33 |
 | EB9 | Swaption exactly on a cube node | Pinned | `ratesvol_e-0001` to `ratesvol_e-0005`, `ratesvol_e-0009`, `ratesvol_e-0012` | Parameters equal the node's; checks the time axis |
-| EB10 | Cap quotes with calendar arbitrage | Pinned | `ratesvol_e-0023` (`E_ARBITRAGE`) | Ruling E-B10: rejected, not clipped |
-| EB11 | Zero-strike inflation floor | Pinned | Bachelier YoY floor at 0%: `ratesvol_e-0042`; ZC floor at 0% (`strike_ratio = 1`): `ratesvol_e-0046`; Black YoY floor at 0%: `ratesvol_e-0044` (`E_DOMAIN`) | Deflation protection |
-| EB12 | Implied vol with premium below intrinsic | Pinned | `ratesvol_e-0038` (`E_DOMAIN`) | |
+| EB10 | Cap quotes with calendar arbitrage | Pinned | `ratesvol_e-0058` (`E_ARBITRAGE`) | Ruling E-B10: rejected, not clipped |
+| EB11 | Zero-strike inflation floor | Pinned | Bachelier YoY floor at 0%: `ratesvol_e-0077`; ZC floor at 0% (`strike_ratio = 1`): `ratesvol_e-0081`; Black YoY floor at 0%: `ratesvol_e-0079` (`E_DOMAIN`) | Deflation protection |
+| EB12 | Implied vol with premium below intrinsic | Pinned | `ratesvol_e-0073` (`E_DOMAIN`) | |
 
 ## Rules for adding a row
 

@@ -186,15 +186,15 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 | EB1 | GARCH(1,1) likelihood, forecast, fit | `05-volatility/garch.md` | E7 | Specified | 0 of 27 (no QuantLib object in the Python wheel) |
 | EB2 | Variance swap: replication and realized variance | `05-volatility/variance-swaps.md` | E7 | Specified, outside-checked | `fair_strike` 18 of 27; realized 0 of 4 |
 | EB3 | VIX-style index from a given strip | `05-volatility/vix-index.md` | E7 | Specified | 0 of 14 (hand case is the outside reference) |
-| EB4 | SABR swaption cube | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked | 12 of 18 |
-| EB5 | Caplet stripping | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (reprice) | 4 of 9 |
+| EB4 | SABR swaption cube | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked | 42 of 48 |
+| EB5 | Caplet stripping | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (reprice) | 8 of 14 |
 | EB6 | Bond futures options, price and yield vol | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 10 of 12 |
-| EB8 | Correlation validation and nearest correlation (Higham) | `06-risk/correlation.md` | E6 | Specified, outside-checked | validate 11 of 13; nearest 7 of 14 |
-| EB9 | Implied correlation and dispersion | `06-risk/correlation.md` | E6 | Specified | 0 of 11 (closed forms, hand cases) |
-| EB10 | CDS options (Black on the forward spread) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked | 48 of 56 |
-| EB11 | Gaussian and Student-t default copulas | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked (Gaussian, formula) | 5 of 14 |
-| EB12 | Large homogeneous pool (Vasicek) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked (formula) | 21 of 26 |
-| EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula) | 9 of 11 |
+| EB8 | Correlation validation and nearest correlation (Higham) | `06-risk/correlation.md` | E6 | Specified, outside-checked | validate 15 of 17; nearest 10 of 18 |
+| EB9 | Implied correlation and dispersion | `06-risk/correlation.md` | E6 | Specified | 0 of 14 (closed forms, hand cases) |
+| EB10 | CDS options (Black on the forward spread) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified, outside-checked | 138 of 146 |
+| EB11 | Gaussian and Student-t default copulas | `04-pricing/credit-options-and-copulas.md` | E8 | Specified (Gaussian re-evaluated in QuantLib, not counted: E-B28) | 0 of 14 |
+| EB12 | Large homogeneous pool (Vasicek) | `04-pricing/credit-options-and-copulas.md` | E8 | Specified (re-evaluated in QuantLib, not counted: E-B28) | 0 of 26 |
+| EB7 | YoY and ZC inflation caps | `05-volatility/rates-vol-cube.md` | E4 | Specified, outside-checked (formula, YoY only) | 4 of 11 |
 
 ### EB1 GARCH(1,1)
 - **Purpose:** conditional variance path and Gaussian log-likelihood at given parameters; multi-step variance forecast; maximum-likelihood fit.
@@ -217,7 +217,7 @@ Numbered EB so spec A's stage E rows can be added without renumbering. Status *S
 - **Purpose:** swaption prices off a cube of SABR parameters per expiry and tenor.
 - **Inputs:** D7 curves, node grid and parameter matrices, trade.
 - **Limitations:** parameters are inputs (no calibration to market quotes here); no shift, so no negative forwards; Hagan's expansion is not arbitrage-free in the wings (`sabr.md`); bilinear interpolation has kinks at nodes; no extrapolation; stylised D7 swap.
-- **Validation:** QuantLib smile, interpolation and swaption engine objects agree on all 12 cases. **Review:** 2026-11-08.
+- **Validation:** QuantLib smile, interpolation and swaption engine objects agree on all 42 cases. **Review:** 2026-11-08.
 
 ### EB5 Caplet stripping
 - **Purpose:** caplet vols from flat cap vols at one strike.

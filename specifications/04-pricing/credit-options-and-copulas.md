@@ -8,7 +8,7 @@ Spec version 1.0.0. Status: Specified (stage E, E8, spec B). Rulings: `stage-e-r
 
 Inputs: `as_of`, `expiry`, `maturity` (dates), `rate` and `hazard_rate` (flat, continuous, ACT/365F), `recovery` `R`, `type` (`PAYER`, `RECEIVER`), `strike` `K`, `notional` `N`, `vol` `sigma`, `knock_out` (boolean).
 
-Underlying legs (ruling E-B22): dates `x_0 = expiry`, `x_k = expiry + 3k months` (same day of month, unadjusted, no calendar), the last one `maturity`. With `t(d) = (d - as_of)/365`, `S(d) = e^{-h t(d)}`, `P(d) = e^{-r t(d)}`, and for each period `(a, b)` the mid date `m = a + floor((b - a)/2)` days:
+Underlying legs (rulings E-B22, E-B30): dates `x_0 = expiry`, `x_k = expiry + 3k months`, each counted from `expiry` (not chained), the day clipped to the month end (2027-01-31 + 3 months = 2027-04-30), unadjusted, no calendar; the first `x_k` at or after `maturity` is replaced by `maturity`, so a non-multiple of 3 months gives a short final period. With `t(d) = (d - as_of)/365`, `S(d) = e^{-h t(d)}`, `P(d) = e^{-r t(d)}`, and for each period `(a, b)` the mid date `m = a + floor((b - a)/2)` days:
 
 ```
 protection = sum (1 - R) P(m) (S(a) - S(b))
@@ -62,14 +62,14 @@ Checks: `d <= a`, `a < 0` or `d > 1`: `E_INPUT`; `p` outside `(0, 1)`, `rho` out
 ## Worked examples
 
 - CDS option (`creditopt_e-0001`): expiry 2027-03-20, CDS to 2032-03-20, `r = 3.5%`, `h = 2%`, `R = 40%`, payer at 1.20%, vol 50%, knock-out. Forward spread 1.18877% (close to `(1 - R) h = 1.2%`, lower because of the accrual and discounting), risky annuity 4.32865, price 59,847.84 on 10m. The reported `front_end_protection` is `1e7 x 0.6 x (1 - e^{-0.02 x 134/365}) x e^{-0.035 x 134/365} = 43,333.06`; a non-knock-out payer would add it to its price. A receiver on the same underlying at 0.96% (`creditopt_e-0003`) is worth 11,581.73.
-- Copulas (`creditopt_e-0057`, `-0061`): `p = (2%, 3%)`, `rho = 0.3`. Gaussian joint default 0.2288%, Student t with 4 degrees of freedom 0.5102%: more than twice as likely, from tail dependence alone. At `rho = 0` the Gaussian gives exactly `p1 p2 = 0.06%` (`-0065`); the t with 5 degrees of freedom still gives 2.04% against 1.5% (`-0064`).
-- LHP (`creditopt_e-0071` to `-0076`): `p = 5%`, `rho = 0.3`, `R = 40%`, pool loss 3%. Expected loss of the 0-3% tranche is 54.11% of its notional, 3-7% 19.58%, 7-10% 8.78%, 10-15% 4.06%, 15-30% 0.81%, 30-100% 0.0082%. Width-weighted, they add up to 3%.
+- Copulas (`creditopt_e-0147`, `-0151`): `p = (2%, 3%)`, `rho = 0.3`. Gaussian joint default 0.2288%, Student t with 4 degrees of freedom 0.5102%: more than twice as likely, from tail dependence alone. At `rho = 0` the Gaussian gives exactly `p1 p2 = 0.06%` (`creditopt_e-0155`); the t with 5 degrees of freedom still gives 2.04% against 1.5% (`creditopt_e-0154`).
+- LHP (`creditopt_e-0161` to `-0166`): `p = 5%`, `rho = 0.3`, `R = 40%`, pool loss 3%. Expected loss of the 0-3% tranche is 54.11% of its notional, 3-7% 19.58%, 7-10% 8.78%, 10-15% 4.06%, 15-30% 0.81%, 30-100% 0.0082%. Width-weighted, they add up to 3%.
 
 ## Acceptance
 
 Suite `stage_e_b/creditopt_e`. CDS option prices 1e-9 per unit notional (stage D credit); forward spread and annuity class `simple_analytic`; implied vol class `root_finding`. Copula probabilities and LHP values 1e-12 absolute plus 1e-9 relative (1e-5 currency on a 10m tranche).
 
-Outside oracle (QuantLib 1.44, `oracle/outside_register_e_b.json`): every CDS option and implied-vol case through `CdsOption`, `BlackCdsOptionEngine` and `MidPointCdsEngine`; Gaussian copula, LHP tranche and loss-CDF cases at formula level through `BivariateCumulativeNormalDistributionWe04DP`, with the normal quantile from `InverseCumulativeNormal` refined by one Newton step using QuantLib's `CumulativeNormalDistribution` and `NormalDistribution` (QuantLib's inverse alone is good to about 3e-9). The Student-t copula has no QuantLib object in the Python wheel; its goldens rest on 50-digit quadrature. QuantLib's `GaussianLHPLossModel` and tranche engines are not in the Python wheel.
+Outside oracle (QuantLib 1.44, `oracle/outside_register_e_b.json`): every CDS option and implied-vol case through `CdsOption`, `BlackCdsOptionEngine` and `MidPointCdsEngine`, with `front_end_protection` taken as QuantLib's non-knock-out payer value minus its knock-out payer value. Gaussian copula, LHP tranche and loss-CDF cases are re-evaluated with QuantLib's `BivariateCumulativeNormalDistributionWe04DP` and normal functions, but their outputs are the spec's own algebra on those functions, so they are listed as partly outside and not counted (ruling E-B28, as spec A's E-A17). The Student-t copula has no QuantLib object in the Python wheel; its goldens rest on 50-digit quadrature. QuantLib's `GaussianLHPLossModel` and tranche engines are not in the Python wheel.
 
 Wrong-convention checks, each caught: annuity without accrual on default; ACT/365 premium accrual; option time to maturity instead of expiry; front-end protection added to a knock-out; Gaussian in place of t; `sqrt(rho)` used as the pair correlation; tranche points not scaled by `1 - R`; `rho` read as `sqrt(rho)` in the pool.
 
