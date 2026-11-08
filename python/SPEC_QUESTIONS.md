@@ -158,3 +158,14 @@ Choices made where a stage E spec was silent or two rules pull apart. No golden 
   next), then the bracket, then a negative bracket under the root (`E_DOMAIN`).
 - E-Q6 (E1, `vol.forward.vol`). No check on `expiry_years <= 0` is listed; Python takes them as given (a
   first expiry of 0 then divides by `T_1 - 0` only from the second point on).
+- E-Q7 (E4, `rates.swaption.price_cube`). The domain checks (`alpha <= 0`, `beta` outside `[0, 1]`,
+  `|rho| >= 1`, `nu < 0`) are applied to every node of the cube, not only to the interpolated parameters:
+  `ratesvol_e-0017` puts a bad `rho` at a node the trade does not touch and expects `E_DOMAIN`. A bilinear mix
+  of valid nodes is then valid too.
+- E-Q8 (E4, `infl.cap.zc_price`). `(1 + K)^T` with `1 + K <= 0` has no real value for a non-integer `T`; the
+  page lists no check. Python returns `E_DOMAIN` on `strike`, after the `BLACK_76` forward check and before
+  the `years` check. The page's "strike <= 0" check is read as YoY only, so a negative ZC strike with
+  `1 + K > 0` is priced under both models.
+- E-Q9 (E4, `rates.cap.strip`). The page lists the strip's own checks but not their order against D7's
+  (`start_months`, tenor range, `BLACK_76` strike and forwards). Python runs the strip checks (tenors, count,
+  flat vols), then D7's.

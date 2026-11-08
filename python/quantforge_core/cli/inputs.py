@@ -171,6 +171,13 @@ class Inputs:
             raise _bad(key, "not an array of numbers")
         return [float(e) for e in v]
 
+    def integer_list(self, key: str) -> list[int]:
+        v = self.array(key)
+        if not all(not isinstance(e, bool) and isinstance(e, int) and abs(e) <= MAX_INTEGER
+                   for e in v):
+            raise _bad(key, "not an array of integers")
+        return v
+
     def nullable_reals(self, key: str) -> list[float | None]:
         v = self.array(key)
         if not all(e is None or _is_real(e) for e in v):

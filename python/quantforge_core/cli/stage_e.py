@@ -222,3 +222,74 @@ def _fx_smile(i: Inputs) -> Any:
     args = (*_fx_market(i), i.real("atm_vol"), i.real("rr"), i.real("bf"), i.real("delta"),
             _delta_type(i), i.enum("atm_type", ATM_TYPES))
     return E.fx_smile.smile_from_quotes(*args)
+
+
+# E4: rates and inflation vol (rates-vol-cube.md)
+
+_RATE_MODELS = ("BLACK_76", "BACHELIER")
+
+
+def _curves(i: Inputs) -> tuple[Any, Any]:
+    from .stage_b import _curve
+
+    return _curve(i, "discount"), _curve(i, "projection")
+
+
+@op("rates.swaption.price_cube")
+def _price_cube(i: Inputs) -> Any:
+    c, t = i.object("cube"), i.object("trade")
+    params = {k: c.matrix(k) for k in ("alpha", "beta", "rho", "nu")}
+    months = [c.integer_list(k) for k in ("expiries_months", "tenors_months")]
+    args = (*_curves(i), *months, params, t.enum("type", ("PAYER", "RECEIVER")),
+            t.integer("expiry_months"), t.integer("tenor_months"), t.real("strike"),
+            t.real("notional"))
+    return E.rates_vol.price_cube(*args)
+
+
+@op("rates.cap.strip")
+def _cap_strip(i: Inputs) -> Any:
+    args = (*_curves(i), i.enum("model", _RATE_MODELS), i.integer("start_months"),
+            i.real("strike"), i.integer_list("cap_tenors_months"), i.reals("flat_vols"),
+            i.real("notional"))
+    vols, prices = E.rates_vol.cap_strip(*args)
+    return {"caplet_vols": vols, "cap_prices": prices}
+
+
+def _futures(i: Inputs) -> tuple[str, float, float, float, float]:
+    return (i.enum("type", _OPTION_TYPES), i.real("futures_price"), i.real("strike"),
+            i.real("expiry_years"), i.real("discount_factor"))
+
+
+@op("rates.bondfut.option_price")
+def _bondfut_price(i: Inputs) -> Any:
+    price, value = E.rates_vol.bondfut_price(*_futures(i), i.real("vol"), i.real("contract_size"))
+    return {"price": price, "contract_value": value}
+
+
+@op("rates.bondfut.implied_vol")
+def _bondfut_implied(i: Inputs) -> Any:
+    args = (*_futures(i), i.real("premium"), i.real("ctd_yield"), i.real("ctd_modified_duration"))
+    price_vol, yield_vol = E.rates_vol.bondfut_implied(*args)
+    return {"price_vol": price_vol, "yield_vol": yield_vol}
+
+
+_CAP_TYPES = ("CAP", "FLOOR")
+
+
+@op("infl.cap.yoy_price")
+def _yoy(i: Inputs) -> Any:
+    periods = [(p.real("accrual"), p.real("discount_factor"), p.real("yoy_forward"),
+                p.real("expiry_years"), p.real("vol")) for p in _objects(i, "periods")]
+    args = (i.enum("model", _RATE_MODELS), i.enum("type", _CAP_TYPES), i.real("strike"),
+            i.real("notional"), periods)
+    caplets, price = E.rates_vol.yoy_price(*args)
+    return {"caplets": caplets, "price": price}
+
+
+@op("infl.cap.zc_price")
+def _zc(i: Inputs) -> Any:
+    args = (i.enum("model", _RATE_MODELS), i.enum("type", _CAP_TYPES),
+            i.real("forward_index_ratio"), i.real("years"), i.real("strike"),
+            i.real("discount_factor"), i.real("vol"), i.real("notional"))
+    price, ratio = E.rates_vol.zc_price(*args)
+    return {"price": price, "strike_ratio": ratio}
