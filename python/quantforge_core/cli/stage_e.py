@@ -168,3 +168,57 @@ def _vol_of_vol(i: Inputs) -> Any:
     args = (i.reals("vols"), i.real("periods_per_year"), i.enum("method", ("LOG", "ABSOLUTE")))
     vov, mean = E.vol_e1.vol_of_vol(*args)
     return {"vol_of_vol": vov, "mean_change": mean}
+
+
+# E3: FX smile (fx-smile.md)
+
+_OPTION_TYPES = ("CALL", "PUT")
+
+
+def _fx_market(i: Inputs) -> tuple[float, float, float, float]:
+    return i.real("spot"), i.real("expiry_years"), i.real("domestic_rate"), i.real("foreign_rate")
+
+
+def _delta_type(i: Inputs) -> str:
+    from ..fx_smile import DELTA_TYPES
+
+    return i.enum("delta_type", DELTA_TYPES)
+
+
+@op("fx.option.price")
+def _fx_price(i: Inputs) -> Any:
+    spot, t, rd, rf = _fx_market(i)
+    args = (spot, i.real("strike"), t, rd, rf, i.real("vol"), i.enum("option_type", _OPTION_TYPES),
+            i.real("notional"))
+    return E.fx_smile.option_price(*args)
+
+
+@op("fx.delta.from_strike")
+def _fx_delta_from_strike(i: Inputs) -> Any:
+    spot, t, rd, rf = _fx_market(i)
+    args = (spot, i.real("strike"), t, rd, rf, i.real("vol"), i.enum("option_type", _OPTION_TYPES))
+    return {"deltas": E.fx_smile.delta_from_strike(*args)}
+
+
+@op("fx.delta.to_strike")
+def _fx_delta_to_strike(i: Inputs) -> Any:
+    args = (*_fx_market(i), i.real("vol"), i.enum("option_type", _OPTION_TYPES), i.real("delta"),
+            _delta_type(i))
+    return {"strike": E.fx_smile.delta_to_strike(*args)}
+
+
+@op("fx.atm.strike")
+def _fx_atm_strike(i: Inputs) -> Any:
+    from ..fx_smile import ATM_TYPES
+
+    args = (*_fx_market(i), i.real("vol"), i.enum("atm_type", ATM_TYPES), _delta_type(i))
+    return {"strike": E.fx_smile.atm_strike(*args)}
+
+
+@op("fx.smile.from_quotes")
+def _fx_smile(i: Inputs) -> Any:
+    from ..fx_smile import ATM_TYPES
+
+    args = (*_fx_market(i), i.real("atm_vol"), i.real("rr"), i.real("bf"), i.real("delta"),
+            _delta_type(i), i.enum("atm_type", ATM_TYPES))
+    return E.fx_smile.smile_from_quotes(*args)
