@@ -170,8 +170,8 @@ public final class Exotics {
 
     /** Barone-Adesi-Whaley [BAW87]; r = 0 is E_DOMAIN (ruling E-A22). */
     public static double baw(double phi, double s, double k, double t, double r, double q, double v) {
-        if (r == 0.0) {
-            throw new QfError("E_DOMAIN", "BAW needs a non-zero rate (ruling E-A22)", "rate");
+        if (!(r > 0.0)) {
+            throw new QfError("E_DOMAIN", "BAW needs a positive rate (rulings E-A22, E-A30)", "rate");
         }
         double b = r - q;
         if (phi > 0 && b >= r) {

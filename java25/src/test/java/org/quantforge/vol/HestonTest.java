@@ -26,6 +26,18 @@ class HestonTest {
     }
 
     @Test
+    void shortExpiryParityHoldsOnTheWiderRange() {
+        // two days: the integral now runs to 200/sqrt(T) (ruling E-A26)
+        double t = 2.0 / 365.0;
+        double[] c = Heston.prices(100, t, 0.03, 0.01, true, K, P, null);
+        double[] p = Heston.prices(100, t, 0.03, 0.01, false, K, P, null);
+        for (int i = 0; i < K.length; i++) {
+            assertEquals(100 * Math.exp(-0.01 * t) - K[i] * Math.exp(-0.03 * t), c[i] - p[i], 1e-10);
+            assertTrue(c[i] >= Math.max(100 * Math.exp(-0.01 * t) - K[i] * Math.exp(-0.03 * t), 0.0) - 1e-8);
+        }
+    }
+
+    @Test
     void smallVolOfVolTendsToBlackScholesAtTheAverageVariance() {
         Heston.Params h = new Heston.Params(0.09, 2.0, 0.04, 1e-4, -0.5);
         double t = 1.0;

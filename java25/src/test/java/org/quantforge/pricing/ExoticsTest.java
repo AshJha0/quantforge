@@ -74,6 +74,7 @@ class ExoticsTest {
         // a call with no dividend is never exercised early
         assertEquals(bs(1, 100) * 0 + Exotics.gbs(1, S, 100, T, R, R, V), Exotics.baw(1, S, 100, T, R, 0, V), 0.0);
         assertEquals("E_DOMAIN", assertThrows(QfError.class, () -> Exotics.baw(1, S, 100, T, 0.0, Q, V)).code());
+        assertEquals("E_DOMAIN", assertThrows(QfError.class, () -> Exotics.baw(-1, S, 100, T, -0.01, Q, V)).code());
         assertEquals("E_DOMAIN", assertThrows(QfError.class, () -> Exotics.crr(1, S, 100, 1, 0.5, 0, 0.01, 1)).code());
     }
 }

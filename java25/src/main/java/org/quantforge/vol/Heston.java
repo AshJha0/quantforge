@@ -8,7 +8,8 @@ import org.quantforge.core.QfError;
 public final class Heston {
     private Heston() {}
 
-    public static final int NODES = 256;
+    /** Recipe of ruling E-A26: 1024 nodes on [0, 200/sqrt(min(T, 1))]. */
+    public static final int NODES = 1024;
     public static final double U_MAX = 200.0;
     private static final double[][] GL = Integration.legendre(NODES);
 
@@ -110,14 +111,15 @@ public final class Heston {
     /** Lewis call price [Lew01] by Gauss-Legendre on [0, U_MAX] (ruling E-A13); puts by parity. */
     static double lewis(double f, double k, double r, double t, boolean call, Function<C, C> phi) {
         double lk = Math.log(f / k);
+        double top = U_MAX / Math.sqrt(Math.min(t, 1.0));
         double integral = 0.0;
         for (int i = 0; i < NODES; i++) {
-            double u = U_MAX / 2.0 * (1.0 + GL[0][i]);
+            double u = top / 2.0 * (1.0 + GL[0][i]);
             C z = phi.apply(new C(u, -0.5));
             C e = new C(0.0, u * lk).exp();
             integral += GL[1][i] * e.times(z).re() / (u * u + 0.25);
         }
-        integral *= U_MAX / 2.0;
+        integral *= top / 2.0;
         double df = Math.exp(-r * t);
         double c = df * (f - Math.sqrt(f * k) / Math.PI * integral);
         return call ? c : c - df * (f - k);

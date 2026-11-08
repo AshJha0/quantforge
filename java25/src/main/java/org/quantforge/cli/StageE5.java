@@ -95,8 +95,8 @@ final class StageE5 {
             if (c.phi > 0 ? !(e > 0.0 && e <= c.s) : !(e >= c.s)) {
                 throw domain("running_extreme");
             }
-            if (c.r - c.q == 0.0) {
-                throw new QfError("E_DOMAIN", "zero cost of carry (ruling E-A20)", "dividend_yield");
+            if (Math.abs(c.r - c.q) <= 1e-8 * c.v * c.v) {
+                throw new QfError("E_DOMAIN", "cost of carry too near zero (rulings E-A20, E-A28)", "dividend_yield");
             }
             return Operations.out("price", Exotics.lookback(c.phi, c.s, e, c.t, c.r, c.q, c.v));
         });
