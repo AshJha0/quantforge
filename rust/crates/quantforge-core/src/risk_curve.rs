@@ -467,7 +467,7 @@ mod tests {
         );
         let (c0, f0) = (central.unwrap().zero_dv01, forward.unwrap().zero_dv01);
         assert!((c0 - f0).abs() < 1e-3 * c0.abs());
-        assert!(c0 != f0);
+        assert_ne!(c0, f0);
     }
 
     fn quotes(shift: f64) -> Vec<OisQuote> {

@@ -122,6 +122,19 @@ impl Svi {
         self.a + self.b * (self.rho * x + (x * x + self.sigma * self.sigma).sqrt())
     }
 
+    /// `dw/dk`.
+    pub fn w1(&self, k: f64) -> f64 {
+        let x = k - self.m;
+        self.b * (self.rho + x / (x * x + self.sigma * self.sigma).sqrt())
+    }
+
+    /// `d2w/dk2`.
+    pub fn w2(&self, k: f64) -> f64 {
+        let x = k - self.m;
+        let r = (x * x + self.sigma * self.sigma).sqrt();
+        self.b * self.sigma * self.sigma / (r * r * r)
+    }
+
     /// Gatheral's density function.
     pub fn g(&self, k: f64) -> f64 {
         let x = k - self.m;
