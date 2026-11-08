@@ -1618,6 +1618,222 @@
     "FX.DELTA_TYPE"
    ],
    "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0001",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0002",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0003",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0004",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0005",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0006",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0007",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0008",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0009",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0010",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0011",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0012",
+   "operation": "vol.heston.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "HESTON.ENGINE",
+    "HESTON.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0023",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0024",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0025",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0026",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0027",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "heston_e-0028",
+   "operation": "vol.bates.price",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "BATES.ENGINE",
+    "BATES.PROCESS",
+    "TS.FLAT_CONT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
   }
  ]
 }

@@ -37,3 +37,19 @@ Read:
 - `specifications/edge-case-register.md` (rows EA7 to EA9)
 
 Notes for builds: premium-adjusted call strikes need the upper root (bracket from the strike of maximum delta); strikes are judged to 1e-9 relative.
+
+### E2 Heston, Bates, Merton, SLV (ready, 2026-11-08)
+
+New operations: `vol.heston.price`, `vol.heston.cf`, `vol.bates.price`, `vol.merton.price`, `vol.slv.leverage`. No new error code.
+
+Goldens: `datasets/golden/stage_e/heston_e.json` (38 cases), `datasets/golden/stage_e/slv_e.json` (8 cases).
+
+Read:
+- `specifications/cli-contract.md` (block "Stage E, spec A", E2 row)
+- `specifications/stage-e-rulings.md` (E-A12 to E-A14)
+- `specifications/05-volatility/heston-family.md`
+- `specifications/05-volatility/local-and-forward-vol.md` (`vol.slv.leverage` uses `vol.local.dupire`)
+- `specifications/05-volatility/stage-e-targets-a.md` (E2 table)
+- `specifications/edge-case-register.md` (rows EA10 to EA13)
+
+Notes for builds: use the little-trap characteristic function; prices are judged to 1e-8 per unit. The SLV goldens are a recipe check: follow the scheme in `heston-family.md` step by step, including the floor and the smooth conditional-variance estimate.

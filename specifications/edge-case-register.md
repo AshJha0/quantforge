@@ -42,3 +42,7 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | EA7 | Premium-adjusted call delta: two strikes, and a delta no strike reaches | Pinned | Upper root: the `fx.delta.to_strike` cases tagged `spot_pa`, `forward_pa` in `fxs_e`; above the maximum: the `fxs_e` case tagged `premium-adjusted` (`E_DOMAIN`) | Ruling E-A10 |
 | EA8 | Broker (market) strangle | Out of scope | | Needs a fitted smile and a solve against it (ruling E-A11); planned with the SABR/SVI FX smile fit in a later stage. Stage E quotes are smile strangles |
 | EA9 | Domestic rate below foreign (negative carry), long-dated FX | Pinned | USDJPY-like and 5-year cases in `fxs_e` (`domestic_rate` 0.10% against 4.50%; expiry 1825 days) | |
+| EA10 | Heston near zero vol of variance | Pinned | The `heston_e` cases tagged `small-vol-of-vol` (`xi` 1e-3, 1e-2) | Plan section 8: average variance, near zero not at it. `xi = 0` is `E_DOMAIN` (ruling E-A12) |
+| EA11 | Heston at long maturity with high vol of variance (branch cut) | Pinned | 5-year, `xi = 1`, `rho = -0.9` cases in `heston_e` | Ruling E-A13 |
+| EA12 | Merton with no jumps | Pinned | The `heston_e` cases tagged `no-jumps` | Equals Black-Scholes |
+| EA13 | Feller condition broken in SLV | Out of scope | | The SLV reference scheme puts a no-flux boundary at `v = dv/2`; goldens keep `2 kappa theta > xi^2`. Accumulation at `v = 0` needs a different `v` grid; with the stage G model work |

@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 import runner  # noqa: E402  (tolerance comparison only)
 
 POLICY = runner.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
-SUITES = ["surf_e", "lv_e", "fxs_e"]  # spec A suites; later slices append
+SUITES = ["surf_e", "lv_e", "fxs_e", "heston_e", "slv_e"]  # spec A suites; later slices append
 
 
 class Used:
@@ -174,7 +174,44 @@ def h_fx_smile(u, x):
 HANDLERS.update({"fx.option.price": h_fx_price, "fx.delta.from_strike": h_fx_from_strike, "fx.delta.to_strike": h_fx_to_strike,
                  "fx.atm.strike": h_fx_atm, "fx.smile.from_quotes": h_fx_smile})
 
+
+# ---------------------------------------------------------------- E2
+def _opt_prices(x, eng, ref):
+    d = round(x["expiry_years"] * 365)
+    if d / 365 != x["expiry_years"]:
+        raise NotImplementedError("expiry not whole days")
+    out = []
+    for K in x["strikes"]:
+        o = ql.VanillaOption(ql.PlainVanillaPayoff(ql.Option.Call if x["option_type"] == "CALL" else ql.Option.Put, K), ql.EuropeanExercise(ref + d))
+        o.setPricingEngine(eng)
+        out.append(o.NPV())
+    return {"prices": out}
+
+
+def _curves(u, x):
+    ref = ql.Date(6, 11, 2026)
+    ql.Settings.instance().evaluationDate = ref
+    return ref, u("TS.FLAT_CONT", ref, x["rate"]), u("TS.FLAT_CONT", ref, x["dividend_yield"])
+
+
+def h_heston(u, x):
+    ref, rt, qt = _curves(u, x)
+    return _opt_prices(x, u("HESTON.ENGINE", ql.HestonModel(u("HESTON.PROCESS", rt, qt, x["spot"], x["heston"]))), ref)
+
+
+def h_bates(u, x):
+    ref, rt, qt = _curves(u, x)
+    return _opt_prices(x, u("BATES.ENGINE", ql.BatesModel(u("BATES.PROCESS", rt, qt, x["spot"], x["heston"], x["jumps"]))), ref)
+
+
+
+
+HANDLERS.update({"vol.heston.price": h_heston, "vol.bates.price": h_bates})
+
 NO_ORACLE = {
+    "vol.merton.price": "the QuantLib 1.44 Python wheel does not expose JumpDiffusionEngine or Merton76Process pricing; checked by Poisson series, Lewis at 256 nodes and 30-digit mpmath",
+    "vol.heston.cf": "QuantLib does not expose the characteristic function; checked against 30-digit mpmath",
+    "vol.slv.leverage": "a reference scheme, judged as a recipe; QuantLib HestonSLVFDMModel uses another grid and scheme, so it cannot reproduce the numbers",
     "vol.ssvi.to_svi": "QuantLib has no SSVI; checked by replay through vol.ssvi.evaluate",
     "vol.svi.fit_surface": "fit judged on known-truth parameters; QuantLib's SviInterpolatedSmileSection fits by its own optimiser path",
     "vol.local.dupire": "QuantLib's LocalVolSurface needs a BlackVolTermStructure; none reproduces SVI slices linear in total variance. Checked by a 40-digit price-based Dupire",

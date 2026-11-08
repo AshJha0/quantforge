@@ -212,3 +212,15 @@ Entries added by the stage E spec A session. Status is "Specified" until the fou
 - **Purpose:** FX vanilla prices and Greeks; strikes from delta quotes under the four market delta types and three ATM types.
 - **Limitations:** flat continuous rates; no spot lag, premium or delivery date (ruling E-A9); smile strangle only, no broker strangle (E-A11); no smile interpolation between the quoted pillars.
 - **Validation:** QuantLib `BlackDeltaCalculator`, Black-Scholes-Merton engine. **Review:** 2026-11-08.
+| ME-A5 | Heston, Bates, Merton | `05-volatility/heston-family.md` | E2 | Specified, outside-checked | Heston and Bates 18 of 18 value cases; Merton none |
+| ME-A6 | SLV leverage, reference PDE scheme | `05-volatility/heston-family.md` | E2 | Specified | none |
+
+### ME-A5 Heston, Bates, Merton
+- **Purpose:** European prices under stochastic vol, with or without log-normal jumps; jump diffusion alone.
+- **Limitations:** flat rates and dividend yield; European exercise only; no calibration operation in stage E; `xi = 0` refused.
+- **Validation:** QuantLib analytic Heston and Bates engines; 30-digit mpmath; Merton by two routes inside the oracle only. **Review:** 2026-11-08.
+
+### ME-A6 SLV leverage
+- **Purpose:** leverage function of a Heston SLV model fitted to an SVI-slice local vol surface.
+- **Limitations:** first-order reference scheme, not converged (about 1% at the spot against a doubled grid); positivity floor and boundaries change mass by up to about 1%; Feller condition assumed; no repricing check of vanillas under the SLV model.
+- **Validation:** grid refinement and the flat-vol limit only. No outside library. **Review:** 2026-11-08.

@@ -1,0 +1,1866 @@
+{
+ "schema_version": "1.0",
+ "suite": "heston_e",
+ "spec": "specifications/05-volatility/heston-family.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_a.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "heston_e-0001",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      31.83253432684349,
+      14.928948484688933,
+      8.113489032310287,
+      3.306260863369551,
+      0.06085547503236377
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0002",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.7587383003222641,
+      3.2640631291378686,
+      6.153059012244305,
+      11.05028617878865,
+      36.91824679690671
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0003",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.2493150684931507,
+    "rate": 0.05,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 3.0,
+     "theta": 0.05,
+     "xi": 0.8,
+     "rho": -0.5
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      31.004881950258575,
+      12.857185554657205,
+      5.90810818198436,
+      1.8387297706209667,
+      0.019861184267241518
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0004",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.2493150684931507,
+    "rate": 0.05,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 3.0,
+     "theta": 0.05,
+     "xi": 0.8,
+     "rho": -0.5
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.13769550639838002,
+      1.7422315554083827,
+      4.669270405041225,
+      10.476008215983518,
+      38.28548829654685
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0005",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.02,
+    "heston": {
+     "v0": 0.03,
+     "kappa": 0.8,
+     "theta": 0.06,
+     "xi": 0.3,
+     "rho": -0.3
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      30.581082149553826,
+      16.08134633646154,
+      10.771305458127623,
+      6.8990896835991125,
+      1.6346180741487257
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0006",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.02,
+    "heston": {
+     "v0": 0.03,
+     "kappa": 0.8,
+     "theta": 0.06,
+     "xi": 0.3,
+     "rho": -0.3
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      1.757398974984131,
+      6.473451944938308,
+      10.771305458127623,
+      16.506984075122343,
+      40.06619564024165
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0007",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 5.0,
+    "rate": -0.005,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.05,
+     "kappa": 2.0,
+     "theta": 0.045,
+     "xi": 1.0,
+     "rho": -0.9
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      34.17431233099839,
+      19.777601336207116,
+      13.851778663480655,
+      8.949595649157084,
+      1.0708807217733949
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "negative-rate",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0008",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 5.0,
+    "rate": -0.005,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.05,
+     "kappa": 2.0,
+     "theta": 0.045,
+     "xi": 1.0,
+     "rho": -0.9
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      5.946370767708412,
+      12.055962183405715,
+      16.383290715923543,
+      21.73425890684426,
+      44.61499759519344
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "negative-rate",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0009",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.04,
+    "dividend_yield": 0.03,
+    "heston": {
+     "v0": 0.0625,
+     "kappa": 1.0,
+     "theta": 0.04,
+     "xi": 0.4,
+     "rho": 0.3
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      29.972234154331716,
+      12.408697214121593,
+      6.646582629728921,
+      3.3854375925235276,
+      0.4709653811073362
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0010",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.04,
+    "dividend_yield": 0.03,
+    "heston": {
+     "v0": 0.0625,
+     "kappa": 1.0,
+     "theta": 0.04,
+     "xi": 0.4,
+     "rho": 0.3
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.07465860623014109,
+      2.116169351912447,
+      6.1565786104659885,
+      12.697957416206808,
+      39.19105673362925
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "heston",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0011",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 2.0,
+     "theta": 0.04,
+     "xi": 0.001,
+     "rho": -0.5
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      32.59187247637807,
+      16.916305298597564,
+      11.279821597022496,
+      7.1845406095627125,
+      1.5010890821859502
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits"
+   ],
+   "tags": [
+    "heston",
+    "small-vol-of-vol",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0012",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 2.0,
+     "theta": 0.04,
+     "xi": 0.01,
+     "rho": -0.5
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      32.60145515696572,
+      16.925354355944016,
+      11.279516141543732,
+      7.173832587345439,
+      1.4810497120277855
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits"
+   ],
+   "tags": [
+    "heston",
+    "small-vol-of-vol",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0013",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.0,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0014",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 0.0,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0015",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": -0.01,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0016",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.0,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0017",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": 1.0
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0018",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0019",
+   "operation": "vol.heston.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     100.0,
+     0.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0020",
+   "operation": "vol.heston.cf",
+   "inputs": {
+    "expiry_years": 1.0,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "u": [
+     0.0,
+     0.5,
+     1.0,
+     5.0,
+     20.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "re": [
+      1.0,
+      0.9943971940019679,
+      0.978148166262176,
+      0.6729975569517288,
+      -0.02716142106939909
+     ],
+     "im": [
+      0.0,
+      -0.009597417790758981,
+      -0.016893289660195803,
+      0.07269177076832213,
+      0.09626475024649855
+     ]
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-30-digits",
+    "analytic"
+   ],
+   "tags": [
+    "heston",
+    "cf",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0021",
+   "operation": "vol.heston.cf",
+   "inputs": {
+    "expiry_years": 0.2493150684931507,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 3.0,
+     "theta": 0.05,
+     "xi": 0.8,
+     "rho": -0.5
+    },
+    "u": [
+     0.0,
+     0.5,
+     1.0,
+     5.0,
+     20.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "re": [
+      1.0,
+      0.9974530421992491,
+      0.9898810929334639,
+      0.7914561811849699,
+      0.07556798283752916
+     ],
+     "im": [
+      0.0,
+      -0.004803109911033898,
+      -0.009198926861942833,
+      0.000890170665619672,
+      0.10103503786117865
+     ]
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-30-digits",
+    "analytic"
+   ],
+   "tags": [
+    "heston",
+    "cf",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0022",
+   "operation": "vol.heston.cf",
+   "inputs": {
+    "expiry_years": 2.0,
+    "heston": {
+     "v0": 0.03,
+     "kappa": 0.8,
+     "theta": 0.06,
+     "xi": 0.3,
+     "rho": -0.3
+    },
+    "u": [
+     0.0,
+     0.5,
+     1.0,
+     5.0,
+     20.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "re": [
+      1.0,
+      0.9879100293396129,
+      0.9530823138806533,
+      0.3940696847973844,
+      -0.00018079939381493524
+     ],
+     "im": [
+      0.0,
+      -0.021830816075413935,
+      -0.039784061576935315,
+      0.011088852179761428,
+      0.0015809474569620356
+     ]
+    }
+   },
+   "tolerance_class": "fourier",
+   "verified_by": [
+    "mpmath-30-digits",
+    "analytic"
+   ],
+   "tags": [
+    "heston",
+    "cf",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0023",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "jumps": {
+     "intensity": 0.3,
+     "mean_log_jump": -0.1,
+     "log_jump_vol": 0.15
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      32.00407643643493,
+      15.580612070434537,
+      9.03996849291532,
+      4.23298759907286,
+      0.1609767795963496
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "bates",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0024",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "jumps": {
+     "intensity": 0.3,
+     "mean_log_jump": -0.1,
+     "log_jump_vol": 0.15
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.9302804099137028,
+      3.9157267148834727,
+      7.079538472849337,
+      11.977012914491958,
+      37.01836810147069
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "bates",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0025",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.2493150684931507,
+    "rate": 0.05,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 3.0,
+     "theta": 0.05,
+     "xi": 0.8,
+     "rho": -0.5
+    },
+    "jumps": {
+     "intensity": 1.0,
+     "mean_log_jump": -0.05,
+     "log_jump_vol": 0.1
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      31.04120935438099,
+      13.128989879804417,
+      6.328001515830807,
+      2.18578431797358,
+      0.03578417858805238
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "bates",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0026",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.2493150684931507,
+    "rate": 0.05,
+    "dividend_yield": 0.0,
+    "heston": {
+     "v0": 0.09,
+     "kappa": 3.0,
+     "theta": 0.05,
+     "xi": 0.8,
+     "rho": -0.5
+    },
+    "jumps": {
+     "intensity": 1.0,
+     "mean_log_jump": -0.05,
+     "log_jump_vol": 0.1
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.17402291052079377,
+      2.0140358805555945,
+      5.089163738887671,
+      10.82306276333613,
+      38.30141129086766
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "bates",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0027",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.02,
+    "heston": {
+     "v0": 0.03,
+     "kappa": 0.8,
+     "theta": 0.06,
+     "xi": 0.3,
+     "rho": -0.3
+    },
+    "jumps": {
+     "intensity": 0.1,
+     "mean_log_jump": 0.05,
+     "log_jump_vol": 0.2
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      30.741057821731047,
+      16.50653188251723,
+      11.323516752210137,
+      7.522698906780696,
+      2.110792510512836
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "bates",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0028",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.02,
+    "heston": {
+     "v0": 0.03,
+     "kappa": 0.8,
+     "theta": 0.06,
+     "xi": 0.3,
+     "rho": -0.3
+    },
+    "jumps": {
+     "intensity": 0.1,
+     "mean_log_jump": 0.05,
+     "log_jump_vol": 0.2
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      1.9173746471613526,
+      6.898637490993998,
+      11.323516752210137,
+      17.13059329830393,
+      40.54237007660576
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200"
+   ],
+   "tags": [
+    "bates",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0029",
+   "operation": "vol.bates.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "heston": {
+     "v0": 0.04,
+     "kappa": 1.5,
+     "theta": 0.04,
+     "xi": 0.5,
+     "rho": -0.7
+    },
+    "jumps": {
+     "intensity": -0.1,
+     "mean_log_jump": 0.0,
+     "log_jump_vol": 0.1
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "heston_e-0030",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "jumps": {
+     "intensity": 0.5,
+     "mean_log_jump": -0.1,
+     "log_jump_vol": 0.2
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      31.907578029778268,
+      16.233566187622284,
+      10.528655435053093,
+      6.4426249065076675,
+      1.175604577196906
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0031",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "jumps": {
+     "intensity": 0.5,
+     "mean_log_jump": -0.1,
+     "log_jump_vol": 0.2
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.8337820032570238,
+      4.568680832071191,
+      8.568225414987088,
+      14.186650221926733,
+      38.03299589907118
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0032",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.2493150684931507,
+    "rate": 0.05,
+    "dividend_yield": 0.0,
+    "vol": 0.15,
+    "jumps": {
+     "intensity": 2.0,
+     "mean_log_jump": -0.02,
+     "log_jump_vol": 0.05
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      30.86741765929727,
+      11.439789300679525,
+      3.9577393575832827,
+      0.7023433186074421,
+      0.0002018509718759079
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0033",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 0.2493150684931507,
+    "rate": 0.05,
+    "dividend_yield": 0.0,
+    "vol": 0.15,
+    "jumps": {
+     "intensity": 2.0,
+     "mean_log_jump": -0.02,
+     "log_jump_vol": 0.05
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.0002312154370623621,
+      0.3248353014306878,
+      2.718901580640137,
+      9.339621763969982,
+      38.265828963251494
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0034",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 3.0,
+    "rate": 0.02,
+    "dividend_yield": 0.0,
+    "vol": 0.25,
+    "jumps": {
+     "intensity": 0.2,
+     "mean_log_jump": 0.1,
+     "log_jump_vol": 0.3
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      38.4461258020402,
+      26.76333864650398,
+      22.249593486046418,
+      18.498714528591734,
+      10.76403528511365
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0035",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 3.0,
+    "rate": 0.02,
+    "dividend_yield": 0.0,
+    "vol": 0.25,
+    "jumps": {
+     "intensity": 0.2,
+     "mean_log_jump": 0.1,
+     "log_jump_vol": 0.3
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      4.369643152937611,
+      11.522146669086364,
+      16.42604684447129,
+      22.092813222859107,
+      42.611069986908475
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0036",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "jumps": {
+     "intensity": 0.0,
+     "mean_log_jump": 0.0,
+     "log_jump_vol": 0.1
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      32.235175558264146,
+      15.429227240231889,
+      9.41340338385303,
+      5.293398058044912,
+      0.6320518393161393
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "no-jumps",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0037",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "jumps": {
+     "intensity": 0.0,
+     "mean_log_jump": 0.0,
+     "log_jump_vol": 0.1
+    },
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "prices": [
+      0.16636290665970999,
+      2.7693252595976143,
+      6.457956738703827,
+      12.042406748380804,
+      36.49442653610727
+     ]
+    }
+   },
+   "tolerance_class": "quadrature",
+   "verified_by": [
+    "mpmath-lewis-30-digits",
+    "lewis-gauss-legendre-256-on-0-200",
+    "poisson-series"
+   ],
+   "tags": [
+    "merton",
+    "no-jumps",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "1e-8 per unit at spot 100: 1e-3 currency units on 100,000 units; QuantLib adaptive engine to 1e-13"
+   }
+  },
+  {
+   "case_id": "heston_e-0038",
+   "operation": "vol.merton.price",
+   "inputs": {
+    "spot": 100.0,
+    "strikes": [
+     70.0,
+     90.0,
+     100.0,
+     110.0,
+     140.0
+    ],
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "jumps": {
+     "intensity": 0.5,
+     "mean_log_jump": 0.0,
+     "log_jump_vol": -0.1
+    },
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}

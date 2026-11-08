@@ -29,3 +29,15 @@ Outside-oracle share (E1): 31 of 67 cases (46%); error cases are in the denomina
 | `fx.delta.to_strike`, `fx.smile.from_quotes` | 1e-10 absolute plus 1e-9 relative on strikes (far below a pip) | QuantLib `strikeFromDelta`; oracle solve to 1e-15 with a conditioning guard | QuantLib agrees within 2e-10 relative |
 
 Outside-oracle share (E3): 114 of 125 (91%); spec A running total in `oracle/OUTSIDE_E_A.md` (145 of 192, 75.5%).
+
+## E2 Heston, Bates, Merton, SLV
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| `vol.heston.price`, `vol.bates.price` | 1e-8 absolute plus 1e-9 relative per unit at spot 100 (1e-3 currency units on 100,000 units) | QuantLib `AnalyticHestonEngine`, `BatesEngine` at relative 1e-13; 30-digit mpmath Lewis integral | QuantLib within 1e-9; reference recipe within 2.4e-11 |
+| Small vol of variance (`xi` 1e-3, 1e-2) | As above | 30-digit mpmath; QuantLib within 1e-12; Black-Scholes at average variance within 0.05 `xi` | The binary64 recipe is about 1e-9 off at `xi = 1e-3` (cancellation), inside the target |
+| `vol.heston.cf` | `fourier` | 30-digit mpmath | Within 1e-13 |
+| `vol.merton.price` | As Heston | Poisson series, Lewis at 256 nodes, 30-digit mpmath (no QuantLib engine in the Python wheel) | Within 1e-9 |
+| `vol.slv.leverage` | `numerical_scheme` (1e-8) | Reference scheme; 1e-12 input perturbation moves leverage under 1e-8; grid refinement within 2% at the spot; flat-vol, zero-correlation limit within 3% of 1 near the money | Holds; mass at `T` 0.988 to 1.000 |
+
+Outside-oracle share (E2): 18 of 46 (Heston and Bates value cases); spec A running total in `oracle/OUTSIDE_E_A.md`.
