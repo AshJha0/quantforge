@@ -13,12 +13,12 @@ import org.quantforge.vol.Black;
 public final class CapSwaption {
     private CapSwaption() {}
 
-    private static LocalDate start(Curve d, long months) {
+    public static LocalDate start(Curve d, long months) {
         LocalDate spot = Calendars.addBusinessDays(Calendars.Id.USGS, d.asOf(), 2);
         return Calendars.adjust(Calendars.Id.USGS, spot.plusMonths(months), Calendars.Convention.MODIFIED_FOLLOWING);
     }
 
-    private static double option(boolean normal, double phi, double f, double k, double t, double v) {
+    public static double option(boolean normal, double phi, double f, double k, double t, double v) {
         return normal ? Black.normal(phi, f, k, t, 1.0, v) : Black.lognormal(phi, f, k, t, 1.0, v);
     }
 
@@ -30,6 +30,32 @@ public final class CapSwaption {
 
     public record Cap(double[] caplets, double price) {}
 
+    /** The caplets of a cap: forward, accrual, payment discount factor and fixing time, per period. */
+    public record Caplets(double[] forward, double[] alpha, double[] discount, double[] time) {
+        public double price(int i, boolean normal, boolean isCap, double k, double n, double vol) {
+            return n * alpha[i] * discount[i] * option(normal, isCap ? 1.0 : -1.0, forward[i], k, time[i], vol);
+        }
+    }
+
+    /** Quarterly caplets from adjust(spot + start_months) over tenor_months (no fixing lag, ruling D28). */
+    public static Caplets caplets(Curve d, Curve p, long startMonths, long tenorMonths) {
+        LocalDate s = start(d, startMonths);
+        List<Schedule.Period> periods = Schedule.generate(s, s.plusMonths(tenorMonths), 3, Calendars.Id.USGS, false, 0);
+        int m = periods.size();
+        double[] fwd = new double[m];
+        double[] alpha = new double[m];
+        double[] df = new double[m];
+        double[] t = new double[m];
+        for (int i = 0; i < m; i++) {
+            Schedule.Period q = periods.get(i);
+            alpha[i] = ChronoUnit.DAYS.between(q.start(), q.end()) / 360.0;
+            fwd[i] = (p.discount(q.start()) / p.discount(q.end()) - 1.0) / alpha[i];
+            df[i] = d.discount(q.end());
+            t[i] = d.time(q.start());
+        }
+        return new Caplets(fwd, alpha, df, t);
+    }
+
     /** {@code vols} has one entry (flat) or one per caplet. */
     public static Cap cap(Curve d, Curve p, boolean normal, double[] vols, boolean listed, boolean isCap,
                           long startMonths, long tenorMonths, double k, double n) {
@@ -38,9 +64,9 @@ public final class CapSwaption {
         }
         checkMonths(startMonths, "start_months");
         checkMonths(tenorMonths, "tenor_months");
-        LocalDate s = start(d, startMonths);
-        List<Schedule.Period> periods = Schedule.generate(s, s.plusMonths(tenorMonths), 3, Calendars.Id.USGS, false, 0);
-        if (listed && vols.length != periods.size()) {
+        Caplets c = caplets(d, p, startMonths, tenorMonths);
+        double[] fwd = c.forward();
+        if (listed && vols.length != fwd.length) {
             throw new QfError("E_INPUT", "need one vol per caplet", "vol");
         }
         for (double v : vols) {
@@ -48,27 +74,17 @@ public final class CapSwaption {
                 throw new QfError("E_DOMAIN", "vol must not be negative", "vol");
             }
         }
-        double[] fwd = new double[periods.size()];
-        double[] alpha = new double[fwd.length];
-        for (int i = 0; i < fwd.length; i++) {
-            Schedule.Period q = periods.get(i);
-            alpha[i] = ChronoUnit.DAYS.between(q.start(), q.end()) / 360.0;
-            fwd[i] = (p.discount(q.start()) / p.discount(q.end()) - 1.0) / alpha[i];
-        }
         checkBlack(normal, k, fwd);
         double[] out = new double[fwd.length];
         double sum = 0.0;
         for (int i = 0; i < out.length; i++) {
-            Schedule.Period q = periods.get(i);
-            double t = d.time(q.start());
-            double v = listed ? vols[i] : vols[0];
-            out[i] = n * alpha[i] * d.discount(q.end()) * option(normal, isCap ? 1.0 : -1.0, fwd[i], k, t, v);
+            out[i] = c.price(i, normal, isCap, k, n, listed ? vols[i] : vols[0]);
             sum += out[i];
         }
         return new Cap(out, sum);
     }
 
-    private static void checkBlack(boolean normal, double k, double... fwd) {
+    public static void checkBlack(boolean normal, double k, double... fwd) {
         if (normal) {
             return;
         }
@@ -94,6 +110,16 @@ public final class CapSwaption {
         if (!(vol >= 0.0)) {
             throw new QfError("E_DOMAIN", "vol must not be negative", "vol");
         }
+        double[] fa = forwardAnnuity(d, p, expiryMonths, tenorMonths);
+        double f = fa[0];
+        double a = fa[1];
+        checkBlack(normal, k, f);
+        double price = n * a * option(normal, payer ? 1.0 : -1.0, f, k, fa[2], vol);
+        return new Swaption(price, f, a);
+    }
+
+    /** {forward swap rate, annuity, exercise time} of D7's swap starting adjust(spot + expiry_months). */
+    public static double[] forwardAnnuity(Curve d, Curve p, long expiryMonths, long tenorMonths) {
         LocalDate s = start(d, expiryMonths);
         LocalDate end = s.plusMonths(tenorMonths);
         double a = 0.0;
@@ -106,9 +132,6 @@ public final class CapSwaption {
         for (Schedule.Period q : Schedule.generate(s, end, 3, Calendars.Id.USGS, false, 0)) {
             fl += (p.discount(q.start()) / p.discount(q.end()) - 1.0) * d.discount(q.end());
         }
-        double f = fl / a;
-        checkBlack(normal, k, f);
-        double price = n * a * option(normal, payer ? 1.0 : -1.0, f, k, d.time(s), vol);
-        return new Swaption(price, f, a);
+        return new double[] {fl / a, a, d.time(s)};
     }
 }

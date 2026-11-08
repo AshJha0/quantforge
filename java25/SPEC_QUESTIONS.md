@@ -179,3 +179,12 @@ Silent choices, all passing `risk_r2`:
 | R2-4 | The `E_DOMAIN` checks (`bump_bp`, then `notional`) run after every `E_SCHEMA` check, and the curve's own rule checks (`key_rate`) run after them, just before `key_dates`, as "Checks, in order" lists |
 | R2-5 | The bumped curves use the same SEQUENTIAL bootstrap as stage B risk. So Jacobian entries above the diagonal, and par buckets for quotes beyond a product's last date, come out as exact zeros |
 | R2-6 | `risk.pnl.explain`: a quote's move is taken on its mid (`rate`, or `(bid+ask)/2` when bid and ask are given), the same value the bootstrap uses. The checks run in this order: `bump_bp`, `notional`, convention, tenor match, then the bootstrap's own quote checks |
+
+## Stage E
+
+- **E7, `vol.vix.term_variance`, one selected strike.** Closed by ruling E-B15: no OTM put or no OTM call selected is `E_INPUT`.
+- **E1, error order across inputs.** `vol.svi.surface_check` checks `slices` (all its rules, `E_LIMIT` last) before `log_moneyness`; `vol.svi.fit_surface` checks `expiry_years`, then row count, then the slice limit, then each row's fit. The goldens agree, but the spec lists checks per object rather than across them.
+- **E4, `rates.swaption.price_cube`, parameter domain.** The checks list `alpha <= 0`, `beta` outside `[0, 1]`, `|rho| >= 1`, `nu < 0` as `E_DOMAIN` without saying whether they apply to every node or only to the interpolated parameters. Java checks every node (a valid grid makes every bilinear blend valid too). Golden `ratesvol_e-0017` passes either way.
+- **E2, `slv_e-0006`.** Closed by ruling E-A24: the stated rule stands and the golden was corrected.
+- **E8, `creditopt_e-0055` (now `creditopt_e-0145`).** Closed by ruling E-B27: the golden is now a receiver whose zero-vol value is above the premium.
+- **E-B38/E-B40, `rulings_e_b-0008`, `-0009`, `-0015`.** Closed at 5b58e2d: the three cases were rebuilt from their proper base inputs.

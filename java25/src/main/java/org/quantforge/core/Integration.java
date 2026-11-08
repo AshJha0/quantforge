@@ -59,7 +59,7 @@ public final class Integration {
     }
 
     /** Returns nodes then weights on [-1, 1], ascending in node. */
-    static double[][] legendre(int n) {
+    public static double[][] legendre(int n) {
         double[] t = new double[n];
         double[] w = new double[n];
         for (int i = 1; i <= n; i++) {

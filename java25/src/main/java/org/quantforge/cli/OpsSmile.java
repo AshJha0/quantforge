@@ -59,12 +59,12 @@ final class OpsSmile {
         return l;
     }
 
-    private static Smile.Svi svi(In in) {
+    static Smile.Svi svi(In in) {
         In s = in.object("svi");
         return new Smile.Svi(s.real("a"), s.real("b"), s.real("rho"), s.real("m"), s.real("sigma"));
     }
 
-    private static Map<String, Object> json(Smile.Svi s) {
+    static Map<String, Object> json(Smile.Svi s) {
         Map<String, Object> m = new java.util.LinkedHashMap<>();
         m.put("a", s.a());
         m.put("b", s.b());
