@@ -1,9 +1,10 @@
-//! Stage E operations: E2 (`heston-family.md`), E4 (`rates-vol-cube.md`), E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
+//! Stage E operations: E6 (`06-risk/correlation.md`), E2 (`heston-family.md`), E4 (`rates-vol-cube.md`), E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
 //! (`garch.md`, `variance-swaps.md`, `vix-index.md`).
 
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
 use crate::ops_b::{curve_input, items, sub};
+use quantforge_core::corr;
 use quantforge_core::curve::{Curve, CurveInput};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::fx_smile::{self, AtmType, DeltaType};
@@ -231,6 +232,55 @@ fn heston_market(i: &Inputs, with_type: bool) -> Result<heston::Market> {
 
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     match op {
+        "risk.corr.validate" => {
+            let m = i.matrix("matrix")?;
+            i.gate()?;
+            let v = corr::validate(&m)?;
+            plain(obj([
+                ("symmetric", v.symmetric.into()),
+                ("unit_diagonal", v.unit_diagonal.into()),
+                ("in_range", v.in_range.into()),
+                ("min_eigenvalue", v.min_eigenvalue.into()),
+                ("psd", v.psd.into()),
+                ("valid", v.valid().into()),
+            ]))
+        }
+        "risk.corr.nearest" => {
+            let m = i.matrix("matrix")?;
+            i.gate()?;
+            let (x, d) = corr::nearest(&m)?;
+            let rows = Json::Arr(x.into_iter().map(Into::into).collect());
+            plain(obj([("matrix", rows), ("frobenius_distance", d.into())]))
+        }
+        "risk.corr.implied" => {
+            let (w, v, s) = (i.reals("weights")?, i.reals("vols")?, i.f64("index_vol")?);
+            i.gate()?;
+            plain(obj([("correlation", corr::implied(&w, &v, s)?.into())]))
+        }
+        "risk.corr.dispersion" => {
+            let (w, k) = (i.reals("weights")?, i.reals("vol_strikes")?);
+            let s = i.reals("realized_vols")?;
+            let x = corr::Dispersion {
+                weights: &w,
+                vol_strikes: &k,
+                index_vol_strike: i.f64("index_vol_strike")?,
+                realized_vols: &s,
+                index_realized_vol: i.f64("index_realized_vol")?,
+                vega_notional: i.f64("vega_notional")?,
+            };
+            i.gate()?;
+            let o = corr::dispersion(&x)?;
+            plain(obj([
+                ("pnl", o.pnl.into()),
+                ("implied_correlation", o.implied_correlation.into()),
+                ("realized_correlation", o.realized_correlation.into()),
+                (
+                    "constituent_variance_notionals",
+                    o.constituent_variance_notionals.into(),
+                ),
+                ("index_variance_notional", o.index_variance_notional.into()),
+            ]))
+        }
         "vol.heston.price" | "vol.bates.price" | "vol.merton.price" => {
             let (m, k) = (heston_market(i, true)?, i.reals("strikes")?);
             let p = match op {

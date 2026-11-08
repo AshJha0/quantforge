@@ -13,6 +13,7 @@ pub mod calendar;
 pub mod calib;
 pub mod compounding;
 pub mod conventions;
+pub mod corr;
 pub mod cos;
 pub mod credit;
 pub mod curve;
