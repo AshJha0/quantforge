@@ -622,4 +622,4 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
 OPERATIONS.update(_stage_b_handlers(_STAGE_B))
 OPERATIONS.update(_stage_c_handlers(_STAGE_C))
 OPERATIONS.update(_stage_d_handlers(_STAGE_D))
-OPERATIONS.update(_stage_e_handlers(SimpleNamespace(**{m: _Core(m) for m in ("correlation", "fx_smile", "heston", "rates_vol", "vol_e1", "vol_e7")})))
+OPERATIONS.update(_stage_e_handlers(SimpleNamespace(**{m: _Core(m) for m in ("correlation", "exotics", "fx_smile", "heston", "rates_vol", "vol_e1", "vol_e7")})))

@@ -98,6 +98,13 @@ _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
 _LAGS = _caps(max_lag=1000)
 
+def _fd_grid(raw: Raw) -> None:
+    grid = raw.get("grid")
+    if isinstance(grid, dict):
+        _cap(grid, "nx", 1001)
+        _cap(grid, "nt", 10_000)
+
+
 def _slv_grid(raw: Raw) -> None:
     grid = raw.get("grid")
     if isinstance(grid, dict):
@@ -141,6 +148,8 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "rates.schedule.generate": _caps(payment_lag=30_000),
     "usecase.rates_hedge": _hedge_tenors,
     "vol.slv.leverage": _slv_grid,
+    "exotic.american.crr": _caps(steps=20_000),
+    "exotic.american.fd": _fd_grid,
     "vol.sabr.arbfree": _caps(cells=20_000, steps=20_000),
 }
 STAGE_C_ARRAY = 100
