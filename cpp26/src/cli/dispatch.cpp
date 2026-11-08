@@ -44,6 +44,7 @@
 #include "quantforge/core/timezone.hpp"
 #include "quantforge/core/arb_surface.hpp"
 #include "quantforge/core/fx_smile.hpp"
+#include "quantforge/core/exotics.hpp"
 #include "quantforge/core/correlation.hpp"
 #include "quantforge/core/heston.hpp"
 #include "quantforge/core/vol_stats.hpp"
@@ -1068,6 +1069,7 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_e3.inc"
 #include "ops_e4.inc"
 #include "ops_e6.inc"
+#include "ops_e5.inc"
 #include "ops_e7.inc"
 
 // ---- dispatch ----
@@ -1098,6 +1100,17 @@ const std::map<string, Handler, std::less<>>& table() {
         {"risk.corr.implied", op_corr_implied},
         {"risk.corr.nearest", op_corr_nearest},
         {"risk.corr.validate", op_corr_validate},
+        {"exotic.american.baw", op_american_baw},
+        {"exotic.american.crr", op_american_crr},
+        {"exotic.american.fd", op_american_fd},
+        {"exotic.asian.geometric", op_asian_geometric},
+        {"exotic.barrier.price", op_barrier},
+        {"exotic.basket.moment", op_basket},
+        {"exotic.chooser.price", op_chooser},
+        {"exotic.digital.price", op_digital},
+        {"exotic.lookback.floating", op_lookback},
+        {"exotic.quanto.price", op_quanto},
+        {"exotic.spread.kirk", op_kirk},
         {"vol.forward.vol", op_forward_vol},
         {"vol.local.dupire", op_local_dupire},
         {"vol.smile.dynamics", op_smile_dynamics},
