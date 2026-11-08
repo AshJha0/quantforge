@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 import runner  # noqa: E402  (tolerance comparison only)
 
 POLICY = runner.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
-SUITES = ["surf_e", "lv_e", "fxs_e", "heston_e", "slv_e"]  # spec A suites; later slices append
+SUITES = ["surf_e", "lv_e", "fxs_e", "heston_e", "slv_e", "exotic_e", "american_e"]  # spec A suites; later slices append
 
 
 class Used:
@@ -212,7 +212,93 @@ def h_bates(u, x):
 
 HANDLERS.update({"vol.heston.price": h_heston, "vol.bates.price": h_bates})
 
+
+# ---------------------------------------------------------------- E5
+REF = ql.Date(6, 11, 2026)
+
+
+def _days(t):
+    d = round(t * 365)
+    if d / 365 != t:
+        raise NotImplementedError("time not whole days")
+    return d
+
+
+def _bsm(u, x):
+    ql.Settings.instance().evaluationDate = REF
+    return u("BSM.PROCESS", REF, x["spot"], x["rate"], x["dividend_yield"], x["vol"])
+
+
+def h_digital(u, x):
+    o = ql.VanillaOption(u("PAY.DIGITAL", x["payoff"], u("OPT.TYPE", x["option_type"]), x["strike"], x["cash"]), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(ql.AnalyticEuropeanEngine(_bsm(u, x)))
+    return {"price": o.NPV()}
+
+
+def h_barrier(u, x):
+    pr = _bsm(u, x)
+    o = ql.BarrierOption(u("BARRIER.TYPE", x["barrier_type"]), x["barrier"], x["rebate"], ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"]),
+                         ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.BARRIER", pr))
+    return {"price": o.NPV()}
+
+
+def h_asian(u, x):
+    pr = _bsm(u, x)
+    pay = ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"])
+    ex = ql.EuropeanExercise(REF + _days(x["expiry_years"]))
+    if x["averaging"] == "CONTINUOUS":
+        o = ql.ContinuousAveragingAsianOption(ql.Average.Geometric, pay, ex)
+        o.setPricingEngine(u("ENG.ASIAN_GEO_CONT", pr))
+    else:
+        o = ql.DiscreteAveragingAsianOption(ql.Average.Geometric, 1.0, 0, [REF + _days(t) for t in x["fixing_years"]], pay, ex)
+        o.setPricingEngine(u("ENG.ASIAN_GEO_DISC", pr))
+    return {"price": o.NPV()}
+
+
+def h_lookback(u, x):
+    pr = _bsm(u, x)
+    o = ql.ContinuousFloatingLookbackOption(x["running_extreme"], ql.FloatingTypePayoff(u("OPT.TYPE", x["option_type"])), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.LOOKBACK_FLOAT", pr))
+    return {"price": o.NPV()}
+
+
+def h_quanto(u, x):
+    ql.Settings.instance().evaluationDate = REF
+    pr = u("BSM.PROCESS", REF, x["spot"], x["domestic_rate"], x["dividend_yield"], x["vol"])
+    o = ql.QuantoVanillaOption(ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"]), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.QUANTO", pr, REF, x["foreign_rate"], x["fx_vol"], x["correlation"]))
+    return {"price": o.NPV()}
+
+
+def h_chooser(u, x):
+    pr = _bsm(u, x)
+    o = ql.SimpleChooserOption(REF + _days(x["choose_years"]), x["strike"], ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.CHOOSER", pr))
+    return {"price": o.NPV()}
+
+
+def h_kirk(u, x):
+    ql.Settings.instance().evaluationDate = REF
+    o = ql.BasketOption(ql.SpreadBasketPayoff(ql.PlainVanillaPayoff(ql.Option.Call, x["strike"])), ql.EuropeanExercise(REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.KIRK", REF, x["forward_1"], x["forward_2"], x["rate"], x["vol_1"], x["vol_2"], x["correlation"]))
+    return {"price": o.NPV()}
+
+
+def h_baw(u, x):
+    pr = _bsm(u, x)
+    o = ql.VanillaOption(ql.PlainVanillaPayoff(u("OPT.TYPE", x["option_type"]), x["strike"]), ql.AmericanExercise(REF, REF + _days(x["expiry_years"])))
+    o.setPricingEngine(u("ENG.BAW", pr))
+    return {"price": o.NPV()}
+
+
+HANDLERS.update({"exotic.digital.price": h_digital, "exotic.barrier.price": h_barrier, "exotic.asian.geometric": h_asian, "exotic.lookback.floating": h_lookback,
+                 "exotic.quanto.price": h_quanto, "exotic.chooser.price": h_chooser, "exotic.spread.kirk": h_kirk, "exotic.american.baw": h_baw})
+
 NO_ORACLE = {
+    "exotic.american.crr": "spec uses the Hull CRR probability (e^{(r-q)dt} - d)/(u - d); the QuantLib crr tree uses 1/2 + drift dt/(2 dx), so values differ. Checked by replay and the Black-Scholes limit",
+    "exotic.american.fd": "reference scheme judged as a recipe; checked against a 2000-step tree within 2e-2",
+    "exotic.basket.moment": "QuantLib has no moment-matched arithmetic basket engine; 30-digit mpmath and the perfect-correlation limit",
     "vol.merton.price": "the QuantLib 1.44 Python wheel does not expose JumpDiffusionEngine or Merton76Process pricing; checked by Poisson series, Lewis at 256 nodes and 30-digit mpmath",
     "vol.heston.cf": "QuantLib does not expose the characteristic function; checked against 30-digit mpmath",
     "vol.slv.leverage": "a reference scheme, judged as a recipe; QuantLib HestonSLVFDMModel uses another grid and scheme, so it cannot reproduce the numbers",

@@ -224,3 +224,15 @@ Entries added by the stage E spec A session. Status is "Specified" until the fou
 - **Purpose:** leverage function of a Heston SLV model fitted to an SVI-slice local vol surface.
 - **Limitations:** first-order reference scheme, not converged (about 1% at the spot against a doubled grid); positivity floor and boundaries change mass by up to about 1%; Feller condition assumed; no repricing check of vanillas under the SLV model.
 - **Validation:** grid refinement and the flat-vol limit only. No outside library. **Review:** 2026-11-08.
+| ME-A7 | Exotics: digitals, barriers, geometric Asians, lookbacks, quanto, chooser, Kirk, moment-matched basket | `04-pricing/exotics.md` | E5 | Specified, outside-checked | 103 of 109 value cases (basket not outside) |
+| ME-A8 | American: CRR, BAW, FD | `04-pricing/exotics.md` | E5 | Specified, outside-checked | BAW 12 of 12; CRR and FD none |
+
+### ME-A7 Exotics
+- **Purpose:** closed-form prices of the standard exotic options on one or two lognormal assets.
+- **Limitations:** flat rates and vols; continuous barrier and lookback monitoring; geometric (not arithmetic) Asians; floating-strike lookbacks only; moment matching for positive-weight baskets only; Kirk is an approximation.
+- **Validation:** QuantLib analytic engines; parity and limit checks. **Review:** 2026-11-08.
+
+### ME-A8 American options
+- **Purpose:** early-exercise prices by tree, by BAW approximation and by a fixed-grid FD scheme.
+- **Limitations:** BAW is an approximation (errors near 1e-2); the FD scheme is first order in time; no discrete dividends.
+- **Validation:** QuantLib BAW; tree and FD by replay, the Black-Scholes limit and cross-method agreement within 2e-2. **Review:** 2026-11-08.

@@ -46,3 +46,7 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | EA11 | Heston at long maturity with high vol of variance (branch cut) | Pinned | 5-year, `xi = 1`, `rho = -0.9` cases in `heston_e` | Ruling E-A13 |
 | EA12 | Merton with no jumps | Pinned | The `heston_e` cases tagged `no-jumps` | Equals Black-Scholes |
 | EA13 | Feller condition broken in SLV | Out of scope | | The SLV reference scheme puts a no-flux boundary at `v = dv/2`; goldens keep `2 kappa theta > xi^2`. Accumulation at `v = 0` needs a different `v` grid; with the stage G model work |
+| EA14 | Barrier already touched at valuation | Pinned | The `exotic_e` cases tagged `knocked` (`E_DOMAIN`, on and beyond the barrier) | Ruling E-A19 |
+| EA15 | Negative rates in exotics | Pinned | Digitals on the `rate` -0.5% market in `exotic_e` | |
+| EA16 | Arithmetic Asians; discrete barrier monitoring | Out of scope | | Arithmetic Asians need Monte Carlo or an approximation (Turnbull-Wakeman); discrete monitoring needs the Broadie-Glasserman shift. Both with the stage J simulation work |
+| EA17 | Lookback at zero carry | Pinned | The `exotic_e` case tagged `ruling` with `dividend_yield` equal to `rate` (`E_DOMAIN`) | Ruling E-A20 |
