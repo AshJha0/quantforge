@@ -13,11 +13,12 @@ mp.mp.dps = 50
 GOLD = Path(__file__).resolve().parents[2] / "datasets" / "golden" / "stage_e_b"
 
 
-def case(suite, cid):
+def case(suite, op, pick):
+    """First ok case of `op` in `suite` for which pick(case) holds. Selected by content, never by id: ids move when cases are inserted."""
     for c in json.loads((GOLD / f"{suite}.json").read_text(encoding="utf-8"))["cases"]:
-        if c["case_id"] == cid:
+        if c["operation"] == op and c["expected"]["status"] == "ok" and pick(c):
             return c
-    raise KeyError(cid)
+    raise KeyError((suite, op))
 
 
 def neg_var_input():
@@ -60,7 +61,8 @@ def rulings_e_b():
     intr = .9962 * (111.25 - 110.0)
     s.add("rates.bondfut.option_price", {**bf, "vol": 0.0}, {"price": intr, "contract_value": intr * 1e5 / 100}, cls=A, verified=["hand"], tags=["ruling", "E-B38"],
           limit={"absolute": 1e-9, "relative": 1e-10, "reason": "1e-9 per 100 face"}, description="zero vol: discounted intrinsic")
-    iv = case("ratesvol_e", "ratesvol_e-0029")["inputs"]
+    iv = case("ratesvol_e", "rates.bondfut.implied_vol", lambda c: True)["inputs"]
+    assert "premium" in iv and "ctd_yield" in iv
     s.add("rates.bondfut.implied_vol", {**iv, "ctd_yield": 0.0}, error="E_DOMAIN", cls=E, tags=["ruling", "E-B38"], description="ctd_yield must be above 0")
     s.add("rates.bondfut.implied_vol", {**iv, "ctd_modified_duration": -1.0}, error="E_DOMAIN", cls=E, tags=["ruling", "E-B38"], description="ctd_modified_duration must be above 0")
     per = [{"accrual": 1.0, "discount_factor": .96, "yoy_forward": .0285, "expiry_years": .75, "vol": 0.0}, {"accrual": 1.0, "discount_factor": .93, "yoy_forward": .0262, "expiry_years": 1.75, "vol": 0.0}]
@@ -72,11 +74,12 @@ def rulings_e_b():
     # E-B40: smaller readings all languages share
     s.add("credit.copula.joint_default", {"copula": "GAUSSIAN", "default_probabilities": [.02, .03, .04], "correlation": .3}, error="E_INPUT", cls=E, tags=["ruling", "E-B40"],
           description="exactly two default probabilities")
-    g = case("creditopt_e", "creditopt_e-0147")
+    g = case("creditopt_e", "credit.copula.joint_default", lambda c: c["inputs"]["copula"] == "GAUSSIAN" and c["inputs"]["correlation"] == .3)
     s.add("credit.copula.joint_default", {**g["inputs"], "degrees_of_freedom": 4}, g["expected"]["outputs"], cls=g["tolerance_class"], verified=["mpmath-50 quad"], tags=["ruling", "E-B40"],
           limit=g["tolerance_limit"], description="degrees_of_freedom is ignored for GAUSSIAN")
     s.add("credit.lhp.loss_cdf", {"default_probability": .05, "correlation": .3, "recovery": .4, "losses": []}, error="E_INPUT", cls=E, tags=["ruling", "E-B40"], description="empty losses")
-    st = case("ratesvol_e", "ratesvol_e-0019")["inputs"]
+    st = case("ratesvol_e", "rates.cap.strip", lambda c: c["inputs"]["model"] == "BLACK_76" and len(c["inputs"]["flat_vols"]) == 5 and "non-annual" not in c["tags"])["inputs"]
+    assert st["cap_tenors_months"] == [12, 24, 36, 48, 60]
     s.add("rates.cap.strip", {**st, "flat_vols": [.24, 0.0, .228, .222, .215], "start_months": 0}, error="E_DOMAIN", cls=E, tags=["ruling", "E-B40", "order"],
           description="flat vol 0 and start_months 0: the strip's own checks (E_DOMAIN) come before D7's start_months (E_INPUT)")
     note("rulings_e_b: cross-language SPEC_QUESTIONS rulings E-B34 to E-B40")
