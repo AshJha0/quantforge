@@ -182,5 +182,6 @@ Silent choices, all passing `risk_r2`:
 
 ## Stage E
 
-- **E7, `vol.vix.term_variance`, one selected strike.** Step 4 gives `dK` from neighbours, but if the zero-bid stop rules leave only `K0` selected there is no neighbour. Java uses `dK = 0` (the strip sum is then 0 and only the correction term is left). No golden reaches this case. Should it be `E_INPUT` instead?
+- **E7, `vol.vix.term_variance`, one selected strike.** Closed by ruling E-B15: no OTM put or no OTM call selected is `E_INPUT`.
 - **E1, error order across inputs.** `vol.svi.surface_check` checks `slices` (all its rules, `E_LIMIT` last) before `log_moneyness`; `vol.svi.fit_surface` checks `expiry_years`, then row count, then the slice limit, then each row's fit. The goldens agree, but the spec lists checks per object rather than across them.
+- **E4, `rates.swaption.price_cube`, parameter domain.** The checks list `alpha <= 0`, `beta` outside `[0, 1]`, `|rho| >= 1`, `nu < 0` as `E_DOMAIN` without saying whether they apply to every node or only to the interpolated parameters. Java checks every node (a valid grid makes every bilinear blend valid too). Golden `ratesvol_e-0017` passes either way.

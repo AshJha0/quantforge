@@ -146,14 +146,14 @@ class StageETest {
         assertEquals(95.0, t.k0(), 0.0);
         assertEquals(0.08188158767696967, t.variance(), 1e-12);
         assertEquals(100 * Math.sqrt(t.variance()), VarianceStrip.index(43200, t, 50000, t), 1e-12);
-        // two consecutive zero call bids above K0 stop the call side
+        // two consecutive zero call bids above K0 stop the call side, leaving no OTM call (ruling E-B15)
         List<VarianceStrip.Quote> cut = List.of(
                 new VarianceStrip.Quote(90, 10.5, 11.5, 0.5, 0.7),
                 new VarianceStrip.Quote(95, 6.0, 6.6, 1.4, 1.6),
                 new VarianceStrip.Quote(100, 0.0, 3.1, 2.9, 3.3),
                 new VarianceStrip.Quote(105, 0.0, 1.2, 5.8, 6.6),
                 new VarianceStrip.Quote(110, 0.3, 0.5, 10.0, 11.0));
-        assertArrayEquals(new double[] {90, 95}, VarianceStrip.term(43200, 0.0, cut).strikesUsed(), 0.0);
+        assertEquals("E_INPUT", code(() -> VarianceStrip.term(43200, 0.0, cut)));
         assertEquals("E_INPUT", code(() -> VarianceStrip.term(0, 0.0, strip)));
         assertEquals("E_INPUT", code(() -> VarianceStrip.term(10, 0.0, strip.subList(0, 2))));
         assertEquals("E_DOMAIN", code(() -> VarianceStrip.term(10, 0.0, List.of(

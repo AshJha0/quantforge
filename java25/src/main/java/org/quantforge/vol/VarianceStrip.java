@@ -155,15 +155,17 @@ public final class VarianceStrip {
             chosen.add(new double[] {x.strike(), x.callMid()});
         }
         int n = chosen.size();
+        if (chosen.getFirst()[0] == atm.strike() || chosen.getLast()[0] == atm.strike()) {
+            // methodology v5.0 3(a)(iii): every OTM put or every OTM call excluded (ruling E-B15)
+            throw new QfError("E_INPUT", "no out-of-the-money put or no out-of-the-money call is selected", "strip");
+        }
         double sum = 0.0;
         double[] used = new double[n];
         for (int i = 0; i < n; i++) {
             double k = chosen.get(i)[0];
             used[i] = k;
             double dk;
-            if (n == 1) {
-                dk = 0.0;
-            } else if (i == 0) {
+            if (i == 0) {
                 dk = chosen.get(1)[0] - k;
             } else if (i == n - 1) {
                 dk = k - chosen.get(n - 2)[0];

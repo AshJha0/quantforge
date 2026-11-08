@@ -20,12 +20,18 @@ class GoldenSuiteTest {
     private static final Path GOLDEN = Path.of("..", "datasets", "golden");
 
     /** absolute, relative; null means exact. Mirrors conformance/tolerances/policy.yaml. */
-    private static final Map<String, double[]> CLASSES = Map.of(
-            "date_and_convention", new double[0], "bit_exact", new double[0],
-            "simple_analytic", new double[] {1e-12, 1e-10}, "interpolation", new double[] {1e-10, 1e-8},
-            "root_finding", new double[] {1e-10, 1e-10}, "quadrature", new double[] {1e-11, 1e-10},
-            "statistics", new double[] {1e-11, 1e-10}, "numerical_scheme", new double[] {1e-8, 1e-8},
-            "fourier", new double[] {1e-9, 1e-9}, "common_rng", new double[] {1e-9, 1e-9});
+    private static final Map<String, double[]> CLASSES = Map.ofEntries(
+            Map.entry("date_and_convention", new double[0]),
+            Map.entry("bit_exact", new double[0]),
+            Map.entry("simple_analytic", new double[] {1e-12, 1e-10}),
+            Map.entry("interpolation", new double[] {1e-10, 1e-8}),
+            Map.entry("root_finding", new double[] {1e-10, 1e-10}),
+            Map.entry("quadrature", new double[] {1e-11, 1e-10}),
+            Map.entry("statistics", new double[] {1e-11, 1e-10}),
+            Map.entry("numerical_scheme", new double[] {1e-8, 1e-8}),
+            Map.entry("fourier", new double[] {1e-9, 1e-9}),
+            Map.entry("common_rng", new double[] {1e-9, 1e-9}),
+            Map.entry("likelihood_sum", new double[] {1e-9, 1e-10}));
 
     /** Stage B cases that a later spec overrides (SPEC_QUESTIONS.md); the runner still reports them. */
     private static final java.util.Set<String> SUPERSEDED = java.util.Set.of();
