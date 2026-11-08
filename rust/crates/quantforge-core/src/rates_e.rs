@@ -185,7 +185,8 @@ pub fn strip_caplets(
     let value = |c: &(f64, f64, f64), v: f64| -> Result<f64> {
         Ok(c.0 * option(x.normal, true, c.1, x.strike, v, c.2)?)
     };
-    let floor = if x.normal { 1e-7 } else { 1e-6 };
+    // Search interval of ruling E-B32: below it is E_ARBITRAGE, above it E_DOMAIN.
+    let (floor, cap) = if x.normal { (1e-10, 0.5) } else { (1e-10, 5.0) };
     let (mut vols, mut targets, mut known) = (Vec::new(), Vec::new(), 0.0);
     let mut done = 0usize;
     for (&m, &flat) in tenors.iter().zip(x.flat_vols) {
@@ -204,14 +205,13 @@ pub fn strip_caplets(
                 "a segment needs a caplet vol at or below zero",
             );
         }
-        let (mut lo, mut hi) = (floor, flat.max(floor) * 2.0);
-        while gap(hi)? < 0.0 {
-            lo = hi;
-            hi *= 2.0;
-            if hi > 1e6 {
-                return fail("E_NO_CONVERGENCE", "no caplet vol reaches the cap price");
-            }
+        if gap(cap)? < 0.0 {
+            return fail(
+                "E_DOMAIN",
+                "a segment needs a caplet vol above the search bound",
+            );
         }
+        let (mut lo, mut hi) = (floor, cap);
         for _ in 0..2000 {
             let mid = 0.5 * (lo + hi);
             if mid <= lo || mid >= hi {
@@ -525,6 +525,7 @@ mod tests {
         assert_eq!(code(&strip(&[12, 24], &[0.2], false)), "E_INPUT");
         assert_eq!(code(&strip(&[12, 24], &[0.2, 0.0], false)), "E_DOMAIN");
         assert_eq!(code(&strip(&[12, 24], &[0.4, 0.05], false)), "E_ARBITRAGE");
+        assert_eq!(code(&strip(&[12, 24], &[6.0, 6.0], false)), "E_DOMAIN");
         let mut s = strip(&[12], &[0.2], false);
         s.start_months = 0;
         assert_eq!(code(&s), "E_INPUT");

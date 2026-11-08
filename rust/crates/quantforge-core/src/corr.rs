@@ -178,6 +178,15 @@ pub fn implied(weights: &[f64], vols: &[f64], index_vol: f64) -> Result<f64> {
     if vols.iter().any(|v| v.is_nan() || *v <= 0.0) || index_vol.is_nan() || index_vol <= 0.0 {
         return fail("E_DOMAIN", "vols must be above 0");
     }
+    // Ruling E-B33: weights >= 0 with at least two positive; a zero weight drops its name.
+    if weights.iter().any(|w| w.is_nan() || *w < 0.0)
+        || weights.iter().filter(|w| **w > 0.0).count() < 2
+    {
+        return fail(
+            "E_DOMAIN",
+            "weights must be at least 0 with two or more positive",
+        );
+    }
     Ok(implied_unchecked(weights, vols, index_vol))
 }
 
@@ -314,6 +323,16 @@ mod tests {
             "E_DOMAIN"
         );
         assert!(implied(&[0.5, 0.5], &[0.2, 0.3], 0.4).unwrap() > 1.0);
+        assert_eq!(
+            implied(&[1.0, 0.0], &[0.2, 0.3], 0.2).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        assert_eq!(
+            implied(&[0.6, -0.4], &[0.2, 0.3], 0.2).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        let three = implied(&[0.5, 0.5, 0.0], &[0.2, 0.3, 0.9], 0.22).unwrap();
+        assert!((three - 0.53).abs() < 1e-12);
         let x = Dispersion {
             weights: &[0.5, 0.5],
             vol_strikes: &[0.25, 0.3],
