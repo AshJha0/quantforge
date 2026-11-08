@@ -246,6 +246,7 @@ VarSwapFair varswap_fair_strike(const VarSwapInputs& in) {
     for (std::size_t j = 0; j < wp.size(); ++j) pi += wp[j] * black_price(fwd, puts[j], vol_of(puts[j]), t, d, -1.0);
     VarSwapFair out;
     out.fair_variance = (2.0 / t) * ((in.rate - in.dividend_yield) * t - (fwd / s0 - 1.0)) + pi / d;
+    if (!(out.fair_variance >= 0.0)) throw Error("E_DOMAIN", "the replicated variance is below 0");  // ruling E-B36
     out.fair_vol = std::sqrt(out.fair_variance);
     out.pv = in.variance_notional * d * (out.fair_variance - in.variance_strike);
     return out;

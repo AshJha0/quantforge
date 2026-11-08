@@ -44,13 +44,13 @@ Wrong-convention checks: 30 for E6, each caught. Outside-oracle share: 25 of 49 
 
 | Suite | Operation | Cases (ok / error) | Tolerance | In money | Oracle |
 |---|---|---|---|---|---|
-| `creditopt_e` | `credit.cdsoption.price` | 90 / 6 | price 1e-9 per unit notional + 1e-9 rel; spread and annuity class `simple_analytic` | 0.01 currency on 10m | mpmath-50; QuantLib `CdsOption` + `BlackCdsOptionEngine`, all 90 (54 on month-end, leap-day and stub schedules) |
-| `creditopt_e` | `credit.cdsoption.implied_vol` | 48 / 2 | class `root_finding` | 1e-10 in vol | QuantLib `CdsOption.impliedVolatility`, all 48 |
+| `creditopt_e` | `credit.cdsoption.price` | 108 / 6 | price 1e-9 per unit notional + 1e-9 rel; spread and annuity class `simple_analytic` | 0.01 currency on 10m | mpmath-50; QuantLib `CdsOption` + `BlackCdsOptionEngine`, all 108 (72 on month-end, leap-day and stub schedules) |
+| `creditopt_e` | `credit.cdsoption.implied_vol` | 60 / 2 | class `root_finding` | 1e-10 in vol | QuantLib `CdsOption.impliedVolatility`, all 60 |
 | `creditopt_e` | `credit.copula.joint_default` | 9 / 5 | 1e-12 abs + 1e-9 rel | n/a | mpmath-50 quadrature; QuantLib bivariate normal re-evaluates the 5 Gaussian cases, partly outside, not counted (E-B28) |
 | `creditopt_e` | `credit.lhp.tranche_loss` | 18 / 4 | 1e-12 abs + 1e-9 rel | 1e-5 currency on a 10m tranche | closed form, split Gauss-Legendre cross-check; QuantLib bivariate normal, partly outside, not counted (E-B28) |
 | `creditopt_e` | `credit.lhp.loss_cdf` | 3 / 1 | 1e-12 abs + 1e-9 rel | n/a | closed form; QuantLib normal functions, partly outside, not counted (E-B28) |
 
-Wrong-convention checks: 272 for E8, each caught. Outside-oracle share: 138 of 186 (74%).
+Wrong-convention checks: 290 for E8, each caught. Outside-oracle share: 168 of 216 (78%).
 
 ## Spec B outside-oracle share (rule 11.2.5)
 
@@ -59,7 +59,8 @@ Wrong-convention checks: 272 for E8, each caught. Outside-oracle share: 138 of 1
 | E7 | `garch_e`, `varswap_e`, `vix_e` | 18 / 84 | 21.4% |
 | E4 | `ratesvol_e` | 64 / 85 | 75.3% |
 | E6 | `corr_e` | 25 / 49 | 51.0% |
-| E8 | `creditopt_e` | 138 / 186 | 74.2% |
-| **Spec B** | | **245 / 404** | **60.6%** |
+| E8 | `creditopt_e` | 168 / 216 | 77.8% |
+| Rulings | `rulings_e_b` | 2 / 15 | 13.3% |
+| **Spec B** | | **277 / 449** | **61.7%** |
 
-Counted under ruling E-B28 (as E-A17): every output a QuantLib value or plain arithmetic on QuantLib values; 31 partly-outside cases are listed in the register and not counted. Error cases are in every denominator and never count. Stage-wide with spec A (263 / 410 at spec A commit b11809f): 508 / 814 = 62.4%, 19.6 cases above the 60% floor.
+Counted under ruling E-B28 (as E-A17): every output a QuantLib value or plain arithmetic on QuantLib values; 31 partly-outside cases are listed in the register and not counted. Error cases are in every denominator and never count. Stage-wide with spec A (280 / 446 at spec A commit dc16b77, from its own register and goldens): 557 / 895 = 62.2%, 20 cases above the 60% floor.

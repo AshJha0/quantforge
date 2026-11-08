@@ -30,7 +30,7 @@ Inputs: `near`, `next`, each a `vol.vix.term_variance` input. With `N1`, `N2` th
 index = 100 sqrt( [ T1 sigma1^2 (N2 - N30)/(N2 - N1) + T2 sigma2^2 (N30 - N1)/(N2 - N1) ] N365 / N30 )
 ```
 
-Outputs: `index`, `near_variance`, `next_variance`. Check: unless `N1 < N2` and `N1 <= N30 <= N2`: `E_INPUT` (no extrapolation, ruling E-B6). A negative bracket (variance in time below 0) under the square root: `E_DOMAIN`.
+Outputs: `index`, `near_variance`, `next_variance`. Checks, in order: unless `N1 < N2` and `N1 <= N30 <= N2`: `E_INPUT` (no extrapolation, ruling E-B6), before either term's own checks (ruling E-B34); then the near term's checks, then the next term's. A negative bracket (variance in time below 0) under the square root: `E_DOMAIN`.
 
 ## Worked example (case `vix_e-0001`)
 
