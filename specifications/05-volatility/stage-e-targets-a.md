@@ -19,3 +19,13 @@ Set before any stage E code (plan section 8). "Oracle measured" is from `oracle/
 Guards: `|g| > 1e-6` and calendar gaps above 1e-9 on every check-grid point; `|g| > 1e-4` and `w_T > 1e-6` at every Dupire point of a value case; Lee slopes and wing slope gaps 1e-6 from their thresholds.
 
 Outside-oracle share (E1): 31 of 67 cases (46%); error cases are in the denominator. The stage floor of 60% applies to the stage as a whole; E2, E3 and E5 are mostly QuantLib engines and carry the share. The running total is in `oracle/OUTSIDE_E_A.md`.
+
+## E3 FX smile
+
+| Item | Target | Oracle | Oracle measured |
+|---|---|---|---|
+| `fx.option.price` | `simple_analytic`; price limit 1e-6 currency units on 1m foreign notional plus 1e-10 relative | QuantLib `BlackScholesMertonProcess` (foreign curve as dividend curve) with `AnalyticEuropeanEngine` | All outputs reproduced |
+| `fx.delta.from_strike`, `fx.atm.strike` | `simple_analytic` | QuantLib `BlackDeltaCalculator` (`deltaFromStrike`, `atmStrike`) | All reproduced |
+| `fx.delta.to_strike`, `fx.smile.from_quotes` | 1e-10 absolute plus 1e-9 relative on strikes (far below a pip) | QuantLib `strikeFromDelta`; oracle solve to 1e-15 with a conditioning guard | QuantLib agrees within 2e-10 relative |
+
+Outside-oracle share (E3): 114 of 125 (91%); spec A running total in `oracle/OUTSIDE_E_A.md` (145 of 192, 75.5%).

@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT / "conformance" / "runner"))
 import runner  # noqa: E402  (tolerance comparison only)
 
 POLICY = runner.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml")
-SUITES = ["surf_e", "lv_e"]  # spec A suites; later slices append
+SUITES = ["surf_e", "lv_e", "fxs_e"]  # spec A suites; later slices append
 
 
 class Used:
@@ -121,6 +121,58 @@ HANDLERS = {
     "vol.smile.dynamics": h_dynamics,
     "vol.volofvol.measure": h_volofvol,
 }
+
+
+# ---------------------------------------------------------------- E3
+def _fx(x):
+    T = x["expiry_years"]
+    return x["spot"], math.exp(-x["domestic_rate"] * T), math.exp(-x["foreign_rate"] * T), T
+
+
+def h_fx_price(u, x):
+    ref = ql.Date(6, 11, 2026)
+    ql.Settings.instance().evaluationDate = ref
+    d = round(x["expiry_years"] * 365)
+    if d / 365 != x["expiry_years"]:
+        raise NotImplementedError("expiry not whole days")
+    pr = u("FX.GK", ref, x["spot"], x["domestic_rate"], x["foreign_rate"], x["vol"])
+    o = ql.VanillaOption(ql.PlainVanillaPayoff(ql.Option.Call if x["option_type"] == "CALL" else ql.Option.Put, x["strike"]), ql.EuropeanExercise(ref + d))
+    o.setPricingEngine(ql.AnalyticEuropeanEngine(pr))
+    N, S = x["notional"], x["spot"]
+    return {"price": N * o.NPV(), "premium_pct_foreign": o.NPV() / S, "forward": S * pr.dividendYield().discount(ref + d) / pr.riskFreeRate().discount(ref + d),
+            "delta": N * o.delta(), "gamma": N * o.gamma(), "vega": N * o.vega()}
+
+
+def h_fx_from_strike(u, x):
+    S, Dd, Df, T = _fx(x)
+    sd = x["vol"] * math.sqrt(T)
+    return {"deltas": {dt: u("FX.DELTA_CALC", x["option_type"], u("FX.DELTA_TYPE", dt), S, Dd, Df, sd).deltaFromStrike(x["strike"]) for dt in ("SPOT", "FORWARD", "SPOT_PA", "FORWARD_PA")}}
+
+
+def h_fx_to_strike(u, x):
+    S, Dd, Df, T = _fx(x)
+    c = u("FX.DELTA_CALC", x["option_type"], u("FX.DELTA_TYPE", x["delta_type"]), S, Dd, Df, x["vol"] * math.sqrt(T))
+    return {"strike": c.strikeFromDelta(x["delta"])}
+
+
+def h_fx_atm(u, x):
+    S, Dd, Df, T = _fx(x)
+    c = u("FX.DELTA_CALC", "CALL", u("FX.DELTA_TYPE", x["delta_type"]), S, Dd, Df, x["vol"] * math.sqrt(T))
+    return {"strike": c.atmStrike(u("FX.ATM_TYPE", x["atm_type"]))}
+
+
+def h_fx_smile(u, x):
+    S, Dd, Df, T = _fx(x)
+    a, rr, bf, dl = x["atm_vol"], x["rr"], x["bf"], x["delta"]
+    cv, pv = a + bf + rr / 2, a + bf - rr / 2
+    dtq = u("FX.DELTA_TYPE", x["delta_type"])
+    st = lambda ot, v, d: u("FX.DELTA_CALC", ot, dtq, S, Dd, Df, v * math.sqrt(T)).strikeFromDelta(d)  # noqa: E731
+    return {"atm_strike": u("FX.DELTA_CALC", "CALL", dtq, S, Dd, Df, a * math.sqrt(T)).atmStrike(u("FX.ATM_TYPE", x["atm_type"])),
+            "call_vol": cv, "put_vol": pv, "call_strike": st("CALL", cv, dl), "put_strike": st("PUT", pv, -dl)}
+
+
+HANDLERS.update({"fx.option.price": h_fx_price, "fx.delta.from_strike": h_fx_from_strike, "fx.delta.to_strike": h_fx_to_strike,
+                 "fx.atm.strike": h_fx_atm, "fx.smile.from_quotes": h_fx_smile})
 
 NO_ORACLE = {
     "vol.ssvi.to_svi": "QuantLib has no SSVI; checked by replay through vol.ssvi.evaluate",

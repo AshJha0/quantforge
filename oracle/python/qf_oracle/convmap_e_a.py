@@ -33,6 +33,21 @@ ROWS = {
                        "delta(spot) is dV/dS at fixed vol; vega(T) per unit vol"),
     "STAT.SAMPLE": ("05-volatility/local-and-forward-vol.md vol of vol: sample standard deviation, divisor n-1",
                     lambda: ql.IncrementalStatistics(), "standardDeviation uses n-1"),
+    # E3
+    "FX.DELTA_TYPE": ("05-volatility/fx-smile.md delta types SPOT, FORWARD, SPOT_PA, FORWARD_PA",
+                      lambda dt: {"SPOT": ql.DeltaVolQuote.Spot, "FORWARD": ql.DeltaVolQuote.Fwd, "SPOT_PA": ql.DeltaVolQuote.PaSpot, "FORWARD_PA": ql.DeltaVolQuote.PaFwd}[dt],
+                      "QuantLib DeltaVolQuote::DeltaType; PA = premium in foreign currency included"),
+    "FX.ATM_TYPE": ("05-volatility/fx-smile.md ATM SPOT, FORWARD, DNS",
+                    lambda at: {"SPOT": ql.DeltaVolQuote.AtmSpot, "FORWARD": ql.DeltaVolQuote.AtmFwd, "DNS": ql.DeltaVolQuote.AtmDeltaNeutral}[at],
+                    "QuantLib AtmDeltaNeutral depends on the delta type, as the spec"),
+    "FX.DELTA_CALC": ("05-volatility/fx-smile.md deltas and strikes; discount factors exp(-r T), continuous",
+                      lambda ot, dtq, S, Dd, Df, sd: ql.BlackDeltaCalculator(ql.Option.Call if ot == "CALL" else ql.Option.Put, dtq, S, Dd, Df, sd), ""),
+    "FX.GK": ("05-volatility/fx-smile.md Garman-Kohlhagen: flat continuous rd, rf on ACT/365F, expiry days/365",
+              lambda ref, S, rd, rf, v: ql.BlackScholesMertonProcess(ql.QuoteHandle(ql.SimpleQuote(S)),
+                                                                  ql.YieldTermStructureHandle(ql.FlatForward(ref, rf, ql.Actual365Fixed(), ql.Continuous)),
+                                                                  ql.YieldTermStructureHandle(ql.FlatForward(ref, rd, ql.Actual365Fixed(), ql.Continuous)),
+                                                                  ql.BlackVolTermStructureHandle(ql.BlackConstantVol(ref, ql.NullCalendar(), v, ql.Actual365Fixed()))),
+              "Garman-Kohlhagen is BlackScholesMertonProcess with the foreign curve as dividend curve (the SWIG wheel has no GarmanKohlhagenProcess); engine AnalyticEuropeanEngine; vega per unit vol"),
 }
 
 
