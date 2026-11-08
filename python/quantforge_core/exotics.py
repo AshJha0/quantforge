@@ -124,8 +124,8 @@ def lookback(s: float, t: float, r: float, q: float, v: float, option_type: str,
     if (call and not 0 < extreme <= s) or (not call and extreme < s):
         raise _domain("running_extreme is on the wrong side of spot", "running_extreme")
     b = r - q
-    if b == 0:
-        raise _domain("zero carry: the closed form divides by b", "dividend_yield")
+    if abs(b) <= 1e-8 * v * v:  # ruling E-A26: the closed form divides by b
+        raise _domain("carry too close to zero: the closed form divides by b", "dividend_yield")
     root = v * math.sqrt(t)
     x1 = (math.log(s / extreme) + (b + v * v / 2) * t) / root
     x2 = x1 - root
@@ -234,8 +234,8 @@ def _solve(f: Callable[[float], float], low: float, high: float) -> float:
 
 def baw(s: float, k: float, t: float, r: float, q: float, v: float, option_type: str) -> float:
     _positive(spot=s, strike=k, expiry_years=t, vol=v)
-    if r == 0:
-        raise _domain("r = 0: BAW divides by 1 - exp(-rT)", "rate")
+    if r <= 0:  # rulings E-A22, E-A27
+        raise _domain("BAW needs r above 0", "rate")
     b = r - q
     phi = _phi(option_type)
     if phi > 0 and b >= r:

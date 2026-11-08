@@ -98,6 +98,15 @@ _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
 _LAGS = _caps(max_lag=1000)
 
+def _caps_list(key: str, limit: int) -> Callable[[Raw], None]:
+    def check(raw: Raw) -> None:
+        value = raw.get(key)
+        if isinstance(value, list) and len(value) > limit:
+            raise _over(key, limit)
+
+    return check
+
+
 def _fd_grid(raw: Raw) -> None:
     grid = raw.get("grid")
     if isinstance(grid, dict):
@@ -148,6 +157,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "rates.schedule.generate": _caps(payment_lag=30_000),
     "usecase.rates_hedge": _hedge_tenors,
     "vol.slv.leverage": _slv_grid,
+    "vol.volofvol.measure": _caps_list("vols", 10_000),
     "exotic.american.crr": _caps(steps=20_000),
     "exotic.american.fd": _fd_grid,
     "vol.sabr.arbfree": _caps(cells=20_000, steps=20_000),
@@ -220,6 +230,7 @@ def check_limits(operation: str, raw: Raw) -> None:
     if grid is not None:
         _check_e1(raw, grid)
     stage_c = (operation.startswith(STAGE_C_PREFIXES) and grid is None
+               and operation != "vol.volofvol.measure"  # ruling E-A35: 10,000
                and not operation.startswith(STAGE_E_B_PREFIXES))
     if stage_c or operation == "usecase.vol_surface":
         _check_stage_c(raw)

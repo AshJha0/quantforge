@@ -185,3 +185,7 @@ Choices made where a stage E spec was silent or two rules pull apart. No golden 
   lower vol bound (as E-B10 gives for the cap strip), which Python would then apply.
 - E-Q13 (E8, `credit.copula.joint_default`). `default_probabilities` must hold exactly two values
   (`E_INPUT` otherwise); the page does not say, and this check runs first.
+
+Closed by rulings (2026-11-08): E-Q1 by E-A34 (`E_LIMIT` at the gate, as built); E-Q2 by E-A35 (stage C cap
+kept, vol-of-vol series raised to 10,000, now built); E-Q6 by E-A36 (first `expiry_years <= 0` is `E_DOMAIN`,
+now built); E-Q10 by E-A24 (golden corrected); E-Q12 by E-B27 (golden corrected).

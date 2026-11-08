@@ -117,17 +117,24 @@ def heston_cf(t: float, h: Heston, us: Floats) -> tuple[list[float], list[float]
 
 
 @cache
-def _nodes() -> tuple[tuple[float, ...], tuple[float, ...]]:
-    """Gauss-Legendre, 256 nodes, mapped to [0, 200]."""
-    x, w = np.polynomial.legendre.leggauss(256)
-    return tuple(float(v) for v in 100 * (x + 1)), tuple(float(v) for v in 100 * w)
+def _unit_rule() -> tuple[tuple[float, ...], tuple[float, ...]]:
+    """Gauss-Legendre, 1024 nodes on [-1, 1]."""
+    x, w = np.polynomial.legendre.leggauss(1024)
+    return tuple(float(v) for v in x), tuple(float(v) for v in w)
+
+
+def _nodes(t: float) -> tuple[list[float], list[float]]:
+    """The rule mapped to [0, 200/sqrt(min(T, 1))] (ruling E-A25: short expiries need more)."""
+    half = 100 / math.sqrt(min(t, 1.0))
+    xs, ws = _unit_rule()
+    return [half * (x + 1) for x in xs], [half * w for w in ws]
 
 
 def _lewis(phi: Cf, spot: float, strikes: Floats, t: float, r: float, q: float,
            call: bool) -> list[float]:
     forward = spot * math.exp((r - q) * t)
     discount = math.exp(-r * t)
-    us, ws = _nodes()
+    us, ws = _nodes(t)
     shifted = [phi(complex(u, -0.5)) for u in us]
     prices = []
     for strike in strikes:
@@ -219,16 +226,18 @@ def _rows(mu: Floats, s: Floats, h: float, dt: float,
 
 def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
                  slices: Sequence[vol_e1.Slice], grid: Grid) -> dict[str, object]:
+    # Ruling E-A37: every E_INPUT rule first, then E_DOMAIN, each in input order.
+    vol_e1.check_slices_input(slices)
+    if grid.nx < 5 or grid.nv < 5 or grid.nt < 2:
+        raise _input("nx and nv must be at least 5 and nt at least 2", "grid")
+    if spot > 0 and not grid.x_min < math.log(spot) < grid.x_max:  # ln needs spot > 0
+        raise _input("ln(spot) must lie inside (x_min, x_max)", "grid")
     if not spot > 0:
         raise _domain("spot must be above 0", "spot")
     if not t > 0:
         raise _domain("expiry_years must be above 0", "expiry_years")
     check_heston(h)
     vol_e1.check_slices(slices)
-    if grid.nx < 5 or grid.nv < 5 or grid.nt < 2:
-        raise _input("nx and nv must be at least 5 and nt at least 2", "grid")
-    if not grid.x_min < math.log(spot) < grid.x_max:
-        raise _input("ln(spot) must lie inside (x_min, x_max)", "grid")
     if not grid.v_max > 0:
         raise _domain("v_max must be above 0", "grid")
     nx, nv, nt = grid.nx, grid.nv, grid.nt

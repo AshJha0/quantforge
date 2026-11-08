@@ -49,13 +49,18 @@ class Slice:
     svi: Svi
 
 
+def check_slices_input(slices: Sequence[Slice]) -> None:
+    """The E_INPUT part of the `slices` checks."""
+    if not slices:
+        raise _input("slices is empty", "slices")
+    if not _increasing([s.expiry_years for s in slices]):
+        raise _input("expiry_years must be strictly increasing", "slices")
+
+
 def check_slices(slices: Sequence[Slice]) -> None:
     """The `slices` object checks, in spec order. The count limit is applied at the CLI gate."""
     expiries = [s.expiry_years for s in slices]
-    if not slices:
-        raise _input("slices is empty", "slices")
-    if not _increasing(expiries):
-        raise _input("expiry_years must be strictly increasing", "slices")
+    check_slices_input(slices)
     if any(t <= 0 for t in expiries):
         raise _domain("an expiry_years is not positive", "slices")
     for s in slices:
@@ -179,6 +184,8 @@ def forward_vols(expiries: Floats, vols: Floats) -> list[float]:
         raise _input("expiry_years and vols must be non-empty and of one length", "vols")
     if not _increasing(expiries):
         raise _input("expiry_years must be strictly increasing", "expiry_years")
+    if expiries[0] <= 0:  # ruling E-A36
+        raise _domain("the first expiry_years is not above 0", "expiry_years")
     if any(v <= 0 for v in vols):
         raise _domain("a vol is not above 0", "vols")
     out = [vols[0]]
