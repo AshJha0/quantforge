@@ -264,6 +264,21 @@ Stage E (target contract 1.8.0, set by the coordinator at merge) adds these, wit
 A test function cannot be sent as JSON, so operations that need one name it from the registry in
 `01-core/test-functions.md`.
 
+## Stage E operations, spec B (contract 1.8.0)
+
+Stage E spec B adds these, with no new error code and no change to the wire format or to `--batch` (each new operation is one line in, one line out, as BT1 to BT4). `stage-e-rulings-b.md` is normative for them. Spec A's stage E operations are in their own section. Rows are added as each slice lands.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `vol.garch.loglik`, `vol.garch.forecast`, `vol.garch.fit` | `05-volatility/garch.md` | E7 |
+| `vol.varswap.fair_strike`, `vol.varswap.realized` | `05-volatility/variance-swaps.md` | E7 |
+| `vol.vix.term_variance`, `vol.vix.index` | `05-volatility/vix-index.md` | E7 |
+| `risk.corr.validate`, `risk.corr.nearest`, `risk.corr.implied`, `risk.corr.dispersion` | `06-risk/correlation.md` | E6 |
+| `credit.cdsoption.price`, `credit.cdsoption.implied_vol`, `credit.copula.joint_default`, `credit.lhp.tranche_loss`, `credit.lhp.loss_cdf` | `04-pricing/credit-options-and-copulas.md` | E8 |
+| `rates.swaption.price_cube`, `rates.cap.strip`, `rates.bondfut.option_price`, `rates.bondfut.implied_vol`, `infl.cap.yoy_price`, `infl.cap.zc_price` | `05-volatility/rates-vol-cube.md` | E4 |
+
+Batch notes for these operations: `vol.garch.fit`, `rates.cap.strip`, `rates.bondfut.implied_vol` `risk.corr.nearest` and `credit.cdsoption.implied_vol` iterate; a line that fails to converge returns `E_NO_CONVERGENCE` for that line and the batch goes on. Array inputs (`returns`, `prices`, `strip`) count towards `01-core/limits.md` like any array. `initial_variance` is a string or a number: any other JSON type is `E_SCHEMA`. `knock_out` must be a JSON boolean; `copula` must be `GAUSSIAN` or `STUDENT_T` (`E_SCHEMA` otherwise).
+
 ## Versioning
 
 Adding an operation or an error code is a minor version. Changing the meaning of a key, a code or an

@@ -21,6 +21,39 @@ Each row is a real-world edge case. It is either **pinned**: named golden cases 
 | E13 | Mark-to-market resetting cross-currency basis swap (the market EUR/USD instrument) | Out of scope | | `fx.xccy.*` is a synthetic constant-notional swap (ruling R1-1). The MTM-reset variant, with the USD notional reset each period at the FX forward, needs a new operation or a `notional_reset` input; planned with stage F trade capture. Until then no stage D result is a market xccy-implied curve |
 | E14 | US bond market early close on Good Friday | Pinned | `edge_d-0018` to `edge_d-0021` (business-day status, 2023, 2024, 2026, 2027), `edge_d-0022` (adding a business day lands on 2026-04-03), `edge_d-0023`, `edge_d-0024` (SOFR compounding across Good Friday 2026, which has no SOFR fixing) | Ruling R1-6: an early close is a business day. Years from SIFMA in `datasets/calendar_provenance.json`; future years are holidays until SIFMA publishes. SOFR compounding still skips every Good Friday, since no SOFR is published |
 
+## Stage E edge cases, spec B (E4, E6, E7, E8)
+
+Numbered EB so spec A's block can be added without renumbering. Pinned means named golden cases; the language builds have not yet run them.
+
+| # | Edge case | State | Golden cases | Notes |
+|---|---|---|---|---|
+| EB1 | GARCH at the stationarity edge | Pinned | `alpha + beta = 1` likelihood: `garch_e-0008` (`alpha = 0.3, beta = 0.7`); forecast refused: `garch_e-0023` (`E_DOMAIN`). `alpha = 0`: `garch_e-0007`; forecast with `alpha = beta = 0`: `garch_e-0022` | The likelihood exists for an integrated process; the long-run variance does not |
+| EB2 | All-zero returns | Pinned | `garch_e-0016` (`E_DOMAIN`) | A numeric initial variance with zero returns is valid |
+| EB3 | Variance swap with dividends | Pinned | `q != 0`: `varswap_e-0007`, `varswap_e-0008` | QuantLib's engine drops `q`; ruling E-B3 |
+| EB4 | Negative rate in replication | Pinned | `varswap_e-0006` (`r = -0.5%`) | |
+| EB5 | Coarse strike strip | Pinned | Density grid `varswap_e-0009` to `varswap_e-0020` | Shows the strip bias; the spec prices the strip given and never fills strikes |
+| EB6 | VIX zero bids: isolated and consecutive | Pinned | `vix_e-0002`, `vix_e-0003`, `vix_e-0005`, `vix_e-0006` | An isolated zero is skipped; two in a row stop the walk; strikes beyond are excluded (checked) |
+| EB7 | VIX forward between strikes, K0 below the at-the-money strike | Pinned | `vix_e-0001` (F = 99.9, K0 = 95) | |
+| EB8 | VIX term outside 30 days | Pinned | `vix_e-0016` (`E_INPUT`) | No extrapolation, ruling E-B6 |
+| EB13 | VIX near or next term exactly 30 days | Pinned | `vix_e-0009` (`N1 = 43200`), `vix_e-0010` (`N2 = 43200`) | Weights 1 and 0 |
+| EB14 | Unsorted strip; zero bid at the ATM strike; no OTM puts | Pinned | `vix_e-0017`, `vix_e-0018`, `vix_e-0021` (`E_INPUT`) | Ruling E-B15 against Cboe v5.0 3(a) |
+| EB15 | Correlation matrix already valid | Pinned | `corr_e-0010`, `corr_e-0012`, `corr_e-0018` | Nearest returns the input |
+| EB16 | Correlation with an entry near -1 after repair | Pinned | `corr_e-0020` | |
+| EB17 | Implied correlation exactly 1 (equal vols, index vol equal) | Pinned | `corr_e-0040` | Not clipped (E-B20) |
+| EB18 | Default of the reference name before expiry | Pinned | Non-knock-out payers (`front-end-protection` tag in `creditopt_e`) and knock-out payers at the same inputs | Ruling E-B23 |
+| EB19 | Negative rate under a CDS option | Pinned | `creditopt_e` cases with `rate = -0.2%` | |
+| EB20 | Zero correlation in copulas | Pinned | Gaussian `creditopt_e-0155` (exact independence), Student t `creditopt_e-0154` (not independence) | |
+| EB21 | Senior tranche far out of the money | Pinned | `creditopt_e-0173` (expected loss 1.4e-9) | Relative tolerance keeps it meaningful |
+| EB22 | Validation flags false (asymmetric by one ulp, diagonal one ulp below 1, entry 1.2, asymmetric) | Pinned | `corr_e-0023` to `corr_e-0026` | Ruling E-B29 |
+| EB23 | Nearest correlation: 1 by 1, non-unit diagonal, `\|rho\| > 1`, rank-deficient 20 by 20 | Pinned | `corr_e-0027` to `corr_e-0030` | Rulings E-B29, E-B31 |
+| EB24 | CDS option schedules on month ends, 29 February and short final stubs | Pinned | `creditopt_e-0049` to `creditopt_e-0138` (`schedule` tag) | Ruling E-B30 |
+| EB25 | Non-annual caps; caplet vol above the search bound | Pinned | `ratesvol_e-0053` to `ratesvol_e-0056`; `ratesvol_e-0057` (`E_DOMAIN`) | Ruling E-B32 |
+| EB26 | Implied correlation with a zero or negative weight | Pinned | `corr_e-0042`, `corr_e-0043`, `corr_e-0044` | Ruling E-B33 |
+| EB9 | Swaption exactly on a cube node | Pinned | `ratesvol_e-0001` to `ratesvol_e-0005`, `ratesvol_e-0009`, `ratesvol_e-0012` | Parameters equal the node's; checks the time axis |
+| EB10 | Cap quotes with calendar arbitrage | Pinned | `ratesvol_e-0058` (`E_ARBITRAGE`) | Ruling E-B10: rejected, not clipped |
+| EB11 | Zero-strike inflation floor | Pinned | Bachelier YoY floor at 0%: `ratesvol_e-0077`; ZC floor at 0% (`strike_ratio = 1`): `ratesvol_e-0081`; Black YoY floor at 0%: `ratesvol_e-0079` (`E_DOMAIN`) | Deflation protection |
+| EB12 | Implied vol with premium below intrinsic | Pinned | `ratesvol_e-0073` (`E_DOMAIN`) | |
+
 ## Rules for adding a row
 
 - A row is pinned only by golden cases that every language passes. Name them by `case_id`.
