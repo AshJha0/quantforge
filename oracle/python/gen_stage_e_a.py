@@ -928,7 +928,7 @@ def e2_slv():
     caught("slv_e", "mixed-term sign (rho flipped)", max(abs(a - b) for a, b in zip(o["leverage"], w["leverage"])), 1e-8)
     s.add(op, {**inp, "grid": {**G0, "nx": 2}}, error="E_INPUT", cls=E, tags=["invalid"], description="nx at least 5")
     s.add(op, {**inp, "grid": {**G0, "x_min": 5.0, "x_max": 4.0}}, error="E_INPUT", cls=E, tags=["invalid"])
-    s.add(op, {**inp, "grid": {**G0, "x_min": 4.6, "x_max": 4.7}}, error="E_INPUT", cls=E, tags=["invalid"], description="spot outside the x grid interior")
+    s.add(op, {**inp, "grid": {**G0, "x_min": 4.61, "x_max": 4.7}}, error="E_INPUT", cls=E, tags=["invalid", "ruling"], description="ln(spot) = 4.6052 below x_min = 4.61 (ruling E-A24)")
     s.add(op, {**inp, "grid": {**G0, "nx": 2001}}, error="E_LIMIT", cls=E, tags=["invalid"])
     s.add(op, {**inp, "heston": {**hp, "xi": 0.0}}, error="E_DOMAIN", cls=E, tags=["invalid"])
     write(s)

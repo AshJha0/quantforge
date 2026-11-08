@@ -376,3 +376,23 @@ Copy the inputs of the named case from `datasets/golden/stage_d/`:
 | CPI curve, ZCIS, linkers | `infl.*` | `inflation_d-0001`, `inflation_d-0007` |
 | Caps and swaptions | `rates.cap.price`, `rates.swaption.price` | `capswaption_d-0001`, `capswaption_d-0010` |
 | Commodity curve and storage | `cmdty.*` | `commodity_d-0001`, `commodity_d-0007` |
+
+### Stage E recipes (spec A)
+
+Copy the inputs of the named case from `datasets/golden/stage_e/`:
+
+| Task | Operation | Case |
+|---|---|---|
+| Check an SVI surface for arbitrage; reject it | `vol.svi.surface_check` | `surf_e-0001` (clean), `surf_e-0007`, `surf_e-0008` (reject) |
+| SSVI slice to raw SVI | `vol.ssvi.to_svi` | `surf_e-0018` |
+| Fit SVI slices to a surface of quotes | `vol.svi.fit_surface` | `surf_e-0024` |
+| Local vol from SVI slices | `vol.local.dupire` | `lv_e-0001` |
+| Forward vol between expiries | `vol.forward.vol` | `lv_e-0007` |
+| Reprice a smile after a spot move, sticky strike or sticky delta | `vol.smile.dynamics` | `lv_e-0018`, `lv_e-0020` |
+| Vol of vol from a vol history | `vol.volofvol.measure` | `lv_e-0033` |
+| FX vanilla price and Greeks | `fx.option.price` | `fxs_e-0001` |
+| FX strike from a delta quote; ATM strike; RR/BF to strikes | `fx.delta.to_strike`, `fx.atm.strike`, `fx.smile.from_quotes` | `fxs_e` cases tagged `forward_pa`; tagged `atm`; `fxs_e-0120` |
+| Heston, Bates, Merton prices | `vol.heston.price`, `vol.bates.price`, `vol.merton.price` | `heston_e-0001`; `heston_e` cases tagged `bates`, `merton` |
+| SLV leverage function | `vol.slv.leverage` | `slv_e-0001` |
+| Barrier, digital, Asian, lookback, quanto, chooser, spread, basket | `exotic.*` | `exotic_e` cases by tag |
+| American put: tree, BAW, FD | `exotic.american.crr`, `.baw`, `.fd` | `american_e-0002`; `american_e` cases tagged `baw`, `fd` |

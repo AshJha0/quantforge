@@ -245,3 +245,47 @@ The worked examples share one trade: receive 3.45% fixed against SOFR on 25 mill
 Stages A to C test correctness with analytic, hand and outside-library answers. Stages B and C add calibration on known truth. Later stages add backtests and new-model tests. `specifications/stage-b-rulings.md` says which stage B suites have an outside oracle. Evidence is always labelled analytic, simulated, proxy or observed, and validation reports are self-assessment until the human review at the end of the project.
 
 R1 adds the records that say how far each result goes. The [model inventory](docs/model-inventory.md) gives every model its spec, oracle, outside-checked share and limits. The [edge-case register](specifications/edge-case-register.md) lists boundary cases and whether a golden pins each one; a row marked out of scope names the stage that would bring it in. `conformance/tolerances/money.md` restates every tolerance as money on 10 million notional, so a reader can judge whether a pass is tight enough to matter. The R1 daily workflows are the first runs on observed public data, and their USD curve is labelled a proxy.
+
+## Stage E (spec A: arbitrage-free surfaces, FX smile, Heston family, exotics)
+
+Specified, with goldens; the four builds are in progress, so nothing below is "implemented" yet. Every number is a golden in `datasets/golden/stage_e/`; every rule cites its spec, and each spec lists its primary sources.
+
+### Arbitrage-free surfaces
+
+**Plain idea.** A vol surface is only usable if no mix of options built from it makes money for nothing. Two things can go wrong. Along one expiry, call prices can stop being convex in strike (butterfly arbitrage: a negative probability density). Across expiries, total variance can fall as time grows (calendar arbitrage).
+
+**Formal statement.** `specifications/05-volatility/arb-free-surfaces.md`. With total variance `w = sigma^2 T` in forward log-moneyness `k`, a slice is butterfly-free iff `g(k) >= 0` and `d_+ -> -inf` (Gatheral-Jacquier 2014, Lemma 2.2), and a surface is calendar-free iff `w(k, T)` rises with `T` at every `k` (Lemma 2.1). `vol.svi.surface_check` tests `g` and `w` on a grid, and tests the SVI wing slopes `b(1 +- rho)` against the Lee bound of 2, flagging a slope of exactly 2 (ruling E-A15).
+
+**Worked example.** `surf_e-0007`: a 1-year slice whose wings sit below the 3-month slice. `calendar_violations` lists `k_index` 0 to 3 at expiry 1. `wing_violations` adds both wings, because the later slice is flatter and must cross below the earlier one far out, beyond the grid. With `reject: true` (`surf_e-0008`) the same surface is `E_ARBITRAGE`.
+
+### Local vol and forward vol
+
+**Plain idea.** Implied vol is one number per option. Local vol is the instantaneous vol, as a function of time and spot, that reproduces every option price at once. Forward vol is the vol that applies between two expiries.
+
+**Formal statement.** `specifications/05-volatility/local-and-forward-vol.md`. Dupire local variance in total-variance form is `w_T / g` (Gatheral 2006, eq. 1.10; Dupire 1994). Forward vol is `sqrt((s2^2 T2 - s1^2 T1)/(T2 - T1))`, because variance adds over time (Hull, 10th ed.). A negative forward variance or a non-positive `g` is `E_ARBITRAGE`.
+
+**Worked example.** `lv_e-0001`, the point `T = 1`, `k = 0` on the three-slice SVI surface: implied vol 0.25269, local vol 0.16776. Local vol is below implied vol at the money here because of the negative skew (`rho < 0`). The golden agrees within 1e-9 relative with a separate 40-digit Dupire computed from call prices (`stage-e-targets-a.md`).
+
+### FX smile conventions
+
+**Plain idea.** FX options are quoted by delta, not strike, and the market uses several deltas. Spot or forward delta, with or without the premium deducted, give different strikes for the same "25-delta" quote.
+
+**Formal statement.** `specifications/05-volatility/fx-smile.md`, after Reiswich and Wystup 2012 and Clark 2011. Four delta types, three ATM types, Garman-Kohlhagen pricing (Garman and Kohlhagen 1983). A premium-adjusted call delta has two strikes; the spec takes the upper one (ruling E-A10).
+
+**Worked example.** `fxs_e-0120`, a USDJPY-like pair (spot 151.20, six months, `rd` 0.10%, `rf` 4.50%, ATM 10.5%, 25-delta risk reversal -1.5, butterfly 0.35, premium-adjusted spot delta). Call vol 10.10%, put vol 11.60%, ATM delta-neutral strike 147.51, 25-delta call strike 155.03, put strike 140.20. All five outputs are reproduced by QuantLib `BlackDeltaCalculator`.
+
+### Heston, Bates, Merton and SLV
+
+**Plain idea.** Let variance itself be random and mean-reverting (Heston), add jumps (Bates), or keep vol constant and add only jumps (Merton). SLV mixes a stochastic vol with a local-vol correction (the leverage function), so the model fits the surface exactly while keeping realistic dynamics.
+
+**Formal statement.** `specifications/05-volatility/heston-family.md`. Prices come from the Lewis single integral of the characteristic function (Lewis 2001), in the "little trap" form (Albrecher et al. 2007). The SLV leverage is `L^2 = sigma_LV^2 / E[v | x]` (Henry-Labordere 2009). It is computed by a fixed-grid Fokker-Planck reference scheme (ruling E-A14), which checks that the four builds follow the same recipe and is not a converged answer.
+
+**Worked example.** `heston_e-0001` (`v0 = theta = 0.04`, `kappa` 1.5, `xi` 0.5, `rho` -0.7, one year): the 100-strike call is 8.1135, matched by QuantLib within 1e-9. As vol of variance tends to 0, Heston tends to Black-Scholes at the average variance, not at `v0` (plan section 8). `heston_e-0011` tests this at `xi = 1e-3`, near zero but not at it.
+
+### Exotics and American options
+
+**Plain idea.** Exotics change the payoff. It can depend on whether a barrier was touched, on an average, on a maximum, on a choice made later, on another currency, or on two assets. American options can be exercised early, which is worth something extra for puts, and for calls on a dividend-paying asset.
+
+**Formal statement.** `specifications/04-pricing/exotics.md`: Reiner-Rubinstein barriers, Kemna-Vorst geometric Asians, Goldman-Sosin-Gatto lookbacks, the Rubinstein chooser, the Kirk spread, Levy moment matching, and for American options a CRR tree, Barone-Adesi-Whaley and a fixed-grid FD scheme (formulas as Haug 2007).
+
+**Worked example.** `american_e-0002`: a one-year at-the-money put (`r` 5%, `q` 2%, vol 25%) on a 200-step tree. American 8.5588, European 8.2148, so early exercise is worth 0.3441. `exotic_e-0019`: a down-and-in call (strike 85, barrier 90, rebate 2) is 7.8991, reproduced by QuantLib `AnalyticBarrierEngine`.
