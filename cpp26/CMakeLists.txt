@@ -57,7 +57,8 @@ add_library(quantforge_core
   src/core/timeseries.cpp
   src/core/timezone.cpp
   src/core/vol_stats.cpp
-  src/core/arb_surface.cpp)
+  src/core/arb_surface.cpp
+  src/core/fx_smile.cpp)
 target_include_directories(quantforge_core PUBLIC include)
 target_compile_features(quantforge_core PUBLIC cxx_std_26)
 # sobol.cpp pulls the direction numbers in with #embed, so no command reads a file at run time.

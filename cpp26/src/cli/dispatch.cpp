@@ -43,6 +43,7 @@
 #include "quantforge/core/timeseries.hpp"
 #include "quantforge/core/timezone.hpp"
 #include "quantforge/core/arb_surface.hpp"
+#include "quantforge/core/fx_smile.hpp"
 #include "quantforge/core/vol_stats.hpp"
 #include "test_functions.hpp"
 
@@ -1061,6 +1062,7 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_credit.inc"
 #include "ops_r2.inc"
 #include "ops_e1.inc"
+#include "ops_e3.inc"
 #include "ops_e7.inc"
 
 // ---- dispatch ----
@@ -1071,6 +1073,11 @@ const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
 #include "ops_c_table.inc"
 #include "ops_d_table.inc"
+        {"fx.atm.strike", op_fx_atm_strike},
+        {"fx.delta.from_strike", op_fx_delta_from_strike},
+        {"fx.delta.to_strike", op_fx_delta_to_strike},
+        {"fx.option.price", op_fx_option_price},
+        {"fx.smile.from_quotes", op_fx_smile_from_quotes},
         {"vol.forward.vol", op_forward_vol},
         {"vol.local.dupire", op_local_dupire},
         {"vol.smile.dynamics", op_smile_dynamics},
