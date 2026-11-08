@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.4.2: R2, risk first (Unreleased)
+## 0.4.2: R2, risk first (2026-11-08)
 
-On branch `r2`. No golden value of an earlier stage changed.
+Released as tag `v0.4.2` (PR #19). No golden value of an earlier stage changed.
 
 ### Added
 - CLI contract 1.7.0, with no new error code; the wire `contract_version` stays 1.0.0. New operations: `risk.curve.par` (bump and rebuild, one bucket per quote), `risk.curve.key_rate` (`TRIANGULAR` or `PILLAR` zero shifts on a given curve), `risk.curve.jacobian` (zero rates against par quotes) and `risk.pnl.explain` (full revaluation against par risk times the move, with threshold `0.05 max(|full_pnl|, gross_risk_pnl) + 1e-8 x notional`, a project choice and not the FRTB P&L attribution test; the real-move run reports Spearman and Kolmogorov-Smirnov statistics without judging them). Products are `OIS` and `BOND`. Specs in `specifications/06-risk/`.

@@ -54,7 +54,7 @@ Before stage E, R1 works on how far the existing results can be trusted. It adds
 
 Open at the end of R1: Python fuzz runs at about 2,760 cases a minute against the 50,000 target.
 
-## R2: risk first (tag `v0.4.2`)
+## R2: risk first (tag `v0.4.2`, released 2026-11-08)
 
 Risk before more products: par and key-rate risk, P&L explain, calibration stability and workflow (b). Contract 1.7.0 adds operations and no error code.
 
