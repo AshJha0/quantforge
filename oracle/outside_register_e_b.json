@@ -1,0 +1,260 @@
+{
+ "rule": "plan 11.2.5",
+ "library": "QuantLib",
+ "version": "1.44",
+ "map_review": "self-reviewed 2026-11-08",
+ "cases": [
+  {
+   "case_id": "varswap_e-0001",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0002",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0003",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0004",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0005",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0006",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0009",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0010",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0011",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0012",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0013",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0014",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0015",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0016",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0017",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0018",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0019",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  },
+  {
+   "case_id": "varswap_e-0020",
+   "operation": "vol.varswap.fair_strike",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.FLAT_CONT_365F",
+    "PROC.BSM",
+    "VOL.STRIKE_TABLE",
+    "VS.DDKZ_SPOT",
+    "VS.INSTRUMENT"
+   ],
+   "map_review": "self-reviewed 2026-11-08"
+  }
+ ]
+}
