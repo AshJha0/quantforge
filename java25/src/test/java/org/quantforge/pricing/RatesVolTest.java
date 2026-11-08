@@ -43,6 +43,9 @@ class RatesVolTest {
         }
         assertEquals("E_ARBITRAGE", code(() -> RatesVol.strip(CURVE, CURVE, false, 3, 0.037, tenors,
                 new double[] {0.30, 0.10, 0.05}, 1e7)));
+        // a root above the search bound of 5 (Black) is E_DOMAIN (ruling E-B32)
+        assertEquals("E_DOMAIN", code(() -> RatesVol.strip(CURVE, CURVE, false, 3, 0.037, new long[] {12, 24},
+                new double[] {0.2, 4.0}, 1e7)));
         assertEquals("E_INPUT", code(() -> RatesVol.strip(CURVE, CURVE, false, 3, 0.037, new long[] {12, 13},
                 new double[] {0.2, 0.2}, 1e7)));
         assertEquals("E_DOMAIN", code(() -> RatesVol.strip(CURVE, CURVE, false, 3, 0.037, new long[] {12},

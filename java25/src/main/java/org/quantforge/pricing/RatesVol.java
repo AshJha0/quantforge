@@ -141,7 +141,8 @@ public final class RatesVol {
         int m = c.forward().length;
         double[] vols = new double[m];
         double[] targets = new double[tenors.length];
-        double lower = normal ? 1e-7 : 1e-6;
+        double lower = 1e-10; // search interval [1e-10, 5] Black or [1e-10, 0.5] Bachelier (ruling E-B32)
+        double upper = normal ? 0.5 : 5.0;
         int done = 0;
         double known = 0.0;
         for (int j = 0; j < tenors.length; j++) {
@@ -164,11 +165,10 @@ public final class RatesVol {
             if (!(g.applyAsDouble(lower) < 0.0)) {
                 throw new QfError("E_ARBITRAGE", "cap " + j + " needs a caplet vol at or below zero");
             }
-            double hi = Math.max(2.0 * flat[j], lower * 2.0);
-            for (int i = 0; i < 200 && g.applyAsDouble(hi) < 0.0; i++) {
-                hi *= 2.0;
+            if (g.applyAsDouble(upper) < 0.0) {
+                throw new QfError("E_DOMAIN", "cap " + j + " needs a caplet vol above the search bound", "flat_vols");
             }
-            double v = bisect(g, lower, hi);
+            double v = bisect(g, lower, upper);
             for (int i = from; i < upto; i++) {
                 vols[i] = v;
                 known += c.price(i, normal, true, k, notional, v);

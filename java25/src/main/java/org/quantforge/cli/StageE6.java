@@ -37,6 +37,7 @@ final class StageE6 {
             double si = in.gate(in.real("index_vol"));
             Correlation.checkNames(w.length, s.length);
             Correlation.checkPositive("vols", s);
+            Correlation.checkWeights(w);
             Correlation.checkPositive("index_vol", si);
             return Operations.out("correlation", Correlation.implied(w, s, si));
         });

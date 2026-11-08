@@ -23,6 +23,9 @@ class CorrelationTest {
         assertEquals(0.157298, n.matrix()[0][2], 1e-6);
         assertEquals(1.0, n.matrix()[1][1], 0.0);
         assertTrue(Correlation.validate(n.matrix()).minEigenvalue() > -1e-12);
+        // an off-unit 2 by 2 with |rho| above 1 repairs to all ones (ruling E-B29)
+        Correlation.Nearest ones = Correlation.nearest(new double[][] {{1, 1.3}, {1.3, 1}});
+        assertEquals(1.0, ones.matrix()[0][1], 1e-12);
     }
 
     @Test
@@ -71,5 +74,12 @@ class CorrelationTest {
         assertThrows(QfError.class, () -> Correlation.checkNames(1, 1));
         assertThrows(QfError.class, () -> Correlation.checkNames(2, 3));
         assertThrows(QfError.class, () -> Correlation.checkPositive("vols", 0.2, 0.0));
+        // ruling E-B33: a zero weight drops its name; negative or fewer than two positive is E_DOMAIN
+        assertEquals(0.53, Correlation.implied(new double[] {0.5, 0.0, 0.5}, new double[] {0.2, 0.9, 0.3}, 0.22), 1e-14);
+        Correlation.checkWeights(new double[] {0.5, 0.0, 0.5});
+        assertEquals("E_DOMAIN", assertThrows(QfError.class,
+                () -> Correlation.checkWeights(new double[] {1.0, 0.0})).code());
+        assertEquals("E_DOMAIN", assertThrows(QfError.class,
+                () -> Correlation.checkWeights(new double[] {0.6, 0.6, -0.2})).code());
     }
 }

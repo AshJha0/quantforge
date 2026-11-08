@@ -156,6 +156,7 @@ public final class Correlation {
         }
         int n = m.length;
         double[][] y = copy(m);
+        double[][] xPrev = copy(m);
         double[][] ds = new double[n][n];
         boolean done = false;
         for (int it = 0; it < 100_000 && !done; it++) {
@@ -166,16 +167,26 @@ public final class Correlation {
                 }
             }
             double[][] x = projectPsd(r);
-            double change = 0.0;
+            double dx = 0.0;
+            double dy = 0.0;
+            double gap = 0.0;
+            double nx = 0.0;
+            double ny = 0.0;
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     ds[i][j] = x[i][j] - r[i][j];
                     double next = i == j ? 1.0 : x[i][j];
-                    change = Math.max(change, Math.abs(next - y[i][j]));
+                    dx += sq(x[i][j] - xPrev[i][j]);
+                    dy += sq(next - y[i][j]);
+                    gap += sq(next - x[i][j]);
+                    nx += sq(x[i][j]);
+                    ny += sq(next);
                     y[i][j] = next;
                 }
             }
-            done = change <= 1e-15;
+            xPrev = x;
+            // Higham's test: relative changes in X and Y, and the X-Y gap, all below TOL (ruling E-B31)
+            done = it > 0 && Math.sqrt(Math.max(dx / nx, Math.max(dy, gap) / ny)) < TOL;
         }
         if (!done) {
             throw new QfError("E_NO_CONVERGENCE", "nearest correlation did not converge");
@@ -187,6 +198,13 @@ public final class Correlation {
             }
         }
         return new Nearest(y, Math.sqrt(d));
+    }
+
+    /** Higham's stopping tolerance, at most 1e-12 (ruling E-B31). */
+    static final double TOL = 1e-13;
+
+    private static double sq(double x) {
+        return x * x;
     }
 
     private static double[][] copy(double[][] m) {
@@ -206,6 +224,22 @@ public final class Correlation {
             ws += w[i] * s[i];
         }
         return (index * index - own) / (ws * ws - own);
+    }
+
+    /** Weights >= 0 with at least two positive (ruling E-B33); a zero weight drops its name. */
+    public static void checkWeights(double[] w) {
+        int positive = 0;
+        for (double x : w) {
+            if (!(x >= 0.0)) {
+                throw new QfError("E_DOMAIN", "weights must not be negative", "weights");
+            }
+            if (x > 0.0) {
+                positive++;
+            }
+        }
+        if (positive < 2) {
+            throw new QfError("E_DOMAIN", "need at least two positive weights", "weights");
+        }
     }
 
     public static void checkNames(int... lengths) {
