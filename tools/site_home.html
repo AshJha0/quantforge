@@ -19,13 +19,13 @@
 </div></header>
 <div class="wrap">
   <h2>Status</h2>
-  <p class="note">Version 0.4.2 (R2, risk first: par and key-rate risk, Jacobian, P&amp;L explain; released 2026-11-08). Stages A to D are at Implemented, not Validated. Validation is self-assessment until a human review at the end of the project. Most curve inputs are labelled synthetic, because free quote history does not exist for them.</p>
+  <p class="note">Version {{version}} ({{release}}; released {{released}}). Stages {{implemented_stages}} are at Implemented, not Validated. Validation is self-assessment until a human review at the end of the project. Most curve inputs are labelled synthetic, because free quote history does not exist for them.</p>
   <p class="note"><b>Honest ceiling.</b> On free public data, QuantForge can show correct pricing and risk, curve quality against published curves, and signals on fitted curves with honest statistics. It cannot show tradable profitability. That needs instrument-level prices, bid and ask, financing and execution data, which cost money. This is a deliberate limit of a zero-spend project.</p>
   <div class="cards">
-    <div class="card"><b>4 languages</b><span>Java 25, C++26, Python 3.15, Rust 2024</span></div>
-    <div class="card"><b>5,922 golden cases</b><span>76 suite files, run by a neutral runner against each language</span></div>
-    <div class="card"><b>12 domains</b><span>Delivered in 11 stages, A to K</span></div>
-    <div class="card"><b>Daily recorder</b><span>15 public sources, hashed into a forward log, scheduled on GitHub Actions</span></div>
+    <div class="card"><b>4 languages</b><span>{{languages}}</span></div>
+    <div class="card"><b>{{golden_cases}} golden cases</b><span>{{suite_files}} suite files, run by a neutral runner against each language</span></div>
+    <div class="card"><b>{{domains}} domains</b><span>Delivered in {{stages}}</span></div>
+    <div class="card"><b>Daily recorder</b><span>{{sources}} public sources, hashed into a forward log, scheduled on GitHub Actions</span></div>
   </div>
 
   <h2>Stages</h2>

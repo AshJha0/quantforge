@@ -34,3 +34,7 @@ Charts are inline SVG inside one `<div class="chart">` line, so Python-Markdown 
 ## After golden-only changes
 
 When new golden cases land but no implementation or example changed, the gallery's evidence counts go stale and `--check` reports "golden evidence changed". Run `python tools/build_gallery.py --evidence-only`. It recounts evidence from `datasets/golden` and re-renders the pages, with no CLI runs, and leaves the committed run data alone, so `--check` still tests it against the CLI.
+
+## Stage E surface pages
+
+`tools/gallery_e.py` holds four pages: implied vol surface, local volatility, swaption cube and vol term structure. Each is Planned, with every section present and no numbers, until its `cli` names an operation and its example file exists. Then `tools/build_gallery.py` runs the four CLIs, checks the Python output against the page's output contract (`CONTRACTS` in the module, which raises on a missing or ragged field), and draws heat grids and slices from it. Operation and example names there are placeholders until the stage E spec fixes them. Charts are 360 units wide, so text renders near 12 px on a 375 px phone, and they take every colour from the site's theme variables, so dark mode needs nothing extra.

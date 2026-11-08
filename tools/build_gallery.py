@@ -23,6 +23,7 @@ import math
 import os
 import subprocess
 import sys
+import types
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,6 +33,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import gallery_real  # noqa: E402
 import gallery_pnl  # noqa: E402
 import gallery_r2  # noqa: E402
+import gallery_e  # noqa: E402
 
 OUT = ROOT / "docs" / "curves"
 DATA = OUT / "data"
@@ -657,6 +659,11 @@ def index_page(all_data):
         live = is_live(spec) and slug in all_data
         rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "D",
                      f"{all_data[slug]['evidence']['cases']} golden case{'s' if all_data[slug]['evidence']['cases'] != 1 else ''}" if live and slug in all_data else "None yet"])
+    for slug, spec in gallery_e.STAGE_E.items():
+        live = gallery_e.is_live(spec) and slug in all_data
+        n = all_data[slug]["evidence"]["cases"] if live else 0
+        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "E",
+                     f"{n} golden case{'s' if n != 1 else ''}" if live else "None yet"])
     rows += [[name, "Planned", stage, "None yet"] for name, stage in PLANNED]
     real = ""
     if gallery_real.SLUG in all_data:
@@ -672,7 +679,7 @@ def index_page(all_data):
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated, and stage E pages are Planned until their CLI operations land: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
@@ -698,6 +705,9 @@ def render_all(all_data):
     for slug, spec in STAGE_D.items():
         live = is_live(spec) and slug in all_data
         pages[f"{slug}.md"] = RENDERERS[spec["kind"]](slug, spec, all_data[slug]) if live else planned_page(slug, spec)
+    this = types.SimpleNamespace(LANGS=LANGS, status_block=status_block, table=table)
+    for slug, spec in gallery_e.STAGE_E.items():
+        pages[f"{slug}.md"] = gallery_e.page(slug, spec, all_data.get(slug), this)
     if gallery_real.SLUG in all_data:
         d = all_data[gallery_real.SLUG]
         versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
@@ -1061,7 +1071,8 @@ def generate_pnl(meta, refresh):
 
 
 def committed_slugs():
-    return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()]
+    return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()] \
+        + [s for s, spec in gallery_e.STAGE_E.items() if gallery_e.is_live(spec) and (DATA / f"{s}.json").is_file()]
 
 
 def refresh_evidence():
@@ -1079,6 +1090,8 @@ def refresh_evidence():
             new = golden_c(VOLS[slug]["golden"])
         elif slug in STAGE_D:
             new = golden_d(STAGE_D[slug]["examples"])
+        elif slug in gallery_e.STAGE_E:
+            new = gallery_e.golden(gallery_e.STAGE_E[slug]["examples"])
         else:
             continue
         if d["evidence"] != new:
@@ -1135,6 +1148,17 @@ def generate(refresh_real=False, real_only=False):
              "reference": results["python"], "agreement": vol_agreement(results), "evidence": golden_d(spec["examples"])}
         all_data[slug] = d
         (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+    for slug, spec in gallery_e.STAGE_E.items():
+        if not gallery_e.is_live(spec):
+            continue
+        results = {lang: d_run(lang, spec) for lang in LANGS}
+        for op in spec["examples"]:
+            gallery_e.check_contract(spec["kind"], results["python"][op])
+        d = {"meta": {**meta, "example_hashes": {v: example_hash(v) for v in spec["examples"].values()}},
+             "inputs": {op: read_example(f)["inputs"] for op, f in spec["examples"].items()},
+             "reference": results["python"], "agreement": vol_agreement(results), "evidence": gallery_e.golden(spec["examples"])}
+        all_data[slug] = d
+        (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
     for name, text in render_all(all_data).items():
         (OUT / name).write_text(text, encoding="utf-8", newline="\n")
     print(f"{len(all_data)} pages of data, {len(all_data) + 1} pages written to {OUT}")
@@ -1189,6 +1213,21 @@ def check():
                 bad.append(f"{slug}: {v} changed")
         compare(d["reference"], d_run("python", spec), slug, bad)
         if d["evidence"] != golden_d(spec["examples"]):
+            bad.append(f"{slug}: golden evidence changed")
+    for slug, spec in gallery_e.STAGE_E.items():
+        if not gallery_e.is_live(spec):
+            continue
+        path = DATA / f"{slug}.json"
+        if not path.is_file():
+            bad.append(f"{slug}: live (cli set) but no committed data; run tools/build_gallery.py")
+            continue
+        d = json.loads(path.read_text(encoding="utf-8"))
+        all_data[slug] = d
+        for v in spec["examples"].values():
+            if d["meta"]["example_hashes"].get(v) != example_hash(v):
+                bad.append(f"{slug}: {v} changed")
+        compare(d["reference"], d_run("python", spec), slug, bad)
+        if d["evidence"] != gallery_e.golden(spec["examples"]):
             bad.append(f"{slug}: golden evidence changed")
     d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
     all_data[gallery_real.SLUG] = d

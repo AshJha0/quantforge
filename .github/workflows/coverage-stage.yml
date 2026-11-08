@@ -1,0 +1,104 @@
+name: Coverage by stage
+# Line-coverage gate on the current stage's new modules (85%, conformance/quality/stage_e.json), per language.
+# A language runs only when the config names at least one of its modules, so before the stage lands the run
+# is the config check alone (about a minute). Weekly and manual; on pull requests only when the config, the
+# gate or this file changes, so module work in the language trees never pays for it twice.
+on:
+  schedule:
+    - cron: '23 4 * * 3'
+  pull_request:
+    paths: ['conformance/quality/**', 'tools/quality_gate.py', '.github/workflows/coverage-stage.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CONFIG: conformance/quality/stage_e.json
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      java: ${{ steps.m.outputs.java }}
+      cpp: ${{ steps.m.outputs.cpp }}
+      python: ${{ steps.m.outputs.python }}
+      rust: ${{ steps.m.outputs.rust }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: python3 tools/quality_gate.py --check-config --config "$CONFIG"
+      - id: m
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          cfg = json.load(open(os.environ["CONFIG"]))
+          for lang in ("java", "cpp", "python", "rust"):
+              on = any(isinstance(m.get(lang), str) and m[lang].strip() and not m[lang].startswith("TODO") for m in cfg["modules"])
+              print(f"{lang}={'true' if on else 'false'}")
+          PY
+  java:
+    needs: plan
+    if: needs.plan.outputs.java == 'true' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - run: mvn -B -Pcoverage verify
+        working-directory: java25
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang java --coverage java25/target/site/jacoco/jacoco.xml
+  cpp:
+    needs: plan
+    if: needs.plan.outputs.cpp == 'true' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: apt-get update && apt-get install -y cmake ninja-build python3 python3-pip
+      - run: pip3 install --break-system-packages gcovr==8.3
+      - run: cmake -S cpp26 -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=--coverage
+      - run: cmake --build build --parallel
+      - run: ctest --test-dir build --output-on-failure
+      - run: gcovr --root . --filter 'cpp26/src/' --cobertura coverage.xml build
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang cpp --coverage coverage.xml
+  python:
+    needs: plan
+    if: needs.plan.outputs.python == 'true' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - run: uv sync --locked --project python
+      - run: uv run coverage run -m pytest -q && uv run coverage json -o coverage.json
+        working-directory: python
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang python --coverage python/coverage.json
+  rust:
+    needs: plan
+    if: needs.plan.outputs.rust == 'true' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup show && rustup component add llvm-tools-preview
+        working-directory: rust
+      - run: cargo install cargo-llvm-cov --version 0.6.16 --locked
+      - run: cargo llvm-cov --workspace --lcov --output-path lcov.info
+        working-directory: rust
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang rust --coverage rust/lcov.info
