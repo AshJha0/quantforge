@@ -126,3 +126,30 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Tranche, attachment, detachment | A slice of pool losses between two levels; the slice's expected loss as a fraction of its width |
 
 Stage E spec B is Specified, not Implemented: goldens exist and the four builds are being written against them. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, so those goldens rest on hand cases and high-precision replicas; 245 of 404 cases (60.6%) are outside-checked under rule 11.2.5 and ruling E-B28 (`specifications/stage-e-rulings-b.md`).
+
+## Stage E (spec A): full vol and exotics
+
+| Term | Meaning |
+|---|---|
+| Total variance | `w = sigma^2 T`: implied variance times time, the quantity that must rise with expiry |
+| SVI, SSVI | The Gatheral five-parameter smile for one expiry, and its surface form with one ATM-variance curve (`specifications/05-volatility/arb-free-surfaces.md`) |
+| Butterfly arbitrage | Call prices not convex in strike, so the implied density is negative somewhere; for SVI, `g(k) < 0` |
+| Calendar arbitrage | Total variance falling as expiry grows at a fixed moneyness |
+| Lee bound | The wings of total variance grow at most like `2|k|` (Lee 2004) |
+| Local vol | The spot- and time-dependent vol that reprices every vanilla (Dupire 1994) |
+| Forward vol | The vol between two expiries, from the difference of their total variances |
+| Sticky strike, sticky delta | Smile regimes: vol fixed at each strike, or fixed at each moneyness (delta) as spot moves (Derman 1999) |
+| Vol of vol | Here, the annualised standard deviation of daily changes in an implied vol |
+| Premium-adjusted delta | An FX delta reduced by the option premium, used when the premium is paid in the foreign currency |
+| DNS | Delta-neutral straddle: the ATM strike at which call and put deltas cancel |
+| Risk reversal, butterfly | Call vol minus put vol at one delta; the average of the two minus ATM vol |
+| Heston, Bates, Merton | Stochastic variance; stochastic variance plus jumps; constant vol plus jumps (`specifications/05-volatility/heston-family.md`) |
+| Leverage function | The local correction in a stochastic-local vol model that makes it fit the local vol surface |
+| Barrier option | An option that comes alive (knock-in) or dies (knock-out) when spot touches a level |
+| Rebate | Cash paid when a knock-out option is knocked out, or when a knock-in option never knocks in |
+| Geometric Asian | An option on the geometric average of prices, which has a closed form |
+| Lookback | An option struck at the best price seen over its life |
+| Quanto | An option on a foreign asset, paid in domestic currency at a fixed exchange rate |
+| Chooser | An option whose holder decides at a set date whether it is a call or a put |
+| Kirk approximation | A closed form for an option on the spread of two forwards |
+| BAW | Barone-Adesi-Whaley: a quadratic approximation to American option prices |

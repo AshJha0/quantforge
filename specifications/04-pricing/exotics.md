@@ -56,7 +56,7 @@ Output `price`. Arithmetic Asians are not in stage E (they need Monte Carlo or a
 
 ## `exotic.lookback.floating`
 
-Inputs: common less `strike`, `running_extreme`: the minimum so far for a call (`<= S`), the maximum so far for a put (`>= S`), else `E_DOMAIN`. Continuous monitoring. `b = 0`: `E_DOMAIN` (the formula divides by `b`; ruling E-A20). Goldman-Sosin-Gatto [Haug ch. 4]: with `m` the minimum,
+Inputs: common less `strike`, `running_extreme`: the minimum so far for a call (`<= S`), the maximum so far for a put (`>= S`), else `E_DOMAIN`. Continuous monitoring. `|b| <= 1e-8 v^2`: `E_DOMAIN` (the formula divides by `b`; rulings E-A20, E-A28). Near that bound binary64 loses digits: at `b = 1e-5` the golden is judged to 1e-8. Goldman-Sosin-Gatto [Haug ch. 4]: with `m` the minimum,
 
 call `= S e^{(b-r)T} N(a1) - m e^{-rT} N(a2) + S e^{-rT} (v^2/(2b)) ((S/m)^{-2b/v^2} N(-a1 + 2b sqrt T/v) - e^{bT} N(-a1))`, `a1 = (ln(S/m) + (b + v^2/2)T)/(v sqrt T)`, `a2 = a1 - v sqrt T`;
 
@@ -88,7 +88,7 @@ Inputs: common, `steps` `n` (1 to 20,000, else `E_INPUT` / `E_LIMIT`). Cox-Ross-
 
 ### `exotic.american.baw`
 
-Inputs: common. Barone-Adesi-Whaley [BAW87], [Haug ch. 3]: `M = 2r/v^2`, `N = 2b/v^2`, `K_T = 1 - e^{-rT}`. `r = 0`: `E_DOMAIN` (ruling E-A22). A call with `b >= r` is European (`GBS`).
+Inputs: common. Barone-Adesi-Whaley [BAW87], [Haug ch. 3]: `M = 2r/v^2`, `N = 2b/v^2`, `K_T = 1 - e^{-rT}`. `r <= 0`: `E_DOMAIN` (rulings E-A22, E-A30). A call with `b >= r` is European (`GBS`).
 
 - Call: `q2 = (-(N-1) + sqrt((N-1)^2 + 4M/K_T))/2`; critical price `S*` solves `S* - K = GBS(call, S*) + (1 - e^{(b-r)T} N(d1(S*))) S*/q2`; `A2 = (S*/q2)(1 - e^{(b-r)T} N(d1(S*)))`; price `GBS(call, S) + A2 (S/S*)^{q2}` if `S < S*`, else `S - K`.
 - Put: `q1 = (-(N-1) - sqrt((N-1)^2 + 4M/K_T))/2`; `S**` solves `K - S** = GBS(put, S**) - (1 - e^{(b-r)T} N(-d1(S**))) S**/q1`; `A1 = -(S**/q1)(1 - e^{(b-r)T} N(-d1(S**)))`; price `GBS(put, S) + A1 (S/S**)^{q1}` if `S > S**`, else `K - S`.

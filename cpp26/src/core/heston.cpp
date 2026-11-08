@@ -16,14 +16,14 @@ constexpr std::size_t max_grid = 1000, max_steps = 10000;
 
 void domain(const char* why, const char* key) { throw Error("E_DOMAIN", why, key); }
 
-// 256-point Gauss-Legendre nodes and weights on [-1, 1], by Newton on the Legendre recurrence.
+// 1024-point Gauss-Legendre nodes and weights on [-1, 1], by Newton on the Legendre recurrence.
 struct Rule {
-    std::array<double, 256> t, w;
+    std::array<double, 1024> t, w;
 };
-const Rule& legendre_256() {
+const Rule& legendre_1024() {
     static const Rule rule = [] {
         Rule r{};
-        constexpr int n = 256;
+        constexpr int n = 1024;
         for (int i = 0; i < n / 2; ++i) {
             double x = std::cos(std::numbers::pi * (i + 0.75) / (n + 0.5)), dp = 0.0;
             for (int it = 0; it < 100; ++it) {
@@ -55,22 +55,24 @@ void check_option(const EquityOption& o) {
         if (!(k > 0)) domain("a strike is not above 0", "strikes");
 }
 
-// Lewis's single integral [Lew01] for a characteristic function of ln(S_T/F); Gauss-Legendre 256 on [0, 200].
+// Lewis's single integral [Lew01] for a characteristic function of ln(S_T/F): Gauss-Legendre 1024 on
+// [0, 200/sqrt(min(T, 1))] (ruling E-A26).
 std::vector<double> lewis(const EquityOption& o, auto&& phi) {
     const double t = o.expiry_years, f = o.spot * std::exp((o.rate - o.dividend_yield) * t);
     const double d = std::exp(-o.rate * t);
-    const Rule& r = legendre_256();
-    std::array<cd, 256> ph;
-    for (int i = 0; i < 256; ++i) ph[i] = phi(cd(100.0 + 100.0 * r.t[i], -0.5));
+    const Rule& r = legendre_1024();
+    const double half = 100.0 / std::sqrt(std::min(t, 1.0));
+    std::vector<cd> ph(1024);
+    for (int i = 0; i < 1024; ++i) ph[i] = phi(cd(half + half * r.t[i], -0.5));
     std::vector<double> out;
     for (const double strike : o.strikes) {
         const double k = std::log(f / strike);
         double sum = 0.0;
-        for (int i = 0; i < 256; ++i) {
-            const double u = 100.0 + 100.0 * r.t[i];
+        for (int i = 0; i < 1024; ++i) {
+            const double u = half + half * r.t[i];
             sum += r.w[i] * (std::exp(cd(0.0, u * k)) * ph[i]).real() / (u * u + 0.25);
         }
-        const double call = d * (f - std::sqrt(f * strike) / std::numbers::pi * 100.0 * sum);
+        const double call = d * (f - std::sqrt(f * strike) / std::numbers::pi * half * sum);
         out.push_back(o.type == OptionType::Call ? call : call - d * (f - strike));
     }
     return out;

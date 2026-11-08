@@ -47,3 +47,18 @@ Spec version 1.0.0. Normative: this page is part of every spec A stage E spec, a
 |---|---|---|
 | E-A24 | `vol.slv.leverage` grid position (C++ question on `slv_e-0006`) | The rule stays as written: `x_min < ln(spot) < x_max`, else `E_INPUT`; no cell margin. The golden was wrong: `ln(100) = 4.6052` lies inside `[4.6, 4.7]`, so the spec accepts it. `slv_e-0006` now uses `x_min = 4.61`, which puts `ln(spot)` below the grid, and still expects `E_INPUT`. No other case changes |
 
+### Rulings on the second R5 audit (E2, E3, E5; 2026-11-08)
+
+| # | Point | Ruling |
+|---|---|---|
+| E-A25 | Stage floor | The 60% floor is judged on the whole stage after E-A17 is applied to both specs, and is reported with its margin in cases. Spec A reports its own share in `oracle/OUTSIDE_E_A.md`; the stage figure is the coordinator's, combining both registers. If the stage is below 60%, either more independent QuantLib-object cases are added or the owner records an accepted deviation |
+| E-A26 | Heston and Bates recipe at short expiry | The 256-node rule on `[0, 200]` missed the target at `T = 0.02` (2.6e-7). The recipe is now 1024 nodes on `[0, 200/sqrt(min(T, 1))]`, within 2e-9 of the 30-digit value from 2 days to 10 years. New goldens at 7 and 2 days (tag `short-expiry`). The target is unchanged |
+| E-A27 | Heston and Bates golden values | Goldens are the 30-digit values, not the binary64 recipe; they moved by about 1e-10, far inside the 1e-8 target. `vol.heston.cf` keeps class `fourier` |
+| E-A28 | Lookback near zero carry | `E_DOMAIN` when `|b| <= 1e-8 v^2`, not only at `b = 0`. A golden at `b = 1e-5` (40-digit value, limit 1e-8) and an `E_DOMAIN` golden at `b = 1e-12` |
+| E-A29 | SLV tolerance | `vol.slv.leverage` goldens are judged to 1e-7 absolute and relative. The recipe is first order, and an independent re-implementation agreed to 1.6e-9, 16% of the old 1e-8 limit |
+| E-A30 | BAW at negative rates | `r <= 0` is `E_DOMAIN`: `1 - e^{-rT} <= 0`, and the put critical-price equation has no root. A golden at `r = -1%` |
+| E-A31 | SLV citation | The leverage identity is Gyongy (1986) and Dupire (2004), not Henry-Labordere 2009, which is the particle method. The grid scheme is this spec's own recipe |
+| E-A32 | Reiswich-Wystup citation | The working paper (CPQF No. 20): delta types section 1.3, ATM section 1.4, strike conversion section 1.5 |
+| E-A33 | Small vol-of-vol claim | The targets table now says within 3 `xi` in price (measured 2.2 `xi`), not 0.05 `xi`. The goldens and their wrong-convention checks are unchanged |
+
+Also added after the audit: one `E_SCHEMA` golden for a missing `cash` on an asset-or-nothing digital; six barrier goldens with rebates, including up-and-out and up-and-in. Up-barrier rebate cases already existed (`exotic_e` cases tagged `up_out`, `up_in` and `rebate`). All new cases are appended, so no case id moved.

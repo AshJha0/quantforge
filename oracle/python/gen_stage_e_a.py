@@ -579,8 +579,7 @@ import cmath  # noqa: E402
 
 import QuantLib as ql  # noqa: E402
 
-GL_T, GL_W = np.polynomial.legendre.leggauss(256)
-GL_T, GL_W = (GL_T + 1) * 100, GL_W * 100   # nodes on (0, 200)
+GL_X, GL_V = np.polynomial.legendre.leggauss(1024)   # ruling E-A26: 1024 nodes on [0, 200/sqrt(min(T, 1))]
 
 
 def phi_heston(u, T, v0, kappa, theta, xi, rho):
@@ -601,11 +600,12 @@ def phi_jump(u, T, lam, mu, delta):
 
 
 def lewis(phi, S, K, T, r, q, ot):
-    """Call by Lewis (2001) single integral; Gauss-Legendre 256 nodes on u in (0, 200). Put by parity."""
+    """Call by Lewis (2001) single integral; Gauss-Legendre 1024 nodes on u in (0, 200/sqrt(min(T, 1))). Put by parity."""
     F = S * math.exp((r - q) * T)
     k = math.log(F / K)
+    U = 200 / math.sqrt(min(T, 1.0))
     tot = 0.0
-    for u, w in zip(GL_T, GL_W):
+    for u, w in zip((GL_X + 1) * U / 2, GL_V * U / 2):
         tot += w * (cmath.exp(1j * u * k) * phi(u - 0.5j)).real / (u * u + 0.25)
     c = math.exp(-r * T) * (F - math.sqrt(F * K) / math.pi * tot)
     return c if ot == "CALL" else c - math.exp(-r * T) * (F - K)
@@ -615,7 +615,7 @@ def mp_lewis(phi_mp, S, K, T, r, q, ot):
     mp.mp.dps = 30
     F = mp.mpf(S) * mp.e ** ((mp.mpf(r) - q) * T)
     k = mp.log(F / K)
-    I_ = mp.quad(lambda u: mp.re(mp.e ** (1j * u * k) * phi_mp(u - 0.5j)) / (u * u + 0.25), [0, 1, 10, 100, mp.inf])
+    I_ = mp.quad(lambda u: mp.re(mp.e ** (1j * u * k) * phi_mp(u - 0.5j)) / (u * u + 0.25), [0, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, mp.inf])
     c = mp.e ** (-mp.mpf(r) * T) * (F - mp.sqrt(F * K) / mp.pi * I_)
     return float(c if ot == "CALL" else c - mp.e ** (-mp.mpf(r) * T) * (F - K))
 
@@ -697,18 +697,17 @@ PLIM = {"absolute": 1e-8, "relative": 1e-9, "reason": "1e-8 per unit at spot 100
 
 def e2_heston():
     s = S("heston_e", "05-volatility/heston-family.md")
-    vq = [QLV, "mpmath-lewis-30-digits", "lewis-gauss-legendre-256-on-0-200"]
+    vq = [QLV, "mpmath-lewis-30-digits", "lewis-gauss-legendre-1024"]
     op = "vol.heston.price"
     for S0, days, r, q, v0, ka, th, xi, rho in HP:
         T = days / 365
         prm = {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": rho}
         for ot in ("CALL", "PUT"):
             ph = lambda u: phi_heston(u, T, v0, ka, th, xi, rho)  # noqa: E731
-            pr = [lewis(ph, S0, K, T, r, q, ot) for K in HK]
+            # ruling E-A27: the golden is the 30-digit value; the binary64 recipe and QuantLib must agree with it
+            pr = [mp_lewis(mp_phi_heston(T, v0, ka, th, xi, rho), S0, K, T, r, q, ot) for K in HK]
             for K, p in zip(HK, pr):
-                a1 = mp_lewis(mp_phi_heston(T, v0, ka, th, xi, rho), S0, K, T, r, q, ot)
-                a2 = ql_heston(S0, K, T, r, q, ot, v0, ka, th, xi, rho)
-                assert abs(p - a1) < 1e-10 and abs(p - a2) < 1e-9, (K, p, a1, a2)
+                assert abs(p - lewis(ph, S0, K, T, r, q, ot)) < 2e-9 and abs(p - ql_heston(S0, K, T, r, q, ot, v0, ka, th, xi, rho)) < 1e-9, K
             s.add(op, {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": prm, "option_type": ot}, {"prices": pr},
                   cls=Q, verified=vq, tags=["heston"] + (["negative-rate"] if r < 0 else []), limit=PLIM)
     # Near-zero vol of vol (plan section 8): Black-Scholes with average variance, not v0, not theta.
@@ -756,11 +755,9 @@ def e2_heston():
         T = days / 365
         for ot in ("CALL", "PUT"):
             ph = lambda u: phi_heston(u, T, v0, ka, th, xi, rho) * phi_jump(u, T, lam, mu, de)  # noqa: E731
-            pr = [lewis(ph, S0, K, T, r, q, ot) for K in HK]
+            pr = [mp_lewis(mp_phi_heston(T, v0, ka, th, xi, rho, lam, mu, de), S0, K, T, r, q, ot) for K in HK]
             for K, p in zip(HK, pr):
-                a1 = mp_lewis(mp_phi_heston(T, v0, ka, th, xi, rho, lam, mu, de), S0, K, T, r, q, ot)
-                a2 = ql_heston(S0, K, T, r, q, ot, v0, ka, th, xi, rho, (lam, mu, de))
-                assert abs(p - a1) < 1e-10 and abs(p - a2) < 1e-9, (K, p, a1, a2)
+                assert abs(p - lewis(ph, S0, K, T, r, q, ot)) < 2e-9 and abs(p - ql_heston(S0, K, T, r, q, ot, v0, ka, th, xi, rho, (lam, mu, de))) < 1e-9, K
             s.add(op, {"spot": S0, "strikes": HK, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": {"v0": v0, "kappa": ka, "theta": th, "xi": xi, "rho": rho},
                        "jumps": {"intensity": lam, "mean_log_jump": mu, "log_jump_vol": de}, "option_type": ot}, {"prices": pr}, cls=Q, verified=vq, tags=["bates"], limit=PLIM)
     S0, days, r, q, v0, ka, th, xi, rho = HP[0]
@@ -788,6 +785,33 @@ def e2_heston():
     caught("heston_e", "Merton drift without -lambda k", abs(merton(100, 100, 1, .03, .01, "CALL", .2, .5, -.1, .2) - merton(100, 100, 1, .03 + .5 * (math.exp(-.1 + .02) - 1), .01, "CALL", .2, .5, -.1, .2)), 1e-8)
     s.add(op, {"spot": 100.0, "strikes": HK, "expiry_years": 1.0, "rate": 0.03, "dividend_yield": 0.0, "vol": 0.2, "jumps": {"intensity": 0.5, "mean_log_jump": 0.0, "log_jump_vol": -0.1}, "option_type": "CALL"},
           error="E_DOMAIN", cls=E, tags=["invalid"])
+    # R5 audit 2 (rulings E-A26, E-A27), appended: short expiries and more QuantLib-checked markets.
+    hk2 = [80.0, 95.0, 100.0, 105.0, 120.0]
+    for days, prm, ot, r, q in ((7, {"v0": 0.04, "kappa": 1.5, "theta": 0.04, "xi": 0.5, "rho": -0.7}, "CALL", 0.03, 0.01),
+                                (2, {"v0": 0.04, "kappa": 1.5, "theta": 0.04, "xi": 0.5, "rho": -0.7}, "PUT", 0.03, 0.01),
+                                (30, {"v0": 0.09, "kappa": 4.0, "theta": 0.06, "xi": 0.9, "rho": -0.8}, "CALL", 0.04, 0.0),
+                                (274, {"v0": 0.02, "kappa": 0.5, "theta": 0.05, "xi": 0.25, "rho": -0.2}, "PUT", 0.01, 0.03),
+                                (1095, {"v0": 0.06, "kappa": 1.2, "theta": 0.035, "xi": 0.6, "rho": 0.1}, "CALL", 0.025, 0.015),
+                                (3650, {"v0": 0.04, "kappa": 0.3, "theta": 0.05, "xi": 0.35, "rho": -0.6}, "PUT", 0.03, 0.01)):
+        T = days / 365
+        h = (prm["v0"], prm["kappa"], prm["theta"], prm["xi"], prm["rho"])
+        ph = lambda u: phi_heston(u, T, *h)  # noqa: E731
+        pr = [mp_lewis(mp_phi_heston(T, *h), 100.0, K, T, r, q, ot) for K in hk2]
+        for K, p in zip(hk2, pr):
+            assert abs(p - lewis(ph, 100.0, K, T, r, q, ot)) < 2e-9 and abs(p - ql_heston(100.0, K, T, r, q, ot, *h)) < 1e-9, (days, K)
+        s.add("vol.heston.price", {"spot": 100.0, "strikes": hk2, "expiry_years": T, "rate": r, "dividend_yield": q, "heston": prm, "option_type": ot}, {"prices": pr},
+              cls=Q, verified=vq, tags=["heston", "ruling"] + (["short-expiry"] if days <= 7 else []), limit=PLIM)
+    for days, prm, j, ot in ((30, {"v0": 0.05, "kappa": 2.0, "theta": 0.05, "xi": 0.6, "rho": -0.6}, (2.0, -0.08, 0.12), "PUT"),
+                             (548, {"v0": 0.03, "kappa": 1.0, "theta": 0.04, "xi": 0.4, "rho": -0.5}, (0.5, -0.15, 0.25), "CALL"),
+                             (1825, {"v0": 0.04, "kappa": 1.5, "theta": 0.04, "xi": 0.5, "rho": -0.7}, (0.2, 0.0, 0.1), "PUT")):
+        T = days / 365
+        h = (prm["v0"], prm["kappa"], prm["theta"], prm["xi"], prm["rho"])
+        ph = lambda u: phi_heston(u, T, *h) * phi_jump(u, T, *j)  # noqa: E731
+        pr = [mp_lewis(mp_phi_heston(T, *h, *j), 100.0, K, T, 0.03, 0.01, ot) for K in hk2]
+        for K, p in zip(hk2, pr):
+            assert abs(p - lewis(ph, 100.0, K, T, 0.03, 0.01, ot)) < 2e-9 and abs(p - ql_heston(100.0, K, T, 0.03, 0.01, ot, *h, j)) < 1e-9, (days, K)
+        s.add("vol.bates.price", {"spot": 100.0, "strikes": hk2, "expiry_years": T, "rate": 0.03, "dividend_yield": 0.01, "heston": prm,
+                                  "jumps": {"intensity": j[0], "mean_log_jump": j[1], "log_jump_vol": j[2]}, "option_type": ot}, {"prices": pr}, cls=Q, verified=vq, tags=["bates", "ruling"], limit=PLIM)
     write(s)
 
 
@@ -921,7 +945,8 @@ def e2_slv():
         if "flat-vol" in tags:
             body = [l for x, l in zip(out["x"], out["leverage"]) if abs(x - math.log(100)) < 0.25]
             assert max(abs(l - 1.0) for l in body) < 0.03, body  # sigma_LV / sqrt(E[v|x]) ~ 0.2/0.2
-        s.add(op, inp, out, cls=N, verified=["reference-scheme", "grid-refinement-2pc", "flat-vol-limit"], tags=["slv"] + tags)
+        s.add(op, inp, out, cls=N, verified=["reference-scheme", "grid-refinement-2pc", "flat-vol-limit"], tags=["slv"] + tags,
+              limit={"absolute": 1e-7, "relative": 1e-7, "reason": "ruling E-A29: first-order recipe; an independent re-implementation agrees to 1.6e-9"})
     inp = cases[0][0]
     o = slv(inp)
     w = slv({**inp, "heston": {**hp, "rho": 0.7}}, guard=False)
@@ -1256,6 +1281,31 @@ def e5_exotics():
           error="E_INPUT", cls=E, tags=["invalid"], description="correlation not symmetric")
     s.add(op, {"forwards": [100.0, 50.0], "weights": [0.5, -0.5], "vols": [0.2, 0.3], "correlation": [[1.0, 0.5], [0.5, 1.0]], "strike": 25.0, "expiry_years": 1.0, "rate": 0.03, "option_type": "CALL"},
           error="E_DOMAIN", cls=E, tags=["invalid", "ruling"], description="negative weight: use Kirk for spreads")
+    # R5 audit 2 (rulings E-A28, E-A30), appended.
+    def mp_lookback_call(S, m, T, r, q, v):
+        mp.mp.dps = 40
+        S, m, T, r, q, v = map(mp.mpf, (S, m, T, r, q, v))
+        b = r - q
+        sd = v * mp.sqrt(T)
+        a1 = (mp.log(S / m) + (b + v * v / 2) * T) / sd
+        a2 = a1 - sd
+        return float(S * mp.e ** ((b - r) * T) * mp.ncdf(a1) - m * mp.e ** (-r * T) * mp.ncdf(a2)
+                     + S * mp.e ** (-r * T) * v * v / (2 * b) * ((S / m) ** (-2 * b / (v * v)) * mp.ncdf(-a1 + 2 * b * mp.sqrt(T) / v) - mp.e ** (b * T) * mp.ncdf(-a1)))
+    op = "exotic.lookback.floating"
+    lb = {"spot": 100.0, "expiry_years": 1.0, "rate": 0.05, "dividend_yield": 0.04999, "vol": 0.25, "option_type": "CALL", "running_extreme": 100.0}
+    ex = mp_lookback_call(100.0, 100.0, 1.0, 0.05, 0.04999, 0.25)
+    assert abs(ex - lookback_float("CALL", 100.0, 100.0, 1.0, 0.05, 0.04999, 0.25)) < 1e-9
+    s.add(op, lb, {"price": ex}, cls=A, verified=["mpmath-40-digits", "analytic-haug"], tags=["lookback", "small-carry", "ruling"],
+          limit={"absolute": 1e-8, "relative": 1e-10, "reason": "b = 1e-5: the closed form divides by b, so binary64 loses about 5 digits (ruling E-A28)"})
+    s.add(op, {**lb, "dividend_yield": 0.05 - 1e-12}, error="E_DOMAIN", cls=E, tags=["invalid", "small-carry", "ruling"], description="|b| <= 1e-8 v^2 (ruling E-A28)")
+    s.add("exotic.digital.price", {**base(*EX[0]), "strike": 100.0, "option_type": "CALL", "payoff": "ASSET_OR_NOTHING"}, error="E_SCHEMA", cls=E, tags=["invalid", "ruling"],
+          description="cash is required for both payoffs")
+    op = "exotic.barrier.price"
+    m = (100.0, 274, 0.04, 0.01, 0.35)
+    for bt, H, K, R, ot in (("UP_OUT", 125.0, 110.0, 3.0, "CALL"), ("UP_IN", 125.0, 110.0, 3.0, "CALL"), ("UP_OUT", 125.0, 130.0, 1.5, "PUT"),
+                            ("UP_IN", 125.0, 95.0, 1.5, "PUT"), ("DOWN_OUT", 80.0, 75.0, 2.5, "PUT"), ("DOWN_IN", 80.0, 105.0, 2.5, "CALL")):
+        s.add(op, {**base(*m), "strike": K, "barrier": H, "rebate": R, "barrier_type": bt, "option_type": ot}, {"price": barrier(bt, ot, 100.0, K, H, R, 274 / 365, 0.04, 0.01, 0.35)},
+              cls=A, verified=vq, tags=["barrier", bt.lower(), "rebate", "ruling"], limit=MLIM)
     write(s)
 
 
@@ -1310,6 +1360,8 @@ def e5_american():
     g = {"nx": 200, "nt": 200, "width": 5.0}
     s.add(op, {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": .05, "dividend_yield": .02, "vol": .25, "option_type": "PUT", "exercise": "AMERICAN", "grid": g}, error="E_INPUT", cls=E, tags=["invalid"], description="nx must be odd")
     s.add(op, {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": .05, "dividend_yield": .02, "vol": .25, "option_type": "PUT", "exercise": "AMERICAN", "grid": {**g, "nx": 2001}}, error="E_LIMIT", cls=E, tags=["invalid"])
+    s.add("exotic.american.baw", {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": -0.01, "dividend_yield": 0.0, "vol": 0.25, "option_type": "PUT"}, error="E_DOMAIN", cls=E, tags=["invalid", "ruling"],
+          description="r < 0: 1 - exp(-rT) < 0 and the put critical price has no root (ruling E-A30)")
     write(s)
 
 

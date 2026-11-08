@@ -133,7 +133,7 @@ double lookback_floating(const ExoticMarket& m, double ext) {
     if (call ? !(ext > 0 && ext <= m.spot) : !(ext >= m.spot))
         throw Error("E_DOMAIN", "running_extreme is on the wrong side of spot", "running_extreme");
     const double s = m.spot, t = m.expiry_years, r = m.rate, v = m.vol, b = r - m.dividend_yield;
-    if (b == 0) throw Error("E_DOMAIN", "zero cost of carry", "dividend_yield");
+    if (std::fabs(b) <= 1e-8 * v * v) throw Error("E_DOMAIN", "cost of carry too near 0 (ruling E-A28)", "dividend_yield");
     const double sd = v * std::sqrt(t), a1 = (std::log(s / ext) + (b + v * v / 2) * t) / sd, a2 = a1 - sd;
     const double scale = s * std::exp(-r * t) * v * v / (2 * b), pw = std::pow(s / ext, -2 * b / (v * v));
     const double reflect = 2 * b * std::sqrt(t) / v;
@@ -236,7 +236,7 @@ AmericanTree american_crr(const ExoticMarket& m, long long steps) {
 double american_baw(const ExoticMarket& m) {
     check_common(m);
     const double s = m.spot, k = m.strike, t = m.expiry_years, r = m.rate, v = m.vol, b = r - m.dividend_yield;
-    if (r == 0) throw Error("E_DOMAIN", "rate 0 is not allowed for BAW", "rate");
+    if (!(r > 0)) throw Error("E_DOMAIN", "BAW needs a positive rate (ruling E-A30)", "rate");
     const bool call = m.type == OptionType::Call;
     if (call && b >= r) return gbs(m.type, s, k, t, r, b, v);
     const double mm = 2 * r / (v * v), nn = 2 * b / (v * v), kt = 1 - std::exp(-r * t);
