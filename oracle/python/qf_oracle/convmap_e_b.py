@@ -25,6 +25,16 @@ NEW = {
     "VOL.STRIKE_TABLE": ("05-volatility/variance-swaps.md vols given at listed strikes only; the engine reads them only there",
                          lambda a, dates, ks, m: ql.BlackVarianceSurface(a, ql.NullCalendar(), dates, ks, m, ql.Actual365Fixed()),
                          "two identical maturity columns so the surface is defined; read only at listed strikes and the maturity"),
+    # E4 rates and inflation vol
+    "SABR.SECTION": ("05-volatility/rates-vol-cube.md smile: sabr.md Hagan lognormal vol at the swaption's own forward and expiry time",
+                     lambda t, F, a, b, r, n: ql.SabrSmileSection(t, F, [a, b, n, r]), "QuantLib parameter order is alpha, beta, nu, rho"),
+    "INTERP.BILINEAR": ("05-volatility/rates-vol-cube.md parameters bilinear in (expiry time ACT/365F, tenor years)",
+                        lambda xs, ys, M: ql.BilinearInterpolation(xs, ys, M), "QuantLib's matrix is indexed [y][x]"),
+    "SWO.BLACK_ENGINE": ("05-volatility/caps-and-swaptions.md swaption, Black on the forward swap rate, time ACT/365F",
+                         lambda h, v: ql.BlackSwaptionEngine(h, ql.QuoteHandle(ql.SimpleQuote(v)), ql.Actual365Fixed()), ""),
+    "OPT.BLACK_FORMULA": ("05-volatility/black-models.md BLACK_76, discounted", lambda: ql.blackFormula, "formula level"),
+    "OPT.BACHELIER_FORMULA": ("05-volatility/black-models.md BACHELIER, discounted", lambda: ql.bachelierBlackFormula, "formula level"),
+    "OPT.BLACK_IMPLIED": ("05-volatility/rates-vol-cube.md implied Black vol from a premium", lambda: ql.blackFormulaImpliedStdDev, "returns the standard deviation; divided by sqrt(t)"),
 }
 ROWS = {**base.ROWS, **NEW}
 

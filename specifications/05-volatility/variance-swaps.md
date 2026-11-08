@@ -41,13 +41,13 @@ Checks: fewer than 2 prices: `E_INPUT`; a price `<= 0`: `E_DOMAIN`.
 
 ## Worked examples
 
-Realized (case `varswap_e-0028`): prices `100, 101, 99.5, 100.25, 102, 101.5`, `A = 252`. Log returns `0.0099503, -0.0149629, 0.0075094, 0.0173057, -0.0049140`; sum of squares `7.02924e-4`; `252/5` of that is `0.0354274`; vol `18.82%`; against a strike of 0.04 on `N_var = 1e6` the payoff is `-4572.61`.
+Realized (case `varswap_e-0030`): prices `100, 101, 99.5, 100.25, 102, 101.5`, `A = 252`. Log returns `0.0099503, -0.0149629, 0.0075094, 0.0173057, -0.0049140`; sum of squares `7.02924e-4`; `252/5` of that is `0.0354274`; vol `18.82%`; against a strike of 0.04 on `N_var = 1e6` the payoff is `-4572.61`.
 
 Replication weights, first case (`varswap_e-0001`, `S0 = 100`, `T = 1`, calls `100..150` step 10, `dk = 10`): `f(110) - f(100) = 2 (0.1 - ln 1.1) = 0.0093796`, so `s_0 = 9.3796e-4` and the call at 100 has weight `9.3796e-4`; the next slope `(f(120) - f(110))/10 = 2.5977e-3` gives the call at 110 weight `1.6598e-3`, close to the continuous `2 dK / K^2 = 2 (10)/110^2 = 1.6529e-3`. The goldens include the same smile on strips of step 20, 10, 5 and 2.5 at three maturities; fair vol falls towards the continuous value as the strip gets finer (27.77%, 23.75%, 22.64%, 22.35% at three months).
 
 ## Acceptance
 
-Suite `stage_e_b/varswap_e`. 1e-12 in variance per unit of variance notional, plus 1e-10 relative: 1e-6 currency on `N_var = 1e6`. Goldens: mpmath at 50 digits. Every `q = 0` replication case is re-priced by QuantLib 1.44 `VarianceSwap` with `ReplicatingVarianceSwapEngine` through `oracle/python/outside_e_b.py` and the map `oracle/CONVENTION_MAP_E_B.md`.
+Suite `stage_e_b/varswap_e`. `fair_variance`, `fair_vol`, `realized_variance`, `realized_vol`: 1e-12 absolute plus 1e-10 relative (class `simple_analytic` by `output_classes`, ruling E-B14). `pv` and `payoff`: 1e-12 per unit of variance notional plus 1e-10 relative, which is 1e-6 currency on `N_var = 1e6`. Goldens: mpmath at 50 digits. Every `q = 0` replication case is re-priced by QuantLib 1.44 `VarianceSwap` with `ReplicatingVarianceSwapEngine` through `oracle/python/outside_e_b.py` and the map `oracle/CONVENTION_MAP_E_B.md`.
 
 QuantLib's engine writes the drift term as `(2/T)(rT - (e^{rT} - 1))`, which omits `q`; with `q != 0` it is not the value of the log contract on a dividend-paying underlying. This spec keeps `q` (ruling E-B3), and QuantLib's form is a wrong-convention check on the `q != 0` cases. Other checks, each caught: strip not grown at the rate (`Pi` instead of `Pi/D`); realized variance demeaned with divisor `m - 1`.
 
