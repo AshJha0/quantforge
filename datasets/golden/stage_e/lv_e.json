@@ -1,0 +1,2026 @@
+{
+ "schema_version": "1.0",
+ "suite": "lv_e",
+ "spec": "specifications/05-volatility/local-and-forward-vol.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_a.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "lv_e-0001",
+   "operation": "vol.local.dupire",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "points": [
+     {
+      "expiry_years": 0.1,
+      "log_moneyness": 0.0
+     },
+     {
+      "expiry_years": 0.25,
+      "log_moneyness": -0.2
+     },
+     {
+      "expiry_years": 0.5,
+      "log_moneyness": 0.0
+     },
+     {
+      "expiry_years": 0.5,
+      "log_moneyness": 0.15
+     },
+     {
+      "expiry_years": 1.0,
+      "log_moneyness": -0.3
+     },
+     {
+      "expiry_years": 1.0,
+      "log_moneyness": 0.0
+     },
+     {
+      "expiry_years": 1.5,
+      "log_moneyness": 0.1
+     },
+     {
+      "expiry_years": 2.0,
+      "log_moneyness": 0.0
+     },
+     {
+      "expiry_years": 3.0,
+      "log_moneyness": -0.1
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "total_variance": [
+      0.01635990049689671,
+      0.058532137494637024,
+      0.04855059825697158,
+      0.04606379198000092,
+      0.09324553139786579,
+      0.06385229228643119,
+      0.07770780073325592,
+      0.09775859028101173,
+      0.15715060328608865
+     ],
+     "implied_vol": [
+      0.40447373829331257,
+      0.48386831884155024,
+      0.3116106489097302,
+      0.30352526082684095,
+      0.3053613128702878,
+      0.2526901111765777,
+      0.22760755806615315,
+      0.2210866236127954,
+      0.22887449492832576
+     ],
+     "local_vol": [
+      0.3869909723376669,
+      0.21278356533802728,
+      0.1582078092483187,
+      0.16339889255941614,
+      0.22846701886205661,
+      0.16776207113021416,
+      0.16714652895968385,
+      0.20286275992019143,
+      0.21683205475712045
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic",
+    "mpmath-price-dupire-40-digits"
+   ],
+   "tags": [
+    "dupire",
+    "synthetic"
+   ],
+   "description": "nodes use the right-hand interval; before and after the grid flat vol"
+  },
+  {
+   "case_id": "lv_e-0002",
+   "operation": "vol.local.dupire",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     }
+    ],
+    "points": [
+     {
+      "expiry_years": 0.5,
+      "log_moneyness": -0.2
+     },
+     {
+      "expiry_years": 1.0,
+      "log_moneyness": 0.0
+     },
+     {
+      "expiry_years": 2.0,
+      "log_moneyness": 0.25
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "total_variance": [
+      0.040611316526609334,
+      0.06385229228643119,
+      0.12632363354352555
+     ],
+     "implied_vol": [
+      0.28499584743153483,
+      0.2526901111765777,
+      0.2513201479622411
+     ],
+     "local_vol": [
+      0.3258086529569957,
+      0.23021935790781908,
+      0.24573777168126917
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "analytic",
+    "mpmath-price-dupire-40-digits"
+   ],
+   "tags": [
+    "dupire",
+    "one-slice",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0003",
+   "operation": "vol.local.dupire",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.03,
+       "b": 0.06,
+       "rho": -0.1,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     }
+    ],
+    "points": [
+     {
+      "expiry_years": 0.5,
+      "log_moneyness": -0.6
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "arbitrage",
+    "calendar",
+    "synthetic"
+   ],
+   "description": "w_T < 0 at this point"
+  },
+  {
+   "case_id": "lv_e-0004",
+   "operation": "vol.local.dupire",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": -0.041,
+       "b": 0.1331,
+       "rho": 0.306,
+       "m": 0.3586,
+       "sigma": 0.4153
+      }
+     }
+    ],
+    "points": [
+     {
+      "expiry_years": 1.0,
+      "log_moneyness": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "arbitrage",
+    "butterfly",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0005",
+   "operation": "vol.local.dupire",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "points": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0006",
+   "operation": "vol.local.dupire",
+   "inputs": {
+    "slices": [
+     {
+      "expiry_years": 0.25,
+      "svi": {
+       "a": 0.02,
+       "b": 0.1,
+       "rho": -0.4,
+       "m": 0.02,
+       "sigma": 0.2
+      }
+     },
+     {
+      "expiry_years": 1.0,
+      "svi": {
+       "a": 0.035,
+       "b": 0.11,
+       "rho": -0.35,
+       "m": 0.03,
+       "sigma": 0.25
+      }
+     },
+     {
+      "expiry_years": 2.0,
+      "svi": {
+       "a": 0.06,
+       "b": 0.12,
+       "rho": -0.3,
+       "m": 0.04,
+       "sigma": 0.3
+      }
+     }
+    ],
+    "points": [
+     {
+      "expiry_years": 0.0,
+      "log_moneyness": 0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0007",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.2,
+     0.4986301369863014,
+     1.0,
+     2.0
+    ],
+    "vols": [
+     0.2,
+     0.21,
+     0.215,
+     0.22
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward_vols": [
+      0.2,
+      0.21643907124092224,
+      0.2198599280863661,
+      0.2248888614404902
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "forward-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0008",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.0821917808219178,
+     0.2493150684931507,
+     1.0
+    ],
+    "vols": [
+     0.3,
+     0.25,
+     0.22
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward_vols": [
+      0.3,
+      0.22130388572292528,
+      0.20908647322261556
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "forward-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0009",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     1.0,
+     2.0
+    ],
+    "vols": [
+     0.2,
+     0.2
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward_vols": [
+      0.2,
+      0.2
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "forward-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0010",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.019178082191780823,
+     0.038356164383561646,
+     0.0821917808219178,
+     0.16712328767123288
+    ],
+    "vols": [
+     0.45,
+     0.38,
+     0.33,
+     0.31
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward_vols": [
+      0.45,
+      0.2937686164313676,
+      0.2789937275280575,
+      0.2893318220068551
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "forward-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0011",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.2493150684931507,
+     0.4986301369863014,
+     0.7479452054794521,
+     1.0,
+     1.4986301369863013,
+     2.0,
+     3.0,
+     5.0
+    ],
+    "vols": [
+     0.18,
+     0.185,
+     0.19,
+     0.195,
+     0.2,
+     0.205,
+     0.21,
+     0.212
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward_vols": [
+      0.18,
+      0.18986837546047522,
+      0.1996246477767713,
+      0.20913447410905162,
+      0.20966843264628957,
+      0.21926666151619806,
+      0.21965882636488793,
+      0.21496511344867103
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "forward-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0012",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.4986301369863014,
+     1.0
+    ],
+    "vols": [
+     0.25,
+     0.1768
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward_vols": [
+      0.25,
+      0.013682105101190108
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic"
+   ],
+   "tags": [
+    "forward-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0013",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.5,
+     1.0
+    ],
+    "vols": [
+     0.3,
+     0.2
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_ARBITRAGE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "arbitrage",
+    "calendar",
+    "synthetic"
+   ],
+   "description": "total variance falls: 0.045 then 0.04"
+  },
+  {
+   "case_id": "lv_e-0014",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     1.0,
+     0.5
+    ],
+    "vols": [
+     0.2,
+     0.2
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0015",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.5,
+     1.0
+    ],
+    "vols": [
+     0.2
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0016",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.5,
+     1.0
+    ],
+    "vols": [
+     0.2,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0017",
+   "operation": "vol.forward.vol",
+   "inputs": {
+    "expiry_years": [
+     0.25,
+     1.0
+    ],
+    "vols": [
+     0.5,
+     0.25
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forward_vols": [
+      0.5,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "analytic"
+   ],
+   "tags": [
+    "forward-vol",
+    "zero",
+    "synthetic"
+   ],
+   "description": "flat total variance: forward vol 0 is allowed"
+  },
+  {
+   "case_id": "lv_e-0018",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    },
+    "expiry_years": 0.5,
+    "spot": 100.0,
+    "spot_shifted": 103.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.33304977844682426,
+      0.29946871856156615,
+      0.2878324110177889,
+      0.28048695897112774,
+      0.27721285618996255
+     ],
+     "vols_shifted": [
+      0.33304977844682426,
+      0.29946871856156615,
+      0.2878324110177889,
+      0.28048695897112774,
+      0.27721285618996255
+     ],
+     "prices_base": [
+      18.660748142159218,
+      11.435710408925646,
+      8.52973603492333,
+      6.200022563496731,
+      3.1612615055657
+     ],
+     "prices_shifted": [
+      21.106449275303483,
+      13.462750216069306,
+      10.286414871893344,
+      7.66693045448417,
+      4.095175668145259
+     ],
+     "deltas": [
+      0.7984214803947058,
+      0.6504400275648201,
+      0.5571787855640061,
+      0.45929419736840793,
+      0.2849566423174305
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_strike",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0019",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    },
+    "expiry_years": 0.5,
+    "spot": 100.0,
+    "spot_shifted": 103.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.33304977844682426,
+      0.29946871856156615,
+      0.2878324110177889,
+      0.28048695897112774,
+      0.27721285618996255
+     ],
+     "vols_shifted": [
+      0.33304977844682426,
+      0.29946871856156615,
+      0.2878324110177889,
+      0.28048695897112774,
+      0.27721285618996255
+     ],
+     "prices_base": [
+      2.8940150891513197,
+      5.52009675194839,
+      7.539682075961373,
+      10.135528302550094,
+      16.947886640649703
+     ],
+     "prices_shifted": [
+      2.3546787847175388,
+      4.562099121513994,
+      6.311323475353338,
+      8.617398755959485,
+      14.896763365651196
+     ],
+     "deltas": [
+      -0.19659099879797653,
+      -0.34457245162786215,
+      -0.4378336936286762,
+      -0.5357182818242744,
+      -0.7100558368752519
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_strike",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0020",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    },
+    "expiry_years": 0.5,
+    "spot": 100.0,
+    "spot_shifted": 103.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_DELTA",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.33304977844682426,
+      0.29946871856156615,
+      0.2878324110177889,
+      0.28048695897112774,
+      0.27721285618996255
+     ],
+     "vols_shifted": [
+      0.34283906797936825,
+      0.3075733873753068,
+      0.2941099460133527,
+      0.2844634086590902,
+      0.2769118499193734
+     ],
+     "prices_base": [
+      18.660748142159218,
+      11.435710408925646,
+      8.52973603492333,
+      6.200022563496731,
+      3.1612615055657
+     ],
+     "prices_shifted": [
+      21.284081056998,
+      13.666289914098508,
+      10.460168332893076,
+      7.781727618550642,
+      4.087186421000711
+     ],
+     "deltas": [
+      0.8626209630670292,
+      0.7177538162469179,
+      0.610046403325711,
+      0.4898200497508167,
+      0.27795086418920567
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0021",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    },
+    "expiry_years": 0.5,
+    "spot": 100.0,
+    "spot_shifted": 103.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_DELTA",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.33304977844682426,
+      0.29946871856156615,
+      0.2878324110177889,
+      0.28048695897112774,
+      0.27721285618996255
+     ],
+     "vols_shifted": [
+      0.34283906797936825,
+      0.3075733873753068,
+      0.2941099460133527,
+      0.2844634086590902,
+      0.2769118499193734
+     ],
+     "prices_base": [
+      2.8940150891513197,
+      5.52009675194839,
+      7.539682075961373,
+      10.135528302550094,
+      16.947886640649703
+     ],
+     "prices_shifted": [
+      2.5323105664120487,
+      4.765638819543192,
+      6.485076936353069,
+      8.732195920025964,
+      14.888774118506651
+     ],
+     "deltas": [
+      -0.13239151612565325,
+      -0.2772586629457643,
+      -0.38496607586697135,
+      -0.5051924294418656,
+      -0.7170616150034766
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0022",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.035,
+     "b": 0.11,
+     "rho": -0.35,
+     "m": 0.03,
+     "sigma": 0.25
+    },
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "spot_shifted": 96.0,
+    "rate": 0.045,
+    "dividend_yield": 0.0,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.2864907975433533,
+      0.26584226705381103,
+      0.25806654742431073,
+      0.2523089294416134,
+      0.2468084036883288
+     ],
+     "vols_shifted": [
+      0.2864907975433533,
+      0.26584226705381103,
+      0.25806654742431073,
+      0.2523089294416134,
+      0.2468084036883288
+     ],
+     "prices_base": [
+      22.259696058965577,
+      15.329405874136329,
+      12.392503002733308,
+      9.869356392215465,
+      6.085738167839422
+     ],
+     "prices_shifted": [
+      19.111574750292732,
+      12.680607672556809,
+      10.03705431396567,
+      7.820289799354333,
+      4.6214757608781385
+     ],
+     "deltas": [
+      0.8071914172559458,
+      0.6897496283972225,
+      0.619210106484466,
+      0.5442443797916579,
+      0.3972216218121949
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_strike",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0023",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.035,
+     "b": 0.11,
+     "rho": -0.35,
+     "m": 0.03,
+     "sigma": 0.25
+    },
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "spot_shifted": 96.0,
+    "rate": 0.045,
+    "dividend_yield": 0.0,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.2864907975433533,
+      0.26584226705381103,
+      0.25806654742431073,
+      0.2523089294416134,
+      0.2468084036883288
+     ],
+     "vols_shifted": [
+      0.2864907975433533,
+      0.26584226705381103,
+      0.25806654742431073,
+      0.2523089294416134,
+      0.2468084036883288
+     ],
+     "prices_base": [
+      3.5194820147790833,
+      6.1491666482808265,
+      7.992251186043284,
+      10.24909198469095,
+      16.025448578645918
+     ],
+     "prices_shifted": [
+      4.371360706106232,
+      7.500368446701307,
+      9.636802497275667,
+      12.200025391829838,
+      18.561186171684636
+     ],
+     "deltas": [
+      -0.19280858274405413,
+      -0.31025037160277746,
+      -0.3807898935155341,
+      -0.4557556202083421,
+      -0.6027783781878051
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_strike",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0024",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.035,
+     "b": 0.11,
+     "rho": -0.35,
+     "m": 0.03,
+     "sigma": 0.25
+    },
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "spot_shifted": 96.0,
+    "rate": 0.045,
+    "dividend_yield": 0.0,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_DELTA",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.2864907975433533,
+      0.26584226705381103,
+      0.25806654742431073,
+      0.2523089294416134,
+      0.2468084036883288
+     ],
+     "vols_shifted": [
+      0.2785034840579404,
+      0.25952536664077985,
+      0.2531237907411867,
+      0.24896659450755393,
+      0.24655018434045628
+     ],
+     "prices_base": [
+      22.259696058965577,
+      15.329405874136329,
+      12.392503002733308,
+      9.869356392215465,
+      6.085738167839422
+     ],
+     "prices_shifted": [
+      18.87746058857104,
+      12.452463671597132,
+      9.849710802581416,
+      7.692461094977773,
+      4.612445337439977
+     ],
+     "deltas": [
+      0.8617966661250491,
+      0.7482275955311678,
+      0.6709622022110728,
+      0.5835061891251875,
+      0.4057489629500091
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0025",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.035,
+     "b": 0.11,
+     "rho": -0.35,
+     "m": 0.03,
+     "sigma": 0.25
+    },
+    "expiry_years": 1.0,
+    "spot": 100.0,
+    "spot_shifted": 96.0,
+    "rate": 0.045,
+    "dividend_yield": 0.0,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_DELTA",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.2864907975433533,
+      0.26584226705381103,
+      0.25806654742431073,
+      0.2523089294416134,
+      0.2468084036883288
+     ],
+     "vols_shifted": [
+      0.2785034840579404,
+      0.25952536664077985,
+      0.2531237907411867,
+      0.24896659450755393,
+      0.24655018434045628
+     ],
+     "prices_base": [
+      3.5194820147790833,
+      6.1491666482808265,
+      7.992251186043284,
+      10.24909198469095,
+      16.025448578645918
+     ],
+     "prices_shifted": [
+      4.1372465443845305,
+      7.27222444574163,
+      9.449458985891408,
+      12.072196687453278,
+      18.552155748246474
+     ],
+     "deltas": [
+      -0.1382033338749508,
+      -0.25177240446883214,
+      -0.3290377977889272,
+      -0.4164938108748124,
+      -0.5942510370499908
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_delta",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0026",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.06,
+     "b": 0.12,
+     "rho": -0.3,
+     "m": 0.04,
+     "sigma": 0.3
+    },
+    "expiry_years": 2.0,
+    "spot": 100.0,
+    "spot_shifted": 110.0,
+    "rate": -0.005,
+    "dividend_yield": 0.02,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.23008258297048478,
+      0.2211628197516427,
+      0.21870070238516465,
+      0.21744918787708098,
+      0.21776710755926737
+     ],
+     "vols_shifted": [
+      0.23008258297048478,
+      0.2211628197516427,
+      0.21870070238516465,
+      0.21744918787708098,
+      0.21776710755926737
+     ],
+     "prices_base": [
+      17.55781149938445,
+      11.994302221557609,
+      9.804248320197722,
+      7.988589653423758,
+      5.310501259055746
+     ],
+     "prices_shifted": [
+      24.70364971630102,
+      17.982660051533358,
+      15.176920933734879,
+      12.75414144212491,
+      8.96774630094585
+     ],
+     "deltas": [
+      0.667217036188052,
+      0.5416590100624935,
+      0.47770547787369455,
+      0.4164953255470021,
+      0.309348768254158
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_strike",
+    "negative-rate",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0027",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.06,
+     "b": 0.12,
+     "rho": -0.3,
+     "m": 0.04,
+     "sigma": 0.3
+    },
+    "expiry_years": 2.0,
+    "spot": 100.0,
+    "spot_shifted": 110.0,
+    "rate": -0.005,
+    "dividend_yield": 0.02,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.23008258297048478,
+      0.2211628197516427,
+      0.21870070238516465,
+      0.21744918787708098,
+      0.21776710755926737
+     ],
+     "vols_shifted": [
+      0.23008258297048478,
+      0.2211628197516427,
+      0.21870070238516465,
+      0.21744918787708098,
+      0.21776710755926737
+     ],
+     "prices_base": [
+      7.333131786306417,
+      11.870124179321255,
+      14.730321113382201,
+      17.964913282029077,
+      25.38732655850275
+     ],
+     "prices_shifted": [
+      4.8710756116997365,
+      8.250587617773757,
+      10.495099335396134,
+      13.122570679206998,
+      19.436677208869618
+     ],
+     "deltas": [
+      -0.2935724029642713,
+      -0.41913042908982967,
+      -0.4830839612786286,
+      -0.5442941136053211,
+      -0.6514406708981652
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_strike",
+    "negative-rate",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0028",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.06,
+     "b": 0.12,
+     "rho": -0.3,
+     "m": 0.04,
+     "sigma": 0.3
+    },
+    "expiry_years": 2.0,
+    "spot": 100.0,
+    "spot_shifted": 110.0,
+    "rate": -0.005,
+    "dividend_yield": 0.02,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_DELTA",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.23008258297048478,
+      0.2211628197516427,
+      0.21870070238516465,
+      0.21744918787708098,
+      0.21776710755926737
+     ],
+     "vols_shifted": [
+      0.24043398512180303,
+      0.22855432320951571,
+      0.22416337645785653,
+      0.22088513068063798,
+      0.21751773522194962
+     ],
+     "prices_base": [
+      17.55781149938445,
+      11.994302221557609,
+      9.804248320197722,
+      7.988589653423758,
+      5.310501259055746
+     ],
+     "prices_shifted": [
+      25.155024324917594,
+      18.378633838197203,
+      15.488194083916786,
+      12.956911970676114,
+      8.953049834365048
+     ],
+     "deltas": [
+      0.7139958368691703,
+      0.5733335856439428,
+      0.4975350132098,
+      0.4244368377236623,
+      0.29950719067047504
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_delta",
+    "negative-rate",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0029",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.06,
+     "b": 0.12,
+     "rho": -0.3,
+     "m": 0.04,
+     "sigma": 0.3
+    },
+    "expiry_years": 2.0,
+    "spot": 100.0,
+    "spot_shifted": 110.0,
+    "rate": -0.005,
+    "dividend_yield": 0.02,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_DELTA",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vols_base": [
+      0.23008258297048478,
+      0.2211628197516427,
+      0.21870070238516465,
+      0.21744918787708098,
+      0.21776710755926737
+     ],
+     "vols_shifted": [
+      0.24043398512180303,
+      0.22855432320951571,
+      0.22416337645785653,
+      0.22088513068063798,
+      0.21751773522194962
+     ],
+     "prices_base": [
+      7.333131786306417,
+      11.870124179321255,
+      14.730321113382201,
+      17.964913282029077,
+      25.38732655850275
+     ],
+     "prices_shifted": [
+      5.322450220316328,
+      8.646561404437625,
+      10.806372485578034,
+      13.3253412077582,
+      19.421980742288824
+     ],
+     "deltas": [
+      -0.24679360228315295,
+      -0.38745585350838035,
+      -0.4632544259425232,
+      -0.5363526014286608,
+      -0.6612822484818481
+     ]
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic",
+    "mpmath-bump-delta"
+   ],
+   "tags": [
+    "smile-dynamics",
+    "sticky_delta",
+    "negative-rate",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0030",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    },
+    "expiry_years": 0.5,
+    "spot": 100.0,
+    "spot_shifted": 103.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "strikes": [],
+    "rule": "STICKY_STRIKE",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0031",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    },
+    "expiry_years": 0.5,
+    "spot": 100.0,
+    "spot_shifted": 0.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "strikes": [
+     85.0,
+     95.0,
+     100.0,
+     105.0,
+     115.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0032",
+   "operation": "vol.smile.dynamics",
+   "inputs": {
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    },
+    "expiry_years": 0.5,
+    "spot": 100.0,
+    "spot_shifted": 103.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "strikes": [
+     100.0,
+     -5.0
+    ],
+    "rule": "STICKY_STRIKE",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0033",
+   "operation": "vol.volofvol.measure",
+   "inputs": {
+    "vols": [
+     0.2,
+     0.205,
+     0.198,
+     0.21,
+     0.222,
+     0.215,
+     0.23,
+     0.226,
+     0.219,
+     0.224,
+     0.24,
+     0.233
+    ],
+    "periods_per_year": 252,
+    "method": "LOG"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol_of_vol": 0.6967636357306444,
+     "mean_change": 0.01388373518342399
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath"
+   ],
+   "tags": [
+    "vol-of-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0034",
+   "operation": "vol.volofvol.measure",
+   "inputs": {
+    "vols": [
+     0.2,
+     0.205,
+     0.198,
+     0.21,
+     0.222,
+     0.215,
+     0.23,
+     0.226,
+     0.219,
+     0.224,
+     0.24,
+     0.233
+    ],
+    "periods_per_year": 52,
+    "method": "LOG"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol_of_vol": 0.31650959345012303,
+     "mean_change": 0.01388373518342399
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath"
+   ],
+   "tags": [
+    "vol-of-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0035",
+   "operation": "vol.volofvol.measure",
+   "inputs": {
+    "vols": [
+     0.2,
+     0.205,
+     0.198,
+     0.21,
+     0.222,
+     0.215,
+     0.23,
+     0.226,
+     0.219,
+     0.224,
+     0.24,
+     0.233
+    ],
+    "periods_per_year": 252,
+    "method": "ABSOLUTE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol_of_vol": 0.1532527324389356,
+     "mean_change": 0.003
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath"
+   ],
+   "tags": [
+    "vol-of-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0036",
+   "operation": "vol.volofvol.measure",
+   "inputs": {
+    "vols": [
+     0.2,
+     0.205,
+     0.198,
+     0.21,
+     0.222,
+     0.215,
+     0.23,
+     0.226,
+     0.219,
+     0.224,
+     0.24,
+     0.233
+    ],
+    "periods_per_year": 52,
+    "method": "ABSOLUTE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol_of_vol": 0.06961609009417288,
+     "mean_change": 0.003
+    }
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "quantlib-1.44",
+    "mpmath"
+   ],
+   "tags": [
+    "vol-of-vol",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0037",
+   "operation": "vol.volofvol.measure",
+   "inputs": {
+    "vols": [
+     0.2,
+     0.21
+    ],
+    "periods_per_year": 252,
+    "method": "LOG"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "at least 3 observations"
+  },
+  {
+   "case_id": "lv_e-0038",
+   "operation": "vol.volofvol.measure",
+   "inputs": {
+    "vols": [
+     0.2,
+     0.0,
+     0.21
+    ],
+    "periods_per_year": 252,
+    "method": "LOG"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "lv_e-0039",
+   "operation": "vol.volofvol.measure",
+   "inputs": {
+    "vols": [
+     0.2,
+     0.22,
+     0.21
+    ],
+    "periods_per_year": 0,
+    "method": "LOG"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  }
+ ]
+}
