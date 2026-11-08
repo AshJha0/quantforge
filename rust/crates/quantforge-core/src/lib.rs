@@ -16,6 +16,7 @@ pub mod conventions;
 pub mod corr;
 pub mod cos;
 pub mod credit;
+pub mod credit_e;
 pub mod curve;
 pub mod curve_fits;
 pub mod data;

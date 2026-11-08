@@ -1,10 +1,11 @@
-//! Stage E operations: E5 (`04-pricing/exotics.md`), E6 (`06-risk/correlation.md`), E2 (`heston-family.md`), E4 (`rates-vol-cube.md`), E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
+//! Stage E operations: E8 (`credit-options-and-copulas.md`), E5 (`04-pricing/exotics.md`), E6 (`06-risk/correlation.md`), E2 (`heston-family.md`), E4 (`rates-vol-cube.md`), E3 (`fx-smile.md`), E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7
 //! (`garch.md`, `variance-swaps.md`, `vix-index.md`).
 
 use crate::input::Inputs;
 use crate::ops::{Outcome, plain};
 use crate::ops_b::{curve_input, items, sub};
 use quantforge_core::corr;
+use quantforge_core::credit_e;
 use quantforge_core::curve::{Curve, CurveInput};
 use quantforge_core::error::{Result, fail};
 use quantforge_core::exotics;
@@ -251,9 +252,86 @@ fn pick<T: Copy>(i: &Inputs, k: &str, table: &[(&str, T)]) -> Result<T> {
         .map_or_else(|| i.fail(k, "unknown value"), |(_, v)| Ok(*v))
 }
 
+fn cds_option(i: &Inputs) -> Result<credit_e::CdsOption> {
+    Ok(credit_e::CdsOption {
+        as_of: i.date("as_of")?,
+        expiry: i.date("expiry")?,
+        maturity: i.date("maturity")?,
+        rate: i.f64("rate")?,
+        hazard_rate: i.f64("hazard_rate")?,
+        recovery: i.f64("recovery")?,
+        payer: kind(i, "PAYER", "RECEIVER")?,
+        strike: i.f64("strike")?,
+        notional: i.f64("notional")?,
+        knock_out: i.bool("knock_out")?,
+    })
+}
+
+fn pool(i: &Inputs) -> Result<credit_e::Pool> {
+    Ok(credit_e::Pool {
+        default_probability: i.f64("default_probability")?,
+        correlation: i.f64("correlation")?,
+        recovery: i.f64("recovery")?,
+    })
+}
+
 pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     let price = |p: f64| plain(obj([("price", p.into())]));
     match op {
+        "credit.cdsoption.price" => {
+            let (o, v) = (cds_option(i)?, i.f64("vol")?);
+            let p = credit_e::cds_option_price(&o, v)?;
+            plain(obj([
+                ("price", p.price.into()),
+                ("forward_spread", p.forward_spread.into()),
+                ("risky_annuity", p.risky_annuity.into()),
+                ("front_end_protection", p.front_end_protection.into()),
+            ]))
+        }
+        "credit.cdsoption.implied_vol" => {
+            let (o, p) = (cds_option(i)?, i.f64("premium")?);
+            plain(obj([(
+                "vol",
+                credit_e::cds_option_implied_vol(&o, p)?.into(),
+            )]))
+        }
+        "credit.copula.joint_default" => {
+            let student = match i.str("copula")? {
+                "GAUSSIAN" => false,
+                "STUDENT_T" => true,
+                _ => return i.fail("copula", "must be GAUSSIAN or STUDENT_T"),
+            };
+            let (p, rho) = (i.reals("default_probabilities")?, i.f64("correlation")?);
+            let nu = i.opt_f64("degrees_of_freedom")?;
+            i.gate()?;
+            if p.len() != 2 {
+                return fail("E_INPUT", "default_probabilities must hold two values");
+            }
+            if student && nu.is_none() {
+                return fail("E_INPUT", "STUDENT_T needs degrees_of_freedom");
+            }
+            let (j, dc) =
+                credit_e::joint_default(p[0], p[1], rho, if student { nu } else { None })?;
+            plain(obj([
+                ("joint_default_probability", j.into()),
+                ("default_correlation", dc.into()),
+            ]))
+        }
+        "credit.lhp.tranche_loss" => {
+            let (p, a, d) = (pool(i)?, i.f64("attachment")?, i.f64("detachment")?);
+            plain(obj([(
+                "expected_loss_fraction",
+                credit_e::tranche_loss(&p, a, d)?.into(),
+            )]))
+        }
+        "credit.lhp.loss_cdf" => {
+            let (p, x) = (pool(i)?, i.reals("losses")?);
+            i.gate()?;
+            if x.is_empty() {
+                return fail("E_INPUT", "losses must not be empty");
+            }
+            plain(obj([("cdf", credit_e::loss_cdf(&p, &x)?.into())]))
+        }
         "exotic.digital.price" => {
             let x = vanilla(i, true, true)?;
             let cash_kind = pick(
