@@ -1,0 +1,23 @@
+{
+ "impl": "cpp",
+ "command": [
+  "/home/ashish/qf-build/cpp/quantforge"
+ ],
+ "machine": {
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "processor": "x86_64",
+  "cpus": 12,
+  "pinned_one_core": true
+ },
+ "date": "2026-11-07",
+ "book_sha256": "d134750abb03a1e578225a4fdfe3621ef42e5ea92fa6e17d8815979623f8922e",
+ "repeats": 5,
+ "commit": "",
+ "T4_startup_s": 0.0019601574999796867,
+ "T1_bootstrap_p99_ms": 1.8328569999539468,
+ "T2_pv_10000_s": 0.8141763779999565,
+ "T5_peak_rss_mib": 96.8984375,
+ "T3_keyrate_trades_measured": 10000,
+ "T3_keyrate_10000_s": 82.29917697100001,
+ "T3_scaled": false
+}

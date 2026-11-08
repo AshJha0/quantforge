@@ -130,4 +130,6 @@ These can run only once the branch is on GitHub. Run each by hand (Actions, then
 | Daily workflows first run | `daily-workflows.yml`, Rust | Both reports on `forward-log` under `reports/`. The header shows `--batch` once the Rust branch has merged |
 | Outside-oracle floor | `oracle-coverage.yml` | Runs on the PR itself, because it touches `oracle/` and `datasets/` |
 | Calendar expiry | `calendar-expiry.yml` | Expected red on USGS until SIFMA's December release |
+| Cross-platform rerun on the PR branch | `cross-platform.yml`, dispatched on the pushed PR branch | The two cells red on main run 42401083926 (ubuntu/cpp, windows/java) go green with the fixes in 3cf8739 |
+| Native Linux T1 benchmark | `benchmarks/batch_targets.py` on an ubuntu runner | Rust and C++ T1 p99 without WSL scheduling jitter |
 | Gallery and docs | `docs.yml` | `build_gallery.py --check` including the real-data page; site has no broken links |

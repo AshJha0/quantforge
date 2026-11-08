@@ -799,9 +799,6 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
                 ("wal", wal.into()),
             ]))
         }
-        _ => fail(
-            "E_UNSUPPORTED_OPERATION",
-            format!("{op} is not in this build"),
-        ),
+        _ => crate::ops_r2::dispatch(op, i),
     }
 }

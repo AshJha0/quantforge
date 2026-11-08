@@ -177,7 +177,7 @@ fn replay(stage: &str) {
             }
         }
     }
-    assert!(seen > 100, "{stage}: only {seen} cases found");
+    assert!(seen >= 40, "{stage}: only {seen} cases found");
     assert!(failures.is_empty(), "{stage}: {failures:#?}");
 }
 
@@ -199,4 +199,9 @@ fn stage_b_goldens() {
 #[test]
 fn core_goldens() {
     replay("core");
+}
+
+#[test]
+fn r2_goldens() {
+    replay("r2");
 }

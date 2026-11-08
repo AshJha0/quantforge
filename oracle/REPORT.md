@@ -279,6 +279,10 @@ suite edge_d: 24 cases
 edge_d: 24 edge-case register cases
 suite rulings_r1: 15 cases
 rulings_r1: 15 cases (R1-3 conversion factor, R1-4 CDS discount interpolation)
+suite risk_r2: 41 cases
+risk_r2: QuantLib worst gaps per unit notional: par 1.8e-12, key-rate 3.7e-16; Jacobian 1.7e-08; par-from-zero identity worst 5.0e-06 of par DV01
+suite pnl_r2: 44 cases
+pnl_r2: 44 cases, 4 not explained (large moves on long products); largest |unexplained|/threshold 3.24; no case within 0.9-1.1
 invariants: 256620 day-count evaluations, none negative, all equal-date results 0
 invariants: 4394 golden cases checked, none breaks a stated invariant
 invariants: 343 stage B cases checked, none breaks one
@@ -353,7 +357,7 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `commodity_d` | 0 | 10 | 0% | no QuantLib object for monthly log-linear commodity forwards with additive seasonality or for storage carry |
 | `compound_d` | 25 | 35 | 71% |  |
 | `credit_d` | 9 | 19 | 47% |  |
-| `csa_d` | 0 | 13 | 0% | CSA discounting with FX forwards is a composition of curve ratios; QuantLib has no CSA-discount object, so a check would re-implement the spec |
+| `csa_d` | 3 | 13 | 23% | cases without FX count via QuantLib ZeroSpreadedTermStructure; CSA with FX forwards has no QuantLib object; spread and basis cases are internal |
 | `edge_d` | 11 | 24 | 46% |  |
 | `equity_d` | 0 | 10 | 0% | QuantLib has no implied-dividend, implied-borrow or equity futures-basis object; its dividend handling uses other conventions |
 | `fits_d` | 0 | 16 | 0% | smooth and robust curve fits are internal estimators (penalised and Huber); no QuantLib equivalent |
@@ -369,7 +373,7 @@ Written by `oracle/python/outside_d.py`. A case counts only if QuantLib 1.44, bu
 | `rulings_r1` | 0 | 15 | 0% | internal: spec rulings; CME conversion factors have no QuantLib object |
 | `steps_d` | 0 | 11 | 0% | meeting-date step fits are internal; QuantLib ForwardCurve could replay a step curve but not the fit |
 | `trs_d` | 0 | 3 | 0% | QuantLib has no equity total return swap with these legs |
-| `xccy_d` | 0 | 13 | 0% | constant-notional xccy legs could be built from QuantLib OvernightLegs, deferred: the curve solve and NDF are compositions of the spec's own curves |
-| **stage D** | **412** | **654** | **63.0%** | |
+| `xccy_d` | 4 | 13 | 31% | PV and bootstrap count via QuantLib OvernightLeg; NDF has no QuantLib object; the rest are error cases |
+| **stage D** | **419** | **654** | **64.1%** | |
 
 Caveat: most counted cases are fixed-rate bonds (suite `outside_d`), so the stage-wide share leans on one product family.

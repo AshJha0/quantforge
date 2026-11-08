@@ -3,6 +3,7 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
+from functools import lru_cache
 
 from . import curves, ois
 from .curves import Curve
@@ -24,6 +25,15 @@ class BumpedCurves:
 def bump_curves(
     convention: str, as_of: date, quotes: Sequence[Quote], interpolation: str
 ) -> BumpedCurves:
+    return _bump_curves(convention, as_of, tuple(quotes), interpolation)
+
+
+@lru_cache(maxsize=8)
+def _bump_curves(
+    convention: str, as_of: date, quotes: tuple[Quote, ...], interpolation: str
+) -> BumpedCurves:
+    """A pure function of its inputs, so a book of trades on one quote set rebuilds the 2n + 2
+    curves once. No number changes (BT7): a cached curve is the curve a rebuild would give."""
     mids = [q.mid for q in quotes]
 
     def rebuilt(shifts: Sequence[float]) -> Curve:

@@ -3,7 +3,7 @@
 Pure functions of a log. Instants are whole seconds since the epoch, as in timezones.py. The format
 function is passed in, as writing instants is the CLI's business.
 """
-import hashlib
+
 import itertools
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -108,6 +108,8 @@ def snapshot(records: Sequence[Record], as_of: int, fmt: Format) -> tuple[str, s
 def chain(records: Sequence[Record]) -> list[str]:
     hashes: list[str] = []
     previous = GENESIS
+    import hashlib
+
     for r in records:
         previous = hashlib.sha256((previous + canonical(r.raw)).encode("utf-8")).hexdigest()
         hashes.append(previous)

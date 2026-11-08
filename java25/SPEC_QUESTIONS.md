@@ -166,3 +166,16 @@ Silent choices, all passing `batch_check.py`:
 | R1-2 | `elapsed_ns` starts when the line's last byte (or EOF, for `run`) has been read, and ends just before the result is serialised to text. Serialisation is not inside the window |
 | R1-3 | BT5 keeps at most 16,777,217 bytes of a line (the limit plus a possible trailing CR) and drops the rest. The length check is made after a trailing CR is removed |
 | R1-4 | `--timings` is accepted only as the second argument after `run`, `batch` or `--batch`; anything else is exit 64 |
+
+## R2.1 par and key-rate risk (contract 1.7.0)
+
+Silent choices, all passing `risk_r2`:
+
+| # | Choice |
+|---|---|
+| R2-1 | `bump_bp` and `scheme` may be absent (defaults 1 and `CENTRAL`); `null` is treated the same as absent |
+| R2-2 | For `PILLAR`, an absent `key_dates` is treated as `null`. For `TRIANGULAR`, a missing or `null` `key_dates` is `E_INPUT` (the "at least 1" rule), not `E_SCHEMA` |
+| R2-3 | In `risk.curve.key_rate` the OIS periods come from the given curve's `as_of`. The curve object has no convention, so the "trade convention differs" `E_INPUT` rule is applied in `risk.curve.par` only |
+| R2-4 | The `E_DOMAIN` checks (`bump_bp`, then `notional`) run after every `E_SCHEMA` check, and the curve's own rule checks (`key_rate`) run after them, just before `key_dates`, as "Checks, in order" lists |
+| R2-5 | The bumped curves use the same SEQUENTIAL bootstrap as stage B risk. So Jacobian entries above the diagonal, and par buckets for quotes beyond a product's last date, come out as exact zeros |
+| R2-6 | `risk.pnl.explain`: a quote's move is taken on its mid (`rate`, or `(bid+ask)/2` when bid and ask are given), the same value the bootstrap uses. The checks run in this order: `bump_bp`, `notional`, convention, tenor match, then the bootstrap's own quote checks |

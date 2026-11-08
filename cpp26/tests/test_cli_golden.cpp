@@ -84,3 +84,31 @@ TEST_CASE("credit operations need a LOG_LINEAR_DF discount curve (ruling R1-4)")
     CHECK_FALSE(r.ok);
     CHECK(r.json.find(R"("code":"E_INPUT")") != std::string::npos);  // before the recovery rule
 }
+
+TEST_CASE("risk.curve.jacobian and BOND products through the CLI layer") {
+    const std::string market =
+        R"("as_of":"2026-11-06","convention":"SOFR","interpolation":"LOG_LINEAR_DF",)"
+        R"("quotes":[{"tenor":"1Y","rate":0.0365},{"tenor":"2Y","rate":0.035},{"tenor":"5Y","rate":0.035}])";
+    const auto j = quantforge::cli::run_case(R"({"schema_version":"1.0","case_id":"j","operation":"risk.curve.jacobian","inputs":{)" +
+                                             market + R"(,"bump_bp":1}})");
+    REQUIRE(j.ok);
+    const auto jv = quantforge::json::parse(j.json);
+    const Value& m = *jv.value.find("outputs")->find("jacobian");
+    REQUIRE(m.items.size() == 3);
+    CHECK(m.items[0].items[1].number == 0.0);
+    CHECK(m.items[1].items[1].number > 0.9);  // a quote moves its own pillar's zero about one for one
+
+    const std::string bond = R"("product":{"kind":"BOND","bond":{"maturity":"2030-11-15","coupon":0.04,"frequency":2},)"
+                             R"("settlement":"2026-11-09","notional":NOTIONAL})";
+    const auto with = [&](const char* n) {
+        std::string s = bond;
+        s.replace(s.find("NOTIONAL"), 8, n);
+        return quantforge::cli::run_case(R"({"schema_version":"1.0","case_id":"b","operation":"risk.curve.par","inputs":{)" + market +
+                                         "," + s + "}}");
+    };
+    const auto p = with("1000000");
+    REQUIRE(p.ok);
+    CHECK(quantforge::json::parse(p.json).value.find("outputs")->find("par_dv01")->number < 0.0);  // a long bond loses as rates rise
+    const auto bad = with("0");
+    CHECK(bad.json.find(R"("code":"E_DOMAIN")") != std::string::npos);
+}

@@ -1,0 +1,13 @@
+{
+  "note": "PROVISIONAL thresholds for the R2 P&L explain and calibration stability job, set by infra on 2026-11-07 before any run, so the spec session can tighten them. Not a spec: when the R2 spec states the unexplained-P&L threshold (plan 11.2.1), replace these with its numbers in their own commit.",
+  "explain": {
+    "book_rel": 0.05,
+    "book_abs_per_dv01": 0.05,
+    "trade_rel": 0.05,
+    "trade_abs_per_mm": 5.0
+  },
+  "calibration": {
+    "condition_max": 1000.0,
+    "beta_step_warn": 0.0050
+  }
+}

@@ -3,10 +3,9 @@
 Instants and local times are whole seconds since 1970-01-01T00:00:00, the first in UTC and the
 second on the local clock. The rules are written here, not read from a timezone database.
 """
-import calendar as _cal
 from datetime import date, timedelta
 
-from . import calendars
+from . import _cal, calendars
 from .errors import QfError
 
 ZONES = ("UTC", "Europe/London", "Europe/Berlin", "America/New_York", "Asia/Tokyo")

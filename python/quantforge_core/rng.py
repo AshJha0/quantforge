@@ -49,8 +49,7 @@ class Xoshiro256:
     @classmethod
     def seeded(cls, seed: int, stream: int = 0) -> Xoshiro256:
         g = cls(_splitmix_words(seed, 4))
-        for _ in range(stream):
-            g.jump()
+        _advance(g, stream << 128)  # stream jumps of 2^128 steps each
         return g
 
     def next_u64(self) -> int:
@@ -81,6 +80,25 @@ class Xoshiro256:
 
     def normal(self) -> float:
         return ppnd16(self.uniform())
+
+    def normals(self, count: int) -> list[float]:
+        """`count` calls of normal(), with the state in locals: the same operations, faster."""
+        s0, s1, s2, s3 = self.s
+        mask, scale, ppnd = MASK, _TWO_M52, ppnd16
+        out = []
+        for _ in range(count):
+            x = (s1 * 5) & mask
+            result = ((((x << 7) | (x >> 57)) & mask) * 9) & mask
+            t = (s1 << 17) & mask
+            s2 ^= s0
+            s3 ^= s1
+            s1 ^= s2
+            s0 ^= s3
+            s2 ^= t
+            s3 = ((s3 << 45) | (s3 >> 19)) & mask
+            out.append(ppnd(((result >> 12) + 0.5) * scale))
+        self.s = [s0, s1, s2, s3]
+        return out
 
 
 def _horner(coefficients: tuple[float, ...], r: float) -> float:
@@ -114,10 +132,78 @@ def inverse_normal(ps: Sequence[float]) -> list[float]:
     return [ppnd16(p) for p in ps]
 
 
-def _advanced(seed: int, stream: int, skip: int) -> Xoshiro256:
-    g = Xoshiro256.seeded(seed, stream)
-    for _ in range(skip):
+# Advancing by k steps. The xoshiro256 step is linear over GF(2), so advancing k steps is
+# P(T) applied to the state, with P = x^k mod p and p the characteristic polynomial of T. That is
+# how jump() works too; it gives the same state as k calls of next_u64, in about 256 steps.
+
+def _min_poly() -> int:
+    """p(x) as an int (bit i is the coefficient of x^i), by Berlekamp-Massey on 512 output bits."""
+    g = Xoshiro256(_splitmix_words(1, 4))
+    bits = []
+    for _ in range(512):
+        bits.append(g.s[0] & 1)
         g.next_u64()
+    c, b, length, m = 1, 1, 0, 1  # connection polynomials, with bit i the coefficient of x^i
+    for n, bit in enumerate(bits):
+        d = bit
+        for i in range(1, length + 1):
+            d ^= ((c >> i) & 1) & bits[n - i]
+        if d == 0:
+            m += 1
+        elif 2 * length <= n:
+            c, b, length, m = c ^ (b << m), c, n + 1 - length, 1
+        else:
+            c ^= b << m
+            m += 1
+    if length != 256:  # never: the xoshiro256 polynomial is primitive of degree 256
+        raise AssertionError(f"minimal polynomial of degree {length}")
+    # c is the connection polynomial; its reverse is the characteristic polynomial.
+    return int(format(c, "0257b")[::-1], 2)
+
+
+_POLY: list[int] = []
+
+
+def _x_power_mod(k: int) -> int:
+    if not _POLY:
+        _POLY.append(_min_poly())
+    p, top = _POLY[0], 1 << 256
+    r = 1
+    for bit in format(k, "b"):
+        # square r: spread its bits (a carry-less square), then reduce
+        sq, i, x = 0, 0, r
+        while x:
+            if x & 1:
+                sq |= 1 << (2 * i)
+            x >>= 1
+            i += 1
+        r = sq
+        if bit == "1":
+            r <<= 1
+        for j in range(r.bit_length() - 1, 255, -1):
+            if (r >> j) & 1:
+                r ^= p << (j - 256)
+        assert r < top
+    return r
+
+
+def _advance(g: Xoshiro256, k: int) -> None:
+    if k < 512:
+        for _ in range(k):
+            g.next_u64()
+        return
+    poly, n = _x_power_mod(k), [0, 0, 0, 0]
+    for b in range(256):
+        if (poly >> b) & 1:
+            for i in range(4):
+                n[i] ^= g.s[i]
+        g.next_u64()
+    g.s = n
+
+
+def _advanced(seed: int, stream: int, skip: int) -> Xoshiro256:
+    g = Xoshiro256(_splitmix_words(seed, 4))
+    _advance(g, (stream << 128) + skip)  # a jump is 2^128 steps
     return g
 
 
@@ -133,7 +219,7 @@ def uniforms(seed: int, stream: int, count: int, skip: int = 0) -> list[float]:
 
 def normals(seed: int, stream: int, count: int, skip: int = 0) -> list[float]:
     g = _advanced(seed, stream, skip)
-    return [g.normal() for _ in range(count)]
+    return g.normals(count)
 
 
 def set_state_next_u64(state: Sequence[int], count: int) -> list[int]:

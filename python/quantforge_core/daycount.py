@@ -1,8 +1,7 @@
 """Year fractions (specifications/01-core/daycount.md)."""
-import calendar as _cal
 from datetime import date
 
-from . import calendars
+from . import _cal, calendars
 from .errors import QfError, required
 
 FREQUENCIES = (1, 2, 3, 4, 6, 12)

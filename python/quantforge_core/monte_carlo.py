@@ -15,9 +15,9 @@ def _draws(method: str, paths: int, steps: int, seed: int, stream: int) -> Itera
         for point in sobol.iter_points(steps, paths):
             yield [ppnd16(u) for u in point]
     else:
-        g = Xoshiro256.seeded(seed, stream)
-        for _ in range(paths):
-            yield [g.normal() for _ in range(steps)]
+        draws = Xoshiro256.seeded(seed, stream).normals(paths * steps)  # path-major order
+        for k in range(0, paths * steps, steps):
+            yield draws[k:k + steps]
 
 
 def _mean_and_stderr(samples: Sequence[float]) -> tuple[float, float]:
@@ -57,6 +57,15 @@ def gbm_european(
 
     samples: list[float] = []
     controls: list[float] = []
+    if method == "PLAIN":  # terminal() and payoff() inlined, the same expressions
+        exp = math.exp
+        for zs in _draws(method, paths, steps, seed, stream):
+            log_s = log_spot
+            for z in zs:
+                log_s += drift + vol * (1.0 * z)
+            s_t = exp(log_s)
+            samples.append(discount * max(s_t - strike if call else strike - s_t, 0.0))
+        return _mean_and_stderr(samples)
     for zs in _draws(method, paths, steps, seed, stream):
         s_t = terminal(zs, 1.0)
         if method == "ANTITHETIC":

@@ -38,4 +38,4 @@ Via each operation. Strings are exact; `pv` uses the case's limit.
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
 - [S1] No external convention: the valuation record is this project's contract
-- [S2] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017 (not opened)
+- [S2] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017 (opened 2026-11-07)

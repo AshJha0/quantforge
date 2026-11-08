@@ -53,5 +53,5 @@ is out of scope; a calculation on dates before 2007 needs dates, not instants.
 
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
-- [S1] IANA Time Zone Database (tzdb), zones `Europe/London`, `America/New_York`, `Europe/Berlin` and their summer-time rules (not opened)
+- [S1] IANA Time Zone Database (tzdb), zones `Europe/London`, `America/New_York`, `Europe/Berlin` and their summer-time rules (opened 2026-11-07, iana.org/time-zones)
 - [S2] ISO 8601, date and time representation (instants with offset) (not opened)

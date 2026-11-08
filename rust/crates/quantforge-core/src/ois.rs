@@ -229,7 +229,11 @@ pub fn pv(
 }
 
 /// PV with the periods held fixed, as bumped risk needs.
-pub fn pv_of_legs(legs: &OisLegs, curve: &Curve, trade: &OisTrade) -> Result<f64> {
+pub fn pv_of_legs<C: Discount + ?Sized>(
+    legs: &OisLegs,
+    curve: &C,
+    trade: &OisTrade,
+) -> Result<f64> {
     let (f, a) = legs.legs(curve)?;
     let sign = if trade.pay { 1.0 } else { -1.0 };
     Ok(sign * trade.notional * (f - trade.fixed_rate * a))

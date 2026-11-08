@@ -2,53 +2,15 @@
 the core, which applies the rule checks in spec order. It returns (outputs, diagnostics)."""
 from collections.abc import Callable
 from datetime import date
+from importlib import import_module
 from types import FunctionType, ModuleType, SimpleNamespace
 from typing import Any
 
-from .. import black as _black
-from .. import bonds as _bonds
-from .. import calendars as calendars_module
-from .. import calibration as _calibration
 from .. import compounding as compounding_module
-from .. import conventions as _conventions
 from .. import cos as cos_module
-from .. import credit as _credit
-from .. import csa as _csa
-from .. import curve_fits as _curve_fits
-from .. import curves as _curves
 from .. import data_checks as data_checks_module
-from .. import daycount as daycount_module
-from .. import equity as _equity
-from .. import equity_d as _equity_d
-from .. import futures as _futures
-from .. import fx as _fx
-from .. import hedging as _hedging
-from .. import inflation as _inflation
-from .. import integrate as integrate_module
-from .. import interp as interp_module
-from .. import linalg as linalg_module
-from .. import money as _money
-from .. import monte_carlo as monte_carlo_module
-from .. import ois as _ois
-from .. import overnight as _overnight
-from .. import pde as pde_module
-from .. import projection as _projection
-from .. import rng as rng_module
 from .. import roots as roots_module
-from .. import sabr as _sabr
-from .. import schedules as _schedules
-from .. import sensitivities as _sensitivities
-from .. import smile as _smile
-from .. import snapshot as snapshot_module
-from .. import sobol as sobol_module
-from .. import stage_d3 as _stage_d3
-from .. import stats as stats_module
-from .. import steps as _steps
 from .. import store as store_module
-from .. import timezones as timezones_module
-from .. import usecases as _usecases
-from .. import vol_usecase as _vol_usecase
-from .. import xccy as _xccy
 from ..calendars import TENOR
 from ..daycount import check_conditional
 from ..errors import QfError
@@ -78,11 +40,16 @@ def _pass_gate() -> None:
 
 
 class _Core:
-    def __init__(self, module: ModuleType):
-        self._module = module
+    """A gated core module, imported on first use so that start-up loads only what a stream needs."""
+
+    def __init__(self, name: str):
+        self._name = name
+        self._loaded: ModuleType | None = None
 
     def __getattr__(self, name: str) -> Any:
-        value = getattr(self._module, name)
+        if self._loaded is None:
+            self._loaded = import_module(f"quantforge_core.{self._name}")
+        value = getattr(self._loaded, name)
         if not isinstance(value, FunctionType):
             return value
 
@@ -93,42 +60,42 @@ class _Core:
         return call
 
 
-calendars = _Core(calendars_module)
-compounding = _Core(compounding_module)
-cos = _Core(cos_module)
-data_checks = _Core(data_checks_module)
-daycount = _Core(daycount_module)
-integrate = _Core(integrate_module)
-interp = _Core(interp_module)
-linalg = _Core(linalg_module)
-monte_carlo = _Core(monte_carlo_module)
-pde = _Core(pde_module)
-rng = _Core(rng_module)
-roots = _Core(roots_module)
-snapshot = _Core(snapshot_module)
-sobol = _Core(sobol_module)
-stats = _Core(stats_module)
-store = _Core(store_module)
-timezones = _Core(timezones_module)
+calendars = _Core("calendars")
+compounding = _Core("compounding")
+cos = _Core("cos")
+data_checks = _Core("data_checks")
+daycount = _Core("daycount")
+integrate = _Core("integrate")
+interp = _Core("interp")
+linalg = _Core("linalg")
+monte_carlo = _Core("monte_carlo")
+pde = _Core("pde")
+rng = _Core("rng")
+roots = _Core("roots")
+snapshot = _Core("snapshot")
+sobol = _Core("sobol")
+stats = _Core("stats")
+store = _Core("store")
+timezones = _Core("timezones")
 
 
 _STAGE_B = SimpleNamespace(
     **{
-        m.__name__.rsplit(".", 1)[-1]: _Core(m)
+        m: _Core(m)
         for m in (
-            _calibration, _conventions, _curves, _fx, _hedging, _money, _ois, _projection,
-            _schedules, _sensitivities, _usecases,
+            "calibration", "conventions", "curves", "fx", "hedging", "money", "ois", "projection",
+            "schedules", "sensitivities", "usecases",
         )
     }
 )
 
 
 _STAGE_C = SimpleNamespace(
-    **{m.__name__.rsplit(".", 1)[-1]: _Core(m) for m in (_black, _equity, _sabr, _smile, _vol_usecase)}
+    **{m: _Core(m) for m in ("black", "equity", "sabr", "smile", "vol_usecase")}
 )
 _STAGE_D = SimpleNamespace(
-    **{m.__name__.rsplit(".", 1)[-1]: _Core(m)
-       for m in (_bonds, _credit, _csa, _curve_fits, _equity_d, _futures, _inflation, _overnight, _stage_d3, _steps, _xccy)}
+    **{m: _Core(m)
+       for m in ("bonds", "credit", "csa", "curve_fits", "equity_d", "futures", "inflation", "overnight", "risk_curve", "stage_d3", "steps", "xccy")}
 )
 
 

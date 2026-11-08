@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(quantforge_cpp26 VERSION 0.4.1 LANGUAGES CXX)
+project(quantforge_cpp26 VERSION 0.4.2 LANGUAGES CXX)
 
 include(CTest)
 set(CMAKE_CXX_STANDARD 26)
@@ -47,6 +47,7 @@ add_library(quantforge_core
   src/core/inflation.cpp
   src/core/equity_d.cpp
   src/core/credit.cpp
+  src/core/risk.cpp
   src/core/rng.cpp
   src/core/root.cpp
   src/core/snapshot.cpp
@@ -80,7 +81,7 @@ if(BUILD_TESTING)
     GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024) # v3.16.1
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_stage_b.cpp tests/test_stage_c.cpp tests/test_stage_d.cpp tests/test_bonds.cpp tests/test_stage_d2.cpp tests/test_stage_d3.cpp tests/test_cli_golden.cpp)
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_stage_b.cpp tests/test_stage_c.cpp tests/test_stage_d.cpp tests/test_bonds.cpp tests/test_stage_d2.cpp tests/test_stage_d3.cpp tests/test_cli_golden.cpp tests/test_r2.cpp tests/test_mutants_d.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   if(MINGW)
     target_link_options(quantforge_core_tests PRIVATE -static)

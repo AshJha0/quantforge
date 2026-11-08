@@ -50,5 +50,5 @@ unscrambled. The oracle's own bit code must match both, and did at generation ti
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
 - [S1] Sobol', I. M., "On the distribution of points in a cube and the approximate evaluation of integrals", *USSR Computational Mathematics and Mathematical Physics* 7(4), 1967, 86-112 (not opened)
-- [S2] Joe, S. and Kuo, F. Y., "Constructing Sobol sequences with better two-dimensional projections", *SIAM Journal on Scientific Computing* 30(5), 2008, 2635-2654; direction numbers file `new-joe-kuo-6.21201` (not opened)
+- [S2] Joe, S. and Kuo, F. Y., "Constructing Sobol sequences with better two-dimensional projections", *SIAM Journal on Scientific Computing* 30(5), 2008, 2635-2654; direction numbers file `new-joe-kuo-6.21201` (opened 2026-11-07: UNSW direction-numbers page confirms the file and the paper reference)
 - [S3] Glasserman, P., *Monte Carlo Methods in Financial Engineering*, Springer, 2003, chapter 5 (quasi-Monte Carlo, Gray-code construction) (not opened)

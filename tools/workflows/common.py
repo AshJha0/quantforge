@@ -7,6 +7,7 @@ decimal), curve time (date - as_of) / 365, and differences between numbers.
 import datetime as dt
 import json
 import math
+import os
 import subprocess
 import sys
 import urllib.request
@@ -43,7 +44,9 @@ def case(case_id, operation, inputs):
 
 def batch(cases, impl="python"):
     """One process for all cases. Returns results keyed by case_id; errors are returned, not raised."""
-    impls = json.loads((ROOT / "conformance/runner/implementations.json").read_text(encoding="utf-8"))
+    # QF_IMPLEMENTATIONS points at another implementations file, e.g. CLIs built in WSL (docs/developer-guides/r1-infra.md).
+    config = Path(os.environ.get("QF_IMPLEMENTATIONS", ROOT / "conformance/runner/implementations.json"))
+    impls = json.loads(config.read_text(encoding="utf-8"))
     base, cwd = resolve_command(impls[impl])
     text = "".join(json.dumps(c, separators=(",", ":")) + "\n" for c in cases)
     args = BATCH_ARGS
@@ -108,8 +111,8 @@ class Report:
         tail = ["", "## Data notices", ""] + [f"- {n}" for n in notices] + [""]
         self.dir.mkdir(parents=True, exist_ok=True)
         slug = self.name.lower().replace(" ", "-")
-        (self.dir / f"{slug}.md").write_text("\n".join(head + self.lines + checks + tail), encoding="utf-8")
+        (self.dir / f"{slug}.md").write_text("\n".join(head + self.lines + checks + tail), encoding="utf-8", newline="\n")
         self.data["checks"] = self.checks
-        (self.dir / f"{slug}.json").write_text(json.dumps(self.data, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        (self.dir / f"{slug}.json").write_text(json.dumps(self.data, indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
         print(f"wrote {self.dir / slug}.md: {'FAIL' if bad else 'PASS'}")
         return 1 if bad else 0

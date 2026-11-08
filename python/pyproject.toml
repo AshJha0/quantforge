@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quantforge-core"
-version = "0.4.1"
+version = "0.4.2"
 description = "Quantitative analytics and trading infrastructure"
 requires-python = "==3.15.*"
 dependencies = ["numpy>=2.0"]
@@ -28,7 +28,12 @@ line-length = 100
 
 [tool.mutmut]
 source_paths = ["quantforge_core/"]
-# The other test files read files outside the copy of python/ that mutmut makes.
-tests_dir = ["tests/test_core.py"]
+# Every unit test file. test_conformance.py is left out: it reads datasets/ outside the copy
+# of python/ that mutmut makes. test_core.py reads one spec file, deselected below.
+tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
+             "tests/test_stage_c.py", "tests/test_stage_d.py", "tests/test_stage_d2.py",
+             "tests/test_stage_d3.py", "tests/test_stage_d_rulings.py", "tests/test_typing_paths.py",
+             "tests/test_r1.py", "tests/test_r2.py", "tests/test_fast_paths.py",
+             "tests/test_goldens_stage_d.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
 do_not_mutate = ["quantforge_core/_sobol_data.py"]

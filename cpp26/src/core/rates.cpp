@@ -221,8 +221,15 @@ double Curve::discount(Date d) const {
     const double t = time(d);
     if (t < 0.0) throw Error("E_OUT_OF_RANGE", "the date is before as_of");
     if (t == 0.0) return 1.0;
-    const double s = plain_discount(t);
+    double s = plain_discount(t);
+    if (zero_shift_) s *= std::exp(-zero_shift_(t) * t);
     return jumps_.empty() ? s : s * jump_product(jumps_, d);
+}
+
+Curve Curve::with_zero_shift(std::function<double(double)> s) const {
+    Curve out = *this;
+    out.zero_shift_ = std::move(s);
+    return out;
 }
 
 double Curve::plain_discount(double t) const {

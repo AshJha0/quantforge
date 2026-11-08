@@ -63,8 +63,8 @@ Targets are in `stage-b-targets.md`. Oracle: independent replay, QuantLib `OISRa
 
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
-- [S1] Bank of England, *SONIA key features and policies* (not opened)
-- [S2] Federal Reserve Bank of New York, SOFR and reference-rate production methodology (statement on the Secured Overnight Financing Rate) (not opened)
-- [S3] European Central Bank, *Euro short-term rate (€STR) methodology and policies* (not opened)
+- [S1] Bank of England, *SONIA key features and policies* (opened 2026-11-07)
+- [S2] Federal Reserve Bank of New York, *Additional Information about Reference Rates Administered by the New York Fed*, section "Calculation Methodology for the TGCR, BGCR, and SOFR" (opened 2026-11-07)
+- [S3] European Central Bank, *The euro short-term rate (€STR) methodology and policies* (opened 2026-11-07, title from the PDF; body not read)
 - [S4] ISDA, *2021 ISDA Interest Rate Derivatives Definitions*, overnight compounding Floating Rate Options for SONIA, SOFR and €STR (not opened)
 - [S5] Ametrano, F. M. and Bianchetti, M., "Everything you always wanted to know about multiple interest rate curve bootstrapping but were afraid to ask", SSRN 2219548, 2013 (not opened)

@@ -122,9 +122,9 @@ public final class Credit {
         return roll(t).plusMonths(u == 'Y' ? 12L * n : n).withDayOfMonth(20);
     }
 
-    private record Period(LocalDate start, LocalDate end, LocalDate pay, double alpha) {}
+    record Period(LocalDate start, LocalDate end, LocalDate pay, double alpha) {}
 
-    private static List<Period> periods(LocalDate t, LocalDate maturity) {
+    static List<Period> periods(LocalDate t, LocalDate maturity) {
         if (!maturity.isAfter(t)) {
             throw new QfError("E_INPUT", "maturity is not after the trade date (ruling D52)", "maturity");
         }

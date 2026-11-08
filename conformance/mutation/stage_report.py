@@ -36,8 +36,11 @@ def score_file(lang, path):
     s = d["summary"]
     if lang == "cpp":
         return s["killed"], s["survived"], f"golden only, {s['killed'] + s['survived'] + s['no_build']} of {s['sites']} sites, {s['no_build']} did not build"
+    note = ""
+    if set(s.get("unit_verdicts", {})) == {"mutmut code 33"}:
+        note = "; NO unit tests mapped (mutmut 33 on every mutant): golden only"
     return (s["sample_either_killed"], s["sampled"] - s["sample_either_killed"],
-            f"unit or golden, sample {s['sampled']} of {s['mutants']}; unit-only {s['sample_unit_killed']}, golden-only {s['sample_golden_killed']}")
+            f"unit or golden, sample {s['sampled']} of {s['mutants']}; unit-only {s['sample_unit_killed']}, golden-only {s['sample_golden_killed']}{note}")
 
 
 def pct(k, s):

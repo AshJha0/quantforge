@@ -20,7 +20,7 @@ python conformance/runner/runner.py --impl rust
 `--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Rust run on `r1` at `3f5d97d`, 2026-11-07:
 
 ```
-TOTAL {'cases': 5837, 'pass': 5837, 'fail': 0, 'not_implemented': 0}
+TOTAL {'cases': 5922, 'pass': 5922, 'fail': 0, 'not_implemented': 0}
 ```
 
 ## More on the CLI
@@ -64,6 +64,54 @@ python conformance/runner/batch_check.py --impl rust
 ```
 
 `--skip-run` leaves out the slow per-case `run` comparison.
+
+## R2 risk recipes
+
+The language builds of these operations are landing, so no CLI output is shown yet. Each recipe sends golden cases through batch mode; the expected values are the oracle's, from `datasets/golden/r2/`. This shell function turns golden cases into batch input lines:
+
+```bash
+pick() { python -c "import json,sys; f,ids=sys.argv[1],sys.argv[2:]; [print(json.dumps({'schema_version':'1.0','case_id':c['case_id'],'operation':c['operation'],'inputs':c['inputs']})) for c in json.load(open(f))['cases'] if c['case_id'] in ids]" "$@"; }
+```
+
+### Par risk, `risk.curve.par`
+
+```bash
+pick datasets/golden/r2/risk_r2.json risk_r2-0001 | rust/target/release/quantforge --batch
+```
+
+Expected: `value` -24052.571714570924, `par_dv01` -4806.9447178779665, 2Y bucket -4808.126944588765. Rust CLI output (2026-11-08, `r2`): status `ok`, `value` -24052.571714571273, `par_dv01` -4806.94471788022, 2Y bucket -4808.126944588765, within the case's tolerance class.
+
+### Key-rate risk, `risk.curve.key_rate`
+
+```bash
+pick datasets/golden/r2/risk_r2.json risk_r2-0002 risk_r2-0004 | rust/target/release/quantforge --batch
+```
+
+`risk_r2-0002` is `TRIANGULAR` with key dates on the pillars; `-0004` is `PILLAR` (`key_dates: null`). Both give `zero_dv01` -4913.216280838518; the 2Y bucket is -4802.5944942185415 and -4828.703749426391. Rust CLI output (2026-11-08): both `ok`, `zero_dv01` -4913.216280838518, 2Y buckets -4802.5944942185415 and -4828.703749426391.
+
+### Jacobian, `risk.curve.jacobian`
+
+```bash
+pick datasets/golden/r2/risk_r2.json risk_r2-0031 | rust/target/release/quantforge --batch
+```
+
+Expected: 13 pillar dates, their zero rates, and a lower-triangular 13 by 13 matrix whose first entry is 1.0131265112373748. Rust CLI output (2026-11-08): `ok`, 13 pillars from 2026-11-19, first entry 1.0131265111749248 (6e-11 away, inside the Jacobian tolerance).
+
+### P&L explain, `risk.pnl.explain`
+
+```bash
+pick datasets/golden/r2/pnl_r2.json pnl_r2-0001 pnl_r2-0011 | rust/target/release/quantforge --batch
+```
+
+Expected: `pnl_r2-0001` explained (unexplained 0.7134295024516177, threshold 240.71713873755908); `pnl_r2-0011` not (unexplained -91509.0298994584, threshold 63158.45945421277). Rust CLI output (2026-11-08): `pnl_r2-0001` explained, unexplained 0.713429492531759, threshold 240.71713873782616; `pnl_r2-0011` not explained, unexplained -91509.0299005867, threshold 63158.4594542317.
+
+Over real daily moves, once a build passes the goldens:
+
+```bash
+python tools/workflows/pnl_explain.py --impl rust --years 2025
+```
+
+Check a build with `python conformance/runner/runner.py --impl rust --suite risk_r2`, and `--suite pnl_r2`.
 
 ## Run the daily workflows
 

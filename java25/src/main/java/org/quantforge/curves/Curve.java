@@ -3,6 +3,7 @@ package org.quantforge.curves;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.function.DoubleUnaryOperator;
 import org.quantforge.core.QfError;
 
 /** An immutable discount curve (curve-framework.md). Curve time is always days / 365. */
@@ -16,12 +17,14 @@ public final class Curve implements Discounting {
     private final double[] lnD; // lnD[0] = 0.
     private final double[] z;   // Zero rates, for LINEAR_ZERO; z[0] = z[1].
     private final Jumps jumps;  // lnD holds ln S = ln D - ln J at the pillars.
+    private final DoubleUnaryOperator shift; // Zero-rate shift s(t): D(t) exp(-s(t) t). Null is none.
 
     private Curve(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] lnDf, Jumps jumps) {
         this.asOf = asOf;
         this.interpolation = interpolation;
         this.dates = dates;
         this.jumps = jumps;
+        this.shift = null;
         int n = dates.length;
         t = new double[n + 1];
         lnD = new double[n + 1];
@@ -32,6 +35,32 @@ public final class Curve implements Discounting {
             z[i] = -lnD[i] / t[i];
         }
         z[0] = z[1];
+    }
+
+    private Curve(Curve base, DoubleUnaryOperator shift) {
+        asOf = base.asOf;
+        interpolation = base.interpolation;
+        dates = base.dates;
+        jumps = base.jumps;
+        t = base.t;
+        lnD = base.lnD;
+        z = base.z;
+        this.shift = shift;
+    }
+
+    /**
+     * This curve with a continuously compounded zero-rate shift {@code s(t)} at every date, interpolation and jumps
+     * unchanged (par-and-key-rate.md). Only an unshifted curve can be shifted.
+     */
+    public Curve withZeroShift(DoubleUnaryOperator s) {
+        if (shift != null) {
+            throw new IllegalStateException("curve is already shifted");
+        }
+        return new Curve(this, s);
+    }
+
+    public Interpolation interpolation() {
+        return interpolation;
     }
 
     /** Builds from a curve object, with the spec's checks. */
@@ -87,7 +116,7 @@ public final class Curve implements Discounting {
     public double[] discountFactors() {
         double[] d = new double[dates.length];
         for (int i = 0; i < d.length; i++) {
-            d[i] = Math.exp(lnD[i + 1] + jumps.logFactor(dates[i]));
+            d[i] = Math.exp(lnD[i + 1] - shifted(t[i + 1]) + jumps.logFactor(dates[i]));
         }
         return d;
     }
@@ -98,13 +127,19 @@ public final class Curve implements Discounting {
 
     @Override
     public double discount(LocalDate d) {
-        return Math.exp(logDiscount(time(d)) + jumps.logFactor(d));
+        double time = time(d);
+        return Math.exp(logDiscount(time) - shifted(time) + jumps.logFactor(d));
     }
 
     /** -ln(D)/t, or null at as_of. */
     public Double zeroRate(LocalDate d) {
         double time = time(d);
-        return time == 0.0 ? null : Double.valueOf(-(logDiscount(time) + jumps.logFactor(d)) / time);
+        return time == 0.0 ? null : Double.valueOf(-(logDiscount(time) - shifted(time) + jumps.logFactor(d)) / time);
+    }
+
+    /** s(t) t, the log discount the shift removes. */
+    private double shifted(double time) {
+        return shift == null ? 0.0 : shift.applyAsDouble(time) * time;
     }
 
     private double logDiscount(double time) {

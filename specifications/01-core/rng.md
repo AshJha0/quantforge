@@ -119,6 +119,6 @@ No published jump vector was found, so jump results rest on the oracle's own cod
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
 - [S1] Steele, G. L., Lea, D. and Flood, C. H., "Fast splittable pseudorandom number generators", OOPSLA 2014 (SplitMix64) (not opened)
-- [S2] Blackman, D. and Vigna, S., "Scrambled linear pseudorandom number generators", *ACM Transactions on Mathematical Software* 47(4), 2021 (xoshiro256**, jump function); reference C code at prng.di.unimi.it (not opened)
+- [S2] Blackman, D. and Vigna, S., "Scrambled linear pseudorandom number generators", *ACM Transactions on Mathematical Software* 47(4), 2021 (xoshiro256**, jump function); reference C code at prng.di.unimi.it (reference-code page opened 2026-11-07: xoshiro256** code and SplitMix seeding confirmed; paper details not opened)
 - [S3] Wichura, M. J., "Algorithm AS 241: The percentage points of the normal distribution", *Applied Statistics* 37(3), 1988, 477-484 (PPND16) (not opened)
 - [S4] Glasserman, P., *Monte Carlo Methods in Financial Engineering*, Springer, 2003, chapter 2 (generating random numbers and random variables) (not opened)

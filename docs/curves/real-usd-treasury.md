@@ -2,7 +2,7 @@
 
 <p class="note">Status: Implemented, not Validated. This page uses <strong>real public data</strong>, unlike the rest of the gallery. USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not a SOFR swap curve. Par yields are fitted, not traded: this shows a working pipeline on real inputs, not a tradable curve. Nothing is traded.</p>
 
-Snapshot of 2026-11-06 (fetched 2026-11-07), bootstrapped from commit `af081b9` by Java 0.2.0, C++ 0.2.0, Python 0.4.0, Rust 0.2.0. Four-language agreement: largest discount-factor gap 1.07e-14. Bands: 12 checks, 0 failed.
+Snapshot of 2026-11-06 (fetched 2026-11-07), bootstrapped from commit `3cf8739` by Java 0.4.0, C++ 0.4.1, Python 0.4.0, Rust 0.4.1. Four-language agreement: largest discount-factor gap 1.04e-14. Bands: 12 checks, 0 failed.
 
 ## Why bands
 

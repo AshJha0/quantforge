@@ -67,4 +67,4 @@ Suite `limits`: at the limit and one above, for each row except the `records` x 
 
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
-- [S1] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017, Section 9 (parsers may set limits on size, nesting depth and number range) (not opened)
+- [S1] IETF RFC 8259, *The JavaScript Object Notation (JSON) Data Interchange Format*, 2017, Section 9 (parsers may set limits on size, nesting depth and number range) (opened 2026-11-07)
