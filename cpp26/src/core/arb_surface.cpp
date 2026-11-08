@@ -80,8 +80,8 @@ SviSurfaceCheck svi_surface_check(const std::vector<SviSlice>& sl, const std::ve
     const auto right = [](const Svi& p) { return std::pair{p.b * (1 + p.rho), p.a - p.b * (1 + p.rho) * p.m}; };
     for (std::size_t j = 0; j < sl.size(); ++j) {
         const Svi& p = sl[j].svi;
-        if (left(p).first > 2) c.wings.push_back({j, "LEFT", "LEE"});
-        if (right(p).first > 2) c.wings.push_back({j, "RIGHT", "LEE"});
+        if (left(p).first >= 2) c.wings.push_back({j, "LEFT", "LEE"});
+        if (right(p).first >= 2) c.wings.push_back({j, "RIGHT", "LEE"});
         if (j == 0) continue;
         const Svi& q = sl[j - 1].svi;
         const auto crosses = [](std::pair<double, double> now, std::pair<double, double> before) {
