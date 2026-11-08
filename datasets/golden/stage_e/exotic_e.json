@@ -4386,6 +4386,331 @@
     "synthetic"
    ],
    "description": "negative weight: use Kirk for spreads"
+  },
+  {
+   "case_id": "exotic_e-0120",
+   "operation": "exotic.lookback.floating",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.04999,
+    "vol": 0.25,
+    "option_type": "CALL",
+    "running_extreme": 100.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17.537922755182688
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-40-digits",
+    "analytic-haug"
+   ],
+   "tags": [
+    "lookback",
+    "small-carry",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-10,
+    "reason": "b = 1e-5: the closed form divides by b, so binary64 loses about 5 digits (ruling E-A28)"
+   }
+  },
+  {
+   "case_id": "exotic_e-0121",
+   "operation": "exotic.lookback.floating",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.049999999999000004,
+    "vol": 0.25,
+    "option_type": "CALL",
+    "running_extreme": 100.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "small-carry",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "|b| <= 1e-8 v^2 (ruling E-A28)"
+  },
+  {
+   "case_id": "exotic_e-0122",
+   "operation": "exotic.digital.price",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "strike": 100.0,
+    "option_type": "CALL",
+    "payoff": "ASSET_OR_NOTHING"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "cash is required for both payoffs"
+  },
+  {
+   "case_id": "exotic_e-0123",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 0.7506849315068493,
+    "rate": 0.04,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "strike": 110.0,
+    "barrier": 125.0,
+    "rebate": 3.0,
+    "barrier_type": "UP_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.465596646251086
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "barrier",
+    "up_out",
+    "rebate",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per unit at spot 100: 1e-4 currency units on 100,000 units"
+   }
+  },
+  {
+   "case_id": "exotic_e-0124",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 0.7506849315068493,
+    "rate": 0.04,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "strike": 110.0,
+    "barrier": 125.0,
+    "rebate": 3.0,
+    "barrier_type": "UP_IN",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10.486725534941892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "barrier",
+    "up_in",
+    "rebate",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per unit at spot 100: 1e-4 currency units on 100,000 units"
+   }
+  },
+  {
+   "case_id": "exotic_e-0125",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 0.7506849315068493,
+    "rate": 0.04,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "strike": 130.0,
+    "barrier": 125.0,
+    "rebate": 1.5,
+    "barrier_type": "UP_OUT",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26.119406838965123
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "barrier",
+    "up_out",
+    "rebate",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per unit at spot 100: 1e-4 currency units on 100,000 units"
+   }
+  },
+  {
+   "case_id": "exotic_e-0126",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 0.7506849315068493,
+    "rate": 0.04,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "strike": 95.0,
+    "barrier": 125.0,
+    "rebate": 1.5,
+    "barrier_type": "UP_IN",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.3867914425685113
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "barrier",
+    "up_in",
+    "rebate",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per unit at spot 100: 1e-4 currency units on 100,000 units"
+   }
+  },
+  {
+   "case_id": "exotic_e-0127",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 0.7506849315068493,
+    "rate": 0.04,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "strike": 75.0,
+    "barrier": 80.0,
+    "rebate": 2.5,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.2050667424490966
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "barrier",
+    "down_out",
+    "rebate",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per unit at spot 100: 1e-4 currency units on 100,000 units"
+   }
+  },
+  {
+   "case_id": "exotic_e-0128",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "expiry_years": 0.7506849315068493,
+    "rate": 0.04,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "strike": 105.0,
+    "barrier": 80.0,
+    "rebate": 2.5,
+    "barrier_type": "DOWN_IN",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.936199514938804
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "barrier",
+    "down_in",
+    "rebate",
+    "ruling",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-10,
+    "reason": "1e-9 per unit at spot 100: 1e-4 currency units on 100,000 units"
+   }
   }
  ]
 }

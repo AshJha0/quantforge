@@ -7,12 +7,13 @@ Written by `oracle/python/outside_e_a.py`. A case counts only if QuantLib, built
 | `surf_e` | 0 | 32 | 0% |
 | `lv_e` | 16 | 43 | 37% |
 | `fxs_e` | 114 | 125 | 91% |
-| `heston_e` | 18 | 38 | 47% |
+| `heston_e` | 27 | 47 | 57% |
 | `slv_e` | 0 | 8 | 0% |
-| `exotic_e` | 103 | 119 | 87% |
-| `american_e` | 12 | 45 | 27% |
+| `exotic_e` | 110 | 128 | 86% |
+| `american_e` | 12 | 46 | 26% |
+| `rulings_e_a` | 1 | 17 | 6% |
 | partly outside, not counted | 16 | | |
-| **spec A total** | **263** | **410** | **64.1%** |
+| **spec A total** | **280** | **446** | **62.8%** |
 
 Operations with no QuantLib route:
 
