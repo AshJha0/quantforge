@@ -1,6 +1,6 @@
 # Stage E rulings, spec B (E4, E6, E7, E8)
 
-Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`garch.md`, `variance-swaps.md`, `vix-index.md`, `rates-vol-cube.md`, `06-risk/correlation.md` and the E8 pages as they land), and wins where it is more exact. Spec A's rulings are in `stage-e-rulings.md` with prefix E-A; the two sets do not overlap.
+Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`garch.md`, `variance-swaps.md`, `vix-index.md`, `rates-vol-cube.md`, `06-risk/correlation.md` and `04-pricing/credit-options-and-copulas.md`), and wins where it is more exact. Spec A's rulings are in `stage-e-rulings.md` with prefix E-A; the two sets do not overlap.
 
 ## E7 rulings
 
@@ -34,6 +34,16 @@ Spec version 1.0.0. Normative: this page is part of every stage E spec B page (`
 | E-B20 | Implied correlation range | Not clipped: a value above 1 or below -1 says the quotes are inconsistent, and the caller should see it |
 | E-B21 | Dispersion notionals | Variance notionals `N w_i / (2 K_i)` on members (long) and `N / (2 K_I)` on the index (short): vega-weighted at the strikes. Realised variance per `variance-swaps.md` is an input here (as realised vols) |
 
+## E8 rulings
+
+| # | Point | Ruling |
+|---|---|---|
+| E-B22 | CDS option underlying | A stylised forward CDS, not the ISDA standard model of `credit.md`: quarterly from expiry on the same day of month, unadjusted, no calendar; flat continuous rate and hazard on ACT/365F; default at the period mid date `a + floor((b - a)/2)` days; premium ACT/360 paid at period end if alive; accrual on default ACT/360 from period start to the mid date. This is QuantLib's `MidPointCdsEngine` (accrual to the mid date, checked against its numbers); half the period accrual is a different, also common choice that misses by about 1e-7 in spread |
+| E-B23 | Front-end protection and implied vol | Added only to payers with `knock_out = false`, as `N (1 - R) (1 - S(expiry)) P(expiry)`; receivers never get it (a defaulted name's receiver is not exercised). `front_end_protection` is always reported. Implied vol is defined for knock-out options only, so the front-end term cannot be confused with option value |
+| E-B24 | Copula functions | Bivariate normal and bivariate t CDFs to 1e-12 absolute plus 1e-9 relative, any method. The t copula uses one `nu` for both margins and a scale matrix with off-diagonal `rho`; at `rho = 0` it is not independence, and the goldens pin that |
+| E-B25 | LHP closed form | Expected tranche loss through `E[min(P(M), k)] = p - Phi_2(c, m*; sqrt(rho)) + k Phi(m*)`; attachment points scaled by `1 - R`; `rho` is the asset correlation (factor loading `sqrt(rho)`). Fixed quadrature is allowed if split at `m*` |
+| E-B26 | Credit oracle split | CDS options count against QuantLib's `CdsOption` engines; Gaussian copula and LHP count at formula level against QuantLib's bivariate normal, with the quantile refined by one Newton step in QuantLib's own normal functions; the t copula is internal only |
+
 ## R5 audit rulings on E7 (2026-11-08)
 
 From `R5_STAGE_E_AUDIT.md` (plan repository), items 1, 4, 6, 7, 8 and 9.
@@ -47,6 +57,6 @@ From `R5_STAGE_E_AUDIT.md` (plan repository), items 1, 4, 6, 7, 8 and 9.
 
 ## Oracle coverage
 
-Outside-oracle cases are verified by `oracle/python/outside_e_b.py` against QuantLib 1.44, every convention object taken from `oracle/python/qf_oracle/convmap_e_b.py` (reviewed copy `oracle/CONVENTION_MAP_E_B.md`), with one register row per counted case in `oracle/outside_register_e_b.json` (library, version, convention rows, review state). The stage E floor of 60% applies to spec B's suites taken together once E4, E6 and E8 land; the running share is in `program/STAGE_E_HANDOVER_B.md`.
+Outside-oracle cases are verified by `oracle/python/outside_e_b.py` against QuantLib 1.44, every convention object taken from `oracle/python/qf_oracle/convmap_e_b.py` (reviewed copy `oracle/CONVENTION_MAP_E_B.md`), with one register row per counted case in `oracle/outside_register_e_b.json` (library, version, convention rows, review state). Spec B, all four slices: 145 of 268 cases (54.1%). Stage-wide with spec A (263 of 410 at its commit b11809f, from its own register and goldens): 408 of 678 (60.2%), just over the 60% floor.
 
 E4: all 35 non-error cases are outside-checked (70% of the suite, errors in the denominator). E7 alone is below the floor (18 of 84 cases, 21.4%, after the R5 additions, which are error cases and non-QuantLib VIX cases), for stated reasons: QuantLib's Python wheel has no `Garch11` and no VIX method. Those suites are pinned by hand cases, 50-digit or exact-rational replicas, and a separately written float replay, and carry most of the 78 caught wrong-convention checks.
