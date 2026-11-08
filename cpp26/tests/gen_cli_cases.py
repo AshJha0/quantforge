@@ -27,13 +27,18 @@ for op in sorted(per_op):
         if e["status"] == "ok":
             if ok >= 2:
                 continue
-            ok += 1
-            if c.get("output_classes") or c.get("extra_checks") or len(json.dumps(e["outputs"])) > MAX_INPUT:
+            if c.get("extra_checks") or len(json.dumps(e["outputs"])) > MAX_INPUT:
                 continue
+            ok += 1
             cls, lim = classes[c["tolerance_class"]], c.get("tolerance_limit") or {}
             exact = cls.get("exact", False)
             a = 0.0 if exact else lim.get("absolute", cls.get("absolute"))
             r = 0.0 if exact else lim.get("relative", cls.get("relative", 0.0))
+            # Per-output classes (ruling E-B14): one tolerance per case here, so take the loosest.
+            for name in set((c.get("output_classes") or {}).values()):
+                oc = classes[name]
+                if not oc.get("exact", False):
+                    a, r = max(a, oc.get("absolute") or 0.0), max(r, oc.get("relative", 0.0))
             rows.append((text, "ok", json.dumps(e["outputs"], separators=(",", ":")),
                          float(a), float(r)))
         elif e["error_code"] not in seen and len(seen) < 2:

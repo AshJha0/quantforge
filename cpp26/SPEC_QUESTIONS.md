@@ -89,7 +89,7 @@ Each is answered here with the most conservative reading; none changes a golden 
 
 E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `variance-swaps.md`, `vix-index.md`). Every golden passes, so none of these is pinned against a golden case.
 
-1. **VIX selection leaves only `K0`.** If zero bids exclude every neighbour of `K0`, `dK` is undefined. Written as `E_INPUT` ("fewer than 2 strikes are selected"). The spec has no rule for it.
+1. **VIX selection.** Settled by ruling E-B15: no selected out-of-the-money put, or no selected out-of-the-money call, is `E_INPUT` (puts are checked first).
 2. **VIX zero-bid count.** The count of consecutive zero bids starts afresh on each side, from the first strike beyond `K0`. `K0`'s own bids never count.
 3. **`vol.vix.index` check order.** After schema, the `N1 < N2`, `N1 <= 43200 <= N2` rule is checked before either term's own checks (near first, then next).
 4. **`vol.varswap.fair_strike` `K_min`.** `K_min - dk <= 0` uses the lowest put strike (the put walk's extension).
@@ -98,3 +98,5 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 7. **Dupire at a point.** `w_T <= 0` is tested before `g <= 0`. Both give `E_ARBITRAGE`, so only the message differs.
 8. **E3 common checks, order.** The common checks run in input order: `spot`, `strike`, `expiry_years`, `vol`, `notional`. `fx.delta.to_strike` then checks the sign of `delta`, then its reachable range. `fx.smile.from_quotes` checks `atm_vol`, then `delta` in `(0, 0.5)`, then `call_vol` and `put_vol`, then each strike solve (so a PA call delta above its maximum is `E_DOMAIN` from that solve).
 9. **E3 PA solves.** Both PA solves bisect in `ln K` to the last representable step. For the PA call, the solve first finds `K*` from `sd N(d2) = n(d2)`, then takes the root between `K*` and `ln F + 40 sd + 2`.
+10. **E4 cube domain.** Every node's SABR parameters are checked (`E_DOMAIN`), not only the four that are interpolated. This runs after the grid checks (`E_INPUT`). It matches the goldens.
+11. **E4 smaller checks.** A negative `vol` is `E_DOMAIN` in the bond-futures, YoY and ZC options; zero is allowed. `ctd_yield` and `ctd_modified_duration` must be above 0 (`E_DOMAIN`), checked after the premium bounds. In `rates.cap.strip`, `start_months` is range-checked after the flat-vol checks.

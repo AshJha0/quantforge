@@ -1063,6 +1063,7 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_r2.inc"
 #include "ops_e1.inc"
 #include "ops_e3.inc"
+#include "ops_e4.inc"
 #include "ops_e7.inc"
 
 // ---- dispatch ----
@@ -1073,6 +1074,12 @@ const std::map<string, Handler, std::less<>>& table() {
     static const std::map<string, Handler, std::less<>> t = {
 #include "ops_c_table.inc"
 #include "ops_d_table.inc"
+        {"infl.cap.yoy_price", op_yoy_cap_price},
+        {"infl.cap.zc_price", op_zc_cap_price},
+        {"rates.bondfut.implied_vol", op_bondfut_implied_vol},
+        {"rates.bondfut.option_price", op_bondfut_option_price},
+        {"rates.cap.strip", op_cap_strip},
+        {"rates.swaption.price_cube", op_swaption_price_cube},
         {"fx.atm.strike", op_fx_atm_strike},
         {"fx.delta.from_strike", op_fx_delta_from_strike},
         {"fx.delta.to_strike", op_fx_delta_to_strike},

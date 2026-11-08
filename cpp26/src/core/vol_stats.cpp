@@ -305,6 +305,7 @@ VixTermResult vix_term_variance(const VixTerm& term) {
         zeros = 0;
         sel.emplace_back(q[i].strike, pmid(std::size_t(i)));
     }
+    if (sel.empty()) throw Error("E_INPUT", "every out-of-the-money put is excluded", "strip");
     std::ranges::reverse(sel);
     sel.emplace_back(q[i0].strike, (cmid(std::size_t(i0)) + pmid(std::size_t(i0))) / 2.0);
     zeros = 0;
@@ -316,7 +317,7 @@ VixTermResult vix_term_variance(const VixTerm& term) {
         zeros = 0;
         sel.emplace_back(q[i].strike, cmid(i));
     }
-    if (sel.size() < 2) throw Error("E_INPUT", "fewer than 2 strikes are selected", "strip");
+    if (sel.back().first == q[i0].strike) throw Error("E_INPUT", "every out-of-the-money call is excluded", "strip");
 
     VixTermResult out;
     out.forward = fwd;
