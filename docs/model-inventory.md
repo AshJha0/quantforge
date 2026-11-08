@@ -180,3 +180,30 @@ Each entry gives: purpose; inputs; known limitations; validation status; use res
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.
+
+## Stage E, spec A
+
+Entries added by the stage E spec A session. Status is "Specified" until the four builds pass; outside-checked counts are from `oracle/outside_register_e_a.json`.
+
+| # | Model | Spec | Stage | Status | Outside-checked |
+|---|---|---|---|---|---|
+| ME-A1 | SVI surface arbitrage checks, SSVI to SVI, SVI surface fit | `05-volatility/arb-free-surfaces.md` | E1 | Specified, outside-checked | `vol.svi.surface_check` 9 of 9 value cases |
+| ME-A2 | Dupire local vol on SVI slices | `05-volatility/local-and-forward-vol.md` | E1 | Specified | none (40-digit independent route) |
+| ME-A3 | Forward vol, smile dynamics, vol of vol | `05-volatility/local-and-forward-vol.md` | E1 | Specified, outside-checked | 22 of 22 value cases |
+
+### ME-A1 SVI surface checks and fit
+- **Purpose:** reject SVI surfaces with butterfly, calendar or wing arbitrage before they reach pricing.
+- **Inputs:** SVI slices by expiry; a check grid in forward log-moneyness.
+- **Limitations:** checks the grid and the asymptotes only, not every `k` between grid points. The fit reports arbitrage but does not remove it (ruling E-A3).
+- **Validation:** QuantLib `SviSmileSection` and its density; published Vogt counterexample. **Review:** 2026-11-08.
+
+### ME-A2 Dupire local vol
+- **Purpose:** local vol from an SVI-slice surface, as input to local-vol and SLV pricing.
+- **Limitations:** total variance is linear in time between slices, so local vol jumps at slice dates; `w_T` is one-sided at nodes. Undefined (`E_ARBITRAGE`) where the surface has arbitrage. No rates term structure: forward log-moneyness only.
+- **Validation:** closed form against a 40-digit price-based Dupire. No outside library. **Review:** 2026-11-08.
+
+### ME-A3 Forward vol, smile dynamics, vol of vol
+- **Purpose:** forward vol between expiries; scenario repricing under sticky-strike or sticky-delta; a historical vol-of-vol measure.
+- **Limitations:** smile dynamics are the two textbook regimes only, at fixed expiry; no sticky-local-vol regime, no time decay. Vol of vol is historical, not implied (no VVIX-style index; that is spec B's E-slice for VIX-style indices).
+- **Validation:** QuantLib `BlackVarianceCurve`, `SviSmileSection`, `blackFormula`, `BlackCalculator`, `IncrementalStatistics`. **Review:** 2026-11-08.
+
