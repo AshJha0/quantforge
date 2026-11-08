@@ -350,3 +350,29 @@ def _slv(i: Inputs) -> Any:
     args = (i.real("spot"), i.real("expiry_years"), i.real("rate"), i.real("dividend_yield"),
             _heston(i), _slices(i), grid)
     return E.heston.slv_leverage(*args)
+
+
+# E6: correlation (06-risk/correlation.md)
+
+@op("risk.corr.validate")
+def _corr_validate(i: Inputs) -> Any:
+    return E.correlation.validate(i.matrix("matrix"))
+
+
+@op("risk.corr.nearest")
+def _corr_nearest(i: Inputs) -> Any:
+    matrix, distance = E.correlation.nearest(i.matrix("matrix"))
+    return {"matrix": matrix, "frobenius_distance": distance}
+
+
+@op("risk.corr.implied")
+def _corr_implied(i: Inputs) -> Any:
+    args = (i.reals("weights"), i.reals("vols"), i.real("index_vol"))
+    return {"correlation": E.correlation.implied(*args)}
+
+
+@op("risk.corr.dispersion")
+def _corr_dispersion(i: Inputs) -> Any:
+    args = (i.reals("weights"), i.reals("vol_strikes"), i.real("index_vol_strike"),
+            i.reals("realized_vols"), i.real("index_realized_vol"), i.real("vega_notional"))
+    return E.correlation.dispersion(*args)
