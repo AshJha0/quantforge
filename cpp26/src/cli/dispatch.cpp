@@ -44,6 +44,7 @@
 #include "quantforge/core/timezone.hpp"
 #include "quantforge/core/arb_surface.hpp"
 #include "quantforge/core/fx_smile.hpp"
+#include "quantforge/core/correlation.hpp"
 #include "quantforge/core/heston.hpp"
 #include "quantforge/core/vol_stats.hpp"
 #include "test_functions.hpp"
@@ -1066,6 +1067,7 @@ void op_store_chain(const In& in, Out& out) {
 #include "ops_e2.inc"
 #include "ops_e3.inc"
 #include "ops_e4.inc"
+#include "ops_e6.inc"
 #include "ops_e7.inc"
 
 // ---- dispatch ----
@@ -1092,6 +1094,10 @@ const std::map<string, Handler, std::less<>>& table() {
         {"vol.heston.price", op_heston_price},
         {"vol.merton.price", op_merton_price},
         {"vol.slv.leverage", op_slv_leverage},
+        {"risk.corr.dispersion", op_corr_dispersion},
+        {"risk.corr.implied", op_corr_implied},
+        {"risk.corr.nearest", op_corr_nearest},
+        {"risk.corr.validate", op_corr_validate},
         {"vol.forward.vol", op_forward_vol},
         {"vol.local.dupire", op_local_dupire},
         {"vol.smile.dynamics", op_smile_dynamics},
