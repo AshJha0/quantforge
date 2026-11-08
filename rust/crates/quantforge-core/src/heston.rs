@@ -303,7 +303,7 @@ pub struct Leverage {
 }
 
 /// Tridiagonal solve by the Thomas algorithm: `lo[k] p[k-1] + di[k] p[k] + up[k] p[k+1] = rhs[k]`.
-fn thomas(lo: &[f64], di: &[f64], up: &[f64], rhs: &mut [f64]) {
+pub(crate) fn thomas(lo: &[f64], di: &[f64], up: &[f64], rhs: &mut [f64]) {
     let n = rhs.len();
     let mut c = vec![0.0; n];
     c[0] = up[0] / di[0];

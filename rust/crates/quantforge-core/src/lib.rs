@@ -24,6 +24,7 @@ pub mod daycount;
 pub mod equity;
 pub mod equity_d;
 pub mod error;
+pub mod exotics;
 pub mod fx;
 pub mod fx_smile;
 pub mod garch;

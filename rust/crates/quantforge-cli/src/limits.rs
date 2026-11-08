@@ -78,6 +78,16 @@ fn operation_above(op: &str, i: &Json) -> bool {
                 || g("nv").is_some_and(|n| n > 1000)
                 || g("nt").is_some_and(|n| n > 10_000)
         }
+        "exotic.american.crr" => above(i, "steps", 20_000),
+        "exotic.american.fd" => {
+            let g = |k: &str| {
+                i.get("grid")
+                    .and_then(|g| g.get(k))
+                    .and_then(Json::as_int)
+                    .map(i128::from)
+            };
+            g("nx").is_some_and(|n| n > 1001) || g("nt").is_some_and(|n| n > 10_000)
+        }
         "vol.local.dupire" => {
             len(i, "slices").is_some_and(|n| n > 100)
                 || len(i, "points").is_some_and(|n| n > 10_000)
