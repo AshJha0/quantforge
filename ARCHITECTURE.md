@@ -69,3 +69,16 @@ Formally, `specifications/06-risk/par-and-key-rate.md` defines a `product` objec
 
 Worked example: `risk_r2-0001` revalues a 2Y receiver 29 times (value, a central pair for the parallel bump, and a central pair for each of 13 quotes), each through the same `rates.ois.pv` the stage B goldens test.
 
+### Stage E, spec B: rates vol, correlation, GARCH and variance, credit options (v0.5, in progress)
+
+Plain idea: stage E adds models on top of the stage D curves and pricers, not beside them. A swaption cube is the D7 swaption with a vol that depends on strike and node; a caplet strip is D7's cap priced many times; a CDS option is a forward CDS inside Black's formula. Correlation and variance work is closed form or a fixed convex problem.
+
+Formally, spec B owns 22 operations in four groups, each with its own spec page and suite (`specifications/cli-contract.md`, section "Stage E operations, spec B"):
+- **E4** `rates.swaption.price_cube`, `rates.cap.strip`, `rates.bondfut.*`, `infl.cap.*` (`05-volatility/rates-vol-cube.md`, suite `ratesvol_e`);
+- **E6** `risk.corr.*` (`06-risk/correlation.md`, suite `corr_e`);
+- **E7** `vol.garch.*`, `vol.varswap.*`, `vol.vix.*` (`garch.md`, `variance-swaps.md`, `vix-index.md`; suites `garch_e`, `varswap_e`, `vix_e`);
+- **E8** `credit.cdsoption.*`, `credit.copula.joint_default`, `credit.lhp.*` (`04-pricing/credit-options-and-copulas.md`, suite `creditopt_e`).
+
+No new error code and no wire-format change; `E_ARBITRAGE` (stage C) is reused for cap quotes that cannot be stripped. Four operations iterate (`vol.garch.fit`, `rates.cap.strip`, the two implied vols) and one converges (`risk.corr.nearest`); each is judged on what it must achieve (repricing, the objective, or a convergence tolerance), never on an iteration path (rulings E-B10, E-B16, E-B18). Goldens give non-money outputs their own tolerance through `output_classes` (ruling E-B14). On the oracle side, `oracle/python/gen_stage_e_b*.py` write the goldens, and `oracle/python/outside_e_b.py` re-prices them in QuantLib through the separate convention table `oracle/CONVENTION_MAP_E_B.md` (plan rule 11.2.5).
+
+Worked example: `ratesvol_e-0006` touches four layers: the stage B curves (input), the D7 swap schedule and annuity (4.27337), the E4 parameter interpolation (`rho = -0.27995` between nodes), the stage C Hagan formula (vol 25.27%) and the D7 Black swaption price (205,137.03 on 10m). Status: specified, goldens written, language builds in progress; 145 of 268 cases outside-checked (`specifications/05-volatility/stage-e-targets-b.md`).
