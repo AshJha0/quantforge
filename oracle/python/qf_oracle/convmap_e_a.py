@@ -48,6 +48,17 @@ ROWS = {
                                                                   ql.YieldTermStructureHandle(ql.FlatForward(ref, rd, ql.Actual365Fixed(), ql.Continuous)),
                                                                   ql.BlackVolTermStructureHandle(ql.BlackConstantVol(ref, ql.NullCalendar(), v, ql.Actual365Fixed()))),
               "Garman-Kohlhagen is BlackScholesMertonProcess with the foreign curve as dividend curve (the SWIG wheel has no GarmanKohlhagenProcess); engine AnalyticEuropeanEngine; vega per unit vol"),
+    # E2
+    "TS.FLAT_CONT": ("05-volatility/heston-family.md flat continuous r, q on ACT/365F; expiry days/365",
+                     lambda ref, r: ql.YieldTermStructureHandle(ql.FlatForward(ref, r, ql.Actual365Fixed(), ql.Continuous)), ""),
+    "HESTON.PROCESS": ("05-volatility/heston-family.md heston {v0, kappa, theta, xi, rho}",
+                       lambda rt, qt, S, h: ql.HestonProcess(rt, qt, ql.QuoteHandle(ql.SimpleQuote(S)), h["v0"], h["kappa"], h["theta"], h["xi"], h["rho"]),
+                       "QuantLib argument order (v0, kappa, theta, sigma, rho); sigma = xi"),
+    "HESTON.ENGINE": ("05-volatility/heston-family.md Lewis price, target 1e-8", lambda m: ql.AnalyticHestonEngine(m, 1e-13, 1000000), "adaptive Gauss-Lobatto, relative 1e-13"),
+    "BATES.PROCESS": ("05-volatility/heston-family.md jumps {intensity, mean_log_jump, log_jump_vol}, compensated",
+                      lambda rt, qt, S, h, j: ql.BatesProcess(rt, qt, ql.QuoteHandle(ql.SimpleQuote(S)), h["v0"], h["kappa"], h["theta"], h["xi"], h["rho"], j["intensity"], j["mean_log_jump"], j["log_jump_vol"]),
+                      "QuantLib (lambda, nu, delta): nu is the mean of ln(1+J)"),
+    "BATES.ENGINE": ("05-volatility/heston-family.md Bates price", lambda m: ql.BatesEngine(m, 1e-13, 1000000), ""),
 }
 
 
