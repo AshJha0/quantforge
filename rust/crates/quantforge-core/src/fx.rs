@@ -55,15 +55,15 @@ impl FxMarket {
         spot_date(&self.pair, self.as_of)
     }
 
-    fn growth(&self, curve: &Curve, sp: Date, t: Date) -> Result<f64> {
+    fn growth(curve: &Curve, sp: Date, t: Date) -> Result<f64> {
         Ok(curve.discount(t)? / curve.discount(sp)?)
     }
 
     fn forward(&self, t: Date) -> Result<f64> {
         let sp = self.spot_settlement()?;
         let (a, b) = (
-            self.growth(&self.base, sp, t)?,
-            self.growth(&self.quote, sp, t)?,
+            Self::growth(&self.base, sp, t)?,
+            Self::growth(&self.quote, sp, t)?,
         );
         Ok(self.spot * a / b)
     }
@@ -116,8 +116,8 @@ impl FxMarket {
                 return fail("E_INPUT", "points are not in tenor order");
             }
             let f = self.spot + p * self.pair.pip;
-            let ratio = f / self.spot * self.growth(&self.quote, sp, t)?;
-            let a = self.growth(&self.base, sp, t)?;
+            let ratio = f / self.spot * Self::growth(&self.quote, sp, t)?;
+            let a = Self::growth(&self.base, sp, t)?;
             let tau = (t.serial() - sp.serial()) as f64 / 365.0;
             out.push((t, ratio, 10000.0 * (-ratio.ln() / tau + a.ln() / tau)));
         }

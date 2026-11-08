@@ -69,9 +69,8 @@ impl CpiInput {
 
 /// The curve fields; `seasonality` is a required key that may be `null`.
 fn cpi_input(i: &Inputs) -> Result<CpiInput> {
-    let base = match month_of(i.str("base_month")?) {
-        Some(m) => m,
-        None => return i.fail("base_month", "expected YYYY-MM"),
+    let Some(base) = month_of(i.str("base_month")?) else {
+        return i.fail("base_month", "expected YYYY-MM");
     };
     let base_cpi = i.f64("base_cpi")?;
     let mut quotes = Vec::new();
@@ -666,9 +665,8 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
             let (y, base) = (i.f64("real_yield")?, i.f64("base_ref_cpi")?);
             let mut fx = Vec::new();
             for f in items(i, "cpi_fixings")? {
-                let m = match month_of(f.str("month")?) {
-                    Some(m) => m,
-                    None => return f.fail("month", "expected YYYY-MM"),
+                let Some(m) = month_of(f.str("month")?) else {
+                    return f.fail("month", "expected YYYY-MM");
                 };
                 fx.push((m, f.f64("value")?));
             }
@@ -741,9 +739,8 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "cmdty.curve.forward" => {
             let mut q = Vec::new();
             for x in items(i, "quotes")? {
-                let m = match month_of(x.str("month")?) {
-                    Some(m) => m,
-                    None => return x.fail("month", "expected YYYY-MM"),
+                let Some(m) = month_of(x.str("month")?) else {
+                    return x.fail("month", "expected YYYY-MM");
                 };
                 q.push((m, x.f64("price")?));
             }

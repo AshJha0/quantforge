@@ -381,7 +381,7 @@ mod tests {
     #[test]
     fn commodity_curve_and_carry() {
         let q = [(100, 3.0), (103, 3.3)];
-        let s: Vec<f64> = (0..12).map(|i| i as f64 * 0.01).collect();
+        let s: Vec<f64> = (0..12).map(|i| f64::from(i) * 0.01).collect();
         let f = commodity_forwards(&q, Some(&s), &[100, 103]).unwrap();
         assert!((f[0] - 3.0).abs() < 1e-14 && (f[1] - 3.3).abs() < 1e-14);
         let mid = commodity_forwards(&q, None, &[101]).unwrap()[0];

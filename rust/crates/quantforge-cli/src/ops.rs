@@ -23,6 +23,8 @@ pub struct Outcome {
     pub diagnostics: Json,
 }
 
+// Ops return Result uniformly so the dispatcher can treat them alike.
+#[allow(clippy::unnecessary_wraps)]
 pub fn plain(outputs: Json) -> Result<Outcome> {
     Ok(Outcome {
         outputs,
@@ -847,6 +849,7 @@ fn root_inputs(i: &Inputs) -> Result<(Fun, Fun, Controls)> {
     Ok((f, df, c))
 }
 
+#[allow(clippy::unnecessary_wraps)]
 fn root_result(r: Root) -> Result<Outcome> {
     Ok(Outcome {
         outputs: obj([("root", r.root.into())]),

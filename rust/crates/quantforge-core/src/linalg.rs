@@ -196,3 +196,83 @@ pub fn thomas(lower: f64, diag: f64, upper: f64, rhs: &mut [f64]) {
         rhs[i] -= c[i] * rhs[i + 1];
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn close(a: &[f64], b: &[f64], tol: f64) {
+        assert_eq!(a.len(), b.len());
+        for (x, y) in a.iter().zip(b) {
+            assert!((x - y).abs() <= tol, "{a:?} vs {b:?}");
+        }
+    }
+
+    #[test]
+    fn solve_needs_pivoting_and_rejects_bad_shapes() {
+        let a = vec![
+            vec![0.0, 2.0, 1.0],
+            vec![1.0, 1.0, 0.0],
+            vec![3.0, 0.0, 1.0],
+        ];
+        let x = solve(&a, &[5.0, 3.0, 4.0]).unwrap();
+        close(&x, &[1.0, 2.0, 1.0], 1e-12);
+        assert!(solve(&vec![vec![1.0, 2.0]], &[1.0]).is_err());
+        assert!(solve(&Vec::new(), &[]).is_err());
+        assert!(solve(&vec![vec![1.0, 2.0], vec![2.0, 4.0]], &[1.0, 2.0]).is_err());
+    }
+
+    #[test]
+    fn cholesky_reconstructs_matrix() {
+        let a = vec![
+            vec![4.0, 2.0, 0.4],
+            vec![2.0, 5.0, 1.0],
+            vec![0.4, 1.0, 3.0],
+        ];
+        let l = cholesky(&a).unwrap();
+        for i in 0..3 {
+            for j in 0..3 {
+                let v: f64 = (0..3).map(|k| l[i][k] * l[j][k]).sum();
+                assert!((v - a[i][j]).abs() < 1e-12);
+            }
+            for j in i + 1..3 {
+                assert_eq!(l[i][j], 0.0);
+            }
+        }
+        assert!(cholesky(&vec![vec![1.0, 2.0], vec![2.0, 1.0]]).is_err());
+        assert!(cholesky(&vec![vec![1.0, 0.5], vec![0.4, 1.0]]).is_err());
+    }
+
+    #[test]
+    fn eigenvalues_and_singular_values() {
+        let mut e = eigen_symmetric(&vec![vec![2.0, 1.0], vec![1.0, 2.0]]).unwrap();
+        e.sort_by(f64::total_cmp);
+        close(&e, &[1.0, 3.0], 1e-12);
+        let mut s = singular_values(&vec![vec![3.0, 0.0], vec![0.0, -4.0], vec![0.0, 0.0]]);
+        s.sort_by(f64::total_cmp);
+        close(&s, &[3.0, 4.0], 1e-12);
+    }
+
+    #[test]
+    fn thomas_matches_dense_solve() {
+        let (lo, d, up) = (-1.0, 4.0, -2.0);
+        let rhs = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let n = rhs.len();
+        let dense: Matrix = (0..n)
+            .map(|i| {
+                (0..n)
+                    .map(|j| match j as i64 - i as i64 {
+                        0 => d,
+                        -1 => lo,
+                        1 => up,
+                        _ => 0.0,
+                    })
+                    .collect()
+            })
+            .collect();
+        let want = solve(&dense, &rhs).unwrap();
+        let mut got = rhs;
+        thomas(lo, d, up, &mut got);
+        close(&got, &want, 1e-12);
+    }
+}

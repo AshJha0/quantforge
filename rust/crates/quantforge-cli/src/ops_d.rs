@@ -75,9 +75,8 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "rates.ois.compound_dated" => {
             let c = overnight_record(i);
             let (s, e) = (i.date("start")?, i.date("end")?);
-            let m = match Shift::parse(i.str("method")?) {
-                Some(m) => m,
-                None => return i.fail("method", "unknown method"),
+            let Some(m) = Shift::parse(i.str("method")?) else {
+                return i.fail("method", "unknown method");
             };
             let (k, f) = (i.int("shift_days")?, fixings(i)?);
             i.gate()?;
@@ -145,15 +144,14 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
         "rates.csa.discount" => {
             let (c, s) = (curve_input(i, "curve")?, i.f64("collateral_spread")?);
             present(i, "fx")?;
-            let fx = match i.opt("fx") {
-                None => None,
-                Some(_) => {
-                    let f = sub(i, "fx")?;
-                    Some(CsaFx {
-                        spot: f.f64("spot")?,
-                        forwards: dated(&f, "forwards", "forward")?,
-                    })
-                }
+            let fx = if i.opt("fx").is_none() {
+                None
+            } else {
+                let f = sub(i, "fx")?;
+                Some(CsaFx {
+                    spot: f.f64("spot")?,
+                    forwards: dated(&f, "forwards", "forward")?,
+                })
             };
             let dates = i.dates("dates")?;
             i.gate()?;

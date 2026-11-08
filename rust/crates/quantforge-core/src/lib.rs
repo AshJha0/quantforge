@@ -1,4 +1,4 @@
-//! QuantForge stage A: financial mathematics and shared foundations.
+//! `QuantForge` stage A: financial mathematics and shared foundations.
 //! Written from `specifications/01-core/`. No third-party code.
 #![allow(
     clippy::excessive_precision,

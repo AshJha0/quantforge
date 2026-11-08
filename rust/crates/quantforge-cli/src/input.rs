@@ -186,6 +186,8 @@ impl<'a> Inputs<'a> {
         Ok(s as u32)
     }
 
+    // A method so call sites read `i.fail(key, why)` beside the other field accessors.
+    #[allow(clippy::unused_self)]
     pub fn fail<T>(&self, k: &str, what: &str) -> Result<T> {
         Err(schema(k, what))
     }
