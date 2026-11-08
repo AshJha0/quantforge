@@ -106,6 +106,18 @@ class Recorder(unittest.TestCase):
         self.assertNotIn("SOFR", sources["nyfed-bgcr"]["notice"])
         self.assertNotIn("bankofengland.co.uk/-/media", json.dumps(sources))  # BoE curve zips: third-party inputs, not cleared
 
+    def test_stage_e_sources(self):
+        sources = {s["id"]: s for s in json.loads((ROOT / "tools/recorder/sources.json").read_text(encoding="utf-8"))["sources"]}
+        s = sources["fiscaldata-treasury-auctions"]
+        self.assertTrue(s["enabled"])
+        self.assertTrue(s["terms_checked"].startswith("2026-11-08"))
+        self.assertIn("{year}", s["url"])
+        self.assertNotIn("[", s["url"])  # brackets must be percent-encoded for urllib
+        self.assertIn("held back from git", s["redistribute_raw"])
+        # Not qualified for automated use (stage E survey): FRED scraping ban, Cboe and Deribit personal use only, DMO bot wall
+        for banned in ("cboe.com", "deribit.com", "dmo.gov.uk", "treasurydirect.gov"):
+            self.assertNotIn(banned, json.dumps(sources))
+
     def test_disabled_source_is_skipped(self):
         with tempfile.TemporaryDirectory() as d:
             p, log = self.run_with(d, [self.source("file:///x", enabled=False)])
