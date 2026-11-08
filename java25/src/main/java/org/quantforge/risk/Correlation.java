@@ -228,11 +228,21 @@ public final class Correlation {
 
     /** Weights >= 0 with at least two positive (ruling E-B33); a zero weight drops its name. */
     public static void checkWeights(double[] w) {
-        int positive = 0;
+        checkNonNegative(w);
+        checkTwoPositive(w);
+    }
+
+    public static void checkNonNegative(double[] w) {
         for (double x : w) {
             if (!(x >= 0.0)) {
                 throw new QfError("E_DOMAIN", "weights must not be negative", "weights");
             }
+        }
+    }
+
+    public static void checkTwoPositive(double[] w) {
+        int positive = 0;
+        for (double x : w) {
             if (x > 0.0) {
                 positive++;
             }

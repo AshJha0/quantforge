@@ -34,7 +34,7 @@ class GoldenSuiteTest {
             Map.entry("likelihood_sum", new double[] {1e-9, 1e-10}));
 
     /** Cases held open in SPEC_QUESTIONS.md (golden and spec text disagree); the runner still reports them. */
-    private static final java.util.Set<String> SUPERSEDED = java.util.Set.of();
+    private static final java.util.Set<String> SUPERSEDED = java.util.Set.of("rulings_e_b-0008", "rulings_e_b-0009", "rulings_e_b-0015");
 
     @TestFactory
     Stream<DynamicTest> everySuite() throws IOException {

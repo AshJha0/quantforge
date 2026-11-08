@@ -227,6 +227,9 @@ public final class RatesVol {
         for (int i = 0; i < 200 && g.applyAsDouble(hi) < 0.0; i++) {
             hi *= 2.0;
         }
+        if (!(yield > 0.0) || !(duration > 0.0)) {
+            throw new QfError("E_DOMAIN", "ctd_yield and ctd_modified_duration must be above 0 (ruling E-B38)", "ctd_yield");
+        }
         double v = bisect(g, 0.0, hi);
         return new double[] {v, v / (duration * yield)};
     }
@@ -265,10 +268,13 @@ public final class RatesVol {
     /** {price, strike ratio (1 + K)^T} of a zero-coupon inflation cap or floor (E-B13). */
     public static double[] zcCap(boolean normal, boolean cap, double fwdRatio, double years, double k, double df,
                                  double vol, double notional) {
-        double ratio = Math.pow(1.0 + k, years);
-        if (!normal && (!(ratio > 0.0) || !(fwdRatio > 0.0))) {
-            throw new QfError("E_DOMAIN", "BLACK_76 needs a positive strike and forward", "strike");
+        if (!normal && !(fwdRatio > 0.0)) {
+            throw new QfError("E_DOMAIN", "BLACK_76 needs a positive forward", "forward_index_ratio");
         }
+        if (!(1.0 + k > 0.0)) {
+            throw new QfError("E_DOMAIN", "1 + strike must be above 0 (ruling E-B37)", "strike");
+        }
+        double ratio = Math.pow(1.0 + k, years);
         if (!(years > 0.0)) {
             throw new QfError("E_DOMAIN", "years must be above 0", "years");
         }

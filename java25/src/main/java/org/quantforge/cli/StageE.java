@@ -365,12 +365,13 @@ final class StageE {
             Term near = term(in.object("near"));
             Term next = term(in.object("next"));
             in.gate();
-            VarianceStrip.Term a = VarianceStrip.term(near.minutes, near.rate, near.strip);
-            VarianceStrip.Term b = VarianceStrip.term(next.minutes, next.rate, next.strip);
+            // the bracket reads only the minutes, so it comes before either term's checks (ruling E-B34)
             if (!(near.minutes < next.minutes && near.minutes <= VarianceStrip.MINUTES_30D
                     && VarianceStrip.MINUTES_30D <= next.minutes)) {
                 throw input("near", "terms must bracket 30 days, near before next");
             }
+            VarianceStrip.Term a = VarianceStrip.term(near.minutes, near.rate, near.strip);
+            VarianceStrip.Term b = VarianceStrip.term(next.minutes, next.rate, next.strip);
             return Operations.out("index", VarianceStrip.index(near.minutes, a, next.minutes, b), "near_variance",
                     a.variance(), "next_variance", b.variance());
         });
@@ -459,6 +460,9 @@ final class StageE {
         }
         double t = ChronoUnit.DAYS.between(asOf, mat) / 365.0;
         double fv = VarianceStrip.fairVariance(s0, r, q, t, puts, calls, vol::get, dk);
+        if (fv < 0.0) {
+            throw domain("put_strikes", "replicated variance is below 0 (ruling E-B36)");
+        }
         double pv = nVar * Math.exp(-r * t) * (fv - kVar);
         return Operations.out("fair_variance", fv, "fair_vol", Math.sqrt(fv), "pv", pv);
     }

@@ -36,9 +36,11 @@ final class StageE6 {
             double[] s = in.reals("vols");
             double si = in.gate(in.real("index_vol"));
             Correlation.checkNames(w.length, s.length);
+            // order of ruling E-B39: negative weight, member vols, index_vol, fewer than two positive weights
+            Correlation.checkNonNegative(w);
             Correlation.checkPositive("vols", s);
-            Correlation.checkWeights(w);
             Correlation.checkPositive("index_vol", si);
+            Correlation.checkTwoPositive(w);
             return Operations.out("correlation", Correlation.implied(w, s, si));
         });
         table.put("risk.corr.dispersion", in -> {

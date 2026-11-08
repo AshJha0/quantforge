@@ -33,6 +33,10 @@ final class StageE8 {
         double n = in.real("notional");
         double x = in.real(last);
         boolean ko = in.gate(in.bool("knock_out"));
+        if (last.equals("premium") && !ko) {
+            // the knock-out rule is checked before the dates (ruling E-B40)
+            throw new QfError("E_INPUT", "implied vol is for knock-out options only (ruling E-B23)", "knock_out");
+        }
         CreditOptions.checkOption(a, e, m, h, rec, k);
         return new Option(a, e, m, r, h, rec, payer, k, n, x, ko);
     }
@@ -79,7 +83,7 @@ final class StageE8 {
             if (!(Math.abs(rho) < 1.0)) {
                 throw new QfError("E_DOMAIN", "correlation must be in (-1, 1)", "correlation");
             }
-            if (nu != null && !(nu > 0.0)) {
+            if (c == CreditOptions.Copula.STUDENT_T && !(nu > 0.0)) { // ignored for GAUSSIAN (ruling E-B40)
                 throw new QfError("E_DOMAIN", "degrees_of_freedom must be above 0", "degrees_of_freedom");
             }
             double[] r = CreditOptions.jointDefault(c, p[0], p[1], rho, nu == null ? 0.0 : nu);
@@ -102,6 +106,9 @@ final class StageE8 {
             double rho = in.real("correlation");
             double rec = in.real("recovery");
             double[] x = in.gate(in.reals("losses"));
+            if (x.length == 0) {
+                throw new QfError("E_INPUT", "losses is empty (ruling E-B40)", "losses");
+            }
             CreditOptions.checkPool(p, rho, rec);
             List<Object> out = new ArrayList<>();
             for (double v : x) {
