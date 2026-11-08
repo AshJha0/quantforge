@@ -110,13 +110,14 @@ pub fn cds_option_price(o: &CdsOption, vol: f64) -> Result<CdsOptionPrice> {
 
 /// Knock-out options only (ruling E-B23).
 pub fn cds_option_implied_vol(o: &CdsOption, premium: f64) -> Result<f64> {
-    o.check()?;
+    // Ruling E-B40: the knock-out rule comes before the dates.
     if !o.knock_out {
         return fail(
             "E_INPUT",
             "implied vol is defined for knock-out options only",
         );
     }
+    o.check()?;
     let (f, a, fep) = o.legs();
     let floor = o.value(f, a, fep, 0.0);
     let cap = o.notional * a * if o.payer { f } else { o.strike };

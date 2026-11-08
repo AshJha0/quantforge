@@ -105,6 +105,10 @@ pub fn fair_strike(x: &Replication) -> Result<Fair> {
         )
         .sum();
     let fair_variance = 2.0 / t * ((r - q) * t - (fwd / s0 - 1.0)) + pi / d;
+    if fair_variance.is_nan() || fair_variance < 0.0 {
+        // Ruling E-B36: checked after the replication.
+        return fail("E_DOMAIN", "replicated variance is below 0");
+    }
     Ok(Fair {
         fair_variance,
         fair_vol: fair_variance.sqrt(),

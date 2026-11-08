@@ -175,13 +175,14 @@ pub fn implied(weights: &[f64], vols: &[f64], index_vol: f64) -> Result<f64> {
     if weights.len() < 2 || weights.len() != vols.len() {
         return fail("E_INPUT", "at least two names, one vol each");
     }
+    // Ruling E-B39 order: negative weight, member vols, index_vol, two positive weights (E-B33).
+    if weights.iter().any(|w| w.is_nan() || *w < 0.0) {
+        return fail("E_DOMAIN", "weights must be at least 0");
+    }
     if vols.iter().any(|v| v.is_nan() || *v <= 0.0) || index_vol.is_nan() || index_vol <= 0.0 {
         return fail("E_DOMAIN", "vols must be above 0");
     }
-    // Ruling E-B33: weights >= 0 with at least two positive; a zero weight drops its name.
-    if weights.iter().any(|w| w.is_nan() || *w < 0.0)
-        || weights.iter().filter(|w| **w > 0.0).count() < 2
-    {
+    if weights.iter().filter(|w| **w > 0.0).count() < 2 {
         return fail(
             "E_DOMAIN",
             "weights must be at least 0 with two or more positive",

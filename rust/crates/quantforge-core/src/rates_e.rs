@@ -321,6 +321,13 @@ pub fn futures_implied_vol(
         }
     }
     let v = 0.5 * (lo + hi);
+    if ctd_yield.is_nan() || ctd_yield <= 0.0 || duration.is_nan() || duration <= 0.0 {
+        // Ruling E-B38: after the premium bounds.
+        return fail(
+            "E_DOMAIN",
+            "ctd_yield and ctd_modified_duration must be above 0",
+        );
+    }
     Ok((v, v / (duration * ctd_yield)))
 }
 
@@ -350,6 +357,9 @@ pub fn yoy_caplets(
     {
         return fail("E_DOMAIN", "expiry_years must be above 0");
     }
+    if periods.iter().any(|p| p.vol.is_nan() || p.vol < 0.0) {
+        return fail("E_DOMAIN", "vol must not be negative");
+    }
     periods
         .iter()
         .map(|p| {
@@ -372,8 +382,18 @@ pub struct ZeroCoupon {
 
 /// `(price, strike_ratio)` with `strike_ratio = (1 + K)^T` (ruling E-B13).
 pub fn zc_cap(z: &ZeroCoupon) -> Result<(f64, f64)> {
+    // Ruling E-B37: forward, then 1 + K, then years; E-B38: vol >= 0.
+    if !z.normal && (z.forward_index_ratio.is_nan() || z.forward_index_ratio <= 0.0) {
+        return fail("E_DOMAIN", "BLACK_76 needs a positive forward");
+    }
+    if z.strike.is_nan() || 1.0 + z.strike <= 0.0 {
+        return fail("E_DOMAIN", "1 + strike must be above 0");
+    }
     if z.years.is_nan() || z.years <= 0.0 {
         return fail("E_DOMAIN", "years must be above 0");
+    }
+    if z.vol.is_nan() || z.vol < 0.0 {
+        return fail("E_DOMAIN", "vol must not be negative");
     }
     let ratio = (1.0 + z.strike).powf(z.years);
     let o = option(
@@ -550,6 +570,14 @@ mod tests {
             "E_DOMAIN"
         );
         assert_eq!(
+            futures_implied_vol(&o, p, 0.0, 6.0).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        assert_eq!(
+            futures_implied_vol(&o, p, 0.04, -1.0).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        assert_eq!(
             futures_implied_vol(&o, 200.0, 0.04, 6.0).unwrap_err().code,
             "E_DOMAIN"
         );
@@ -616,6 +644,24 @@ mod tests {
         assert!((r - 1.131408212890625).abs() < 1e-15);
         assert_eq!(
             zc_cap(&ZeroCoupon { years: 0.0, ..z }).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        let code = |z: ZeroCoupon| zc_cap(&z).unwrap_err().code;
+        assert_eq!(code(ZeroCoupon { strike: -1.5, ..z }), "E_DOMAIN");
+        assert_eq!(code(ZeroCoupon { vol: -0.1, ..z }), "E_DOMAIN");
+        assert_eq!(
+            code(ZeroCoupon {
+                forward_index_ratio: 0.0,
+                ..z
+            }),
+            "E_DOMAIN"
+        );
+        assert!(zc_cap(&ZeroCoupon { strike: -0.01, ..z }).is_ok());
+        let neg = YoyPeriod { vol: -0.1, ..per };
+        assert_eq!(
+            yoy_caplets(false, true, 0.03, 1.0, &[neg])
+                .unwrap_err()
+                .code,
             "E_DOMAIN"
         );
     }
