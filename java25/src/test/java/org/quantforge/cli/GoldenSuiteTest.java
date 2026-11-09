@@ -23,6 +23,8 @@ class GoldenSuiteTest {
     private static final Map<String, double[]> CLASSES = Map.ofEntries(
             Map.entry("date_and_convention", new double[0]),
             Map.entry("bit_exact", new double[0]),
+            Map.entry("jacobian", new double[] {1e-9, 1e-6}),
+            Map.entry("standard_error", new double[] {1e-15, 1e-5}),
             Map.entry("simple_analytic", new double[] {1e-12, 1e-10}),
             Map.entry("interpolation", new double[] {1e-10, 1e-8}),
             Map.entry("root_finding", new double[] {1e-10, 1e-10}),
