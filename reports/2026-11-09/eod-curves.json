@@ -1,0 +1,376 @@
+{
+ "as_of": "2026-11-09",
+ "batch_command": {
+  "rust": "--batch"
+ },
+ "book_sha256": "49456317fff9f8425631873b4dcf71855827ab28db98669c9a5b35e060291d53",
+ "checks": [
+  {
+   "check": "USD par quotes quote levels",
+   "detail": "outside band: none",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par quotes adjacent tenor gaps",
+   "detail": "none",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "USD par quotes day change",
+   "detail": "largest 1Y 0.0005",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par quotes day change (warn)",
+   "detail": "largest 1Y 0.0005",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "SOFR level",
+   "detail": "2026-11-06: 0.0389",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SOFR day change",
+   "detail": "0.0003 vs 0.01",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SOFR day change (warn)",
+   "detail": "0.0003 vs 0.0025",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "USD bootstrap",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD curve discount factors in band",
+   "detail": "min 0.205008, max 0.995864",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD curve discount factors non-increasing",
+   "detail": "rises after none",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "USD curve zero rates in band",
+   "detail": "min 0.0408877, max 0.0538401",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD curve forwards in band",
+   "detail": "min 0.0401335, max 0.0590448",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD fixing vs shortest quote",
+   "detail": "-0.0015 vs \u00b10.0075",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 10Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 15Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 1Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 20Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 2Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 30Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 3Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 5Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD par probe 7Y",
+   "detail": "ok",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD key-rate risk",
+   "detail": "50/50 trades ok; failed none",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "USD sum of key rates vs parallel DV01",
+   "detail": "sum 79,765.20 vs DV01 79,765.19",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "SONIA level",
+   "detail": "2026-11-05: value withheld",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SONIA day change",
+   "detail": "value withheld vs 0.01",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "SONIA day change (warn)",
+   "detail": "value withheld vs 0.0025",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE curves read",
+   "detail": "OIS 5 days, nominal 5 days",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE OIS spot zero rates in band",
+   "detail": "value withheld; 50 maturities",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE OIS spot forwards in band",
+   "detail": "value withheld",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE OIS spot day change",
+   "detail": "value withheld vs 0.01",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE OIS spot day change (warn)",
+   "detail": "value withheld vs 0.003",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE nominal spot zero rates in band",
+   "detail": "value withheld; 80 maturities",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE nominal spot forwards in band",
+   "detail": "value withheld",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE nominal spot day change",
+   "detail": "value withheld vs 0.01",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE nominal spot day change (warn)",
+   "detail": "value withheld vs 0.003",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "GBP OIS vs nominal gap",
+   "detail": "value withheld vs 0.015; 50 shared maturities",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "GBP SONIA vs shortest OIS spot",
+   "detail": "value withheld vs 0.0075; OIS shortest maturity 0.5y",
+   "level": "warn",
+   "ok": true
+  },
+  {
+   "check": "GBP BoE curve date vs SONIA",
+   "detail": "BoE 2026-11-06, SONIA 2026-11-05",
+   "level": "warn",
+   "ok": true
+  }
+ ],
+ "curve_label": "USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not a SOFR swap curve.",
+ "dv01": 79765.19253756842,
+ "gbp_reference": {
+  "boe_date": "2026-11-06",
+  "nominal_maturities": 80,
+  "ois_maturities": 50
+ },
+ "impl": "rust",
+ "key_rate": {
+  "10Y": 62922.3479258375,
+  "1M": -14.275605347392684,
+  "1Y": -992.050873773987,
+  "20Y": 63107.991634370985,
+  "2M": -0.0008167660748767958,
+  "2Y": -28698.626115100476,
+  "30Y": -57654.13415482507,
+  "3M": 0.0077697438646282535,
+  "3Y": 6371.691376712835,
+  "4M": -0.058165833340353856,
+  "5Y": -11212.799041998038,
+  "6M": 2.188695983516027,
+  "7Y": 45932.91932735522
+ },
+ "sonia_latest_date": "2026-11-05",
+ "usd_pillars": [
+  {
+   "date": "2026-12-16",
+   "discount_factor": 0.995863793286361
+  },
+  {
+   "date": "2027-01-14",
+   "discount_factor": 0.9923765855205107
+  },
+  {
+   "date": "2027-02-17",
+   "discount_factor": 0.988358285331725
+  },
+  {
+   "date": "2027-03-16",
+   "discount_factor": 0.985428420507424
+  },
+  {
+   "date": "2027-05-14",
+   "discount_factor": 0.9784666457661748
+  },
+  {
+   "date": "2027-11-16",
+   "discount_factor": 0.9566951239766565
+  },
+  {
+   "date": "2028-11-15",
+   "discount_factor": 0.9127355205621189
+  },
+  {
+   "date": "2029-11-15",
+   "discount_factor": 0.8718751318825484
+  },
+  {
+   "date": "2031-11-14",
+   "discount_factor": 0.7925776416731707
+  },
+  {
+   "date": "2033-11-16",
+   "discount_factor": 0.7172854626833659
+  },
+  {
+   "date": "2036-11-14",
+   "discount_factor": 0.6141646402895803
+  },
+  {
+   "date": "2046-11-15",
+   "discount_factor": 0.3401307369309005
+  },
+  {
+   "date": "2056-11-15",
+   "discount_factor": 0.20500808338361493
+  }
+ ],
+ "usd_quotes": [
+  {
+   "rate": 0.0404,
+   "tenor": "1M"
+  },
+  {
+   "rate": 0.04190000000000001,
+   "tenor": "2M"
+  },
+  {
+   "rate": 0.0424,
+   "tenor": "3M"
+  },
+  {
+   "rate": 0.042,
+   "tenor": "4M"
+  },
+  {
+   "rate": 0.0426,
+   "tenor": "6M"
+  },
+  {
+   "rate": 0.0438,
+   "tenor": "1Y"
+  },
+  {
+   "rate": 0.045599999999999995,
+   "tenor": "2Y"
+  },
+  {
+   "rate": 0.0458,
+   "tenor": "3Y"
+  },
+  {
+   "rate": 0.0467,
+   "tenor": "5Y"
+  },
+  {
+   "rate": 0.047599999999999996,
+   "tenor": "7Y"
+  },
+  {
+   "rate": 0.048799999999999996,
+   "tenor": "10Y"
+  },
+  {
+   "rate": 0.0529,
+   "tenor": "20Y"
+  },
+  {
+   "rate": 0.0526,
+   "tenor": "30Y"
+  }
+ ],
+ "workflow": "EOD curves"
+}

@@ -1,0 +1,234 @@
+{
+ "as_of": "2025-12-31",
+ "batch_command": {
+  "rust": "--batch"
+ },
+ "checks": [
+  {
+   "check": "OIS 2Y RECEIVE explained share >= 95%",
+   "detail": "100.0% of 248 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "OIS 10Y RECEIVE explained share >= 95%",
+   "detail": "100.0% of 248 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "OIS 30Y PAY explained share >= 95%",
+   "detail": "100.0% of 248 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  },
+  {
+   "check": "Bond 4.25% 2035 explained share >= 95%",
+   "detail": "100.0% of 248 days, 0 errors",
+   "level": "fail",
+   "ok": true
+  }
+ ],
+ "impl": "rust",
+ "label": "Real moves of a proxy curve; synthetic product terms. USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not a SOFR swap curve.",
+ "pairs": 248,
+ "summary": {
+  "Bond 4.25% 2035": {
+   "days": 248,
+   "errors": 0,
+   "explained": 248,
+   "ks": 0.012096774193548487,
+   "p50": 0.0017198176761368188,
+   "p95": 0.005222706766209177,
+   "p99": 0.0067815208819114155,
+   "share": 1.0,
+   "spearman": 0.9999944927942146,
+   "worst": [
+    {
+     "end": "2025-04-03",
+     "full_pnl": 113122.45302681625,
+     "largest_move_bp": 21.0,
+     "start": "2025-04-02",
+     "unexplained": 987.83645722043
+    },
+    {
+     "end": "2025-08-01",
+     "full_pnl": 112670.487329619,
+     "largest_move_bp": 25.0,
+     "start": "2025-07-31",
+     "unexplained": 961.4425014770968
+    },
+    {
+     "end": "2025-04-07",
+     "full_pnl": -119739.89716631547,
+     "largest_move_bp": 17.0,
+     "start": "2025-04-04",
+     "unexplained": 743.5948136518273
+    },
+    {
+     "end": "2025-01-15",
+     "full_pnl": 94862.54887964576,
+     "largest_move_bp": 15.0,
+     "start": "2025-01-14",
+     "unexplained": 643.3123561386601
+    },
+    {
+     "end": "2025-06-06",
+     "full_pnl": -87546.4748919215,
+     "largest_move_bp": 14.0,
+     "start": "2025-06-05",
+     "unexplained": 544.4617312045011
+    }
+   ]
+  },
+  "OIS 10Y RECEIVE": {
+   "days": 248,
+   "errors": 0,
+   "explained": 248,
+   "ks": 0.024193548387096753,
+   "p50": 0.00171499788591919,
+   "p95": 0.0050284442561229666,
+   "p99": 0.006822806675570777,
+   "share": 1.0,
+   "spearman": 0.9997448982102327,
+   "worst": [
+    {
+     "end": "2025-04-03",
+     "full_pnl": 115352.77627877872,
+     "largest_move_bp": 21.0,
+     "start": "2025-04-02",
+     "unexplained": 1007.2953371072217
+    },
+    {
+     "end": "2025-08-01",
+     "full_pnl": 114817.42739645972,
+     "largest_move_bp": 25.0,
+     "start": "2025-07-31",
+     "unexplained": 978.4708467182063
+    },
+    {
+     "end": "2025-04-07",
+     "full_pnl": -114892.51897363829,
+     "largest_move_bp": 17.0,
+     "start": "2025-04-04",
+     "unexplained": 692.2553679726698
+    },
+    {
+     "end": "2025-01-15",
+     "full_pnl": 95747.06878752726,
+     "largest_move_bp": 15.0,
+     "start": "2025-01-14",
+     "unexplained": 622.6438882967195
+    },
+    {
+     "end": "2025-06-06",
+     "full_pnl": -88769.59837576027,
+     "largest_move_bp": 14.0,
+     "start": "2025-06-05",
+     "unexplained": 545.9269184815639
+    }
+   ]
+  },
+  "OIS 2Y RECEIVE": {
+   "days": 248,
+   "errors": 0,
+   "explained": 248,
+   "ks": 0.04032258064516131,
+   "p50": 0.0003921669080358268,
+   "p95": 0.0013307847294639018,
+   "p99": 0.0025365679652233643,
+   "share": 1.0,
+   "spearman": 0.9960971436259844,
+   "worst": [
+    {
+     "end": "2025-08-01",
+     "full_pnl": 119776.68768638067,
+     "largest_move_bp": 25.0,
+     "start": "2025-07-31",
+     "unexplained": 424.97067384488764
+    },
+    {
+     "end": "2025-04-09",
+     "full_pnl": -95802.80963532029,
+     "largest_move_bp": 20.0,
+     "start": "2025-04-08",
+     "unexplained": 281.915061302032
+    },
+    {
+     "end": "2025-04-03",
+     "full_pnl": 95927.34212048975,
+     "largest_move_bp": 21.0,
+     "start": "2025-04-02",
+     "unexplained": 243.3262230118562
+    },
+    {
+     "end": "2025-01-10",
+     "full_pnl": -61740.30216486056,
+     "largest_move_bp": 15.0,
+     "start": "2025-01-09",
+     "unexplained": 104.88563342823181
+    },
+    {
+     "end": "2025-05-02",
+     "full_pnl": -62160.37953694457,
+     "largest_move_bp": 13.0,
+     "start": "2025-05-01",
+     "unexplained": 103.26514580049843
+    }
+   ]
+  },
+  "OIS 30Y PAY": {
+   "days": 248,
+   "errors": 0,
+   "explained": 248,
+   "ks": 0.024193548387096864,
+   "p50": 0.0037951591462865686,
+   "p95": 0.011101248273286948,
+   "p99": 0.013632879423974634,
+   "share": 1.0,
+   "spearman": 0.9998526818718289,
+   "worst": [
+    {
+     "end": "2025-04-07",
+     "full_pnl": 139148.83292435674,
+     "largest_move_bp": 17.0,
+     "start": "2025-04-04",
+     "unexplained": -2756.6349434307776
+    },
+    {
+     "end": "2025-04-08",
+     "full_pnl": 104763.62250007143,
+     "largest_move_bp": 15.0,
+     "start": "2025-04-07",
+     "unexplained": -1663.6328274310072
+    },
+    {
+     "end": "2025-04-10",
+     "full_pnl": 110919.08903777925,
+     "largest_move_bp": 14.0,
+     "start": "2025-04-09",
+     "unexplained": -1512.146566669151
+    },
+    {
+     "end": "2025-02-05",
+     "full_pnl": -88890.67450681687,
+     "largest_move_bp": 12.0,
+     "start": "2025-02-04",
+     "unexplained": -1149.03664965801
+    },
+    {
+     "end": "2025-05-21",
+     "full_pnl": 92927.90502447633,
+     "largest_move_bp": 12.0,
+     "start": "2025-05-20",
+     "unexplained": -1125.759962523589
+    }
+   ]
+  }
+ },
+ "threshold": "5% max(|full|, gross first-order P&L) + 1e-8 notional; a project choice, not FRTB PLA",
+ "workflow": "P&L explain",
+ "years": [
+  2025
+ ]
+}
