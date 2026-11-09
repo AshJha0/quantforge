@@ -12,8 +12,8 @@ import org.quantforge.core.QfError;
 import org.quantforge.curves.Curve;
 
 /** Equity curves, index dividends, rebalancing, corporate actions and TRS (equity-curves.md, equity-index.md). */
-public final class EquityD {
-    private EquityD() {}
+public final class EquityCurves {
+    private EquityCurves() {}
 
     public record Div(LocalDate exDate, double amount) {}
 

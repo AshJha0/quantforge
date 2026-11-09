@@ -15,7 +15,7 @@ import org.quantforge.vol.Surfaces;
  * Q5a: limit-case and convergence-order checks for the stage E numerical methods that have no
  * outside source (plan section 12.1). The same checks run in all four languages.
  */
-class LimitsETest {
+class PricingLimitsTest {
     private static final double X0 = Math.log(100.0);
 
     private static double[] order(double[] e) {

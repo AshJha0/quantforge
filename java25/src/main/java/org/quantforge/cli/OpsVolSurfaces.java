@@ -20,8 +20,8 @@ import org.quantforge.vol.Surfaces;
 import org.quantforge.vol.VarianceStrip;
 
 /** Stage E operations: E1 (surfaces, local and forward vol) and E7 (GARCH, variance swaps, VIX). */
-final class StageE {
-    private StageE() {}
+final class OpsVolSurfaces {
+    private OpsVolSurfaces() {}
 
     enum Rule { STICKY_STRIKE, STICKY_DELTA }
 
@@ -184,7 +184,7 @@ final class StageE {
             }
             return Operations.out("forward_vols", OpsSmile.list(Surfaces.forwardVols(t, v)));
         });
-        table.put("vol.smile.dynamics", StageE::smileDynamics);
+        table.put("vol.smile.dynamics", OpsVolSurfaces::smileDynamics);
         table.put("vol.volofvol.measure", in -> {
             double[] v = in.reals("vols");
             double ppy = in.real("periods_per_year");
@@ -337,7 +337,7 @@ final class StageE {
             sampleKeyword(in);
             return Operations.out("loglik", Garch.fit(r, startVariance(iv, r)));
         });
-        table.put("vol.varswap.fair_strike", StageE::fairStrike);
+        table.put("vol.varswap.fair_strike", OpsVolSurfaces::fairStrike);
         table.put("vol.varswap.realized", in -> {
             double[] p = in.reals("prices");
             double a = in.real("periods_per_year");

@@ -13,8 +13,8 @@ import org.quantforge.core.QfError;
 import org.quantforge.pricing.Bonds;
 
 /** Stage D wave 2, D2: bonds, repo and bond futures. */
-final class StageD2 {
-    private StageD2() {}
+final class OpsBonds {
+    private OpsBonds() {}
 
     private static final int MAX_BONDS = 100;
     private static final Pattern MONTH = Pattern.compile("\\d{4}-(0[1-9]|1[0-2])");
@@ -51,7 +51,7 @@ final class StageD2 {
         table.put("bond.price.from_curve", in -> {
             Bonds.Bond b = bond(in.object("bond"));
             LocalDate s = in.date("settlement");
-            StageB.CurveInput c = StageB.curve(in, "curve");
+            OpsLinear.CurveInput c = OpsLinear.curve(in, "curve");
             in.gate();
             double dirty = Bonds.curveDirty(b, s, c.build(), 0.0);
             double accrued = b.accrued(s);
@@ -60,7 +60,7 @@ final class StageD2 {
         table.put("bond.spread.z", in -> {
             Bonds.Bond b = bond(in.object("bond"));
             LocalDate s = in.date("settlement");
-            StageB.CurveInput c = StageB.curve(in, "curve");
+            OpsLinear.CurveInput c = OpsLinear.curve(in, "curve");
             double clean = in.real("clean_price");
             in.gate();
             Bonds.checkSettlement(b, s);
@@ -69,7 +69,7 @@ final class StageD2 {
         table.put("bond.spread.asset_swap", in -> {
             Bonds.Bond b = bond(in.object("bond"));
             LocalDate s = in.date("settlement");
-            StageB.CurveInput c = StageB.curve(in, "curve");
+            OpsLinear.CurveInput c = OpsLinear.curve(in, "curve");
             double dirty = in.real("dirty_price");
             in.gate();
             Bonds.AssetSwap r = Bonds.assetSwap(b, s, c.build(), dirty);
@@ -85,8 +85,8 @@ final class StageD2 {
             double current = in.real("current_rate");
             double margin = in.real("margin");
             double dm = in.real("discount_margin");
-            StageB.CurveInput d = StageB.curve(in, "discount");
-            StageB.CurveInput p = StageB.curve(in, "projection");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
+            OpsLinear.CurveInput p = OpsLinear.curve(in, "projection");
             in.gate();
             Bonds.Frn r = Bonds.frn(s, m, (int) f, current, margin, dm, d.build(), p.build());
             return Operations.out("dirty", r.dirty(), "accrued", r.accrued(), "clean", r.clean());

@@ -12,8 +12,8 @@ import org.quantforge.vol.Slv;
 import org.quantforge.vol.Surfaces;
 
 /** Stage E2: Heston, Bates, Merton, SLV leverage (heston-family.md). */
-final class StageE2 {
-    private StageE2() {}
+final class OpsHeston {
+    private OpsHeston() {}
 
     private static Heston.Params heston(In in) {
         In h = in.object("heston");

@@ -25,8 +25,8 @@ import org.quantforge.pricing.Pricing;
 import org.quantforge.risk.RatesRisk;
 
 /** Stage B operations. As in {@link Operations}, all inputs are read before the gate, and work comes after it. */
-final class StageB {
-    private StageB() {}
+final class OpsLinear {
+    private OpsLinear() {}
 
     private static final int MAX_QUOTES = 100;
 

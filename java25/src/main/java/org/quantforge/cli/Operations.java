@@ -39,45 +39,46 @@ final class Operations {
 
     record Out(Map<String, Object> outputs, Map<String, Object> diagnostics) {}
 
-    private static final Map<String, Function<In, Out>> TABLE = new TreeMap<>();
+    /** Every domain module, in registration order. Dispatch and the {@code operations} verb read only the registry built from it. */
+    static final List<Registry.Module> MODULES = List.of(
+            new Registry.Module("core.dates", Operations::dates),
+            new Registry.Module("core.numerics", Operations::numerics),
+            new Registry.Module("core.statistics", Operations::statistics),
+            new Registry.Module("core.engines", Operations::engines),
+            new Registry.Module("core.store", Operations::store),
+            new Registry.Module("linear", OpsLinear::register),
+            new Registry.Module("rates_curves", OpsRatesCurves::register),
+            new Registry.Module("bonds", OpsBonds::register),
+            new Registry.Module("xccy", OpsXccy::register),
+            new Registry.Module("credit", OpsCredit::register),
+            new Registry.Module("equity", OpsEquity::register),
+            new Registry.Module("inflation", OpsInflation::register),
+            new Registry.Module("caps_cmdty_mbs", OpsCapsCmdtyMbs::register),
+            new Registry.Module("vol_surfaces", OpsVolSurfaces::register),
+            new Registry.Module("fx_smile", OpsFxSmile::register),
+            new Registry.Module("rates_vol", OpsRatesVol::register),
+            new Registry.Module("heston", OpsHeston::register),
+            new Registry.Module("correlation", OpsCorrelation::register),
+            new Registry.Module("exotics", OpsExotics::register),
+            new Registry.Module("credit_options", OpsCreditOptions::register),
+            new Registry.Module("forward", OpsForward::register),
+            new Registry.Module("black", OpsBlack::register),
+            new Registry.Module("greeks", OpsGreeks::register),
+            new Registry.Module("smile", OpsSmile::register),
+            new Registry.Module("surface", OpsSurface::register),
+            new Registry.Module("sabr", OpsSabr::register),
+            new Registry.Module("usecase_vol_surface", OpsUseCaseVolSurface::register),
+            new Registry.Module("risk", OpsRisk::register)
+    );
 
-    static {
-        dates();
-        numerics();
-        statistics();
-        engines();
-        store();
-        StageB.register(TABLE);
-        StageD.register(TABLE);
-        StageD2.register(TABLE);
-        StageD3.register(TABLE);
-        StageD4.register(TABLE);
-        StageD5.register(TABLE);
-        StageD6.register(TABLE);
-        StageD7.register(TABLE);
-        StageE.register(TABLE);
-        StageE3.register(TABLE);
-        StageE4.register(TABLE);
-        StageE2.register(TABLE);
-        StageE6.register(TABLE);
-        StageE5.register(TABLE);
-        StageE8.register(TABLE);
-        OpsForward.register(TABLE);
-        OpsBlack.register(TABLE);
-        OpsGreeks.register(TABLE);
-        OpsSmile.register(TABLE);
-        OpsSurface.register(TABLE);
-        OpsSabr.register(TABLE);
-        OpsUseCase3.register(TABLE);
-        OpsRisk.register(TABLE);
-    }
+    static final Registry REGISTRY = Registry.of(MODULES);
 
     static Set<String> names() {
-        return TABLE.keySet();
+        return REGISTRY.names();
     }
 
     static Function<In, Out> find(String name) {
-        return TABLE.get(name);
+        return REGISTRY.find(name);
     }
 
     static Out out(Object... keysAndValues) {
@@ -96,22 +97,22 @@ final class Operations {
         return dates.stream().map(LocalDate::toString).toList();
     }
 
-    private static void dates() {
-        TABLE.put("core.daycount.year_fraction", Operations::yearFraction);
-        TABLE.put("core.calendar.is_business_day", in -> {
+    private static void dates(Map<String, Function<In, Out>> table) {
+        table.put("core.daycount.year_fraction", Operations::yearFraction);
+        table.put("core.calendar.is_business_day", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             return out("is_business_day", Calendars.isBusinessDay(cal, in.date("date")));
         });
-        TABLE.put("core.calendar.holidays", in -> {
+        table.put("core.calendar.holidays", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             return out("dates", text(Calendars.holidays(cal, in.integer("year"))));
         });
-        TABLE.put("core.calendar.adjust", in -> {
+        table.put("core.calendar.adjust", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             LocalDate d = in.date("date");
             return out("date", Calendars.adjust(cal, d, in.choice("convention", Calendars.Convention.class)).toString());
         });
-        TABLE.put("core.calendar.add_business_days", in -> {
+        table.put("core.calendar.add_business_days", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             LocalDate d = in.date("date");
             long days = in.integer("days");
@@ -119,49 +120,49 @@ final class Operations {
             in.gate();
             return out("date", Calendars.addBusinessDays(cal, d, days).toString());
         });
-        TABLE.put("core.calendar.business_days_between", in -> {
+        table.put("core.calendar.business_days_between", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             LocalDate start = in.date("start");
             return out("count", Calendars.businessDaysBetween(cal, start, in.date("end")));
         });
-        TABLE.put("core.calendar.add_tenor", in -> {
+        table.put("core.calendar.add_tenor", in -> {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             LocalDate d = in.date("date");
             String tenor = in.string("tenor");
             Calendars.Convention c = in.choice("convention", Calendars.Convention.class);
             return out("date", Calendars.addTenor(cal, d, tenor, c, in.bool("end_of_month")).toString());
         });
-        TABLE.put("core.compounding.discount_factor", in -> {
+        table.put("core.compounding.discount_factor", in -> {
             double rate = in.real("rate");
             double t = in.real("t");
             return out("discount_factor", Compounding.discountFactor(rate, t, basis(in)));
         });
-        TABLE.put("core.compounding.convert", in -> {
+        table.put("core.compounding.convert", in -> {
             double rate = in.real("rate");
             double t = in.real("t");
             Compounding.Basis from = basis(in.object("from"));
             Compounding.Basis to = basis(in.object("to"));
             return out("rate", Compounding.convert(rate, t, from, to));
         });
-        TABLE.put("core.snapshot.hash", in -> {
+        table.put("core.snapshot.hash", in -> {
             SnapshotHash.Result r = SnapshotHash.hash(in.string("document_text"));
             return out("canonical", r.canonical(), "snapshot_id", r.snapshotId());
         });
-        TABLE.put("core.time.utc_offset", in -> {
+        table.put("core.time.utc_offset", in -> {
             TimeZones.Zone z = TimeZones.Zone.of(in.string("zone"));
             return out("offset_seconds", TimeZones.utcOffset(z, in.instant("instant")));
         });
-        TABLE.put("core.time.to_local", in -> {
+        table.put("core.time.to_local", in -> {
             TimeZones.Zone z = TimeZones.Zone.of(in.string("zone"));
             return out("local", TimeZones.toLocal(z, in.instant("instant")));
         });
-        TABLE.put("core.time.to_instant", in -> {
+        table.put("core.time.to_instant", in -> {
             TimeZones.Zone z = TimeZones.Zone.of(in.string("zone"));
             var local = TimeZones.parseLocal(in.string("local"));
             TimeZones.Overlap o = in.has("overlap") ? in.choice("overlap", TimeZones.Overlap.class) : null;
             return out("instant", TimeZones.toInstant(z, local, o));
         });
-        TABLE.put("core.time.business_date", in -> {
+        table.put("core.time.business_date", in -> {
             long instant = in.instant("instant");
             TimeZones.Zone z = TimeZones.Zone.of(in.string("zone"));
             String cutoff = in.string("cutoff");
@@ -169,7 +170,7 @@ final class Operations {
             Calendars.Id cal = in.choice("calendar", Calendars.Id.class);
             return out("date", TimeZones.businessDate(instant, z, cutoff, cal).toString());
         });
-        TABLE.put("core.data.check_quotes", Operations::checkQuotes);
+        table.put("core.data.check_quotes", Operations::checkQuotes);
     }
 
     private static Out yearFraction(In in) {
@@ -295,12 +296,12 @@ final class Operations {
                 "termination", r.termination().name());
     }
 
-    private static void numerics() {
-        TABLE.put("core.rng.next_u64", in -> {
+    private static void numerics(Map<String, Function<In, Out>> table) {
+        table.put("core.rng.next_u64", in -> {
             int n = count(in);
             return out("values", u64Text(seededAfterSkip(in), n));
         });
-        TABLE.put("core.rng.uniforms", in -> {
+        table.put("core.rng.uniforms", in -> {
             int n = count(in);
             Rng rng = seededAfterSkip(in);
             double[] v = new double[n];
@@ -309,7 +310,7 @@ final class Operations {
             }
             return out("values", v);
         });
-        TABLE.put("core.rng.normals", in -> {
+        table.put("core.rng.normals", in -> {
             int n = count(in);
             Rng rng = seededAfterSkip(in);
             double[] v = new double[n];
@@ -318,7 +319,7 @@ final class Operations {
             }
             return out("values", v);
         });
-        TABLE.put("core.rng.inverse_normal", in -> {
+        table.put("core.rng.inverse_normal", in -> {
             double[] p = in.reals("p");
             double[] z = new double[p.length];
             for (int i = 0; i < p.length; i++) {
@@ -329,7 +330,7 @@ final class Operations {
             }
             return out("z", z);
         });
-        TABLE.put("core.rng.set_state_next_u64", in -> {
+        table.put("core.rng.set_state_next_u64", in -> {
             long[] state = in.u64s("state", 4);
             int n = count(in);
             in.gate();
@@ -338,16 +339,16 @@ final class Operations {
             }
             return out("values", u64Text(Rng.fromState(state), n));
         });
-        TABLE.put("core.sobol.points", Operations::sobol);
-        TABLE.put("core.root.bisection", in -> {
+        table.put("core.sobol.points", Operations::sobol);
+        table.put("core.root.bisection", in -> {
             TestFunctions.Pair p = TestFunctions.root(in.string("function"));
             return rootOut(RootFinders.bisection(p.f(), in.real("a"), in.real("b"), tolerances(in)));
         });
-        TABLE.put("core.root.brent", in -> {
+        table.put("core.root.brent", in -> {
             TestFunctions.Pair p = TestFunctions.root(in.string("function"));
             return rootOut(RootFinders.brent(p.f(), in.real("a"), in.real("b"), tolerances(in)));
         });
-        TABLE.put("core.root.newton", in -> {
+        table.put("core.root.newton", in -> {
             TestFunctions.Pair p = TestFunctions.root(in.string("function"));
             if (in.has("a") != in.has("b")) {
                 throw new QfError("E_SCHEMA", "a and b must be given together");
@@ -355,36 +356,36 @@ final class Operations {
             return rootOut(RootFinders.newton(p.f(), p.df(), in.real("x0"), in.realOrNull("a"), in.realOrNull("b"),
                     tolerances(in)));
         });
-        TABLE.put("core.integrate.trapezoid", in -> {
+        table.put("core.integrate.trapezoid", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             return out("value", Integration.trapezoid(f, in.real("a"), in.real("b"), in.gate(in.atMost("n", 10_000_000))));
         });
-        TABLE.put("core.integrate.simpson", in -> {
+        table.put("core.integrate.simpson", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             return out("value", Integration.simpson(f, in.real("a"), in.real("b"), in.gate(in.atMost("n", 10_000_000))));
         });
-        TABLE.put("core.integrate.gauss_legendre", in -> {
+        table.put("core.integrate.gauss_legendre", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             return out("value", Integration.gaussLegendre(f, in.real("a"), in.real("b"), in.integer("n")));
         });
-        TABLE.put("core.integrate.adaptive_simpson", in -> {
+        table.put("core.integrate.adaptive_simpson", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             return out("value", Integration.adaptiveSimpson(f, in.real("a"), in.real("b"), in.real("tol", 1e-10),
                     in.gate(in.atMost("max_depth", 50, 60))));
         });
-        TABLE.put("core.integrate.gauss_kronrod", in -> {
+        table.put("core.integrate.gauss_kronrod", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             Integration.Adaptive r = Integration.gaussKronrod(f, in.real("a"), in.real("b"), in.real("tol", 1e-10),
                     in.gate(in.atMost("max_intervals", 500, 10_000)));
             return withDiagnostics(out("value", r.value()), "error_estimate", r.errorEstimate());
         });
-        TABLE.put("core.interp.evaluate", Operations::interpolate);
-        TABLE.put("core.interp.monotone_convex", in -> {
+        table.put("core.interp.evaluate", Operations::interpolate);
+        table.put("core.interp.monotone_convex", in -> {
             MonotoneConvex.Result r = MonotoneConvex.evaluate(in.reals("t"), in.reals("r"), in.reals("at"),
                     in.gate(in.bool("positive", false)));
             return out("forwards", r.forwards(), "zero_rates", r.zeroRates());
         });
-        TABLE.put("core.diff.central", in -> {
+        table.put("core.diff.central", in -> {
             DoubleUnaryOperator f = TestFunctions.plain(in.string("function"));
             double x = in.real("x");
             double h = in.real("h");
@@ -400,9 +401,9 @@ final class Operations {
             return out("value", order == 1 ? (up - down) / (2.0 * h)
                     : (up - 2.0 * f.applyAsDouble(x) + down) / (h * h));
         });
-        TABLE.put("core.linalg.solve", in -> out("x", LinearAlgebra.solve(in.matrix("a"), in.gate(in.reals("b")))));
-        TABLE.put("core.linalg.cholesky", in -> out("l", LinearAlgebra.cholesky(in.gate(in.matrix("a")))));
-        TABLE.put("core.linalg.eigen_symmetric", in -> out("values", LinearAlgebra.eigenSymmetric(in.gate(in.matrix("a")))));
+        table.put("core.linalg.solve", in -> out("x", LinearAlgebra.solve(in.matrix("a"), in.gate(in.reals("b")))));
+        table.put("core.linalg.cholesky", in -> out("l", LinearAlgebra.cholesky(in.gate(in.matrix("a")))));
+        table.put("core.linalg.eigen_symmetric", in -> out("values", LinearAlgebra.eigenSymmetric(in.gate(in.matrix("a")))));
     }
 
     private static Out sobol(In in) {
@@ -446,8 +447,8 @@ final class Operations {
         return r.derivatives() == null ? out("values", r.values()) : out("values", r.values(), "derivatives", r.derivatives());
     }
 
-    private static void statistics() {
-        TABLE.put("core.stats.normal", in -> {
+    private static void statistics(Map<String, Function<In, Out>> table) {
+        table.put("core.stats.normal", in -> {
             double[] x = in.reals("x");
             double[] pdf = new double[x.length];
             double[] cdf = new double[x.length];
@@ -457,44 +458,44 @@ final class Operations {
             }
             return out("pdf", pdf, "cdf", cdf);
         });
-        TABLE.put("core.stats.summary", in -> {
+        table.put("core.stats.summary", in -> {
             Statistics.Summary s = Statistics.summary(in.reals("x"));
             return out("count", s.count(), "mean", s.mean(), "variance", s.variance(), "stdev", s.stdev(),
                     "skewness", s.skewness(), "excess_kurtosis", s.excessKurtosis(), "min", s.min(), "max", s.max());
         });
-        TABLE.put("core.stats.quantile", in -> out("values", Statistics.quantile(in.reals("x"), in.gate(in.reals("p")))));
-        TABLE.put("core.stats.covariance", in -> {
+        table.put("core.stats.quantile", in -> out("values", Statistics.quantile(in.reals("x"), in.gate(in.reals("p")))));
+        table.put("core.stats.covariance", in -> {
             Statistics.Covariance c = Statistics.covariance(in.reals("x"), in.reals("y"));
             return out("covariance", c.covariance(), "correlation", c.correlation());
         });
-        TABLE.put("core.stats.ols", in -> {
+        table.put("core.stats.ols", in -> {
             Statistics.Ols o = Statistics.ols(in.reals("x"), in.reals("y"));
             return out("alpha", o.alpha(), "beta", o.beta(), "r_squared", o.rSquared(), "se_alpha", o.seAlpha(),
                     "se_beta", o.seBeta());
         });
-        TABLE.put("core.ts.returns", in -> {
+        table.put("core.ts.returns", in -> {
             double[] p = in.reals("prices");
             return out("returns", TimeSeries.returns(p, in.choice("kind", TimeSeries.ReturnKind.class)));
         });
-        TABLE.put("core.ts.rolling", in -> {
+        table.put("core.ts.rolling", in -> {
             double[] x = in.reals("x");
             long w = in.atMost("window", 1000);
             return out("values", TimeSeries.rolling(x, w, in.gate(in.choice("statistic", TimeSeries.RollingStatistic.class))));
         });
-        TABLE.put("core.ts.ewma_variance", in -> out("variance", TimeSeries.ewmaVariance(in.reals("returns"), in.real("lambda"))));
-        TABLE.put("core.ts.autocorrelation", in -> out("acf", TimeSeries.autocorrelation(in.reals("x"), in.gate(in.atMost("max_lag", 1000)))));
-        TABLE.put("core.ts.ljung_box", in -> out("statistic", TimeSeries.ljungBox(in.reals("x"), in.gate(in.atMost("max_lag", 1000)))));
-        TABLE.put("core.ts.ar1", in -> {
+        table.put("core.ts.ewma_variance", in -> out("variance", TimeSeries.ewmaVariance(in.reals("returns"), in.real("lambda"))));
+        table.put("core.ts.autocorrelation", in -> out("acf", TimeSeries.autocorrelation(in.reals("x"), in.gate(in.atMost("max_lag", 1000)))));
+        table.put("core.ts.ljung_box", in -> out("statistic", TimeSeries.ljungBox(in.reals("x"), in.gate(in.atMost("max_lag", 1000)))));
+        table.put("core.ts.ar1", in -> {
             TimeSeries.Ar1 a = TimeSeries.ar1(in.reals("x"));
             return out("constant", a.constant(), "phi", a.phi(), "sigma", a.sigma());
         });
-        TABLE.put("core.ts.resample_last", in -> {
+        table.put("core.ts.resample_last", in -> {
             List<LocalDate> d = in.dates("dates");
             List<Double> v = in.nullableReals("values");
             TimeSeries.Resampled r = TimeSeries.resampleLast(d, v, in.choice("frequency", TimeSeries.Frequency.class));
             return out("dates", text(r.dates()), "values", r.values());
         });
-        TABLE.put("core.ts.forward_fill", in -> {
+        table.put("core.ts.forward_fill", in -> {
             List<Double> v = in.nullableReals("values");
             return out("values", TimeSeries.forwardFill(v, in.integer("limit")));
         });
@@ -529,8 +530,8 @@ final class Operations {
         others.forEach(AsOfStore::checkInstant);
     }
 
-    private static void store() {
-        TABLE.put("core.store.query_as_of", in -> {
+    private static void store(Map<String, Function<In, Out>> table) {
+        table.put("core.store.query_as_of", in -> {
             List<AsOfStore.Entry> log = log(in);
             long asOf = in.instant("as_of");
             String series = in.has("series_id") ? in.string("series_id") : null;
@@ -556,7 +557,7 @@ final class Operations {
             }
             return out("rows", rows);
         });
-        TABLE.put("core.store.latest", in -> {
+        table.put("core.store.latest", in -> {
             List<AsOfStore.Entry> log = log(in);
             long asOf = in.instant("as_of");
             String series = in.string("series_id");
@@ -569,14 +570,14 @@ final class Operations {
             }
             return out("row", last == null ? null : AsOfStore.row(last));
         });
-        TABLE.put("core.store.snapshot", in -> {
+        table.put("core.store.snapshot", in -> {
             List<AsOfStore.Entry> log = log(in);
             long asOf = in.instant("as_of");
             checkStore(in, log, List.of(asOf));
             SnapshotHash.Result r = AsOfStore.snapshot(log, asOf);
             return out("canonical", r.canonical(), "snapshot_id", r.snapshotId());
         });
-        TABLE.put("core.store.replay", in -> {
+        table.put("core.store.replay", in -> {
             List<AsOfStore.Entry> log = log(in);
             List<Long> checkpoints = in.instants("checkpoints");
             in.limit(checkpoints.size() > 1000 || In.productOver(log.size(), checkpoints.size(), 10_000_000L), "checkpoints");
@@ -593,7 +594,7 @@ final class Operations {
             }
             return out("snapshots", snapshots, "head", AsOfStore.chain(log).head());
         });
-        TABLE.put("core.store.chain", in -> {
+        table.put("core.store.chain", in -> {
             List<AsOfStore.Entry> log = log(in);
             checkStore(in, log, List.of());
             AsOfStore.Chain c = AsOfStore.chain(log);
@@ -605,8 +606,8 @@ final class Operations {
 
     private enum ModelName { BLACK_SCHOLES, HESTON }
 
-    private static void engines() {
-        TABLE.put("core.pde.bs_european", in -> {
+    private static void engines(Map<String, Function<In, Out>> table) {
+        table.put("core.pde.bs_european", in -> {
             boolean call = in.choice("option", Option.class) == Option.CALL;
             long space = in.integer("space_steps");
             long time = in.integer("time_steps");
@@ -616,7 +617,7 @@ final class Operations {
                     in.gate(in.integer("rannacher_steps", 2))));
             return withDiagnostics(out("price", r.price(), "delta", r.delta(), "gamma", r.gamma()), "grid_h", r.gridH());
         });
-        TABLE.put("core.mc.gbm_european", in -> {
+        table.put("core.mc.gbm_european", in -> {
             boolean call = in.choice("option", Option.class) == Option.CALL;
             long paths = in.integer("paths");
             long steps = in.integer("steps", 1);
@@ -626,7 +627,7 @@ final class Operations {
                     stream(in), in.gate(in.choice("method", MonteCarlo.Method.class))));
             return out("price", r.price(), "stderr", r.stderr());
         });
-        TABLE.put("core.cos.european", in -> {
+        table.put("core.cos.european", in -> {
             boolean call = in.choice("option", Option.class) == Option.CALL;
             In m = in.object("model");
             CosPricer.Model model = m.choice("name", ModelName.class) == ModelName.BLACK_SCHOLES

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.quantforge.core.QfError;
 import org.quantforge.pricing.EquityForward;
 
-class StageCTest {
+class VolSmileTest {
     private static Black.Option b76(double phi, double k, double t, double f, double d) {
         return new Black.Option(Black.Model.BLACK_76, phi, k, t, f, 0, 0, d, 0);
     }

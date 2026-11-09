@@ -8,8 +8,8 @@ import org.quantforge.cli.Operations.Out;
 import org.quantforge.risk.Correlation;
 
 /** Stage E6: correlation (correlation.md). */
-final class StageE6 {
-    private StageE6() {}
+final class OpsCorrelation {
+    private OpsCorrelation() {}
 
     private static List<Object> rows(double[][] m) {
         List<Object> out = new ArrayList<>();

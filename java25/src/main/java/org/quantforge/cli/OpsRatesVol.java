@@ -8,8 +8,8 @@ import org.quantforge.core.QfError;
 import org.quantforge.pricing.RatesVol;
 
 /** Stage E4: rates and inflation vol (rates-vol-cube.md). */
-final class StageE4 {
-    private StageE4() {}
+final class OpsRatesVol {
+    private OpsRatesVol() {}
 
     private static boolean normal(In in) {
         return switch (in.string("model")) {
@@ -32,8 +32,8 @@ final class StageE4 {
 
     static void register(Map<String, Function<In, Out>> table) {
         table.put("rates.swaption.price_cube", in -> {
-            StageB.CurveInput d = StageB.curve(in, "discount");
-            StageB.CurveInput p = StageB.curve(in, "projection");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
+            OpsLinear.CurveInput p = OpsLinear.curve(in, "projection");
             In c = in.object("cube");
             RatesVol.Cube cube = new RatesVol.Cube(c.integers("expiries_months"), c.integers("tenors_months"),
                     c.anyMatrix("alpha"), c.anyMatrix("beta"), c.anyMatrix("rho"), c.anyMatrix("nu"));
@@ -50,8 +50,8 @@ final class StageE4 {
                             r.sabr().rho(), "nu", r.sabr().nu()));
         });
         table.put("rates.cap.strip", in -> {
-            StageB.CurveInput d = StageB.curve(in, "discount");
-            StageB.CurveInput p = StageB.curve(in, "projection");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
+            OpsLinear.CurveInput p = OpsLinear.curve(in, "projection");
             boolean normal = normal(in);
             long start = in.integer("start_months");
             double k = in.real("strike");

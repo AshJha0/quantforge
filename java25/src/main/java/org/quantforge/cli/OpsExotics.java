@@ -8,8 +8,8 @@ import org.quantforge.pricing.Exotics;
 import org.quantforge.vol.Black;
 
 /** Stage E5: exotics and American options (exotics.md). */
-final class StageE5 {
-    private StageE5() {}
+final class OpsExotics {
+    private OpsExotics() {}
 
     enum Payoff { CASH_OR_NOTHING, ASSET_OR_NOTHING }
 

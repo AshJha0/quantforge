@@ -14,7 +14,7 @@ import org.quantforge.curves.Ois;
 import org.quantforge.hedging.HedgeSolver;
 
 /** Properties the specs state that golden values alone do not prove. */
-class StageBSpecTest {
+class LinearSpecTest {
     private static final LocalDate AS_OF = LocalDate.of(2026, 11, 6);
 
     private static List<Ois.Quote> quotes() {

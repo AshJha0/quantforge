@@ -9,8 +9,8 @@ import org.quantforge.vol.Black;
 import org.quantforge.vol.FxSmile;
 
 /** Stage E3: FX smile (fx-smile.md). */
-final class StageE3 {
-    private StageE3() {}
+final class OpsFxSmile {
+    private OpsFxSmile() {}
 
     private static FxSmile.Market market(In in) {
         return new FxSmile.Market(in.real("spot"), in.real("expiry_years"), in.real("domestic_rate"),

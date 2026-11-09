@@ -13,8 +13,8 @@ import org.quantforge.pricing.Bonds;
 import org.quantforge.pricing.Inflation;
 
 /** Stage D wave 3, D6: inflation curves and linkers. */
-final class StageD6 {
-    private StageD6() {}
+final class OpsInflation {
+    private OpsInflation() {}
 
     private static final Pattern MONTH = Pattern.compile("\\d{4}-(0[1-9]|1[0-2])");
 
@@ -70,7 +70,7 @@ final class StageD6 {
         });
         table.put("infl.zcis.pv", in -> {
             CurveIn c = curve(in.object("curve"));
-            StageB.CurveInput d = StageB.curve(in, "discount");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
             In t = in.object("trade");
             long years = t.integer("years");
             double k = t.real("fixed_rate");
@@ -85,7 +85,7 @@ final class StageD6 {
             return Operations.out("index_ratio", r.indexRatio(), "pv", r.pv());
         });
         table.put("infl.linker.price", in -> {
-            Bonds.Bond b = StageD2.bond(in.object("bond"));
+            Bonds.Bond b = OpsBonds.bond(in.object("bond"));
             LocalDate s = in.date("settlement");
             double y = in.real("real_yield");
             double base = in.real("base_ref_cpi");
@@ -105,11 +105,11 @@ final class StageD6 {
                     "nominal_accrued", r.nominalAccrued());
         });
         table.put("infl.linker.price_curve", in -> {
-            Bonds.Bond b = StageD2.bond(in.object("bond"));
+            Bonds.Bond b = OpsBonds.bond(in.object("bond"));
             LocalDate s = in.date("settlement");
             double base = in.real("base_ref_cpi");
             CurveIn c = curve(in.object("curve"));
-            StageB.CurveInput d = StageB.curve(in, "discount");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
             in.gate();
             return Operations.out("nominal_dirty", Inflation.linkerCurve(b, s, base, c.build(), d.build()));
         });

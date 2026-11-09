@@ -14,12 +14,12 @@ import org.quantforge.curves.DatedCompounding;
 import org.quantforge.curves.Jumps;
 import org.quantforge.curves.Ois;
 import org.quantforge.curves.Projection;
-import org.quantforge.curves.RatesD;
+import org.quantforge.curves.RatesCurves;
 import org.quantforge.curves.StepCurve;
 
 /** Stage D wave 1 operations. All inputs are read before the gate, and work comes after it. */
-final class StageD {
-    private StageD() {}
+final class OpsRatesCurves {
+    private OpsRatesCurves() {}
 
     private static final int MAX_LIST = 100;
 
@@ -58,7 +58,7 @@ final class StageD {
                 stepDates[i] = steps.get(i).date("date");
                 rates[i] = steps.get(i).real("rate");
             }
-            Jumps jumps = StageB.jumps(in, true);
+            Jumps jumps = OpsLinear.jumps(in, true);
             List<LocalDate> dates = in.dates("dates");
             in.gate();
             StepCurve curve = StepCurve.of(asOf, base, stepDates, rates, jumps);
@@ -78,22 +78,22 @@ final class StageD {
             LocalDate asOf = in.date("as_of");
             List<LocalDate> stepDates = in.dates("step_dates");
             in.limit(stepDates.size() > MAX_LIST, "step_dates");
-            List<Ois.Quote> quotes = StageB.quotes(in);
-            Jumps jumps = StageB.jumps(in, true);
+            List<Ois.Quote> quotes = OpsLinear.quotes(in);
+            Jumps jumps = OpsLinear.jumps(in, true);
             in.gate();
             Conventions.RateIndex c = Conventions.requireOvernight(id);
-            RatesD.StepFit fit = RatesD.fitSteps(c, asOf, stepDates.toArray(new LocalDate[0]), quotes, jumps);
+            RatesCurves.StepFit fit = RatesCurves.fitSteps(c, asOf, stepDates.toArray(new LocalDate[0]), quotes, jumps);
             return new Out(Operations.out("base_rate", fit.baseRate(), "step_rates", fit.stepRates()).outputs(),
                     Operations.out("max_repricing_error", fit.maxRepricingError()).outputs());
         });
         table.put("rates.futures.convexity", in -> {
-            RatesD.Convexity r = RatesD.convexity(in.real("price"), in.real("start_years"), in.real("end_years"),
+            RatesCurves.Convexity r = RatesCurves.convexity(in.real("price"), in.real("start_years"), in.real("end_years"),
                     in.real("sigma"), in.gate(in.real("mean_reversion")));
             return Operations.out("futures_rate", r.futuresRate(), "convexity", r.convexity(),
                     "forward_rate", r.forwardRate());
         });
         table.put("rates.csa.discount", in -> {
-            StageB.CurveInput ci = StageB.curve(in, "curve");
+            OpsLinear.CurveInput ci = OpsLinear.curve(in, "curve");
             double s = in.real("collateral_spread");
             Object fxRaw = in.anyValue("fx");
             Double spot = null;
@@ -115,30 +115,30 @@ final class StageD {
             in.gate();
             Curve c = ci.build();
             return Operations.out("discount_factors",
-                    RatesD.csaDiscount(c, s, spot, fwdDates, fwds, dates.toArray(new LocalDate[0])));
+                    RatesCurves.csaDiscount(c, s, spot, fwdDates, fwds, dates.toArray(new LocalDate[0])));
         });
         table.put("rates.basis.ois_spread", in -> {
             Conventions.RateIndex c = Conventions.overnight(in.string("convention"));
             String tenor = in.string("tenor");
             Ois.checkTenor(tenor);
-            StageB.CurveInput d = StageB.curve(in, "discount");
-            StageB.CurveInput a = StageB.curve(in, "projection_a");
-            StageB.CurveInput b = StageB.curve(in, "projection_b");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
+            OpsLinear.CurveInput a = OpsLinear.curve(in, "projection_a");
+            OpsLinear.CurveInput b = OpsLinear.curve(in, "projection_b");
             in.gate();
-            return Operations.out("spread", RatesD.oisSpread(c, tenor, d.build(), a.build(), b.build()));
+            return Operations.out("spread", RatesCurves.oisSpread(c, tenor, d.build(), a.build(), b.build()));
         });
         table.put("rates.curve.joint_bootstrap", in -> {
             Conventions.RateIndex c = Conventions.overnight(in.string("convention"));
             Conventions.RateIndex ix = Conventions.term(in.string("index"));
             LocalDate asOf = in.date("as_of");
-            List<Ois.Quote> ois = StageB.quotes(in, "ois_quotes");
-            List<Projection.Quote> term = StageB.termQuotes(in, "term_quotes");
+            List<Ois.Quote> ois = OpsLinear.quotes(in, "ois_quotes");
+            List<Projection.Quote> term = OpsLinear.termQuotes(in, "term_quotes");
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             CurveSolver.Method method = in.choice("method", CurveSolver.Method.class);
             in.gate();
-            RatesD.Joint j = RatesD.jointBootstrap(c, ix, asOf, ois, term, interp, method);
-            return new Out(Operations.out("discount_pillars", StageB.pillars(j.discount()),
-                    "projection_pillars", StageB.pillars(j.projection())).outputs(),
+            RatesCurves.Joint j = RatesCurves.jointBootstrap(c, ix, asOf, ois, term, interp, method);
+            return new Out(Operations.out("discount_pillars", OpsLinear.pillars(j.discount()),
+                    "projection_pillars", OpsLinear.pillars(j.projection())).outputs(),
                     Operations.out("max_repricing_error", j.maxRepricingError()).outputs());
         });
         table.put("calib.curve.smooth", in -> {

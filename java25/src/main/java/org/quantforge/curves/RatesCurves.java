@@ -10,8 +10,8 @@ import org.quantforge.core.Conventions;
 import org.quantforge.core.QfError;
 
 /** Stage D rates: step fit, futures convexity, CSA discounting, OIS basis, joint bootstrap. */
-public final class RatesD {
-    private RatesD() {}
+public final class RatesCurves {
+    private RatesCurves() {}
 
     private static final double TARGET = 1e-15;
     private static final double ACCEPT = 1e-13;

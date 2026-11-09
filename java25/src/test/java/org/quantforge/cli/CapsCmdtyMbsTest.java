@@ -15,7 +15,7 @@ import org.quantforge.pricing.CapSwaption;
 import org.quantforge.pricing.CmdtyMbs;
 
 /** Stage D D7 to D9: parity identities, edge and error paths, and a fuzz pass. */
-class StageD7to9Test {
+class CapsCmdtyMbsTest {
     private static final LocalDate AS_OF = LocalDate.of(2026, 11, 6);
     private static final Curve D = Curve.of(AS_OF, Curve.Interpolation.LOG_LINEAR_DF,
             new LocalDate[] {LocalDate.of(2027, 11, 6), LocalDate.of(2056, 11, 6)},
