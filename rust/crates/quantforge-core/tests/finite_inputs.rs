@@ -33,7 +33,10 @@ fn compounding_scalars() {
         domain(discount_factor(b, 1.0, Compounding::Continuous), "r");
         domain(discount_factor(0.05, b, Compounding::Continuous), "t");
         domain(discount_factor(0.05, 1.0, Compounding::Periodic(b)), "c");
-        domain(convert(b, 1.0, Compounding::Simple, Compounding::Continuous), "r");
+        domain(
+            convert(b, 1.0, Compounding::Simple, Compounding::Continuous),
+            "r",
+        );
     }
     // -0.0 is a finite zero: it passes the finiteness rule.
     assert!(discount_factor(-0.0, 1.0, Compounding::Continuous).is_ok());
