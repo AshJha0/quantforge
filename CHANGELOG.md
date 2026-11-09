@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.5.0: stage E, full volatility and exotics (unreleased)
+## 0.5.0: stage E, full volatility and exotics (2026-11-09)
 
-Undated until the tag. Two spec sessions wrote slices E1 to E8 in parallel; each language was built from the specs alone. No golden value of an earlier stage changed.
+Tagged `v0.5.0` on `1b2bc7e` (PR #22). Two spec sessions wrote slices E1 to E8 in parallel; each language was built from the specs alone. No golden value of an earlier stage changed.
 
 ### Added
 - Stage E closeout infrastructure (plan 13.1 R3, R12, E3, E5, E8): recorder sources for Treasury bill and real yield curves and BLS CPI (API v1, no key), with parsed values, `state_sha256`, revision rows, daily study rows for R3-01 to R3-03 and the `sources.json` hash in every row; `gap_monitor.py --studies` and `recheck`. FRED T5YIE and T10YIE are listed but disabled, because FRED's terms forbid storing its data; the breakevens are rebuilt from the Treasury curves. `release.yml` for vMAJOR.MINOR.PATCH tags, `tools/doctor.py`, a devcontainer, a rewritten CONTRIBUTING and a README quick start checked in CI.
