@@ -1,9 +1,10 @@
 //! Q5a: limit-case and convergence-order checks for the stage E numerical methods that have
 //! no outside source (plan section 12.1). The same checks run in all four languages.
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
+use quantforge_core::arb_surface::Slice;
 use quantforge_core::exotics::{FdGrid, Vanilla, american_fd, crr, gbs};
 use quantforge_core::heston::{Grid, Heston, Market, slv_leverage};
 use quantforge_core::pde::{PdeInputs, bs_european};
-use quantforge_core::surface_e::Slice;
 use quantforge_core::svi::Svi;
 
 fn order(e: &[f64]) -> Vec<f64> {

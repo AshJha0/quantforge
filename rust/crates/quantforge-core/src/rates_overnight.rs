@@ -5,6 +5,7 @@ use crate::calendar::{Calendar, CalendarId};
 use crate::conventions::Overnight;
 use crate::curve::{Curve, Discount, Interpolation, SolveMethod, Solved, check_jumps, curve_time};
 use crate::dates::Date;
+
 use crate::error::{Result, err, fail};
 use crate::ois::{OisCurveProblem, OisLegs, OisQuote};
 use crate::projection::{self, ProjectionQuote};
@@ -54,6 +55,7 @@ pub fn compound_dated(
     k: i64,
     fixings: &[(Date, f64)],
 ) -> Result<Compounded> {
+    crate::error::finite("fixings", &fixings)?;
     if end <= start {
         return fail("E_DATE_ORDER", "end is not after start");
     }
@@ -157,6 +159,9 @@ impl StepCurve {
         steps: Vec<(Date, f64)>,
         jumps: Vec<(Date, f64)>,
     ) -> Result<StepCurve> {
+        crate::error::finite("base_rate", &base_rate)?;
+        crate::error::finite("steps", &steps)?;
+        crate::error::finite("jumps", &jumps)?;
         let dates: Vec<Date> = steps.iter().map(|s| s.0).collect();
         if !dates.is_empty() {
             check_step_dates(as_of, &dates)?;
@@ -172,6 +177,7 @@ impl StepCurve {
 
     /// The forward in force on `d`.
     pub fn forward(&self, d: Date) -> Result<f64> {
+        crate::error::finite("self", self)?;
         if d < self.as_of {
             return fail("E_OUT_OF_RANGE", "date is before as_of");
         }
@@ -237,6 +243,7 @@ pub fn fit_steps(
     quotes: &[((i64, char), f64)],
     jumps: &[(Date, f64)],
 ) -> Result<StepFit> {
+    crate::error::finite("jumps", &jumps)?;
     let m = step_dates.len();
     if quotes.len() != m + 1 {
         return fail("E_INPUT", "need one more quote than step dates");
@@ -331,6 +338,11 @@ fn b_factor(a: f64, x: f64) -> f64 {
 
 /// `rates.futures.convexity`: Hull-White, as `QuantLib`'s `HullWhite::convexityBias`.
 pub fn convexity(price: f64, t: f64, big_t: f64, sigma: f64, a: f64) -> Result<Convexity> {
+    crate::error::finite("price", &price)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("big_t", &big_t)?;
+    crate::error::finite("sigma", &sigma)?;
+    crate::error::finite("a", &a)?;
     if big_t.is_nan() || t.is_nan() || big_t <= t {
         return fail("E_INPUT", "end_years must be after start_years");
     }
@@ -368,6 +380,8 @@ pub fn csa_discount(
     fx: Option<&CsaFx>,
     dates: &[Date],
 ) -> Result<Vec<f64>> {
+    crate::error::finite("spread", &spread)?;
+    crate::error::finite("fx", &fx)?;
     if dates.is_empty() {
         return fail("E_INPUT", "no dates");
     }
@@ -410,6 +424,8 @@ pub fn joint_bootstrap(
     interpolation: Interpolation,
     method: SolveMethod,
 ) -> Result<(Solved, Solved)> {
+    crate::error::finite("ois_quotes", &ois_quotes)?;
+    crate::error::finite("term_quotes", &term_quotes)?;
     if ois_quotes.is_empty() || term_quotes.is_empty() {
         return fail("E_INPUT", "both quote lists must be non-empty");
     }
@@ -417,6 +433,42 @@ pub fn joint_bootstrap(
     let discount = p.solve(&p.mids, method)?;
     let projection = projection::bootstrap(&discount.curve, as_of, term_quotes, interpolation)?;
     Ok((discount, projection))
+}
+
+impl crate::error::Finite for Compounded {
+    fn is_all_finite(&self) -> bool {
+        self.compounded_rate.is_all_finite()
+            && self.accrual.is_all_finite()
+            && self.interest.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Convexity {
+    fn is_all_finite(&self) -> bool {
+        self.futures_rate.is_all_finite()
+            && self.convexity.is_all_finite()
+            && self.forward_rate.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for CsaFx {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite() && self.forwards.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for StepCurve {
+    fn is_all_finite(&self) -> bool {
+        self.base_rate.is_all_finite() && self.steps.is_all_finite() && self.jumps.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for StepFit {
+    fn is_all_finite(&self) -> bool {
+        self.base_rate.is_all_finite()
+            && self.step_rates.is_all_finite()
+            && self.max_repricing_error.is_all_finite()
+    }
 }
 
 #[cfg(test)]

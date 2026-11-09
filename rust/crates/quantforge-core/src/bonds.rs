@@ -1,6 +1,7 @@
 //! Bonds, repo and bond futures (`04-pricing/bonds.md`).
 use crate::curve::{Curve, Discount, curve_time};
 use crate::dates::{Date, days_in_month};
+
 use crate::error::{Result, err, fail};
 use crate::linalg::solve;
 use crate::schedule::add_months;
@@ -59,6 +60,7 @@ fn periods(maturity: Date, months: i64, settlement: Date) -> Result<(Date, Vec<D
 }
 
 impl Bond {
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn new(maturity: Date, coupon: f64, frequency: i64) -> Bond {
         Bond {
             maturity,
@@ -76,6 +78,7 @@ impl Bond {
     }
 
     pub fn flows(&self, settlement: Date) -> Result<Flows> {
+        crate::error::finite("self", self)?;
         let (prev, dates) = periods(self.maturity, self.months(), settlement)?;
         let next = dates[0];
         let c = self.amount();
@@ -91,6 +94,7 @@ impl Bond {
     }
 
     pub fn accrued(&self, settlement: Date) -> Result<f64> {
+        crate::error::finite("self", self)?;
         Ok(self.flows(settlement)?.accrued)
     }
 
@@ -117,6 +121,8 @@ pub struct YieldPrice {
 }
 
 pub fn price_from_yield(b: &Bond, settlement: Date, y: f64) -> Result<YieldPrice> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("y", &y)?;
     let fl = b.flows(settlement)?;
     let f = b.frequency as f64;
     if 1.0 + y / f <= 0.0 {
@@ -144,6 +150,8 @@ pub fn price_from_yield(b: &Bond, settlement: Date, y: f64) -> Result<YieldPrice
 
 /// `(yield, dirty, accrued)`.
 pub fn yield_from_price(b: &Bond, settlement: Date, clean: f64) -> Result<(f64, f64, f64)> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("clean", &clean)?;
     let accrued = b.accrued(settlement)?;
     let target = clean + accrued;
     if clean <= 0.0 || target <= 0.0 {
@@ -186,6 +194,8 @@ pub fn dirty_on<C: Discount + ?Sized>(
     c: &C,
     z: f64,
 ) -> Result<(f64, f64, f64)> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("z", &z)?;
     if settlement < as_of {
         return fail("E_OUT_OF_RANGE", "settlement is before the curve's as_of");
     }
@@ -204,11 +214,14 @@ pub fn dirty_on<C: Discount + ?Sized>(
 
 /// `(dirty, accrued)` on the curve.
 pub fn price_from_curve(b: &Bond, settlement: Date, c: &Curve) -> Result<(f64, f64)> {
+    crate::error::finite("b", &b)?;
     let (d, _, a) = curve_dirty(b, settlement, c, 0.0)?;
     Ok((d, a))
 }
 
 pub fn z_spread(b: &Bond, settlement: Date, c: &Curve, clean: f64) -> Result<f64> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("clean", &clean)?;
     let (_, _, accrued) = curve_dirty(b, settlement, c, 0.0)?;
     let target = clean + accrued;
     let mut z = 0.0;
@@ -247,6 +260,8 @@ fn floating_dates(maturity: Date, settlement: Date) -> Result<(Date, Vec<Date>)>
 
 /// `(spread, annuity)`: par-par asset swap on quarterly floating dates.
 pub fn asset_swap(b: &Bond, settlement: Date, c: &Curve, dirty: f64) -> Result<(f64, f64)> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("dirty", &dirty)?;
     let (p, _) = price_from_curve(b, settlement, c)?;
     let (_, dates) = floating_dates(b.maturity, settlement)?;
     let ds = c.discount(settlement)?;
@@ -271,6 +286,7 @@ pub struct Frn {
 
 /// `(dirty, accrued)`.
 pub fn frn_price(n: &Frn, discount: &Curve, projection: &Curve) -> Result<(f64, f64)> {
+    crate::error::finite("n", &n)?;
     let (prev, dates) = periods(n.maturity, 12 / n.frequency, n.settlement)?;
     let dm = |d: Date| -> Result<f64> {
         Ok(discount.discount(d)? * (-n.discount_margin * curve_time(discount.as_of, d)).exp())
@@ -334,6 +350,10 @@ pub fn repo_forward(
     r: f64,
     gc: Option<f64>,
 ) -> Result<RepoForward> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("clean", &clean)?;
+    crate::error::finite("r", &r)?;
+    crate::error::finite("gc", &gc)?;
     repo_checks(b, start, end)?;
     let (dirty, sum, weighted) = repo_parts(b, start, end, clean)?;
     let tau = days(start, end) / 360.0;
@@ -355,6 +375,9 @@ pub fn repo_implied_rate(
     clean: f64,
     forward_clean: f64,
 ) -> Result<f64> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("clean", &clean)?;
+    crate::error::finite("forward_clean", &forward_clean)?;
     repo_checks(b, start, end)?;
     let (dirty, sum, weighted) = repo_parts(b, start, end, clean)?;
     let tau = days(start, end) / 360.0;
@@ -370,6 +393,8 @@ pub fn conversion_factor(
     notional: f64,
     whole_months: bool,
 ) -> Result<f64> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("notional", &notional)?;
     if notional != 0.06 || b.frequency != 2 {
         return fail("E_INPUT", "6% notional and semi-annual bonds only");
     }
@@ -416,6 +441,9 @@ pub fn futures_basis(
     r: f64,
     bonds: &[(Bond, f64, f64)],
 ) -> Result<(Vec<Basis>, usize)> {
+    crate::error::finite("f", &f)?;
+    crate::error::finite("r", &r)?;
+    crate::error::finite("bonds", &bonds)?;
     if bonds.is_empty() {
         return fail("E_INPUT", "no bonds");
     }
@@ -454,6 +482,9 @@ pub fn fit_nelson_siegel(
     bonds: &[(Bond, f64)],
     weights: Option<&[f64]>,
 ) -> Result<([f64; 3], Vec<f64>)> {
+    crate::error::finite("tau", &tau)?;
+    crate::error::finite("bonds", &bonds)?;
+    crate::error::finite("weights", &weights)?;
     if tau <= 0.0 {
         return fail("E_DOMAIN", "tau must be positive");
     }
@@ -541,6 +572,57 @@ pub fn fit_nelson_siegel(
     }
     let residuals = (0..n).map(|j| p[j] - bonds[j].1).collect();
     Ok((beta, residuals))
+}
+
+impl crate::error::Finite for Basis {
+    fn is_all_finite(&self) -> bool {
+        self.invoice.is_all_finite()
+            && self.gross_basis.is_all_finite()
+            && self.net_basis.is_all_finite()
+            && self.implied_repo.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Bond {
+    fn is_all_finite(&self) -> bool {
+        self.coupon.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Flows {
+    fn is_all_finite(&self) -> bool {
+        self.flows.is_all_finite() && self.accrued.is_all_finite() && self.w.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Frn {
+    fn is_all_finite(&self) -> bool {
+        self.current_rate.is_all_finite()
+            && self.margin.is_all_finite()
+            && self.discount_margin.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for RepoForward {
+    fn is_all_finite(&self) -> bool {
+        self.dirty.is_all_finite()
+            && self.forward_dirty.is_all_finite()
+            && self.forward_clean.is_all_finite()
+            && self.interest.is_all_finite()
+            && self.special_spread.is_all_finite()
+            && self.specialness_value.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for YieldPrice {
+    fn is_all_finite(&self) -> bool {
+        self.dirty.is_all_finite()
+            && self.accrued.is_all_finite()
+            && self.clean.is_all_finite()
+            && self.modified_duration.is_all_finite()
+            && self.macaulay_duration.is_all_finite()
+            && self.convexity.is_all_finite()
+    }
 }
 
 #[cfg(test)]

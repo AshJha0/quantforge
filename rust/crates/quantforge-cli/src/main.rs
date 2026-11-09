@@ -6,15 +6,9 @@ mod golden_replay;
 mod input;
 mod limits;
 mod ops;
-mod ops_b;
-mod ops_c;
-mod ops_d;
-mod ops_d2;
-mod ops_e;
-mod ops_r2;
 
 use input::Inputs;
-use ops::{OPERATIONS, dispatch};
+use ops::{dispatch, operations};
 use quantforge_core::error::{QfError, err};
 use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
@@ -93,7 +87,8 @@ fn check_envelope(doc: &Json, flags: Flags) -> Result<(&str, &Json), QfError> {
 /// works on an array stops at `Inputs::gate`, after its typed reads. An oversized array in a key
 /// the operation ignores reaches the end, and its small result is replaced here.
 fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
-    let limit = OPERATIONS
+    let inputs = &with_non_finite_tokens(inputs);
+    let limit = operations()
         .contains(&op)
         .then(|| limits::check(op, inputs))
         .flatten();
@@ -101,7 +96,26 @@ fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
     match (result, limit) {
         (Err(e), _) if e.code == "E_SCHEMA" => Err(e),
         (_, Some(l)) => Err(l),
+        // F-2: after E_SCHEMA and E_LIMIT, before every check of the operation's own.
+        _ if inputs.has_non_finite() => Err(err("E_DOMAIN", "a Real input is NaN or infinite")),
         (r, None) => r,
+    }
+}
+
+/// F-1: the strings `"NaN"`, `"Infinity"` and `"-Infinity"` are the binary64 values. They become
+/// numbers here, so a Real read accepts them and an Integer, Date or Enum read is `E_SCHEMA`.
+fn with_non_finite_tokens(v: &Json) -> Json {
+    match v {
+        Json::Str(s) if s == "NaN" => Json::Num(f64::NAN),
+        Json::Str(s) if s == "Infinity" => Json::Num(f64::INFINITY),
+        Json::Str(s) if s == "-Infinity" => Json::Num(f64::NEG_INFINITY),
+        Json::Arr(a) => Json::Arr(a.iter().map(with_non_finite_tokens).collect()),
+        Json::Obj(o) => Json::Obj(
+            o.iter()
+                .map(|(k, x)| (k.clone(), with_non_finite_tokens(x)))
+                .collect(),
+        ),
+        other => other.clone(),
     }
 }
 
@@ -253,7 +267,7 @@ fn command(name: &str, timings: bool) -> std::io::Result<u8> {
             ("contract_version", CONTRACT.into()),
             ("toolchain", "rustc 1.99.1".into()),
         ])),
-        _ => print(&OPERATIONS.to_vec().into()),
+        _ => print(&operations().to_vec().into()),
     }
 }
 
@@ -296,8 +310,8 @@ mod tests {
 
     #[test]
     fn operations_are_sorted_and_all_dispatch() {
-        assert!(OPERATIONS.windows(2).all(|w| w[0] < w[1]));
-        for op in OPERATIONS {
+        assert!(operations().windows(2).all(|w| w[0] < w[1]));
+        for op in operations() {
             assert_eq!(code(&case(op, "{}")), Some("E_SCHEMA"), "{op}");
         }
     }

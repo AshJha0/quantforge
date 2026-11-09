@@ -4,6 +4,7 @@ use crate::error::{Result, fail};
 use crate::stats::{centered, is_constant, mean, ols};
 
 pub fn returns(prices: &[f64], log: bool) -> Result<Vec<f64>> {
+    crate::error::finite("prices", &prices)?;
     if prices.len() < 2 {
         return fail("E_INPUT", "at least 2 prices are needed");
     }
@@ -23,6 +24,7 @@ pub fn returns(prices: &[f64], log: bool) -> Result<Vec<f64>> {
 }
 
 pub fn rolling(x: &[f64], window: i64, stdev: bool) -> Result<Vec<Option<f64>>> {
+    crate::error::finite("x", &x)?;
     if window < 2 || window > x.len() as i64 {
         return fail("E_INPUT", "window out of range");
     }
@@ -42,6 +44,8 @@ pub fn rolling(x: &[f64], window: i64, stdev: bool) -> Result<Vec<Option<f64>>> 
 }
 
 pub fn ewma_variance(r: &[f64], lambda: f64) -> Result<Vec<f64>> {
+    crate::error::finite("r", &r)?;
+    crate::error::finite("lambda", &lambda)?;
     if r.is_empty() {
         return fail("E_INPUT", "at least 1 return is needed");
     }
@@ -59,6 +63,7 @@ pub fn ewma_variance(r: &[f64], lambda: f64) -> Result<Vec<f64>> {
 }
 
 pub fn autocorrelation(x: &[f64], max_lag: i64) -> Result<Vec<f64>> {
+    crate::error::finite("x", &x)?;
     if max_lag < 1 || max_lag >= x.len() as i64 {
         return fail("E_INPUT", "max_lag out of range");
     }
@@ -73,6 +78,7 @@ pub fn autocorrelation(x: &[f64], max_lag: i64) -> Result<Vec<f64>> {
 }
 
 pub fn ljung_box(x: &[f64], max_lag: i64) -> Result<f64> {
+    crate::error::finite("x", &x)?;
     let acf = autocorrelation(x, max_lag)?;
     let n = x.len() as f64;
     let s: f64 = acf
@@ -85,6 +91,7 @@ pub fn ljung_box(x: &[f64], max_lag: i64) -> Result<f64> {
 
 /// Returns `(constant, phi, sigma)`.
 pub fn ar1(x: &[f64]) -> Result<(f64, f64, f64)> {
+    crate::error::finite("x", &x)?;
     if x.len() < 4 {
         return fail("E_INPUT", "at least 4 values are needed");
     }
@@ -98,6 +105,7 @@ pub fn resample_last(
     values: &[Option<f64>],
     monthly: bool,
 ) -> Result<(Vec<Date>, Vec<f64>)> {
+    crate::error::finite("values", &values)?;
     if dates.len() != values.len() {
         return fail("E_INPUT", "dates and values differ in length");
     }
@@ -126,6 +134,7 @@ pub fn resample_last(
 }
 
 pub fn forward_fill(values: &[Option<f64>], limit: i64) -> Result<Vec<Option<f64>>> {
+    crate::error::finite("values", &values)?;
     if limit < 1 {
         return fail("E_INPUT", "limit must be at least 1");
     }

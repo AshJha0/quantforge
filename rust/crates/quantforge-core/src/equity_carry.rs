@@ -2,6 +2,7 @@
 //! rebalancing, corporate actions and TRS (`equity-index.md`).
 use crate::curve::{Curve, curve_time};
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 use std::collections::{BTreeMap, HashSet};
 
@@ -20,6 +21,8 @@ impl Carry<'_> {
 
     /// `F(T) = [S - sum div C(t_i)] / C(T)` over ex-dates in `(as_of, T]`.
     pub fn forward(&self, spot: f64, dividends: &[(Date, f64)], t: Date) -> Result<f64> {
+        crate::error::finite("spot", &spot)?;
+        crate::error::finite("dividends", &dividends)?;
         let mut pv = 0.0;
         for (d, a) in dividends {
             if *d > self.funding.as_of && *d <= t {
@@ -75,6 +78,9 @@ pub fn dividend_implied(
     borrow: f64,
     futures: &[(Date, f64)],
 ) -> Result<ImpliedDividends> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("borrow", &borrow)?;
+    crate::error::finite("futures", &futures)?;
     if futures.is_empty() {
         return fail("E_INPUT", "no futures");
     }
@@ -114,6 +120,9 @@ pub fn borrow_implied(
     expiry: Date,
     forward: f64,
 ) -> Result<f64> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("dividends", &dividends)?;
+    crate::error::finite("forward", &forward)?;
     if expiry <= funding.as_of {
         return fail("E_DATE_ORDER", "expiry is not after as_of");
     }
@@ -142,6 +151,11 @@ pub fn futures_basis(
     expiry: Date,
     price: f64,
 ) -> Result<(f64, f64, f64)> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("borrow", &borrow)?;
+    crate::error::finite("spread", &spread)?;
+    crate::error::finite("dividends", &dividends)?;
+    crate::error::finite("price", &price)?;
     if expiry <= funding.as_of {
         return fail("E_DATE_ORDER", "expiry is not after as_of");
     }
@@ -188,6 +202,9 @@ pub fn index_dividends(
     periods: &[(Date, Date)],
     implied: &[f64],
 ) -> Result<IndexDividends> {
+    crate::error::finite("divisor", &divisor)?;
+    crate::error::finite("cs", &cs)?;
+    crate::error::finite("implied", &implied)?;
     if divisor <= 0.0 {
         return fail("E_DOMAIN", "divisor must be positive");
     }
@@ -232,6 +249,9 @@ pub fn rebalance(
     old: &[Constituent],
     new: &[Constituent],
 ) -> Result<(f64, f64, Vec<f64>)> {
+    crate::error::finite("divisor", &divisor)?;
+    crate::error::finite("old", &old)?;
+    crate::error::finite("new", &new)?;
     for list in [old, new] {
         let mut seen = HashSet::new();
         if list.iter().any(|c| !seen.insert(c.id.as_str())) {
@@ -261,6 +281,10 @@ pub fn corporate_action(
     shares: f64,
     strike: f64,
 ) -> Result<(f64, f64, f64, f64)> {
+    crate::error::finite("a", &a)?;
+    crate::error::finite("p", &p)?;
+    crate::error::finite("shares", &shares)?;
+    crate::error::finite("strike", &strike)?;
     let f = match a {
         Action::Split(r) => {
             if r <= 0.0 {
@@ -303,6 +327,11 @@ pub fn trs_pv(
     t: &Trs,
     current_rate: Option<f64>,
 ) -> Result<(f64, f64, f64)> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("borrow", &borrow)?;
+    crate::error::finite("dividends", &dividends)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("current_rate", &current_rate)?;
     if t.end <= t.start {
         return fail("E_DATE_ORDER", "end is not after start");
     }
@@ -329,6 +358,48 @@ pub fn trs_pv(
     let fund = t.shares * t.initial_price * (r + t.spread) * alpha * de;
     let sign = if t.receive_equity { 1.0 } else { -1.0 };
     Ok((equity, fund, sign * (equity - fund)))
+}
+
+impl crate::error::Finite for Action {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Split(x0) => x0.is_all_finite(),
+            Self::Rights { m, k, .. } => m.is_all_finite() && k.is_all_finite(),
+            Self::SpecialDividend(x0) => x0.is_all_finite(),
+        }
+    }
+}
+
+impl crate::error::Finite for Constituent {
+    fn is_all_finite(&self) -> bool {
+        self.shares.is_all_finite() && self.price.is_all_finite() && self.dividends.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for ImpliedDividends {
+    fn is_all_finite(&self) -> bool {
+        self.pv_dividends.is_all_finite()
+            && self.period_pv_dividends.is_all_finite()
+            && self.dividend_yields.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for IndexDividends {
+    fn is_all_finite(&self) -> bool {
+        self.level.is_all_finite()
+            && self.points.is_all_finite()
+            && self.period_points.is_all_finite()
+            && self.basis.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Trs {
+    fn is_all_finite(&self) -> bool {
+        self.initial_price.is_all_finite()
+            && self.shares.is_all_finite()
+            && self.spread.is_all_finite()
+    }
 }
 
 #[cfg(test)]
