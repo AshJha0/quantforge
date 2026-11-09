@@ -102,9 +102,9 @@ stage it belongs to.
 
 ## Pull request checklist
 - [ ] Mathematical specification reviewed and unchanged or updated.
-- [ ] Inputs, outputs, units and conventions are explicit.
+- [ ] Inputs, outputs, units and conventions are explicit; public names follow the name map and [ADR-0011](architecture/decisions/ADR-0011-api-style.md).
 - [ ] Normal, boundary, invalid and numerical stress cases tested.
-- [ ] Determinism and reproducibility verified.
+- [ ] Determinism and reproducibility verified, at the level [docs/determinism.md](docs/determinism.md) gives for that output.
 - [ ] Cross-language goldens regenerated through the oracle where applicable.
 - [ ] CLI changes pass `python conformance/runner/batch_check.py --impl <lang>` as well as the golden runner.
 - [ ] Independent expected values or external reference evidence supplied.

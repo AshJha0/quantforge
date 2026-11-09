@@ -2,6 +2,8 @@
 
 Short recipes. Commands run from the repository root, in Git Bash or a Unix shell. `python` means any Python 3.12 or later, because the neutral tools use only the standard library.
 
+New here? [Tutorial 1](docs/getting-started/tutorial-1-swap.md) builds a curve, prices a swap and takes its DV01 in each language. `python tools/check_tutorial.py --lang rust` runs its blocks and checks the output.
+
 ## Build each CLI
 
 ```bash
@@ -482,3 +484,7 @@ Expected (case `ratesvol_e-0081`): `price` 5993.010165883334, `strike_ratio` 1.0
 #### Recipes that need curves or long arrays
 
 The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves or hundreds of numbers. Copy the `inputs` of `ratesvol_e-0001`, `ratesvol_e-0049`, `varswap_e-0001` or `garch_e-0027` from the golden file into a case document and run it the same way.
+
+## Stage F recipes
+
+*Planned.* Recipes for the stage F risk, portfolio and book operations are added at the stage F merge, with real outputs.
