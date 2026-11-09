@@ -250,3 +250,76 @@ pub(crate) fn tension_eval(t: &[f64], l: &[f64], m: &[f64], sigma: f64, at: f64)
     let d = (l[i + 1] - l[i]) / h - m[i] * drb + m[i + 1] * dra;
     (v, -d)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn nodes() -> (Vec<f64>, Vec<f64>) {
+        let t = vec![
+            0.0, 0.1, 0.25, 0.5, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0, 15.0, 20.0, 30.0,
+        ];
+        let z = [
+            0.043, 0.043, 0.0425, 0.0412, 0.039, 0.0365, 0.0355, 0.0352, 0.0356, 0.0364, 0.0376,
+            0.038, 0.0368,
+        ];
+        let l = t.iter().zip(z).map(|(t, z)| -z * t).collect();
+        (t, l)
+    }
+
+    #[test]
+    fn convex_returns_nodes_and_is_continuous() {
+        let (t, l) = nodes();
+        let f = convex_nodes(&t, &l);
+        for i in 1..t.len() {
+            let (ls, _) = convex_eval(&t, &l, &f, t[i]);
+            assert!((ls - l[i]).abs() < 1e-14, "node {i}");
+        }
+        for i in 1..t.len() - 1 {
+            let left = convex_eval(&t, &l, &f, t[i] - 1e-12).1;
+            let right = convex_eval(&t, &l, &f, t[i]).1;
+            assert!((left - right).abs() < 1e-9, "f jump at {i}");
+        }
+    }
+
+    #[test]
+    fn convex_flat_is_rule_a_and_local() {
+        let t = [0.0, 1.0, 2.0, 3.0];
+        let l = [0.0, -0.03, -0.06, -0.09];
+        let f = convex_nodes(&t, &l);
+        for x in [0.0, 0.3, 1.7, 2.9] {
+            assert!((convex_eval(&t, &l, &f, x).1 - 0.03).abs() < 1e-15);
+        }
+        // Locality (F-22): a change in S_j moves f only on sections j-1 to j+2.
+        let (t, l) = nodes();
+        let mut l2 = l.clone();
+        l2[3] -= 1e-4;
+        let (f1, f2) = (convex_nodes(&t, &l), convex_nodes(&t, &l2));
+        for x in [6.0, 12.0, 25.0] {
+            let d = convex_eval(&t, &l, &f1, x).1 - convex_eval(&t, &l2, &f2, x).1;
+            assert!(d.abs() <= 1e-15, "{x}");
+        }
+    }
+
+    #[test]
+    fn log_cubic_and_tension() {
+        let (t, l) = nodes();
+        let m = log_cubic_slopes(&t, &l);
+        for i in 1..t.len() - 1 {
+            let left = log_cubic_eval(&t, &l, &m, t[i] - 1e-12).1;
+            let right = log_cubic_eval(&t, &l, &m, t[i]).1;
+            assert!((left - right).abs() < 1e-9);
+            assert!((log_cubic_eval(&t, &l, &m, t[i]).0 - l[i]).abs() < 1e-15);
+        }
+        // Small tension tends to the natural cubic; nodes are returned for any tension.
+        for sigma in [1e-6, 0.5, 50.0, 1000.0] {
+            let mt = tension_moments(&t, &l, sigma);
+            for i in 0..t.len() - 1 {
+                assert!((tension_eval(&t, &l, &mt, sigma, t[i]).0 - l[i]).abs() < 1e-13);
+            }
+        }
+        let a = tension_moments(&t, &l, 1e-4);
+        let b = tension_moments(&t, &l, 2e-3);
+        assert!(a.iter().zip(&b).all(|(x, y)| (x - y).abs() < 1e-6));
+    }
+}

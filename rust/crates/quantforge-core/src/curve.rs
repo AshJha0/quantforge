@@ -229,7 +229,7 @@ impl Curve {
         if self.is_stage_f() {
             return Ok(self.smooth(t.min(self.times[n])).1);
         }
-        if t >= self.times[n] || self.interpolation == Interpolation::LogLinearDf {
+        if t >= self.times[n] || self.interpolation != Interpolation::LinearZero {
             return Ok(self.log_linear(t.min(self.times[n])).1);
         }
         // LINEAR_ZERO: z(t) + t z'(t), right-hand slope.
