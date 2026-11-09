@@ -34,6 +34,16 @@ classes:
     # Stage E spec B (garch.md): a log-likelihood summed over hundreds of terms. Each ln may differ in its last bit across libms.
     absolute: 1.0e-9
     relative: 1.0e-10
+  jacobian:
+    # Stage F (joint-solve-and-funding.md, Q4): d unknown / d quote by the implicit function theorem. A build may form dR/dx by
+    # central differences (about 1e-9 relative); the inverse carries it at the system's condition number.
+    absolute: 1.0e-9
+    relative: 1.0e-6
+  standard_error:
+    # Stage F (garch.md R8, ruling F-13): sqrt of the diagonal of an inverted Hessian. Builds may form the Hessian by
+    # central differences of an analytic score (error about 1e-9 relative); the inverse amplifies it by the condition number.
+    absolute: 1.0e-15
+    relative: 1.0e-5
   numerical_scheme:
     # The same grid recipe in another language: rounding through hundreds of tridiagonal solves.
     absolute: 1.0e-8

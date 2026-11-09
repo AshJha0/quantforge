@@ -63,3 +63,22 @@ Synthetic strips are Black prices on a skewed smile rounded to 0.05 ticks, with 
 - [S2] Demeterfi, K., Derman, E., Kamal, M. and Zou, J., "A guide to volatility and variance swaps", *Journal of Derivatives* 6(4), 1999, 9-32 (the strip behind the method) (not opened)
 
 The methodology also derives `R` from Treasury yields (section 2) and picks expiries by rule; those steps are the caller's here, so the caller passes `R` and the two strips.
+
+## Stage F additions (plan item R10)
+
+Spec version 1.1.0 for this section. Rulings: `stage-f-rulings.md` F-15 and F-16. Suite `stage_f/vix_f`. A strip without `null` quotes gives exactly the stage E result.
+
+**Source re-read (2026-11-09).** Cboe, *Cboe Volatility Index Mathematics Methodology* v5.0 (revised 26 February 2026), section 3(a)(ii): the ATM strike is where the absolute call-put mid difference is smallest, lowest strike on a tie, and "Series with null quotes or bid price higher than ask price are not candidates to be the ATM strike." Section 3(a)(iii): "First, remove all option strikes with null quotes from both the put and the call option series." A zero bid is not a null quote: zero-bid series stay ATM candidates (ruling E-B5 stands; the source confirms it). Cboe, *Cboe Volatility Index Methodology* v6.0 (revised 26 February 2026), Appendix 3 (sample calculation) and Appendix 4 (the complete SPX/SPXW strip it uses).
+
+**Null quotes (ruling F-15).** Each of `call_bid`, `call_ask`, `put_bid`, `put_ask` may be `null`. A series (the call, or the put, at one strike) with a `null` bid or ask is a *null series*. Then:
+
+1. **Forward.** Only strikes whose call and put are both not null are candidates for `K*`. If there is none: `E_INPUT`.
+2. **K0** as before, over all strikes in the strip (a strike exists if it is listed). If the `K0` call or the `K0` put is a null series: `E_INPUT` ("cannot be calculated", 3(a)(ii)).
+3. **Selection.** Null series are removed from their own side's walk before it starts: a null put is skipped on the put walk as if its strike were not listed for puts (it neither counts as a zero bid nor breaks a run of zero bids); the call at the same strike is unaffected, and the other way round.
+4. Steps 4 and 5 unchanged; `dK` uses the selected strikes.
+
+A bid above its ask stays `E_INPUT` (unchanged, ruling F-16): Cboe drops such series from the ATM search and leaves them to its series-level filter (Mathematics Methodology section 4), which needs quote history this pure function does not have; a caller must clean or null them. A strip where every strike has a null series on some side still needs at least 3 listed strikes.
+
+**Cboe sample calculation (golden, `vix_f`).** Near term: 34,484 minutes, `R1 = 0.031664%` (0.00031664), 186 strikes from 800 to 2250. Next term: 44,954 minutes, `R2 = 0.028797%`, 128 strikes from 1225 to 2250. Bid and ask as printed in Appendix 4 (four values whose decimal point is lost in the PDF text layer, `99 00`, `100 40`, `7 50`, `7 80`, and `0 00`, `0 10`, `286 30`, `289 00`, are read as `99.00` and so on; the published results confirm the reading). Published: `F1 = 1962.89996`, `F2 = 1962.40006`, `K0 = 1960` for both, `sigma1^2 = 0.019233906`, `sigma2^2 = 0.019423884`, VIX `= 100 x 0.13927842 = 13.93`. This method gives `1962.8999564`, `1962.4000591`, `0.0192339065`, `0.0194238843` and `13.9278424`, equal to every printed digit; the 146 near-term and 122 next-term strikes used are the highlighted ones. The goldens hold the full-precision values; the oracle asserts the printed digits. This is the outside reference for this method (no library implements it).
+
+Wrong conventions the new goldens catch: a strike with a null side used as `K*`; a null put counted as a zero bid (stops the walk early); a null put removing the call at the same strike; `K0` with a null side priced instead of refused.
