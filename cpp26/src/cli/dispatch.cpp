@@ -4,6 +4,7 @@
 #include <charconv>
 #include <cmath>
 #include <initializer_list>
+#include <limits>
 #include <map>
 #include <span>
 #include <stdexcept>
@@ -80,9 +81,19 @@ bool product_above(long long a, long long b, double limit) {
 template <class T>
 using EnumTable = std::initializer_list<std::pair<string_view, T>>;
 
+// The first non-finite Real read in the current case (ruling F-1, F-2). In::ready() raises it as E_DOMAIN,
+// after E_SCHEMA and E_LIMIT have had their turn and before any rule check. Reset by run_case.
+thread_local std::optional<string> first_non_finite;
+
 double to_real(const Value& v, string_view key) {
-    if (v.kind != Kind::Number) schema(key, "expected a number");
-    return v.number;
+    double x;
+    if (v.kind == Kind::Number) x = v.number;
+    else if (v.kind == Kind::String && v.text == "NaN") x = std::numeric_limits<double>::quiet_NaN();
+    else if (v.kind == Kind::String && v.text == "Infinity") x = std::numeric_limits<double>::infinity();
+    else if (v.kind == Kind::String && v.text == "-Infinity") x = -std::numeric_limits<double>::infinity();
+    else schema(key, "expected a number");
+    if (!std::isfinite(x) && !first_non_finite) first_non_finite = string(key);
+    return x;
 }
 
 long long to_integer(const Value& v, string_view key) {
@@ -161,6 +172,7 @@ public:
     // turn by then, so the array limit can stop the case (ruling B24).
     void ready() const {
         if (oversized_) throw Error("E_LIMIT", "an array in inputs is above its limit");
+        if (first_non_finite) throw Error("E_DOMAIN", *first_non_finite + " must be finite", *first_non_finite);
     }
 
     const Value* find(string_view key) const {
@@ -394,6 +406,7 @@ CaseResult run_case(string_view text) {
         const json::Parsed parsed = json::parse(text);
         if (const Value* id = parsed.value.find("case_id"); id && id->kind == Kind::String && !id->text.empty())
             case_id = id->text;
+        first_non_finite.reset();
         Handler handler = nullptr;
         const Value& inputs = check_envelope(parsed, handler);
         const bool big = oversized(inputs);

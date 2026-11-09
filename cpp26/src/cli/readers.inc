@@ -95,6 +95,10 @@ StoreRecord record_of(const Value& v) {
     if (v.kind != Kind::Object) schema("records", "expected an object");
     const In r(v);
     if (!v.find("value")) schema("value", "missing");
+    // A record value is any JSON value; as a Real it may be a non-finite token (ruling F-1), which F-2 rejects.
+    if (const Value& value = *v.find("value"); value.kind == Kind::String &&
+        (value.text == "NaN" || value.text == "Infinity" || value.text == "-Infinity"))
+        to_real(value, "value");
     const long long sequence = r.integer("sequence");
     if (sequence < 1) schema("sequence", "must be at least 1");
     const string& series = r.text("series_id");
@@ -932,7 +936,8 @@ struct InitialVariance {
 
 InitialVariance initial_variance_of(const In& in) {
     const Value& v = in.need("initial_variance");
-    if (v.kind == Kind::String) return {std::nullopt, v.text != "SAMPLE"};
+    if (v.kind == Kind::String && v.text != "NaN" && v.text != "Infinity" && v.text != "-Infinity")
+        return {std::nullopt, v.text != "SAMPLE"};
     return {to_real(v, "initial_variance"), false};
 }
 
