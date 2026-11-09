@@ -10,8 +10,8 @@ import org.quantforge.core.QfError;
 import org.quantforge.pricing.CreditOptions;
 
 /** Stage E8: CDS options, copulas, large homogeneous pool (credit-options-and-copulas.md). */
-final class StageE8 {
-    private StageE8() {}
+final class OpsCreditOptions {
+    private OpsCreditOptions() {}
 
     private record Option(LocalDate asOf, LocalDate expiry, LocalDate maturity, double r, double h, double rec,
                           boolean payer, double k, double n, double x, boolean knockOut) {}

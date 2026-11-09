@@ -15,11 +15,11 @@ import org.quantforge.curves.Curve;
 import org.quantforge.curves.CurveSolver;
 import org.quantforge.curves.Jumps;
 import org.quantforge.curves.Ois;
-import org.quantforge.curves.RatesD;
+import org.quantforge.curves.RatesCurves;
 import org.quantforge.curves.StepCurve;
 
 /** Stage D wave 1: each operation's rules, edge and error paths, and a fuzz pass. */
-class StageDSpecTest {
+class RatesCurvesSpecTest {
     private static final LocalDate AS_OF = LocalDate.of(2026, 11, 6);
     private static final String CURVE = "{\"as_of\":\"2026-11-06\",\"interpolation\":\"LOG_LINEAR_DF\",\"pillars\":"
             + "[{\"date\":\"2027-11-06\",\"discount_factor\":0.96},{\"date\":\"2028-11-06\",\"discount_factor\":0.92}]";
@@ -203,7 +203,7 @@ class StageDSpecTest {
         for (String t : tenors) {
             q.add(new Ois.Quote(t, Ois.legs(Conventions.SOFR, AS_OF, t).parRate(c), null, null));
         }
-        RatesD.StepFit fit = RatesD.fitSteps(Conventions.SOFR, AS_OF, steps, q, j);
+        RatesCurves.StepFit fit = RatesCurves.fitSteps(Conventions.SOFR, AS_OF, steps, q, j);
         assertEquals(0.0425, fit.baseRate(), 1e-12);
         for (int i = 0; i < truth.length; i++) {
             assertEquals(truth[i], fit.stepRates()[i], 1e-12);
@@ -229,13 +229,13 @@ class StageDSpecTest {
 
     @Test
     void convexityAtZeroMeanReversionIsTheLimit() {
-        RatesD.Convexity zero = RatesD.convexity(96, 1, 1.25, 0.01, 0);
-        RatesD.Convexity tiny = RatesD.convexity(96, 1, 1.25, 0.01, 1e-9);
+        RatesCurves.Convexity zero = RatesCurves.convexity(96, 1, 1.25, 0.01, 0);
+        RatesCurves.Convexity tiny = RatesCurves.convexity(96, 1, 1.25, 0.01, 1e-9);
         assertEquals(zero.convexity(), tiny.convexity(), 1e-12);
         double z = 0.0001 / 2 * (2 * 0.0625 + 0.25 * 1);
         assertEquals(-Math.expm1(-z) * (0.04 + 4), zero.convexity(), 1e-17);
         assertEquals(0.04 - zero.convexity(), zero.forwardRate(), 0.0);
-        assertEquals(0.0, RatesD.convexity(96, 0, 0.25, 0.0, 0.1).convexity(), 0.0);
+        assertEquals(0.0, RatesCurves.convexity(96, 0, 0.25, 0.0, 0.1).convexity(), 0.0);
         String f = "{\"price\":96,\"start_years\":%s,\"end_years\":%s,\"sigma\":%s,\"mean_reversion\":%s}";
         error("E_INPUT", "rates.futures.convexity", f.formatted(1, 1, 0.01, 0.03));
         error("E_INPUT", "rates.futures.convexity", f.formatted(-1, -2, 0.01, 0.03));

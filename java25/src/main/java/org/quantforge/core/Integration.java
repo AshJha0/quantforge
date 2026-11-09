@@ -19,6 +19,8 @@ public final class Integration {
     }
 
     public static double trapezoid(DoubleUnaryOperator f, double a, double b, long n) {
+        Finite.check("a", a);
+        Finite.check("b", b);
         checkRange(a, b);
         if (n < 1) {
             throw new QfError("E_INPUT", "need n >= 1", "n");
@@ -33,6 +35,8 @@ public final class Integration {
     }
 
     public static double simpson(DoubleUnaryOperator f, double a, double b, long n) {
+        Finite.check("a", a);
+        Finite.check("b", b);
         checkRange(a, b);
         if (n < 2 || n % 2 != 0) {
             throw new QfError("E_INPUT", "need even n >= 2", "n");
@@ -81,6 +85,8 @@ public final class Integration {
     }
 
     public static double gaussLegendre(DoubleUnaryOperator f, double a, double b, long n) {
+        Finite.check("a", a);
+        Finite.check("b", b);
         checkRange(a, b);
         if (n < 1 || n > 64) {
             throw new QfError("E_INPUT", "need n from 1 to 64", "n");
@@ -113,6 +119,9 @@ public final class Integration {
     }
 
     public static double adaptiveSimpson(DoubleUnaryOperator f, double a, double b, double tol, long maxDepth) {
+        Finite.check("a", a);
+        Finite.check("b", b);
+        Finite.check("tol", tol);
         checkRange(a, b);
         if (!(tol > 0.0) || maxDepth < 1) {
             throw new QfError("E_INPUT", "need tol > 0 and max_depth >= 1");
@@ -170,6 +179,9 @@ public final class Integration {
     }
 
     public static Adaptive gaussKronrod(DoubleUnaryOperator raw, double a, double b, double tol, long maxIntervals) {
+        Finite.check("a", a);
+        Finite.check("b", b);
+        Finite.check("tol", tol);
         DoubleUnaryOperator f = counted(raw);
         checkRange(a, b);
         if (!(tol > 0.0) || maxIntervals < 1) {

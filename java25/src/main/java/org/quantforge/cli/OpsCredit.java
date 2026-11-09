@@ -11,8 +11,8 @@ import org.quantforge.curves.Curve;
 import org.quantforge.pricing.Credit;
 
 /** Stage D wave 2, D4: credit. */
-final class StageD4 {
-    private StageD4() {}
+final class OpsCredit {
+    private OpsCredit() {}
 
     private record HazardInput(LocalDate asOf, LocalDate[] dates, double[] survival) {
         Credit.Hazard build() {
@@ -59,7 +59,7 @@ final class StageD4 {
     }
 
     /** Ruling R1-4: every credit.* operation needs ISDA flat forwards, checked before any other rule. */
-    private static void logLinear(StageB.CurveInput d) {
+    private static void logLinear(OpsLinear.CurveInput d) {
         if (d.interp() != Curve.Interpolation.LOG_LINEAR_DF) {
             throw new QfError("E_INPUT", "discount interpolation must be LOG_LINEAR_DF", "discount");
         }
@@ -68,7 +68,7 @@ final class StageD4 {
     static void register(Map<String, Function<In, Out>> table) {
         table.put("credit.cds.price", in -> {
             LocalDate t = in.date("trade_date");
-            StageB.CurveInput d = StageB.curve(in, "discount");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
             HazardInput h = hazard(in);
             double r = in.real("recovery");
             In tr = in.object("trade");
@@ -92,7 +92,7 @@ final class StageD4 {
         });
         table.put("credit.cds.bootstrap", in -> {
             LocalDate t = in.date("trade_date");
-            StageB.CurveInput d = StageB.curve(in, "discount");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
             double r = in.real("recovery");
             Quotes q = quotes(in);
             in.gate();
@@ -101,7 +101,7 @@ final class StageD4 {
         });
         table.put("credit.index.intrinsic", in -> {
             LocalDate t = in.date("trade_date");
-            StageB.CurveInput d = StageB.curve(in, "discount");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
             List<In> names = in.objects("names");
             in.limit(names.size() > 1000, "names");
             List<HazardInput> hz = new ArrayList<>();
@@ -141,7 +141,7 @@ final class StageD4 {
         });
         table.put("credit.curve.composite", in -> {
             LocalDate t = in.date("trade_date");
-            StageB.CurveInput d = StageB.curve(in, "discount");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
             double r = in.real("recovery");
             List<In> cons = in.objects("constituents");
             in.limit(cons.size() > 1000, "constituents");

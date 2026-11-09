@@ -14,7 +14,7 @@ import org.quantforge.pricing.CmdtyMbs;
 import org.quantforge.pricing.Credit;
 
 /** The code paths rulings D33 to D39 changed. */
-class RulingsDTest {
+class RulingsRatesTest {
     private static final LocalDate AS_OF = LocalDate.of(2026, 11, 6);
     private static final Curve D = Curve.of(AS_OF, Curve.Interpolation.LOG_LINEAR_DF,
             new LocalDate[] {LocalDate.of(2027, 11, 6), LocalDate.of(2046, 11, 6)}, new double[] {0.96, 0.45});

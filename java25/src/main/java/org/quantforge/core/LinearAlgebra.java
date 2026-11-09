@@ -48,6 +48,8 @@ public final class LinearAlgebra {
     }
 
     public static double[] solve(double[][] input, double[] rhs) {
+        Finite.check("input", input);
+        Finite.check("rhs", rhs);
         checkSquare(input);
         int n = input.length;
         if (rhs.length != n) {
@@ -92,6 +94,7 @@ public final class LinearAlgebra {
     }
 
     public static double[][] cholesky(double[][] a) {
+        Finite.check("a", a);
         checkSymmetric(a);
         int n = a.length;
         double[][] l = new double[n][n];
@@ -117,6 +120,7 @@ public final class LinearAlgebra {
 
     /** Eigenvalues, ascending, by cyclic Jacobi rotations. */
     public static double[] eigenSymmetric(double[][] input) {
+        Finite.check("input", input);
         checkSymmetric(input);
         int n = input.length;
         double[][] a = copy(input);
@@ -150,6 +154,7 @@ public final class LinearAlgebra {
 
     /** Singular values, descending, by one-sided Jacobi, which keeps small ones accurate. */
     public static double[] singularValues(double[][] input) {
+        Finite.check("input", input);
         double[][] u = copy(input);
         int n = u[0].length;
         boolean moved = true;

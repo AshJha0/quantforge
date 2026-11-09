@@ -1,5 +1,7 @@
 package org.quantforge.curves;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,7 @@ public final class Xccy {
 
     /** The leg with exchanges, per unit notional. */
     public static double leg(List<LocalDate> dates, Discounting p, Discounting d, double m) {
+        Finite.check("m", m);
         double sum = 0.0;
         for (int i = 1; i < dates.size(); i++) {
             LocalDate s = dates.get(i - 1);
@@ -65,6 +68,7 @@ public final class Xccy {
 
     public static CurveSolver.Solved bootstrap(Curve domestic, Curve foreignProjection, LocalDate start, long[] months,
                                                double[] spreads, Curve.Interpolation interp) {
+        Finite.check("spreads", spreads);
         if (months.length == 0) {
             throw new QfError("E_INPUT", "no quotes", "quotes");
         }
@@ -92,6 +96,9 @@ public final class Xccy {
 
     public static Pv pv(Curve domestic, Curve fProj, Curve fDisc, double spot, LocalDate start, long months,
                         double notional, double spread, boolean receiveForeign) {
+        Finite.check("spot", spot);
+        Finite.check("notional", notional);
+        Finite.check("spread", spread);
         if (!(spot > 0.0)) {
             throw new QfError("E_DOMAIN", "spot must be positive", "spot");
         }
@@ -108,6 +115,9 @@ public final class Xccy {
 
     public static Ndf ndf(Curve usd, Curve off, double spot, LocalDate fixingDate, LocalDate payment, double strike,
                           double notional, boolean buy, Double fixing) {
+        Finite.check("spot", spot);
+        Finite.check("strike", strike);
+        Finite.check("notional", notional);
         if (payment.isBefore(fixingDate)) {
             throw new QfError("E_DATE_ORDER", "payment_date is before fixing_date", "payment_date");
         }

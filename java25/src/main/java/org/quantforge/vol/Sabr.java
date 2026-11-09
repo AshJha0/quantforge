@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.quantforge.core.QfError;
@@ -11,6 +13,9 @@ public final class Sabr {
     public record Params(double alpha, double beta, double rho, double nu) {}
 
     public static void check(double t, Params p, double f, double[] x) {
+        Finite.check("t", t);
+        Finite.check("f", f);
+        Finite.check("x", x);
         if (t <= 0.0 || p.alpha() <= 0.0 || p.beta() < 0.0 || p.beta() > 1.0 || Math.abs(p.rho()) >= 1.0 || p.nu() < 0.0
                 || f <= 0.0) {
             throw new QfError("E_DOMAIN", "sabr inputs");
@@ -24,6 +29,9 @@ public final class Sabr {
 
     /** {@code f}, {@code x} are shifted. */
     public static double hagan(double f, double x, double t, Params p) {
+        Finite.check("f", f);
+        Finite.check("x", x);
+        Finite.check("t", t);
         double a = p.alpha();
         double b = p.beta();
         double rho = p.rho();
@@ -47,6 +55,10 @@ public final class Sabr {
     }
 
     public static double[] density(double f, double[] x, double t, Params p, double h) {
+        Finite.check("f", f);
+        Finite.check("x", x);
+        Finite.check("t", t);
+        Finite.check("h", h);
         double[] out = new double[x.length];
         for (int i = 0; i < x.length; i++) {
             out[i] = (call(f, x[i] + h, t, p) - 2.0 * call(f, x[i], t, p) + call(f, x[i] - h, t, p)) / (h * h);
@@ -61,6 +73,12 @@ public final class Sabr {
     public record SabrFit(double alpha, double rho, double nu, double rmse) {}
 
     public static SabrFit calibrate(double f, double t, double beta, double[] x, double[] vols, double[] wt) {
+        Finite.check("f", f);
+        Finite.check("t", t);
+        Finite.check("beta", beta);
+        Finite.check("x", x);
+        Finite.check("vols", vols);
+        Finite.check("wt", wt);
         int n = x.length;
         double atm = vols[0];
         double near = Double.POSITIVE_INFINITY;
@@ -103,6 +121,9 @@ public final class Sabr {
 
     /** {@code f0}, {@code x} are shifted. */
     public static ArbFree arbFree(double f0, double t, Params p, int cells, int below, int steps, double[] x) {
+        Finite.check("f0", f0);
+        Finite.check("t", t);
+        Finite.check("x", x);
         double alpha = p.alpha();
         double beta = p.beta();
         double rho = p.rho();

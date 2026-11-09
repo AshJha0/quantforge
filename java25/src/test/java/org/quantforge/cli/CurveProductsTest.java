@@ -15,11 +15,11 @@ import org.quantforge.curves.Curve;
 import org.quantforge.curves.Xccy;
 import org.quantforge.pricing.Bonds;
 import org.quantforge.pricing.Credit;
-import org.quantforge.pricing.EquityD;
+import org.quantforge.pricing.EquityCurves;
 import org.quantforge.pricing.Inflation;
 
 /** Stage D waves 2 and 3: identities, edge and error paths, and a fuzz pass. */
-class StageD2to6Test {
+class CurveProductsTest {
     private static final LocalDate AS_OF = LocalDate.of(2026, 11, 6);
     private static final String CURVE = "{\"as_of\":\"2026-11-06\",\"interpolation\":\"LOG_LINEAR_DF\",\"pillars\":"
             + "[{\"date\":\"2027-11-06\",\"discount_factor\":0.96},{\"date\":\"2046-11-06\",\"discount_factor\":0.45}]}";
@@ -180,24 +180,24 @@ class StageD2to6Test {
 
     @Test
     void equityImpliedRatesInvert() {
-        List<EquityD.Div> divs = List.of(new EquityD.Div(LocalDate.of(2026, 12, 18), 18),
-                new EquityD.Div(LocalDate.of(2027, 3, 19), 16.5));
+        List<EquityCurves.Div> divs = List.of(new EquityCurves.Div(LocalDate.of(2026, 12, 18), 18),
+                new EquityCurves.Div(LocalDate.of(2027, 3, 19), 16.5));
         LocalDate expiry = LocalDate.of(2027, 3, 19);
-        double fwd = EquityD.forward(5000, FLAT, 0.003, 0, divs, expiry);
-        assertEquals(0.003, EquityD.impliedBorrow(5000, FLAT, divs, expiry, fwd), 1e-14);
-        EquityD.Basis b = EquityD.futuresBasis(5000, FLAT, 0.003, 0.001, divs, expiry, fwd);
+        double fwd = EquityCurves.forward(5000, FLAT, 0.003, 0, divs, expiry);
+        assertEquals(0.003, EquityCurves.impliedBorrow(5000, FLAT, divs, expiry, fwd), 1e-14);
+        EquityCurves.Basis b = EquityCurves.futuresBasis(5000, FLAT, 0.003, 0.001, divs, expiry, fwd);
         assertEquals(0.0, b.impliedSpread(), 1e-13);
         try {
-            EquityD.impliedBorrow(5000, FLAT, divs, expiry, 1e9);
+            EquityCurves.impliedBorrow(5000, FLAT, divs, expiry, 1e9);
             throw new AssertionError();
         } catch (org.quantforge.core.QfError e) {
             assertEquals("E_NOT_BRACKETED", e.code());
         }
-        EquityD.Action rights = EquityD.corporateAction("RIGHTS", 100, 10, 90, null, 0.5, 70.0, null);
+        EquityCurves.Action rights = EquityCurves.corporateAction("RIGHTS", 100, 10, 90, null, 0.5, 70.0, null);
         assertEquals(90.0 / 100.0, rights.factor(), 1e-15);
         assertEquals(90.0, rights.exPrice(), 1e-13);
-        EquityD.Rebalance r = EquityD.rebalance(2, List.of(new EquityD.Constituent("A", 10, 10, List.of())),
-                List.of(new EquityD.Constituent("A", 5, 10, List.of()), new EquityD.Constituent("B", 5, 10, List.of())));
+        EquityCurves.Rebalance r = EquityCurves.rebalance(2, List.of(new EquityCurves.Constituent("A", 10, 10, List.of())),
+                List.of(new EquityCurves.Constituent("A", 5, 10, List.of()), new EquityCurves.Constituent("B", 5, 10, List.of())));
         assertEquals(50.0, r.level(), 0.0);
         assertEquals(2.0, r.newDivisor(), 0.0);
         error("E_INPUT", "eq.trs.pv", "{\"spot\":5000,\"funding\":" + CURVE + ",\"borrow_rate\":0,\"dividends\":[],"

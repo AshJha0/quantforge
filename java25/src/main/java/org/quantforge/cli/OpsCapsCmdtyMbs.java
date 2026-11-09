@@ -12,8 +12,8 @@ import org.quantforge.pricing.CmdtyMbs;
 import org.quantforge.pricing.Inflation;
 
 /** Stage D wave 3, D7 to D9: caps and swaptions, commodities, MBS. */
-final class StageD7 {
-    private StageD7() {}
+final class OpsCapsCmdtyMbs {
+    private OpsCapsCmdtyMbs() {}
 
     private static boolean normalModel(In in) {
         String m = in.string("model");
@@ -48,8 +48,8 @@ final class StageD7 {
 
     static void register(Map<String, Function<In, Out>> table) {
         table.put("rates.cap.price", in -> {
-            StageB.CurveInput d = StageB.curve(in, "discount");
-            StageB.CurveInput p = StageB.curve(in, "projection");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
+            OpsLinear.CurveInput p = OpsLinear.curve(in, "projection");
             boolean normal = normalModel(in);
             Object v = in.anyValue("vol");
             boolean listed = v instanceof List<?>;
@@ -65,8 +65,8 @@ final class StageD7 {
             return Operations.out("caplets", r.caplets(), "price", r.price());
         });
         table.put("rates.swaption.price", in -> {
-            StageB.CurveInput d = StageB.curve(in, "discount");
-            StageB.CurveInput p = StageB.curve(in, "projection");
+            OpsLinear.CurveInput d = OpsLinear.curve(in, "discount");
+            OpsLinear.CurveInput p = OpsLinear.curve(in, "projection");
             boolean normal = normalModel(in);
             double vol = in.real("vol");
             In t = in.object("trade");
@@ -85,7 +85,7 @@ final class StageD7 {
             long[] k = new long[q.size()];
             double[] prices = new double[k.length];
             for (int i = 0; i < k.length; i++) {
-                k[i] = Inflation.index(StageD6.month(q.get(i).string("month"), "month"));
+                k[i] = Inflation.index(OpsInflation.month(q.get(i).string("month"), "month"));
                 prices[i] = q.get(i).real("price");
             }
             Object s = in.anyValue("seasonality");
@@ -93,13 +93,13 @@ final class StageD7 {
             List<String> ms = in.strings("months");
             long[] months = new long[ms.size()];
             for (int i = 0; i < months.length; i++) {
-                months[i] = Inflation.index(StageD6.month(ms.get(i), "months"));
+                months[i] = Inflation.index(OpsInflation.month(ms.get(i), "months"));
             }
             in.gate();
             return Operations.out("forwards", CmdtyMbs.forwards(k, prices, season, months));
         });
         table.put("cmdty.storage.carry", in -> {
-            StageB.CurveInput f = StageB.curve(in, "funding");
+            OpsLinear.CurveInput f = OpsLinear.curve(in, "funding");
             List<In> fw = in.objects("forwards");
             in.limit(fw.size() > 1000, "forwards");
             LocalDate[] d = new LocalDate[fw.size()];

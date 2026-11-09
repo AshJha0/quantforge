@@ -1,5 +1,7 @@
 package org.quantforge.curves;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +12,8 @@ import org.quantforge.core.Conventions;
 import org.quantforge.core.QfError;
 
 /** Stage D rates: step fit, futures convexity, CSA discounting, OIS basis, joint bootstrap. */
-public final class RatesD {
-    private RatesD() {}
+public final class RatesCurves {
+    private RatesCurves() {}
 
     private static final double TARGET = 1e-15;
     private static final double ACCEPT = 1e-13;
@@ -105,6 +107,11 @@ public final class RatesD {
 
     /** futures-convexity.md, Hull-White. */
     public static Convexity convexity(double price, double t, double bigT, double sigma, double a) {
+        Finite.check("price", price);
+        Finite.check("t", t);
+        Finite.check("bigT", bigT);
+        Finite.check("sigma", sigma);
+        Finite.check("a", a);
         if (!(bigT > t)) {
             throw new QfError("E_INPUT", "end_years must be after start_years", "end_years");
         }
@@ -124,6 +131,8 @@ public final class RatesD {
     /** csa-and-basis.md: {@code fxSpot} null means no FX; forwards are matched by exact date. */
     public static double[] csaDiscount(Curve c, double s, Double fxSpot, LocalDate[] fwdDates, double[] fwds,
                                        LocalDate[] dates) {
+        Finite.check("s", s);
+        Finite.check("fwds", fwds);
         Map<LocalDate, Double> forwards = new HashMap<>();
         if (fxSpot != null) {
             if (!(fxSpot > 0.0)) {

@@ -12,13 +12,13 @@ import org.quantforge.curves.CurveSolver;
 import org.quantforge.curves.Xccy;
 
 /** Stage D wave 2, D3: cross-currency basis and NDFs. */
-final class StageD3 {
-    private StageD3() {}
+final class OpsXccy {
+    private OpsXccy() {}
 
     static void register(Map<String, Function<In, Out>> table) {
         table.put("fx.xccy.bootstrap", in -> {
-            StageB.CurveInput dom = StageB.curve(in, "domestic");
-            StageB.CurveInput fp = StageB.curve(in, "foreign_projection");
+            OpsLinear.CurveInput dom = OpsLinear.curve(in, "domestic");
+            OpsLinear.CurveInput fp = OpsLinear.curve(in, "foreign_projection");
             Conventions.RateIndex dc = Conventions.overnight(in.string("domestic_convention"));
             Conventions.RateIndex fc = Conventions.overnight(in.string("foreign_convention"));
             LocalDate start = in.date("start");
@@ -36,13 +36,13 @@ final class StageD3 {
             Curve f = fp.build();
             Xccy.checkConventions(dc, fc);
             CurveSolver.Solved s = Xccy.bootstrap(d, f, start, months, spreads, interp);
-            return new Out(Operations.out("pillars", StageB.pillars(s.curve())).outputs(),
+            return new Out(Operations.out("pillars", OpsLinear.pillars(s.curve())).outputs(),
                     Operations.out("max_repricing_error", s.maxRepricingError()).outputs());
         });
         table.put("fx.xccy.pv", in -> {
-            StageB.CurveInput dom = StageB.curve(in, "domestic");
-            StageB.CurveInput fp = StageB.curve(in, "foreign_projection");
-            StageB.CurveInput fd = StageB.curve(in, "foreign_discount");
+            OpsLinear.CurveInput dom = OpsLinear.curve(in, "domestic");
+            OpsLinear.CurveInput fp = OpsLinear.curve(in, "foreign_projection");
+            OpsLinear.CurveInput fd = OpsLinear.curve(in, "foreign_discount");
             double spot = in.real("spot");
             In t = in.object("trade");
             LocalDate start = t.date("start");
@@ -59,8 +59,8 @@ final class StageD3 {
             return Operations.out("pv", r.pv(), "foreign_leg", r.foreignLeg(), "domestic_leg", r.domesticLeg());
         });
         table.put("fx.ndf.pv", in -> {
-            StageB.CurveInput usd = StageB.curve(in, "usd_curve");
-            StageB.CurveInput off = StageB.curve(in, "offshore_curve");
+            OpsLinear.CurveInput usd = OpsLinear.curve(in, "usd_curve");
+            OpsLinear.CurveInput off = OpsLinear.curve(in, "offshore_curve");
             double spot = in.real("spot");
             In t = in.object("trade");
             LocalDate fixingDate = t.date("fixing_date");

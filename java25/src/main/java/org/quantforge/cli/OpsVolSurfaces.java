@@ -20,8 +20,8 @@ import org.quantforge.vol.Surfaces;
 import org.quantforge.vol.VarianceStrip;
 
 /** Stage E operations: E1 (surfaces, local and forward vol) and E7 (GARCH, variance swaps, VIX). */
-final class StageE {
-    private StageE() {}
+final class OpsVolSurfaces {
+    private OpsVolSurfaces() {}
 
     enum Rule { STICKY_STRIKE, STICKY_DELTA }
 
@@ -184,7 +184,7 @@ final class StageE {
             }
             return Operations.out("forward_vols", OpsSmile.list(Surfaces.forwardVols(t, v)));
         });
-        table.put("vol.smile.dynamics", StageE::smileDynamics);
+        table.put("vol.smile.dynamics", OpsVolSurfaces::smileDynamics);
         table.put("vol.volofvol.measure", in -> {
             double[] v = in.reals("vols");
             double ppy = in.real("periods_per_year");
@@ -266,17 +266,17 @@ final class StageE {
     /** The initial variance input: "SAMPLE" (null here) or a number; any other JSON type is E_SCHEMA. */
     private static Double initialVariance(In in) {
         Object v = in.anyValue("initial_variance");
-        if (v instanceof String) {
+        if (v instanceof String && !In.isNonFiniteToken(v)) {
             return null;
         }
-        if (v instanceof org.quantforge.core.Json.Number) {
+        if (v instanceof org.quantforge.core.Json.Number || In.isNonFiniteToken(v)) {
             return in.real("initial_variance");
         }
         throw new QfError("E_SCHEMA", "initial_variance must be a string or a number", "initial_variance");
     }
 
     private static void sampleKeyword(In in) {
-        if (in.anyValue("initial_variance") instanceof String s && !s.equals("SAMPLE")) {
+        if (in.anyValue("initial_variance") instanceof String s && !s.equals("SAMPLE") && !In.isNonFiniteToken(s)) {
             throw input("initial_variance", "initial_variance must be SAMPLE or a number");
         }
     }
@@ -337,7 +337,7 @@ final class StageE {
             sampleKeyword(in);
             return Operations.out("loglik", Garch.fit(r, startVariance(iv, r)));
         });
-        table.put("vol.varswap.fair_strike", StageE::fairStrike);
+        table.put("vol.varswap.fair_strike", OpsVolSurfaces::fairStrike);
         table.put("vol.varswap.realized", in -> {
             double[] p = in.reals("prices");
             double a = in.real("periods_per_year");

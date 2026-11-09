@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.quantforge.core.QfError;
 
 /** Stage E1 and E7 against independent routes: substitution, price-based Dupire, hand cases, limits. */
-class StageETest {
+class VolSurfaceTest {
     private static final Smile.Svi S1 = new Smile.Svi(0.02, 0.1, -0.4, 0.02, 0.2);
     private static final Smile.Svi S2 = new Smile.Svi(0.035, 0.11, -0.35, 0.03, 0.25);
     private static final List<Surfaces.Slice> SURFACE = List.of(new Surfaces.Slice(0.25, S1),

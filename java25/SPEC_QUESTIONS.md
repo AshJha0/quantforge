@@ -188,3 +188,14 @@ Silent choices, all passing `risk_r2`:
 - **E2, `slv_e-0006`.** Closed by ruling E-A24: the stated rule stands and the golden was corrected.
 - **E8, `creditopt_e-0055` (now `creditopt_e-0145`).** Closed by ruling E-B27: the golden is now a receiver whose zero-vol value is above the premium.
 - **E-B38/E-B40, `rulings_e_b-0008`, `-0009`, `-0015`.** Closed at 5b58e2d: the three cases were rebuilt from their proper base inputs.
+
+## Stage F
+
+Silent choices, phase 0 (G4, E1, G6):
+
+| # | Choice |
+|---|---|
+| F-J1 | `core.store.*`: a record `value` is any JSON. A `value` that is exactly `"NaN"`, `"Infinity"` or `"-Infinity"` is read as a non-finite Real (ruling F-1) and gives `E_DOMAIN`; the same tokens nested inside an object or array `value` stay plain strings |
+| F-J2 | F-2 order: a held `E_LIMIT` outranks the held non-finite `E_DOMAIN`; `E_SCHEMA` and `E_PARSE` outrank both. Among several non-finite inputs the first one read is named in `field` (read order follows the spec's input order) |
+| F-J3 | F-4 library API: every public static method with a `double`, `double[]` or `double[][]` parameter checks it with `core.Finite` before anything else. Unchecked raw kernels: `core.Normal`, `core.Rng`, `core.Sobol`. Public record constructors (`Black.Option` and the result records) are not checked; the methods that take them check their own reals |
+| F-J4 | G4: CLI modules are named by domain (`OpsBonds`, `OpsCredit`, ...); `RatesD` is `curves.RatesCurves`, `EquityD` is `pricing.EquityCurves`. `cli.Registry` builds the verb table from `Operations.MODULES` and rejects a verb registered twice |

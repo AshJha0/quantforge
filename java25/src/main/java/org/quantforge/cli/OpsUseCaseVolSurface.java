@@ -17,15 +17,15 @@ import org.quantforge.vol.Smile;
 import org.quantforge.vol.Surface;
 
 /** usecase.vol_surface (use-cases.md). */
-final class OpsUseCase3 {
-    private OpsUseCase3() {}
+final class OpsUseCaseVolSurface {
+    private OpsUseCaseVolSurface() {}
 
     private record Slice(LocalDate expiry, List<EquityForward.Quote> quotes) {}
 
     static void register(Map<String, Function<In, Out>> table) {
         table.put("usecase.vol_surface", in -> {
             LocalDate asOf = in.date("as_of");
-            StageB.CurveInput ci = StageB.curve(in, "funding_curve");
+            OpsLinear.CurveInput ci = OpsLinear.curve(in, "funding_curve");
             List<In> list = in.objects("slices");
             in.limit(list.size() > OpsForward.MAX_LIST, "slices");
             List<Slice> slices = new ArrayList<>();

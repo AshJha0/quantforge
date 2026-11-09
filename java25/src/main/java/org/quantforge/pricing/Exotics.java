@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.util.function.DoubleUnaryOperator;
 import org.quantforge.core.Normal;
 import org.quantforge.core.QfError;
@@ -16,11 +18,26 @@ public final class Exotics {
 
     /** Generalised Black-Scholes with cost of carry b. */
     public static double gbs(double phi, double s, double k, double t, double r, double b, double v) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("b", b);
+        Finite.check("v", v);
         return Black.lognormal(phi, s * Math.exp(b * t), k, t, Math.exp(-r * t), v);
     }
 
     public static double digital(double phi, boolean cash, double s, double k, double t, double r, double q, double v,
                                  double amount) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
+        Finite.check("amount", amount);
         double sd = v * Math.sqrt(t);
         double d1 = (Math.log(s / k) + (r - q + v * v / 2) * t) / sd;
         return cash ? amount * Math.exp(-r * t) * n(phi * (d1 - sd)) : s * Math.exp(-q * t) * n(phi * d1);
@@ -31,6 +48,15 @@ public final class Exotics {
     /** Reiner-Rubinstein, continuous monitoring [RR91]. */
     public static double barrier(double phi, BarrierType type, double s, double k, double t, double r, double q,
                                  double v, double h, double rebate) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
+        Finite.check("h", h);
+        Finite.check("rebate", rebate);
         boolean down = type == BarrierType.DOWN_IN || type == BarrierType.DOWN_OUT;
         if (down ? s <= h : s >= h) {
             throw new QfError("E_DOMAIN", "spot is on or beyond the barrier (ruling E-A19)", "barrier");
@@ -68,11 +94,26 @@ public final class Exotics {
     }
 
     public static double asianContinuous(double phi, double s, double k, double t, double r, double q, double v) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
         return gbs(phi, s, k, t, r, ((r - q) - v * v / 6) / 2, v / Math.sqrt(3));
     }
 
     public static double asianDiscrete(double phi, double s, double k, double t, double r, double q, double v,
                                        double[] fix) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
+        Finite.check("fix", fix);
         int m = fix.length;
         double mean = 0.0;
         double sum = 0.0;
@@ -92,6 +133,13 @@ public final class Exotics {
 
     /** Goldman-Sosin-Gatto floating-strike lookback; {@code e} is the running minimum (call) or maximum (put). */
     public static double lookback(double phi, double s, double e, double t, double r, double q, double v) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("e", e);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
         double b = r - q;
         double sq = Math.sqrt(t);
         double a1 = (Math.log(s / e) + (b + v * v / 2) * t) / (v * sq);
@@ -108,10 +156,27 @@ public final class Exotics {
 
     public static double quanto(double phi, double s, double k, double t, double rd, double rf, double q, double v,
                                 double fxVol, double rho) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("rd", rd);
+        Finite.check("rf", rf);
+        Finite.check("q", q);
+        Finite.check("v", v);
+        Finite.check("fxVol", fxVol);
+        Finite.check("rho", rho);
         return gbs(phi, s, k, t, rd, rf - q - rho * v * fxVol, v);
     }
 
     public static double chooser(double s, double k, double t, double r, double q, double v, double tc) {
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
+        Finite.check("tc", tc);
         double b = r - q;
         double d = (Math.log(s / k) + (b + v * v / 2) * t) / (v * Math.sqrt(t));
         double y = (Math.log(s / k) + b * t + v * v * tc / 2) / (v * Math.sqrt(tc));
@@ -121,6 +186,14 @@ public final class Exotics {
     }
 
     public static double kirk(double f1, double f2, double k, double t, double r, double v1, double v2, double rho) {
+        Finite.check("f1", f1);
+        Finite.check("f2", f2);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("v1", v1);
+        Finite.check("v2", v2);
+        Finite.check("rho", rho);
         double f = f2 / (f2 + k);
         double s = Math.sqrt(v1 * v1 - 2 * rho * v1 * v2 * f + v2 * v2 * f * f);
         double d1 = (Math.log(f1 / (f2 + k)) + s * s * t / 2) / (s * Math.sqrt(t));
@@ -130,6 +203,14 @@ public final class Exotics {
     /** {price, M1, v_B} by lognormal moment matching [Levy92]. */
     public static double[] basket(double phi, double[] f, double[] w, double[] v, double[][] rho, double k, double t,
                                   double r) {
+        Finite.check("phi", phi);
+        Finite.check("f", f);
+        Finite.check("w", w);
+        Finite.check("v", v);
+        Finite.check("rho", rho);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
         double m1 = 0.0;
         double m2 = 0.0;
         for (int i = 0; i < f.length; i++) {
@@ -144,6 +225,13 @@ public final class Exotics {
 
     /** {american, european} on a CRR tree with Hull's probability (ruling E-A23). */
     public static double[] crr(double phi, double s, double k, double t, double r, double q, double v, int steps) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
         double dt = t / steps;
         double u = Math.exp(v * Math.sqrt(dt));
         double d = 1 / u;
@@ -170,6 +258,13 @@ public final class Exotics {
 
     /** Barone-Adesi-Whaley [BAW87]; r = 0 is E_DOMAIN (ruling E-A22). */
     public static double baw(double phi, double s, double k, double t, double r, double q, double v) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
         if (!(r > 0.0)) {
             throw new QfError("E_DOMAIN", "BAW needs a positive rate (rulings E-A22, E-A30)", "rate");
         }
@@ -226,6 +321,14 @@ public final class Exotics {
     /** {price, delta, gamma} at the centre node of the reference backward-Euler scheme (ruling E-A23). */
     public static double[] fd(double phi, boolean american, double s, double k, double t, double r, double q, double v,
                               int nx, int nt, double width) {
+        Finite.check("phi", phi);
+        Finite.check("s", s);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("v", v);
+        Finite.check("width", width);
         double h = width * v * Math.sqrt(t);
         double dx = 2 * h / (nx - 1);
         double dt = t / nt;
