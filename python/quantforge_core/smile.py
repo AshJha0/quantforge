@@ -10,6 +10,7 @@ lazy import numpy as np
 
 from .black import big_n, black76_position, n_inverse
 from .errors import QfError
+from .finite import guard
 from .fitting import best_of
 
 Floats = Sequence[float]
@@ -409,3 +410,6 @@ def surface_vega(s: Surface, book: Sequence[Position]) -> dict[str, object]:
         "pv": _book_pv(s, book), "bucket_vega": buckets,
         "parallel_vega": (moved(h) - moved(-h)) / (2 * h), "bucket_sum": total,
     }
+
+
+guard(globals())

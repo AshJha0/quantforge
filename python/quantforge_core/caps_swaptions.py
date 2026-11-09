@@ -6,6 +6,7 @@ from . import black, curves, daycount, projection
 from .black import Option
 from .curves import CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 INDEX = "USD-TERM-3M"
@@ -69,3 +70,6 @@ def swaption_price(
     _check_black(model, strike, [forward])
     value = notional * annuity * _option(model, kind == "PAYER", forward, strike, vol, d.time(s))
     return value, forward, annuity
+
+
+guard(globals())

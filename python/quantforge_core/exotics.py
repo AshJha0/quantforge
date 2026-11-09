@@ -10,6 +10,7 @@ from collections.abc import Callable, Sequence
 from . import roots
 from .black import big_n
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum, thomas
 
 Floats = Sequence[float]
@@ -319,3 +320,6 @@ def fd(s: float, k: float, t: float, r: float, q: float, v: float, option_type: 
         "delta": (right - left) / (2 * dx * s),
         "gamma": ((right - 2 * mid + left) / (dx * dx) - (right - left) / (2 * dx)) / (s * s),
     }
+
+
+guard(globals())

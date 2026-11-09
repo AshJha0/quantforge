@@ -1,6 +1,8 @@
 """The convention registry (specifications/01-core/conventions.md)."""
 from typing import Any
 
+from .finite import guard
+
 _MF = "MODIFIED_FOLLOWING"
 
 REGISTRY: dict[str, dict[str, Any]] = {
@@ -40,3 +42,6 @@ PAIRS = tuple(k for k, v in REGISTRY.items() if v["kind"] == "FX")
 
 def lookup(convention_id: str) -> dict[str, Any]:
     return dict(REGISTRY[convention_id])
+
+
+guard(globals())

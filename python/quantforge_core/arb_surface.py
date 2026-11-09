@@ -10,6 +10,7 @@ from dataclasses import dataclass
 
 from .black import big_n, small_n
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .smile import Svi, _check_svi, svi_calibrate
 
@@ -259,3 +260,6 @@ def vol_of_vol(vols: Floats, periods_per_year: float, method: str) -> tuple[floa
     mean = ordered_sum(xs) / len(xs)
     spread = ordered_sum((x - mean) ** 2 for x in xs) / (len(xs) - 1)
     return math.sqrt(periods_per_year) * math.sqrt(spread), mean
+
+
+guard(globals())

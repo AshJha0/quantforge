@@ -7,6 +7,7 @@ from datetime import date
 from . import curves, ois, projection
 from .curves import CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .ois import Quote
 from .projection import ProjectionQuote
@@ -65,3 +66,6 @@ def joint_bootstrap(
     disc, e1 = ois.bootstrap(convention, as_of, ois_quotes, interpolation, method)
     proj, e2 = projection.bootstrap(disc, index, as_of, term_quotes, interpolation)
     return disc, proj, max(e1, e2)
+
+
+guard(globals())

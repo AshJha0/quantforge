@@ -13,6 +13,7 @@ from . import calendars, curves, daycount, linalg, schedules
 from .conventions import REGISTRY
 from .curves import Curve, CurveData
 from .errors import QfError, required
+from .finite import guard
 from .schedules import Period
 
 _MF = "MODIFIED_FOLLOWING"
@@ -224,3 +225,6 @@ def pv(
     result = valuation(value, currency, "OIS_DISCOUNTING", snapshot_id, trade.convention,
                        curve.as_of)
     return result, par, annuity
+
+
+guard(globals())

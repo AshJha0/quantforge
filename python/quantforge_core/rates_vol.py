@@ -12,6 +12,7 @@ from .black import Option
 from .caps_swaptions import INDEX, _check_black, _check_tenor, _option
 from .curves import CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Matrix = Sequence[Sequence[float]]
@@ -233,3 +234,6 @@ def zc_price(model: str, kind: str, forward_ratio: float, years: float, strike: 
         raise _domain("years must be above 0", "years")
     ratio = (1 + strike) ** years
     return notional * df * _inflation_option(model, kind, forward_ratio, ratio, vol, years), ratio
+
+
+guard(globals())

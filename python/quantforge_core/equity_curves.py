@@ -8,6 +8,7 @@ from datetime import date
 from . import curves, roots
 from .curves import Curve, CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Dividends = Sequence[tuple[date, float]]
@@ -149,3 +150,6 @@ def trs_pv(spot: float, funding: CurveData, b: float, divs: Dividends, start: da
     funding_leg = n * s0 * (r + spread) * alpha * d_end
     sign = 1 if side == "RECEIVE_EQUITY" else -1
     return equity, funding_leg, sign * (equity - funding_leg)
+
+
+guard(globals())

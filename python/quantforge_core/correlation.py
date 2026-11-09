@@ -8,6 +8,7 @@ from collections.abc import Sequence
 lazy import numpy as np
 
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Matrix = Sequence[Sequence[float]]
@@ -126,3 +127,6 @@ def dispersion(weights: Sequence[float], strikes: Sequence[float], index_strike:
         "constituent_variance_notionals": legs,
         "index_variance_notional": index_leg,
     }
+
+
+guard(globals())

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Floats = Sequence[float]
@@ -214,3 +215,6 @@ def forward_fill(values: Sequence[float | None], limit: int) -> list[float | Non
             age += 1
             out.append(last if last is not None and age <= limit else None)
     return out
+
+
+guard(globals())

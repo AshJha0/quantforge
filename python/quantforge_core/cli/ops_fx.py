@@ -27,25 +27,25 @@ def _months(tenor: str) -> int:
 
 
 @op("fx.spot_date")
-def spot_date(i):
+def spot_date(i: Inputs) -> Any:
     d = core.fx.spot_date(i.enum("pair", conventions.PAIRS), i.date("trade_date"))
     return {"spot_date": d.isoformat()}
 
 
 @op("fx.forward.outright")
-def outright(i):
+def outright(i: Inputs) -> Any:
     f, points = core.fx.outright(_market(i), i.date("value_date"))
     return {"forward": f, "points": points}
 
 
 @op("fx.forward.pv")
-def fx_pv(i):
+def fx_pv(i: Inputs) -> Any:
     value, delta = core.fx.forward_pv(_market(i), _forward_trade(i.object("trade")))
     return {"valuation": value, "fx_delta": delta}
 
 
 @op("fx.swap.pv")
-def fx_swap(i):
+def fx_swap(i: Inputs) -> Any:
     t = i.object("trade")
     trade = FxSwap(t.real("notional_base"), t.date("near_date"), t.real("near_rate"),
                    t.date("far_date"), t.real("far_rate"), t.enum("far_side", ("BUY", "SELL")))
@@ -54,7 +54,7 @@ def fx_swap(i):
 
 
 @op("fx.curve.implied")
-def fx_implied(i):
+def fx_implied(i: Inputs) -> Any:
     market = _market(i)
     points = [(_months(_tenor(p)), p.real("points")) for p in _objects(i, "points")]
     return {"nodes": core.fx.implied(market, points)}

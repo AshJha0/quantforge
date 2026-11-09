@@ -9,6 +9,7 @@ from . import _cal, bonds, curves
 from .bonds import Bond
 from .curves import CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 
@@ -101,3 +102,6 @@ def linker_price_curve(bond: Bond, settlement: date, base_ref: float, data: CpiC
     total = ordered_sum(cf * _ref(d, curve.cpi) / base_ref * disc.discount(d)
                         for d, cf in zip(fl.dates, fl.amounts, strict=True))
     return total / disc.discount(settlement)
+
+
+guard(globals())

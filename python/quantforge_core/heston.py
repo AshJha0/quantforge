@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from . import arb_surface
 from .black import big_n
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum, thomas
 
 Floats = Sequence[float]
@@ -302,3 +303,6 @@ def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
         p = [[max(x, 0.0) for x in thomas(*v_rows, star[i])] for i in range(nx)]
     mass = ordered_sum(ordered_sum(row) for row in p) * dx * dv
     return {"x": xs, "leverage": leverage(p, t), "mass": mass}
+
+
+guard(globals())

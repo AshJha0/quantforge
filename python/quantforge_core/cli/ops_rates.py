@@ -25,7 +25,7 @@ from .registry import core, op
 
 
 @op("rates.schedule.generate")
-def schedule(i):
+def schedule(i: Inputs) -> Any:
     start, end = i.date("start"), i.date("end")
     frequency = i.integer("frequency_months")
     if frequency not in FREQUENCIES:
@@ -42,14 +42,14 @@ def schedule(i):
 
 
 @op("rates.curve.discount")
-def curve_discount(i):
+def curve_discount(i: Inputs) -> Any:
     data = _curve(i)
     factors, zeros = core.curves.discount(data, i.dates("dates"))
     return {"discount_factors": factors, "zero_rates": zeros}
 
 
 @op("rates.curve.forward")
-def curve_forward(i):
+def curve_forward(i: Inputs) -> Any:
     data, start, end = _curve(i), i.date("start"), i.date("end")
     day_count = i.enum("day_count", _daycount.CONVENTIONS)
     _daycount.check_conditional(day_count)
@@ -57,7 +57,7 @@ def curve_forward(i):
 
 
 @op("rates.ois.bootstrap")
-def bootstrap(i):
+def bootstrap(i: Inputs) -> Any:
     data, error = core.ois.bootstrap(
         i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), _quotes(i),
         i.enum("interpolation", curves.INTERPOLATIONS),
@@ -67,7 +67,7 @@ def bootstrap(i):
 
 
 @op("rates.ois.compound")
-def compound(i):
+def compound(i: Inputs) -> Any:
     days = i.array("days")
     if not all(isinstance(n, int) and not isinstance(n, bool) for n in days):
         raise QfError("E_SCHEMA", "days must be integers", "days")
@@ -78,23 +78,23 @@ def compound(i):
 
 
 @op("rates.ois.pv")
-def ois_pv(i):
+def ois_pv(i: Inputs) -> Any:
     value, par, annuity = core.ois.pv(_curve(i), _ois_trade(i), i.opt_string("snapshot_id"))
     return {"valuation": value, "par_rate": par, "annuity": annuity}
 
 
-def projection_quote(q):
+def projection_quote(q: Inputs) -> ProjectionQuote:
     kind = q.enum("type", ("DEPOSIT", "FRA", "SWAP"))
     months = q.integer("start_months" if kind == "FRA" else "months")
     return ProjectionQuote(kind, months, q.real("rate"))
 
 
-def index(i):
+def index(i: Inputs) -> str:
     return i.enum("index", conventions.TERM)
 
 
 @op("rates.projection.bootstrap")
-def projection_bootstrap(i):
+def projection_bootstrap(i: Inputs) -> Any:
     data, error = core.projection.bootstrap(
         _curve(i, "discount"), index(i), i.date("as_of"),
         [projection_quote(q) for q in _objects(i, "quotes")],
@@ -104,7 +104,7 @@ def projection_bootstrap(i):
 
 
 @op("rates.swap.pv")
-def swap_pv(i):
+def swap_pv(i: Inputs) -> Any:
     t = i.object("trade")
     trade = SwapTrade(index(t), t.integer("tenor_months"), t.real("fixed_rate"),
                       t.real("notional"), t.enum("side", ("PAY", "RECEIVE")))
@@ -114,7 +114,7 @@ def swap_pv(i):
 
 
 @op("rates.fra.pv")
-def fra_pv(i):
+def fra_pv(i: Inputs) -> Any:
     t = i.object("trade")
     trade = FraTrade(index(t), t.date("start"), t.real("fixed_rate"), t.real("notional"),
                      t.enum("side", ("PAY", "RECEIVE")))
@@ -124,7 +124,7 @@ def fra_pv(i):
 
 
 @op("rates.basis.spread")
-def basis(i):
+def basis(i: Inputs) -> Any:
     return {"spread": core.projection.basis_spread(
         _curve(i, "discount"), _curve(i, "projection"), index(i), i.integer("tenor_months"))}
 

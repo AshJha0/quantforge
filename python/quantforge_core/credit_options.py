@@ -12,6 +12,7 @@ from datetime import date, timedelta
 from . import black, integrate, roots
 from .black import Option, big_n, n_inverse, small_n
 from .errors import QfError
+from .finite import guard
 from .schedules import add_months
 
 _TOL = 1e-16
@@ -268,3 +269,5 @@ def loss_cdf(p: float, rho: float, recovery: float, losses: list[float]) -> list
     return [big_n((math.sqrt(1 - rho) * n_inverse(x / scale) - c) / math.sqrt(rho))
             for x in losses]
 
+
+guard(globals())

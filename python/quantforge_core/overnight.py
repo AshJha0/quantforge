@@ -6,6 +6,7 @@ from datetime import date, timedelta
 from . import calendars
 from .conventions import REGISTRY
 from .errors import QfError
+from .finite import guard
 
 METHODS = ("NONE", "LOOKBACK", "OBSERVATION_SHIFT", "LOCKOUT")
 FALLBACKS: dict[str, tuple[str, float]] = {
@@ -103,3 +104,6 @@ def fallback(
     index, spread = FALLBACKS[ibor]
     rate, _, _ = compound_dated(index, start, end, "OBSERVATION_SHIFT", 2, fixings)
     return rate, spread, rate + spread
+
+
+guard(globals())

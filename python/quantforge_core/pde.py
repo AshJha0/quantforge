@@ -3,6 +3,7 @@ import math
 from dataclasses import dataclass
 
 from .errors import QfError
+from .finite import guard
 
 
 @dataclass(frozen=True)
@@ -93,3 +94,6 @@ def bs_european(
     vx = (v[half + 1] - v[half - 1]) / (2 * h)
     vxx = (v[half + 1] - 2 * v[half] + v[half - 1]) / (h * h)
     return PdeResult(v[half], vx / spot, (vxx - vx) / (spot * spot), h)
+
+
+guard(globals())

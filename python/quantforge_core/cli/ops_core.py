@@ -140,7 +140,7 @@ def _add_tenor(i: Inputs) -> Result:
 
 def _compounding(i: Inputs) -> compounding_module.Compounding:
     kind = i.string("compounding")
-    c = compounding.Compounding(kind, i.opt_integer("frequency") if kind == "PERIODIC" else None)
+    c = compounding_module.Compounding(kind, i.opt_integer("frequency") if kind == "PERIODIC" else None)
     c.validate()
     return c
 
@@ -337,7 +337,7 @@ def _normal(i: Inputs) -> Result:
 
 
 @op("core.stats.summary")
-def _summary(i: Inputs) -> Result:
+def _summary(i: Inputs) -> Any:
     return stats.summary(i.reals("x"))
 
 
@@ -435,8 +435,8 @@ def _monte_carlo(i: Inputs) -> Result:
 def _cos_model(m: Inputs) -> cos_module.BlackScholes | cos_module.Heston:
     name = m.enum("name", ("BLACK_SCHOLES", "HESTON"))
     if name == "BLACK_SCHOLES":
-        return cos.BlackScholes(m.real("sigma"))
-    return cos.Heston(m.real("v0"), m.real("kappa"), m.real("theta"), m.real("sigma"), m.real("rho"))
+        return cos_module.BlackScholes(m.real("sigma"))
+    return cos_module.Heston(m.real("v0"), m.real("kappa"), m.real("theta"), m.real("sigma"), m.real("rho"))
 
 
 @op("core.cos.european")
@@ -455,7 +455,7 @@ def _quote(raw: Any) -> data_checks_module.Quote:
     for key in ("bid", "ask"):
         if key not in raw:
             raise QfError("E_SCHEMA", f"a quote has no {key}", "quotes")
-    return data_checks.Quote(
+    return data_checks_module.Quote(
         q.string("instrument_id"), parse_instant(raw.get("event_time"), "event_time"),
         q.opt_real("bid"), q.opt_real("ask"), q.enum("quote_status", ("FIRM", "INDICATIVE")),
     )
@@ -489,7 +489,7 @@ def _record(raw: Any) -> store_module.Record:
     sequence, series_id = r.integer("sequence"), r.string("series_id")
     if sequence < 1 or not series_id or has_lone_surrogate(raw):
         raise QfError("E_SCHEMA", "bad sequence, series_id or string in a record", "records")
-    return store.Record(
+    return store_module.Record(
         sequence, series_id, r.instant("event_time"), r.instant("knowledge_time"),
         raw["value"], r.opt_boolean("deleted", False), raw,
     )
@@ -589,25 +589,25 @@ def _money(m: Inputs) -> tuple[str, str]:
 
 
 @op("core.units.convert")
-def convert(i):
+def convert(i: Inputs) -> Any:
     units = tuple(money.UNITS)
     return {"value": core.money.convert(
         i.real("value"), i.enum("from", units), i.enum("to", units))}
 
 
 @op("core.units.add_money")
-def add_money(i):
+def add_money(i: Inputs) -> Any:
     a, b = _money(i.object("a")), _money(i.object("b"))
     amount, currency = core.money.add_money(*a, *b)
     return {"amount": amount, "currency": currency}
 
 
 @op("core.units.round_money")
-def round_money(i):
+def round_money(i: Inputs) -> Any:
     amount, currency = core.money.round_money(*_money(i))
     return {"amount": amount, "currency": currency}
 
 
 @op("core.conventions.lookup")
-def lookup(i):
+def lookup(i: Inputs) -> Any:
     return core.conventions.lookup(i.enum("id", tuple(conventions.REGISTRY)))

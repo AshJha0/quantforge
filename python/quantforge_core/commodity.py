@@ -7,6 +7,7 @@ from datetime import date
 from . import curves
 from .curves import CurveData
 from .errors import QfError
+from .finite import guard
 
 
 def commodity_forwards(
@@ -57,3 +58,6 @@ def storage_carry(
         ys.append(r + u - math.log(f1 / f0) / dt)
         values.append(p1 * f1 - p0 * f0 * math.exp(u * dt))
     return ys, values, [v > 0 for v in values]
+
+
+guard(globals())

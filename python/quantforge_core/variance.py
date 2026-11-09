@@ -11,6 +11,7 @@ from datetime import date
 
 from . import black
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Floats = Sequence[float]
@@ -359,3 +360,6 @@ def vix_index(near: tuple[int, float, Sequence[Quote]],
     if bracket < 0:
         raise _domain("the interpolated variance is negative", "near")
     return 100 * math.sqrt(bracket * MINUTES_PER_YEAR / MINUTES_30D), v1, v2
+
+
+guard(globals())

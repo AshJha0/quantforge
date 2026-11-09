@@ -15,7 +15,7 @@ def _data(i: Inputs, model: str) -> tuple[list[float], list[float]]:
 
 
 @op("calib.fit")
-def fit(i):
+def fit(i: Inputs) -> Any:
     model = i.enum("model", tuple(PARAMETERS))
     report = i.opt_boolean("report_parameters", True)
     optional = {k: i.reals(k) for k in ("weights", "prior", "lower", "upper") if i.has(k)}
@@ -32,13 +32,13 @@ def fit(i):
 
 
 @op("calib.check_bid_ask")
-def bid_ask(i):
+def bid_ask(i: Inputs) -> Any:
     return {"breaches": core.calibration.check_bid_ask(
         i.reals("fitted"), i.reals("bid"), i.reals("ask"))}
 
 
 @op("calib.curve_report")
-def curve_report(i):
+def curve_report(i: Inputs) -> Any:
     quotes = _quotes(i)
     jacobian, condition, error = core.calibration.curve_report(
         i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), quotes,

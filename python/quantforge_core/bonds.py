@@ -8,6 +8,7 @@ from . import _cal, curves, linalg, roots, schedules
 from .curve_fits import _basis
 from .curves import Curve, CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 FREQUENCIES = (1, 2, 4)
@@ -360,3 +361,6 @@ def fit_nelson_siegel(
             break
     values, _ = model(beta)
     return beta, [m - y for m, y in zip(values, market, strict=True)]
+
+
+guard(globals())

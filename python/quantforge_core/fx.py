@@ -9,6 +9,7 @@ from . import calendars, curves, schedules
 from .conventions import REGISTRY
 from .curves import Curve, CurveData
 from .errors import QfError
+from .finite import guard
 from .ois import valuation
 
 _DAY = timedelta(days=1)
@@ -140,3 +141,6 @@ def implied(m: FxMarket, points: Sequence[tuple[int, float]]) -> list[dict[str, 
         basis = 10000 * (-math.log(ratio) / tau + math.log(built.a(t)) / tau)
         nodes.append({"value_date": t.isoformat(), "implied_ratio": ratio, "basis_bp": basis})
     return nodes
+
+
+guard(globals())

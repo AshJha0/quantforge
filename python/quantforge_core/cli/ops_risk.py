@@ -19,7 +19,7 @@ from .registry import core, op
 
 
 @op("risk.ois.dv01")
-def dv01(i):
+def dv01(i: Inputs) -> Any:
     value, keys = core.sensitivities.dv01(
         i.date("as_of"), _quotes(i), i.enum("interpolation", curves.INTERPOLATIONS),
         _ois_trade(i),
@@ -28,7 +28,7 @@ def dv01(i):
 
 
 @op("risk.cashflows")
-def cashflows(i):
+def cashflows(i: Inputs) -> Any:
     flows = [(c.real("t"), c.real("amount")) for c in _objects(i, "cashflows")]
     pv, duration, convexity = core.sensitivities.cashflows(flows, i.real("yield"))
     return {"pv": pv, "duration": duration, "convexity": convexity}

@@ -1,6 +1,7 @@
 """Agency MBS pass-through cash flows and pricing (specifications/04-pricing/mbs.md)."""
 
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Pool = tuple[float, float, float, int, int, str, float]
@@ -59,3 +60,6 @@ def mbs_price(pool: Pool, y: float, delay_days: int) -> tuple[float, float, floa
     pv = ordered_sum(x for _, x in terms)
     duration = ordered_sum(t / 12 * x * v for t, x in terms) / pv
     return 100 * pv / pool[0], duration, wal
+
+
+guard(globals())
