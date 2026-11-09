@@ -38,7 +38,7 @@ bool is_leap(int y) { return year{y}.is_leap(); }
 int days_in_year(int y) { return is_leap(y) ? 366 : 365; }
 Date last_of_month(int y, unsigned m) { return Date{year{y} / month{m} / last}; }
 unsigned weekday_of(Date d) { return weekday{d}.c_encoding(); }
-int days_between(Date a, Date b) { return (b - a).count(); }
+int days_between(Date a, Date b) { return static_cast<int>((b - a).count()); }
 
 std::optional<Date> parse_date(std::string_view s) {
     if (s.size() != 10 || s[4] != '-' || s[7] != '-') return std::nullopt;

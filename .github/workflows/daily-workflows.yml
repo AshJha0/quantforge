@@ -102,8 +102,19 @@ jobs:
         with:
           name: daily-reports
           path: out/reports/
-      - name: Fail on a failed check
-        if: steps.eod.outcome == 'failure' || steps.sofr.outcome == 'failure' || steps.richcheap.outcome == 'failure' || steps.pnl.outcome == 'failure'
+      - name: Fail on a failed soft step
+        # The checks above are continue-on-error so every report is still written and pushed; this step makes
+        # a failure visible as a red run and names the failed steps (plan 12.1 G5).
+        if: always()
+        env:
+          OUTCOMES: >-
+            eod=${{ steps.eod.outcome }} sofr=${{ steps.sofr.outcome }}
+            richcheap=${{ steps.richcheap.outcome }} pnl=${{ steps.pnl.outcome }}
         run: |
-          echo "::error::a fail-level check failed; see the reports on branch forward-log"
-          exit 1
+          failed=""
+          for kv in $OUTCOMES; do if [ "${kv#*=}" = failure ]; then failed="$failed ${kv%%=*}"; fi; done
+          if [ -n "$failed" ]; then
+            echo "::error::soft steps failed:$failed; see the reports on branch forward-log"
+            exit 1
+          fi
+          echo "all soft steps passed or were skipped ($OUTCOMES)"
