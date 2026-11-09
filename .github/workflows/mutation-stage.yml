@@ -77,7 +77,7 @@ jobs:
       - if: matrix.lang == 'cpp'
         run: |
           docker run --rm -v "$PWD:/w" -w /w -e TARGET -e SUITE -e MAX -e OUT gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
-            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --out "$OUT.json"'
+            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --unit --out "$OUT.json"'
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         if: matrix.lang == 'python'
       - if: matrix.lang == 'rust'
