@@ -40,6 +40,14 @@ cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQF_SA
 
 Use Linux or WSL. GCC on MinGW has no sanitizer runtime. Inside a container, LeakSanitizer needs `--cap-add=SYS_PTRACE`.
 
+## Warnings as errors
+
+CI configures the C++ build with `-DQF_WERROR=ON`, which adds `-Werror -Wconversion -Wshadow -Wno-sign-conversion` on top of `-Wall -Wextra` (GCC already leaves sign conversion out of `-Wconversion` in C++; the explicit `-Wno-sign-conversion` keeps Clang in line). Local builds leave it off so a new warning does not stop work in progress. Turn it on before you push C++ changes.
+
+## Limit cases and convergence orders
+
+Some stage E methods have no outside reference to compare against: the SLV leverage scheme, the backward-Euler American scheme, and the Crank-Nicolson and CRR pricers beyond their golden cases. For these, a set of unit tests (`rust/crates/quantforge-core/tests/limits_e.rs`, `java25/.../pricing/LimitsETest.java`, `cpp26/tests/test_limits_e.cpp`, `python/tests/test_limits_e.py`) checks each one against a case whose answer is known and against its own theoretical order. SLV with a flat 20% surface and a Heston model with v0 = theta = 0.04 and vol of vol 0.01 is plain Heston, so the leverage must be 1: the gap within 0.3 of ln(spot) is under 0.07 on a 41x20x20 grid and must fall below 0.6 of that on a 81x40x40 grid, which shows it is discretisation error. The American put on a 401x1600 grid must agree with a 1000-step CRR tree to 5e-3 (the measured scheme error there is about 2e-3, the tree's about 5e-4), and at zero rate and zero yield, where early exercise is worth nothing, it must equal the European to 1e-12. The observed orders, log2 of successive error ratios on doubled grids, must lie in [1.8, 2.2] for Crank-Nicolson with Rannacher start (measured 1.99 to 2.00) and for the backward-Euler scheme in space with dt quartered (2.00 to 2.01), and in [0.8, 1.2] for the same scheme in time (1.00) and for the CRR European at the money (1.00). Python also calibrates SLV to the Dupire local vol of an SVI surface fitted to Heston prices (v0 = theta = 0.04, kappa 1.5, xi 0.3, rho -0.5): the leverage must be within 0.06 of 1 within 0.3 of ln(spot) at 0.5, 0.75 and 1 year, and a seeded 20,000-path Euler Monte Carlo with that leverage must reprice the 1-year Heston calls at strikes 90, 100 and 110 within 3 standard errors (measured 1.3, 0.9 and 0.1). Evidence class: computed in this repository, against closed forms and the methods' own theory; no outside source.
+
 ## Fuzzing
 
 ```bash
