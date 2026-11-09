@@ -15,8 +15,9 @@ class _Sec:
     """One section of the convex monotone interpolation: value(x) (forward) and primitive(x) (integral from x_0)."""
 
 
-def _cm_sections(x, y):
-    """x: node times, y: discrete forwards, y[0] ignored. Returns (sections keyed by right node index, extrap)."""
+def _cm_sections(x, y, fp_=False):
+    """x: node times, y: discrete forwards, y[0] ignored. fp_ is QuantLib's forcePositive (the spec uses False).
+    Returns (sections keyed by right node index, extrapolation section)."""
     n = len(x)
     secs = {}
     if n == 2:
@@ -28,8 +29,9 @@ def _cm_sections(x, y):
         f[i] = dx / (dx + dxp) * y[i] + dxp / (dx + dxp) * y[i + 1]
     f[0] = 1.5 * y[1] - 0.5 * f[1]
     f[n - 1] = 1.5 * y[n - 1] - 0.5 * f[n - 2]
-    f[0] = max(f[0], 0.0) if f[0] < 0 else f[0]
-    f[n - 1] = 0.0 if f[n - 1] < 0.0 else f[n - 1]
+    if fp_:
+        f[0] = 0.0 if f[0] < 0 else f[0]
+        f[n - 1] = 0.0 if f[n - 1] < 0.0 else f[n - 1]
     prim = 0.0
     for i in range(1, n):
         gp, gn = f[i - 1] - y[i], f[i] - y[i]
@@ -37,29 +39,29 @@ def _cm_sections(x, y):
         if abs(gp) < 1e-14 and abs(gn) < 1e-14:
             secs[i] = ("grad", f[i - 1], prim, x0, x1, f[i])
         elif (gp > 0 and -0.5 * gp >= gn >= -2 * gp) or (gp < 0 and -0.5 * gp <= gn <= -2 * gp):
-            secs[i] = _quad_min(x0, x1, f[i - 1], f[i], fa, prim)
+            secs[i] = _quad_min(x0, x1, f[i - 1], f[i], fa, prim, fp_)
         elif (gp < 0 and gn > -2 * gp) or (gp > 0 and gn < -2 * gp):
             eta = (gn + 2 * gp) / (gn - gp)
-            secs[i] = ("cm2", x0, x1 - x0, gp, gn, fa, eta, prim) if eta < 1.0 else _cm4min(x0, x1, gp, gn, fa, 1.0, prim)
+            secs[i] = ("cm2", x0, x1 - x0, gp, gn, fa, eta, prim) if eta < 1.0 else _cm4min(x0, x1, gp, gn, fa, 1.0, prim, fp_)
         elif (gp > 0 and gn < 0 and gn > -0.5 * gp) or (gp < 0 and gn > 0 and gn < -0.5 * gp):
             eta = gn / (gn - gp) * 3.0
-            secs[i] = ("cm3", x0, x1 - x0, gp, gn, fa, eta, prim) if eta > 0.0 else _cm4min(x0, x1, gp, gn, fa, 0.0, prim)
+            secs[i] = ("cm3", x0, x1 - x0, gp, gn, fa, eta, prim) if eta > 0.0 else _cm4min(x0, x1, gp, gn, fa, 0.0, prim, fp_)
         else:
             eta = min(max(gn / (gp + gn), 0.0), 1.0)
-            secs[i] = _cm4min(x0, x1, gp, gn, fa, eta, prim)
+            secs[i] = _cm4min(x0, x1, gp, gn, fa, eta, prim, fp_)
         prim += y[i] * (x[i] - x[i - 1])
     last = _sec_value(secs[n - 1], x[n - 1])
     return secs, ("const", last, prim, x[n - 1])
 
 
-def _quad_min(x1, x4, fp, fn, fa, p1):
+def _quad_min(x1, x4, fp, fn, fa, p1, fp_=True):
     a = 3 * fp + 3 * fn - 6 * fa
     b = -(4 * fp + 2 * fn - 6 * fa)
     c = fp
     d = b * b - 4 * a * c
     sc = x4 - x1
     split = None
-    if d > 0:
+    if d > 0 and fp_:
         aav, bav, cav = 36.0, -24 * (fp + fn), 4 * (fp * fp + fp * fn + fn * fn)
         dav = bav * bav - 4.0 * aav * cav
         if dav >= 0.0:
@@ -77,11 +79,11 @@ def _quad_min(x1, x4, fp, fn, fa, p1):
     return ("qmin", x1, x4, a, b, c, sc, p1, split)
 
 
-def _cm4min(x0, x1, gp, gn, fa, eta, prim):
+def _cm4min(x0, x1, gp, gn, fa, eta, prim, fp_=True):
     sc = x1 - x0
     A = -0.5 * (eta * gp + (1 - eta) * gn)
     split = None
-    if A + fa <= 0.0:
+    if A + fa <= 0.0 and fp_:
         fp, fn = gp + fa, gn + fa
         shift = (eta * fp + (1 - eta) * fn) / 3.0 - fa
         period = shift * sc / (fa + shift)
@@ -190,11 +192,11 @@ def _sec_prim(s, x):
 
 
 class MonotoneConvex:
-    def __init__(self, t, S):
+    def __init__(self, t, S, force_positive=False):
         self.x = list(t)
         lnS = [math.log(s) for s in S]
         self.y = [0.0] + [(lnS[i - 1] - lnS[i]) / (t[i] - t[i - 1]) for i in range(1, len(t))]
-        self.secs, self.ext = _cm_sections(self.x, self.y)
+        self.secs, self.ext = _cm_sections(self.x, self.y, force_positive)
 
     def _sec(self, t):
         if t >= self.x[-1]:

@@ -28,3 +28,14 @@ Spec version 1.0.0. Normative: this page is part of every stage F spec page and 
 | F-15 | VIX null quotes (R10) | A quote may be `null`. A null series is not an ATM candidate (only strikes with both sides non-null are), is removed from its own side's walk before it starts (no effect on zero-bid runs), and at `K0` makes the term `E_INPUT`. Source: Cboe Mathematics Methodology v5.0, 3(a)(ii) and (iii), quoted in `vix-index.md` |
 | F-16 | VIX crossed quotes (R10) | A bid above its ask stays `E_INPUT` (Cboe leaves crossed series to its quote-history filter, which a pure function cannot run) |
 | F-17 | Local vol at slice expiries (R10) | Documented, not changed: `w`, implied vol, `w_k`, `w_kk` are continuous in `T`; local vol jumps at each slice expiry by the stated formula, and a node takes the right limit. A C1-in-`T` surface is stage G model work |
+
+## Wave 1, F1 curve layer (Q1, Q4, funding)
+
+| # | Point | Ruling |
+|---|---|---|
+| F-18 | New interpolations (Q1) | `MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE` (with `tension`) and `HYBRID` (with `step_end`), all on `S = D/J`. New operation `rates.curve.inspect` reports instantaneous forwards |
+| F-19 | Convex monotone positivity (Q1) | QuantLib `ConvexMonotone(0, 1, forcePositive = false)`. QuantLib's forcePositive helper does not preserve section averages, so a curve built with it does not return its own pillars; measured on the stage F pillars and recorded in `curve-framework.md` |
+| F-20 | Extrapolation of the new methods (Q1) | Flat instantaneous forward `f(t_n-)` beyond the last pillar. `LOG_LINEAR_DF` and `LINEAR_ZERO` keep their stage B rule |
+| F-21 | Bootstrap with non-local methods (Q1) | `SEQUENTIAL` and `GLOBAL` both return the global solution, repricing below 1e-13 |
+| F-22 | Locality is on pillars (Q1; amends the T row) | Locality is stated for a change in one pillar discount factor, not in one quote, because a bootstrap spreads a quote move over later pillars. The T row's "1 bp move in quote i" becomes "a change in pillar i", and its "forced positive" becomes `forcePositive = false` (ruling F-19) |
+| F-23 | Outside-oracle floor for stage F | The 60% floor (rule 11.2.5, as stage D) is measured over the stage F value suites. The E1 suites (`e1_*`) are left out of the denominator: they test the input rule F-2 on every older operation, and no library is an oracle for a JSON input rule. A published worked example by the owner of a methodology (Cboe for VIX, BCBS for FRTB-SA) counts as outside when every compared output matches its printed digits. `oracle/python/outside_f.py` writes `oracle/outside_register_f.json` and prints the share |

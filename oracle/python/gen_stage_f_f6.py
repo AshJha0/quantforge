@@ -264,7 +264,7 @@ def garch_ll(e, theta, dist, init, jet=False):
     else:
         th = [mp.mpf(x) for x in theta]
     om, al, be = th[:3]
-    s2 = init
+    s2 = Jet.const(init, n) if jet else init
     ll = Jet.const(0, n) if jet else mp.mpf(0)
     if dist == "NORMAL":
         c = -mp.log(2 * mp.pi) / 2
