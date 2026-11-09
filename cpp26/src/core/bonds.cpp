@@ -4,12 +4,15 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/linalg.hpp"
 
 namespace quantforge {
 namespace {
 
 double days(Date a, Date b) { return double(days_between(a, b)); }
+
+void require_finite_bond(const Bond& b, std::string_view field = "coupon") { require_finite(b.coupon, field); }
 
 Date month_end(Date d) {
     using namespace std::chrono;
@@ -67,19 +70,27 @@ std::vector<Date> roll_back(Date maturity, int months, Date from, bool month_end
 }
 
 BondPeriod bond_period(const Bond& b, Date settlement) {
+    require_finite_bond(b);
     if (settlement >= b.maturity) throw Error("E_DATE_ORDER", "settlement must be before maturity", "settlement");
     const auto dates = roll_back(b.maturity, 12 / b.frequency, settlement);
     return {dates[0], dates[1], std::vector<Date>(dates.begin() + 1, dates.end())};
 }
 
-double coupon_amount(const Bond& b) { return 100.0 * b.coupon / b.frequency; }
+double coupon_amount(const Bond& b) {
+    require_finite_bond(b);
+    return 100.0 * b.coupon / b.frequency;
+}
 
 double accrued(const Bond& b, Date settlement) {
+    require_finite_bond(b);
     const BondPeriod p = bond_period(b, settlement);
     return coupon_amount(b) * days(p.prev, settlement) / days(p.prev, p.next);
 }
 
-YieldPrice price_from_yield(const Bond& b, Date settlement, double y) {
+namespace {
+
+// The unchecked kernel; the root search below calls it with trial yields.
+YieldPrice price_from_yield_raw(const Bond& b, Date settlement, double y) {
     const BondPeriod p = bond_period(b, settlement);
     const double f = b.frequency;
     if (!(1.0 + y / f > 0.0)) throw Error("E_DOMAIN", "1 + yield/frequency must be positive", "yield");
@@ -97,15 +108,25 @@ YieldPrice price_from_yield(const Bond& b, Date settlement, double y) {
     return {dirty, acc, dirty - acc, dur / dirty * v, dur / dirty, conv / dirty};
 }
 
+}  // namespace
+
+YieldPrice price_from_yield(const Bond& b, Date settlement, double y) {
+    require_finite_bond(b);
+    require_finite(y, "yield");
+    return price_from_yield_raw(b, settlement, y);
+}
+
 double yield_from_price(const Bond& b, Date settlement, double clean_price) {
+    require_finite_bond(b);
+    require_finite(clean_price, "clean_price");
     const double acc = accrued(b, settlement);
     if (!(clean_price > 0.0) || !(clean_price + acc > 0.0)) throw Error("E_DOMAIN", "the dirty price is not positive", "clean_price");
     const double f = b.frequency;
-    double y = decreasing_root([&](double x) { return price_from_yield(b, settlement, x).clean - clean_price; },
+    double y = decreasing_root([&](double x) { return price_from_yield_raw(b, settlement, x).clean - clean_price; },
                                b.coupon, 0.01, -f);
     // Newton polish at full precision.
     for (int i = 0; i < 3; ++i) {
-        const YieldPrice p = price_from_yield(b, settlement, y);
+        const YieldPrice p = price_from_yield_raw(b, settlement, y);
         const double step = (p.clean - clean_price) / (p.modified_duration * p.dirty);
         if (!std::isfinite(step) || !(1.0 + (y + step) / f > 0.0)) break;
         y += step;
@@ -113,7 +134,10 @@ double yield_from_price(const Bond& b, Date settlement, double clean_price) {
     return y;
 }
 
-double curve_dirty(const Bond& b, Date settlement, const Curve& curve, double z) {
+namespace {
+
+// The unchecked kernel; the z-spread root search calls it with trial spreads.
+double curve_dirty_raw(const Bond& b, Date settlement, const Curve& curve, double z) {
     const BondPeriod p = bond_period(b, settlement);
     if (settlement < curve.as_of()) throw Error("E_OUT_OF_RANGE", "settlement is before the curve's as_of", "settlement");
     const auto ds = [&](Date d) { return curve.discount(d) * std::exp(-z * curve.time(d)); };
@@ -123,14 +147,26 @@ double curve_dirty(const Bond& b, Date settlement, const Curve& curve, double z)
     return sum / ds(settlement);
 }
 
+}  // namespace
+
+double curve_dirty(const Bond& b, Date settlement, const Curve& curve, double z) {
+    require_finite_bond(b);
+    require_finite(z, "z");
+    return curve_dirty_raw(b, settlement, curve, z);
+}
+
 double z_spread(const Bond& b, Date settlement, const Curve& curve, double clean_price) {
+    require_finite_bond(b);
+    require_finite(clean_price, "clean_price");
     const double target = clean_price + accrued(b, settlement);
-    (void)curve_dirty(b, settlement, curve, 0.0);  // checks first
-    return decreasing_root([&](double z) { return curve_dirty(b, settlement, curve, z) - target; }, 0.0, 0.01, -HUGE_VAL);
+    (void)curve_dirty_raw(b, settlement, curve, 0.0);  // checks first
+    return decreasing_root([&](double z) { return curve_dirty_raw(b, settlement, curve, z) - target; }, 0.0, 0.01, -HUGE_VAL);
 }
 
 AssetSwap asset_swap(const Bond& b, Date settlement, const Curve& curve, double dirty_price) {
-    const double model = curve_dirty(b, settlement, curve, 0.0);
+    require_finite_bond(b);
+    require_finite(dirty_price, "dirty_price");
+    const double model = curve_dirty_raw(b, settlement, curve, 0.0);
     const auto dates = roll_back(b.maturity, 3, settlement, false);
     double annuity = 0.0;
     Date s = settlement;
@@ -143,6 +179,9 @@ AssetSwap asset_swap(const Bond& b, Date settlement, const Curve& curve, double 
 }
 
 FrnPrice frn_price(const Frn& n, Date settlement, const Curve& discount, const Curve& projection) {
+    require_finite(n.current_rate, "current_rate");
+    require_finite(n.margin, "margin");
+    require_finite(n.discount_margin, "discount_margin");
     const Bond shape{n.maturity, 0.0, n.frequency};
     const BondPeriod p = bond_period(shape, settlement);
     if (settlement < discount.as_of()) throw Error("E_OUT_OF_RANGE", "settlement is before the curve's as_of", "settlement");
@@ -184,6 +223,10 @@ RepoTerms repo_terms(const Bond& b, Date start, Date end, double clean_price) {
 }  // namespace
 
 RepoForward repo_forward(const Bond& b, Date start, Date end, double clean_price, double r, std::optional<double> gc) {
+    require_finite_bond(b);
+    require_finite(clean_price, "clean_price");
+    require_finite(r, "repo_rate");
+    require_finite(gc, "gc_rate");
     const RepoTerms t = repo_terms(b, start, end, clean_price);
     const double fd = t.dirty * (1.0 + r * t.t) - (t.coupons + r * t.coupons_weighted);
     RepoForward out{t.dirty, fd, fd - accrued(b, end), t.dirty * r * t.t, std::nullopt, std::nullopt};
@@ -195,12 +238,17 @@ RepoForward repo_forward(const Bond& b, Date start, Date end, double clean_price
 }
 
 double repo_implied_rate(const Bond& b, Date start, Date end, double clean_price, double forward_clean) {
+    require_finite_bond(b);
+    require_finite(clean_price, "clean_price");
+    require_finite(forward_clean, "forward_clean");
     const RepoTerms t = repo_terms(b, start, end, clean_price);
     const double fd = forward_clean + accrued(b, end);
     return (fd - t.dirty + t.coupons) / (t.dirty * t.t - t.coupons_weighted);
 }
 
 double conversion_factor(const Bond& b, Date delivery, double notional_coupon, FuturesContract contract) {
+    require_finite_bond(b);
+    require_finite(notional_coupon, "notional_coupon");
     if (notional_coupon != 0.06) throw Error("E_INPUT", "notional_coupon must be 0.06", "notional_coupon");
     if (b.frequency != 2) throw Error("E_INPUT", "only semi-annual bonds", "bond");
     if (delivery >= b.maturity) throw Error("E_DATE_ORDER", "maturity must follow the delivery month", "delivery_month");
@@ -218,6 +266,13 @@ double conversion_factor(const Bond& b, Date delivery, double notional_coupon, F
 }
 
 Basis futures_basis(double f, Date settlement, Date delivery, double r, const std::vector<BasisBond>& bonds) {
+    require_finite(f, "futures_price");
+    require_finite(r, "repo_rate");
+    for (const BasisBond& x : bonds) {
+        require_finite_bond(x.bond, "bonds");
+        require_finite(x.clean_price, "bonds");
+        require_finite(x.conversion_factor, "bonds");
+    }
     if (bonds.empty()) throw Error("E_INPUT", "no bonds", "bonds");
     Basis out{{}, 0};
     for (const BasisBond& x : bonds) {
@@ -234,6 +289,12 @@ Basis futures_basis(double f, Date settlement, Date delivery, double r, const st
 
 NsFit bond_nelson_siegel(Date settlement, double tau, const std::vector<NsBond>& bonds,
                          const std::optional<std::vector<double>>& weights) {
+    require_finite(tau, "tau");
+    for (const NsBond& nb : bonds) {
+        require_finite_bond(nb.bond, "bonds");
+        require_finite(nb.dirty_price, "bonds");
+    }
+    require_finite(weights, "weights");
     if (weights && weights->size() != bonds.size()) throw Error("E_INPUT", "weights must match bonds", "weights");
     const std::vector<double> w = weights ? *weights : std::vector<double>(bonds.size(), 1.0);
     if (std::ranges::count_if(w, [](double x) { return x > 0.0; }) < 3)

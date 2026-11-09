@@ -1,18 +1,5 @@
-// Stage D, D2 bonds and repo. Included by dispatch.cpp after ops_stage_d.inc.
-
-Bond bond_fields(const In& b) {
-    const Date maturity = b.date("maturity");
-    const double coupon = b.real("coupon");
-    const long long f = b.integer("frequency");
-    if (f != 1 && f != 2 && f != 4) schema("frequency", "must be 1, 2 or 4");
-    return {maturity, coupon, int(f)};
-}
-
-Bond bond_of(const In& in) {
-    const Value& v = in.need("bond");
-    if (v.kind != Kind::Object) schema("bond", "expected an object");
-    return bond_fields(In(v));
-}
+// CLI handlers, the bonds verbs.
+// Included by dispatch.cpp inside its unnamed namespace; not a translation unit of its own.
 
 void op_bond_from_yield(const In& in, Out& out) {
     const Bond b = bond_of(in);
@@ -114,13 +101,6 @@ void op_repo_implied(const In& in, Out& out) {
     out.key_real("repo_rate", repo_implied_rate(b, start, end, clean, fc));
 }
 
-Date delivery_month_of(const In& in) {
-    const string& m = in.text("delivery_month");
-    const auto d = m.size() == 7 ? parse_date(m + "-01") : std::nullopt;
-    if (!d) schema("delivery_month", "expected YYYY-MM");
-    return *d;
-}
-
 void op_conversion_factor(const In& in, Out& out) {
     const Bond b = bond_of(in);
     const Date d = delivery_month_of(in);
@@ -171,3 +151,17 @@ void op_bond_ns(const In& in, Out& out) {
     out.key_reals("betas", fit.betas);
     out.key_reals("residuals", fit.residuals);
 }
+
+constexpr Entry bonds_ops[] = {
+    {"bond.fit.nelson_siegel", op_bond_ns},
+    {"bond.frn.price", op_frn},
+    {"bond.futures.basis", op_futures_basis},
+    {"bond.futures.conversion_factor", op_conversion_factor},
+    {"bond.price.from_curve", op_bond_from_curve},
+    {"bond.price.from_yield", op_bond_from_yield},
+    {"bond.spread.asset_swap", op_bond_asw},
+    {"bond.spread.z", op_bond_z},
+    {"bond.yield.from_price", op_bond_yield},
+    {"repo.forward", op_repo_forward},
+    {"repo.implied_rate", op_repo_implied},
+};

@@ -5,6 +5,7 @@
 #include <limits>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 namespace {
@@ -332,6 +333,14 @@ bool polish(const Matrix& q, const Vec& q0, const Vec& pen, Vec& x) {
 }  // namespace
 
 FitResult fit(const FitInputs& in) {
+    require_finite(in.x, "x");
+    require_finite(in.y, "y");
+    require_finite(in.start, "start");
+    require_finite(in.weights, "weights");
+    require_finite(in.regularisation, "regularisation");
+    require_finite(in.prior, "prior");
+    require_finite(in.lower, "lower");
+    require_finite(in.upper, "upper");
     const std::size_t n = in.start.size();
     if (in.x.size() != in.y.size()) throw Error("E_INPUT", "x and y differ in length");
     if (n != parameter_count(in.model)) throw Error("E_INPUT", "start has the wrong length", "start");
@@ -371,6 +380,9 @@ FitResult fit(const FitInputs& in) {
 }
 
 std::vector<Breach> check_bid_ask(const Vec& fitted, const Vec& bid, const Vec& ask) {
+    require_finite(fitted, "fitted");
+    require_finite(bid, "bid");
+    require_finite(ask, "ask");
     if (fitted.size() != bid.size() || fitted.size() != ask.size()) throw Error("E_INPUT", "lengths differ");
     for (std::size_t i = 0; i < bid.size(); ++i)
         if (bid[i] > ask[i]) throw Error("E_INPUT", "bid is above ask");
@@ -384,6 +396,7 @@ std::vector<Breach> check_bid_ask(const Vec& fitted, const Vec& bid, const Vec& 
 
 CurveReport curve_report(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
                          CurveInterpolation interpolation) {
+    for (const OisQuote& q : quotes) require_finite(q.rate, "quotes");
     constexpr double h = 1e-5;
     const SolvedCurve base = ois_bootstrap(c, as_of, quotes, interpolation, SolveMethod::Sequential);
     const std::size_t n = quotes.size();
@@ -408,6 +421,11 @@ CurveReport curve_report(const RateConvention& c, Date as_of, const std::vector<
 }
 
 HedgeResult hedge_solve(const Matrix& a, const Vec& b, const Vec& weights, const Vec& costs, double lambda) {
+    require_finite(a, "a");
+    require_finite(b, "b");
+    require_finite(weights, "weights");
+    require_finite(costs, "costs");
+    require_finite(lambda, "lambda");
     if (a.empty() || a[0].empty()) throw Error("E_INPUT", "a is empty", "a");
     const std::size_t rows = a.size(), n = a[0].size();
     for (const Vec& row : a)
@@ -466,6 +484,8 @@ HedgeResult hedge_solve(const Matrix& a, const Vec& b, const Vec& weights, const
 }
 
 double spread_cost(const Vec& quantities, const Vec& half_spreads) {
+    require_finite(quantities, "quantities");
+    require_finite(half_spreads, "half_spreads");
     if (quantities.size() != half_spreads.size()) throw Error("E_INPUT", "lengths differ");
     if (std::ranges::any_of(half_spreads, [](double h) { return h < 0.0; })) throw Error("E_DOMAIN", "a half spread is negative", "half_spreads");
     double cost = 0.0;

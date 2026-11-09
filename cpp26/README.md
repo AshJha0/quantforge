@@ -8,7 +8,7 @@ Stages A and B of QuantForge: the specs in `specifications/` that `stage-b-follo
 | Path | Holds |
 |---|---|
 | `include/quantforge/core/`, `src/core/` | The library. No CLI knowledge |
-| `src/cli/` | Case parsing, the operation table, and the test function registry |
+| `src/cli/` | Case parsing (`dispatch.cpp`), shared input readers (`readers.inc`), one `ops_<domain>.inc` per verb domain, each ending with its `<domain>_ops` array, and the test function registry. The verb registry in `dispatch.cpp` lists the domain arrays; dispatch and the `operations` command are generated from it |
 | `tests/` | Catch2 tests, from the specs' worked examples and numeric targets |
 | `SPEC_QUESTIONS.md` | Golden cases that disagree with a spec, and gaps in the specs |
 
