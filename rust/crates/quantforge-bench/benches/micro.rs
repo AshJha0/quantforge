@@ -2,6 +2,7 @@
 //! Writes `benchmarks/micro/out/rust.json` at the repo root after criterion finishes.
 //! `QF_BENCH_INJECT_NS` adds a busy-wait to every timed op (used to prove the CI gate fails).
 use std::alloc::{GlobalAlloc, Layout, System};
+use std::fmt::Write as _;
 use std::hint::black_box;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -181,9 +182,24 @@ fn main() {
     c.final_summary();
 
     let allocs = [
-        ("bootstrap", allocs_per_op(|| drop(black_box(bootstrap())))),
-        ("swap_pv", allocs_per_op(|| drop(black_box(swap_pv())))),
-        ("implied_vol", allocs_per_op(|| drop(black_box(implied())))),
+        (
+            "bootstrap",
+            allocs_per_op(|| {
+                black_box(bootstrap());
+            }),
+        ),
+        (
+            "swap_pv",
+            allocs_per_op(|| {
+                black_box(swap_pv());
+            }),
+        ),
+        (
+            "implied_vol",
+            allocs_per_op(|| {
+                black_box(implied());
+            }),
+        ),
     ];
     let mut out = String::from("{\"lang\":\"rust\",\"benchmarks\":{");
     for (n, (id, a)) in allocs.iter().enumerate() {
@@ -191,9 +207,7 @@ fn main() {
             out.push(',');
         }
         let ns = median_ns(id);
-        out.push_str(&format!(
-            "\"{id}\":{{\"ns_per_op\":{ns},\"allocs_per_op\":{a}}}"
-        ));
+        write!(out, "\"{id}\":{{\"ns_per_op\":{ns},\"allocs_per_op\":{a}}}").expect("write");
     }
     out.push_str("}}\n");
     let dir = repo_root().join("benchmarks/micro/out");
