@@ -14,16 +14,7 @@ on:
       - 'datasets/**'
       - 'specifications/**'
       - '.github/workflows/conformance.yml'
-  pull_request:
-    paths:
-      - 'java25/**'
-      - 'cpp26/**'
-      - 'python/**'
-      - 'rust/**'
-      - 'conformance/**'
-      - 'datasets/**'
-      - 'specifications/**'
-      - '.github/workflows/conformance.yml'
+  pull_request:  # every PR, so these can be required checks on main
   workflow_dispatch:
 permissions:
   contents: read

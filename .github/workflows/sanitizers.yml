@@ -8,12 +8,7 @@ on:
       - 'datasets/golden/**'
       - 'conformance/runner/**'
       - '.github/workflows/sanitizers.yml'
-  pull_request:
-    paths:
-      - 'cpp26/**'
-      - 'datasets/golden/**'
-      - 'conformance/runner/**'
-      - '.github/workflows/sanitizers.yml'
+  pull_request:  # every PR, so these can be required checks on main
   workflow_dispatch:
 permissions:
   contents: read
