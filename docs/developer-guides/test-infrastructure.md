@@ -40,6 +40,14 @@ cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQF_SA
 
 Use Linux or WSL. GCC on MinGW has no sanitizer runtime. Inside a container, LeakSanitizer needs `--cap-add=SYS_PTRACE`.
 
+## Warnings as errors
+
+CI configures the C++ build with `-DQF_WERROR=ON`, which adds `-Werror -Wconversion -Wshadow -Wno-sign-conversion` on top of `-Wall -Wextra` (GCC already leaves sign conversion out of `-Wconversion` in C++; the explicit `-Wno-sign-conversion` keeps Clang in line). Local builds leave it off so a new warning does not stop work in progress. Turn it on before you push C++ changes.
+
+## Limit cases and convergence orders
+
+Some stage E methods have no outside reference to compare against: the SLV leverage scheme, the backward-Euler American scheme, and the Crank-Nicolson and CRR pricers beyond their golden cases. For these, a set of unit tests (`rust/crates/quantforge-core/tests/limits_e.rs`, `java25/.../pricing/LimitsETest.java`, `cpp26/tests/test_limits_e.cpp`, `python/tests/test_limits_e.py`) checks each one against a case whose answer is known and against its own theoretical order. SLV with a flat 20% surface and a Heston model with v0 = theta = 0.04 and vol of vol 0.01 is plain Heston, so the leverage must be 1: the gap within 0.3 of ln(spot) is under 0.07 on a 41x20x20 grid and must fall below 0.6 of that on a 81x40x40 grid, which shows it is discretisation error. The American put on a 401x1600 grid must agree with a 1000-step CRR tree to 5e-3 (the measured scheme error there is about 2e-3, the tree's about 5e-4), and at zero rate and zero yield, where early exercise is worth nothing, it must equal the European to 1e-12. The observed orders, log2 of successive error ratios on doubled grids, must lie in [1.8, 2.2] for Crank-Nicolson with Rannacher start (measured 1.99 to 2.00) and for the backward-Euler scheme in space with dt quartered (2.00 to 2.01), and in [0.8, 1.2] for the same scheme in time (1.00) and for the CRR European at the money (1.00). Python also calibrates SLV to the Dupire local vol of an SVI surface fitted to Heston prices (v0 = theta = 0.04, kappa 1.5, xi 0.3, rho -0.5): the leverage must be within 0.06 of 1 within 0.3 of ln(spot) at 0.5, 0.75 and 1 year, and a seeded 20,000-path Euler Monte Carlo with that leverage must reprice the 1-year Heston calls at strikes 90, 100 and 110 within 3 standard errors (measured 1.3, 0.9 and 0.1). Evidence class: computed in this repository, against closed forms and the methods' own theory; no outside source.
+
 ## Fuzzing
 
 ```bash
@@ -80,3 +88,26 @@ Observed, WSL Ubuntu, 2026-11-06, source at `a60d814`, seed 1, one run. Unit sco
 | Python `daycount` | `daycount` | 173 of 436 (40%) | 15 | 34 | 35 |
 
 This was measured on stage A code. No mutation score exists for stage B code; `oracle/MUTANTS.md` is a different check, of the golden tolerances. Limits: this is two files per language and 40 mutants each, so a sample figure can be several points out. Python ran one suite, because all suites take over a minute per mutant, so it may undercount. Survivors have not been sorted into equivalent mutants and real gaps. mutmut changes error message text, which the runner does not compare, and that may explain some Python survivors. The four Rust compounding survivors include three in `check_rate`, which are worth a look as possible missing cases.
+
+### Mutation scores (stage E)
+
+Measured on branch `stage-e`. Pooled CI score before the closeout tests: **84.3%** (2,360 killed, 439 survived; CI run 42590488102, `mutation-report.md`). Two columns: the score before the closeout tests, and the score after them where tests were added.
+
+Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "before": local `--unit` runs on a 40-site sample, 0 timeouts (observed, local); the CI report's golden-only C++ scores are lower because they do not run the unit tests. Python and Rust "before": CI sample of 40 mutants, unit or golden (observed, CI). Every "after" score is a hand-applied survivor check: each surviving sampled mutant was applied by hand against the new tests (`cpp26/tests/test_mutants_e.cpp` after commit `996527c`, `python/tests/test_mutants_e.py`, `rust/crates/quantforge-core/tests/mutants_e.rs`). It is not a fresh full mutation run. Remaining survivors are classed as equivalent by the author, with reasons in those test files; a second reviewer's sign-off is scheduled (plan 13.2 T).
+
+| Module | Java (PIT) | C++ before | C++ after | Python before | Python after | Rust before | Rust after |
+|---|---|---|---|---|---|---|---|
+| surfaces_local_vol (E1) | 91.7% | 85.0% | unchanged | 70.0% | 97.5% (39/40) | 85.0% | unchanged |
+| heston_slv (E2) | 94.6% | 82.5% | unchanged | 75.0% | 100% (40/40) | 87.5% | unchanged |
+| fx_smile (E3) | 81.7% | 85.0% | unchanged | 72.5% | 90.0% (36/40) | 87.5% | unchanged |
+| rates_vol (E4) | 91.7% | 66.7% | 97.4% (38/39) | 57.5% | 90.0% (36/40) | 87.5% | unchanged |
+| exotics (E5) | 93.9% | 85.0% | unchanged | 65.0% | 97.5% (39/40) | 97.5% | unchanged |
+| correlation (E6) | 86.3% | 85.0% | unchanged | 80.0% | unchanged | 90.0% | unchanged |
+| garch_varswap_vix (E7) | 82.2% | 75.0% | 82.5% (33/40) | 65.0% | 100% (40/40) | 70.0% | 87.5% (35/40) |
+| credit_options (E8) | 90.4% | 60.0% | 92.5% (37/40) | 70.0% | 82.5% (33/40) | 95.0% | unchanged |
+
+Every cell is at or above the 80% target after the closeout tests, on the evidence classes above.
+
+## Stage quality scope
+
+`conformance/quality/stage_e.json` lists the stage E modules per language: the coverage gate (85% line coverage, `.github/workflows/coverage-stage.yml`, weekly and manual), the scope check and the fuzz focus read it, and `conformance/mutation/stages.json` has the same module names under stage E. Entries start as TODO and every tool skips them. When a module lands, replace its TODO with the source path and run `python tools/quality_gate.py --check-config`: it fails if the path matches nothing, a Rust file is outside a workspace member crate, a C++ file is not in `cpp26/CMakeLists.txt`, or a Python file or test is outside what ruff and mutmut cover. Weekly fuzzing draws about half its seeds from `datasets/golden/stage_e` once that folder exists.

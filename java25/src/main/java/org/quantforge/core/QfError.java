@@ -2,6 +2,8 @@ package org.quantforge.core;
 
 /** A failure with a contract error code. The CLI turns it into a result with status "error". */
 public final class QfError extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     private final String code;
     private final String field;
 

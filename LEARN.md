@@ -186,7 +186,7 @@ A tolerance such as 1e-10 says little to a desk. `conformance/tolerances/money.m
 
 ## R2: Risk
 
-**What is being built.** Phase R2 (target v0.4.2) adds four risk operations on top of the existing pricers: `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` and `risk.pnl.explain`. All risk is bump and revalue (ADR-0010), and every number is money per basis point, signed: risk is the change in value for a +1 bp move, so a receiver of fixed, which loses when rates rise, has a negative DV01 (the 2Y receiver below: -4,806.94). Specs: `specifications/06-risk/par-and-key-rate.md` and `pnl-explain.md`. Goldens: `datasets/golden/r2/`, 41 risk cases and 44 P&L explain cases, each re-priced in QuantLib 1.44. The language builds are landing, so the numbers below are the oracle's expected values, not yet CLI output.
+**What is being built.** Phase R2 (target v0.4.2) adds four risk operations on top of the existing pricers: `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` and `risk.pnl.explain`. All risk is bump and revalue (ADR-0010), and every number is money per basis point, signed: risk is the change in value for a +1 bp move, so a receiver of fixed, which loses when rates rise, has a negative DV01 (the 2Y receiver below: -4,806.94). Specs: `specifications/06-risk/par-and-key-rate.md` and `pnl-explain.md`. Goldens: `datasets/golden/r2/`, 41 risk cases and 44 P&L explain cases, each re-priced in QuantLib 1.44. All four builds reproduce these numbers: each passed 5,922 of 5,922 golden cases on the merged `r2` tree (observed, local, 2026-11-08).
 
 The worked examples share one trade: receive 3.45% fixed against SOFR on 25 million for 2 years, on a synthetic 13-quote SOFR curve (1W to 30Y) as of 2026-11-06. Its value is -24,052.57.
 
@@ -224,7 +224,7 @@ The worked examples share one trade: receive 3.45% fixed against SOFR on 25 mill
 
 **On real moves.** `tools/workflows/pnl_explain.py` runs the control over consecutive days of the US Treasury par curve, a proxy for SOFR swap rates. R2 acceptance is at least 95% of days explained for every product. On the 2025 Treasury moves, every product in the sample book was explained on 100% of days, against the 95% target, in both Java and Python (coordinator run, 2026-11-07). For the 2Y OIS, Spearman was 0.997 and KS 0.044; for the 10Y OIS, Spearman 0.9998 and KS 0.028. Those two statistics are reported, not judged. A clean year says the risk and the revaluation agree on 2025's moves; it says nothing about a year with larger ones.
 
-**Calibration stability and rich/cheap.** R2 also specifies a calibration stability report (`specifications/03-calibration/stability.md`) and workflow (b), a Treasury and gilt rich/cheap screen (`specifications/04-pricing/workflow-b-rich-cheap.md`). Both run existing operations in batch mode. The rich/cheap fit weights each bond by `1/D_mod^2`, with `D_mod` its modified duration, so price errors become roughly yield errors, as Gurkaynak, Sack and Wright (2007) and the Bank of England's spline method (Anderson and Sleath 2001) do (ruling R2-A5). Treasury on-the-run and first off-the-run issues are left out of the fit, because their liquidity premium bends it, but their residuals are still reported (R2-A6). Calibration stability, first run: 28 of 28 rows passed (seven calibrations in four languages), and the languages agreed within 2e-8. C3 was rerun under ruling R2-A9, which judges it on the operation's own `residuals`, and passes in all four languages. Workflow (b) is blocked on price data (ruling R2-A11): TreasuryDirect's robots.txt and personal-use terms rule out automated fetching, and the DMO serves its prices behind an anti-bot page. Prices can be supplied by hand with `--data DIR`; without them the job writes a BLOCKED report.
+**Calibration stability and rich/cheap.** R2 also specifies a calibration stability report (`specifications/03-calibration/stability.md`) and workflow (b), a Treasury and gilt rich/cheap screen (`specifications/04-pricing/workflow-b-rich-cheap.md`). Both run existing operations in batch mode. The rich/cheap fit weights each bond by `1/D_mod^2`, with `D_mod` its modified duration, so price errors become roughly yield errors, as Gurkaynak, Sack and Wright (2007) and the Bank of England's spline method (Anderson and Sleath 2001) do (ruling R2-A5). Treasury on-the-run and first off-the-run issues are left out of the fit, because their liquidity premium bends it, but their residuals are still reported (R2-A6). Calibration stability, first run: 28 of 28 rows passed (seven calibrations in four languages), and the languages agreed within 2e-8. C3 was rerun under ruling R2-A9, which judges it on the operation's own `residuals`, and passes in all four languages. Workflow (b) is blocked on price data (ruling R2-A11): TreasuryDirect's robots.txt and personal-use terms rule out automated fetching, and the DMO serves its prices behind an anti-bot page. Prices can be supplied by hand with `--data DIR`; without them the job writes a BLOCKED report. At stage E the recorder's Fiscal Data auction feed (`fiscaldata-treasury-auctions`, open licence) gives a note or bond's `price_per100` only on its own auction day, and from 2026-08-01 to 2026-11-08 at most two notes or bonds were auctioned on any day (23 auctions on 21 days). A fit needs the whole coupon universe priced on one date, so the feed does not qualify as a price source; it stays in use for the on-the-run list. The manual `--data` path stays.
 
 ## Batch mode
 
@@ -245,3 +245,129 @@ The worked examples share one trade: receive 3.45% fixed against SOFR on 25 mill
 Stages A to C test correctness with analytic, hand and outside-library answers. Stages B and C add calibration on known truth. Later stages add backtests and new-model tests. `specifications/stage-b-rulings.md` says which stage B suites have an outside oracle. Evidence is always labelled analytic, simulated, proxy or observed, and validation reports are self-assessment until the human review at the end of the project.
 
 R1 adds the records that say how far each result goes. The [model inventory](docs/model-inventory.md) gives every model its spec, oracle, outside-checked share and limits. The [edge-case register](specifications/edge-case-register.md) lists boundary cases and whether a golden pins each one; a row marked out of scope names the stage that would bring it in. `conformance/tolerances/money.md` restates every tolerance as money on 10 million notional, so a reader can judge whether a pass is tight enough to matter. The R1 daily workflows are the first runs on observed public data, and their USD curve is labelled a proxy.
+
+## Stage E: full volatility, exotics, rates vol, correlation and credit (v0.5.0)
+
+**What was built.** Eight slices: arbitrage-free SVI surfaces with local and forward vol (E1), the Heston family and SLV (E2), FX smile conventions (E3), rates and inflation vol (E4), exotics and American options (E5), correlation (E6), GARCH, variance swaps and a VIX-style index (E7), and CDS options, copulas and the large-pool model (E8). Two spec sessions wrote the specs and goldens in parallel; rulings are E-A1 to E-A40 (`specifications/stage-e-rulings.md`) and E-B1 to E-B40 (`specifications/stage-e-rulings-b.md`), and each language was built from the specs alone.
+
+**Status: implemented in all four languages.** At the stage E merge, `597abf2` (2026-11-08), the golden set holds 6,817 cases in 91 suite files (counted from `datasets/golden/`). C++, Java and Rust each reported 6,817 of 6,817 passing in their final stage E commits (`5af077d`, `a9cd195`, `141245d`; *reported*). Python passed 6,817 of 6,817 through the neutral runner on the merged tree, built from `597abf2` (*observed*, local, Windows, 2026-11-08). Outside oracle under plan rule 11.2.5, counting a case only if every output is a QuantLib 1.44 value (rulings E-A17, E-B28): 557 of the 895 stage E cases, 62.2% (spec A 280 of 446 in `oracle/outside_register_e_a.json`, spec B 277 of 449 in `oracle/outside_register_e_b.json`; *outside-checked*). All inputs are synthetic, and no model is Validated (`docs/model-inventory.md`).
+
+Evidence classes used in this section: *golden* (the oracle's expected value, which every build now reproduces), *outside-checked* (re-priced in QuantLib 1.44 through a reviewed convention map), *observed* (a run on this machine), *reported* (stated in a build's commit), *cited* (a published source; "not opened" in a spec means the reference was checked from memory, and paywalled equation numbers are unverified).
+
+### Arbitrage-free surfaces
+
+**Plain idea.** A vol surface is only usable if no mix of options built from it makes money for nothing. Two things can go wrong. Along one expiry, call prices can stop being convex in strike (butterfly arbitrage: a negative probability density). Across expiries, total variance can fall as time grows (calendar arbitrage).
+
+**Formal statement.** `specifications/05-volatility/arb-free-surfaces.md`. With total variance `w = sigma^2 T` in forward log-moneyness `k`, a slice is butterfly-free iff `g(k) >= 0` and `d_+ -> -inf` (Gatheral-Jacquier 2014, Lemma 2.2), and a surface is calendar-free iff `w(k, T)` rises with `T` at every `k` (Lemma 2.1). `vol.svi.surface_check` tests `g` and `w` on a grid, and tests the SVI wing slopes `b(1 +- rho)` against the Lee bound of 2, flagging a slope of exactly 2 (ruling E-A15).
+
+**Worked example.** `surf_e-0007`: a 1-year slice whose wings sit below the 3-month slice. `calendar_violations` lists `k_index` 0 to 3 at expiry 1. `wing_violations` adds both wings, because the later slice is flatter and must cross below the earlier one far out, beyond the grid. With `reject: true` (`surf_e-0008`) the same surface is `E_ARBITRAGE`.
+
+### Local vol and forward vol
+
+**Plain idea.** Implied vol is one number per option. Local vol is the instantaneous vol, as a function of time and spot, that reproduces every option price at once. Forward vol is the vol that applies between two expiries.
+
+**Formal statement.** `specifications/05-volatility/local-and-forward-vol.md`. Dupire local variance in total-variance form is `w_T / g` (Gatheral 2006, eq. 1.10; Dupire 1994). Forward vol is `sqrt((s2^2 T2 - s1^2 T1)/(T2 - T1))`, because variance adds over time (Hull, 10th ed.). A negative forward variance or a non-positive `g` is `E_ARBITRAGE`.
+
+**Worked example.** `lv_e-0001`, the point `T = 1`, `k = 0` on the three-slice SVI surface: implied vol 0.25269, local vol 0.16776. Local vol is below implied vol at the money here because of the negative skew (`rho < 0`). The golden agrees within 1e-9 relative with a separate 40-digit Dupire computed from call prices (`stage-e-targets-a.md`).
+
+### FX smile conventions
+
+**Plain idea.** FX options are quoted by delta, not strike, and the market uses several deltas. Spot or forward delta, with or without the premium deducted, give different strikes for the same "25-delta" quote.
+
+**Formal statement.** `specifications/05-volatility/fx-smile.md`, after Reiswich and Wystup 2012 and Clark 2011. Four delta types, three ATM types, Garman-Kohlhagen pricing (Garman and Kohlhagen 1983). A premium-adjusted call delta has two strikes; the spec takes the upper one (ruling E-A10).
+
+**Worked example.** `fxs_e-0120`, a USDJPY-like pair (spot 151.20, six months, `rd` 0.10%, `rf` 4.50%, ATM 10.5%, 25-delta risk reversal -1.5, butterfly 0.35, premium-adjusted spot delta). Call vol 10.10%, put vol 11.60%, ATM delta-neutral strike 147.51, 25-delta call strike 155.03, put strike 140.20. All five outputs are reproduced by QuantLib `BlackDeltaCalculator`.
+
+### Heston, Bates, Merton and SLV
+
+**Plain idea.** Let variance itself be random and mean-reverting (Heston), add jumps (Bates), or keep vol constant and add only jumps (Merton). SLV mixes a stochastic vol with a local-vol correction (the leverage function), so the model fits the surface exactly while keeping realistic dynamics.
+
+**Formal statement.** `specifications/05-volatility/heston-family.md`. Prices come from the Lewis single integral of the characteristic function (Lewis 2001), in the "little trap" form (Albrecher et al. 2007). The SLV leverage is `L^2 = sigma_LV^2 / E[v | x]` (Henry-Labordere 2009). It is computed by a fixed-grid Fokker-Planck reference scheme (ruling E-A14), which checks that the four builds follow the same recipe and is not a converged answer.
+
+**Worked example.** `heston_e-0001` (`v0 = theta = 0.04`, `kappa` 1.5, `xi` 0.5, `rho` -0.7, one year): the 100-strike call is 8.1135, matched by QuantLib within 1e-9. As vol of variance tends to 0, Heston tends to Black-Scholes at the average variance, not at `v0` (plan section 8). `heston_e-0011` tests this at `xi = 1e-3`, near zero but not at it.
+
+### Exotics and American options
+
+**Plain idea.** Exotics change the payoff. It can depend on whether a barrier was touched, on an average, on a maximum, on a choice made later, on another currency, or on two assets. American options can be exercised early, which is worth something extra for puts, and for calls on a dividend-paying asset.
+
+**Formal statement.** `specifications/04-pricing/exotics.md`: Reiner-Rubinstein barriers, Kemna-Vorst geometric Asians, Goldman-Sosin-Gatto lookbacks, the Rubinstein chooser, the Kirk spread, Levy moment matching, and for American options a CRR tree, Barone-Adesi-Whaley and a fixed-grid FD scheme (formulas as Haug 2007).
+
+**Worked example.** `american_e-0002`: a one-year at-the-money put (`r` 5%, `q` 2%, vol 25%) on a 200-step tree. American 8.5588, European 8.2148, so early exercise is worth 0.3441. `exotic_e-0019`: a down-and-in call (strike 85, barrier 90, rebate 2) is 7.8991, reproduced by QuantLib `AnalyticBarrierEngine`.
+
+The topics below cover slices E4, E6, E7 and E8. Specs: `specifications/05-volatility/rates-vol-cube.md`, `garch.md`, `variance-swaps.md`, `vix-index.md`, `specifications/06-risk/correlation.md` and `specifications/04-pricing/credit-options-and-copulas.md`; goldens in `datasets/golden/stage_e_b/`.
+
+### Why a swaption cube interpolates parameters, not vols
+
+**Plain idea.** A swaption's vol depends on three things: expiry, swap length and strike. Desks keep a small grid of expiries and lengths, and at each point a smile. Between grid points you could average the vols, but an average of two smiles is not, in general, a smile any model would produce. Averaging the SABR parameters instead keeps every in-between smile a proper SABR smile.
+
+**Formal statement.** Each SABR parameter (`alpha`, `beta`, `rho`, `nu`) is bilinear in expiry time (ACT/365F to the adjusted node date) and swap length (months/12). The vol is the Hagan expansion of `sabr.md` at the swaption's own forward, and the price is D7's Black swaption (`rates-vol-cube.md`, ruling E-B8). The method is Hagan and co-authors (2002), "Managing smile risk", applied node by node.
+
+**Worked example.** `ratesvol_e-0001` sits exactly on the 12M x 5Y node, so its parameters are the node's (`alpha 0.048, rho -0.27, nu 0.44`) and its vol is 25.265%. `ratesvol_e-0006` is 18M x 5Y: `rho` comes out at -0.27995, between the 12M (-0.27) and 24M (-0.29) nodes, weighted by time, not by months. Interpolating vols instead of parameters moves the price by more than 0.01 on 10m in every off-node case; it is one of the 34 E4 wrong-convention checks.
+
+### Stripping caplet vols, and when it must fail
+
+**Plain idea.** Brokers quote one flat vol per cap. A 2Y cap and a 1Y cap share their first four caplets, so the 2Y quote really tells you about caplets 5 to 8. Stripping peels off one segment at a time. If a longer cap is quoted so low that even zero vol on its new caplets is too much, the quotes contradict each other, and the right answer is to say so.
+
+**Formal statement.** Caplet vols are constant on each segment between cap maturities. Segment `k` solves `known caplets + new caplets at v_k = cap k at its flat vol`; the left side rises with `v_k`, so the root is unique when it exists. No positive root gives `E_ARBITRAGE` (rulings E-B9, E-B10). Brigo and Mercurio (2006), chapter 6, describe caplet stripping from cap quotes.
+
+**Worked example.** `ratesvol_e-0049`: flat vols 24.0, 23.5, 22.8, 22.2, 21.5% give caplet vols 24.00, 23.14, 21.96, 21.10, 19.71%. The first segment equals the first quote; later ones fall faster than the quotes, as they must. `ratesvol_e-0058` quotes 30%, 30%, 12%: the third cap is cheaper than the caplets the first two already fix, so the result is `E_ARBITRAGE`.
+
+### GARCH(1,1): volatility that remembers
+
+**Plain idea.** Big moves cluster. GARCH(1,1) says tomorrow's variance is a constant plus a share of today's squared return plus a share of today's variance. Because the two shares add to less than one, variance drifts back to a long-run level.
+
+**Formal statement.** `sigma2_{t+1} = omega + alpha r_t^2 + beta sigma2_t`; Gaussian log-likelihood summed from the first return with the `ln(2 pi)` constant; forecast `E[sigma2_{n+h}] = V_L + (alpha + beta)^(h-1) (sigma2_{n+1} - V_L)` with `V_L = omega / (1 - alpha - beta)` (`garch.md`; Bollerslev 1986; Hull, "Estimating Volatilities and Correlations"). The fit is judged on the log-likelihood at the optimum, not on parameters (ruling E-B16).
+
+**Worked example.** `garch_e-0009`: returns 1% and -2%, `omega = 1e-5`, `alpha = 0.1`, `beta = 0.8`. The start is the mean square, 2.5e-4; then `sigma2_2 = 1e-5 + 0.1 x 1e-4 + 0.8 x 2.5e-4 = 2.2e-4`, and the next variance is 2.26e-4. The log-likelihood is 5.410998350356715. Starting from `r_1^2` instead, or dropping `ln(2 pi)`, is a wrong-convention check.
+
+### Variance swaps: a strip of options prices variance
+
+**Plain idea.** The value of expected variance equals the value of a log contract, and a log contract can be built from out-of-the-money puts and calls weighted about `2/K^2`. So today's option prices set the fair variance strike.
+
+**Formal statement.** The discrete strip of Demeterfi, Derman, Kamal and Zou (1999), with reference point the spot and piecewise-linear weights. Fair variance `(2/T)[(r - q)T - (F/S0 - 1)] + Pi/D`, where `Pi` is the weighted strip (`variance-swaps.md`). QuantLib's engine drops `q` from the drift term, so the spec keeps `q` and treats QuantLib's form as a wrong convention (ruling E-B3).
+
+**Worked example.** Three months, a skewed smile, strips with strike steps 20, 10, 5 and 2.5 (`varswap_e-0009` to `-0012`): fair vol 27.77%, 23.75%, 22.64%, 22.35%. The coarse strip overstates variance; the spec prices the strip it is given and never invents strikes. Realised variance (`varswap_e-0030`): five daily returns give `252/5 x 7.029e-4 = 0.0354`, a vol of 18.82%.
+
+### The VIX method
+
+**Plain idea.** The VIX is the variance-swap strip applied to real quotes for two expiries around 30 days, interpolated to exactly 30 days. Two details matter. The at-the-money strike is the one at or below the forward. Quotes with no bid are dropped, and two in a row end the walk outwards.
+
+**Formal statement.** Cboe *Volatility Index Mathematics Methodology* v5.0 (26 Feb 2026), section 3(a): `sigma^2 = (2/T) sum (dK_i/K_i^2) e^{RT} Q(K_i) - (1/T)(F/K0 - 1)^2`, formula (1); time in minutes over 525,600; section 3(b) interpolates to 43,200 minutes (`vix-index.md`, rulings E-B5, E-B15).
+
+**Worked example.** `vix_e-0001`, five strikes, rate 0, 30 days: the smallest call-put gap is at 100, so `F = 100 + (3.0 - 3.1) = 99.9` and `K0 = 95`, not 100. The strip sum is 0.0046952, times `2/T` gives 0.11425; the correction `(1/T)(99.9/95 - 1)^2 = 0.03237`; variance 0.08188.
+
+### Repairing a correlation matrix
+
+**Plain idea.** Pairwise estimates, taken on different windows or adjusted by hand, often give a matrix with a negative eigenvalue, which implies some portfolio has negative variance. Higham's method finds the closest valid correlation matrix. The answer is unique, so two correct methods must agree.
+
+**Formal statement.** Minimise `||X - M||_F` over symmetric PSD matrices with unit diagonal. Higham (2002) alternates projections onto the two sets with Dykstra's correction; plain alternation without the correction stops at another point (`correlation.md`, ruling E-B18). Goldens are judged at 2e-5 on entries.
+
+**Worked example.** Higham's own example, `[[1,1,0],[1,1,1],[0,1,1]]` (`corr_e-0001`, `-0002`): smallest eigenvalue `1 - sqrt 2 = -0.414`; nearest matrix with off-diagonals 0.760690 and 0.157298. Clipping the eigenvalues and rescaling, a common shortcut, lands more than 2e-5 away and is a wrong-convention check.
+
+### Implied correlation and dispersion
+
+**Plain idea.** If the index's variance and each member's variance are known, one average correlation makes them agree. A dispersion trade buys member variance and sells index variance, so it profits when realised correlation comes in below that implied level.
+
+**Formal statement.** `rho = (sigma_I^2 - sum w_i^2 sigma_i^2) / sum_{i != j} w_i w_j sigma_i sigma_j`, not clipped (ruling E-B20); dispersion legs are variance notionals `N w_i/(2 K_i)` long and `N/(2 K_I)` short (ruling E-B21; `correlation.md`).
+
+**Worked example.** `corr_e-0036`: weights 0.5 and 0.5, vols 20% and 30%, index 22%: `(0.0484 - 0.0325)/0.03 = 0.53`. Dispersion `corr_e-0046`: implied correlation at the strikes 0.519, realised -0.037; P&L `1,590 + 2,708.33 + 1,916.67 = 6,215` on 100,000 of vega.
+
+### CDS options and front-end protection
+
+**Plain idea.** A payer CDS option is the right to buy protection at a fixed spread later. If the name defaults first, a knock-out option dies. A non-knock-out payer is worth more by exactly the protection the forward CDS would have missed.
+
+**Formal statement.** Black on the forward spread, times the risky annuity, with mid-point legs (QuantLib's `MidPointCdsEngine`; accrual on default ACT/360 to the mid date); front-end protection `N (1 - R)(1 - S(expiry)) P(expiry)` for non-knock-out payers only (`credit-options-and-copulas.md`, rulings E-B22, E-B23; O'Kane 2008).
+
+**Worked example.** `creditopt_e-0001`: hazard 2%, recovery 40%, rate 3.5%, expiry in 134 days, 5Y underlying, strike 1.20%, vol 50%. Forward spread 1.18877%, annuity 4.32865, price 59,847.84 on 10m. The front-end protection is 43,333.06, about 70% of the option's own value at this short expiry.
+
+### Copulas and the large pool
+
+**Plain idea.** A copula decides how defaults move together. The Gaussian copula has no tail dependence; the Student t has some, so joint defaults are likelier at the same correlation. In a very large pool of identical names, the defaulted fraction depends only on one common factor, which gives the loss distribution and tranche losses in closed form (Vasicek).
+
+**Formal statement.** Joint default `Phi_2(Phi^-1 p1, Phi^-1 p2; rho)`, or the bivariate t version. In the pool, `P(M) = Phi((Phi^-1 p - sqrt(rho) M)/sqrt(1 - rho))`, loss `(1 - R) P(M)`, and `E[min(P, k)] = p - Phi_2(c, m*; sqrt rho) + k Phi(m*)` (`credit-options-and-copulas.md`, rulings E-B24, E-B25; Li 2000; Demarta and McNeil 2005; Vasicek 1991, 2002).
+
+**Worked example.** `creditopt_e-0147` and `-0151`: default probabilities 2% and 3%, correlation 0.3. Gaussian joint default 0.229%, t with 4 degrees of freedom 0.510%: more than twice as likely. Pool `creditopt_e-0161` to `-0166` (p 5%, rho 0.3, recovery 40%): the 0-3% tranche expects to lose 54.1% of its notional, the 30-100% tranche 0.008%.
+
+### What is not checked by an outside library
+
+QuantLib's Python wheel has no GARCH, no VIX method, no bivariate t and no large-pool loss model (the Gaussian copula and pool formulas can be re-evaluated with its bivariate normal, but that checks the spec's algebra with itself, so it does not count), so those goldens rest on hand cases, 50-digit or exact-rational replicas and separate float replays. For slices E4, E6, E7 and E8 the outside share is 277 of 449 (61.7%), counting a case only if every output is a QuantLib value; stage-wide it is 557 of 895 (62.2%) (`specifications/05-volatility/stage-e-targets-b.md`).

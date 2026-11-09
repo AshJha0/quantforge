@@ -83,6 +83,11 @@ impl<'a> Inputs<'a> {
         Ok(self.opt_int(k)?.unwrap_or(default))
     }
 
+    pub fn bool(&self, k: &str) -> Result<bool> {
+        self.req(k)?;
+        self.bool_or(k, false)
+    }
+
     pub fn bool_or(&self, k: &str, default: bool) -> Result<bool> {
         match self.opt(k) {
             None => Ok(default),
@@ -186,6 +191,8 @@ impl<'a> Inputs<'a> {
         Ok(s as u32)
     }
 
+    // A method so call sites read `i.fail(key, why)` beside the other field accessors.
+    #[allow(clippy::unused_self)]
     pub fn fail<T>(&self, k: &str, what: &str) -> Result<T> {
         Err(schema(k, what))
     }

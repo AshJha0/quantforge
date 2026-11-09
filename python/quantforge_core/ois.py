@@ -13,7 +13,6 @@ from . import calendars, curves, daycount, linalg, schedules
 from .conventions import REGISTRY
 from .curves import Curve, CurveData
 from .errors import QfError, required
-from .numeric import ordered_sum
 from .schedules import Period
 
 _MF = "MODIFIED_FOLLOWING"
@@ -84,11 +83,15 @@ def legs(
     year fractions, may be passed in precomputed; the sums are the same."""
     if alphas is None:
         alphas = _alphas(convention, ps)
-    annuity = ordered_sum(a * curve.discount(p.payment) for a, p in zip(alphas, ps, strict=True))
-    floating = ordered_sum(
-        (curve.discount(p.start) / curve.discount(p.end) - 1) * curve.discount(p.payment)
-        for p in ps
-    )
+    # Plain loops in array order, as ordered_sum would add them: this is the curve solve's
+    # innermost loop, and a generator per sum costs more than the arithmetic.
+    discount = curve.discount
+    annuity = 0.0
+    for a, p in zip(alphas, ps, strict=True):
+        annuity += a * discount(p.payment)
+    floating = 0.0
+    for p in ps:
+        floating += (discount(p.start) / discount(p.end) - 1) * discount(p.payment)
     return annuity, floating
 
 
@@ -101,8 +104,27 @@ def _models(convention: str, swaps: Sequence[Sequence[Period]]) -> list[curves.M
     def model(ps: Sequence[Period]) -> curves.Model:
         alphas = _alphas(convention, ps)  # fixed for the whole solve
 
+        # During one pillar solve the leading periods, those paid and ended on or before the
+        # previous pillar, discount to the same bits at every iteration. Their partial sums,
+        # added left to right as legs() adds them, are kept per solve; the rest is added on.
+        held: dict[date, float] | None = None
+        held_k, held_annuity, held_floating = 0, 0.0, 0.0
+
         def rate(c: curves.Curve) -> float:
-            annuity, floating = legs(convention, ps, c, alphas)
+            nonlocal held, held_k, held_annuity, held_floating
+            stable, until = c.stable_part()
+            if held is not stable:
+                k = 0
+                while k < len(ps) and ps[k].payment <= until and ps[k].end <= until:
+                    k += 1
+                held_annuity, held_floating = legs(convention, ps[:k], c, alphas[:k])
+                held, held_k = stable, k
+            k, annuity, floating = held_k, held_annuity, held_floating
+            discount = c.discount
+            for a, p in zip(alphas[k:], ps[k:], strict=True):
+                annuity += a * discount(p.payment)
+            for p in ps[k:]:
+                floating += (discount(p.start) / discount(p.end) - 1) * discount(p.payment)
             return floating / annuity
 
         return rate

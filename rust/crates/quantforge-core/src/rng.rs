@@ -170,3 +170,62 @@ pub fn inverse_normal(p: &[f64]) -> Result<Vec<f64>> {
     }
     Ok(p.iter().map(|&v| ppnd16(v)).collect())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn generators_are_deterministic_and_streams_differ() {
+        let (mut a, mut b, mut c) = (
+            Xoshiro::seeded(7, 0),
+            Xoshiro::seeded(7, 0),
+            Xoshiro::seeded(7, 1),
+        );
+        let xs: Vec<u64> = (0..16).map(|_| a.next_u64()).collect();
+        let ys: Vec<u64> = (0..16).map(|_| b.next_u64()).collect();
+        let zs: Vec<u64> = (0..16).map(|_| c.next_u64()).collect();
+        assert_eq!(xs, ys);
+        assert_ne!(xs, zs);
+        let mut s = 0;
+        assert_ne!(splitmix64(&mut s), splitmix64(&mut s));
+    }
+
+    #[test]
+    fn uniforms_lie_in_open_interval_with_sane_moments() {
+        let mut g = Xoshiro::seeded(42, 3);
+        let n = 20_000;
+        let (mut m, mut v) = (0.0, 0.0);
+        for _ in 0..n {
+            let u = g.next_uniform();
+            assert!(u > 0.0 && u < 1.0);
+            let z = g.next_normal();
+            m += z;
+            v += z * z;
+        }
+        let m = m / f64::from(n);
+        assert!(m.abs() < 0.05, "{m}");
+        assert!((v / f64::from(n) - 1.0).abs() < 0.05);
+        assert!(to_uniform(0) > 0.0 && to_uniform(u64::MAX) < 1.0);
+    }
+
+    #[test]
+    fn inverse_normal_is_odd_and_validates() {
+        assert_eq!(ppnd16(0.5), 0.0);
+        for p in [0.001, 1e-4, 0.02, 0.3, 0.45] {
+            assert!((ppnd16(p) + ppnd16(1.0 - p)).abs() < 1e-9);
+        }
+        assert!((ppnd16(0.975) - 1.959963984540054).abs() < 1e-12);
+        assert!(inverse_normal(&[0.0]).is_err());
+        assert!(inverse_normal(&[1.0]).is_err());
+        assert_eq!(inverse_normal(&[0.5, 0.5]).unwrap(), vec![0.0, 0.0]);
+    }
+
+    #[test]
+    fn jump_moves_the_sequence() {
+        let mut a = Xoshiro::seeded(1, 0);
+        let mut b = a.clone();
+        b.jump();
+        assert_ne!(a.next_u64(), b.next_u64());
+    }
+}

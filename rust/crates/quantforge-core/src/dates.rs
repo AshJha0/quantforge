@@ -72,6 +72,7 @@ impl Date {
         self.weekday() >= 5
     }
 
+    #[must_use]
     pub fn add_days(self, n: i64) -> Date {
         Date::from_serial(self.serial() + n)
     }
@@ -98,5 +99,77 @@ impl Date {
 impl fmt::Display for Date {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:04}-{:02}-{:02}", self.y, self.m, self.d)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn leap_years_follow_gregorian_rule() {
+        assert!(is_leap(2024) && is_leap(2000) && is_leap(1600));
+        assert!(!is_leap(2023) && !is_leap(1900) && !is_leap(2100));
+        assert_eq!(days_in_year(2000), 366);
+        assert_eq!(days_in_year(1900), 365);
+        assert_eq!(days_in_month(2024, 2), 29);
+        assert_eq!(days_in_month(2023, 2), 28);
+        assert_eq!(days_in_month(2023, 4), 30);
+        assert_eq!(days_in_month(2023, 12), 31);
+    }
+
+    #[test]
+    fn serial_round_trips_across_eras() {
+        for n in (-800_000..800_000).step_by(997) {
+            assert_eq!(Date::from_serial(n).serial(), n);
+        }
+        let d = Date::new(2024, 2, 28);
+        assert_eq!(d.add_days(1), Date::new(2024, 2, 29));
+        assert_eq!(d.add_days(2), Date::new(2024, 3, 1));
+        assert_eq!(
+            Date::new(2025, 1, 1).serial() - Date::new(2024, 1, 1).serial(),
+            366
+        );
+    }
+
+    #[test]
+    fn weekdays_and_weekends() {
+        // 1970-01-01 was a Thursday; 2024-06-15 a Saturday.
+        assert_eq!(Date::new(1970, 1, 1).weekday(), 3);
+        assert!(Date::new(2024, 6, 15).is_weekend());
+        assert!(Date::new(2024, 6, 16).is_weekend());
+        assert!(!Date::new(2024, 6, 17).is_weekend());
+        assert!(Date::new(1600, 1, 1).weekday() < 7);
+    }
+
+    #[test]
+    fn end_of_february() {
+        assert!(Date::new(2024, 2, 29).is_end_of_february());
+        assert!(!Date::new(2024, 2, 28).is_end_of_february());
+        assert!(Date::new(2023, 2, 28).is_end_of_february());
+        assert!(!Date::new(2023, 3, 31).is_end_of_february());
+    }
+
+    #[test]
+    fn parse_accepts_only_valid_iso_dates() {
+        assert_eq!(Date::parse("2024-02-29"), Some(Date::new(2024, 2, 29)));
+        for bad in [
+            "2023-02-29",
+            "2024-13-01",
+            "2024-00-10",
+            "2024-01-00",
+            "2024-1-01",
+            "2024/01/01",
+            "+024-01-01",
+            "2024-01-011",
+            "",
+            "２024-01-01",
+        ] {
+            assert_eq!(Date::parse(bad), None, "{bad}");
+        }
+        assert_eq!(Date::new(7, 3, 4).to_string(), "0007-03-04");
+        assert_eq!(fixed_digits("0042", 4), Some(42));
+        assert_eq!(fixed_digits("42", 4), None);
+        assert_eq!(fixed_digits("4a", 2), None);
     }
 }

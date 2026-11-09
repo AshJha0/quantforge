@@ -130,23 +130,20 @@ pub fn parity(q: &[ParityQuote], given: Option<f64>) -> Result<Parity> {
         .iter()
         .map(|x| (x.call_bid + x.call_ask) / 2.0 - (x.put_bid + x.put_ask) / 2.0)
         .collect();
-    let (d, f) = match given {
-        Some(d) => {
-            let sum: f64 = q.iter().zip(&y).map(|(x, y)| x.strike + y / d).sum();
-            (d, sum / n)
+    let (d, f) = if let Some(d) = given {
+        let sum: f64 = q.iter().zip(&y).map(|(x, y)| x.strike + y / d).sum();
+        (d, sum / n)
+    } else {
+        let kbar = q.iter().map(|x| x.strike).sum::<f64>() / n;
+        let ybar = y.iter().sum::<f64>() / n;
+        let (mut sxy, mut sxx) = (0.0, 0.0);
+        for (x, y) in q.iter().zip(&y) {
+            sxy += (x.strike - kbar) * (y - ybar);
+            sxx += (x.strike - kbar) * (x.strike - kbar);
         }
-        None => {
-            let kbar = q.iter().map(|x| x.strike).sum::<f64>() / n;
-            let ybar = y.iter().sum::<f64>() / n;
-            let (mut sxy, mut sxx) = (0.0, 0.0);
-            for (x, y) in q.iter().zip(&y) {
-                sxy += (x.strike - kbar) * (y - ybar);
-                sxx += (x.strike - kbar) * (x.strike - kbar);
-            }
-            let s = sxy / sxx;
-            let d = -s;
-            (d, (ybar - s * kbar) / d)
-        }
+        let s = sxy / sxx;
+        let d = -s;
+        (d, (ybar - s * kbar) / d)
     };
     if d <= 0.0 || f <= 0.0 {
         return fail(

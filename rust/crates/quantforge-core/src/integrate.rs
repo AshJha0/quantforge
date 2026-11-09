@@ -39,7 +39,7 @@ pub fn simpson(f: F, a: f64, b: f64, n: i64) -> Result<f64> {
     Ok(h / 3.0 * s)
 }
 
-/// Value of P_n and its derivative at `t`.
+/// Value of `P_n` and its derivative at `t`.
 fn legendre(n: usize, t: f64) -> (f64, f64) {
     let (mut p0, mut p1) = (1.0, t);
     for k in 2..=n {
@@ -90,6 +90,7 @@ fn simpson_panel(l: f64, fl: f64, r: f64, fr: f64, fm: f64) -> f64 {
     (r - l) / 6.0 * (fl + 4.0 * fm + fr)
 }
 
+#[derive(Clone, Copy)]
 struct Panel {
     l: f64,
     r: f64,

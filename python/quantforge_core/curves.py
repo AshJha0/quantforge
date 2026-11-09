@@ -33,16 +33,40 @@ class Curve:
         self.logs = [0.0, *(math.log(v / self.jump(d))
                             for d, v in zip(data.dates, data.discount_factors, strict=True))]
         self.zeros = [0.0, *(-x / t for x, t in zip(self.logs[1:], self.times[1:], strict=True))]
-        self.zeros[0] = self.zeros[1]
+        if data.dates:  # an empty curve is only the bare prefix of a curve solve
+            self.zeros[0] = self.zeros[1]
         self._memo: dict[date, float] = {}
         self._stable_until = date.min
         self._stable = self._memo
+
+    @classmethod
+    def _extended(cls, prefix: Curve, d: date, factor: float) -> Curve:
+        """The curve `prefix` with one more pillar (d, factor), computed element by element as
+        __init__ would: the fixed pillars' times, logs and zeros are reused, not recomputed."""
+        curve = cls.__new__(cls)
+        curve.as_of, curve.interpolation, curve.jumps = prefix.as_of, prefix.interpolation, prefix.jumps
+        curve.dates = (*prefix.dates, d)
+        t = curve.time(d)
+        x = math.log(factor / curve.jump(d))
+        curve.times = [*prefix.times, t]
+        curve.logs = [*prefix.logs, x]
+        curve.zeros = [*prefix.zeros, -x / t]
+        curve.zeros[0] = curve.zeros[1]
+        curve._memo = {}
+        curve._stable_until = date.min
+        curve._stable = curve._memo
+        return curve
 
     def share_stable(self, until: date, memo: dict[date, float]) -> Curve:
         """Uses `memo` for dates on or before `until`. For the curve solve: while the last
         pillar moves, a date on or before the previous pillar discounts to the same bits."""
         self._stable_until, self._stable = until, memo
         return self
+
+    def stable_part(self) -> tuple[dict[date, float], date]:
+        """The shared memo and its bound, as given to share_stable: a model may treat terms on
+        dates up to the bound as fixed for as long as it sees the same memo."""
+        return self._stable, self._stable_until
 
     def time(self, d: date) -> float:
         return (d - self.as_of).days / 365
@@ -58,6 +82,11 @@ class Curve:
     def discount(self, d: date) -> float:
         # A curve is immutable, so a date's factor is memoised: swap legs ask for each period
         # boundary more than once. The arithmetic is unchanged.
+        # The stable memo holds only dates on or before its bound, so it is looked in first
+        # without comparing dates.
+        value = self._stable.get(d)
+        if value is not None:
+            return value
         memo = self._stable if d <= self._stable_until else self._memo
         value = memo.get(d)
         if value is None:
@@ -141,12 +170,15 @@ def solve_pillars(
     logs: list[float] = []
 
     def curve_with(x: float, count: int) -> Curve:
-        factors = (*(math.exp(v) for v in logs), math.exp(x))
-        return Curve(CurveData(as_of, interpolation, tuple(pillars[:count]), factors, jumps))
+        return Curve._extended(prefix, pillars[count - 1], math.exp(x))
 
     for j, (model, target) in enumerate(zip(models, targets, strict=True)):
         stable_until = pillars[j - 1] if j else as_of
         stable: dict[date, float] = {}
+        # The pillars before j are fixed while pillar j is solved, so their part of the curve is
+        # built once here. With no fixed pillar the prefix is the bare curve date.
+        prefix = Curve(CurveData(as_of, interpolation, tuple(pillars[:j]),
+                                 tuple(math.exp(v) for v in logs), jumps))
 
         def error(x: float, model: Model = model, target: float = target, j: int = j,
                   until: date = stable_until, memo: dict[date, float] = stable) -> float:

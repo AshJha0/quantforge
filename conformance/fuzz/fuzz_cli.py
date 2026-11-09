@@ -6,7 +6,7 @@ checks the rules in specifications/cli-contract.md: one result per line, the res
 error code, and a clean exit. A failing batch is replayed one input at a time with `run`, so each
 finding names the exact input. Findings are written to --out as JSON Lines.
 
-Usage: fuzz_cli.py --impl NAME [--seconds N] [--seed N] [--chunk N] [--timeout S] [--out FILE]
+Usage: fuzz_cli.py --impl NAME [--seconds N] [--seed N] [--chunk N] [--timeout S] [--out FILE] [--focus-config FILE]
 Exit status: 0 no findings, 1 findings, 2 bad usage.
 """
 import argparse
@@ -41,9 +41,9 @@ RAW = [
 ]
 
 
-def load_seeds():
+def load_seeds(folder=None):
     seeds = []
-    for path in sorted((ROOT / "datasets" / "golden").rglob("*.json")):
+    for path in sorted((folder or ROOT / "datasets" / "golden").rglob("*.json")):
         for c in json.loads(path.read_text(encoding="utf-8"))["cases"]:
             seeds.append({"schema_version": "1.0", "case_id": c["case_id"],
                           "operation": c["operation"], "inputs": c["inputs"]})
@@ -58,6 +58,20 @@ def slots(value, out):
         if isinstance(v, (dict, list)):
             slots(v, out)
     return out
+
+
+def focus_seeds(seeds, config):
+    """Weights the seed list toward a stage's goldens, from the fuzz entry of a quality config
+    (conformance/quality/stage_<x>.json): about `share` of draws come from that folder. A missing or empty
+    folder leaves the list unchanged, so the option is safe before the stage has goldens."""
+    cfg = json.loads(Path(config).read_text(encoding="utf-8")).get("fuzz", {})
+    folders = cfg.get("golden") or []
+    share = float(cfg.get("share", 0))
+    focus = [s for f in ([folders] if isinstance(folders, str) else folders) if (ROOT / f).is_dir() for s in load_seeds(ROOT / f)]
+    if not focus or not 0 < share < 1:
+        return seeds
+    copies = max(1, round(share * len(seeds) / ((1 - share) * len(focus))))
+    return seeds + focus * copies
 
 
 def mutate_case(rng, seeds):
@@ -187,6 +201,7 @@ def main():
     ap.add_argument("--config", default=str(ROOT / "conformance" / "runner" / "implementations.json"))
     ap.add_argument("--out", default=str(ROOT / "conformance" / "reports" / "fuzz"))
     ap.add_argument("--max-findings", type=int, default=25)
+    ap.add_argument("--focus-config", help="quality config whose fuzz entry weights seeds toward one stage")
     a = ap.parse_args()
     impls = load_impls(a.config)
     if a.impl not in impls:
@@ -195,6 +210,8 @@ def main():
     base, cwd = resolve_command(impls[a.impl])
     rng = random.Random(a.seed)
     seeds = load_seeds()
+    if a.focus_config:
+        seeds = focus_seeds(seeds, a.focus_config)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     findings, sent, replayed = [], 0, 0

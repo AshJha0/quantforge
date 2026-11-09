@@ -1,0 +1,4022 @@
+{
+ "schema_version": "1.0",
+ "suite": "varswap_e",
+ "spec": "specifications/05-volatility/variance-swaps.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "varswap_e-0001",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     60.0,
+     70.0,
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0,
+     130.0,
+     140.0,
+     150.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.04155842578274349,
+     "fair_vol": 0.20385883788235304,
+     "pv": 1497.31903376264
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0002",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-05-07",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     60.0,
+     70.0,
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0,
+     130.0,
+     140.0
+    ],
+    "vols": [
+     {
+      "strike": 60.0,
+      "vol": 0.276624
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.253501
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.233472
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.215804
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.185703
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.172652
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.160645
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.149529
+     }
+    ],
+    "extension_step": 5.0,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.04420803737896135,
+     "fair_vol": 0.2102570745039542,
+     "pv": -5677.585169018466
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0003",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 4500.0,
+    "rate": 0.035,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     2700.0,
+     2850.0,
+     3000.0,
+     3150.0,
+     3300.0,
+     3450.0,
+     3600.0,
+     3750.0,
+     3900.0,
+     4050.0,
+     4200.0,
+     4350.0,
+     4500.0
+    ],
+    "call_strikes": [
+     4500.0,
+     4650.0,
+     4800.0,
+     4950.0,
+     5100.0,
+     5250.0,
+     5400.0,
+     5550.0,
+     5700.0
+    ],
+    "vols": [
+     {
+      "strike": 2700.0,
+      "vol": 0.241299
+     },
+     {
+      "strike": 2850.0,
+      "vol": 0.234811
+     },
+     {
+      "strike": 3000.0,
+      "vol": 0.228656
+     },
+     {
+      "strike": 3150.0,
+      "vol": 0.222801
+     },
+     {
+      "strike": 3300.0,
+      "vol": 0.217219
+     },
+     {
+      "strike": 3450.0,
+      "vol": 0.211884
+     },
+     {
+      "strike": 3600.0,
+      "vol": 0.206777
+     },
+     {
+      "strike": 3750.0,
+      "vol": 0.201879
+     },
+     {
+      "strike": 3900.0,
+      "vol": 0.197172
+     },
+     {
+      "strike": 4050.0,
+      "vol": 0.192643
+     },
+     {
+      "strike": 4200.0,
+      "vol": 0.188279
+     },
+     {
+      "strike": 4350.0,
+      "vol": 0.184068
+     },
+     {
+      "strike": 4500.0,
+      "vol": 0.18
+     },
+     {
+      "strike": 4650.0,
+      "vol": 0.176065
+     },
+     {
+      "strike": 4800.0,
+      "vol": 0.172255
+     },
+     {
+      "strike": 4950.0,
+      "vol": 0.168563
+     },
+     {
+      "strike": 5100.0,
+      "vol": 0.16498
+     },
+     {
+      "strike": 5250.0,
+      "vol": 0.161502
+     },
+     {
+      "strike": 5400.0,
+      "vol": 0.158121
+     },
+     {
+      "strike": 5550.0,
+      "vol": 0.154834
+     },
+     {
+      "strike": 5700.0,
+      "vol": 0.151633
+     }
+    ],
+    "extension_step": 150.0,
+    "variance_strike": 0.035,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.03264228145940752,
+     "fair_vol": 0.18067175058488674,
+     "pv": -2276.6257928069826
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0004",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2026-12-18",
+    "spot": 4500.0,
+    "rate": 0.035,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     3600.0,
+     3650.0,
+     3700.0,
+     3750.0,
+     3800.0,
+     3850.0,
+     3900.0,
+     3950.0,
+     4000.0,
+     4050.0,
+     4100.0,
+     4150.0,
+     4200.0,
+     4250.0,
+     4300.0,
+     4350.0,
+     4400.0,
+     4450.0,
+     4500.0
+    ],
+    "call_strikes": [
+     4500.0,
+     4550.0,
+     4600.0,
+     4650.0,
+     4700.0,
+     4750.0,
+     4800.0,
+     4850.0,
+     4900.0,
+     4950.0,
+     5000.0
+    ],
+    "vols": [
+     {
+      "strike": 3600.0,
+      "vol": 0.204629
+     },
+     {
+      "strike": 3650.0,
+      "vol": 0.20187
+     },
+     {
+      "strike": 3700.0,
+      "vol": 0.199149
+     },
+     {
+      "strike": 3750.0,
+      "vol": 0.196464
+     },
+     {
+      "strike": 3800.0,
+      "vol": 0.193815
+     },
+     {
+      "strike": 3850.0,
+      "vol": 0.191201
+     },
+     {
+      "strike": 3900.0,
+      "vol": 0.18862
+     },
+     {
+      "strike": 3950.0,
+      "vol": 0.186072
+     },
+     {
+      "strike": 4000.0,
+      "vol": 0.183557
+     },
+     {
+      "strike": 4050.0,
+      "vol": 0.181072
+     },
+     {
+      "strike": 4100.0,
+      "vol": 0.178618
+     },
+     {
+      "strike": 4150.0,
+      "vol": 0.176194
+     },
+     {
+      "strike": 4200.0,
+      "vol": 0.173799
+     },
+     {
+      "strike": 4250.0,
+      "vol": 0.171432
+     },
+     {
+      "strike": 4300.0,
+      "vol": 0.169092
+     },
+     {
+      "strike": 4350.0,
+      "vol": 0.16678
+     },
+     {
+      "strike": 4400.0,
+      "vol": 0.164495
+     },
+     {
+      "strike": 4450.0,
+      "vol": 0.162235
+     },
+     {
+      "strike": 4500.0,
+      "vol": 0.16
+     },
+     {
+      "strike": 4550.0,
+      "vol": 0.15779
+     },
+     {
+      "strike": 4600.0,
+      "vol": 0.155604
+     },
+     {
+      "strike": 4650.0,
+      "vol": 0.153442
+     },
+     {
+      "strike": 4700.0,
+      "vol": 0.151303
+     },
+     {
+      "strike": 4750.0,
+      "vol": 0.149187
+     },
+     {
+      "strike": 4800.0,
+      "vol": 0.147092
+     },
+     {
+      "strike": 4850.0,
+      "vol": 0.14502
+     },
+     {
+      "strike": 4900.0,
+      "vol": 0.142968
+     },
+     {
+      "strike": 4950.0,
+      "vol": 0.140938
+     },
+     {
+      "strike": 5000.0,
+      "vol": 0.138928
+     }
+    ],
+    "extension_step": 50.0,
+    "variance_strike": 0.02,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.025938360921346812,
+     "fair_vol": 0.16105390688010898,
+     "pv": 5914.492878149041
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0005",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2028-11-06",
+    "spot": 50.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     20.0,
+     25.0,
+     30.0,
+     35.0,
+     40.0,
+     45.0,
+     50.0
+    ],
+    "call_strikes": [
+     50.0,
+     55.0,
+     60.0,
+     70.0,
+     80.0,
+     100.0
+    ],
+    "vols": [
+     {
+      "strike": 20.0,
+      "vol": 0.391629
+     },
+     {
+      "strike": 25.0,
+      "vol": 0.369315
+     },
+     {
+      "strike": 30.0,
+      "vol": 0.351083
+     },
+     {
+      "strike": 35.0,
+      "vol": 0.335667
+     },
+     {
+      "strike": 40.0,
+      "vol": 0.322314
+     },
+     {
+      "strike": 45.0,
+      "vol": 0.310536
+     },
+     {
+      "strike": 50.0,
+      "vol": 0.3
+     },
+     {
+      "strike": 55.0,
+      "vol": 0.290469
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.281768
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.266353
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.253
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.230685
+     }
+    ],
+    "extension_step": 5.0,
+    "variance_strike": 0.09,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.09741457686944213,
+     "fair_vol": 0.31211308346405814,
+     "pv": 6982.211623182572
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0006",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": -0.005,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     70.0,
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0,
+     130.0
+    ],
+    "vols": [
+     {
+      "strike": 70.0,
+      "vol": 0.25
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.25
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.25
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.25
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.25
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.25
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.25
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.06,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.06126881029272407,
+     "fair_vol": 0.2475253730281485,
+     "pv": 1275.1702307829703
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "negative-rate",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0007",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.015,
+    "put_strikes": [
+     50.0,
+     60.0,
+     70.0,
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0,
+     130.0,
+     140.0,
+     150.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.269315
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.251083
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.235667
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.222314
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.210536
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.190469
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.181768
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.173764
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.166353
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.159453
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.042887070771755034,
+     "fair_vol": 0.20709193796899733,
+     "pv": 2773.867107587582
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "varswap",
+    "dividend",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0008",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 4500.0,
+    "rate": 0.035,
+    "dividend_yield": 0.013,
+    "put_strikes": [
+     2700.0,
+     2850.0,
+     3000.0,
+     3150.0,
+     3300.0,
+     3450.0,
+     3600.0,
+     3750.0,
+     3900.0,
+     4050.0,
+     4200.0,
+     4350.0,
+     4500.0
+    ],
+    "call_strikes": [
+     4500.0,
+     4650.0,
+     4800.0,
+     4950.0,
+     5100.0,
+     5250.0,
+     5400.0,
+     5550.0,
+     5700.0
+    ],
+    "vols": [
+     {
+      "strike": 2700.0,
+      "vol": 0.241299
+     },
+     {
+      "strike": 2850.0,
+      "vol": 0.234811
+     },
+     {
+      "strike": 3000.0,
+      "vol": 0.228656
+     },
+     {
+      "strike": 3150.0,
+      "vol": 0.222801
+     },
+     {
+      "strike": 3300.0,
+      "vol": 0.217219
+     },
+     {
+      "strike": 3450.0,
+      "vol": 0.211884
+     },
+     {
+      "strike": 3600.0,
+      "vol": 0.206777
+     },
+     {
+      "strike": 3750.0,
+      "vol": 0.201879
+     },
+     {
+      "strike": 3900.0,
+      "vol": 0.197172
+     },
+     {
+      "strike": 4050.0,
+      "vol": 0.192643
+     },
+     {
+      "strike": 4200.0,
+      "vol": 0.188279
+     },
+     {
+      "strike": 4350.0,
+      "vol": 0.184068
+     },
+     {
+      "strike": 4500.0,
+      "vol": 0.18
+     },
+     {
+      "strike": 4650.0,
+      "vol": 0.176065
+     },
+     {
+      "strike": 4800.0,
+      "vol": 0.172255
+     },
+     {
+      "strike": 4950.0,
+      "vol": 0.168563
+     },
+     {
+      "strike": 5100.0,
+      "vol": 0.16498
+     },
+     {
+      "strike": 5250.0,
+      "vol": 0.161502
+     },
+     {
+      "strike": 5400.0,
+      "vol": 0.158121
+     },
+     {
+      "strike": 5550.0,
+      "vol": 0.154834
+     },
+     {
+      "strike": 5700.0,
+      "vol": 0.151633
+     }
+    ],
+    "extension_step": 150.0,
+    "variance_strike": 0.035,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.03328525724534159,
+     "fair_vol": 0.18244247653806278,
+     "pv": -1655.7648913865826
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "varswap",
+    "dividend",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0009",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-02-05",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     60.0,
+     80.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     120.0,
+     140.0,
+     160.0,
+     180.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 20,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.07713370701915734,
+     "fair_vol": 0.27772955733799265,
+     "pv": 26931.518829444398
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0010",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-02-05",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     60.0,
+     70.0,
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0,
+     130.0,
+     140.0,
+     150.0,
+     160.0,
+     170.0,
+     180.0,
+     190.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 10,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.05639597702909316,
+     "fair_vol": 0.23747837170802136,
+     "pv": 6348.317082885109
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0011",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-02-05",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     55.0,
+     60.0,
+     65.0,
+     70.0,
+     75.0,
+     80.0,
+     85.0,
+     90.0,
+     95.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     105.0,
+     110.0,
+     115.0,
+     120.0,
+     125.0,
+     130.0,
+     135.0,
+     140.0,
+     145.0,
+     150.0,
+     155.0,
+     160.0,
+     165.0,
+     170.0,
+     175.0,
+     180.0,
+     185.0,
+     190.0,
+     195.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 55.0,
+      "vol": 0.327611
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 65.0,
+      "vol": 0.297541
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 75.0,
+      "vol": 0.271783
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 85.0,
+      "vol": 0.249253
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 95.0,
+      "vol": 0.229233
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 105.0,
+      "vol": 0.211218
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 115.0,
+      "vol": 0.194843
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 125.0,
+      "vol": 0.179834
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 135.0,
+      "vol": 0.165981
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 145.0,
+      "vol": 0.153119
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 155.0,
+      "vol": 0.141114
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 165.0,
+      "vol": 0.12986
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 175.0,
+      "vol": 0.119269
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 185.0,
+      "vol": 0.109267
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 195.0,
+      "vol": 0.099791
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 5,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.05124741031485362,
+     "fair_vol": 0.226378908723524,
+     "pv": 1238.1151738243645
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0012",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-02-05",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     52.5,
+     55.0,
+     57.5,
+     60.0,
+     62.5,
+     65.0,
+     67.5,
+     70.0,
+     72.5,
+     75.0,
+     77.5,
+     80.0,
+     82.5,
+     85.0,
+     87.5,
+     90.0,
+     92.5,
+     95.0,
+     97.5,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     102.5,
+     105.0,
+     107.5,
+     110.0,
+     112.5,
+     115.0,
+     117.5,
+     120.0,
+     122.5,
+     125.0,
+     127.5,
+     130.0,
+     132.5,
+     135.0,
+     137.5,
+     140.0,
+     142.5,
+     145.0,
+     147.5,
+     150.0,
+     152.5,
+     155.0,
+     157.5,
+     160.0,
+     162.5,
+     165.0,
+     167.5,
+     170.0,
+     172.5,
+     175.0,
+     177.5,
+     180.0,
+     182.5,
+     185.0,
+     187.5,
+     190.0,
+     192.5,
+     195.0,
+     197.5,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 52.5,
+      "vol": 0.335984
+     },
+     {
+      "strike": 55.0,
+      "vol": 0.327611
+     },
+     {
+      "strike": 57.5,
+      "vol": 0.319609
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 62.5,
+      "vol": 0.304601
+     },
+     {
+      "strike": 65.0,
+      "vol": 0.297541
+     },
+     {
+      "strike": 67.5,
+      "vol": 0.290748
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 72.5,
+      "vol": 0.277885
+     },
+     {
+      "strike": 75.0,
+      "vol": 0.271783
+     },
+     {
+      "strike": 77.5,
+      "vol": 0.265881
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 82.5,
+      "vol": 0.254627
+     },
+     {
+      "strike": 85.0,
+      "vol": 0.249253
+     },
+     {
+      "strike": 87.5,
+      "vol": 0.244036
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 92.5,
+      "vol": 0.234033
+     },
+     {
+      "strike": 95.0,
+      "vol": 0.229233
+     },
+     {
+      "strike": 97.5,
+      "vol": 0.224557
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 102.5,
+      "vol": 0.215555
+     },
+     {
+      "strike": 105.0,
+      "vol": 0.211218
+     },
+     {
+      "strike": 107.5,
+      "vol": 0.206982
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 112.5,
+      "vol": 0.198799
+     },
+     {
+      "strike": 115.0,
+      "vol": 0.194843
+     },
+     {
+      "strike": 117.5,
+      "vol": 0.190972
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 122.5,
+      "vol": 0.183471
+     },
+     {
+      "strike": 125.0,
+      "vol": 0.179834
+     },
+     {
+      "strike": 127.5,
+      "vol": 0.17627
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 132.5,
+      "vol": 0.169346
+     },
+     {
+      "strike": 135.0,
+      "vol": 0.165981
+     },
+     {
+      "strike": 137.5,
+      "vol": 0.162678
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 142.5,
+      "vol": 0.156249
+     },
+     {
+      "strike": 145.0,
+      "vol": 0.153119
+     },
+     {
+      "strike": 147.5,
+      "vol": 0.150042
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 152.5,
+      "vol": 0.144041
+     },
+     {
+      "strike": 155.0,
+      "vol": 0.141114
+     },
+     {
+      "strike": 157.5,
+      "vol": 0.138234
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 162.5,
+      "vol": 0.132609
+     },
+     {
+      "strike": 165.0,
+      "vol": 0.12986
+     },
+     {
+      "strike": 167.5,
+      "vol": 0.127154
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 172.5,
+      "vol": 0.121859
+     },
+     {
+      "strike": 175.0,
+      "vol": 0.119269
+     },
+     {
+      "strike": 177.5,
+      "vol": 0.116716
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 182.5,
+      "vol": 0.111716
+     },
+     {
+      "strike": 185.0,
+      "vol": 0.109267
+     },
+     {
+      "strike": 187.5,
+      "vol": 0.10685
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 192.5,
+      "vol": 0.102113
+     },
+     {
+      "strike": 195.0,
+      "vol": 0.099791
+     },
+     {
+      "strike": 197.5,
+      "vol": 0.097498
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 2.5,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.04996274622891427,
+     "fair_vol": 0.22352348026306829,
+     "pv": -36.976172726960264
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0013",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     60.0,
+     80.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     120.0,
+     140.0,
+     160.0,
+     180.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 20,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.060288700818504466,
+     "fair_vol": 0.24553757516621458,
+     "pv": 9984.623755334538
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0014",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     60.0,
+     70.0,
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0,
+     130.0,
+     140.0,
+     150.0,
+     160.0,
+     170.0,
+     180.0,
+     190.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 10,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.054964674244321096,
+     "fair_vol": 0.2344454611297073,
+     "pv": 4817.945945924724
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0015",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     55.0,
+     60.0,
+     65.0,
+     70.0,
+     75.0,
+     80.0,
+     85.0,
+     90.0,
+     95.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     105.0,
+     110.0,
+     115.0,
+     120.0,
+     125.0,
+     130.0,
+     135.0,
+     140.0,
+     145.0,
+     150.0,
+     155.0,
+     160.0,
+     165.0,
+     170.0,
+     175.0,
+     180.0,
+     185.0,
+     190.0,
+     195.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 55.0,
+      "vol": 0.327611
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 65.0,
+      "vol": 0.297541
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 75.0,
+      "vol": 0.271783
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 85.0,
+      "vol": 0.249253
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 95.0,
+      "vol": 0.229233
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 105.0,
+      "vol": 0.211218
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 115.0,
+      "vol": 0.194843
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 125.0,
+      "vol": 0.179834
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 135.0,
+      "vol": 0.165981
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 145.0,
+      "vol": 0.153119
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 155.0,
+      "vol": 0.141114
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 165.0,
+      "vol": 0.12986
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 175.0,
+      "vol": 0.119269
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 185.0,
+      "vol": 0.109267
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 195.0,
+      "vol": 0.099791
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 5,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.05325423733791896,
+     "fair_vol": 0.23076879628303076,
+     "pv": 3158.060089690236
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0016",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     52.5,
+     55.0,
+     57.5,
+     60.0,
+     62.5,
+     65.0,
+     67.5,
+     70.0,
+     72.5,
+     75.0,
+     77.5,
+     80.0,
+     82.5,
+     85.0,
+     87.5,
+     90.0,
+     92.5,
+     95.0,
+     97.5,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     102.5,
+     105.0,
+     107.5,
+     110.0,
+     112.5,
+     115.0,
+     117.5,
+     120.0,
+     122.5,
+     125.0,
+     127.5,
+     130.0,
+     132.5,
+     135.0,
+     137.5,
+     140.0,
+     142.5,
+     145.0,
+     147.5,
+     150.0,
+     152.5,
+     155.0,
+     157.5,
+     160.0,
+     162.5,
+     165.0,
+     167.5,
+     170.0,
+     172.5,
+     175.0,
+     177.5,
+     180.0,
+     182.5,
+     185.0,
+     187.5,
+     190.0,
+     192.5,
+     195.0,
+     197.5,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 52.5,
+      "vol": 0.335984
+     },
+     {
+      "strike": 55.0,
+      "vol": 0.327611
+     },
+     {
+      "strike": 57.5,
+      "vol": 0.319609
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 62.5,
+      "vol": 0.304601
+     },
+     {
+      "strike": 65.0,
+      "vol": 0.297541
+     },
+     {
+      "strike": 67.5,
+      "vol": 0.290748
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 72.5,
+      "vol": 0.277885
+     },
+     {
+      "strike": 75.0,
+      "vol": 0.271783
+     },
+     {
+      "strike": 77.5,
+      "vol": 0.265881
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 82.5,
+      "vol": 0.254627
+     },
+     {
+      "strike": 85.0,
+      "vol": 0.249253
+     },
+     {
+      "strike": 87.5,
+      "vol": 0.244036
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 92.5,
+      "vol": 0.234033
+     },
+     {
+      "strike": 95.0,
+      "vol": 0.229233
+     },
+     {
+      "strike": 97.5,
+      "vol": 0.224557
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 102.5,
+      "vol": 0.215555
+     },
+     {
+      "strike": 105.0,
+      "vol": 0.211218
+     },
+     {
+      "strike": 107.5,
+      "vol": 0.206982
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 112.5,
+      "vol": 0.198799
+     },
+     {
+      "strike": 115.0,
+      "vol": 0.194843
+     },
+     {
+      "strike": 117.5,
+      "vol": 0.190972
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 122.5,
+      "vol": 0.183471
+     },
+     {
+      "strike": 125.0,
+      "vol": 0.179834
+     },
+     {
+      "strike": 127.5,
+      "vol": 0.17627
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 132.5,
+      "vol": 0.169346
+     },
+     {
+      "strike": 135.0,
+      "vol": 0.165981
+     },
+     {
+      "strike": 137.5,
+      "vol": 0.162678
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 142.5,
+      "vol": 0.156249
+     },
+     {
+      "strike": 145.0,
+      "vol": 0.153119
+     },
+     {
+      "strike": 147.5,
+      "vol": 0.150042
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 152.5,
+      "vol": 0.144041
+     },
+     {
+      "strike": 155.0,
+      "vol": 0.141114
+     },
+     {
+      "strike": 157.5,
+      "vol": 0.138234
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 162.5,
+      "vol": 0.132609
+     },
+     {
+      "strike": 165.0,
+      "vol": 0.12986
+     },
+     {
+      "strike": 167.5,
+      "vol": 0.127154
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 172.5,
+      "vol": 0.121859
+     },
+     {
+      "strike": 175.0,
+      "vol": 0.119269
+     },
+     {
+      "strike": 177.5,
+      "vol": 0.116716
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 182.5,
+      "vol": 0.111716
+     },
+     {
+      "strike": 185.0,
+      "vol": 0.109267
+     },
+     {
+      "strike": 187.5,
+      "vol": 0.10685
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 192.5,
+      "vol": 0.102113
+     },
+     {
+      "strike": 195.0,
+      "vol": 0.099791
+     },
+     {
+      "strike": 197.5,
+      "vol": 0.097498
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 2.5,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.052749537764350395,
+     "fair_vol": 0.2296726752671079,
+     "pv": 2668.2766427367915
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0017",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2029-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     60.0,
+     80.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     120.0,
+     140.0,
+     160.0,
+     180.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 20,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.05481625691320282,
+     "fair_vol": 0.23412871868526258,
+     "pv": 4401.365618308885
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0018",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2029-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     60.0,
+     70.0,
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0,
+     130.0,
+     140.0,
+     150.0,
+     160.0,
+     170.0,
+     180.0,
+     190.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 10,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.054814705866363465,
+     "fair_vol": 0.23412540628125658,
+     "pv": 4399.948184738759
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0019",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2029-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     55.0,
+     60.0,
+     65.0,
+     70.0,
+     75.0,
+     80.0,
+     85.0,
+     90.0,
+     95.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     105.0,
+     110.0,
+     115.0,
+     120.0,
+     125.0,
+     130.0,
+     135.0,
+     140.0,
+     145.0,
+     150.0,
+     155.0,
+     160.0,
+     165.0,
+     170.0,
+     175.0,
+     180.0,
+     185.0,
+     190.0,
+     195.0,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 55.0,
+      "vol": 0.327611
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 65.0,
+      "vol": 0.297541
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 75.0,
+      "vol": 0.271783
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 85.0,
+      "vol": 0.249253
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 95.0,
+      "vol": 0.229233
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 105.0,
+      "vol": 0.211218
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 115.0,
+      "vol": 0.194843
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 125.0,
+      "vol": 0.179834
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 135.0,
+      "vol": 0.165981
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 145.0,
+      "vol": 0.153119
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 155.0,
+      "vol": 0.141114
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 165.0,
+      "vol": 0.12986
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 175.0,
+      "vol": 0.119269
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 185.0,
+      "vol": 0.109267
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 195.0,
+      "vol": 0.099791
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 5,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.05287434907175611,
+     "fair_vol": 0.2299442303510921,
+     "pv": 2626.7413486114074
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0020",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2029-11-06",
+    "spot": 100.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     50.0,
+     52.5,
+     55.0,
+     57.5,
+     60.0,
+     62.5,
+     65.0,
+     67.5,
+     70.0,
+     72.5,
+     75.0,
+     77.5,
+     80.0,
+     82.5,
+     85.0,
+     87.5,
+     90.0,
+     92.5,
+     95.0,
+     97.5,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     102.5,
+     105.0,
+     107.5,
+     110.0,
+     112.5,
+     115.0,
+     117.5,
+     120.0,
+     122.5,
+     125.0,
+     127.5,
+     130.0,
+     132.5,
+     135.0,
+     137.5,
+     140.0,
+     142.5,
+     145.0,
+     147.5,
+     150.0,
+     152.5,
+     155.0,
+     157.5,
+     160.0,
+     162.5,
+     165.0,
+     167.5,
+     170.0,
+     172.5,
+     175.0,
+     177.5,
+     180.0,
+     182.5,
+     185.0,
+     187.5,
+     190.0,
+     192.5,
+     195.0,
+     197.5,
+     200.0
+    ],
+    "vols": [
+     {
+      "strike": 50.0,
+      "vol": 0.344766
+     },
+     {
+      "strike": 52.5,
+      "vol": 0.335984
+     },
+     {
+      "strike": 55.0,
+      "vol": 0.327611
+     },
+     {
+      "strike": 57.5,
+      "vol": 0.319609
+     },
+     {
+      "strike": 60.0,
+      "vol": 0.311949
+     },
+     {
+      "strike": 62.5,
+      "vol": 0.304601
+     },
+     {
+      "strike": 65.0,
+      "vol": 0.297541
+     },
+     {
+      "strike": 67.5,
+      "vol": 0.290748
+     },
+     {
+      "strike": 70.0,
+      "vol": 0.284201
+     },
+     {
+      "strike": 72.5,
+      "vol": 0.277885
+     },
+     {
+      "strike": 75.0,
+      "vol": 0.271783
+     },
+     {
+      "strike": 77.5,
+      "vol": 0.265881
+     },
+     {
+      "strike": 80.0,
+      "vol": 0.260166
+     },
+     {
+      "strike": 82.5,
+      "vol": 0.254627
+     },
+     {
+      "strike": 85.0,
+      "vol": 0.249253
+     },
+     {
+      "strike": 87.5,
+      "vol": 0.244036
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.238965
+     },
+     {
+      "strike": 92.5,
+      "vol": 0.234033
+     },
+     {
+      "strike": 95.0,
+      "vol": 0.229233
+     },
+     {
+      "strike": 97.5,
+      "vol": 0.224557
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.22
+     },
+     {
+      "strike": 102.5,
+      "vol": 0.215555
+     },
+     {
+      "strike": 105.0,
+      "vol": 0.211218
+     },
+     {
+      "strike": 107.5,
+      "vol": 0.206982
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.202844
+     },
+     {
+      "strike": 112.5,
+      "vol": 0.198799
+     },
+     {
+      "strike": 115.0,
+      "vol": 0.194843
+     },
+     {
+      "strike": 117.5,
+      "vol": 0.190972
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.187182
+     },
+     {
+      "strike": 122.5,
+      "vol": 0.183471
+     },
+     {
+      "strike": 125.0,
+      "vol": 0.179834
+     },
+     {
+      "strike": 127.5,
+      "vol": 0.17627
+     },
+     {
+      "strike": 130.0,
+      "vol": 0.172774
+     },
+     {
+      "strike": 132.5,
+      "vol": 0.169346
+     },
+     {
+      "strike": 135.0,
+      "vol": 0.165981
+     },
+     {
+      "strike": 137.5,
+      "vol": 0.162678
+     },
+     {
+      "strike": 140.0,
+      "vol": 0.159435
+     },
+     {
+      "strike": 142.5,
+      "vol": 0.156249
+     },
+     {
+      "strike": 145.0,
+      "vol": 0.153119
+     },
+     {
+      "strike": 147.5,
+      "vol": 0.150042
+     },
+     {
+      "strike": 150.0,
+      "vol": 0.147016
+     },
+     {
+      "strike": 152.5,
+      "vol": 0.144041
+     },
+     {
+      "strike": 155.0,
+      "vol": 0.141114
+     },
+     {
+      "strike": 157.5,
+      "vol": 0.138234
+     },
+     {
+      "strike": 160.0,
+      "vol": 0.135399
+     },
+     {
+      "strike": 162.5,
+      "vol": 0.132609
+     },
+     {
+      "strike": 165.0,
+      "vol": 0.12986
+     },
+     {
+      "strike": 167.5,
+      "vol": 0.127154
+     },
+     {
+      "strike": 170.0,
+      "vol": 0.124487
+     },
+     {
+      "strike": 172.5,
+      "vol": 0.121859
+     },
+     {
+      "strike": 175.0,
+      "vol": 0.119269
+     },
+     {
+      "strike": 177.5,
+      "vol": 0.116716
+     },
+     {
+      "strike": 180.0,
+      "vol": 0.114198
+     },
+     {
+      "strike": 182.5,
+      "vol": 0.111716
+     },
+     {
+      "strike": 185.0,
+      "vol": 0.109267
+     },
+     {
+      "strike": 187.5,
+      "vol": 0.10685
+     },
+     {
+      "strike": 190.0,
+      "vol": 0.104466
+     },
+     {
+      "strike": 192.5,
+      "vol": 0.102113
+     },
+     {
+      "strike": 195.0,
+      "vol": 0.099791
+     },
+     {
+      "strike": 197.5,
+      "vol": 0.097498
+     },
+     {
+      "strike": 200.0,
+      "vol": 0.095234
+     }
+    ],
+    "extension_step": 2.5,
+    "variance_strike": 0.05,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fair_variance": 0.05207937401236294,
+     "fair_vol": 0.22820905769132596,
+     "pv": 1900.2485645087997
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50",
+    "quantlib-1.44 ReplicatingVarianceSwapEngine (q=0)"
+   ],
+   "tags": [
+    "varswap",
+    "synthetic"
+   ],
+   "output_classes": {
+    "fair_variance": "simple_analytic",
+    "fair_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance per unit of variance notional: 1e-6 currency on 1e6"
+   }
+  },
+  {
+   "case_id": "varswap_e-0021",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     105.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "put strike above spot"
+  },
+  {
+   "case_id": "varswap_e-0022",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     95.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "call strike below spot"
+  },
+  {
+   "case_id": "varswap_e-0023",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "missing vol for a strike"
+  },
+  {
+   "case_id": "varswap_e-0024",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 0.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "extension step not positive"
+  },
+  {
+   "case_id": "varswap_e-0025",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2026-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "maturity not after as_of"
+  },
+  {
+   "case_id": "varswap_e-0026",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 80.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "extension takes the lowest put to zero"
+  },
+  {
+   "case_id": "varswap_e-0027",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "duplicate strike in a list"
+  },
+  {
+   "case_id": "varswap_e-0028",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 0.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     0.0
+    ],
+    "call_strikes": [
+     0.0
+    ],
+    "vols": [
+     {
+      "strike": 0.0,
+      "vol": 0.2
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "spot not positive"
+  },
+  {
+   "case_id": "varswap_e-0029",
+   "operation": "vol.varswap.fair_strike",
+   "inputs": {
+    "as_of": "2026-11-06",
+    "maturity": "2027-11-06",
+    "spot": 100.0,
+    "rate": 0.04,
+    "dividend_yield": 0.0,
+    "put_strikes": [
+     80.0,
+     90.0,
+     100.0
+    ],
+    "call_strikes": [
+     100.0,
+     110.0,
+     120.0
+    ],
+    "vols": [
+     {
+      "strike": 80.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 90.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 100.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 110.0,
+      "vol": 0.2
+     },
+     {
+      "strike": 120.0,
+      "vol": 0.0
+     }
+    ],
+    "extension_step": 10.0,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "vol not positive"
+  },
+  {
+   "case_id": "varswap_e-0030",
+   "operation": "vol.varswap.realized",
+   "inputs": {
+    "prices": [
+     100.0,
+     101.0,
+     99.5,
+     100.25,
+     102.0,
+     101.5
+    ],
+    "periods_per_year": 252,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "realized_variance": 0.035427394095297673,
+     "realized_vol": 0.1882216621308442,
+     "payoff": -4572.605904702326
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath-50"
+   ],
+   "tags": [
+    "varswap",
+    "realized",
+    "hand",
+    "synthetic"
+   ],
+   "output_classes": {
+    "realized_variance": "simple_analytic",
+    "realized_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance on 1e6 variance notional"
+   }
+  },
+  {
+   "case_id": "varswap_e-0031",
+   "operation": "vol.varswap.realized",
+   "inputs": {
+    "prices": [
+     4500.0,
+     4501.75,
+     4571.7,
+     4635.63,
+     4608.88,
+     4593.33,
+     4565.94,
+     4595.53,
+     4592.61,
+     4631.67,
+     4535.66,
+     4616.95,
+     4611.9,
+     4647.62,
+     4640.43,
+     4620.53,
+     4644.86,
+     4688.49,
+     4677.74,
+     4669.64,
+     4706.09,
+     4659.88,
+     4580.55,
+     4601.11,
+     4566.26,
+     4467.91,
+     4426.86,
+     4403.45,
+     4344.27,
+     4271.37,
+     4273.14,
+     4316.84,
+     4305.44,
+     4269.29,
+     4287.97,
+     4322.98,
+     4308.3,
+     4334.99,
+     4386.56,
+     4376.28,
+     4336.1,
+     4353.23,
+     4365.47,
+     4420.2,
+     4356.28,
+     4323.72,
+     4282.82,
+     4199.43,
+     4205.45,
+     4230.69,
+     4195.4,
+     4261.84,
+     4301.74,
+     4332.45,
+     4352.23,
+     4399.65,
+     4333.7,
+     4363.97,
+     4393.9,
+     4306.71,
+     4323.69,
+     4311.43,
+     4349.81,
+     4328.21
+    ],
+    "periods_per_year": 252,
+    "variance_strike": 0.0324,
+    "variance_notional": 2500000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "realized_variance": 0.02450180748304716,
+     "realized_vol": 0.15653053211130138,
+     "payoff": -19745.4812923821
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "independent-replay",
+    "mpmath-50"
+   ],
+   "tags": [
+    "varswap",
+    "realized",
+    "synthetic"
+   ],
+   "output_classes": {
+    "realized_variance": "simple_analytic",
+    "realized_vol": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 2.5e-06,
+    "relative": 1e-10,
+    "reason": "1e-12 in variance on the variance notional"
+   }
+  },
+  {
+   "case_id": "varswap_e-0032",
+   "operation": "vol.varswap.realized",
+   "inputs": {
+    "prices": [
+     100.0
+    ],
+    "periods_per_year": 252,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "at least two prices"
+  },
+  {
+   "case_id": "varswap_e-0033",
+   "operation": "vol.varswap.realized",
+   "inputs": {
+    "prices": [
+     100.0,
+     0.0
+    ],
+    "periods_per_year": 252,
+    "variance_strike": 0.04,
+    "variance_notional": 1000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "prices positive"
+  }
+ ]
+}

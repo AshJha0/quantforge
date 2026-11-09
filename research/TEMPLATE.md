@@ -48,3 +48,11 @@ Otherwise it **fails**, and is reported as a null or negative result. The forwar
 - *Signal on a fitted curve; tradability not established.*
 - Every assumption about costs, financing and capacity, with its source.
 - Self-assessment until the human review at the end of the project.
+
+## 7. AI assistance
+Recorded for every study and every prereg or amendment (plan 13.1 R5, A8 brought forward).
+- Tool and version: product, model id, and the date used.
+- What it did: drafting text, writing code, choosing parameters, signing under delegation.
+- Prompts kept: where the prompts and replies are stored, or a statement that they are not.
+- Claims checked by a human: which claims a person verified, by whom and when; anything not yet checked is listed as unchecked.
+- Prior knowledge: whether the tool, or the person, could know the holdout period's history. A model trained on data that covers the holdout period may "know" it even though no study data was read. "Unread" means no file was opened; it does not mean "unknown".

@@ -10,7 +10,17 @@
       "attribution": "US Department of the Treasury",
       "redistribute_raw": "believed yes, unconfirmed",
       "notice": "Source: US Department of the Treasury.",
-      "enabled": true
+      "enabled": true,
+      "parse": {
+        "format": "treasury_csv",
+        "fields": [
+          "3 Mo",
+          "2 Yr",
+          "5 Yr",
+          "10 Yr",
+          "30 Yr"
+        ]
+      }
     },
     {
       "id": "boe-sonia",
@@ -165,6 +175,90 @@
       "redistribute_raw": "yes with acknowledgement; held back from git by the rule above",
       "notice": "Source: U.S. Energy Information Administration, natural gas bulk file, with the date fetched.",
       "enabled": true
+    },
+    {
+      "id": "fiscaldata-treasury-auctions",
+      "url": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query?filter=auction_date:gte:{year}-01-01&page%5Bsize%5D=10000&format=csv",
+      "licence": "Fiscal Data: free to copy, adapt, redistribute or otherwise use for non-commercial and commercial purposes",
+      "licence_url": "https://fiscaldata.treasury.gov/about-us/",
+      "terms_checked": "2026-11-08: About Us page read (reuse clause quoted above). API tested with no key, CSV returned. Security-level auction results by CUSIP, including price_per100. Auction prices only, not daily secondary-market prices",
+      "attribution": "US Department of the Treasury, Bureau of the Fiscal Service",
+      "redistribute_raw": "yes per the Fiscal Data terms; held back from git by the rule above",
+      "notice": "Source: US Department of the Treasury, Bureau of the Fiscal Service, Fiscal Data (fiscaldata.treasury.gov), Treasury Securities Auctions Data.",
+      "enabled": true
+    },
+    {
+      "id": "us-treasury-bill-rates",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{year}/all?type=daily_treasury_bill_rates&field_tdr_date_value={year}&page&_format=csv",
+      "licence": "US federal government work (17 USC 105)",
+      "licence_url": "https://www.usa.gov/government-copyright",
+      "attribution": "US Department of the Treasury",
+      "redistribute_raw": "believed yes, unconfirmed",
+      "notice": "Source: US Department of the Treasury.",
+      "terms_checked": "2026-11-09: same Treasury site and reading as us-treasury-par-yields. Feed tested with no key: CSV, bank discount and coupon equivalent for 4 to 52 weeks. R3-02 uses the 13-week coupon equivalent",
+      "parse": {
+        "format": "treasury_csv",
+        "fields": [
+          "13 WEEKS BANK DISCOUNT",
+          "13 WEEKS COUPON EQUIVALENT",
+          "26 WEEKS COUPON EQUIVALENT"
+        ]
+      },
+      "enabled": true
+    },
+    {
+      "id": "us-treasury-real-yields",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{year}/all?type=daily_treasury_real_yield_curve&field_tdr_date_value={year}&page&_format=csv",
+      "licence": "US federal government work (17 USC 105)",
+      "licence_url": "https://www.usa.gov/government-copyright",
+      "attribution": "US Department of the Treasury",
+      "redistribute_raw": "believed yes, unconfirmed",
+      "notice": "Source: US Department of the Treasury.",
+      "terms_checked": "2026-11-09: same Treasury site and reading as us-treasury-par-yields. Feed tested with no key: CSV, TIPS par real yields at 5, 7, 10, 20 and 30 years. With the nominal par curve it gives the 5- and 10-year breakevens that FRED publishes as T5YIE and T10YIE",
+      "parse": {
+        "format": "treasury_csv",
+        "fields": [
+          "5 YR",
+          "10 YR"
+        ]
+      },
+      "enabled": true
+    },
+    {
+      "id": "bls-cpi-u-nsa",
+      "url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CUUR0000SA0",
+      "licence": "BLS data are public domain (US federal government work); the API terms of service ask that the access date be cited, that BLS be credited, and that altered data not be passed off as BLS data",
+      "licence_url": "https://www.bls.gov/developers/termsOfService.htm",
+      "terms_checked": "2026-11-09: the terms page answered 403 to an automated fetch, so the reading is the stage D survey's (2026-11-07: cite the access date, do not alter, credit BLS; API v1 needs no registration, at most 25 queries a day and 10 years a query). API v1 tested with no key: JSON, CPI-U all items NSA, the last three years. One query a day. API v2 needs registration and is not used",
+      "attribution": "U.S. Bureau of Labor Statistics",
+      "redistribute_raw": "believed yes (public domain), with the access date; held back from git by the rule above",
+      "notice": "Source: U.S. Bureau of Labor Statistics, CPI-U all items, not seasonally adjusted (CUUR0000SA0), with the date accessed. BLS is not responsible for any change made to the data.",
+      "parse": {
+        "format": "bls_v1"
+      },
+      "enabled": true
+    },
+    {
+      "id": "fred-t5yie",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
+      "licence": "FRED Terms of Use: no scraping or extraction, no storing or caching of FRED content",
+      "licence_url": "https://fred.stlouisfed.org/legal/",
+      "terms_checked": "2026-11-09: FRED legal page (https://fred.stlouisfed.org/legal/) read again. It says not to do any data mining, scraping or extraction of FRED data, and not to store, cache or archive FRED content or put it in any database. fredgraph.csv answers with no key, but a daily recorder that keeps the values is the use the terms rule out. Not enabled. T5YIE is the 5-year nominal Treasury constant-maturity yield minus the 5-year TIPS constant-maturity yield, so the recorder keeps both Treasury inputs (us-treasury-par-yields and us-treasury-real-yields) and the breakeven is rebuilt from them",
+      "attribution": "Federal Reserve Bank of St. Louis, FRED",
+      "redistribute_raw": "no",
+      "notice": "Not recorded. Rebuilt from US Treasury par and real yields instead.",
+      "enabled": false
+    },
+    {
+      "id": "fred-t10yie",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10YIE",
+      "licence": "FRED Terms of Use: no scraping or extraction, no storing or caching of FRED content",
+      "licence_url": "https://fred.stlouisfed.org/legal/",
+      "terms_checked": "2026-11-09: FRED legal page (https://fred.stlouisfed.org/legal/) read again. It says not to do any data mining, scraping or extraction of FRED data, and not to store, cache or archive FRED content or put it in any database. fredgraph.csv answers with no key, but a daily recorder that keeps the values is the use the terms rule out. Not enabled. T5YIE is the 5-year nominal Treasury constant-maturity yield minus the 5-year TIPS constant-maturity yield, so the recorder keeps both Treasury inputs (us-treasury-par-yields and us-treasury-real-yields) and the breakeven is rebuilt from them",
+      "attribution": "Federal Reserve Bank of St. Louis, FRED",
+      "redistribute_raw": "no",
+      "notice": "Not recorded. Rebuilt from US Treasury par and real yields instead.",
+      "enabled": false
     }
   ]
 }

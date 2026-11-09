@@ -21,6 +21,7 @@ from .limits import check_limits
 from .stage_b import handlers as _stage_b_handlers
 from .stage_c import handlers as _stage_c_handlers
 from .stage_d import handlers as _stage_d_handlers
+from .stage_e import handlers as _stage_e_handlers
 
 Result = dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]
 OPTIONS = ("CALL", "PUT")
@@ -621,3 +622,4 @@ OPERATIONS: dict[str, Callable[[Inputs], Result]] = {
 OPERATIONS.update(_stage_b_handlers(_STAGE_B))
 OPERATIONS.update(_stage_c_handlers(_STAGE_C))
 OPERATIONS.update(_stage_d_handlers(_STAGE_D))
+OPERATIONS.update(_stage_e_handlers(SimpleNamespace(**{m: _Core(m) for m in ("correlation", "credit_e8", "exotics", "fx_smile", "heston", "rates_vol", "vol_e1", "vol_e7")})))

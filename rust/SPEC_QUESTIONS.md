@@ -114,3 +114,37 @@ No stage D question is open.
 - **Jacobian above the diagonal** is set to exactly 0 rather than computed. The sequential bootstrap already gives 0 there; setting it makes "exactly 0" hold by construction.
 - **Convention check** applies to `risk.curve.par` only. `risk.curve.key_rate` takes a curve object that carries no convention, so an `OIS` product is priced on it whatever its convention.
 - **Bond value** uses the bond pricer's `dirty`, scaled by `notional / 100`, on the bumped discount function with the curve's `as_of` as time origin. Settlement before `as_of` is `E_OUT_OF_RANGE`, as `bond.price.from_curve`.
+
+## Stage E (silent choices, 2026-11-08)
+
+E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e 14). Readings taken where the spec is silent:
+
+- **E1 `reject`** is required (`E_SCHEMA` when missing), as ruling E-A18 settled.
+- **E1 `vol.svi.fit_surface` row count:** a `total_variance` with a different number of rows from `expiry_years` is `E_INPUT` (the stage C "ragged rows" rule), checked after the expiry order.
+- **E1 `vol.forward.vol` expiry sign:** no `expiry_years <= 0` check is specified, so none is made; strict increase is the only expiry rule. Suggest the spec say whether `T_0 <= 0` is `E_DOMAIN`.
+- **E1 enums:** an unknown `rule`, `option_type` or `method` is `E_SCHEMA`, as for enums elsewhere in the contract.
+- **E1 `vol.smile.dynamics` order:** empty `strikes` (`E_INPUT`), then the SVI domain, then the positivity of `expiry_years`, `spot`, `spot_shifted` and strikes (`E_DOMAIN`).
+- **E7 `vol.vix.term_variance` with no OTM put or call selected:** settled by ruling E-B15, `E_INPUT` (implemented).
+- **E7 strip order:** the strip may come in any order; the build sorts it by strike. Duplicates are found after sorting.
+- **E7 `vol.vix.index` order:** after schema reads of both terms, the `N1 < N2`, `N1 <= 43200 <= N2` bracket is checked before either term's rule checks.
+- **E7 zero-bid counter:** "consecutive" resets on any quote with a non-zero bid; `K0` itself does not count towards either side's run.
+- **E3 check order:** the common checks (`spot`, `expiry_years`, `vol` above 0) come first, then `strike` and `notional`; in `fx.delta.to_strike` the sign of the delta comes before its reach; in `fx.smile.from_quotes` the `delta` interval comes before the wing vols.
+- **E3 PA call maximum:** a delta exactly equal to the maximum is `E_DOMAIN` (ruling E-A10 "at or above"). The peak is found by bisection on `d2`, so a delta within a few ulps of the maximum may land on either side.
+- **E4 cube domain** is checked on every node (not only the interpolated point), after the shape, node-order and grid checks; then strike and forward. A one-node axis needs the trade exactly on that node.
+- **E4 cube `expiry_months < 1`** is `E_INPUT`, as D7's swaption.
+- **E4 strip schedule:** every cap uses the prefix of the longest cap's quarterly schedule (cap `k` holds the first `M_k/3` caplets). `start_months < 1` is `E_INPUT`, as D7, checked after the flat-vol checks. A bracket that cannot reach a cap price below vol 1e6 is `E_NO_CONVERGENCE` (unspecified; cannot occur for a finite price below the bound).
+- **E4 bond futures:** a negative `vol` is `E_DOMAIN`; `ctd_yield` and `ctd_modified_duration` are not checked (the spec lists no rule), so a zero gives an infinite `yield_vol`. Suggest the spec require both above 0.
+- **E2 `slv_e-0006`:** settled by ruling E-A24 (the written rule stands, the golden was corrected); passes with no code change.
+- **E2 Heston small `xi`:** `b - d` is computed as `-xi^2 (iu + u^2)/(b + d)` and `ln((1 - g e)/(1 - g))` by a complex `log1p`, which is algebraically the [Alb07] form with no cancellation; the plain form was 8e-8 off at `xi = 1e-3` (`heston_e-0011`), outside the 1e-8 target.
+- **E2 SLV check order:** slices, then grid sizes (`E_INPUT`), then spot and expiry (`E_DOMAIN`), then the `ln(spot)` interior rule (`E_INPUT`), then `v_max` (`E_DOMAIN`), then the Heston domain.
+- **E6 `risk.corr.nearest` stop:** Dykstra iterations stop when no entry of `Y` moves by more than 1e-13 (cap 100,000 iterations, then `E_NO_CONVERGENCE`). Eigenvectors by cyclic Jacobi.
+- **E6 `risk.corr.implied` index vol:** `index_vol <= 0` is `E_DOMAIN` with the member vols (the spec names only member vols).
+- **E8 `creditopt_e-0055`:** settled by ruling E-B27 (golden corrected to a receiver below its zero-vol value); passes with no code change.
+- **E8 copula inputs:** `default_probabilities` must hold exactly two values (`E_INPUT`); `degrees_of_freedom` is read for `STUDENT_T` only and ignored for `GAUSSIAN`. `credit.lhp.loss_cdf` with an empty `losses` is `E_INPUT`.
+- **E8 numerics:** bivariate normal by the Drezner-Wesolowsky `sin` substitution (16 panels of 20-point Gauss-Legendre); Student t CDF and bivariate t as normal mixtures over `ln(W/nu)` (120 panels, normalised by the same rule); t quantile by bisection; normal quantile AS241 plus one Newton step.
+- **E5 readings:** `CONTINUOUS` averaging with a non-empty `fixing_years` is `E_INPUT`; fixings are checked before the common `E_DOMAIN` checks. Kirk needs vols above 0 and correlation in `[-1, 1]` (`E_DOMAIN`), unstated in the spec. Basket length mismatches are `E_INPUT` with the correlation checks. CRR `steps` above 20,000 is `E_LIMIT`; FD `nx` above 1,001 or `nt` above 10,000 is `E_LIMIT`, `nt < 1` `E_INPUT`, `width <= 0` `E_DOMAIN`.
+- **E-B31/E-B32/E-B33 (second audit):** the nearest-matrix stop (no entry moves more than 1e-13) is tighter than the relative 1e-12 of E-B31 and passes every golden, including the 20 by 20; the strip searches `[1e-10, 5]` (Black) or `[1e-10, 0.5]` (Bachelier), refusing below with `E_ARBITRAGE` and above with `E_DOMAIN`; implied correlation refuses a negative weight or fewer than two positive weights with `E_DOMAIN`, and a zero weight drops its name.
+- **Spec A second audit (E-A26, E-A28, E-A30):** Lewis integral now 1024 Gauss-Legendre nodes on `[0, 200/sqrt(min(T, 1))]` (short-expiry goldens at 7 and 2 days pass); lookback refuses `|b| <= 1e-8 v^2`; BAW refuses `r <= 0`. No stage E question is open: the two spec/golden conflicts Rust raised (`slv_e-0006`, `creditopt_e-0055`) were settled by E-A24 and E-B27.
+- **Cross-language rulings E-A34 to E-A40:** applied. `E_LIMIT` stays at the gate (E-A34). The C10 cap of 100 now also covers `exotic.*` lists, `expiry_years`, `u`, `fixing_years`, `forwards` and `correlation`, while the stated limits win: check grid and Dupire points 10,000, vol-of-vol series 10,000 (E-A35). A forward-vol first expiry at or below 0 is `E_DOMAIN` (E-A36). SLV puts every `E_INPUT` rule before `E_DOMAIN` (E-A37). Asian checks follow input order, common checks first (E-A38). Kirk and basket checks upheld (E-A39); FD codes upheld (E-A40). The earlier readings for these points are superseded.
+- **Cross-language rulings E-B34 to E-B40:** applied. VIX bracket first (E-B34, already so); no C10 cap on E7 lists (E-B35, already so); replicated variance below 0 is `E_DOMAIN` (E-B36); ZC order forward, `1 + K`, years, with negative `K` priced (E-B37); E4 option vols `>= 0` and CTD inputs above 0 after the premium bounds (E-B38); implied-correlation `E_DOMAIN` order (E-B39); CDS implied-vol knock-out rule before the dates (E-B40).
+- **`rulings_e_b-0008`, `-0009`, `-0015`:** settled; spec B rebuilt them from the proper bases (5b58e2d) and they pass with no code change. No stage E question is open.

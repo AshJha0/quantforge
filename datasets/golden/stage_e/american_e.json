@@ -1,0 +1,1535 @@
+{
+ "schema_version": "1.0",
+ "suite": "american_e",
+ "spec": "specifications/04-pricing/exotics.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_e_a.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "american_e-0001",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 8.539077470526058,
+     "european": 8.178595703863163,
+     "early_exercise_premium": 0.360481766662895
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0002",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 8.558809799474238,
+     "european": 8.214753341202048,
+     "early_exercise_premium": 0.3440564582721901
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0003",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 14.464816582765149,
+     "european": 13.761621223579674,
+     "early_exercise_premium": 0.7031953591854752
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0004",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 14.435566605091319,
+     "european": 13.734776484275464,
+     "early_exercise_premium": 0.7007901208158547
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0005",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "CALL",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 11.075522257744193,
+     "european": 11.075520584467274,
+     "early_exercise_premium": 1.673276919689215e-06
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0006",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "CALL",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 11.111680900805332,
+     "european": 11.111678221807574,
+     "early_exercise_premium": 2.6789977578545177e-06
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0007",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 4.98771204452914,
+     "european": 4.848554367162153,
+     "early_exercise_premium": 0.13915767736698648
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0008",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 4.9998324528065625,
+     "european": 4.8695561978379445,
+     "early_exercise_premium": 0.13027625496861805
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0009",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 11.39045625892522,
+     "european": 10.987194727523859,
+     "early_exercise_premium": 0.4032615314013608
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0010",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 11.374370890221037,
+     "european": 10.972017425953856,
+     "early_exercise_premium": 0.4023534642671809
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0011",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "CALL",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 6.333311918437406,
+     "european": 6.333311918437406,
+     "early_exercise_premium": 0.0
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0012",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "CALL",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 6.354313749110749,
+     "european": 6.354313749110749,
+     "early_exercise_premium": 0.0
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0013",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 17.709729832640086,
+     "european": 17.69807195223988,
+     "early_exercise_premium": 0.011657880400207432
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0014",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 17.769709510665333,
+     "european": 17.75745694061043,
+     "early_exercise_premium": 0.012252570054901213
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0015",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 24.190441956736688,
+     "european": 24.16736684420947,
+     "early_exercise_premium": 0.02307511252721639
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0016",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 24.185480578272667,
+     "european": 24.161538379573003,
+     "early_exercise_premium": 0.02394219869966463
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0017",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "CALL",
+    "steps": 50
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 14.556154507635469,
+     "european": 13.93076267567101,
+     "early_exercise_premium": 0.6253918319644587
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0018",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "CALL",
+    "steps": 200
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "american": 14.591385016524061,
+     "european": 13.99014766404128,
+     "early_exercise_premium": 0.6012373524827819
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "independent-replay",
+    "bs-limit"
+   ],
+   "tags": [
+    "american",
+    "crr",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0019",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "steps": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0020",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "steps": 20001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0021",
+   "operation": "exotic.american.crr",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.5,
+    "dividend_yield": 0.02,
+    "vol": 0.01,
+    "option_type": "PUT",
+    "steps": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "up-move probability outside (0, 1)"
+  },
+  {
+   "case_id": "american_e-0022",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.580054049689823
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0023",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14.396883245398659
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0024",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.125687251819251
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0025",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 90.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 16.638985160468746
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0026",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.993967043242794
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0027",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.31546200217243
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0028",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.361332461194948
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "no-early-exercise",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0029",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 90.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12.791388743422885
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "no-early-exercise",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0030",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17.845977374549477
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0031",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 24.241650530280822
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0032",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14.669138705421412
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0033",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 90.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19.032887671569124
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "quantlib-1.44",
+    "analytic-haug"
+   ],
+   "tags": [
+    "american",
+    "baw",
+    "synthetic"
+   ],
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 1e-08,
+    "reason": "QuantLib solves the critical price to about 1e-6; 1e-5 per unit at spot 100 is 1 currency unit on 100,000 units, far below the BAW approximation error"
+   }
+  },
+  {
+   "case_id": "american_e-0034",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.0,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "r = 0: BAW divides by 1 - exp(-rT)"
+  },
+  {
+   "case_id": "american_e-0035",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.549268504869268,
+     "delta": -0.4188566227825308,
+     "gamma": 0.01684041142398621
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "american",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0036",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14.41334129728115,
+     "delta": -0.5872867589379112,
+     "gamma": 0.018203719051610494
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "american",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0037",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "exercise": "EUROPEAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.217402679448949,
+     "delta": -0.39528993545975827,
+     "gamma": 0.01521441810045114
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "european",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0038",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.995252035075112,
+     "delta": -0.44537928952971073,
+     "gamma": 0.02960126978336222
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "american",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0039",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.36549133265575,
+     "delta": -0.7310270480201458,
+     "gamma": 0.028465544578352132
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "american",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0040",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.4986301369863014,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "option_type": "PUT",
+    "exercise": "EUROPEAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4.871330626774765,
+     "delta": -0.4299721445663553,
+     "gamma": 0.027873540126837678
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "european",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0041",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17.771709641184874,
+     "delta": -0.4190275572105964,
+     "gamma": 0.008691443035604108
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "american",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0042",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 110.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 24.154857011821978,
+     "delta": -0.5023445206634768,
+     "gamma": 0.00873333808182078
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "american",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0043",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 2.0,
+    "rate": 0.02,
+    "dividend_yield": 0.04,
+    "vol": 0.3,
+    "option_type": "PUT",
+    "exercise": "EUROPEAN",
+    "grid": {
+     "nx": 201,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17.759113086610228,
+     "delta": -0.4182562002773533,
+     "gamma": 0.008641426676696587
+    }
+   },
+   "tolerance_class": "numerical_scheme",
+   "verified_by": [
+    "reference-scheme",
+    "crr-2000-within-2e-2"
+   ],
+   "tags": [
+    "american",
+    "fd",
+    "european",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0044",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 200,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ],
+   "description": "nx must be odd"
+  },
+  {
+   "case_id": "american_e-0045",
+   "operation": "exotic.american.fd",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "option_type": "PUT",
+    "exercise": "AMERICAN",
+    "grid": {
+     "nx": 2001,
+     "nt": 200,
+     "width": 5.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "synthetic"
+   ]
+  },
+  {
+   "case_id": "american_e-0046",
+   "operation": "exotic.american.baw",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": -0.01,
+    "dividend_yield": 0.0,
+    "vol": 0.25,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "ruling",
+    "synthetic"
+   ],
+   "description": "r < 0: 1 - exp(-rT) < 0 and the put critical price has no root (ruling E-A30)"
+  }
+ ]
+}

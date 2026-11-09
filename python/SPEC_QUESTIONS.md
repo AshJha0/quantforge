@@ -132,3 +132,64 @@ No stage D question is open.
   `batch --batch` are exit 64.
 - R1-P5. R1-6 SOFR: the "USGS plus every Good Friday" calendar is used only inside `overnight.compound_dated`
   (business days, start/end check, `back`). Other SOFR uses (swap schedules, curves) keep plain `USGS`.
+
+## Stage E (open)
+
+Choices made where a stage E spec was silent or two rules pull apart. No golden depends on any of them.
+
+- E-Q1 (E1, `slices` count). `arb-free-surfaces.md` lists "more than 100 slices: `E_LIMIT`" last, after the
+  `E_INPUT` and `E_DOMAIN` slice checks, but `01-core/limits.md` B3 puts `E_LIMIT` before every rule check.
+  Python follows B3: the slice cap (100), the grid cap (`log_moneyness`, 10,000) and the point cap (`points`,
+  10,000) are checked at the gate, before any rule check. `vol.svi.fit_surface` caps `expiry_years` at 100 the
+  same way.
+- E-Q2 (E1, other arrays). The stage C cap of 100 (ruling C10, every `vol.` operation) would cap the E1 grid
+  at 100, against the 10,000 stated in E1. Python lifts the stage C cap for the three E1 operations with a
+  stated grid (`vol.svi.surface_check`, `vol.svi.fit_surface`, `vol.local.dupire`) and keeps it for the other
+  E1 operations (`vol.forward.vol` expiries, `vol.smile.dynamics` strikes, `vol.volofvol.measure` vols), whose
+  pages name no limit. A 100-long cap on a vol-of-vol series is tight; a ruling is asked for.
+- E-Q3 (E7, arrays). `returns`, `prices` and `strip` "count towards limits.md like any array" (cli-contract,
+  spec B): read as the 100,000 cap only, so the stage C cap of 100 does not apply to `vol.garch.*`,
+  `vol.varswap.*` and `vol.vix.*`.
+- E-Q4 (E7, `vol.varswap.fair_strike`). A replicated `fair_variance` below 0 (possible on a coarse strip with
+  a large carry) has no `sqrt`. The page lists no check for it; Python returns `E_DOMAIN` on field `vols`
+  rather than crash.
+- E-Q5 (E7, `vol.vix.index`). The bracket rule (`N1 < N2`, `N1 <= 43200 <= N2`) is the only listed check;
+  its order against the two term inputs' own checks is not stated. Python checks both terms first (near, then
+  next), then the bracket, then a negative bracket under the root (`E_DOMAIN`).
+- E-Q6 (E1, `vol.forward.vol`). No check on `expiry_years <= 0` is listed; Python takes them as given (a
+  first expiry of 0 then divides by `T_1 - 0` only from the second point on).
+- E-Q7 (E4, `rates.swaption.price_cube`). The domain checks (`alpha <= 0`, `beta` outside `[0, 1]`,
+  `|rho| >= 1`, `nu < 0`) are applied to every node of the cube, not only to the interpolated parameters:
+  `ratesvol_e-0017` puts a bad `rho` at a node the trade does not touch and expects `E_DOMAIN`. A bilinear mix
+  of valid nodes is then valid too.
+- E-Q8 (E4, `infl.cap.zc_price`). `(1 + K)^T` with `1 + K <= 0` has no real value for a non-integer `T`; the
+  page lists no check. Python returns `E_DOMAIN` on `strike`, after the `BLACK_76` forward check and before
+  the `years` check. The page's "strike <= 0" check is read as YoY only, so a negative ZC strike with
+  `1 + K > 0` is priced under both models.
+- E-Q9 (E4, `rates.cap.strip`). The page lists the strip's own checks but not their order against D7's
+  (`start_months`, tenor range, `BLACK_76` strike and forwards). Python runs the strip checks (tenors, count,
+  flat vols), then D7's.
+- E-Q10 (E2, `vol.slv.leverage`, golden `slv_e-0006`). The spec's check is `x_min < ln(spot) < x_max`, else
+  `E_INPUT`. The golden has `spot = 100`, `x_min = 4.6`, `x_max = 4.7`; `ln 100 = 4.60517` lies inside, and
+  also inside the node interior (`x_1 = 4.60167`), so by the page the case is valid, but the golden expects
+  `E_INPUT` ("spot outside the x grid interior"). Python follows the page and fails this one golden; a
+  ruling or a corrected golden (for example `x_min = 4.61`) is asked for. No other check is added to fit it.
+- E-Q11 (E2, array caps). `strikes` and `u` fall under the stage C cap of 100 (every `vol.` operation, as
+  E-Q2); the E2 page names no limit except the SLV grid (`nx`, `nv` 1000, `nt` 10,000), checked at the gate.
+- E-Q12 (E8, `credit.cdsoption.implied_vol`, golden `creditopt_e-0055`). The page says `E_DOMAIN` for a
+  premium "at or below the zero-vol value, or at or above the upper bound". The golden is an out-of-the-money
+  knock-out payer (forward 1.18877% against a 1.20% strike), so the zero-vol value is 0, with `premium = 1.0`
+  on 10m notional. By the page that premium has an implied vol: Python finds 0.5397%, which reprices to
+  1.0 within 1e-12. The golden expects `E_DOMAIN` ("premium below the zero-vol value"). Python follows the
+  page and fails this one golden. Either the golden needs a premium at or below 0, or the page needs a stated
+  lower vol bound (as E-B10 gives for the cap strip), which Python would then apply.
+- E-Q13 (E8, `credit.copula.joint_default`). `default_probabilities` must hold exactly two values
+  (`E_INPUT` otherwise); the page does not say, and this check runs first.
+
+Closed by rulings (2026-11-08): E-Q1 by E-A34 (`E_LIMIT` at the gate, as built); E-Q2 by E-A35 (stage C cap
+kept, vol-of-vol series raised to 10,000, now built); E-Q6 by E-A36 (first `expiry_years <= 0` is `E_DOMAIN`,
+now built); E-Q10 by E-A24 (golden corrected); E-Q12 by E-B27 (golden corrected).
+Closed by spec B rulings (2026-11-08): E-Q3 by E-B35 (as built); E-Q4 by E-B36 (as built); E-Q5 by E-B34
+(bracket now checked first); E-Q8 by E-B37 (as built); E-Q9 by E-B40 (as built); E-Q13 by E-B40 (as built).
+Still open: E-Q7 (cube domain checks on every node, as the golden needs) and E-Q11 (E2 array caps), both
+upheld in effect by goldens and E-A35.

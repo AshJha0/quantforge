@@ -30,6 +30,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       matrix: ${{ steps.m.outputs.matrix }}
+      any: ${{ steps.m.outputs.any }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -42,9 +43,11 @@ jobs:
           inc = [{"lang": l, "module": m["module"], "target": m[l], "suite": m.get(l + "_suite", m["suite"])}
                  for m in cfg["stages"][os.environ["STAGE"]] for l in ("java", "cpp", "python", "rust") if m.get(l)]
           print("matrix=" + json.dumps({"include": inc}))
+          print("any=" + ("true" if inc else "false"))  # stage E starts with every target null
           PY
   mutate:
     needs: plan
+    if: needs.plan.outputs.any == 'true'
     strategy:
       fail-fast: false
       max-parallel: 8
@@ -74,7 +77,7 @@ jobs:
       - if: matrix.lang == 'cpp'
         run: |
           docker run --rm -v "$PWD:/w" -w /w -e TARGET -e SUITE -e MAX -e OUT gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
-            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --out "$OUT.json"'
+            bash -c 'apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null && python3 conformance/mutation/cpp_mutants.py --file "$TARGET" --suite "$SUITE" --max "$MAX" --unit --out "$OUT.json"'
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         if: matrix.lang == 'python'
       - if: matrix.lang == 'rust'

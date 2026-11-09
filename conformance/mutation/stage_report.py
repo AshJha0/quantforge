@@ -35,7 +35,10 @@ def score_file(lang, path):
     d = json.loads(Path(path).read_text(encoding="utf-8"))
     s = d["summary"]
     if lang == "cpp":
-        return s["killed"], s["survived"], f"golden only, {s['killed'] + s['survived'] + s['no_build']} of {s['sites']} sites, {s['no_build']} did not build"
+        basis = (f"unit or golden, golden {s.get('golden_killed', s['killed'])}, unit {s['unit_killed']}" if s.get("unit")
+                 else "golden only")
+        return s["killed"], s["survived"], (f"{basis}, {s['killed'] + s['survived'] + s['no_build']} of {s['sites']} sites, "
+                                            f"{s['no_build']} did not build, {s.get('timed_out', 0)} timed out")
     note = ""
     if set(s.get("unit_verdicts", {})) == {"mutmut code 33"}:
         note = "; NO unit tests mapped (mutmut 33 on every mutant): golden only"

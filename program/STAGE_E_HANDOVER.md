@@ -1,0 +1,98 @@
+# Stage E handover
+
+From the two stage E spec sessions to the four language sessions. Append-only: spec A writes under "Spec A slices", spec B under "Spec B slices". Each slice section says what a language session may read. Never read anything under `oracle/`: that is the oracle, and reading it breaks the clean room.
+
+All stage E goldens are in `datasets/golden/stage_e/`, run through `conformance/runner/runner.py` (it finds them by suite name). Always read `specifications/cli-contract.md` and `specifications/stage-e-rulings.md` (spec A) with any spec A slice.
+
+## Spec A slices
+
+### E1 arbitrage-free surfaces (ready, 2026-11-08)
+
+New operations: `vol.svi.surface_check`, `vol.ssvi.to_svi`, `vol.svi.fit_surface`, `vol.local.dupire`, `vol.forward.vol`, `vol.smile.dynamics`, `vol.volofvol.measure`. No new error code; `E_ARBITRAGE` gains uses (cli-contract, stage E spec A block).
+
+Goldens: `datasets/golden/stage_e/surf_e.json` (28 cases), `datasets/golden/stage_e/lv_e.json` (39 cases).
+
+Read:
+- `specifications/cli-contract.md` (block "Stage E, spec A")
+- `specifications/stage-e-rulings.md` (E-A1 to E-A8)
+- `specifications/05-volatility/smile-and-surface.md` (stage C SVI, SSVI, `g`: E1 builds on it)
+- `specifications/05-volatility/arb-free-surfaces.md`
+- `specifications/05-volatility/local-and-forward-vol.md`
+- `specifications/05-volatility/stage-e-targets-a.md` (E1 table)
+- `specifications/edge-case-register.md` (rows EA1 to EA6)
+
+Notes for builds: `vol.svi.fit_surface` is judged on parameters within 1e-6 from exact quotes, so any proven least-squares solver with several starts works; `vol.svi.surface_check` lists are exact, and the goldens keep every compared quantity well away from its threshold.
+
+### E3 FX smile (ready, 2026-11-08)
+
+New operations: `fx.option.price`, `fx.delta.from_strike`, `fx.delta.to_strike`, `fx.atm.strike`, `fx.smile.from_quotes`. No new error code.
+
+Goldens: `datasets/golden/stage_e/fxs_e.json` (125 cases).
+
+Read:
+- `specifications/cli-contract.md` (block "Stage E, spec A", E3 row)
+- `specifications/stage-e-rulings.md` (E-A9 to E-A11)
+- `specifications/05-volatility/fx-smile.md`
+- `specifications/05-volatility/stage-e-targets-a.md` (E3 table)
+- `specifications/edge-case-register.md` (rows EA7 to EA9)
+
+Notes for builds: premium-adjusted call strikes need the upper root (bracket from the strike of maximum delta); strikes are judged to 1e-9 relative.
+
+### E2 Heston, Bates, Merton, SLV (ready, 2026-11-08)
+
+New operations: `vol.heston.price`, `vol.heston.cf`, `vol.bates.price`, `vol.merton.price`, `vol.slv.leverage`. No new error code.
+
+Goldens: `datasets/golden/stage_e/heston_e.json` (38 cases), `datasets/golden/stage_e/slv_e.json` (8 cases).
+
+Read:
+- `specifications/cli-contract.md` (block "Stage E, spec A", E2 row)
+- `specifications/stage-e-rulings.md` (E-A12 to E-A14)
+- `specifications/05-volatility/heston-family.md`
+- `specifications/05-volatility/local-and-forward-vol.md` (`vol.slv.leverage` uses `vol.local.dupire`)
+- `specifications/05-volatility/stage-e-targets-a.md` (E2 table)
+- `specifications/edge-case-register.md` (rows EA10 to EA13)
+
+Notes for builds: use the little-trap characteristic function; prices are judged to 1e-8 per unit. The SLV goldens are a recipe check: follow the scheme in `heston-family.md` step by step, including the floor and the smooth conditional-variance estimate.
+
+### E1 rulings on the R5 audit (2026-11-08)
+
+Rulings E-A15 to E-A18 in `specifications/stage-e-rulings.md`. Changes builds must make: the Lee wing test is `>= 2` (was `> 2`). New goldens appended to `surf_e.json` (`surf_e-0029` to `-0032`) and `lv_e.json` (`lv_e-0040` to `-0043`); no existing case changed. Re-read `05-volatility/arb-free-surfaces.md` (wing rule, citations) and `local-and-forward-vol.md` (citations only).
+
+### E5 exotics (ready, 2026-11-08)
+
+New operations: `exotic.digital.price`, `exotic.barrier.price`, `exotic.asian.geometric`, `exotic.lookback.floating`, `exotic.quanto.price`, `exotic.chooser.price`, `exotic.spread.kirk`, `exotic.basket.moment`, `exotic.american.crr`, `exotic.american.baw`, `exotic.american.fd`. No new error code.
+
+Goldens: `datasets/golden/stage_e/exotic_e.json` (119 cases), `datasets/golden/stage_e/american_e.json` (45 cases).
+
+Read:
+- `specifications/cli-contract.md` (block "Stage E, spec A", E5 row)
+- `specifications/stage-e-rulings.md` (E-A19 to E-A23)
+- `specifications/04-pricing/exotics.md`
+- `specifications/05-volatility/stage-e-targets-a.md` (E5 table)
+- `specifications/edge-case-register.md` (rows EA14 to EA17)
+
+Notes for builds: the CRR tree uses Hull's probability, not QuantLib's; the FD goldens are a recipe check, so follow the scheme exactly, including the odd `nx` and the centre-node Greeks.
+
+### Ruling E-A24 (2026-11-08)
+
+`slv_e-0006` input corrected (`x_min` 4.6 to 4.61); the expected `E_INPUT` and the spec rule are unchanged. Pull `datasets/golden/stage_e/slv_e.json` and `specifications/stage-e-rulings.md`.
+
+### Rulings on the second R5 audit (2026-11-08)
+
+Rulings E-A25 to E-A33 in `specifications/stage-e-rulings.md`. What builds must change:
+- Heston and Bates: the 256-node rule is not enough at short expiry. Use 1024 nodes on `[0, 200/sqrt(min(T, 1))]`, or any method meeting 1e-8. The existing golden values moved by about 1e-10 (now 30-digit values). New appended cases have short expiries.
+- Lookback: `E_DOMAIN` for `|b| <= 1e-8 v^2`. BAW: `E_DOMAIN` for `r <= 0`.
+- SLV goldens are now judged to 1e-7.
+
+New goldens are appended to `heston_e`, `exotic_e` and `american_e`; no existing case id moved. Re-read `heston-family.md`, `exotics.md`, `fx-smile.md` (citations only) and `stage-e-targets-a.md`.
+
+### Rulings E-A34 to E-A40 on the cross-language spec questions (2026-11-08)
+
+New suite `datasets/golden/stage_e/rulings_e_a.json` (17 cases). What builds must change:
+- C++, Java: `E_LIMIT` at the gate (E-A34).
+- C++, Java, Rust: the cap of 100 on unstated `vol.*` lists, and 10,000 on vol-of-vol series (E-A35).
+- Python, Rust: `vol.forward.vol` first expiry `<= 0` is `E_DOMAIN` (E-A36).
+- C++: SLV `E_INPUT` rules before `E_DOMAIN` (E-A37).
+- Rust: Asian checks in input order (E-A38).
+- Others than Rust: the Kirk, basket and FD checks (E-A39, E-A40).
+Re-read `stage-e-rulings.md`, `arb-free-surfaces.md`, `local-and-forward-vol.md`, `heston-family.md`, `exotics.md`.

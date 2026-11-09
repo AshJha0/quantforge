@@ -329,7 +329,7 @@ fn b_factor(a: f64, x: f64) -> f64 {
     if a == 0.0 { x } else { -(-a * x).exp_m1() / a }
 }
 
-/// `rates.futures.convexity`: Hull-White, as QuantLib's `HullWhite::convexityBias`.
+/// `rates.futures.convexity`: Hull-White, as `QuantLib`'s `HullWhite::convexityBias`.
 pub fn convexity(price: f64, t: f64, big_t: f64, sigma: f64, a: f64) -> Result<Convexity> {
     if big_t.is_nan() || t.is_nan() || big_t <= t {
         return fail("E_INPUT", "end_years must be after start_years");

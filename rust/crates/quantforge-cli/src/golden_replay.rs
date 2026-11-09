@@ -8,6 +8,7 @@ use quantforge_core::json::{Json, obj, parse};
 
 /// `(absolute, relative)`, or `None` for an exact class. Classes judged only by a per-case limit
 /// or by extra checks (`calibration`, `monte_carlo`) have no numeric default.
+#[allow(clippy::option_option)]
 fn class(name: &str) -> Option<Option<(f64, f64)>> {
     Some(match name {
         "date_and_convention" | "bit_exact" => None,
@@ -140,12 +141,11 @@ fn judge(case: &Json) -> Vec<String> {
             msgs.push(format!("extra check {name} missing"));
             continue;
         };
-        let lim = match chk.get("method").and_then(Json::as_str) {
-            Some("absolute") => num(chk.get("limit")).unwrap(),
-            _ => {
-                let se_key = chk.get("stderr_output").and_then(Json::as_str).unwrap();
-                num(chk.get("z")).unwrap() * num(outs.get(se_key)).unwrap_or(f64::NAN)
-            }
+        let lim = if let Some("absolute") = chk.get("method").and_then(Json::as_str) {
+            num(chk.get("limit")).unwrap()
+        } else {
+            let se_key = chk.get("stderr_output").and_then(Json::as_str).unwrap();
+            num(chk.get("z")).unwrap() * num(outs.get(se_key)).unwrap_or(f64::NAN)
         };
         let within = (a - e).abs() <= lim; // false for a NaN limit
         if !within {

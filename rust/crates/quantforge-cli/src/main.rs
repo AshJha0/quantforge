@@ -10,6 +10,7 @@ mod ops_b;
 mod ops_c;
 mod ops_d;
 mod ops_d2;
+mod ops_e;
 mod ops_r2;
 
 use input::Inputs;
@@ -76,7 +77,7 @@ fn check_envelope(doc: &Json, flags: Flags) -> Result<(&str, &Json), QfError> {
     if !text("schema_version").is_some_and(version_like) {
         return Err(err("E_SCHEMA", "bad schema_version"));
     }
-    if !text("case_id").is_some_and(|s| !s.is_empty()) {
+    if text("case_id").is_none_or(str::is_empty) {
         return Err(err("E_SCHEMA", "bad case_id"));
     }
     let Some(op) = text("operation").filter(|s| operation_like(s)) else {
@@ -183,7 +184,7 @@ fn run(timings: bool) -> std::io::Result<u8> {
     let mut bytes = Vec::new();
     std::io::stdin().read_to_end(&mut bytes)?;
     let (result, ok) = timed_case(&bytes, timings);
-    print(result)?;
+    print(&result)?;
     Ok(if ok { 0 } else { 2 })
 }
 
@@ -229,12 +230,12 @@ fn batch(timings: bool) -> std::io::Result<u8> {
         } else {
             timed_case(&line, timings).0
         };
-        print(result)?;
+        print(&result)?;
     }
     Ok(0)
 }
 
-fn print(v: Json) -> std::io::Result<u8> {
+fn print(v: &Json) -> std::io::Result<u8> {
     let mut out = std::io::stdout().lock();
     out.write_all(v.to_text().as_bytes())?;
     out.write_all(b"\n")?;
@@ -246,13 +247,13 @@ fn command(name: &str, timings: bool) -> std::io::Result<u8> {
     match name {
         "run" => run(timings),
         "batch" | "--batch" => batch(timings),
-        "version" => print(obj([
+        "version" => print(&obj([
             ("language", "rust".into()),
             ("implementation_version", env!("CARGO_PKG_VERSION").into()),
             ("contract_version", CONTRACT.into()),
             ("toolchain", "rustc 1.99.1".into()),
         ])),
-        _ => print(OPERATIONS.to_vec().into()),
+        _ => print(&OPERATIONS.to_vec().into()),
     }
 }
 
@@ -272,7 +273,7 @@ fn main() -> ExitCode {
     let worker = std::thread::Builder::new()
         .stack_size(256 << 20)
         .spawn(move || command(&name, timings));
-    match worker.map(|h| h.join()) {
+    match worker.map(std::thread::JoinHandle::join) {
         Ok(Ok(Ok(code))) => ExitCode::from(code),
         _ => ExitCode::from(70),
     }

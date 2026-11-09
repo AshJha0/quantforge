@@ -17,6 +17,9 @@ from pathlib import Path, PurePosixPath
 
 import markdown
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from site_figures import home_figures, render_home  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 LEFT_OUT = (".github/",)
 LINK = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)\)")
@@ -129,7 +132,8 @@ def main():
         up = "../" * page.count("/")
         target.write_text(PAGE.format(title=html.escape(title), up=up, body=body), encoding="utf-8")
         listing.append((page, title))
-    shutil.copy(ROOT / "tools" / "site_home.html", out / "index.html")
+    home = render_home((ROOT / "tools" / "site_home.html").read_text(encoding="utf-8"), home_figures())
+    (out / "index.html").write_text(home, encoding="utf-8")
     rows = "\n".join(f'<li><a href="{p[:-3]}.html">{html.escape(p)}</a>: {html.escape(t)}</li>' for p, t in listing)
     (out / "all-pages.html").write_text(PAGE.format(title="All pages", up="", body=f"<h1>All pages</h1><ul>{rows}</ul>"),
                                         encoding="utf-8")

@@ -14,16 +14,7 @@ on:
       - 'datasets/**'
       - 'specifications/**'
       - '.github/workflows/conformance.yml'
-  pull_request:
-    paths:
-      - 'java25/**'
-      - 'cpp26/**'
-      - 'python/**'
-      - 'rust/**'
-      - 'conformance/**'
-      - 'datasets/**'
-      - 'specifications/**'
-      - '.github/workflows/conformance.yml'
+  pull_request:  # every PR, so these can be required checks on main
   workflow_dispatch:
 permissions:
   contents: read
@@ -41,6 +32,7 @@ jobs:
       python: ${{ steps.paths.outputs.python }}
       rust: ${{ steps.paths.outputs.rust }}
       stage_d: ${{ steps.paths.outputs.stage_d }}
+      stage_e: ${{ steps.paths.outputs.stage_e }}
       golden: ${{ steps.paths.outputs.golden }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -52,7 +44,7 @@ jobs:
           EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
-          shared=false java=false cpp=false python=false rust=false stage_d=false
+          shared=false java=false cpp=false python=false rust=false stage_d=false stage_e=false e_dirs=
           base=
           [ "$EVENT" = pull_request ] && base=HEAD^1 # the merge ref's first parent is the base branch
           [ "$EVENT" = push ] && base=$BEFORE
@@ -64,21 +56,28 @@ jobs:
                 python/*) python=true ;;
                 rust/*) rust=true ;;
                 datasets/golden/stage_d/*|specifications/*stage-d*) stage_d=true ;;
+                datasets/golden/stage_e/*) stage_e=true; e_dirs="$e_dirs stage_e" ;;
+                datasets/golden/stage_e_b/*) stage_e=true; e_dirs="$e_dirs stage_e_b" ;;
+                specifications/*stage-e*) stage_e=true; e_dirs="$e_dirs mixed" ;;
                 conformance/runner/*|conformance/tolerances/*|datasets/*|specifications/*|.github/workflows/conformance.yml) shared=true ;;
               esac
             done
           else
             shared=true
           fi
-          # Stage D slot: a change only to stage D goldens or rulings runs every language on stage D goldens alone.
+          # Stage slots: a change only to one stage's goldens or rulings runs every language on that stage's goldens alone.
+          # Both stages at once, or a stage plus anything else, runs everything.
           golden=datasets/golden
-          if [ "$stage_d" = true ] && [ "$shared$java$cpp$python$rust" = falsefalsefalsefalsefalse ]; then
+          langs="$shared$java$cpp$python$rust"
+          if [ "$stage_d$stage_e" = truefalse ] && [ "$langs" = falsefalsefalsefalsefalse ]; then
             golden=datasets/golden/stage_d java=true cpp=true python=true rust=true
-          elif [ "$stage_d" = true ]; then
+          elif [ "$stage_d$stage_e" = falsetrue ] && [ "$langs" = falsefalsefalsefalsefalse ] && [ "$(echo $e_dirs | tr ' ' '\n' | sort -u | wc -l)" = 1 ] && [ "${e_dirs# }" != mixed ]; then
+            golden=datasets/golden/$(echo $e_dirs | cut -d' ' -f1) java=true cpp=true python=true rust=true
+          elif [ "$stage_d" = true ] || [ "$stage_e" = true ]; then
             shared=true
           fi
-          echo "shared=$shared java=$java cpp=$cpp python=$python rust=$rust stage_d=$stage_d golden=$golden"
-          { echo "shared=$shared"; echo "java=$java"; echo "cpp=$cpp"; echo "python=$python"; echo "rust=$rust"; echo "stage_d=$stage_d"; echo "golden=$golden"; } >> "$GITHUB_OUTPUT"
+          echo "shared=$shared java=$java cpp=$cpp python=$python rust=$rust stage_d=$stage_d stage_e=$stage_e golden=$golden"
+          { echo "shared=$shared"; echo "java=$java"; echo "cpp=$cpp"; echo "python=$python"; echo "rust=$rust"; echo "stage_d=$stage_d"; echo "stage_e=$stage_e"; echo "golden=$golden"; } >> "$GITHUB_OUTPUT"
   runner-self-test:
     needs: scope
     if: needs.scope.outputs.shared == 'true'

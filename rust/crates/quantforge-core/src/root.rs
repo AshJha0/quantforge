@@ -40,6 +40,8 @@ fn same_sign(a: f64, b: f64) -> bool {
     (a > 0.0) == (b > 0.0)
 }
 
+// Shares the solvers' Result return so every exit path reads the same.
+#[allow(clippy::unnecessary_wraps)]
 fn done(root: f64, iterations: i64, residual: f64, termination: &'static str) -> Result<Root> {
     Ok(Root {
         root,
@@ -208,10 +210,10 @@ pub fn newton(
         let mut next = x - fx / dfx;
         if let Some((a, b, fa, fb)) = &mut br {
             // An end point may be an exact root, so judge by an end with a sign.
-            let left = if *fa != 0.0 {
-                same_sign(*fa, fx)
-            } else {
+            let left = if *fa == 0.0 {
                 !same_sign(*fb, fx)
+            } else {
+                same_sign(*fa, fx)
             };
             if left {
                 *a = x;

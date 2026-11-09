@@ -1,0 +1,257 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-vol-dupire-grid-e",
+ "operation": "vol.local.dupire",
+ "inputs": {
+  "slices": [
+   {
+    "expiry_years": 0.25,
+    "svi": {
+     "a": 0.02,
+     "b": 0.1,
+     "rho": -0.4,
+     "m": 0.02,
+     "sigma": 0.2
+    }
+   },
+   {
+    "expiry_years": 1.0,
+    "svi": {
+     "a": 0.035,
+     "b": 0.11,
+     "rho": -0.35,
+     "m": 0.03,
+     "sigma": 0.25
+    }
+   },
+   {
+    "expiry_years": 2.0,
+    "svi": {
+     "a": 0.06,
+     "b": 0.12,
+     "rho": -0.3,
+     "m": 0.04,
+     "sigma": 0.3
+    }
+   }
+  ],
+  "points": [
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": -0.4
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": -0.3
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": -0.2
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": -0.1
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": 0.0
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": 0.1
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": 0.2
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": 0.3
+   },
+   {
+    "expiry_years": 0.25,
+    "log_moneyness": 0.4
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": -0.4
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": -0.3
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": -0.2
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": -0.1
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": 0.0
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": 0.1
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": 0.2
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": 0.3
+   },
+   {
+    "expiry_years": 0.5,
+    "log_moneyness": 0.4
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": -0.4
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": -0.3
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": -0.2
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": -0.1
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": 0.0
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": 0.1
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": 0.2
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": 0.3
+   },
+   {
+    "expiry_years": 0.75,
+    "log_moneyness": 0.4
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": -0.4
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": -0.3
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": -0.2
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": -0.1
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": 0.0
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": 0.1
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": 0.2
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": 0.3
+   },
+   {
+    "expiry_years": 1.0,
+    "log_moneyness": 0.4
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": -0.4
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": -0.3
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": -0.2
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": -0.1
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": 0.0
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": 0.1
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": 0.2
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": 0.3
+   },
+   {
+    "expiry_years": 1.5,
+    "log_moneyness": 0.4
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": -0.4
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": -0.3
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": -0.2
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": -0.1
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": 0.0
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": 0.1
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": 0.2
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": 0.3
+   },
+   {
+    "expiry_years": 2.0,
+    "log_moneyness": 0.4
+   }
+  ]
+ }
+}

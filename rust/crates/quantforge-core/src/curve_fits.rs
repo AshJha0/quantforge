@@ -267,7 +267,7 @@ mod tests {
         assert_eq!(r.outliers, vec![3]);
         assert!(r.residuals[3] < -0.0005);
         let pure = robust(&m, &y.iter().map(|v| v + 0.0).collect::<Vec<_>>(), 2.0, 1.0).unwrap();
-        assert!(pure.outliers.is_empty());
+        assert_eq!(pure.outliers, [] as [usize; 0]);
     }
 
     #[test]

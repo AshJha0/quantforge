@@ -17,10 +17,10 @@ uv sync --locked --project python
 python conformance/runner/runner.py --impl rust
 ```
 
-`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Rust run on `r1` at `3f5d97d`, 2026-11-07:
+`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Python run on the stage E merge, `597abf2`, 2026-11-08 (*observed*, Windows; the other three builds reported the same count):
 
 ```
-TOTAL {'cases': 5922, 'pass': 5922, 'fail': 0, 'not_implemented': 0}
+TOTAL {'cases': 6817, 'pass': 6817, 'fail': 0, 'not_implemented': 0}
 ```
 
 ## More on the CLI
@@ -63,11 +63,11 @@ New in 1.6.0 (R1): `quantforge --batch` is the same command, and `--timings` on 
 python conformance/runner/batch_check.py --impl rust
 ```
 
-`--skip-run` leaves out the slow per-case `run` comparison.
+`--skip-run` leaves out the slow per-case `run` comparison. With `--impl python` the full check runs past five minutes on a Windows laptop, because each `run` call starts a fresh `uv` process; `--skip-run` passes in about a minute (*observed*, 2026-11-09).
 
 ## R2 risk recipes
 
-The language builds of these operations are landing, so no CLI output is shown yet. Each recipe sends golden cases through batch mode; the expected values are the oracle's, from `datasets/golden/r2/`. This shell function turns golden cases into batch input lines:
+All four builds pass these goldens (5,922 of 5,922 at the R2 merge). Each recipe sends golden cases through batch mode; the expected values are the oracle's, from `datasets/golden/r2/`. This shell function turns golden cases into batch input lines:
 
 ```bash
 pick() { python -c "import json,sys; f,ids=sys.argv[1],sys.argv[2:]; [print(json.dumps({'schema_version':'1.0','case_id':c['case_id'],'operation':c['operation'],'inputs':c['inputs']})) for c in json.load(open(f))['cases'] if c['case_id'] in ids]" "$@"; }
@@ -376,3 +376,109 @@ Copy the inputs of the named case from `datasets/golden/stage_d/`:
 | CPI curve, ZCIS, linkers | `infl.*` | `inflation_d-0001`, `inflation_d-0007` |
 | Caps and swaptions | `rates.cap.price`, `rates.swaption.price` | `capswaption_d-0001`, `capswaption_d-0010` |
 | Commodity curve and storage | `cmdty.*` | `commodity_d-0001`, `commodity_d-0007` |
+
+## Stage E recipes
+
+Slices E1, E2, E3 and E5. Copy the inputs of the named case from `datasets/golden/stage_e/`:
+
+| Task | Operation | Case |
+|---|---|---|
+| Check an SVI surface for arbitrage; reject it | `vol.svi.surface_check` | `surf_e-0001` (clean), `surf_e-0007`, `surf_e-0008` (reject) |
+| SSVI slice to raw SVI | `vol.ssvi.to_svi` | `surf_e-0018` |
+| Fit SVI slices to a surface of quotes | `vol.svi.fit_surface` | `surf_e-0024` |
+| Local vol from SVI slices | `vol.local.dupire` | `lv_e-0001` |
+| Forward vol between expiries | `vol.forward.vol` | `lv_e-0007` |
+| Reprice a smile after a spot move, sticky strike or sticky delta | `vol.smile.dynamics` | `lv_e-0018`, `lv_e-0020` |
+| Vol of vol from a vol history | `vol.volofvol.measure` | `lv_e-0033` |
+| FX vanilla price and Greeks | `fx.option.price` | `fxs_e-0001` |
+| FX strike from a delta quote; ATM strike; RR/BF to strikes | `fx.delta.to_strike`, `fx.atm.strike`, `fx.smile.from_quotes` | `fxs_e` cases tagged `forward_pa`; tagged `atm`; `fxs_e-0120` |
+| Heston, Bates, Merton prices | `vol.heston.price`, `vol.bates.price`, `vol.merton.price` | `heston_e-0001`; `heston_e` cases tagged `bates`, `merton` |
+| SLV leverage function | `vol.slv.leverage` | `slv_e-0001` |
+| Barrier, digital, Asian, lookback, quanto, chooser, spread, basket | `exotic.*` | `exotic_e` cases by tag |
+| American put: tree, BAW, FD | `exotic.american.crr`, `.baw`, `.fd` | `american_e-0002`; `american_e` cases tagged `baw`, `fd` |
+
+
+Slices E4, E6, E7 and E8. The outputs quoted are the golden values (`datasets/golden/stage_e_b/`), which all four builds reproduce. Replace the binary with any build's CLI. On Windows without a Rust build, `python/.venv/Scripts/quantforge.exe run` (after `uv sync`) gives the same values to within the last two or three digits, inside each case's tolerance (*observed*, 2026-11-09, all eight recipes below).
+
+#### GARCH likelihood by hand
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"vol.garch.loglik",
+ "inputs":{"returns":[0.01,-0.02],"omega":1e-5,"alpha":0.1,"beta":0.8,"initial_variance":"SAMPLE"}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `garch_e-0009`): `loglik` 5.410998350356715, `variances` [0.00025, 0.00022], `next_variance` 0.000226. Worked in `specifications/05-volatility/garch.md`.
+
+#### A VIX term from five strikes
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"vol.vix.term_variance",
+ "inputs":{"minutes_to_expiry":43200,"rate":0.0,"strip":[
+ {"strike":90,"call_bid":10.5,"call_ask":11.5,"put_bid":0.5,"put_ask":0.7},
+ {"strike":95,"call_bid":6.0,"call_ask":6.6,"put_bid":1.4,"put_ask":1.6},
+ {"strike":100,"call_bid":2.9,"call_ask":3.1,"put_bid":2.9,"put_ask":3.3},
+ {"strike":105,"call_bid":1.0,"call_ask":1.2,"put_bid":5.8,"put_ask":6.6},
+ {"strike":110,"call_bid":0.3,"call_ask":0.5,"put_bid":10.0,"put_ask":11.0}]}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `vix_e-0001`): `forward` 99.9, `k0` 95, `variance` 0.08188158767696967. Set `call_bid` at 100 to 0 and the forward moves to 98.45 (case `vix_e-0018`): a zero bid still counts when choosing the forward, but that call drops out of the sum.
+
+#### Implied correlation
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.implied",
+ "inputs":{"weights":[0.5,0.5],"vols":[0.2,0.3],"index_vol":0.22}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `corr_e-0036`): `correlation` 0.53.
+
+#### Repair Higham's matrix
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"risk.corr.nearest",
+ "inputs":{"matrix":[[1,1,0],[1,1,1],[0,1,1]]}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `corr_e-0002`): off-diagonals 0.76069 and 0.15730, unit diagonal, within 2e-5 per entry.
+
+#### Joint default under two copulas
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"credit.copula.joint_default",
+ "inputs":{"copula":"STUDENT_T","default_probabilities":[0.02,0.03],"correlation":0.3,"degrees_of_freedom":4}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `creditopt_e-0151`): `joint_default_probability` 0.005101673899339225. With `"copula":"GAUSSIAN"` and no `degrees_of_freedom` (case `creditopt_e-0147`): 0.0022875610978654965.
+
+#### An equity tranche in the large pool
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"credit.lhp.tranche_loss",
+ "inputs":{"default_probability":0.05,"correlation":0.3,"recovery":0.4,"attachment":0,"detachment":0.03}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `creditopt_e-0161`): `expected_loss_fraction` 0.5410575024827762.
+
+#### A CDS option
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"credit.cdsoption.price",
+ "inputs":{"as_of":"2026-11-06","expiry":"2027-03-20","maturity":"2032-03-20","rate":0.035,"hazard_rate":0.02,
+ "recovery":0.4,"type":"PAYER","strike":0.012,"notional":1e7,"vol":0.5,"knock_out":true}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `creditopt_e-0001`): `price` 59847.84260792966, `forward_spread` 0.011887730437307897, `risky_annuity` 4.328652217279409, `front_end_protection` 43333.06144966937.
+
+#### A zero-coupon inflation floor at 0%
+
+```bash
+echo '{"schema_version":"1.0","case_id":"x","operation":"infl.cap.zc_price",
+ "inputs":{"model":"BLACK_76","type":"FLOOR","forward_index_ratio":1.1268,"years":5.0,"strike":0.0,
+ "discount_factor":0.8305,"vol":0.028,"notional":1e7}}' | tr -d '\n' | rust/target/release/quantforge run
+```
+
+Expected (case `ratesvol_e-0081`): `price` 5993.010165883334, `strike_ratio` 1.0: deflation protection over five years.
+
+#### Recipes that need curves or long arrays
+
+The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves or hundreds of numbers. Copy the `inputs` of `ratesvol_e-0001`, `ratesvol_e-0049`, `varswap_e-0001` or `garch_e-0027` from the golden file into a case document and run it the same way.

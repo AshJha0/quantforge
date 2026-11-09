@@ -85,7 +85,7 @@ pub fn year_fraction(convention: &str, start: Date, end: Date, i: &DayCountInput
                 frequency(i)?,
                 need(i.ref_start, "ref_start")?,
                 need(i.ref_end, "ref_end")?,
-            ))
+            ));
         }
         "THIRTY_E_360_ISDA" => termination = Some(need(i.termination, "termination")?),
         "BUS_252" => calendar = Some(need(i.calendar.as_ref(), "calendar")?),
