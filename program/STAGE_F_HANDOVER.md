@@ -102,3 +102,14 @@ The Q4 section above ("F1 Q4 joint solve and funding curve") is now ready, with 
 **Open item (spec session, next turn):** the full system (SOFR monotone convex with a solved turn + term + ESTR monotonic log cubic + EUR xccy) solves to 1.6e-15, but its IFT Jacobian differs from bump-and-rebuild by up to 2e-3, so it is left out of the goldens (`gen_stage_f_q4.py`, `systems()[0]`, skipped in `main`). Suspects: a convex-monotone section at a branch boundary (the method is piecewise in its data, so its Jacobian is one-sided there), or the xccy `dR/dq`. Diagnostic script pattern: solve, `jacobian()`, `bump_jacobian()`, print the worst entries. Builds should implement the full operation regardless; the missing golden does not change the spec.
 
 Outside share after wave 1: 52 of 171 = 30.4% (ruling F-23), below the 60% floor.
+
+
+### Resume here (checkpoint 2026-11-09 22:15; laptop off at 23:00)
+1. **Merge main first.** Part 1 merged to main as PR #25 (`5c8fa9d`): `git merge main` into `stage-f` before any new work.
+2. **Four-curve Jacobian mismatch (Q4 open item).** Run `cd oracle/python && uv run python -u -W ignore diag_q4_jacobian.py`. The three committed systems pass (max excess below 0). Only `systems()[0]` fails (up to 2e-3 against bump-and-rebuild), and the script prints its four worst entries last. The 2026-11-09 run was stopped at the shutdown, before that output. Read the worst entries' rows and columns:
+   - **XCCY quote columns wrong.** Check `System.dRdq` for `XCCY`: the residual is `L_foreign` and its derivative in `spread` is `sum alpha_i D_f(e_i)` on the foreign discount curve being solved. Also check that bumping `spread` in `bump_jacobian` uses the same key.
+   - **USD-SOFR rows wrong** (monotone convex with the turn). Test whether a section sits on a branch boundary (`g0`, `g1` near a rule switch in `interp_f._cm_sections`). If so, either move the quotes off the boundary and assert a margin in the generator, as the stage E goldens do with `away()`, or state in the spec that the Jacobian of a piecewise method is one-sided at a boundary.
+   - **Turn column wrong.** Check that the turn unknown's columns in `dR/dx` and the `turn_sensitivity` zeroing agree.
+
+   When it passes, remove the skip in `gen_stage_f_q4.py` `main` (the "OPEN" comment) and rerun it (about 5 minutes). Then rerun `outside_f.py` and the stub replay, update the `joint_f` hash in `docs/model-inventory.md` (MF-5, MF-6), and tell the coordinator the new case count.
+3. Then the items in "Where to resume" above: R8 coverage, E1 for the new stage F operations, waves 2 and 3.
