@@ -29,7 +29,7 @@ jobs:
         with:
           persist-credentials: false
       - run: apt-get update && apt-get install -y cmake ninja-build python3
-      - run: cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQF_SANITIZE=address,undefined,float-cast-overflow
+      - run: cmake -S cpp26 -B cpp26/build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQF_SANITIZE=address,undefined,float-cast-overflow -DQF_WERROR=ON
       - run: cmake --build cpp26/build --parallel
       - run: ctest --test-dir cpp26/build --output-on-failure
       - run: python3 conformance/runner/runner.py --impl cpp
