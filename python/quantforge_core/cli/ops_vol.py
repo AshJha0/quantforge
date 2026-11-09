@@ -220,7 +220,11 @@ _QUOTE_KEYS = ("strike", "call_bid", "call_ask", "put_bid", "put_ask")
 def _term(i: Inputs) -> tuple[int, float, list[Any]]:
     from ..variance import Quote
 
-    strip = [Quote(*(q.real(k) for k in _QUOTE_KEYS)) for q in _objects(i, "strip")]
+    def quote(q: Inputs) -> Any:  # each side may be null (ruling F-15), but never left out
+        sides = [None if k in q.raw and q.raw[k] is None else q.real(k) for k in _QUOTE_KEYS[1:]]
+        return Quote(q.real("strike"), *sides)
+
+    strip = [quote(q) for q in _objects(i, "strip")]
     return i.integer("minutes_to_expiry"), i.real("rate"), strip
 
 

@@ -269,28 +269,45 @@ def varswap_realized(prices: Floats, periods_per_year: float, variance_strike: f
 @dataclass(frozen=True)
 class Quote:
     strike: float
-    call_bid: float
-    call_ask: float
-    put_bid: float
-    put_ask: float
+    call_bid: float | None  # None is a null quote (ruling F-15)
+    call_ask: float | None
+    put_bid: float | None
+    put_ask: float | None
 
     @property
     def call(self) -> float:
-        return (self.call_bid + self.call_ask) / 2
+        return (_q(self.call_bid) + _q(self.call_ask)) / 2
 
     @property
     def put(self) -> float:
-        return (self.put_bid + self.put_ask) / 2
+        return (_q(self.put_bid) + _q(self.put_ask)) / 2
+
+    @property
+    def null_call(self) -> bool:
+        return self.call_bid is None or self.call_ask is None
+
+    @property
+    def null_put(self) -> bool:
+        return self.put_bid is None or self.put_ask is None
 
 
 MINUTES_PER_YEAR = 525600
 MINUTES_30D = 43200
 
 
-def _side(quotes: Sequence[Quote], bid: Callable[[Quote], float]) -> list[Quote]:
-    """Walks away from K0 (not included): bid 0 is skipped, a second consecutive 0 stops."""
+def _q(value: float | None) -> float:
+    if value is None:
+        raise _input("a null quote is used", "strip")
+    return value
+
+
+def _side(quotes: Sequence[Quote], bid: Callable[[Quote], float | None]) -> list[Quote]:
+    """Walks away from K0 (not included): bid 0 is skipped, a second consecutive 0 stops. A null
+    series is removed before the walk starts (ruling F-15)."""
     used, zeros = [], 0
     for q in quotes:
+        if bid(q) is None:
+            continue
         if bid(q) == 0:
             zeros += 1
             if zeros == 2:
@@ -310,22 +327,32 @@ def vix_term_variance(minutes: int, rate: float,
         raise _input("at least 3 strikes are needed", "strip")
     if len(set(strikes)) != len(strikes):
         raise _input("a strike is repeated", "strip")
-    if any(q.call_bid > q.call_ask or q.put_bid > q.put_ask for q in strip):
+    def crossed(b: float | None, a: float | None) -> bool:
+        return b is not None and a is not None and b > a
+
+    if any(crossed(q.call_bid, q.call_ask) or crossed(q.put_bid, q.put_ask) for q in strip):
         raise _input("a bid is above its ask", "strip")
-    if any(min(q.call_bid, q.call_ask, q.put_bid, q.put_ask) < 0 for q in strip):
+    values = [v for q in strip for v in (q.call_bid, q.call_ask, q.put_bid, q.put_ask)
+              if v is not None]
+    if any(v < 0 for v in values):
         raise _domain("a quote is negative", "strip")
     t = minutes / MINUTES_PER_YEAR
     growth = math.exp(rate * t)
     ordered = sorted(strip, key=lambda q: q.strike)
-    star = min(ordered, key=lambda q: abs(q.call - q.put))  # first, so lowest, on a tie
+    candidates = [q for q in ordered if not (q.null_call or q.null_put)]
+    if not candidates:
+        raise _input("no strike has both a call and a put quote", "strip")
+    star = min(candidates, key=lambda q: abs(q.call - q.put))  # first, so lowest, on a tie
     forward = star.strike + growth * (star.call - star.put)
     below = [q for q in ordered if q.strike <= forward]
     if not below:
         raise _input("no strike is at or below the forward", "strip")
     k0 = below[-1]
+    if k0.null_call or k0.null_put:
+        raise _input("the K0 call or put has a null quote", "strip")
     i0 = ordered.index(k0)
-    puts = _side(ordered[i0 - 1::-1] if i0 else [], lambda q: q.put_bid)
-    calls = _side(ordered[i0 + 1:], lambda q: q.call_bid)
+    puts = _side(ordered[i0 - 1::-1] if i0 else [], lambda q: None if q.null_put else q.put_bid)
+    calls = _side(ordered[i0 + 1:], lambda q: None if q.null_call else q.call_bid)
     if not puts or not calls:  # ruling E-B15, Cboe methodology 3(a)(iii)
         raise _input("no out-of-the-money put or no out-of-the-money call is selected", "strip")
     chosen = [(q.strike, q.put) for q in reversed(puts)]
