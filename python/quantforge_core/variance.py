@@ -8,6 +8,7 @@ import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date
+from typing import Any
 
 from . import black
 from .errors import QfError
@@ -183,6 +184,175 @@ def garch_fit(returns: Floats, initial: str | float) -> float:
     if not math.isfinite(v):
         raise QfError("E_NO_CONVERGENCE", "the GARCH fit found no finite likelihood")
     return -v
+
+
+# --- Stage F (R8): Student-t, a mean, and the estimate with standard errors -------------------
+
+DISTRIBUTIONS = ("NORMAL", "STUDENT_T")
+NU_MAX = 500.0
+
+
+def _digamma(x: float) -> float:
+    """psi(x) for x > 0: recurrence up to 10, then the asymptotic series (about 1e-15)."""
+    total = 0.0
+    while x < 10:
+        total -= 1 / x
+        x += 1
+    inv = 1 / (x * x)
+    series = inv * (1 / 12 - inv * (1 / 120 - inv * (1 / 252 - inv * (1 / 240 - inv / 132))))
+    return total + math.log(x) - 0.5 / x - series
+
+
+def _t_constant(nu: float) -> float:
+    return math.lgamma((nu + 1) / 2) - math.lgamma(nu / 2) - 0.5 * math.log(math.pi * (nu - 2))
+
+
+def _score(e: Floats, theta: Sequence[float], sigma2: float,
+           student: bool) -> tuple[float, list[float]]:
+    """(loglik, gradient) in (omega, alpha, beta[, nu]), by the recursion's derivatives."""
+    omega, alpha, beta = theta[0], theta[1], theta[2]
+    nu = theta[3] if student else 0.0
+    c = _t_constant(nu) if student else 0.0
+    dc = (0.5 * _digamma((nu + 1) / 2) - 0.5 * _digamma(nu / 2) - 0.5 / (nu - 2)
+          if student else 0.0)
+    s, ds = sigma2, [0.0, 0.0, 0.0]
+    total, grad = 0.0, [0.0] * (4 if student else 3)
+    for r in e:
+        if student:
+            u = r * r / ((nu - 2) * s)
+            total += c - 0.5 * math.log(s) - (nu + 1) / 2 * math.log1p(u)
+            dl_ds = -0.5 / s + (nu + 1) / 2 * u / (1 + u) / s
+            grad[3] += dc - 0.5 * math.log1p(u) + (nu + 1) / 2 * u / (1 + u) / (nu - 2)
+        else:
+            total += -0.5 * (_LN_2PI + math.log(s) + r * r / s)
+            dl_ds = -0.5 * (1 / s - r * r / (s * s))
+        for k in range(3):
+            grad[k] += dl_ds * ds[k]
+        ds = [1 + beta * ds[0], r * r + beta * ds[1], s + beta * ds[2]]
+        s = omega + alpha * r * r + beta * s
+    return total, grad
+
+
+def _check_distribution(distribution: str, nu: float | None) -> None:
+    if distribution not in DISTRIBUTIONS:
+        raise QfError("E_SCHEMA", "distribution is not listed", "distribution")
+    if distribution == "STUDENT_T":
+        if nu is None:
+            raise _input("STUDENT_T needs degrees_of_freedom", "degrees_of_freedom")
+        if nu <= 2:
+            raise _domain("degrees_of_freedom must be above 2", "degrees_of_freedom")
+
+
+def garch_loglik_t(returns: Floats, omega: float, alpha: float, beta: float,
+                   initial: str | float, distribution: str, nu: float | None,
+                   mean: float) -> tuple[float, list[float], float]:
+    """vol.garch.loglik with the stage F options: the recursion on e_t = r_t - mean."""
+    if len(returns) < 2:
+        raise _input("at least 2 returns are needed", "returns")
+    _check_initial_text(initial)
+    _check_weights(omega, alpha, beta)
+    _check_distribution(distribution, nu)
+    e = [r - mean for r in returns]
+    sigma2 = _initial_variance(e, initial)
+    loglik, variances, nxt = _recursion(e, omega, alpha, beta, sigma2)
+    if distribution == "STUDENT_T" and nu is not None:
+        loglik = _score(e, [omega, alpha, beta, nu], sigma2, True)[0]
+    return loglik, variances, nxt
+
+
+def garch_estimate(returns: Floats, initial: str | float, distribution: str,
+                   demean: bool) -> dict[str, object]:
+    """Interior MLE, Newton-polished, with observed-information standard errors (F-11 to F-14)."""
+    import numpy as np
+
+    student = distribution == "STUDENT_T"
+    if distribution not in DISTRIBUTIONS:
+        raise QfError("E_SCHEMA", "distribution is not listed", "distribution")
+    if len(returns) < (100 if student else 30):
+        raise _input("too few returns", "returns")
+    _check_initial_text(initial)
+    mu = ordered_sum(returns) / len(returns) if demean else 0.0
+    e = [r - mu for r in returns]
+    sigma2 = _initial_variance(e, initial)
+    sample = ordered_sum(r * r for r in e) / len(e)
+    if sample <= 0:
+        raise _domain("the returns are all zero", "returns")
+
+    def params(x: Sequence[float]) -> list[float]:
+        persistence = _sigmoid(x[1])
+        alpha = persistence * _sigmoid(x[2])
+        out = [math.exp(x[0]), alpha, persistence - alpha]
+        if student:
+            out.append(2 + (NU_MAX - 2) * _sigmoid(x[3]))
+        return out
+
+    def objective(x: list[float]) -> float:
+        try:
+            value = -_score(e, params(x), sigma2, student)[0]
+        except (OverflowError, ValueError, ZeroDivisionError):
+            return math.inf
+        return value if math.isfinite(value) else math.inf
+
+    best: tuple[list[float], float] | None = None
+    for p in (0.5, 0.9, 0.97):
+        for share in (0.05, 0.15, 0.3):
+            start = [math.log(sample * (1 - p)), _logit(p), _logit(share)]
+            if student:
+                start.append(_logit((8 - 2) / (NU_MAX - 2)))
+            x, v = _nelder_mead(objective, start, 0.5, 3000)
+            if best is None or v < best[1]:
+                best = (x, v)
+    assert best is not None
+    x, v = best
+    for step in (0.1, 0.01, 1e-3):
+        x, v = _nelder_mead(objective, x, step, 4000)
+    theta = params(x)
+    scale = [sample, 1.0, 1.0, 1.0]
+    n = len(theta)
+
+    def hessian(t: list[float]) -> Any:
+        h = np.zeros((n, n))
+        for j in range(n):
+            step = 1e-5 * abs(t[j])
+            up, down = list(t), list(t)
+            up[j] += step
+            down[j] -= step
+            gu, gd = _score(e, up, sigma2, student)[1], _score(e, down, sigma2, student)[1]
+            h[:, j] = [(a - b) / (2 * step) for a, b in zip(gu, gd, strict=True)]
+        return 0.5 * (h + h.T)
+
+    def interior(t: list[float]) -> bool:
+        ok = t[0] > 1e-6 * sample and t[1] > 1e-6 and t[2] > 1e-6 and t[1] + t[2] < 1 - 1e-6
+        return ok and (not student or 2 + 1e-6 < t[3] < NU_MAX * (1 - 1e-6))
+
+    def fail() -> QfError:
+        return QfError("E_NO_CONVERGENCE", "no interior maximum", "returns")
+
+    try:
+        for _ in range(60):
+            if not interior(theta):
+                raise fail()
+            grad = np.array(_score(e, theta, sigma2, student)[1])
+            step = np.linalg.solve(hessian(theta), grad).tolist()
+            rel = max(abs(b) / max(abs(a), s)
+                      for a, b, s in zip(theta, step, scale[:n], strict=True))
+            theta = [a - b for a, b in zip(theta, step, strict=True)]
+            if rel < 1e-12:
+                break
+        else:
+            raise fail()
+        h = hessian(theta)
+    except (np.linalg.LinAlgError, OverflowError, ValueError, ZeroDivisionError):
+        raise fail() from None
+    if not interior(theta) or not bool(np.all(np.linalg.eigvalsh(h) < 0)):
+        raise fail()
+    errors = np.sqrt(np.diag(np.linalg.inv(-h))).tolist()
+    keys = ["omega", "alpha", "beta", "degrees_of_freedom"]
+    std = {k: (float(errors[j]) if j < n else None) for j, k in enumerate(keys)}
+    return {"omega": theta[0], "alpha": theta[1], "beta": theta[2],
+            "degrees_of_freedom": theta[3] if student else None, "mean": mu,
+            "loglik": _score(e, theta, sigma2, student)[0], "std_errors": std,
+            "persistence": theta[1] + theta[2]}
 
 
 # --- Variance swaps ---------------------------------------------------------------------------

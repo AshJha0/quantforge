@@ -177,9 +177,20 @@ def _weights(i: Inputs) -> tuple[float, float, float]:
 
 @op("vol.garch.loglik")
 def _garch_loglik(i: Inputs) -> Any:
-    args = (i.reals("returns"), *_weights(i), _initial_variance(i))
-    loglik, variances, nxt = core.variance.garch_loglik(*args)
+    distribution = (i.enum("distribution", ("NORMAL", "STUDENT_T"))
+                    if i.raw.get("distribution") is not None else "NORMAL")
+    nu = i.opt_real("degrees_of_freedom") if distribution == "STUDENT_T" else None
+    args = (i.reals("returns"), *_weights(i), _initial_variance(i), distribution, nu,
+            i.opt_real("mean", 0.0))
+    loglik, variances, nxt = core.variance.garch_loglik_t(*args)
     return {"loglik": loglik, "variances": variances, "next_variance": nxt}
+
+
+@op("vol.garch.estimate")
+def _garch_estimate(i: Inputs) -> Any:
+    args = (i.reals("returns"), _initial_variance(i),
+            i.enum("distribution", ("NORMAL", "STUDENT_T")), i.boolean("demean"))
+    return core.variance.garch_estimate(*args)
 
 
 @op("vol.garch.forecast")
