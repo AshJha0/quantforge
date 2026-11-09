@@ -278,16 +278,16 @@ double ois_index_spread(const RateConvention& c, Tenor tenor, const Curve& disco
 
 JointCurves joint_bootstrap(const RateConvention& c, const RateConvention& index, Date as_of,
                             const std::vector<OisQuote>& ois_quotes, const std::vector<ProjectionQuote>& term_quotes,
-                            CurveInterpolation interpolation, SolveMethod method) {
+                            CurveInterpolation interpolation, SolveMethod method, const CurveShape& shape) {
     require_finite_quotes(ois_quotes, "ois_quotes");
     for (const ProjectionQuote& q : term_quotes) require_finite(q.rate, "term_quotes");
     if (ois_quotes.empty()) input("no OIS quotes", "ois_quotes");
     if (term_quotes.empty()) input("no term quotes", "term_quotes");
     // Block triangular: the OIS block does not see the projection curve, so the global Newton solve on
     // the whole system reduces to the discount block's solve followed by the projection block's.
-    SolvedCurve d = ois_bootstrap(c, as_of, ois_quotes, interpolation, method);
+    SolvedCurve d = ois_bootstrap(c, as_of, ois_quotes, interpolation, method, {}, shape);
     double error = 0.0;
-    Curve p = projection_bootstrap(d.curve, index, as_of, term_quotes, interpolation, &error);
+    Curve p = projection_bootstrap(d.curve, index, as_of, term_quotes, interpolation, &error, shape);
     return {std::move(d.curve), std::move(p), std::max(error, d.max_repricing_error)};
 }
 

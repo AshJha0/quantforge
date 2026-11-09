@@ -49,6 +49,26 @@ void op_curve_forward(const In& in, Out& out) {
     out.key_real("forward", simple_forward(ci.build(), start, end, dc));
 }
 
+// Stage F (Q1): discount factors, zero rates and instantaneous forwards of the smooth curve.
+void op_curve_inspect(const In& in, Out& out) {
+    const CurveInput ci = curve_of(in, "curve");
+    const auto dates = dates_of(in, "dates");
+    in.ready();
+    ci.limit();
+    const Curve c = ci.build();
+    Vec df, forwards;
+    std::vector<MaybeReal> zero;
+    for (const Date d : dates) {
+        df.push_back(c.discount(d));
+        if (d == c.as_of()) zero.push_back(std::nullopt);
+        else zero.push_back(-std::log(df.back()) / c.time(d));
+        forwards.push_back(c.instantaneous_forward(d));
+    }
+    out.key_reals("discount_factors", df);
+    out.key_maybes("zero_rates", zero);
+    out.key_reals("instantaneous_forwards", forwards);
+}
+
 void op_ois_bootstrap(const In& in, Out& out) {
     const RateConvention* c = ois_convention_of(in.need("convention"), "convention");
     const Date as_of = in.date("as_of");
@@ -56,11 +76,12 @@ void op_ois_bootstrap(const In& in, Out& out) {
     const auto interpolation = in.choice("interpolation", curve_interpolations);
     const auto method = in.choice<SolveMethod>("method", {{"SEQUENTIAL", SolveMethod::Sequential}, {"GLOBAL", SolveMethod::Global}});
     const auto jumps = jumps_of(in, false);
+    const CurveShape shape = curve_shape_of(in);
     in.ready();
     const auto quotes = checked_quotes(raw);
     check_jumps(as_of, jumps);
     check_crossed(raw);
-    const SolvedCurve s = ois_bootstrap(*c, as_of, quotes, interpolation, method, jumps);
+    const SolvedCurve s = ois_bootstrap(*c, as_of, quotes, interpolation, method, jumps, shape);
     write_pillars(out, s.curve);
     out.diagnostic("max_repricing_error", s.max_repricing_error);
 }
@@ -297,6 +318,7 @@ void op_joint_bootstrap(const In& in, Out& out) {
     }
     const auto interpolation = in.choice("interpolation", curve_interpolations);
     const auto method = in.choice<SolveMethod>("method", {{"SEQUENTIAL", SolveMethod::Sequential}, {"GLOBAL", SolveMethod::Global}});
+    const CurveShape shape = curve_shape_of(in);
     in.ready();
     const auto quotes = checked_quotes(raw);
     limit_if(term.size() > max_quotes, "term_quotes");
@@ -304,7 +326,7 @@ void op_joint_bootstrap(const In& in, Out& out) {
     for (const ProjectionQuote& q : term)
         if (q.months > 1200 || q.months < (q.type == ProjectionQuoteType::Fra ? 0 : 1))
             throw Error("E_INPUT", "months is out of range", "term_quotes");
-    const JointCurves j = joint_bootstrap(*c, *index, as_of, quotes, term, interpolation, method);
+    const JointCurves j = joint_bootstrap(*c, *index, as_of, quotes, term, interpolation, method, shape);
     const auto pillars = [&](const char* key, const Curve& curve) {
         out.values.key(key);
         out.values.begin_array();
@@ -437,6 +459,7 @@ constexpr Entry rates_ops[] = {
     {"rates.csa.discount", op_csa_discount},
     {"rates.curve.discount", op_curve_discount},
     {"rates.curve.forward", op_curve_forward},
+    {"rates.curve.inspect", op_curve_inspect},
     {"rates.curve.joint_bootstrap", op_joint_bootstrap},
     {"rates.fallback.rate", op_fallback_rate},
     {"rates.fra.pv", op_fra_pv},

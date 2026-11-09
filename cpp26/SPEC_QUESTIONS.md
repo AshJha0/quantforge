@@ -120,3 +120,5 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
   case keeps its base case's `extra_checks`), and `e1_core-0129` to `0131` (`"NaN"` in the Integer `n` expects
   `E_DOMAIN`; F-1 says `E_SCHEMA`). This build follows F-1.
 - R7 `credit.cdsindex.option_price`: domain checks in the spec order (recovery, hazard, strike, coupon, vol), notional last; `F_adj <= 0` names field `hazard_rate`, `K_adj <= 0` names `strike`; `h_K` bisection to the floating-point limit; vol = 0 is the intrinsic value; notional scales outputs only.
+- Q1 tension spline: the small-z limit of alpha is coded as the spec writes it, `h/6 (1 - z^2/60)`; the exact series is `h(1/6 - 7 z^2/360)`. Goldens pass as written; flagged to the spec owner.
+- Q1 `step_end` must be a pillar of every curve it is applied to (in `rates.curve.joint_bootstrap` both curves). `rates.projection.bootstrap` has no `tension`/`step_end` keys, so TENSION_SPLINE and HYBRID are `E_INPUT` there. `rates.curve.inspect` forwards are of the smooth curve (no jumps, no zero shift); LINEAR_ZERO forward before the first pillar is the first zero rate.

@@ -5,6 +5,7 @@
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/finite.hpp"
+#include "quantforge/core/interp.hpp"
 #include "quantforge/core/linalg.hpp"
 
 using namespace std::chrono;
@@ -181,6 +182,74 @@ std::vector<Period> generate_schedule(Date start, Date end, long long frequency_
 Curve::Curve(Date as_of, CurveInterpolation interpolation)
     : as_of_(as_of), interpolation_(interpolation), t_{0.0}, log_df_{0.0} {}
 
+// The smooth part of a stage F curve: the nodes from `first` on (as_of, or step_end for Hybrid).
+struct SmoothPart {
+    std::size_t first = 0;
+    std::optional<NodeLogCurve> curve;  // empty: a Hybrid curve that is all steps
+};
+
+bool non_local(CurveInterpolation interpolation) {
+    return interpolation != CurveInterpolation::LogLinearDf && interpolation != CurveInterpolation::LinearZero;
+}
+
+void check_shape(CurveInterpolation interpolation, const CurveShape& shape, const std::vector<Date>& pillar_dates) {
+    if (interpolation == CurveInterpolation::TensionSpline) {
+        if (!shape.tension) throw Error("E_INPUT", "TENSION_SPLINE needs tension", "tension");
+        require_finite(*shape.tension, "tension");
+        if (!(*shape.tension > 0.0) || *shape.tension > 1000.0)
+            throw Error("E_DOMAIN", "tension must lie in (0, 1000]", "tension");
+    }
+    if (interpolation == CurveInterpolation::Hybrid) {
+        if (!shape.step_end) throw Error("E_INPUT", "HYBRID needs step_end", "step_end");
+        if (!pillar_dates.empty() && std::ranges::find(pillar_dates, *shape.step_end) == pillar_dates.end())
+            throw Error("E_INPUT", "step_end must equal a pillar date", "step_end");
+    }
+}
+
+void Curve::set_shape(const CurveShape& shape) {
+    check_shape(interpolation_, shape, {});
+    shape_ = shape;
+    smooth_.reset();
+}
+
+const SmoothPart* Curve::smooth() const {
+    if (!non_local(interpolation_) || dates_.empty()) return nullptr;
+    if (!smooth_) {
+        auto part = std::make_shared<SmoothPart>();
+        NodeCurveMethod method = NodeCurveMethod::MonotoneConvex;
+        if (interpolation_ == CurveInterpolation::MonotonicLogCubic) method = NodeCurveMethod::MonotonicLogCubic;
+        if (interpolation_ == CurveInterpolation::TensionSpline) method = NodeCurveMethod::TensionSpline;
+        bool active = true;
+        if (interpolation_ == CurveInterpolation::Hybrid) {
+            const auto it = shape_.step_end ? std::ranges::find(dates_, *shape_.step_end) : dates_.end();
+            // step_end not (yet) a pillar, or the last one: every segment is a step.
+            active = it != dates_.end() && it + 1 != dates_.end();
+            if (active) part->first = std::size_t(it - dates_.begin()) + 1;
+        }
+        if (active)
+            part->curve.emplace(method, std::vector<double>(t_.begin() + std::ptrdiff_t(part->first), t_.end()),
+                                std::vector<double>(log_df_.begin() + std::ptrdiff_t(part->first), log_df_.end()),
+                                shape_.tension.value_or(0.0));
+        smooth_ = std::move(part);
+    }
+    return smooth_->curve ? smooth_.get() : nullptr;
+}
+
+double Curve::instantaneous_forward(Date d) const {
+    const double t = time(d);
+    if (t < 0.0) throw Error("E_OUT_OF_RANGE", "the date is before as_of");
+    if (const SmoothPart* sp = smooth(); sp && t >= t_[sp->first]) return sp->curve->forward(t);
+    const std::size_t n = t_.size() - 1;
+    if (t >= t_[n]) return -(log_df_[n] - log_df_[n - 1]) / (t_[n] - t_[n - 1]);
+    const auto i = std::size_t(std::upper_bound(t_.begin(), t_.end(), t) - t_.begin()) - 1;
+    const double h = t_[i + 1] - t_[i];
+    if (interpolation_ != CurveInterpolation::LinearZero) return -(log_df_[i + 1] - log_df_[i]) / h;
+    const double z1 = -log_df_[i + 1] / t_[i + 1];
+    if (i == 0) return z1;
+    const double z0 = -log_df_[i] / t_[i], u = (t - t_[i]) / h;
+    return (1.0 - u) * z0 + u * z1 + t * (z1 - z0) / h;
+}
+
 void check_jumps(Date as_of, const std::vector<Jump>& jumps) {
     require_finite_jumps(jumps);
     Date previous = as_of;
@@ -205,7 +274,7 @@ void Curve::set_jumps(const std::vector<Jump>& jumps) {
 }
 
 Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars,
-             const std::vector<Jump>& jumps)
+             const std::vector<Jump>& jumps, const CurveShape& shape)
     : Curve(as_of, interpolation) {
     for (const Pillar& p : pillars) require_finite(p.discount_factor, "pillars");
     require_finite_jumps(jumps);
@@ -219,6 +288,10 @@ Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pil
         if (p.discount_factor <= 0.0) throw Error("E_DOMAIN", "a discount factor is not positive", "pillars");
     }
     set_jumps(jumps);  // after the pillar checks (ruling D46)
+    std::vector<Date> dates;
+    for (const Pillar& p : pillars) dates.push_back(p.date);
+    check_shape(interpolation, shape, dates);
+    shape_ = shape;
     for (const Pillar& p : pillars) push(p.date, std::log(p.discount_factor / jump_product(jumps_, p.date)));
 }
 
@@ -226,6 +299,7 @@ void Curve::push(Date d, double log_df) {
     dates_.push_back(d);
     t_.push_back(time(d));
     log_df_.push_back(log_df);
+    smooth_.reset();
 }
 
 std::vector<Pillar> Curve::pillars() const {
@@ -250,6 +324,7 @@ Curve Curve::with_zero_shift(std::function<double(double)> s) const {
 }
 
 double Curve::plain_discount(double t) const {
+    if (const SmoothPart* sp = smooth(); sp && t >= t_[sp->first]) return std::exp(sp->curve->ln_s(t));
     const std::size_t n = t_.size() - 1;
     if (t >= t_[n]) {
         if (t == t_[n]) return std::exp(log_df_[n]);
@@ -258,7 +333,7 @@ double Curve::plain_discount(double t) const {
     }
     const auto i = std::size_t(std::upper_bound(t_.begin(), t_.end(), t) - t_.begin()) - 1;
     const double u = (t - t_[i]) / (t_[i + 1] - t_[i]);
-    if (interpolation_ == CurveInterpolation::LogLinearDf) return std::exp((1.0 - u) * log_df_[i] + u * log_df_[i + 1]);
+    if (interpolation_ != CurveInterpolation::LinearZero) return std::exp((1.0 - u) * log_df_[i] + u * log_df_[i + 1]);
     const double z1 = -log_df_[i + 1] / t_[i + 1];
     const double z0 = i == 0 ? z1 : -log_df_[i] / t_[i];
     return std::exp(-((1.0 - u) * z0 + u * z1) * t);
@@ -271,22 +346,33 @@ double simple_forward(const Curve& c, Date start, Date end, DayCount day_count) 
 
 SolvedCurve solve_curve(Date as_of, CurveInterpolation interpolation, const std::vector<Date>& dates,
                         const std::vector<double>& targets, const ModelRate& model, SolveMethod method,
-                        const std::vector<Jump>& jumps) {
+                        const std::vector<Jump>& jumps, const CurveShape& shape) {
     require_finite(targets, "targets");
     require_finite_jumps(jumps);
+    check_shape(interpolation, shape, dates);
     Curve c(as_of, interpolation);
     c.set_jumps(jumps);
+    c.set_shape(shape);
+    const bool global = non_local(interpolation);
     double previous_t = 0.0, previous_x = 0.0;
     for (std::size_t j = 0; j < dates.size(); ++j) {
         const double t = c.time(dates[j]);
         // Start from the quote as a flat forward beyond the last pillar.
         const double x = previous_x - targets[j] * (t - previous_t);
         c.push(dates[j], x);
-        if (method == SolveMethod::Sequential) solve_one(c, j, targets[j], model);
+        if (global) {
+            // A starting point only: these pillars move once later pillars arrive (ruling F-21).
+            try {
+                solve_one(c, j, targets[j], model);
+            } catch (const Error&) {
+            }
+        } else if (method == SolveMethod::Sequential) {
+            solve_one(c, j, targets[j], model);
+        }
         previous_t = t;
         previous_x = c.log_df(j);
     }
-    if (method == SolveMethod::Global) c = solve_global(std::move(c), targets, model);
+    if (global || method == SolveMethod::Global) c = solve_global(std::move(c), targets, model);
     const double error = max_error(targets, model, c);
     if (error >= required) solve_failed();
     return {std::move(c), error};
@@ -319,7 +405,8 @@ Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const
 }
 
 SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
-                          CurveInterpolation interpolation, SolveMethod method, const std::vector<Jump>& jumps) {
+                          CurveInterpolation interpolation, SolveMethod method, const std::vector<Jump>& jumps,
+                          const CurveShape& shape) {
     require_finite_quotes(quotes, "quotes");
     check_jumps(as_of, jumps);
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
@@ -334,7 +421,8 @@ SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector
             throw Error("E_INPUT", "pillars must strictly increase", "quotes");
     }
     return solve_curve(as_of, interpolation, dates, targets,
-                       [&](std::size_t j, const Curve& curve) { return ois_legs(c, swaps[j], curve).par(); }, method, jumps);
+                       [&](std::size_t j, const Curve& curve) { return ois_legs(c, swaps[j], curve).par(); }, method, jumps,
+                       shape);
 }
 
 double ois_compound(const std::vector<double>& rates, const std::vector<long long>& days, double denominator) {
@@ -360,7 +448,7 @@ OisPrice ois_price(const OisTrade& trade, const Curve& curve, std::optional<std:
 
 Curve projection_bootstrap(const Curve& discount, const RateConvention& index, Date as_of,
                            const std::vector<ProjectionQuote>& quotes, CurveInterpolation interpolation,
-                           double* max_repricing_error) {
+                           double* max_repricing_error, const CurveShape& shape) {
     for (const ProjectionQuote& q : quotes) require_finite(q.rate, "quotes");
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     struct Instrument {
@@ -395,7 +483,7 @@ Curve projection_bootstrap(const Curve& discount, const RateConvention& index, D
             if (!it.legs.fixed.empty()) return swap_values(index, it.legs, discount, p).par();
             return (p.discount(it.start) / p.discount(it.end) - 1.0) / it.alpha;
         },
-        SolveMethod::Sequential);
+        SolveMethod::Sequential, {}, shape);
     if (max_repricing_error) *max_repricing_error = s.max_repricing_error;
     return std::move(s.curve);
 }

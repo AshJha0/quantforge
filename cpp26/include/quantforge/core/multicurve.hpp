@@ -81,7 +81,7 @@ struct JointCurves {
 };
 JointCurves joint_bootstrap(const RateConvention& c, const RateConvention& index, Date as_of,
                             const std::vector<OisQuote>& ois_quotes, const std::vector<ProjectionQuote>& term_quotes,
-                            CurveInterpolation interpolation, SolveMethod method);
+                            CurveInterpolation interpolation, SolveMethod method, const CurveShape& shape = {});
 
 struct SmoothFit {
     std::vector<double> forwards, fitted;
