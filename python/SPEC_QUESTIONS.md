@@ -207,3 +207,10 @@ upheld in effect by goldens and E-A35.
 - F-Q2 (G4). Core modules are named by domain; `stage_d3` was split into `caps_swaptions`, `commodity` and
   `mbs`; `vol_e1` is `arb_surface`, `vol_e7` is `variance`, `credit_e8` is `credit_options`, `equity_d` is
   `equity_curves`. CLI handlers live in `cli/ops_<domain>.py` by verb prefix; the verb table is the registry.
+- F-Q3 (F-1 tokens). Python converts `"NaN"`, `"Infinity"` and `"-Infinity"` anywhere in the inputs before the
+  handlers read them, so the field types decide: a Real takes the value, any other type is `E_SCHEMA`. A
+  free-text field (an id, a store record's `value`) holding exactly one of the three strings is therefore
+  read as a number. Asked: whether such fields keep the string (Python would then convert per Real field).
+- F-Q4 (R8). The estimate starts from Nelder-Mead on an unconstrained map, then Newton on the analytic score
+  with the Hessian from central differences of the score (relative step 1e-5), until the largest relative
+  step (omega scaled by the sample variance) is below 1e-12. Interior means 1e-6 from every bound.
