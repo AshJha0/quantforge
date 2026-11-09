@@ -77,6 +77,29 @@ super::registry! {
                 ("zero_rates", z.into()),
             ]))
         },
+        "rates.funding.curve" => {
+            let c = curve_input(i, "discount")?;
+            let quotes = items(i, "quotes")?
+                .iter()
+                .map(|q| Ok((q.date("end")?, q.f64("rate")?)))
+                .collect::<Result<Vec<_>>>()?;
+            let dates = match i.0.get("dates") {
+                None => Vec::new(),
+                Some(_) => i.dates("dates")?,
+            };
+            i.gate()?;
+            let f = quantforge_core::funding::funding_curve(&Curve::new(&c)?, &quotes, &dates)?;
+            let pillars: Vec<Json> = f
+                .pillars
+                .iter()
+                .map(|(d, v)| obj([("date", d.to_string().into()), ("discount_factor", (*v).into())]))
+                .collect();
+            plain(obj([
+                ("spreads", f.spreads.into()),
+                ("pillars", Json::Arr(pillars)),
+                ("discount_factors", f.discount_factors.into()),
+            ]))
+        },
         "rates.curve.inspect" => {
             let c = curve_input(i, "curve")?;
             let dates = i.dates("dates")?;

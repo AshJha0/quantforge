@@ -30,6 +30,7 @@ pub mod equity;
 pub mod equity_carry;
 pub mod error;
 pub mod exotics;
+pub mod funding;
 pub mod fx;
 pub mod fx_smile;
 pub mod garch;
