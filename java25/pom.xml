@@ -37,5 +37,33 @@
         </plugin>
       </plugins></build>
     </profile>
+    <!-- G2 microbenchmarks (JMH), from repo root:
+         mvn -f java25/pom.xml -B -q -Pbench -DskipTests package exec:exec@bench && python3 benchmarks/micro/jmh_to_json.py java25/target/jmh.json benchmarks/micro/out/java.json -->
+    <profile>
+      <id>bench</id>
+      <properties><jmh.version>1.37</jmh.version></properties>
+      <dependencies>
+        <dependency><groupId>org.openjdk.jmh</groupId><artifactId>jmh-core</artifactId><version>${jmh.version}</version></dependency>
+        <dependency><groupId>org.openjdk.jmh</groupId><artifactId>jmh-generator-annprocess</artifactId><version>${jmh.version}</version><scope>provided</scope></dependency>
+      </dependencies>
+      <build><plugins>
+        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
+          <executions><execution><id>jmh-sources</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
+            <configuration><sources><source>src/jmh/java</source></sources></configuration></execution></executions>
+        </plugin>
+        <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.16.0</version>
+          <configuration><annotationProcessorPaths><path><groupId>org.openjdk.jmh</groupId><artifactId>jmh-generator-annprocess</artifactId><version>${jmh.version}</version></path></annotationProcessorPaths></configuration>
+        </plugin>
+        <plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.6.2</version>
+          <executions><execution><id>bench</id><goals><goal>exec</goal></goals>
+            <configuration><executable>java</executable>
+              <arguments><argument>-Dqf.examples=${project.basedir}/../examples</argument><argument>-cp</argument><classpath/>
+                <argument>org.openjdk.jmh.Main</argument><argument>org.quantforge.bench.MicroBench</argument>
+                <argument>-prof</argument><argument>gc</argument><argument>-jvmArgsAppend</argument><argument>-Dqf.examples=${project.basedir}/../examples</argument>
+                <argument>-rf</argument><argument>json</argument><argument>-rff</argument><argument>${project.build.directory}/jmh.json</argument></arguments>
+            </configuration></execution></executions>
+        </plugin>
+      </plugins></build>
+    </profile>
   </profiles>
 </project>
