@@ -87,6 +87,7 @@ fn check_envelope(doc: &Json, flags: Flags) -> Result<(&str, &Json), QfError> {
 /// works on an array stops at `Inputs::gate`, after its typed reads. An oversized array in a key
 /// the operation ignores reaches the end, and its small result is replaced here.
 fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
+    let inputs = &with_non_finite_tokens(inputs);
     let limit = operations()
         .contains(&op)
         .then(|| limits::check(op, inputs))
@@ -95,7 +96,26 @@ fn run_operation(op: &str, inputs: &Json) -> Result<ops::Outcome, QfError> {
     match (result, limit) {
         (Err(e), _) if e.code == "E_SCHEMA" => Err(e),
         (_, Some(l)) => Err(l),
+        // F-2: after E_SCHEMA and E_LIMIT, before every check of the operation's own.
+        _ if inputs.has_non_finite() => Err(err("E_DOMAIN", "a Real input is NaN or infinite")),
         (r, None) => r,
+    }
+}
+
+/// F-1: the strings `"NaN"`, `"Infinity"` and `"-Infinity"` are the binary64 values. They become
+/// numbers here, so a Real read accepts them and an Integer, Date or Enum read is `E_SCHEMA`.
+fn with_non_finite_tokens(v: &Json) -> Json {
+    match v {
+        Json::Str(s) if s == "NaN" => Json::Num(f64::NAN),
+        Json::Str(s) if s == "Infinity" => Json::Num(f64::INFINITY),
+        Json::Str(s) if s == "-Infinity" => Json::Num(f64::NEG_INFINITY),
+        Json::Arr(a) => Json::Arr(a.iter().map(with_non_finite_tokens).collect()),
+        Json::Obj(o) => Json::Obj(
+            o.iter()
+                .map(|(k, x)| (k.clone(), with_non_finite_tokens(x)))
+                .collect(),
+        ),
+        other => other.clone(),
     }
 }
 
