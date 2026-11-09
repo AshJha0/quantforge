@@ -56,10 +56,12 @@ impl CdsOption {
         (d.serial() - self.as_of.serial()) as f64 / 365.0
     }
 
-    /// `(forward_spread, annuity, front_end_protection)` of the stylised forward CDS (E-B22).
-    fn legs(&self) -> (f64, f64, f64) {
-        let surv = |d: Date| (-self.hazard_rate * self.t(d)).exp();
-        let disc = |d: Date| (-self.rate * self.t(d)).exp();
+    /// Stylised legs (E-B22) per unit notional on a flat hazard `x`, with times measured from
+    /// `origin`: `(protection, risky_annuity)`.
+    fn legs_from(&self, origin: Date, x: f64) -> (f64, f64) {
+        let t = |d: Date| (d.serial() - origin.serial()) as f64 / 365.0;
+        let surv = |d: Date| (-x * t(d)).exp();
+        let disc = |d: Date| (-self.rate * t(d)).exp();
         let mut dates = vec![self.expiry];
         for k in 1.. {
             let d = add_months(self.expiry, 3 * k);
@@ -79,8 +81,17 @@ impl CdsOption {
             ann += days as f64 / 360.0 * disc(b) * surv(b)
                 + (m.serial() - a.serial()) as f64 / 360.0 * disc(m) * lost;
         }
-        let fep =
-            self.notional * (1.0 - self.recovery) * (1.0 - surv(self.expiry)) * disc(self.expiry);
+        (prot, ann)
+    }
+
+    /// `(forward_spread, annuity, front_end_protection)` of the stylised forward CDS (E-B22).
+    fn legs(&self) -> (f64, f64, f64) {
+        let (prot, ann) = self.legs_from(self.as_of, self.hazard_rate);
+        let te = self.t(self.expiry);
+        let fep = self.notional
+            * (1.0 - self.recovery)
+            * (1.0 - (-self.hazard_rate * te).exp())
+            * (-self.rate * te).exp();
         (prot / ann, ann, fep)
     }
 
@@ -109,6 +120,133 @@ pub fn cds_option_price(o: &CdsOption, vol: f64) -> Result<CdsOptionPrice> {
         risky_annuity: a,
         front_end_protection: fep,
     })
+}
+
+/// A CDS index option (rulings F-7 to F-10): never knocked out, priced by Black on the
+/// Pedersen adjusted forward and strike.
+pub struct IndexOption {
+    pub as_of: Date,
+    pub expiry: Date,
+    pub maturity: Date,
+    pub rate: f64,
+    pub hazard_rate: f64,
+    pub recovery: f64,
+    pub payer: bool,
+    pub strike: f64,
+    pub coupon: f64,
+    pub notional: f64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct IndexOptionPrice {
+    pub price: f64,
+    pub forward_spread: f64,
+    pub adjusted_forward: f64,
+    pub adjusted_strike: f64,
+    pub risky_annuity: f64,
+    pub strike_annuity: f64,
+    pub strike_hazard: f64,
+    pub exercise_upfront: f64,
+    pub front_end_protection: f64,
+}
+
+/// `h_K`: the flat hazard whose stylised spread from `expiry` is `k` (ruling F-8), bisected
+/// until the bracket cannot shrink, which is within 1e-15 relative.
+fn strike_hazard(o: &CdsOption, k: f64) -> f64 {
+    let ratio = |x: f64| {
+        let (p, a) = o.legs_from(o.expiry, x);
+        p / a
+    };
+    let (mut lo, mut hi) = (0.0_f64, 2.0 * k / (1.0 - o.recovery));
+    while ratio(hi) < k {
+        lo = hi;
+        hi *= 2.0;
+    }
+    loop {
+        let mid = 0.5 * (lo + hi);
+        if mid <= lo || mid >= hi {
+            return if (ratio(lo) - k).abs() <= (ratio(hi) - k).abs() {
+                lo
+            } else {
+                hi
+            };
+        }
+        if ratio(mid) < k {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+}
+
+pub fn index_option_price(x: &IndexOption, vol: f64) -> Result<IndexOptionPrice> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("vol", &vol)?;
+    if x.expiry <= x.as_of || x.maturity <= x.expiry {
+        return fail("E_INPUT", "need as_of < expiry < maturity");
+    }
+    if !(0.0..1.0).contains(&x.recovery)
+        || x.hazard_rate < 0.0
+        || x.strike <= 0.0
+        || x.coupon < 0.0
+        || vol < 0.0
+        || x.notional <= 0.0
+    {
+        return fail(
+            "E_DOMAIN",
+            "recovery in [0, 1), hazard_rate >= 0, strike > 0, coupon >= 0, vol >= 0 and notional > 0 required",
+        );
+    }
+    let o = CdsOption {
+        as_of: x.as_of,
+        expiry: x.expiry,
+        maturity: x.maturity,
+        rate: x.rate,
+        hazard_rate: x.hazard_rate,
+        recovery: x.recovery,
+        payer: x.payer,
+        strike: x.strike,
+        notional: 1.0,
+        knock_out: false,
+    };
+    let (f, a, fep) = o.legs();
+    let h_k = strike_hazard(&o, x.strike);
+    let a_k = o.legs_from(x.expiry, h_k).1;
+    let g = (x.strike - x.coupon) * a_k;
+    let te = o.t(x.expiry);
+    let p_exp = (-x.rate * te).exp();
+    let f_adj = f + fep / a;
+    let k_adj = x.coupon + g * p_exp / a;
+    if f_adj <= 0.0 || k_adj <= 0.0 {
+        return fail(
+            "E_DOMAIN",
+            "the adjusted forward and strike must be positive",
+        );
+    }
+    Ok(IndexOptionPrice {
+        price: x.notional * a * black(x.payer, f_adj, k_adj, vol, te, 1.0),
+        forward_spread: f,
+        adjusted_forward: f_adj,
+        adjusted_strike: k_adj,
+        risky_annuity: a,
+        strike_annuity: a_k,
+        strike_hazard: h_k,
+        exercise_upfront: x.notional * g,
+        front_end_protection: x.notional * fep,
+    })
+}
+
+impl crate::error::Finite for IndexOption {
+    fn is_all_finite(&self) -> bool {
+        crate::error::Finite::is_all_finite(&[
+            self.rate,
+            self.hazard_rate,
+            self.recovery,
+            self.strike,
+            self.coupon,
+            self.notional,
+        ])
+    }
 }
 
 /// Knock-out options only (ruling E-B23).
