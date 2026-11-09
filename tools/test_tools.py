@@ -603,5 +603,50 @@ class SiteHome(unittest.TestCase):
             sf.render_home("{{nope}}", figures)
 
 
+class DoctorAndQuickstart(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(ROOT / "tools"))
+        import check_quickstart
+        import doctor
+        cls.doctor, cls.qs = doctor, check_quickstart
+
+    def test_expected_versions_come_from_the_repo(self):
+        e = self.doctor.expected()
+        self.assertEqual(e["python"], (ROOT / "python/.python-version").read_text().strip())
+        self.assertIn(e["rust"], (ROOT / "rust/rust-toolchain.toml").read_text())
+        self.assertTrue(e["java"].startswith("25"))
+
+    def test_doctor_lists_every_problem_and_exits_1(self):
+        e = self.doctor.expected()
+        good = {"uv": "uv 0.13.6", "rustc": f"rustc {e['rust']} (x)", "java": f'openjdk version "{e["java"]}" 2026',
+                "mvn": "Apache Maven 3.9.12", "cmake": "cmake version 4.0.1", "ninja": "1.13.2", "g++": e["gcc"] + ".0", "clang++": None}
+
+        def runner(table):
+            def r(cmd, cwd=None):
+                if cmd[:2] == ["uv", "python"]:
+                    return "/x/python" if table["uv"] else None
+                return table[cmd[0]]
+            return r
+        self.assertEqual(self.doctor.main([], runner(good)), 0)
+        bad = dict(good, rustc="rustc 1.80.0 (x)", mvn=None, cmake="cmake version 3.20.0")
+        self.assertEqual(self.doctor.main([], runner(bad)), 1)
+        failed = [r[1] for r in self.doctor.checks(e, runner(bad)) if not r[2]]
+        self.assertEqual(len(failed), 3, failed)
+        self.assertEqual(self.doctor.main(["--only", "python"], runner(bad)), 0)
+
+    def test_quickstart_block_is_in_the_first_20_lines_and_compares_the_contract(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertLess(text.splitlines().index("<!-- quickstart:end -->"), 20)
+        cmd, expected = self.qs.extract(text)
+        self.assertIn("quantforge", cmd)
+        printed = "\n".join(json.dumps(dict(e, diagnostics={"iterations": 99})) for e in expected)
+        self.assertEqual(self.qs.compare(expected, printed), [])  # diagnostics are not contract
+        changed = json.loads(json.dumps(expected))
+        changed[0]["outputs"]["year_fraction"] = 0.5
+        self.assertEqual(len(self.qs.compare(expected, "\n".join(json.dumps(e) for e in changed))), 1)
+        self.assertTrue(self.qs.compare(expected, ""))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,20 @@
+{
+  // Free devcontainer (plan 13.1 E5). The base is the same GCC 16.2 image CI's gcc job uses (Debian), so the
+  // C++ build matches CI; the devcontainer features add Rust, Java and Maven, and post-create adds CMake,
+  // Ninja, uv and the pinned Python. Versions follow rust/rust-toolchain.toml, .github/workflows/java25.yml
+  // and python/.python-version; tools/doctor.py checks them.
+  "name": "QuantForge",
+  "image": "gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": { "username": "vscode" },
+    "ghcr.io/devcontainers/features/rust:1": { "version": "1.99.1", "profile": "minimal" },
+    "ghcr.io/devcontainers/features/java:1": { "version": "25.0.5-tem", "jdkDistro": "tem", "installMaven": "true" }
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y cmake ninja-build python3 && curl -LsSf https://astral.sh/uv/install.sh | sh && ~/.local/bin/uv python install $(cat python/.python-version) && python3 tools/doctor.py",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "rust-lang.rust-analyzer", "vscjava.vscode-java-pack", "ms-vscode.cmake-tools"]
+    }
+  }
+}

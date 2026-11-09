@@ -1,6 +1,23 @@
 # QuantForge
 
-Docs site: <https://ashjha0.github.io/quantforge/>
+[![Python](https://github.com/AshJha0/quantforge/actions/workflows/python.yml/badge.svg)](https://github.com/AshJha0/quantforge/actions/workflows/python.yml) [![Rust](https://github.com/AshJha0/quantforge/actions/workflows/rust.yml/badge.svg)](https://github.com/AshJha0/quantforge/actions/workflows/rust.yml) [![Java 25](https://github.com/AshJha0/quantforge/actions/workflows/java25.yml/badge.svg)](https://github.com/AshJha0/quantforge/actions/workflows/java25.yml) [![C++26](https://github.com/AshJha0/quantforge/actions/workflows/cpp26.yml/badge.svg)](https://github.com/AshJha0/quantforge/actions/workflows/cpp26.yml) [![Docs](https://github.com/AshJha0/quantforge/actions/workflows/docs.yml/badge.svg)](https://ashjha0.github.io/quantforge/) [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
+Quick start: with [uv](https://docs.astral.sh/uv/) installed, from the repository root (uv fetches Python 3.15 on the first run):
+
+<!-- quickstart:begin -->
+```bash
+uv run --project python quantforge batch < examples/batch.jsonl
+```
+
+```json
+{"schema_version":"1.0","case_id":"example-daycount","status":"ok","outputs":{"year_fraction":0.5055555555555555},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"example-discount","status":"ok","outputs":{"discount_factor":0.9048374180359595},"diagnostics":{}}
+{"schema_version":"1.0","case_id":"example-root","status":"ok","outputs":{"root":2.094551481542327},"diagnostics":{"iterations":7,"residual":3.552713678800501e-15,"termination":"X_TOL"}}
+{"schema_version":"1.0","case_id":"example-error","status":"error","error":{"code":"E_DATE_ORDER","message":"end is before start","field":"end"},"diagnostics":{}}
+```
+<!-- quickstart:end -->
+
+That is an ACT/360 year fraction, a discount factor, a root find and a refused input, printed by the Python build on Windows (*observed*, 2026-11-09). `docs.yml` runs the block on every PR (`tools/check_quickstart.py`). Docs site: <https://ashjha0.github.io/quantforge/>
 ## Quantitative analytics and trading infrastructure
 
 QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Five stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3), curves and fixed income (stage D, v0.4) and full volatility and exotics (stage E, v0.5.0). Phases R1, credibility hardening (v0.4.1), and R2, risk first (v0.4.2), sit between stages D and E. See Status below.
