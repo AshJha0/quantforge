@@ -738,6 +738,17 @@ class DoctorAndQuickstart(unittest.TestCase):
         self.assertTrue(self.qs.compare(expected, ""))
 
 
+    def test_tutorial_has_a_block_per_language_and_one_expected_output(self):
+        sys.path.insert(0, str(ROOT / "tools"))
+        import check_tutorial
+        runs, expected = check_tutorial.blocks(check_tutorial.PAGE.read_text(encoding="utf-8"))
+        self.assertEqual(set(runs), {"python", "rust", "java", "cpp"})
+        self.assertEqual(runs["python"][0], "python")
+        self.assertEqual(len(expected), 4)
+        with self.assertRaises(ValueError):
+            check_tutorial.blocks("no markers")
+
+
 class StageFInfra(unittest.TestCase):
     """Plan 13.2 E11 hygiene gate and 12.2 G6 / 13.2 E10 incremental mutation planner."""
 
