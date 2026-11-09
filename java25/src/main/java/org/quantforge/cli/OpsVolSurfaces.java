@@ -379,13 +379,19 @@ final class OpsVolSurfaces {
 
     private record Term(long minutes, double rate, List<VarianceStrip.Quote> strip) {}
 
+    /** Ruling F-15: a quote may be null, carried as NaN (a real NaN token was already held by rule F-2). */
+    private static double quote(In q, String key) {
+        Double v = q.nullableReal(key);
+        return v == null ? Double.NaN : v;
+    }
+
     private static Term term(In in) {
         long n = in.integer("minutes_to_expiry");
         double r = in.real("rate");
         List<VarianceStrip.Quote> strip = new ArrayList<>();
         for (In q : in.objects("strip")) {
-            strip.add(new VarianceStrip.Quote(q.real("strike"), q.real("call_bid"), q.real("call_ask"),
-                    q.real("put_bid"), q.real("put_ask")));
+            strip.add(new VarianceStrip.Quote(q.real("strike"), quote(q, "call_bid"), quote(q, "call_ask"),
+                    quote(q, "put_bid"), quote(q, "put_ask")));
         }
         return new Term(n, r, strip);
     }

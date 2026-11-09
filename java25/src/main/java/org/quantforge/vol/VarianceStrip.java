@@ -83,7 +83,16 @@ public final class VarianceStrip {
         return periodsPerYear / m * s;
     }
 
+    /** A strike's quotes. A {@code null} quote (ruling F-15) is NaN here; the CLI maps JSON null to it. */
     public record Quote(double strike, double callBid, double callAsk, double putBid, double putAsk) {
+        boolean callNull() {
+            return Double.isNaN(callBid) || Double.isNaN(callAsk);
+        }
+
+        boolean putNull() {
+            return Double.isNaN(putBid) || Double.isNaN(putAsk);
+        }
+
         double callMid() {
             return (callBid + callAsk) / 2.0;
         }
@@ -123,11 +132,17 @@ public final class VarianceStrip {
         }
         double t = minutes / MINUTES_YEAR;
         double growth = Math.exp(rate * t);
-        Quote star = q.getFirst();
+        Quote star = null;
         for (Quote x : q) {
-            if (Math.abs(x.callMid() - x.putMid()) < Math.abs(star.callMid() - star.putMid())) {
+            if (x.callNull() || x.putNull()) {
+                continue; // ruling F-15: only strikes with both sides quoted are candidates
+            }
+            if (star == null || Math.abs(x.callMid() - x.putMid()) < Math.abs(star.callMid() - star.putMid())) {
                 star = x;
             }
+        }
+        if (star == null) {
+            throw new QfError("E_INPUT", "no strike has both a call and a put quote", "strip");
         }
         double fwd = star.strike() + growth * (star.callMid() - star.putMid());
         int i0 = -1;
@@ -139,10 +154,16 @@ public final class VarianceStrip {
         if (i0 < 0) {
             throw new QfError("E_INPUT", "no strike at or below the forward", "strip");
         }
+        if (q.get(i0).callNull() || q.get(i0).putNull()) {
+            throw new QfError("E_INPUT", "the K0 call or put has a null quote", "strip");
+        }
         List<double[]> chosen = new ArrayList<>(); // {strike, Q}
         int zeros = 0;
         for (int i = i0 - 1; i >= 0; i--) {
             Quote x = q.get(i);
+            if (x.putNull()) {
+                continue; // removed from the put walk before it starts
+            }
             if (x.putBid() == 0.0) {
                 if (++zeros >= 2) {
                     break;
@@ -157,6 +178,9 @@ public final class VarianceStrip {
         zeros = 0;
         for (int i = i0 + 1; i < q.size(); i++) {
             Quote x = q.get(i);
+            if (x.callNull()) {
+                continue;
+            }
             if (x.callBid() == 0.0) {
                 if (++zeros >= 2) {
                     break;
