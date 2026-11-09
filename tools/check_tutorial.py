@@ -4,7 +4,7 @@
   python tools/check_tutorial.py --lang python [--page docs/getting-started/tutorial-1-swap.md]
 
 A block marked <!-- tutorial:run LANG --> is run: a python block through `uv run --project python python -`,
-a bash block through bash, both from the repository root. Its stdout must equal, line for line, the text
+a bash block through bash, both from the repository root. The last lines of its stdout must equal, line for line, the text
 block marked <!-- tutorial:expect -->. Every language prints the same lines, so one expected block serves
 all four. Exit 0 on a match, 1 otherwise. Standard library only.
 """
@@ -51,7 +51,8 @@ def check(lang, page):
     if p.returncode != 0:
         print(f"{lang} block exited {p.returncode}:\n{p.stderr}", file=sys.stderr)
         return 1
-    actual = [x for x in p.stdout.splitlines() if x.strip()]
+    # Build tools (Ninja) may log to stdout first; the tutorial's own output is the last lines.
+    actual = [x for x in p.stdout.splitlines() if x.strip()][-len(expected):]
     if actual != expected:
         print(f"{lang} printed\n" + "\n".join(actual) + "\nbut the page shows\n" + "\n".join(expected),
               file=sys.stderr)
