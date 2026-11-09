@@ -38,7 +38,7 @@ a{color:var(--link)}.inner,.wrap{max-width:68rem;margin:0 auto;padding-left:2rem
 h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--line);padding-bottom:.3rem;margin-top:2rem}
 .note{background:var(--panel);border-left:4px solid var(--accent);padding:.7rem 1rem}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem;margin:1rem 0}
-.card{background:var(--panel);border-radius:6px;padding:1rem 1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.12)}.card b{display:block}.card span{font-size:.92rem}
+.card{background:var(--panel);border-radius:6px;padding:1rem 1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.12)}.card b{display:block}.card span{display:block;font-size:.92rem;color:var(--ink);background:var(--panel)}
 pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal}
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
 .chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}.chart p{font-size:.85rem;margin:.3rem 0 0}
