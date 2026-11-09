@@ -1,6 +1,6 @@
 {
   "note": "Modules per stage and language, for the per-stage mutation report (plan 11.5.6). The stage D target is 80%: killed / (killed + survived), with unviable and non-building mutants left out. Python and Rust count a mutant killed if the unit tests or the golden cases catch it. C++ uses the golden cases only. Java uses PIT with the unit tests. 'suite' is the golden-file glob each mutant is checked against; '<lang>_suite' overrides it for one language (Python's xccy code sits in the shared cli/stage_d.py, so every stage D suite applies). Module lists come from the files the stage D branches added; extend this file when a stage adds modules. Stage E modules have the same names as conformance/quality/stage_e.json; a null target is skipped by the plan job. Suites match stage_e and stage_e_b file names.",
-  "target": {"D": 0.80, "E": 0.80},
+  "target": {"D": 0.80, "E": 0.80, "F": 0.80},
   "stages": {
     "D": [
       {"module": "bonds", "suite": "*bond*_d",
@@ -31,6 +31,7 @@
       {"module": "garch_varswap_vix", "suite": "*_e", "java": "org.quantforge.vol.Garch*", "cpp": "cpp26/src/core/vol_stats.cpp", "python": "quantforge_core.vol_e7*", "rust": "**/garch.rs"},
       {"module": "correlation", "suite": "corr_e", "java": "org.quantforge.risk.Correlation", "cpp": "cpp26/src/core/correlation.cpp", "python": "quantforge_core.correlation*", "rust": "**/corr.rs"},
       {"module": "credit_options", "suite": "creditopt_e", "java": "org.quantforge.pricing.CreditOptions", "cpp": "cpp26/src/core/credit_e.cpp", "python": "quantforge_core.credit_e8*", "rust": "**/credit_e.rs"}
-    ]
+    ],
+    "F": []
   }
 }
