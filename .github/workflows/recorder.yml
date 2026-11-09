@@ -57,12 +57,44 @@ jobs:
           git commit -q -m "recorder: $(date -u +%Y-%m-%dT%H:%MZ) (main ${GITHUB_SHA::7})"
           for i in 1 2 3; do git push origin forward-log && exit 0; git pull --rebase -q origin forward-log; done
           exit 1
+      - name: Anchor the head hash outside the repo
+        # R4 (plan 13.2): stamp the chain head with OpenTimestamps (free calendars, no account, no secret) and keep the
+        # proofs on branch forward-log-anchors. A rewrite of forward-log, even with every hash recomputed, no longer
+        # matches an anchor that Bitcoin timestamps. How to check: docs/developer-guides/forward-log-anchors.md
+        id: anchor
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          pip install --quiet opentimestamps-client==0.7.2
+          url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if git ls-remote --exit-code --heads "$url" forward-log-anchors >/dev/null; then
+            git clone --branch forward-log-anchors "$url" anchors
+          else
+            git init -b forward-log-anchors anchors && git -C anchors remote add origin "$url"
+            printf '# forward-log-anchors\n\nOpenTimestamps anchors for branch forward-log. See docs/developer-guides/forward-log-anchors.md on main.\n' > anchors/README.md
+          fi
+          # a fresh run must not anchor a log that does not match the anchors already held
+          python3 code/tools/forward-log/anchor.py verify --log log/actions/log.jsonl --anchors anchors/anchors
+          (cd anchors/anchors 2>/dev/null && ots upgrade *.json.ots || true) # fills in Bitcoin attestations once confirmed
+          python3 code/tools/forward-log/anchor.py make --log log/actions/log.jsonl --out-dir anchors/anchors --stamp
+          cd anchors
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "anchor: $(date -u +%Y-%m-%dT%H:%MZ) forward-log head $(git -C ../log rev-parse --short HEAD)"
+          for i in 1 2 3; do git push origin forward-log-anchors && break; git pull --rebase -q origin forward-log-anchors; done
+          # a tag on the forward-log commit as a second, GitHub-visible marker (unsigned: see the guide)
+          cd ../log
+          tag="forward-log-anchor-$(date -u +%Y%m%dT%H%MZ)"
+          git tag -a "$tag" -m "forward-log head anchored; proof on branch forward-log-anchors" && git push origin "$tag"
       - name: Fail on a failed soft step
         # Record and Gap report are continue-on-error so the rows are still pushed; this step makes a failure
         # visible as a red run and names the failed steps (plan 12.1 G5).
         if: always()
         env:
-          OUTCOMES: record=${{ steps.record.outcome }} gaps=${{ steps.gaps.outcome }}
+          OUTCOMES: record=${{ steps.record.outcome }} gaps=${{ steps.gaps.outcome }} anchor=${{ steps.anchor.outcome }}
         run: |
           failed=""
           for kv in $OUTCOMES; do if [ "${kv#*=}" = failure ]; then failed="$failed ${kv%%=*}"; fi; done

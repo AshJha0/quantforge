@@ -13,6 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("forward_log", ROOT / "tools/forward-log/forward_log.py")
 fl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(fl)
+aspec = importlib.util.spec_from_file_location("anchor", ROOT / "tools/forward-log/anchor.py")
+anchor = importlib.util.module_from_spec(aspec)
+aspec.loader.exec_module(anchor)
 RECORD = ROOT / "tools/recorder/record.py"
 
 
@@ -613,6 +616,50 @@ class Governance(unittest.TestCase):
         self.assertEqual(self.qg.check_governance(True, True, base), 0)
         now = {"register": ["entry X9: missing Tier"], "specs": []}
         self.assertEqual(self.qg.check_governance(True, True, base, now), 1)  # a new gap fails
+
+
+class ForwardLogAnchor(unittest.TestCase):
+    def _log(self, d, n=5):
+        p = Path(d) / "log.jsonl"
+        for i in range(n):
+            fl.append(p, "a", f"2026-01-0{i + 1}T00:00:00Z", float(i))
+        return p
+
+    def test_honest_log_and_growth_pass(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._log(d, 3)
+            anchor.make(p, Path(d) / "an", "t1")
+            fl.append(p, "a", "2026-02-01T00:00:00Z", 9.0)
+            self.assertEqual(anchor.check_anchors(p, Path(d) / "an"), 1)
+
+    def test_full_rewrite_with_recomputed_hashes_is_caught(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._log(d, 5)
+            anchor.make(p, Path(d) / "an", "t1")
+            rows = fl.read(p)
+            rows[1]["record"]["value"]["payload"] = 99.0  # rewrite an old line
+            head = fl.ZERO
+            for r in rows:  # recompute every hash so the chain alone is consistent
+                head = fl.link(head, r["record"])
+                r["hash"] = head
+            p.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows), encoding="utf-8")
+            self.assertEqual(fl.verify(p)[0], 5)  # the chain by itself cannot see it
+            with self.assertRaises(ValueError):
+                anchor.check_anchors(p, Path(d) / "an")
+
+    def test_truncation_is_caught(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._log(d, 4)
+            anchor.make(p, Path(d) / "an", "t1")
+            lines = p.read_text(encoding="utf-8").splitlines()
+            p.write_text("\n".join(lines[:2]) + "\n",encoding="utf-8")
+            with self.assertRaises(ValueError):
+                anchor.check_anchors(p, Path(d) / "an")
+
+    def test_empty_log_not_anchored(self):
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(ValueError):
+                anchor.make(Path(d) / "none.jsonl", Path(d) / "an")
 
 
 class ResearchDsrGate(unittest.TestCase):
