@@ -279,6 +279,19 @@ Stage E spec B adds these, with no new error code and no change to the wire form
 
 Batch notes for these operations: `vol.garch.fit`, `rates.cap.strip`, `rates.bondfut.implied_vol` `risk.corr.nearest` and `credit.cdsoption.implied_vol` iterate; a line that fails to converge returns `E_NO_CONVERGENCE` for that line and the batch goes on. Array inputs (`returns`, `prices`, `strip`) count towards `01-core/limits.md` like any array. `initial_variance` is a string or a number: any other JSON type is `E_SCHEMA`. `knock_out` must be a JSON boolean; `copula` must be `GAUSSIAN` or `STUDENT_T` (`E_SCHEMA` otherwise).
 
+## Stage F operations (target contract 1.9.0)
+
+Stage F changes one rule for every operation and adds no error code. `stage-f-rulings.md` is normative.
+
+- **Non-finite tokens (F-1).** A Real input may be the string `"NaN"`, `"Infinity"` or `"-Infinity"`. This is the only change to the wire format; the value-encoding table above still holds for every other value. Outputs never carry these strings: a non-finite output is `E_NON_FINITE` as before.
+- **Finite rule (F-2, plan item E1).** The first rule check of every operation is that every Real input is finite; otherwise `E_DOMAIN`. Order of checks becomes `E_PARSE`, `E_SCHEMA`, `E_LIMIT`, the finite rule, then the operation's own checks.
+- **Negative zero (F-3).** `-0.0` gives the same result as `0.0`.
+
+Stage F operations are added to the table below as each wave lands.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+
 ## Versioning
 
 Adding an operation or an error code is a minor version. Changing the meaning of a key, a code or an

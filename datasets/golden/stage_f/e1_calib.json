@@ -1,0 +1,5420 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_calib",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1_calib-0001",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     "NaN",
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0023",
+    "input:/fitted/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0002",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     "Infinity",
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/fitted/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0003",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     "-Infinity",
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/fitted/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0004",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     0.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0023",
+    "input:/fitted/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0005",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     -0.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0004"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0023",
+    "input:/fitted/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0006",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     "NaN"
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0023",
+    "input:/fitted/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0007",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     "Infinity"
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/fitted/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0008",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     "-Infinity"
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/fitted/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0009",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     0.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0023",
+    "input:/fitted/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0010",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     -0.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0009"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0023",
+    "input:/fitted/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0011",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     "NaN",
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0023",
+    "input:/bid/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0012",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     "Infinity",
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/bid/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0013",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     "-Infinity",
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/bid/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0014",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.0,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0023",
+    "input:/bid/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0015",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     -0.0,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0014"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0023",
+    "input:/bid/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0016",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     "NaN"
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0023",
+    "input:/bid/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0017",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     "Infinity"
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/bid/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0018",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     "-Infinity"
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/bid/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0019",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     0.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0023",
+    "input:/bid/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0020",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     -0.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0019"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0023",
+    "input:/bid/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0021",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     "NaN",
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0023",
+    "input:/ask/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0022",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     "Infinity",
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/ask/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0023",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     "-Infinity",
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/ask/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0024",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     0.0,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0023",
+    "input:/ask/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0025",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     -0.0,
+     2.2,
+     3.1
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0024"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0023",
+    "input:/ask/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0026",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     "NaN"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0023",
+    "input:/ask/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0027",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     "Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/ask/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0028",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0023",
+    "input:/ask/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0029",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0023",
+    "input:/ask/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0030",
+   "operation": "calib.check_bid_ask",
+   "inputs": {
+    "fitted": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "bid": [
+     0.9,
+     2.1,
+     3.0
+    ],
+    "ask": [
+     1.1,
+     2.2,
+     -0.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0029"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0023",
+    "input:/ask/2"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0031",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     "NaN",
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0009",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0032",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     "Infinity",
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0033",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     "-Infinity",
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0034",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.0,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0009",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0035",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     -0.0,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0034"
+   },
+   "tolerance_class": "calibration",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   },
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0009",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0036",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     "NaN"
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0009",
+    "input:/maturities/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0037",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     "Infinity"
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/maturities/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0038",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     "-Infinity"
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/maturities/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0039",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     0.0
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0009",
+    "input:/maturities/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0040",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     -0.0
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0039"
+   },
+   "tolerance_class": "calibration",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   },
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0009",
+    "input:/maturities/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0041",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     "NaN",
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0009",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0042",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     "Infinity",
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0043",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     "-Infinity",
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0044",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0009",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0045",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     -0.0,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0044"
+   },
+   "tolerance_class": "calibration",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   },
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0009",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0046",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     "NaN"
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0009",
+    "input:/zero_rates/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0047",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     "Infinity"
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/zero_rates/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0048",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     "-Infinity"
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/zero_rates/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0049",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.0
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0009",
+    "input:/zero_rates/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0050",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     -0.0
+    ],
+    "tau": 2.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0049"
+   },
+   "tolerance_class": "calibration",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   },
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0009",
+    "input:/zero_rates/11"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0051",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": "NaN",
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0009",
+    "input:/tau"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0052",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": "Infinity",
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/tau"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0053",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": "-Infinity",
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/tau"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0054",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 0.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0009",
+    "input:/tau"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0055",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": -0.0,
+    "delta": 0.0005
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0054"
+   },
+   "tolerance_class": "calibration",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   },
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0009",
+    "input:/tau"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0056",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0009",
+    "input:/delta"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0057",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": "Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/delta"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0058",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0009",
+    "input:/delta"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0059",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0009",
+    "input:/delta"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0060",
+   "operation": "calib.curve.robust",
+   "inputs": {
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     15,
+     20,
+     30
+    ],
+    "zero_rates": [
+     0.0365750681431389,
+     0.03709678903700033,
+     0.03794469340287367,
+     0.039046964470628456,
+     0.04269704549224485,
+     0.04006265301734371,
+     0.04023182200935749,
+     0.04037298862322476,
+     0.04036687713920586,
+     0.0402532006712804,
+     0.040199718520435475,
+     0.04014333145713244
+    ],
+    "tau": 2.0,
+    "delta": -0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0059"
+   },
+   "tolerance_class": "calibration",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 0.0,
+    "reason": "convex objective, unique minimum; reached by IRLS and SciPy from three starts"
+   },
+   "output_classes": {
+    "outliers": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0009",
+    "input:/delta"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0061",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     "NaN",
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0001",
+    "input:/knots/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0062",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     "Infinity",
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/knots/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0063",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     "-Infinity",
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/knots/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0064",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.0,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0001",
+    "input:/knots/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0065",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     -0.0,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0064"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0001",
+    "input:/knots/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0066",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     "NaN"
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0001",
+    "input:/knots/6"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0067",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     "Infinity"
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/knots/6"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0068",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     "-Infinity"
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/knots/6"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0069",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     0.0
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0001",
+    "input:/knots/6"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0070",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     -0.0
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0069"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0001",
+    "input:/knots/6"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0071",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     "NaN",
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0001",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0072",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     "Infinity",
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0073",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     "-Infinity",
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0074",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.0,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0001",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0075",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     -0.0,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0074"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0001",
+    "input:/maturities/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0076",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     "NaN"
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0001",
+    "input:/maturities/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0077",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     "Infinity"
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/maturities/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0078",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     "-Infinity"
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/maturities/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0079",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     0.0
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0001",
+    "input:/maturities/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0080",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     -0.0
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0079"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0001",
+    "input:/maturities/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0081",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     "NaN",
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0001",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0082",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     "Infinity",
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0083",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     "-Infinity",
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0084",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.0,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0001",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0085",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     -0.0,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0084"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0001",
+    "input:/zero_rates/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0086",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     "NaN"
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0001",
+    "input:/zero_rates/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0087",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     "Infinity"
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/zero_rates/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0088",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     "-Infinity"
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/zero_rates/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0089",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:fits_d-0001",
+    "input:/zero_rates/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0090",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     -0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0089"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0001",
+    "input:/zero_rates/9"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0091",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:fits_d-0001",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0092",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": "Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0093",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:fits_d-0001",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0094",
+   "operation": "calib.curve.smooth",
+   "inputs": {
+    "knots": [
+     0.5,
+     1,
+     2,
+     3,
+     5,
+     7,
+     10
+    ],
+    "maturities": [
+     0.25,
+     0.5,
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10
+    ],
+    "zero_rates": [
+     0.042,
+     0.0415,
+     0.0398,
+     0.0385,
+     0.0376,
+     0.0365,
+     0.0362,
+     0.0364,
+     0.0371,
+     0.038
+    ],
+    "lambda": -0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "forwards": [
+      0.04175,
+      0.03792142857142857,
+      0.035507142857142855,
+      0.033982653061224485,
+      0.036094897959183685,
+      0.03909234693877551,
+      0.0401
+     ],
+     "fitted": [
+      0.04175,
+      0.04175,
+      0.03983571428571429,
+      0.038392857142857145,
+      0.03767142857142857,
+      0.03644183673469387,
+      0.03635510204081633,
+      0.0363030612244898,
+      0.0371,
+      0.038
+     ],
+     "objective": 1.796938775510193e-07
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "linear solve; condition number up to about 1e3"
+   },
+   "verified_by": [
+    "copied:fits_d-0001",
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:fits_d-0001",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0095",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": "NaN"
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0025",
+    "input:/quotes/0/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0096",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": "Infinity"
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0025",
+    "input:/quotes/0/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0097",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": "-Infinity"
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0025",
+    "input:/quotes/0/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0098",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0025",
+    "input:/quotes/0/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0099",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": -0.0
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0335
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0098"
+   },
+   "tolerance_class": "interpolation",
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 0.0001,
+    "reason": "analytic or bumped Jacobians both pass; bump error is about 1e-7"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0025",
+    "input:/quotes/0/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0100",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": "NaN"
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0025",
+    "input:/quotes/7/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0101",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": "Infinity"
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0025",
+    "input:/quotes/7/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0102",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": "-Infinity"
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0025",
+    "input:/quotes/7/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0103",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": 0.0
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0025",
+    "input:/quotes/7/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0104",
+   "operation": "calib.curve_report",
+   "inputs": {
+    "convention": "SONIA",
+    "as_of": "2026-11-06",
+    "quotes": [
+     {
+      "tenor": "1W",
+      "rate": 0.0372
+     },
+     {
+      "tenor": "1M",
+      "rate": 0.0371
+     },
+     {
+      "tenor": "3M",
+      "rate": 0.0368
+     },
+     {
+      "tenor": "6M",
+      "rate": 0.0362
+     },
+     {
+      "tenor": "1Y",
+      "rate": 0.035
+     },
+     {
+      "tenor": "2Y",
+      "rate": 0.0335
+     },
+     {
+      "tenor": "3Y",
+      "rate": 0.033
+     },
+     {
+      "tenor": "5Y",
+      "rate": -0.0
+     }
+    ],
+    "interpolation": "LOG_LINEAR_DF"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0103"
+   },
+   "tolerance_class": "interpolation",
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 0.0001,
+    "reason": "analytic or bumped Jacobians both pass; bump error is about 1e-7"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0025",
+    "input:/quotes/7/rate"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0105",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     "NaN",
+     1.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0016",
+    "input:/start/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0106",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     "Infinity",
+     1.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0016",
+    "input:/start/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0107",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     "-Infinity",
+     1.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0016",
+    "input:/start/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0108",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     0.0,
+     1.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0016",
+    "input:/start/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0109",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     -0.0,
+     1.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0108"
+   },
+   "tolerance_class": "interpolation",
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 0.0,
+    "reason": "gradient test at 1e-8"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0016",
+    "input:/start/0"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0110",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     -1.2,
+     "NaN"
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:calibration-0016",
+    "input:/start/1"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0111",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     -1.2,
+     "Infinity"
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0016",
+    "input:/start/1"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0112",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     -1.2,
+     "-Infinity"
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:calibration-0016",
+    "input:/start/1"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0113",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     -1.2,
+     0.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:calibration-0016",
+    "input:/start/1"
+   ]
+  },
+  {
+   "case_id": "e1_calib-0114",
+   "operation": "calib.fit",
+   "inputs": {
+    "model": "ROSENBROCK",
+    "x": [],
+    "y": [],
+    "start": [
+     -1.2,
+     -0.0
+    ],
+    "method": "BFGS"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_calib-0113"
+   },
+   "tolerance_class": "interpolation",
+   "tolerance_limit": {
+    "absolute": 1e-05,
+    "relative": 0.0,
+    "reason": "gradient test at 1e-8"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:calibration-0016",
+    "input:/start/1"
+   ]
+  }
+ ]
+}

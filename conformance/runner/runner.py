@@ -128,8 +128,11 @@ def extra_check(check, outputs):
     return [] if abs(a - e) <= lim else [f"extra check {check['output']}: {a!r} vs {e!r}, limit {lim:g}"]
 
 
-def judge(case, res, classes):
-    """Returns (status, messages). status: pass, fail, not_implemented."""
+def judge(case, res, classes, peers=None):
+    """Returns (status, messages). status: pass, fail, not_implemented.
+
+    Stage F (rule F-3): expected status "any" passes on any well-formed result; "same_as" passes when the
+    result matches the peer case's result (same status and code, or outputs within this case's tolerance)."""
     exp = case["expected"]
     if not isinstance(res, dict):
         return "fail", ["no result object"]
@@ -137,6 +140,18 @@ def judge(case, res, classes):
         return "fail", [f"case_id mismatch: {res.get('case_id')!r}"]
     if res.get("status") == "error" and (res.get("error") or {}).get("code") == "E_UNSUPPORTED_OPERATION":
         return "not_implemented", []
+    if exp["status"] == "any":
+        return ("pass", []) if res.get("status") in ("ok", "error") else ("fail", [f"bad status {res.get('status')!r}"])
+    if exp["status"] == "same_as":
+        peer = (peers or {}).get(exp["case_id"])
+        if not isinstance(peer, dict) or peer.get("status") not in ("ok", "error"):
+            return "fail", [f"peer {exp['case_id']} has no well-formed result"]
+        if peer.get("status") == "error" and (peer.get("error") or {}).get("code") == "E_UNSUPPORTED_OPERATION":
+            return "not_implemented", []
+        if peer["status"] == "error":
+            exp = {"status": "error", "error_code": (peer.get("error") or {}).get("code")}
+        else:
+            exp = {"status": "ok", "outputs": peer.get("outputs") or {}}
     if exp["status"] == "error":
         if res.get("status") != "error":
             return "fail", [f"expected {exp['error_code']}, got status {res.get('status')!r}"]
@@ -234,8 +249,9 @@ def main():
             bad = True
             print(f"{doc['suite']:<14} CRASH {err}")
         else:
+            peers = {c["case_id"]: r for c, r in zip(cases, results)}
             for c, r in zip(cases, results):
-                st, msgs = judge(c, r, classes)
+                st, msgs = judge(c, r, classes, peers)
                 row[st] += 1
                 if st == "fail":
                     bad = True

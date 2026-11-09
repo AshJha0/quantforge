@@ -1,0 +1,1493 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_mbs",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1_mbs-0001",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": "NaN",
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0001",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0002",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": "Infinity",
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0003",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": "-Infinity",
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0004",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 0.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0001",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0005",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": -0.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0004"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-10,
+    "reason": "360 months of products; errors grow with length"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0001",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0006",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": "NaN",
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0001",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0007",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": "Infinity",
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0008",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": "-Infinity",
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0009",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.0,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0001",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0010",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": -0.0,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0009"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-10,
+    "reason": "360 months of products; errors grow with length"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0001",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0011",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": "NaN",
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0001",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0012",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": "Infinity",
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0013",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": "-Infinity",
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0014",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.0,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0001",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0015",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": -0.0,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    }
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0014"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-10,
+    "reason": "360 months of products; errors grow with length"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0001",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0016",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": "NaN"
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0001",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0017",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": "Infinity"
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0018",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": "-Infinity"
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0001",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0019",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 0.0
+     }
+    }
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0001",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0020",
+   "operation": "mbs.cashflows",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": -0.0
+     }
+    }
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0019"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 1e-10,
+    "reason": "360 months of products; errors grow with length"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0001",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0021",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": "NaN",
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0004",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0022",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": "Infinity",
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0023",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": "-Infinity",
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0024",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 0.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0004",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0025",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": -0.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0024"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0004",
+    "input:/pool/balance"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0026",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": "NaN",
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0004",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0027",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": "Infinity",
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0028",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": "-Infinity",
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0029",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.0,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0004",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0030",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": -0.0,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0029"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0004",
+    "input:/pool/wac"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0031",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": "NaN",
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0004",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0032",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": "Infinity",
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0033",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": "-Infinity",
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0034",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.0,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0004",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0035",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": -0.0,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0034"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0004",
+    "input:/pool/net_coupon"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0036",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": "NaN"
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0004",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0037",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": "Infinity"
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0038",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": "-Infinity"
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0039",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 0.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0004",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0040",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": -0.0
+     }
+    },
+    "yield": 0.055,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0039"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0004",
+    "input:/pool/prepayment/speed"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0041",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": "NaN",
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mbs_d-0004",
+    "input:/yield"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0042",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": "Infinity",
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/yield"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0043",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": "-Infinity",
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mbs_d-0004",
+    "input:/yield"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0044",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": 0.0,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mbs_d-0004",
+    "input:/yield"
+   ]
+  },
+  {
+   "case_id": "e1_mbs-0045",
+   "operation": "mbs.price",
+   "inputs": {
+    "pool": {
+     "balance": 1000000.0,
+     "wac": 0.065,
+     "net_coupon": 0.06,
+     "wam": 60,
+     "age": 0,
+     "prepayment": {
+      "model": "PSA",
+      "speed": 150.0
+     }
+    },
+    "yield": -0.0,
+    "delay_days": 24
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_mbs-0044"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mbs_d-0004",
+    "input:/yield"
+   ]
+  }
+ ]
+}
