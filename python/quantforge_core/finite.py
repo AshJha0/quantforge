@@ -8,17 +8,20 @@ values are the core's own (an intermediate infinity is still E_NON_FINITE at the
 CLI contract says). Over the CLI an input cannot be NaN or infinite, so results there do not change.
 """
 import functools
-import inspect
 import threading
 from collections.abc import Callable
-from dataclasses import fields, is_dataclass
 from math import isfinite
 from types import FunctionType
 from typing import Any
 
 from .errors import QfError
 
-_state = threading.local()
+
+class _State(threading.local):
+    inside = False  # True inside an outer public call, per thread
+
+
+_state = _State()
 
 
 def bad_field(value: Any) -> str | None:
@@ -51,11 +54,12 @@ def bad_field(value: Any) -> str | None:
             if found is not None:
                 return found or str(key)
         return None
-    if is_dataclass(value) and not isinstance(value, type):
-        for f in fields(value):
-            found = bad_field(getattr(value, f.name))
+    names = getattr(value, "__dataclass_fields__", None)  # no dataclasses import at start-up
+    if names is not None and not isinstance(value, type):
+        for name in names:
+            found = bad_field(getattr(value, name))
             if found is not None:
-                return found or f.name
+                return found or name
         return None
     dtype = getattr(value, "dtype", None)
     if dtype is not None and getattr(dtype, "kind", "") in "fc":
@@ -75,14 +79,14 @@ def _domain(name: str) -> QfError:
 
 
 def _wrap[**P, R](f: Callable[P, R]) -> Callable[P, R]:
-    sig = inspect.signature(f)
-    positional = [p.name for p in sig.parameters.values()
-                  if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
-    rest = next((p.name for p in sig.parameters.values() if p.kind == p.VAR_POSITIONAL), "args")
+    # From the code object rather than inspect.signature: inspect costs start-up on every process.
+    code = f.__code__
+    positional = list(code.co_varnames[:code.co_argcount])
+    rest = code.co_varnames[code.co_argcount + code.co_kwonlyargcount] if code.co_flags & 4 else "args"
 
     @functools.wraps(f)
     def checked(*args: P.args, **kwargs: P.kwargs) -> R:
-        if getattr(_state, "inside", False):
+        if _state.inside:
             return f(*args, **kwargs)
         for k, a in enumerate(args):
             found = bad_field(a)

@@ -15,7 +15,8 @@ from quantforge_core.errors import QfError
 
 BAD = (math.nan, math.inf, -math.inf)
 # Modules with no public numeric entry points: data tables, the error type, the guard itself.
-SKIP = {"errors", "finite", "_legendre_1024", "_sobol_data", "_cal"}
+# strictjson parses text and takes no numeric input; it stays off the start-up path of `version`.
+SKIP = {"errors", "finite", "strictjson", "_legendre_1024", "_sobol_data", "_cal"}
 
 
 def _core_modules():
