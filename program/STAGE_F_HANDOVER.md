@@ -87,3 +87,9 @@ Read with every slice: `specifications/cli-contract.md` (block "Stage F operatio
 ### Open items
 - R7: the Pedersen (2003) worked example is not reproduced (paper not freely available); added to the known issues for a human with access.
 - T amendments made by this wave (rulings F-19, F-22): the Q1 row now names `forcePositive = false` and states locality on pillars. Both are written into the plan's section 12.10 and into the T table above.
+
+### Where to resume (spec session checkpoint, 2026-11-09 22:05)
+- Wave 1b (Q4): `cd oracle/python && uv run python -u -W ignore gen_stage_f_q4.py` writes `datasets/golden/stage_f/joint_f.json` (it prints a line per system solved and per bump-and-rebuild check). Then `uv run python -W ignore outside_f.py` (QuantLib check of the OIS + projection systems and the stage F share), the stub replay `python conformance/runner/runner.py --impl stub --suite joint_f`, fill the `TODO wave 1b` lineage hashes in `docs/model-inventory.md` (MF-5, MF-6), and add a "WAVE 1b READY" heading here.
+- R8 coverage study: `uv run python -W ignore gen_stage_f_f6.py COVER` (about an hour; writes `oracle/R8_COVERAGE.json`, asserts the [0.90, 0.99] band).
+- Regenerate E1 after new operations land: `gen_stage_f_e1.py` reads only suites outside `stage_f`, so the stage F operations (`credit.cdsindex.option_price`, `vol.garch.estimate`, `rates.curve.inspect`, `rates.curve.joint_solve`, `rates.funding.curve`) still need E1 cases: change its skip rule to skip only `e1_*` files, then rerun.
+- Then waves 2 and 3 as in the task order (F3 and F4 specs, the E9 MC hash golden, F5 book).

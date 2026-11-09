@@ -184,6 +184,16 @@ class System:
             cols.append((self.res(x + e) - self.res(x - e)) / (2 * h))
         return np.column_stack(cols)
 
+    def chord(self, x, Jx):
+        """Warm-started chord iterations with a fixed dR/dx (for small quote bumps)."""
+        for _ in range(50):
+            r = self.res(x)
+            if max(abs(r)) < 1e-15:
+                break
+            x = x - np.linalg.solve(Jx, r)
+        assert max(abs(self.res(x))) < 1e-14
+        return x
+
     def solve(self):
         x = self.x0()
         for it in range(60):
@@ -210,14 +220,15 @@ class System:
         return J, Jx
 
 
-def bump_jacobian(inp, h):
-    """Reference: rebuild the whole system with each quote moved by +-h and +-h/2, Richardson-combined."""
+def bump_jacobian(inp, h, x0, Jx):
+    """Reference: re-solve the whole system with each quote moved by +-h and +-h/2 (chord iterations from the solution to
+    1e-15, so the bumped curves are the exact bumped solutions), Richardson-combined."""
     def solve_with(j, dq):
         q2 = [dict(q) for q in inp["instruments"]]
         key = {"FUTURE": "price", "XCCY": "spread"}.get(q2[j]["type"], "rate")
         q2[j][key] += dq
         s = System({**inp, "instruments": q2})
-        return s.solve()[0]
+        return s.chord(np.array(x0), Jx)
     cols = []
     for j in range(len(inp["instruments"])):
         d1 = (solve_with(j, h) - solve_with(j, -h)) / (2 * h)
@@ -365,7 +376,9 @@ def main():
         sysm = System(inp)
         x, err = sysm.solve()
         J, Jx = sysm.jacobian()
-        ref = bump_jacobian(inp, 1e-4)
+        print(f"  solved {desc[:40]} ({len(x)} unknowns), max residual {err:.1e}", flush=True)
+        ref = bump_jacobian(inp, 1e-4, x, Jx)
+        print("  bump-and-rebuild done", flush=True)
         dev = np.max(np.abs(J - ref) - (1e-9 + 1e-6 * np.abs(ref)))
         assert dev <= 0, f"{desc}: IFT Jacobian against bump-and-rebuild: {dev:.3e}"
         out = outputs(sysm, x, J, Jx)
@@ -374,7 +387,8 @@ def main():
         # wrong conventions: futures without convexity; turn not solved (factor 1)
         if any(q["type"] == "FUTURE" for q in inp["instruments"]):
             noc = {**inp, "instruments": [dict(q, sigma=0.0) if q["type"] == "FUTURE" else q for q in inp["instruments"]]}
-            x2 = System(noc).solve()[0]
+            s2 = System(noc)
+            x2 = s2.chord(np.array(x), Jx)
             caught(f"{desc}: no futures convexity", float(np.max(np.abs(x2 - x))), 1e-10)
         if any(c.get("turns") for c in inp["curves"]):
             caught(f"{desc}: turn factor left at 1", max(abs(t["factor"] - 1) for t in out["turn_factors"]), 1e-10)
