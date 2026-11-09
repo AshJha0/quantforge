@@ -159,3 +159,17 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - `-0.0`: F-3, same result as `+0.0`; the `negative_zero` cases pass with no change.
 - Library `field` for a non-finite value inside a struct is the argument name (`self` for a
   receiver); F-4 does not fix the field, so this stays a Rust choice.
+
+## Stage F wave 1a (F6, Q1), choices made where the spec is silent
+
+- Q1 `TENSION_SPLINE` and `HYBRID` read `tension` and `step_end` from the same object as
+  `interpolation` (the curve object, or the top level of a bootstrap). The order of checks is
+  `tension` missing `E_INPUT`, out of `(0, 1000]` `E_DOMAIN`, then the pillar checks; a
+  `step_end` that is not a pillar date is `E_INPUT` after the pillar order checks.
+- Q1 bootstrap: for the four stage F methods `SEQUENTIAL` runs the same global Newton solve as
+  `GLOBAL` (ruling F-21 allows either route to the unique solution).
+- R8 `vol.garch.estimate`: the search is the stage E multi-start Nelder-Mead (27 starts for
+  Student-t, over `nu` in 5, 10 and 30), then Newton on the exact gradient with a central-difference
+  Hessian (relative step 1e-5). The Student-t golden series take about 10 s each in a release
+  build; a faster start would come from the Gaussian estimate.
+- R7: `h_K` is bisected until the bracket cannot shrink, which is within 1e-15 relative.
