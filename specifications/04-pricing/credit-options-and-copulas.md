@@ -81,3 +81,69 @@ Wrong-convention checks, each caught: annuity without accrual on default; ACT/36
 - [S4] Demarta, S. and McNeil, A. J., "The t copula and related copulas", *International Statistical Review* 73(1), 2005, 111-129 (Student t copula, tail dependence) (not opened)
 - [S5] West, G., "Better approximations to cumulative normal functions", *Wilmott Magazine*, 2005 (the bivariate normal algorithm QuantLib uses) (not opened)
 - [S6] QuantLib 1.44 Python wheel: `CdsOption`, `BlackCdsOptionEngine`, `MidPointCdsEngine`, `BivariateCumulativeNormalDistributionWe04DP`, `InverseCumulativeNormal` (used by behaviour)
+
+## `credit.cdsindex.option_price` (stage F, plan item R7)
+
+Spec version 1.1.0 for this section. Rulings: `stage-f-rulings.md` F-7 to F-10. Suite `stage_f/cdsidx_f`.
+
+**Plain idea.** An option on a CDS index (CDX, iTraxx) is never knocked out: names that default before expiry are settled into the index, and a payer who exercises collects those losses. Two things differ from the single-name option above. First, the losses before expiry (the front-end protection) belong inside the option, not added to its price. Second, the index trades with a fixed coupon `C`, so the strike spread `K` is exercised as an upfront amount `(K - C) A_K`, where `A_K` is the risky annuity of a flat curve at spread `K`. Pedersen's method [S7] puts both into Black's formula as an adjusted forward and an adjusted strike. Adding the front-end protection to a Black payer price (`credit.cdsoption.price` with `knock_out = false`) overprices the payer and breaks put-call parity; this operation replaces it for index options.
+
+Inputs: `as_of`, `expiry`, `maturity` (dates); `rate` `r` and `hazard_rate` `h` (flat, continuous, ACT/365F, the index curve); `recovery` `R`; `type` (`PAYER`, `RECEIVER`); `strike` `K` (spread); `coupon` `C` (the index's fixed running coupon, such as 0.01 or 0.05); `notional` `N`; `vol` `sigma` (lognormal vol of the adjusted forward).
+
+**Index legs from today.** Exactly the legs of `credit.cdsoption.price` (ruling E-B22, E-B30) on `(r, h)`: periods `(a, b)` from `expiry` to `maturity`, mid dates `m`, `t(d) = (d - as_of)/365`, giving `F = protection / A`, the risky annuity `A` (today's value, per unit notional, survival from today included), and
+
+```
+FEP = (1 - R) (1 - S(expiry)) P(expiry)          front-end protection per unit notional, today's value
+```
+
+**Strike annuity at expiry (ruling F-8).** The same periods, but measured from `expiry`: `t'(d) = (d - expiry)/365`, `P'(d) = e^{-r t'(d)}`, `S'_x(d) = e^{-x t'(d)}` for a flat hazard `x`, and
+
+```
+prot'(x) = sum (1 - R) P'(m) (S'_x(a) - S'_x(b))
+A'(x)    = sum [ (b - a)/360 P'(b) S'_x(b) + (m - a)/360 P'(m) (S'_x(a) - S'_x(b)) ]
+h_K      : the x >= 0 with prot'(x) / A'(x) = K
+A_K      = A'(h_K)
+```
+
+`prot'/A'` is 0 at `x = 0` and strictly increasing without bound, so for `K > 0` there is exactly one root. Solve to `|x - h_K| <= 1e-15 max(1, h_K)`; any bracketing solver works (bracket `[0, x_hi]`, doubling `x_hi` from `2K/(1 - R)` until the ratio exceeds `K`).
+
+**Pedersen adjustment (ruling F-7).**
+
+```
+G     = (K - C) A_K                         exercise upfront per unit notional, paid at expiry (negative when K < C)
+F_adj = F + FEP / A
+K_adj = C + G P(expiry) / A
+T     = t(expiry)
+payer    = N A Black_call(F_adj, K_adj, sigma sqrt(T))
+receiver = N A Black_put (F_adj, K_adj, sigma sqrt(T))
+```
+
+so that, for every input, `payer - receiver = N A (F_adj - K_adj)` (put-call parity on the adjusted pair). With `sigma = 0` the price is the intrinsic value `N A max(F_adj - K_adj, 0)` (payer) or `N A max(K_adj - F_adj, 0)` (receiver).
+
+Outputs: `price`, `forward_spread` (`F`), `adjusted_forward` (`F_adj`), `adjusted_strike` (`K_adj`), `risky_annuity` (`A`), `strike_annuity` (`A_K`), `strike_hazard` (`h_K`), `exercise_upfront` (`N G`), `front_end_protection` (`N FEP`).
+
+Checks, in order (after the finite rule F-2): `expiry <= as_of` or `maturity <= expiry`: `E_INPUT`; `R` outside `[0, 1)`, `hazard_rate < 0`, `strike <= 0`, `coupon < 0`, `vol < 0`, `notional <= 0`: `E_DOMAIN`; `F_adj <= 0` (only when `hazard_rate = 0`) or `K_adj <= 0` (possible only for a strike far below a large coupon): `E_DOMAIN`.
+
+### Why the adjusted pair (derivation, for review)
+
+At expiry the payer's exercise value per unit notional is `Prot(T) - C A(T) + L(T) - G`, where `L(T)` is the loss on names that defaulted before expiry (paid on exercise). Its value today, before optionality, is `A F - C A + FEP - G P(expiry) = A (F_adj - K_adj)`. Black on the pair `(F_adj, K_adj)` in the annuity measure is Pedersen's approximation [S7], [S1, chapter on index options]; it keeps parity exactly and reduces to the single-name formula when `C = K` and `FEP = 0`.
+
+### Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| `h_K` root solve | superlinear (Brent) or 1 (bisection); judged on the result, not the path | not a grid method | `C = K`: `G = 0`, `K_adj = C = K` | closed form |
+| Black on adjusted pair | closed form | none | `sigma -> 0`: intrinsic; `h = 0`: `F_adj = 0`, refused with `E_DOMAIN` | parity `payer - receiver = N A (F_adj - K_adj)` checked to 1e-10 relative in the oracle on every case |
+
+### Acceptance (plan 13.2 R7)
+
+- Non-knock-out payer minus receiver equals `N A (F_adj - K_adj)` to 1e-10 relative, on every golden pair (asserted by the oracle; each language adds it as a property test on its own outputs).
+- Prices 1e-9 per unit notional (`tolerance_limit` absolute `1e-9 N`, relative 1e-9, as stage D credit); `h_K` class `root_finding`; `F`, `A`, `F_adj`, `K_adj`, `A_K` class `root_finding` (they inherit the root's error through `A_K`); `FEP` class `simple_analytic`.
+- **The Pedersen (2003) worked example is not reproduced.** The paper (Lehman Brothers Quantitative Credit Research, November 2003) is not freely available; only unofficial copies exist, which this project does not use. The item stays open in the known-issues list for a human with access (as other licensed citations). In its place: the derivation above, parity on every case, the limit cases, and five wrong conventions each caught by the goldens: front-end protection added outright to the payer; strike not adjusted for the coupon (`K_adj = K`); `A_K` on the index hazard `h` instead of `h_K`; exercise upfront not discounted from expiry (`P(expiry)` dropped); `A_K` measured from `as_of` instead of `expiry`.
+- No QuantLib object prices an index option with this adjustment (QuantLib 1.44 `CdsOption` is single-name, with the front-end protection added outright), so no case here counts as outside-checked.
+
+### Sources (this section)
+
+- [S7] Pedersen, C. M., "Valuation of portfolio credit default swaptions", Lehman Brothers Quantitative Credit Research, November 2003 (not opened: not freely available; the method is stated in full above)
+- [S1] O'Kane (2008), chapter on CDS index options: the exercise price `(K - C) A_K` and the loss-adjusted forward (not opened)
+- [S8] ISDA, *CDS Standard Model* and the "Big Bang" protocol (2009): fixed coupons of 100 and 500 bp, upfront from a flat spread (cited for the coupon convention only; the stylised legs here are ruling E-B22, not the ISDA model)
