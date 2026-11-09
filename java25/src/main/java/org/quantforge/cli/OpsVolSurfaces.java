@@ -15,6 +15,7 @@ import org.quantforge.core.Normal;
 import org.quantforge.core.QfError;
 import org.quantforge.vol.Black;
 import org.quantforge.vol.Garch;
+import org.quantforge.vol.GarchMle;
 import org.quantforge.vol.Smile;
 import org.quantforge.vol.Surfaces;
 import org.quantforge.vol.VarianceStrip;
@@ -281,6 +282,32 @@ final class OpsVolSurfaces {
         }
     }
 
+    /** {@code distribution}: NORMAL (the default) or STUDENT_T; anything else is E_SCHEMA. */
+    private static boolean studentT(In in) {
+        if (!in.has("distribution")) {
+            return false;
+        }
+        return switch (in.string("distribution")) {
+            case "NORMAL" -> false;
+            case "STUDENT_T" -> true;
+            default -> throw new QfError("E_SCHEMA", "distribution: not a listed value", "distribution");
+        };
+    }
+
+    /** Ruling F-14: nu for STUDENT_T (required, above 2); NaN for NORMAL, where it is ignored. */
+    private static double degrees(boolean t, Double nu) {
+        if (!t) {
+            return Double.NaN;
+        }
+        if (nu == null) {
+            throw input("degrees_of_freedom", "STUDENT_T needs degrees_of_freedom");
+        }
+        if (!(nu > 2.0)) {
+            throw domain("degrees_of_freedom", "degrees_of_freedom must be above 2");
+        }
+        return nu;
+    }
+
     private static double startVariance(Double given, double[] r) {
         double v = given == null ? Garch.sampleVariance(r) : given;
         if (!(v > 0.0)) {
@@ -295,15 +322,40 @@ final class OpsVolSurfaces {
             double omega = in.real("omega");
             double alpha = in.real("alpha");
             double beta = in.real("beta");
-            Double iv = in.gate(initialVariance(in));
+            Double iv = initialVariance(in);
+            boolean t = studentT(in);
+            Double nu = in.realOrNull("degrees_of_freedom");
+            double mu = in.gate(in.real("mean", 0.0));
             if (r.length < 2) {
                 throw input("returns", "need at least 2 returns");
             }
             sampleKeyword(in);
             Garch.checkParameters(omega, alpha, beta);
-            Garch.Path p = Garch.path(r, omega, alpha, beta, startVariance(iv, r));
+            double n = degrees(t, nu);
+            double[] e = GarchMle.residuals(r, mu);
+            Garch.Path p = GarchMle.loglik(r, omega, alpha, beta, startVariance(iv, e), n, mu);
             return Operations.out("loglik", p.loglik(), "variances", OpsSmile.list(p.variances()), "next_variance",
                     p.next());
+        });
+        table.put("vol.garch.estimate", in -> {
+            double[] r = in.reals("returns");
+            Double iv = initialVariance(in);
+            boolean t = studentT(in);
+            boolean demean = in.gate(in.bool("demean"));
+            if (r.length < (t ? 100 : Garch.MIN_FIT_RETURNS)) {
+                throw input("returns", "too few returns");
+            }
+            sampleKeyword(in);
+            double[] e = GarchMle.residuals(r, demean ? GarchMle.mean(r) : 0.0);
+            GarchMle.Estimate x = GarchMle.estimate(r, startVariance(iv, e), t, demean);
+            Map<String, Object> se = new java.util.LinkedHashMap<>();
+            se.put("omega", x.stdErrors()[0]);
+            se.put("alpha", x.stdErrors()[1]);
+            se.put("beta", x.stdErrors()[2]);
+            se.put("degrees_of_freedom", t ? x.stdErrors()[3] : null);
+            return Operations.out("omega", x.omega(), "alpha", x.alpha(), "beta", x.beta(), "degrees_of_freedom",
+                    t ? x.nu() : null, "mean", x.mean(), "loglik", x.loglik(), "std_errors", se, "persistence",
+                    x.alpha() + x.beta());
         });
         table.put("vol.garch.forecast", in -> {
             double omega = in.real("omega");
