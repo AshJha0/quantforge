@@ -6,7 +6,7 @@ Docs site: <https://ashjha0.github.io/quantforge/>
 QuantForge is a quantitative library written four times, in Java, C++, Python and Rust, from one set of specifications. The plan covers market data, curves, calibration, pricing, volatility, risk, portfolio analytics, hedging, market microstructure, execution analytics and systematic research. Five stages are built so far: Foundation (released as v0.1), the FX and rates slices (v0.2), the equity vol slice (v0.3), curves and fixed income (stage D, v0.4) and full volatility and exotics (stage E, v0.5.0). Phases R1, credibility hardening (v0.4.1), and R2, risk first (v0.4.2), sit between stages D and E. See Status below.
 
 ### What it can and cannot show
-On free public data, QuantForge can show correct pricing and risk, curve quality against published curves, and signals on fitted curves with honest statistics.
+On free public data, QuantForge can show correct pricing and risk, curve quality against published curves, and signals on fitted curves tested against preregistered pass rules (research/preregs, amended 2026-11-09: one-sided deflated test, 24-trial family, Holm correction; the studies are underpowered and say so).
 
 It cannot show tradable profitability. That needs instrument-level prices, bid and ask, financing and execution data, which cost money. This is a deliberate limit of a zero-spend project. Today every golden case uses synthetic inputs, and risk is bump-and-revalue sensitivities with P&L explain (R2), not a portfolio risk engine.
 
