@@ -9,6 +9,7 @@
 namespace quantforge {
 
 /// Bivariate standard normal CDF P(X <= a, Y <= b) with correlation rho (Genz's method, 20-point rule).
+/// Special functions, called inside pricers; unchecked: caller guarantees finite inputs.
 double bivariate_normal_cdf(double a, double b, double rho);
 /// Student t CDF and its inverse, nu > 0 (any real).
 double student_t_cdf(double x, double nu);

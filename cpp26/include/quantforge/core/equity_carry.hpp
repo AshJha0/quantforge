@@ -17,7 +17,9 @@ struct CashDividend {
 struct EquityCarry {
     const Curve& funding;
     double borrow, spread;
+    /// unchecked: caller guarantees finite inputs
     double carry(Date d) const;
+    /// unchecked: caller guarantees finite inputs
     /// F(T) = [S - sum_{as_of < t_i <= T} div_i C(t_i)] / C(T).
     double forward(double spot, const std::vector<CashDividend>& dividends, Date expiry) const;
 };

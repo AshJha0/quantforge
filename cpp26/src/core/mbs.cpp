@@ -5,10 +5,23 @@
 #include <string>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 
+namespace {
+
+void require_finite_pool(const MbsPool& p) {
+    require_finite(p.balance, "pool");
+    require_finite(p.wac, "pool");
+    require_finite(p.net_coupon, "pool");
+    require_finite(p.rate_or_speed, "pool");
+}
+
+}  // namespace
+
 MbsCashflows mbs_cashflows(const MbsPool& p) {
+    require_finite_pool(p);
     if (p.wam < 1 || p.wam > 1200 || p.age < 0 || p.age > 1200) throw Error("E_INPUT", "wam or age is out of range", "pool");
     // wac <= 0 is reported before net_coupon > wac, which presumes a valid wac (mbs_d-0011; SPEC_QUESTIONS 18).
     if (!(p.wac > 0.0)) throw Error("E_DOMAIN", "wac must be positive", "pool");
@@ -37,6 +50,8 @@ MbsCashflows mbs_cashflows(const MbsPool& p) {
 }
 
 MbsPrice mbs_price(const MbsPool& pool, double y, long long delay_days) {
+    require_finite_pool(pool);
+    require_finite(y, "yield");
     const MbsCashflows c = mbs_cashflows(pool);
     if (delay_days < 0 || delay_days > 3650) throw Error("E_INPUT", "delay_days must be at least 0", "delay_days");
     if (!(1.0 + y / 12.0 > 0.0)) throw Error("E_DOMAIN", "1 + yield/12 must be positive", "yield");

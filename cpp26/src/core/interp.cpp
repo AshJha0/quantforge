@@ -1,3 +1,4 @@
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/interp.hpp"
 
 #include <algorithm>
@@ -237,6 +238,12 @@ struct Shape {
 }  // namespace
 
 InterpResult interpolate(InterpMethod method, const Vec& x, const Vec& y, const Vec& at, const InterpParams& params) {
+    require_finite(x, "x");
+    require_finite(y, "y");
+    require_finite(at, "at");
+    require_finite(params.slope_start, "slope_start");
+    require_finite(params.slope_end, "slope_end");
+    require_finite(params.tension, "tension");
     using enum InterpMethod;
     if (x.size() != y.size()) throw Error("E_INPUT", "x and y differ in length");
     if (x.size() < min_knots(method)) throw Error("E_INPUT", "too few knots", "x");
@@ -282,6 +289,9 @@ InterpResult interpolate(InterpMethod method, const Vec& x, const Vec& y, const 
 }
 
 MonotoneConvexResult monotone_convex(const Vec& t_in, const Vec& r_in, const Vec& at, bool positive) {
+    require_finite(t_in, "t");
+    require_finite(r_in, "r");
+    require_finite(at, "at");
     if (t_in.size() != r_in.size()) throw Error("E_INPUT", "t and r differ in length");
     if (t_in.size() < 2) throw Error("E_INPUT", "at least 2 points are needed", "t");
     if (!strictly_increasing(t_in) || t_in.front() <= 0.0) throw Error("E_INPUT", "t must be positive and increasing", "t");

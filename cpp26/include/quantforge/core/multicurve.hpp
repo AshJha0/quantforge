@@ -40,10 +40,12 @@ struct StepCurve {
     std::vector<Step> steps;
     std::vector<Jump> jumps;
 
-    /// Step dates (E_INPUT), then jumps.
+    /// Finite base_rate, step rates and jump factors (E_DOMAIN), then step dates (E_INPUT), then jumps.
     void check() const;
-    /// E_OUT_OF_RANGE before as_of.
+    /// E_OUT_OF_RANGE before as_of. Call check() first.
+    /// unchecked: caller guarantees finite inputs
     double discount(Date d) const;
+    /// unchecked: caller guarantees finite inputs
     double forward(Date d) const;
 };
 

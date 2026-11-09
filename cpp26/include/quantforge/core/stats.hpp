@@ -10,10 +10,13 @@ struct Centred {
     double mean;
     std::vector<double> d;
 };
+/// Internal helper over checked data; unchecked: caller guarantees finite inputs.
 Centred centre(const std::vector<double>& x);
 /// The zero-variance test: exact, so rounding cannot hide it.
+/// unchecked: caller guarantees finite inputs
 bool all_equal(const std::vector<double>& x);
 
+/// Raw kernels, defined at the infinities; unchecked: caller guarantees finite inputs.
 double normal_pdf(double x);
 double normal_cdf(double x);
 

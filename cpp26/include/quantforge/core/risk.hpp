@@ -33,6 +33,7 @@ void check_key_dates(const Curve& curve, const std::vector<Date>& key_dates);
 KeyRateRisk key_rate_risk(const Curve& curve, KeyRateMode mode, const std::vector<Date>& key_dates,
                           const CurvePricer& price, double bump_bp, BumpScheme scheme);
 /// The triangular weight of key i at curve time t (key times strictly increasing).
+/// unchecked: caller guarantees finite inputs
 double triangular_weight(const std::vector<double>& key_times, std::size_t i, double t);
 
 struct PnlExplain {

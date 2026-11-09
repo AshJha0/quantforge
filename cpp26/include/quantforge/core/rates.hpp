@@ -52,6 +52,7 @@ struct Jump {
 /// E_INPUT unless dates strictly increase after as_of; E_DOMAIN on a factor <= 0.
 void check_jumps(Date as_of, const std::vector<Jump>& jumps);
 /// Product of the factors dated strictly before d.
+/// unchecked: caller guarantees finite inputs
 double jump_product(const std::vector<Jump>& jumps, Date d);
 
 struct Pillar {
@@ -76,7 +77,10 @@ public:
     double discount(Date d) const;
 
     std::size_t size() const { return dates_.size(); }
+    /// Solver primitives: they store raw log discount factors.
+    /// unchecked: caller guarantees finite inputs
     void push(Date d, double log_df);
+    /// unchecked: caller guarantees finite inputs
     void set_log_df(std::size_t pillar, double log_df) { log_df_[pillar + 1] = log_df; }
     double log_df(std::size_t pillar) const { return log_df_[pillar + 1]; }
     std::vector<Pillar> pillars() const;

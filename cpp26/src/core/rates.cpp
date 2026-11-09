@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/linalg.hpp"
 
 using namespace std::chrono;
@@ -19,6 +20,19 @@ const RateConvention table[] = {
     {"ESTR", "EUR", Calendar::Euta, 2, 2, 12, DayCount::Act360, 0, 360.0},
     {"USD-TERM-3M", "USD", Calendar::Usgs, 2, 0, 12, DayCount::Thirty360Bond, 3, 360.0},
 };
+
+void require_finite_quotes(const std::vector<OisQuote>& quotes, std::string_view field) {
+    for (const OisQuote& q : quotes) require_finite(q.rate, field);
+}
+
+void require_finite_jumps(const std::vector<Jump>& jumps) {
+    for (const Jump& j : jumps) require_finite(j.factor, "jumps");
+}
+
+void require_finite_trade(double fixed_rate, double notional) {
+    require_finite(fixed_rate, "fixed_rate");
+    require_finite(notional, "notional");
+}
 
 double sign_of(FixedSide s) { return s == FixedSide::Pay ? 1.0 : -1.0; }
 
@@ -168,6 +182,7 @@ Curve::Curve(Date as_of, CurveInterpolation interpolation)
     : as_of_(as_of), interpolation_(interpolation), t_{0.0}, log_df_{0.0} {}
 
 void check_jumps(Date as_of, const std::vector<Jump>& jumps) {
+    require_finite_jumps(jumps);
     Date previous = as_of;
     for (const Jump& j : jumps) {
         if (j.date <= previous) throw Error("E_INPUT", "jump dates must increase and follow as_of", "jumps");
@@ -192,6 +207,8 @@ void Curve::set_jumps(const std::vector<Jump>& jumps) {
 Curve::Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars,
              const std::vector<Jump>& jumps)
     : Curve(as_of, interpolation) {
+    for (const Pillar& p : pillars) require_finite(p.discount_factor, "pillars");
+    require_finite_jumps(jumps);
     if (pillars.empty()) throw Error("E_INPUT", "no pillars", "pillars");
     Date previous = as_of;
     for (const Pillar& p : pillars) {
@@ -255,6 +272,8 @@ double simple_forward(const Curve& c, Date start, Date end, DayCount day_count) 
 SolvedCurve solve_curve(Date as_of, CurveInterpolation interpolation, const std::vector<Date>& dates,
                         const std::vector<double>& targets, const ModelRate& model, SolveMethod method,
                         const std::vector<Jump>& jumps) {
+    require_finite(targets, "targets");
+    require_finite_jumps(jumps);
     Curve c(as_of, interpolation);
     c.set_jumps(jumps);
     double previous_t = 0.0, previous_x = 0.0;
@@ -301,6 +320,7 @@ Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const
 
 SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
                           CurveInterpolation interpolation, SolveMethod method, const std::vector<Jump>& jumps) {
+    require_finite_quotes(quotes, "quotes");
     check_jumps(as_of, jumps);
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     std::vector<std::vector<Period>> swaps;
@@ -318,6 +338,8 @@ SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector
 }
 
 double ois_compound(const std::vector<double>& rates, const std::vector<long long>& days, double denominator) {
+    require_finite(rates, "rates");
+    require_finite(denominator, "denominator");
     if (rates.empty() || rates.size() != days.size()) throw Error("E_INPUT", "rates and days must match");
     double product = 1.0, total = 0.0;
     for (std::size_t i = 0; i < rates.size(); ++i) {
@@ -329,6 +351,7 @@ double ois_compound(const std::vector<double>& rates, const std::vector<long lon
 }
 
 OisPrice ois_price(const OisTrade& trade, const Curve& curve, std::optional<std::string> snapshot_id) {
+    require_finite_trade(trade.fixed_rate, trade.notional);
     const RateConvention& c = *trade.convention;
     const Legs legs = ois_legs(c, ois_periods(c, curve.as_of(), trade.tenor), curve);
     const double pv = sign_of(trade.side) * trade.notional * (legs.floating - trade.fixed_rate * legs.annuity);
@@ -338,6 +361,7 @@ OisPrice ois_price(const OisTrade& trade, const Curve& curve, std::optional<std:
 Curve projection_bootstrap(const Curve& discount, const RateConvention& index, Date as_of,
                            const std::vector<ProjectionQuote>& quotes, CurveInterpolation interpolation,
                            double* max_repricing_error) {
+    for (const ProjectionQuote& q : quotes) require_finite(q.rate, "quotes");
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     struct Instrument {
         Date start, end;
@@ -378,6 +402,7 @@ Curve projection_bootstrap(const Curve& discount, const RateConvention& index, D
 
 SwapPrice swap_price(const SwapTrade& trade, const Curve& discount, const Curve& projection,
                      std::optional<std::string> snapshot_id) {
+    require_finite_trade(trade.fixed_rate, trade.notional);
     const RateConvention& c = *trade.index;
     const Legs v = swap_values(c, swap_legs(c, discount.as_of(), trade.tenor_months), discount, projection);
     const double pv = sign_of(trade.side) * trade.notional * (v.floating - trade.fixed_rate * v.annuity);
@@ -386,6 +411,7 @@ SwapPrice swap_price(const SwapTrade& trade, const Curve& discount, const Curve&
 
 FraPrice fra_price(const FraTrade& trade, const Curve& discount, const Curve& projection,
                    std::optional<std::string> snapshot_id) {
+    require_finite_trade(trade.fixed_rate, trade.notional);
     const RateConvention& c = *trade.index;
     const Date e = plus_months(c, trade.start, c.months);
     const double alpha = year_fraction(DayCount::Act360, trade.start, e);
@@ -407,6 +433,7 @@ double basis_spread(const Curve& discount, const Curve& projection, const RateCo
 
 BumpedCurves bumped_curves(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
                            CurveInterpolation interpolation) {
+    require_finite_quotes(quotes, "quotes");
     constexpr double bp = 1e-4;
     const auto build = [&](const std::vector<OisQuote>& q) {
         return ois_bootstrap(c, as_of, q, interpolation, SolveMethod::Sequential).curve;
@@ -428,6 +455,7 @@ BumpedCurves bumped_curves(const RateConvention& c, Date as_of, const std::vecto
 }
 
 RateRisk rate_risk(const OisTrade& trade, const BumpedCurves& curves) {
+    require_finite_trade(trade.fixed_rate, trade.notional);
     const auto pv = [&](const Curve& c) { return ois_price(trade, c).valuation.pv; };
     RateRisk r{(pv(*curves.all_up) - pv(*curves.all_down)) / 2.0, {}};
     for (std::size_t j = 0; j < curves.up.size(); ++j) r.key_rate.push_back((pv(curves.up[j]) - pv(curves.down[j])) / 2.0);
@@ -435,6 +463,11 @@ RateRisk rate_risk(const OisTrade& trade, const BumpedCurves& curves) {
 }
 
 CashflowRisk cashflow_risk(const std::vector<Cashflow>& cashflows, double yield) {
+    for (const Cashflow& c : cashflows) {
+        require_finite(c.t, "cashflows");
+        require_finite(c.amount, "cashflows");
+    }
+    require_finite(yield, "yield");
     if (cashflows.empty()) throw Error("E_INPUT", "at least 1 cashflow is needed", "cashflows");
     for (const Cashflow& c : cashflows)
         if (c.t < 0.0) throw Error("E_DOMAIN", "t is negative", "cashflows");

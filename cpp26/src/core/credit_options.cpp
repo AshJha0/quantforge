@@ -8,6 +8,7 @@
 
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/calendar.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/integrate.hpp"
 #include "quantforge/core/smile.hpp"
@@ -194,7 +195,19 @@ double bivariate_t_cdf(double a, double b, double rho, double nu) {
     return gauss_kronrod(f, 0.0, 1.0, 1e-15, 2000).value + gauss_kronrod(f, 1.0, smax, 1e-15, 2000).value;
 }
 
+namespace {
+void finite_cds(const CdsOptionInputs& in) {
+    require_finite(in.rate, "rate");
+    require_finite(in.hazard_rate, "hazard_rate");
+    require_finite(in.recovery, "recovery");
+    require_finite(in.strike, "strike");
+    require_finite(in.notional, "notional");
+}
+}  // namespace
+
 CdsOptionPrice cds_option_price(const CdsOptionInputs& in, double vol) {
+    finite_cds(in);
+    require_finite(vol, "vol");
     const Legs l = cds_legs(in);
     if (!(vol >= 0)) throw Error("E_DOMAIN", "vol is negative", "vol");
     const double f = l.protection / l.annuity, phi = in.payer ? 1.0 : -1.0;
@@ -205,6 +218,8 @@ CdsOptionPrice cds_option_price(const CdsOptionInputs& in, double vol) {
 }
 
 double cds_option_implied_vol(const CdsOptionInputs& in, double premium) {
+    finite_cds(in);
+    require_finite(premium, "premium");
     if (!in.knock_out) throw Error("E_INPUT", "implied vol is for knock-out options only", "knock_out");
     const Legs l = cds_legs(in);
     const double f = l.protection / l.annuity, phi = in.payer ? 1.0 : -1.0, scale = in.notional * l.annuity;
@@ -217,6 +232,9 @@ double cds_option_implied_vol(const CdsOptionInputs& in, double premium) {
 }
 
 JointDefault copula_joint_default(CopulaKind kind, const std::vector<double>& p, double rho, std::optional<double> nu) {
+    require_finite(p, "default_probabilities");
+    require_finite(rho, "correlation");
+    require_finite(nu, "degrees_of_freedom");
     if (p.size() != 2) throw Error("E_INPUT", "two default probabilities are needed", "default_probabilities");
     if (kind == CopulaKind::StudentT && !nu) throw Error("E_INPUT", "STUDENT_T needs degrees_of_freedom", "degrees_of_freedom");
     prob(p[0], "default_probabilities");
@@ -245,6 +263,11 @@ double expected_min(double c, double rho, double p, double k) {
 }  // namespace
 
 double lhp_tranche_loss(double p, double rho, double r, double a, double d) {
+    require_finite(p, "default_probability");
+    require_finite(rho, "correlation");
+    require_finite(r, "recovery");
+    require_finite(a, "attachment");
+    require_finite(d, "detachment");
     if (!(d > a) || a < 0 || d > 1) throw Error("E_INPUT", "0 <= attachment < detachment <= 1 is needed");
     check_pool(p, rho, r);
     const double c = normal_inverse(p);
@@ -254,6 +277,10 @@ double lhp_tranche_loss(double p, double rho, double r, double a, double d) {
 }
 
 std::vector<double> lhp_loss_cdf(double p, double rho, double r, const std::vector<double>& x) {
+    require_finite(p, "default_probability");
+    require_finite(rho, "correlation");
+    require_finite(r, "recovery");
+    require_finite(x, "losses");
     if (x.empty()) throw Error("E_INPUT", "losses is empty", "losses");
     check_pool(p, rho, r);
     for (const double v : x)

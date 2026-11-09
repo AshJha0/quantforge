@@ -104,7 +104,7 @@ if(BUILD_TESTING)
     GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024) # v3.16.1
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp)
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   qf_strict(quantforge_core_tests)
   if(MINGW)

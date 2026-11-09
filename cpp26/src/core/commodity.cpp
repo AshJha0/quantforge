@@ -5,11 +5,14 @@
 #include <string>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 
 std::vector<double> commodity_forwards(const std::vector<CommodityQuote>& q, const std::optional<std::vector<double>>& seasonality,
                                        const std::vector<long long>& months) {
+    for (const CommodityQuote& x : q) require_finite(x.price, "quotes");
+    require_finite(seasonality, "seasonality");
     if (q.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     for (std::size_t j = 1; j < q.size(); ++j)
         if (q[j].month <= q[j - 1].month) throw Error("E_INPUT", "quote months must strictly increase", "quotes");
@@ -34,6 +37,8 @@ std::vector<double> commodity_forwards(const std::vector<CommodityQuote>& q, con
 }
 
 StorageCarry storage_carry(const Curve& funding, const std::vector<DatedPrice>& f, double u) {
+    for (const DatedPrice& x : f) require_finite(x.price, "forwards");
+    require_finite(u, "storage_cost");
     if (f.size() < 2) throw Error("E_INPUT", "at least two forwards are needed", "forwards");
     Date previous = funding.as_of();
     for (const DatedPrice& x : f) {

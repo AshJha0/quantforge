@@ -14,6 +14,7 @@ struct ExoticMarket {
 };
 
 /// Generalised Black-Scholes with cost of carry b.
+/// Raw kernel called by the checked pricers; unchecked: caller guarantees finite inputs.
 double gbs(OptionType type, double s, double k, double t, double r, double b, double v);
 
 enum class DigitalPayoff { CashOrNothing, AssetOrNothing };

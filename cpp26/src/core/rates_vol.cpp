@@ -5,6 +5,7 @@
 #include <string>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/black.hpp"
 
 namespace quantforge {
@@ -29,6 +30,10 @@ void check_months(long long tenor) {
 
 CapPrice cap_price(const Curve& discount, const Curve& projection, RateVolModel model, const std::vector<double>& vols, bool flat,
                    double phi, long long start_months, long long tenor_months, double strike, double notional) {
+    require_finite(vols, "vol");
+    require_finite(phi, "phi");
+    require_finite(strike, "strike");
+    require_finite(notional, "notional");
     if (start_months < 1 || start_months > 1200) throw Error("E_INPUT", "start_months must be at least 1", "trade");
     check_months(tenor_months);
     const Date start = spot_plus(discount, start_months);
@@ -58,6 +63,10 @@ CapPrice cap_price(const Curve& discount, const Curve& projection, RateVolModel 
 
 SwaptionPrice swaption_price(const Curve& discount, const Curve& projection, RateVolModel model, double vol, double phi,
                              long long expiry_months, long long tenor_months, double strike, double notional) {
+    require_finite(vol, "vol");
+    require_finite(phi, "phi");
+    require_finite(strike, "strike");
+    require_finite(notional, "notional");
     if (expiry_months < 1 || expiry_months > 1200) throw Error("E_INPUT", "expiry_months must be at least 1", "trade");
     check_months(tenor_months);
     if (!(vol >= 0.0)) throw Error("E_DOMAIN", "vol is negative", "vol");
@@ -112,6 +121,13 @@ void check_bondfut(double futures, double strike, double t, double discount) {
 
 CubeSwaption swaption_price_cube(const Curve& discount, const Curve& projection, const SabrCube& c, double phi,
                                  long long expiry_months, long long tenor_months, double strike, double notional) {
+    require_finite(c.alpha, "cube");
+    require_finite(c.beta, "cube");
+    require_finite(c.rho, "cube");
+    require_finite(c.nu, "cube");
+    require_finite(phi, "phi");
+    require_finite(strike, "strike");
+    require_finite(notional, "notional");
     const std::size_t ne = c.expiries_months.size(), nt = c.tenors_months.size();
     const auto shaped = [&](const std::vector<std::vector<double>>& m) {
         return m.size() == ne && std::ranges::all_of(m, [&](const std::vector<double>& r) { return r.size() == nt; });
@@ -160,6 +176,9 @@ CubeSwaption swaption_price_cube(const Curve& discount, const Curve& projection,
 
 CapStrip cap_strip(const Curve& discount, const Curve& projection, RateVolModel model, long long start_months, double strike,
                    const std::vector<long long>& tenors, const std::vector<double>& flat, double notional) {
+    require_finite(strike, "strike");
+    require_finite(flat, "flat_vols");
+    require_finite(notional, "notional");
     if (tenors.empty()) throw Error("E_INPUT", "cap_tenors_months is empty", "cap_tenors_months");
     for (std::size_t k = 0; k < tenors.size(); ++k)
         if (tenors[k] <= 0 || tenors[k] % 3 != 0 || (k > 0 && tenors[k] <= tenors[k - 1]))
@@ -213,6 +232,13 @@ CapStrip cap_strip(const Curve& discount, const Curve& projection, RateVolModel 
 
 BondFutOption bondfut_option_price(double phi, double futures, double strike, double t, double discount, double vol,
                                    double contract_size) {
+    require_finite(phi, "phi");
+    require_finite(futures, "futures_price");
+    require_finite(strike, "strike");
+    require_finite(t, "expiry_years");
+    require_finite(discount, "discount_factor");
+    require_finite(vol, "vol");
+    require_finite(contract_size, "contract_size");
     check_bondfut(futures, strike, t, discount);
     if (!(vol >= 0)) throw Error("E_DOMAIN", "vol is negative", "vol");
     const double p = black_price(futures, strike, vol, t, discount, phi);
@@ -221,6 +247,14 @@ BondFutOption bondfut_option_price(double phi, double futures, double strike, do
 
 BondFutVol bondfut_implied_vol(double phi, double futures, double strike, double t, double discount, double premium,
                                double y, double dm) {
+    require_finite(phi, "phi");
+    require_finite(futures, "futures_price");
+    require_finite(strike, "strike");
+    require_finite(t, "expiry_years");
+    require_finite(discount, "discount_factor");
+    require_finite(premium, "premium");
+    require_finite(y, "ctd_yield");
+    require_finite(dm, "ctd_modified_duration");
     check_bondfut(futures, strike, t, discount);
     const double intrinsic = discount * std::max(phi * (futures - strike), 0.0);
     const double bound = discount * (phi > 0 ? futures : strike);
@@ -235,6 +269,11 @@ BondFutVol bondfut_implied_vol(double phi, double futures, double strike, double
 }
 
 CapPrice yoy_cap_price(RateVolModel model, double phi, double strike, double notional, const std::vector<YoyPeriod>& periods) {
+    require_finite(phi, "phi");
+    require_finite(strike, "strike");
+    require_finite(notional, "notional");
+    for (const YoyPeriod& p : periods)
+        for (const double x : {p.accrual, p.discount_factor, p.yoy_forward, p.expiry_years, p.vol}) require_finite(x, "periods");
     if (periods.empty()) throw Error("E_INPUT", "periods is empty", "periods");
     if (model == RateVolModel::Black76) {
         if (!(strike > 0)) throw Error("E_DOMAIN", "BLACK_76 needs a positive strike", "strike");
@@ -257,6 +296,13 @@ CapPrice yoy_cap_price(RateVolModel model, double phi, double strike, double not
 
 ZcCap zc_cap_price(RateVolModel model, double phi, double fi, double years, double strike, double discount, double vol,
                    double notional) {
+    require_finite(phi, "phi");
+    require_finite(fi, "forward_index_ratio");
+    require_finite(years, "years");
+    require_finite(strike, "strike");
+    require_finite(discount, "discount_factor");
+    require_finite(vol, "vol");
+    require_finite(notional, "notional");
     if (model == RateVolModel::Black76 && !(fi > 0))
         throw Error("E_DOMAIN", "BLACK_76 needs a positive forward", "forward_index_ratio");
     if (!(years > 0)) throw Error("E_DOMAIN", "years is not above 0", "years");

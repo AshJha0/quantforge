@@ -6,6 +6,7 @@
 #include <set>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 namespace {
@@ -43,6 +44,9 @@ double EquityCarry::forward(double spot, const std::vector<CashDividend>& divide
 }
 
 ImpliedDividends implied_dividends(double spot, const Curve& funding, double borrow, const std::vector<FuturesQuote>& futures) {
+    require_finite(spot, "spot");
+    require_finite(borrow, "borrow");
+    for (const FuturesQuote& f : futures) require_finite(f.price, "futures");
     if (futures.empty()) throw Error("E_INPUT", "no futures", "futures");
     Date previous = funding.as_of();
     for (const FuturesQuote& f : futures) {
@@ -64,12 +68,20 @@ ImpliedDividends implied_dividends(double spot, const Curve& funding, double bor
 }
 
 double implied_borrow(double spot, const Curve& funding, const std::vector<CashDividend>& dividends, Date expiry, double forward) {
+    require_finite(spot, "spot");
+    for (const CashDividend& d : dividends) require_finite(d.amount, "dividends");
+    require_finite(forward, "forward");
     if (expiry <= funding.as_of()) throw Error("E_DATE_ORDER", "expiry must follow as_of", "expiry");
     return decreasing_root([&](double b) { return EquityCarry{funding, b, 0.0}.forward(spot, dividends, expiry) - forward; });
 }
 
 FuturesBasis equity_futures_basis(double spot, const Curve& funding, double borrow, double spread,
                                   const std::vector<CashDividend>& dividends, Date expiry, double futures_price) {
+    require_finite(spot, "spot");
+    require_finite(borrow, "borrow");
+    require_finite(spread, "spread");
+    for (const CashDividend& d : dividends) require_finite(d.amount, "dividends");
+    require_finite(futures_price, "futures_price");
     if (expiry <= funding.as_of()) throw Error("E_DATE_ORDER", "expiry must follow as_of", "expiry");
     const double fair = EquityCarry{funding, borrow, spread}.forward(spot, dividends, expiry);
     // F rises with the financing spread s; solve on -s to reuse the decreasing root.
@@ -80,6 +92,13 @@ FuturesBasis equity_futures_basis(double spot, const Curve& funding, double borr
 
 IndexDividends index_dividends(double divisor, const std::vector<Constituent>& cs, const std::vector<Period2>& periods,
                                const std::vector<double>& implied) {
+    require_finite(divisor, "divisor");
+    for (const Constituent& c : cs) {
+        require_finite(c.shares, "constituents");
+        require_finite(c.price, "constituents");
+        for (const CashDividend& d : c.dividends) require_finite(d.amount, "constituents");
+    }
+    require_finite(implied, "implied_period_points");
     if (!(divisor > 0.0)) throw Error("E_DOMAIN", "divisor is not positive", "divisor");
     for (const Period2& p : periods)
         if (p.end < p.start) throw Error("E_DATE_ORDER", "a period ends before it starts", "periods");
@@ -106,6 +125,17 @@ IndexDividends index_dividends(double divisor, const std::vector<Constituent>& c
 }
 
 Rebalance index_rebalance(double divisor, const std::vector<Constituent>& old_list, const std::vector<Constituent>& new_list) {
+    require_finite(divisor, "divisor");
+    for (const Constituent& c : old_list) {
+        require_finite(c.shares, "constituents");
+        require_finite(c.price, "constituents");
+        for (const CashDividend& d : c.dividends) require_finite(d.amount, "constituents");
+    }
+    for (const Constituent& c : new_list) {
+        require_finite(c.shares, "new_constituents");
+        require_finite(c.price, "new_constituents");
+        for (const CashDividend& d : c.dividends) require_finite(d.amount, "new_constituents");
+    }
     for (const auto* list : {&old_list, &new_list}) {
         std::set<std::string> ids;
         for (const Constituent& c : *list)
@@ -123,6 +153,11 @@ Rebalance index_rebalance(double divisor, const std::vector<Constituent>& old_li
 }
 
 ActionResult corporate_action(CorporateAction action, double p, double shares, double strike, double a, double k) {
+    require_finite(p, "cum_price");
+    require_finite(shares, "shares");
+    require_finite(strike, "strike");
+    require_finite(a, action == CorporateAction::Rights ? "new_per_old" : action == CorporateAction::SpecialDividend ? "amount" : "ratio");
+    require_finite(k, "subscription_price");
     double f = 0.0;
     switch (action) {
         case CorporateAction::Split:
@@ -145,6 +180,14 @@ ActionResult corporate_action(CorporateAction action, double p, double shares, d
 
 TrsPrice trs_price(double spot, const Curve& funding, double borrow, const std::vector<CashDividend>& dividends,
                    const TrsTrade& t, std::optional<double> current_rate) {
+    require_finite(spot, "spot");
+    require_finite(borrow, "borrow");
+    for (const CashDividend& d : dividends) require_finite(d.amount, "dividends");
+    require_finite(t.initial_price, "trade");
+    require_finite(t.shares, "trade");
+    require_finite(t.spread, "trade");
+    require_finite(t.sign, "trade");
+    require_finite(current_rate, "current_rate");
     if (t.end <= t.start) throw Error("E_DATE_ORDER", "end must follow start", "trade");
     if (t.start < funding.as_of() && !current_rate) throw Error("E_INPUT", "current_rate is needed once the period has started", "current_rate");
     const EquityCarry c{funding, borrow, 0.0};

@@ -6,6 +6,7 @@
 #include <set>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/linalg.hpp"
 
 namespace quantforge {
@@ -17,6 +18,18 @@ namespace {
 }
 
 double days(Date a, Date b) { return double(days_between(a, b)); }
+
+void require_finite_fixings(const std::vector<Fixing>& fixings) {
+    for (const Fixing& f : fixings) require_finite(f.rate, "fixings");
+}
+
+void require_finite_quotes(const std::vector<OisQuote>& quotes, std::string_view field) {
+    for (const OisQuote& q : quotes) require_finite(q.rate, field);
+}
+
+void require_finite_jumps(const std::vector<Jump>& jumps) {
+    for (const Jump& j : jumps) require_finite(j.factor, "jumps");
+}
 
 }  // namespace
 
@@ -39,6 +52,7 @@ Date fixing_days_back(const RateConvention& c, Date x, long long k) {
 
 DatedCompound compound_dated(const RateConvention& c, Date start, Date end, ShiftMethod method, long long k,
                              const std::vector<Fixing>& fixings) {
+    require_finite_fixings(fixings);
     if (c.months != 0) input("the convention is not overnight", "convention");
     if (end <= start) throw Error("E_DATE_ORDER", "end must be after start", "end");
     std::vector<Date> d;
@@ -79,6 +93,7 @@ DatedCompound compound_dated(const RateConvention& c, Date start, Date end, Shif
 }
 
 FallbackRate fallback_rate(std::string_view ibor, Date start, Date end, const std::vector<Fixing>& fixings) {
+    require_finite_fixings(fixings);
     struct Row {
         std::string_view ibor, index;
         double spread;
@@ -101,6 +116,9 @@ FallbackRate fallback_rate(std::string_view ibor, Date start, Date end, const st
 // ---- step curves ----
 
 void StepCurve::check() const {
+    require_finite(base_rate, "base_rate");
+    for (const Step& s : steps) require_finite(s.rate, "steps");
+    require_finite_jumps(jumps);
     Date previous = as_of;
     for (const Step& s : steps) {
         if (s.date <= previous) input("step dates must increase and follow as_of", "steps");
@@ -133,6 +151,8 @@ double StepCurve::forward(Date d) const {
 
 StepFit fit_steps(const RateConvention& c, Date as_of, const std::vector<Date>& step_dates,
                   const std::vector<OisQuote>& quotes, const std::vector<Jump>& jumps) {
+    require_finite_quotes(quotes, "quotes");
+    require_finite_jumps(jumps);
     if (c.months != 0) input("the convention is not overnight", "convention");
     const std::size_t m = step_dates.size();
     if (m == 0) input("no step dates", "step_dates");
@@ -193,6 +213,11 @@ StepFit fit_steps(const RateConvention& c, Date as_of, const std::vector<Date>& 
 // ---- futures ----
 
 Convexity futures_convexity(double price, double t, double big_t, double sigma, double a) {
+    require_finite(price, "price");
+    require_finite(t, "start_years");
+    require_finite(big_t, "end_years");
+    require_finite(sigma, "sigma");
+    require_finite(a, "mean_reversion");
     if (big_t <= t) input("end_years must be after start_years", "end_years");
     if (t < 0.0) throw Error("E_DOMAIN", "start_years is negative", "start_years");
     if (sigma < 0.0) throw Error("E_DOMAIN", "sigma is negative", "sigma");
@@ -214,6 +239,11 @@ Convexity futures_convexity(double price, double t, double big_t, double sigma, 
 
 std::vector<double> csa_discount(const Curve& curve, double spread, const std::optional<CsaFx>& fx,
                                  const std::vector<Date>& dates) {
+    require_finite(spread, "spread");
+    if (fx) {
+        require_finite(fx->spot, "fx");
+        for (const FxForwardPoint& f : fx->forwards) require_finite(f.forward, "fx");
+    }
     std::map<Date, double> forwards;
     if (fx) {
         if (!(fx->spot > 0.0)) throw Error("E_DOMAIN", "spot is not positive", "fx");
@@ -249,6 +279,8 @@ double ois_index_spread(const RateConvention& c, Tenor tenor, const Curve& disco
 JointCurves joint_bootstrap(const RateConvention& c, const RateConvention& index, Date as_of,
                             const std::vector<OisQuote>& ois_quotes, const std::vector<ProjectionQuote>& term_quotes,
                             CurveInterpolation interpolation, SolveMethod method) {
+    require_finite_quotes(ois_quotes, "ois_quotes");
+    for (const ProjectionQuote& q : term_quotes) require_finite(q.rate, "term_quotes");
     if (ois_quotes.empty()) input("no OIS quotes", "ois_quotes");
     if (term_quotes.empty()) input("no term quotes", "term_quotes");
     // Block triangular: the OIS block does not see the projection curve, so the global Newton solve on
@@ -263,6 +295,11 @@ JointCurves joint_bootstrap(const RateConvention& c, const RateConvention& index
 
 SmoothFit smooth_fit(const std::vector<double>& knots, const std::vector<double>& m, const std::vector<double>& y,
                      double lambda, const std::optional<std::vector<double>>& weights) {
+    require_finite(knots, "knots");
+    require_finite(m, "maturities");
+    require_finite(y, "zero_rates");
+    require_finite(lambda, "lambda");
+    require_finite(weights, "weights");
     if (m.empty() || m.size() != y.size() || (weights && weights->size() != m.size()))
         input("maturities, zero_rates and weights must match and not be empty", "maturities");
     if (knots.empty()) input("no knots", "knots");
@@ -311,6 +348,10 @@ SmoothFit smooth_fit(const std::vector<double>& knots, const std::vector<double>
 }
 
 RobustFit robust_fit(const std::vector<double>& m, const std::vector<double>& y, double tau, double delta) {
+    require_finite(m, "maturities");
+    require_finite(y, "zero_rates");
+    require_finite(tau, "tau");
+    require_finite(delta, "delta");
     if (m.size() != y.size() || m.size() < 3) input("maturities and zero_rates must match, with at least 3", "maturities");
     if (!(tau > 0.0)) throw Error("E_DOMAIN", "tau is not positive", "tau");
     if (!(delta > 0.0)) throw Error("E_DOMAIN", "delta is not positive", "delta");
@@ -427,6 +468,8 @@ std::vector<Date> xccy_schedule(Date start, long long months) {
 }
 
 double xccy_leg(const std::vector<Date>& dates, double notional, const Curve& projection, const Curve& discount, double spread) {
+    require_finite(notional, "notional");
+    require_finite(spread, "spread");
     double sum = 0.0;
     for (std::size_t i = 1; i < dates.size(); ++i) {
         const double alpha = double(days_between(dates[i - 1], dates[i])) / 360.0;
@@ -437,6 +480,7 @@ double xccy_leg(const std::vector<Date>& dates, double notional, const Curve& pr
 
 SolvedCurve xccy_bootstrap(const Curve& foreign_projection, Date start, const std::vector<XccyQuote>& quotes,
                            CurveInterpolation interpolation) {
+    for (const XccyQuote& q : quotes) require_finite(q.spread, "quotes");
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     std::vector<std::vector<Date>> swaps;
     std::vector<Date> dates;
@@ -453,6 +497,11 @@ SolvedCurve xccy_bootstrap(const Curve& foreign_projection, Date start, const st
 
 NdfPrice ndf_price(const Curve& usd, const Curve& offshore, double spot, Date fixing_date, Date payment_date, double strike,
                    double usd_notional, double sign, std::optional<double> fixing) {
+    require_finite(spot, "spot");
+    require_finite(strike, "strike");
+    require_finite(usd_notional, "usd_notional");
+    require_finite(sign, "sign");
+    require_finite(fixing, "fixing");
     if (payment_date < fixing_date) throw Error("E_DATE_ORDER", "payment_date is before fixing_date", "trade");
     if (fixing_date <= usd.as_of() && !fixing) throw Error("E_INPUT", "a past fixing must be given", "fixing");
     if (!(spot > 0.0) || (fixing && !(*fixing > 0.0)) || !(strike > 0.0)) throw Error("E_DOMAIN", "spot, fixing and strike must be positive");
