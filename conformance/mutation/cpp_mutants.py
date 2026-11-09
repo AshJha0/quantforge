@@ -44,11 +44,15 @@ def apply(text, site):
     return "".join(lines), lines[at].strip()
 
 
+TIMED_OUT = []
+
+
 def quiet(cmd, timeout=None):
     try:
         return subprocess.run(cmd, capture_output=True, timeout=timeout).returncode
     except subprocess.TimeoutExpired:
-        return 124  # a mutant that hangs is caught
+        TIMED_OUT.append(cmd)
+        return 124  # a mutant that hangs is caught (counted in timed_out)
 
 
 def main():
@@ -95,13 +99,13 @@ def main():
                 survived.append(f"{a.file}:{site[0] + 1}: {shown}")
     killed_total = killed + unit_killed
     print(f"mutants {min(len(chosen), a.max)} of {len(chosen)} sites: killed {killed_total} (golden {killed}, unit {unit_killed}), "
-          f"did not build {no_build}, survived {len(survived)}")
+          f"did not build {no_build}, survived {len(survived)}, timed out {len(TIMED_OUT)}")
     for row in survived:
         print("SURVIVED", row)
     if a.out:
         Path(a.out).write_text(json.dumps({"summary": {"impl": "cpp", "target": a.file, "suite": a.suite, "seed": a.seed,
                                                        "sites": len(chosen), "killed": killed_total, "golden_killed": killed,
-                                                       "unit_killed": unit_killed, "unit": a.unit, "no_build": no_build,
+                                                       "unit_killed": unit_killed, "unit": a.unit, "no_build": no_build, "timed_out": len(TIMED_OUT),
                                                        "survived": len(survived)}, "survivors": survived}, indent=1) + "\n",
                                encoding="utf-8")
     return 0
