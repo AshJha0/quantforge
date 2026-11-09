@@ -91,7 +91,22 @@ This was measured on stage A code. No mutation score exists for stage B code; `o
 
 ### Mutation scores (stage E)
 
-PLACEHOLDER: to be filled by the coordinator before the v0.5.0 tag. Give the score per language on the stage E modules, the tool and version, the test set (unit tests, goldens or both), the commit measured and the evidence class. Until then, the latest published scores are stage D's (README, Known issues).
+Measured on branch `stage-e`. Pooled CI score before the closeout tests: **84.3%** (2,360 killed, 439 survived; CI run 42590488102, `mutation-report.md`). Two columns: the score before the closeout tests, and the score after them where tests were added.
+
+Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "before": local `--unit` runs on a 40-site sample, 0 timeouts (observed, local); the CI report's golden-only C++ scores are lower because they do not run the unit tests. Python and Rust "before": CI sample of 40 mutants, unit or golden (observed, CI). Every "after" score is a hand-applied survivor check: each surviving sampled mutant was applied by hand against the new tests (`cpp26/tests/test_mutants_e.cpp` after commit `996527c`, `python/tests/test_mutants_e.py`, `rust/crates/quantforge-core/tests/mutants_e.rs`). It is not a fresh full mutation run. Remaining survivors are classed as equivalent by the author, with reasons in those test files; a second reviewer's sign-off is scheduled (plan 13.2 T).
+
+| Module | Java (PIT) | C++ before | C++ after | Python before | Python after | Rust before | Rust after |
+|---|---|---|---|---|---|---|---|
+| surfaces_local_vol (E1) | 91.7% | 85.0% | unchanged | 70.0% | 97.5% (39/40) | 85.0% | unchanged |
+| heston_slv (E2) | 94.6% | 82.5% | unchanged | 75.0% | 100% (40/40) | 87.5% | unchanged |
+| fx_smile (E3) | 81.7% | 85.0% | unchanged | 72.5% | 90.0% (36/40) | 87.5% | unchanged |
+| rates_vol (E4) | 91.7% | 66.7% | 97.4% (38/39) | 57.5% | 90.0% (36/40) | 87.5% | unchanged |
+| exotics (E5) | 93.9% | 85.0% | unchanged | 65.0% | 97.5% (39/40) | 97.5% | unchanged |
+| correlation (E6) | 86.3% | 85.0% | unchanged | 80.0% | unchanged | 90.0% | unchanged |
+| garch_varswap_vix (E7) | 82.2% | 75.0% | 82.5% (33/40) | 65.0% | 100% (40/40) | 70.0% | 87.5% (35/40) |
+| credit_options (E8) | 90.4% | 60.0% | 92.5% (37/40) | 70.0% | 82.5% (33/40) | 95.0% | unchanged |
+
+Every cell is at or above the 80% target after the closeout tests, on the evidence classes above.
 
 ## Stage quality scope
 

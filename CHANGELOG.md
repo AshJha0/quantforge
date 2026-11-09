@@ -6,6 +6,7 @@ Undated until the tag. Two spec sessions wrote slices E1 to E8 in parallel; each
 
 ### Added
 - Stage E closeout infrastructure (plan 13.1 R3, R12, E3, E5, E8): recorder sources for Treasury bill and real yield curves and BLS CPI (API v1, no key), with parsed values, `state_sha256`, revision rows, daily study rows for R3-01 to R3-03 and the `sources.json` hash in every row; `gap_monitor.py --studies` and `recheck`. FRED T5YIE and T10YIE are listed but disabled, because FRED's terms forbid storing its data; the breakevens are rebuilt from the Treasury curves. `release.yml` for vMAJOR.MINOR.PATCH tags, `tools/doctor.py`, a devcontainer, a rewritten CONTRIBUTING and a README quick start checked in CI.
+- Stage E mutation scores and closeout tests (`test_mutants_e` in C++, Python and Rust): pooled CI score 84.3% before the new tests; every module and language at or above 80% after them by hand-applied survivor checks, not a fresh full run (table in `docs/model-inventory.md`).
 - E1 arbitrage-free SVI surfaces (butterfly, calendar and wing checks, SSVI to SVI, surface fit), Dupire local vol on SVI slices, forward vol, smile dynamics and vol of vol (`05-volatility/arb-free-surfaces.md`, `local-and-forward-vol.md`).
 - E2 Heston, Bates and Merton prices by the Lewis integral, and SLV leverage by a reference PDE scheme (`05-volatility/heston-family.md`).
 - E3 FX smile: four delta types, three ATM types, risk-reversal and butterfly strikes, Garman-Kohlhagen (`05-volatility/fx-smile.md`).
