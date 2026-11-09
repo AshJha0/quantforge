@@ -77,6 +77,23 @@ super::registry! {
                 ("zero_rates", z.into()),
             ]))
         },
+        "rates.curve.inspect" => {
+            let c = curve_input(i, "curve")?;
+            let dates = i.dates("dates")?;
+            i.gate()?;
+            let c = Curve::new(&c)?;
+            let d = dates.iter().map(|d| c.discount(*d));
+            let d = d.collect::<Result<Vec<_>>>()?;
+            let z = dates.iter().map(|d| c.zero_rate(*d));
+            let z = z.collect::<Result<Vec<_>>>()?;
+            let f = dates.iter().map(|d| c.instantaneous_forward(*d));
+            let f = f.collect::<Result<Vec<_>>>()?;
+            plain(obj([
+                ("discount_factors", d.into()),
+                ("zero_rates", z.into()),
+                ("instantaneous_forwards", f.into()),
+            ]))
+        },
         "rates.curve.forward" => {
             let c = curve_input(i, "curve")?;
             let (s, e, dc) = (i.date("start")?, i.date("end")?, i.str("day_count")?);

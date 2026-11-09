@@ -22,6 +22,7 @@ pub mod credit;
 pub mod credit_options;
 pub mod curve;
 pub mod curve_fits;
+pub mod curve_interp;
 pub mod data;
 pub mod dates;
 pub mod daycount;

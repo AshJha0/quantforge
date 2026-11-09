@@ -5,10 +5,17 @@ use crate::daycount::{DayCountInputs, year_fraction};
 use crate::error::{Result, err, fail};
 use crate::linalg::solve;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Interpolation {
     LogLinearDf,
     LinearZero,
+    /// Stage F (ruling F-18): Hagan-West, `forcePositive = false`.
+    MonotoneConvex,
+    MonotonicLogCubic,
+    /// Tension `sigma > 0` per year.
+    TensionSpline(f64),
+    /// Log-linear up to the pillar `step_end`, monotone convex after.
+    Hybrid(Date),
 }
 
 impl Interpolation {
@@ -16,6 +23,8 @@ impl Interpolation {
         match s {
             "LOG_LINEAR_DF" => Some(Interpolation::LogLinearDf),
             "LINEAR_ZERO" => Some(Interpolation::LinearZero),
+            "MONOTONE_CONVEX" => Some(Interpolation::MonotoneConvex),
+            "MONOTONIC_LOG_CUBIC" => Some(Interpolation::MonotonicLogCubic),
             _ => None,
         }
     }
@@ -69,6 +78,10 @@ pub struct Curve {
     logs: Vec<f64>,
     /// `(time, ln factor)`.
     jumps: Vec<(f64, f64)>,
+    /// Stage F node data: convex node forwards, cubic slopes or tension moments.
+    aux: Vec<f64>,
+    /// `HYBRID`: node index of `step_end`.
+    step: usize,
 }
 
 pub fn curve_time(as_of: Date, d: Date) -> f64 {
@@ -88,6 +101,11 @@ impl Curve {
             return fail("E_DOMAIN", "a discount factor is not positive");
         }
         check_jumps(c.as_of, &c.jumps)?;
+        if let Interpolation::Hybrid(end) = c.interpolation
+            && !c.pillars.iter().any(|p| p.0 == end)
+        {
+            return fail("E_INPUT", "step_end must be a pillar date");
+        }
         let dates: Vec<Date> = c.pillars.iter().map(|p| p.0).collect();
         let logs: Vec<f64> = c.pillars.iter().map(|p| p.1.ln()).collect();
         Ok(Curve::from_logs_with_jumps(
@@ -126,13 +144,104 @@ impl Curve {
                 .zip(&times[1..])
                 .map(|(x, t)| x - log_jump(&jumps, *t)),
         );
+        let mut step = 0;
+        let aux = match i {
+            Interpolation::LogLinearDf | Interpolation::LinearZero => Vec::new(),
+            Interpolation::MonotoneConvex => crate::curve_interp::convex_nodes(&times, &l),
+            Interpolation::MonotonicLogCubic => crate::curve_interp::log_cubic_slopes(&times, &l),
+            Interpolation::TensionSpline(s) => crate::curve_interp::tension_moments(&times, &l, s),
+            Interpolation::Hybrid(end) => {
+                let te = curve_time(as_of, end);
+                step = times
+                    .iter()
+                    .position(|x| *x == te)
+                    .unwrap_or(times.len() - 1);
+                if step + 1 < times.len() {
+                    crate::curve_interp::convex_nodes(&times[step..], &l[step..])
+                } else {
+                    Vec::new()
+                }
+            }
+        };
         Curve {
             as_of,
             interpolation: i,
             times,
             logs: l,
             jumps,
+            aux,
+            step,
         }
+    }
+
+    /// `(ln S, f)` for a stage F method inside `[0, t_n]` (left limit at `t_n`).
+    fn smooth(&self, t: f64) -> (f64, f64) {
+        use crate::curve_interp::{convex_eval, log_cubic_eval, tension_eval};
+        let (ts, l) = (&self.times, &self.logs);
+        match self.interpolation {
+            Interpolation::MonotoneConvex => convex_eval(ts, l, &self.aux, t),
+            Interpolation::MonotonicLogCubic => log_cubic_eval(ts, l, &self.aux, t),
+            Interpolation::TensionSpline(s) => tension_eval(ts, l, &self.aux, s, t),
+            Interpolation::Hybrid(_) => {
+                let k = self.step;
+                if t < ts[k] || k + 1 == ts.len() {
+                    self.log_linear(t)
+                } else {
+                    convex_eval(&ts[k..], &l[k..], &self.aux, t)
+                }
+            }
+            _ => self.log_linear(t),
+        }
+    }
+
+    /// Log-linear `(ln S, f)` inside `[0, t_n]`, right-hand forward at nodes.
+    fn log_linear(&self, t: f64) -> (f64, f64) {
+        let n = self.times.len() - 1;
+        let i = self
+            .times
+            .partition_point(|x| *x <= t)
+            .saturating_sub(1)
+            .min(n - 1);
+        let h = self.times[i + 1] - self.times[i];
+        let u = (t - self.times[i]) / h;
+        (
+            (1.0 - u) * self.logs[i] + u * self.logs[i + 1],
+            -(self.logs[i + 1] - self.logs[i]) / h,
+        )
+    }
+
+    fn is_stage_f(&self) -> bool {
+        match self.interpolation {
+            Interpolation::LogLinearDf | Interpolation::LinearZero => false,
+            Interpolation::Hybrid(_) => self.step + 1 < self.times.len(),
+            _ => true,
+        }
+    }
+
+    /// Instantaneous forward of the smooth curve `S` at time `t >= 0`: right-hand at nodes,
+    /// the extrapolation forward at and after the last pillar.
+    pub fn instantaneous_forward(&self, d: Date) -> Result<f64> {
+        if d < self.as_of {
+            return fail("E_OUT_OF_RANGE", "date is before as_of");
+        }
+        let t = curve_time(self.as_of, d);
+        let n = self.times.len() - 1;
+        if self.is_stage_f() {
+            return Ok(self.smooth(t.min(self.times[n])).1);
+        }
+        if t >= self.times[n] || self.interpolation == Interpolation::LogLinearDf {
+            return Ok(self.log_linear(t.min(self.times[n])).1);
+        }
+        // LINEAR_ZERO: z(t) + t z'(t), right-hand slope.
+        let i = self
+            .times
+            .partition_point(|x| *x <= t)
+            .saturating_sub(1)
+            .min(n - 1);
+        let h = self.times[i + 1] - self.times[i];
+        let u = (t - self.times[i]) / h;
+        let slope = (self.zero(i + 1) - self.zero(i)) / h;
+        Ok((1.0 - u) * self.zero(i) + u * self.zero(i + 1) + t * slope)
     }
 
     fn zero(&self, i: usize) -> f64 {
@@ -145,6 +254,13 @@ impl Curve {
         if t == 0.0 {
             return 1.0;
         }
+        if self.is_stage_f() {
+            if t >= self.times[n] {
+                let f = self.smooth(self.times[n]).1;
+                return (self.logs[n] - f * (t - self.times[n])).exp();
+            }
+            return self.smooth(t).0.exp();
+        }
         if t > self.times[n] {
             let f = -(self.logs[n] - self.logs[n - 1]) / (self.times[n] - self.times[n - 1]);
             return (self.logs[n] - f * (t - self.times[n])).exp();
@@ -156,7 +272,11 @@ impl Curve {
             .min(n - 1);
         let u = (t - self.times[i]) / (self.times[i + 1] - self.times[i]);
         match self.interpolation {
-            Interpolation::LogLinearDf => ((1.0 - u) * self.logs[i] + u * self.logs[i + 1]).exp(),
+            Interpolation::LogLinearDf
+            | Interpolation::MonotoneConvex
+            | Interpolation::MonotonicLogCubic
+            | Interpolation::TensionSpline(_)
+            | Interpolation::Hybrid(_) => ((1.0 - u) * self.logs[i] + u * self.logs[i + 1]).exp(),
             Interpolation::LinearZero => {
                 let z = (1.0 - u) * self.zero(i) + u * self.zero(i + 1);
                 (-z * t).exp()
@@ -243,6 +363,16 @@ pub fn solve_curve_with_jumps(
 ) -> Result<Solved> {
     crate::error::finite("jumps", &jumps)?;
     crate::error::finite("quotes", &quotes)?;
+    if let Interpolation::Hybrid(end) = interpolation
+        && !dates.contains(&end)
+    {
+        return fail("E_INPUT", "step_end must be a pillar date");
+    }
+    // Ruling F-21: the stage F methods are not local, so both methods return the global solve.
+    let method = match interpolation {
+        Interpolation::LogLinearDf | Interpolation::LinearZero => method,
+        _ => SolveMethod::Global,
+    };
     let start = |j: usize| -quotes[j] * curve_time(as_of, dates[j]);
     let mut logs: Vec<f64> = (0..dates.len()).map(start).collect();
     let build =

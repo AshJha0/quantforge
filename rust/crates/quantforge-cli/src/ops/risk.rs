@@ -234,9 +234,22 @@ super::registry! {
 }
 
 pub(crate) fn interpolation(i: &Inputs) -> Result<Interpolation> {
-    match Interpolation::parse(i.str("interpolation")?) {
-        Some(v) => Ok(v),
-        None => i.fail("interpolation", "unknown interpolation"),
+    match i.str("interpolation")? {
+        "TENSION_SPLINE" => match i.opt_f64("tension")? {
+            None => quantforge_core::error::fail("E_INPUT", "TENSION_SPLINE needs tension"),
+            Some(s) if !(s > 0.0 && s <= 1000.0) => {
+                quantforge_core::error::fail("E_DOMAIN", "tension must be in (0, 1000]")
+            }
+            Some(s) => Ok(Interpolation::TensionSpline(s)),
+        },
+        "HYBRID" => match i.0.get("step_end") {
+            None => quantforge_core::error::fail("E_INPUT", "HYBRID needs step_end"),
+            Some(_) => Ok(Interpolation::Hybrid(i.date("step_end")?)),
+        },
+        s => match Interpolation::parse(s) {
+            Some(v) => Ok(v),
+            None => i.fail("interpolation", "unknown interpolation"),
+        },
     }
 }
 
