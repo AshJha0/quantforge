@@ -8,14 +8,14 @@ The workflow runs at 14:30 and 23:30 UTC, Monday to Friday, and can also be star
 
 1. It checks out `main` (the code) and the `forward-log` branch (the rows). On the first run it creates `forward-log` as an orphan branch.
 2. It runs `tools/recorder/record.py` with the same `sources.json` the local task uses. Raw bytes go to the runner's temp folder and are discarded when the job ends.
-3. It appends one hash-chained row per source to `actions/log.jsonl` on `forward-log`, using the same row format as `tools/forward-log/log.jsonl`. It then verifies the chain.
-4. It writes `actions/gaps.md` and `actions/gaps.json` with `tools/recorder/gap_monitor.py`.
+3. It appends one hash-chained row per source to `actions/log.jsonl` on `forward-log`, using the same row format as `tools/forward-log/log.jsonl`. It then verifies the chain, and `gap_monitor.py recheck` replays the parsed values kept for public-domain sources (Treasury curves, BLS CPI) against each row's `state_sha256`. One `study/<id>` row per R3 study (`tools/recorder/studies.json`) follows the sources, and every row carries the `sources.json` sha256.
+4. It writes `actions/gaps.md` and `actions/gaps.json` with `tools/recorder/gap_monitor.py --studies`, which also fails if a prereg input series or study row is missing on any business day since the study's start, however old.
 5. It commits and pushes to `forward-log`, and nothing else. Only the bot account writes to that branch.
 6. If a business day in the last three has no successful recording, the job fails, so GitHub emails the repo owner. Older gaps stay in the report: a rerun cannot fill them, because the sources serve today's data, not yesterday's.
 
 **Why two runs a day.** The Treasury curve is published at the end of the US day. SOFR for day T is published at 08:00 ET on T+1. The 14:30 run catches SOFR, and the 23:30 run catches the curve. If one run fails, the other still leaves a row that day.
 
-**No raw data leaves the runner.** That includes artifacts: on a public repo, anyone can download them, and SONIA may not be redistributed until the Bank of England answers (`sources.json`). The rows carry only the URL, sha256, size, licence and code commit. This matches the local recorder's rule that no source's data is committed.
+**No raw data leaves the runner.** That includes artifacts: on a public repo, anyone can download them, and SONIA may not be redistributed until the Bank of England answers (`sources.json`). The rows carry the URL, sha256, size, licence and code commit, and, for public-domain sources only, the parsed values. This matches the local recorder's rule that no source's data is committed.
 
 **Business days.** These are Monday to Friday, minus `tools/recorder/holidays.txt` (Federal Reserve holidays, checked 2026-11-07, covering up to 2027-12-31). UK and TARGET2 holidays are not listed, so a SONIA or ECB gap on such a day shows in the report and can be read as expected. Extend the file every year. The edge-case register's calendar provenance work (plan 11.2.3) will replace it with the library's own calendars.
 
