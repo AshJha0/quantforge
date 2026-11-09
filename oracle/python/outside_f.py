@@ -30,6 +30,8 @@ ROWS = {
                                 "MonotonicLogCubicDiscountCurve(dates, dfs, Actual365Fixed) for D; MonotonicCubicNaturalSpline(t, ln D).derivative for f; PiecewiseLogCubicDiscount(ref, helpers, Actual365Fixed[, jumps])"),
     "OIS.HELPER": ("02-curves/ois-curves.md periods and lags", "OISRateHelper(settlementDays, tenor, quote, index, discount=None, telescopic=True, paymentLag)"),
     "IDX": ("01-core/conventions.md SOFR, SONIA, ESTR", "ql.Sofr(), ql.Sonia(), ql.Estr()"),
+    "TERM.HELPERS": ("02-curves/projection-and-fra.md USD-TERM-3M deposits, FRAs, swaps", "IborIndex TERM 3M (2 days, US GovernmentBond, ModifiedFollowing, Actual360); DepositRateHelper, FraRateHelper, SwapRateHelper(Annual, ModifiedFollowing, Thirty360 BondBasis, exogenous discount)"),
+    "CRV.LOG_LINEAR_DF": ("02-curves/curve-framework.md LOG_LINEAR_DF", "PiecewiseLogLinearDiscount(ref, helpers, Actual365Fixed)"),
     "CBOE.SAMPLE": ("05-volatility/vix-index.md Cboe sample", "Cboe Volatility Index Methodology v6.0, Appendix 3 printed values (F, K0, sigma^2, VIX)"),
 }
 LAGS = {"SOFR": (2, 2), "ESTR": (2, 2), "SONIA": (0, 0)}
@@ -98,7 +100,72 @@ def h_cboe(case):
     return ok
 
 
-HANDLERS = {"rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect}
+PIECEWISE = {"LOG_LINEAR_DF": lambda a, hs, j=None: ql.PiecewiseLogLinearDiscount(a, hs, A365),
+             "MONOTONIC_LOG_CUBIC": lambda a, hs, j=None: ql.PiecewiseLogCubicDiscount(a, hs, A365),
+             "MONOTONE_CONVEX": lambda a, hs, j=None: ql.PiecewiseConvexMonotoneForward(a, hs, A365, [], [], ql.ConvexMonotone(0.0, 1.0, False))}
+
+
+def _term_index(h=None):
+    return ql.IborIndex("TERM", ql.Period(3, ql.Months), 2, ql.USDCurrency(), ql.UnitedStates(ql.UnitedStates.GovernmentBond), ql.ModifiedFollowing,
+                        False, ql.Actual360(), h or ql.YieldTermStructureHandle())
+
+
+def ql_joint(i, bump=None):
+    """QuantLib build of an OIS + PROJECTION system (no turns, steps or xccy). bump = (instrument index, dq). Returns
+    {curve name: (QuantLib curve, pillar dates)}."""
+    a = Q(D(i["as_of"]))
+    ql.Settings.instance().evaluationDate = a
+    built = {}
+    for c in i["curves"]:
+        if c["type"] not in ("OIS", "PROJECTION") or c.get("turns") or c.get("jumps") or c["interpolation"] not in PIECEWISE:
+            raise NotImplementedError(f"{c['type']} {c.get('interpolation')} turns={bool(c.get('turns'))}")
+        hs = []
+        for k, q in enumerate(i["instruments"]):
+            if q["curve"] != c["name"]:
+                continue
+            r = q["rate"] + (bump[1] if bump and bump[0] == k else 0.0)
+            qq = ql.QuoteHandle(ql.SimpleQuote(r))
+            if q["type"] == "OIS":
+                sl, pl = LAGS[c["convention"]]
+                hs.append(ql.OISRateHelper(sl, _per(q["tenor"]), qq, IDX[c["convention"]](), ql.YieldTermStructureHandle(), True, pl))
+            elif q["type"] == "DEPOSIT":
+                hs.append(ql.DepositRateHelper(qq, _term_index()))
+            elif q["type"] == "FRA":
+                hs.append(ql.FraRateHelper(qq, q["start_months"], _term_index()))
+            elif q["type"] == "SWAP":
+                idx = _term_index()
+                hs.append(ql.SwapRateHelper(qq, ql.Period(q["months"], ql.Months), idx.fixingCalendar(), ql.Annual, ql.ModifiedFollowing,
+                                            ql.Thirty360(ql.Thirty360.BondBasis), idx, ql.QuoteHandle(), ql.Period(0, ql.Days),
+                                            ql.YieldTermStructureHandle(built[c["discount"]][0])))
+            else:
+                raise NotImplementedError(q["type"])
+        cv = PIECEWISE[c["interpolation"]](a, hs)
+        cv.enableExtrapolation()
+        built[c["name"]] = (cv, [h.pillarDate() for h in hs])
+    return built
+
+
+def h_joint(i):
+    b0 = ql_joint(i)
+    curves = [{"name": c["name"], "pillars": [{"date": p.ISO(), "discount_factor": b0[c["name"]][0].discount(p)} for p in b0[c["name"]][1]]} for c in i["curves"]]
+    x0 = [math.log(p["discount_factor"]) for cv in curves for p in cv["pillars"]]
+    labels = [f"{cv['name']}:pillar:{p['date']}" for cv in curves for p in cv["pillars"]]
+
+    def xs(bump):
+        b = ql_joint(i, bump)
+        return [math.log(b[c["name"]][0].discount(p)) for c in i["curves"] for p in b[c["name"]][1]]
+    h = 1e-4
+    cols = []
+    for k in range(len(i["instruments"])):
+        d1 = [(u - v) / (2 * h) for u, v in zip(xs((k, h)), xs((k, -h)))]
+        d2 = [(u - v) / h for u, v in zip(xs((k, h / 2)), xs((k, -h / 2)))]
+        cols.append([(4 * q2 - q1) / 3 for q1, q2 in zip(d1, d2)])
+    matrix = [[cols[k][r] for k in range(len(cols))] for r in range(len(x0))]
+    return {"curves": curves, "turn_factors": [], "jacobian": {"unknowns": labels, "quotes": [q["id"] for q in i["instruments"]], "matrix": matrix},
+            "turn_sensitivity": []}, {"CRV." + c["interpolation"] for c in i["curves"]} | {"OIS.HELPER", "IDX", "TERM.HELPERS"}
+
+
+HANDLERS = {"rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
 
 
 def main():
@@ -123,7 +190,7 @@ def main():
                 continue
             try:
                 got, rows = h(c["inputs"])
-            except NotImplementedError as e:
+            except NotImplementedError:
                 if c["operation"] == "rates.curve.inspect" and c["inputs"]["curve"]["interpolation"] == "MONOTONE_CONVEX":
                     partly.append({"case_id": c["case_id"], "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"})
                 continue

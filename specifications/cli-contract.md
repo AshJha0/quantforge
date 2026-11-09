@@ -291,6 +291,13 @@ Stage F operations are added to the table below as each wave lands.
 
 | Prefix | Spec | Slice |
 |---|---|---|
+| `credit.cdsindex.option_price` | `04-pricing/credit-options-and-copulas.md` | F6 (R7) |
+| `vol.garch.estimate`; new optional inputs `distribution`, `degrees_of_freedom`, `mean` on `vol.garch.loglik` | `05-volatility/garch.md` | F6 (R8) |
+| `vol.vix.term_variance`, `vol.vix.index`: quotes may be `null` | `05-volatility/vix-index.md` | F6 (R10) |
+| `rates.curve.inspect`; `interpolation` values `MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE`, `HYBRID` (curve keys `tension`, `step_end`) wherever a curve object or a bootstrap takes `interpolation` | `02-curves/curve-framework.md` | F1 (Q1) |
+| `rates.curve.joint_solve`, `rates.funding.curve` | `02-curves/joint-solve-and-funding.md` | F1 (Q4) |
+
+Batch notes: `rates.curve.joint_solve` and `vol.garch.estimate` iterate; a line that fails returns `E_NO_CONVERGENCE` and the batch goes on. `null` is a legal value only where a spec says so (VIX quotes, `zero_rates` outputs); elsewhere it stays `E_SCHEMA`. New policy classes: `jacobian`, `standard_error` (`conformance/tolerances/policy.yaml`).
 
 ## Versioning
 

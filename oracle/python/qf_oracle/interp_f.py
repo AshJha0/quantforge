@@ -134,6 +134,8 @@ def _sec_value(s, x):
             return 0.0
         xv = 1.0 - (1.0 - xv) / xr
         return fa + A + (gn - A) * (xv - e) * (xv - e) / ((1 - e) * (1 - e))
+    if e == 0.0 and xv <= 0.0:
+        return fa + gp   # limit at the left end when eta = 0 (spec rule (e)); QuantLib divides 0 by 0 here
     if xv <= e:
         return fa + A + (gp - A) * (e - xv) * (e - xv) / (e * e)
     return fa + A + (gn - A) * (xv - e) * (xv - e) / ((1 - e) * (1 - e))
@@ -185,6 +187,8 @@ def _sec_prim(s, x):
         xv = 1.0 - (1.0 - xv) / xr
         return pr + sc * xr * (fa * xv + A * xv + (gp - A) * (1.0 / 3.0 * e) + (gn - A) / ((1.0 - e) * (1.0 - e)) *
                                (1.0 / 3.0 * xv ** 3 - e * xv * xv + e * e * xv - 1.0 / 3.0 * e ** 3))
+    if e == 0.0 and xv <= 0.0:
+        return pr
     if xv <= e:
         return pr + sc * (fa + A + (gp - A) / (e * e) * (e * e - e * xv + 1.0 / 3.0 * xv * xv)) * xv
     return pr + sc * (fa * xv + A * xv + (gp - A) * (1.0 / 3.0 * e) + (gn - A) / ((1 - e) * (1 - e)) *
