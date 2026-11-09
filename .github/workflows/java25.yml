@@ -4,10 +4,11 @@ on:
     branches: [main]
     paths: ['java25/**', '.github/workflows/java25.yml']
   pull_request:  # every PR, so these can be required checks on main
+  workflow_call:  # release.yml reruns this on a version tag
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: java25-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   test:
