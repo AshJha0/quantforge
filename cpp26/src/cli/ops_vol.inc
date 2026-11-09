@@ -388,14 +388,47 @@ void op_slv_leverage(const In& in, Out& out) {
     out.key_real("mass", s.mass);
 }
 
+constexpr EnumTable<GarchDistribution> garch_distributions = {{"NORMAL", GarchDistribution::Normal},
+                                                               {"STUDENT_T", GarchDistribution::StudentT}};
+
+void op_garch_estimate(const In& in, Out& out) {
+    const Vec r = in.reals("returns");
+    const InitialVariance iv = initial_variance_of(in);
+    const GarchDistribution d = in.choice("distribution", garch_distributions);
+    const bool demean = in.boolean("demean");
+    in.ready();
+    const bool t = d == GarchDistribution::StudentT;
+    if (r.size() < 30 || (t && r.size() < 100)) throw Error("E_INPUT", "too few returns", "returns");
+    check_initial_variance(iv);
+    const GarchEstimate e = garch_estimate(r, iv.value, d, demean);
+    out.key_real("omega", e.omega);
+    out.key_real("alpha", e.alpha);
+    out.key_real("beta", e.beta);
+    out.key_maybe("degrees_of_freedom", e.degrees_of_freedom);
+    out.key_real("mean", e.mean);
+    out.key_real("loglik", e.loglik);
+    out.values.key("std_errors");
+    out.values.begin_object();
+    out.key_real("omega", e.se_omega);
+    out.key_real("alpha", e.se_alpha);
+    out.key_real("beta", e.se_beta);
+    out.key_maybe("degrees_of_freedom", e.se_degrees_of_freedom);
+    out.values.end_object();
+    out.key_real("persistence", e.persistence);
+}
+
 void op_garch_loglik(const In& in, Out& out) {
     const Vec r = in.reals("returns");
     const double omega = in.real("omega"), alpha = in.real("alpha"), beta = in.real("beta");
     const InitialVariance iv = initial_variance_of(in);
+    GarchLaw law;
+    if (in.find("distribution")) law.distribution = in.choice("distribution", garch_distributions);
+    if (in.find("degrees_of_freedom")) law.degrees_of_freedom = in.real("degrees_of_freedom");
+    law.mean = in.real("mean", 0.0);
     in.ready();
     if (r.size() < 2) throw Error("E_INPUT", "at least 2 returns are needed", "returns");
     check_initial_variance(iv);
-    const GarchLoglik g = garch_loglik(r, omega, alpha, beta, iv.value);
+    const GarchLoglik g = garch_loglik(r, omega, alpha, beta, iv.value, law);
     out.key_real("loglik", g.loglik);
     out.key_reals("variances", g.variances);
     out.key_real("next_variance", g.next_variance);
@@ -457,8 +490,32 @@ void op_varswap_realized(const In& in, Out& out) {
     out.key_real("payoff", r.payoff);
 }
 
+// VIX terms whose quotes may be null (ruling F-15); a missing key stays E_SCHEMA.
+std::optional<double> vix_quote(const In& q, string_view key) {
+    const Value* v = q.raw().find(key);
+    if (!v) schema(key, "missing");
+    return to_maybe_real(*v, key);
+}
+
+VixTerm vix_term_nullable(const In& in) {
+    VixTerm t;
+    t.minutes = in.integer("minutes_to_expiry");
+    t.rate = in.real("rate");
+    t.strip = rows_of<VixQuote>(in, "strip", [](const In& q) {
+        return VixQuote{q.real("strike"), vix_quote(q, "call_bid"), vix_quote(q, "call_ask"), vix_quote(q, "put_bid"),
+                        vix_quote(q, "put_ask")};
+    });
+    return t;
+}
+
+VixTerm vix_term_nullable_at(const In& in, string_view key) {
+    const Value& v = in.need(key);
+    if (v.kind != Kind::Object) schema(key, "expected an object");
+    return vix_term_nullable(In(v));
+}
+
 void op_vix_term(const In& in, Out& out) {
-    const VixTerm t = vix_term_of(in);
+    const VixTerm t = vix_term_nullable(in);
     in.ready();
     const VixTermResult r = vix_term_variance(t);
     out.key_real("forward", r.forward);
@@ -468,7 +525,7 @@ void op_vix_term(const In& in, Out& out) {
 }
 
 void op_vix_index(const In& in, Out& out) {
-    const VixTerm near = vix_term_at(in, "near"), next = vix_term_at(in, "next");
+    const VixTerm near = vix_term_nullable_at(in, "near"), next = vix_term_nullable_at(in, "next");
     in.ready();
     const VixIndex r = vix_index(near, next);
     out.key_real("index", r.index);
@@ -482,6 +539,7 @@ constexpr Entry vol_ops[] = {
     {"vol.delta.to_strike", op_delta_to_strike},
     {"vol.equity.price", op_equity_price},
     {"vol.forward.vol", op_forward_vol},
+    {"vol.garch.estimate", op_garch_estimate},
     {"vol.garch.fit", op_garch_fit},
     {"vol.garch.forecast", op_garch_forecast},
     {"vol.garch.loglik", op_garch_loglik},

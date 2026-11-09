@@ -85,7 +85,7 @@ TEST_CASE("garch estimate: input checks at their edges") {
     CHECK(code_of([&] { garch_estimate(r99, std::nullopt, GarchDistribution::StudentT, false); }) == "E_INPUT");
     CHECK(code_of([&] { garch_estimate(r, 0.0, GarchDistribution::Normal, false); }) == "E_DOMAIN");
     CHECK(code_of([&] { garch_estimate(r, -1e-4, GarchDistribution::Normal, false); }) == "E_DOMAIN");
-    const std::vector<double> flat(40, 0.002);
+    const std::vector<double> flat(40, 0.5);  // exact in binary: the demeaned series is exactly zero
     CHECK(code_of([&] { garch_estimate(flat, std::nullopt, GarchDistribution::Normal, true); }) == "E_DOMAIN");
     std::vector<double> bad = r;
     bad[3] = std::numeric_limits<double>::quiet_NaN();
