@@ -54,3 +54,36 @@ Goldens: `datasets/golden/stage_f/e1_*.json`, 5,207 cases in 23 files over 206 o
 - `same_as` (negative-zero) cases no longer copy the base case's `extra_checks`: those hold expected values for the base input, not for the zeroed input.
 - A path counts as Real only if an **ok** golden writes a float there. Error cases (such as `rulings-0001`, `n = 4.0` → `E_SCHEMA`) no longer make an Integer field Real, so no case puts a token in `n` of `core.integrate.*`; F-1 makes that `E_SCHEMA`, untested here. `core.integrate.gauss_legendre` `a` and `b` are Real by `01-core/integration.md` (an explicit override in the generator).
 - Now 5,207 cases. Case ids were renumbered: re-run the whole `e1_*` set, do not compare by old id.
+
+## WAVE 1a READY (2026-11-09 21:10): F6 model fixes and F1 Q1 interpolation
+
+Q4 (joint solve, funding curve) is wave 1b: its section below is not ready until a later "WAVE 1b READY" heading says so.
+
+Read with every slice: `specifications/cli-contract.md` (block "Stage F operations"), `specifications/stage-f-rulings.md` (F-7 to F-27), `specifications/edge-case-register.md` (rows F4 to F10), `conformance/tolerances/policy.yaml` (new classes `jacobian`, `standard_error`).
+
+### F6 R7 CDS index option
+- New operation `credit.cdsindex.option_price`. Read `specifications/04-pricing/credit-options-and-copulas.md`, section "`credit.cdsindex.option_price`" (and the stage E legs above it). Goldens `stage_f/cdsidx_f.json` (45 cases).
+- Build notes: the strike annuity is measured from `expiry` on the flat hazard that reprices the strike; solve it to 1e-15. Add a property test: payer minus receiver equals `N A (F_adj - K_adj)` to 1e-10 relative on your own outputs.
+
+### F6 R8 GARCH estimate
+- New operation `vol.garch.estimate`; new optional inputs on `vol.garch.loglik`. Read `specifications/05-volatility/garch.md`, section "Stage F additions". Goldens `stage_f/garch_f.json` (16 cases).
+- Build notes: finish with Newton steps on an exact gradient and Hessian (or 1e-10-accurate ones) until the relative step is below 1e-12; parameters are judged at 1e-6 relative, standard errors at 1e-5. Java needs its own `lnGamma` (Lanczos g = 7, 9 terms, or Stirling with recurrence).
+
+### F6 R10 VIX and local vol
+- `vol.vix.*` quotes may be `null`; `vol.local.dupire` behaviour at slice expiries is pinned. Read `specifications/05-volatility/vix-index.md` and `local-and-forward-vol.md`, sections "Stage F additions" and "Continuity at slice expiries". Goldens `stage_f/vix_f.json` (10 cases, including the Cboe sample strip) and `stage_f/lvc_f.json` (3 cases).
+- Build notes: a null series is removed from its own side's walk before it starts; it is neither a zero bid nor a break in a zero run. Add the continuity property tests listed in the spec.
+
+### F1 Q1 interpolation
+- New `interpolation` values `MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE`, `HYBRID` everywhere a curve object or a bootstrap takes one; new operation `rates.curve.inspect`. Read `specifications/02-curves/curve-framework.md`, section "Stage F: pluggable interpolation". Goldens `stage_f/curve_f.json` (84 cases).
+- Build notes: follow the convex monotone branch rules in order, including the `eta = 0` limit; `forcePositive` is off (ruling F-19). The monotonic log cubic filter reads only chord slopes, node by node. Non-local methods need a global bootstrap (ruling F-21): Newton on all pillars works. Extrapolation of the new methods uses the left-hand forward at the last pillar.
+
+### F1 Q4 joint solve and funding curve (NOT READY: wave 1b)
+- New operations `rates.curve.joint_solve` and `rates.funding.curve`. Read `specifications/02-curves/joint-solve-and-funding.md` in full, and the instrument specs it names (`ois-curves.md`, `projection-and-fra.md`, `cross-currency.md`, `futures-convexity.md`, `meeting-steps.md`). Goldens `stage_f/joint_f.json` (pending cases).
+- Build notes: the Jacobian is `-(dR/dx)^{-1} dR/dq`; central differences on `x` with `h` near 1e-7 meet the `jacobian` class. Structural zeros must be exact zeros (do not invert the full matrix with pivoting that mixes blocks; a block solve or a plain LU of a block lower-triangular matrix keeps them). `turn_sensitivity` is exactly 0 off the turn.
+
+### Outside-oracle status (rule 11.2.5, ruling F-23)
+: curve_f 48 of 84, vix_f 3 of 10 (Cboe sample), cdsidx_f, garch_f and lvc_f none (no free outside source). Stage F so far 51 of 158 = 32%, below the 60% floor; Q4, F4 (scipy, BCBS worked examples) and the remaining waves must raise it (ruling F-23).
+
+### Open items
+- R7: the Pedersen (2003) worked example is not reproduced (paper not freely available); added to the known issues for a human with access.
+- T amendments made by this wave (rulings F-19, F-22): the Q1 row now names `forcePositive = false` and states locality on pillars. Both are written into the plan's section 12.10 and into the T table above.
