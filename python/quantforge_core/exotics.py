@@ -1,4 +1,4 @@
-"""Stage E, E5: closed-form exotics and American options (CRR tree, BAW, a reference FD scheme).
+"""Closed-form exotics and American options (CRR tree, BAW, a reference FD scheme).
 
 Spec: specifications/04-pricing/exotics.md, rulings E-A19 to E-A23 in
 specifications/stage-e-rulings.md. Prices are per unit of underlying; b = r - q is the carry.
@@ -10,6 +10,7 @@ from collections.abc import Callable, Sequence
 from . import roots
 from .black import big_n
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum, thomas
 
 Floats = Sequence[float]
@@ -319,3 +320,6 @@ def fd(s: float, k: float, t: float, r: float, q: float, v: float, option_type: 
         "delta": (right - left) / (2 * dx * s),
         "gamma": ((right - 2 * mid + left) / (dx * dx) - (right - left) / (2 * dx)) / (s * s),
     }
+
+
+guard(globals())

@@ -7,6 +7,7 @@ from datetime import date, timedelta
 
 from . import _cal, calendars
 from .errors import QfError
+from .finite import guard
 
 ZONES = ("UTC", "Europe/London", "Europe/Berlin", "America/New_York", "Asia/Tokyo")
 MIN_YEAR, MAX_YEAR = 2007, 2037
@@ -108,3 +109,6 @@ def business_date(instant: int, zone: str, cutoff_seconds: int, calendar: str) -
     if local % DAY >= cutoff_seconds:
         d += timedelta(days=1)
     return calendars.adjust(calendar, d, "FOLLOWING")
+
+
+guard(globals())

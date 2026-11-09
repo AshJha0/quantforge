@@ -7,6 +7,7 @@ import math
 from collections.abc import Sequence
 
 from .errors import QfError
+from .finite import guard
 from .linalg import lu_solve
 from .numeric import ordered_sum
 
@@ -96,3 +97,6 @@ def spread_cost(quantities: Floats, half_spreads: Floats) -> float:
     if any(s < 0 for s in half_spreads):
         raise QfError("E_DOMAIN", "half_spreads must not be negative", "half_spreads")
     return ordered_sum(abs(q) * s for q, s in zip(quantities, half_spreads, strict=True))
+
+
+guard(globals())

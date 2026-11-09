@@ -3,6 +3,7 @@ import math
 from collections.abc import Sequence
 
 from .errors import QfError
+from .finite import guard
 
 Matrix = Sequence[Sequence[float]]
 
@@ -83,3 +84,6 @@ def eigen_symmetric(a: Matrix) -> list[float]:
     import numpy  # loaded only here, to keep CLI start-up short
 
     return [float(v) for v in numpy.linalg.eigvalsh(numpy.array(a, dtype=float))]
+
+
+guard(globals())

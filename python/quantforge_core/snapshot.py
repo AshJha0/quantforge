@@ -6,6 +6,7 @@ from typing import Any
 
 from . import strictjson
 from .errors import QfError
+from .finite import guard
 
 MAX_DEPTH = 64
 
@@ -94,3 +95,6 @@ def hash_document(text: str) -> tuple[str, str]:
     if not isinstance(document, dict):
         raise QfError("E_SCHEMA", "the top level is not an object", "document_text")
     return hash_value({k: v for k, v in document.items() if k != "snapshot_id"})
+
+
+guard(globals())

@@ -3,6 +3,7 @@ import math
 from dataclasses import dataclass
 
 from .errors import QfError, required
+from .finite import guard
 
 FREQUENCIES = (1, 2, 3, 4, 6, 12)
 KINDS = ("SIMPLE", "PERIODIC", "CONTINUOUS")
@@ -62,3 +63,6 @@ def convert(rate: float, t: float, source: Compounding, target: Compounding) -> 
         raise QfError("E_DOMAIN", "t must be positive to define a rate", "t")
     _check_rate(rate, t, source)
     return _rate(_discount(rate, t, source), t, target)
+
+
+guard(globals())

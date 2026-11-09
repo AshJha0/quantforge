@@ -2,6 +2,7 @@
 import math
 
 from .errors import QfError
+from .finite import guard
 
 
 def _b(a: float, x: float) -> float:
@@ -23,3 +24,6 @@ def convexity(
     z = sigma * sigma / 2 * (big_l * bd * bd + bd * bt * bt)
     bias = -math.expm1(-z) * (rate + 1 / d)
     return rate, bias, rate - bias
+
+
+guard(globals())

@@ -1,4 +1,4 @@
-"""Stage E, E7: GARCH(1,1), variance swaps and a VIX-style index.
+"""GARCH(1,1), variance swaps and a VIX-style index.
 
 Specs: specifications/05-volatility/garch.md, variance-swaps.md, vix-index.md, with rulings E-B1 to
 E-B7 in specifications/stage-e-rulings-b.md. Each function applies its checks in spec order.
@@ -11,6 +11,7 @@ from datetime import date
 
 from . import black
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Floats = Sequence[float]
@@ -359,3 +360,6 @@ def vix_index(near: tuple[int, float, Sequence[Quote]],
     if bracket < 0:
         raise _domain("the interpolated variance is negative", "near")
     return 100 * math.sqrt(bracket * MINUTES_PER_YEAR / MINUTES_30D), v1, v2
+
+
+guard(globals())

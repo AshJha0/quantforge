@@ -8,6 +8,7 @@ from datetime import date
 from . import curves
 from .curves import CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 
@@ -124,3 +125,6 @@ def parity(
         if not q.call_bid - q.put_ask <= d * (f - q.strike) <= q.call_ask - q.put_bid
     ]
     return f, d, residual, outside
+
+
+guard(globals())

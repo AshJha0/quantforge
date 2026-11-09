@@ -5,6 +5,7 @@ from collections.abc import Sequence
 
 from . import linalg
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 
@@ -108,3 +109,6 @@ def robust(
     objective = ordered_sum(v * v / 2 if abs(v) <= delta else delta * abs(v) - delta * delta / 2
                             for v in r)
     return beta, r, outliers, objective
+
+
+guard(globals())

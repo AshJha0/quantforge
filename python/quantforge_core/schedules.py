@@ -5,6 +5,7 @@ from datetime import date
 
 from . import _cal, calendars
 from .errors import QfError
+from .finite import guard
 
 FREQUENCIES = (1, 2, 3, 4, 6, 12)
 _MF = "MODIFIED_FOLLOWING"
@@ -57,3 +58,6 @@ def generate(
 
 def _payment(calendar: str, end: date, lag: int) -> date:
     return calendars.add_business_days(calendar, end, lag) if lag else end
+
+
+guard(globals())

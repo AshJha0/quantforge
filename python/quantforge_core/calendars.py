@@ -5,6 +5,7 @@ from functools import lru_cache
 
 from . import _cal
 from .errors import QfError
+from .finite import guard
 
 CALENDARS = ("GBLO", "EUTA", "USGS")
 CONVENTIONS = ("UNADJUSTED", "FOLLOWING", "PRECEDING", "MODIFIED_FOLLOWING", "MODIFIED_PRECEDING")
@@ -225,3 +226,6 @@ def add_tenor(name: str, d: date, tenor: str, convention: str, end_of_month: boo
         elif d >= last_business_day(name, d.year, d.month):
             return last_business_day(name, year, month)
     return adjust(name, date(year, month, min(d.day, target_last)), convention)
+
+
+guard(globals())
