@@ -470,6 +470,26 @@ class QualityGate(unittest.TestCase):
         self.assertEqual(fails, ["x"])
 
 
+class ResearchDsrGate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.qg = load("quality_gate", "tools/quality_gate.py")
+
+    def test_ledger_has_the_24_r3_trials(self):
+        rows = self.qg.read_ledger()
+        self.assertEqual(len(rows), 24)
+        per = {s: sum(r["study"] == s for r in rows) for s in ("R3-01", "R3-02", "R3-03")}
+        self.assertEqual(per, {"R3-01": 8, "R3-02": 12, "R3-03": 4})
+        self.assertEqual(self.qg.check_dsr_trials(rows, 24, expect_family=24), [])
+
+    def test_dsr_with_fewer_trials_than_the_ledger_is_rejected(self):
+        rows = self.qg.read_ledger()
+        self.assertTrue(self.qg.check_dsr_trials(rows, 8))  # the per-study count is not enough
+        self.assertEqual(self.qg.main(["--check-dsr", "--trials", "12"]), 1)
+        self.assertEqual(self.qg.main(["--check-dsr", "--trials", "24", "--expect-family", "24"]), 0)
+        self.assertTrue(self.qg.check_dsr_trials(rows + rows[:1], 30))  # duplicate id
+
+
 class FuzzFocus(unittest.TestCase):
     def test_focus_weights_toward_stage_and_is_a_noop_without_goldens(self):
         fz = load("fuzz_cli", "conformance/fuzz/fuzz_cli.py")

@@ -12,9 +12,15 @@
         coverage.py JSON (python), JaCoCo XML (java), LCOV (rust, cargo llvm-cov --lcov) or Cobertura XML
         (cpp, gcovr --cobertura). Exit 1 if a filled module is below the minimum or has no lines in the report.
 
+    python tools/quality_gate.py --check-dsr --trials N [--ledger research/trials.csv] [--expect-family 24]
+        Research gate (plan 13.1 R6). A deflated Sharpe ratio for an R3 study must be computed with at
+        least the family trial count, which is the number of rows in the trial ledger. Exit 1 if N is
+        smaller, if the ledger has duplicate trial ids, or if its row count differs from --expect-family.
+
 Entries left as TODO are skipped, so the gate passes before the language sessions land.
 """
 import argparse
+import csv
 import fnmatch
 import json
 import re
@@ -23,6 +29,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+LEDGER = ROOT / "research" / "trials.csv"
 DEFAULT = ROOT / "conformance" / "quality" / "stage_e.json"
 LANGS = ("java", "cpp", "python", "rust")
 
@@ -150,13 +157,45 @@ def gate(cfg, lang, rows):
     return out, fails
 
 
+# ---- research: DSR trial count against the ledger ----------------------------------------------
+
+def read_ledger(path=LEDGER):
+    with open(path, encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def check_dsr_trials(rows, n_used, expect_family=None):
+    """Returns a list of problems; empty means the DSR trial count is acceptable."""
+    bad = []
+    ids = [r["trial_id"] for r in rows]
+    if len(set(ids)) != len(ids):
+        bad.append("ledger has duplicate trial ids")
+    if expect_family is not None and len(rows) != expect_family:
+        bad.append(f"ledger has {len(rows)} trials, expected {expect_family}")
+    if n_used < len(rows):
+        bad.append(f"DSR computed with {n_used} trials; the ledger has {len(rows)}, so the deflation is too weak")
+    return bad
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--config", default=str(DEFAULT))
     ap.add_argument("--check-config", action="store_true")
     ap.add_argument("--coverage")
     ap.add_argument("--lang", choices=LANGS)
+    ap.add_argument("--check-dsr", action="store_true")
+    ap.add_argument("--trials", type=int)
+    ap.add_argument("--ledger", default=str(LEDGER))
+    ap.add_argument("--expect-family", type=int)
     a = ap.parse_args(argv)
+    if a.check_dsr:
+        if a.trials is None:
+            ap.error("--check-dsr needs --trials")
+        bad = check_dsr_trials(read_ledger(a.ledger), a.trials, a.expect_family)
+        for b in bad:
+            print("BAD", b)
+        print(f"dsr trial count {a.trials}: {'rejected' if bad else 'ok'}")
+        return 1 if bad else 0
     cfg = json.loads(Path(a.config).read_text(encoding="utf-8"))
     if a.check_config:
         bad, todo, warn = check_config(cfg)
