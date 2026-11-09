@@ -1,0 +1,907 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_repo",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1_repo-0001",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": "NaN",
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:repo_d-0011",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0002",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": "Infinity",
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0011",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0003",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": "-Infinity",
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0011",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0004",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:repo_d-0011",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0005",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": -0.0,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_repo-0004"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:repo_d-0011",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0006",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": "NaN",
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:repo_d-0011",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0007",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": "Infinity",
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0011",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0008",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": "-Infinity",
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0011",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0009",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 0.0,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:repo_d-0011",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0010",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": -0.0,
+    "repo_rate": 0.039,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_repo-0009"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:repo_d-0011",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0011",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": "NaN",
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:repo_d-0011",
+    "input:/repo_rate"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0012",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": "Infinity",
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0011",
+    "input:/repo_rate"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0013",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": "-Infinity",
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0011",
+    "input:/repo_rate"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0014",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": 0.0,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:repo_d-0011",
+    "input:/repo_rate"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0015",
+   "operation": "repo.forward",
+   "inputs": {
+    "bond": {
+     "maturity": "2031-02-28",
+     "coupon": 0.0375,
+     "frequency": 2
+    },
+    "start": "2026-11-09",
+    "end": "2027-03-09",
+    "clean_price": 98.62653398076066,
+    "repo_rate": -0.0,
+    "gc_rate": null
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_repo-0014"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:repo_d-0011",
+    "input:/repo_rate"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0016",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": "NaN",
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:repo_d-0010",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0017",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": "Infinity",
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0010",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0018",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": "-Infinity",
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0010",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0019",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.0,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:repo_d-0010",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0020",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": -0.0,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_repo-0019"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:repo_d-0010",
+    "input:/bond/coupon"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0021",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": "NaN",
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:repo_d-0010",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0022",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": "Infinity",
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0010",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0023",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": "-Infinity",
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0010",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0024",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 0.0,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:repo_d-0010",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0025",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": -0.0,
+    "forward_clean": 93.42249896902945
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_repo-0024"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:repo_d-0010",
+    "input:/clean_price"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0026",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:repo_d-0010",
+    "input:/forward_clean"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0027",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": "Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0010",
+    "input:/forward_clean"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0028",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:repo_d-0010",
+    "input:/forward_clean"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0029",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:repo_d-0010",
+    "input:/forward_clean"
+   ]
+  },
+  {
+   "case_id": "e1_repo-0030",
+   "operation": "repo.implied_rate",
+   "inputs": {
+    "bond": {
+     "maturity": "2034-03-31",
+     "coupon": 0.03,
+     "frequency": 1
+    },
+    "start": "2026-11-09",
+    "end": "2027-04-09",
+    "clean_price": 93.09360797648607,
+    "forward_clean": -0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_repo-0029"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:repo_d-0010",
+    "input:/forward_clean"
+   ]
+  }
+ ]
+}

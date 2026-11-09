@@ -1,0 +1,2244 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_cmdty",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1_cmdty-0001",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": "NaN"
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:commodity_d-0002",
+    "input:/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0002",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": "Infinity"
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0002",
+    "input:/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0003",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": "-Infinity"
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0002",
+    "input:/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0004",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 0.0
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:commodity_d-0002",
+    "input:/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0005",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": -0.0
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 3.7
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_cmdty-0004"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:commodity_d-0002",
+    "input:/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0006",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": "NaN"
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:commodity_d-0002",
+    "input:/quotes/5/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0007",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": "Infinity"
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0002",
+    "input:/quotes/5/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0008",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": "-Infinity"
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0002",
+    "input:/quotes/5/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0009",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": 0.0
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:commodity_d-0002",
+    "input:/quotes/5/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0010",
+   "operation": "cmdty.curve.forward",
+   "inputs": {
+    "quotes": [
+     {
+      "month": "2026-12",
+      "price": 3.42
+     },
+     {
+      "month": "2027-03",
+      "price": 3.105
+     },
+     {
+      "month": "2027-06",
+      "price": 2.88
+     },
+     {
+      "month": "2027-12",
+      "price": 3.56
+     },
+     {
+      "month": "2028-12",
+      "price": 3.64
+     },
+     {
+      "month": "2030-12",
+      "price": -0.0
+     }
+    ],
+    "seasonality": null,
+    "months": [
+     "2026-12",
+     "2027-01",
+     "2027-02",
+     "2027-05",
+     "2027-08",
+     "2027-11",
+     "2028-07",
+     "2029-01",
+     "2030-12"
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_cmdty-0009"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:commodity_d-0002",
+    "input:/quotes/5/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0011",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": "NaN"
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/0/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0012",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": "Infinity"
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/0/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0013",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": "-Infinity"
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/0/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0014",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.0
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/0/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0015",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": -0.0
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_cmdty-0014"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "arbitrage": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/0/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0016",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": "NaN"
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/3/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0017",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": "Infinity"
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/3/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0018",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": "-Infinity"
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/3/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0019",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.0
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/3/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0020",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": -0.0
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_cmdty-0019"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "arbitrage": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:commodity_d-0007",
+    "input:/funding/pillars/3/discount_factor"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0021",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": "NaN"
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:commodity_d-0007",
+    "input:/forwards/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0022",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": "Infinity"
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/forwards/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0023",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": "-Infinity"
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/forwards/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0024",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 0.0
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:commodity_d-0007",
+    "input:/forwards/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0025",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": -0.0
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_cmdty-0024"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "arbitrage": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:commodity_d-0007",
+    "input:/forwards/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0026",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": "NaN"
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:commodity_d-0007",
+    "input:/forwards/4/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0027",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": "Infinity"
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/forwards/4/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0028",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": "-Infinity"
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/forwards/4/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0029",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 0.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:commodity_d-0007",
+    "input:/forwards/4/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0030",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": -0.0
+     }
+    ],
+    "storage_cost": 0.02
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_cmdty-0029"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "arbitrage": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:commodity_d-0007",
+    "input:/forwards/4/price"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0031",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:commodity_d-0007",
+    "input:/storage_cost"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0032",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": "Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/storage_cost"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0033",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:commodity_d-0007",
+    "input:/storage_cost"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0034",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:commodity_d-0007",
+    "input:/storage_cost"
+   ]
+  },
+  {
+   "case_id": "e1_cmdty-0035",
+   "operation": "cmdty.storage.carry",
+   "inputs": {
+    "funding": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2027-05-06",
+       "discount_factor": 0.9803598150999601
+      },
+      {
+       "date": "2027-11-08",
+       "discount_factor": 0.9615452062959098
+      },
+      {
+       "date": "2028-11-06",
+       "discount_factor": 0.9267197211276171
+      },
+      {
+       "date": "2031-11-06",
+       "discount_factor": 0.8310200391947283
+      }
+     ]
+    },
+    "forwards": [
+     {
+      "date": "2026-12-15",
+      "price": 75.2
+     },
+     {
+      "date": "2027-03-15",
+      "price": 74.1
+     },
+     {
+      "date": "2027-06-15",
+      "price": 75.9
+     },
+     {
+      "date": "2027-12-15",
+      "price": 78.4
+     },
+     {
+      "date": "2028-12-15",
+      "price": 76.0
+     }
+    ],
+    "storage_cost": -0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_cmdty-0034"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "arbitrage": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:commodity_d-0007",
+    "input:/storage_cost"
+   ]
+  }
+ ]
+}
