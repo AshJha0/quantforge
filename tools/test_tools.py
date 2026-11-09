@@ -712,5 +712,32 @@ class DoctorAndQuickstart(unittest.TestCase):
         self.assertTrue(self.qs.compare(expected, ""))
 
 
+class StageFInfra(unittest.TestCase):
+    """Plan 13.2 E11 hygiene gate and 12.2 G6 / 13.2 E10 incremental mutation planner."""
+
+    def test_hygiene(self):
+        h = load("check_hygiene", "tools/check_hygiene.py")
+        big = h.LIMIT + 1
+        sizes = {"a.json": big, "b.json": big, "c.txt": 5}
+        bad = h.large_files(list(sizes), sizes, {"a.json": True, "c.txt": True, "gone.json": True})
+        self.assertEqual(len(bad), 3)  # b.json unlisted; c.txt under the limit; gone.json untracked
+        files = ["python/quantforge_x/.gitkeep", "rust/crates/a/src/lib.rs", "python/quantforge_y/__init__.py"]
+        bad = h.empty_packages(files, {files[0]: 0, files[1]: 10, files[2]: 0})
+        self.assertEqual(len(bad), 2)
+        self.assertEqual(h.main(), 0)  # the shipped tree is clean
+
+    def test_mutation_plan(self):
+        pm = load("plan_matrix", "conformance/mutation/plan_matrix.py")
+        cfg = {"stages": {"E": [{"module": "m", "suite": "s", "java": "org.q.vol.Surf", "cpp": "cpp26/src/core/m.cpp",
+                                 "python": "quantforge_core.m_e*", "rust": "**/m.rs"}]}}
+        inc, frag = pm.plan(cfg, changed=["python/quantforge_core/m_e1.py", "README.md"])
+        self.assertEqual([e["lang"] for e in inc], ["python"])
+        self.assertEqual(list(frag["stages"]["PR"][0]), ["module", "suite", "python"])
+        inc, _ = pm.plan(cfg, changed=["java25/src/main/java/org/q/vol/Surf.java", "rust/crates/c/src/m.rs"])
+        self.assertEqual(sorted(e["lang"] for e in inc), ["java", "rust"])
+        self.assertEqual(pm.plan(cfg, changed=["docs/x.md"])[0], [])
+        self.assertEqual(len(pm.plan(cfg, stage="E")[0]), 4)
+
+
 if __name__ == "__main__":
     unittest.main()

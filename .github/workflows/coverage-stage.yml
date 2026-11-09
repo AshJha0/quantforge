@@ -1,13 +1,15 @@
 name: Coverage by stage
-# Line-coverage gate on the current stage's new modules (85%, conformance/quality/stage_e.json), per language.
-# A language runs only when the config names at least one of its modules, so before the stage lands the run
-# is the config check alone (about a minute). Weekly and manual; on pull requests only when the config, the
-# gate or this file changes, so module work in the language trees never pays for it twice.
+# Per-language floor over the whole library (plan 12.2 G6, conformance/quality/floors.json) on every run, and the
+# line-coverage gate on the current stage's new modules (85%, conformance/quality/stage_e.json), per language.
+# Every language runs, since the floor always applies; modules still TODO in the config are skipped by the
+# module gate. Weekly, manual, and on pull requests that touch library code or the gate.
 on:
   schedule:
     - cron: '23 4 * * 3'
   pull_request:
-    paths: ['conformance/quality/**', 'tools/quality_gate.py', '.github/workflows/coverage-stage.yml']
+    paths: ['cpp26/src/**', 'cpp26/include/**', 'java25/src/**', 'python/quantforge_core/**', 'python/tests/**',
+            'rust/crates/**', 'conformance/quality/**', 'tools/quality_gate.py', 'tools/governance_gate.py',
+            '.github/workflows/coverage-stage.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -41,7 +43,6 @@ jobs:
           PY
   java:
     needs: plan
-    if: needs.plan.outputs.java == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -55,10 +56,9 @@ jobs:
           cache: maven
       - run: mvn -B -Pcoverage verify
         working-directory: java25
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang java --coverage java25/target/site/jacoco/jacoco.xml
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang java --coverage java25/target/site/jacoco/jacoco.xml --floor
   cpp:
     needs: plan
-    if: needs.plan.outputs.cpp == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
     timeout-minutes: 25
@@ -72,10 +72,9 @@ jobs:
       - run: cmake --build build --parallel
       - run: ctest --test-dir build --output-on-failure
       - run: gcovr --root . --filter 'cpp26/src/' --cobertura coverage.xml build
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang cpp --coverage coverage.xml
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang cpp --coverage coverage.xml --floor
   python:
     needs: plan
-    if: needs.plan.outputs.python == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -86,10 +85,9 @@ jobs:
       - run: uv sync --locked --project python
       - run: uv run coverage run -m pytest -q && uv run coverage json -o coverage.json
         working-directory: python
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang python --coverage python/coverage.json
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang python --coverage python/coverage.json --floor
   rust:
     needs: plan
-    if: needs.plan.outputs.rust == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -101,4 +99,4 @@ jobs:
       - run: cargo install cargo-llvm-cov --version 0.6.16 --locked
       - run: cargo llvm-cov --workspace --lcov --output-path lcov.info
         working-directory: rust
-      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang rust --coverage rust/lcov.info
+      - run: python3 tools/quality_gate.py --config "$CONFIG" --lang rust --coverage rust/lcov.info --floor
