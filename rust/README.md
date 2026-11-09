@@ -4,7 +4,7 @@ Stages A and B of QuantForge in Rust 1.99.1, edition 2024, written from `specifi
 
 - `crates/quantforge-core`: the library, one module per domain. Every public function that returns
   `Result` rejects NaN and infinity as `E_DOMAIN` (E1); infallible kernels such as `black()` are
-  marked as unchecked.
+  documented "unchecked: caller guarantees finite inputs" (F-4).
 - `crates/quantforge-cli`: the `quantforge` executable. `src/ops/` has one module per operation
   domain (`bond`, `core`, `rates`, `vol` and so on); each declares its operations once with
   `registry!`, and the verb table is generated from the registry. `clippy::unwrap_used` is denied

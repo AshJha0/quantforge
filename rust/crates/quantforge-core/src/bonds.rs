@@ -60,7 +60,7 @@ fn periods(maturity: Date, months: i64, settlement: Date) -> Result<(Date, Vec<D
 }
 
 impl Bond {
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn new(maturity: Date, coupon: f64, frequency: i64) -> Bond {
         Bond {
             maturity,

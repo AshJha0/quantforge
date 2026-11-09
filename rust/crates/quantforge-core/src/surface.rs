@@ -72,7 +72,7 @@ impl Surface {
     }
 
     /// Total variance at a point, for `t` above 0.
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn w(&self, t: f64, k: f64) -> f64 {
         let g = &self.t;
         let n = g.len() - 1;

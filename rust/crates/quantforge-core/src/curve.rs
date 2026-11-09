@@ -100,13 +100,13 @@ impl Curve {
     }
 
     /// From log discount factors at dates already known to be in order.
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn from_logs(as_of: Date, i: Interpolation, dates: &[Date], logs: &[f64]) -> Curve {
         Curve::from_logs_with_jumps(as_of, i, dates, logs, &[])
     }
 
     /// From full log discount factors, with checked jumps. Nodes keep `ln S = ln D - ln J`.
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn from_logs_with_jumps(
         as_of: Date,
         i: Interpolation,

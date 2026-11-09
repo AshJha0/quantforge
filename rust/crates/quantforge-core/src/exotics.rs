@@ -50,7 +50,7 @@ impl Vanilla {
 }
 
 /// Generalised Black-Scholes.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn gbs(call: bool, s: f64, k: f64, t: f64, r: f64, b: f64, v: f64) -> f64 {
     let sd = v * t.sqrt();
     let d1 = ((s / k).ln() + (b + v * v / 2.0) * t) / sd;

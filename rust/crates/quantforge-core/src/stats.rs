@@ -2,20 +2,20 @@
 
 use crate::error::{Result, fail};
 
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn mean(x: &[f64]) -> f64 {
     x.iter().sum::<f64>() / x.len() as f64
 }
 
 /// True when all values are equal. Rounding in a mean cannot fake a non-zero variance here.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn is_constant(x: &[f64]) -> bool {
     x.iter().all(|v| *v == x[0])
 }
 
 /// The mean and deviations from it, by way of a shift to the first value. The shift is exact for
 /// nearby values, so a large offset does not reach the moments through a rounded mean.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn centered(x: &[f64]) -> (f64, Vec<f64>) {
     let y: Vec<f64> = x.iter().map(|v| v - x[0]).collect();
     let my = mean(&y);
@@ -23,7 +23,7 @@ pub fn centered(x: &[f64]) -> (f64, Vec<f64>) {
 }
 
 /// Two-pass sample variance, divisor `n - 1`.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn variance(x: &[f64]) -> f64 {
     let m = mean(x);
     x.iter().map(|v| (v - m) * (v - m)).sum::<f64>() / (x.len() - 1) as f64
@@ -117,14 +117,14 @@ fn erfcx(y: f64) -> f64 {
     }
 }
 
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn normal_pdf(x: f64) -> f64 {
     (-x * x / 2.0).exp() / (2.0 * std::f64::consts::PI).sqrt()
 }
 
 /// `N(x)`. The Gaussian factor is formed from `x` itself, split so that `x^2/2` loses no bits;
 /// going through `y = |x|/sqrt 2` would cost about 1e-13 relative at `x = -37`.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn normal_cdf(x: f64) -> f64 {
     let ax = x.abs();
     let y = ax / std::f64::consts::SQRT_2;

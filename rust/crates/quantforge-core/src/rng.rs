@@ -146,7 +146,7 @@ const F: [f64; 8] = [
 ];
 
 /// Wichura's AS 241 inverse normal, for `p` strictly inside (0, 1).
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn ppnd16(p: f64) -> f64 {
     let q = p - 0.5;
     if q.abs() <= 0.425 {

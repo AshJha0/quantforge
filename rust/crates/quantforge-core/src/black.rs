@@ -34,7 +34,7 @@ pub fn phi(call: bool) -> f64 {
 }
 
 /// Lognormal price on forward `f`, strike `k`, discount `d`.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn black(call: bool, f: f64, k: f64, v: f64, t: f64, d: f64) -> f64 {
     let p = phi(call);
     if t == 0.0 || v == 0.0 {
@@ -44,14 +44,14 @@ pub fn black(call: bool, f: f64, k: f64, v: f64, t: f64, d: f64) -> f64 {
     d * p * (f * normal_cdf(p * d1) - k * normal_cdf(p * d2))
 }
 
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn d1_d2(f: f64, k: f64, v: f64, t: f64) -> (f64, f64) {
     let s = v * t.sqrt();
     let d1 = ((f / k).ln() + v * v * t / 2.0) / s;
     (d1, d1 - s)
 }
 
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn bachelier(call: bool, f: f64, k: f64, v: f64, t: f64, d: f64) -> f64 {
     let p = phi(call);
     if t == 0.0 || v == 0.0 {
@@ -126,7 +126,7 @@ impl Option_ {
         Ok(())
     }
 
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn value(&self, v: f64) -> f64 {
         let (f, d, k) = self.fdk();
         if self.is_normal() {

@@ -184,7 +184,7 @@ pub fn fit_surface(expiries: &[f64], k: &[f64], w: &[Vec<f64>]) -> Result<Surfac
 }
 
 /// `(w, w_k, w_kk, w_T)` at `(t, k)` by ruling E-A4.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn surface_at(slices: &[Slice], t: f64, k: f64) -> (f64, f64, f64, f64) {
     let n = slices.len();
     let at = |j: usize| {
@@ -211,7 +211,7 @@ pub fn surface_at(slices: &[Slice], t: f64, k: f64) -> (f64, f64, f64, f64) {
 }
 
 /// Gatheral's `g` for a general total variance and its `k` derivatives.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn density(k: f64, w: f64, wk: f64, wkk: f64) -> f64 {
     let u = 1.0 - k * wk / (2.0 * w);
     u * u - (wk * wk / 4.0) * (1.0 / w + 0.25) + wkk / 2.0

@@ -109,7 +109,7 @@ impl Heston {
     }
 
     /// Characteristic function of `ln(S_T/F)` at complex `u`, little-trap form [Alb07].
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn cf(&self, u: C, t: f64) -> C {
         let Heston {
             v0,

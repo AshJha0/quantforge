@@ -154,7 +154,7 @@ pub fn cds_option_implied_vol(o: &CdsOption, premium: f64) -> Result<f64> {
 }
 
 /// Standard normal quantile: AS241 refined by one Newton step.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn normal_inv(p: f64) -> f64 {
     let x = ppnd16(p);
     x - (normal_cdf(x) - p) / normal_pdf(x)
@@ -182,7 +182,7 @@ fn integrate(f: &dyn Fn(f64) -> f64, a: f64, b: f64, panels: usize) -> f64 {
 
 /// Bivariate normal CDF by Drezner-Wesolowsky's `sin` substitution:
 /// `Phi(h) Phi(k) + (1/2pi) int_0^{asin rho} exp(-(h^2 + k^2 - 2hk sin t)/(2 cos^2 t)) dt`.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn bivariate_normal(h: f64, k: f64, rho: f64) -> f64 {
     let top = rho.asin();
     let g = |t: f64| {
@@ -204,13 +204,13 @@ fn chi_mix(nu: f64, f: &dyn Fn(f64) -> f64) -> f64 {
 }
 
 /// Student t CDF with `nu` degrees of freedom.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn student_cdf(x: f64, nu: f64) -> f64 {
     chi_mix(nu, &|r| normal_cdf(x * r))
 }
 
 /// Student t quantile by bisection on [`student_cdf`].
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn student_inv(p: f64, nu: f64) -> f64 {
     let (mut lo, mut hi) = (-1.0, 1.0);
     while student_cdf(lo, nu) > p {
@@ -234,7 +234,7 @@ pub fn student_inv(p: f64, nu: f64) -> f64 {
 }
 
 /// Bivariate Student t CDF, one `nu`, scale matrix with off-diagonal `rho` (ruling E-B24).
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn bivariate_student(x: f64, y: f64, rho: f64, nu: f64) -> f64 {
     chi_mix(nu, &|r| bivariate_normal(x * r, y * r, rho))
 }

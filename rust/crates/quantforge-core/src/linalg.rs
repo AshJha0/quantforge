@@ -183,7 +183,7 @@ pub fn singular_values(a: &Matrix) -> Vec<f64> {
 }
 
 /// Thomas algorithm for a constant tridiagonal system. The solution replaces `rhs`.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn thomas(lower: f64, diag: f64, upper: f64, rhs: &mut [f64]) {
     let n = rhs.len();
     let mut c = vec![0.0; n];

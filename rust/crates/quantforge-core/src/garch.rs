@@ -134,7 +134,7 @@ fn params(u: &[f64]) -> (f64, f64, f64) {
 }
 
 /// Nelder-Mead minimiser of `f` from `x0` with initial steps `step`. Returns point and value.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn nelder_mead<F: Fn(&[f64]) -> f64>(
     f: &F,
     x0: &[f64],

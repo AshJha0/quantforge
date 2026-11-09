@@ -4,7 +4,7 @@ use crate::error::{Result, fail};
 
 /// Levenberg-Marquardt with a central-difference Jacobian. `resid` returns `None` outside the
 /// domain, and a step that lands there is refused. Returns the point and its sum of squares.
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn minimise<F>(x0: &[f64], resid: &F) -> Option<(Vec<f64>, f64)>
 where
     F: Fn(&[f64]) -> Option<Vec<f64>>,
@@ -120,21 +120,21 @@ impl Svi {
         }
     }
 
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn w(&self, k: f64) -> f64 {
         let x = k - self.m;
         self.a + self.b * (self.rho * x + (x * x + self.sigma * self.sigma).sqrt())
     }
 
     /// `dw/dk`.
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn w1(&self, k: f64) -> f64 {
         let x = k - self.m;
         self.b * (self.rho + x / (x * x + self.sigma * self.sigma).sqrt())
     }
 
     /// `d2w/dk2`.
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn w2(&self, k: f64) -> f64 {
         let x = k - self.m;
         let r = (x * x + self.sigma * self.sigma).sqrt();
@@ -142,7 +142,7 @@ impl Svi {
     }
 
     /// Gatheral's density function.
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn g(&self, k: f64) -> f64 {
         let x = k - self.m;
         let r = (x * x + self.sigma * self.sigma).sqrt();
@@ -247,12 +247,12 @@ pub fn calibrate(k: &[f64], w: &[f64], weights: Option<&[f64]>) -> Result<SviFit
     })
 }
 
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn ssvi_phi(theta: f64, eta: f64, gamma: f64) -> f64 {
     eta * theta.powf(-gamma) * (1.0 + theta).powf(gamma - 1.0)
 }
 
-/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn ssvi_w(k: f64, theta: f64, rho: f64, eta: f64, gamma: f64) -> f64 {
     let p = ssvi_phi(theta, eta, gamma);
     let x = p * k;

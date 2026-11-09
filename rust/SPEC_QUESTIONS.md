@@ -149,14 +149,13 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - **Cross-language rulings E-B34 to E-B40:** applied. VIX bracket first (E-B34, already so); no C10 cap on E7 lists (E-B35, already so); replicated variance below 0 is `E_DOMAIN` (E-B36); ZC order forward, `1 + K`, years, with negative `K` priced (E-B37); E4 option vols `>= 0` and CTD inputs above 0 after the premium bounds (E-B38); implied-correlation `E_DOMAIN` order (E-B39); CDS implied-vol knock-out rule before the dates (E-B40).
 - **`rulings_e_b-0008`, `-0009`, `-0015`:** settled; spec B rebuilt them from the proper bases (5b58e2d) and they pass with no code change. No stage E question is open.
 
-## Stage F, open (phase 0, E1)
+## Stage F, closed by `stage-f` 968952b (F-1 to F-4)
 
-- E1 order of checks: the finiteness check runs first in each public function, before every
-  other rule, so a NaN input is `E_DOMAIN` even where another input would be `E_INPUT`. Is that
-  the order the shared golden expects?
-- E1 `field`: a non-finite field inside a struct passed as a method receiver reports
-  `field = "self"`; for a struct argument it reports the argument name, not the inner field.
-  The CLI layer cannot see NaN (JSON has no NaN, and an overflowing number is `E_SCHEMA`), so
-  the CLI golden's encoding of NaN, +inf and -inf is awaited from the spec.
-- E1 `-0.0` is finite and passes the finiteness rule; whatever sign rule an operation has
-  applies to it as to `0.0`.
+- E1 order: F-2 puts the finite rule after `E_SCHEMA` and `E_LIMIT` and before every own check;
+  the CLI follows it. Library functions check finiteness first as well.
+- E1 encoding: F-1 tokens are read at the CLI boundary. A string field whose value is literally
+  `"NaN"` would also be read as a number and be `E_SCHEMA`; no spec field takes free text where
+  that could occur, so it is noted here, not asked.
+- `-0.0`: F-3, same result as `+0.0`; the `negative_zero` cases pass with no change.
+- Library `field` for a non-finite value inside a struct is the argument name (`self` for a
+  receiver); F-4 does not fix the field, so this stays a Rust choice.

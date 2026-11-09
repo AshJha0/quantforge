@@ -96,7 +96,7 @@ impl FxMarket {
         ))
     }
 
-    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn valuation(&self, pv: f64, model: &'static str) -> Valuation {
         Valuation {
             pv,
