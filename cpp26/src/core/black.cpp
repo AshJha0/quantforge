@@ -5,6 +5,7 @@
 #include <numbers>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/stats.hpp"
 
 namespace quantforge {
@@ -13,6 +14,13 @@ namespace {
 double density(double x) { return std::exp(-x * x / 2) / std::sqrt(2 * std::numbers::pi); }
 
 [[noreturn]] void domain(const char* why) { throw Error("E_DOMAIN", why); }
+
+// option_price without the finite check, for the solvers and bumps below (their trial vols are finite).
+double price_raw(const OptionInput& in, double vol) {
+    const double f = in.model_forward(), d = in.model_discount(), t = in.expiry_years;
+    if (in.model == VolModel::Bachelier) return bachelier_price(f, in.strike, vol, t, d, in.phi());
+    return black_price(f + in.shift, in.strike + in.shift, vol, t, d, in.phi());
+}
 
 }  // namespace
 
@@ -36,7 +44,19 @@ double bachelier_price(double f, double k, double vol, double t, double d, doubl
     return d * (phi * (f - k) * normal_cdf(phi * x) + s * density(x));
 }
 
+void require_finite(const OptionInput& in) {
+    require_finite(in.strike, "strike");
+    require_finite(in.expiry_years, "expiry_years");
+    require_finite(in.spot, "spot");
+    require_finite(in.rate, "rate");
+    require_finite(in.yield, "dividend_yield");
+    require_finite(in.forward, "forward");
+    require_finite(in.discount_factor, "discount_factor");
+    require_finite(in.shift, "shift");
+}
+
 void check_option(const OptionInput& in) {
+    require_finite(in);
     if (in.model != VolModel::BlackScholes && in.discount_factor <= 0) domain("discount_factor is not above 0");
     if (in.model == VolModel::BlackScholes && in.spot <= 0) domain("spot is not above 0");
     if (in.model == VolModel::Black76 && in.forward + in.shift <= 0) domain("forward + shift is not above 0");
@@ -44,19 +64,27 @@ void check_option(const OptionInput& in) {
 }
 
 double option_price(const OptionInput& in, double vol) {
-    const double f = in.model_forward(), d = in.model_discount(), t = in.expiry_years;
-    if (in.model == VolModel::Bachelier) return bachelier_price(f, in.strike, vol, t, d, in.phi());
-    return black_price(f + in.shift, in.strike + in.shift, vol, t, d, in.phi());
+    require_finite(in);
+    require_finite(vol, "vol");
+    return price_raw(in, vol);
 }
 
 double checked_option_price(const OptionInput& in, double vol) {
+    require_finite(in);
+    require_finite(vol, "vol");
     if (in.expiry_years < 0) domain("expiry_years below 0");
     if (vol < 0) domain("vol below 0");
     check_option(in);
-    return option_price(in, vol);
+    return price_raw(in, vol);
 }
 
 double implied_vol(const OptionInput& in, double price) {
+    require_finite(in);
+    require_finite(price, "price");
+    return implied_vol_unchecked(in, price);
+}
+
+double implied_vol_unchecked(const OptionInput& in, double price) {
     if (in.expiry_years < 0) domain("expiry_years below 0");
     check_option(in);
     if (in.expiry_years == 0) domain("expiry_years is 0");
@@ -68,7 +96,7 @@ double implied_vol(const OptionInput& in, double price) {
     if (!normal && price >= d * (phi > 0 ? f : k)) domain("price is at or above the upper bound");
     if (price == intrinsic) return 0.0;
 
-    const auto gap = [&](double v) { return option_price(in, v) - price; };
+    const auto gap = [&](double v) { return price_raw(in, v) - price; };
     const auto vega = [&](double v) {
         if (normal) return d * root_t * density((f - k) / (v * root_t));
         const double s = v * root_t;
@@ -101,12 +129,14 @@ double implied_vol(const OptionInput& in, double price) {
 }
 
 Greeks option_greeks(const OptionInput& in, double vol) {
+    require_finite(in);
+    require_finite(vol, "vol");
     if (in.expiry_years < 0) domain("expiry_years below 0");
     if (vol < 0) domain("vol below 0");
     check_option(in);
     if (vol <= 0 || in.expiry_years <= 0) domain("vol and expiry_years must be above 0");
     const double t = in.expiry_years, root_t = std::sqrt(t), phi = in.phi(), v = vol, d = in.model_discount();
-    const double price = option_price(in, v);
+    const double price = price_raw(in, v);
     if (in.model == VolModel::Bachelier) {
         const double x = (in.forward - in.strike) / (v * root_t), n = density(x);
         return {price, d * phi * normal_cdf(phi * x), d * n / (v * root_t), d * root_t * n, -d * v * n / (2 * root_t),
@@ -132,6 +162,8 @@ Greeks option_greeks(const OptionInput& in, double vol) {
 }
 
 BumpGreeks bump_greeks(const OptionInput& in, double vol) {
+    require_finite(in);
+    require_finite(vol, "vol");
     if (in.expiry_years < 0) domain("expiry_years below 0");
     if (vol < 0) domain("vol below 0");
     check_option(in);
@@ -145,7 +177,7 @@ BumpGreeks bump_greeks(const OptionInput& in, double vol) {
     const auto value = [&](double du, double dv) {
         OptionInput moved = in;
         (spot ? moved.spot : moved.forward) = u + du;
-        return option_price(moved, vol + dv);
+        return price_raw(moved, vol + dv);
     };
     const double v0 = value(0, 0), up = value(hu, 0), down = value(-hu, 0), vup = value(0, hv), vdown = value(0, -hv);
     return {(up - down) / (2 * hu),

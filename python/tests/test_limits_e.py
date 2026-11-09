@@ -6,9 +6,9 @@ import math
 
 import numpy as np
 
+from quantforge_core import arb_surface, pde
 from quantforge_core import exotics as ex
 from quantforge_core import heston as hm
-from quantforge_core import pde, vol_e1
 from quantforge_core.smile import Svi
 
 X0 = math.log(100.0)
@@ -21,7 +21,7 @@ def _order(e):
 def _slv_gap(nx, nv, nt):
     """Largest |L - 1| within 0.3 of ln(spot) for a flat 20% surface and Heston with
     v0 = theta = 0.04 and vanishing vol of vol: SLV then reduces to Heston with L = 1."""
-    flat = [vol_e1.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
+    flat = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
     out = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, hm.Heston(0.04, 2.0, 0.04, 0.01, -0.7), flat,
                           hm.Grid(nx, nv, nt, X0 - 1.0, X0 + 1.0, 0.25))
     assert abs(out["mass"] - 1.0) < 1e-3
@@ -94,7 +94,7 @@ def test_slv_calibrated_to_heston_surface_has_unit_leverage_and_reprices():
     rows = [[_implied(p, k, t) ** 2 * t
              for p, k in zip(hm.heston_price(100.0, strikes, t, 0.0, 0.0, h, "CALL"), strikes)]
             for t in expiries]
-    slices, _, _ = vol_e1.fit_surface(expiries, ks, rows, False)
+    slices, _, _ = arb_surface.fit_surface(expiries, ks, rows, False)
     times = (0.125, 0.25, 0.5, 0.75, 1.0)
     levs, xs = [], None
     for t in times:

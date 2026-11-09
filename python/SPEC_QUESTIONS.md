@@ -193,3 +193,17 @@ Closed by spec B rulings (2026-11-08): E-Q3 by E-B35 (as built); E-Q4 by E-B36 (
 (bracket now checked first); E-Q8 by E-B37 (as built); E-Q9 by E-B40 (as built); E-Q13 by E-B40 (as built).
 Still open: E-Q7 (cube domain checks on every node, as the golden needs) and E-Q11 (E2 array caps), both
 upheld in effect by goldens and E-A35.
+
+## Stage F
+
+- F-Q1 (E1, NaN and infinity at public inputs). Until the shared golden lands, Python applies the rule in the
+  library, at the outermost public call, before any other check: a NaN, +inf or -inf anywhere in an argument
+  (floats, lists, tuples, dicts, dataclasses, NumPy float arrays) is `E_DOMAIN`, and -0.0 is accepted as 0.0.
+  The field is the innermost dataclass field or dict key holding the value, else the parameter name. Calls
+  between core functions are not checked again, so an intermediate infinity is still `E_NON_FINITE` at the
+  output. Over the CLI no input can be NaN or infinite (cli-contract, JSON), so conformance results do not
+  change. Asked: whether E1 runs before the E_SCHEMA and E_INPUT checks (Python: first), and which field a
+  value inside a structured input names.
+- F-Q2 (G4). Core modules are named by domain; `stage_d3` was split into `caps_swaptions`, `commodity` and
+  `mbs`; `vol_e1` is `arb_surface`, `vol_e7` is `variance`, `credit_e8` is `credit_options`, `equity_d` is
+  `equity_curves`. CLI handlers live in `cli/ops_<domain>.py` by verb prefix; the verb table is the registry.

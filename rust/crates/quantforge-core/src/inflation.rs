@@ -2,6 +2,7 @@
 use crate::bonds::{Bond, price_from_yield};
 use crate::curve::Curve;
 use crate::dates::{Date, days_in_month};
+
 use crate::error::{Result, err, fail};
 use std::collections::HashMap;
 
@@ -26,6 +27,9 @@ impl CpiCurve {
         quotes: &[(i64, f64)],
         seasonality: Option<&[f64]>,
     ) -> Result<CpiCurve> {
+        crate::error::finite("base_cpi", &base_cpi)?;
+        crate::error::finite("quotes", &quotes)?;
+        crate::error::finite("seasonality", &seasonality)?;
         if quotes.is_empty()
             || quotes[0].0 <= 0
             || quotes.windows(2).any(|w| w[1].0 <= w[0].0)
@@ -113,6 +117,7 @@ pub struct Zcis {
 
 /// `(pv, index_ratio)`.
 pub fn zcis_pv(c: &CpiCurve, discount: &Curve, t: &Zcis) -> Result<(f64, f64)> {
+    crate::error::finite("t", &t)?;
     if t.years <= 0 || t.years > 100 {
         return fail("E_INPUT", "years must be a positive integer");
     }
@@ -142,6 +147,10 @@ pub fn linker_price(
     base_ref_cpi: f64,
     fixings: &[(i64, f64)],
 ) -> Result<LinkerPrice> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("real_yield", &real_yield)?;
+    crate::error::finite("base_ref_cpi", &base_ref_cpi)?;
+    crate::error::finite("fixings", &fixings)?;
     let mut table = HashMap::new();
     for (m, v) in fixings {
         if table.insert(*m, *v).is_some() {
@@ -177,6 +186,8 @@ pub fn linker_price_curve(
     c: &CpiCurve,
     discount: &Curve,
 ) -> Result<f64> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("base_ref_cpi", &base_ref_cpi)?;
     if base_ref_cpi <= 0.0 {
         return fail("E_DOMAIN", "base_ref_cpi must be positive");
     }
@@ -187,6 +198,23 @@ pub fn linker_price_curve(
         sum += cf * reference_cpi(*d, &lookup)? / base_ref_cpi * discount.discount(*d)?;
     }
     Ok(sum / discount.discount(settlement)?)
+}
+
+impl crate::error::Finite for LinkerPrice {
+    fn is_all_finite(&self) -> bool {
+        self.ref_cpi.is_all_finite()
+            && self.index_ratio.is_all_finite()
+            && self.real_clean.is_all_finite()
+            && self.real_accrued.is_all_finite()
+            && self.nominal_clean.is_all_finite()
+            && self.nominal_accrued.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Zcis {
+    fn is_all_finite(&self) -> bool {
+        self.fixed_rate.is_all_finite() && self.notional.is_all_finite()
+    }
 }
 
 #[cfg(test)]

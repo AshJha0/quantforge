@@ -5,6 +5,7 @@
 
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 namespace {
@@ -32,6 +33,9 @@ double slice_w(const Surface& s, std::size_t j, double k) {
 }  // namespace
 
 void check_surface(const Surface& s) {
+    require_finite(s.expiry_years, "expiry_years");
+    require_finite(s.log_moneyness, "log_moneyness");
+    require_finite(s.vols, "vols");
     if (s.expiry_years.empty() || s.log_moneyness.empty() || !increasing(s.expiry_years) || !increasing(s.log_moneyness) ||
         s.vols.size() != s.expiry_years.size())
         throw Error("E_INPUT", "grids are not strictly increasing, or shapes differ");
@@ -45,6 +49,11 @@ void check_surface(const Surface& s) {
 }
 
 double surface_total_variance(const Surface& s, double t, double k) {
+    require_finite(s.expiry_years, "expiry_years");
+    require_finite(s.log_moneyness, "log_moneyness");
+    require_finite(s.vols, "vols");
+    require_finite(t, "expiry_years");
+    require_finite(k, "log_moneyness");
     const auto& g = s.expiry_years;
     if (t <= g.front()) return slice_w(s, 0, k) * t / g.front();
     if (t >= g.back()) return slice_w(s, g.size() - 1, k) * t / g.back();
@@ -54,6 +63,9 @@ double surface_total_variance(const Surface& s, double t, double k) {
 }
 
 SurfaceCheck surface_check(const Surface& s) {
+    require_finite(s.expiry_years, "expiry_years");
+    require_finite(s.log_moneyness, "log_moneyness");
+    require_finite(s.vols, "vols");
     SurfaceCheck out;
     const std::size_t rows = s.expiry_years.size(), n = s.log_moneyness.size();
     for (std::size_t j = 1; j < rows; ++j)

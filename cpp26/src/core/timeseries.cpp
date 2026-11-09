@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/stats.hpp"
 
@@ -19,9 +20,14 @@ long long bucket(Date d, ResampleFrequency f) {
     return n >= 0 ? n / 7 : -((6 - n) / 7);
 }
 
+void require_finite_present(const std::vector<MaybeReal>& values, std::string_view field) {
+    for (const MaybeReal& v : values) require_finite(v, field);
+}
+
 }  // namespace
 
 std::vector<double> returns(const std::vector<double>& p, ReturnKind kind) {
+    require_finite(p, "prices");
     if (p.size() < 2) throw Error("E_INPUT", "at least 2 prices are needed", "prices");
     for (const double v : p)
         if (v <= 0.0) throw Error("E_DOMAIN", "prices must be positive", "prices");
@@ -33,6 +39,7 @@ std::vector<double> returns(const std::vector<double>& p, ReturnKind kind) {
 }
 
 std::vector<MaybeReal> rolling(const std::vector<double>& x, long long window, RollingStatistic statistic) {
+    require_finite(x, "x");
     if (window < 2 || window > std::ssize(x)) throw Error("E_INPUT", "window must be 2 to n", "window");
     const auto w = std::size_t(window);
     std::vector<MaybeReal> out(x.size());
@@ -52,6 +59,8 @@ std::vector<MaybeReal> rolling(const std::vector<double>& x, long long window, R
 }
 
 std::vector<double> ewma_variance(const std::vector<double>& r, double lambda) {
+    require_finite(r, "returns");
+    require_finite(lambda, "lambda");
     if (r.empty()) throw Error("E_INPUT", "at least 1 return is needed", "returns");
     if (lambda <= 0.0 || lambda >= 1.0) throw Error("E_DOMAIN", "lambda must lie in (0, 1)", "lambda");
     std::vector<double> v(r.size());
@@ -61,6 +70,7 @@ std::vector<double> ewma_variance(const std::vector<double>& r, double lambda) {
 }
 
 std::vector<double> autocorrelation(const std::vector<double>& x, long long max_lag) {
+    require_finite(x, "x");
     check_lag(x, max_lag);
     const auto d = centre(x).d;
     double denominator = 0.0;
@@ -76,6 +86,7 @@ std::vector<double> autocorrelation(const std::vector<double>& x, long long max_
 }
 
 double ljung_box(const std::vector<double>& x, long long max_lag) {
+    require_finite(x, "x");
     const auto acf = autocorrelation(x, max_lag);
     const double n = double(x.size());
     double s = 0.0;
@@ -84,6 +95,7 @@ double ljung_box(const std::vector<double>& x, long long max_lag) {
 }
 
 Ar1 ar1(const std::vector<double>& x) {
+    require_finite(x, "x");
     if (x.size() < 4) throw Error("E_INPUT", "at least 4 values are needed", "x");
     const std::vector<double> lagged(x.begin(), x.end() - 1), current(x.begin() + 1, x.end());
     const auto [mx, dx] = centre(lagged);
@@ -104,6 +116,7 @@ Ar1 ar1(const std::vector<double>& x) {
 }
 
 Resampled resample_last(const std::vector<Date>& dates, const std::vector<MaybeReal>& values, ResampleFrequency f) {
+    require_finite_present(values, "values");
     if (dates.size() != values.size()) throw Error("E_INPUT", "dates and values differ in length");
     for (std::size_t i = 1; i < dates.size(); ++i)
         if (!(dates[i - 1] < dates[i])) throw Error("E_INPUT", "dates must be strictly increasing", "dates");
@@ -127,6 +140,7 @@ Resampled resample_last(const std::vector<Date>& dates, const std::vector<MaybeR
 }
 
 std::vector<MaybeReal> forward_fill(const std::vector<MaybeReal>& values, long long limit) {
+    require_finite_present(values, "values");
     if (limit < 1) throw Error("E_INPUT", "limit must be at least 1", "limit");
     std::vector<MaybeReal> out = values;
     long long last = -1;

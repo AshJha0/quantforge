@@ -5,7 +5,7 @@ from datetime import date
 
 import pytest
 
-from quantforge_core import bonds, credit, equity_d, inflation, xccy
+from quantforge_core import bonds, credit, equity_curves, inflation, xccy
 from quantforge_core.bonds import Bond
 from quantforge_core.cli.main import run_case
 from quantforge_core.curves import CurveData
@@ -238,41 +238,41 @@ DIVS = [(date(2026, 12, 18), 18.0), (date(2027, 3, 19), 16.5)]
 
 def test_implied_dividends_recover_known_and_checks():
     expiry = date(2027, 3, 19)
-    _, f = 0, equity_d._forward
+    _, f = 0, equity_curves._forward
     from quantforge_core import curves
     c = curves.build(_flat())
     price = f(5000, c, 0.003, 0.0, DIVS, expiry)
-    xs, periods, _ = equity_d.dividend_implied(5000, _flat(), 0.003, [(expiry, price)])
+    xs, periods, _ = equity_curves.dividend_implied(5000, _flat(), 0.003, [(expiry, price)])
     assert periods == xs
-    assert equity_d.borrow_implied(5000, _flat(), DIVS, expiry, price) == pytest.approx(
+    assert equity_curves.borrow_implied(5000, _flat(), DIVS, expiry, price) == pytest.approx(
         0.003, abs=1e-14)
-    assert _code_of(equity_d.dividend_implied, 5000, _flat(), 0.0, [(AS_OF, 1.0)]) == "E_INPUT"
-    assert _code_of(equity_d.dividend_implied, 5000, _flat(), 0.0, [(expiry, 0.0)]) == "E_DOMAIN"
-    assert _code_of(equity_d.borrow_implied, 5000, _flat(), DIVS, expiry,
+    assert _code_of(equity_curves.dividend_implied, 5000, _flat(), 0.0, [(AS_OF, 1.0)]) == "E_INPUT"
+    assert _code_of(equity_curves.dividend_implied, 5000, _flat(), 0.0, [(expiry, 0.0)]) == "E_DOMAIN"
+    assert _code_of(equity_curves.borrow_implied, 5000, _flat(), DIVS, expiry,
                     1e6) == "E_NOT_BRACKETED"
 
 
 def test_futures_basis_zero_at_fair_and_checks():
-    assert _code_of(equity_d.futures_basis, 5000, _flat(), 0.003, 0.001, DIVS,
+    assert _code_of(equity_curves.futures_basis, 5000, _flat(), 0.003, 0.001, DIVS,
                     date(2027, 6, 1), 1.0) == "E_NOT_BRACKETED"
     from quantforge_core import curves
-    fair = equity_d._forward(5000, curves.build(_flat()), 0.003, 0.001, DIVS, date(2027, 6, 1))
-    fair2, basis2, s2 = equity_d.futures_basis(5000, _flat(), 0.003, 0.001, DIVS,
+    fair = equity_curves._forward(5000, curves.build(_flat()), 0.003, 0.001, DIVS, date(2027, 6, 1))
+    fair2, basis2, s2 = equity_curves.futures_basis(5000, _flat(), 0.003, 0.001, DIVS,
                                                date(2027, 6, 1), fair)
     assert basis2 == 0 and s2 == pytest.approx(0.001, abs=1e-14) and fair2 == fair
-    assert _code_of(equity_d.futures_basis, 5000, _flat(), 0.0, 0.0, [], AS_OF,
+    assert _code_of(equity_curves.futures_basis, 5000, _flat(), 0.0, 0.0, [], AS_OF,
                     1.0) == "E_DATE_ORDER"
 
 
 def test_index_ops():
     cons = [("A", 10.0, 5.0, [(date(2027, 1, 1), 1.0)]), ("B", 5.0, 4.0, [(date(2027, 1, 1), 2.0)])]
-    out = equity_d.index_dividends(10.0, cons, [(date(2027, 1, 1), date(2027, 1, 1))], [3.0])
+    out = equity_curves.index_dividends(10.0, cons, [(date(2027, 1, 1), date(2027, 1, 1))], [3.0])
     assert out["points"] == [2.0] and out["period_points"] == [2.0] and out["basis"] == [1.0]
-    level, divisor, w = equity_d.rebalance(10.0, [("A", 10.0, 5.0)], [("A", 5.0, 5.0),
+    level, divisor, w = equity_curves.rebalance(10.0, [("A", 10.0, 5.0)], [("A", 5.0, 5.0),
                                                                        ("B", 5.0, 5.0)])
     assert level == 5.0 and divisor == 10.0 and w == [0.5, 0.5]
-    assert _code_of(equity_d.rebalance, 10.0, [("A", 1.0, 1.0), ("A", 1.0, 1.0)], []) == "E_INPUT"
-    assert _code_of(equity_d.index_dividends, 10.0, cons, [], [1.0]) == "E_INPUT"
+    assert _code_of(equity_curves.rebalance, 10.0, [("A", 1.0, 1.0), ("A", 1.0, 1.0)], []) == "E_INPUT"
+    assert _code_of(equity_curves.index_dividends, 10.0, cons, [], [1.0]) == "E_INPUT"
 
 
 @pytest.mark.parametrize("action,params", [
@@ -282,14 +282,14 @@ def test_index_ops():
     ("REVERSE_SPLIT", {"ratio": -1.0}),
 ])
 def test_corporate_action_domain(action, params):
-    assert _code_of(equity_d.corporate_action, action, 100.0, 1.0, 1.0, params) == "E_DOMAIN"
+    assert _code_of(equity_curves.corporate_action, action, 100.0, 1.0, 1.0, params) == "E_DOMAIN"
 
 
 def test_trs_at_inception_on_flat_curve_and_checks():
-    e, f, pv = equity_d.trs_pv(5000, _flat(), 0.0, [], AS_OF, date(2027, 11, 8), 5000, 1.0, 0.0,
+    e, f, pv = equity_curves.trs_pv(5000, _flat(), 0.0, [], AS_OF, date(2027, 11, 8), 5000, 1.0, 0.0,
                                "RECEIVE_EQUITY", None)
     assert pv == pytest.approx(0, abs=1e-8) and e == pytest.approx(f)
-    assert _code_of(equity_d.trs_pv, 5000, _flat(), 0.0, [], date(2026, 9, 1), date(2027, 3, 1),
+    assert _code_of(equity_curves.trs_pv, 5000, _flat(), 0.0, [], date(2026, 9, 1), date(2027, 3, 1),
                     5000, 1.0, 0.0, "RECEIVE_EQUITY", None) == "E_INPUT"
 
 

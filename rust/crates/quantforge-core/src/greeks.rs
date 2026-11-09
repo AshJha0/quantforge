@@ -1,5 +1,6 @@
 //! Analytic and bumped option Greeks (`vol-greeks.md`).
 use crate::black::{Model, Option_, d1_d2, phi};
+
 use crate::error::{Result, fail};
 use crate::stats::{normal_cdf, normal_pdf};
 
@@ -24,6 +25,8 @@ fn check(o: &Option_, v: f64) -> Result<()> {
 }
 
 pub fn analytic(o: &Option_, v: f64) -> Result<Greeks> {
+    crate::error::finite("o", &o)?;
+    crate::error::finite("v", &v)?;
     check(o, v)?;
     let (f, d, k) = o.fdk();
     let (t, p) = (o.t, phi(o.call));
@@ -94,6 +97,8 @@ fn moved(o: &Option_, h: f64) -> Option_ {
 
 /// `delta`, `gamma`, `vega`, `volga`, `vanna`.
 pub fn bumped(o: &Option_, v: f64) -> Result<[f64; 5]> {
+    crate::error::finite("o", &o)?;
+    crate::error::finite("v", &v)?;
     check(o, v)?;
     let hu = match o.model {
         Model::BlackScholes { spot, .. } => 1e-4 * spot,
@@ -113,6 +118,19 @@ pub fn bumped(o: &Option_, v: f64) -> Result<[f64; 5]> {
         (up.value(v + hv) - up.value(v - hv) - down.value(v + hv) + down.value(v - hv))
             / (4.0 * hu * hv),
     ])
+}
+
+impl crate::error::Finite for Greeks {
+    fn is_all_finite(&self) -> bool {
+        self.price.is_all_finite()
+            && self.delta.is_all_finite()
+            && self.gamma.is_all_finite()
+            && self.vega.is_all_finite()
+            && self.theta.is_all_finite()
+            && self.rho.is_all_finite()
+            && self.vanna.is_all_finite()
+            && self.volga.is_all_finite()
+    }
 }
 
 #[cfg(test)]

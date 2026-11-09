@@ -1,5 +1,7 @@
 package org.quantforge.calibration;
 
+import org.quantforge.core.Finite;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.quantforge.core.LinearAlgebra;
@@ -463,6 +465,9 @@ public final class LeastSquares {
     }
 
     public static List<Breach> checkBidAsk(double[] fitted, double[] bid, double[] ask) {
+        Finite.check("fitted", fitted);
+        Finite.check("bid", bid);
+        Finite.check("ask", ask);
         if (fitted.length != bid.length || fitted.length != ask.length) {
             throw new QfError("E_INPUT", "lengths differ");
         }

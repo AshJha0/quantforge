@@ -5,6 +5,7 @@ import re
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 
 _STRINGS = re.compile(r'"(?:[^"\\]|\\.)*"?', re.DOTALL)
 _BRACKETS = re.compile(r"[\[\]{}]")
@@ -71,3 +72,6 @@ def parse(text: str) -> tuple[Any, bool]:
     except json.JSONDecodeError as e:
         raise QfError("E_PARSE", f"not valid JSON: {e}") from None
     return value, overflow
+
+
+guard(globals())

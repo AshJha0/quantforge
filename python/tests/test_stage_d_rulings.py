@@ -5,7 +5,7 @@ from datetime import date
 
 import pytest
 
-from quantforge_core import bonds, credit, curve_fits, inflation, stage_d3, steps, xccy
+from quantforge_core import bonds, caps_swaptions, credit, curve_fits, inflation, mbs, steps, xccy
 from quantforge_core.bonds import Bond
 from quantforge_core.cli.main import run_case
 from quantforge_core.curves import CurveData
@@ -43,9 +43,9 @@ POOL = (1e6, 0.06, 0.055, 60, 0, "PSA", 100.0)
 
 
 def test_d33_d34_d44_mbs():
-    assert _code_of(stage_d3.mbs_cashflows, (*POOL[:3], 1201, *POOL[4:])) == "E_INPUT"
-    assert _code_of(stage_d3.mbs_price, POOL, -12.0, 0) == "E_DOMAIN"
-    assert _code_of(stage_d3.mbs_cashflows, (1e6, 0.0, 0.06, 60, 0, "PSA", 1.0)) == "E_DOMAIN"
+    assert _code_of(mbs.mbs_cashflows, (*POOL[:3], 1201, *POOL[4:])) == "E_INPUT"
+    assert _code_of(mbs.mbs_price, POOL, -12.0, 0) == "E_DOMAIN"
+    assert _code_of(mbs.mbs_cashflows, (1e6, 0.0, 0.06, 60, 0, "PSA", 1.0)) == "E_DOMAIN"
 
 
 def test_d35_conversion_factor_date_order():
@@ -94,9 +94,9 @@ def test_d39_xccy_start_before_as_of():
 
 @pytest.mark.parametrize("tenor", [0, 1201])
 def test_d40_tenor_months(tenor):
-    assert _code_of(stage_d3.cap_price, _flat(), _flat(), "BLACK_76", 0.2, "CAP", 3, tenor, 0.03,
+    assert _code_of(caps_swaptions.cap_price, _flat(), _flat(), "BLACK_76", 0.2, "CAP", 3, tenor, 0.03,
                     1.0) == "E_INPUT"
-    assert _code_of(stage_d3.swaption_price, _flat(), _flat(), "BLACK_76", 0.2, "PAYER", 12,
+    assert _code_of(caps_swaptions.swaption_price, _flat(), _flat(), "BLACK_76", 0.2, "PAYER", 12,
                     tenor, 0.03, 1.0) == "E_INPUT"
 
 
@@ -135,7 +135,7 @@ def test_d59_xccy_months_limit():
 
 
 def test_d55_bachelier_negative_strike():
-    caplets, _ = stage_d3.cap_price(_flat(), _flat(), "BACHELIER", 0.01, "CAP", 3, 12, -0.01, 1.0)
+    caplets, _ = caps_swaptions.cap_price(_flat(), _flat(), "BACHELIER", 0.01, "CAP", 3, 12, -0.01, 1.0)
     assert all(c > 0 for c in caplets)
 
 

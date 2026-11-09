@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.quantforge.core.Integration;
@@ -42,6 +44,9 @@ public final class CreditOptions {
 
     /** The forward CDS of ruling E-B22, per unit notional. */
     public static Legs legs(LocalDate asOf, LocalDate expiry, LocalDate maturity, double r, double h, double rec) {
+        Finite.check("r", r);
+        Finite.check("h", h);
+        Finite.check("rec", rec);
         double prot = 0.0;
         double ann = 0.0;
         LocalDate a = expiry;
@@ -63,6 +68,9 @@ public final class CreditOptions {
 
     public static void checkOption(LocalDate asOf, LocalDate expiry, LocalDate maturity, double h, double rec,
                                    double k) {
+        Finite.check("h", h);
+        Finite.check("rec", rec);
+        Finite.check("k", k);
         if (!expiry.isAfter(asOf) || !maturity.isAfter(expiry)) {
             throw new QfError("E_INPUT", "need as_of < expiry < maturity", "expiry");
         }
@@ -75,6 +83,12 @@ public final class CreditOptions {
 
     public static OptionPrice price(LocalDate asOf, LocalDate expiry, LocalDate maturity, double r, double h,
                                     double rec, boolean payer, double k, double n, double vol, boolean knockOut) {
+        Finite.check("r", r);
+        Finite.check("h", h);
+        Finite.check("rec", rec);
+        Finite.check("k", k);
+        Finite.check("n", n);
+        Finite.check("vol", vol);
         Legs l = legs(asOf, expiry, maturity, r, h, rec);
         double t = years(asOf, expiry);
         double fep = n * (1 - rec) * (1 - Math.exp(-h * t)) * Math.exp(-r * t);
@@ -85,6 +99,12 @@ public final class CreditOptions {
     /** Knock-out options only (ruling E-B23); bisection on vol to the last midpoint. */
     public static double impliedVol(LocalDate asOf, LocalDate expiry, LocalDate maturity, double r, double h,
                                     double rec, boolean payer, double k, double n, double premium) {
+        Finite.check("r", r);
+        Finite.check("h", h);
+        Finite.check("rec", rec);
+        Finite.check("k", k);
+        Finite.check("n", n);
+        Finite.check("premium", premium);
         Legs l = legs(asOf, expiry, maturity, r, h, rec);
         double t = years(asOf, expiry);
         double f = l.forward();
@@ -107,12 +127,16 @@ public final class CreditOptions {
 
     /** Inverse normal: AS 241 refined by one Newton step. */
     public static double inverseNormal(double p) {
+        Finite.check("p", p);
         double x = Rng.ppnd16(p);
         return x - (Normal.cdf(x) - p) / Normal.pdf(x);
     }
 
     /** Bivariate normal CDF, Drezner-Wesolowsky in the arcsine variable. */
     public static double bivariateNormal(double h, double k, double rho) {
+        Finite.check("h", h);
+        Finite.check("k", k);
+        Finite.check("rho", rho);
         if (rho == 0.0) {
             return Normal.cdf(h) * Normal.cdf(k);
         }
@@ -138,10 +162,14 @@ public final class CreditOptions {
     }
 
     public static double studentCdf(double x, double nu) {
+        Finite.check("x", x);
+        Finite.check("nu", nu);
         return mixture(nu, s -> Normal.cdf(x * s));
     }
 
     public static double studentInverse(double p, double nu) {
+        Finite.check("p", p);
+        Finite.check("nu", nu);
         double lo = -1.0;
         double hi = 1.0;
         while (studentCdf(lo, nu) > p) {
@@ -156,6 +184,10 @@ public final class CreditOptions {
     }
 
     public static double bivariateStudent(double x, double y, double rho, double nu) {
+        Finite.check("x", x);
+        Finite.check("y", y);
+        Finite.check("rho", rho);
+        Finite.check("nu", nu);
         return mixture(nu, s -> bivariateNormal(x * s, y * s, rho));
     }
 
@@ -165,6 +197,10 @@ public final class CreditOptions {
 
     /** {joint default probability, default correlation}. */
     public static double[] jointDefault(Copula c, double p1, double p2, double rho, double nu) {
+        Finite.check("p1", p1);
+        Finite.check("p2", p2);
+        Finite.check("rho", rho);
+        Finite.check("nu", nu);
         double joint = c == Copula.GAUSSIAN
                 ? bivariateNormal(inverseNormal(p1), inverseNormal(p2), rho)
                 : bivariateStudent(studentInverse(p1, nu), studentInverse(p2, nu), rho, nu);
@@ -172,6 +208,9 @@ public final class CreditOptions {
     }
 
     public static void checkPool(double p, double rho, double rec) {
+        Finite.check("p", p);
+        Finite.check("rho", rho);
+        Finite.check("rec", rec);
         if (!(p > 0.0 && p < 1.0) || !(rho > 0.0 && rho < 1.0) || !(rec >= 0.0 && rec < 1.0)) {
             throw new QfError("E_DOMAIN", "default_probability, correlation or recovery out of range");
         }
@@ -191,12 +230,21 @@ public final class CreditOptions {
     }
 
     public static double trancheLoss(double p, double rho, double rec, double a, double d) {
+        Finite.check("p", p);
+        Finite.check("rho", rho);
+        Finite.check("rec", rec);
+        Finite.check("a", a);
+        Finite.check("d", d);
         double ea = a == 0.0 ? 0.0 : expectedMin(p, rho, Math.min(a / (1 - rec), 1.0));
         double ed = expectedMin(p, rho, Math.min(d / (1 - rec), 1.0));
         return (1 - rec) * (ed - ea) / (d - a);
     }
 
     public static double lossCdf(double p, double rho, double rec, double x) {
+        Finite.check("p", p);
+        Finite.check("rho", rho);
+        Finite.check("rec", rec);
+        Finite.check("x", x);
         return Normal.cdf((Math.sqrt(1 - rho) * inverseNormal(x / (1 - rec)) - inverseNormal(p)) / Math.sqrt(rho));
     }
 }

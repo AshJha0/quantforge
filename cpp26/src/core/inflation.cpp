@@ -4,12 +4,27 @@
 #include <map>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 
 long long month_index(Date d) { return 12LL * year_of(d) + month_of(d) - 1; }
 
+namespace {
+
+void require_finite_curve(const CpiCurve& c) {
+    require_finite(c.base_cpi, "base_cpi");
+    for (const ZcisQuote& q : c.quotes) {
+        require_finite(q.years, "quotes");
+        require_finite(q.rate, "quotes");
+    }
+    require_finite(c.seasonality, "seasonality");
+}
+
+}  // namespace
+
 void CpiCurve::check() const {
+    require_finite_curve(*this);
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     double previous = 0.0;
     for (const ZcisQuote& q : quotes) {
@@ -53,6 +68,11 @@ double CpiCurve::cpi(long long k) const {
 }
 
 ZcisPrice zcis_price(const CpiCurve& curve, const Curve& discount, double years, double k, double n, double sign, Date pay) {
+    require_finite_curve(curve);
+    require_finite(years, "years");
+    require_finite(k, "fixed_rate");
+    require_finite(n, "notional");
+    require_finite(sign, "sign");
     curve.check();
     if (!(years >= 1.0) || years != std::floor(years) || years > 100) throw Error("E_INPUT", "years must be a positive integer", "trade");
     const double ratio = curve.cpi(curve.base_month + 12 * (long long)years) / curve.base_cpi;
@@ -61,6 +81,10 @@ ZcisPrice zcis_price(const CpiCurve& curve, const Curve& discount, double years,
 
 LinkerPrice linker_price(const Bond& bond, Date settlement, double real_yield, double base_ref_cpi,
                          const std::vector<CpiFixing>& fixings) {
+    require_finite(bond.coupon, "coupon");
+    require_finite(real_yield, "real_yield");
+    require_finite(base_ref_cpi, "base_ref_cpi");
+    for (const CpiFixing& f : fixings) require_finite(f.value, "cpi_fixings");
     std::map<long long, double> by_month;
     for (const CpiFixing& f : fixings)
         if (!by_month.emplace(f.month, f.value).second) throw Error("E_INPUT", "two fixings share a month", "cpi_fixings");
@@ -76,6 +100,9 @@ LinkerPrice linker_price(const Bond& bond, Date settlement, double real_yield, d
 }
 
 double linker_price_curve(const Bond& bond, Date settlement, double base_ref_cpi, const CpiCurve& curve, const Curve& discount) {
+    require_finite(bond.coupon, "coupon");
+    require_finite(base_ref_cpi, "base_ref_cpi");
+    require_finite_curve(curve);
     curve.check();
     if (!(base_ref_cpi > 0.0)) throw Error("E_DOMAIN", "base_ref_cpi is not positive", "base_ref_cpi");
     const BondPeriod p = bond_period(bond, settlement);

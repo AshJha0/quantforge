@@ -4,6 +4,8 @@ from collections.abc import Callable, Iterable
 
 lazy import numpy as np
 
+from .finite import guard
+
 type Residual = Callable[[np.ndarray], np.ndarray]
 
 
@@ -79,3 +81,6 @@ def best_of(residual: Residual, starts: Iterable[np.ndarray]) -> tuple[np.ndarra
         if result is not None and (best is None or result[1] < best[1]):
             best = result
     return best
+
+
+guard(globals())

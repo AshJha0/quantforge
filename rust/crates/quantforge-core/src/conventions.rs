@@ -1,4 +1,5 @@
 //! Convention registry (`conventions.md`). Market conventions are data, kept here only.
+
 use crate::json::{Json, obj};
 
 /// An overnight index.
@@ -139,4 +140,10 @@ pub fn lookup(id: &str) -> Option<Json> {
             ("pip", p.pip.into()),
         ])
     })
+}
+
+impl crate::error::Finite for FxPair {
+    fn is_all_finite(&self) -> bool {
+        self.pip.is_all_finite()
+    }
 }

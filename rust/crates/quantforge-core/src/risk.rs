@@ -3,6 +3,7 @@
 use crate::conventions::Overnight;
 use crate::curve::{Curve, Interpolation, SolveMethod, curve_time};
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 use crate::hedge::solve_hedge;
 use crate::linalg::singular_values;
@@ -45,6 +46,8 @@ pub fn ois_dv01(
     interpolation: Interpolation,
     trade: &OisTrade,
 ) -> Result<(f64, Vec<f64>)> {
+    crate::error::finite("quotes", &quotes)?;
+    crate::error::finite("trade", &trade)?;
     let p = OisCurveProblem::new(&trade.convention, as_of, quotes, interpolation)?;
     let legs = OisLegs::new(&trade.convention, as_of, trade.tenor)?;
     sensitivities(&bumped(&p)?, &legs, trade)
@@ -52,6 +55,8 @@ pub fn ois_dv01(
 
 /// Returns `(pv, duration, convexity)`.
 pub fn cashflows(flows: &[(f64, f64)], y: f64) -> Result<(f64, f64, f64)> {
+    crate::error::finite("flows", &flows)?;
+    crate::error::finite("y", &y)?;
     if flows.is_empty() {
         return fail("E_INPUT", "no cashflows");
     }
@@ -90,6 +95,10 @@ pub fn rates_hedge(
     unit_notional: f64,
     half_spread_bp: f64,
 ) -> Result<RatesHedge> {
+    crate::error::finite("quotes", &quotes)?;
+    crate::error::finite("trade", &trade)?;
+    crate::error::finite("unit_notional", &unit_notional)?;
+    crate::error::finite("half_spread_bp", &half_spread_bp)?;
     if half_spread_bp < 0.0 {
         return fail("E_DOMAIN", "half_spread_bp is negative");
     }
@@ -150,6 +159,7 @@ pub fn curve_report(
     quotes: &[OisQuote],
     interpolation: Interpolation,
 ) -> Result<CurveReport> {
+    crate::error::finite("quotes", &quotes)?;
     let p = OisCurveProblem::new(c, as_of, quotes, interpolation)?;
     let base = p.solve(&p.mids, SolveMethod::Sequential)?;
     let times: Vec<f64> = base.dates.iter().map(|d| curve_time(as_of, *d)).collect();
@@ -174,4 +184,23 @@ pub fn curve_report(
         condition_number: largest / smallest,
         max_repricing_error: base.max_repricing_error,
     })
+}
+
+impl crate::error::Finite for CurveReport {
+    fn is_all_finite(&self) -> bool {
+        self.jacobian.is_all_finite()
+            && self.condition_number.is_all_finite()
+            && self.max_repricing_error.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for RatesHedge {
+    fn is_all_finite(&self) -> bool {
+        self.pv.is_all_finite()
+            && self.dv01.is_all_finite()
+            && self.key_rate.is_all_finite()
+            && self.hedge_units.is_all_finite()
+            && self.residual_key_rate.is_all_finite()
+            && self.hedge_cost.is_all_finite()
+    }
 }

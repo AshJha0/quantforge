@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 
@@ -28,16 +29,23 @@ std::vector<OisQuote> moved(std::vector<OisQuote> q, std::size_t j, double h) {
     return q;
 }
 
+void require_finite_quotes(const std::vector<OisQuote>& quotes, std::string_view field) {
+    for (const OisQuote& q : quotes) require_finite(q.rate, field);
+}
+
 double zero_rate(const Curve& curve, Date d) { return -std::log(curve.discount(d)) / curve.time(d); }
 
 }  // namespace
 
 void check_bump(double bump_bp) {
+    require_finite(bump_bp, "bump_bp");
     if (!(bump_bp > 0.0 && bump_bp <= 100.0)) throw Error("E_DOMAIN", "bump_bp must be in (0, 100]", "bump_bp");
 }
 
 ParRisk par_risk(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
                  CurveInterpolation interpolation, const CurvePricer& price, double bump_bp, BumpScheme scheme) {
+    require_finite_quotes(quotes, "quotes");
+    require_finite(bump_bp, "bump_bp");
     const double v0 = price(build(c, as_of, quotes, interpolation));
     const auto risk_of = [&](std::size_t j) {
         return bumped(scheme, bump_bp, v0, [&](double h) { return price(build(c, as_of, moved(quotes, j, h), interpolation)); });
@@ -50,6 +58,10 @@ ParRisk par_risk(const RateConvention& c, Date as_of, const std::vector<OisQuote
 PnlExplain pnl_explain(const RateConvention& c, Date as_of, const std::vector<OisQuote>& start,
                        const std::vector<OisQuote>& end, CurveInterpolation interpolation, const CurvePricer& price,
                        double bump_bp, double notional) {
+    require_finite_quotes(start, "quotes_start");
+    require_finite_quotes(end, "quotes_end");
+    require_finite(bump_bp, "bump_bp");
+    require_finite(notional, "notional");
     bool same = start.size() == end.size();
     for (std::size_t j = 0; same && j < start.size(); ++j)
         same = start[j].tenor.count == end[j].tenor.count && start[j].tenor.unit == end[j].tenor.unit;
@@ -89,6 +101,7 @@ double triangular_weight(const std::vector<double>& k, std::size_t i, double t) 
 
 KeyRateRisk key_rate_risk(const Curve& curve, KeyRateMode mode, const std::vector<Date>& key_dates,
                           const CurvePricer& price, double bump_bp, BumpScheme scheme) {
+    require_finite(bump_bp, "bump_bp");
     const double v0 = price(curve);
     KeyRateRisk out{v0, 0.0, {}};
     out.zero_dv01 = bumped(scheme, bump_bp, v0, [&](double h) {
@@ -117,6 +130,8 @@ KeyRateRisk key_rate_risk(const Curve& curve, KeyRateMode mode, const std::vecto
 
 ZeroJacobian zero_jacobian(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
                            CurveInterpolation interpolation, double bump_bp) {
+    require_finite_quotes(quotes, "quotes");
+    require_finite(bump_bp, "bump_bp");
     const Curve base = build(c, as_of, quotes, interpolation);
     ZeroJacobian out;
     for (const Pillar& p : base.pillars()) {

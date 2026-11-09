@@ -1,4 +1,5 @@
 //! Worked examples and numeric targets quoted in the specifications.
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
 use quantforge_core::calendar::{Bdc, Calendar, easter_sunday};
 use quantforge_core::compounding::{Compounding, discount_factor};
 use quantforge_core::cos::{CosInputs, Model, european};

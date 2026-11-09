@@ -15,3 +15,7 @@ mutants.out*/
 site/
 reports/workflows/
 python/.coverage
+*.egg-info
+.hypothesis/
+.benchmarks/
+benchmarks/micro/out/

@@ -1,5 +1,7 @@
 package org.quantforge.curves;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -65,12 +67,14 @@ public final class Curve implements Discounting {
 
     /** Builds from a curve object, with the spec's checks. */
     public static Curve of(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] discountFactors) {
+        Finite.check("discountFactors", discountFactors);
         return of(asOf, interpolation, dates, discountFactors, Jumps.NONE);
     }
 
     /** As {@link #of(LocalDate, Interpolation, LocalDate[], double[])}, with jumps checked after the pillars. */
     public static Curve of(LocalDate asOf, Interpolation interpolation, LocalDate[] dates, double[] discountFactors,
                            Jumps jumps) {
+        Finite.check("discountFactors", discountFactors);
         if (dates.length == 0) {
             throw new QfError("E_INPUT", "curve has no pillars");
         }

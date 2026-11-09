@@ -1,5 +1,6 @@
 //! Calibration core (`least-squares.md`). Every model is a residual vector, so the objective is
 //! always `sum r^2`, with regularisation as further rows.
+
 use crate::error::{Result, fail};
 use crate::linalg::{Matrix, solve};
 
@@ -335,6 +336,7 @@ fn parameter_count(m: Model) -> usize {
 }
 
 pub fn fit(i: &FitInputs) -> Result<Fit> {
+    crate::error::finite("i", &i)?;
     let n = parameter_count(i.model);
     let rosenbrock = i.model == Model::Rosenbrock;
     let weights = match (&i.weights, rosenbrock) {
@@ -398,6 +400,9 @@ pub fn check_bid_ask(
     bid: &[f64],
     ask: &[f64],
 ) -> Result<Vec<(i64, &'static str, f64)>> {
+    crate::error::finite("fitted", &fitted)?;
+    crate::error::finite("bid", &bid)?;
+    crate::error::finite("ask", &ask)?;
     if fitted.len() != bid.len() || fitted.len() != ask.len() {
         return fail("E_INPUT", "lengths differ");
     }
@@ -413,4 +418,50 @@ pub fn check_bid_ask(
         }
     }
     Ok(out)
+}
+
+impl crate::error::Finite for Fit {
+    fn is_all_finite(&self) -> bool {
+        self.parameters.is_all_finite()
+            && self.objective.is_all_finite()
+            && self.residuals.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for FitInputs {
+    fn is_all_finite(&self) -> bool {
+        self.model.is_all_finite()
+            && self.x.is_all_finite()
+            && self.y.is_all_finite()
+            && self.start.is_all_finite()
+            && self.method.is_all_finite()
+            && self.weights.is_all_finite()
+            && self.regularisation.is_all_finite()
+            && self.prior.is_all_finite()
+            && self.lower.is_all_finite()
+            && self.upper.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Method {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::GaussNewton => true,
+            Self::LevenbergMarquardt => true,
+            Self::Bfgs => true,
+        }
+    }
+}
+
+impl crate::error::Finite for Model {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Linear => true,
+            Self::Exponential => true,
+            Self::NelsonSiegel => true,
+            Self::Rosenbrock => true,
+        }
+    }
 }

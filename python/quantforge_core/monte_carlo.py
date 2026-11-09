@@ -4,6 +4,7 @@ from collections.abc import Iterator, Sequence
 
 from . import sobol
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .rng import Xoshiro256, ppnd16
 
@@ -84,3 +85,6 @@ def gbm_european(
         beta = cov / var
         samples = [p - beta * (c - known) for p, c in zip(samples, controls)]
     return _mean_and_stderr(samples)
+
+
+guard(globals())

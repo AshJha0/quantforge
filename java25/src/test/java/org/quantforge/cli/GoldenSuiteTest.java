@@ -53,6 +53,7 @@ class GoldenSuiteTest {
     private static void suite(Path file) throws IOException {
         Map<?, ?> doc = map(Json.parse(Files.readString(file)).value());
         List<String> failures = new ArrayList<>();
+        Map<String, Map<?, ?>> results = new java.util.HashMap<>();
         for (Object o : (List<?>) doc.get("cases")) {
             Map<?, ?> c = map(o);
             if (SUPERSEDED.contains(String.valueOf(c.get("case_id")))) {
@@ -69,7 +70,8 @@ class GoldenSuiteTest {
             StringBuilder b = new StringBuilder();
             Json.write(b, envelope);
             Map<?, ?> result = map(Json.parse(Main.handle(b.toString()).json()).value());
-            String problem = judge(c, result);
+            results.put(String.valueOf(c.get("case_id")), result);
+            String problem = judge(c, result, results);
             if (problem != null) {
                 failures.add(c.get("case_id") + ": " + problem);
             }
@@ -91,8 +93,29 @@ class GoldenSuiteTest {
         };
     }
 
-    private static String judge(Map<?, ?> c, Map<?, ?> result) {
+    /** Rule F-3 statuses: "any" passes on a well-formed result; "same_as" compares with an earlier peer case. */
+    private static String judge(Map<?, ?> c, Map<?, ?> result, Map<String, Map<?, ?>> peers) {
         Map<?, ?> expected = map(c.get("expected"));
+        if ("any".equals(expected.get("status"))) {
+            return "ok".equals(result.get("status")) || "error".equals(result.get("status")) ? null : "bad status";
+        }
+        if ("same_as".equals(expected.get("status"))) {
+            Map<?, ?> peer = peers.get(String.valueOf(expected.get("case_id")));
+            if (peer == null) {
+                return "peer " + expected.get("case_id") + " not run before this case";
+            }
+            Map<String, Object> e = new LinkedHashMap<>();
+            if ("error".equals(peer.get("status"))) {
+                e.put("status", "error");
+                e.put("error_code", map(peer.get("error")).get("code"));
+            } else {
+                e.put("status", "ok");
+                e.put("outputs", peer.get("outputs"));
+            }
+            Map<Object, Object> copy = new LinkedHashMap<>(c);
+            copy.put("expected", e);
+            return judge(copy, result, peers);
+        }
         if ("error".equals(expected.get("status"))) {
             Object code = result.get("error") == null ? null : map(result.get("error")).get("code");
             return expected.get("error_code").equals(code) ? null : "expected " + expected.get("error_code") + ", got " + result;

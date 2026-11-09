@@ -1,0 +1,7 @@
+# Tracked files allowed over 1 MB (tools/check_hygiene.py, plan 13.2 E11). One path per line, with the reason.
+# Both are the numerical-limits stress goldens: each case carries a deliberately huge input (a multi-megabyte
+# document to hash, a 10^7-step integral). Minified JSON is still about 8 MB each, and generating the inputs from
+# a seed would change the conformance runners in all four languages, so they stay as data until stage G4 moves
+# the runners. They compress well in git packs.
+datasets/golden/core/limits.json
+datasets/golden/core/limit_order.json

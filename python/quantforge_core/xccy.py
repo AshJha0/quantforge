@@ -7,6 +7,7 @@ from . import calendars, curves, schedules
 from .conventions import REGISTRY
 from .curves import Curve, CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 
@@ -103,3 +104,6 @@ def ndf_pv(
     forward = fixing if fixing is not None else spot * u.discount(payment) / o.discount(payment)
     sign = 1 if side == "BUY" else -1
     return sign * notional * (1 - strike / forward) * u.discount(payment), forward
+
+
+guard(globals())

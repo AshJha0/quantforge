@@ -1,0 +1,5 @@
+{
+ "_note": "Empty until the first CI run on github-ubuntu-24.04: download the bench-results-* artifacts into one folder and run tools/bench_gate.py --current DIR --write-baseline --machine github-ubuntu-24.04. Local laptop numbers are not stored: they were measured under heavy load.",
+ "machine": "unset",
+ "results": {}
+}

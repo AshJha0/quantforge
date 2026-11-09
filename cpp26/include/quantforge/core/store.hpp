@@ -38,6 +38,7 @@ struct Chain {
     std::vector<std::string> hashes;
 };
 
+/// No double inputs: record values are json, hashed by spelling, so the finite rule does not apply here.
 std::string format_instant(Instant i);
 
 /// Sequence and knowledge-time order. Throws E_INPUT.

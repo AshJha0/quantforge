@@ -8,6 +8,7 @@ namespace quantforge {
 /// Spot is domestic per unit foreign; rates flat continuous; T runs to expiry and delivery together.
 struct GkMarket {
     double spot, expiry_years, domestic_rate, foreign_rate;
+    /// unchecked: caller guarantees finite inputs
     double forward() const;
 };
 
@@ -20,6 +21,7 @@ struct GkPrice {
 GkPrice fx_option_price(const GkMarket& m, double strike, double vol, OptionType type, double notional);
 
 /// One delta of the given type at a strike (inputs checked by the caller).
+/// unchecked: caller guarantees finite inputs
 double fx_delta(const GkMarket& m, double strike, double vol, OptionType type, FxDeltaType dt);
 struct FxDeltas {
     double spot, forward, spot_pa, forward_pa;

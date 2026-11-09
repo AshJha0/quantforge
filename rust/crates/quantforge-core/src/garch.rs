@@ -1,4 +1,5 @@
 //! GARCH(1,1) likelihood, forecast and fit (`05-volatility/garch.md`, rulings E-B1, E-B2).
+
 use crate::error::{Result, fail};
 use std::f64::consts::PI;
 
@@ -59,6 +60,11 @@ pub fn loglik(
     beta: f64,
     start: Start,
 ) -> Result<Likelihood> {
+    crate::error::finite("returns", &returns)?;
+    crate::error::finite("omega", &omega)?;
+    crate::error::finite("alpha", &alpha)?;
+    crate::error::finite("beta", &beta)?;
+    crate::error::finite("start", &start)?;
     if returns.len() < 2 {
         return fail("E_INPUT", "at least 2 returns are required");
     }
@@ -83,6 +89,11 @@ pub fn forecast(
     horizon: i64,
     periods_per_year: f64,
 ) -> Result<Forecast> {
+    crate::error::finite("omega", &omega)?;
+    crate::error::finite("alpha", &alpha)?;
+    crate::error::finite("beta", &beta)?;
+    crate::error::finite("next_variance", &next_variance)?;
+    crate::error::finite("periods_per_year", &periods_per_year)?;
     if horizon < 1 || periods_per_year.is_nan() || periods_per_year <= 0.0 {
         return fail(
             "E_INPUT",
@@ -123,6 +134,7 @@ fn params(u: &[f64]) -> (f64, f64, f64) {
 }
 
 /// Nelder-Mead minimiser of `f` from `x0` with initial steps `step`. Returns point and value.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn nelder_mead<F: Fn(&[f64]) -> f64>(
     f: &F,
     x0: &[f64],
@@ -194,6 +206,8 @@ pub struct Fit {
 /// Maximum likelihood with the start variance held fixed: multi-start Nelder-Mead in an
 /// unconstrained parametrisation, each best point restarted until it stops improving.
 pub fn fit(returns: &[f64], start: Start) -> Result<Fit> {
+    crate::error::finite("returns", &returns)?;
+    crate::error::finite("start", &start)?;
     if returns.len() < 30 {
         return fail("E_INPUT", "at least 30 returns are required");
     }
@@ -237,6 +251,42 @@ pub fn fit(returns: &[f64], start: Start) -> Result<Fit> {
             })
         }
         _ => fail("E_NO_CONVERGENCE", "the likelihood could not be maximised"),
+    }
+}
+
+impl crate::error::Finite for Fit {
+    fn is_all_finite(&self) -> bool {
+        self.loglik.is_all_finite()
+            && self.omega.is_all_finite()
+            && self.alpha.is_all_finite()
+            && self.beta.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Forecast {
+    fn is_all_finite(&self) -> bool {
+        self.variances.is_all_finite()
+            && self.total_variance.is_all_finite()
+            && self.annualized_vol.is_all_finite()
+            && self.long_run_variance.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Likelihood {
+    fn is_all_finite(&self) -> bool {
+        self.loglik.is_all_finite()
+            && self.variances.is_all_finite()
+            && self.next_variance.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Start {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Sample => true,
+            Self::Given(x0) => x0.is_all_finite(),
+        }
     }
 }
 

@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from . import linalg, ois
 from .errors import QfError
+from .finite import guard
 
 Floats = Sequence[float]
 PARAMETERS = {"LINEAR": 2, "EXPONENTIAL": 2, "NELSON_SIEGEL": 4, "ROSENBROCK": 2}
@@ -349,3 +350,6 @@ def curve_report(
         for i in range(n):
             jacobian[i][j] = (sides[0][i] - sides[1][i]) / (2 * h)
     return jacobian, float(numpy.linalg.cond(numpy.array(jacobian), 2)), error
+
+
+guard(globals())

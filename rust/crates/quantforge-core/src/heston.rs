@@ -1,9 +1,10 @@
 //! Heston, Bates and Merton pricing, and the SLV leverage reference scheme
 //! (`05-volatility/heston-family.md`, rulings E-A12 to E-A14).
+use crate::arb_surface::{Slice, check_slices, local_variance};
 use crate::black::black;
+
 use crate::error::{Result, fail};
 use crate::integrate::gauss_legendre_rule;
-use crate::surface_e::{Slice, check_slices, local_variance};
 use std::f64::consts::PI;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::sync::OnceLock;
@@ -96,6 +97,7 @@ pub struct Heston {
 
 impl Heston {
     pub fn check(&self) -> Result<()> {
+        crate::error::finite("self", self)?;
         let pos = [self.v0, self.kappa, self.theta, self.xi]
             .iter()
             .all(|v| *v > 0.0);
@@ -107,6 +109,7 @@ impl Heston {
     }
 
     /// Characteristic function of `ln(S_T/F)` at complex `u`, little-trap form [Alb07].
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn cf(&self, u: C, t: f64) -> C {
         let Heston {
             v0,
@@ -141,6 +144,7 @@ pub struct Jumps {
 
 impl Jumps {
     pub fn check(&self) -> Result<()> {
+        crate::error::finite("self", self)?;
         if self.intensity >= 0.0 && self.log_jump_vol >= 0.0 && self.mean_log_jump.is_finite() {
             Ok(())
         } else {
@@ -221,12 +225,19 @@ fn lewis(m: &Market, strikes: &[f64], phi: &dyn Fn(C) -> C) -> Vec<f64> {
 }
 
 pub fn heston_price(m: &Market, strikes: &[f64], h: &Heston) -> Result<Vec<f64>> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("strikes", &strikes)?;
+    crate::error::finite("h", &h)?;
     m.check(strikes)?;
     h.check()?;
     Ok(lewis(m, strikes, &|u| h.cf(u, m.expiry_years)))
 }
 
 pub fn bates_price(m: &Market, strikes: &[f64], h: &Heston, j: &Jumps) -> Result<Vec<f64>> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("strikes", &strikes)?;
+    crate::error::finite("h", &h)?;
+    crate::error::finite("j", &j)?;
     m.check(strikes)?;
     h.check()?;
     j.check()?;
@@ -236,6 +247,9 @@ pub fn bates_price(m: &Market, strikes: &[f64], h: &Heston, j: &Jumps) -> Result
 
 /// `(re, im)` of the Heston characteristic function at real `u >= 0`.
 pub fn heston_cf(t: f64, h: &Heston, u: &[f64]) -> Result<(Vec<f64>, Vec<f64>)> {
+    crate::error::finite("t", &t)?;
+    crate::error::finite("h", &h)?;
+    crate::error::finite("u", &u)?;
     if u.is_empty() {
         return fail("E_INPUT", "at least 1 u is required");
     }
@@ -251,6 +265,10 @@ pub fn heston_cf(t: f64, h: &Heston, u: &[f64]) -> Result<(Vec<f64>, Vec<f64>)> 
 
 /// Merton's Poisson series [Mer76]: weights at `lambda (1 + kbar)`, each term at rate `r_n`.
 pub fn merton_price(m: &Market, strikes: &[f64], vol: f64, j: &Jumps) -> Result<Vec<f64>> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("strikes", &strikes)?;
+    crate::error::finite("vol", &vol)?;
+    crate::error::finite("j", &j)?;
     m.check(strikes)?;
     if vol.is_nan() || vol <= 0.0 {
         return fail("E_DOMAIN", "vol must be above 0");
@@ -355,6 +373,10 @@ fn rows(mu: &[f64], s: &[f64], h: f64, dt: f64, no_flux: bool) -> (Vec<f64>, Vec
 
 /// The leverage reference scheme of `heston-family.md` (ruling E-A14).
 pub fn slv_leverage(m: &Market, h: &Heston, slices: &[Slice], g: &Grid) -> Result<Leverage> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("h", &h)?;
+    crate::error::finite("slices", &slices)?;
+    crate::error::finite("g", &g)?;
     check_slices(slices)?;
     if g.nx < 5 || g.nv < 5 || g.nt < 2 {
         return fail("E_INPUT", "nx and nv must be at least 5 and nt at least 2");
@@ -476,6 +498,51 @@ pub fn slv_leverage(m: &Market, h: &Heston, slices: &[Slice], g: &Grid) -> Resul
         mass: mass(&p),
         x,
     })
+}
+
+impl crate::error::Finite for C {
+    fn is_all_finite(&self) -> bool {
+        self.re.is_all_finite() && self.im.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Grid {
+    fn is_all_finite(&self) -> bool {
+        self.x_min.is_all_finite() && self.x_max.is_all_finite() && self.v_max.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Heston {
+    fn is_all_finite(&self) -> bool {
+        self.v0.is_all_finite()
+            && self.kappa.is_all_finite()
+            && self.theta.is_all_finite()
+            && self.xi.is_all_finite()
+            && self.rho.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Jumps {
+    fn is_all_finite(&self) -> bool {
+        self.intensity.is_all_finite()
+            && self.mean_log_jump.is_all_finite()
+            && self.log_jump_vol.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Leverage {
+    fn is_all_finite(&self) -> bool {
+        self.x.is_all_finite() && self.leverage.is_all_finite() && self.mass.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Market {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite()
+            && self.expiry_years.is_all_finite()
+            && self.rate.is_all_finite()
+            && self.dividend_yield.is_all_finite()
+    }
 }
 
 #[cfg(test)]

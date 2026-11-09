@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -105,6 +107,8 @@ public final class Inflation {
     public record Zcis(double indexRatio, double pv) {}
 
     public static Zcis zcis(CpiCurve c, Curve d, long years, double k, double n, boolean receive, LocalDate pay) {
+        Finite.check("k", k);
+        Finite.check("n", n);
         if (years < 1 || years > 100) {
             throw new QfError("E_INPUT", "years must be a positive integer", "years");
         }
@@ -118,6 +122,8 @@ public final class Inflation {
 
     public static Linker linker(Bonds.Bond b, LocalDate settlement, double realYield, double baseRef,
                                 Map<Long, Double> fixings) {
+        Finite.check("realYield", realYield);
+        Finite.check("baseRef", baseRef);
         Bonds.checkSettlement(b, settlement);
         if (!(baseRef > 0.0)) {
             throw new QfError("E_DOMAIN", "base_ref_cpi must be positive", "base_ref_cpi");
@@ -135,6 +141,7 @@ public final class Inflation {
     }
 
     public static double linkerCurve(Bonds.Bond b, LocalDate settlement, double baseRef, CpiCurve c, Curve d) {
+        Finite.check("baseRef", baseRef);
         Bonds.checkSettlement(b, settlement);
         if (!(baseRef > 0.0)) {
             throw new QfError("E_DOMAIN", "base_ref_cpi must be positive", "base_ref_cpi");

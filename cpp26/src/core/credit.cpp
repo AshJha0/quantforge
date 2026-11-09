@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 namespace {
@@ -115,6 +116,7 @@ void check_recovery(double r) {
 }  // namespace
 
 void HazardCurve::check() const {
+    require_finite(survival, "hazard");
     if (dates.empty() || dates.size() != survival.size()) throw Error("E_INPUT", "no hazard pillars", "hazard");
     Date previous = as_of;
     for (const Date d : dates) {
@@ -151,6 +153,10 @@ Date cds_maturity(Date t, Tenor tenor) {
 
 CdsPrice cds_price(Date t, const Curve& discount, const HazardCurve& hazard, double recovery, Date maturity, double coupon,
                    double notional, CdsSide side, CdsPayout payout) {
+    require_finite(recovery, "recovery");
+    require_finite(coupon, "coupon");
+    require_finite(notional, "notional");
+    require_finite(hazard.survival, "hazard");
     check_recovery(recovery);
     hazard.check();
     if (hazard.as_of != t || discount.as_of() != t) throw Error("E_INPUT", "curves must be as of trade_date", "trade_date");
@@ -167,6 +173,8 @@ CdsPrice cds_price(Date t, const Curve& discount, const HazardCurve& hazard, dou
 }
 
 HazardCurve cds_bootstrap(Date t, const Curve& discount, double recovery, const std::vector<CdsQuote>& quotes) {
+    require_finite(recovery, "recovery");
+    for (const CdsQuote& q : quotes) require_finite(q.spread, "quotes");
     check_recovery(recovery);
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
     std::vector<Date> mats;

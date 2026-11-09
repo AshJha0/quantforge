@@ -1,4 +1,5 @@
 //! Market-data checks (`data-checks.md`).
+
 use crate::error::{Result, fail};
 use std::collections::HashMap;
 
@@ -49,6 +50,7 @@ fn is_outlier(mid: f64, history: &[f64], threshold: f64) -> bool {
 }
 
 pub fn check_quotes(i: &CheckInputs) -> Result<Vec<Checked>> {
+    crate::error::finite("i", &i)?;
     if i.stale_after_seconds <= 0
         || i.max_relative_spread.is_some_and(|v| v <= 0.0)
         || i.outlier_threshold <= 0.0
@@ -120,5 +122,19 @@ fn check_one(i: &CheckInputs, q: &Quote) -> Checked {
         instrument_id: q.instrument_id.clone(),
         quote_status: status,
         quality_flags: flags,
+    }
+}
+
+impl crate::error::Finite for CheckInputs {
+    fn is_all_finite(&self) -> bool {
+        self.quotes.is_all_finite()
+            && self.max_relative_spread.is_all_finite()
+            && self.outlier_threshold.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Quote {
+    fn is_all_finite(&self) -> bool {
+        self.bid.is_all_finite() && self.ask.is_all_finite()
     }
 }

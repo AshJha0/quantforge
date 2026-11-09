@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.quantforge.core.QfError;
@@ -60,6 +62,7 @@ public final class Surfaces {
 
     /** Strictly increasing, 1 to 10,000 points. */
     public static void checkGrid(double[] k) {
+        Finite.check("k", k);
         if (k.length == 0) {
             throw new QfError("E_INPUT", "log_moneyness is empty", "log_moneyness");
         }
@@ -75,6 +78,7 @@ public final class Surfaces {
 
     /** Grid butterfly and calendar checks plus the wing rules, all strict (rulings E-A1, E-A2). */
     public static Check check(List<Slice> slices, double[] k) {
+        Finite.check("k", k);
         List<Cell> fly = new ArrayList<>();
         List<Cell> cal = new ArrayList<>();
         List<Wing> wings = new ArrayList<>();
@@ -138,6 +142,10 @@ public final class Surfaces {
 
     /** The SVI slice equal to an SSVI slice at theta ([GJ14] section 3). */
     public static Smile.Svi ssviToSvi(double rho, double eta, double gamma, double theta) {
+        Finite.check("rho", rho);
+        Finite.check("eta", eta);
+        Finite.check("gamma", gamma);
+        Finite.check("theta", theta);
         Smile.check(new Smile.Ssvi(rho, eta, gamma));
         if (!(theta > 0.0)) {
             throw new QfError("E_DOMAIN", "theta must be above 0", "theta");
@@ -186,6 +194,8 @@ public final class Surfaces {
 
     /** Dupire local vol in total-variance form [Gat06, eq. 1.10]; any arbitrage point is E_ARBITRAGE. */
     public static LocalVol dupire(List<Slice> slices, double[] t, double[] k) {
+        Finite.check("t", t);
+        Finite.check("k", k);
         int n = t.length;
         double[] w = new double[n];
         double[] iv = new double[n];
@@ -209,6 +219,8 @@ public final class Surfaces {
 
     /** Forward vols between expiries, additive in variance; a negative forward variance is E_ARBITRAGE. */
     public static double[] forwardVols(double[] t, double[] v) {
+        Finite.check("t", t);
+        Finite.check("v", v);
         double[] out = new double[t.length];
         out[0] = v[0];
         for (int i = 1; i < t.length; i++) {
@@ -223,6 +235,8 @@ public final class Surfaces {
 
     /** {mean change, annualised sample standard deviation of changes} (ruling E-A7). */
     public static double[] volOfVol(double[] v, double periodsPerYear, boolean log) {
+        Finite.check("v", v);
+        Finite.check("periodsPerYear", periodsPerYear);
         int n = v.length - 1;
         double[] x = new double[n];
         double mean = 0.0;

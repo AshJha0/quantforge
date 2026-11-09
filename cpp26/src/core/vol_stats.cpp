@@ -8,6 +8,7 @@
 
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 namespace {
@@ -140,6 +141,11 @@ std::vector<double> walk_weights(const std::vector<double>& k, auto&& f) {
 
 GarchLoglik garch_loglik(const std::vector<double>& r, double omega, double alpha, double beta,
                          std::optional<double> initial) {
+    require_finite(r, "returns");
+    require_finite(omega, "omega");
+    require_finite(alpha, "alpha");
+    require_finite(beta, "beta");
+    require_finite(initial, "initial_variance");
     if (r.size() < 2) throw Error("E_INPUT", "at least 2 returns are needed", "returns");
     check_params(omega, alpha, beta);
     const double v1 = start_variance(r, initial);
@@ -149,6 +155,11 @@ GarchLoglik garch_loglik(const std::vector<double>& r, double omega, double alph
 }
 
 GarchForecast garch_forecast(double omega, double alpha, double beta, double next, long long h, double ppy) {
+    require_finite(omega, "omega");
+    require_finite(alpha, "alpha");
+    require_finite(beta, "beta");
+    require_finite(next, "next_variance");
+    require_finite(ppy, "periods_per_year");
     if (h < 1) throw Error("E_INPUT", "horizon must be at least 1", "horizon");
     if (ppy <= 0.0) throw Error("E_INPUT", "periods_per_year must be positive", "periods_per_year");
     check_params(omega, alpha, beta);
@@ -170,6 +181,8 @@ GarchForecast garch_forecast(double omega, double alpha, double beta, double nex
 }
 
 GarchFit garch_fit(const std::vector<double>& r, std::optional<double> initial) {
+    require_finite(r, "returns");
+    require_finite(initial, "initial_variance");
     if (r.size() < 30) throw Error("E_INPUT", "at least 30 returns are needed", "returns");
     const double v1 = start_variance(r, initial);
     const double var = sample_variance(r);
@@ -206,6 +219,18 @@ GarchFit garch_fit(const std::vector<double>& r, std::optional<double> initial) 
 // ---- variance swaps ----
 
 VarSwapFair varswap_fair_strike(const VarSwapInputs& in) {
+    require_finite(in.spot, "spot");
+    require_finite(in.rate, "rate");
+    require_finite(in.dividend_yield, "dividend_yield");
+    require_finite(in.put_strikes, "put_strikes");
+    require_finite(in.call_strikes, "call_strikes");
+    for (const StrikeVol& v : in.vols) {
+        require_finite(v.strike, "vols");
+        require_finite(v.vol, "vols");
+    }
+    require_finite(in.extension_step, "extension_step");
+    require_finite(in.variance_strike, "variance_strike");
+    require_finite(in.variance_notional, "variance_notional");
     if (in.maturity <= in.as_of) throw Error("E_INPUT", "maturity must be after as_of", "maturity");
     check_strikes(in.put_strikes, "put_strikes");
     check_strikes(in.call_strikes, "call_strikes");
@@ -253,6 +278,10 @@ VarSwapFair varswap_fair_strike(const VarSwapInputs& in) {
 }
 
 VarSwapRealized varswap_realized(const std::vector<double>& p, double a, double k_var, double n_var) {
+    require_finite(p, "prices");
+    require_finite(a, "periods_per_year");
+    require_finite(k_var, "variance_strike");
+    require_finite(n_var, "variance_notional");
     if (p.size() < 2) throw Error("E_INPUT", "at least 2 prices are needed", "prices");
     for (const double x : p)
         if (x <= 0.0) throw Error("E_DOMAIN", "a price is not positive", "prices");
@@ -270,7 +299,16 @@ VarSwapRealized varswap_realized(const std::vector<double>& p, double a, double 
 
 // ---- VIX ----
 
+namespace {
+void require_finite_term(const VixTerm& term) {
+    require_finite(term.rate, "rate");
+    for (const VixQuote& x : term.strip)
+        for (const double v : {x.strike, x.call_bid, x.call_ask, x.put_bid, x.put_ask}) require_finite(v, "strip");
+}
+}  // namespace
+
 VixTermResult vix_term_variance(const VixTerm& term) {
+    require_finite_term(term);
     if (term.minutes < 1) throw Error("E_INPUT", "minutes_to_expiry must be at least 1", "minutes_to_expiry");
     std::vector<VixQuote> q = term.strip;
     std::ranges::sort(q, {}, &VixQuote::strike);
@@ -338,6 +376,8 @@ VixTermResult vix_term_variance(const VixTerm& term) {
 }
 
 VixIndex vix_index(const VixTerm& near, const VixTerm& next) {
+    require_finite_term(near);
+    require_finite_term(next);
     constexpr double n30 = 43200.0, n365 = 525600.0;
     const double n1 = double(near.minutes), n2 = double(next.minutes);
     if (!(n1 < n2 && n1 <= n30 && n30 <= n2))

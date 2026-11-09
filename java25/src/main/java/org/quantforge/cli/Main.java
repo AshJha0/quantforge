@@ -232,6 +232,10 @@ public final class Main {
             if (in.pendingLimit() != null && !e.code().equals("E_SCHEMA") && !e.code().equals("E_PARSE")) {
                 throw in.pendingLimit();
             }
+            if (in.pendingDomain() != null && !e.code().equals("E_SCHEMA") && !e.code().equals("E_PARSE")
+                    && !e.code().equals("E_LIMIT")) {
+                throw in.pendingDomain();
+            }
             throw e;
         }
     }

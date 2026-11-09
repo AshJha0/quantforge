@@ -1,31 +1,53 @@
-# Monthly and grouped, because each update PR spends CI minutes.
+# Weekly and grouped (plan 12.2 G8). Each ecosystem raises at most one grouped version PR and one grouped
+# security PR a week, so CI minutes stay low. Security PRs also need Settings > Code security >
+# Dependabot security updates switched on.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
+      day: monday
     groups:
-      actions:
+      github-actions-security:
+        applies-to: security-updates
+        patterns: ['*']
+      github-actions-version:
+        applies-to: version-updates
         patterns: ['*']
   - package-ecosystem: cargo
     directory: /rust
     schedule:
-      interval: monthly
+      interval: weekly
+      day: monday
     groups:
-      cargo:
+      cargo-security:
+        applies-to: security-updates
+        patterns: ['*']
+      cargo-version:
+        applies-to: version-updates
         patterns: ['*']
   - package-ecosystem: maven
     directory: /java25
     schedule:
-      interval: monthly
+      interval: weekly
+      day: monday
     groups:
-      maven:
+      maven-security:
+        applies-to: security-updates
+        patterns: ['*']
+      maven-version:
+        applies-to: version-updates
         patterns: ['*']
   - package-ecosystem: uv
     directory: /python
     schedule:
-      interval: monthly
+      interval: weekly
+      day: monday
     groups:
-      python:
+      uv-security:
+        applies-to: security-updates
+        patterns: ['*']
+      uv-version:
+        applies-to: version-updates
         patterns: ['*']
