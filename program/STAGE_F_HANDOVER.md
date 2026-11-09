@@ -113,3 +113,9 @@ Outside share after wave 1: 52 of 171 = 30.4% (ruling F-23), below the 60% floor
 
    When it passes, remove the skip in `gen_stage_f_q4.py` `main` (the "OPEN" comment) and rerun it (about 5 minutes). Then rerun `outside_f.py` and the stub replay, update the `joint_f` hash in `docs/model-inventory.md` (MF-5, MF-6), and tell the coordinator the new case count.
 3. Then the items in "Where to resume" above: R8 coverage, E1 for the new stage F operations, waves 2 and 3.
+
+**Diagnostic result (2026-11-09 22:17).** Full system max excess 1.99e-3. The worst entries, IFT against bump:
+- `USD-SOFR:turn:2026-12-31` / `SOFR-3M`: 0.18997 against 0.19196.
+- `USD-TERM-3M` pillars 2028-11-13, 2031-11-12, 2036-11-12 / `SOFR-2Y`: errors of about 5e-4 each.
+
+No XCCY column appears, so the xccy suspect is unlikely. The errors sit in SOFR quote columns (3M near the turn, 2Y), which points to the monotone-convex SOFR curve. Check whether a section near 3M or 2Y switches branch rule under a 1e-4 quote bump (compare `interp_f._cm_sections` branch kinds at `x` and at the bumped solutions). If it does, the 1e-4 Richardson bump straddles a kink: use a smaller bump for the reference (1e-6) and compare again, then either keep the quotes off the boundary with an asserted margin or state one-sided derivatives in the spec.
