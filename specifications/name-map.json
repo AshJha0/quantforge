@@ -1,0 +1,5826 @@
+{
+ "generated_by": "tools/gen_name_map.py",
+ "rule": "specifications/stage-f-rulings.md F-5",
+ "operations": {
+  "bond.fit.nelson_siegel": {
+   "spec": "specifications/03-calibration/stability.md",
+   "rust": "quantforge::bond::fit_nelson_siegel",
+   "python": "quantforge.bond.fit_nelson_siegel",
+   "java": "Bond.fitNelsonSiegel",
+   "cpp": "qf::bond::fit_nelson_siegel",
+   "inputs": {
+    "bonds": {
+     "java": "bonds"
+    },
+    "settlement": {
+     "java": "settlement"
+    },
+    "tau": {
+     "java": "tau"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "betas",
+    "residuals"
+   ]
+  },
+  "bond.frn.price": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::bond::frn_price",
+   "python": "quantforge.bond.frn_price",
+   "java": "Bond.frnPrice",
+   "cpp": "qf::bond::frn_price",
+   "inputs": {
+    "current_rate": {
+     "java": "currentRate"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "discount_margin": {
+     "java": "discountMargin"
+    },
+    "frequency": {
+     "java": "frequency"
+    },
+    "margin": {
+     "java": "margin"
+    },
+    "maturity": {
+     "java": "maturity"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "accrued",
+    "clean",
+    "dirty"
+   ]
+  },
+  "bond.futures.basis": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::bond::futures_basis",
+   "python": "quantforge.bond.futures_basis",
+   "java": "Bond.futuresBasis",
+   "cpp": "qf::bond::futures_basis",
+   "inputs": {
+    "bonds": {
+     "java": "bonds"
+    },
+    "delivery": {
+     "java": "delivery"
+    },
+    "futures_price": {
+     "java": "futuresPrice"
+    },
+    "repo_rate": {
+     "java": "repoRate"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "bonds",
+    "ctd"
+   ]
+  },
+  "bond.futures.conversion_factor": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::bond::futures_conversion_factor",
+   "python": "quantforge.bond.futures_conversion_factor",
+   "java": "Bond.futuresConversionFactor",
+   "cpp": "qf::bond::futures_conversion_factor",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "contract": {
+     "java": "contract"
+    },
+    "delivery_month": {
+     "java": "deliveryMonth"
+    },
+    "notional_coupon": {
+     "java": "notionalCoupon"
+    }
+   },
+   "outputs": [
+    "conversion_factor"
+   ]
+  },
+  "bond.price.from_curve": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::bond::price_from_curve",
+   "python": "quantforge.bond.price_from_curve",
+   "java": "Bond.priceFromCurve",
+   "cpp": "qf::bond::price_from_curve",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "accrued",
+    "clean",
+    "dirty"
+   ]
+  },
+  "bond.price.from_yield": {
+   "spec": "specifications/02-curves/inflation.md",
+   "rust": "quantforge::bond::price_from_yield",
+   "python": "quantforge.bond.price_from_yield",
+   "java": "Bond.priceFromYield",
+   "cpp": "qf::bond::price_from_yield",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "settlement": {
+     "java": "settlement"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "accrued",
+    "clean",
+    "convexity",
+    "dirty",
+    "macaulay_duration",
+    "modified_duration"
+   ]
+  },
+  "bond.spread.asset_swap": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::bond::spread_asset_swap",
+   "python": "quantforge.bond.spread_asset_swap",
+   "java": "Bond.spreadAssetSwap",
+   "cpp": "qf::bond::spread_asset_swap",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "dirty_price": {
+     "java": "dirtyPrice"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "annuity",
+    "spread"
+   ]
+  },
+  "bond.spread.z": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::bond::spread_z",
+   "python": "quantforge.bond.spread_z",
+   "java": "Bond.spreadZ",
+   "cpp": "qf::bond::spread_z",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "clean_price": {
+     "java": "cleanPrice"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "z_spread"
+   ]
+  },
+  "bond.yield.from_price": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::bond::yield_from_price",
+   "python": "quantforge.bond.yield_from_price",
+   "java": "Bond.yieldFromPrice",
+   "cpp": "qf::bond::yield_from_price",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "clean_price": {
+     "java": "cleanPrice"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "accrued",
+    "dirty",
+    "yield"
+   ]
+  },
+  "calib.check_bid_ask": {
+   "spec": "specifications/03-calibration/least-squares.md",
+   "rust": "quantforge::calib::check_bid_ask_",
+   "python": "quantforge.calib.check_bid_ask_",
+   "java": "Calib.checkBidAsk",
+   "cpp": "qf::calib::check_bid_ask_",
+   "inputs": {
+    "ask": {
+     "java": "ask"
+    },
+    "bid": {
+     "java": "bid"
+    },
+    "fitted": {
+     "java": "fitted"
+    }
+   },
+   "outputs": [
+    "breaches"
+   ]
+  },
+  "calib.curve.robust": {
+   "spec": "specifications/03-calibration/curve-fits.md",
+   "rust": "quantforge::calib::curve_robust",
+   "python": "quantforge.calib.curve_robust",
+   "java": "Calib.curveRobust",
+   "cpp": "qf::calib::curve_robust",
+   "inputs": {
+    "delta": {
+     "java": "delta"
+    },
+    "maturities": {
+     "java": "maturities"
+    },
+    "tau": {
+     "java": "tau"
+    },
+    "zero_rates": {
+     "java": "zeroRates"
+    }
+   },
+   "outputs": [
+    "betas",
+    "objective",
+    "outliers",
+    "residuals"
+   ]
+  },
+  "calib.curve.smooth": {
+   "spec": "specifications/03-calibration/curve-fits.md",
+   "rust": "quantforge::calib::curve_smooth",
+   "python": "quantforge.calib.curve_smooth",
+   "java": "Calib.curveSmooth",
+   "cpp": "qf::calib::curve_smooth",
+   "inputs": {
+    "knots": {
+     "java": "knots"
+    },
+    "lambda": {
+     "java": "lambda"
+    },
+    "maturities": {
+     "java": "maturities"
+    },
+    "weights": {
+     "java": "weights"
+    },
+    "zero_rates": {
+     "java": "zeroRates"
+    }
+   },
+   "outputs": [
+    "fitted",
+    "forwards",
+    "objective"
+   ]
+  },
+  "calib.curve_report": {
+   "spec": "specifications/03-calibration/least-squares.md",
+   "rust": "quantforge::calib::curve_report_",
+   "python": "quantforge.calib.curve_report_",
+   "java": "Calib.curveReport",
+   "cpp": "qf::calib::curve_report_",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "condition_number",
+    "jacobian"
+   ]
+  },
+  "calib.fit": {
+   "spec": "specifications/03-calibration/least-squares.md",
+   "rust": "quantforge::calib::fit_",
+   "python": "quantforge.calib.fit_",
+   "java": "Calib.fit",
+   "cpp": "qf::calib::fit_",
+   "inputs": {
+    "lower": {
+     "java": "lower"
+    },
+    "max_iter": {
+     "java": "maxIter"
+    },
+    "method": {
+     "java": "method"
+    },
+    "model": {
+     "java": "model"
+    },
+    "prior": {
+     "java": "prior"
+    },
+    "regularisation": {
+     "java": "regularisation"
+    },
+    "report_parameters": {
+     "java": "reportParameters"
+    },
+    "start": {
+     "java": "start"
+    },
+    "upper": {
+     "java": "upper"
+    },
+    "weights": {
+     "java": "weights"
+    },
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "objective",
+    "parameters"
+   ]
+  },
+  "cmdty.curve.forward": {
+   "spec": "specifications/02-curves/commodity.md",
+   "rust": "quantforge::cmdty::curve_forward",
+   "python": "quantforge.cmdty.curve_forward",
+   "java": "Cmdty.curveForward",
+   "cpp": "qf::cmdty::curve_forward",
+   "inputs": {
+    "months": {
+     "java": "months"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "seasonality": {
+     "java": "seasonality"
+    }
+   },
+   "outputs": [
+    "forwards"
+   ]
+  },
+  "cmdty.storage.carry": {
+   "spec": "specifications/02-curves/commodity.md",
+   "rust": "quantforge::cmdty::storage_carry",
+   "python": "quantforge.cmdty.storage_carry",
+   "java": "Cmdty.storageCarry",
+   "cpp": "qf::cmdty::storage_carry",
+   "inputs": {
+    "forwards": {
+     "java": "forwards"
+    },
+    "funding": {
+     "java": "funding"
+    },
+    "storage_cost": {
+     "java": "storageCost"
+    }
+   },
+   "outputs": [
+    "arbitrage",
+    "carry_values",
+    "convenience_yields"
+   ]
+  },
+  "core.calendar.add_business_days": {
+   "spec": "specifications/01-core/calendars.md",
+   "rust": "quantforge::core::calendar_add_business_days",
+   "python": "quantforge.core.calendar_add_business_days",
+   "java": "Core.calendarAddBusinessDays",
+   "cpp": "qf::core::calendar_add_business_days",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "date": {
+     "java": "date"
+    },
+    "days": {
+     "java": "days"
+    }
+   },
+   "outputs": [
+    "date"
+   ]
+  },
+  "core.calendar.add_tenor": {
+   "spec": "specifications/01-core/calendars.md",
+   "rust": "quantforge::core::calendar_add_tenor",
+   "python": "quantforge.core.calendar_add_tenor",
+   "java": "Core.calendarAddTenor",
+   "cpp": "qf::core::calendar_add_tenor",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "date": {
+     "java": "date"
+    },
+    "end_of_month": {
+     "java": "endOfMonth"
+    },
+    "tenor": {
+     "java": "tenor"
+    }
+   },
+   "outputs": [
+    "date"
+   ]
+  },
+  "core.calendar.adjust": {
+   "spec": "specifications/01-core/calendars.md",
+   "rust": "quantforge::core::calendar_adjust",
+   "python": "quantforge.core.calendar_adjust",
+   "java": "Core.calendarAdjust",
+   "cpp": "qf::core::calendar_adjust",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "date": {
+     "java": "date"
+    }
+   },
+   "outputs": [
+    "date"
+   ]
+  },
+  "core.calendar.business_days_between": {
+   "spec": "specifications/01-core/calendars.md",
+   "rust": "quantforge::core::calendar_business_days_between",
+   "python": "quantforge.core.calendar_business_days_between",
+   "java": "Core.calendarBusinessDaysBetween",
+   "cpp": "qf::core::calendar_business_days_between",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "end": {
+     "java": "end"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "count"
+   ]
+  },
+  "core.calendar.holidays": {
+   "spec": "specifications/01-core/calendars.md",
+   "rust": "quantforge::core::calendar_holidays",
+   "python": "quantforge.core.calendar_holidays",
+   "java": "Core.calendarHolidays",
+   "cpp": "qf::core::calendar_holidays",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "year": {
+     "java": "year"
+    }
+   },
+   "outputs": [
+    "dates"
+   ]
+  },
+  "core.calendar.is_business_day": {
+   "spec": "specifications/01-core/calendars.md",
+   "rust": "quantforge::core::calendar_is_business_day",
+   "python": "quantforge.core.calendar_is_business_day",
+   "java": "Core.calendarIsBusinessDay",
+   "cpp": "qf::core::calendar_is_business_day",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "date": {
+     "java": "date"
+    }
+   },
+   "outputs": [
+    "is_business_day"
+   ]
+  },
+  "core.compounding.convert": {
+   "spec": "specifications/01-core/compounding.md",
+   "rust": "quantforge::core::compounding_convert",
+   "python": "quantforge.core.compounding_convert",
+   "java": "Core.compoundingConvert",
+   "cpp": "qf::core::compounding_convert",
+   "inputs": {
+    "from": {
+     "java": "from"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "t": {
+     "java": "t"
+    },
+    "to": {
+     "java": "to"
+    }
+   },
+   "outputs": [
+    "rate"
+   ]
+  },
+  "core.compounding.discount_factor": {
+   "spec": "specifications/01-core/compounding.md",
+   "rust": "quantforge::core::compounding_discount_factor",
+   "python": "quantforge.core.compounding_discount_factor",
+   "java": "Core.compoundingDiscountFactor",
+   "cpp": "qf::core::compounding_discount_factor",
+   "inputs": {
+    "compounding": {
+     "java": "compounding"
+    },
+    "frequency": {
+     "java": "frequency"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "t": {
+     "java": "t"
+    }
+   },
+   "outputs": [
+    "discount_factor"
+   ]
+  },
+  "core.conventions.lookup": {
+   "spec": "specifications/01-core/conventions.md",
+   "rust": "quantforge::core::conventions_lookup",
+   "python": "quantforge.core.conventions_lookup",
+   "java": "Core.conventionsLookup",
+   "cpp": "qf::core::conventions_lookup",
+   "inputs": {
+    "id": {
+     "java": "id"
+    }
+   },
+   "outputs": [
+    "base",
+    "business_day_convention",
+    "calendar",
+    "calendars",
+    "currency",
+    "day_count",
+    "fixed_day_count",
+    "fixed_months",
+    "kind",
+    "months",
+    "payment_lag",
+    "pip",
+    "quote",
+    "spot_lag"
+   ]
+  },
+  "core.cos.european": {
+   "spec": "specifications/01-core/cos.md",
+   "rust": "quantforge::core::cos_european",
+   "python": "quantforge.core.cos_european",
+   "java": "Core.cosEuropean",
+   "cpp": "qf::core::cos_european",
+   "inputs": {
+    "model": {
+     "java": "model"
+    },
+    "option": {
+     "java": "option"
+    },
+    "q": {
+     "java": "q"
+    },
+    "r": {
+     "java": "r"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "t": {
+     "java": "t"
+    },
+    "terms": {
+     "java": "terms"
+    },
+    "truncation": {
+     "java": "truncation"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "core.data.check_quotes": {
+   "spec": "specifications/01-core/data-checks.md",
+   "rust": "quantforge::core::data_check_quotes",
+   "python": "quantforge.core.data_check_quotes",
+   "java": "Core.dataCheckQuotes",
+   "cpp": "qf::core::data_check_quotes",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "history": {
+     "java": "history"
+    },
+    "max_relative_spread": {
+     "java": "maxRelativeSpread"
+    },
+    "outlier_min_history": {
+     "java": "outlierMinHistory"
+    },
+    "positive_only": {
+     "java": "positiveOnly"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "stale_after_seconds": {
+     "java": "staleAfterSeconds"
+    }
+   },
+   "outputs": [
+    "results"
+   ]
+  },
+  "core.daycount.year_fraction": {
+   "spec": "specifications/01-core/daycount.md",
+   "rust": "quantforge::core::daycount_year_fraction",
+   "python": "quantforge.core.daycount_year_fraction",
+   "java": "Core.daycountYearFraction",
+   "cpp": "qf::core::daycount_year_fraction",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "end": {
+     "java": "end"
+    },
+    "frequency": {
+     "java": "frequency"
+    },
+    "ref_end": {
+     "java": "refEnd"
+    },
+    "ref_start": {
+     "java": "refStart"
+    },
+    "start": {
+     "java": "start"
+    },
+    "termination": {
+     "java": "termination"
+    },
+    "unused": {
+     "java": "unused"
+    }
+   },
+   "outputs": [
+    "year_fraction"
+   ]
+  },
+  "core.diff.central": {
+   "spec": "specifications/01-core/differentiation-and-linalg.md",
+   "rust": "quantforge::core::diff_central",
+   "python": "quantforge.core.diff_central",
+   "java": "Core.diffCentral",
+   "cpp": "qf::core::diff_central",
+   "inputs": {
+    "function": {
+     "java": "function"
+    },
+    "h": {
+     "java": "h"
+    },
+    "order": {
+     "java": "order"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "core.integrate.adaptive_simpson": {
+   "spec": "specifications/01-core/integration.md",
+   "rust": "quantforge::core::integrate_adaptive_simpson",
+   "python": "quantforge.core.integrate_adaptive_simpson",
+   "java": "Core.integrateAdaptiveSimpson",
+   "cpp": "qf::core::integrate_adaptive_simpson",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "max_depth": {
+     "java": "maxDepth"
+    },
+    "tol": {
+     "java": "tol"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "core.integrate.gauss_kronrod": {
+   "spec": "specifications/01-core/integration.md",
+   "rust": "quantforge::core::integrate_gauss_kronrod",
+   "python": "quantforge.core.integrate_gauss_kronrod",
+   "java": "Core.integrateGaussKronrod",
+   "cpp": "qf::core::integrate_gauss_kronrod",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "max_intervals": {
+     "java": "maxIntervals"
+    },
+    "tol": {
+     "java": "tol"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "core.integrate.gauss_legendre": {
+   "spec": "specifications/01-core/integration.md",
+   "rust": "quantforge::core::integrate_gauss_legendre",
+   "python": "quantforge.core.integrate_gauss_legendre",
+   "java": "Core.integrateGaussLegendre",
+   "cpp": "qf::core::integrate_gauss_legendre",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "n": {
+     "java": "n"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "core.integrate.simpson": {
+   "spec": "specifications/01-core/integration.md",
+   "rust": "quantforge::core::integrate_simpson",
+   "python": "quantforge.core.integrate_simpson",
+   "java": "Core.integrateSimpson",
+   "cpp": "qf::core::integrate_simpson",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "n": {
+     "java": "n"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "core.integrate.trapezoid": {
+   "spec": "specifications/01-core/integration.md",
+   "rust": "quantforge::core::integrate_trapezoid",
+   "python": "quantforge.core.integrate_trapezoid",
+   "java": "Core.integrateTrapezoid",
+   "cpp": "qf::core::integrate_trapezoid",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "n": {
+     "java": "n"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "core.interp.evaluate": {
+   "spec": "specifications/01-core/interpolation.md",
+   "rust": "quantforge::core::interp_evaluate",
+   "python": "quantforge.core.interp_evaluate",
+   "java": "Core.interpEvaluate",
+   "cpp": "qf::core::interp_evaluate",
+   "inputs": {
+    "at": {
+     "java": "at"
+    },
+    "method": {
+     "java": "method"
+    },
+    "slope_end": {
+     "java": "slopeEnd"
+    },
+    "slope_start": {
+     "java": "slopeStart"
+    },
+    "tension": {
+     "java": "tension"
+    },
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "derivatives",
+    "values"
+   ]
+  },
+  "core.interp.monotone_convex": {
+   "spec": "specifications/01-core/interpolation.md",
+   "rust": "quantforge::core::interp_monotone_convex",
+   "python": "quantforge.core.interp_monotone_convex",
+   "java": "Core.interpMonotoneConvex",
+   "cpp": "qf::core::interp_monotone_convex",
+   "inputs": {
+    "at": {
+     "java": "at"
+    },
+    "positive": {
+     "java": "positive"
+    },
+    "r": {
+     "java": "r"
+    },
+    "t": {
+     "java": "t"
+    }
+   },
+   "outputs": [
+    "forwards",
+    "zero_rates"
+   ]
+  },
+  "core.linalg.cholesky": {
+   "spec": "specifications/01-core/differentiation-and-linalg.md",
+   "rust": "quantforge::core::linalg_cholesky",
+   "python": "quantforge.core.linalg_cholesky",
+   "java": "Core.linalgCholesky",
+   "cpp": "qf::core::linalg_cholesky",
+   "inputs": {
+    "a": {
+     "java": "a"
+    }
+   },
+   "outputs": [
+    "l"
+   ]
+  },
+  "core.linalg.eigen_symmetric": {
+   "spec": "specifications/01-core/differentiation-and-linalg.md",
+   "rust": "quantforge::core::linalg_eigen_symmetric",
+   "python": "quantforge.core.linalg_eigen_symmetric",
+   "java": "Core.linalgEigenSymmetric",
+   "cpp": "qf::core::linalg_eigen_symmetric",
+   "inputs": {
+    "a": {
+     "java": "a"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.linalg.solve": {
+   "spec": "specifications/01-core/differentiation-and-linalg.md",
+   "rust": "quantforge::core::linalg_solve",
+   "python": "quantforge.core.linalg_solve",
+   "java": "Core.linalgSolve",
+   "cpp": "qf::core::linalg_solve",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    }
+   },
+   "outputs": [
+    "x"
+   ]
+  },
+  "core.mc.gbm_european": {
+   "spec": "specifications/01-core/limits.md",
+   "rust": "quantforge::core::mc_gbm_european",
+   "python": "quantforge.core.mc_gbm_european",
+   "java": "Core.mcGbmEuropean",
+   "cpp": "qf::core::mc_gbm_european",
+   "inputs": {
+    "method": {
+     "java": "method"
+    },
+    "option": {
+     "java": "option"
+    },
+    "paths": {
+     "java": "paths"
+    },
+    "q": {
+     "java": "q"
+    },
+    "r": {
+     "java": "r"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "steps": {
+     "java": "steps"
+    },
+    "stream": {
+     "java": "stream"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "t": {
+     "java": "t"
+    }
+   },
+   "outputs": [
+    "price",
+    "stderr"
+   ]
+  },
+  "core.pde.bs_european": {
+   "spec": "specifications/01-core/limits.md",
+   "rust": "quantforge::core::pde_bs_european",
+   "python": "quantforge.core.pde_bs_european",
+   "java": "Core.pdeBsEuropean",
+   "cpp": "qf::core::pde_bs_european",
+   "inputs": {
+    "option": {
+     "java": "option"
+    },
+    "q": {
+     "java": "q"
+    },
+    "r": {
+     "java": "r"
+    },
+    "rannacher_steps": {
+     "java": "rannacherSteps"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "space_steps": {
+     "java": "spaceSteps"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "t": {
+     "java": "t"
+    },
+    "time_steps": {
+     "java": "timeSteps"
+    }
+   },
+   "outputs": [
+    "delta",
+    "gamma",
+    "price"
+   ]
+  },
+  "core.rng.inverse_normal": {
+   "spec": "specifications/01-core/rng.md",
+   "rust": "quantforge::core::rng_inverse_normal",
+   "python": "quantforge.core.rng_inverse_normal",
+   "java": "Core.rngInverseNormal",
+   "cpp": "qf::core::rng_inverse_normal",
+   "inputs": {
+    "p": {
+     "java": "p"
+    }
+   },
+   "outputs": [
+    "z"
+   ]
+  },
+  "core.rng.next_u64": {
+   "spec": "specifications/01-core/rng.md",
+   "rust": "quantforge::core::rng_next_u64",
+   "python": "quantforge.core.rng_next_u64",
+   "java": "Core.rngNextU64",
+   "cpp": "qf::core::rng_next_u64",
+   "inputs": {
+    "count": {
+     "java": "count"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "skip": {
+     "java": "skip"
+    },
+    "stream": {
+     "java": "stream"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.rng.normals": {
+   "spec": "specifications/01-core/rng.md",
+   "rust": "quantforge::core::rng_normals",
+   "python": "quantforge.core.rng_normals",
+   "java": "Core.rngNormals",
+   "cpp": "qf::core::rng_normals",
+   "inputs": {
+    "count": {
+     "java": "count"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "skip": {
+     "java": "skip"
+    },
+    "stream": {
+     "java": "stream"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.rng.set_state_next_u64": {
+   "spec": "specifications/01-core/rng.md",
+   "rust": "quantforge::core::rng_set_state_next_u64",
+   "python": "quantforge.core.rng_set_state_next_u64",
+   "java": "Core.rngSetStateNextU64",
+   "cpp": "qf::core::rng_set_state_next_u64",
+   "inputs": {
+    "count": {
+     "java": "count"
+    },
+    "state": {
+     "java": "state"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.rng.uniforms": {
+   "spec": "specifications/01-core/rng.md",
+   "rust": "quantforge::core::rng_uniforms",
+   "python": "quantforge.core.rng_uniforms",
+   "java": "Core.rngUniforms",
+   "cpp": "qf::core::rng_uniforms",
+   "inputs": {
+    "count": {
+     "java": "count"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "skip": {
+     "java": "skip"
+    },
+    "stream": {
+     "java": "stream"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.root.bisection": {
+   "spec": "specifications/01-core/root-finders.md",
+   "rust": "quantforge::core::root_bisection",
+   "python": "quantforge.core.root_bisection",
+   "java": "Core.rootBisection",
+   "cpp": "qf::core::root_bisection",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "max_iter": {
+     "java": "maxIter"
+    },
+    "x_tol": {
+     "java": "xTol"
+    }
+   },
+   "outputs": [
+    "root"
+   ]
+  },
+  "core.root.brent": {
+   "spec": "specifications/01-core/root-finders.md",
+   "rust": "quantforge::core::root_brent",
+   "python": "quantforge.core.root_brent",
+   "java": "Core.rootBrent",
+   "cpp": "qf::core::root_brent",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "max_iter": {
+     "java": "maxIter"
+    },
+    "x_tol": {
+     "java": "xTol"
+    }
+   },
+   "outputs": [
+    "root"
+   ]
+  },
+  "core.root.newton": {
+   "spec": "specifications/01-core/root-finders.md",
+   "rust": "quantforge::core::root_newton",
+   "python": "quantforge.core.root_newton",
+   "java": "Core.rootNewton",
+   "cpp": "qf::core::root_newton",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "function": {
+     "java": "function"
+    },
+    "max_iter": {
+     "java": "maxIter"
+    },
+    "x0": {
+     "java": "x0"
+    }
+   },
+   "outputs": [
+    "root"
+   ]
+  },
+  "core.snapshot.hash": {
+   "spec": "specifications/01-core/snapshot-hash.md",
+   "rust": "quantforge::core::snapshot_hash",
+   "python": "quantforge.core.snapshot_hash",
+   "java": "Core.snapshotHash",
+   "cpp": "qf::core::snapshot_hash",
+   "inputs": {
+    "document_text": {
+     "java": "documentText"
+    }
+   },
+   "outputs": [
+    "canonical",
+    "snapshot_id"
+   ]
+  },
+  "core.sobol.points": {
+   "spec": "specifications/01-core/limits.md",
+   "rust": "quantforge::core::sobol_points",
+   "python": "quantforge.core.sobol_points",
+   "java": "Core.sobolPoints",
+   "cpp": "qf::core::sobol_points",
+   "inputs": {
+    "count": {
+     "java": "count"
+    },
+    "dimensions": {
+     "java": "dimensions"
+    },
+    "skip": {
+     "java": "skip"
+    }
+   },
+   "outputs": [
+    "points"
+   ]
+  },
+  "core.stats.covariance": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::stats_covariance",
+   "python": "quantforge.core.stats_covariance",
+   "java": "Core.statsCovariance",
+   "cpp": "qf::core::stats_covariance",
+   "inputs": {
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "correlation",
+    "covariance"
+   ]
+  },
+  "core.stats.normal": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::stats_normal",
+   "python": "quantforge.core.stats_normal",
+   "java": "Core.statsNormal",
+   "cpp": "qf::core::stats_normal",
+   "inputs": {
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "cdf",
+    "pdf"
+   ]
+  },
+  "core.stats.ols": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::stats_ols",
+   "python": "quantforge.core.stats_ols",
+   "java": "Core.statsOls",
+   "cpp": "qf::core::stats_ols",
+   "inputs": {
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "alpha",
+    "beta",
+    "r_squared",
+    "se_alpha",
+    "se_beta"
+   ]
+  },
+  "core.stats.quantile": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::stats_quantile",
+   "python": "quantforge.core.stats_quantile",
+   "java": "Core.statsQuantile",
+   "cpp": "qf::core::stats_quantile",
+   "inputs": {
+    "p": {
+     "java": "p"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.stats.summary": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::stats_summary",
+   "python": "quantforge.core.stats_summary",
+   "java": "Core.statsSummary",
+   "cpp": "qf::core::stats_summary",
+   "inputs": {
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "count",
+    "excess_kurtosis",
+    "max",
+    "mean",
+    "min",
+    "skewness",
+    "stdev",
+    "variance"
+   ]
+  },
+  "core.store.chain": {
+   "spec": "specifications/01-core/asof-store.md",
+   "rust": "quantforge::core::store_chain",
+   "python": "quantforge.core.store_chain",
+   "java": "Core.storeChain",
+   "cpp": "qf::core::store_chain",
+   "inputs": {
+    "records": {
+     "java": "records"
+    }
+   },
+   "outputs": [
+    "hashes",
+    "head"
+   ]
+  },
+  "core.store.latest": {
+   "spec": "specifications/01-core/asof-store.md",
+   "rust": "quantforge::core::store_latest",
+   "python": "quantforge.core.store_latest",
+   "java": "Core.storeLatest",
+   "cpp": "qf::core::store_latest",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "records": {
+     "java": "records"
+    },
+    "series_id": {
+     "java": "seriesId"
+    }
+   },
+   "outputs": [
+    "row"
+   ]
+  },
+  "core.store.query_as_of": {
+   "spec": "specifications/01-core/asof-store.md",
+   "rust": "quantforge::core::store_query_as_of",
+   "python": "quantforge.core.store_query_as_of",
+   "java": "Core.storeQueryAsOf",
+   "cpp": "qf::core::store_query_as_of",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "event_from": {
+     "java": "eventFrom"
+    },
+    "event_to": {
+     "java": "eventTo"
+    },
+    "records": {
+     "java": "records"
+    },
+    "series_id": {
+     "java": "seriesId"
+    }
+   },
+   "outputs": [
+    "rows"
+   ]
+  },
+  "core.store.replay": {
+   "spec": "specifications/01-core/asof-store.md",
+   "rust": "quantforge::core::store_replay",
+   "python": "quantforge.core.store_replay",
+   "java": "Core.storeReplay",
+   "cpp": "qf::core::store_replay",
+   "inputs": {
+    "checkpoints": {
+     "java": "checkpoints"
+    },
+    "records": {
+     "java": "records"
+    }
+   },
+   "outputs": [
+    "head",
+    "snapshots"
+   ]
+  },
+  "core.store.snapshot": {
+   "spec": "specifications/01-core/asof-store.md",
+   "rust": "quantforge::core::store_snapshot",
+   "python": "quantforge.core.store_snapshot",
+   "java": "Core.storeSnapshot",
+   "cpp": "qf::core::store_snapshot",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "records": {
+     "java": "records"
+    }
+   },
+   "outputs": [
+    "canonical",
+    "snapshot_id"
+   ]
+  },
+  "core.time.business_date": {
+   "spec": "specifications/01-core/timezone-and-cutoff.md",
+   "rust": "quantforge::core::time_business_date",
+   "python": "quantforge.core.time_business_date",
+   "java": "Core.timeBusinessDate",
+   "cpp": "qf::core::time_business_date",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "cutoff": {
+     "java": "cutoff"
+    },
+    "instant": {
+     "java": "instant"
+    },
+    "zone": {
+     "java": "zone"
+    }
+   },
+   "outputs": [
+    "date"
+   ]
+  },
+  "core.time.to_instant": {
+   "spec": "specifications/01-core/timezone-and-cutoff.md",
+   "rust": "quantforge::core::time_to_instant",
+   "python": "quantforge.core.time_to_instant",
+   "java": "Core.timeToInstant",
+   "cpp": "qf::core::time_to_instant",
+   "inputs": {
+    "local": {
+     "java": "local"
+    },
+    "overlap": {
+     "java": "overlap"
+    },
+    "zone": {
+     "java": "zone"
+    }
+   },
+   "outputs": [
+    "instant"
+   ]
+  },
+  "core.time.to_local": {
+   "spec": "specifications/01-core/timezone-and-cutoff.md",
+   "rust": "quantforge::core::time_to_local",
+   "python": "quantforge.core.time_to_local",
+   "java": "Core.timeToLocal",
+   "cpp": "qf::core::time_to_local",
+   "inputs": {
+    "instant": {
+     "java": "instant"
+    },
+    "zone": {
+     "java": "zone"
+    }
+   },
+   "outputs": [
+    "local"
+   ]
+  },
+  "core.time.utc_offset": {
+   "spec": "specifications/01-core/timezone-and-cutoff.md",
+   "rust": "quantforge::core::time_utc_offset",
+   "python": "quantforge.core.time_utc_offset",
+   "java": "Core.timeUtcOffset",
+   "cpp": "qf::core::time_utc_offset",
+   "inputs": {
+    "instant": {
+     "java": "instant"
+    },
+    "zone": {
+     "java": "zone"
+    }
+   },
+   "outputs": [
+    "offset_seconds"
+   ]
+  },
+  "core.ts.ar1": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::ts_ar1",
+   "python": "quantforge.core.ts_ar1",
+   "java": "Core.tsAr1",
+   "cpp": "qf::core::ts_ar1",
+   "inputs": {
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "constant",
+    "phi",
+    "sigma"
+   ]
+  },
+  "core.ts.autocorrelation": {
+   "spec": "specifications/01-core/limits.md",
+   "rust": "quantforge::core::ts_autocorrelation",
+   "python": "quantforge.core.ts_autocorrelation",
+   "java": "Core.tsAutocorrelation",
+   "cpp": "qf::core::ts_autocorrelation",
+   "inputs": {
+    "max_lag": {
+     "java": "maxLag"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "acf"
+   ]
+  },
+  "core.ts.ewma_variance": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::ts_ewma_variance",
+   "python": "quantforge.core.ts_ewma_variance",
+   "java": "Core.tsEwmaVariance",
+   "cpp": "qf::core::ts_ewma_variance",
+   "inputs": {
+    "lambda": {
+     "java": "lambda"
+    },
+    "returns": {
+     "java": "returns"
+    }
+   },
+   "outputs": [
+    "variance"
+   ]
+  },
+  "core.ts.forward_fill": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::ts_forward_fill",
+   "python": "quantforge.core.ts_forward_fill",
+   "java": "Core.tsForwardFill",
+   "cpp": "qf::core::ts_forward_fill",
+   "inputs": {
+    "limit": {
+     "java": "limit"
+    },
+    "values": {
+     "java": "values"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.ts.ljung_box": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::ts_ljung_box",
+   "python": "quantforge.core.ts_ljung_box",
+   "java": "Core.tsLjungBox",
+   "cpp": "qf::core::ts_ljung_box",
+   "inputs": {
+    "max_lag": {
+     "java": "maxLag"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "statistic"
+   ]
+  },
+  "core.ts.resample_last": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::ts_resample_last",
+   "python": "quantforge.core.ts_resample_last",
+   "java": "Core.tsResampleLast",
+   "cpp": "qf::core::ts_resample_last",
+   "inputs": {
+    "dates": {
+     "java": "dates"
+    },
+    "frequency": {
+     "java": "frequency"
+    },
+    "values": {
+     "java": "values"
+    }
+   },
+   "outputs": [
+    "dates",
+    "values"
+   ]
+  },
+  "core.ts.returns": {
+   "spec": "specifications/01-core/statistics-and-time-series.md",
+   "rust": "quantforge::core::ts_returns",
+   "python": "quantforge.core.ts_returns",
+   "java": "Core.tsReturns",
+   "cpp": "qf::core::ts_returns",
+   "inputs": {
+    "kind": {
+     "java": "kind"
+    },
+    "prices": {
+     "java": "prices"
+    }
+   },
+   "outputs": [
+    "returns"
+   ]
+  },
+  "core.ts.rolling": {
+   "spec": "specifications/01-core/limits.md",
+   "rust": "quantforge::core::ts_rolling",
+   "python": "quantforge.core.ts_rolling",
+   "java": "Core.tsRolling",
+   "cpp": "qf::core::ts_rolling",
+   "inputs": {
+    "statistic": {
+     "java": "statistic"
+    },
+    "window": {
+     "java": "window"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "values"
+   ]
+  },
+  "core.units.add_money": {
+   "spec": "specifications/01-core/units-and-money.md",
+   "rust": "quantforge::core::units_add_money",
+   "python": "quantforge.core.units_add_money",
+   "java": "Core.unitsAddMoney",
+   "cpp": "qf::core::units_add_money",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    }
+   },
+   "outputs": [
+    "amount",
+    "currency"
+   ]
+  },
+  "core.units.convert": {
+   "spec": "specifications/01-core/units-and-money.md",
+   "rust": "quantforge::core::units_convert",
+   "python": "quantforge.core.units_convert",
+   "java": "Core.unitsConvert",
+   "cpp": "qf::core::units_convert",
+   "inputs": {
+    "from": {
+     "java": "from"
+    },
+    "to": {
+     "java": "to"
+    },
+    "value": {
+     "java": "value"
+    }
+   },
+   "outputs": [
+    "value"
+   ]
+  },
+  "core.units.round_money": {
+   "spec": "specifications/01-core/units-and-money.md",
+   "rust": "quantforge::core::units_round_money",
+   "python": "quantforge.core.units_round_money",
+   "java": "Core.unitsRoundMoney",
+   "cpp": "qf::core::units_round_money",
+   "inputs": {
+    "amount": {
+     "java": "amount"
+    },
+    "currency": {
+     "java": "currency"
+    }
+   },
+   "outputs": [
+    "amount",
+    "currency"
+   ]
+  },
+  "credit.cds.bootstrap": {
+   "spec": "specifications/04-pricing/credit.md",
+   "rust": "quantforge::credit::cds_bootstrap",
+   "python": "quantforge.credit.cds_bootstrap",
+   "java": "Credit.cdsBootstrap",
+   "cpp": "qf::credit::cds_bootstrap",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "pillars"
+   ]
+  },
+  "credit.cds.price": {
+   "spec": "specifications/04-pricing/credit.md",
+   "rust": "quantforge::credit::cds_price",
+   "python": "quantforge.credit.cds_price",
+   "java": "Credit.cdsPrice",
+   "cpp": "qf::credit::cds_price",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "hazard": {
+     "java": "hazard"
+    },
+    "payout": {
+     "java": "payout"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "trade": {
+     "java": "trade"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "accrued",
+    "par_spread",
+    "protection_leg",
+    "pv",
+    "rpv01",
+    "upfront"
+   ]
+  },
+  "credit.cdsoption.implied_vol": {
+   "spec": "specifications/04-pricing/credit-options-and-copulas.md",
+   "rust": "quantforge::credit::cdsoption_implied_vol",
+   "python": "quantforge.credit.cdsoption_implied_vol",
+   "java": "Credit.cdsoptionImpliedVol",
+   "cpp": "qf::credit::cdsoption_implied_vol",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "expiry": {
+     "java": "expiry"
+    },
+    "hazard_rate": {
+     "java": "hazardRate"
+    },
+    "knock_out": {
+     "java": "knockOut"
+    },
+    "maturity": {
+     "java": "maturity"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "premium": {
+     "java": "premium"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "type": {
+     "java": "type"
+    }
+   },
+   "outputs": [
+    "vol"
+   ]
+  },
+  "credit.cdsoption.price": {
+   "spec": "specifications/04-pricing/credit-options-and-copulas.md",
+   "rust": "quantforge::credit::cdsoption_price",
+   "python": "quantforge.credit.cdsoption_price",
+   "java": "Credit.cdsoptionPrice",
+   "cpp": "qf::credit::cdsoption_price",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "expiry": {
+     "java": "expiry"
+    },
+    "hazard_rate": {
+     "java": "hazardRate"
+    },
+    "knock_out": {
+     "java": "knockOut"
+    },
+    "maturity": {
+     "java": "maturity"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "type": {
+     "java": "type"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "forward_spread",
+    "front_end_protection",
+    "price",
+    "risky_annuity"
+   ]
+  },
+  "credit.copula.joint_default": {
+   "spec": "specifications/04-pricing/credit-options-and-copulas.md",
+   "rust": "quantforge::credit::copula_joint_default",
+   "python": "quantforge.credit.copula_joint_default",
+   "java": "Credit.copulaJointDefault",
+   "cpp": "qf::credit::copula_joint_default",
+   "inputs": {
+    "copula": {
+     "java": "copula"
+    },
+    "correlation": {
+     "java": "correlation"
+    },
+    "default_probabilities": {
+     "java": "defaultProbabilities"
+    },
+    "degrees_of_freedom": {
+     "java": "degreesOfFreedom"
+    }
+   },
+   "outputs": [
+    "default_correlation",
+    "joint_default_probability"
+   ]
+  },
+  "credit.curve.composite": {
+   "spec": "specifications/04-pricing/credit.md",
+   "rust": "quantforge::credit::curve_composite",
+   "python": "quantforge.credit.curve_composite",
+   "java": "Credit.curveComposite",
+   "cpp": "qf::credit::curve_composite",
+   "inputs": {
+    "constituents": {
+     "java": "constituents"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "scale": {
+     "java": "scale"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "pillars",
+    "spreads"
+   ]
+  },
+  "credit.index.intrinsic": {
+   "spec": "specifications/04-pricing/credit.md",
+   "rust": "quantforge::credit::index_intrinsic",
+   "python": "quantforge.credit.index_intrinsic",
+   "java": "Credit.indexIntrinsic",
+   "cpp": "qf::credit::index_intrinsic",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "names": {
+     "java": "names"
+    },
+    "quoted_upfront": {
+     "java": "quotedUpfront"
+    },
+    "trade": {
+     "java": "trade"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "basis",
+    "intrinsic_upfront",
+    "name_upfronts"
+   ]
+  },
+  "credit.lhp.loss_cdf": {
+   "spec": "specifications/04-pricing/credit-options-and-copulas.md",
+   "rust": "quantforge::credit::lhp_loss_cdf",
+   "python": "quantforge.credit.lhp_loss_cdf",
+   "java": "Credit.lhpLossCdf",
+   "cpp": "qf::credit::lhp_loss_cdf",
+   "inputs": {
+    "correlation": {
+     "java": "correlation"
+    },
+    "default_probability": {
+     "java": "defaultProbability"
+    },
+    "losses": {
+     "java": "losses"
+    },
+    "recovery": {
+     "java": "recovery"
+    }
+   },
+   "outputs": [
+    "cdf"
+   ]
+  },
+  "credit.lhp.tranche_loss": {
+   "spec": "specifications/04-pricing/credit-options-and-copulas.md",
+   "rust": "quantforge::credit::lhp_tranche_loss",
+   "python": "quantforge.credit.lhp_tranche_loss",
+   "java": "Credit.lhpTrancheLoss",
+   "cpp": "qf::credit::lhp_tranche_loss",
+   "inputs": {
+    "attachment": {
+     "java": "attachment"
+    },
+    "correlation": {
+     "java": "correlation"
+    },
+    "default_probability": {
+     "java": "defaultProbability"
+    },
+    "detachment": {
+     "java": "detachment"
+    },
+    "recovery": {
+     "java": "recovery"
+    }
+   },
+   "outputs": [
+    "expected_loss_fraction"
+   ]
+  },
+  "eq.borrow.implied": {
+   "spec": "specifications/02-curves/equity-curves.md",
+   "rust": "quantforge::eq::borrow_implied",
+   "python": "quantforge.eq.borrow_implied",
+   "java": "Eq.borrowImplied",
+   "cpp": "qf::eq::borrow_implied",
+   "inputs": {
+    "dividends": {
+     "java": "dividends"
+    },
+    "expiry": {
+     "java": "expiry"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "funding": {
+     "java": "funding"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "borrow_rate"
+   ]
+  },
+  "eq.corporate_action.adjust": {
+   "spec": "specifications/04-pricing/equity-index.md",
+   "rust": "quantforge::eq::corporate_action_adjust",
+   "python": "quantforge.eq.corporate_action_adjust",
+   "java": "Eq.corporateActionAdjust",
+   "cpp": "qf::eq::corporate_action_adjust",
+   "inputs": {
+    "action": {
+     "java": "action"
+    },
+    "amount": {
+     "java": "amount"
+    },
+    "cum_price": {
+     "java": "cumPrice"
+    },
+    "new_per_old": {
+     "java": "newPerOld"
+    },
+    "ratio": {
+     "java": "ratio"
+    },
+    "shares": {
+     "java": "shares"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "subscription_price": {
+     "java": "subscriptionPrice"
+    }
+   },
+   "outputs": [
+    "adjusted_shares",
+    "adjusted_strike",
+    "ex_price",
+    "factor"
+   ]
+  },
+  "eq.dividend.implied": {
+   "spec": "specifications/02-curves/equity-curves.md",
+   "rust": "quantforge::eq::dividend_implied",
+   "python": "quantforge.eq.dividend_implied",
+   "java": "Eq.dividendImplied",
+   "cpp": "qf::eq::dividend_implied",
+   "inputs": {
+    "borrow_rate": {
+     "java": "borrowRate"
+    },
+    "funding": {
+     "java": "funding"
+    },
+    "futures": {
+     "java": "futures"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "dividend_yields",
+    "period_pv_dividends",
+    "pv_dividends"
+   ]
+  },
+  "eq.forward.flat": {
+   "spec": "specifications/02-curves/equity-forward.md",
+   "rust": "quantforge::eq::forward_flat",
+   "python": "quantforge.eq.forward_flat",
+   "java": "Eq.forwardFlat",
+   "cpp": "qf::eq::forward_flat",
+   "inputs": {
+    "borrow": {
+     "java": "borrow"
+    },
+    "dividends": {
+     "java": "dividends"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "forward"
+   ]
+  },
+  "eq.forward.outright": {
+   "spec": "specifications/02-curves/equity-forward.md",
+   "rust": "quantforge::eq::forward_outright",
+   "python": "quantforge.eq.forward_outright",
+   "java": "Eq.forwardOutright",
+   "cpp": "qf::eq::forward_outright",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "borrow_curve": {
+     "java": "borrowCurve"
+    },
+    "dividends": {
+     "java": "dividends"
+    },
+    "expiry": {
+     "java": "expiry"
+    },
+    "funding_curve": {
+     "java": "fundingCurve"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "carry_factor",
+    "discount_factor",
+    "forward",
+    "pv_dividends"
+   ]
+  },
+  "eq.forward.parity": {
+   "spec": "specifications/02-curves/equity-forward.md",
+   "rust": "quantforge::eq::forward_parity",
+   "python": "quantforge.eq.forward_parity",
+   "java": "Eq.forwardParity",
+   "cpp": "qf::eq::forward_parity",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "discount_factor",
+    "forward",
+    "max_residual",
+    "outside_spread"
+   ]
+  },
+  "eq.futures.basis": {
+   "spec": "specifications/02-curves/equity-curves.md",
+   "rust": "quantforge::eq::futures_basis",
+   "python": "quantforge.eq.futures_basis",
+   "java": "Eq.futuresBasis",
+   "cpp": "qf::eq::futures_basis",
+   "inputs": {
+    "borrow_rate": {
+     "java": "borrowRate"
+    },
+    "dividends": {
+     "java": "dividends"
+    },
+    "expiry": {
+     "java": "expiry"
+    },
+    "financing_spread": {
+     "java": "financingSpread"
+    },
+    "funding": {
+     "java": "funding"
+    },
+    "futures_price": {
+     "java": "futuresPrice"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "basis",
+    "fair_price",
+    "implied_financing_spread"
+   ]
+  },
+  "eq.index.dividends": {
+   "spec": "specifications/04-pricing/equity-index.md",
+   "rust": "quantforge::eq::index_dividends",
+   "python": "quantforge.eq.index_dividends",
+   "java": "Eq.indexDividends",
+   "cpp": "qf::eq::index_dividends",
+   "inputs": {
+    "constituents": {
+     "java": "constituents"
+    },
+    "divisor": {
+     "java": "divisor"
+    },
+    "implied_period_points": {
+     "java": "impliedPeriodPoints"
+    },
+    "periods": {
+     "java": "periods"
+    }
+   },
+   "outputs": [
+    "basis",
+    "ex_dates",
+    "level",
+    "period_points",
+    "points"
+   ]
+  },
+  "eq.index.rebalance": {
+   "spec": "specifications/04-pricing/equity-index.md",
+   "rust": "quantforge::eq::index_rebalance",
+   "python": "quantforge.eq.index_rebalance",
+   "java": "Eq.indexRebalance",
+   "cpp": "qf::eq::index_rebalance",
+   "inputs": {
+    "constituents": {
+     "java": "constituents"
+    },
+    "divisor": {
+     "java": "divisor"
+    },
+    "new_constituents": {
+     "java": "newConstituents"
+    }
+   },
+   "outputs": [
+    "level",
+    "new_divisor",
+    "weights"
+   ]
+  },
+  "eq.trs.pv": {
+   "spec": "specifications/04-pricing/equity-index.md",
+   "rust": "quantforge::eq::trs_pv",
+   "python": "quantforge.eq.trs_pv",
+   "java": "Eq.trsPv",
+   "cpp": "qf::eq::trs_pv",
+   "inputs": {
+    "borrow_rate": {
+     "java": "borrowRate"
+    },
+    "current_rate": {
+     "java": "currentRate"
+    },
+    "dividends": {
+     "java": "dividends"
+    },
+    "funding": {
+     "java": "funding"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "equity_leg",
+    "funding_leg",
+    "pv"
+   ]
+  },
+  "exotic.american.baw": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::american_baw",
+   "python": "quantforge.exotic.american_baw",
+   "java": "Exotic.americanBaw",
+   "cpp": "qf::exotic::american_baw",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "exotic.american.crr": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::american_crr",
+   "python": "quantforge.exotic.american_crr",
+   "java": "Exotic.americanCrr",
+   "cpp": "qf::exotic::american_crr",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "steps": {
+     "java": "steps"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "american",
+    "early_exercise_premium",
+    "european"
+   ]
+  },
+  "exotic.american.fd": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::american_fd",
+   "python": "quantforge.exotic.american_fd",
+   "java": "Exotic.americanFd",
+   "cpp": "qf::exotic::american_fd",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "exercise": {
+     "java": "exercise"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "grid": {
+     "java": "grid"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "delta",
+    "gamma",
+    "price"
+   ]
+  },
+  "exotic.asian.geometric": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::asian_geometric",
+   "python": "quantforge.exotic.asian_geometric",
+   "java": "Exotic.asianGeometric",
+   "cpp": "qf::exotic::asian_geometric",
+   "inputs": {
+    "averaging": {
+     "java": "averaging"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "fixing_years": {
+     "java": "fixingYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "exotic.barrier.price": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::barrier_price",
+   "python": "quantforge.exotic.barrier_price",
+   "java": "Exotic.barrierPrice",
+   "cpp": "qf::exotic::barrier_price",
+   "inputs": {
+    "barrier": {
+     "java": "barrier"
+    },
+    "barrier_type": {
+     "java": "barrierType"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "rebate": {
+     "java": "rebate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "exotic.basket.moment": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::basket_moment",
+   "python": "quantforge.exotic.basket_moment",
+   "java": "Exotic.basketMoment",
+   "cpp": "qf::exotic::basket_moment",
+   "inputs": {
+    "correlation": {
+     "java": "correlation"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forwards": {
+     "java": "forwards"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vols": {
+     "java": "vols"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "basket_forward",
+    "basket_vol",
+    "price"
+   ]
+  },
+  "exotic.chooser.price": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::chooser_price",
+   "python": "quantforge.exotic.chooser_price",
+   "java": "Exotic.chooserPrice",
+   "cpp": "qf::exotic::chooser_price",
+   "inputs": {
+    "choose_years": {
+     "java": "chooseYears"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "exotic.digital.price": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::digital_price",
+   "python": "quantforge.exotic.digital_price",
+   "java": "Exotic.digitalPrice",
+   "cpp": "qf::exotic::digital_price",
+   "inputs": {
+    "cash": {
+     "java": "cash"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "payoff": {
+     "java": "payoff"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "exotic.lookback.floating": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::lookback_floating",
+   "python": "quantforge.exotic.lookback_floating",
+   "java": "Exotic.lookbackFloating",
+   "cpp": "qf::exotic::lookback_floating",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "running_extreme": {
+     "java": "runningExtreme"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "exotic.quanto.price": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::quanto_price",
+   "python": "quantforge.exotic.quanto_price",
+   "java": "Exotic.quantoPrice",
+   "cpp": "qf::exotic::quanto_price",
+   "inputs": {
+    "correlation": {
+     "java": "correlation"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "domestic_rate": {
+     "java": "domesticRate"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "foreign_rate": {
+     "java": "foreignRate"
+    },
+    "fx_vol": {
+     "java": "fxVol"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "exotic.spread.kirk": {
+   "spec": "specifications/04-pricing/exotics.md",
+   "rust": "quantforge::exotic::spread_kirk",
+   "python": "quantforge.exotic.spread_kirk",
+   "java": "Exotic.spreadKirk",
+   "cpp": "qf::exotic::spread_kirk",
+   "inputs": {
+    "correlation": {
+     "java": "correlation"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward_1": {
+     "java": "forward1"
+    },
+    "forward_2": {
+     "java": "forward2"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol_1": {
+     "java": "vol1"
+    },
+    "vol_2": {
+     "java": "vol2"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "fx.atm.strike": {
+   "spec": "specifications/05-volatility/fx-smile.md",
+   "rust": "quantforge::fx::atm_strike",
+   "python": "quantforge.fx.atm_strike",
+   "java": "Fx.atmStrike",
+   "cpp": "qf::fx::atm_strike",
+   "inputs": {
+    "atm_type": {
+     "java": "atmType"
+    },
+    "delta_type": {
+     "java": "deltaType"
+    },
+    "domestic_rate": {
+     "java": "domesticRate"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "foreign_rate": {
+     "java": "foreignRate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "strike"
+   ]
+  },
+  "fx.curve.implied": {
+   "spec": "specifications/02-curves/fx.md",
+   "rust": "quantforge::fx::curve_implied",
+   "python": "quantforge.fx.curve_implied",
+   "java": "Fx.curveImplied",
+   "cpp": "qf::fx::curve_implied",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "base_curve": {
+     "java": "baseCurve"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "points": {
+     "java": "points"
+    },
+    "quote_curve": {
+     "java": "quoteCurve"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "nodes"
+   ]
+  },
+  "fx.delta.from_strike": {
+   "spec": "specifications/05-volatility/fx-smile.md",
+   "rust": "quantforge::fx::delta_from_strike",
+   "python": "quantforge.fx.delta_from_strike",
+   "java": "Fx.deltaFromStrike",
+   "cpp": "qf::fx::delta_from_strike",
+   "inputs": {
+    "domestic_rate": {
+     "java": "domesticRate"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "foreign_rate": {
+     "java": "foreignRate"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "deltas"
+   ]
+  },
+  "fx.delta.to_strike": {
+   "spec": "specifications/05-volatility/fx-smile.md",
+   "rust": "quantforge::fx::delta_to_strike",
+   "python": "quantforge.fx.delta_to_strike",
+   "java": "Fx.deltaToStrike",
+   "cpp": "qf::fx::delta_to_strike",
+   "inputs": {
+    "delta": {
+     "java": "delta"
+    },
+    "delta_type": {
+     "java": "deltaType"
+    },
+    "domestic_rate": {
+     "java": "domesticRate"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "foreign_rate": {
+     "java": "foreignRate"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "strike"
+   ]
+  },
+  "fx.forward.outright": {
+   "spec": "specifications/02-curves/fx.md",
+   "rust": "quantforge::fx::forward_outright",
+   "python": "quantforge.fx.forward_outright",
+   "java": "Fx.forwardOutright",
+   "cpp": "qf::fx::forward_outright",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "base_curve": {
+     "java": "baseCurve"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "quote_curve": {
+     "java": "quoteCurve"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "value_date": {
+     "java": "valueDate"
+    }
+   },
+   "outputs": [
+    "forward",
+    "points"
+   ]
+  },
+  "fx.forward.pv": {
+   "spec": "specifications/02-curves/fx.md",
+   "rust": "quantforge::fx::forward_pv",
+   "python": "quantforge.fx.forward_pv",
+   "java": "Fx.forwardPv",
+   "cpp": "qf::fx::forward_pv",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "base_curve": {
+     "java": "baseCurve"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "quote_curve": {
+     "java": "quoteCurve"
+    },
+    "snapshot_id": {
+     "java": "snapshotId"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "fx_delta",
+    "valuation"
+   ]
+  },
+  "fx.ndf.pv": {
+   "spec": "specifications/02-curves/cross-currency.md",
+   "rust": "quantforge::fx::ndf_pv",
+   "python": "quantforge.fx.ndf_pv",
+   "java": "Fx.ndfPv",
+   "cpp": "qf::fx::ndf_pv",
+   "inputs": {
+    "fixing": {
+     "java": "fixing"
+    },
+    "offshore_curve": {
+     "java": "offshoreCurve"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "trade": {
+     "java": "trade"
+    },
+    "usd_curve": {
+     "java": "usdCurve"
+    }
+   },
+   "outputs": [
+    "forward",
+    "pv"
+   ]
+  },
+  "fx.option.price": {
+   "spec": "specifications/05-volatility/fx-smile.md",
+   "rust": "quantforge::fx::option_price",
+   "python": "quantforge.fx.option_price",
+   "java": "Fx.optionPrice",
+   "cpp": "qf::fx::option_price",
+   "inputs": {
+    "domestic_rate": {
+     "java": "domesticRate"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "foreign_rate": {
+     "java": "foreignRate"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "delta",
+    "forward",
+    "gamma",
+    "premium_pct_foreign",
+    "price",
+    "vega"
+   ]
+  },
+  "fx.smile.from_quotes": {
+   "spec": "specifications/05-volatility/fx-smile.md",
+   "rust": "quantforge::fx::smile_from_quotes",
+   "python": "quantforge.fx.smile_from_quotes",
+   "java": "Fx.smileFromQuotes",
+   "cpp": "qf::fx::smile_from_quotes",
+   "inputs": {
+    "atm_type": {
+     "java": "atmType"
+    },
+    "atm_vol": {
+     "java": "atmVol"
+    },
+    "bf": {
+     "java": "bf"
+    },
+    "delta": {
+     "java": "delta"
+    },
+    "delta_type": {
+     "java": "deltaType"
+    },
+    "domestic_rate": {
+     "java": "domesticRate"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "foreign_rate": {
+     "java": "foreignRate"
+    },
+    "rr": {
+     "java": "rr"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "atm_strike",
+    "call_strike",
+    "call_vol",
+    "put_strike",
+    "put_vol"
+   ]
+  },
+  "fx.spot_date": {
+   "spec": "specifications/02-curves/fx.md",
+   "rust": "quantforge::fx::spot_date_",
+   "python": "quantforge.fx.spot_date_",
+   "java": "Fx.spotDate",
+   "cpp": "qf::fx::spot_date_",
+   "inputs": {
+    "pair": {
+     "java": "pair"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "spot_date"
+   ]
+  },
+  "fx.swap.pv": {
+   "spec": "specifications/02-curves/fx.md",
+   "rust": "quantforge::fx::swap_pv",
+   "python": "quantforge.fx.swap_pv",
+   "java": "Fx.swapPv",
+   "cpp": "qf::fx::swap_pv",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "base_curve": {
+     "java": "baseCurve"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "quote_curve": {
+     "java": "quoteCurve"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "fx_delta",
+    "valuation"
+   ]
+  },
+  "fx.xccy.bootstrap": {
+   "spec": "specifications/02-curves/cross-currency.md",
+   "rust": "quantforge::fx::xccy_bootstrap",
+   "python": "quantforge.fx.xccy_bootstrap",
+   "java": "Fx.xccyBootstrap",
+   "cpp": "qf::fx::xccy_bootstrap",
+   "inputs": {
+    "domestic": {
+     "java": "domestic"
+    },
+    "domestic_convention": {
+     "java": "domesticConvention"
+    },
+    "foreign_convention": {
+     "java": "foreignConvention"
+    },
+    "foreign_projection": {
+     "java": "foreignProjection"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "pillars"
+   ]
+  },
+  "fx.xccy.pv": {
+   "spec": "specifications/02-curves/cross-currency.md",
+   "rust": "quantforge::fx::xccy_pv",
+   "python": "quantforge.fx.xccy_pv",
+   "java": "Fx.xccyPv",
+   "cpp": "qf::fx::xccy_pv",
+   "inputs": {
+    "domestic": {
+     "java": "domestic"
+    },
+    "foreign_discount": {
+     "java": "foreignDiscount"
+    },
+    "foreign_projection": {
+     "java": "foreignProjection"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "domestic_leg",
+    "foreign_leg",
+    "pv"
+   ]
+  },
+  "hedge.solve": {
+   "spec": "specifications/08-hedging/stage-b-hedges.md",
+   "rust": "quantforge::hedge::solve_",
+   "python": "quantforge.hedge.solve_",
+   "java": "Hedge.solve",
+   "cpp": "qf::hedge::solve_",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "costs": {
+     "java": "costs"
+    },
+    "lambda": {
+     "java": "lambda"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "objective",
+    "residual",
+    "x"
+   ]
+  },
+  "hedge.spread_cost": {
+   "spec": "specifications/08-hedging/stage-b-hedges.md",
+   "rust": "quantforge::hedge::spread_cost_",
+   "python": "quantforge.hedge.spread_cost_",
+   "java": "Hedge.spreadCost",
+   "cpp": "qf::hedge::spread_cost_",
+   "inputs": {
+    "half_spreads": {
+     "java": "halfSpreads"
+    },
+    "quantities": {
+     "java": "quantities"
+    }
+   },
+   "outputs": [
+    "cost"
+   ]
+  },
+  "infl.cap.yoy_price": {
+   "spec": "specifications/05-volatility/rates-vol-cube.md",
+   "rust": "quantforge::infl::cap_yoy_price",
+   "python": "quantforge.infl.cap_yoy_price",
+   "java": "Infl.capYoyPrice",
+   "cpp": "qf::infl::cap_yoy_price",
+   "inputs": {
+    "model": {
+     "java": "model"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "periods": {
+     "java": "periods"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "type": {
+     "java": "type"
+    }
+   },
+   "outputs": [
+    "caplets",
+    "price"
+   ]
+  },
+  "infl.cap.zc_price": {
+   "spec": "specifications/05-volatility/rates-vol-cube.md",
+   "rust": "quantforge::infl::cap_zc_price",
+   "python": "quantforge.infl.cap_zc_price",
+   "java": "Infl.capZcPrice",
+   "cpp": "qf::infl::cap_zc_price",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "forward_index_ratio": {
+     "java": "forwardIndexRatio"
+    },
+    "model": {
+     "java": "model"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "type": {
+     "java": "type"
+    },
+    "vol": {
+     "java": "vol"
+    },
+    "years": {
+     "java": "years"
+    }
+   },
+   "outputs": [
+    "price",
+    "strike_ratio"
+   ]
+  },
+  "infl.curve.cpi": {
+   "spec": "specifications/02-curves/inflation.md",
+   "rust": "quantforge::infl::curve_cpi",
+   "python": "quantforge.infl.curve_cpi",
+   "java": "Infl.curveCpi",
+   "cpp": "qf::infl::curve_cpi",
+   "inputs": {
+    "base_cpi": {
+     "java": "baseCpi"
+    },
+    "base_month": {
+     "java": "baseMonth"
+    },
+    "months": {
+     "java": "months"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "seasonality": {
+     "java": "seasonality"
+    }
+   },
+   "outputs": [
+    "cpi"
+   ]
+  },
+  "infl.linker.price": {
+   "spec": "specifications/02-curves/inflation.md",
+   "rust": "quantforge::infl::linker_price",
+   "python": "quantforge.infl.linker_price",
+   "java": "Infl.linkerPrice",
+   "cpp": "qf::infl::linker_price",
+   "inputs": {
+    "base_ref_cpi": {
+     "java": "baseRefCpi"
+    },
+    "bond": {
+     "java": "bond"
+    },
+    "cpi_fixings": {
+     "java": "cpiFixings"
+    },
+    "real_yield": {
+     "java": "realYield"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "index_ratio",
+    "nominal_accrued",
+    "nominal_clean",
+    "real_accrued",
+    "real_clean",
+    "ref_cpi"
+   ]
+  },
+  "infl.linker.price_curve": {
+   "spec": "specifications/02-curves/inflation.md",
+   "rust": "quantforge::infl::linker_price_curve",
+   "python": "quantforge.infl.linker_price_curve",
+   "java": "Infl.linkerPriceCurve",
+   "cpp": "qf::infl::linker_price_curve",
+   "inputs": {
+    "base_ref_cpi": {
+     "java": "baseRefCpi"
+    },
+    "bond": {
+     "java": "bond"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "settlement": {
+     "java": "settlement"
+    }
+   },
+   "outputs": [
+    "nominal_dirty"
+   ]
+  },
+  "infl.zcis.pv": {
+   "spec": "specifications/02-curves/inflation.md",
+   "rust": "quantforge::infl::zcis_pv",
+   "python": "quantforge.infl.zcis_pv",
+   "java": "Infl.zcisPv",
+   "cpp": "qf::infl::zcis_pv",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "index_ratio",
+    "pv"
+   ]
+  },
+  "mbs.cashflows": {
+   "spec": "specifications/04-pricing/mbs.md",
+   "rust": "quantforge::mbs::cashflows_",
+   "python": "quantforge.mbs.cashflows_",
+   "java": "Mbs.cashflows",
+   "cpp": "qf::mbs::cashflows_",
+   "inputs": {
+    "pool": {
+     "java": "pool"
+    }
+   },
+   "outputs": [
+    "balance",
+    "interest",
+    "prepayment",
+    "scheduled_principal",
+    "wal"
+   ]
+  },
+  "mbs.price": {
+   "spec": "specifications/04-pricing/mbs.md",
+   "rust": "quantforge::mbs::price_",
+   "python": "quantforge.mbs.price_",
+   "java": "Mbs.price",
+   "cpp": "qf::mbs::price_",
+   "inputs": {
+    "delay_days": {
+     "java": "delayDays"
+    },
+    "pool": {
+     "java": "pool"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "modified_duration",
+    "price",
+    "wal"
+   ]
+  },
+  "rates.basis.ois_spread": {
+   "spec": "specifications/02-curves/csa-and-basis.md",
+   "rust": "quantforge::rates::basis_ois_spread",
+   "python": "quantforge.rates.basis_ois_spread",
+   "java": "Rates.basisOisSpread",
+   "cpp": "qf::rates::basis_ois_spread",
+   "inputs": {
+    "convention": {
+     "java": "convention"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "projection_a": {
+     "java": "projectionA"
+    },
+    "projection_b": {
+     "java": "projectionB"
+    },
+    "tenor": {
+     "java": "tenor"
+    }
+   },
+   "outputs": [
+    "spread"
+   ]
+  },
+  "rates.basis.spread": {
+   "spec": "specifications/02-curves/projection-and-fra.md",
+   "rust": "quantforge::rates::basis_spread",
+   "python": "quantforge.rates.basis_spread",
+   "java": "Rates.basisSpread",
+   "cpp": "qf::rates::basis_spread",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "index": {
+     "java": "index"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "tenor_months": {
+     "java": "tenorMonths"
+    }
+   },
+   "outputs": [
+    "spread"
+   ]
+  },
+  "rates.bondfut.implied_vol": {
+   "spec": "specifications/05-volatility/rates-vol-cube.md",
+   "rust": "quantforge::rates::bondfut_implied_vol",
+   "python": "quantforge.rates.bondfut_implied_vol",
+   "java": "Rates.bondfutImpliedVol",
+   "cpp": "qf::rates::bondfut_implied_vol",
+   "inputs": {
+    "ctd_modified_duration": {
+     "java": "ctdModifiedDuration"
+    },
+    "ctd_yield": {
+     "java": "ctdYield"
+    },
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "futures_price": {
+     "java": "futuresPrice"
+    },
+    "premium": {
+     "java": "premium"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "type": {
+     "java": "type"
+    }
+   },
+   "outputs": [
+    "price_vol",
+    "yield_vol"
+   ]
+  },
+  "rates.bondfut.option_price": {
+   "spec": "specifications/05-volatility/rates-vol-cube.md",
+   "rust": "quantforge::rates::bondfut_option_price",
+   "python": "quantforge.rates.bondfut_option_price",
+   "java": "Rates.bondfutOptionPrice",
+   "cpp": "qf::rates::bondfut_option_price",
+   "inputs": {
+    "contract_size": {
+     "java": "contractSize"
+    },
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "futures_price": {
+     "java": "futuresPrice"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "type": {
+     "java": "type"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "contract_value",
+    "price"
+   ]
+  },
+  "rates.cap.price": {
+   "spec": "specifications/05-volatility/caps-and-swaptions.md",
+   "rust": "quantforge::rates::cap_price",
+   "python": "quantforge.rates.cap_price",
+   "java": "Rates.capPrice",
+   "cpp": "qf::rates::cap_price",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "model": {
+     "java": "model"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "trade": {
+     "java": "trade"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "caplets",
+    "price"
+   ]
+  },
+  "rates.cap.strip": {
+   "spec": "specifications/05-volatility/rates-vol-cube.md",
+   "rust": "quantforge::rates::cap_strip",
+   "python": "quantforge.rates.cap_strip",
+   "java": "Rates.capStrip",
+   "cpp": "qf::rates::cap_strip",
+   "inputs": {
+    "cap_tenors_months": {
+     "java": "capTenorsMonths"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "flat_vols": {
+     "java": "flatVols"
+    },
+    "model": {
+     "java": "model"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "start_months": {
+     "java": "startMonths"
+    },
+    "strike": {
+     "java": "strike"
+    }
+   },
+   "outputs": [
+    "cap_prices",
+    "caplet_vols"
+   ]
+  },
+  "rates.csa.discount": {
+   "spec": "specifications/02-curves/csa-and-basis.md",
+   "rust": "quantforge::rates::csa_discount",
+   "python": "quantforge.rates.csa_discount",
+   "java": "Rates.csaDiscount",
+   "cpp": "qf::rates::csa_discount",
+   "inputs": {
+    "collateral_spread": {
+     "java": "collateralSpread"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "dates": {
+     "java": "dates"
+    },
+    "fx": {
+     "java": "fx"
+    }
+   },
+   "outputs": [
+    "discount_factors"
+   ]
+  },
+  "rates.curve.discount": {
+   "spec": "specifications/02-curves/curve-framework.md",
+   "rust": "quantforge::rates::curve_discount",
+   "python": "quantforge.rates.curve_discount",
+   "java": "Rates.curveDiscount",
+   "cpp": "qf::rates::curve_discount",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "dates": {
+     "java": "dates"
+    }
+   },
+   "outputs": [
+    "discount_factors",
+    "zero_rates"
+   ]
+  },
+  "rates.curve.forward": {
+   "spec": "specifications/02-curves/curve-framework.md",
+   "rust": "quantforge::rates::curve_forward",
+   "python": "quantforge.rates.curve_forward",
+   "java": "Rates.curveForward",
+   "cpp": "qf::rates::curve_forward",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "day_count": {
+     "java": "dayCount"
+    },
+    "end": {
+     "java": "end"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "forward"
+   ]
+  },
+  "rates.curve.joint_bootstrap": {
+   "spec": "specifications/02-curves/csa-and-basis.md",
+   "rust": "quantforge::rates::curve_joint_bootstrap",
+   "python": "quantforge.rates.curve_joint_bootstrap",
+   "java": "Rates.curveJointBootstrap",
+   "cpp": "qf::rates::curve_joint_bootstrap",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "index": {
+     "java": "index"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "method": {
+     "java": "method"
+    },
+    "ois_quotes": {
+     "java": "oisQuotes"
+    },
+    "term_quotes": {
+     "java": "termQuotes"
+    }
+   },
+   "outputs": [
+    "discount_pillars",
+    "projection_pillars"
+   ]
+  },
+  "rates.fallback.rate": {
+   "spec": "specifications/02-curves/overnight-compounding.md",
+   "rust": "quantforge::rates::fallback_rate",
+   "python": "quantforge.rates.fallback_rate",
+   "java": "Rates.fallbackRate",
+   "cpp": "qf::rates::fallback_rate",
+   "inputs": {
+    "end": {
+     "java": "end"
+    },
+    "fixings": {
+     "java": "fixings"
+    },
+    "ibor": {
+     "java": "ibor"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "compounded_rate",
+    "fallback_rate",
+    "spread_adjustment"
+   ]
+  },
+  "rates.fra.pv": {
+   "spec": "specifications/02-curves/projection-and-fra.md",
+   "rust": "quantforge::rates::fra_pv",
+   "python": "quantforge.rates.fra_pv",
+   "java": "Rates.fraPv",
+   "cpp": "qf::rates::fra_pv",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "forward_rate",
+    "valuation"
+   ]
+  },
+  "rates.futures.convexity": {
+   "spec": "specifications/02-curves/futures-convexity.md",
+   "rust": "quantforge::rates::futures_convexity",
+   "python": "quantforge.rates.futures_convexity",
+   "java": "Rates.futuresConvexity",
+   "cpp": "qf::rates::futures_convexity",
+   "inputs": {
+    "end_years": {
+     "java": "endYears"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "price": {
+     "java": "price"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "start_years": {
+     "java": "startYears"
+    }
+   },
+   "outputs": [
+    "convexity",
+    "forward_rate",
+    "futures_rate"
+   ]
+  },
+  "rates.ois.bootstrap": {
+   "spec": "specifications/02-curves/csa-and-basis.md",
+   "rust": "quantforge::rates::ois_bootstrap",
+   "python": "quantforge.rates.ois_bootstrap",
+   "java": "Rates.oisBootstrap",
+   "cpp": "qf::rates::ois_bootstrap",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "jumps": {
+     "java": "jumps"
+    },
+    "method": {
+     "java": "method"
+    },
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "pillars"
+   ]
+  },
+  "rates.ois.compound": {
+   "spec": "specifications/02-curves/ois-curves.md",
+   "rust": "quantforge::rates::ois_compound",
+   "python": "quantforge.rates.ois_compound",
+   "java": "Rates.oisCompound",
+   "cpp": "qf::rates::ois_compound",
+   "inputs": {
+    "days": {
+     "java": "days"
+    },
+    "denominator": {
+     "java": "denominator"
+    },
+    "rates": {
+     "java": "rates"
+    }
+   },
+   "outputs": [
+    "compounded_rate"
+   ]
+  },
+  "rates.ois.compound_dated": {
+   "spec": "specifications/02-curves/overnight-compounding.md",
+   "rust": "quantforge::rates::ois_compound_dated",
+   "python": "quantforge.rates.ois_compound_dated",
+   "java": "Rates.oisCompoundDated",
+   "cpp": "qf::rates::ois_compound_dated",
+   "inputs": {
+    "convention": {
+     "java": "convention"
+    },
+    "end": {
+     "java": "end"
+    },
+    "fixings": {
+     "java": "fixings"
+    },
+    "method": {
+     "java": "method"
+    },
+    "shift_days": {
+     "java": "shiftDays"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "accrual",
+    "compounded_rate",
+    "interest"
+   ]
+  },
+  "rates.ois.fit_steps": {
+   "spec": "specifications/02-curves/meeting-steps.md",
+   "rust": "quantforge::rates::ois_fit_steps",
+   "python": "quantforge.rates.ois_fit_steps",
+   "java": "Rates.oisFitSteps",
+   "cpp": "qf::rates::ois_fit_steps",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "jumps": {
+     "java": "jumps"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "step_dates": {
+     "java": "stepDates"
+    }
+   },
+   "outputs": [
+    "base_rate",
+    "step_rates"
+   ]
+  },
+  "rates.ois.pv": {
+   "spec": "specifications/02-curves/ois-curves.md",
+   "rust": "quantforge::rates::ois_pv",
+   "python": "quantforge.rates.ois_pv",
+   "java": "Rates.oisPv",
+   "cpp": "qf::rates::ois_pv",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "snapshot_id": {
+     "java": "snapshotId"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "annuity",
+    "par_rate",
+    "valuation"
+   ]
+  },
+  "rates.ois.step_curve": {
+   "spec": "specifications/02-curves/meeting-steps.md",
+   "rust": "quantforge::rates::ois_step_curve",
+   "python": "quantforge.rates.ois_step_curve",
+   "java": "Rates.oisStepCurve",
+   "cpp": "qf::rates::ois_step_curve",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "base_rate": {
+     "java": "baseRate"
+    },
+    "dates": {
+     "java": "dates"
+    },
+    "jumps": {
+     "java": "jumps"
+    },
+    "steps": {
+     "java": "steps"
+    }
+   },
+   "outputs": [
+    "discount_factors",
+    "overnight_forwards"
+   ]
+  },
+  "rates.projection.bootstrap": {
+   "spec": "specifications/02-curves/csa-and-basis.md",
+   "rust": "quantforge::rates::projection_bootstrap",
+   "python": "quantforge.rates.projection_bootstrap",
+   "java": "Rates.projectionBootstrap",
+   "cpp": "qf::rates::projection_bootstrap",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "index": {
+     "java": "index"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "pillars"
+   ]
+  },
+  "rates.schedule.generate": {
+   "spec": "specifications/02-curves/schedules.md",
+   "rust": "quantforge::rates::schedule_generate",
+   "python": "quantforge.rates.schedule_generate",
+   "java": "Rates.scheduleGenerate",
+   "cpp": "qf::rates::schedule_generate",
+   "inputs": {
+    "calendar": {
+     "java": "calendar"
+    },
+    "end": {
+     "java": "end"
+    },
+    "end_of_month": {
+     "java": "endOfMonth"
+    },
+    "frequency_months": {
+     "java": "frequencyMonths"
+    },
+    "payment_lag": {
+     "java": "paymentLag"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "periods"
+   ]
+  },
+  "rates.swap.pv": {
+   "spec": "specifications/02-curves/projection-and-fra.md",
+   "rust": "quantforge::rates::swap_pv",
+   "python": "quantforge.rates.swap_pv",
+   "java": "Rates.swapPv",
+   "cpp": "qf::rates::swap_pv",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "par_rate",
+    "valuation"
+   ]
+  },
+  "rates.swaption.price": {
+   "spec": "specifications/05-volatility/caps-and-swaptions.md",
+   "rust": "quantforge::rates::swaption_price",
+   "python": "quantforge.rates.swaption_price",
+   "java": "Rates.swaptionPrice",
+   "cpp": "qf::rates::swaption_price",
+   "inputs": {
+    "discount": {
+     "java": "discount"
+    },
+    "model": {
+     "java": "model"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "trade": {
+     "java": "trade"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "annuity",
+    "forward_rate",
+    "price"
+   ]
+  },
+  "rates.swaption.price_cube": {
+   "spec": "specifications/05-volatility/rates-vol-cube.md",
+   "rust": "quantforge::rates::swaption_price_cube",
+   "python": "quantforge.rates.swaption_price_cube",
+   "java": "Rates.swaptionPriceCube",
+   "cpp": "qf::rates::swaption_price_cube",
+   "inputs": {
+    "cube": {
+     "java": "cube"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "projection": {
+     "java": "projection"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "annuity",
+    "forward_rate",
+    "price",
+    "sabr",
+    "vol"
+   ]
+  },
+  "repo.forward": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::repo::forward_",
+   "python": "quantforge.repo.forward_",
+   "java": "Repo.forward",
+   "cpp": "qf::repo::forward_",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "clean_price": {
+     "java": "cleanPrice"
+    },
+    "end": {
+     "java": "end"
+    },
+    "gc_rate": {
+     "java": "gcRate"
+    },
+    "repo_rate": {
+     "java": "repoRate"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "dirty",
+    "forward_clean",
+    "forward_dirty",
+    "interest",
+    "special_spread",
+    "specialness_value"
+   ]
+  },
+  "repo.implied_rate": {
+   "spec": "specifications/04-pricing/bonds.md",
+   "rust": "quantforge::repo::implied_rate_",
+   "python": "quantforge.repo.implied_rate_",
+   "java": "Repo.impliedRate",
+   "cpp": "qf::repo::implied_rate_",
+   "inputs": {
+    "bond": {
+     "java": "bond"
+    },
+    "clean_price": {
+     "java": "cleanPrice"
+    },
+    "end": {
+     "java": "end"
+    },
+    "forward_clean": {
+     "java": "forwardClean"
+    },
+    "start": {
+     "java": "start"
+    }
+   },
+   "outputs": [
+    "repo_rate"
+   ]
+  },
+  "risk.cashflows": {
+   "spec": "specifications/06-risk/rates-sensitivities.md",
+   "rust": "quantforge::risk::cashflows_",
+   "python": "quantforge.risk.cashflows_",
+   "java": "Risk.cashflows",
+   "cpp": "qf::risk::cashflows_",
+   "inputs": {
+    "cashflows": {
+     "java": "cashflows"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "convexity",
+    "duration",
+    "pv"
+   ]
+  },
+  "risk.corr.dispersion": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::risk::corr_dispersion",
+   "python": "quantforge.risk.corr_dispersion",
+   "java": "Risk.corrDispersion",
+   "cpp": "qf::risk::corr_dispersion",
+   "inputs": {
+    "index_realized_vol": {
+     "java": "indexRealizedVol"
+    },
+    "index_vol_strike": {
+     "java": "indexVolStrike"
+    },
+    "realized_vols": {
+     "java": "realizedVols"
+    },
+    "vega_notional": {
+     "java": "vegaNotional"
+    },
+    "vol_strikes": {
+     "java": "volStrikes"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "constituent_variance_notionals",
+    "implied_correlation",
+    "index_variance_notional",
+    "pnl",
+    "realized_correlation"
+   ]
+  },
+  "risk.corr.implied": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::risk::corr_implied",
+   "python": "quantforge.risk.corr_implied",
+   "java": "Risk.corrImplied",
+   "cpp": "qf::risk::corr_implied",
+   "inputs": {
+    "index_vol": {
+     "java": "indexVol"
+    },
+    "vols": {
+     "java": "vols"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "correlation"
+   ]
+  },
+  "risk.corr.nearest": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::risk::corr_nearest",
+   "python": "quantforge.risk.corr_nearest",
+   "java": "Risk.corrNearest",
+   "cpp": "qf::risk::corr_nearest",
+   "inputs": {
+    "matrix": {
+     "java": "matrix"
+    }
+   },
+   "outputs": [
+    "frobenius_distance",
+    "matrix"
+   ]
+  },
+  "risk.corr.validate": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::risk::corr_validate",
+   "python": "quantforge.risk.corr_validate",
+   "java": "Risk.corrValidate",
+   "cpp": "qf::risk::corr_validate",
+   "inputs": {
+    "matrix": {
+     "java": "matrix"
+    }
+   },
+   "outputs": [
+    "in_range",
+    "min_eigenvalue",
+    "psd",
+    "symmetric",
+    "unit_diagonal",
+    "valid"
+   ]
+  },
+  "risk.curve.jacobian": {
+   "spec": "specifications/06-risk/par-and-key-rate.md",
+   "rust": "quantforge::risk::curve_jacobian",
+   "python": "quantforge.risk.curve_jacobian",
+   "java": "Risk.curveJacobian",
+   "cpp": "qf::risk::curve_jacobian",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "bump_bp": {
+     "java": "bumpBp"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "jacobian",
+    "pillar_dates",
+    "zero_rates"
+   ]
+  },
+  "risk.curve.key_rate": {
+   "spec": "specifications/06-risk/par-and-key-rate.md",
+   "rust": "quantforge::risk::curve_key_rate",
+   "python": "quantforge.risk.curve_key_rate",
+   "java": "Risk.curveKeyRate",
+   "cpp": "qf::risk::curve_key_rate",
+   "inputs": {
+    "bump_bp": {
+     "java": "bumpBp"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "key_dates": {
+     "java": "keyDates"
+    },
+    "mode": {
+     "java": "mode"
+    },
+    "product": {
+     "java": "product"
+    },
+    "scheme": {
+     "java": "scheme"
+    }
+   },
+   "outputs": [
+    "key_rates",
+    "value",
+    "zero_dv01"
+   ]
+  },
+  "risk.curve.par": {
+   "spec": "specifications/06-risk/par-and-key-rate.md",
+   "rust": "quantforge::risk::curve_par",
+   "python": "quantforge.risk.curve_par",
+   "java": "Risk.curvePar",
+   "cpp": "qf::risk::curve_par",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "bump_bp": {
+     "java": "bumpBp"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "product": {
+     "java": "product"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "scheme": {
+     "java": "scheme"
+    }
+   },
+   "outputs": [
+    "par_buckets",
+    "par_dv01",
+    "value"
+   ]
+  },
+  "risk.ois.dv01": {
+   "spec": "specifications/01-core/limits.md",
+   "rust": "quantforge::risk::ois_dv01",
+   "python": "quantforge.risk.ois_dv01",
+   "java": "Risk.oisDv01",
+   "cpp": "qf::risk::ois_dv01",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "dv01",
+    "key_rate"
+   ]
+  },
+  "risk.pnl.explain": {
+   "spec": "specifications/06-risk/pnl-explain.md",
+   "rust": "quantforge::risk::pnl_explain",
+   "python": "quantforge.risk.pnl_explain",
+   "java": "Risk.pnlExplain",
+   "cpp": "qf::risk::pnl_explain",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "bump_bp": {
+     "java": "bumpBp"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "product": {
+     "java": "product"
+    },
+    "quotes_end": {
+     "java": "quotesEnd"
+    },
+    "quotes_start": {
+     "java": "quotesStart"
+    }
+   },
+   "outputs": [
+    "explained",
+    "full_pnl",
+    "gross_risk_pnl",
+    "par_buckets",
+    "risk_pnl",
+    "threshold",
+    "unexplained",
+    "value_end",
+    "value_start"
+   ]
+  },
+  "risk.vol.bump_greeks": {
+   "spec": "specifications/06-risk/vol-greeks.md",
+   "rust": "quantforge::risk::vol_bump_greeks",
+   "python": "quantforge.risk.vol_bump_greeks",
+   "java": "Risk.volBumpGreeks",
+   "cpp": "qf::risk::vol_bump_greeks",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "model": {
+     "java": "model"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "delta",
+    "gamma",
+    "vanna",
+    "vega",
+    "volga"
+   ]
+  },
+  "risk.vol.greeks": {
+   "spec": "specifications/06-risk/vol-greeks.md",
+   "rust": "quantforge::risk::vol_greeks",
+   "python": "quantforge.risk.vol_greeks",
+   "java": "Risk.volGreeks",
+   "cpp": "qf::risk::vol_greeks",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "model": {
+     "java": "model"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "shift": {
+     "java": "shift"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "delta",
+    "gamma",
+    "price",
+    "rho",
+    "theta",
+    "vanna",
+    "vega",
+    "volga"
+   ]
+  },
+  "risk.vol.surface_vega": {
+   "spec": "specifications/06-risk/vol-greeks.md",
+   "rust": "quantforge::risk::vol_surface_vega",
+   "python": "quantforge.risk.vol_surface_vega",
+   "java": "Risk.volSurfaceVega",
+   "cpp": "qf::risk::vol_surface_vega",
+   "inputs": {
+    "positions": {
+     "java": "positions"
+    },
+    "surface": {
+     "java": "surface"
+    }
+   },
+   "outputs": [
+    "bucket_sum",
+    "bucket_vega",
+    "parallel_vega",
+    "pv"
+   ]
+  },
+  "usecase.fx_hedge": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::usecase::fx_hedge_",
+   "python": "quantforge.usecase.fx_hedge_",
+   "java": "Usecase.fxHedge",
+   "cpp": "qf::usecase::fx_hedge_",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "base_curve": {
+     "java": "baseCurve"
+    },
+    "book": {
+     "java": "book"
+    },
+    "half_spread": {
+     "java": "halfSpread"
+    },
+    "pair": {
+     "java": "pair"
+    },
+    "quote_curve": {
+     "java": "quoteCurve"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "fx_delta",
+    "hedge_cost",
+    "hedge_spot_base",
+    "pv",
+    "residual_delta"
+   ]
+  },
+  "usecase.rates_hedge": {
+   "spec": "specifications/stage-b-rulings.md",
+   "rust": "quantforge::usecase::rates_hedge_",
+   "python": "quantforge.usecase.rates_hedge_",
+   "java": "Usecase.ratesHedge",
+   "cpp": "qf::usecase::rates_hedge_",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "half_spread_bp": {
+     "java": "halfSpreadBp"
+    },
+    "hedge_tenors": {
+     "java": "hedgeTenors"
+    },
+    "hedge_unit_notional": {
+     "java": "hedgeUnitNotional"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "trade": {
+     "java": "trade"
+    }
+   },
+   "outputs": [
+    "dv01",
+    "hedge_cost",
+    "hedge_units",
+    "key_rate",
+    "pv",
+    "residual_key_rate"
+   ]
+  },
+  "usecase.vol_surface": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::usecase::vol_surface_",
+   "python": "quantforge.usecase.vol_surface_",
+   "java": "Usecase.volSurface",
+   "cpp": "qf::usecase::vol_surface_",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "currency": {
+     "java": "currency"
+    },
+    "funding_curve": {
+     "java": "fundingCurve"
+    },
+    "k_grid": {
+     "java": "kGrid"
+    },
+    "slices": {
+     "java": "slices"
+    },
+    "target": {
+     "java": "target"
+    }
+   },
+   "outputs": [
+    "arbitrage_free",
+    "delta",
+    "forwards",
+    "svi_rmse",
+    "valuation",
+    "vega",
+    "vol"
+   ]
+  },
+  "vol.bates.price": {
+   "spec": "specifications/05-volatility/heston-family.md",
+   "rust": "quantforge::vol::bates_price",
+   "python": "quantforge.vol.bates_price",
+   "java": "Vol.batesPrice",
+   "cpp": "qf::vol::bates_price",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "heston": {
+     "java": "heston"
+    },
+    "jumps": {
+     "java": "jumps"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strikes": {
+     "java": "strikes"
+    }
+   },
+   "outputs": [
+    "prices"
+   ]
+  },
+  "vol.delta.from_strike": {
+   "spec": "specifications/05-volatility/smile-and-surface.md",
+   "rust": "quantforge::vol::delta_from_strike",
+   "python": "quantforge.vol.delta_from_strike",
+   "java": "Vol.deltaFromStrike",
+   "cpp": "qf::vol::delta_from_strike",
+   "inputs": {
+    "convention": {
+     "java": "convention"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "scale": {
+     "java": "scale"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "delta"
+   ]
+  },
+  "vol.delta.to_strike": {
+   "spec": "specifications/05-volatility/smile-and-surface.md",
+   "rust": "quantforge::vol::delta_to_strike",
+   "python": "quantforge.vol.delta_to_strike",
+   "java": "Vol.deltaToStrike",
+   "cpp": "qf::vol::delta_to_strike",
+   "inputs": {
+    "convention": {
+     "java": "convention"
+    },
+    "delta": {
+     "java": "delta"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "scale": {
+     "java": "scale"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "strike"
+   ]
+  },
+  "vol.equity.price": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::vol::equity_price",
+   "python": "quantforge.vol.equity_price",
+   "java": "Vol.equityPrice",
+   "cpp": "qf::vol::equity_price",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "borrow_curve": {
+     "java": "borrowCurve"
+    },
+    "currency": {
+     "java": "currency"
+    },
+    "dividends": {
+     "java": "dividends"
+    },
+    "expiry": {
+     "java": "expiry"
+    },
+    "funding_curve": {
+     "java": "fundingCurve"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "side": {
+     "java": "side"
+    },
+    "snapshot_id": {
+     "java": "snapshotId"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "delta",
+    "forward",
+    "gamma",
+    "valuation",
+    "vega"
+   ]
+  },
+  "vol.forward.vol": {
+   "spec": "specifications/05-volatility/local-and-forward-vol.md",
+   "rust": "quantforge::vol::forward_vol",
+   "python": "quantforge.vol.forward_vol",
+   "java": "Vol.forwardVol",
+   "cpp": "qf::vol::forward_vol",
+   "inputs": {
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "vols": {
+     "java": "vols"
+    }
+   },
+   "outputs": [
+    "forward_vols"
+   ]
+  },
+  "vol.garch.fit": {
+   "spec": "specifications/05-volatility/garch.md",
+   "rust": "quantforge::vol::garch_fit",
+   "python": "quantforge.vol.garch_fit",
+   "java": "Vol.garchFit",
+   "cpp": "qf::vol::garch_fit",
+   "inputs": {
+    "initial_variance": {
+     "java": "initialVariance"
+    },
+    "returns": {
+     "java": "returns"
+    }
+   },
+   "outputs": [
+    "loglik"
+   ]
+  },
+  "vol.garch.forecast": {
+   "spec": "specifications/05-volatility/garch.md",
+   "rust": "quantforge::vol::garch_forecast",
+   "python": "quantforge.vol.garch_forecast",
+   "java": "Vol.garchForecast",
+   "cpp": "qf::vol::garch_forecast",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "beta": {
+     "java": "beta"
+    },
+    "horizon": {
+     "java": "horizon"
+    },
+    "next_variance": {
+     "java": "nextVariance"
+    },
+    "omega": {
+     "java": "omega"
+    },
+    "periods_per_year": {
+     "java": "periodsPerYear"
+    }
+   },
+   "outputs": [
+    "annualized_vol",
+    "long_run_variance",
+    "total_variance",
+    "variances"
+   ]
+  },
+  "vol.garch.loglik": {
+   "spec": "specifications/05-volatility/garch.md",
+   "rust": "quantforge::vol::garch_loglik",
+   "python": "quantforge.vol.garch_loglik",
+   "java": "Vol.garchLoglik",
+   "cpp": "qf::vol::garch_loglik",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "beta": {
+     "java": "beta"
+    },
+    "initial_variance": {
+     "java": "initialVariance"
+    },
+    "omega": {
+     "java": "omega"
+    },
+    "returns": {
+     "java": "returns"
+    }
+   },
+   "outputs": [
+    "loglik",
+    "next_variance",
+    "variances"
+   ]
+  },
+  "vol.heston.cf": {
+   "spec": "specifications/05-volatility/heston-family.md",
+   "rust": "quantforge::vol::heston_cf",
+   "python": "quantforge.vol.heston_cf",
+   "java": "Vol.hestonCf",
+   "cpp": "qf::vol::heston_cf",
+   "inputs": {
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "heston": {
+     "java": "heston"
+    },
+    "u": {
+     "java": "u"
+    }
+   },
+   "outputs": [
+    "im",
+    "re"
+   ]
+  },
+  "vol.heston.price": {
+   "spec": "specifications/05-volatility/heston-family.md",
+   "rust": "quantforge::vol::heston_price",
+   "python": "quantforge.vol.heston_price",
+   "java": "Vol.hestonPrice",
+   "cpp": "qf::vol::heston_price",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "heston": {
+     "java": "heston"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strikes": {
+     "java": "strikes"
+    }
+   },
+   "outputs": [
+    "prices"
+   ]
+  },
+  "vol.local.dupire": {
+   "spec": "specifications/05-volatility/heston-family.md",
+   "rust": "quantforge::vol::local_dupire",
+   "python": "quantforge.vol.local_dupire",
+   "java": "Vol.localDupire",
+   "cpp": "qf::vol::local_dupire",
+   "inputs": {
+    "points": {
+     "java": "points"
+    },
+    "slices": {
+     "java": "slices"
+    }
+   },
+   "outputs": [
+    "implied_vol",
+    "local_vol",
+    "total_variance"
+   ]
+  },
+  "vol.merton.price": {
+   "spec": "specifications/05-volatility/heston-family.md",
+   "rust": "quantforge::vol::merton_price",
+   "python": "quantforge.vol.merton_price",
+   "java": "Vol.mertonPrice",
+   "cpp": "qf::vol::merton_price",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "jumps": {
+     "java": "jumps"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strikes": {
+     "java": "strikes"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "prices"
+   ]
+  },
+  "vol.option.implied": {
+   "spec": "specifications/05-volatility/black-models.md",
+   "rust": "quantforge::vol::option_implied",
+   "python": "quantforge.vol.option_implied",
+   "java": "Vol.optionImplied",
+   "cpp": "qf::vol::option_implied",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "model": {
+     "java": "model"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "price": {
+     "java": "price"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "vol"
+   ]
+  },
+  "vol.option.price": {
+   "spec": "specifications/05-volatility/black-models.md",
+   "rust": "quantforge::vol::option_price",
+   "python": "quantforge.vol.option_price",
+   "java": "Vol.optionPrice",
+   "cpp": "qf::vol::option_price",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "model": {
+     "java": "model"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "shift": {
+     "java": "shift"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    },
+    "yield": {
+     "java": "yield"
+    }
+   },
+   "outputs": [
+    "forward",
+    "price"
+   ]
+  },
+  "vol.sabr.arbfree": {
+   "spec": "specifications/05-volatility/sabr.md",
+   "rust": "quantforge::vol::sabr_arbfree",
+   "python": "quantforge.vol.sabr_arbfree",
+   "java": "Vol.sabrArbfree",
+   "cpp": "qf::vol::sabr_arbfree",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "beta": {
+     "java": "beta"
+    },
+    "cells": {
+     "java": "cells"
+    },
+    "cells_below": {
+     "java": "cellsBelow"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "nu": {
+     "java": "nu"
+    },
+    "rho": {
+     "java": "rho"
+    },
+    "shift": {
+     "java": "shift"
+    },
+    "steps": {
+     "java": "steps"
+    },
+    "strikes": {
+     "java": "strikes"
+    }
+   },
+   "outputs": [
+    "absorbed",
+    "call_prices",
+    "mass",
+    "mean",
+    "min_density",
+    "vols"
+   ]
+  },
+  "vol.sabr.calibrate": {
+   "spec": "specifications/03-calibration/stability.md",
+   "rust": "quantforge::vol::sabr_calibrate",
+   "python": "quantforge.vol.sabr_calibrate",
+   "java": "Vol.sabrCalibrate",
+   "cpp": "qf::vol::sabr_calibrate",
+   "inputs": {
+    "beta": {
+     "java": "beta"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "strikes": {
+     "java": "strikes"
+    },
+    "vols": {
+     "java": "vols"
+    }
+   },
+   "outputs": [
+    "alpha",
+    "nu",
+    "rho",
+    "rmse"
+   ]
+  },
+  "vol.sabr.density": {
+   "spec": "specifications/05-volatility/sabr.md",
+   "rust": "quantforge::vol::sabr_density",
+   "python": "quantforge.vol.sabr_density",
+   "java": "Vol.sabrDensity",
+   "cpp": "qf::vol::sabr_density",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "beta": {
+     "java": "beta"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "h_strike": {
+     "java": "hStrike"
+    },
+    "nu": {
+     "java": "nu"
+    },
+    "on_negative": {
+     "java": "onNegative"
+    },
+    "rho": {
+     "java": "rho"
+    },
+    "shift": {
+     "java": "shift"
+    },
+    "strikes": {
+     "java": "strikes"
+    }
+   },
+   "outputs": [
+    "density",
+    "min_density",
+    "negative_density"
+   ]
+  },
+  "vol.sabr.hagan": {
+   "spec": "specifications/05-volatility/sabr.md",
+   "rust": "quantforge::vol::sabr_hagan",
+   "python": "quantforge.vol.sabr_hagan",
+   "java": "Vol.sabrHagan",
+   "cpp": "qf::vol::sabr_hagan",
+   "inputs": {
+    "alpha": {
+     "java": "alpha"
+    },
+    "beta": {
+     "java": "beta"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "nu": {
+     "java": "nu"
+    },
+    "rho": {
+     "java": "rho"
+    },
+    "shift": {
+     "java": "shift"
+    },
+    "strikes": {
+     "java": "strikes"
+    }
+   },
+   "outputs": [
+    "vols"
+   ]
+  },
+  "vol.slv.leverage": {
+   "spec": "specifications/05-volatility/heston-family.md",
+   "rust": "quantforge::vol::slv_leverage",
+   "python": "quantforge.vol.slv_leverage",
+   "java": "Vol.slvLeverage",
+   "cpp": "qf::vol::slv_leverage",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "grid": {
+     "java": "grid"
+    },
+    "heston": {
+     "java": "heston"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "slices": {
+     "java": "slices"
+    },
+    "spot": {
+     "java": "spot"
+    }
+   },
+   "outputs": [
+    "leverage",
+    "mass",
+    "x"
+   ]
+  },
+  "vol.smile.dynamics": {
+   "spec": "specifications/05-volatility/local-and-forward-vol.md",
+   "rust": "quantforge::vol::smile_dynamics",
+   "python": "quantforge.vol.smile_dynamics",
+   "java": "Vol.smileDynamics",
+   "cpp": "qf::vol::smile_dynamics",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "rule": {
+     "java": "rule"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "spot_shifted": {
+     "java": "spotShifted"
+    },
+    "strikes": {
+     "java": "strikes"
+    },
+    "svi": {
+     "java": "svi"
+    }
+   },
+   "outputs": [
+    "deltas",
+    "prices_base",
+    "prices_shifted",
+    "vols_base",
+    "vols_shifted"
+   ]
+  },
+  "vol.smile.rr_bf": {
+   "spec": "specifications/05-volatility/smile-and-surface.md",
+   "rust": "quantforge::vol::smile_rr_bf",
+   "python": "quantforge.vol.smile_rr_bf",
+   "java": "Vol.smileRrBf",
+   "cpp": "qf::vol::smile_rr_bf",
+   "inputs": {
+    "atm_convention": {
+     "java": "atmConvention"
+    },
+    "atm_vol": {
+     "java": "atmVol"
+    },
+    "bf": {
+     "java": "bf"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "delta": {
+     "java": "delta"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "forward": {
+     "java": "forward"
+    },
+    "rr": {
+     "java": "rr"
+    },
+    "scale": {
+     "java": "scale"
+    }
+   },
+   "outputs": [
+    "atm_strike",
+    "call_strike",
+    "call_vol",
+    "put_strike",
+    "put_vol"
+   ]
+  },
+  "vol.ssvi.calibrate": {
+   "spec": "specifications/05-volatility/smile-and-surface.md",
+   "rust": "quantforge::vol::ssvi_calibrate",
+   "python": "quantforge.vol.ssvi_calibrate",
+   "java": "Vol.ssviCalibrate",
+   "cpp": "qf::vol::ssvi_calibrate",
+   "inputs": {
+    "log_moneyness": {
+     "java": "logMoneyness"
+    },
+    "thetas": {
+     "java": "thetas"
+    },
+    "total_variance": {
+     "java": "totalVariance"
+    }
+   },
+   "outputs": [
+    "eta",
+    "gamma",
+    "rho",
+    "rmse"
+   ]
+  },
+  "vol.ssvi.evaluate": {
+   "spec": "specifications/05-volatility/smile-and-surface.md",
+   "rust": "quantforge::vol::ssvi_evaluate",
+   "python": "quantforge.vol.ssvi_evaluate",
+   "java": "Vol.ssviEvaluate",
+   "cpp": "qf::vol::ssvi_evaluate",
+   "inputs": {
+    "eta": {
+     "java": "eta"
+    },
+    "gamma": {
+     "java": "gamma"
+    },
+    "log_moneyness": {
+     "java": "logMoneyness"
+    },
+    "rho": {
+     "java": "rho"
+    },
+    "thetas": {
+     "java": "thetas"
+    }
+   },
+   "outputs": [
+    "butterfly_free",
+    "calendar_free",
+    "total_variance"
+   ]
+  },
+  "vol.ssvi.to_svi": {
+   "spec": "specifications/05-volatility/arb-free-surfaces.md",
+   "rust": "quantforge::vol::ssvi_to_svi",
+   "python": "quantforge.vol.ssvi_to_svi",
+   "java": "Vol.ssviToSvi",
+   "cpp": "qf::vol::ssvi_to_svi",
+   "inputs": {
+    "eta": {
+     "java": "eta"
+    },
+    "gamma": {
+     "java": "gamma"
+    },
+    "rho": {
+     "java": "rho"
+    },
+    "theta": {
+     "java": "theta"
+    }
+   },
+   "outputs": [
+    "svi"
+   ]
+  },
+  "vol.surface.check": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::vol::surface_check",
+   "python": "quantforge.vol.surface_check",
+   "java": "Vol.surfaceCheck",
+   "cpp": "qf::vol::surface_check",
+   "inputs": {
+    "surface": {
+     "java": "surface"
+    }
+   },
+   "outputs": [
+    "arbitrage_free",
+    "butterfly_violations",
+    "calendar_violations"
+   ]
+  },
+  "vol.surface.query": {
+   "spec": "specifications/05-volatility/smile-and-surface.md",
+   "rust": "quantforge::vol::surface_query",
+   "python": "quantforge.vol.surface_query",
+   "java": "Vol.surfaceQuery",
+   "cpp": "qf::vol::surface_query",
+   "inputs": {
+    "points": {
+     "java": "points"
+    },
+    "surface": {
+     "java": "surface"
+    }
+   },
+   "outputs": [
+    "total_variance",
+    "vols"
+   ]
+  },
+  "vol.svi.calibrate": {
+   "spec": "specifications/03-calibration/stability.md",
+   "rust": "quantforge::vol::svi_calibrate",
+   "python": "quantforge.vol.svi_calibrate",
+   "java": "Vol.sviCalibrate",
+   "cpp": "qf::vol::svi_calibrate",
+   "inputs": {
+    "log_moneyness": {
+     "java": "logMoneyness"
+    },
+    "total_variance": {
+     "java": "totalVariance"
+    }
+   },
+   "outputs": [
+    "rmse",
+    "svi"
+   ]
+  },
+  "vol.svi.evaluate": {
+   "spec": "specifications/05-volatility/smile-and-surface.md",
+   "rust": "quantforge::vol::svi_evaluate",
+   "python": "quantforge.vol.svi_evaluate",
+   "java": "Vol.sviEvaluate",
+   "cpp": "qf::vol::svi_evaluate",
+   "inputs": {
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "log_moneyness": {
+     "java": "logMoneyness"
+    },
+    "svi": {
+     "java": "svi"
+    }
+   },
+   "outputs": [
+    "butterfly_free",
+    "g",
+    "implied_vol",
+    "min_g",
+    "total_variance"
+   ]
+  },
+  "vol.svi.fit_surface": {
+   "spec": "specifications/05-volatility/arb-free-surfaces.md",
+   "rust": "quantforge::vol::svi_fit_surface",
+   "python": "quantforge.vol.svi_fit_surface",
+   "java": "Vol.sviFitSurface",
+   "cpp": "qf::vol::svi_fit_surface",
+   "inputs": {
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "log_moneyness": {
+     "java": "logMoneyness"
+    },
+    "reject": {
+     "java": "reject"
+    },
+    "total_variance": {
+     "java": "totalVariance"
+    }
+   },
+   "outputs": [
+    "arbitrage_free",
+    "butterfly_violations",
+    "calendar_violations",
+    "rmse",
+    "slices",
+    "wing_violations"
+   ]
+  },
+  "vol.svi.surface_check": {
+   "spec": "specifications/05-volatility/arb-free-surfaces.md",
+   "rust": "quantforge::vol::svi_surface_check",
+   "python": "quantforge.vol.svi_surface_check",
+   "java": "Vol.sviSurfaceCheck",
+   "cpp": "qf::vol::svi_surface_check",
+   "inputs": {
+    "log_moneyness": {
+     "java": "logMoneyness"
+    },
+    "reject": {
+     "java": "reject"
+    },
+    "slices": {
+     "java": "slices"
+    }
+   },
+   "outputs": [
+    "arbitrage_free",
+    "butterfly_violations",
+    "calendar_violations",
+    "wing_violations"
+   ]
+  },
+  "vol.varswap.fair_strike": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::vol::varswap_fair_strike",
+   "python": "quantforge.vol.varswap_fair_strike",
+   "java": "Vol.varswapFairStrike",
+   "cpp": "qf::vol::varswap_fair_strike",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "call_strikes": {
+     "java": "callStrikes"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "extension_step": {
+     "java": "extensionStep"
+    },
+    "maturity": {
+     "java": "maturity"
+    },
+    "put_strikes": {
+     "java": "putStrikes"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "variance_notional": {
+     "java": "varianceNotional"
+    },
+    "variance_strike": {
+     "java": "varianceStrike"
+    },
+    "vols": {
+     "java": "vols"
+    }
+   },
+   "outputs": [
+    "fair_variance",
+    "fair_vol",
+    "pv"
+   ]
+  },
+  "vol.varswap.realized": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::vol::varswap_realized",
+   "python": "quantforge.vol.varswap_realized",
+   "java": "Vol.varswapRealized",
+   "cpp": "qf::vol::varswap_realized",
+   "inputs": {
+    "periods_per_year": {
+     "java": "periodsPerYear"
+    },
+    "prices": {
+     "java": "prices"
+    },
+    "variance_notional": {
+     "java": "varianceNotional"
+    },
+    "variance_strike": {
+     "java": "varianceStrike"
+    }
+   },
+   "outputs": [
+    "payoff",
+    "realized_variance",
+    "realized_vol"
+   ]
+  },
+  "vol.vix.index": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::vol::vix_index",
+   "python": "quantforge.vol.vix_index",
+   "java": "Vol.vixIndex",
+   "cpp": "qf::vol::vix_index",
+   "inputs": {
+    "near": {
+     "java": "near"
+    },
+    "next": {
+     "java": "next"
+    }
+   },
+   "outputs": [
+    "index",
+    "near_variance",
+    "next_variance"
+   ]
+  },
+  "vol.vix.term_variance": {
+   "spec": "specifications/05-volatility/stage-e-targets-b.md",
+   "rust": "quantforge::vol::vix_term_variance",
+   "python": "quantforge.vol.vix_term_variance",
+   "java": "Vol.vixTermVariance",
+   "cpp": "qf::vol::vix_term_variance",
+   "inputs": {
+    "minutes_to_expiry": {
+     "java": "minutesToExpiry"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "strip": {
+     "java": "strip"
+    }
+   },
+   "outputs": [
+    "forward",
+    "k0",
+    "strikes_used",
+    "variance"
+   ]
+  },
+  "vol.volofvol.measure": {
+   "spec": "specifications/05-volatility/local-and-forward-vol.md",
+   "rust": "quantforge::vol::volofvol_measure",
+   "python": "quantforge.vol.volofvol_measure",
+   "java": "Vol.volofvolMeasure",
+   "cpp": "qf::vol::volofvol_measure",
+   "inputs": {
+    "method": {
+     "java": "method"
+    },
+    "periods_per_year": {
+     "java": "periodsPerYear"
+    },
+    "vols": {
+     "java": "vols"
+    }
+   },
+   "outputs": [
+    "mean_change",
+    "vol_of_vol"
+   ]
+  }
+ },
+ "unit_warnings": [
+  "bond.frn.price: maturity",
+  "core.calendar.add_tenor: tenor",
+  "core.data.check_quotes: max_relative_spread",
+  "credit.cdsoption.implied_vol: expiry",
+  "credit.cdsoption.implied_vol: maturity",
+  "credit.cdsoption.price: expiry",
+  "credit.cdsoption.price: maturity",
+  "eq.borrow.implied: expiry",
+  "eq.forward.outright: expiry",
+  "eq.futures.basis: expiry",
+  "eq.futures.basis: financing_spread",
+  "rates.basis.ois_spread: tenor",
+  "rates.csa.discount: collateral_spread",
+  "risk.vol.greeks: shift",
+  "usecase.fx_hedge: half_spread",
+  "vol.equity.price: expiry",
+  "vol.garch.forecast: horizon",
+  "vol.option.price: shift",
+  "vol.sabr.arbfree: shift",
+  "vol.sabr.density: shift",
+  "vol.sabr.hagan: shift",
+  "vol.smile.dynamics: spot_shifted",
+  "vol.varswap.fair_strike: maturity",
+  "vol.vix.term_variance: minutes_to_expiry"
+ ],
+ "spec_only": []
+}

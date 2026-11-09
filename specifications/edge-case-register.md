@@ -86,3 +86,11 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | EA18 | Heston and Bates at very short expiry | Pinned | The `heston_e` cases tagged `short-expiry` (7 and 2 days) | Ruling E-A26: the quadrature range grows as `T` falls |
 | EA19 | Lookback with carry near zero | Pinned | The `exotic_e` cases tagged `small-carry` (`b = 1e-5` priced; `b = 1e-12` `E_DOMAIN`) | Ruling E-A28 |
 | EA20 | BAW at a negative rate | Pinned | The `american_e` case with `rate` -1% (`E_DOMAIN`) | Ruling E-A30 |
+
+## Stage F
+
+| # | Edge case | State | Golden | Note |
+|---|---|---|---|---|
+| F1 | NaN, +inf or -inf in any Real input of any operation | Pinned | `stage_f/e1_*.json`, tags `non_finite` (three per Real leaf, every operation with an ok golden) | Rules F-1, F-2: `E_DOMAIN`, checked first. JSON cannot write them, so they travel as the strings `"NaN"`, `"Infinity"`, `"-Infinity"` |
+| F2 | Negative zero in any Real input | Pinned | `stage_f/e1_*.json`, tags `negative_zero` (and `zero_anchor`) | Rule F-3: same result as `+0.0`. Catches sign-bit branches and `1/x` with `x = -0.0` |
+| F3 | Overflowing number literal (`1e400`) as an operation input | Rule only | none (a JSON runner cannot send it through `json.dumps`) | Still `E_SCHEMA` (`cli-contract.md`, value encoding), unchanged by F-1; covered by the fuzz harness, not a golden |
