@@ -42,10 +42,11 @@ jobs:
         continue-on-error: true # a failed source is logged as a failure row, and the gap monitor judges it
         run: python3 code/tools/recorder/record.py --data "$RUNNER_TEMP/raw" --log log/actions/log.jsonl
       - run: python3 code/tools/forward-log/forward_log.py verify --log log/actions/log.jsonl
+      - run: python3 code/tools/recorder/gap_monitor.py recheck --log log/actions/log.jsonl
       - name: Gap report
         id: gaps
         continue-on-error: true
-        run: python3 code/tools/recorder/gap_monitor.py gaps --log log/actions/log.jsonl --holidays code/tools/recorder/holidays.txt --out log/actions/gaps.md
+        run: python3 code/tools/recorder/gap_monitor.py gaps --log log/actions/log.jsonl --holidays code/tools/recorder/holidays.txt --studies code/tools/recorder/studies.json --out log/actions/gaps.md
       - name: Push rows
         run: |
           cd log
@@ -59,5 +60,5 @@ jobs:
       - name: Fail on recent gaps
         if: steps.gaps.outcome == 'failure'
         run: |
-          echo "::error::the gap monitor found missing business days; see actions/gaps.md on branch forward-log"
+          echo "::error::the gap monitor found missing business days or a prereg input or study row missing; see actions/gaps.md on branch forward-log"
           exit 1

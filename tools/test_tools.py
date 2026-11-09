@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Tests for the recorder and forward log: python tools/test_tools.py"""
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -53,7 +54,7 @@ class Recorder(unittest.TestCase):
         cfg = Path(d) / "s.json"
         cfg.write_text(json.dumps({"sources": sources}))
         log = Path(d) / "log.jsonl"
-        p = subprocess.run([sys.executable, str(RECORD), "--sources", str(cfg), "--data", str(Path(d) / "data"), "--log", str(log)], capture_output=True, text=True)
+        p = subprocess.run([sys.executable, str(RECORD), "--sources", str(cfg), "--studies", str(Path(d) / "no-studies.json"), "--data", str(Path(d) / "data"), "--log", str(log)], capture_output=True, text=True)
         return p, log
 
     def source(self, url, **kw):
@@ -89,8 +90,11 @@ class Recorder(unittest.TestCase):
         for s in sources:
             for k in ("licence", "licence_url", "terms_checked", "attribution", "redistribute_raw", "notice"):
                 self.assertTrue(s[k], (s["id"], k))
-            self.assertNotIn("stlouisfed", s["url"])
-            for banned in ("nasdaq", "lobster", "api.bls.gov", "api_key", "apikey"):
+            if s["enabled"]:  # FRED's terms rule out storing its data: listed with the reading, never enabled
+                self.assertNotIn("stlouisfed", s["url"])
+            if "api.bls.gov" in s["url"]:
+                self.assertIn("/publicAPI/v1/", s["url"])  # v2 needs registration
+            for banned in ("nasdaq", "lobster", "api_key", "apikey", "registrationkey"):
                 self.assertNotIn(banned, s["url"].lower(), s["id"])
             self.assertTrue(s["url"].startswith("https://"), s["id"])
 
@@ -117,6 +121,82 @@ class Recorder(unittest.TestCase):
         # Not qualified for automated use (stage E survey): FRED scraping ban, Cboe and Deribit personal use only, DMO bot wall
         for banned in ("cboe.com", "deribit.com", "dmo.gov.uk", "treasurydirect.gov"):
             self.assertNotIn(banned, json.dumps(sources))
+
+    def test_r3_sources_and_studies(self):
+        sources = {s["id"]: s for s in json.loads((ROOT / "tools/recorder/sources.json").read_text(encoding="utf-8"))["sources"]}
+        for sid in ("us-treasury-bill-rates", "us-treasury-real-yields", "bls-cpi-u-nsa"):
+            self.assertTrue(sources[sid]["enabled"] and sources[sid]["parse"], sid)
+            self.assertTrue(sources[sid]["terms_checked"].startswith("2026-11-09"), sid)
+        for sid in ("fred-t5yie", "fred-t10yie"):
+            self.assertFalse(sources[sid]["enabled"])
+            self.assertIn("scraping", sources[sid]["terms_checked"])
+        studies = json.loads((ROOT / "tools/recorder/studies.json").read_text(encoding="utf-8"))["studies"]
+        self.assertEqual([s["id"] for s in studies], ["R3-01", "R3-02", "R3-03"])
+        for st in studies:
+            self.assertTrue((ROOT / st["prereg"]).exists())
+            for i in st["inputs"]:
+                self.assertTrue(sources[i]["enabled"], i)
+
+    def test_parsed_values_revisions_study_rows_and_recheck(self):
+        fx = ROOT / "tools/recorder/fixtures"
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            bill = d / "bill.csv"
+            bill.write_bytes((fx / "treasury-bill-rates.csv").read_bytes())
+            cfg = [self.source(bill.as_uri(), id="bill", parse={"format": "treasury_csv", "fields": ["13 WEEKS COUPON EQUIVALENT"]}),
+                   self.source((fx / "treasury-real-yields.csv").as_uri(), id="real", parse={"format": "treasury_csv", "fields": ["5 YR", "10 YR"]}),
+                   self.source((fx / "bls-cpi-v1.json").as_uri(), id="cpi", parse={"format": "bls_v1"})]
+            (d / "s.json").write_text(json.dumps({"sources": cfg}))
+            studies = d / "studies.json"
+            studies.write_text(json.dumps({"studies": [{"id": "S1", "inputs": ["bill", "cpi"], "status": "no position", "start": "2026-01-01"}]}))
+            log = d / "log.jsonl"
+
+            def run():
+                return subprocess.run([sys.executable, str(RECORD), "--sources", str(d / "s.json"), "--studies", str(studies),
+                                       "--data", str(d / "data"), "--log", str(log)], capture_output=True, text=True)
+            self.assertEqual(run().returncode, 0)
+            # Treasury revises 2026-11-05 and adds nothing else: one revision row, one changed observation
+            bill.write_bytes(bill.read_bytes().replace(b"11/05/2026,3.89,3.96,3.91,3.98,3.98,4.06,4.00,4.10",
+                                                       b"11/05/2026,3.89,3.96,3.91,3.98,3.98,4.06,4.00,4.12"))
+            self.assertEqual(run().returncode, 0)
+            recs = [e["record"] for e in fl.read(log)]
+            sha = hashlib.sha256((d / "s.json").read_bytes()).hexdigest()
+            self.assertTrue(all(r["value"]["payload"]["sources_sha256"] == sha for r in recs))
+            pay = lambda sid: [r["value"]["payload"] for r in recs if r["series_id"] == sid]
+            bills = pay("recorder/bill")
+            self.assertEqual(bills[0]["observations"]["2026-11-06|13 WEEKS COUPON EQUIVALENT"], 4.11)
+            self.assertEqual(len(bills[0]["observations"]), 3)
+            self.assertEqual(bills[1]["observations"], {"2026-11-05|13 WEEKS COUPON EQUIVALENT": 4.12})
+            self.assertEqual([(v["old"], v["new"]) for v in pay("revision/bill")], [(4.10, 4.12)])
+            cpi = pay("recorder/cpi")
+            self.assertEqual(cpi[0]["observations"]["2026-09|CUUR0000SA0"], 336.94)
+            self.assertEqual(cpi[1]["observations"], {})
+            self.assertEqual(len(pay("recorder/real")), 2)
+            study = pay("study/S1")
+            self.assertEqual(len(study), 2)
+            self.assertIsNone(study[0]["position"])
+            self.assertEqual(study[1]["inputs"]["bill"], bills[1]["state_sha256"])
+            gap = ROOT / "tools/recorder/gap_monitor.py"
+            r = subprocess.run([sys.executable, str(gap), "recheck", "--log", str(log)], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertIn("6 parsed rows rechecked, 0 mismatched", r.stdout)
+            # A kept value edited afterwards fails the recheck even with the hash chain rebuilt around it
+            bad = d / "bad.jsonl"
+            for e in fl.read(log):
+                rec = e["record"]
+                if rec["sequence"] == 1:
+                    rec["value"]["payload"]["observations"]["2026-11-06|13 WEEKS COUPON EQUIVALENT"] = 4.0
+                fl.append(bad, rec["series_id"], rec["event_time"], rec["value"]["payload"], rec["knowledge_time"])
+            r = subprocess.run([sys.executable, str(gap), "recheck", "--log", str(bad)], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+
+    def test_bad_feed_is_a_failure_row(self):
+        with tempfile.TemporaryDirectory() as d:
+            src = Path(d) / "x.csv"
+            src.write_text("Date,Other\n")
+            p, log = self.run_with(d, [self.source(src.as_uri(), parse={"format": "treasury_csv", "fields": ["5 YR"]})])
+            self.assertEqual(p.returncode, 1)
+            self.assertIn("recording_failed", log.read_text(encoding="utf-8"))
 
     def test_disabled_source_is_skipped(self):
         with tempfile.TemporaryDirectory() as d:
@@ -146,6 +226,27 @@ class GapMonitor(unittest.TestCase):
             self.assertNotIn("2026-11-11", r.stdout.split("Missing")[1].split("Recent")[0])
             r = self.run_gap("gaps", "--log", str(log), "--holidays", str(hol), "--until", "2026-11-12", "--recent", "1")
             self.assertEqual(r.returncode, 0)
+
+    def test_prereg_inputs_and_study_rows_fail_on_any_missing_day(self):
+        with tempfile.TemporaryDirectory() as d:
+            log, studies = Path(d) / "a.jsonl", Path(d) / "s.json"
+            studies.write_text(json.dumps({"studies": [{"id": "S1", "inputs": ["x"], "status": "-", "start": "2026-11-09"}]}))
+            self.write(log, ["2026-11-09", "2026-11-10", "2026-11-11"])
+            row = {"kind": "study_position", "position": None, "inputs": {"x": "ab"}}
+            for day in ["2026-11-09", "2026-11-11"]:  # study row missing on Tue 10, an old day
+                fl.append(log, "study/S1", f"{day}T23:30:00Z", row)
+            r = self.run_gap("gaps", "--log", str(log), "--until", "2026-11-11", "--recent", "1", "--studies", str(studies))
+            self.assertEqual(r.returncode, 1)
+            self.assertIn("S1 study/S1 2026-11-10", r.stdout)
+            r = self.run_gap("gaps", "--log", str(log), "--until", "2026-11-11", "--recent", "1")
+            self.assertEqual(r.returncode, 0)  # without --studies only recent days count
+            fl.append(log, "study/S1", "2026-11-10T23:30:00Z", row)
+            r = self.run_gap("gaps", "--log", str(log), "--until", "2026-11-11", "--recent", "1", "--studies", str(studies))
+            self.assertEqual(r.returncode, 0, r.stdout)
+            studies.write_text(json.dumps({"studies": [{"id": "S1", "inputs": ["x", "never"], "status": "-", "start": "2026-11-09"}]}))
+            r = self.run_gap("gaps", "--log", str(log), "--until", "2026-11-11", "--studies", str(studies))
+            self.assertEqual(r.returncode, 1)
+            self.assertIn("recorder/never 2026-11-09", r.stdout)
 
     def test_second_log_fills_gap_and_reconcile(self):
         with tempfile.TemporaryDirectory() as d:

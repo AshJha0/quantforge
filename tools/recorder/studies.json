@@ -1,0 +1,37 @@
+{
+  "note": "Daily signal and position rows, one per R3 study, written by record.py under study/<id> on every run. inputs lists the recorder sources each prereg reads; gap_monitor fails if any of them, or the study row, is missing on a US business day from start on. status stays 'no position' until the study runs, and the row is still written daily. R3-03's T5YIE and T10YIE come from FRED, whose terms rule out a recorder, so the inputs are the Treasury nominal and real par curves they are built from.",
+  "studies": [
+    {
+      "id": "R3-01",
+      "prereg": "research/preregs/R3-01-treasury-fly.md",
+      "inputs": [
+        "us-treasury-par-yields"
+      ],
+      "status": "no position: study not started",
+      "start": "2026-11-10"
+    },
+    {
+      "id": "R3-02",
+      "prereg": "research/preregs/R3-02-bill-repo-spread.md",
+      "inputs": [
+        "us-treasury-bill-rates",
+        "nyfed-sofr",
+        "nyfed-tgcr",
+        "nyfed-bgcr"
+      ],
+      "status": "no position: study not started",
+      "start": "2026-11-10"
+    },
+    {
+      "id": "R3-03",
+      "prereg": "research/preregs/R3-03-breakeven-seasonality.md",
+      "inputs": [
+        "us-treasury-par-yields",
+        "us-treasury-real-yields",
+        "bls-cpi-u-nsa"
+      ],
+      "status": "no position: study not started",
+      "start": "2026-11-10"
+    }
+  ]
+}
