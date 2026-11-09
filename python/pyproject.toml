@@ -44,3 +44,7 @@ do_not_mutate = ["quantforge_core/_sobol_data.py", "quantforge_core/_legendre_10
 # A plain path .pth instead of setuptools' import-hook finder: the finder pulls in pathlib and
 # importlib.util at every interpreter start, about 0.1 s of T4 on the reference laptop.
 config-settings = { editable_mode = "compat" }
+
+[tool.mypy]
+strict = true
+files = ["quantforge_core"]

@@ -4,6 +4,7 @@ import itertools
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import cast
 
 lazy import numpy as np
 
@@ -69,7 +70,7 @@ def _hagan(p: Sabr, strike: float) -> float:
         + rho * beta * nu * alpha / (4 * root_a)
         + (2 - 3 * rho * rho) * nu * nu / 24
     )
-    return alpha * m * h / den
+    return float(alpha * m * h / den)
 
 
 def hagan(p: Sabr, strikes: Floats) -> list[float]:
@@ -129,7 +130,7 @@ def calibrate(
 
     def residual(x: np.ndarray) -> np.ndarray:
         p = model(x)
-        return root_weight * (np.array([_hagan(p, k) for k in strikes]) - target)
+        return cast("np.ndarray", root_weight * (np.array([_hagan(p, k) for k in strikes]) - target))
 
     f = forward + shift
     nearest = min(range(len(strikes)), key=lambda i: abs(strikes[i] - forward))

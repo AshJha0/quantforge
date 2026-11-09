@@ -30,7 +30,7 @@ def _unit() -> Any:
 
 
 def n_inverse(p: float) -> float:
-    return _unit().inv_cdf(p)
+    return float(_unit().inv_cdf(p))
 
 
 def _domain(message: str, field: str | None = None) -> QfError:
