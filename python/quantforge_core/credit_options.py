@@ -30,7 +30,8 @@ def _domain(message: str, field: str | None = None) -> QfError:
 
 def _legs(as_of: date, expiry: date, maturity: date, rate: float,
           hazard: float, recovery: float) -> tuple[float, float]:
-    """(protection, risky annuity) per unit notional of the stylised forward CDS (E-B22)."""
+    """(protection, risky annuity) per unit notional of the stylised forward CDS (E-B22), with
+    times measured from `as_of` (from `expiry` itself gives the strike legs of ruling F-8)."""
     dates = [expiry]
     k = 1
     while dates[-1] < maturity:
@@ -92,6 +93,60 @@ def cds_option_price(as_of: date, expiry: date, maturity: date, rate: float, haz
         price += front
     return {"price": price, "forward_spread": forward, "risky_annuity": annuity,
             "front_end_protection": front}
+
+
+def _strike_hazard(expiry: date, maturity: date, rate: float, recovery: float,
+                   strike: float) -> tuple[float, float]:
+    """(h_K, A_K): the flat hazard whose stylised spread from expiry is the strike (F-8)."""
+    def spread(x: float) -> float:
+        protection, annuity = _legs(expiry, expiry, maturity, rate, x, recovery)
+        return protection / annuity
+
+    low, high = 0.0, 2 * strike / (1 - recovery)
+    while spread(high) <= strike:
+        low, high = high, 2 * high
+    while high - low > 1e-15 * max(1.0, high):
+        mid = 0.5 * (low + high)
+        if mid in (low, high):
+            break
+        if spread(mid) < strike:
+            low = mid
+        else:
+            high = mid
+    h_k = 0.5 * (low + high)
+    return h_k, _legs(expiry, expiry, maturity, rate, h_k, recovery)[1]
+
+
+def cds_index_option_price(as_of: date, expiry: date, maturity: date, rate: float,
+                           hazard: float, recovery: float, kind: str, strike: float,
+                           coupon: float, notional: float, vol: float) -> dict[str, float]:
+    """Pedersen's adjusted forward and strike in Black (rulings F-7 to F-10)."""
+    _check_option(as_of, expiry, maturity, hazard, recovery, strike)
+    if coupon < 0:
+        raise _domain("coupon must not be negative", "coupon")
+    if vol < 0:
+        raise _domain("vol must not be negative", "vol")
+    if notional <= 0:
+        raise _domain("notional must be above 0", "notional")
+    protection, annuity = _legs(as_of, expiry, maturity, rate, hazard, recovery)
+    forward = protection / annuity
+    t = (expiry - as_of).days / 365
+    p_expiry = math.exp(-rate * t)
+    fep = (1 - recovery) * (1 - math.exp(-hazard * t)) * p_expiry
+    h_k, a_k = _strike_hazard(expiry, maturity, rate, recovery, strike)
+    upfront = (strike - coupon) * a_k
+    f_adj = forward + fep / annuity
+    k_adj = coupon + upfront * p_expiry / annuity
+    if f_adj <= 0:
+        raise _domain("the adjusted forward is not positive", "hazard_rate")
+    if k_adj <= 0:
+        raise _domain("the adjusted strike is not positive", "strike")
+    option = Option(black.BLACK_76, "CALL" if kind == "PAYER" else "PUT", k_adj, t, f_adj)
+    price = notional * annuity * black.price(option, vol)
+    return {"price": price, "forward_spread": forward, "adjusted_forward": f_adj,
+            "adjusted_strike": k_adj, "risky_annuity": annuity, "strike_annuity": a_k,
+            "strike_hazard": h_k, "exercise_upfront": notional * upfront,
+            "front_end_protection": notional * fep}
 
 
 def cds_option_implied(as_of: date, expiry: date, maturity: date, rate: float, hazard: float,
