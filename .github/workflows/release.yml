@@ -69,12 +69,19 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - run: cargo package -p quantforge-core --locked
+      # The release ships the Rust CLI binary, like C++. A source crate cannot be packaged yet: the core library
+      # reads data files from specifications/ outside the crate. Registry publishing is plan item 12.7 G3b (stage K).
+      - run: cargo build --release --locked -p quantforge-cli
         working-directory: rust
+      - env:
+          VERSION: ${{ needs.changelog.outputs.version }}
+        run: |
+          cp LICENSE rust/target/release/
+          tar -czf "quantforge-rust-cli-${VERSION}-linux-x86_64.tar.gz" -C rust/target/release quantforge LICENSE
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rust
-          path: rust/target/package/*.crate
+          path: quantforge-rust-cli-*.tar.gz
   build-java:
     needs: changelog
     runs-on: ubuntu-24.04
