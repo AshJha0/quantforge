@@ -119,3 +119,4 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 - Golden defects reported to the spec session on 2026-11-09: `e1_core-0033`, `0038`, `0275`, `0280`, `0305` (a `same_as`
   case keeps its base case's `extra_checks`), and `e1_core-0129` to `0131` (`"NaN"` in the Integer `n` expects
   `E_DOMAIN`; F-1 says `E_SCHEMA`). This build follows F-1.
+- R7 `credit.cdsindex.option_price`: domain checks in the spec order (recovery, hazard, strike, coupon, vol), notional last; `F_adj <= 0` names field `hazard_rate`, `K_adj <= 0` names `strike`; `h_K` bisection to the floating-point limit; vol = 0 is the intrinsic value; notional scales outputs only.

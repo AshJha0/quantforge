@@ -30,6 +30,20 @@ struct CdsOptionPrice {
 CdsOptionPrice cds_option_price(const CdsOptionInputs& in, double vol);
 double cds_option_implied_vol(const CdsOptionInputs& in, double premium);
 
+/// CDS index option, Pedersen adjusted pair (stage F R7, rulings F-7 to F-10). Never knocked out.
+struct CdsIndexOptionInputs {
+    Date as_of, expiry, maturity;
+    double rate, hazard_rate, recovery;
+    bool payer;
+    double strike, coupon, notional, vol;
+};
+struct CdsIndexOptionPrice {
+    double price, forward_spread, adjusted_forward, adjusted_strike, risky_annuity, strike_annuity, strike_hazard,
+        exercise_upfront, front_end_protection;
+};
+/// Checked: every double must be finite (E_DOMAIN), then the rules of the spec section in order.
+CdsIndexOptionPrice cds_index_option_price(const CdsIndexOptionInputs& in);
+
 enum class CopulaKind { Gaussian, StudentT };
 struct JointDefault {
     double joint, default_correlation;

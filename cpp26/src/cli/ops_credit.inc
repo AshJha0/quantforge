@@ -158,9 +158,36 @@ void op_lhp_loss_cdf(const In& in, Out& out) {
     out.key_reals("cdf", lhp_loss_cdf(p, rho, r, x));
 }
 
+void op_cds_index_option_price(const In& in, Out& out) {
+    CdsIndexOptionInputs c;
+    c.as_of = in.date("as_of");
+    c.expiry = in.date("expiry");
+    c.maturity = in.date("maturity");
+    c.rate = in.real("rate");
+    c.hazard_rate = in.real("hazard_rate");
+    c.recovery = in.real("recovery");
+    c.payer = in.choice<bool>("type", {{"PAYER", true}, {"RECEIVER", false}});
+    c.strike = in.real("strike");
+    c.coupon = in.real("coupon");
+    c.notional = in.real("notional");
+    c.vol = in.real("vol");
+    in.ready();
+    const CdsIndexOptionPrice r = cds_index_option_price(c);
+    out.key_real("price", r.price);
+    out.key_real("forward_spread", r.forward_spread);
+    out.key_real("adjusted_forward", r.adjusted_forward);
+    out.key_real("adjusted_strike", r.adjusted_strike);
+    out.key_real("risky_annuity", r.risky_annuity);
+    out.key_real("strike_annuity", r.strike_annuity);
+    out.key_real("strike_hazard", r.strike_hazard);
+    out.key_real("exercise_upfront", r.exercise_upfront);
+    out.key_real("front_end_protection", r.front_end_protection);
+}
+
 constexpr Entry credit_ops[] = {
     {"credit.cds.bootstrap", op_cds_bootstrap},
     {"credit.cds.price", op_cds_price},
+    {"credit.cdsindex.option_price", op_cds_index_option_price},
     {"credit.cdsoption.implied_vol", op_cds_option_implied_vol},
     {"credit.cdsoption.price", op_cds_option_price},
     {"credit.copula.joint_default", op_copula_joint_default},
