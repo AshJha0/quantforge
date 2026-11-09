@@ -653,7 +653,7 @@ class SiteHome(unittest.TestCase):
     def test_home_figures_come_from_one_place(self):
         sf = load("site_figures", "tools/site_figures.py")
         template = (ROOT / "tools/site_home.html").read_text(encoding="utf-8")
-        figures = sf.home_figures()
+        figures = {**sf.home_figures(), "nav": "<nav></nav>"}
         self.assertNotIn("{{", sf.render_home(template, figures))
         version = figures["version"]
         import re
@@ -665,6 +665,32 @@ class SiteHome(unittest.TestCase):
             self.assertNotIn(literal, template)  # no release figure hard-coded in the template
         with self.assertRaisesRegex(ValueError, "nope"):
             sf.render_home("{{nope}}", figures)
+
+    def test_stage_table_follows_roadmap(self):
+        """Plan 13.2 E7: the home stage table is generated from ROADMAP, and site_facts must agree with it."""
+        sf = load("site_figures", "tools/site_figures.py")
+        rows = sf.roadmap_stages()
+        self.assertEqual([r[0] for r in rows][:5], ["A", "B", "C", "D", "E"])
+        self.assertIn("<td>E</td>", sf.home_figures()["stage_rows"])
+        self.assertEqual(sf.check_status(sf.home_figures(), rows), [])
+        self.assertTrue(sf.check_status({"implemented_stages": "A to D"}, rows))  # drift fails the build
+        self.assertNotIn("<tr><td>", (ROOT / "tools/site_home.html").read_text(encoding="utf-8"))
+
+    def test_site_search_and_accessibility_markup(self):
+        """Plan 13.2 E6 and E7: aria-current on the nav, and a search for SOFR finds the curve pages first."""
+        try:
+            bs = load("build_site", "tools/build_site.py")
+        except ImportError:
+            self.skipTest("markdown not installed; docs.yml runs this with it")
+        self.assertIn('href="../LEARN.html" aria-current="page"', bs.nav("LEARN.html", "../"))
+        self.assertEqual(bs.nav("x.html", "").count("aria-current"), 0)
+        index = [bs.search_entry("docs/curves/sofr-ois.html", "SOFR OIS curve", "Bootstrap from SOFR quotes."),
+                 bs.search_entry("LEARN.html", "Learn", "Mentions sofr once in passing."),
+                 bs.search_entry("GLOSSARY.html", "Glossary", "No match here.")]
+        self.assertEqual(bs.search(index, "SOFR"), ["docs/curves/sofr-ois.html", "LEARN.html"])
+        for needle in ('class="skip"', '<main id="main"', "search.js"):
+            self.assertIn(needle, bs.PAGE)
+        self.assertIn(":focus-visible", bs.CSS)
 
 
 class DoctorAndQuickstart(unittest.TestCase):

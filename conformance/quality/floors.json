@@ -1,1 +1,1 @@
-{"_note": "Whole-library line coverage floors per language (plan 12.2 G6). Set a few points under the level measured on 2026-11-09; raise, never lower.", "python": 0.95, "java": 0.80, "rust": 0.80, "cpp": 0.80}
+{"_note": "Whole-library line coverage floors per language (plan 12.2 G6). Set a few points under the level measured on 2026-11-09; raise, never lower.", "python": 0.95, "java": 0.95, "rust": 0.80, "cpp": 0.80}
