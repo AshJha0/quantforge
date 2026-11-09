@@ -199,3 +199,12 @@ Silent choices, phase 0 (G4, E1, G6):
 | F-J2 | F-2 order: a held `E_LIMIT` outranks the held non-finite `E_DOMAIN`; `E_SCHEMA` and `E_PARSE` outrank both. Among several non-finite inputs the first one read is named in `field` (read order follows the spec's input order) |
 | F-J3 | F-4 library API: every public static method with a `double`, `double[]` or `double[][]` parameter checks it with `core.Finite` before anything else. Unchecked raw kernels: `core.Normal`, `core.Rng`, `core.Sobol`. Public record constructors (`Black.Option` and the result records) are not checked; the methods that take them check their own reals |
 | F-J4 | G4: CLI modules are named by domain (`OpsBonds`, `OpsCredit`, ...); `RatesD` is `curves.RatesCurves`, `EquityD` is `pricing.EquityCurves`. `cli.Registry` builds the verb table from `Operations.MODULES` and rejects a verb registered twice |
+
+Silent choices, wave 1a (F6, Q1):
+
+| # | Choice |
+|---|---|
+| F-J5 | R10: a `null` quote is carried as NaN inside `VarianceStrip.Quote`; the CLI maps JSON `null` to it, and a real `"NaN"` token is still `E_DOMAIN` by rule F-2 |
+| F-J6 | R8: the Hessian is central differences of the exact (forward-mode) score with relative step 1e-5; Newton stops at a relative step below 1e-12, else `E_NO_CONVERGENCE`. The interior test for `nu` uses `nu - 2 >= 1e-6` and `500 - nu >= 5e-4` |
+| F-J7 | R10 continuity property: `local-and-forward-vol.md` asks for `abs(w(T_j(1 - 1e-9)) - w(T_j)) <= 1e-9 w(T_j)`. A step of 1e-9 T_j moves w by `w_T T_j 1e-9`, which equals the bound when the left slope is `w_j / T_j` and goes over it at an inner node with a steeper interval. Java asserts 3e-9; please state the bound as `(w_T T_j / w_j + 1) 1e-9` or similar |
+| F-J8 | Q1: `SEQUENTIAL` with a stage F method runs the global Newton solve directly (ruling F-21 allows either; both give the same curve) |
