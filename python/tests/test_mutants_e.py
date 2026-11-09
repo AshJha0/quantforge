@@ -79,7 +79,7 @@ def test_tranche_and_pool_errors():
 
 
 def test_tranche_above_the_maximum_loss_is_empty():
-    # tranche_loss 52: losses never pass 1 - R, so a tranche attaching above it loses nothing
+    # losses never pass 1 - R, so a tranche attaching above it loses nothing
     assert ce.tranche_loss(0.05, 0.3, 0.4, 0.7, 0.9) == pytest.approx(0.0, abs=1e-15)
 
 
@@ -391,6 +391,7 @@ def test_vol_of_vol_by_hand():
 # credit_e8 _beta_fraction 25: 999 -> 1000 iterations; the fraction converges in well under 100.
 # credit_e8 _beta_fraction 68: the tiny guard only acts when |1 + num / c| <= 1e-300, never here.
 # credit_e8 _beta_fraction 84: < vs <= 1e-16 on a float difference; the tie is not reachable.
+# credit_e8 tranche_loss 52: min(a / (1 - R), 2.0) vs 1.0; _capped_mean returns p for any k >= 1.
 # credit_e8 _incomplete_beta 28: both branches are the same function (symmetry I_x(a, b) =
 #   1 - I_{1-x}(b, a)); moving the switch point changes only rounding.
 # exotics basket 92: strict=None is falsy like strict=False; lengths are checked equal before.
