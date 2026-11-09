@@ -633,14 +633,6 @@
     "case_id": "e1_core-0022"
    },
    "tolerance_class": "fourier",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "absolute",
-     "limit": 1e-10
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -803,14 +795,6 @@
     "case_id": "e1_core-0027"
    },
    "tolerance_class": "fourier",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "absolute",
-     "limit": 1e-10
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -973,14 +957,6 @@
     "case_id": "e1_core-0032"
    },
    "tolerance_class": "fourier",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "absolute",
-     "limit": 1e-10
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -1143,14 +1119,6 @@
     "case_id": "e1_core-0037"
    },
    "tolerance_class": "fourier",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "absolute",
-     "limit": 1e-10
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -1313,14 +1281,6 @@
     "case_id": "e1_core-0042"
    },
    "tolerance_class": "fourier",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "absolute",
-     "limit": 1e-10
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -1483,14 +1443,6 @@
     "case_id": "e1_core-0047"
    },
    "tolerance_class": "fourier",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "absolute",
-     "limit": 1e-10
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -1653,14 +1605,6 @@
     "case_id": "e1_core-0052"
    },
    "tolerance_class": "fourier",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "absolute",
-     "limit": 1e-10
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -3627,128 +3571,6 @@
   },
   {
    "case_id": "e1_core-0129",
-   "operation": "core.integrate.trapezoid",
-   "inputs": {
-    "function": "exp",
-    "a": 0,
-    "b": 1,
-    "n": "NaN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:integrate-0001",
-    "input:/n"
-   ]
-  },
-  {
-   "case_id": "e1_core-0130",
-   "operation": "core.integrate.trapezoid",
-   "inputs": {
-    "function": "exp",
-    "a": 0,
-    "b": 1,
-    "n": "Infinity"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:integrate-0001",
-    "input:/n"
-   ]
-  },
-  {
-   "case_id": "e1_core-0131",
-   "operation": "core.integrate.trapezoid",
-   "inputs": {
-    "function": "exp",
-    "a": 0,
-    "b": 1,
-    "n": "-Infinity"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:integrate-0001",
-    "input:/n"
-   ]
-  },
-  {
-   "case_id": "e1_core-0132",
-   "operation": "core.integrate.trapezoid",
-   "inputs": {
-    "function": "exp",
-    "a": 0,
-    "b": 1,
-    "n": 0.0
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:integrate-0001",
-    "input:/n"
-   ]
-  },
-  {
-   "case_id": "e1_core-0133",
-   "operation": "core.integrate.trapezoid",
-   "inputs": {
-    "function": "exp",
-    "a": 0,
-    "b": 1,
-    "n": -0.0
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0132"
-   },
-   "tolerance_class": "quadrature",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:integrate-0001",
-    "input:/n"
-   ]
-  },
-  {
-   "case_id": "e1_core-0134",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -3789,7 +3611,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0135",
+   "case_id": "e1_core-0130",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -3830,7 +3652,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0136",
+   "case_id": "e1_core-0131",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -3871,7 +3693,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0137",
+   "case_id": "e1_core-0132",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -3927,7 +3749,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0138",
+   "case_id": "e1_core-0133",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -3968,7 +3790,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0139",
+   "case_id": "e1_core-0134",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4009,7 +3831,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0140",
+   "case_id": "e1_core-0135",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4050,7 +3872,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0141",
+   "case_id": "e1_core-0136",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4089,7 +3911,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0142",
+   "case_id": "e1_core-0137",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4101,6 +3923,208 @@
     ],
     "y": [
      1.0,
+     1.0,
+     2.0,
+     4.0
+    ],
+    "at": [
+     0.0,
+     0.5,
+     1.5,
+     2.5,
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0136"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:rulings-0027",
+    "input:/x/3"
+   ]
+  },
+  {
+   "case_id": "e1_core-0138",
+   "operation": "core.interp.evaluate",
+   "inputs": {
+    "method": "monotone_pchip",
+    "x": [
+     0.0,
+     1.0,
+     2.0,
+     3.0
+    ],
+    "y": [
+     "NaN",
+     1.0,
+     2.0,
+     4.0
+    ],
+    "at": [
+     0.0,
+     0.5,
+     1.5,
+     2.5,
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:rulings-0027",
+    "input:/y/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0139",
+   "operation": "core.interp.evaluate",
+   "inputs": {
+    "method": "monotone_pchip",
+    "x": [
+     0.0,
+     1.0,
+     2.0,
+     3.0
+    ],
+    "y": [
+     "Infinity",
+     1.0,
+     2.0,
+     4.0
+    ],
+    "at": [
+     0.0,
+     0.5,
+     1.5,
+     2.5,
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0027",
+    "input:/y/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0140",
+   "operation": "core.interp.evaluate",
+   "inputs": {
+    "method": "monotone_pchip",
+    "x": [
+     0.0,
+     1.0,
+     2.0,
+     3.0
+    ],
+    "y": [
+     "-Infinity",
+     1.0,
+     2.0,
+     4.0
+    ],
+    "at": [
+     0.0,
+     0.5,
+     1.5,
+     2.5,
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0027",
+    "input:/y/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0141",
+   "operation": "core.interp.evaluate",
+   "inputs": {
+    "method": "monotone_pchip",
+    "x": [
+     0.0,
+     1.0,
+     2.0,
+     3.0
+    ],
+    "y": [
+     0.0,
+     1.0,
+     2.0,
+     4.0
+    ],
+    "at": [
+     0.0,
+     0.5,
+     1.5,
+     2.5,
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:rulings-0027",
+    "input:/y/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0142",
+   "operation": "core.interp.evaluate",
+   "inputs": {
+    "method": "monotone_pchip",
+    "x": [
+     0.0,
+     1.0,
+     2.0,
+     3.0
+    ],
+    "y": [
+     -0.0,
      1.0,
      2.0,
      4.0
@@ -4125,213 +4149,11 @@
     "e1",
     "negative_zero",
     "base:rulings-0027",
-    "input:/x/3"
+    "input:/y/0"
    ]
   },
   {
    "case_id": "e1_core-0143",
-   "operation": "core.interp.evaluate",
-   "inputs": {
-    "method": "monotone_pchip",
-    "x": [
-     0.0,
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     "NaN",
-     1.0,
-     2.0,
-     4.0
-    ],
-    "at": [
-     0.0,
-     0.5,
-     1.5,
-     2.5,
-     3.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:rulings-0027",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0144",
-   "operation": "core.interp.evaluate",
-   "inputs": {
-    "method": "monotone_pchip",
-    "x": [
-     0.0,
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     "Infinity",
-     1.0,
-     2.0,
-     4.0
-    ],
-    "at": [
-     0.0,
-     0.5,
-     1.5,
-     2.5,
-     3.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0027",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0145",
-   "operation": "core.interp.evaluate",
-   "inputs": {
-    "method": "monotone_pchip",
-    "x": [
-     0.0,
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     "-Infinity",
-     1.0,
-     2.0,
-     4.0
-    ],
-    "at": [
-     0.0,
-     0.5,
-     1.5,
-     2.5,
-     3.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0027",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0146",
-   "operation": "core.interp.evaluate",
-   "inputs": {
-    "method": "monotone_pchip",
-    "x": [
-     0.0,
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     0.0,
-     1.0,
-     2.0,
-     4.0
-    ],
-    "at": [
-     0.0,
-     0.5,
-     1.5,
-     2.5,
-     3.0
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:rulings-0027",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0147",
-   "operation": "core.interp.evaluate",
-   "inputs": {
-    "method": "monotone_pchip",
-    "x": [
-     0.0,
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     -0.0,
-     1.0,
-     2.0,
-     4.0
-    ],
-    "at": [
-     0.0,
-     0.5,
-     1.5,
-     2.5,
-     3.0
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0146"
-   },
-   "tolerance_class": "interpolation",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:rulings-0027",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0148",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4372,7 +4194,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0149",
+   "case_id": "e1_core-0144",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4413,7 +4235,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0150",
+   "case_id": "e1_core-0145",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4454,7 +4276,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0151",
+   "case_id": "e1_core-0146",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4493,7 +4315,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0152",
+   "case_id": "e1_core-0147",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4519,7 +4341,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0151"
+    "case_id": "e1_core-0146"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -4533,7 +4355,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0153",
+   "case_id": "e1_core-0148",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4574,7 +4396,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0154",
+   "case_id": "e1_core-0149",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4615,7 +4437,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0155",
+   "case_id": "e1_core-0150",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4656,7 +4478,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0156",
+   "case_id": "e1_core-0151",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4712,7 +4534,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0157",
+   "case_id": "e1_core-0152",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4753,7 +4575,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0158",
+   "case_id": "e1_core-0153",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4794,7 +4616,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0159",
+   "case_id": "e1_core-0154",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4835,7 +4657,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0160",
+   "case_id": "e1_core-0155",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4874,7 +4696,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0161",
+   "case_id": "e1_core-0156",
    "operation": "core.interp.evaluate",
    "inputs": {
     "method": "monotone_pchip",
@@ -4900,7 +4722,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0160"
+    "case_id": "e1_core-0155"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -4914,7 +4736,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0162",
+   "case_id": "e1_core-0157",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -4952,7 +4774,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0163",
+   "case_id": "e1_core-0158",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -4990,7 +4812,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0164",
+   "case_id": "e1_core-0159",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5028,7 +4850,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0165",
+   "case_id": "e1_core-0160",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5064,13 +4886,200 @@
    ]
   },
   {
-   "case_id": "e1_core-0166",
+   "case_id": "e1_core-0161",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
      -0.0,
      2.0,
      3.0
+    ],
+    "r": [
+     0.02,
+     0.02,
+     0.0233
+    ],
+    "at": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "positive": false
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0160"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:rulings-0029",
+    "input:/t/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0162",
+   "operation": "core.interp.monotone_convex",
+   "inputs": {
+    "t": [
+     1.0,
+     2.0,
+     "NaN"
+    ],
+    "r": [
+     0.02,
+     0.02,
+     0.0233
+    ],
+    "at": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "positive": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:rulings-0029",
+    "input:/t/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0163",
+   "operation": "core.interp.monotone_convex",
+   "inputs": {
+    "t": [
+     1.0,
+     2.0,
+     "Infinity"
+    ],
+    "r": [
+     0.02,
+     0.02,
+     0.0233
+    ],
+    "at": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "positive": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0029",
+    "input:/t/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0164",
+   "operation": "core.interp.monotone_convex",
+   "inputs": {
+    "t": [
+     1.0,
+     2.0,
+     "-Infinity"
+    ],
+    "r": [
+     0.02,
+     0.02,
+     0.0233
+    ],
+    "at": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "positive": false
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0029",
+    "input:/t/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0165",
+   "operation": "core.interp.monotone_convex",
+   "inputs": {
+    "t": [
+     1.0,
+     2.0,
+     0.0
+    ],
+    "r": [
+     0.02,
+     0.02,
+     0.0233
+    ],
+    "at": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "positive": false
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:rulings-0029",
+    "input:/t/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0166",
+   "operation": "core.interp.monotone_convex",
+   "inputs": {
+    "t": [
+     1.0,
+     2.0,
+     -0.0
     ],
     "r": [
      0.02,
@@ -5097,7 +5106,7 @@
     "e1",
     "negative_zero",
     "base:rulings-0029",
-    "input:/t/0"
+    "input:/t/2"
    ]
   },
   {
@@ -5107,10 +5116,10 @@
     "t": [
      1.0,
      2.0,
-     "NaN"
+     3.0
     ],
     "r": [
-     0.02,
+     "NaN",
      0.02,
      0.0233
     ],
@@ -5135,7 +5144,7 @@
     "non_finite",
     "nan",
     "base:rulings-0029",
-    "input:/t/2"
+    "input:/r/0"
    ]
   },
   {
@@ -5145,10 +5154,10 @@
     "t": [
      1.0,
      2.0,
-     "Infinity"
+     3.0
     ],
     "r": [
-     0.02,
+     "Infinity",
      0.02,
      0.0233
     ],
@@ -5173,7 +5182,7 @@
     "non_finite",
     "infinity",
     "base:rulings-0029",
-    "input:/t/2"
+    "input:/r/0"
    ]
   },
   {
@@ -5183,10 +5192,10 @@
     "t": [
      1.0,
      2.0,
-     "-Infinity"
+     3.0
     ],
     "r": [
-     0.02,
+     "-Infinity",
      0.02,
      0.0233
     ],
@@ -5211,7 +5220,7 @@
     "non_finite",
     "infinity",
     "base:rulings-0029",
-    "input:/t/2"
+    "input:/r/0"
    ]
   },
   {
@@ -5221,10 +5230,10 @@
     "t": [
      1.0,
      2.0,
-     0.0
+     3.0
     ],
     "r": [
-     0.02,
+     0.0,
      0.02,
      0.0233
     ],
@@ -5247,7 +5256,7 @@
     "e1",
     "zero_anchor",
     "base:rulings-0029",
-    "input:/t/2"
+    "input:/r/0"
    ]
   },
   {
@@ -5257,10 +5266,10 @@
     "t": [
      1.0,
      2.0,
-     -0.0
+     3.0
     ],
     "r": [
-     0.02,
+     -0.0,
      0.02,
      0.0233
     ],
@@ -5284,7 +5293,7 @@
     "e1",
     "negative_zero",
     "base:rulings-0029",
-    "input:/t/2"
+    "input:/r/0"
    ]
   },
   {
@@ -5297,9 +5306,9 @@
      3.0
     ],
     "r": [
-     "NaN",
      0.02,
-     0.0233
+     0.02,
+     "NaN"
     ],
     "at": [
      1.5,
@@ -5322,7 +5331,7 @@
     "non_finite",
     "nan",
     "base:rulings-0029",
-    "input:/r/0"
+    "input:/r/2"
    ]
   },
   {
@@ -5335,9 +5344,9 @@
      3.0
     ],
     "r": [
-     "Infinity",
      0.02,
-     0.0233
+     0.02,
+     "Infinity"
     ],
     "at": [
      1.5,
@@ -5360,7 +5369,7 @@
     "non_finite",
     "infinity",
     "base:rulings-0029",
-    "input:/r/0"
+    "input:/r/2"
    ]
   },
   {
@@ -5373,9 +5382,9 @@
      3.0
     ],
     "r": [
-     "-Infinity",
      0.02,
-     0.0233
+     0.02,
+     "-Infinity"
     ],
     "at": [
      1.5,
@@ -5398,7 +5407,7 @@
     "non_finite",
     "infinity",
     "base:rulings-0029",
-    "input:/r/0"
+    "input:/r/2"
    ]
   },
   {
@@ -5411,9 +5420,9 @@
      3.0
     ],
     "r": [
-     0.0,
      0.02,
-     0.0233
+     0.02,
+     0.0
     ],
     "at": [
      1.5,
@@ -5434,7 +5443,7 @@
     "e1",
     "zero_anchor",
     "base:rulings-0029",
-    "input:/r/0"
+    "input:/r/2"
    ]
   },
   {
@@ -5447,9 +5456,9 @@
      3.0
     ],
     "r": [
-     -0.0,
      0.02,
-     0.0233
+     0.02,
+     -0.0
     ],
     "at": [
      1.5,
@@ -5471,198 +5480,11 @@
     "e1",
     "negative_zero",
     "base:rulings-0029",
-    "input:/r/0"
+    "input:/r/2"
    ]
   },
   {
    "case_id": "e1_core-0177",
-   "operation": "core.interp.monotone_convex",
-   "inputs": {
-    "t": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "r": [
-     0.02,
-     0.02,
-     "NaN"
-    ],
-    "at": [
-     1.5,
-     2.0,
-     2.5,
-     3.0
-    ],
-    "positive": false
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:rulings-0029",
-    "input:/r/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0178",
-   "operation": "core.interp.monotone_convex",
-   "inputs": {
-    "t": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "r": [
-     0.02,
-     0.02,
-     "Infinity"
-    ],
-    "at": [
-     1.5,
-     2.0,
-     2.5,
-     3.0
-    ],
-    "positive": false
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0029",
-    "input:/r/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0179",
-   "operation": "core.interp.monotone_convex",
-   "inputs": {
-    "t": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "r": [
-     0.02,
-     0.02,
-     "-Infinity"
-    ],
-    "at": [
-     1.5,
-     2.0,
-     2.5,
-     3.0
-    ],
-    "positive": false
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0029",
-    "input:/r/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0180",
-   "operation": "core.interp.monotone_convex",
-   "inputs": {
-    "t": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "r": [
-     0.02,
-     0.02,
-     0.0
-    ],
-    "at": [
-     1.5,
-     2.0,
-     2.5,
-     3.0
-    ],
-    "positive": false
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:rulings-0029",
-    "input:/r/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0181",
-   "operation": "core.interp.monotone_convex",
-   "inputs": {
-    "t": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "r": [
-     0.02,
-     0.02,
-     -0.0
-    ],
-    "at": [
-     1.5,
-     2.0,
-     2.5,
-     3.0
-    ],
-    "positive": false
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0180"
-   },
-   "tolerance_class": "interpolation",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:rulings-0029",
-    "input:/r/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0182",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5700,7 +5522,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0183",
+   "case_id": "e1_core-0178",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5738,7 +5560,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0184",
+   "case_id": "e1_core-0179",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5776,7 +5598,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0185",
+   "case_id": "e1_core-0180",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5812,7 +5634,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0186",
+   "case_id": "e1_core-0181",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5835,7 +5657,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0185"
+    "case_id": "e1_core-0180"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -5849,7 +5671,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0187",
+   "case_id": "e1_core-0182",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5887,7 +5709,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0188",
+   "case_id": "e1_core-0183",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5925,7 +5747,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0189",
+   "case_id": "e1_core-0184",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5963,7 +5785,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0190",
+   "case_id": "e1_core-0185",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -5999,7 +5821,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0191",
+   "case_id": "e1_core-0186",
    "operation": "core.interp.monotone_convex",
    "inputs": {
     "t": [
@@ -6022,7 +5844,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0190"
+    "case_id": "e1_core-0185"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -6036,7 +5858,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0192",
+   "case_id": "e1_core-0187",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6074,7 +5896,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0193",
+   "case_id": "e1_core-0188",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6112,7 +5934,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0194",
+   "case_id": "e1_core-0189",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6150,7 +5972,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0195",
+   "case_id": "e1_core-0190",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6186,7 +6008,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0196",
+   "case_id": "e1_core-0191",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6194,6 +6016,193 @@
       -0.0,
       1.0,
       2.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0190"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:diff_linalg-0012",
+    "input:/a/0/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0192",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      "NaN"
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:diff_linalg-0012",
+    "input:/a/0/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0193",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      "Infinity"
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:diff_linalg-0012",
+    "input:/a/0/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0194",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      "-Infinity"
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:diff_linalg-0012",
+    "input:/a/0/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0195",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      5.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:diff_linalg-0012",
+    "input:/a/0/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0196",
+   "operation": "core.linalg.cholesky",
+   "inputs": {
+    "a": [
+     [
+      4.0,
+      1.0,
+      -0.0
      ],
      [
       1.0,
@@ -6219,7 +6228,7 @@
     "e1",
     "negative_zero",
     "base:diff_linalg-0012",
-    "input:/a/0/0"
+    "input:/a/0/2"
    ]
   },
   {
@@ -6230,7 +6239,7 @@
      [
       4.0,
       1.0,
-      "NaN"
+      2.0
      ],
      [
       1.0,
@@ -6238,7 +6247,7 @@
       0.0
      ],
      [
-      2.0,
+      "NaN",
       0.0,
       5.0
      ]
@@ -6257,7 +6266,7 @@
     "non_finite",
     "nan",
     "base:diff_linalg-0012",
-    "input:/a/0/2"
+    "input:/a/2/0"
    ]
   },
   {
@@ -6268,7 +6277,7 @@
      [
       4.0,
       1.0,
-      "Infinity"
+      2.0
      ],
      [
       1.0,
@@ -6276,7 +6285,7 @@
       0.0
      ],
      [
-      2.0,
+      "Infinity",
       0.0,
       5.0
      ]
@@ -6295,7 +6304,7 @@
     "non_finite",
     "infinity",
     "base:diff_linalg-0012",
-    "input:/a/0/2"
+    "input:/a/2/0"
    ]
   },
   {
@@ -6306,7 +6315,7 @@
      [
       4.0,
       1.0,
-      "-Infinity"
+      2.0
      ],
      [
       1.0,
@@ -6314,7 +6323,7 @@
       0.0
      ],
      [
-      2.0,
+      "-Infinity",
       0.0,
       5.0
      ]
@@ -6333,7 +6342,7 @@
     "non_finite",
     "infinity",
     "base:diff_linalg-0012",
-    "input:/a/0/2"
+    "input:/a/2/0"
    ]
   },
   {
@@ -6344,7 +6353,7 @@
      [
       4.0,
       1.0,
-      0.0
+      2.0
      ],
      [
       1.0,
@@ -6352,7 +6361,7 @@
       0.0
      ],
      [
-      2.0,
+      0.0,
       0.0,
       5.0
      ]
@@ -6369,7 +6378,7 @@
     "e1",
     "zero_anchor",
     "base:diff_linalg-0012",
-    "input:/a/0/2"
+    "input:/a/2/0"
    ]
   },
   {
@@ -6380,7 +6389,7 @@
      [
       4.0,
       1.0,
-      -0.0
+      2.0
      ],
      [
       1.0,
@@ -6388,7 +6397,7 @@
       0.0
      ],
      [
-      2.0,
+      -0.0,
       0.0,
       5.0
      ]
@@ -6406,7 +6415,7 @@
     "e1",
     "negative_zero",
     "base:diff_linalg-0012",
-    "input:/a/0/2"
+    "input:/a/2/0"
    ]
   },
   {
@@ -6425,193 +6434,6 @@
       0.0
      ],
      [
-      "NaN",
-      0.0,
-      5.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:diff_linalg-0012",
-    "input:/a/2/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0203",
-   "operation": "core.linalg.cholesky",
-   "inputs": {
-    "a": [
-     [
-      4.0,
-      1.0,
-      2.0
-     ],
-     [
-      1.0,
-      3.0,
-      0.0
-     ],
-     [
-      "Infinity",
-      0.0,
-      5.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:diff_linalg-0012",
-    "input:/a/2/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0204",
-   "operation": "core.linalg.cholesky",
-   "inputs": {
-    "a": [
-     [
-      4.0,
-      1.0,
-      2.0
-     ],
-     [
-      1.0,
-      3.0,
-      0.0
-     ],
-     [
-      "-Infinity",
-      0.0,
-      5.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:diff_linalg-0012",
-    "input:/a/2/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0205",
-   "operation": "core.linalg.cholesky",
-   "inputs": {
-    "a": [
-     [
-      4.0,
-      1.0,
-      2.0
-     ],
-     [
-      1.0,
-      3.0,
-      0.0
-     ],
-     [
-      0.0,
-      0.0,
-      5.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:diff_linalg-0012",
-    "input:/a/2/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0206",
-   "operation": "core.linalg.cholesky",
-   "inputs": {
-    "a": [
-     [
-      4.0,
-      1.0,
-      2.0
-     ],
-     [
-      1.0,
-      3.0,
-      0.0
-     ],
-     [
-      -0.0,
-      0.0,
-      5.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0205"
-   },
-   "tolerance_class": "interpolation",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:diff_linalg-0012",
-    "input:/a/2/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0207",
-   "operation": "core.linalg.cholesky",
-   "inputs": {
-    "a": [
-     [
-      4.0,
-      1.0,
-      2.0
-     ],
-     [
-      1.0,
-      3.0,
-      0.0
-     ],
-     [
       2.0,
       0.0,
       "NaN"
@@ -6635,7 +6457,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0208",
+   "case_id": "e1_core-0203",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6673,7 +6495,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0209",
+   "case_id": "e1_core-0204",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6711,7 +6533,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0210",
+   "case_id": "e1_core-0205",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6747,7 +6569,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0211",
+   "case_id": "e1_core-0206",
    "operation": "core.linalg.cholesky",
    "inputs": {
     "a": [
@@ -6770,7 +6592,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0210"
+    "case_id": "e1_core-0205"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -6784,7 +6606,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0212",
+   "case_id": "e1_core-0207",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -6815,7 +6637,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0213",
+   "case_id": "e1_core-0208",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -6846,7 +6668,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0214",
+   "case_id": "e1_core-0209",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -6877,7 +6699,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0215",
+   "case_id": "e1_core-0210",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -6906,13 +6728,170 @@
    ]
   },
   {
-   "case_id": "e1_core-0216",
+   "case_id": "e1_core-0211",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
      [
       -0.0,
       1.0
+     ],
+     [
+      1.0000001,
+      1000000.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0210"
+   },
+   "tolerance_class": "interpolation",
+   "tolerance_limit": {
+    "absolute": 0.001,
+    "relative": 0.0,
+    "reason": "asymmetry of 1e-7 is inside the rule; which triangle is read is free"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:rulings-0024",
+    "input:/a/0/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0212",
+   "operation": "core.linalg.eigen_symmetric",
+   "inputs": {
+    "a": [
+     [
+      1000000.0,
+      "NaN"
+     ],
+     [
+      1.0000001,
+      1000000.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:rulings-0024",
+    "input:/a/0/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0213",
+   "operation": "core.linalg.eigen_symmetric",
+   "inputs": {
+    "a": [
+     [
+      1000000.0,
+      "Infinity"
+     ],
+     [
+      1.0000001,
+      1000000.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0024",
+    "input:/a/0/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0214",
+   "operation": "core.linalg.eigen_symmetric",
+   "inputs": {
+    "a": [
+     [
+      1000000.0,
+      "-Infinity"
+     ],
+     [
+      1.0000001,
+      1000000.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0024",
+    "input:/a/0/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0215",
+   "operation": "core.linalg.eigen_symmetric",
+   "inputs": {
+    "a": [
+     [
+      1000000.0,
+      0.0
+     ],
+     [
+      1.0000001,
+      1000000.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:rulings-0024",
+    "input:/a/0/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0216",
+   "operation": "core.linalg.eigen_symmetric",
+   "inputs": {
+    "a": [
+     [
+      1000000.0,
+      -0.0
      ],
      [
       1.0000001,
@@ -6937,168 +6916,11 @@
     "e1",
     "negative_zero",
     "base:rulings-0024",
-    "input:/a/0/0"
+    "input:/a/0/1"
    ]
   },
   {
    "case_id": "e1_core-0217",
-   "operation": "core.linalg.eigen_symmetric",
-   "inputs": {
-    "a": [
-     [
-      1000000.0,
-      "NaN"
-     ],
-     [
-      1.0000001,
-      1000000.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:rulings-0024",
-    "input:/a/0/1"
-   ]
-  },
-  {
-   "case_id": "e1_core-0218",
-   "operation": "core.linalg.eigen_symmetric",
-   "inputs": {
-    "a": [
-     [
-      1000000.0,
-      "Infinity"
-     ],
-     [
-      1.0000001,
-      1000000.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0024",
-    "input:/a/0/1"
-   ]
-  },
-  {
-   "case_id": "e1_core-0219",
-   "operation": "core.linalg.eigen_symmetric",
-   "inputs": {
-    "a": [
-     [
-      1000000.0,
-      "-Infinity"
-     ],
-     [
-      1.0000001,
-      1000000.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0024",
-    "input:/a/0/1"
-   ]
-  },
-  {
-   "case_id": "e1_core-0220",
-   "operation": "core.linalg.eigen_symmetric",
-   "inputs": {
-    "a": [
-     [
-      1000000.0,
-      0.0
-     ],
-     [
-      1.0000001,
-      1000000.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:rulings-0024",
-    "input:/a/0/1"
-   ]
-  },
-  {
-   "case_id": "e1_core-0221",
-   "operation": "core.linalg.eigen_symmetric",
-   "inputs": {
-    "a": [
-     [
-      1000000.0,
-      -0.0
-     ],
-     [
-      1.0000001,
-      1000000.0
-     ]
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0220"
-   },
-   "tolerance_class": "interpolation",
-   "tolerance_limit": {
-    "absolute": 0.001,
-    "relative": 0.0,
-    "reason": "asymmetry of 1e-7 is inside the rule; which triangle is read is free"
-   },
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:rulings-0024",
-    "input:/a/0/1"
-   ]
-  },
-  {
-   "case_id": "e1_core-0222",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7129,7 +6951,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0223",
+   "case_id": "e1_core-0218",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7160,7 +6982,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0224",
+   "case_id": "e1_core-0219",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7191,7 +7013,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0225",
+   "case_id": "e1_core-0220",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7220,7 +7042,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0226",
+   "case_id": "e1_core-0221",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7236,7 +7058,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0225"
+    "case_id": "e1_core-0220"
    },
    "tolerance_class": "interpolation",
    "tolerance_limit": {
@@ -7255,7 +7077,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0227",
+   "case_id": "e1_core-0222",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7286,7 +7108,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0228",
+   "case_id": "e1_core-0223",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7317,7 +7139,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0229",
+   "case_id": "e1_core-0224",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7348,7 +7170,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0230",
+   "case_id": "e1_core-0225",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7377,7 +7199,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0231",
+   "case_id": "e1_core-0226",
    "operation": "core.linalg.eigen_symmetric",
    "inputs": {
     "a": [
@@ -7393,7 +7215,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0230"
+    "case_id": "e1_core-0225"
    },
    "tolerance_class": "interpolation",
    "tolerance_limit": {
@@ -7412,7 +7234,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0232",
+   "case_id": "e1_core-0227",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7447,7 +7269,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0233",
+   "case_id": "e1_core-0228",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7482,7 +7304,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0234",
+   "case_id": "e1_core-0229",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7517,7 +7339,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0235",
+   "case_id": "e1_core-0230",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7557,7 +7379,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0236",
+   "case_id": "e1_core-0231",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7592,7 +7414,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0237",
+   "case_id": "e1_core-0232",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7627,7 +7449,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0238",
+   "case_id": "e1_core-0233",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7662,7 +7484,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0239",
+   "case_id": "e1_core-0234",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7695,7 +7517,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0240",
+   "case_id": "e1_core-0235",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7715,7 +7537,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0239"
+    "case_id": "e1_core-0234"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -7729,7 +7551,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0241",
+   "case_id": "e1_core-0236",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7764,7 +7586,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0242",
+   "case_id": "e1_core-0237",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7799,7 +7621,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0243",
+   "case_id": "e1_core-0238",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7834,7 +7656,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0244",
+   "case_id": "e1_core-0239",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7867,7 +7689,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0245",
+   "case_id": "e1_core-0240",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7887,7 +7709,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0244"
+    "case_id": "e1_core-0239"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -7901,7 +7723,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0246",
+   "case_id": "e1_core-0241",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7936,7 +7758,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0247",
+   "case_id": "e1_core-0242",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -7971,7 +7793,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0248",
+   "case_id": "e1_core-0243",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8006,7 +7828,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0249",
+   "case_id": "e1_core-0244",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8039,7 +7861,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0250",
+   "case_id": "e1_core-0245",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8059,7 +7881,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0249"
+    "case_id": "e1_core-0244"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -8073,7 +7895,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0251",
+   "case_id": "e1_core-0246",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8108,7 +7930,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0252",
+   "case_id": "e1_core-0247",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8143,7 +7965,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0253",
+   "case_id": "e1_core-0248",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8178,7 +8000,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0254",
+   "case_id": "e1_core-0249",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8211,7 +8033,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0255",
+   "case_id": "e1_core-0250",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8231,7 +8053,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0254"
+    "case_id": "e1_core-0249"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -8245,7 +8067,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0256",
+   "case_id": "e1_core-0251",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8280,7 +8102,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0257",
+   "case_id": "e1_core-0252",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8315,7 +8137,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0258",
+   "case_id": "e1_core-0253",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8350,7 +8172,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0259",
+   "case_id": "e1_core-0254",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8383,7 +8205,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0260",
+   "case_id": "e1_core-0255",
    "operation": "core.linalg.solve",
    "inputs": {
     "a": [
@@ -8403,7 +8225,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0259"
+    "case_id": "e1_core-0254"
    },
    "tolerance_class": "interpolation",
    "verified_by": [
@@ -8417,7 +8239,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0261",
+   "case_id": "e1_core-0256",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": "NaN",
@@ -8449,7 +8271,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0262",
+   "case_id": "e1_core-0257",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": "Infinity",
@@ -8481,7 +8303,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0263",
+   "case_id": "e1_core-0258",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": "-Infinity",
@@ -8513,7 +8335,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0264",
+   "case_id": "e1_core-0259",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 0.0,
@@ -8543,7 +8365,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0265",
+   "case_id": "e1_core-0260",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": -0.0,
@@ -8560,18 +8382,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0264"
+    "case_id": "e1_core-0259"
    },
    "tolerance_class": "common_rng",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "confidence_interval",
-     "stderr_output": "stderr",
-     "z": 4.0
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -8583,7 +8396,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0266",
+   "case_id": "e1_core-0261",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8615,7 +8428,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0267",
+   "case_id": "e1_core-0262",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8647,7 +8460,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0268",
+   "case_id": "e1_core-0263",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8679,7 +8492,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0269",
+   "case_id": "e1_core-0264",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8709,7 +8522,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0270",
+   "case_id": "e1_core-0265",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8726,18 +8539,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0269"
+    "case_id": "e1_core-0264"
    },
    "tolerance_class": "common_rng",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "confidence_interval",
-     "stderr_output": "stderr",
-     "z": 4.0
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -8749,7 +8553,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0271",
+   "case_id": "e1_core-0266",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8781,7 +8585,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0272",
+   "case_id": "e1_core-0267",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8813,7 +8617,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0273",
+   "case_id": "e1_core-0268",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8845,7 +8649,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0274",
+   "case_id": "e1_core-0269",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8875,7 +8679,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0275",
+   "case_id": "e1_core-0270",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8892,18 +8696,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0274"
+    "case_id": "e1_core-0269"
    },
    "tolerance_class": "common_rng",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "confidence_interval",
-     "stderr_output": "stderr",
-     "z": 4.0
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -8915,7 +8710,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0276",
+   "case_id": "e1_core-0271",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8947,7 +8742,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0277",
+   "case_id": "e1_core-0272",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -8979,7 +8774,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0278",
+   "case_id": "e1_core-0273",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9011,7 +8806,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0279",
+   "case_id": "e1_core-0274",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9041,7 +8836,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0280",
+   "case_id": "e1_core-0275",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9058,18 +8853,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0279"
+    "case_id": "e1_core-0274"
    },
    "tolerance_class": "common_rng",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "confidence_interval",
-     "stderr_output": "stderr",
-     "z": 4.0
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -9081,7 +8867,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0281",
+   "case_id": "e1_core-0276",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9113,7 +8899,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0282",
+   "case_id": "e1_core-0277",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9145,7 +8931,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0283",
+   "case_id": "e1_core-0278",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9177,7 +8963,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0284",
+   "case_id": "e1_core-0279",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9207,7 +8993,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0285",
+   "case_id": "e1_core-0280",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9224,18 +9010,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0284"
+    "case_id": "e1_core-0279"
    },
    "tolerance_class": "common_rng",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "confidence_interval",
-     "stderr_output": "stderr",
-     "z": 4.0
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -9247,7 +9024,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0286",
+   "case_id": "e1_core-0281",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9279,7 +9056,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0287",
+   "case_id": "e1_core-0282",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9311,7 +9088,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0288",
+   "case_id": "e1_core-0283",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9343,7 +9120,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0289",
+   "case_id": "e1_core-0284",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9373,7 +9150,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0290",
+   "case_id": "e1_core-0285",
    "operation": "core.mc.gbm_european",
    "inputs": {
     "spot": 100.0,
@@ -9390,18 +9167,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0289"
+    "case_id": "e1_core-0284"
    },
    "tolerance_class": "common_rng",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 6.330080627549918,
-     "method": "confidence_interval",
-     "stderr_output": "stderr",
-     "z": 4.0
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -9413,7 +9181,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0291",
+   "case_id": "e1_core-0286",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": "NaN",
@@ -9443,7 +9211,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0292",
+   "case_id": "e1_core-0287",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": "Infinity",
@@ -9473,7 +9241,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0293",
+   "case_id": "e1_core-0288",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": "-Infinity",
@@ -9503,7 +9271,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0294",
+   "case_id": "e1_core-0289",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 0.0,
@@ -9531,7 +9299,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0295",
+   "case_id": "e1_core-0290",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": -0.0,
@@ -9546,17 +9314,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0294"
+    "case_id": "e1_core-0289"
    },
    "tolerance_class": "numerical_scheme",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 23.37958738793615,
-     "method": "absolute",
-     "limit": 0.005
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -9568,7 +9328,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0296",
+   "case_id": "e1_core-0291",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9598,7 +9358,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0297",
+   "case_id": "e1_core-0292",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9628,7 +9388,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0298",
+   "case_id": "e1_core-0293",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9658,7 +9418,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0299",
+   "case_id": "e1_core-0294",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9686,7 +9446,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0300",
+   "case_id": "e1_core-0295",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9701,17 +9461,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0299"
+    "case_id": "e1_core-0294"
    },
    "tolerance_class": "numerical_scheme",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 23.37958738793615,
-     "method": "absolute",
-     "limit": 0.005
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -9723,7 +9475,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0301",
+   "case_id": "e1_core-0296",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9753,7 +9505,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0302",
+   "case_id": "e1_core-0297",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9783,7 +9535,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0303",
+   "case_id": "e1_core-0298",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9813,7 +9565,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0304",
+   "case_id": "e1_core-0299",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9841,7 +9593,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0305",
+   "case_id": "e1_core-0300",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9856,17 +9608,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0304"
+    "case_id": "e1_core-0299"
    },
    "tolerance_class": "numerical_scheme",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 23.37958738793615,
-     "method": "absolute",
-     "limit": 0.005
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -9878,7 +9622,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0306",
+   "case_id": "e1_core-0301",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9908,7 +9652,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0307",
+   "case_id": "e1_core-0302",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9938,7 +9682,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0308",
+   "case_id": "e1_core-0303",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -9968,7 +9712,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0309",
+   "case_id": "e1_core-0304",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10010,7 +9754,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0310",
+   "case_id": "e1_core-0305",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10040,7 +9784,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0311",
+   "case_id": "e1_core-0306",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10070,7 +9814,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0312",
+   "case_id": "e1_core-0307",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10100,7 +9844,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0313",
+   "case_id": "e1_core-0308",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10128,7 +9872,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0314",
+   "case_id": "e1_core-0309",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10143,17 +9887,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0313"
+    "case_id": "e1_core-0308"
    },
    "tolerance_class": "numerical_scheme",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 23.37958738793615,
-     "method": "absolute",
-     "limit": 0.005
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -10165,7 +9901,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0315",
+   "case_id": "e1_core-0310",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10195,7 +9931,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0316",
+   "case_id": "e1_core-0311",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10225,7 +9961,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0317",
+   "case_id": "e1_core-0312",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10255,7 +9991,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0318",
+   "case_id": "e1_core-0313",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10283,7 +10019,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0319",
+   "case_id": "e1_core-0314",
    "operation": "core.pde.bs_european",
    "inputs": {
     "spot": 100.0,
@@ -10298,17 +10034,9 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0318"
+    "case_id": "e1_core-0313"
    },
    "tolerance_class": "numerical_scheme",
-   "extra_checks": [
-    {
-     "output": "price",
-     "expected": 23.37958738793615,
-     "method": "absolute",
-     "limit": 0.005
-    }
-   ],
    "verified_by": [
     "rule-F-3"
    ],
@@ -10320,7 +10048,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0320",
+   "case_id": "e1_core-0315",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10360,7 +10088,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0321",
+   "case_id": "e1_core-0316",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10400,7 +10128,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0322",
+   "case_id": "e1_core-0317",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10440,7 +10168,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0323",
+   "case_id": "e1_core-0318",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10478,7 +10206,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0324",
+   "case_id": "e1_core-0319",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10503,7 +10231,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0323"
+    "case_id": "e1_core-0318"
    },
    "tolerance_class": "common_rng",
    "verified_by": [
@@ -10517,7 +10245,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0325",
+   "case_id": "e1_core-0320",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10557,7 +10285,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0326",
+   "case_id": "e1_core-0321",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10597,7 +10325,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0327",
+   "case_id": "e1_core-0322",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10637,7 +10365,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0328",
+   "case_id": "e1_core-0323",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10675,7 +10403,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0329",
+   "case_id": "e1_core-0324",
    "operation": "core.rng.inverse_normal",
    "inputs": {
     "p": [
@@ -10700,7 +10428,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0328"
+    "case_id": "e1_core-0323"
    },
    "tolerance_class": "common_rng",
    "verified_by": [
@@ -10714,7 +10442,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0330",
+   "case_id": "e1_core-0325",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10738,7 +10466,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0331",
+   "case_id": "e1_core-0326",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10762,7 +10490,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0332",
+   "case_id": "e1_core-0327",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10786,7 +10514,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0333",
+   "case_id": "e1_core-0328",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10812,7 +10540,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0334",
+   "case_id": "e1_core-0329",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10836,7 +10564,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0335",
+   "case_id": "e1_core-0330",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10860,7 +10588,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0336",
+   "case_id": "e1_core-0331",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10884,7 +10612,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0337",
+   "case_id": "e1_core-0332",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10906,7 +10634,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0338",
+   "case_id": "e1_core-0333",
    "operation": "core.root.bisection",
    "inputs": {
     "function": "steep_atan",
@@ -10915,7 +10643,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0337"
+    "case_id": "e1_core-0332"
    },
    "tolerance_class": "root_finding",
    "verified_by": [
@@ -10929,7 +10657,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0339",
+   "case_id": "e1_core-0334",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -10953,7 +10681,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0340",
+   "case_id": "e1_core-0335",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -10977,7 +10705,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0341",
+   "case_id": "e1_core-0336",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -11001,7 +10729,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0342",
+   "case_id": "e1_core-0337",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -11027,7 +10755,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0343",
+   "case_id": "e1_core-0338",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -11051,7 +10779,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0344",
+   "case_id": "e1_core-0339",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -11075,7 +10803,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0345",
+   "case_id": "e1_core-0340",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -11099,7 +10827,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0346",
+   "case_id": "e1_core-0341",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -11121,7 +10849,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0347",
+   "case_id": "e1_core-0342",
    "operation": "core.root.brent",
    "inputs": {
     "function": "steep_atan",
@@ -11130,7 +10858,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0346"
+    "case_id": "e1_core-0341"
    },
    "tolerance_class": "root_finding",
    "verified_by": [
@@ -11144,7 +10872,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0348",
+   "case_id": "e1_core-0343",
    "operation": "core.root.newton",
    "inputs": {
     "function": "square",
@@ -11167,7 +10895,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0349",
+   "case_id": "e1_core-0344",
    "operation": "core.root.newton",
    "inputs": {
     "function": "square",
@@ -11190,7 +10918,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0350",
+   "case_id": "e1_core-0345",
    "operation": "core.root.newton",
    "inputs": {
     "function": "square",
@@ -11213,7 +10941,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0351",
+   "case_id": "e1_core-0346",
    "operation": "core.root.newton",
    "inputs": {
     "function": "square",
@@ -11238,7 +10966,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0352",
+   "case_id": "e1_core-0347",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11267,7 +10995,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0353",
+   "case_id": "e1_core-0348",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11296,7 +11024,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0354",
+   "case_id": "e1_core-0349",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11325,7 +11053,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0355",
+   "case_id": "e1_core-0350",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11352,12 +11080,154 @@
    ]
   },
   {
-   "case_id": "e1_core-0356",
+   "case_id": "e1_core-0351",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
      -0.0,
      1.0
+    ],
+    "y": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0350"
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0012",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0352",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.0,
+     "NaN"
+    ],
+    "y": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0012",
+    "input:/x/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0353",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.0,
+     "Infinity"
+    ],
+    "y": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0012",
+    "input:/x/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0354",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.0,
+     "-Infinity"
+    ],
+    "y": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0012",
+    "input:/x/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0355",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.0,
+     0.0
+    ],
+    "y": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0012",
+    "input:/x/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0356",
+   "operation": "core.stats.covariance",
+   "inputs": {
+    "x": [
+     1.0,
+     -0.0
     ],
     "y": [
      1.0,
@@ -11376,7 +11246,7 @@
     "e1",
     "negative_zero",
     "base:stats-0012",
-    "input:/x/0"
+    "input:/x/1"
    ]
   },
   {
@@ -11385,10 +11255,10 @@
    "inputs": {
     "x": [
      1.0,
-     "NaN"
+     1.0
     ],
     "y": [
-     1.0,
+     "NaN",
      2.0
     ]
    },
@@ -11405,7 +11275,7 @@
     "non_finite",
     "nan",
     "base:stats-0012",
-    "input:/x/1"
+    "input:/y/0"
    ]
   },
   {
@@ -11414,10 +11284,10 @@
    "inputs": {
     "x": [
      1.0,
-     "Infinity"
+     1.0
     ],
     "y": [
-     1.0,
+     "Infinity",
      2.0
     ]
    },
@@ -11434,7 +11304,7 @@
     "non_finite",
     "infinity",
     "base:stats-0012",
-    "input:/x/1"
+    "input:/y/0"
    ]
   },
   {
@@ -11443,10 +11313,10 @@
    "inputs": {
     "x": [
      1.0,
-     "-Infinity"
+     1.0
     ],
     "y": [
-     1.0,
+     "-Infinity",
      2.0
     ]
    },
@@ -11463,7 +11333,7 @@
     "non_finite",
     "infinity",
     "base:stats-0012",
-    "input:/x/1"
+    "input:/y/0"
    ]
   },
   {
@@ -11472,10 +11342,10 @@
    "inputs": {
     "x": [
      1.0,
-     0.0
+     1.0
     ],
     "y": [
-     1.0,
+     0.0,
      2.0
     ]
    },
@@ -11490,7 +11360,7 @@
     "e1",
     "zero_anchor",
     "base:stats-0012",
-    "input:/x/1"
+    "input:/y/0"
    ]
   },
   {
@@ -11499,10 +11369,10 @@
    "inputs": {
     "x": [
      1.0,
-     -0.0
+     1.0
     ],
     "y": [
-     1.0,
+     -0.0,
      2.0
     ]
    },
@@ -11518,153 +11388,11 @@
     "e1",
     "negative_zero",
     "base:stats-0012",
-    "input:/x/1"
+    "input:/y/0"
    ]
   },
   {
    "case_id": "e1_core-0362",
-   "operation": "core.stats.covariance",
-   "inputs": {
-    "x": [
-     1.0,
-     1.0
-    ],
-    "y": [
-     "NaN",
-     2.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0012",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0363",
-   "operation": "core.stats.covariance",
-   "inputs": {
-    "x": [
-     1.0,
-     1.0
-    ],
-    "y": [
-     "Infinity",
-     2.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0012",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0364",
-   "operation": "core.stats.covariance",
-   "inputs": {
-    "x": [
-     1.0,
-     1.0
-    ],
-    "y": [
-     "-Infinity",
-     2.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0012",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0365",
-   "operation": "core.stats.covariance",
-   "inputs": {
-    "x": [
-     1.0,
-     1.0
-    ],
-    "y": [
-     0.0,
-     2.0
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0012",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0366",
-   "operation": "core.stats.covariance",
-   "inputs": {
-    "x": [
-     1.0,
-     1.0
-    ],
-    "y": [
-     -0.0,
-     2.0
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0365"
-   },
-   "tolerance_class": "statistics",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0012",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0367",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11693,7 +11421,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0368",
+   "case_id": "e1_core-0363",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11722,7 +11450,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0369",
+   "case_id": "e1_core-0364",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11751,7 +11479,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0370",
+   "case_id": "e1_core-0365",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11778,7 +11506,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0371",
+   "case_id": "e1_core-0366",
    "operation": "core.stats.covariance",
    "inputs": {
     "x": [
@@ -11792,7 +11520,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0370"
+    "case_id": "e1_core-0365"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -11806,7 +11534,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0372",
+   "case_id": "e1_core-0367",
    "operation": "core.stats.normal",
    "inputs": {
     "x": [
@@ -11838,7 +11566,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0373",
+   "case_id": "e1_core-0368",
    "operation": "core.stats.normal",
    "inputs": {
     "x": [
@@ -11870,7 +11598,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0374",
+   "case_id": "e1_core-0369",
    "operation": "core.stats.normal",
    "inputs": {
     "x": [
@@ -11902,7 +11630,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0375",
+   "case_id": "e1_core-0370",
    "operation": "core.stats.normal",
    "inputs": {
     "x": [
@@ -11932,7 +11660,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0376",
+   "case_id": "e1_core-0371",
    "operation": "core.stats.normal",
    "inputs": {
     "x": [
@@ -11945,6 +11673,168 @@
      0.5,
      1.96,
      6.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0370"
+   },
+   "tolerance_class": "statistics",
+   "tolerance_limit": {
+    "relative": 1e-13,
+    "absolute": 0.0,
+    "reason": "tail values near 1e-300: relative accuracy is the point"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0001",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0372",
+   "operation": "core.stats.normal",
+   "inputs": {
+    "x": [
+     -37.0,
+     -10.0,
+     -5.0,
+     -1.0,
+     -0.1,
+     0.0,
+     0.5,
+     1.96,
+     "NaN"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0001",
+    "input:/x/8"
+   ]
+  },
+  {
+   "case_id": "e1_core-0373",
+   "operation": "core.stats.normal",
+   "inputs": {
+    "x": [
+     -37.0,
+     -10.0,
+     -5.0,
+     -1.0,
+     -0.1,
+     0.0,
+     0.5,
+     1.96,
+     "Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0001",
+    "input:/x/8"
+   ]
+  },
+  {
+   "case_id": "e1_core-0374",
+   "operation": "core.stats.normal",
+   "inputs": {
+    "x": [
+     -37.0,
+     -10.0,
+     -5.0,
+     -1.0,
+     -0.1,
+     0.0,
+     0.5,
+     1.96,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0001",
+    "input:/x/8"
+   ]
+  },
+  {
+   "case_id": "e1_core-0375",
+   "operation": "core.stats.normal",
+   "inputs": {
+    "x": [
+     -37.0,
+     -10.0,
+     -5.0,
+     -1.0,
+     -0.1,
+     0.0,
+     0.5,
+     1.96,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0001",
+    "input:/x/8"
+   ]
+  },
+  {
+   "case_id": "e1_core-0376",
+   "operation": "core.stats.normal",
+   "inputs": {
+    "x": [
+     -37.0,
+     -10.0,
+     -5.0,
+     -1.0,
+     -0.1,
+     0.0,
+     0.5,
+     1.96,
+     -0.0
     ]
    },
    "expected": {
@@ -11964,173 +11854,11 @@
     "e1",
     "negative_zero",
     "base:stats-0001",
-    "input:/x/0"
+    "input:/x/8"
    ]
   },
   {
    "case_id": "e1_core-0377",
-   "operation": "core.stats.normal",
-   "inputs": {
-    "x": [
-     -37.0,
-     -10.0,
-     -5.0,
-     -1.0,
-     -0.1,
-     0.0,
-     0.5,
-     1.96,
-     "NaN"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0001",
-    "input:/x/8"
-   ]
-  },
-  {
-   "case_id": "e1_core-0378",
-   "operation": "core.stats.normal",
-   "inputs": {
-    "x": [
-     -37.0,
-     -10.0,
-     -5.0,
-     -1.0,
-     -0.1,
-     0.0,
-     0.5,
-     1.96,
-     "Infinity"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0001",
-    "input:/x/8"
-   ]
-  },
-  {
-   "case_id": "e1_core-0379",
-   "operation": "core.stats.normal",
-   "inputs": {
-    "x": [
-     -37.0,
-     -10.0,
-     -5.0,
-     -1.0,
-     -0.1,
-     0.0,
-     0.5,
-     1.96,
-     "-Infinity"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0001",
-    "input:/x/8"
-   ]
-  },
-  {
-   "case_id": "e1_core-0380",
-   "operation": "core.stats.normal",
-   "inputs": {
-    "x": [
-     -37.0,
-     -10.0,
-     -5.0,
-     -1.0,
-     -0.1,
-     0.0,
-     0.5,
-     1.96,
-     0.0
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0001",
-    "input:/x/8"
-   ]
-  },
-  {
-   "case_id": "e1_core-0381",
-   "operation": "core.stats.normal",
-   "inputs": {
-    "x": [
-     -37.0,
-     -10.0,
-     -5.0,
-     -1.0,
-     -0.1,
-     0.0,
-     0.5,
-     1.96,
-     -0.0
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0380"
-   },
-   "tolerance_class": "statistics",
-   "tolerance_limit": {
-    "relative": 1e-13,
-    "absolute": 0.0,
-    "reason": "tail values near 1e-300: relative accuracy is the point"
-   },
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0001",
-    "input:/x/8"
-   ]
-  },
-  {
-   "case_id": "e1_core-0382",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12161,7 +11889,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0383",
+   "case_id": "e1_core-0378",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12192,7 +11920,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0384",
+   "case_id": "e1_core-0379",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12223,7 +11951,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0385",
+   "case_id": "e1_core-0380",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12252,13 +11980,165 @@
    ]
   },
   {
-   "case_id": "e1_core-0386",
+   "case_id": "e1_core-0381",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
      -0.0,
      2.0,
      3.0
+    ],
+    "y": [
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0380"
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:rulings-0031",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0382",
+   "operation": "core.stats.ols",
+   "inputs": {
+    "x": [
+     1.0,
+     2.0,
+     "NaN"
+    ],
+    "y": [
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:rulings-0031",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0383",
+   "operation": "core.stats.ols",
+   "inputs": {
+    "x": [
+     1.0,
+     2.0,
+     "Infinity"
+    ],
+    "y": [
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0031",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0384",
+   "operation": "core.stats.ols",
+   "inputs": {
+    "x": [
+     1.0,
+     2.0,
+     "-Infinity"
+    ],
+    "y": [
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:rulings-0031",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0385",
+   "operation": "core.stats.ols",
+   "inputs": {
+    "x": [
+     1.0,
+     2.0,
+     0.0
+    ],
+    "y": [
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:rulings-0031",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0386",
+   "operation": "core.stats.ols",
+   "inputs": {
+    "x": [
+     1.0,
+     2.0,
+     -0.0
     ],
     "y": [
      5.0,
@@ -12278,7 +12158,7 @@
     "e1",
     "negative_zero",
     "base:rulings-0031",
-    "input:/x/0"
+    "input:/x/2"
    ]
   },
   {
@@ -12288,10 +12168,10 @@
     "x": [
      1.0,
      2.0,
-     "NaN"
+     3.0
     ],
     "y": [
-     5.0,
+     "NaN",
      5.0,
      5.0
     ]
@@ -12309,7 +12189,7 @@
     "non_finite",
     "nan",
     "base:rulings-0031",
-    "input:/x/2"
+    "input:/y/0"
    ]
   },
   {
@@ -12319,10 +12199,10 @@
     "x": [
      1.0,
      2.0,
-     "Infinity"
+     3.0
     ],
     "y": [
-     5.0,
+     "Infinity",
      5.0,
      5.0
     ]
@@ -12340,7 +12220,7 @@
     "non_finite",
     "infinity",
     "base:rulings-0031",
-    "input:/x/2"
+    "input:/y/0"
    ]
   },
   {
@@ -12350,10 +12230,10 @@
     "x": [
      1.0,
      2.0,
-     "-Infinity"
+     3.0
     ],
     "y": [
-     5.0,
+     "-Infinity",
      5.0,
      5.0
     ]
@@ -12371,7 +12251,7 @@
     "non_finite",
     "infinity",
     "base:rulings-0031",
-    "input:/x/2"
+    "input:/y/0"
    ]
   },
   {
@@ -12381,10 +12261,10 @@
     "x": [
      1.0,
      2.0,
-     0.0
+     3.0
     ],
     "y": [
-     5.0,
+     0.0,
      5.0,
      5.0
     ]
@@ -12400,7 +12280,7 @@
     "e1",
     "zero_anchor",
     "base:rulings-0031",
-    "input:/x/2"
+    "input:/y/0"
    ]
   },
   {
@@ -12410,10 +12290,10 @@
     "x": [
      1.0,
      2.0,
-     -0.0
+     3.0
     ],
     "y": [
-     5.0,
+     -0.0,
      5.0,
      5.0
     ]
@@ -12430,163 +12310,11 @@
     "e1",
     "negative_zero",
     "base:rulings-0031",
-    "input:/x/2"
+    "input:/y/0"
    ]
   },
   {
    "case_id": "e1_core-0392",
-   "operation": "core.stats.ols",
-   "inputs": {
-    "x": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     "NaN",
-     5.0,
-     5.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:rulings-0031",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0393",
-   "operation": "core.stats.ols",
-   "inputs": {
-    "x": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     "Infinity",
-     5.0,
-     5.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0031",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0394",
-   "operation": "core.stats.ols",
-   "inputs": {
-    "x": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     "-Infinity",
-     5.0,
-     5.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:rulings-0031",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0395",
-   "operation": "core.stats.ols",
-   "inputs": {
-    "x": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     0.0,
-     5.0,
-     5.0
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:rulings-0031",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0396",
-   "operation": "core.stats.ols",
-   "inputs": {
-    "x": [
-     1.0,
-     2.0,
-     3.0
-    ],
-    "y": [
-     -0.0,
-     5.0,
-     5.0
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0395"
-   },
-   "tolerance_class": "statistics",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:rulings-0031",
-    "input:/y/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0397",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12617,7 +12345,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0398",
+   "case_id": "e1_core-0393",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12648,7 +12376,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0399",
+   "case_id": "e1_core-0394",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12679,7 +12407,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0400",
+   "case_id": "e1_core-0395",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12708,7 +12436,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0401",
+   "case_id": "e1_core-0396",
    "operation": "core.stats.ols",
    "inputs": {
     "x": [
@@ -12724,7 +12452,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0400"
+    "case_id": "e1_core-0395"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -12738,7 +12466,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0402",
+   "case_id": "e1_core-0397",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -12782,7 +12510,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0403",
+   "case_id": "e1_core-0398",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -12826,7 +12554,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0404",
+   "case_id": "e1_core-0399",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -12870,7 +12598,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0405",
+   "case_id": "e1_core-0400",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -12912,7 +12640,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0406",
+   "case_id": "e1_core-0401",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -12928,6 +12656,223 @@
      0.5,
      6.25,
      3.25
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0400"
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0003",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0402",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "NaN"
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0003",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0403",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "Infinity"
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0003",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0404",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "-Infinity"
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0003",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0405",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     0.0
+    ],
+    "p": [
+     0.0,
+     0.01,
+     0.25,
+     0.5,
+     0.9,
+     0.99,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0003",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0406",
+   "operation": "core.stats.quantile",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     -0.0
     ],
     "p": [
      0.0,
@@ -12951,228 +12896,11 @@
     "e1",
     "negative_zero",
     "base:stats-0003",
-    "input:/x/0"
+    "input:/x/11"
    ]
   },
   {
    "case_id": "e1_core-0407",
-   "operation": "core.stats.quantile",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "NaN"
-    ],
-    "p": [
-     0.0,
-     0.01,
-     0.25,
-     0.5,
-     0.9,
-     0.99,
-     1.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0003",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0408",
-   "operation": "core.stats.quantile",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "Infinity"
-    ],
-    "p": [
-     0.0,
-     0.01,
-     0.25,
-     0.5,
-     0.9,
-     0.99,
-     1.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0003",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0409",
-   "operation": "core.stats.quantile",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "-Infinity"
-    ],
-    "p": [
-     0.0,
-     0.01,
-     0.25,
-     0.5,
-     0.9,
-     0.99,
-     1.0
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0003",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0410",
-   "operation": "core.stats.quantile",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     0.0
-    ],
-    "p": [
-     0.0,
-     0.01,
-     0.25,
-     0.5,
-     0.9,
-     0.99,
-     1.0
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0003",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0411",
-   "operation": "core.stats.quantile",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     -0.0
-    ],
-    "p": [
-     0.0,
-     0.01,
-     0.25,
-     0.5,
-     0.9,
-     0.99,
-     1.0
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0410"
-   },
-   "tolerance_class": "statistics",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0003",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0412",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13216,7 +12944,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0413",
+   "case_id": "e1_core-0408",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13260,7 +12988,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0414",
+   "case_id": "e1_core-0409",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13304,7 +13032,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0415",
+   "case_id": "e1_core-0410",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13358,7 +13086,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0416",
+   "case_id": "e1_core-0411",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13402,7 +13130,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0417",
+   "case_id": "e1_core-0412",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13446,7 +13174,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0418",
+   "case_id": "e1_core-0413",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13490,7 +13218,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0419",
+   "case_id": "e1_core-0414",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13532,7 +13260,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0420",
+   "case_id": "e1_core-0415",
    "operation": "core.stats.quantile",
    "inputs": {
     "x": [
@@ -13561,7 +13289,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0419"
+    "case_id": "e1_core-0414"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -13575,7 +13303,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0421",
+   "case_id": "e1_core-0416",
    "operation": "core.stats.summary",
    "inputs": {
     "x": [
@@ -13601,7 +13329,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0422",
+   "case_id": "e1_core-0417",
    "operation": "core.stats.summary",
    "inputs": {
     "x": [
@@ -13627,7 +13355,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0423",
+   "case_id": "e1_core-0418",
    "operation": "core.stats.summary",
    "inputs": {
     "x": [
@@ -13653,7 +13381,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0424",
+   "case_id": "e1_core-0419",
    "operation": "core.stats.summary",
    "inputs": {
     "x": [
@@ -13677,13 +13405,143 @@
    ]
   },
   {
-   "case_id": "e1_core-0425",
+   "case_id": "e1_core-0420",
    "operation": "core.stats.summary",
    "inputs": {
     "x": [
      -0.0,
      2.0,
      2.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0419"
+   },
+   "tolerance_class": "statistics",
+   "output_classes": {
+    "count": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0008",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0421",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     2.0,
+     2.0,
+     "NaN"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0008",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0422",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     2.0,
+     2.0,
+     "Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0008",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0423",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     2.0,
+     2.0,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0008",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0424",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     2.0,
+     2.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0008",
+    "input:/x/2"
+   ]
+  },
+  {
+   "case_id": "e1_core-0425",
+   "operation": "core.stats.summary",
+   "inputs": {
+    "x": [
+     2.0,
+     2.0,
+     -0.0
     ]
    },
    "expected": {
@@ -13701,141 +13559,11 @@
     "e1",
     "negative_zero",
     "base:stats-0008",
-    "input:/x/0"
+    "input:/x/2"
    ]
   },
   {
    "case_id": "e1_core-0426",
-   "operation": "core.stats.summary",
-   "inputs": {
-    "x": [
-     2.0,
-     2.0,
-     "NaN"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0008",
-    "input:/x/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0427",
-   "operation": "core.stats.summary",
-   "inputs": {
-    "x": [
-     2.0,
-     2.0,
-     "Infinity"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0008",
-    "input:/x/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0428",
-   "operation": "core.stats.summary",
-   "inputs": {
-    "x": [
-     2.0,
-     2.0,
-     "-Infinity"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0008",
-    "input:/x/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0429",
-   "operation": "core.stats.summary",
-   "inputs": {
-    "x": [
-     2.0,
-     2.0,
-     0.0
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0008",
-    "input:/x/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0430",
-   "operation": "core.stats.summary",
-   "inputs": {
-    "x": [
-     2.0,
-     2.0,
-     -0.0
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0429"
-   },
-   "tolerance_class": "statistics",
-   "output_classes": {
-    "count": "date_and_convention"
-   },
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0008",
-    "input:/x/2"
-   ]
-  },
-  {
-   "case_id": "e1_core-0431",
    "operation": "core.store.latest",
    "inputs": {
     "records": [
@@ -13910,7 +13638,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0432",
+   "case_id": "e1_core-0427",
    "operation": "core.store.latest",
    "inputs": {
     "records": [
@@ -13985,7 +13713,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0433",
+   "case_id": "e1_core-0428",
    "operation": "core.store.latest",
    "inputs": {
     "records": [
@@ -14060,7 +13788,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0434",
+   "case_id": "e1_core-0429",
    "operation": "core.store.latest",
    "inputs": {
     "records": [
@@ -14133,7 +13861,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0435",
+   "case_id": "e1_core-0430",
    "operation": "core.store.latest",
    "inputs": {
     "records": [
@@ -14190,6 +13918,373 @@
     ],
     "as_of": "2026-11-03T16:05:00Z",
     "series_id": "SONIA"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0429"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:store-0008",
+    "input:/records/0/value"
+   ]
+  },
+  {
+   "case_id": "e1_core-0431",
+   "operation": "core.store.replay",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "NaN"
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "checkpoints": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:store_rulings-0011",
+    "input:/records/0/value"
+   ]
+  },
+  {
+   "case_id": "e1_core-0432",
+   "operation": "core.store.replay",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "Infinity"
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "checkpoints": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:store_rulings-0011",
+    "input:/records/0/value"
+   ]
+  },
+  {
+   "case_id": "e1_core-0433",
+   "operation": "core.store.replay",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": "-Infinity"
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "checkpoints": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:store_rulings-0011",
+    "input:/records/0/value"
+   ]
+  },
+  {
+   "case_id": "e1_core-0434",
+   "operation": "core.store.replay",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 0.0
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "checkpoints": []
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:store_rulings-0011",
+    "input:/records/0/value"
+   ]
+  },
+  {
+   "case_id": "e1_core-0435",
+   "operation": "core.store.replay",
+   "inputs": {
+    "records": [
+     {
+      "sequence": 1,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": -0.0
+     },
+     {
+      "sequence": 2,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-02T16:05:00Z",
+      "value": 1.08
+     },
+     {
+      "sequence": 3,
+      "series_id": "SONIA",
+      "event_time": "2026-11-03T16:00:00Z",
+      "knowledge_time": "2026-11-03T16:05:00Z",
+      "value": 3.74
+     },
+     {
+      "sequence": 4,
+      "series_id": "SONIA",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": 3.72
+     },
+     {
+      "sequence": 5,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-04T09:00:00Z",
+      "value": null,
+      "deleted": true
+     },
+     {
+      "sequence": 6,
+      "series_id": "EURUSD",
+      "event_time": "2026-11-02T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": 1.09
+     },
+     {
+      "sequence": 7,
+      "series_id": "SONIA",
+      "event_time": "2026-11-01T16:00:00Z",
+      "knowledge_time": "2026-11-05T09:00:00Z",
+      "value": null
+     }
+    ],
+    "checkpoints": []
    },
    "expected": {
     "status": "same_as",
@@ -14202,67 +14297,24 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:store-0008",
+    "base:store_rulings-0011",
     "input:/records/0/value"
    ]
   },
   {
    "case_id": "e1_core-0436",
-   "operation": "core.store.replay",
+   "operation": "core.store.snapshot",
    "inputs": {
     "records": [
      {
       "sequence": 1,
-      "series_id": "SONIA",
+      "series_id": "A",
       "event_time": "2026-11-02T16:00:00Z",
       "knowledge_time": "2026-11-02T16:05:00Z",
       "value": "NaN"
-     },
-     {
-      "sequence": 2,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": 1.08
-     },
-     {
-      "sequence": 3,
-      "series_id": "SONIA",
-      "event_time": "2026-11-03T16:00:00Z",
-      "knowledge_time": "2026-11-03T16:05:00Z",
-      "value": 3.74
-     },
-     {
-      "sequence": 4,
-      "series_id": "SONIA",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": 3.72
-     },
-     {
-      "sequence": 5,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": null,
-      "deleted": true
-     },
-     {
-      "sequence": 6,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": 1.09
-     },
-     {
-      "sequence": 7,
-      "series_id": "SONIA",
-      "event_time": "2026-11-01T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": null
      }
     ],
-    "checkpoints": []
+    "as_of": "2026-11-02T17:05:00+01:00"
    },
    "expected": {
     "status": "error",
@@ -14276,67 +14328,24 @@
     "e1",
     "non_finite",
     "nan",
-    "base:store_rulings-0011",
+    "base:store-0011",
     "input:/records/0/value"
    ]
   },
   {
    "case_id": "e1_core-0437",
-   "operation": "core.store.replay",
+   "operation": "core.store.snapshot",
    "inputs": {
     "records": [
      {
       "sequence": 1,
-      "series_id": "SONIA",
+      "series_id": "A",
       "event_time": "2026-11-02T16:00:00Z",
       "knowledge_time": "2026-11-02T16:05:00Z",
       "value": "Infinity"
-     },
-     {
-      "sequence": 2,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": 1.08
-     },
-     {
-      "sequence": 3,
-      "series_id": "SONIA",
-      "event_time": "2026-11-03T16:00:00Z",
-      "knowledge_time": "2026-11-03T16:05:00Z",
-      "value": 3.74
-     },
-     {
-      "sequence": 4,
-      "series_id": "SONIA",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": 3.72
-     },
-     {
-      "sequence": 5,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": null,
-      "deleted": true
-     },
-     {
-      "sequence": 6,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": 1.09
-     },
-     {
-      "sequence": 7,
-      "series_id": "SONIA",
-      "event_time": "2026-11-01T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": null
      }
     ],
-    "checkpoints": []
+    "as_of": "2026-11-02T17:05:00+01:00"
    },
    "expected": {
     "status": "error",
@@ -14350,67 +14359,24 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:store_rulings-0011",
+    "base:store-0011",
     "input:/records/0/value"
    ]
   },
   {
    "case_id": "e1_core-0438",
-   "operation": "core.store.replay",
+   "operation": "core.store.snapshot",
    "inputs": {
     "records": [
      {
       "sequence": 1,
-      "series_id": "SONIA",
+      "series_id": "A",
       "event_time": "2026-11-02T16:00:00Z",
       "knowledge_time": "2026-11-02T16:05:00Z",
       "value": "-Infinity"
-     },
-     {
-      "sequence": 2,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": 1.08
-     },
-     {
-      "sequence": 3,
-      "series_id": "SONIA",
-      "event_time": "2026-11-03T16:00:00Z",
-      "knowledge_time": "2026-11-03T16:05:00Z",
-      "value": 3.74
-     },
-     {
-      "sequence": 4,
-      "series_id": "SONIA",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": 3.72
-     },
-     {
-      "sequence": 5,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": null,
-      "deleted": true
-     },
-     {
-      "sequence": 6,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": 1.09
-     },
-     {
-      "sequence": 7,
-      "series_id": "SONIA",
-      "event_time": "2026-11-01T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": null
      }
     ],
-    "checkpoints": []
+    "as_of": "2026-11-02T17:05:00+01:00"
    },
    "expected": {
     "status": "error",
@@ -14424,67 +14390,24 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:store_rulings-0011",
+    "base:store-0011",
     "input:/records/0/value"
    ]
   },
   {
    "case_id": "e1_core-0439",
-   "operation": "core.store.replay",
+   "operation": "core.store.snapshot",
    "inputs": {
     "records": [
      {
       "sequence": 1,
-      "series_id": "SONIA",
+      "series_id": "A",
       "event_time": "2026-11-02T16:00:00Z",
       "knowledge_time": "2026-11-02T16:05:00Z",
       "value": 0.0
-     },
-     {
-      "sequence": 2,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": 1.08
-     },
-     {
-      "sequence": 3,
-      "series_id": "SONIA",
-      "event_time": "2026-11-03T16:00:00Z",
-      "knowledge_time": "2026-11-03T16:05:00Z",
-      "value": 3.74
-     },
-     {
-      "sequence": 4,
-      "series_id": "SONIA",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": 3.72
-     },
-     {
-      "sequence": 5,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": null,
-      "deleted": true
-     },
-     {
-      "sequence": 6,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": 1.09
-     },
-     {
-      "sequence": 7,
-      "series_id": "SONIA",
-      "event_time": "2026-11-01T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": null
      }
     ],
-    "checkpoints": []
+    "as_of": "2026-11-02T17:05:00+01:00"
    },
    "expected": {
     "status": "any"
@@ -14496,67 +14419,24 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:store_rulings-0011",
+    "base:store-0011",
     "input:/records/0/value"
    ]
   },
   {
    "case_id": "e1_core-0440",
-   "operation": "core.store.replay",
+   "operation": "core.store.snapshot",
    "inputs": {
     "records": [
      {
       "sequence": 1,
-      "series_id": "SONIA",
+      "series_id": "A",
       "event_time": "2026-11-02T16:00:00Z",
       "knowledge_time": "2026-11-02T16:05:00Z",
       "value": -0.0
-     },
-     {
-      "sequence": 2,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": 1.08
-     },
-     {
-      "sequence": 3,
-      "series_id": "SONIA",
-      "event_time": "2026-11-03T16:00:00Z",
-      "knowledge_time": "2026-11-03T16:05:00Z",
-      "value": 3.74
-     },
-     {
-      "sequence": 4,
-      "series_id": "SONIA",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": 3.72
-     },
-     {
-      "sequence": 5,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-04T09:00:00Z",
-      "value": null,
-      "deleted": true
-     },
-     {
-      "sequence": 6,
-      "series_id": "EURUSD",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": 1.09
-     },
-     {
-      "sequence": 7,
-      "series_id": "SONIA",
-      "event_time": "2026-11-01T16:00:00Z",
-      "knowledge_time": "2026-11-05T09:00:00Z",
-      "value": null
      }
     ],
-    "checkpoints": []
+    "as_of": "2026-11-02T17:05:00+01:00"
    },
    "expected": {
     "status": "same_as",
@@ -14569,164 +14449,12 @@
    "tags": [
     "e1",
     "negative_zero",
-    "base:store_rulings-0011",
+    "base:store-0011",
     "input:/records/0/value"
    ]
   },
   {
    "case_id": "e1_core-0441",
-   "operation": "core.store.snapshot",
-   "inputs": {
-    "records": [
-     {
-      "sequence": 1,
-      "series_id": "A",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": "NaN"
-     }
-    ],
-    "as_of": "2026-11-02T17:05:00+01:00"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:store-0011",
-    "input:/records/0/value"
-   ]
-  },
-  {
-   "case_id": "e1_core-0442",
-   "operation": "core.store.snapshot",
-   "inputs": {
-    "records": [
-     {
-      "sequence": 1,
-      "series_id": "A",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": "Infinity"
-     }
-    ],
-    "as_of": "2026-11-02T17:05:00+01:00"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:store-0011",
-    "input:/records/0/value"
-   ]
-  },
-  {
-   "case_id": "e1_core-0443",
-   "operation": "core.store.snapshot",
-   "inputs": {
-    "records": [
-     {
-      "sequence": 1,
-      "series_id": "A",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": "-Infinity"
-     }
-    ],
-    "as_of": "2026-11-02T17:05:00+01:00"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:store-0011",
-    "input:/records/0/value"
-   ]
-  },
-  {
-   "case_id": "e1_core-0444",
-   "operation": "core.store.snapshot",
-   "inputs": {
-    "records": [
-     {
-      "sequence": 1,
-      "series_id": "A",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": 0.0
-     }
-    ],
-    "as_of": "2026-11-02T17:05:00+01:00"
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:store-0011",
-    "input:/records/0/value"
-   ]
-  },
-  {
-   "case_id": "e1_core-0445",
-   "operation": "core.store.snapshot",
-   "inputs": {
-    "records": [
-     {
-      "sequence": 1,
-      "series_id": "A",
-      "event_time": "2026-11-02T16:00:00Z",
-      "knowledge_time": "2026-11-02T16:05:00Z",
-      "value": -0.0
-     }
-    ],
-    "as_of": "2026-11-02T17:05:00+01:00"
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0444"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:store-0011",
-    "input:/records/0/value"
-   ]
-  },
-  {
-   "case_id": "e1_core-0446",
    "operation": "core.ts.ar1",
    "inputs": {
     "x": [
@@ -14761,7 +14489,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0447",
+   "case_id": "e1_core-0442",
    "operation": "core.ts.ar1",
    "inputs": {
     "x": [
@@ -14796,7 +14524,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0448",
+   "case_id": "e1_core-0443",
    "operation": "core.ts.ar1",
    "inputs": {
     "x": [
@@ -14831,7 +14559,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0449",
+   "case_id": "e1_core-0444",
    "operation": "core.ts.ar1",
    "inputs": {
     "x": [
@@ -14864,7 +14592,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0450",
+   "case_id": "e1_core-0445",
    "operation": "core.ts.ar1",
    "inputs": {
     "x": [
@@ -14880,6 +14608,178 @@
      0.5,
      6.25,
      3.25
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0444"
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0027",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0446",
+   "operation": "core.ts.ar1",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "NaN"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0027",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0447",
+   "operation": "core.ts.ar1",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0027",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0448",
+   "operation": "core.ts.ar1",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0027",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0449",
+   "operation": "core.ts.ar1",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0027",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0450",
+   "operation": "core.ts.ar1",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     -0.0
     ]
    },
    "expected": {
@@ -14894,183 +14794,11 @@
     "e1",
     "negative_zero",
     "base:stats-0027",
-    "input:/x/0"
+    "input:/x/11"
    ]
   },
   {
    "case_id": "e1_core-0451",
-   "operation": "core.ts.ar1",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "NaN"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0027",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0452",
-   "operation": "core.ts.ar1",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "Infinity"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0027",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0453",
-   "operation": "core.ts.ar1",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "-Infinity"
-    ]
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0027",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0454",
-   "operation": "core.ts.ar1",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     0.0
-    ]
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0027",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0455",
-   "operation": "core.ts.ar1",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     -0.0
-    ]
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0454"
-   },
-   "tolerance_class": "statistics",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0027",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0456",
    "operation": "core.ts.autocorrelation",
    "inputs": {
     "x": [
@@ -15106,7 +14834,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0457",
+   "case_id": "e1_core-0452",
    "operation": "core.ts.autocorrelation",
    "inputs": {
     "x": [
@@ -15142,7 +14870,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0458",
+   "case_id": "e1_core-0453",
    "operation": "core.ts.autocorrelation",
    "inputs": {
     "x": [
@@ -15178,7 +14906,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0459",
+   "case_id": "e1_core-0454",
    "operation": "core.ts.autocorrelation",
    "inputs": {
     "x": [
@@ -15212,7 +14940,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0460",
+   "case_id": "e1_core-0455",
    "operation": "core.ts.autocorrelation",
    "inputs": {
     "x": [
@@ -15228,6 +14956,183 @@
      0.5,
      6.25,
      3.25
+    ],
+    "max_lag": 4
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0454"
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0024",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0456",
+   "operation": "core.ts.autocorrelation",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "NaN"
+    ],
+    "max_lag": 4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0024",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0457",
+   "operation": "core.ts.autocorrelation",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "Infinity"
+    ],
+    "max_lag": 4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0024",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0458",
+   "operation": "core.ts.autocorrelation",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     "-Infinity"
+    ],
+    "max_lag": 4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0024",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0459",
+   "operation": "core.ts.autocorrelation",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     0.0
+    ],
+    "max_lag": 4
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0024",
+    "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0460",
+   "operation": "core.ts.autocorrelation",
+   "inputs": {
+    "x": [
+     1.5,
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     -0.0
     ],
     "max_lag": 4
    },
@@ -15243,188 +15148,11 @@
     "e1",
     "negative_zero",
     "base:stats-0024",
-    "input:/x/0"
+    "input:/x/11"
    ]
   },
   {
    "case_id": "e1_core-0461",
-   "operation": "core.ts.autocorrelation",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "NaN"
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0024",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0462",
-   "operation": "core.ts.autocorrelation",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "Infinity"
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0024",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0463",
-   "operation": "core.ts.autocorrelation",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     "-Infinity"
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0024",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0464",
-   "operation": "core.ts.autocorrelation",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     0.0
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0024",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0465",
-   "operation": "core.ts.autocorrelation",
-   "inputs": {
-    "x": [
-     1.5,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     -0.0
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0464"
-   },
-   "tolerance_class": "statistics",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0024",
-    "input:/x/11"
-   ]
-  },
-  {
-   "case_id": "e1_core-0466",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15453,7 +15181,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0467",
+   "case_id": "e1_core-0462",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15482,7 +15210,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0468",
+   "case_id": "e1_core-0463",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15511,7 +15239,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0469",
+   "case_id": "e1_core-0464",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15538,7 +15266,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0470",
+   "case_id": "e1_core-0465",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15552,7 +15280,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0469"
+    "case_id": "e1_core-0464"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -15566,7 +15294,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0471",
+   "case_id": "e1_core-0466",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15595,7 +15323,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0472",
+   "case_id": "e1_core-0467",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15624,7 +15352,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0473",
+   "case_id": "e1_core-0468",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15653,7 +15381,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0474",
+   "case_id": "e1_core-0469",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15680,7 +15408,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0475",
+   "case_id": "e1_core-0470",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15694,7 +15422,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0474"
+    "case_id": "e1_core-0469"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -15708,7 +15436,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0476",
+   "case_id": "e1_core-0471",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15737,7 +15465,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0477",
+   "case_id": "e1_core-0472",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15766,7 +15494,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0478",
+   "case_id": "e1_core-0473",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15795,7 +15523,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0479",
+   "case_id": "e1_core-0474",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15822,7 +15550,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0480",
+   "case_id": "e1_core-0475",
    "operation": "core.ts.ewma_variance",
    "inputs": {
     "returns": [
@@ -15836,7 +15564,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0479"
+    "case_id": "e1_core-0474"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -15850,7 +15578,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0481",
+   "case_id": "e1_core-0476",
    "operation": "core.ts.forward_fill",
    "inputs": {
     "values": [
@@ -15881,7 +15609,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0482",
+   "case_id": "e1_core-0477",
    "operation": "core.ts.forward_fill",
    "inputs": {
     "values": [
@@ -15912,7 +15640,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0483",
+   "case_id": "e1_core-0478",
    "operation": "core.ts.forward_fill",
    "inputs": {
     "values": [
@@ -15943,7 +15671,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0484",
+   "case_id": "e1_core-0479",
    "operation": "core.ts.forward_fill",
    "inputs": {
     "values": [
@@ -15972,7 +15700,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0485",
+   "case_id": "e1_core-0480",
    "operation": "core.ts.forward_fill",
    "inputs": {
     "values": [
@@ -15982,6 +15710,158 @@
      null,
      null,
      2.0,
+     null
+    ],
+    "limit": 2
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0479"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0031",
+    "input:/values/1"
+   ]
+  },
+  {
+   "case_id": "e1_core-0481",
+   "operation": "core.ts.forward_fill",
+   "inputs": {
+    "values": [
+     null,
+     1.0,
+     null,
+     null,
+     null,
+     "NaN",
+     null
+    ],
+    "limit": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0031",
+    "input:/values/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0482",
+   "operation": "core.ts.forward_fill",
+   "inputs": {
+    "values": [
+     null,
+     1.0,
+     null,
+     null,
+     null,
+     "Infinity",
+     null
+    ],
+    "limit": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0031",
+    "input:/values/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0483",
+   "operation": "core.ts.forward_fill",
+   "inputs": {
+    "values": [
+     null,
+     1.0,
+     null,
+     null,
+     null,
+     "-Infinity",
+     null
+    ],
+    "limit": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0031",
+    "input:/values/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0484",
+   "operation": "core.ts.forward_fill",
+   "inputs": {
+    "values": [
+     null,
+     1.0,
+     null,
+     null,
+     null,
+     0.0,
+     null
+    ],
+    "limit": 2
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0031",
+    "input:/values/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0485",
+   "operation": "core.ts.forward_fill",
+   "inputs": {
+    "values": [
+     null,
+     1.0,
+     null,
+     null,
+     null,
+     -0.0,
      null
     ],
     "limit": 2
@@ -15998,23 +15878,28 @@
     "e1",
     "negative_zero",
     "base:stats-0031",
-    "input:/values/1"
+    "input:/values/5"
    ]
   },
   {
    "case_id": "e1_core-0486",
-   "operation": "core.ts.forward_fill",
+   "operation": "core.ts.ljung_box",
    "inputs": {
-    "values": [
-     null,
-     1.0,
-     null,
-     null,
-     null,
+    "x": [
      "NaN",
-     null
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
     ],
-    "limit": 2
+    "max_lag": 4
    },
    "expected": {
     "status": "error",
@@ -16028,24 +15913,29 @@
     "e1",
     "non_finite",
     "nan",
-    "base:stats-0031",
-    "input:/values/5"
+    "base:stats-0025",
+    "input:/x/0"
    ]
   },
   {
    "case_id": "e1_core-0487",
-   "operation": "core.ts.forward_fill",
+   "operation": "core.ts.ljung_box",
    "inputs": {
-    "values": [
-     null,
-     1.0,
-     null,
-     null,
-     null,
+    "x": [
      "Infinity",
-     null
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
     ],
-    "limit": 2
+    "max_lag": 4
    },
    "expected": {
     "status": "error",
@@ -16059,24 +15949,29 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:stats-0031",
-    "input:/values/5"
+    "base:stats-0025",
+    "input:/x/0"
    ]
   },
   {
    "case_id": "e1_core-0488",
-   "operation": "core.ts.forward_fill",
+   "operation": "core.ts.ljung_box",
    "inputs": {
-    "values": [
-     null,
-     1.0,
-     null,
-     null,
-     null,
+    "x": [
      "-Infinity",
-     null
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
     ],
-    "limit": 2
+    "max_lag": 4
    },
    "expected": {
     "status": "error",
@@ -16090,24 +15985,29 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:stats-0031",
-    "input:/values/5"
+    "base:stats-0025",
+    "input:/x/0"
    ]
   },
   {
    "case_id": "e1_core-0489",
-   "operation": "core.ts.forward_fill",
+   "operation": "core.ts.ljung_box",
    "inputs": {
-    "values": [
-     null,
-     1.0,
-     null,
-     null,
-     null,
+    "x": [
      0.0,
-     null
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
     ],
-    "limit": 2
+    "max_lag": 4
    },
    "expected": {
     "status": "any"
@@ -16119,205 +16019,33 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:stats-0031",
-    "input:/values/5"
+    "base:stats-0025",
+    "input:/x/0"
    ]
   },
   {
    "case_id": "e1_core-0490",
-   "operation": "core.ts.forward_fill",
+   "operation": "core.ts.ljung_box",
    "inputs": {
-    "values": [
-     null,
-     1.0,
-     null,
-     null,
-     null,
+    "x": [
      -0.0,
-     null
+     2.25,
+     3.0,
+     2.75,
+     7.5,
+     -1.25,
+     4.0,
+     3.5,
+     2.0,
+     0.5,
+     6.25,
+     3.25
     ],
-    "limit": 2
+    "max_lag": 4
    },
    "expected": {
     "status": "same_as",
     "case_id": "e1_core-0489"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0031",
-    "input:/values/5"
-   ]
-  },
-  {
-   "case_id": "e1_core-0491",
-   "operation": "core.ts.ljung_box",
-   "inputs": {
-    "x": [
-     "NaN",
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     3.25
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0025",
-    "input:/x/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0492",
-   "operation": "core.ts.ljung_box",
-   "inputs": {
-    "x": [
-     "Infinity",
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     3.25
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0025",
-    "input:/x/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0493",
-   "operation": "core.ts.ljung_box",
-   "inputs": {
-    "x": [
-     "-Infinity",
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     3.25
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0025",
-    "input:/x/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0494",
-   "operation": "core.ts.ljung_box",
-   "inputs": {
-    "x": [
-     0.0,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     3.25
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0025",
-    "input:/x/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0495",
-   "operation": "core.ts.ljung_box",
-   "inputs": {
-    "x": [
-     -0.0,
-     2.25,
-     3.0,
-     2.75,
-     7.5,
-     -1.25,
-     4.0,
-     3.5,
-     2.0,
-     0.5,
-     6.25,
-     3.25
-    ],
-    "max_lag": 4
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0494"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -16331,7 +16059,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0496",
+   "case_id": "e1_core-0491",
    "operation": "core.ts.ljung_box",
    "inputs": {
     "x": [
@@ -16367,7 +16095,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0497",
+   "case_id": "e1_core-0492",
    "operation": "core.ts.ljung_box",
    "inputs": {
     "x": [
@@ -16403,7 +16131,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0498",
+   "case_id": "e1_core-0493",
    "operation": "core.ts.ljung_box",
    "inputs": {
     "x": [
@@ -16439,7 +16167,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0499",
+   "case_id": "e1_core-0494",
    "operation": "core.ts.ljung_box",
    "inputs": {
     "x": [
@@ -16473,7 +16201,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0500",
+   "case_id": "e1_core-0495",
    "operation": "core.ts.ljung_box",
    "inputs": {
     "x": [
@@ -16494,7 +16222,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0499"
+    "case_id": "e1_core-0494"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -16505,6 +16233,213 @@
     "negative_zero",
     "base:stats-0025",
     "input:/x/11"
+   ]
+  },
+  {
+   "case_id": "e1_core-0496",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-29",
+     "2024-01-31",
+     "2024-02-01",
+     "2024-02-02",
+     "2024-02-05",
+     "2024-02-29",
+     "2024-03-01",
+     "2024-03-04"
+    ],
+    "values": [
+     "NaN",
+     2.0,
+     null,
+     4.0,
+     null,
+     6.0,
+     7.0,
+     null
+    ],
+    "frequency": "WEEK"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0029",
+    "input:/values/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0497",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-29",
+     "2024-01-31",
+     "2024-02-01",
+     "2024-02-02",
+     "2024-02-05",
+     "2024-02-29",
+     "2024-03-01",
+     "2024-03-04"
+    ],
+    "values": [
+     "Infinity",
+     2.0,
+     null,
+     4.0,
+     null,
+     6.0,
+     7.0,
+     null
+    ],
+    "frequency": "WEEK"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0029",
+    "input:/values/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0498",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-29",
+     "2024-01-31",
+     "2024-02-01",
+     "2024-02-02",
+     "2024-02-05",
+     "2024-02-29",
+     "2024-03-01",
+     "2024-03-04"
+    ],
+    "values": [
+     "-Infinity",
+     2.0,
+     null,
+     4.0,
+     null,
+     6.0,
+     7.0,
+     null
+    ],
+    "frequency": "WEEK"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0029",
+    "input:/values/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0499",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-29",
+     "2024-01-31",
+     "2024-02-01",
+     "2024-02-02",
+     "2024-02-05",
+     "2024-02-29",
+     "2024-03-01",
+     "2024-03-04"
+    ],
+    "values": [
+     0.0,
+     2.0,
+     null,
+     4.0,
+     null,
+     6.0,
+     7.0,
+     null
+    ],
+    "frequency": "WEEK"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0029",
+    "input:/values/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0500",
+   "operation": "core.ts.resample_last",
+   "inputs": {
+    "dates": [
+     "2024-01-29",
+     "2024-01-31",
+     "2024-02-01",
+     "2024-02-02",
+     "2024-02-05",
+     "2024-02-29",
+     "2024-03-01",
+     "2024-03-04"
+    ],
+    "values": [
+     -0.0,
+     2.0,
+     null,
+     4.0,
+     null,
+     6.0,
+     7.0,
+     null
+    ],
+    "frequency": "WEEK"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0499"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0029",
+    "input:/values/0"
    ]
   },
   {
@@ -16522,13 +16457,13 @@
      "2024-03-04"
     ],
     "values": [
-     "NaN",
+     1.0,
      2.0,
      null,
      4.0,
      null,
      6.0,
-     7.0,
+     "NaN",
      null
     ],
     "frequency": "WEEK"
@@ -16546,7 +16481,7 @@
     "non_finite",
     "nan",
     "base:stats-0029",
-    "input:/values/0"
+    "input:/values/6"
    ]
   },
   {
@@ -16564,13 +16499,13 @@
      "2024-03-04"
     ],
     "values": [
-     "Infinity",
+     1.0,
      2.0,
      null,
      4.0,
      null,
      6.0,
-     7.0,
+     "Infinity",
      null
     ],
     "frequency": "WEEK"
@@ -16588,7 +16523,7 @@
     "non_finite",
     "infinity",
     "base:stats-0029",
-    "input:/values/0"
+    "input:/values/6"
    ]
   },
   {
@@ -16606,13 +16541,13 @@
      "2024-03-04"
     ],
     "values": [
-     "-Infinity",
+     1.0,
      2.0,
      null,
      4.0,
      null,
      6.0,
-     7.0,
+     "-Infinity",
      null
     ],
     "frequency": "WEEK"
@@ -16630,7 +16565,7 @@
     "non_finite",
     "infinity",
     "base:stats-0029",
-    "input:/values/0"
+    "input:/values/6"
    ]
   },
   {
@@ -16648,13 +16583,13 @@
      "2024-03-04"
     ],
     "values": [
-     0.0,
+     1.0,
      2.0,
      null,
      4.0,
      null,
      6.0,
-     7.0,
+     0.0,
      null
     ],
     "frequency": "WEEK"
@@ -16670,7 +16605,7 @@
     "e1",
     "zero_anchor",
     "base:stats-0029",
-    "input:/values/0"
+    "input:/values/6"
    ]
   },
   {
@@ -16688,13 +16623,13 @@
      "2024-03-04"
     ],
     "values": [
-     -0.0,
+     1.0,
      2.0,
      null,
      4.0,
      null,
      6.0,
-     7.0,
+     -0.0,
      null
     ],
     "frequency": "WEEK"
@@ -16711,34 +16646,26 @@
     "e1",
     "negative_zero",
     "base:stats-0029",
-    "input:/values/0"
+    "input:/values/6"
    ]
   },
   {
    "case_id": "e1_core-0506",
-   "operation": "core.ts.resample_last",
+   "operation": "core.ts.returns",
    "inputs": {
-    "dates": [
-     "2024-01-29",
-     "2024-01-31",
-     "2024-02-01",
-     "2024-02-02",
-     "2024-02-05",
-     "2024-02-29",
-     "2024-03-01",
-     "2024-03-04"
-    ],
-    "values": [
-     1.0,
-     2.0,
-     null,
-     4.0,
-     null,
-     6.0,
+    "prices": [
      "NaN",
-     null
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
     ],
-    "frequency": "WEEK"
+    "kind": "LOG"
    },
    "expected": {
     "status": "error",
@@ -16752,35 +16679,27 @@
     "e1",
     "non_finite",
     "nan",
-    "base:stats-0029",
-    "input:/values/6"
+    "base:stats-0017",
+    "input:/prices/0"
    ]
   },
   {
    "case_id": "e1_core-0507",
-   "operation": "core.ts.resample_last",
+   "operation": "core.ts.returns",
    "inputs": {
-    "dates": [
-     "2024-01-29",
-     "2024-01-31",
-     "2024-02-01",
-     "2024-02-02",
-     "2024-02-05",
-     "2024-02-29",
-     "2024-03-01",
-     "2024-03-04"
-    ],
-    "values": [
-     1.0,
-     2.0,
-     null,
-     4.0,
-     null,
-     6.0,
+    "prices": [
      "Infinity",
-     null
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
     ],
-    "frequency": "WEEK"
+    "kind": "LOG"
    },
    "expected": {
     "status": "error",
@@ -16794,35 +16713,27 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:stats-0029",
-    "input:/values/6"
+    "base:stats-0017",
+    "input:/prices/0"
    ]
   },
   {
    "case_id": "e1_core-0508",
-   "operation": "core.ts.resample_last",
+   "operation": "core.ts.returns",
    "inputs": {
-    "dates": [
-     "2024-01-29",
-     "2024-01-31",
-     "2024-02-01",
-     "2024-02-02",
-     "2024-02-05",
-     "2024-02-29",
-     "2024-03-01",
-     "2024-03-04"
-    ],
-    "values": [
-     1.0,
-     2.0,
-     null,
-     4.0,
-     null,
-     6.0,
+    "prices": [
      "-Infinity",
-     null
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
     ],
-    "frequency": "WEEK"
+    "kind": "LOG"
    },
    "expected": {
     "status": "error",
@@ -16836,35 +16747,27 @@
     "e1",
     "non_finite",
     "infinity",
-    "base:stats-0029",
-    "input:/values/6"
+    "base:stats-0017",
+    "input:/prices/0"
    ]
   },
   {
    "case_id": "e1_core-0509",
-   "operation": "core.ts.resample_last",
+   "operation": "core.ts.returns",
    "inputs": {
-    "dates": [
-     "2024-01-29",
-     "2024-01-31",
-     "2024-02-01",
-     "2024-02-02",
-     "2024-02-05",
-     "2024-02-29",
-     "2024-03-01",
-     "2024-03-04"
-    ],
-    "values": [
-     1.0,
-     2.0,
-     null,
-     4.0,
-     null,
-     6.0,
+    "prices": [
      0.0,
-     null
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
     ],
-    "frequency": "WEEK"
+    "kind": "LOG"
    },
    "expected": {
     "status": "any"
@@ -16876,206 +16779,31 @@
    "tags": [
     "e1",
     "zero_anchor",
-    "base:stats-0029",
-    "input:/values/6"
+    "base:stats-0017",
+    "input:/prices/0"
    ]
   },
   {
    "case_id": "e1_core-0510",
-   "operation": "core.ts.resample_last",
+   "operation": "core.ts.returns",
    "inputs": {
-    "dates": [
-     "2024-01-29",
-     "2024-01-31",
-     "2024-02-01",
-     "2024-02-02",
-     "2024-02-05",
-     "2024-02-29",
-     "2024-03-01",
-     "2024-03-04"
-    ],
-    "values": [
-     1.0,
-     2.0,
-     null,
-     4.0,
-     null,
-     6.0,
+    "prices": [
      -0.0,
-     null
+     101.5,
+     99.25,
+     102.0,
+     103.5,
+     102.75,
+     104.0,
+     105.25,
+     103.0,
+     106.5
     ],
-    "frequency": "WEEK"
+    "kind": "LOG"
    },
    "expected": {
     "status": "same_as",
     "case_id": "e1_core-0509"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0029",
-    "input:/values/6"
-   ]
-  },
-  {
-   "case_id": "e1_core-0511",
-   "operation": "core.ts.returns",
-   "inputs": {
-    "prices": [
-     "NaN",
-     101.5,
-     99.25,
-     102.0,
-     103.5,
-     102.75,
-     104.0,
-     105.25,
-     103.0,
-     106.5
-    ],
-    "kind": "LOG"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0017",
-    "input:/prices/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0512",
-   "operation": "core.ts.returns",
-   "inputs": {
-    "prices": [
-     "Infinity",
-     101.5,
-     99.25,
-     102.0,
-     103.5,
-     102.75,
-     104.0,
-     105.25,
-     103.0,
-     106.5
-    ],
-    "kind": "LOG"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0017",
-    "input:/prices/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0513",
-   "operation": "core.ts.returns",
-   "inputs": {
-    "prices": [
-     "-Infinity",
-     101.5,
-     99.25,
-     102.0,
-     103.5,
-     102.75,
-     104.0,
-     105.25,
-     103.0,
-     106.5
-    ],
-    "kind": "LOG"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0017",
-    "input:/prices/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0514",
-   "operation": "core.ts.returns",
-   "inputs": {
-    "prices": [
-     0.0,
-     101.5,
-     99.25,
-     102.0,
-     103.5,
-     102.75,
-     104.0,
-     105.25,
-     103.0,
-     106.5
-    ],
-    "kind": "LOG"
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0017",
-    "input:/prices/0"
-   ]
-  },
-  {
-   "case_id": "e1_core-0515",
-   "operation": "core.ts.returns",
-   "inputs": {
-    "prices": [
-     -0.0,
-     101.5,
-     99.25,
-     102.0,
-     103.5,
-     102.75,
-     104.0,
-     105.25,
-     103.0,
-     106.5
-    ],
-    "kind": "LOG"
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0514"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -17089,7 +16817,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0516",
+   "case_id": "e1_core-0511",
    "operation": "core.ts.returns",
    "inputs": {
     "prices": [
@@ -17123,7 +16851,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0517",
+   "case_id": "e1_core-0512",
    "operation": "core.ts.returns",
    "inputs": {
     "prices": [
@@ -17157,7 +16885,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0518",
+   "case_id": "e1_core-0513",
    "operation": "core.ts.returns",
    "inputs": {
     "prices": [
@@ -17191,7 +16919,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0519",
+   "case_id": "e1_core-0514",
    "operation": "core.ts.returns",
    "inputs": {
     "prices": [
@@ -17223,7 +16951,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0520",
+   "case_id": "e1_core-0515",
    "operation": "core.ts.returns",
    "inputs": {
     "prices": [
@@ -17242,7 +16970,7 @@
    },
    "expected": {
     "status": "same_as",
-    "case_id": "e1_core-0519"
+    "case_id": "e1_core-0514"
    },
    "tolerance_class": "statistics",
    "verified_by": [
@@ -17256,7 +16984,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0521",
+   "case_id": "e1_core-0516",
    "operation": "core.ts.rolling",
    "inputs": {
     "x": [
@@ -17287,7 +17015,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0522",
+   "case_id": "e1_core-0517",
    "operation": "core.ts.rolling",
    "inputs": {
     "x": [
@@ -17318,7 +17046,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0523",
+   "case_id": "e1_core-0518",
    "operation": "core.ts.rolling",
    "inputs": {
     "x": [
@@ -17349,7 +17077,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0524",
+   "case_id": "e1_core-0519",
    "operation": "core.ts.rolling",
    "inputs": {
     "x": [
@@ -17378,7 +17106,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0525",
+   "case_id": "e1_core-0520",
    "operation": "core.ts.rolling",
    "inputs": {
     "x": [
@@ -17388,6 +17116,158 @@
      4.0,
      3.0,
      5.0
+    ],
+    "window": 3,
+    "statistic": "MEAN"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_core-0519"
+   },
+   "tolerance_class": "statistics",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:stats-0019",
+    "input:/x/0"
+   ]
+  },
+  {
+   "case_id": "e1_core-0521",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     "NaN"
+    ],
+    "window": 3,
+    "statistic": "MEAN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:stats-0019",
+    "input:/x/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0522",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     "Infinity"
+    ],
+    "window": 3,
+    "statistic": "MEAN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0019",
+    "input:/x/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0523",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     "-Infinity"
+    ],
+    "window": 3,
+    "statistic": "MEAN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:stats-0019",
+    "input:/x/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0524",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     0.0
+    ],
+    "window": 3,
+    "statistic": "MEAN"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:stats-0019",
+    "input:/x/5"
+   ]
+  },
+  {
+   "case_id": "e1_core-0525",
+   "operation": "core.ts.rolling",
+   "inputs": {
+    "x": [
+     100000000.0,
+     1.0,
+     2.0,
+     4.0,
+     3.0,
+     -0.0
     ],
     "window": 3,
     "statistic": "MEAN"
@@ -17404,163 +17284,11 @@
     "e1",
     "negative_zero",
     "base:stats-0019",
-    "input:/x/0"
+    "input:/x/5"
    ]
   },
   {
    "case_id": "e1_core-0526",
-   "operation": "core.ts.rolling",
-   "inputs": {
-    "x": [
-     100000000.0,
-     1.0,
-     2.0,
-     4.0,
-     3.0,
-     "NaN"
-    ],
-    "window": 3,
-    "statistic": "MEAN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "nan",
-    "base:stats-0019",
-    "input:/x/5"
-   ]
-  },
-  {
-   "case_id": "e1_core-0527",
-   "operation": "core.ts.rolling",
-   "inputs": {
-    "x": [
-     100000000.0,
-     1.0,
-     2.0,
-     4.0,
-     3.0,
-     "Infinity"
-    ],
-    "window": 3,
-    "statistic": "MEAN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0019",
-    "input:/x/5"
-   ]
-  },
-  {
-   "case_id": "e1_core-0528",
-   "operation": "core.ts.rolling",
-   "inputs": {
-    "x": [
-     100000000.0,
-     1.0,
-     2.0,
-     4.0,
-     3.0,
-     "-Infinity"
-    ],
-    "window": 3,
-    "statistic": "MEAN"
-   },
-   "expected": {
-    "status": "error",
-    "error_code": "E_DOMAIN"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-2"
-   ],
-   "tags": [
-    "e1",
-    "non_finite",
-    "infinity",
-    "base:stats-0019",
-    "input:/x/5"
-   ]
-  },
-  {
-   "case_id": "e1_core-0529",
-   "operation": "core.ts.rolling",
-   "inputs": {
-    "x": [
-     100000000.0,
-     1.0,
-     2.0,
-     4.0,
-     3.0,
-     0.0
-    ],
-    "window": 3,
-    "statistic": "MEAN"
-   },
-   "expected": {
-    "status": "any"
-   },
-   "tolerance_class": "date_and_convention",
-   "verified_by": [
-    "rule-F-3-anchor"
-   ],
-   "tags": [
-    "e1",
-    "zero_anchor",
-    "base:stats-0019",
-    "input:/x/5"
-   ]
-  },
-  {
-   "case_id": "e1_core-0530",
-   "operation": "core.ts.rolling",
-   "inputs": {
-    "x": [
-     100000000.0,
-     1.0,
-     2.0,
-     4.0,
-     3.0,
-     -0.0
-    ],
-    "window": 3,
-    "statistic": "MEAN"
-   },
-   "expected": {
-    "status": "same_as",
-    "case_id": "e1_core-0529"
-   },
-   "tolerance_class": "statistics",
-   "verified_by": [
-    "rule-F-3"
-   ],
-   "tags": [
-    "e1",
-    "negative_zero",
-    "base:stats-0019",
-    "input:/x/5"
-   ]
-  },
-  {
-   "case_id": "e1_core-0531",
    "operation": "core.units.convert",
    "inputs": {
     "value": "NaN",
@@ -17584,7 +17312,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0532",
+   "case_id": "e1_core-0527",
    "operation": "core.units.convert",
    "inputs": {
     "value": "Infinity",
@@ -17608,7 +17336,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0533",
+   "case_id": "e1_core-0528",
    "operation": "core.units.convert",
    "inputs": {
     "value": "-Infinity",
@@ -17632,7 +17360,7 @@
    ]
   },
   {
-   "case_id": "e1_core-0534",
+   "case_id": "e1_core-0529",
    "operation": "core.units.convert",
    "inputs": {
     "value": -0.0,

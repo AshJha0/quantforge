@@ -47,4 +47,10 @@ Language sessions may start F2 (E1, G4 with the name map, G9). Read:
 - `specifications/name-map.json` (data; regenerate with `python tools/gen_name_map.py`, check with `--check`)
 - `specifications/edge-case-register.md` (rows F1 to F3)
 
-Goldens: `datasets/golden/stage_f/e1_*.json`, 5,212 cases in 23 files over 206 operations (1,053 Real leaves; 24 operations have no Real input and get no case, listed in `oracle/E1_SUMMARY.json`). Build notes: implement F-1 in the JSON reader's Real conversion, and F-2 as one generic walk before dispatch only if the walk knows which fields are Real; a key-name heuristic is not enough (`initial_variance` is a string or a Real). The anchors (`zero_anchor` tag) expect any well-formed result, so a `+0.0` that is outside an operation's domain may return its own error; its `-0.0` twin must return the same.
+Goldens: `datasets/golden/stage_f/e1_*.json`, 5,207 cases in 23 files over 206 operations (1,052 Real leaves; 24 operations have no Real input and get no case, listed in `oracle/E1_SUMMARY.json`). Build notes: implement F-1 in the JSON reader's Real conversion, and F-2 as one generic walk before dispatch only if the walk knows which fields are Real; a key-name heuristic is not enough (`initial_variance` is a string or a Real). The anchors (`zero_anchor` tag) expect any well-formed result, so a `+0.0` that is outside an operation's domain may return its own error; its `-0.0` twin must return the same.
+
+### E1 golden fix (2026-11-09, from the C++ session)
+
+- `same_as` (negative-zero) cases no longer copy the base case's `extra_checks`: those hold expected values for the base input, not for the zeroed input.
+- A path counts as Real only if an **ok** golden writes a float there. Error cases (such as `rulings-0001`, `n = 4.0` → `E_SCHEMA`) no longer make an Integer field Real, so no case puts a token in `n` of `core.integrate.*`; F-1 makes that `E_SCHEMA`, untested here. `core.integrate.gauss_legendre` `a` and `b` are Real by `01-core/integration.md` (an explicit override in the generator).
+- Now 5,207 cases. Case ids were renumbered: re-run the whole `e1_*` set, do not compare by old id.
