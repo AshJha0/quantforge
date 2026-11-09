@@ -570,6 +570,50 @@ class QualityGate(unittest.TestCase):
         _, fails = self.qg.gate({"coverage_min": 0.85, "modules": [{"module": "x", "cpp": "cpp26/src/core/x.cpp"}]}, "cpp", [])
         self.assertEqual(fails, ["x"])
 
+    def test_language_floor(self):
+        rows = [("quantforge_core/a.py", 80, 100), ("tests/test_a.py", 0, 50)]
+        self.assertTrue(self.qg.floor_gate("python", rows, 0.80)[1])  # tests are not library lines
+        self.assertFalse(self.qg.floor_gate("python", rows, 0.81)[1])
+        self.assertFalse(self.qg.floor_gate("rust", rows, 0.5)[1])  # no rust library lines at all
+        floors = json.loads((ROOT / "conformance/quality/floors.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(k for k in floors if not k.startswith("_")), ["cpp", "java", "python", "rust"])
+
+
+class Governance(unittest.TestCase):
+    """Plan 12.2 A2 (model register) and Q5b (convergence rule)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.qg = load("quality_gate", "tools/quality_gate.py")
+        cls.gov = cls.qg.gov
+
+    def test_a2_fields(self):
+        full = "\n".join(f"- **{f}:** x" for f in self.gov.A2_FIELDS)
+        inv = (f"## Index\n| M1 | m | `02-curves/a.md` |\n## Entries\n### M1 Curve\n{full}\n"
+               "### M2 Other\n- **Tier:** 2\n- **Challenger:** TODO\n")
+        gaps = self.gov.register_gaps(inv, ["02-curves/a.md", "02-curves/b.md"])
+        self.assertEqual(len(gaps), 2)
+        self.assertTrue(gaps[0].startswith("entry M2: missing Challenger, Monitoring thresholds"))  # TODO is not filled
+        self.assertEqual(gaps[1], "spec 02-curves/b.md: no inventory entry")
+        self.assertTrue(self.gov.has_field("| Data lineage hash | sha256:ab |", "Data lineage hash"))
+
+    def test_convergence_section(self):
+        g = self.gov.convergence_gap
+        self.assertIsNone(g("# Day count\nNo numerics here."))
+        self.assertIn("without", g("# Pricer\nSolved by Newton iteration."))
+        empty = ("# P\nMonte Carlo.\n## Convergence and limit cases\n| Method | Asserted order |\n|---|---|\n"
+                 "| <name> | <p> |\n## Next\n")
+        self.assertIn("no filled", g(empty))
+        ok = empty.replace("| <name> | <p> |", "| MC | 0.5 |")
+        self.assertIsNone(g(ok))
+
+    def test_ratchet_and_shipped_tree(self):
+        self.assertEqual(self.gov.ratchet(["a", "b"], ["b", "c"]), (["a"], ["b"], ["c"]))
+        base = ROOT / "conformance/quality/governance_baseline.json"
+        self.assertEqual(self.qg.check_governance(True, True, base), 0)
+        now = {"register": ["entry X9: missing Tier"], "specs": []}
+        self.assertEqual(self.qg.check_governance(True, True, base, now), 1)  # a new gap fails
+
 
 class ResearchDsrGate(unittest.TestCase):
     @classmethod
