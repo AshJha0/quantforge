@@ -1,5 +1,7 @@
 package org.quantforge.calibration;
 
+import org.quantforge.core.Finite;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.quantforge.core.LinearAlgebra;
@@ -12,6 +14,11 @@ public final class CurveFits {
     public record Smooth(double[] forwards, double[] fitted, double objective) {}
 
     public static Smooth smooth(double[] knots, double[] m, double[] y, double lambda, double[] w) {
+        Finite.check("knots", knots);
+        Finite.check("m", m);
+        Finite.check("y", y);
+        Finite.check("lambda", lambda);
+        Finite.check("w", w);
         if (m.length != y.length || (w != null && w.length != m.length) || m.length == 0) {
             throw new QfError("E_INPUT", "maturities, zero_rates and weights need one equal, non-zero length");
         }
@@ -91,6 +98,10 @@ public final class CurveFits {
     public record Robust(double[] betas, double[] residuals, int[] outliers, double objective) {}
 
     public static Robust robust(double[] m, double[] y, double tau, double delta) {
+        Finite.check("m", m);
+        Finite.check("y", y);
+        Finite.check("tau", tau);
+        Finite.check("delta", delta);
         if (m.length != y.length || m.length < 3) {
             throw new QfError("E_INPUT", "need at least 3 points of equal length");
         }

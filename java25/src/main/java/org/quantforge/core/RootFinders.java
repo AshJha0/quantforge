@@ -43,6 +43,8 @@ public final class RootFinders {
     }
 
     public static Result bisection(DoubleUnaryOperator f, double a, double b, Tolerances t) {
+        Finite.check("a", a);
+        Finite.check("b", b);
         t.check();
         checkBracket(a, b);
         double fa = eval(f, a);
@@ -79,6 +81,8 @@ public final class RootFinders {
     }
 
     public static Result brent(DoubleUnaryOperator f, double lo, double hi, Tolerances t) {
+        Finite.check("lo", lo);
+        Finite.check("hi", hi);
         t.check();
         checkBracket(lo, hi);
         double a = lo;
@@ -163,6 +167,7 @@ public final class RootFinders {
     /** {@code a} and {@code b} are null together when there is no bracket. */
     public static Result newton(DoubleUnaryOperator f, DoubleUnaryOperator df, double x0, Double a, Double b,
                                 Tolerances t) {
+        Finite.check("x0", x0);
         t.check();
         boolean bracket = a != null;
         double lo = 0.0;

@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import org.quantforge.core.Normal;
 import org.quantforge.core.QfError;
 
@@ -49,12 +51,19 @@ public final class Black {
     }
 
     public static double price(Option o, double vol) {
+        Finite.check("vol", vol);
         double f = o.forward() + o.shift();
         double x = o.strike() + o.shift();
         return o.normal() ? normal(o.phi(), f, x, o.t(), o.df(), vol) : lognormal(o.phi(), f, x, o.t(), o.df(), vol);
     }
 
     public static double lognormal(double phi, double f, double x, double t, double d, double v) {
+        Finite.check("phi", phi);
+        Finite.check("f", f);
+        Finite.check("x", x);
+        Finite.check("t", t);
+        Finite.check("d", d);
+        Finite.check("v", v);
         if (t == 0.0 || v == 0.0) {
             return d * Math.max(phi * (f - x), 0.0);
         }
@@ -65,6 +74,12 @@ public final class Black {
     }
 
     public static double normal(double phi, double f, double x, double t, double d, double v) {
+        Finite.check("phi", phi);
+        Finite.check("f", f);
+        Finite.check("x", x);
+        Finite.check("t", t);
+        Finite.check("d", d);
+        Finite.check("v", v);
         if (t == 0.0 || v == 0.0) {
             return d * Math.max(phi * (f - x), 0.0);
         }
@@ -82,6 +97,7 @@ public final class Black {
     }
 
     public static double implied(Option o, double price) {
+        Finite.check("price", price);
         o.check(0.0);
         if (o.t() == 0.0) {
             throw new QfError("E_DOMAIN", "expiry_years is zero");
@@ -104,6 +120,12 @@ public final class Black {
 
     /** Newton inside a bracket. V is increasing in vol, so a bisection step is always safe. */
     public static double solve(boolean normal, double phi, double f, double x, double t, double d, double price) {
+        Finite.check("phi", phi);
+        Finite.check("f", f);
+        Finite.check("x", x);
+        Finite.check("t", t);
+        Finite.check("d", d);
+        Finite.check("price", price);
         double lo = 0.0;
         double hi = normal ? Math.max(Math.abs(f - x), 1.0) : 1.0;
         while (value(normal, phi, f, x, t, d, hi) < price) {

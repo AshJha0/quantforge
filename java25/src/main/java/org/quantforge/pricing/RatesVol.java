@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.util.function.DoubleUnaryOperator;
 import org.quantforge.core.QfError;
 import org.quantforge.curves.Curve;
@@ -67,6 +69,8 @@ public final class RatesVol {
     /** SABR parameters bilinear in (ACT/365F expiry time, tenor years), read at the swaption's forward (E-B8). */
     public static CubePrice priceCube(Curve d, Curve p, Cube c, boolean payer, long expiryMonths, long tenorMonths,
                                       double k, double notional) {
+        Finite.check("k", k);
+        Finite.check("notional", notional);
         increasing(c.expiriesMonths(), "expiries_months");
         increasing(c.tenorsMonths(), "tenors_months");
         int rows = c.expiriesMonths().length;
@@ -114,6 +118,9 @@ public final class RatesVol {
      * E_ARBITRAGE (E-B10). */
     public static Strip strip(Curve d, Curve p, boolean normal, long startMonths, double k, long[] tenors,
                               double[] flat, double notional) {
+        Finite.check("k", k);
+        Finite.check("flat", flat);
+        Finite.check("notional", notional);
         if (tenors.length == 0) {
             throw new QfError("E_INPUT", "cap_tenors_months is empty", "cap_tenors_months");
         }
@@ -206,6 +213,12 @@ public final class RatesVol {
 
     /** Black-76 on the futures price, premium paid at the discount date (E-B11). Per 100 face. */
     public static double futuresOption(double phi, double f, double k, double t, double df, double vol) {
+        Finite.check("phi", phi);
+        Finite.check("f", f);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("df", df);
+        Finite.check("vol", vol);
         checkFutures(f, k, t, df);
         if (!(vol >= 0.0)) {
             throw new QfError("E_DOMAIN", "vol must not be negative", "vol");
@@ -216,6 +229,14 @@ public final class RatesVol {
     /** {price vol, yield vol = price vol / (duration x yield)} (E-B11). */
     public static double[] futuresImpliedVol(double phi, double f, double k, double t, double df, double premium,
                                              double yield, double duration) {
+        Finite.check("phi", phi);
+        Finite.check("f", f);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("df", df);
+        Finite.check("premium", premium);
+        Finite.check("yield", yield);
+        Finite.check("duration", duration);
         checkFutures(f, k, t, df);
         double intrinsic = df * Math.max(phi * (f - k), 0.0);
         double bound = df * (phi > 0 ? f : k);
@@ -242,6 +263,8 @@ public final class RatesVol {
 
     /** YoY caplets with option time to the fixing (E-B12). Returns the caplets; the price is their sum. */
     public static double[] yoyCaplets(boolean normal, boolean cap, double k, double notional, YoyPeriod[] periods) {
+        Finite.check("k", k);
+        Finite.check("notional", notional);
         if (periods.length == 0) {
             throw new QfError("E_INPUT", "periods is empty", "periods");
         }
@@ -268,6 +291,12 @@ public final class RatesVol {
     /** {price, strike ratio (1 + K)^T} of a zero-coupon inflation cap or floor (E-B13). */
     public static double[] zcCap(boolean normal, boolean cap, double fwdRatio, double years, double k, double df,
                                  double vol, double notional) {
+        Finite.check("fwdRatio", fwdRatio);
+        Finite.check("years", years);
+        Finite.check("k", k);
+        Finite.check("df", df);
+        Finite.check("vol", vol);
+        Finite.check("notional", notional);
         if (!normal && !(fwdRatio > 0.0)) {
             throw new QfError("E_DOMAIN", "BLACK_76 needs a positive forward", "forward_index_ratio");
         }

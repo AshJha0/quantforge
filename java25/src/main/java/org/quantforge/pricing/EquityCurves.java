@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -24,6 +26,9 @@ public final class EquityCurves {
     }
 
     public static double forward(double spot, Curve f, double b, double s, List<Div> divs, LocalDate expiry) {
+        Finite.check("spot", spot);
+        Finite.check("b", b);
+        Finite.check("s", s);
         double sum = 0.0;
         for (Div d : divs) {
             if (d.exDate().isAfter(f.asOf()) && !d.exDate().isAfter(expiry)) {
@@ -36,6 +41,9 @@ public final class EquityCurves {
     public record Implied(double[] pv, double[] period, double[] yields) {}
 
     public static Implied impliedDividends(double spot, Curve f, double b, LocalDate[] expiries, double[] prices) {
+        Finite.check("spot", spot);
+        Finite.check("b", b);
+        Finite.check("prices", prices);
         if (expiries.length == 0) {
             throw new QfError("E_INPUT", "no futures", "futures");
         }
@@ -79,6 +87,8 @@ public final class EquityCurves {
     }
 
     public static double impliedBorrow(double spot, Curve f, List<Div> divs, LocalDate expiry, double forward) {
+        Finite.check("spot", spot);
+        Finite.check("forward", forward);
         if (!expiry.isAfter(f.asOf())) {
             throw new QfError("E_DATE_ORDER", "expiry is not after as_of", "expiry");
         }
@@ -89,6 +99,10 @@ public final class EquityCurves {
 
     public static Basis futuresBasis(double spot, Curve f, double b, double s, List<Div> divs, LocalDate expiry,
                                      double price) {
+        Finite.check("spot", spot);
+        Finite.check("b", b);
+        Finite.check("s", s);
+        Finite.check("price", price);
         if (!expiry.isAfter(f.asOf())) {
             throw new QfError("E_DATE_ORDER", "expiry is not after as_of", "expiry");
         }
@@ -104,6 +118,8 @@ public final class EquityCurves {
 
     public static IndexDivs indexDividends(double divisor, List<Constituent> cs, LocalDate[] starts, LocalDate[] ends,
                                            double[] implied) {
+        Finite.check("divisor", divisor);
+        Finite.check("implied", implied);
         if (!(divisor > 0.0)) {
             throw new QfError("E_DOMAIN", "divisor must be positive", "divisor");
         }
@@ -155,6 +171,7 @@ public final class EquityCurves {
     }
 
     public static Rebalance rebalance(double divisor, List<Constituent> old, List<Constituent> neu) {
+        Finite.check("divisor", divisor);
         unique(old, "constituents");
         unique(neu, "new_constituents");
         if (!(divisor > 0.0)) {
@@ -180,6 +197,9 @@ public final class EquityCurves {
 
     public static Action corporateAction(String action, double p, double shares, double strike, Double ratio,
                                          Double m, Double k, Double amount) {
+        Finite.check("p", p);
+        Finite.check("shares", shares);
+        Finite.check("strike", strike);
         double f;
         switch (action) {
             case "SPLIT", "REVERSE_SPLIT" -> {
@@ -209,6 +229,11 @@ public final class EquityCurves {
 
     public static Trs trs(double spot, Curve f, double b, List<Div> divs, LocalDate start, LocalDate end, double s0,
                           double n, double spread, boolean receiveEquity, Double current) {
+        Finite.check("spot", spot);
+        Finite.check("b", b);
+        Finite.check("s0", s0);
+        Finite.check("n", n);
+        Finite.check("spread", spread);
         if (!end.isAfter(start)) {
             throw new QfError("E_DATE_ORDER", "end is not after start", "end");
         }

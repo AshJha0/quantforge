@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.function.Function;
 import org.quantforge.core.Integration;
 import org.quantforge.core.QfError;
@@ -83,6 +85,7 @@ public final class Heston {
 
     /** phi(u) of X = ln(S_T/F), little-trap form [Alb07]. */
     public static C cf(C u, double t, Params p) {
+        Finite.check("t", t);
         double xi2 = p.xi() * p.xi();
         C iu = I.times(u);
         C b = C.of(p.kappa()).minus(iu.times(p.rho() * p.xi()));
@@ -127,6 +130,11 @@ public final class Heston {
 
     public static double[] prices(double s, double t, double r, double q, boolean call, double[] k, Params p,
                                   Jumps j) {
+        Finite.check("s", s);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("k", k);
         double f = s * Math.exp((r - q) * t);
         double[] out = new double[k.length];
         for (int i = 0; i < k.length; i++) {
@@ -138,6 +146,12 @@ public final class Heston {
     /** Merton's series [Mer76]: Poisson weights at lambda (1 + kbar), BS terms at r_n and v_n. */
     public static double[] merton(double s, double t, double r, double q, boolean call, double[] k, double v,
                                   Jumps j) {
+        Finite.check("s", s);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("k", k);
+        Finite.check("v", v);
         double kbar = j.kbar();
         double lp = j.intensity() * (1.0 + kbar) * t;
         double phi = call ? 1.0 : -1.0;

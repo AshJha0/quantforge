@@ -514,6 +514,9 @@ final class Operations {
                 throw new QfError("E_SCHEMA", "lone surrogate in a record", "records");
             }
             Object value = r.anyValue("value");
+            if (In.isNonFiniteToken(value)) {
+                r.real("value"); // SQ F-J1: a bare token value is a non-finite Real (ruling F-1), held for the gate
+            }
             for (Object field : r.raw().values()) {
                 in.limit(Json.depth(field) > SnapshotHash.MAX_DEPTH, "records");
             }

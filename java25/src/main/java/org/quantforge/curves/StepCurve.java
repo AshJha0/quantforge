@@ -1,5 +1,7 @@
 package org.quantforge.curves;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.quantforge.core.QfError;
@@ -32,6 +34,8 @@ public final class StepCurve implements Discounting {
     }
 
     public static StepCurve of(LocalDate asOf, double baseRate, LocalDate[] stepDates, double[] rates, Jumps jumps) {
+        Finite.check("baseRate", baseRate);
+        Finite.check("rates", rates);
         checkSteps(asOf, stepDates);
         jumps.check(asOf);
         return new StepCurve(asOf, baseRate, stepDates, rates, jumps);

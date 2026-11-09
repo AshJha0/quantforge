@@ -20,6 +20,7 @@ public final class TimeSeries {
     public record Resampled(List<LocalDate> dates, List<Double> values) {}
 
     public static double[] returns(double[] p, ReturnKind kind) {
+        Finite.check("p", p);
         if (p.length < 2) {
             throw new QfError("E_INPUT", "need at least 2 prices", "prices");
         }
@@ -36,6 +37,7 @@ public final class TimeSeries {
     }
 
     public static Double[] rolling(double[] x, long window, RollingStatistic stat) {
+        Finite.check("x", x);
         if (window < 2 || window > x.length) {
             throw new QfError("E_INPUT", "window must be from 2 to n", "window");
         }
@@ -51,6 +53,8 @@ public final class TimeSeries {
     }
 
     public static double[] ewmaVariance(double[] r, double lambda) {
+        Finite.check("r", r);
+        Finite.check("lambda", lambda);
         if (r.length < 1) {
             throw new QfError("E_INPUT", "need at least 1 return", "returns");
         }
@@ -66,6 +70,7 @@ public final class TimeSeries {
     }
 
     public static double[] autocorrelation(double[] x, long maxLag) {
+        Finite.check("x", x);
         if (maxLag < 1 || maxLag >= x.length) {
             throw new QfError("E_INPUT", "max_lag must be from 1 to n - 1", "max_lag");
         }
@@ -86,6 +91,7 @@ public final class TimeSeries {
     }
 
     public static double ljungBox(double[] x, long maxLag) {
+        Finite.check("x", x);
         double[] acf = autocorrelation(x, maxLag);
         double n = x.length;
         double s = 0.0;
@@ -96,6 +102,7 @@ public final class TimeSeries {
     }
 
     public static Ar1 ar1(double[] x) {
+        Finite.check("x", x);
         if (x.length < 4) {
             throw new QfError("E_INPUT", "need at least 4 values", "x");
         }

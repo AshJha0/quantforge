@@ -266,17 +266,17 @@ final class OpsVolSurfaces {
     /** The initial variance input: "SAMPLE" (null here) or a number; any other JSON type is E_SCHEMA. */
     private static Double initialVariance(In in) {
         Object v = in.anyValue("initial_variance");
-        if (v instanceof String) {
+        if (v instanceof String && !In.isNonFiniteToken(v)) {
             return null;
         }
-        if (v instanceof org.quantforge.core.Json.Number) {
+        if (v instanceof org.quantforge.core.Json.Number || In.isNonFiniteToken(v)) {
             return in.real("initial_variance");
         }
         throw new QfError("E_SCHEMA", "initial_variance must be a string or a number", "initial_variance");
     }
 
     private static void sampleKeyword(In in) {
-        if (in.anyValue("initial_variance") instanceof String s && !s.equals("SAMPLE")) {
+        if (in.anyValue("initial_variance") instanceof String s && !s.equals("SAMPLE") && !In.isNonFiniteToken(s)) {
             throw input("initial_variance", "initial_variance must be SAMPLE or a number");
         }
     }

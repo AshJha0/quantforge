@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -65,6 +67,7 @@ public final class Bonds {
                              double convexity) {}
 
     public static YieldPrice fromYield(Bond b, LocalDate settlement, double y) {
+        Finite.check("y", y);
         checkSettlement(b, settlement);
         int f = b.frequency();
         if (!(1.0 + y / f > 0.0)) {
@@ -91,6 +94,7 @@ public final class Bonds {
     }
 
     public static double yieldFromPrice(Bond b, LocalDate settlement, double clean) {
+        Finite.check("clean", clean);
         checkSettlement(b, settlement);
         double accrued = b.accrued(settlement);
         if (!(clean > 0.0) || !(clean + accrued > 0.0)) {
@@ -102,6 +106,7 @@ public final class Bonds {
 
     /** Dirty price on {@code curve} with spread {@code z}, carried to settlement. */
     public static double curveDirty(Bond b, LocalDate settlement, Curve c, double z) {
+        Finite.check("z", z);
         checkSettlement(b, settlement);
         if (settlement.isBefore(c.asOf())) {
             throw new QfError("E_OUT_OF_RANGE", "settlement is before the curve's as_of", "settlement");
@@ -116,6 +121,7 @@ public final class Bonds {
     }
 
     public static double zSpread(Bond b, LocalDate settlement, Curve c, double clean) {
+        Finite.check("clean", clean);
         double dirty = clean + b.accrued(settlement);
         curveDirty(b, settlement, c, 0.0);
         if (!(dirty > 0.0)) {
@@ -127,6 +133,7 @@ public final class Bonds {
     public record AssetSwap(double spread, double annuity) {}
 
     public static AssetSwap assetSwap(Bond b, LocalDate settlement, Curve c, double dirtyPrice) {
+        Finite.check("dirtyPrice", dirtyPrice);
         double p = curveDirty(b, settlement, c, 0.0);
         double annuity = 0.0;
         LocalDate e = b.maturity();
@@ -144,6 +151,9 @@ public final class Bonds {
 
     public static Frn frn(LocalDate settlement, LocalDate maturity, int frequency, double current, double margin,
                           double dm, Curve d, Curve p) {
+        Finite.check("current", current);
+        Finite.check("margin", margin);
+        Finite.check("dm", dm);
         Bond b = new Bond(maturity, 0.0, frequency);
         checkSettlement(b, settlement);
         if (settlement.isBefore(d.asOf()) || settlement.isBefore(p.asOf())) {
@@ -194,6 +204,8 @@ public final class Bonds {
     }
 
     public static Repo repo(Bond b, LocalDate start, LocalDate end, double clean, double r, Double gc) {
+        Finite.check("clean", clean);
+        Finite.check("r", r);
         checkTerm(b, start, end);
         double dirty = clean + b.accrued(start);
         double t = days(start, end) / 360.0;
@@ -205,6 +217,8 @@ public final class Bonds {
     }
 
     public static double impliedRepo(Bond b, LocalDate start, LocalDate end, double clean, double forwardClean) {
+        Finite.check("clean", clean);
+        Finite.check("forwardClean", forwardClean);
         checkTerm(b, start, end);
         double dirty = clean + b.accrued(start);
         double fwd = forwardClean + b.accrued(end);
@@ -225,6 +239,7 @@ public final class Bonds {
     }
 
     public static double conversionFactor(Bond b, YearMonth delivery, double notional, Contract contract) {
+        Finite.check("notional", notional);
         if (notional != 0.06) {
             throw new QfError("E_INPUT", "notional_coupon must be 0.06", "notional_coupon");
         }
@@ -251,6 +266,10 @@ public final class Bonds {
 
     public static Basis basis(Bond b, double clean, double cf, double futures, LocalDate settlement, LocalDate delivery,
                               double r) {
+        Finite.check("clean", clean);
+        Finite.check("cf", cf);
+        Finite.check("futures", futures);
+        Finite.check("r", r);
         checkTerm(b, settlement, delivery);
         double invoice = futures * cf + b.accrued(delivery);
         double dirty = clean + b.accrued(settlement);
@@ -265,6 +284,9 @@ public final class Bonds {
      * bracket, with bisection when they leave it.
      */
     public static double solveDecreasing(DoubleUnaryOperator g, double guess, double lo, double hi) {
+        Finite.check("guess", guess);
+        Finite.check("lo", lo);
+        Finite.check("hi", hi);
         double a = guess;
         double fa = g.applyAsDouble(a);
         if (fa == 0.0) {
@@ -318,6 +340,9 @@ public final class Bonds {
     }
 
     public static double[] nsBetas(List<Bond> bonds, double[] dirty, double[] w, LocalDate settlement, double tau) {
+        Finite.check("dirty", dirty);
+        Finite.check("w", w);
+        Finite.check("tau", tau);
         if (!(tau > 0.0)) {
             throw new QfError("E_DOMAIN", "tau must be positive", "tau");
         }
@@ -401,6 +426,9 @@ public final class Bonds {
 
     /** Model dirty price; fills {@code grad} with its derivative in the betas when not null. */
     public static double nsModel(Bond b, LocalDate settlement, double tau, double[] beta, double[] grad) {
+        Finite.check("tau", tau);
+        Finite.check("beta", beta);
+        Finite.check("grad", grad);
         List<LocalDate> a = b.around(settlement);
         double sum = 0.0;
         for (int k = 1; k < a.size(); k++) {
