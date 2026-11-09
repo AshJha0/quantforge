@@ -8,18 +8,25 @@ const N365: f64 = 525_600.0;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Quote {
     pub strike: f64,
-    pub call_bid: f64,
-    pub call_ask: f64,
-    pub put_bid: f64,
-    pub put_ask: f64,
+    /// `None` is a null quote (ruling F-15).
+    pub call_bid: Option<f64>,
+    pub call_ask: Option<f64>,
+    pub put_bid: Option<f64>,
+    pub put_ask: Option<f64>,
 }
 
 impl Quote {
     fn call_mid(&self) -> f64 {
-        (self.call_bid + self.call_ask) / 2.0
+        (self.call_bid.unwrap_or(0.0) + self.call_ask.unwrap_or(0.0)) / 2.0
     }
     fn put_mid(&self) -> f64 {
-        (self.put_bid + self.put_ask) / 2.0
+        (self.put_bid.unwrap_or(0.0) + self.put_ask.unwrap_or(0.0)) / 2.0
+    }
+    fn call_null(&self) -> bool {
+        self.call_bid.is_none() || self.call_ask.is_none()
+    }
+    fn put_null(&self) -> bool {
+        self.put_bid.is_none() || self.put_ask.is_none()
     }
 }
 
@@ -33,15 +40,17 @@ pub struct Term {
 }
 
 /// Selected out-of-the-money strikes walking away from `k0` (exclusive), with their quote:
-/// a zero bid is skipped, and the second consecutive zero bid stops the walk.
+/// a zero bid is skipped, and the second consecutive zero bid stops the walk. Null series are
+/// removed before the walk starts (ruling F-15).
 fn walk<'a>(
     side: impl Iterator<Item = &'a Quote>,
-    bid: fn(&Quote) -> f64,
+    bid: fn(&Quote) -> Option<f64>,
     mid: fn(&Quote) -> f64,
 ) -> Vec<(f64, f64)> {
     let (mut out, mut zeros) = (Vec::new(), 0);
     for q in side {
-        if bid(q) == 0.0 {
+        let Some(b) = bid(q) else { continue };
+        if b == 0.0 {
             zeros += 1;
             if zeros == 2 {
                 break;
@@ -65,21 +74,25 @@ pub fn term_variance(minutes: i64, rate: f64, strip: &[Quote]) -> Result<Term> {
     if s.len() < 3 || s.windows(2).any(|w| w[0].strike == w[1].strike) {
         return fail("E_INPUT", "need at least 3 distinct strikes");
     }
+    let crossed = |b: Option<f64>, a: Option<f64>| matches!((b, a), (Some(b), Some(a)) if b > a);
     if s.iter()
-        .any(|q| q.call_bid > q.call_ask || q.put_bid > q.put_ask)
+        .any(|q| crossed(q.call_bid, q.call_ask) || crossed(q.put_bid, q.put_ask))
     {
         return fail("E_INPUT", "a bid is above its ask");
     }
     let quotes = |q: &Quote| [q.call_bid, q.call_ask, q.put_bid, q.put_ask];
     if s.iter()
-        .any(|q| quotes(q).iter().any(|v| v.is_nan() || *v < 0.0))
+        .any(|q| quotes(q).iter().flatten().any(|v| v.is_nan() || *v < 0.0))
     {
         return fail("E_DOMAIN", "quotes must not be negative");
     }
     let t = minutes as f64 / N365;
     let growth = (rate * t).exp();
-    let mut star = &s[0];
-    for q in &s[1..] {
+    let mut candidates = s.iter().filter(|q| !q.call_null() && !q.put_null());
+    let Some(mut star) = candidates.next() else {
+        return fail("E_INPUT", "no strike has both a call and a put quote");
+    };
+    for q in candidates {
         if (q.call_mid() - q.put_mid()).abs() < (star.call_mid() - star.put_mid()).abs() {
             star = q;
         }
@@ -89,8 +102,19 @@ pub fn term_variance(minutes: i64, rate: f64, strip: &[Quote]) -> Result<Term> {
         return fail("E_INPUT", "no strike at or below the forward");
     };
     let k0 = s[i0].strike;
-    let mut used = walk(s[..i0].iter().rev(), |q| q.put_bid, Quote::put_mid);
-    let calls = walk(s[i0 + 1..].iter(), |q| q.call_bid, Quote::call_mid);
+    if s[i0].call_null() || s[i0].put_null() {
+        return fail("E_INPUT", "the K0 call or put has a null quote");
+    }
+    let mut used = walk(
+        s[..i0].iter().rev().filter(|q| !q.put_null()),
+        |q| q.put_bid,
+        Quote::put_mid,
+    );
+    let calls = walk(
+        s[i0 + 1..].iter().filter(|q| !q.call_null()),
+        |q| q.call_bid,
+        Quote::call_mid,
+    );
     if used.is_empty() || calls.is_empty() {
         // Methodology 3(a)(iii), ruling E-B15: no out-of-the-money put or call left.
         return fail(
@@ -193,10 +217,10 @@ mod tests {
     fn q(strike: f64, cb: f64, ca: f64, pb: f64, pa: f64) -> Quote {
         Quote {
             strike,
-            call_bid: cb,
-            call_ask: ca,
-            put_bid: pb,
-            put_ask: pa,
+            call_bid: Some(cb),
+            call_ask: Some(ca),
+            put_bid: Some(pb),
+            put_ask: Some(pa),
         }
     }
 
@@ -243,24 +267,24 @@ mod tests {
         d[0].strike = 90.0;
         assert_eq!(code(term_variance(10, 0.0, &d)), "E_INPUT");
         let mut b = e.clone();
-        b[0].call_bid = 1.0;
+        b[0].call_bid = Some(1.0);
         assert_eq!(code(term_variance(10, 0.0, &b)), "E_INPUT");
         let mut n = e.clone();
-        n[0].put_bid = -1.0;
+        n[0].put_bid = Some(-1.0);
         assert_eq!(code(term_variance(10, 0.0, &n)), "E_DOMAIN");
         let mut low = e.clone();
         for x in &mut low {
-            x.call_bid += 50.0;
-            x.call_ask += 50.0;
+            x.call_bid = x.call_bid.map(|v| v + 50.0);
+            x.call_ask = x.call_ask.map(|v| v + 50.0);
         }
         assert_eq!(code(term_variance(10, 0.0, &low)), "E_INPUT");
         let mut no_put = example();
-        no_put[1].put_bid = 0.0;
+        no_put[1].put_bid = Some(0.0);
         assert_eq!(code(term_variance(43_200, 0.0, &no_put)), "E_INPUT");
         let mut high = e;
         for x in &mut high {
-            x.put_bid += 50.0;
-            x.put_ask += 50.0;
+            x.put_bid = x.put_bid.map(|v| v + 50.0);
+            x.put_ask = x.put_ask.map(|v| v + 50.0);
         }
         assert_eq!(code(term_variance(10, 0.0, &high)), "E_INPUT");
         let s = example();
@@ -272,5 +296,37 @@ mod tests {
                 .code,
             "E_INPUT"
         );
+    }
+
+    #[test]
+    fn null_quotes_f15() {
+        let e = example();
+        let base = term_variance(43_200, 0.0, &e).unwrap();
+        // A null put at the lowest strike is skipped, not counted as a zero bid.
+        let mut skip = e.clone();
+        skip[0].put_bid = None;
+        assert!(term_variance(43_200, 0.0, &skip).is_ok());
+        // A strike with no complete pair is never K*; all strikes null on one side: E_INPUT.
+        let mut none = e.clone();
+        for x in &mut none {
+            x.call_ask = None;
+        }
+        assert_eq!(
+            term_variance(43_200, 0.0, &none).unwrap_err().code,
+            "E_INPUT"
+        );
+        // A null side at K0 refuses the term.
+        let mut at_k0 = e.clone();
+        let k0 = at_k0.iter().position(|q| q.strike == base.k0).unwrap();
+        at_k0[k0].put_ask = None;
+        assert_eq!(
+            term_variance(43_200, 0.0, &at_k0).unwrap_err().code,
+            "E_INPUT"
+        );
+        // A crossed pair with one null side is not a crossed quote.
+        let mut half = e;
+        half[0].call_bid = Some(1e9);
+        half[0].call_ask = None;
+        assert!(term_variance(43_200, 0.0, &half).is_ok());
     }
 }

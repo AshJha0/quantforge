@@ -3,6 +3,7 @@ use super::eq::forward_inputs;
 use super::eq::items;
 use super::eq::outright;
 use super::fx::call_or_put;
+use super::fx::nullable_f64;
 use super::rates::present;
 use super::rates::snapshot_id;
 use super::rates::start;
@@ -626,10 +627,10 @@ pub(crate) fn strip(i: &Inputs) -> Result<(i64, f64, Vec<VixQuote>)> {
         .map(|q| {
             Ok(VixQuote {
                 strike: q.f64("strike")?,
-                call_bid: q.f64("call_bid")?,
-                call_ask: q.f64("call_ask")?,
-                put_bid: q.f64("put_bid")?,
-                put_ask: q.f64("put_ask")?,
+                call_bid: nullable_f64(&q, "call_bid")?,
+                call_ask: nullable_f64(&q, "call_ask")?,
+                put_bid: nullable_f64(&q, "put_bid")?,
+                put_ask: nullable_f64(&q, "put_ask")?,
             })
         })
         .collect::<Result<Vec<_>>>()?;
