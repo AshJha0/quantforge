@@ -168,9 +168,21 @@ def test_bracket_up_doubles():
     assert fx._bracket_up(lambda x: 5.0 - x, 0.0) == 8.0
 
 
-def test_pa_put_with_a_tiny_delta_walks_left():
-    # delta_to_strike 117: a small PA put delta needs the bracket walked several units left
+def test_pa_put_with_a_tiny_delta_walks_left(monkeypatch):
+    # delta_to_strike 117: a small PA put delta needs the bracket walked several units left.
+    # The mutant (low = 1.0) never leaves the loop, so cap the delta calls to fail fast.
+    calls = [0]
+    real = fx._Market.delta
+
+    def counted(self, *args):
+        calls[0] += 1
+        if calls[0] > 10_000:
+            raise RuntimeError("bracket walk does not terminate")
+        return real(self, *args)
+
+    monkeypatch.setattr(fx._Market, "delta", counted)
     strike = fx.delta_to_strike(*EUR, 0.8, "PUT", -1e-6, "FORWARD_PA")
+    monkeypatch.undo()
     m = fx._Market(*EUR, 0.8)
     assert math.log(strike / m.forward) < -1.0
     assert m.delta("FORWARD_PA", -1.0, strike) == pytest.approx(-1e-6, rel=1e-8)
@@ -282,11 +294,21 @@ SLV_REF = {"leverage": [0.7567192932516402, 0.694103940389056, 0.715974007324097
 
 
 def test_slv_reference_values():
-    # slv_leverage 151, 272, 295 and 334
+    # slv_leverage 272, 295 and 334
     lo, hi = math.log(100) - 1.0, math.log(100) + 1.0
     out = hm.slv_leverage(100.0, 1.0, 0.05, 0.01, H, FLAT, hm.Grid(11, 7, 6, lo, hi, 0.25))
     assert out["leverage"] == pytest.approx(SLV_REF["leverage"], rel=1e-12)
     assert out["mass"] == pytest.approx(SLV_REF["mass"], rel=1e-12)
+
+
+def test_slv_start_density_uses_the_drifted_local_vol():
+    # slv_leverage 151: the t = 0 local vol is read at ln S + (r - q) dt; a skewed slice makes
+    # the point matter (a flat one does not)
+    skew = [vol_e1.Slice(1.0, Svi(0.03, 0.1, -0.5, 0.0, 0.2))]
+    lo, hi = math.log(100) - 1.0, math.log(100) + 1.0
+    out = hm.slv_leverage(100.0, 1.0, 0.05, 0.01, H, skew, hm.Grid(11, 7, 6, lo, hi, 0.25))
+    assert out["leverage"][5] == pytest.approx(0.8221523246794936, rel=1e-12)
+    assert out["mass"] == pytest.approx(0.8170518283911051, rel=1e-12)
 
 
 # --- rates_vol ---
@@ -317,6 +339,13 @@ def test_strip_black_search_bound_is_five():
     assert run("rates.cap.strip", dict(inputs, flat_vols=[0.8] * n))["status"] == "ok"
     code, field, _ = cli_err("rates.cap.strip", dict(inputs, flat_vols=[6.0] * n))
     assert (code, field) == ("E_DOMAIN", "flat_vols")
+
+
+def test_strip_arbitrage_error_field():
+    # cap_strip 199: a steep fall in flat vol needs a negative caplet vol
+    inputs = _base("rates.cap.strip")
+    n = len(inputs["flat_vols"])
+    assert cli_err("rates.cap.strip", dict(inputs, flat_vols=[0.5] + [0.05] * (n - 1))) ==         ("E_ARBITRAGE", "flat_vols", "a caplet segment needs a vol at or below zero")
 
 
 def test_rates_option_errors():
