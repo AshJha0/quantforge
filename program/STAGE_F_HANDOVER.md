@@ -82,7 +82,7 @@ Read with every slice: `specifications/cli-contract.md` (block "Stage F operatio
 - Build notes: the Jacobian is `-(dR/dx)^{-1} dR/dq`; central differences on `x` with `h` near 1e-7 meet the `jacobian` class. Structural zeros must be exact zeros (do not invert the full matrix with pivoting that mixes blocks; a block solve or a plain LU of a block lower-triangular matrix keeps them). `turn_sensitivity` is exactly 0 off the turn.
 
 ### Outside-oracle status (rule 11.2.5, ruling F-23)
-: curve_f 48 of 84, vix_f 3 of 10 (Cboe sample), cdsidx_f, garch_f and lvc_f none (no free outside source). Stage F so far 51 of 158 = 32%, below the 60% floor; Q4, F4 (scipy, BCBS worked examples) and the remaining waves must raise it (ruling F-23).
+`oracle/python/outside_f.py`: curve_f 48 of 84, vix_f 3 of 10 (Cboe sample), cdsidx_f, garch_f and lvc_f none (no free outside source). Stage F so far 51 of 158 = 32%, below the 60% floor; Q4, F4 (scipy, BCBS worked examples) and the remaining waves must raise it (ruling F-23).
 
 ### Open items
 - R7: the Pedersen (2003) worked example is not reproduced (paper not freely available); added to the known issues for a human with access.
