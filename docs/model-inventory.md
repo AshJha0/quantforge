@@ -346,7 +346,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 | MF-2 | GARCH(1,1) estimate with standard errors, Student-t, demeaning | `05-volatility/garch.md` | F (R8) | Specified | none |
 | MF-3 | VIX null-quote rule; local vol at slice expiries | `05-volatility/vix-index.md`, `05-volatility/local-and-forward-vol.md` | F (R10) | Specified | VIX: Cboe sample calculation, 3 of 10 |
 | MF-4 | Curve interpolation: monotone convex, monotonic log cubic, tension spline, hybrid | `02-curves/curve-framework.md` | F (Q1) | Specified | 48 of 84 (QuantLib 1.44) |
-| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Specified | see `oracle/outside_register_f.json` |
+| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Specified | 1 of 13 (QuantLib 1.44 rebuild with Jacobian) |
 | MF-6 | Funding curve (spread over OIS) | `02-curves/joint-solve-and-funding.md` | F | Specified | none |
 
 ### MF-1 CDS index option (Pedersen)
@@ -405,7 +405,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** sequential stage B and D bootstraps on the same quotes (`rates.ois.bootstrap`, `rates.curve.joint_bootstrap`).
 - **Monitoring thresholds:** any residual above 1e-13; Jacobian outside `1e-9 + 1e-6 |ref|` of bump-and-rebuild.
-- **Data lineage hash:** TODO wave 1b (joint_f not yet written)
+- **Data lineage hash:** sha256 05d94767453f1447c65daa1b33e69a6b83f729dd2ffe0bb17879f4dc7ebd62a7
 - **Retirement trigger:** mark-to-market cross-currency swaps and a calibrated convexity model (stage G) replace the synthetic pieces.
 - **Validation report:** `specifications/02-curves/joint-solve-and-funding.md` (acceptance); `oracle/outside_register_f.json`.
 
@@ -417,7 +417,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2 (feeds FVA, not prices, until stage G).
 - **Challenger:** a bond-implied funding curve (Z-spread of own issuance) in stage G.
 - **Monitoring thresholds:** a quote not repriced to 1e-12.
-- **Data lineage hash:** TODO wave 1b (joint_f not yet written)
+- **Data lineage hash:** sha256 05d94767453f1447c65daa1b33e69a6b83f729dd2ffe0bb17879f4dc7ebd62a7
 - **Retirement trigger:** a funding model with term structure from issued bonds and CDS supersedes the money-market version.
 - **Validation report:** `specifications/02-curves/joint-solve-and-funding.md`.
 

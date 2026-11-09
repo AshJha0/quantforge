@@ -93,3 +93,12 @@ Read with every slice: `specifications/cli-contract.md` (block "Stage F operatio
 - R8 coverage study: `uv run python -W ignore gen_stage_f_f6.py COVER` (about an hour; writes `oracle/R8_COVERAGE.json`, asserts the [0.90, 0.99] band).
 - Regenerate E1 after new operations land: `gen_stage_f_e1.py` reads only suites outside `stage_f`, so the stage F operations (`credit.cdsindex.option_price`, `vol.garch.estimate`, `rates.curve.inspect`, `rates.curve.joint_solve`, `rates.funding.curve`) still need E1 cases: change its skip rule to skip only `e1_*` files, then rerun.
 - Then waves 2 and 3 as in the task order (F3 and F4 specs, the E9 MC hash golden, F5 book).
+
+
+## WAVE 1b READY (2026-11-09 22:12): F1 Q4 joint solve and funding curve, with one open system
+
+The Q4 section above ("F1 Q4 joint solve and funding curve") is now ready, with `joint_f` at 13 cases: three joint systems (SOFR meeting steps fitted to SR3 futures with convexity and a solved year-end turn; SOFR + term log-linear; SOFR + term monotonic log cubic), four error cases and six funding-curve cases (one is the zero-spread limit). Stub replay 13 of 13. Each system's IFT Jacobian matches a bump-and-rebuild of the whole system (Richardson, `h = 1e-4`) within `1e-9 + 1e-6 |ref|`; structural zeros are exact. QuantLib 1.44 rebuilds the log-linear system and its bump Jacobian (counted). The monotonic log cubic system's QuantLib bump Jacobian differs by 3e-6 relative, which is QuantLib's 1e-12 bootstrap accuracy over a 1e-4 bump, so it is not counted.
+
+**Open item (spec session, next turn):** the full system (SOFR monotone convex with a solved turn + term + ESTR monotonic log cubic + EUR xccy) solves to 1.6e-15, but its IFT Jacobian differs from bump-and-rebuild by up to 2e-3, so it is left out of the goldens (`gen_stage_f_q4.py`, `systems()[0]`, skipped in `main`). Suspects: a convex-monotone section at a branch boundary (the method is piecewise in its data, so its Jacobian is one-sided there), or the xccy `dR/dq`. Diagnostic script pattern: solve, `jacobian()`, `bump_jacobian()`, print the worst entries. Builds should implement the full operation regardless; the missing golden does not change the spec.
+
+Outside share after wave 1: 52 of 171 = 30.4% (ruling F-23), below the 60% floor.
