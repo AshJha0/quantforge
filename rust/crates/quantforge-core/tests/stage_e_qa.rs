@@ -1,4 +1,5 @@
 //! Stage E quality pass: parity, limits and domain errors checked from outside the crate.
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
 use quantforge_core::corr::implied;
 use quantforge_core::credit_e::{Pool, bivariate_normal, loss_cdf, normal_inv, tranche_loss};
 use quantforge_core::heston::{Heston, Jumps, Market, heston_price, merton_price};

@@ -1,4 +1,5 @@
 //! Tests aimed at the garch.rs mutants that survived the stage E mutation run.
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
 use quantforge_core::garch::{Start, fit, nelder_mead};
 use std::cell::Cell;
 

@@ -1,4 +1,5 @@
 //! Identities and examples from the stage B specs.
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
 use quantforge_core::calendar::parse_tenor;
 use quantforge_core::conventions::overnight;
 use quantforge_core::curve::{Interpolation, SolveMethod};
