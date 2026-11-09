@@ -32,6 +32,7 @@ pub mod exotics;
 pub mod fx;
 pub mod fx_smile;
 pub mod garch;
+pub mod garch_estimate;
 pub mod greeks;
 pub mod hedge;
 pub mod heston;
