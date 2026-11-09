@@ -17,10 +17,10 @@ uv sync --locked --project python
 python conformance/runner/runner.py --impl rust
 ```
 
-`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Rust run on `r1` at `3f5d97d`, 2026-11-07:
+`--impl` takes `java`, `cpp`, `python` or `rust`. Add `--suite daycount` for one suite. The last line of a full Python run on the stage E merge, `597abf2`, 2026-11-08 (*observed*, Windows; the other three builds reported the same count):
 
 ```
-TOTAL {'cases': 5922, 'pass': 5922, 'fail': 0, 'not_implemented': 0}
+TOTAL {'cases': 6817, 'pass': 6817, 'fail': 0, 'not_implemented': 0}
 ```
 
 ## More on the CLI
@@ -63,7 +63,7 @@ New in 1.6.0 (R1): `quantforge --batch` is the same command, and `--timings` on 
 python conformance/runner/batch_check.py --impl rust
 ```
 
-`--skip-run` leaves out the slow per-case `run` comparison.
+`--skip-run` leaves out the slow per-case `run` comparison. With `--impl python` the full check runs past five minutes on a Windows laptop, because each `run` call starts a fresh `uv` process; `--skip-run` passes in about a minute (*observed*, 2026-11-09).
 
 ## R2 risk recipes
 
@@ -379,10 +379,7 @@ Copy the inputs of the named case from `datasets/golden/stage_d/`:
 
 ## Stage E recipes
 
-Slices E1, E2, E3 and E5:
-
-
-Copy the inputs of the named case from `datasets/golden/stage_e/`:
+Slices E1, E2, E3 and E5. Copy the inputs of the named case from `datasets/golden/stage_e/`:
 
 | Task | Operation | Case |
 |---|---|---|
@@ -401,7 +398,7 @@ Copy the inputs of the named case from `datasets/golden/stage_e/`:
 | American put: tree, BAW, FD | `exotic.american.crr`, `.baw`, `.fd` | `american_e-0002`; `american_e` cases tagged `baw`, `fd` |
 
 
-Slices E4, E6, E7 and E8. The outputs quoted are the golden values (`datasets/golden/stage_e_b/`), which all four builds reproduce. Replace the binary with any build's CLI.
+Slices E4, E6, E7 and E8. The outputs quoted are the golden values (`datasets/golden/stage_e_b/`), which all four builds reproduce. Replace the binary with any build's CLI. On Windows without a Rust build, `python/.venv/Scripts/quantforge.exe run` (after `uv sync`) gives the same values to within the last two or three digits, inside each case's tolerance (*observed*, 2026-11-09, all eight recipes below).
 
 #### GARCH likelihood by hand
 

@@ -294,7 +294,6 @@ Evidence classes used in this section: *golden* (the oracle's expected value, wh
 
 **Worked example.** `american_e-0002`: a one-year at-the-money put (`r` 5%, `q` 2%, vol 25%) on a 200-step tree. American 8.5588, European 8.2148, so early exercise is worth 0.3441. `exotic_e-0019`: a down-and-in call (strike 85, barrier 90, rebate 2) is 7.8991, reproduced by QuantLib `AnalyticBarrierEngine`.
 
-
 The topics below cover slices E4, E6, E7 and E8. Specs: `specifications/05-volatility/rates-vol-cube.md`, `garch.md`, `variance-swaps.md`, `vix-index.md`, `specifications/06-risk/correlation.md` and `specifications/04-pricing/credit-options-and-copulas.md`; goldens in `datasets/golden/stage_e_b/`.
 
 ### Why a swaption cube interpolates parameters, not vols
