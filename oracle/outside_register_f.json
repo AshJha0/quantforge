@@ -1,0 +1,647 @@
+{
+ "rule": "plan 11.2.5",
+ "library": "QuantLib",
+ "version": "1.44",
+ "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit",
+ "partly_outside_not_counted": [
+  {
+   "case_id": "curve_f-0002",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0006",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0010",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0020",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0024",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0028",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0032",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0036",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0040",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0044",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0048",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0052",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0056",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0060",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0064",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0070",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  },
+  {
+   "case_id": "curve_f-0077",
+   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
+  }
+ ],
+ "cases": [
+  {
+   "case_id": "curve_f-0001",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0003",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0004",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0005",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0007",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0008",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0009",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0011",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0012",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0013",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0019",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0021",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0022",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0023",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0025",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0026",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0027",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0029",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0030",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0031",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0033",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0034",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0035",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0037",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0038",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0039",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0041",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0042",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0043",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0045",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0046",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0047",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0049",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0050",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0051",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0053",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0054",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0055",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0057",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0058",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0059",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0061",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0062",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0063",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0065",
+   "operation": "rates.ois.bootstrap",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0066",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0067",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0071",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "vix_f-0001",
+   "operation": "vol.vix.term_variance",
+   "source": "Cboe Volatility Index Methodology v6.0, Appendix 3",
+   "convention_rows": [
+    "CBOE.SAMPLE"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "vix_f-0002",
+   "operation": "vol.vix.term_variance",
+   "source": "Cboe Volatility Index Methodology v6.0, Appendix 3",
+   "convention_rows": [
+    "CBOE.SAMPLE"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "vix_f-0003",
+   "operation": "vol.vix.index",
+   "source": "Cboe Volatility Index Methodology v6.0, Appendix 3",
+   "convention_rows": [
+    "CBOE.SAMPLE"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  }
+ ]
+}

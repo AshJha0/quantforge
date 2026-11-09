@@ -94,3 +94,10 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | F1 | NaN, +inf or -inf in any Real input of any operation | Pinned | `stage_f/e1_*.json`, tags `non_finite` (three per Real leaf, every operation with an ok golden) | Rules F-1, F-2: `E_DOMAIN`, checked first. JSON cannot write them, so they travel as the strings `"NaN"`, `"Infinity"`, `"-Infinity"` |
 | F2 | Negative zero in any Real input | Pinned | `stage_f/e1_*.json`, tags `negative_zero` (and `zero_anchor`) | Rule F-3: same result as `+0.0`. Catches sign-bit branches and `1/x` with `x = -0.0` |
 | F3 | Overflowing number literal (`1e400`) as an operation input | Rule only | none (a JSON runner cannot send it through `json.dumps`) | Still `E_SCHEMA` (`cli-contract.md`, value encoding), unchanged by F-1; covered by the fuzz harness, not a golden |
+| F4 | CDS index option with front-end protection, strike below the index coupon | Pinned | `stage_f/cdsidx_f` tags `strike-below-coupon`; `E_DOMAIN` when the adjusted strike is not positive | Rulings F-7 to F-10 |
+| F5 | GARCH optimum on a parameter bound | Rule only | none (a boundary golden would depend on the optimiser's path) | Ruling F-11: `E_NO_CONVERGENCE` |
+| F6 | Null quote in a VIX strip, at K0, and next to zero bids | Pinned | `stage_f/vix_f` tags `null-quote` | Ruling F-15 |
+| F7 | Local vol at an SVI slice expiry (short end included) | Pinned | `stage_f/lvc_f` | Ruling F-17: documented jump, node takes the right limit |
+| F8 | Monotone convex section with eta clamped to 0 | Rule | `curve-framework.md` rule (e) | QuantLib divides 0 by 0 at the section start; the spec defines the limit |
+| F9 | Negative overnight rates under the new interpolations | Pinned | `stage_f/curve_f` ESTR builds (1W at -0.05%) | Forwards returned as computed (ruling F-19) |
+| F10 | Year-end turn solved from a spanning quote | Pinned | `stage_f/joint_f` turn cases; `turn_sensitivity` exactly 0 off the turn | Ruling F-26 |
