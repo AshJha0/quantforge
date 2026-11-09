@@ -55,8 +55,8 @@ def qf_bench(benchmark):
             clock = time.perf_counter_ns
 
             def timed():
-                end = clock() + spin
                 result = fn()
+                end = clock() + spin  # spin after the op, so the added cost is exactly `spin`
                 while clock() < end:
                     pass
                 return result

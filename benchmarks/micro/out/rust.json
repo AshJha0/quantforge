@@ -1,1 +1,0 @@
-{"lang":"rust","benchmarks":{"bootstrap":{"ns_per_op":5456882.916666666,"allocs_per_op":1386},"swap_pv":{"ns_per_op":396547.15909090906,"allocs_per_op":81},"implied_vol":{"ns_per_op":13602.533234126984,"allocs_per_op":0}}}
