@@ -19,6 +19,10 @@ MAX_BYTES = 900_000
 
 
 REAL_PATHS = {}
+# Real inputs that no ok golden writes as a float; the type is from the spec page named.
+REAL_OVERRIDES = {
+    "core.integrate.gauss_legendre": {("a",), ("b",)},  # 01-core/integration.md: bounds of [a, b]
+}
 
 
 def norm(path):
@@ -48,14 +52,16 @@ def base_cases():
         if not isinstance(doc, dict) or "cases" not in doc:
             continue
         for c in doc["cases"]:
-            if isinstance(c.get("inputs"), dict):
-                REAL_PATHS.setdefault(c["operation"], set()).update(float_paths(c["inputs"]))
             if c.get("expected", {}).get("status") != "ok":
                 continue
+            # only accepted inputs type a path: error cases may hold a float in an Integer field (E_SCHEMA)
+            REAL_PATHS.setdefault(c["operation"], set()).update(float_paths(c["inputs"]))
             key = (len(json.dumps(c["inputs"], sort_keys=True)), c["case_id"])
             op = c["operation"]
             if op not in best or key < best[op][0]:
                 best[op] = (key, c)
+    for op, paths in REAL_OVERRIDES.items():
+        REAL_PATHS.setdefault(op, set()).update(paths)
     return {op: v[1] for op, v in sorted(best.items())}
 
 
@@ -90,8 +96,10 @@ def put(inputs, path, value):
     return new
 
 
-def judged_fields(base):
-    keep = {k: base[k] for k in ("tolerance_class", "tolerance_limit", "output_classes", "extra_checks") if k in base}
+def judged_fields(base, peer=False):
+    """extra_checks hold expected values for the base input, so a same_as case (other input) never takes them."""
+    names = ("tolerance_class", "tolerance_limit", "output_classes") + (() if peer else ("extra_checks",))
+    keep = {k: base[k] for k in names if k in base}
     return keep
 
 
@@ -126,7 +134,7 @@ def main():
                               "verified_by": ["rule-F-3-anchor"],
                               "tags": ["e1", "zero_anchor", f"base:{b['case_id']}", f"input:{where}"]})
                 cases.append({"operation": op, "inputs": put(b["inputs"], path, -0.0),
-                              "expected": {"status": "same_as", "case_id": None}, **judged_fields(b),
+                              "expected": {"status": "same_as", "case_id": None}, **judged_fields(b, peer=True),
                               "verified_by": ["rule-F-3"],
                               "tags": ["e1", "negative_zero", f"base:{b['case_id']}", f"input:{where}"]})
     OUT.mkdir(parents=True, exist_ok=True)
