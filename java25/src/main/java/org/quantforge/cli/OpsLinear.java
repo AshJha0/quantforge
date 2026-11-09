@@ -31,10 +31,18 @@ final class OpsLinear {
     private static final int MAX_QUOTES = 100;
 
     /** A curve as read. Its rule checks wait until {@link #build()}. */
-    record CurveInput(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] factors, Jumps jumps) {
+    record CurveInput(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] factors, Jumps jumps,
+                      Curve.Shape shape) {
         Curve build() {
-            return Curve.of(asOf, interp, dates, factors, jumps);
+            return Curve.of(asOf, interp, dates, factors, jumps, shape);
         }
+    }
+
+    /** Optional {@code tension} and {@code step_end} (ruling F-18); checked against the method at the build. */
+    static Curve.Shape shape(In in) {
+        Double tension = in.realOrNull("tension");
+        LocalDate stepEnd = in.has("step_end") ? in.date("step_end") : null;
+        return new Curve.Shape(tension, stepEnd);
     }
 
     /** Optional jumps: absent is none, null is E_SCHEMA (ruling D10). Rule checks wait for the build. */
@@ -65,7 +73,7 @@ final class OpsLinear {
             dates[i] = pillars.get(i).date("date");
             factors[i] = pillars.get(i).real("discount_factor");
         }
-        return new CurveInput(asOf, interp, dates, factors, jumps(c, false));
+        return new CurveInput(asOf, interp, dates, factors, jumps(c, false), shape(c));
     }
 
     static List<Ois.Quote> quotes(In in) {
@@ -177,6 +185,21 @@ final class OpsLinear {
     }
 
     private static void rates(Map<String, Function<In, Out>> table) {
+        table.put("rates.curve.inspect", in -> {
+            CurveInput ci = curve(in, "curve");
+            List<LocalDate> dates = in.dates("dates");
+            in.gate();
+            Curve c = ci.build();
+            double[] d = new double[dates.size()];
+            Double[] z = new Double[d.length];
+            double[] f = new double[d.length];
+            for (int i = 0; i < d.length; i++) {
+                d[i] = c.discount(dates.get(i));
+                z[i] = c.zeroRate(dates.get(i));
+                f[i] = c.forward(dates.get(i));
+            }
+            return Operations.out("discount_factors", d, "zero_rates", z, "instantaneous_forwards", f);
+        });
         table.put("rates.curve.discount", in -> {
             CurveInput ci = curve(in, "curve");
             List<LocalDate> dates = in.dates("dates");
@@ -214,8 +237,9 @@ final class OpsLinear {
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             CurveSolver.Method method = in.choice("method", CurveSolver.Method.class);
             Jumps jumps = jumps(in, false);
+            Curve.Shape shape = shape(in);
             in.gate();
-            CurveSolver.Solved s = Ois.bootstrap(c, asOf, quotes, interp, method, null, jumps);
+            CurveSolver.Solved s = Ois.bootstrap(c, asOf, quotes, interp, method, null, jumps, shape);
             return new Out(Operations.out("pillars", pillars(s.curve())).outputs(),
                     Operations.out("max_repricing_error", s.maxRepricingError()).outputs());
         });
