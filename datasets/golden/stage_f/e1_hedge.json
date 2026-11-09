@@ -1,0 +1,1413 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_hedge",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1_hedge-0001",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      "NaN"
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0005",
+    "input:/a/0/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0002",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      "Infinity"
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/a/0/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0003",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      "-Infinity"
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/a/0/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0004",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      0.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:hedge-0005",
+    "input:/a/0/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0005",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_hedge-0004"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0005",
+    "input:/a/0/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0006",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     "NaN"
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0005",
+    "input:/b/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0007",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     "Infinity"
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/b/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0008",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     "-Infinity"
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/b/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0009",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     0.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:hedge-0005",
+    "input:/b/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0010",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     -0.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_hedge-0009"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0005",
+    "input:/b/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0011",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     "NaN"
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0005",
+    "input:/weights/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0012",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     "Infinity"
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/weights/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0013",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     "-Infinity"
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/weights/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0014",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     0.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:hedge-0005",
+    "input:/weights/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0015",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     -0.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_hedge-0014"
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0005",
+    "input:/weights/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0016",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     "NaN"
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0005",
+    "input:/costs/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0017",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     "Infinity"
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/costs/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0018",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     "-Infinity"
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/costs/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0019",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     -0.0
+    ],
+    "lambda": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -5.0
+     ],
+     "residual": [
+      0.0
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "copied:hedge-0005",
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0005",
+    "input:/costs/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0020",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": "NaN"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0005",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0021",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": "Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0022",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": "-Infinity"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0005",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0023",
+   "operation": "hedge.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     5.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "costs": [
+     0.0
+    ],
+    "lambda": -0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -5.0
+     ],
+     "residual": [
+      0.0
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "interpolation",
+   "verified_by": [
+    "copied:hedge-0005",
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0005",
+    "input:/lambda"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0024",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     "NaN",
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0009",
+    "input:/quantities/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0025",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     "Infinity",
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/quantities/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0026",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     "-Infinity",
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/quantities/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0027",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     0.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:hedge-0009",
+    "input:/quantities/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0028",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     -0.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_hedge-0027"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0009",
+    "input:/quantities/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0029",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     "NaN"
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0009",
+    "input:/quantities/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0030",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     "Infinity"
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/quantities/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0031",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     "-Infinity"
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/quantities/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0032",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     0.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:hedge-0009",
+    "input:/quantities/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0033",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -0.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_hedge-0032"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0009",
+    "input:/quantities/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0034",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     "NaN",
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0009",
+    "input:/half_spreads/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0035",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     "Infinity",
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/half_spreads/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0036",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     "-Infinity",
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/half_spreads/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0037",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.0,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:hedge-0009",
+    "input:/half_spreads/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0038",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     -0.0,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_hedge-0037"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0009",
+    "input:/half_spreads/0"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0039",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     "NaN"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:hedge-0009",
+    "input:/half_spreads/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0040",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     "Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/half_spreads/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0041",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     "-Infinity"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:hedge-0009",
+    "input:/half_spreads/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0042",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:hedge-0009",
+    "input:/half_spreads/1"
+   ]
+  },
+  {
+   "case_id": "e1_hedge-0043",
+   "operation": "hedge.spread_cost",
+   "inputs": {
+    "quantities": [
+     100.0,
+     -50.0
+    ],
+    "half_spreads": [
+     0.25,
+     -0.0
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_hedge-0042"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:hedge-0009",
+    "input:/half_spreads/1"
+   ]
+  }
+ ]
+}

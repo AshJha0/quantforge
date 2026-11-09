@@ -38,6 +38,11 @@ def answer(case, idx, mode, by):
     if "expected" in case:
         raise SystemExit("the runner leaked expected values")
     exp = g["expected"]
+    if exp["status"] == "same_as":
+        r = answer(dict(case, case_id=exp["case_id"]), idx, mode, by)
+        return dict(r, case_id=cid)
+    if exp["status"] == "any":
+        exp = {"status": "error", "error_code": "E_INPUT"}
     if exp["status"] == "error":
         code = "E_WRONG" if mode == "wrong_error" else exp["error_code"]
         return {"schema_version": "1.0", "case_id": cid, "status": "error", "error": {"code": code, "message": "stub"}}
