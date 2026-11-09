@@ -2,6 +2,7 @@
 //! (`04-pricing/credit-options-and-copulas.md`, rulings E-B22 to E-B26).
 use crate::black::black;
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 use crate::integrate::gauss_legendre_rule;
 use crate::rng::ppnd16;
@@ -95,6 +96,8 @@ impl CdsOption {
 }
 
 pub fn cds_option_price(o: &CdsOption, vol: f64) -> Result<CdsOptionPrice> {
+    crate::error::finite("o", &o)?;
+    crate::error::finite("vol", &vol)?;
     o.check()?;
     if vol.is_nan() || vol < 0.0 {
         return fail("E_DOMAIN", "vol must not be negative");
@@ -110,6 +113,8 @@ pub fn cds_option_price(o: &CdsOption, vol: f64) -> Result<CdsOptionPrice> {
 
 /// Knock-out options only (ruling E-B23).
 pub fn cds_option_implied_vol(o: &CdsOption, premium: f64) -> Result<f64> {
+    crate::error::finite("o", &o)?;
+    crate::error::finite("premium", &premium)?;
     // Ruling E-B40: the knock-out rule comes before the dates.
     if !o.knock_out {
         return fail(
@@ -149,6 +154,7 @@ pub fn cds_option_implied_vol(o: &CdsOption, premium: f64) -> Result<f64> {
 }
 
 /// Standard normal quantile: AS241 refined by one Newton step.
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn normal_inv(p: f64) -> f64 {
     let x = ppnd16(p);
     x - (normal_cdf(x) - p) / normal_pdf(x)
@@ -176,6 +182,7 @@ fn integrate(f: &dyn Fn(f64) -> f64, a: f64, b: f64, panels: usize) -> f64 {
 
 /// Bivariate normal CDF by Drezner-Wesolowsky's `sin` substitution:
 /// `Phi(h) Phi(k) + (1/2pi) int_0^{asin rho} exp(-(h^2 + k^2 - 2hk sin t)/(2 cos^2 t)) dt`.
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn bivariate_normal(h: f64, k: f64, rho: f64) -> f64 {
     let top = rho.asin();
     let g = |t: f64| {
@@ -197,11 +204,13 @@ fn chi_mix(nu: f64, f: &dyn Fn(f64) -> f64) -> f64 {
 }
 
 /// Student t CDF with `nu` degrees of freedom.
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn student_cdf(x: f64, nu: f64) -> f64 {
     chi_mix(nu, &|r| normal_cdf(x * r))
 }
 
 /// Student t quantile by bisection on [`student_cdf`].
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn student_inv(p: f64, nu: f64) -> f64 {
     let (mut lo, mut hi) = (-1.0, 1.0);
     while student_cdf(lo, nu) > p {
@@ -225,12 +234,17 @@ pub fn student_inv(p: f64, nu: f64) -> f64 {
 }
 
 /// Bivariate Student t CDF, one `nu`, scale matrix with off-diagonal `rho` (ruling E-B24).
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn bivariate_student(x: f64, y: f64, rho: f64, nu: f64) -> f64 {
     chi_mix(nu, &|r| bivariate_normal(x * r, y * r, rho))
 }
 
 /// `(joint_default_probability, default_correlation)`. `nu` is `Some` for the t copula.
 pub fn joint_default(p1: f64, p2: f64, rho: f64, nu: Option<f64>) -> Result<(f64, f64)> {
+    crate::error::finite("p1", &p1)?;
+    crate::error::finite("p2", &p2)?;
+    crate::error::finite("rho", &rho)?;
+    crate::error::finite("nu", &nu)?;
     let unit = |p: f64| p > 0.0 && p < 1.0;
     let rho_ok = rho.abs() < 1.0;
     let nu_ok = nu.is_none_or(|v| v > 0.0);
@@ -281,6 +295,9 @@ impl Pool {
 }
 
 pub fn tranche_loss(pool: &Pool, attachment: f64, detachment: f64) -> Result<f64> {
+    crate::error::finite("pool", &pool)?;
+    crate::error::finite("attachment", &attachment)?;
+    crate::error::finite("detachment", &detachment)?;
     if detachment <= attachment || attachment < 0.0 || detachment > 1.0 {
         return fail("E_INPUT", "need 0 <= attachment < detachment <= 1");
     }
@@ -296,6 +313,8 @@ pub fn tranche_loss(pool: &Pool, attachment: f64, detachment: f64) -> Result<f64
 }
 
 pub fn loss_cdf(pool: &Pool, losses: &[f64]) -> Result<Vec<f64>> {
+    crate::error::finite("pool", &pool)?;
+    crate::error::finite("losses", &losses)?;
     pool.check()?;
     let lgd = 1.0 - pool.recovery;
     if losses.iter().any(|x| !(*x > 0.0 && *x < lgd)) {
@@ -306,6 +325,33 @@ pub fn loss_cdf(pool: &Pool, losses: &[f64]) -> Result<Vec<f64>> {
         .iter()
         .map(|x| normal_cdf(((1.0 - rho).sqrt() * normal_inv(x / lgd) - c) / rho.sqrt()))
         .collect())
+}
+
+impl crate::error::Finite for CdsOption {
+    fn is_all_finite(&self) -> bool {
+        self.rate.is_all_finite()
+            && self.hazard_rate.is_all_finite()
+            && self.recovery.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.notional.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for CdsOptionPrice {
+    fn is_all_finite(&self) -> bool {
+        self.price.is_all_finite()
+            && self.forward_spread.is_all_finite()
+            && self.risky_annuity.is_all_finite()
+            && self.front_end_protection.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Pool {
+    fn is_all_finite(&self) -> bool {
+        self.default_probability.is_all_finite()
+            && self.correlation.is_all_finite()
+            && self.recovery.is_all_finite()
+    }
 }
 
 #[cfg(test)]

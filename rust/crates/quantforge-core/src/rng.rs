@@ -146,6 +146,7 @@ const F: [f64; 8] = [
 ];
 
 /// Wichura's AS 241 inverse normal, for `p` strictly inside (0, 1).
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn ppnd16(p: f64) -> f64 {
     let q = p - 0.5;
     if q.abs() <= 0.425 {
@@ -165,6 +166,7 @@ pub fn ppnd16(p: f64) -> f64 {
 }
 
 pub fn inverse_normal(p: &[f64]) -> Result<Vec<f64>> {
+    crate::error::finite("p", &p)?;
     if p.iter().any(|&v| v <= 0.0 || v >= 1.0) {
         return fail("E_DOMAIN", "p must lie in (0, 1)");
     }

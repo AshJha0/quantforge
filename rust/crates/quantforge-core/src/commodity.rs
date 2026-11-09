@@ -9,6 +9,8 @@ pub fn commodity_forwards(
     seasonality: Option<&[f64]>,
     months: &[i64],
 ) -> Result<Vec<f64>> {
+    crate::error::finite("quotes", &quotes)?;
+    crate::error::finite("seasonality", &seasonality)?;
     if quotes.is_empty() || quotes.windows(2).any(|w| w[1].0 <= w[0].0) {
         return fail("E_INPUT", "quote months must strictly increase");
     }
@@ -45,6 +47,8 @@ pub fn storage_carry(
     forwards: &[(Date, f64)],
     u: f64,
 ) -> Result<(Vec<f64>, Vec<f64>, Vec<bool>)> {
+    crate::error::finite("forwards", &forwards)?;
+    crate::error::finite("u", &u)?;
     if forwards.len() < 2
         || forwards[0].0 <= funding.as_of
         || forwards.windows(2).any(|w| w[1].0 <= w[0].0)

@@ -1,4 +1,5 @@
 //! Black-Scholes, Black-76 and Bachelier prices and implied vols (`black-models.md`).
+
 use crate::error::{Result, fail};
 use crate::stats::{normal_cdf, normal_pdf};
 
@@ -33,6 +34,7 @@ pub fn phi(call: bool) -> f64 {
 }
 
 /// Lognormal price on forward `f`, strike `k`, discount `d`.
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn black(call: bool, f: f64, k: f64, v: f64, t: f64, d: f64) -> f64 {
     let p = phi(call);
     if t == 0.0 || v == 0.0 {
@@ -42,12 +44,14 @@ pub fn black(call: bool, f: f64, k: f64, v: f64, t: f64, d: f64) -> f64 {
     d * p * (f * normal_cdf(p * d1) - k * normal_cdf(p * d2))
 }
 
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn d1_d2(f: f64, k: f64, v: f64, t: f64) -> (f64, f64) {
     let s = v * t.sqrt();
     let d1 = ((f / k).ln() + v * v * t / 2.0) / s;
     (d1, d1 - s)
 }
 
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn bachelier(call: bool, f: f64, k: f64, v: f64, t: f64, d: f64) -> f64 {
     let p = phi(call);
     if t == 0.0 || v == 0.0 {
@@ -93,6 +97,8 @@ impl Option_ {
 
     /// The checks both operations share, except `vol`, in the spec's order around it.
     pub fn check(&self, vol: Option<f64>) -> Result<()> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("vol", &vol)?;
         if self.t < 0.0 || vol.is_some_and(|v| v < 0.0) {
             return fail("E_DOMAIN", "expiry_years or vol is negative");
         }
@@ -120,6 +126,7 @@ impl Option_ {
         Ok(())
     }
 
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn value(&self, v: f64) -> f64 {
         let (f, d, k) = self.fdk();
         if self.is_normal() {
@@ -130,6 +137,8 @@ impl Option_ {
     }
 
     pub fn price(&self, v: f64) -> Result<f64> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("v", &v)?;
         self.check(Some(v))?;
         Ok(self.value(v))
     }
@@ -145,6 +154,8 @@ impl Option_ {
     }
 
     pub fn implied(&self, price: f64) -> Result<f64> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("price", &price)?;
         self.check(None)?;
         if self.t == 0.0 {
             return fail("E_DOMAIN", "expiry_years is 0");
@@ -202,6 +213,35 @@ impl Option_ {
             return Ok(v);
         }
         fail("E_NO_CONVERGENCE", "implied vol did not converge")
+    }
+}
+
+impl crate::error::Finite for Model {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::BlackScholes {
+                spot,
+                rate,
+                dividend,
+                ..
+            } => spot.is_all_finite() && rate.is_all_finite() && dividend.is_all_finite(),
+            Self::Black76 {
+                forward,
+                discount,
+                shift,
+                ..
+            } => forward.is_all_finite() && discount.is_all_finite() && shift.is_all_finite(),
+            Self::Bachelier {
+                forward, discount, ..
+            } => forward.is_all_finite() && discount.is_all_finite(),
+        }
+    }
+}
+
+impl crate::error::Finite for Option_ {
+    fn is_all_finite(&self) -> bool {
+        self.model.is_all_finite() && self.strike.is_all_finite() && self.t.is_all_finite()
     }
 }
 

@@ -4,6 +4,7 @@ use crate::black::black;
 use crate::caps::{forward_start, option, periods, swap_forward, years};
 use crate::curve::Curve;
 use crate::daycount::{DayCountInputs, year_fraction};
+
 use crate::error::{Result, fail};
 use crate::sabr::Sabr;
 
@@ -74,6 +75,8 @@ pub fn price_cube(
     c: &Cube,
     t: &CubeTrade,
 ) -> Result<CubePrice> {
+    crate::error::finite("c", &c)?;
+    crate::error::finite("t", &t)?;
     let (ne, nt) = (c.expiries_months.len(), c.tenors_months.len());
     let shaped = |m: &Vec<Vec<f64>>| m.len() == ne && m.iter().all(|r| r.len() == nt);
     if ![&c.alpha, &c.beta, &c.rho, &c.nu].into_iter().all(shaped)
@@ -273,6 +276,9 @@ impl FuturesOption {
 
 /// `(price per 100 face, contract value)`.
 pub fn futures_option_price(o: &FuturesOption, vol: f64, contract_size: f64) -> Result<(f64, f64)> {
+    crate::error::finite("o", &o)?;
+    crate::error::finite("vol", &vol)?;
+    crate::error::finite("contract_size", &contract_size)?;
     o.check()?;
     if vol.is_nan() || vol < 0.0 {
         return fail("E_DOMAIN", "vol must not be negative");
@@ -288,6 +294,10 @@ pub fn futures_implied_vol(
     ctd_yield: f64,
     duration: f64,
 ) -> Result<(f64, f64)> {
+    crate::error::finite("o", &o)?;
+    crate::error::finite("premium", &premium)?;
+    crate::error::finite("ctd_yield", &ctd_yield)?;
+    crate::error::finite("duration", &duration)?;
     o.check()?;
     let (f, k, d) = (o.futures_price, o.strike, o.discount_factor);
     let intrinsic = d * if o.call {
@@ -348,6 +358,9 @@ pub fn yoy_caplets(
     notional: f64,
     periods: &[YoyPeriod],
 ) -> Result<Vec<f64>> {
+    crate::error::finite("strike", &strike)?;
+    crate::error::finite("notional", &notional)?;
+    crate::error::finite("periods", &periods)?;
     if periods.is_empty() {
         return fail("E_INPUT", "periods must not be empty");
     }
@@ -382,6 +395,7 @@ pub struct ZeroCoupon {
 
 /// `(price, strike_ratio)` with `strike_ratio = (1 + K)^T` (ruling E-B13).
 pub fn zc_cap(z: &ZeroCoupon) -> Result<(f64, f64)> {
+    crate::error::finite("z", &z)?;
     // Ruling E-B37: forward, then 1 + K, then years; E-B38: vol >= 0.
     if !z.normal && (z.forward_index_ratio.is_nan() || z.forward_index_ratio <= 0.0) {
         return fail("E_DOMAIN", "BLACK_76 needs a positive forward");
@@ -405,6 +419,70 @@ pub fn zc_cap(z: &ZeroCoupon) -> Result<(f64, f64)> {
         z.years,
     )?;
     Ok((z.notional * z.discount_factor * o, ratio))
+}
+
+impl crate::error::Finite for Cube {
+    fn is_all_finite(&self) -> bool {
+        self.alpha.is_all_finite()
+            && self.beta.is_all_finite()
+            && self.rho.is_all_finite()
+            && self.nu.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for CubePrice {
+    fn is_all_finite(&self) -> bool {
+        self.price.is_all_finite()
+            && self.forward_rate.is_all_finite()
+            && self.annuity.is_all_finite()
+            && self.vol.is_all_finite()
+            && self.sabr.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for CubeTrade {
+    fn is_all_finite(&self) -> bool {
+        self.strike.is_all_finite() && self.notional.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for FuturesOption {
+    fn is_all_finite(&self) -> bool {
+        self.futures_price.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.expiry_years.is_all_finite()
+            && self.discount_factor.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for SabrParams {
+    fn is_all_finite(&self) -> bool {
+        self.alpha.is_all_finite()
+            && self.beta.is_all_finite()
+            && self.rho.is_all_finite()
+            && self.nu.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for YoyPeriod {
+    fn is_all_finite(&self) -> bool {
+        self.accrual.is_all_finite()
+            && self.discount_factor.is_all_finite()
+            && self.yoy_forward.is_all_finite()
+            && self.expiry_years.is_all_finite()
+            && self.vol.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for ZeroCoupon {
+    fn is_all_finite(&self) -> bool {
+        self.forward_index_ratio.is_all_finite()
+            && self.years.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.discount_factor.is_all_finite()
+            && self.vol.is_all_finite()
+            && self.notional.is_all_finite()
+    }
 }
 
 #[cfg(test)]

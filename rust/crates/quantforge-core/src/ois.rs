@@ -7,6 +7,7 @@ use crate::curve::{
 };
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
+
 use crate::error::{Result, fail};
 use crate::json::{Json, obj};
 use crate::schedule::{Period, add_months, generate};
@@ -146,6 +147,7 @@ impl OisCurveProblem {
         quotes: &[OisQuote],
         interpolation: Interpolation,
     ) -> Result<OisCurveProblem> {
+        crate::error::finite("quotes", &quotes)?;
         OisCurveProblem::with_jumps(c, as_of, quotes, interpolation, &[])
     }
 
@@ -157,6 +159,8 @@ impl OisCurveProblem {
         interpolation: Interpolation,
         jumps: &[(Date, f64)],
     ) -> Result<OisCurveProblem> {
+        crate::error::finite("quotes", &quotes)?;
+        crate::error::finite("jumps", &jumps)?;
         check_jumps(as_of, jumps)?;
         if quotes.is_empty() {
             return fail("E_INPUT", "no quotes");
@@ -183,6 +187,8 @@ impl OisCurveProblem {
     }
 
     pub fn solve(&self, quotes: &[f64], method: SolveMethod) -> Result<Solved> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("quotes", &quotes)?;
         let model = |c: &Curve, j: usize| self.swaps[j].par_rate(c);
         solve_curve_with_jumps(
             self.as_of,
@@ -197,6 +203,7 @@ impl OisCurveProblem {
 }
 
 pub fn compound(rates: &[f64], days: &[i64], denominator: i64) -> Result<f64> {
+    crate::error::finite("rates", &rates)?;
     if rates.len() != days.len() || rates.is_empty() || days.iter().any(|d| *d < 1) {
         return fail("E_INPUT", "rates and days do not match");
     }
@@ -214,6 +221,7 @@ pub fn pv(
     trade: &OisTrade,
     snapshot_id: Option<String>,
 ) -> Result<(Valuation, f64, f64)> {
+    crate::error::finite("trade", &trade)?;
     let legs = OisLegs::new(&trade.convention, curve.as_of, trade.tenor)?;
     let value = pv_of_legs(&legs, curve, trade)?;
     let (f, a) = legs.legs(curve)?;
@@ -234,6 +242,7 @@ pub fn pv_of_legs<C: Discount + ?Sized>(
     curve: &C,
     trade: &OisTrade,
 ) -> Result<f64> {
+    crate::error::finite("trade", &trade)?;
     let (f, a) = legs.legs(curve)?;
     let sign = if trade.pay { 1.0 } else { -1.0 };
     Ok(sign * trade.notional * (f - trade.fixed_rate * a))
@@ -254,4 +263,28 @@ pub fn ois_spread(
     let (fa, annuity) = legs.legs_on(discount, a)?;
     let (fb, _) = legs.legs_on(discount, b)?;
     Ok((fa - fb) / annuity)
+}
+
+impl crate::error::Finite for OisCurveProblem {
+    fn is_all_finite(&self) -> bool {
+        self.mids.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for OisQuote {
+    fn is_all_finite(&self) -> bool {
+        self.bid.is_all_finite() && self.ask.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for OisTrade {
+    fn is_all_finite(&self) -> bool {
+        self.fixed_rate.is_all_finite() && self.notional.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Valuation {
+    fn is_all_finite(&self) -> bool {
+        self.pv.is_all_finite()
+    }
 }

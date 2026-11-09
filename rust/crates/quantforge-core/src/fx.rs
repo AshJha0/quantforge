@@ -3,6 +3,7 @@ use crate::calendar::{Bdc, Calendar};
 use crate::conventions::FxPair;
 use crate::curve::Curve;
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 use crate::ois::Valuation;
 
@@ -16,6 +17,7 @@ fn joint(c: &[Calendar; 2], d: Date) -> Result<bool> {
 }
 
 pub fn spot_date(p: &FxPair, trade_date: Date) -> Result<Date> {
+    crate::error::finite("p", &p)?;
     let c = calendars(p);
     let (mut d, mut left) = (trade_date, p.spot_lag);
     while left > 0 {
@@ -70,6 +72,7 @@ impl FxMarket {
 
     /// Returns `(forward, points)`.
     pub fn outright(&self, value_date: Date) -> Result<(f64, f64)> {
+        crate::error::finite("self", self)?;
         if value_date < self.spot_settlement()? {
             return fail("E_DATE_ORDER", "value_date is before spot");
         }
@@ -79,6 +82,8 @@ impl FxMarket {
 
     /// Returns `(pv, fx_delta)` for one leg.
     pub fn leg(&self, l: &FxLeg) -> Result<(f64, f64)> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("l", &l)?;
         if l.value_date < self.spot_settlement()? {
             return fail("E_DATE_ORDER", "value_date is before spot");
         }
@@ -91,6 +96,7 @@ impl FxMarket {
         ))
     }
 
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn valuation(&self, pv: f64, model: &'static str) -> Valuation {
         Valuation {
             pv,
@@ -104,6 +110,7 @@ impl FxMarket {
 
     /// Returns `(value_date, implied_ratio, basis_bp)` for each `(tenor, points)`.
     pub fn implied(&self, points: &[((i64, char), f64)]) -> Result<Vec<(Date, f64, f64)>> {
+        crate::error::finite("self", self)?;
         let sp = self.spot_settlement()?;
         let c = calendars(&self.pair);
         let mut out: Vec<(Date, f64, f64)> = Vec::new();
@@ -127,6 +134,9 @@ impl FxMarket {
 
 /// Use case 1. Returns `(pv, fx_delta, hedge_spot_base, residual_delta, hedge_cost)`.
 pub fn hedge_book(m: &FxMarket, book: &[FxLeg], half_spread: f64) -> Result<[f64; 5]> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("book", &book)?;
+    crate::error::finite("half_spread", &half_spread)?;
     if half_spread < 0.0 {
         return fail("E_DOMAIN", "half_spread is negative");
     }
@@ -138,4 +148,16 @@ pub fn hedge_book(m: &FxMarket, book: &[FxLeg], half_spread: f64) -> Result<[f64
     }
     let hedge = -delta;
     Ok([pv, delta, hedge, 0.0, hedge.abs() * half_spread])
+}
+
+impl crate::error::Finite for FxLeg {
+    fn is_all_finite(&self) -> bool {
+        self.notional_base.is_all_finite() && self.strike.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for FxMarket {
+    fn is_all_finite(&self) -> bool {
+        self.pair.is_all_finite() && self.spot.is_all_finite()
+    }
 }

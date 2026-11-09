@@ -1,6 +1,7 @@
 //! Curve object, and the solve shared by every bootstrap (`curve-framework.md`).
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
+
 use crate::error::{Result, err, fail};
 use crate::linalg::solve;
 
@@ -43,6 +44,7 @@ impl Discount for Curve {
 
 /// Checks a jump list (`curve-framework.md`): dates first, then factors.
 pub fn check_jumps(as_of: Date, jumps: &[(Date, f64)]) -> Result<()> {
+    crate::error::finite("jumps", &jumps)?;
     if jumps.first().is_some_and(|j| j.0 <= as_of) || jumps.windows(2).any(|w| w[1].0 <= w[0].0) {
         return fail("E_INPUT", "jump dates must increase and follow as_of");
     }
@@ -75,6 +77,7 @@ pub fn curve_time(as_of: Date, d: Date) -> f64 {
 
 impl Curve {
     pub fn new(c: &CurveInput) -> Result<Curve> {
+        crate::error::finite("c", &c)?;
         if c.pillars.is_empty()
             || c.pillars[0].0 <= c.as_of
             || c.pillars.windows(2).any(|w| w[1].0 <= w[0].0)
@@ -97,11 +100,13 @@ impl Curve {
     }
 
     /// From log discount factors at dates already known to be in order.
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn from_logs(as_of: Date, i: Interpolation, dates: &[Date], logs: &[f64]) -> Curve {
         Curve::from_logs_with_jumps(as_of, i, dates, logs, &[])
     }
 
     /// From full log discount factors, with checked jumps. Nodes keep `ln S = ln D - ln J`.
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn from_logs_with_jumps(
         as_of: Date,
         i: Interpolation,
@@ -222,6 +227,7 @@ pub fn solve_curve(
     model: &dyn Fn(&Curve, usize) -> Result<f64>,
     method: SolveMethod,
 ) -> Result<Solved> {
+    crate::error::finite("quotes", &quotes)?;
     solve_curve_with_jumps(as_of, interpolation, dates, &[], quotes, model, method)
 }
 
@@ -235,6 +241,8 @@ pub fn solve_curve_with_jumps(
     model: &dyn Fn(&Curve, usize) -> Result<f64>,
     method: SolveMethod,
 ) -> Result<Solved> {
+    crate::error::finite("jumps", &jumps)?;
+    crate::error::finite("quotes", &quotes)?;
     let start = |j: usize| -quotes[j] * curve_time(as_of, dates[j]);
     let mut logs: Vec<f64> = (0..dates.len()).map(start).collect();
     let build =
@@ -331,4 +339,16 @@ pub fn solve_curve_with_jumps(
         logs,
         max_repricing_error: worst,
     })
+}
+
+impl crate::error::Finite for CurveInput {
+    fn is_all_finite(&self) -> bool {
+        self.pillars.is_all_finite() && self.jumps.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Solved {
+    fn is_all_finite(&self) -> bool {
+        self.logs.is_all_finite() && self.max_repricing_error.is_all_finite()
+    }
 }

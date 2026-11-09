@@ -1,8 +1,10 @@
 //! SVI, SSVI (`smile-and-surface.md`), and the small least-squares solver the fits share.
+
 use crate::error::{Result, fail};
 
 /// Levenberg-Marquardt with a central-difference Jacobian. `resid` returns `None` outside the
 /// domain, and a step that lands there is refused. Returns the point and its sum of squares.
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn minimise<F>(x0: &[f64], resid: &F) -> Option<(Vec<f64>, f64)>
 where
     F: Fn(&[f64]) -> Option<Vec<f64>>,
@@ -110,6 +112,7 @@ impl Svi {
     }
 
     pub fn check(&self) -> Result<()> {
+        crate::error::finite("self", self)?;
         if self.valid() {
             Ok(())
         } else {
@@ -117,18 +120,21 @@ impl Svi {
         }
     }
 
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn w(&self, k: f64) -> f64 {
         let x = k - self.m;
         self.a + self.b * (self.rho * x + (x * x + self.sigma * self.sigma).sqrt())
     }
 
     /// `dw/dk`.
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn w1(&self, k: f64) -> f64 {
         let x = k - self.m;
         self.b * (self.rho + x / (x * x + self.sigma * self.sigma).sqrt())
     }
 
     /// `d2w/dk2`.
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn w2(&self, k: f64) -> f64 {
         let x = k - self.m;
         let r = (x * x + self.sigma * self.sigma).sqrt();
@@ -136,6 +142,7 @@ impl Svi {
     }
 
     /// Gatheral's density function.
+    /// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
     pub fn g(&self, k: f64) -> f64 {
         let x = k - self.m;
         let r = (x * x + self.sigma * self.sigma).sqrt();
@@ -164,6 +171,9 @@ fn from_x(x: &[f64]) -> Svi {
 
 /// Weights default to 1. Starts sweep `rho`, `m`, `sigma`, and solve `a`, `b` by regression.
 pub fn calibrate(k: &[f64], w: &[f64], weights: Option<&[f64]>) -> Result<SviFit> {
+    crate::error::finite("k", &k)?;
+    crate::error::finite("w", &w)?;
+    crate::error::finite("weights", &weights)?;
     if k.len() < 5 || k.len() != w.len() || weights.is_some_and(|v| v.len() != k.len()) {
         return fail("E_INPUT", "needs 5 points and equal lengths");
     }
@@ -237,10 +247,12 @@ pub fn calibrate(k: &[f64], w: &[f64], weights: Option<&[f64]>) -> Result<SviFit
     })
 }
 
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn ssvi_phi(theta: f64, eta: f64, gamma: f64) -> f64 {
     eta * theta.powf(-gamma) * (1.0 + theta).powf(gamma - 1.0)
 }
 
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn ssvi_w(k: f64, theta: f64, rho: f64, eta: f64, gamma: f64) -> f64 {
     let p = ssvi_phi(theta, eta, gamma);
     let x = p * k;
@@ -265,6 +277,11 @@ pub struct Ssvi {
 }
 
 pub fn ssvi_evaluate(rho: f64, eta: f64, gamma: f64, thetas: &[f64], k: &[f64]) -> Result<Ssvi> {
+    crate::error::finite("rho", &rho)?;
+    crate::error::finite("eta", &eta)?;
+    crate::error::finite("gamma", &gamma)?;
+    crate::error::finite("thetas", &thetas)?;
+    crate::error::finite("k", &k)?;
     if rho.abs() >= 1.0 || eta <= 0.0 || gamma <= 0.0 || gamma > 1.0 {
         return fail("E_DOMAIN", "ssvi parameters are out of domain");
     }
@@ -290,6 +307,9 @@ pub fn ssvi_evaluate(rho: f64, eta: f64, gamma: f64, thetas: &[f64], k: &[f64]) 
 
 /// `rho`, `eta`, `gamma`, `rmse`.
 pub fn ssvi_calibrate(thetas: &[f64], k: &[f64], w: &[Vec<f64>]) -> Result<[f64; 4]> {
+    crate::error::finite("thetas", &thetas)?;
+    crate::error::finite("k", &k)?;
+    crate::error::finite("w", &w)?;
     let count = thetas.len() * k.len();
     if count < 3 || w.len() != thetas.len() || w.iter().any(|r| r.len() != k.len()) {
         return fail("E_INPUT", "too few points, or ragged rows");
@@ -327,6 +347,28 @@ pub fn ssvi_calibrate(thetas: &[f64], k: &[f64], w: &[Vec<f64>]) -> Result<[f64;
     };
     let (rho, eta, gamma) = params(&x);
     Ok([rho, eta, gamma, (c / count as f64).sqrt()])
+}
+
+impl crate::error::Finite for Ssvi {
+    fn is_all_finite(&self) -> bool {
+        self.total_variance.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Svi {
+    fn is_all_finite(&self) -> bool {
+        self.a.is_all_finite()
+            && self.b.is_all_finite()
+            && self.rho.is_all_finite()
+            && self.m.is_all_finite()
+            && self.sigma.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for SviFit {
+    fn is_all_finite(&self) -> bool {
+        self.svi.is_all_finite() && self.rmse.is_all_finite()
+    }
 }
 
 #[cfg(test)]

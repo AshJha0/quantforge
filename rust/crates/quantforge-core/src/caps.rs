@@ -4,6 +4,7 @@ use crate::calendar::{Bdc, Calendar};
 use crate::curve::Curve;
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
+
 use crate::error::{Result, fail};
 use crate::schedule::{Period, add_months, generate};
 
@@ -57,6 +58,8 @@ pub fn cap_price(
     vols: &[f64],
     t: &CapTrade,
 ) -> Result<Vec<f64>> {
+    crate::error::finite("vols", &vols)?;
+    crate::error::finite("t", &t)?;
     if t.start_months < 1 {
         return fail("E_INPUT", "start_months must be at least 1");
     }
@@ -98,6 +101,8 @@ pub fn swaption_price(
     vol: f64,
     t: &SwaptionTrade,
 ) -> Result<(f64, f64, f64)> {
+    crate::error::finite("vol", &vol)?;
+    crate::error::finite("t", &t)?;
     if t.expiry_months < 1 {
         return fail("E_INPUT", "expiry_months must be at least 1");
     }
@@ -131,6 +136,18 @@ pub(crate) fn swap_forward(
             * discount.discount(p.end)?;
     }
     Ok((s, fl / a, a))
+}
+
+impl crate::error::Finite for CapTrade {
+    fn is_all_finite(&self) -> bool {
+        self.strike.is_all_finite() && self.notional.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for SwaptionTrade {
+    fn is_all_finite(&self) -> bool {
+        self.strike.is_all_finite() && self.notional.is_all_finite()
+    }
 }
 
 #[cfg(test)]

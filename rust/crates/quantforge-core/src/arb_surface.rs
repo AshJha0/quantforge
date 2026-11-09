@@ -2,6 +2,7 @@
 //! dynamics and vol of vol (`arb-free-surfaces.md`, `local-and-forward-vol.md`, rulings E-A1 to
 //! E-A8).
 use crate::black::black;
+
 use crate::error::{Result, fail};
 use crate::stats::{normal_cdf, normal_pdf};
 use crate::svi::{self, Svi};
@@ -14,6 +15,7 @@ pub struct Slice {
 
 /// The `slices` checks in spec order: empty or not increasing, then expiry, then SVI domain.
 pub fn check_slices(slices: &[Slice]) -> Result<()> {
+    crate::error::finite("slices", &slices)?;
     if slices.is_empty()
         || slices
             .windows(2)
@@ -68,6 +70,8 @@ fn wings(p: &Svi) -> [(f64, f64); 2] {
 
 /// Strict comparisons with no tolerance (ruling E-A1). `slices` must already be checked.
 pub fn surface_check(slices: &[Slice], k: &[f64]) -> Result<Check> {
+    crate::error::finite("slices", &slices)?;
+    crate::error::finite("k", &k)?;
     if k.is_empty() || k.windows(2).any(|w| w[1] <= w[0]) {
         return fail(
             "E_INPUT",
@@ -114,6 +118,10 @@ pub fn surface_check(slices: &[Slice], k: &[f64]) -> Result<Check> {
 
 /// One SSVI slice as raw SVI ([GJ14] section 3).
 pub fn ssvi_to_svi(rho: f64, eta: f64, gamma: f64, theta: f64) -> Result<Svi> {
+    crate::error::finite("rho", &rho)?;
+    crate::error::finite("eta", &eta)?;
+    crate::error::finite("gamma", &gamma)?;
+    crate::error::finite("theta", &theta)?;
     let bad = |x: f64| x.is_nan();
     if bad(rho)
         || rho.abs() >= 1.0
@@ -147,6 +155,9 @@ pub struct SurfaceFit {
 /// Each row fitted alone by the stage C rule, then checked; the fit does not repair arbitrage
 /// (ruling E-A3).
 pub fn fit_surface(expiries: &[f64], k: &[f64], w: &[Vec<f64>]) -> Result<SurfaceFit> {
+    crate::error::finite("expiries", &expiries)?;
+    crate::error::finite("k", &k)?;
+    crate::error::finite("w", &w)?;
     if expiries.is_empty() || expiries.windows(2).any(|p| p[1] <= p[0]) {
         return fail("E_INPUT", "expiry_years must strictly increase");
     }
@@ -173,6 +184,7 @@ pub fn fit_surface(expiries: &[f64], k: &[f64], w: &[Vec<f64>]) -> Result<Surfac
 }
 
 /// `(w, w_k, w_kk, w_T)` at `(t, k)` by ruling E-A4.
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn surface_at(slices: &[Slice], t: f64, k: f64) -> (f64, f64, f64, f64) {
     let n = slices.len();
     let at = |j: usize| {
@@ -199,6 +211,7 @@ pub fn surface_at(slices: &[Slice], t: f64, k: f64) -> (f64, f64, f64, f64) {
 }
 
 /// Gatheral's `g` for a general total variance and its `k` derivatives.
+/// Unchecked kernel (E1): inputs are not validated, and NaN or infinity in gives NaN out.
 pub fn density(k: f64, w: f64, wk: f64, wkk: f64) -> f64 {
     let u = 1.0 - k * wk / (2.0 * w);
     u * u - (wk * wk / 4.0) * (1.0 / w + 0.25) + wkk / 2.0
@@ -213,6 +226,8 @@ pub struct LocalVol {
 
 /// Dupire in total-variance form; any point with `w_T <= 0` or `g <= 0` is `E_ARBITRAGE`.
 pub fn dupire(slices: &[Slice], points: &[(f64, f64)]) -> Result<LocalVol> {
+    crate::error::finite("slices", &slices)?;
+    crate::error::finite("points", &points)?;
     check_slices(slices)?;
     if points.is_empty() {
         return fail("E_INPUT", "at least 1 point is required");
@@ -234,6 +249,9 @@ pub fn dupire(slices: &[Slice], points: &[(f64, f64)]) -> Result<LocalVol> {
 /// Dupire local variance `w_T / g` at `(t, k)`; `w_T <= 0` or `g <= 0` is `E_ARBITRAGE`.
 /// `slices` must already be checked.
 pub fn local_variance(slices: &[Slice], t: f64, k: f64) -> Result<f64> {
+    crate::error::finite("slices", &slices)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("k", &k)?;
     let (w, wk, wkk, wt) = surface_at(slices, t, k);
     let g = density(k, w, wk, wkk);
     if wt.is_nan() || wt <= 0.0 {
@@ -250,6 +268,8 @@ pub fn local_variance(slices: &[Slice], t: f64, k: f64) -> Result<f64> {
 
 /// Forward vols between consecutive expiries; a zero forward variance gives 0 (ruling E-A5).
 pub fn forward_vols(t: &[f64], v: &[f64]) -> Result<Vec<f64>> {
+    crate::error::finite("t", &t)?;
+    crate::error::finite("v", &v)?;
     if t.is_empty() || t.len() != v.len() || t.windows(2).any(|p| p[1] <= p[0]) {
         return fail(
             "E_INPUT",
@@ -345,6 +365,8 @@ pub fn smile_dynamics(x: &Dynamics) -> Result<DynamicsOut> {
 /// `(vol_of_vol, mean_change)`: sample standard deviation (divisor `n - 1`) of changes,
 /// annualised (ruling E-A7).
 pub fn vol_of_vol(vols: &[f64], periods_per_year: f64, log: bool) -> Result<(f64, f64)> {
+    crate::error::finite("vols", &vols)?;
+    crate::error::finite("periods_per_year", &periods_per_year)?;
     if vols.len() < 3 {
         return fail("E_INPUT", "at least 3 observations are required");
     }
@@ -362,6 +384,36 @@ pub fn vol_of_vol(vols: &[f64], periods_per_year: f64, log: bool) -> Result<(f64
     let mean = x.iter().sum::<f64>() / n;
     let ss: f64 = x.iter().map(|v| (v - mean) * (v - mean)).sum();
     Ok(((ss / (n - 1.0)).sqrt() * periods_per_year.sqrt(), mean))
+}
+
+impl crate::error::Finite for DynamicsOut {
+    fn is_all_finite(&self) -> bool {
+        self.vols_base.is_all_finite()
+            && self.vols_shifted.is_all_finite()
+            && self.prices_base.is_all_finite()
+            && self.prices_shifted.is_all_finite()
+            && self.deltas.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for LocalVol {
+    fn is_all_finite(&self) -> bool {
+        self.total_variance.is_all_finite()
+            && self.implied_vol.is_all_finite()
+            && self.local_vol.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Slice {
+    fn is_all_finite(&self) -> bool {
+        self.expiry_years.is_all_finite() && self.svi.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for SurfaceFit {
+    fn is_all_finite(&self) -> bool {
+        self.slices.is_all_finite() && self.rmse.is_all_finite()
+    }
 }
 
 #[cfg(test)]

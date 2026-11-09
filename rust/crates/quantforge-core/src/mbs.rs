@@ -1,4 +1,5 @@
 //! Mortgage pools: prepayment, cash flows and price (`mbs.md`).
+
 use crate::error::{Result, fail};
 
 #[derive(Debug, Clone, Copy)]
@@ -28,6 +29,7 @@ pub struct MbsFlows {
 
 /// `mbs.cashflows`. Checks as golden `mbs_d-0011` orders them: `wac <= 0` first.
 pub fn mbs_cashflows(p: &Pool) -> Result<MbsFlows> {
+    crate::error::finite("p", &p)?;
     if p.wac <= 0.0 {
         return fail("E_DOMAIN", "wac must be positive");
     }
@@ -78,6 +80,8 @@ pub fn mbs_cashflows(p: &Pool) -> Result<MbsFlows> {
 
 /// `mbs.price`: `(price, modified_duration, wal)`.
 pub fn mbs_price(p: &Pool, y: f64, delay_days: i64) -> Result<(f64, f64, f64)> {
+    crate::error::finite("p", &p)?;
+    crate::error::finite("y", &y)?;
     if delay_days < 0 {
         return fail("E_INPUT", "delay_days must not be negative");
     }
@@ -95,6 +99,35 @@ pub fn mbs_price(p: &Pool, y: f64, delay_days: i64) -> Result<(f64, f64, f64)> {
         dur += t / 12.0 * x * v;
     }
     Ok((100.0 * pv / p.balance, dur / pv, f.wal))
+}
+
+impl crate::error::Finite for MbsFlows {
+    fn is_all_finite(&self) -> bool {
+        self.balance.is_all_finite()
+            && self.interest.is_all_finite()
+            && self.scheduled_principal.is_all_finite()
+            && self.prepayment.is_all_finite()
+            && self.wal.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Pool {
+    fn is_all_finite(&self) -> bool {
+        self.balance.is_all_finite()
+            && self.wac.is_all_finite()
+            && self.net_coupon.is_all_finite()
+            && self.prepayment.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Prepayment {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Cpr(x0) => x0.is_all_finite(),
+            Self::Psa(x0) => x0.is_all_finite(),
+        }
+    }
 }
 
 #[cfg(test)]
