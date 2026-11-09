@@ -1,4 +1,4 @@
-"""Stage E, E2: Heston, Bates and Merton prices and the SLV leverage reference scheme.
+"""Heston, Bates and Merton prices and the SLV leverage reference scheme.
 
 Spec: specifications/05-volatility/heston-family.md, rulings E-A12 to E-A14 in
 specifications/stage-e-rulings.md. Prices use Lewis's single integral with the reference recipe:
@@ -9,7 +9,7 @@ import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
-from . import vol_e1
+from . import arb_surface
 from .black import big_n
 from .errors import QfError
 from .numeric import ordered_sum, thomas
@@ -222,9 +222,9 @@ def _rows(mu: Floats, s: Floats, h: float, dt: float,
 
 
 def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
-                 slices: Sequence[vol_e1.Slice], grid: Grid) -> dict[str, object]:
+                 slices: Sequence[arb_surface.Slice], grid: Grid) -> dict[str, object]:
     # Ruling E-A37: every E_INPUT rule first, then E_DOMAIN, each in input order.
-    vol_e1.check_slices_input(slices)
+    arb_surface.check_slices_input(slices)
     if grid.nx < 5 or grid.nv < 5 or grid.nt < 2:
         raise _input("nx and nv must be at least 5 and nt at least 2", "grid")
     if spot > 0 and not grid.x_min < math.log(spot) < grid.x_max:  # ln needs spot > 0
@@ -234,7 +234,7 @@ def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
     if not t > 0:
         raise _domain("expiry_years must be above 0", "expiry_years")
     check_heston(h)
-    vol_e1.check_slices(slices)
+    arb_surface.check_slices(slices)
     if not grid.v_max > 0:
         raise _domain("v_max must be above 0", "grid")
     nx, nv, nt = grid.nx, grid.nv, grid.nt
@@ -247,7 +247,7 @@ def slv_leverage(spot: float, t: float, r: float, q: float, h: Heston,
 
     def local_vol(time: float, x: float) -> float:
         k = x - (log_spot + (r - q) * time)
-        return vol_e1.dupire(slices, [(time, k)])[2][0]
+        return arb_surface.dupire(slices, [(time, k)])[2][0]
 
     def leverage(p: list[list[float]], time: float) -> list[float]:
         m = [ordered_sum(row) for row in p]

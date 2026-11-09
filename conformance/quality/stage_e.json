@@ -7,7 +7,7 @@
       "module": "surfaces_local_vol",
       "java": "java25/src/main/java/org/quantforge/vol/Surfaces.java",
       "cpp": "cpp26/src/core/arb_surface.cpp",
-      "python": "python/quantforge_core/vol_e1.py",
+      "python": "python/quantforge_core/arb_surface.py",
       "rust": "rust/crates/quantforge-core/src/surface_e.rs"
     },
     {
@@ -48,7 +48,7 @@
         "java25/src/main/java/org/quantforge/vol/VarianceStrip.java"
       ],
       "cpp": "cpp26/src/core/vol_stats.cpp",
-      "python": "python/quantforge_core/vol_e7.py",
+      "python": "python/quantforge_core/variance.py",
       "rust": [
         "rust/crates/quantforge-core/src/garch.rs",
         "rust/crates/quantforge-core/src/varswap.rs",
@@ -66,7 +66,7 @@
       "module": "credit_options",
       "java": "java25/src/main/java/org/quantforge/pricing/CreditOptions.java",
       "cpp": "cpp26/src/core/credit_e.cpp",
-      "python": "python/quantforge_core/credit_e8.py",
+      "python": "python/quantforge_core/credit_options.py",
       "rust": "rust/crates/quantforge-core/src/credit_e.rs"
     }
   ],

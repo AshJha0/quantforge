@@ -1,4 +1,4 @@
-"""Stage E, E7: GARCH(1,1), variance swaps and a VIX-style index.
+"""GARCH(1,1), variance swaps and a VIX-style index.
 
 Specs: specifications/05-volatility/garch.md, variance-swaps.md, vix-index.md, with rulings E-B1 to
 E-B7 in specifications/stage-e-rulings-b.md. Each function applies its checks in spec order.

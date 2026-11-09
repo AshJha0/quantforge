@@ -1,4 +1,4 @@
-"""Stage E, E6: correlation validation, nearest correlation, implied correlation and dispersion.
+"""Correlation validation, nearest correlation, implied correlation and dispersion.
 
 Spec: specifications/06-risk/correlation.md, rulings E-B18 to E-B21 in
 specifications/stage-e-rulings-b.md. NumPy is used for symmetric eigen-decompositions only.

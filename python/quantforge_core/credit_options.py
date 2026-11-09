@@ -1,4 +1,4 @@
-"""Stage E, E8: CDS options, two-name default copulas and the large homogeneous pool.
+"""CDS options, two-name default copulas and the large homogeneous pool.
 
 Spec: specifications/04-pricing/credit-options-and-copulas.md, rulings E-B22 to E-B26 in
 specifications/stage-e-rulings-b.md. Bivariate CDFs are integrals of the conditional form,

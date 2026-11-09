@@ -1,4 +1,4 @@
-"""Stage E, E3: Garman-Kohlhagen vanillas, FX delta conventions, ATM strikes and the smile from
+"""Garman-Kohlhagen vanillas, FX delta conventions, ATM strikes and the smile from
 ATM, risk reversal and strangle quotes.
 
 Spec: specifications/05-volatility/fx-smile.md, rulings E-A9 to E-A11 in

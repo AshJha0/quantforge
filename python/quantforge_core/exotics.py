@@ -1,4 +1,4 @@
-"""Stage E, E5: closed-form exotics and American options (CRR tree, BAW, a reference FD scheme).
+"""Closed-form exotics and American options (CRR tree, BAW, a reference FD scheme).
 
 Spec: specifications/04-pricing/exotics.md, rulings E-A19 to E-A23 in
 specifications/stage-e-rulings.md. Prices are per unit of underlying; b = r - q is the carry.

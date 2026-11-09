@@ -8,7 +8,7 @@ from datetime import date
 import pytest
 from scipy import stats
 
-from quantforge_core import credit_e8 as ce
+from quantforge_core import credit_options as ce
 from quantforge_core.cli.main import run_case
 from quantforge_core.errors import QfError
 

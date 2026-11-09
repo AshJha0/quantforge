@@ -1,4 +1,4 @@
-"""Stage E, E1: arbitrage checks on SVI surfaces, local and forward vol, smile dynamics and vol of vol.
+"""Arbitrage checks on SVI surfaces, local and forward vol, smile dynamics and vol of vol.
 
 Specs: specifications/05-volatility/arb-free-surfaces.md and local-and-forward-vol.md, with
 rulings E-A1 to E-A8 in specifications/stage-e-rulings.md. SVI itself is stage C (smile.py).
