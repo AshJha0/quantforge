@@ -110,3 +110,22 @@ sequenceDiagram
   N->>N: compare by tolerance class
   N->>N: write report
 ```
+
+## Stage E: volatility and exotics
+
+Plain idea: stage E builds on the stage D curves and pricers rather than beside them. Each box names its slice and spec page; the goldens for spec A live in `datasets/golden/stage_e/` (446 cases) and for spec B in `datasets/golden/stage_e_b/` (449 cases).
+
+```mermaid
+flowchart LR
+  D[stage D curves and pricers] --> E1[E1 SVI/SSVI surfaces, Dupire local vol, forward vol]
+  E1 --> E2[E2 Heston, Bates, Merton, SLV leverage]
+  D --> E3[E3 FX smile, delta and ATM conventions]
+  D --> E4[E4 SABR swaption cube, caplet strip, bond futures options, inflation caps]
+  E1 --> E5[E5 exotics and American options]
+  D --> E6[E6 correlation repair, implied correlation, dispersion]
+  D --> E7[E7 GARCH, variance swaps, VIX-style index]
+  D --> E8[E8 CDS options, copulas, large-pool tranches]
+  E1 & E2 & E3 & E5 --> GA[goldens stage_e]
+  E4 & E6 & E7 & E8 --> GB[goldens stage_e_b]
+  GA & GB --> QL[QuantLib 1.44 outside check: 557 of 895]
+```

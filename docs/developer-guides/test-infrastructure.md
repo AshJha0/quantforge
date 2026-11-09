@@ -81,6 +81,10 @@ Observed, WSL Ubuntu, 2026-11-06, source at `a60d814`, seed 1, one run. Unit sco
 
 This was measured on stage A code. No mutation score exists for stage B code; `oracle/MUTANTS.md` is a different check, of the golden tolerances. Limits: this is two files per language and 40 mutants each, so a sample figure can be several points out. Python ran one suite, because all suites take over a minute per mutant, so it may undercount. Survivors have not been sorted into equivalent mutants and real gaps. mutmut changes error message text, which the runner does not compare, and that may explain some Python survivors. The four Rust compounding survivors include three in `check_rate`, which are worth a look as possible missing cases.
 
+### Mutation scores (stage E)
+
+PLACEHOLDER: to be filled by the coordinator before the v0.5.0 tag. Give the score per language on the stage E modules, the tool and version, the test set (unit tests, goldens or both), the commit measured and the evidence class. Until then, the latest published scores are stage D's (README, Known issues).
+
 ## Stage quality scope
 
 `conformance/quality/stage_e.json` lists the stage E modules per language: the coverage gate (85% line coverage, `.github/workflows/coverage-stage.yml`, weekly and manual), the scope check and the fuzz focus read it, and `conformance/mutation/stages.json` has the same module names under stage E. Entries start as TODO and every tool skips them. When a module lands, replace its TODO with the source path and run `python tools/quality_gate.py --check-config`: it fails if the path matches nothing, a Rust file is outside a workspace member crate, a C++ file is not in `cpp26/CMakeLists.txt`, or a Python file or test is outside what ruff and mutmut cover. Weekly fuzzing draws about half its seeds from `datasets/golden/stage_e` once that folder exists.

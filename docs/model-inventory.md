@@ -317,6 +317,10 @@ Outside-checked counts are from `oracle/outside_register_e_b.json`.
 - **Limitations:** infinitely granular, homogeneous pool; one correlation for all tranches (so no base-correlation skew); single horizon, no tranche premium leg. Known to underprice senior tranches against market quotes.
 - **Validation:** closed form against a split fixed quadrature; QuantLib bivariate normal. **Review:** 2026-11-08.
 
+### Mutation scores (stage E)
+
+PLACEHOLDER: to be filled by the coordinator before the v0.5.0 tag. Give the score per language on the stage E modules, the tool and version, the test set (unit tests, goldens or both), the commit measured and the evidence class. Until then, the latest published scores are stage D's (README, Known issues).
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.
