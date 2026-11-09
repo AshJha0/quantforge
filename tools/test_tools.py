@@ -752,6 +752,18 @@ class StageFInfra(unittest.TestCase):
         self.assertEqual(len(bad), 2)
         self.assertEqual(h.main(), 0)  # the shipped tree is clean
 
+    def test_bench_gate_fails_on_injected_slowdown(self):
+        bg = load("bench_gate", "tools/bench_gate.py")
+        clean = {"py": {"implied_vol": {"ns_per_op": 25000.0, "allocs_per_op": 1.4}}}
+        slow = {"py": {"implied_vol": {"ns_per_op": 225000.0, "allocs_per_op": 1.4}}}
+        base = {"machine": "m", "results": clean}
+        self.assertEqual(bg.compare(clean, base, "m")[1], [])
+        self.assertEqual(len(bg.compare(slow, base, "m")[1]), 1)  # 9x slower fails
+        self.assertEqual(bg.compare(slow, base, "other")[1], [])  # another machine class: reported, not gated
+        leaky = {"py": {"implied_vol": {"ns_per_op": 25000.0, "allocs_per_op": 5.0}}}
+        self.assertIn("allocs", bg.compare(leaky, base, "m")[1][0])
+        self.assertEqual(bg.compare({}, base, "m")[1], ["py implied_vol: no result"])
+
     def test_mutation_plan(self):
         pm = load("plan_matrix", "conformance/mutation/plan_matrix.py")
         cfg = {"stages": {"E": [{"module": "m", "suite": "s", "java": "org.q.vol.Surf", "cpp": "cpp26/src/core/m.cpp",

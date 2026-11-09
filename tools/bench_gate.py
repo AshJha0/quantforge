@@ -9,7 +9,7 @@ Reads every <lang>.json in --current (schema: {"lang", "benchmarks": {id: {"ns_p
   * time: fails if ns_per_op is more than --time-ratio (default 1.5) times the baseline. Checked only when the
     baseline's "machine" equals --machine, since timings from another machine class say nothing;
   * allocations: fails if allocs_per_op or alloc_bytes_per_op grows by more than --alloc-ratio (default 1.10)
-    plus 1 allocation (or 64 bytes). Allocation counts do not depend on the machine, so this always applies;
+    plus 1 allocation (or 64 bytes). Also only on the same machine class: allocator, runtime and OS change counts;
   * a benchmark in the baseline that is missing from the results fails.
 Prints a Markdown table (ns/op and allocs/op per language) for the job summary. Exit 1 on any failure.
 """
@@ -50,16 +50,17 @@ def compare(current, baseline, machine, time_ratio=1.5, alloc_ratio=1.10):
             flags = []
             if timed and grew(c["ns_per_op"], b["ns_per_op"], time_ratio, 0):
                 flags.append(f"time {c['ns_per_op'] / b['ns_per_op']:.2f}x")
-            if grew(c.get("allocs_per_op"), b.get("allocs_per_op"), alloc_ratio, 1):
+            if timed and grew(c.get("allocs_per_op"), b.get("allocs_per_op"), alloc_ratio, 1):
                 flags.append(f"allocs {b['allocs_per_op']:g} -> {c['allocs_per_op']:g}")
-            if grew(c.get("alloc_bytes_per_op"), b.get("alloc_bytes_per_op"), alloc_ratio, 64):
+            if timed and grew(c.get("alloc_bytes_per_op"), b.get("alloc_bytes_per_op"), alloc_ratio, 64):
                 flags.append(f"bytes {b['alloc_bytes_per_op']:g} -> {c['alloc_bytes_per_op']:g}")
             if flags:
                 fails.append(f"{lang} {bid}: {', '.join(flags)}")
             rows.append(f"| {lang} | {bid} | {c['ns_per_op']:,.0f} | {b['ns_per_op']:,.0f} | "
                         f"{fmt(c.get('allocs_per_op'))} | {fmt(c.get('alloc_bytes_per_op'))} | {'; '.join(flags) or 'ok'} |")
     head = [f"Baseline machine `{baseline.get('machine')}`, this run `{machine}`: time "
-            + (f"gated at {time_ratio}x." if timed else "not gated (different machine class), allocations gated."), "",
+            + (f"time gated at {time_ratio}x, allocations at {alloc_ratio}x." if timed
+               else "not gated: different machine class (allocator, runtime and OS differ). Refresh the baseline from CI."), "",
             "| Language | Benchmark | ns/op | baseline ns/op | allocs/op | bytes/op | Result |", "|---|---|---:|---:|---:|---:|---|"]
     return head + rows, fails
 
