@@ -68,7 +68,7 @@ NAV = (("index.html", "QuantForge"), ("LEARN.html", "Learn"), ("COOKBOOK.html", 
        ("docs/diagrams/README.html", "Diagrams"), ("all-pages.html", "All pages"))
 SEARCH_FORM = ('<form class="search" role="search" onsubmit="return false"><label class="sr-only" for="q">Search the site</label>'
                '<input id="q" type="search" placeholder="Search" autocomplete="off" aria-controls="hits">'
-               '<ul id="hits" aria-live="polite" hidden></ul></form>')
+               '<button type="submit" class="sr-only">Search</button><ul id="hits" aria-live="polite" hidden></ul></form>')
 
 
 def nav(here, up):

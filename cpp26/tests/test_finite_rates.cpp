@@ -209,7 +209,7 @@ TEST_CASE("finite rates: compounding and money") {
 
 TEST_CASE("finite rates: calibration and hedging") {
     for (const double x : bad_values()) {
-        FitInputs in{FitModel::Linear, {1.0, 2.0, 3.0}, {1.0, 2.0, x}, {0.0, 1.0}, FitMethod::GaussNewton};
+        FitInputs in{.model = FitModel::Linear, .x = {1.0, 2.0, 3.0}, .y = {1.0, 2.0, x}, .start = {0.0, 1.0}, .method = FitMethod::GaussNewton};
         CHECK(code_of([&] { fit(in); }) == "E_DOMAIN");
         in.y = {1.0, 2.0, 3.0};
         in.regularisation = x;
