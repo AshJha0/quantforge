@@ -617,6 +617,19 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "joint_f-0002",
+   "operation": "rates.curve.joint_solve",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX",
+    "OIS.HELPER",
+    "TERM.HELPERS"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "vix_f-0001",
    "operation": "vol.vix.term_variance",
    "source": "Cboe Volatility Index Methodology v6.0, Appendix 3",
