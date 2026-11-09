@@ -24,6 +24,28 @@ def run(mode, suite="*", by=None):
         return p.returncode, json.loads(rep.read_text()) if rep.exists() else None, p.stdout + p.stderr
 
 
+class PeerTests(unittest.TestCase):
+    """Stage F rule F-3: expected status "any" and "same_as"."""
+    classes = {"x": {"absolute": 1e-12, "relative": 1e-10}, "date_and_convention": {"exact": True}}
+
+    def res(self, cid, **kw):
+        return {"schema_version": "1.0", "case_id": cid, **kw}
+
+    def test_any_and_same_as(self):
+        anchor = {"case_id": "a", "expected": {"status": "any"}, "tolerance_class": "date_and_convention"}
+        twin = {"case_id": "b", "expected": {"status": "same_as", "case_id": "a"}, "tolerance_class": "x"}
+        ok_a = self.res("a", status="ok", outputs={"pv": 1.0})
+        peers = {"a": ok_a}
+        self.assertEqual(runner.judge(anchor, ok_a, self.classes)[0], "pass")
+        self.assertEqual(runner.judge(anchor, self.res("a", status="weird"), self.classes)[0], "fail")
+        self.assertEqual(runner.judge(twin, self.res("b", status="ok", outputs={"pv": 1.0}), self.classes, peers)[0], "pass")
+        self.assertEqual(runner.judge(twin, self.res("b", status="ok", outputs={"pv": 1.1}), self.classes, peers)[0], "fail")
+        self.assertEqual(runner.judge(twin, self.res("b", status="error", error={"code": "E_DOMAIN"}), self.classes, peers)[0], "fail")
+        err = {"a": self.res("a", status="error", error={"code": "E_DOMAIN"})}
+        self.assertEqual(runner.judge(twin, self.res("b", status="error", error={"code": "E_DOMAIN"}), self.classes, err)[0], "pass")
+        self.assertEqual(runner.judge(twin, self.res("b", status="error", error={"code": "E_INPUT"}), self.classes, err)[0], "fail")
+
+
 class StubTests(unittest.TestCase):
     def test_replay_passes_every_case(self):
         code, rep, out = run("replay")
