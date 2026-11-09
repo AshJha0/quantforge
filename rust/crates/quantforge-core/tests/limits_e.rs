@@ -23,7 +23,9 @@ fn put(rate: f64) -> Vanilla {
 }
 
 fn fd(x: &Vanilla, american: bool, nx: i64, nt: i64) -> f64 {
-    american_fd(x, american, &FdGrid { nx, nt, width: 5.0 }).unwrap().price
+    american_fd(x, american, &FdGrid { nx, nt, width: 5.0 })
+        .unwrap()
+        .price
 }
 
 /// Largest |L - 1| within 0.3 of ln(spot), for a flat 20% surface and a Heston model with
@@ -139,7 +141,10 @@ fn fd_reference_scheme_orders() {
         assert!((1.8..=2.2).contains(&p), "space {p}");
     }
     // Time: Richardson on successive differences at a fixed fine grid.
-    let f: Vec<f64> = [50i64, 100, 200, 400].iter().map(|&nt| fd(&x, false, 401, nt)).collect();
+    let f: Vec<f64> = [50i64, 100, 200, 400]
+        .iter()
+        .map(|&nt| fd(&x, false, 401, nt))
+        .collect();
     let d: Vec<f64> = f.windows(2).map(|w| w[0] - w[1]).collect();
     for p in order(&d) {
         assert!((0.8..=1.2).contains(&p), "time {p}");
@@ -150,8 +155,10 @@ fn fd_reference_scheme_orders() {
 fn crr_first_order() {
     let x = put(0.05);
     let exact = gbs(false, 100.0, 100.0, 1.0, 0.05, 0.05, 0.2);
-    let errs: Vec<f64> =
-        [100i64, 200, 400].iter().map(|&n| crr(&x, n).unwrap().european - exact).collect();
+    let errs: Vec<f64> = [100i64, 200, 400]
+        .iter()
+        .map(|&n| crr(&x, n).unwrap().european - exact)
+        .collect();
     for p in order(&errs) {
         assert!((0.8..=1.2).contains(&p), "{p}");
     }

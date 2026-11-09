@@ -21,9 +21,14 @@ add_compile_options(-ffp-contract=off -Wall -Wextra)
 
 # CI turns this on (plan 12.1 G7); local builds keep warnings soft.
 option(QF_WERROR "Treat warnings as errors and add -Wconversion -Wshadow" OFF)
+# Applied to QuantForge's own targets only (see qf_strict below), never to fetched third-party code such as Catch2.
+set(QF_STRICT_FLAGS)
 if(QF_WERROR)
-  add_compile_options(-Werror -Wconversion -Wshadow -Wno-sign-conversion)
+  set(QF_STRICT_FLAGS -Werror -Wconversion -Wshadow -Wno-sign-conversion)
 endif()
+function(qf_strict target)
+  target_compile_options(${target} PRIVATE ${QF_STRICT_FLAGS})
+endfunction()
 
 add_library(quantforge_core
   src/core/calendar.cpp
@@ -81,6 +86,9 @@ target_link_libraries(quantforge_cli_lib PUBLIC quantforge_core)
 target_compile_definitions(quantforge_cli_lib PRIVATE QF_VERSION="${PROJECT_VERSION}")
 
 add_executable(quantforge src/cli/main.cpp)
+qf_strict(quantforge_core)
+qf_strict(quantforge_cli_lib)
+qf_strict(quantforge)
 target_link_libraries(quantforge PRIVATE quantforge_cli_lib)
 if(MINGW)
   # One self-contained executable, so the runner needs no compiler on PATH.
@@ -96,6 +104,7 @@ if(BUILD_TESTING)
   add_executable(quantforge_core_tests
     tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_stage_b.cpp tests/test_stage_c.cpp tests/test_stage_d.cpp tests/test_bonds.cpp tests/test_stage_d2.cpp tests/test_stage_d3.cpp tests/test_cli_golden.cpp tests/test_r2.cpp tests/test_mutants_d.cpp tests/test_mutants_e.cpp tests/test_coverage.cpp tests/test_stage_e.cpp tests/test_limits_e.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
+  qf_strict(quantforge_core_tests)
   if(MINGW)
     target_link_options(quantforge_core_tests PRIVATE -static)
   endif()

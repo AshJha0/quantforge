@@ -28,7 +28,6 @@ double fix(int day) { return 0.04 + day / 10000.0; }
 }  // namespace
 
 TEST_CASE("ESTR is a listed overnight convention") {
-    REQUIRE(&estr_conv() != nullptr);
     CHECK(estr_conv().calendar == Calendar::Euta);
     CHECK(estr_conv().spot_lag == 2);
     CHECK(estr_conv().payment_lag == 2);
