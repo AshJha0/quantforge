@@ -26,8 +26,8 @@
   "fx.spot_date",
   "rates.schedule.generate"
  ],
- "leaves": 1053,
- "cases": 5212,
+ "leaves": 1052,
+ "cases": 5207,
  "files": [
   [
    "e1_bond",
@@ -43,7 +43,7 @@
   ],
   [
    "e1_core",
-   534
+   529
   ],
   [
    "e1_credit",
