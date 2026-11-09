@@ -11,10 +11,10 @@ use quantforge_core::dates::Date;
 use quantforge_core::equity;
 use quantforge_core::equity::Outright;
 use quantforge_core::equity::ParityQuote;
-use quantforge_core::equity_d;
-use quantforge_core::equity_d::Action;
-use quantforge_core::equity_d::Constituent;
-use quantforge_core::equity_d::Trs;
+use quantforge_core::equity_carry;
+use quantforge_core::equity_carry::Action;
+use quantforge_core::equity_carry::Constituent;
+use quantforge_core::equity_carry::Trs;
 use quantforge_core::error::Result;
 use quantforge_core::json::Json;
 use quantforge_core::json::obj;
@@ -70,7 +70,7 @@ super::registry! {
                 fut.push((x.date("expiry")?, x.f64("price")?));
             }
             i.gate()?;
-            let r = equity_d::dividend_implied(s, &Curve::new(&f)?, b, &fut)?;
+            let r = equity_carry::dividend_implied(s, &Curve::new(&f)?, b, &fut)?;
             plain(obj([
                 ("pv_dividends", r.pv_dividends.into()),
                 ("period_pv_dividends", r.period_pv_dividends.into()),
@@ -81,7 +81,7 @@ super::registry! {
             let (s, f, dv) = (i.f64("spot")?, curve_input(i, "funding")?, ex_dividends(i)?);
             let (e, fw) = (i.date("expiry")?, i.f64("forward")?);
             i.gate()?;
-            let b = equity_d::borrow_implied(s, &Curve::new(&f)?, &dv, e, fw)?;
+            let b = equity_carry::borrow_implied(s, &Curve::new(&f)?, &dv, e, fw)?;
             plain(obj([("borrow_rate", b.into())]))
         },
         "eq.futures.basis" => {
@@ -94,7 +94,7 @@ super::registry! {
             let (e, p) = (i.date("expiry")?, i.f64("futures_price")?);
             i.gate()?;
             let (fair, basis, implied) =
-                equity_d::futures_basis(s, &Curve::new(&f)?, b, sp, &dv, e, p)?;
+                equity_carry::futures_basis(s, &Curve::new(&f)?, b, sp, &dv, e, p)?;
             plain(obj([
                 ("fair_price", fair.into()),
                 ("basis", basis.into()),
@@ -110,7 +110,7 @@ super::registry! {
             }
             let implied = i.reals("implied_period_points")?;
             i.gate()?;
-            let r = equity_d::index_dividends(d, &cs, &periods, &implied)?;
+            let r = equity_carry::index_dividends(d, &cs, &periods, &implied)?;
             let ex: Vec<Json> = r.ex_dates.iter().map(|d| d.to_string().into()).collect();
             plain(obj([
                 ("level", r.level.into()),
@@ -127,7 +127,7 @@ super::registry! {
                 constituents(i, "new_constituents", false)?,
             );
             i.gate()?;
-            let (l, nd, w) = equity_d::rebalance(d, &old, &new)?;
+            let (l, nd, w) = equity_carry::rebalance(d, &old, &new)?;
             plain(obj([
                 ("level", l.into()),
                 ("new_divisor", nd.into()),
@@ -145,7 +145,7 @@ super::registry! {
                 _ => return i.fail("action", "unknown action"),
             };
             let (p, n, k) = (i.f64("cum_price")?, i.f64("shares")?, i.f64("strike")?);
-            let (f, ex, ns, ks) = equity_d::corporate_action(a, p, n, k)?;
+            let (f, ex, ns, ks) = equity_carry::corporate_action(a, p, n, k)?;
             plain(obj([
                 ("factor", f.into()),
                 ("ex_price", ex.into()),
@@ -171,7 +171,7 @@ super::registry! {
             };
             let r = nullable_f64(i, "current_rate")?;
             i.gate()?;
-            let (e, fl, pv) = equity_d::trs_pv(s, &Curve::new(&f)?, b, &dv, &trade, r)?;
+            let (e, fl, pv) = equity_carry::trs_pv(s, &Curve::new(&f)?, b, &dv, &trade, r)?;
             plain(obj([
                 ("equity_leg", e.into()),
                 ("funding_leg", fl.into()),

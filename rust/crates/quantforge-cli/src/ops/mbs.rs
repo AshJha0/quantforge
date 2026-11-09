@@ -4,15 +4,15 @@ use super::{Outcome, plain};
 use crate::input::Inputs;
 use quantforge_core::error::Result;
 use quantforge_core::json::obj;
-use quantforge_core::stage_d3;
-use quantforge_core::stage_d3::Pool;
-use quantforge_core::stage_d3::Prepayment;
+use quantforge_core::mbs;
+use quantforge_core::mbs::Pool;
+use quantforge_core::mbs::Prepayment;
 
 super::registry! {
 (op, i)
         "mbs.cashflows" => {
             let p = mbs_pool(i)?;
-            let f = stage_d3::mbs_cashflows(&p)?;
+            let f = mbs::mbs_cashflows(&p)?;
             plain(obj([
                 ("balance", f.balance.into()),
                 ("interest", f.interest.into()),
@@ -23,7 +23,7 @@ super::registry! {
         },
         "mbs.price" => {
             let (p, y, dd) = (mbs_pool(i)?, i.f64("yield")?, i.int("delay_days")?);
-            let (pr, dur, wal) = stage_d3::mbs_price(&p, y, dd)?;
+            let (pr, dur, wal) = mbs::mbs_price(&p, y, dd)?;
             plain(obj([
                 ("price", pr.into()),
                 ("modified_duration", dur.into()),

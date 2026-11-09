@@ -9,7 +9,7 @@ use crate::input::Inputs;
 use quantforge_core::credit;
 use quantforge_core::credit::CdsTrade;
 use quantforge_core::credit::Hazard;
-use quantforge_core::credit_e;
+use quantforge_core::credit_options;
 use quantforge_core::curve::Curve;
 use quantforge_core::curve::CurveInput;
 use quantforge_core::curve::Interpolation;
@@ -108,7 +108,7 @@ super::registry! {
         },
         "credit.cdsoption.price" => {
             let (o, v) = (cds_option(i)?, i.f64("vol")?);
-            let p = credit_e::cds_option_price(&o, v)?;
+            let p = credit_options::cds_option_price(&o, v)?;
             plain(obj([
                 ("price", p.price.into()),
                 ("forward_spread", p.forward_spread.into()),
@@ -120,7 +120,7 @@ super::registry! {
             let (o, p) = (cds_option(i)?, i.f64("premium")?);
             plain(obj([(
                 "vol",
-                credit_e::cds_option_implied_vol(&o, p)?.into(),
+                credit_options::cds_option_implied_vol(&o, p)?.into(),
             )]))
         },
         "credit.copula.joint_default" => {
@@ -139,7 +139,7 @@ super::registry! {
                 return fail("E_INPUT", "STUDENT_T needs degrees_of_freedom");
             }
             let (j, dc) =
-                credit_e::joint_default(p[0], p[1], rho, if student { nu } else { None })?;
+                credit_options::joint_default(p[0], p[1], rho, if student { nu } else { None })?;
             plain(obj([
                 ("joint_default_probability", j.into()),
                 ("default_correlation", dc.into()),
@@ -149,7 +149,7 @@ super::registry! {
             let (p, a, d) = (lhp_pool(i)?, i.f64("attachment")?, i.f64("detachment")?);
             plain(obj([(
                 "expected_loss_fraction",
-                credit_e::tranche_loss(&p, a, d)?.into(),
+                credit_options::tranche_loss(&p, a, d)?.into(),
             )]))
         },
         "credit.lhp.loss_cdf" => {
@@ -158,7 +158,7 @@ super::registry! {
             if x.is_empty() {
                 return fail("E_INPUT", "losses must not be empty");
             }
-            plain(obj([("cdf", credit_e::loss_cdf(&p, &x)?.into())]))
+            plain(obj([("cdf", credit_options::loss_cdf(&p, &x)?.into())]))
         }
 }
 
@@ -198,8 +198,8 @@ pub(crate) fn survival_json(h: &Hazard) -> Json {
     rows.into()
 }
 
-pub(crate) fn cds_option(i: &Inputs) -> Result<credit_e::CdsOption> {
-    Ok(credit_e::CdsOption {
+pub(crate) fn cds_option(i: &Inputs) -> Result<credit_options::CdsOption> {
+    Ok(credit_options::CdsOption {
         as_of: i.date("as_of")?,
         expiry: i.date("expiry")?,
         maturity: i.date("maturity")?,
@@ -213,8 +213,8 @@ pub(crate) fn cds_option(i: &Inputs) -> Result<credit_e::CdsOption> {
     })
 }
 
-pub(crate) fn lhp_pool(i: &Inputs) -> Result<credit_e::Pool> {
-    Ok(credit_e::Pool {
+pub(crate) fn lhp_pool(i: &Inputs) -> Result<credit_options::Pool> {
+    Ok(credit_options::Pool {
         default_probability: i.f64("default_probability")?,
         correlation: i.f64("correlation")?,
         recovery: i.f64("recovery")?,

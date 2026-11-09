@@ -9,6 +9,9 @@ use super::risk::ois_quotes_at;
 use super::usecase::tenor_text;
 use super::{Outcome, plain};
 use crate::input::Inputs;
+use quantforge_core::caps;
+use quantforge_core::caps::CapTrade;
+use quantforge_core::caps::SwaptionTrade;
 use quantforge_core::conventions;
 use quantforge_core::conventions::Overnight;
 use quantforge_core::conventions::TERM_INDEX;
@@ -27,15 +30,12 @@ use quantforge_core::ois::OisCurveProblem;
 use quantforge_core::ois::OisTrade;
 use quantforge_core::projection;
 use quantforge_core::projection::ProjectionQuote;
-use quantforge_core::rates_d;
-use quantforge_core::rates_d::CsaFx;
-use quantforge_core::rates_d::Shift;
-use quantforge_core::rates_d::StepCurve;
-use quantforge_core::rates_e;
+use quantforge_core::rates_overnight;
+use quantforge_core::rates_overnight::CsaFx;
+use quantforge_core::rates_overnight::Shift;
+use quantforge_core::rates_overnight::StepCurve;
+use quantforge_core::rates_vol;
 use quantforge_core::schedule;
-use quantforge_core::stage_d3;
-use quantforge_core::stage_d3::CapTrade;
-use quantforge_core::stage_d3::SwaptionTrade;
 
 super::registry! {
 (op, i)
@@ -182,17 +182,17 @@ super::registry! {
             };
             let (k, f) = (i.int("shift_days")?, fixings(i)?);
             i.gate()?;
-            let r = rates_d::compound_dated(&c?, s, e, m, k, &f)?;
+            let r = rates_overnight::compound_dated(&c?, s, e, m, k, &f)?;
             plain(compounded(r))
         },
         "rates.fallback.rate" => {
-            let Some((index, spread)) = rates_d::fallback_spread(i.str("ibor")?) else {
+            let Some((index, spread)) = rates_overnight::fallback_spread(i.str("ibor")?) else {
                 return i.fail("ibor", "not a listed IBOR");
             };
             let (s, e, f) = (i.date("start")?, i.date("end")?, fixings(i)?);
             i.gate()?;
             let c = conventions::overnight(index).expect("listed index");
-            let r = rates_d::compound_dated(&c, s, e, Shift::ObservationShift, 2, &f)?;
+            let r = rates_overnight::compound_dated(&c, s, e, Shift::ObservationShift, 2, &f)?;
             plain(obj([
                 ("compounded_rate", r.compounded_rate.into()),
                 ("spread_adjustment", spread.into()),
@@ -224,7 +224,7 @@ super::registry! {
             }
             let j = jumps(i, true)?;
             i.gate()?;
-            let fit = rates_d::fit_steps(&c, t, &steps, &quotes, &j)?;
+            let fit = rates_overnight::fit_steps(&c, t, &steps, &quotes, &j)?;
             Ok(Outcome {
                 outputs: obj([
                     ("base_rate", fit.base_rate.into()),
@@ -236,7 +236,7 @@ super::registry! {
         "rates.futures.convexity" => {
             let (p, s, e) = (i.f64("price")?, i.f64("start_years")?, i.f64("end_years")?);
             let (v, a) = (i.f64("sigma")?, i.f64("mean_reversion")?);
-            let r = rates_d::convexity(p, s, e, v, a)?;
+            let r = rates_overnight::convexity(p, s, e, v, a)?;
             plain(obj([
                 ("futures_rate", r.futures_rate.into()),
                 ("convexity", r.convexity.into()),
@@ -257,7 +257,7 @@ super::registry! {
             };
             let dates = i.dates("dates")?;
             i.gate()?;
-            let d = rates_d::csa_discount(&Curve::new(&c)?, s, fx.as_ref(), &dates)?;
+            let d = rates_overnight::csa_discount(&Curve::new(&c)?, s, fx.as_ref(), &dates)?;
             plain(obj([("discount_factors", d.into())]))
         },
         "rates.basis.ois_spread" => {
@@ -279,7 +279,7 @@ super::registry! {
             let p = projection_quotes_at(i, "term_quotes")?;
             let (m, method) = (interpolation(i)?, solve_method(i)?);
             i.gate()?;
-            let (d, p) = rates_d::joint_bootstrap(&c, t, &q, &p, m, method)?;
+            let (d, p) = rates_overnight::joint_bootstrap(&c, t, &q, &p, m, method)?;
             let field = |j: Json| match j {
                 Json::Obj(mut v) => v.remove(0).1,
                 other => other,
@@ -312,7 +312,7 @@ super::registry! {
                 notional: t.f64("notional")?,
             };
             i.gate()?;
-            let c = stage_d3::cap_price(&Curve::new(&d)?, &Curve::new(&p)?, normal, &vols, &trade)?;
+            let c = caps::cap_price(&Curve::new(&d)?, &Curve::new(&p)?, normal, &vols, &trade)?;
             let total: f64 = c.iter().sum();
             plain(obj([("price", total.into()), ("caplets", c.into())]))
         },
@@ -333,7 +333,7 @@ super::registry! {
             };
             i.gate()?;
             let (pr, f, a) =
-                stage_d3::swaption_price(&Curve::new(&d)?, &Curve::new(&p)?, normal, vol, &trade)?;
+                caps::swaption_price(&Curve::new(&d)?, &Curve::new(&p)?, normal, vol, &trade)?;
             plain(obj([
                 ("price", pr.into()),
                 ("forward_rate", f.into()),
@@ -343,7 +343,7 @@ super::registry! {
         "rates.swaption.price_cube" => {
             let (d, p) = curves(i)?;
             let c = sub(i, "cube")?;
-            let cube = rates_e::Cube {
+            let cube = rates_vol::Cube {
                 expiries_months: ints(&c, "expiries_months")?,
                 tenors_months: ints(&c, "tenors_months")?,
                 alpha: c.matrix("alpha")?,
@@ -352,7 +352,7 @@ super::registry! {
                 nu: c.matrix("nu")?,
             };
             let t = sub(i, "trade")?;
-            let trade = rates_e::CubeTrade {
+            let trade = rates_vol::CubeTrade {
                 payer: kind(&t, "PAYER", "RECEIVER")?,
                 expiry_months: t.int("expiry_months")?,
                 tenor_months: t.int("tenor_months")?,
@@ -360,7 +360,7 @@ super::registry! {
                 notional: t.f64("notional")?,
             };
             i.gate()?;
-            let r = rates_e::price_cube(&Curve::new(&d)?, &Curve::new(&p)?, &cube, &trade)?;
+            let r = rates_vol::price_cube(&Curve::new(&d)?, &Curve::new(&p)?, &cube, &trade)?;
             plain(obj([
                 ("price", r.price.into()),
                 ("forward_rate", r.forward_rate.into()),
@@ -380,7 +380,7 @@ super::registry! {
         "rates.cap.strip" => {
             let (d, p) = curves(i)?;
             let (tenors, vols) = (ints(i, "cap_tenors_months")?, i.reals("flat_vols")?);
-            let x = rates_e::Strip {
+            let x = rates_vol::Strip {
                 normal: model(i)?,
                 start_months: i.int("start_months")?,
                 strike: i.f64("strike")?,
@@ -389,7 +389,7 @@ super::registry! {
                 notional: i.f64("notional")?,
             };
             i.gate()?;
-            let (cv, prices) = rates_e::strip_caplets(&Curve::new(&d)?, &Curve::new(&p)?, &x)?;
+            let (cv, prices) = rates_vol::strip_caplets(&Curve::new(&d)?, &Curve::new(&p)?, &x)?;
             plain(obj([
                 ("caplet_vols", cv.into()),
                 ("cap_prices", prices.into()),
@@ -398,14 +398,14 @@ super::registry! {
         "rates.bondfut.option_price" => {
             let o = futures_option(i)?;
             let (v, n) = (i.f64("vol")?, i.f64("contract_size")?);
-            let (p, cv) = rates_e::futures_option_price(&o, v, n)?;
+            let (p, cv) = rates_vol::futures_option_price(&o, v, n)?;
             plain(obj([("price", p.into()), ("contract_value", cv.into())]))
         },
         "rates.bondfut.implied_vol" => {
             let o = futures_option(i)?;
             let (pr, y) = (i.f64("premium")?, i.f64("ctd_yield")?);
             let dm = i.f64("ctd_modified_duration")?;
-            let (pv, yv) = rates_e::futures_implied_vol(&o, pr, y, dm)?;
+            let (pv, yv) = rates_vol::futures_implied_vol(&o, pr, y, dm)?;
             plain(obj([("price_vol", pv.into()), ("yield_vol", yv.into())]))
         }
 }
@@ -565,7 +565,7 @@ pub(crate) fn overnight_record(i: &Inputs) -> Result<Overnight> {
     }
 }
 
-pub(crate) fn compounded(r: rates_d::Compounded) -> Json {
+pub(crate) fn compounded(r: rates_overnight::Compounded) -> Json {
     obj([
         ("compounded_rate", r.compounded_rate.into()),
         ("accrual", r.accrual.into()),
@@ -613,8 +613,8 @@ pub(crate) fn curves(i: &Inputs) -> Result<(CurveInput, CurveInput)> {
     Ok((curve_input(i, "discount")?, curve_input(i, "projection")?))
 }
 
-pub(crate) fn futures_option(i: &Inputs) -> Result<rates_e::FuturesOption> {
-    Ok(rates_e::FuturesOption {
+pub(crate) fn futures_option(i: &Inputs) -> Result<rates_vol::FuturesOption> {
+    Ok(rates_vol::FuturesOption {
         call: kind(i, "CALL", "PUT")?,
         futures_price: i.f64("futures_price")?,
         strike: i.f64("strike")?,

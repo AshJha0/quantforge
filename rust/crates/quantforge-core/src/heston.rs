@@ -1,9 +1,9 @@
 //! Heston, Bates and Merton pricing, and the SLV leverage reference scheme
 //! (`05-volatility/heston-family.md`, rulings E-A12 to E-A14).
+use crate::arb_surface::{Slice, check_slices, local_variance};
 use crate::black::black;
 use crate::error::{Result, fail};
 use crate::integrate::gauss_legendre_rule;
-use crate::surface_e::{Slice, check_slices, local_variance};
 use std::f64::consts::PI;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::sync::OnceLock;

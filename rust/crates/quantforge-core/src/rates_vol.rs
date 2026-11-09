@@ -1,11 +1,11 @@
 //! Stage E4: SABR swaption cube, caplet stripping, bond futures options, inflation caps
 //! (`05-volatility/rates-vol-cube.md`, rulings E-B8 to E-B13).
 use crate::black::black;
+use crate::caps::{forward_start, option, periods, swap_forward, years};
 use crate::curve::Curve;
 use crate::daycount::{DayCountInputs, year_fraction};
 use crate::error::{Result, fail};
 use crate::sabr::Sabr;
-use crate::stage_d3::{forward_start, option, periods, swap_forward, years};
 
 /// SABR parameters at each (expiry, tenor) node; matrices are rows by expiry.
 pub struct Cube {
@@ -523,14 +523,14 @@ mod tests {
             assert!((cv[0] - vols[0]).abs() < 1e-12);
             for (k, &m) in tenors.iter().enumerate() {
                 let n = usize::try_from(m / 3).unwrap();
-                let trade = crate::stage_d3::CapTrade {
+                let trade = crate::caps::CapTrade {
                     cap: true,
                     start_months: 3,
                     tenor_months: m,
                     strike: 0.037,
                     notional: 1e7,
                 };
-                let c = crate::stage_d3::cap_price(&d, &p, normal, &cv[..n], &trade).unwrap();
+                let c = crate::caps::cap_price(&d, &p, normal, &cv[..n], &trade).unwrap();
                 assert!((c.iter().sum::<f64>() - targets[k]).abs() < 1e-6);
             }
         }

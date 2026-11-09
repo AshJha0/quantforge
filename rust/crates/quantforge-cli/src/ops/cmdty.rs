@@ -4,11 +4,11 @@ use super::infl::month_of;
 use super::rates::curve_input;
 use super::{Outcome, plain};
 use crate::input::Inputs;
+use quantforge_core::commodity;
 use quantforge_core::curve::Curve;
 use quantforge_core::error::Result;
 use quantforge_core::json::Json;
 use quantforge_core::json::obj;
-use quantforge_core::stage_d3;
 
 super::registry! {
 (op, i)
@@ -33,7 +33,7 @@ super::registry! {
                 }
             }
             i.gate()?;
-            let f = stage_d3::commodity_forwards(&q, s.as_deref(), &months)?;
+            let f = commodity::commodity_forwards(&q, s.as_deref(), &months)?;
             plain(obj([("forwards", f.into())]))
         },
         "cmdty.storage.carry" => {
@@ -44,7 +44,7 @@ super::registry! {
             }
             let u = i.f64("storage_cost")?;
             i.gate()?;
-            let (y, c, a) = stage_d3::storage_carry(&Curve::new(&f)?, &fw, u)?;
+            let (y, c, a) = commodity::storage_carry(&Curve::new(&f)?, &fw, u)?;
             let a: Vec<Json> = a.into_iter().map(Json::Bool).collect();
             plain(obj([
                 ("convenience_yields", y.into()),

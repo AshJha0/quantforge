@@ -15,7 +15,7 @@ use quantforge_core::inflation::Zcis;
 use quantforge_core::inflation::month_index;
 use quantforge_core::json::Json;
 use quantforge_core::json::obj;
-use quantforge_core::rates_e;
+use quantforge_core::rates_vol;
 
 super::registry! {
 (op, i)
@@ -88,7 +88,7 @@ super::registry! {
             let periods = items(i, "periods")?
                 .iter()
                 .map(|p| {
-                    Ok(rates_e::YoyPeriod {
+                    Ok(rates_vol::YoyPeriod {
                         accrual: p.f64("accrual")?,
                         discount_factor: p.f64("discount_factor")?,
                         yoy_forward: p.f64("yoy_forward")?,
@@ -98,12 +98,12 @@ super::registry! {
                 })
                 .collect::<Result<Vec<_>>>()?;
             i.gate()?;
-            let c = rates_e::yoy_caplets(normal, cap, k, n, &periods)?;
+            let c = rates_vol::yoy_caplets(normal, cap, k, n, &periods)?;
             let total: f64 = c.iter().sum();
             plain(obj([("caplets", c.into()), ("price", total.into())]))
         },
         "infl.cap.zc_price" => {
-            let z = rates_e::ZeroCoupon {
+            let z = rates_vol::ZeroCoupon {
                 normal: model(i)?,
                 cap: kind(i, "CAP", "FLOOR")?,
                 forward_index_ratio: i.f64("forward_index_ratio")?,
@@ -113,7 +113,7 @@ super::registry! {
                 vol: i.f64("vol")?,
                 notional: i.f64("notional")?,
             };
-            let (p, r) = rates_e::zc_cap(&z)?;
+            let (p, r) = rates_vol::zc_cap(&z)?;
             plain(obj([("price", p.into()), ("strike_ratio", r.into())]))
         }
 }

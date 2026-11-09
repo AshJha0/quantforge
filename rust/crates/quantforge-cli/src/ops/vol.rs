@@ -13,6 +13,13 @@ use super::usecase::equity_valuation;
 use super::usecase::trade_side;
 use super::{Outcome, plain};
 use crate::input::Inputs;
+use quantforge_core::arb_surface;
+use quantforge_core::arb_surface::Check as ArbCheck;
+use quantforge_core::arb_surface::Dynamics;
+use quantforge_core::arb_surface::Rule;
+use quantforge_core::arb_surface::Side;
+use quantforge_core::arb_surface::Slice;
+use quantforge_core::arb_surface::WingKind;
 use quantforge_core::black;
 use quantforge_core::error::Result;
 use quantforge_core::error::fail;
@@ -27,13 +34,6 @@ use quantforge_core::stats::normal_cdf;
 use quantforge_core::stats::normal_pdf;
 use quantforge_core::surface::Check as GridCheck;
 use quantforge_core::surface::Surface;
-use quantforge_core::surface_e;
-use quantforge_core::surface_e::Check as ArbCheck;
-use quantforge_core::surface_e::Dynamics;
-use quantforge_core::surface_e::Rule;
-use quantforge_core::surface_e::Side;
-use quantforge_core::surface_e::Slice;
-use quantforge_core::surface_e::WingKind;
 use quantforge_core::svi;
 use quantforge_core::svi::Svi;
 use quantforge_core::varswap;
@@ -283,21 +283,21 @@ super::registry! {
             let s = slices(i)?;
             let (k, reject) = (i.reals("log_moneyness")?, i.bool("reject")?);
             i.gate()?;
-            surface_e::check_slices(&s)?;
-            let c = surface_e::surface_check(&s, &k)?;
+            arb_surface::check_slices(&s)?;
+            let c = arb_surface::surface_check(&s, &k)?;
             plain(fields(check_fields(&c, reject)?))
         },
         "vol.ssvi.to_svi" => {
             let (rho, eta) = (i.f64("rho")?, i.f64("eta")?);
             let (gamma, theta) = (i.f64("gamma")?, i.f64("theta")?);
-            let s = surface_e::ssvi_to_svi(rho, eta, gamma, theta)?;
+            let s = arb_surface::ssvi_to_svi(rho, eta, gamma, theta)?;
             plain(obj([("svi", svi_json(&s))]))
         },
         "vol.svi.fit_surface" => {
             let (t, k) = (i.reals("expiry_years")?, i.reals("log_moneyness")?);
             let (w, reject) = (i.matrix("total_variance")?, i.bool("reject")?);
             i.gate()?;
-            let f = surface_e::fit_surface(&t, &k, &w)?;
+            let f = arb_surface::fit_surface(&t, &k, &w)?;
             let fitted = f
                 .slices
                 .iter()
@@ -319,7 +319,7 @@ super::registry! {
                 .map(|p| Ok((p.f64("expiry_years")?, p.f64("log_moneyness")?)))
                 .collect::<Result<Vec<_>>>()?;
             i.gate()?;
-            let r = surface_e::dupire(&s, &p)?;
+            let r = arb_surface::dupire(&s, &p)?;
             plain(obj([
                 ("total_variance", r.total_variance.into()),
                 ("implied_vol", r.implied_vol.into()),
@@ -329,7 +329,7 @@ super::registry! {
         "vol.forward.vol" => {
             let (t, v) = (i.reals("expiry_years")?, i.reals("vols")?);
             i.gate()?;
-            let f = surface_e::forward_vols(&t, &v)?;
+            let f = arb_surface::forward_vols(&t, &v)?;
             plain(obj([("forward_vols", f.into())]))
         },
         "vol.smile.dynamics" => {
@@ -356,7 +356,7 @@ super::registry! {
                 },
             };
             i.gate()?;
-            let o = surface_e::smile_dynamics(&x)?;
+            let o = arb_surface::smile_dynamics(&x)?;
             plain(obj([
                 ("vols_base", o.vols_base.into()),
                 ("vols_shifted", o.vols_shifted.into()),
@@ -373,7 +373,7 @@ super::registry! {
                 _ => return i.fail("method", "must be LOG or ABSOLUTE"),
             };
             i.gate()?;
-            let (vv, m) = surface_e::vol_of_vol(&v, a, log)?;
+            let (vv, m) = arb_surface::vol_of_vol(&v, a, log)?;
             plain(obj([("vol_of_vol", vv.into()), ("mean_change", m.into())]))
         },
         "vol.garch.loglik" => {
