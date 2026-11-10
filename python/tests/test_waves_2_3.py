@@ -70,7 +70,7 @@ def test_tokens_only_in_real_fields() -> None:
     """Ruling F-38: "NaN" in a string field is a name; in a Real field it is E_DOMAIN."""
     import pytest
 
-    from quantforge_core.cli.registry import execute
+    from quantforge_core.cli.operations import execute
     from quantforge_core.errors import QfError
     position = {"id": "NaN", "kind": "BOND", "notional": 100.0, "recovery": 0.4,
                 "market_value": 90.0}
