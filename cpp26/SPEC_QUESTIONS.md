@@ -132,3 +132,16 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 - Q4 IFT `dR/dx`: central differences Richardson-combined over `h = 1e-5` and `5e-6`. With `h = 1e-7` the
   monotonic log cubic system (`joint_f-0003`) misses the `jacobian` class by roundoff (1.6e-9 against 1e-9).
 - Q4 `rates.funding.curve`: `1 + rate tau <= 0` (`E_DOMAIN`) is checked after all `end` order checks (`E_INPUT`).
+- F3 `risk.curve.cross_gamma`: the golden trade `side` is `PAYER`/`RECEIVER`, while `par-and-key-rate.md` products use
+  `PAY`/`RECEIVE`; this verb reads `PAYER`/`RECEIVER`. Plain revaluation misses the 1e-10 absolute class by about 2e-10 at
+  notional 1e6 (each V about 1e6); the build sums `V(bump) - V(0)` per cash flow with `expm1` of the exact log shift.
+- F3 `risk.book.ois_sensitivity`: exact derivatives for LOG_LINEAR_DF and LINEAR_ZERO; the stage F interpolations are
+  `E_DOMAIN` here (no golden). `tenor_years` above 100 is `E_DOMAIN` (calendar range). E_LIMIT sizes (100000 swaps or rows,
+  100 PCA columns) are this build's choice.
+- F4 `risk.var.monte_carlo`: `seed` is a JSON integer in the goldens (other seeds in the contract are u64 strings); a negative
+  seed is `E_DOMAIN`. A covariance that is not positive definite is `E_DOMAIN` here, not `E_NOT_POSITIVE_DEFINITE`.
+- F4: filtered historical with all returns 0 (sigma 0) and traffic light with exceptions above observations are `E_DOMAIN`
+  (not specified, no golden).
+- F5 book: a duplicate instrument in the opening `positions` is `E_INPUT`; a zero opening quantity is ignored; `ipv` is
+  optional; a quote dated after `as_of` is never a mark. UC4: `factor_names` against the column count and ragged rows are
+  `E_INPUT`, checked before `T >= K + 2`.

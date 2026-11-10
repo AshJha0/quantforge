@@ -55,6 +55,9 @@
 #include "quantforge/core/heston.hpp"
 #include "quantforge/core/vol_stats.hpp"
 #include "quantforge/core/joint.hpp"
+#include "quantforge/core/risk_f3.hpp"
+#include "quantforge/core/risk_f4.hpp"
+#include "quantforge/core/book.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -298,6 +301,9 @@ struct Entry {
 #include "ops_mbs.inc"
 #include "ops_credit.inc"
 #include "ops_exotics.inc"
+#include "ops_risk_f3.inc"
+#include "ops_risk_f4.inc"
+#include "ops_book.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -318,6 +324,9 @@ constexpr std::span<const Entry> registry[] = {
     mbs_ops,
     credit_ops,
     exotics_ops,
+    risk_f3_ops,
+    risk_f4_ops,
+    book_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
