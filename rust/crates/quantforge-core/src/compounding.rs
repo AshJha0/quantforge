@@ -1,4 +1,5 @@
 //! Compounding (`compounding.md`).
+
 use crate::error::{Result, fail};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -29,6 +30,9 @@ fn factor(c: Compounding, r: f64, t: f64) -> f64 {
 }
 
 pub fn discount_factor(r: f64, t: f64, c: Compounding) -> Result<f64> {
+    crate::error::finite("r", &r)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("c", &c)?;
     if t < 0.0 {
         return fail("E_DOMAIN", "t is negative");
     }
@@ -37,6 +41,10 @@ pub fn discount_factor(r: f64, t: f64, c: Compounding) -> Result<f64> {
 }
 
 pub fn convert(r: f64, t: f64, from: Compounding, to: Compounding) -> Result<f64> {
+    crate::error::finite("r", &r)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("from", &from)?;
+    crate::error::finite("to", &to)?;
     if t < 0.0 {
         return fail("E_DOMAIN", "t is negative");
     }
@@ -50,4 +58,15 @@ pub fn convert(r: f64, t: f64, from: Compounding, to: Compounding) -> Result<f64
         Compounding::Periodic(n) => n * (d.powf(-1.0 / (n * t)) - 1.0),
         Compounding::Continuous => -d.ln() / t,
     })
+}
+
+impl crate::error::Finite for Compounding {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Simple => true,
+            Self::Continuous => true,
+            Self::Periodic(x0) => x0.is_all_finite(),
+        }
+    }
 }

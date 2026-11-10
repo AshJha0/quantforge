@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.function.DoubleUnaryOperator;
 import org.quantforge.core.Normal;
 import org.quantforge.core.QfError;
@@ -28,6 +30,7 @@ public final class FxSmile {
     }
 
     public static void checkMarket(Market m, double vol) {
+        Finite.check("vol", vol);
         if (!(m.spot() > 0.0) || !(m.t() > 0.0) || !(vol > 0.0)) {
             throw new QfError("E_DOMAIN", "spot, expiry_years and vol must be above 0");
         }
@@ -42,6 +45,10 @@ public final class FxSmile {
                         double vega) {}
 
     public static Price price(Market m, double k, double v, double phi, double notional) {
+        Finite.check("k", k);
+        Finite.check("v", v);
+        Finite.check("phi", phi);
+        Finite.check("notional", notional);
         double f = m.forward();
         double t = m.t();
         double d1 = d1(f, k, v, t);
@@ -53,6 +60,9 @@ public final class FxSmile {
     }
 
     public static double delta(Market m, double k, double v, double phi, DeltaType type) {
+        Finite.check("k", k);
+        Finite.check("v", v);
+        Finite.check("phi", phi);
         double f = m.forward();
         double d1 = d1(f, k, v, m.t());
         double d2 = d1 - v * Math.sqrt(m.t());
@@ -77,6 +87,9 @@ public final class FxSmile {
 
     /** The strike with the given delta; PA calls take the root above the maximum-delta strike. */
     public static double strike(Market m, double delta, double v, double phi, DeltaType type) {
+        Finite.check("delta", delta);
+        Finite.check("v", v);
+        Finite.check("phi", phi);
         if (!(phi * delta > 0.0)) {
             throw new QfError("E_DOMAIN", "a call delta must be above 0 and a put delta below 0", "delta");
         }
@@ -137,6 +150,7 @@ public final class FxSmile {
     }
 
     public static double atmStrike(Market m, double v, AtmType atm, DeltaType type) {
+        Finite.check("v", v);
         double f = m.forward();
         return switch (atm) {
             case SPOT -> m.spot();

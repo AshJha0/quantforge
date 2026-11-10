@@ -1,5 +1,7 @@
 package org.quantforge.hedging;
 
+import org.quantforge.core.Finite;
+
 import org.quantforge.core.LinearAlgebra;
 import org.quantforge.core.QfError;
 
@@ -15,6 +17,11 @@ public final class HedgeSolver {
     private static final int MAX_SWEEPS = 200_000;
 
     public static Solution solve(double[][] a, double[] b, double[] weights, double[] costs, double lambda) {
+        Finite.check("a", a);
+        Finite.check("b", b);
+        Finite.check("weights", weights);
+        Finite.check("costs", costs);
+        Finite.check("lambda", lambda);
         int rows = a.length;
         if (rows == 0 || b.length != rows || weights.length != rows) {
             throw new QfError("E_INPUT", "length mismatch");

@@ -112,3 +112,23 @@ if(BUILD_TESTING)
   endif()
   add_test(NAME quantforge_core_tests COMMAND quantforge_core_tests)
 endif()
+
+# G2 microbenchmarks (Google Benchmark). Off by default; -DQF_BENCH=ON builds qf_micro.
+option(QF_BENCH "Build the qf_micro Google Benchmark target" OFF)
+if(QF_BENCH)
+  include(FetchContent)
+  set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(googlebenchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG v1.9.4)
+  FetchContent_MakeAvailable(googlebenchmark)
+  add_executable(qf_micro bench/micro.cpp)
+  target_link_libraries(qf_micro PRIVATE quantforge_core benchmark::benchmark)
+  target_compile_definitions(qf_micro PRIVATE QF_REPO_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/..")
+  if(MINGW)
+    target_link_options(qf_micro PRIVATE -static)
+  endif()
+endif()

@@ -1,4 +1,5 @@
 //! Root finders (`root-finders.md`).
+
 use crate::error::{Result, fail};
 
 #[derive(Debug, Clone, Copy)]
@@ -236,4 +237,16 @@ pub fn newton(
         x = next;
     }
     no_convergence()
+}
+
+impl crate::error::Finite for Controls {
+    fn is_all_finite(&self) -> bool {
+        self.x_tol.is_all_finite() && self.f_tol.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Root {
+    fn is_all_finite(&self) -> bool {
+        self.root.is_all_finite() && self.residual.is_all_finite()
+    }
 }

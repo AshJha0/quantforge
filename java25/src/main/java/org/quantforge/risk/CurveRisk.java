@@ -1,5 +1,7 @@
 package org.quantforge.risk;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.DoubleUnaryOperator;
@@ -28,6 +30,7 @@ public final class CurveRisk {
 
     /** 0 < bump_bp <= 100, else E_DOMAIN. */
     public static void checkBump(double bumpBp) {
+        Finite.check("bumpBp", bumpBp);
         if (!(bumpBp > 0.0 && bumpBp <= 100.0)) {
             throw new QfError("E_DOMAIN", "bump_bp must be in (0, 100]", "bump_bp");
         }
@@ -59,6 +62,7 @@ public final class CurveRisk {
 
     public static Par par(Conventions.RateIndex c, LocalDate asOf, List<Ois.Quote> quotes, Curve.Interpolation interp,
                           ToDoubleFunction<Curve> product, double bumpBp, Scheme scheme) {
+        Finite.check("bumpBp", bumpBp);
         double base = product.applyAsDouble(rebuilt(c, asOf, quotes, interp, null));
         int n = quotes.size();
         double h = bumpBp * BP;
@@ -91,6 +95,8 @@ public final class CurveRisk {
     public static Explain explain(Conventions.RateIndex c, LocalDate asOf, Curve.Interpolation interp,
                                   List<Ois.Quote> start, List<Ois.Quote> end, ToDoubleFunction<Curve> product,
                                   double bumpBp, double notional) {
+        Finite.check("bumpBp", bumpBp);
+        Finite.check("notional", notional);
         Par par = par(c, asOf, start, interp, product, bumpBp, Scheme.CENTRAL);
         double valueEnd = product.applyAsDouble(rebuilt(c, asOf, end, interp, null));
         double full = valueEnd - par.value();
@@ -148,6 +154,7 @@ public final class CurveRisk {
 
     public static KeyRate keyRate(Curve curve, Mode mode, LocalDate[] keyDates, ToDoubleFunction<Curve> product,
                                   double bumpBp, Scheme scheme) {
+        Finite.check("bumpBp", bumpBp);
         double base = product.applyAsDouble(curve);
         double h = bumpBp * BP;
         double[] buckets;
@@ -195,6 +202,7 @@ public final class CurveRisk {
 
     public static Jacobian jacobian(Conventions.RateIndex c, LocalDate asOf, List<Ois.Quote> quotes,
                                     Curve.Interpolation interp, double bumpBp) {
+        Finite.check("bumpBp", bumpBp);
         Curve base = rebuilt(c, asOf, quotes, interp, null);
         int n = quotes.size();
         double h = bumpBp * BP;

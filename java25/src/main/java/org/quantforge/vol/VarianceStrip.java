@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +38,13 @@ public final class VarianceStrip {
     /** Fair variance with the drift term that keeps q (ruling E-B3). Strike lists are checked by the caller. */
     public static double fairVariance(double s0, double r, double q, double t, double[] puts, double[] calls,
                                       VolOf vols, double dk) {
+        Finite.check("s0", s0);
+        Finite.check("r", r);
+        Finite.check("q", q);
+        Finite.check("t", t);
+        Finite.check("puts", puts);
+        Finite.check("calls", calls);
+        Finite.check("dk", dk);
         double d = Math.exp(-r * t);
         double fwd = s0 * Math.exp((r - q) * t);
         double[] up = calls.clone();
@@ -63,6 +72,8 @@ public final class VarianceStrip {
 
     /** (A/m) sum ln(p_i/p_{i-1})^2: no mean, divisor m (ruling E-B4). */
     public static double realizedVariance(double[] p, double periodsPerYear) {
+        Finite.check("p", p);
+        Finite.check("periodsPerYear", periodsPerYear);
         int m = p.length - 1;
         double s = 0.0;
         for (int i = 1; i <= m; i++) {
@@ -86,6 +97,7 @@ public final class VarianceStrip {
 
     /** One term of the VIX method, checks in the order of vix-index.md. */
     public static Term term(long minutes, double rate, List<Quote> strip) {
+        Finite.check("rate", rate);
         if (minutes < 1) {
             throw new QfError("E_INPUT", "minutes_to_expiry must be at least 1", "minutes_to_expiry");
         }

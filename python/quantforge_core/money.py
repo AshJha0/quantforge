@@ -5,6 +5,7 @@ Amounts are held as integers in units of 1e-8, so no binary rounding can reach t
 import re
 
 from .errors import QfError
+from .finite import guard
 
 UNITS = {"DECIMAL": 1.0, "PERCENT": 100.0, "BP": 10000.0}
 MINOR_UNITS = {"GBP": 2, "USD": 2, "EUR": 2, "JPY": 0}
@@ -50,3 +51,6 @@ def round_money(amount: str, currency: str) -> tuple[str, str]:
         quotient += 1
     rounded = quotient * step
     return _format(-rounded if units < 0 else rounded, places), currency
+
+
+guard(globals())

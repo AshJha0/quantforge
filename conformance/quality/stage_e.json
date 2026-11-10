@@ -1,5 +1,5 @@
 {
-  "note": "Stage E code-quality scope, one place for the coverage gate, the scope check and the fuzz focus. Mutation modules live in conformance/mutation/stages.json under stage E, with the same module names. Paths are repository-relative globs of source files, one or a list per language, filled from the files the stage E branches added. Two are wider than stage E: C++ rates_vol is in cpp26/src/core/misc_d.cpp with stage D code, and the C++ and Rust garch_varswap_vix entries hold all three topics. A TODO entry is skipped by every tool; tools/quality_gate.py --check-config checks the rest.",
+  "note": "Stage E code-quality scope, one place for the coverage gate, the scope check and the fuzz focus. Mutation modules live in conformance/mutation/stages.json under stage E, with the same module names. Paths are repository-relative globs of source files, one or a list per language, filled from the files the stage E branches added. Two are wider than stage E: C++ rates_vol is in cpp26/src/core/rates_vol.cpp with stage D code, and the C++ and Rust garch_varswap_vix entries hold all three topics. A TODO entry is skipped by every tool; tools/quality_gate.py --check-config checks the rest.",
   "stage": "E",
   "coverage_min": 0.85,
   "modules": [
@@ -7,8 +7,8 @@
       "module": "surfaces_local_vol",
       "java": "java25/src/main/java/org/quantforge/vol/Surfaces.java",
       "cpp": "cpp26/src/core/arb_surface.cpp",
-      "python": "python/quantforge_core/vol_e1.py",
-      "rust": "rust/crates/quantforge-core/src/surface_e.rs"
+      "python": "python/quantforge_core/arb_surface.py",
+      "rust": "rust/crates/quantforge-core/src/arb_surface.rs"
     },
     {
       "module": "heston_slv",
@@ -37,9 +37,9 @@
     {
       "module": "rates_vol",
       "java": "java25/src/main/java/org/quantforge/pricing/RatesVol.java",
-      "cpp": "cpp26/src/core/misc_d.cpp",
+      "cpp": "cpp26/src/core/rates_vol.cpp",
       "python": "python/quantforge_core/rates_vol.py",
-      "rust": "rust/crates/quantforge-core/src/rates_e.rs"
+      "rust": "rust/crates/quantforge-core/src/rates_vol.rs"
     },
     {
       "module": "garch_varswap_vix",
@@ -48,7 +48,7 @@
         "java25/src/main/java/org/quantforge/vol/VarianceStrip.java"
       ],
       "cpp": "cpp26/src/core/vol_stats.cpp",
-      "python": "python/quantforge_core/vol_e7.py",
+      "python": "python/quantforge_core/variance.py",
       "rust": [
         "rust/crates/quantforge-core/src/garch.rs",
         "rust/crates/quantforge-core/src/varswap.rs",
@@ -65,9 +65,9 @@
     {
       "module": "credit_options",
       "java": "java25/src/main/java/org/quantforge/pricing/CreditOptions.java",
-      "cpp": "cpp26/src/core/credit_e.cpp",
-      "python": "python/quantforge_core/credit_e8.py",
-      "rust": "rust/crates/quantforge-core/src/credit_e.rs"
+      "cpp": "cpp26/src/core/credit_options.cpp",
+      "python": "python/quantforge_core/credit_options.py",
+      "rust": "rust/crates/quantforge-core/src/credit_options.rs"
     }
   ],
   "python_tests": [

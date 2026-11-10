@@ -1,4 +1,4 @@
-"""Stage E, E3: Garman-Kohlhagen vanillas, FX delta conventions, ATM strikes and the smile from
+"""Garman-Kohlhagen vanillas, FX delta conventions, ATM strikes and the smile from
 ATM, risk reversal and strangle quotes.
 
 Spec: specifications/05-volatility/fx-smile.md, rulings E-A9 to E-A11 in
@@ -10,6 +10,7 @@ from collections.abc import Callable
 from . import roots
 from .black import big_n, n_inverse, small_n
 from .errors import QfError
+from .finite import guard
 
 DELTA_TYPES = ("SPOT", "FORWARD", "SPOT_PA", "FORWARD_PA")
 ATM_TYPES = ("SPOT", "FORWARD", "DNS")
@@ -163,3 +164,6 @@ def smile_from_quotes(spot: float, t: float, rd: float, rf: float, atm_vol: floa
         "call_strike": delta_to_strike(spot, t, rd, rf, call_vol, "CALL", delta, delta_type),
         "put_strike": delta_to_strike(spot, t, rd, rf, put_vol, "PUT", -delta, delta_type),
     }
+
+
+guard(globals())

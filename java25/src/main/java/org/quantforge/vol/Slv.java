@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.List;
 import org.quantforge.core.QfError;
 
@@ -43,6 +45,10 @@ public final class Slv {
 
     public static Result leverage(double spot, double t, double r, double q, Heston.Params h,
                                   List<Surfaces.Slice> slices, Grid g) {
+        Finite.check("spot", spot);
+        Finite.check("t", t);
+        Finite.check("r", r);
+        Finite.check("q", q);
         int nx = (int) g.nx();
         int nv = (int) g.nv();
         int nt = (int) g.nt();

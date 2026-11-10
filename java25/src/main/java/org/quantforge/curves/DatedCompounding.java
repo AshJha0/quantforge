@@ -1,5 +1,7 @@
 package org.quantforge.curves;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -66,6 +68,7 @@ public final class DatedCompounding {
 
     public static Result compound(Conventions.RateIndex c, LocalDate start, LocalDate end, Method method, long k,
                                   LocalDate[] fixingDates, double[] fixingRates) {
+        Finite.check("fixingRates", fixingRates);
         if (!end.isAfter(start)) {
             throw new QfError("E_DATE_ORDER", "end is not after start", "end");
         }

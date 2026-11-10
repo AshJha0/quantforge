@@ -72,6 +72,7 @@ impl Sobol {
         Sobol { v, x, index: skip }
     }
 
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn next_point(&mut self, out: &mut [f64]) {
         let c = (!self.index).trailing_zeros() as usize + 1;
         self.index += 1;

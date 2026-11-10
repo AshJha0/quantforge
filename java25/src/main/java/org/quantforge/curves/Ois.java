@@ -1,5 +1,7 @@
 package org.quantforge.curves;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -98,6 +100,7 @@ public final class Ois {
     /** Builds a curve from quotes; {@code bump} is added to each quote's mid, and may be null. */
     public static CurveSolver.Solved bootstrap(Conventions.RateIndex c, LocalDate asOf, List<Quote> quotes,
                                                Curve.Interpolation interp, CurveSolver.Method method, double[] bump) {
+        Finite.check("bump", bump);
         return bootstrap(c, asOf, quotes, interp, method, bump, Jumps.NONE);
     }
 
@@ -105,6 +108,7 @@ public final class Ois {
     public static CurveSolver.Solved bootstrap(Conventions.RateIndex c, LocalDate asOf, List<Quote> quotes,
                                                Curve.Interpolation interp, CurveSolver.Method method, double[] bump,
                                                Jumps jumps) {
+        Finite.check("bump", bump);
         jumps.check(asOf);
         if (quotes.isEmpty()) {
             throw new QfError("E_INPUT", "no quotes", "quotes");
@@ -132,6 +136,7 @@ public final class Ois {
 
     /** Compounded in arrears from actual fixings. */
     public static double compound(double[] rates, long[] days, int denominator) {
+        Finite.check("rates", rates);
         if (rates.length != days.length || rates.length == 0) {
             throw new QfError("E_INPUT", "need equal, non-empty rates and days");
         }

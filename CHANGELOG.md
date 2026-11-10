@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased: stage F, part 1 (wave 0, lanes)
+
+Stage F (target v0.6.0) lands in two pull requests. This first one holds wave 0 and the parallel lanes; the curve layer, risk and book follow in part 2. No golden value of an earlier stage changed.
+
+### Added
+- T: tightened acceptance rows for A3, A4, A5, A7, Q1, Q3a and the equivalent-mutant sign-off, with parameters fixed before the items are built (`program/STAGE_F_HANDOVER.md`).
+- E1: every public numeric input must be finite, else `E_DOMAIN`; a token in an Integer field is `E_SCHEMA` (ruling F-1). 5,207 shared goldens with NaN, +inf, -inf and -0.0 per input of every verb, passed by all four languages.
+- E4: cross-language name map generated from the specs, and the API style ADR. Q5b: convergence order and limit-case field in the spec template, checked by `tools/quality_gate.py --check-specs`.
+- A2: model-register fields (tier, challenger, monitoring thresholds, data-lineage hash, retirement trigger, validation report), checked by `--check-register`; earlier entries are on a baseline list.
+- G2: microbenchmarks (criterion, JMH, Google Benchmark, pytest-benchmark) for bootstrap, swap PV and implied vol, with a regression gate against a stored baseline. G3: build-provenance attestation and a CycloneDX SBOM in `release.yml`. G6: coverage floors per language, a mutation gate, and property tests (proptest, jqwik, hypothesis). G8: weekly Dependabot security updates.
+- E2: "Tutorial 1: price your first swap" in Python, Rust, Java and C++, run in CI by `tutorial.yml`; LEARN reordered by topic. E9: `docs/determinism.md`.
+- E6: site accessibility (WCAG AA colours, skip link, focus styles, labelled charts) checked by pa11y-ci. E7: client-side site search and a home status table generated from the facts file. E10: `concurrency` on every workflow and PR mutation on changed files only. E11: a hygiene gate for tracked files over 1 MB and empty packages.
+- R4: the forward-log head hash is anchored to OpenTimestamps by the recorder, with a verifier that detects a rewritten history.
+
+### Changed
+- G4: modules are named by domain, not by stage letter, in all four languages, and CLI dispatch uses a registry. Conformance is unchanged. Mutation and quality configs follow the new paths.
+- G9: Rust denies `clippy::unwrap_used` outside tests.
+
 ## 0.5.0: stage E, full volatility and exotics (2026-11-09)
 
 Tagged `v0.5.0` on `1b2bc7e` (PR #22). Two spec sessions wrote slices E1 to E8 in parallel; each language was built from the specs alone. No golden value of an earlier stage changed.

@@ -8,6 +8,7 @@ from datetime import date
 from . import bonds, curves, ois
 from .curves import Curve, CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .ois import OisTrade, Quote
 
@@ -222,3 +223,6 @@ def pnl_explain(as_of: date, convention: str, interpolation: str, start: Sequenc
         "risk_pnl": risk, "unexplained": unexplained, "gross_risk_pnl": gross,
         "threshold": threshold, "explained": abs(unexplained) <= threshold,
     }
+
+
+guard(globals())

@@ -2,6 +2,7 @@
 use crate::calendar::Calendar;
 use crate::curve::{Curve, Interpolation, SolveMethod, Solved, solve_curve};
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 use crate::schedule::add_months;
 
@@ -49,6 +50,7 @@ pub fn schedule(start: Date, months: i64) -> Result<Vec<Date>> {
 
 /// `L / N`: a leg with notional exchanges, per unit notional.
 pub fn leg(dates: &[Date], projection: &Curve, discount: &Curve, spread: f64) -> Result<f64> {
+    crate::error::finite("spread", &spread)?;
     let mut v = 0.0;
     for w in dates.windows(2) {
         let (s, e) = (w[0], w[1]);
@@ -67,6 +69,7 @@ pub fn bootstrap(
     quotes: &[(i64, f64)],
     interpolation: Interpolation,
 ) -> Result<Solved> {
+    crate::error::finite("quotes", &quotes)?;
     if quotes.is_empty() {
         return fail("E_INPUT", "no quotes");
     }
@@ -114,6 +117,8 @@ pub fn pv(
     spot: f64,
     t: &XccyTrade,
 ) -> Result<(f64, f64, f64)> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("t", &t)?;
     let dates = schedule(t.start, t.months)?;
     let f = t.foreign_notional * leg(&dates, foreign_projection, foreign_discount, t.spread)?;
     let d = t.foreign_notional * spot * leg(&dates, domestic, domestic, 0.0)?;
@@ -138,6 +143,9 @@ pub fn ndf_pv(
     t: &Ndf,
     fixing: Option<f64>,
 ) -> Result<(f64, f64)> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("fixing", &fixing)?;
     if t.payment_date < t.fixing_date {
         return fail("E_DATE_ORDER", "payment_date is before fixing_date");
     }
@@ -154,6 +162,18 @@ pub fn ndf_pv(
     };
     let sign = if t.buy { 1.0 } else { -1.0 };
     Ok((sign * t.usd_notional * (1.0 - t.strike / f) * du, f))
+}
+
+impl crate::error::Finite for Ndf {
+    fn is_all_finite(&self) -> bool {
+        self.strike.is_all_finite() && self.usd_notional.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for XccyTrade {
+    fn is_all_finite(&self) -> bool {
+        self.foreign_notional.is_all_finite() && self.spread.is_all_finite()
+    }
 }
 
 #[cfg(test)]

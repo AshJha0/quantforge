@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -180,6 +182,9 @@ public final class Credit {
 
     public static Price price(LocalDate t, Curve p, Hazard q, double recovery, LocalDate maturity, double coupon,
                               double notional, boolean buyer, boolean digital) {
+        Finite.check("recovery", recovery);
+        Finite.check("coupon", coupon);
+        Finite.check("notional", notional);
         if (!(recovery >= 0.0 && recovery < 1.0)) {
             throw new QfError("E_DOMAIN", "recovery must be in [0, 1)", "recovery");
         }
@@ -264,6 +269,8 @@ public final class Credit {
     }
 
     public static Hazard bootstrap(LocalDate t, Curve p, double recovery, String[] tenors, double[] spreads) {
+        Finite.check("recovery", recovery);
+        Finite.check("spreads", spreads);
         if (!(recovery >= 0.0 && recovery < 1.0)) {
             throw new QfError("E_DOMAIN", "recovery must be in [0, 1)", "recovery");
         }

@@ -48,10 +48,10 @@ final class OpsRisk {
         String kind = p.string("kind");
         return switch (kind) {
             case "OIS" -> {
-                Pricing.OisTrade t = StageB.oisTrade(p.object("trade"));
+                Pricing.OisTrade t = OpsLinear.oisTrade(p.object("trade"));
                 yield new Product(t.convention(), null, t, null, null);
             }
-            case "BOND" -> new Product(null, p.real("notional"), null, StageD2.bond(p.object("bond")),
+            case "BOND" -> new Product(null, p.real("notional"), null, OpsBonds.bond(p.object("bond")),
                     p.date("settlement"));
             default -> throw new QfError("E_SCHEMA", "unknown product kind", "kind");
         };
@@ -75,7 +75,7 @@ final class OpsRisk {
         table.put("risk.curve.par", in -> {
             LocalDate asOf = in.date("as_of");
             Conventions.RateIndex c = Conventions.overnight(in.string("convention"));
-            List<Ois.Quote> quotes = StageB.quotes(in);
+            List<Ois.Quote> quotes = OpsLinear.quotes(in);
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             Product p = product(in);
             double bump = bumpBp(in);
@@ -88,7 +88,7 @@ final class OpsRisk {
             return Operations.out("value", r.value(), "par_dv01", r.parDv01(), "par_buckets", r.parBuckets());
         });
         table.put("risk.curve.key_rate", in -> {
-            StageB.CurveInput ci = StageB.curve(in, "curve");
+            OpsLinear.CurveInput ci = OpsLinear.curve(in, "curve");
             CurveRisk.Mode mode = in.choice("mode", CurveRisk.Mode.class);
             LocalDate[] keys = in.has("key_dates") ? in.dates("key_dates").toArray(LocalDate[]::new) : null;
             Product p = product(in);
@@ -106,8 +106,8 @@ final class OpsRisk {
             LocalDate asOf = in.date("as_of");
             Conventions.RateIndex c = Conventions.overnight(in.string("convention"));
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
-            List<Ois.Quote> start = StageB.quotes(in, "quotes_start");
-            List<Ois.Quote> end = StageB.quotes(in, "quotes_end");
+            List<Ois.Quote> start = OpsLinear.quotes(in, "quotes_start");
+            List<Ois.Quote> end = OpsLinear.quotes(in, "quotes_end");
             Product p = product(in);
             double bump = bumpBp(in);
             in.gate();
@@ -123,7 +123,7 @@ final class OpsRisk {
         table.put("risk.curve.jacobian", in -> {
             LocalDate asOf = in.date("as_of");
             Conventions.RateIndex c = Conventions.overnight(in.string("convention"));
-            List<Ois.Quote> quotes = StageB.quotes(in);
+            List<Ois.Quote> quotes = OpsLinear.quotes(in);
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             double bump = bumpBp(in);
             in.gate();

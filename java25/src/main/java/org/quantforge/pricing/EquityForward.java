@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,7 @@ public final class EquityForward {
     /** Curves are built by the caller, after the spot check. */
     public static Result outright(double spot, LocalDate asOf, LocalDate expiry, Curve funding, Curve borrow,
                                   List<Dividend> dividends) {
+        Finite.check("spot", spot);
         if (!funding.asOf().equals(asOf) || (borrow != null && !borrow.asOf().equals(asOf))) {
             throw new QfError("E_INPUT", "curve as_of differs");
         }
@@ -60,6 +63,12 @@ public final class EquityForward {
     }
 
     public static double flat(double spot, double rate, double borrow, double expiry, double[] times, double[] amounts) {
+        Finite.check("spot", spot);
+        Finite.check("rate", rate);
+        Finite.check("borrow", borrow);
+        Finite.check("expiry", expiry);
+        Finite.check("times", times);
+        Finite.check("amounts", amounts);
         if (spot <= 0.0 || expiry < 0.0) {
             throw domain("spot or expiry_years");
         }

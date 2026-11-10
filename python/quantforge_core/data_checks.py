@@ -3,6 +3,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from .errors import QfError
+from .finite import guard
 
 
 @dataclass(frozen=True)
@@ -108,3 +109,6 @@ def check_quotes(
         )
         for q in quotes
     ]
+
+
+guard(globals())

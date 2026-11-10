@@ -8,6 +8,7 @@ from functools import lru_cache
 from . import curves, ois
 from .curves import Curve
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .ois import OisTrade, Quote
 
@@ -79,3 +80,6 @@ def cashflows(flows: Sequence[tuple[float, float]], y: float) -> tuple[float, fl
         ordered_sum(t * v for t, v in values) / pv,
         ordered_sum(t * t * v for t, v in values) / pv,
     )
+
+
+guard(globals())

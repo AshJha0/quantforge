@@ -13,8 +13,10 @@ Conformance, from the repository root: `python conformance/runner/runner.py --im
 The interpreter is pinned in `.python-version` and dependencies in `uv.lock`. NumPy is used only for
 symmetric eigenvalues and condition numbers. SciPy is a dev dependency, for second checks in the tests.
 
-`quantforge_core` holds one module per spec, for stages A and B. `quantforge_core/cli` holds
-the `quantforge` command, the input decoding, and the test function registry. The other `quantforge_*`
-folders are empty placeholders for later stages.
+`quantforge_core` holds one module per domain spec (curves, bonds, credit, caps_swaptions, variance and
+so on), never named by stage. `quantforge_core/cli` holds the `quantforge` command and the input
+decoding. Each `cli/ops_<domain>.py` registers its verbs with `registry.op`, and the verb table
+(`quantforge operations`) is generated from that registry. The other `quantforge_*` folders are
+empty placeholders.
 
 Open questions on the specs, and the choices made where one was silent, are in `SPEC_QUESTIONS.md`.

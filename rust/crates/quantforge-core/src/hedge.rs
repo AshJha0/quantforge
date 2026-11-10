@@ -1,4 +1,5 @@
 //! Hedge solve and cost (`stage-b-hedges.md`).
+
 use crate::error::{Result, fail};
 use crate::linalg::{Matrix, solve};
 
@@ -82,6 +83,10 @@ pub fn solve_hedge(
     costs: &[f64],
     lambda: f64,
 ) -> Result<Hedge> {
+    crate::error::finite("b", &b)?;
+    crate::error::finite("weights", &weights)?;
+    crate::error::finite("costs", &costs)?;
+    crate::error::finite("lambda", &lambda)?;
     let rows = a.len();
     let n = costs.len();
     if rows == 0
@@ -158,6 +163,8 @@ pub fn solve_hedge(
 }
 
 pub fn spread_cost(quantities: &[f64], half_spreads: &[f64]) -> Result<f64> {
+    crate::error::finite("quantities", &quantities)?;
+    crate::error::finite("half_spreads", &half_spreads)?;
     if quantities.len() != half_spreads.len() {
         return fail("E_INPUT", "lengths differ");
     }
@@ -169,4 +176,10 @@ pub fn spread_cost(quantities: &[f64], half_spreads: &[f64]) -> Result<f64> {
         .zip(half_spreads)
         .map(|(q, h)| q.abs() * h)
         .sum())
+}
+
+impl crate::error::Finite for Hedge {
+    fn is_all_finite(&self) -> bool {
+        self.x.is_all_finite() && self.residual.is_all_finite() && self.objective.is_all_finite()
+    }
 }
