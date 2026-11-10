@@ -15,3 +15,16 @@ Run `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D 
 from the repository root.
 
 Open questions on the specs and golden cases are in `SPEC_QUESTIONS.md`, including one known gap against ruling B24.
+
+**Mutation testing.** `cargo mutants` cannot run from a plain copy of `rust/`, because `sobol.rs`
+embeds a data file from `specifications/`. Run it through the wrapper, which clones the committed
+tree into a scratch directory and runs `cargo mutants --in-place` there, so no mutant can be left
+in your checkout (commit first; uncommitted edits are not included):
+
+```bash
+tools/rust_mutants.sh '**/credit.rs' --cargo-test-arg=--lib
+```
+
+`--cargo-test-arg=--lib` limits each mutant to the unit tests, which is faster; drop it to run the
+whole suite. `QF_MUTANTS_DIR` picks the scratch directory. CI scores the golden suite as well
+(`conformance/mutation/golden_mutants.py`).
