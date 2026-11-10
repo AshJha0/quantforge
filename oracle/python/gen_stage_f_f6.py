@@ -189,6 +189,23 @@ def r7():
             except ValueError as e:
                 assert str(e) == code, (d, e)
         s.add(op, {**base, **chg}, error=code, cls=E, tags=["invalid"], description=d)
+    # R5 audit (appended, ids above unchanged): strikes above the coupon, a near-zero F_adj that is still valid, and an
+    # expiry ladder on which the front-end protection grows from small to dominant
+    more = [("IG, K above C", dict(base, strike=k), f"IG 3m, K = {k * 1e4:.0f} bp above C = 100 bp") for k in (.012, .015, .02)]
+    more += [("HY, K above C", dict(base, hazard_rate=.055, recovery=.3, coupon=.05, strike=k, vol=.6), f"HY 3m, K = {k * 1e4:.0f} bp above C = 500 bp") for k in (.055, .07)]
+    more += [("near-zero F_adj", dict(base, hazard_rate=1e-10, strike=1e-8, coupon=0.0), "hazard 1e-10: F_adj about 6e-11, still valid (F-10 refuses only F_adj <= 0)")]
+    more += [("FEP ladder", dict(base, hazard_rate=.08, recovery=.3, coupon=.05, strike=.05, vol=.6, expiry=ex), f"HY hazard 8%, expiry {ex}: FEP grows with expiry")
+             for ex in ("2026-12-09", "2027-05-10", "2027-11-09", "2028-11-09")]
+    for lab, inp0, d in more:
+        pair = {}
+        for typ in ("PAYER", "RECEIVER"):
+            inp = dict(inp0, type=typ)
+            out, raw = cdsidx(inp)
+            pair[typ] = raw
+            s.add(op, inp, out, cls=R, verified=["mpmath-50", "parity-check"], tags=["cdsindex", typ.lower(), "pedersen", "r5-audit"], output_classes=oc, limit=lim,
+                  description=d)
+        (pp, Aa, Fa, Ka, NN), (pr, _, _, _, _) = pair["PAYER"], pair["RECEIVER"]
+        assert abs((pp - pr) - NN * Aa * (Fa - Ka)) <= mp.mpf("1e-30") * max(1, abs(NN * Aa * (Fa - Ka))), "parity"
     note(f"cdsidx_f: {len(s.cases)} cases; payer - receiver = N A (F_adj - K_adj) on {n_par} pairs to 1e-30; Pedersen (2003) example not available (spec)")
     write(s)
 
@@ -441,7 +458,7 @@ def r8():
                          ("nu = 2: variance not finite", {"distribution": "STUDENT_T", "degrees_of_freedom": 2.0}, "E_DOMAIN")):
         s.add(lop, {**base, **chg}, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
     # estimate
-    PL = {"absolute": 1e-14, "relative": 1e-6, "reason": "parameters agree to 1e-6 relative (plan R8); the optimum is Newton-polished"}
+    PL = {"absolute": 1e-14, "relative": 1e-8, "reason": "parameters to 1e-8 relative (R5 audit, ruling F-43; plan R8 asked 1e-6): Newton on an exact score until the step is below 1e-12 reaches about 1e-10"}
     oc = {"loglik": "likelihood_sum", "std_errors": "standard_error", "mean": A}
     report = []
     for key, r, dist, dm, truth in (("normal", rn, "NORMAL", False, TRUE_N), ("t", rt, "STUDENT_T", False, TRUE_T),
@@ -469,6 +486,12 @@ def r8():
           description="negative initial variance")
     s.add(eop, {"returns": rn[:100], "initial_variance": "SAMPLE", "distribution": "NORMAL", "demean": "yes"}, error="E_SCHEMA", cls=E, tags=["invalid", "stage-f"],
           description="demean must be a boolean")
+    # E_NO_CONVERGENCE (R5 audit, ruling F-43): |r_t| constant, so with "SAMPLE" every sigma2_t = c whenever
+    # omega = (1 - alpha - beta) c. The maximum is a whole plane of parameters, the Hessian is singular, and there is no
+    # strict interior maximum.
+    flat = [0.01 if k % 2 == 0 else -0.01 for k in range(200)]
+    s.add(eop, {"returns": flat, "initial_variance": "SAMPLE", "distribution": "NORMAL", "demean": False}, error="E_NO_CONVERGENCE", cls=E,
+          tags=["invalid", "no-convergence", "stage-f"], description="constant |r|: a plane of maxima, singular Hessian, no strict interior maximum")
     write(s)
 
 
@@ -718,6 +741,31 @@ def lvc():
     assert abs(o1["local_vol"][0] - o1["local_vol"][1]) < 1e-8 * o1["local_vol"][1], "one slice: no jump (g moves by 1e-9 with T)"
     s.add(op, {"slices": one, "points": [{"expiry_years": T, "log_moneyness": k} for T, k in pts]}, o1, cls=I, verified=["analytic"],
           tags=["dupire", "continuity", "stage-f", "one-slice"], description="one slice: flat vol, no jump at the slice expiry")
+    # R5 audit (appended): points strictly between expiries on a wide k grid, every one checked against the 40-digit
+    # price-based Dupire; and butterfly arbitrage (g < 0) refused with E_ARBITRAGE
+    Ts = [x["expiry_years"] for x in SURF]
+    edges = [0.0] + Ts + [Ts[-1] * 2]
+    pts = [(a + (b - a) * u, k) for a, b in zip(edges, edges[1:]) for u in (0.25, 0.5, 0.75) for k in (-0.8, -0.5, -0.2, 0.1, 0.4, 0.7)]
+    ob = {"total_variance": [], "implied_vol": [], "local_vol": []}
+    for T, k in pts:
+        w, g, wT = dupire(SURF, T, k)
+        assert g > 1e-4 and wT > 1e-6, (T, k)
+        ob["total_variance"].append(w)
+        ob["implied_vol"].append(math.sqrt(w / T))
+        ob["local_vol"].append(math.sqrt(wT / g))
+        alt = mp_dupire(SURF, T, k)
+        assert abs(alt - ob["local_vol"][-1]) < 1e-8 * alt, (T, k, alt)
+    s.add(op, {"slices": SURF, "points": [{"expiry_years": T, "log_moneyness": k} for T, k in pts]}, ob, cls=I,
+          verified=["analytic", "mpmath-price-dupire-40-digits on every point"], tags=["dupire", "between-expiries", "stage-f"],
+          description="three-slice: points strictly between expiries, k from -0.8 to 0.7")
+    # Gatheral and Jacquier (2014), section 5: raw SVI a = -0.0410, b = 0.1331, rho = 0.3060, m = 0.3586, sigma = 0.4153
+    # at T = 1 has butterfly arbitrage (g < 0 near k = 0.7)
+    gj = [{"expiry_years": 1.0, "svi": {"a": -0.0410, "b": 0.1331, "rho": 0.3060, "m": 0.3586, "sigma": 0.4153}}]
+    neg = [k / 100 for k in range(-150, 151) if dupire(gj, 1.0, k / 100)[1] <= 0]
+    assert neg, "no butterfly arbitrage found"
+    kb = neg[len(neg) // 2]
+    s.add(op, {"slices": gj, "points": [{"expiry_years": 0.5, "log_moneyness": 0.0}, {"expiry_years": 1.0, "log_moneyness": kb}]}, error="E_ARBITRAGE", cls=E,
+          tags=["invalid", "butterfly", "stage-f"], description=f"Gatheral-Jacquier SVI with butterfly arbitrage: g < 0 at k = {kb} (g < 0 on [{neg[0]}, {neg[-1]}])")
     write(s)
 
 

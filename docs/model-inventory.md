@@ -343,13 +343,13 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 | # | Model | Spec | Stage | Status | Outside-checked |
 |---|---|---|---|---|---|
 | MF-1 | CDS index option, Pedersen adjusted forward | `04-pricing/credit-options-and-copulas.md` | F (R7) | Specified | none (no free outside source) |
-| MF-2 | GARCH(1,1) estimate with standard errors, Student-t, demeaning | `05-volatility/garch.md` | F (R8) | Specified | arch 7.2.0, 9 of 16 |
+| MF-2 | GARCH(1,1) estimate with standard errors, Student-t, demeaning | `05-volatility/garch.md` | F (R8) | Specified | arch 7.2.0, 8 of 17 |
 | MF-3 | VIX null-quote rule; local vol at slice expiries | `05-volatility/vix-index.md`, `05-volatility/local-and-forward-vol.md` | F (R10) | Specified | VIX: Cboe sample calculation, 3 of 10 |
-| MF-4 | Curve interpolation: monotone convex, monotonic log cubic, tension spline, hybrid | `02-curves/curve-framework.md` | F (Q1) | Specified | 67 of 84 (QuantLib 1.44, SciPy quad) |
-| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Specified | 1 of 14 (QuantLib 1.44 rebuild with Jacobian) |
+| MF-4 | Curve interpolation: monotone convex, monotonic log cubic, tension spline, hybrid | `02-curves/curve-framework.md` | F (Q1) | Specified | 67 of 86 (QuantLib 1.44, SciPy quad) |
+| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Specified | 1 of 15 (QuantLib 1.44 rebuild with Jacobian) |
 | MF-6 | Funding curve (spread over OIS) | `02-curves/joint-solve-and-funding.md` | F | Specified | none |
-| MF-7 | Book sensitivities: AAD reference, IFT zero Jacobian, PCA, cross gamma, jump to default | `06-risk/book-sensitivities.md` | F (Q3a, F3) | Specified | PCA: SciPy; cross gamma: QuantLib (30 of 54) |
-| MF-8 | VaR and ES (historical, filtered historical, parametric, Monte Carlo) and backtests | `06-risk/var-es-and-backtests.md` | F (Q2) | Specified | SciPy, NumPy, arch (88 of 102) |
+| MF-7 | Book sensitivities: AAD reference, IFT zero Jacobian, PCA, cross gamma, jump to default | `06-risk/book-sensitivities.md` | F (Q3a, F3) | Specified | PCA: SciPy; cross gamma: QuantLib (30 of 57) |
+| MF-8 | VaR and ES (historical, filtered historical, parametric, Monte Carlo) and backtests | `06-risk/var-es-and-backtests.md` | F (Q2) | Specified | SciPy, NumPy, arch (92 of 108) |
 | MF-9 | FRTB-SA GIRR delta | `06-risk/frtb-sa-girr.md` | F (Q2) | Specified | none (no worked example in MAR21) |
 | MF-10 | Book lifecycle and end-of-day marks | `07-portfolio/book-lifecycle.md` | F (F5) | Specified | none (own conventions) |
 | MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F (F5) | Specified | SciPy lstsq (24 of 27) |
@@ -362,7 +362,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1 (prices a traded option).
 - **Challenger:** Pedersen's exact model (lognormal loss-adjusted index value integrated numerically), stage G.
 - **Monitoring thresholds:** parity residual above 1e-10 relative, or any golden outside 1e-9 per unit notional, fails conformance.
-- **Data lineage hash:** sha256 227d670739edb4e6a0c79e5de1c6918034a36153a013cc61d4c4316c6b1f5b7d
+- **Data lineage hash:** sha256 ad2336be619b7ed8d6f51621479f34c7986ae8b0f5334dfebffa4444538d6f25
 - **Retirement trigger:** an ISDA-standard-model index option (stage G) that matches market upfronts replaces the stylised legs.
 - **Validation report:** `oracle/REPORT.md` (stage F section) and `specifications/04-pricing/credit-options-and-copulas.md` (R7 acceptance).
 
@@ -374,7 +374,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2 (volatility forecasts for analytics and VaR filtering).
 - **Challenger:** the `arch` Python package (not a dependency; an offline comparison is allowed in stage J).
 - **Monitoring thresholds:** parameters outside 1e-6 relative or standard errors outside 1e-5 relative across languages fail conformance; coverage outside [0.90, 0.99] fails the oracle run.
-- **Data lineage hash:** sha256 1825dd623364b4a2e09c9fa1020c59afac1b06a0628733c2561a67b7624ae78f
+- **Data lineage hash:** sha256 e84b9fe4a6af37a249755f1545110840883360bd464f79898a559cb4eceeb457
 - **Retirement trigger:** a multivariate or asymmetric (GJR, EGARCH) model with its own goldens supersedes it for VaR filtering.
 - **Validation report:** `oracle/REPORT.md`; `oracle/R8_COVERAGE.json`.
 
@@ -386,7 +386,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** a C1-in-time surface (stage G) for local vol.
 - **Monitoring thresholds:** the Cboe sample case must round to the printed values; any continuity assertion failing stops the oracle run.
-- **Data lineage hash:** sha256 c2a308ff9004a417aa74c2c2c6c99f2458078c9ccc12debdae6c745eba5ac2c2; sha256 41d4979e50effaa54a0a0dcca8bda0f50d352d6ebafaa420caf8ec27b16cb6cc
+- **Data lineage hash:** sha256 c2a308ff9004a417aa74c2c2c6c99f2458078c9ccc12debdae6c745eba5ac2c2; sha256 04a242b21faacd43475d19edbd9aa649614f07588a41a9b6a97d04674cf14491
 - **Retirement trigger:** a C1 surface interpolation in time replaces the documented jump.
 - **Validation report:** `specifications/05-volatility/vix-index.md` and `local-and-forward-vol.md` (stage F sections).
 
@@ -398,7 +398,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1 (curves feed every price).
 - **Challenger:** `LOG_LINEAR_DF` (the stage B default) on the same quotes; the hybrid against `MONOTONE_CONVEX`.
 - **Monitoring thresholds:** pillars or zero rates more than 1e-10 from QuantLib on the golden builds; a forward jump above 1e-12 at an interior pillar.
-- **Data lineage hash:** sha256 9ee455cdb93e45f00a98b9dcbfcb88669b13cd11d5907b72aeb38d579530e0d7
+- **Data lineage hash:** sha256 291dd8a43870fa08437b0557e65e93f50a61eb865b584ae5fc5bb76733cdcbbf
 - **Retirement trigger:** a smoothing method with a published market standard (for example an ISDA SIMM curve rule) that QuantLib also implements.
 - **Validation report:** `oracle/outside_register_f.json`; `specifications/02-curves/curve-framework.md` (stage F acceptance).
 
@@ -410,7 +410,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** sequential stage B and D bootstraps on the same quotes (`rates.ois.bootstrap`, `rates.curve.joint_bootstrap`).
 - **Monitoring thresholds:** any residual above 1e-13; Jacobian outside `1e-9 + 1e-6 |ref|` of bump-and-rebuild.
-- **Data lineage hash:** sha256 a35637ed63ff4a91c0092eec2c06caad14a47ad1e592dc64198e4f4627dce954
+- **Data lineage hash:** sha256 9e85177418877d2d7de85f831f16863820248b9d93a154c0262696cf41fe208f
 - **Retirement trigger:** mark-to-market cross-currency swaps and a calibrated convexity model (stage G) replace the synthetic pieces.
 - **Validation report:** `specifications/02-curves/joint-solve-and-funding.md` (acceptance); `oracle/outside_register_f.json`.
 
@@ -422,7 +422,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2 (feeds FVA, not prices, until stage G).
 - **Challenger:** a bond-implied funding curve (Z-spread of own issuance) in stage G.
 - **Monitoring thresholds:** a quote not repriced to 1e-12.
-- **Data lineage hash:** sha256 a35637ed63ff4a91c0092eec2c06caad14a47ad1e592dc64198e4f4627dce954
+- **Data lineage hash:** sha256 9e85177418877d2d7de85f831f16863820248b9d93a154c0262696cf41fe208f
 - **Retirement trigger:** a funding model with term structure from issued bonds and CDS supersedes the money-market version.
 - **Validation report:** `specifications/02-curves/joint-solve-and-funding.md`.
 
@@ -434,7 +434,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** bump and revalue (`risk.curve.par`, R2).
 - **Monitoring thresholds:** AAD outside `1e-10 + 1e-8 |ref|` of the Richardson bump in the Rust unit tests.
-- **Data lineage hash:** sha256 ae4ead0413fdd9c0c171b8b08126cbb724b9dc063a7f7bf3ee5780f6b347fe46
+- **Data lineage hash:** sha256 4038828afe7c4244702949e846effbf7c2837adfab623c267bec655060e7fade
 - **Retirement trigger:** AAD through every pricer replaces bump risk as the default (a later stage, by ADR).
 - **Validation report:** `specifications/06-risk/book-sensitivities.md`; `oracle/outside_register_f.json`.
 
@@ -446,7 +446,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** full revaluation against sensitivity P&L (`risk.pnl.explain`).
 - **Monitoring thresholds:** a traffic-light zone of YELLOW or RED on the bank's own backtest.
-- **Data lineage hash:** sha256 eb615bed83742b4fbb9b62d6dbb5eab06ba93315559752a370d10c935994ec9a
+- **Data lineage hash:** sha256 325cffa5419606d7099fe040897e0dc14f77b9836538c467f90448b2d72beaaa
 - **Retirement trigger:** a full-revaluation historical engine on real positions (stage G and later).
 - **Validation report:** `specifications/06-risk/var-es-and-backtests.md`.
 

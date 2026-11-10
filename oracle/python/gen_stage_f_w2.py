@@ -162,6 +162,11 @@ def book_case(conv, quotes, raw, swaps=None):
     return inp, out, m
 
 
+def zcheck(n):
+    """F-30: on a sequential build the zero Jacobian is exactly 0 above the diagonal (runner method exact_zero)."""
+    return {"method": "exact_zero", "output": "zero_jacobian.matrix", "positions": [[i, j] for i in range(n) for j in range(i + 1, n)]}
+
+
 def f3_book(s):
     op = "risk.book.ois_sensitivity"
     cls = {"pv": AADC, "book_pv": AADC, "quote_sensitivity": AADC, "book_sensitivity": AADC, "zero_jacobian": IFTC}
@@ -172,7 +177,7 @@ def f3_book(s):
     assert all(zm[i][j] == 0.0 or abs(zm[i][j]) < 1e-40 for i in range(12) for j in range(12) if j > i)
     zm = [[0.0 if j > i else v for j, v in enumerate(r)] for i, r in enumerate(zm)]
     out["zero_jacobian"]["matrix"] = zm
-    s.add(op, inp, out, cls=AADC, output_classes=cls, verified=["mpmath 40-digit solve, exact IFT"], tags=["q3a", "book", "stage-f"],
+    s.add(op, inp, out, cls=AADC, output_classes=cls, extra_checks=[zcheck(len(SOFR12))], verified=["mpmath 40-digit solve, exact IFT"], tags=["q3a", "book", "stage-f"],
           description="Q3a: 500 SOFR OIS swaps from core.rng seed 20261109 on the 12-pillar SOFR build")
     # mutants on the book: forward-rate sign of the receiver; sensitivity per bp instead of per unit quote
     caught("book", "sensitivity per bp, not per unit quote", gap(np.array(out["quote_sensitivity"]["matrix"]) * 1e-4, out["quote_sensitivity"]["matrix"]), 1e-8)
@@ -185,7 +190,7 @@ def f3_book(s):
         raw = [(min(y, maxy), sp, side) for y, sp, side in book_from_rng(n, SEED + sd)]
         i2, o2, _ = book_case(conv, qs, raw)
         o2["zero_jacobian"]["matrix"] = [[0.0 if j > i else v for j, v in enumerate(r)] for i, r in enumerate(o2["zero_jacobian"]["matrix"])]
-        s.add(op, i2, o2, cls=AADC, output_classes=cls, verified=["mpmath 40-digit solve, exact IFT"], tags=["book", "stage-f"],
+        s.add(op, i2, o2, cls=AADC, output_classes=cls, extra_checks=[zcheck(len(qs))], verified=["mpmath 40-digit solve, exact IFT"], tags=["book", "stage-f"],
               description=f"{conv}: {n} swaps")
     # a swap at par: PV 0; its sensitivity to its own quote is -annuity (payer)
     m = MpOIS("SOFR", SOFR12)
@@ -194,7 +199,7 @@ def f3_book(s):
     i3, o3, _ = book_case("SOFR", SOFR12, None, swaps=[{"id": "PAR5", "tenor_years": 5, "fixed_rate": f(fl / an), "side": "PAY"}])
     o3["zero_jacobian"]["matrix"] = [[0.0 if j > i else v for j, v in enumerate(r)] for i, r in enumerate(o3["zero_jacobian"]["matrix"])]
     assert abs(o3["quote_sensitivity"]["matrix"][0][6] - f(an)) < 1e-6 * f(an)  # d(fl - K an)/dq5Y = an at par (K fixed), payer
-    s.add(op, i3, o3, cls=AADC, output_classes=cls, verified=["mpmath 40-digit solve, exact IFT", "limit: par payer, dPV/dq_own = annuity"],
+    s.add(op, i3, o3, cls=AADC, output_classes=cls, extra_checks=[zcheck(len(SOFR12))], verified=["mpmath 40-digit solve, exact IFT", "limit: par payer, dPV/dq_own = annuity"],
           tags=["book", "limit", "stage-f"], description="limit: 5Y payer at par; PV 0, own-quote sensitivity equals the annuity")
     base = i3
     for d, chg, code in (("empty book", lambda i: {**i, "swaps": []}, "E_INPUT"),
@@ -338,6 +343,22 @@ def f3_jtd(s):
         s.add(op, {"positions": pos}, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
 
 
+def f3_more(s):
+    """R5 audit additions, appended so that no earlier id moves: rulings F-41 (interpolations, tenor range) and F-42
+    (E_LIMIT sizes)."""
+    m = MpOIS("SOFR", SOFR12)
+    m.solve()
+    an, fl = m.legs(m.x, swap_periods("SOFR", 5))
+    base = {"as_of": AS.isoformat(), "convention": "SOFR", "interpolation": "LOG_LINEAR_DF", "quotes": [{"tenor": a, "rate": r} for a, r in SOFR12],
+            "swaps": [{"id": "S1", "tenor_years": 5, "fixed_rate": f(fl / an), "side": "PAY"}]}
+    op = "risk.book.ois_sensitivity"
+    for d, inp, code in (("interpolation MONOTONE_CONVEX (not a sequential build, F-41)", dict(base, interpolation="MONOTONE_CONVEX"), "E_INPUT"),
+                         ("tenor_years 101 (above 100, F-41)", dict(base, swaps=[dict(base["swaps"][0], tenor_years=101)]), "E_DOMAIN")):
+        s.add(op, inp, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
+    s.add("risk.curve.pca", {"changes": [[1e-4] * 201, [2e-4] * 201], "components": 1}, error="E_LIMIT", cls=E, tags=["invalid", "limit", "stage-f"],
+          description="201 tenors (limit 200, F-42)")
+
+
 def F3():
     s = S("risk_f3", "06-risk/book-sensitivities.md")
     s.compact = True  # the 500-swap book and the PCA series: over 1 MB indented (hygiene gate E11)
@@ -345,6 +366,7 @@ def F3():
     f3_pca(s)
     f3_cross_gamma(s)
     f3_jtd(s)
+    f3_more(s)
     write(s)
 
 
@@ -639,6 +661,26 @@ def f4_girr(s):
         s.add(op, {"sensitivities": sens}, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
 
 
+def f4_more(s):
+    """R5 audit additions (appended): binary64 n c just above an integer, ties, k = n and k = 1, and E_LIMIT."""
+    op = "risk.var.historical"
+    g = Xo(SEED, stream=9)
+    for n, c, d in ((100, .55, "n c = 55.00000000000001 in binary64: k = ceil = 56, not 55 (ruling F-31)"),
+                    (100, .56, "n c = 56.00000000000001 in binary64: k = 57"),
+                    (100, .999, "k = n: VaR is the largest loss and ES equals it"),
+                    (2, .5, "k = 1: ES is the mean of the whole sample")):
+        pnl = [round(1e5 * ppnd16(g.uniform()), 2) for _ in range(n)]
+        var, es, m_ = hist_ref(pnl, c)
+        s.add(op, {"pnl": pnl, "confidence": c}, {"var": f(var), "es": f(es), "tail_count": m_}, cls=A, output_classes={"tail_count": E},
+              verified=["exact sort, 40-digit mean"], tags=["var", "edge", "stage-f"], description=d)
+    ties = [-500.0] * 5 + [100.0 * k for k in range(95)]
+    var, es, m_ = hist_ref(ties, .97)
+    s.add(op, {"pnl": ties, "confidence": .97}, {"var": f(var), "es": f(es), "tail_count": m_}, cls=A, output_classes={"tail_count": E},
+          verified=["exact sort, 40-digit mean"], tags=["var", "edge", "stage-f"], description="five tied worst losses; the VaR scenario sits inside the tie")
+    s.add("risk.var.monte_carlo", {"mean": [0.0], "covariance": [[1e-4]], "weights": [1.0], "paths": 10000001, "seed": "1", "confidence": .99},
+          error="E_LIMIT", cls=E, tags=["invalid", "limit", "stage-f"], description="paths above 10,000,000 (F-42)")
+
+
 def F4():
     s = S("risk_f4", "06-risk/var-es-and-backtests.md")
     f4_hist(s)
@@ -648,6 +690,7 @@ def F4():
     f4_kupiec(s)
     f4_christ(s)
     f4_traffic(s)
+    f4_more(s)
     s2 = S("frtb_f", "06-risk/frtb-sa-girr.md")
     f4_girr(s2)
     write(s)

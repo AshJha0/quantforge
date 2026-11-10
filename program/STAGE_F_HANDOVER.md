@@ -201,3 +201,23 @@ No case ids moved. Spec texts updated for F-39 (the C++ lane's F4 and F5 choices
 | `curve_f` | Compact JSON only (was 1.06 MB indented); the same values | none needed (re-run is harmless) |
 
 Versions are 0.6.0 in all four builds, the lock files, the oracle and `oracle/strata` (lanes: merge before your next build so `implementation_version` reports 0.6.0). The docs pass covers README, LEARN (stage F section), COOKBOOK (stage F recipes by golden case), ARCHITECTURE, `docs/diagrams` (stage F flow), the CHANGELOG 0.6.0 entry with its known issues (`OUTSIDE_GAPS_F`, R7, F-33, wave 2b, E1 for stage F), `tools/site_facts.json` and the model inventory. Stage F is written as *Specified* everywhere; the part 2 merge must replace that with the measured language results (README Status, CHANGELOG "Verified on the merged tree", site facts `implemented_stages` and `released`).
+
+## RE-MERGE (2026-11-10, spec session): R5 audit findings, one merge for all four languages
+
+Merge `stage-f` once and re-run **every stage F suite**. This covers the R5 audit fixes below and the earlier `risk_f3` compaction (F-36, F-39 and the PCA rewrite). Read rulings F-40 to F-44 (`stage-f-rulings.md`, "R5 audit findings") and the amended F-35. **No existing case id moved**: new cases are appended at the end of each suite.
+
+**Runner:** a new `extra_checks` method `exact_zero` (F-44). Structural zeros must be exactly `0.0`; within tolerance is not enough. It covers F-25 in `joint_f`, the F-26 zeros on `OIS_STEPS`, and F-30 in `risk_f3`. **Policy:** a new class `jacobian_piecewise` (1e-7 absolute, 1e-5 relative) for `joint_f-0001` only.
+
+| Suite | Changes | Cases |
+|---|---|---|
+| `joint_f` | `joint_f-0001` in `jacobian_piecewise`, with the second reference in `oracle/Q4_REFERENCE_F.json` (max IFT against reference 3.2e-9); exact F-25 zeros (247 positions in 0001, 48 each in 0003 and 0004) and F-26 zeros in 0002; new `joint_f-0015` `E_NO_CONVERGENCE` (two instruments on the same dates, different quotes) | 14 → 15 |
+| `garch_f` | parameters judged at 1e-8 relative (was 1e-6, F-43); interior margins pinned in the spec; new `garch_f-0017` `E_NO_CONVERGENCE` (returns of constant size: a plane of maxima) | 16 → 17 |
+| `curve_f` | the tension spline uses the cancellation-free `shm`/`chm` forms for `z < 1` (F-35 amended); cases 0015, 0016, 0072 and 0073 changed (at most 2.3e-12); new 0085 (tension 1e-6, every `z` below 3e-5) and 0086 (tension 500, O(1/sigma) approach to log-linear) | 84 → 86 |
+| `risk_f3` | `exact_zero` on the zero Jacobian of every book case; new 0055 (`MONOTONE_CONVEX` is `E_INPUT`, F-41), 0056 (`tenor_years` 101 is `E_DOMAIN`), 0057 (201 PCA tenors is `E_LIMIT`, F-42) | 54 → 57 |
+| `risk_f4` | new 0103 and 0104 (`n c` = 55.00000000000001 and 56.00000000000001 in binary64, so `k` is one more than exact), 0105 (`k = n`), 0106 (`k = 1`, ES the whole sample), 0107 (ties at the VaR scenario), 0108 (Monte Carlo paths above 10,000,000 is `E_LIMIT`) | 102 → 108 |
+| `cdsidx_f` | new 0046 to 0065: K above C (120, 150, 200 bp on IG; 550, 700 bp on HY); a near-zero F_adj (6.3e-11) that is still valid; an expiry ladder where FEP grows from 4.6e4 to 9.6e5 (the curve is flat, so "non-flat FEP" is read as FEP varying with expiry) | 45 → 65 |
+| `lvc_f` | new 0004 (72 points strictly between expiries, k from -0.8 to 0.7, each checked against the 40-digit price-based Dupire) and 0005 (Gatheral-Jacquier SVI with butterfly arbitrage: `E_ARBITRAGE`) | 3 → 5 |
+
+Spec pins added: the `E_NO_CONVERGENCE` rule of the joint solve (F-40); the GARCH interior margins (F-43); `risk.book.ois_sensitivity` takes only `LOG_LINEAR_DF` and `LINEAR_ZERO`, with `tenor_years` in [1, 100] (F-41); `E_LIMIT` sizes for every stage F operation (F-42).
+
+**Outside oracle: 225 of 438 = 51.4%. The 60% floor is not met**, and the release records it as a known issue (README, CHANGELOG). Error cases stay in the denominator (coordinator ruling). The R5 second review of `oracle/outside_register_f.json` is still owed. `garch_f-0009` dropped out (`arch` at 2.6e-8 against 1e-8; the WSL rerun timed out), and so did the ties case (`risk_f4-0107`); both are in `OUTSIDE_GAPS_F.md`.
