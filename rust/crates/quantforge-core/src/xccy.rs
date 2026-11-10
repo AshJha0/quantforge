@@ -1,6 +1,6 @@
 //! Cross-currency basis and NDFs (`02-curves/cross-currency.md`). Domestic USD, foreign EUR.
 use crate::calendar::Calendar;
-use crate::curve::{Curve, Interpolation, SolveMethod, Solved, solve_curve};
+use crate::curve::{Curve, Discount, Interpolation, SolveMethod, Solved, solve_curve};
 use crate::dates::Date;
 
 use crate::error::{Result, fail};
@@ -49,7 +49,12 @@ pub fn schedule(start: Date, months: i64) -> Result<Vec<Date>> {
 }
 
 /// `L / N`: a leg with notional exchanges, per unit notional.
-pub fn leg(dates: &[Date], projection: &Curve, discount: &Curve, spread: f64) -> Result<f64> {
+pub fn leg<P: Discount + ?Sized, D: Discount + ?Sized>(
+    dates: &[Date],
+    projection: &P,
+    discount: &D,
+    spread: f64,
+) -> Result<f64> {
     crate::error::finite("spread", &spread)?;
     let mut v = 0.0;
     for w in dates.windows(2) {

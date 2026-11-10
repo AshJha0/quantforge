@@ -41,6 +41,7 @@ pub mod heston;
 pub mod inflation;
 pub mod integrate;
 pub mod interp;
+pub mod joint;
 pub mod json;
 pub mod linalg;
 pub mod mbs;

@@ -23,6 +23,7 @@ use quantforge_core::dates::Date;
 use quantforge_core::error::Result;
 use quantforge_core::error::fail;
 use quantforge_core::garch::Start;
+use quantforge_core::joint;
 use quantforge_core::json::Json;
 use quantforge_core::json::obj;
 use quantforge_core::ois;
@@ -99,6 +100,76 @@ super::registry! {
                 ("pillars", Json::Arr(pillars)),
                 ("discount_factors", f.discount_factors.into()),
             ]))
+        },
+        "rates.curve.joint_solve" => {
+            let as_of = i.date("as_of")?;
+            let curves = items(i, "curves")?
+                .iter()
+                .map(joint_curve)
+                .collect::<Result<Vec<_>>>()?;
+            let insts = items(i, "instruments")?
+                .iter()
+                .map(joint_instrument)
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let r = joint::joint_solve(as_of, &curves, &insts)?;
+            let curves: Vec<Json> = r
+                .curves
+                .iter()
+                .map(|c| match c {
+                    joint::CurveOut::Pillars { name, pillars } => obj([
+                        ("name", name.as_str().into()),
+                        (
+                            "pillars",
+                            Json::Arr(
+                                pillars
+                                    .iter()
+                                    .map(|(d, v)| {
+                                        obj([
+                                            ("date", d.to_string().into()),
+                                            ("discount_factor", (*v).into()),
+                                        ])
+                                    })
+                                    .collect(),
+                            ),
+                        ),
+                    ]),
+                    joint::CurveOut::Steps { name, base_rate, step_rates } => obj([
+                        ("name", name.as_str().into()),
+                        ("base_rate", (*base_rate).into()),
+                        ("step_rates", step_rates.clone().into()),
+                    ]),
+                })
+                .collect();
+            let turns: Vec<Json> = r
+                .turn_factors
+                .iter()
+                .map(|(c, d, f)| {
+                    obj([
+                        ("curve", c.as_str().into()),
+                        ("date", d.to_string().into()),
+                        ("factor", (*f).into()),
+                    ])
+                })
+                .collect();
+            let strs = |v: &[String]| Json::Arr(v.iter().map(|s| s.as_str().into()).collect());
+            let rows = |m: &[Vec<f64>]| Json::Arr(m.iter().map(|r| r.clone().into()).collect());
+            Ok(Outcome {
+                outputs: obj([
+                    ("curves", Json::Arr(curves)),
+                    ("turn_factors", Json::Arr(turns)),
+                    (
+                        "jacobian",
+                        obj([
+                            ("unknowns", strs(&r.unknowns)),
+                            ("quotes", strs(&r.quotes)),
+                            ("matrix", rows(&r.jacobian)),
+                        ]),
+                    ),
+                    ("turn_sensitivity", rows(&r.turn_sensitivity)),
+                ]),
+                diagnostics: repricing(r.max_repricing_error),
+            })
         },
         "rates.curve.inspect" => {
             let c = curve_input(i, "curve")?;
@@ -660,5 +731,92 @@ pub(crate) fn futures_option(i: &Inputs) -> Result<rates_vol::FuturesOption> {
         strike: i.f64("strike")?,
         expiry_years: i.f64("expiry_years")?,
         discount_factor: i.f64("discount_factor")?,
+    })
+}
+
+fn joint_curve(c: &Inputs) -> Result<joint::CurveSpec> {
+    let turns = match c.0.get("turns") {
+        None => Vec::new(),
+        Some(_) => items(c, "turns")?
+            .iter()
+            .map(|t| t.date("date"))
+            .collect::<Result<Vec<_>>>()?,
+    };
+    let kind = match c.str("type")? {
+        "OIS" => joint::CurveKind::Ois {
+            convention: overnight(c, "convention")?,
+            interpolation: interpolation(c)?,
+            jumps: jumps(c, false)?,
+        },
+        "OIS_STEPS" => joint::CurveKind::Steps {
+            convention: overnight(c, "convention")?,
+            step_dates: c.dates("step_dates")?,
+            jumps: jumps(c, false)?,
+        },
+        "PROJECTION" => {
+            term_index(c)?;
+            joint::CurveKind::Projection {
+                discount: c.str("discount")?.to_string(),
+                interpolation: interpolation(c)?,
+            }
+        }
+        "XCCY" => {
+            let (d, f) = (
+                overnight(c, "domestic_convention")?,
+                overnight(c, "foreign_convention")?,
+            );
+            let _ = (d, f);
+            joint::CurveKind::Xccy {
+                domestic: c.str("domestic")?.to_string(),
+                foreign_projection: c.str("foreign_projection")?.to_string(),
+                start: c.date("start")?,
+                interpolation: interpolation(c)?,
+            }
+        }
+        _ => return c.fail("type", "unknown curve type"),
+    };
+    Ok(joint::CurveSpec {
+        name: c.str("name")?.to_string(),
+        kind,
+        turns,
+    })
+}
+
+fn joint_instrument(q: &Inputs) -> Result<joint::InstrumentSpec> {
+    let quote = match q.str("type")? {
+        "OIS" => joint::Quote::Ois {
+            tenor: tenor(q, "tenor")?,
+            rate: q.f64("rate")?,
+        },
+        "FUTURE" => joint::Quote::Future {
+            start: q.date("start")?,
+            end: q.date("end")?,
+            price: q.f64("price")?,
+            sigma: q.f64("sigma")?,
+            mean_reversion: q.f64("mean_reversion")?,
+        },
+        "DEPOSIT" => joint::Quote::Projection(ProjectionQuote::Deposit {
+            months: q.int("months")?,
+            rate: q.f64("rate")?,
+        }),
+        "FRA" => joint::Quote::Projection(ProjectionQuote::Fra {
+            start_months: q.int("start_months")?,
+            rate: q.f64("rate")?,
+        }),
+        "SWAP" => joint::Quote::Projection(ProjectionQuote::Swap {
+            months: q.int("months")?,
+            rate: q.f64("rate")?,
+        }),
+        "XCCY" => joint::Quote::Xccy {
+            months: q.int("months")?,
+            spread: q.f64("spread")?,
+        },
+        _ => return q.fail("type", "unknown instrument type"),
+    };
+    Ok(joint::InstrumentSpec {
+        id: q.str("id")?.to_string(),
+        curve: q.str("curve")?.to_string(),
+        quote,
+        turn: q.bool_or("turn", false)?,
     })
 }

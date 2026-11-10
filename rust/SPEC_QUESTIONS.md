@@ -173,3 +173,30 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
   Hessian (relative step 1e-5). The Student-t golden series take about 10 s each in a release
   build; a faster start would come from the Gaussian estimate.
 - R7: `h_K` is bisected until the bracket cannot shrink, which is within 1e-15 relative.
+
+## Stage F wave 1b (Q4 joint solve), choices and findings
+
+- `rates.curve.joint_solve` is solved block by block (F-25): Newton on each curve's own
+  unknowns with a central-difference block Jacobian and backtracking, to 1e-16 where reachable.
+  Starting point as the spec, except `XCCY`, which starts from its foreign projection curve's
+  discount factors at its pillars (the "first quote" of an xccy curve is a spread, not a rate).
+- IFT Jacobian: `dR/dx` by a five-point stencil per unknown, with a step that starts at 1e-5 and
+  shrinks by 4 until two steps agree within residual roundoff (4e-9 times 1e-5/h, plus 1e-6
+  relative). Then block forward substitution, so cross-curve zeros are exact (F-25).
+- Finding for the held-back four-curve case: the 2e-3 mismatch has two causes, neither in the
+  spec. (1) The h = 1e-4 Richardson reference crosses a monotone-convex branch boundary for the
+  `SOFR-3M` and `SOFR-2Y` columns (one-sided derivatives of the turn factor in `SOFR-3M` are
+  0.18997 for |h| up to 1e-5, but 0.17804 at +1e-4). (2) A fixed 1e-5 five-point `dR/dx`
+  stencil also crosses a boundary in one SOFR pillar column, which put `turn` / `SOFR-1M` off by
+  7.5e-4 (0.11714 against 0.11790 on both sides). With the adaptive stencil the Rust IFT
+  matches small-step bump-and-rebuild (h = 1e-6 central, or 1e-5 / 5e-6 Richardson) to about
+  2e-8 above the `jacobian` limit, and that remainder is the spread between the references.
+- `XCCY` `dR/dq` is `sum alpha_i D_f(e_i)` on the solved foreign curve, not `-1`. The text says
+  "-1 on the diagonal for rate and spread quotes", but the xccy residual is the leg value with the
+  spread inside it, so its exact derivative is the annuity.
+- F-26 with `ln D` pillar unknowns: on a pillar curve, holding the full `ln D` at pillars while
+  the turn's `ln factor` moves changes `S = D/J` at pillars after the turn, so an instrument whose
+  dates all sit before the turn but inside the section that ends at the first pillar after it
+  (or anywhere, for a non-local method) does move. Rust reports the honest `d model / d ln factor`
+  (it is the `dR/dx` column), so those zeros are not forced. On `OIS_STEPS` curves the zeros are
+  exact. The goldens only have steps-curve turns, so nothing fails today.
