@@ -4385,6 +4385,45 @@
     "price"
    ]
   },
+  "rates.shortrate.callable_bond": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_callable_bond",
+   "python": "quantforge.rates.shortrate_callable_bond",
+   "java": "Rates.shortrateCallableBond",
+   "cpp": "qf::rates::shortrate_callable_bond",
+   "inputs": {
+    "call_price": {
+     "java": "callPrice"
+    },
+    "call_times": {
+     "java": "callTimes"
+    },
+    "coupon_rate": {
+     "java": "couponRate"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "grid": {
+     "java": "grid"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "sigma": {
+     "java": "sigma"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
   "rates.shortrate.capfloor": {
    "spec": "specifications/04-pricing/short-rate-models.md",
    "rust": "quantforge::rates::shortrate_capfloor",

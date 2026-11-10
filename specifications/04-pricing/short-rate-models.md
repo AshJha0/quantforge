@@ -124,6 +124,22 @@ Outputs: `price` (the sum) and `caplet_prices` (per period, in order; floorlets 
 
 Validation: three models x two schedules (semi-annual to 5 years, annual to 7 years) x cap and floor x strikes 3%, 4%, 5% (36 cases), 5 error cases. Values: 50-digit mpmath (CIR through the noncentral chi-square). Asserted: cap minus floor equals `notional sum (P(t_(i-1)) - (1 + K tau_i) P(t_i))` on all 18 pairs. Outside: QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` `discountBondOption` per period, scaled and summed: 36 of 41 count. Wrong convention caught: a cap priced with bond calls.
 
+## `rates.shortrate.callable_bond` (stage G wave 2g)
+
+Issuer-callable fixed-rate bond on Hull-White, on the G-18 scheme (ruling G-21). Suite `stage_g/callable_g` (12 cases), generator `gen_stage_g_berm.py` slice `CALL`.
+
+Inputs: `curve`, `mean_reversion`, `sigma`; `payment_times` (at least one, strictly increasing, first > 0; else `E_INPUT`), `coupon_rate` `c` (accrual `tau_i` = time differences from 0), `notional`; `call_times`: a possibly empty, strictly increasing list of payment times before the last (else `E_INPUT`); `call_price` (fraction of face, > 0, else `E_DOMAIN`); `grid` as `bermudan_swaption`.
+
+Scheme: the G-18 grid and step with `t_m` the last payment time and knots `0, T1, ..., Tn`. Start at `Tn` with `V = 1 + c tau_n`. After stepping back to each knot `Tk > 0`: first, if `Tk` is a call time, `V = min(V, call_price)` (the issuer calls the ex-coupon bond); then add the coupon, `V = V + c tau_k`. `price = notional x V` at the centre node at 0.
+
+Validation: three coupons x (seven annual calls from year 3, one call at year 5) on a 10-year bond; the straight-bond limit (no calls); a 2% call premium with high mean reversion and volatility; 4 error cases. Asserted: every price at most the straight bond (curve-discounted cash flows). Not counted as outside (G-18).
+
+## Convergence and limit cases (callable bond)
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| G-18 scheme with coupons and a call cap | 1 in time | `nx = 51 ... 401`, `steps_per_year = 25 ... 200`, width 6, no calls, 4.5% coupon on 100 face: errors 3.71e-2, 1.85e-2, 9.32e-3, 4.51e-3; orders 1.01, 0.99, 1.05 | no call times: the straight bond | curve-discounted cash flows |
+
 ## G2++: `rates.g2pp.zcb`, `rates.g2pp.zcb_option` (stage G wave 2b)
 
 Two-factor Gaussian model [BM 4.2, eqs. 4.10, 4.14 and 4.31] (not opened; checked against QuantLib 1.44 `G2`). Suite `stage_g/g2pp_g` (38 cases), generator slice `G2B`. Ruling G-14.

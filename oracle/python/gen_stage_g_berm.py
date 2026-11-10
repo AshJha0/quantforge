@@ -189,5 +189,113 @@ def main():
     reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
 
 
+# ================================================================================================ G3 callable bond (same scheme)
+CB = "rates.shortrate.callable_bond"
+
+
+def step_back(V, xs, dx, a, s, alpha, t0, t1, ntpy):
+    nx = len(xs)
+    n = max(1, math.ceil(ntpy * (t1 - t0)))
+    dt = (t1 - t0) / n
+    for j in range(n, 0, -1):
+        t = t0 + (j - 1) * dt
+        al = alpha(t)
+        m = nx - 2
+        lo, di, up, rhs = [0.0] * m, [0.0] * m, [0.0] * m, [0.0] * m
+        for i in range(1, nx - 1):
+            x = xs[i]
+            cl = 0.5 * s * s / (dx * dx) + a * x / (2 * dx)
+            cu = 0.5 * s * s / (dx * dx) - a * x / (2 * dx)
+            cd = -s * s / (dx * dx) - (x + al)
+            lo[i - 1], di[i - 1], up[i - 1], rhs[i - 1] = -dt * cl, 1 - dt * cd, -dt * cu, V[i]
+        di[0] += 2 * lo[0]
+        up[0] -= lo[0]
+        di[-1] += 2 * up[-1]
+        lo[-1] -= up[-1]
+        for i in range(1, m):
+            w = lo[i] / di[i - 1]
+            di[i] -= w * up[i - 1]
+            rhs[i] -= w * rhs[i - 1]
+        sol = [0.0] * m
+        sol[-1] = rhs[-1] / di[-1]
+        for i in range(m - 2, -1, -1):
+            sol[i] = (rhs[i] - up[i] * sol[i + 1]) / di[i]
+        V = [2 * sol[0] - sol[1]] + sol + [2 * sol[-1] - sol[-2]]
+    return V
+
+
+def callable_price(inp):
+    cv = FCurve(**inp["curve"])
+    a, s = inp["mean_reversion"], inp["sigma"]
+    Ts, c, N = inp["payment_times"], inp["coupon_rate"], inp["notional"]
+    calls = set(inp["call_times"])
+    cp = inp["call_price"]
+    nx, ntpy, width = inp["grid"]["nx"], inp["grid"]["steps_per_year"], inp["grid"]["width"]
+    alpha = lambda t: cv.fwd(t) + s * s / (2 * a * a) * (1 - math.exp(-a * t)) ** 2  # noqa: E731
+    sx = s * math.sqrt((1 - math.exp(-2 * a * Ts[-1])) / (2 * a))
+    h = width * sx
+    dx = 2 * h / (nx - 1)
+    xs = [-h + i * dx for i in range(nx)]
+    knots = [0.0] + Ts
+    V = [1.0 + c * (Ts[-1] - knots[-2])] * nx
+    for k in range(len(knots) - 1, 0, -1):
+        V = step_back(V, xs, dx, a, s, alpha, knots[k - 1], knots[k], ntpy)
+        t = knots[k - 1]
+        if t > 0:
+            if t in calls:
+                V = [min(v, cp) for v in V]
+            V = [v + c * (t - knots[k - 2]) for v in V]
+    return N * V[(nx - 1) // 2]
+
+
+def g3():
+    s = Suite("callable_g", "specifications/04-pricing/short-rate-models.md", G)
+    grid = {"nx": 201, "steps_per_year": 100, "width": 6.0}
+    base = dict(mean_reversion=0.05, sigma=0.01, curve=CURVE, notional=100.0, payment_times=[1.0 * k for k in range(1, 11)], grid=grid, call_price=1.0)
+    rows = []
+    for c in (0.03, 0.045, 0.06):
+        rows.append(dict(base, coupon_rate=c, call_times=[3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]))
+        rows.append(dict(base, coupon_rate=c, call_times=[5.0]))
+    rows.append(dict(base, coupon_rate=0.045, call_times=[]))  # straight bond limit
+    rows.append(dict(base, coupon_rate=0.05, call_times=[2.0, 4.0, 6.0, 8.0], call_price=1.02, sigma=0.015, mean_reversion=0.2))
+    straight = lambda inp: inp["notional"] * (sum(inp["coupon_rate"] * (t - p) * FCurve(**inp["curve"]).P(t) for p, t in zip([0.0] + inp["payment_times"][:-1], inp["payment_times"])) + FCurve(**inp["curve"]).P(inp["payment_times"][-1]))  # noqa: E731
+    for inp in rows:
+        v = callable_price(inp)
+        assert v <= straight(inp) + 1e-3 * inp["notional"]
+        s.add(CB, inp, {"price": v}, cls="root_finding", verified=["reference-scheme-float64", "straight-bond-bound"],
+              tags=["shortrate", "callable"], limit={"absolute": 1e-9, "relative": 1e-9, "reason": "pinned scheme; tridiagonal rounding only"},
+              description=f"HW callable bond c={inp['coupon_rate']} calls={inp['call_times']} K={inp['call_price']}")
+    lim = rows[6]
+    conv = []
+    for lev in range(4):
+        g = {"nx": 50 * 2 ** lev + 1, "steps_per_year": 25 * 2 ** lev, "width": 6.0}
+        conv.append(callable_price(dict(lim, grid=g)) - straight(lim))
+    orders = [math.log2(abs(conv[i] / conv[i + 1])) for i in range(3)]
+    note(f"callable scheme, straight-bond limit errors {['%.3e' % c for c in conv]}, orders {['%.2f' % o for o in orders]}")
+    e = dict(base, coupon_rate=0.04, call_times=[3.0])
+    errs = [(dict(e, call_times=[2.5]), "E_INPUT", "call not a coupon date"), (dict(e, call_times=[10.0]), "E_INPUT", "call at maturity"),
+            (dict(e, call_price=0.0), "E_DOMAIN", "call_price 0"), (dict(e, payment_times=[]), "E_INPUT", "no payments")]
+    for inp, code, d in errs:
+        s.add(CB, inp, error=code, cls="date_and_convention", tags=["invalid", "callable"], description=d)
+    for c_ in s.cases:
+        c_["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    ev = HERE.parent / "BERMUDAN_EVIDENCE_G.json"
+    d = json.loads(ev.read_text(encoding="utf-8"))
+    d["callable_straight_limit"] = {"errors": conv, "orders": orders}
+    ev.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["callable_g"] = {"counted": 0, "total": len(s.cases), "rule": "not counted: pinned scheme (G-18)"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) < 2 or "BERM" in sys.argv:
+        main()
+    if len(sys.argv) < 2 or "CALL" in sys.argv:
+        g3()

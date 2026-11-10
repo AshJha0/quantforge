@@ -64,6 +64,12 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-20 | `model` on the swaption | `rates.shortrate.swaption` gains optional `model` (default `HULL_WHITE`, a minor contract change: no existing case changes meaning). The G-5 `short_rate` rule is per model as in `zcb_option`. CIR with no non-negative critical rate is `E_DOMAIN` (checked as `sum c_i P(T0, Ti; 0) < 1`) |
 
+## Wave 2g, callable bonds
+
+| # | Point | Ruling |
+|---|---|---|
+| G-21 | Callable bond on the G-18 scheme | Issuer call on coupon dates only, at a fixed fraction of face, applied to the ex-coupon value before the coupon is added; no notice period, no accrued interest between dates, no credit spread. The golden is the scheme (G-18); QuantLib's `CallableFixedRateBond` was not compared tonight (its date and accrual setup differs), so the evidence is the straight-bond limit only |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |

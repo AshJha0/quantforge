@@ -43,5 +43,10 @@
   "counted": 0,
   "total": 15,
   "rule": "not counted: the golden is the pinned scheme; QuantLib FD and tree values are convergence evidence (oracle/BERMUDAN_EVIDENCE_G.json)"
+ },
+ "callable_g": {
+  "counted": 0,
+  "total": 12,
+  "rule": "not counted: pinned scheme (G-18)"
  }
 }

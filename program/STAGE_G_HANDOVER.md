@@ -179,3 +179,34 @@ Read: `specifications/04-pricing/short-rate-models.md`, section "Stage G wave 2f
 
 ### Status update (after wave 2f)
 `swaption_affine_g` 36 of 39 count. **Stage G: 205 of 325 = 63.1%, above the 60% floor** (error cases in the denominator). Per suite: shortrate 61/78, barrier 2/32, swaption 33/40, swaption_affine 36/39, g2pp 30/38, capfloor 36/41, exposure 7/15; hwcal 0/6, bermudan 0/15, mcgreeks 0/21. Rulings G-1 to G-20; G-10 open for the owner. Left: callable bonds (G-18 scheme), G2++ swaptions, LMM, Q3b, Q9 part 2, the rest of xVA, A5, the R5 audit; stage F carry-over 3 unchanged at 51.4%. Next step: relay waves 2c to 2f; then callable bonds.
+
+## WAVE 2g READY (2026-11-10): callable bonds on the Bermudan scheme
+
+Read: `specifications/04-pricing/short-rate-models.md`, sections "`rates.shortrate.callable_bond`" and its convergence table; ruling G-21; `specifications/name-map.json` (237 operations).
+
+### G3 (suite `callable_g`, 12 cases)
+- New operation `rates.shortrate.callable_bond`: reuse your wave 2d stepper; at each coupon date cap by the call price (if callable) and then add the coupon.
+- Property tests: no call times converges to the straight bond at order about 1; a callable bond is never above the straight bond.
+
+## Final status, 2026-11-10 (supersedes the earlier status counts)
+
+All work committed locally on `stage-g`, not pushed. Waves READY: 1, 2a to 2g, 3a, 4a (12 suites, 337 cases). Rulings G-1 to G-21.
+
+| Suite | Cases | Outside |
+|---|---|---|
+| shortrate_g | 78 | 61 |
+| barrier_g | 32 | 2 |
+| swaption_g | 40 | 33 |
+| swaption_affine_g | 39 | 36 |
+| g2pp_g | 38 | 30 |
+| capfloor_g | 41 | 36 |
+| hwcal_g | 6 | 0 |
+| bermudan_g | 15 | 0 |
+| callable_g | 12 | 0 |
+| mcgreeks_g | 21 | 0 |
+| exposure_g | 15 | 7 |
+| **Stage G** | **337** | **205 = 60.8%** |
+
+**Left for stage G:** G2++ swaptions; two-parameter or time-dependent Hull-White calibration; LMM; Q3b AAD core (G-9); Q9 part 2 model-reserve report; the rest of xVA (CSA, netting, MPoR, collateral simulation, PFE and EPE, DVA, FVA, MVA, SIMM-style IM, wrong-way risk, KVA, ORE demo); A5 surrogate (G-11); the R5 audit; QuantLib comparison for callable bonds. **Open for the owner:** G-10 (Q9 variance test, low power). **Carry-over 3** (stage F 51.4%): not advanced.
+
+**Next step:** relay waves 2c to 2g to the language sessions; the spec session continues with G2++ swaptions and then the xVA simulation wave, keeping the outside share above 60% (it is 60.8% now, with little margin).

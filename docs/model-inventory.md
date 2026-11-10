@@ -487,14 +487,14 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Validation report:** `specifications/04-pricing/use-cases.md`.
 
 ### MG-1 One-factor short-rate models (G1)
-- **Purpose:** zero-coupon bond prices and European bond options under Vasicek, CIR and Hull-White, and European swaptions on Hull-White by Jamshidian, sigma calibration, Bermudan swaptions by a pinned FD scheme, and caps and floors under all three models; the base of the stage G Bermudan, callable-bond and exposure models.
+- **Purpose:** zero-coupon bond prices and European bond options under Vasicek, CIR and Hull-White, and European swaptions on Hull-White by Jamshidian, sigma calibration, Bermudan swaptions by a pinned FD scheme, caps and floors under all three models, and issuer-callable bonds; the base of the stage G Bermudan, callable-bond and exposure models.
 - **Inputs:** model parameters (`a`, `sigma`, `b`), short rate, and for Hull-White a log-linear discount curve.
 - **Limitations:** one factor (perfectly correlated rates); constant parameters (no time-dependent `sigma`); Vasicek and Hull-White allow negative rates without bound; no market price of risk; calibration of `sigma` only with `a` fixed (wave 2c).
 - **Validation:** 50-digit mpmath replicas; QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` outside check (61 of 78 bond cases, 33 of 40 swaption cases). **Review:** 2026-11-10.
 - **Tier:** 1.
 - **Challenger:** G2++ (`rates.g2pp.*`, wave 2b; QuantLib `G2` outside check, 30 of 38).
 - **Monitoring thresholds:** calibration error once calibration lands.
-- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`); b0630a25f4a701810eb1596c3fcdf7ab70736a6759973bc6771345576b7f1188 (`g2pp_g`); f2f683d408b844b83fa054864b36bf089491c6c6a277f701a1045c69d75c0a49 (`hwcal_g`); 3455c11ece1804fc729463fcad1ec8020f444233cfc7ab1a4c9e355125a22287 (`bermudan_g`); 0fda39dc4e71a228d3029a2879cebbdc3e314e915ac5560260e70cd03886728c (`capfloor_g`); f0f6e80f5740683fc4da985dd249517ea3184118b9829202369badf520fc1352 (`swaption_affine_g`)
+- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`); b0630a25f4a701810eb1596c3fcdf7ab70736a6759973bc6771345576b7f1188 (`g2pp_g`); f2f683d408b844b83fa054864b36bf089491c6c6a277f701a1045c69d75c0a49 (`hwcal_g`); 3455c11ece1804fc729463fcad1ec8020f444233cfc7ab1a4c9e355125a22287 (`bermudan_g`); 0fda39dc4e71a228d3029a2879cebbdc3e314e915ac5560260e70cd03886728c (`capfloor_g`); f0f6e80f5740683fc4da985dd249517ea3184118b9829202369badf520fc1352 (`swaption_affine_g`); 235aa37b21ca8e23a2eb3bbc5da2b76501c82524ccd5e778ded7c6628eb1fddf (`callable_g`)
 - **Retirement trigger:** a multi-factor or market model for the desk's products.
 - **Validation report:** `specifications/04-pricing/short-rate-models.md`.
 
