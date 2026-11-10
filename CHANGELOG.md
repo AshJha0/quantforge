@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.6.0: stage F, curve layer, portfolio risk and book (unreleased)
+## 0.6.0: stage F, curve layer, portfolio risk and book (2026-11-10)
 
-Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
+Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
 
 ### Verified on the merged part 2 tree (`db99d87`, 2026-11-10)
 - On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases: Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Observed, one full run per language.
