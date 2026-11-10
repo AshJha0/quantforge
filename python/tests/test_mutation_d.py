@@ -46,3 +46,21 @@ def test_storage_carry_errors() -> None:
         "E_INPUT", "need two or more forwards, increasing after as_of", "forwards")
     assert error_of(commodity.storage_carry, funding, [fwd[0], (date(2026, 6, 2), 0.0)], 0.1) == (
         "E_DOMAIN", "forward prices must be positive", "forwards")
+
+
+def test_fx_point_tenor_months() -> None:
+    from quantforge_core.cli.ops_fx import _months
+    assert [_months(t) for t in ("1M", "6M", "18M", "1Y", "2Y", "10Y")] == [1, 6, 18, 12, 24, 120]
+    assert error_of(_months, "2W") == ("E_SCHEMA", "FX points need a month or year tenor", "tenor")
+
+
+def test_mbs_error_contracts() -> None:
+    from quantforge_core import mbs
+    good = (1e6, 0.06, 0.055, 360, 0, "PSA", 150.0)
+    assert error_of(mbs.mbs_price, (1e6, 0.0, -0.01, 360, 0, "PSA", 150.0), 0.05, 0) == (
+        "E_DOMAIN", "wac must be positive", "wac")
+    for bad in ((0.0, *good[1:]), (*good[:5], "CPR", 1.0), (*good[:6], -1.0)):
+        assert error_of(mbs.mbs_price, bad, 0.05, 0) == (
+            "E_DOMAIN", "balance, rate or speed out of domain", "pool")
+    assert error_of(mbs.mbs_price, good, -12.0, 0) == (
+        "E_DOMAIN", "1 + yield/12 must be positive", "yield")

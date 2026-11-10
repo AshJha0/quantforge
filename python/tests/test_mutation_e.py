@@ -59,3 +59,16 @@ def test_garch_estimate_matches_golden() -> None:
     for key in ("omega", "alpha", "beta"):
         assert got["std_errors"][key] == pytest.approx(  # type: ignore[index]
             want["std_errors"][key], rel=1e-5)
+
+
+def test_exotic_positivity_checks() -> None:
+    from quantforge_core import exotics
+    assert error_of(exotics.asian_geometric, 100.0, 100.0, 0.0, 0.03, 0.0, 0.2, "CALL",
+                    "CONTINUOUS", []) == ("E_DOMAIN", "expiry_years must be above 0",
+                                          "expiry_years")
+    assert error_of(exotics.lookback, 0.0, 1.0, 0.03, 0.0, 0.2, "CALL", 0.0) == (
+        "E_DOMAIN", "spot must be above 0", "spot")
+    corr = [[1.0, 0.5], [0.5, 1.0]]
+    assert error_of(exotics.basket, [100.0, 90.0], [0.0, 0.0], [0.2, 0.3], corr, 95.0, 1.0,
+                    0.03, "CALL") == ("E_DOMAIN", "weights must be non-negative and not all 0",
+                                      "weights")
