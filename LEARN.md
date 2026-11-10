@@ -382,7 +382,7 @@ Every topic is Implemented, not Validated, and all inputs are synthetic unless a
 
 ## Stage F: curves, portfolio risk and the book (specified)
 
-Stage F (target v0.6.0) is **specified**: specs, rulings F-1 to F-39 and goldens are on the `stage-f` branch, and the four builds are being written from them. Nothing below is claimed as built until the part 2 merge reports the conformance results. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
+Stage F (target v0.6.0) is **specified**: specs, rulings F-1 to F-44 and goldens are on the `stage-f` branch, and the four builds are being written from them. Nothing below is claimed as built until the part 2 merge reports the conformance results. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
 
 ### Five more ways to draw a curve
 **Plain idea.** Between quoted dates a curve must be filled in, and the method changes the forward rates a trader sees. Stage F adds monotone convex (Hagan and West), monotonic log cubic, a tension spline and a hybrid that is stepwise at the front and smooth behind. Spec: `02-curves/curve-framework.md`, "Stage F: pluggable interpolation". **Watch for:** monotone convex is piecewise in its data, so its derivative jumps where a section changes rule. Ruling F-28 shows how a too-large bump straddled such a kink and looked like a 2e-3 error.
@@ -408,7 +408,7 @@ Stage F (target v0.6.0) is **specified**: specs, rulings F-1 to F-39 and goldens
 Use case 4 regresses a portfolio's returns on factor returns, and each factor's share of the mean return is its beta times the factor mean (`04-pricing/use-cases.md`). In `uc4_f-0002`, the mean monthly return of 0.279% splits into alpha 0.073% and three factor contributions (0.186%, -0.008%, 0.029%) that add up exactly.
 
 ### What stage F's evidence does and does not show
-- **Outside oracle: 222 of 403 cases (55.1%), below the 60% floor.** The checks use QuantLib 1.44, SciPy, NumPy and `arch`. Every case without a free outside source is listed with the reason in `oracle/OUTSIDE_GAPS_F.md`. 72 of them are error cases, which no library can check; the CDS index option (R7) is the largest value-case gap, because its reference paper is not freely available.
+- **Outside oracle: 225 of 438 cases (51.4%); the 60% floor is not met.** The checks use QuantLib 1.44, SciPy, NumPy and `arch`. Every case without a free outside source is listed with the reason in `oracle/OUTSIDE_GAPS_F.md`. 79 of the cases without one are error cases, which no library can check; the CDS index option (R7) is the largest value-case gap, because its reference paper is not freely available.
 - **All inputs are synthetic.** The 500-swap book, the VaR series and the factor returns are drawn from `core.rng` with fixed seeds.
 - [Determinism](docs/determinism.md): what is bit-exact across languages and platforms, and what is within tolerance.
 

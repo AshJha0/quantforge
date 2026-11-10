@@ -6,6 +6,7 @@ checked here against bump-and-rebuild of the whole system. QuantLib appears only
 
     cd oracle/python && uv run python -W ignore gen_stage_f_q4.py
 """
+import json
 import math
 from datetime import date, timedelta
 
@@ -415,6 +416,9 @@ def funding(s):
         s.add(op, {"discount": disc, "quotes": q}, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
 
 
+REFS = {}
+
+
 def main():
     s = Suite("joint_f", "specifications/02-curves/joint-solve-and-funding.md", G)
     op = "rates.curve.joint_solve"
@@ -424,13 +428,34 @@ def main():
         x, err = sysm.solve()
         J, Jx = sysm.jacobian()
         print(f"  solved {desc[:40]} ({len(x)} unknowns), max residual {err:.1e}", flush=True)
+        # F-25: an earlier curve's unknowns do not depend on a later curve's quotes; the LU solve leaves rounding there
+        zpos = []
+        names = [c["name"] for c in sysm.curves]
+        for ci, c in enumerate(sysm.curves):
+            a, b, _, _ = sysm.layout[c["name"]]
+            later = [j for j, q in enumerate(sysm.ins) if names.index(q["curve"]) > ci]
+            for r in range(a, b):
+                for j in later:
+                    assert abs(J[r, j]) < 1e-12, (r, j, J[r, j])
+                    J[r, j] = 0.0
+                    zpos.append([r, j])
         h, ref = reference_jacobian(inp, x, Jx)
         print(f"  bump-and-rebuild done (h = {h:.3e})", flush=True)
+        gapmax = float(np.max(np.abs(J - ref)))
         dev = np.max(np.abs(J - ref) - (1e-9 + 1e-6 * np.abs(ref)))
         assert dev <= 0, f"{desc}: IFT Jacobian against bump-and-rebuild: {dev:.3e}"
+        REFS[desc] = {"h": h, "max_abs_ift_minus_reference": gapmax, "reference": ref.tolist()}
         out = outputs(sysm, x, J, Jx)
-        s.add(op, inp, out, cls=I, verified=["independent-replay newton 1e-14", f"bump-and-rebuild richardson h={h:.3e}"], tags=["joint", "stage-f"],
-              output_classes=JL, description=f"{desc}; max residual {err:.1e}")
+        checks = [{"method": "exact_zero", "output": "jacobian.matrix", "positions": zpos}] if zpos else []
+        tz = [[k, j] for k, row in enumerate(out["turn_sensitivity"]) for j, v in enumerate(row)
+              if v == 0.0 and sysm.curves[0]["type"] == "OIS_STEPS"]
+        if tz:
+            checks.append({"method": "exact_zero", "output": "turn_sensitivity", "positions": tz})
+        piece = desc.startswith("full")
+        s.add(op, inp, out, cls=I, verified=["independent-replay newton 1e-14", f"bump-and-rebuild richardson h={h:.3e}, max |IFT - ref| {gapmax:.1e}",
+                                             "reference stored in oracle/Q4_REFERENCE_F.json"], tags=["joint", "stage-f"],
+              output_classes={"jacobian": "jacobian_piecewise", "turn_sensitivity": "jacobian_piecewise"} if piece else JL,
+              extra_checks=checks or None, description=f"{desc}; max residual {err:.1e}")
         # wrong conventions: futures without convexity; turn not solved (factor 1)
         if any(q["type"] == "FUTURE" for q in inp["instruments"]):
             noc = {**inp, "instruments": [dict(q, sigma=0.0) if q["type"] == "FUTURE" else q for q in inp["instruments"]]}
@@ -452,6 +477,14 @@ def main():
             bad = chg(base)
         s.add(op, bad, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
     funding(s)
+    # E_NO_CONVERGENCE (R5 audit): two instruments with the same dates and different quotes; dR/dx is singular and no
+    # solution exists. Appended last so that earlier case ids do not move.
+    st = systems()[1][1]
+    one = next(q for q in st["instruments"] if q["id"] == "SOFR-1M")
+    bad = {**st, "instruments": [dict(one, id="SOFR-1M-B", rate=one["rate"] + 0.001, turn=True) if q["id"] == "SOFR-2M" else q for q in st["instruments"]]}
+    s.add(op, bad, error="E_NO_CONVERGENCE", cls=E, tags=["invalid", "no-convergence", "stage-f"],
+          description="two instruments on the same dates with different quotes: dR/dx singular, no solution")
+    (common.ROOT / "oracle" / "Q4_REFERENCE_F.json").write_text(json.dumps(REFS) + chr(10), encoding="utf-8", newline=chr(10))
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / "stage_f"
     for c in s.cases:

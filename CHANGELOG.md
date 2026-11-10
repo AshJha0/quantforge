@@ -10,7 +10,7 @@ Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds w
 - F4 portfolio risk: historical, filtered historical, parametric and Monte Carlo VaR and ES; Kupiec, Christoffersen and the Basel traffic light (`06-risk/var-es-and-backtests.md`, F-31, F-32, F-39); FRTB-SA GIRR delta under MAR21 (`06-risk/frtb-sa-girr.md`, F-33).
 - F5 book and use case 4: `book.lifecycle.apply`, `book.marks.resolve` (`07-portfolio/book-lifecycle.md`, F-34); `usecase.factor_attribution` (`04-pricing/use-cases.md`).
 - F6 model fixes: R7 CDS index option on Pedersen's adjusted forward, R8 GARCH estimates with standard errors and Student-t innovations (the coverage study puts every parameter inside its preregistered band), R10 VIX null quotes and local-vol continuity at slice expiries.
-- 403 stage F value goldens in 11 suites, besides the 5,207 E1 goldens: 12,427 golden cases in 125 suite files (counted from `datasets/golden/`). New tolerance classes `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. Model inventory entries MF-1 to MF-11.
+- 438 stage F value goldens in 11 suites, besides the 5,207 E1 goldens: 12,462 golden cases in 125 suite files (counted from `datasets/golden/`). New tolerance classes `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. Model inventory entries MF-1 to MF-11.
 - Outside oracle for stage F (`oracle/outside_f.py`): QuantLib 1.44, SciPy, NumPy and `arch` 7.2.0. `arch` runs under WSL, because Windows Application Control blocks pandas on the host.
 
 ### Added (part 1)
@@ -29,7 +29,7 @@ Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds w
 - G9: Rust denies `clippy::unwrap_used` outside tests.
 
 ### Known issues (0.6.0)
-- **Outside-oracle share is 55.1% (222 of 403), below the 60% floor.** `oracle/OUTSIDE_GAPS_F.md` lists every case without a free outside source, with its reason. 72 of the 181 are error cases, which no library can check; without them the share is 67.1%. Changing the denominator is the owner's decision.
+- **Outside-oracle share is 51.4% (225 of 438): the 60% floor is not met.** Error cases stay in the denominator (coordinator ruling). `oracle/OUTSIDE_GAPS_F.md` lists every case without a free outside source, with its reason; 79 of the 213 are error cases. The R5 second review of the outside register is still owed.
 - **R7 has no outside case.** Pedersen (2003), the CDS index option's reference example, is not freely available.
 - **FRTB-SA GIRR `low` scenario formula is unconfirmed:** it is an image in MAR21.6 (ruling F-33). The equity FRTB parameters were read only in summary.
 - **Deferred to wave 2b:**
