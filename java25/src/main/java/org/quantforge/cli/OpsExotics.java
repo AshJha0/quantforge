@@ -62,13 +62,31 @@ final class OpsExotics {
             Common c = Common.read(in, true);
             double h = in.real("barrier");
             double rebate = in.real("rebate");
-            Exotics.BarrierType type = in.gate(in.choice("barrier_type", Exotics.BarrierType.class));
+            Exotics.BarrierType type = in.choice("barrier_type", Exotics.BarrierType.class);
+            String monitoring = in.has("monitoring") ? in.string("monitoring") : "CONTINUOUS";
+            boolean hasM = in.has("monitoring_per_year");
+            long m = hasM ? in.integer("monitoring_per_year") : 0;
+            in.limit(m > 1_000_000L, "monitoring_per_year"); // ruling G-6
+            in.gate();
             c.check();
+            boolean discrete = monitoring.equals("DISCRETE");
+            if (!discrete && !monitoring.equals("CONTINUOUS")) {
+                throw new QfError("E_INPUT", "monitoring is not a listed value", "monitoring");
+            }
+            if (discrete != hasM) {
+                throw new QfError("E_INPUT", "monitoring_per_year goes with DISCRETE monitoring only",
+                        "monitoring_per_year");
+            }
+            if (discrete && m < 1) {
+                throw domain("monitoring_per_year");
+            }
             positive(h, "barrier");
             if (!(rebate >= 0.0)) {
                 throw domain("rebate");
             }
-            return Operations.out("price", Exotics.barrier(c.phi, type, c.s, c.k, c.t, c.r, c.q, c.v, h, rebate));
+            return Operations.out("price", discrete
+                    ? Exotics.barrierDiscrete(c.phi, type, c.s, c.k, c.t, c.r, c.q, c.v, h, rebate, m)
+                    : Exotics.barrier(c.phi, type, c.s, c.k, c.t, c.r, c.q, c.v, h, rebate));
         });
         table.put("exotic.asian.geometric", in -> {
             Common c = Common.read(in, true);
