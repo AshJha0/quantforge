@@ -11,6 +11,7 @@ import org.quantforge.core.Conventions;
 import org.quantforge.curves.Curve;
 import org.quantforge.curves.CurveSolver;
 import org.quantforge.curves.DatedCompounding;
+import org.quantforge.curves.JointSolver;
 import org.quantforge.curves.Jumps;
 import org.quantforge.curves.Ois;
 import org.quantforge.curves.Projection;
@@ -140,6 +141,113 @@ final class OpsRatesCurves {
             return new Out(Operations.out("discount_pillars", OpsLinear.pillars(j.discount()),
                     "projection_pillars", OpsLinear.pillars(j.projection())).outputs(),
                     Operations.out("max_repricing_error", j.maxRepricingError()).outputs());
+        });
+        table.put("rates.curve.joint_solve", in -> {
+            LocalDate asOf = in.date("as_of");
+            List<In> cs = in.objects("curves");
+            in.limit(cs.size() > MAX_LIST, "curves");
+            List<JointSolver.CurveSpec> curves = new ArrayList<>();
+            for (In c : cs) {
+                JointSolver.CurveType type = c.choice("type", JointSolver.CurveType.class);
+                boolean pillar = type != JointSolver.CurveType.OIS_STEPS;
+                boolean ois = type == JointSolver.CurveType.OIS || type == JointSolver.CurveType.OIS_STEPS;
+                LocalDate[] turns = new LocalDate[0];
+                if (ois && c.hasKey("turns")) {
+                    List<In> tl = c.objects("turns");
+                    in.limit(tl.size() > MAX_LIST, "turns");
+                    turns = new LocalDate[tl.size()];
+                    for (int i = 0; i < turns.length; i++) {
+                        turns[i] = tl.get(i).date("date");
+                    }
+                }
+                LocalDate[] steps = null;
+                if (type == JointSolver.CurveType.OIS_STEPS) {
+                    List<LocalDate> sd = c.dates("step_dates");
+                    in.limit(sd.size() > MAX_LIST, "step_dates");
+                    steps = sd.toArray(new LocalDate[0]);
+                }
+                boolean xccy = type == JointSolver.CurveType.XCCY;
+                curves.add(new JointSolver.CurveSpec(c.string("name"), type,
+                        ois ? c.string("convention") : null,
+                        pillar ? c.choice("interpolation", Curve.Interpolation.class) : null,
+                        pillar ? OpsLinear.shape(c) : Curve.Shape.NONE,
+                        ois ? OpsLinear.jumps(c, false) : Jumps.NONE, turns, steps,
+                        type == JointSolver.CurveType.PROJECTION ? c.string("index") : null,
+                        type == JointSolver.CurveType.PROJECTION ? c.string("discount") : null,
+                        xccy ? c.string("domestic") : null, xccy ? c.string("foreign_projection") : null,
+                        xccy ? c.string("domestic_convention") : null, xccy ? c.string("foreign_convention") : null,
+                        xccy ? c.date("start") : null));
+            }
+            List<In> is = in.objects("instruments");
+            in.limit(is.size() > 1000, "instruments");
+            List<JointSolver.InstrumentSpec> instruments = new ArrayList<>();
+            for (In q : is) {
+                JointSolver.InstrumentType type = q.choice("type", JointSolver.InstrumentType.class);
+                String id = q.string("id");
+                String curve = q.string("curve");
+                boolean turn = q.bool("turn", false);
+                instruments.add(switch (type) {
+                    case OIS -> {
+                        String tenor = q.string("tenor");
+                        org.quantforge.curves.Ois.checkTenor(tenor);
+                        yield new JointSolver.InstrumentSpec(id, curve, type, turn, q.real("rate"), tenor, null,
+                                null, null, null, null);
+                    }
+                    case FUTURE -> new JointSolver.InstrumentSpec(id, curve, type, turn, q.real("price"), null, null,
+                            q.date("start"), q.date("end"), q.real("sigma"), q.real("mean_reversion"));
+                    case FRA -> new JointSolver.InstrumentSpec(id, curve, type, turn, q.real("rate"), null,
+                            q.integer("start_months"), null, null, null, null);
+                    case DEPOSIT, SWAP -> new JointSolver.InstrumentSpec(id, curve, type, turn, q.real("rate"), null,
+                            q.integer("months"), null, null, null, null);
+                    case XCCY -> new JointSolver.InstrumentSpec(id, curve, type, turn, q.real("spread"), null,
+                            q.integer("months"), null, null, null, null);
+                });
+            }
+            in.gate();
+            JointSolver.Result r = JointSolver.solve(asOf, curves, instruments);
+            List<Map<String, Object>> co = new ArrayList<>();
+            for (JointSolver.SolvedCurve c : r.curves()) {
+                if (c.baseRate() != null) {
+                    co.add(Operations.out("name", c.name(), "base_rate", c.baseRate(), "step_rates", c.stepRates())
+                            .outputs());
+                } else {
+                    List<Map<String, Object>> p = new ArrayList<>();
+                    for (int i = 0; i < c.pillars().length; i++) {
+                        p.add(Operations.out("date", c.pillars()[i].toString(), "discount_factor",
+                                c.discountFactors()[i]).outputs());
+                    }
+                    co.add(Operations.out("name", c.name(), "pillars", p).outputs());
+                }
+            }
+            List<Map<String, Object>> tf = new ArrayList<>();
+            for (JointSolver.TurnFactor t : r.turnFactors()) {
+                tf.add(Operations.out("curve", t.curve(), "date", t.date().toString(), "factor", t.factor()).outputs());
+            }
+            Map<String, Object> jac = Operations.out("unknowns", r.unknowns(), "quotes", r.quotes(),
+                    "matrix", r.jacobian()).outputs();
+            return new Out(Operations.out("curves", co, "turn_factors", tf, "jacobian", jac,
+                    "turn_sensitivity", r.turnSensitivity()).outputs(),
+                    Operations.out("max_repricing_error", r.maxRepricingError()).outputs());
+        });
+        table.put("rates.funding.curve", in -> {
+            OpsLinear.CurveInput ci = OpsLinear.curve(in, "discount");
+            List<In> qs = in.objects("quotes");
+            in.limit(qs.size() > MAX_LIST, "quotes");
+            LocalDate[] ends = new LocalDate[qs.size()];
+            double[] rates = new double[ends.length];
+            for (int i = 0; i < ends.length; i++) {
+                ends[i] = qs.get(i).date("end");
+                rates[i] = qs.get(i).real("rate");
+            }
+            List<LocalDate> dates = in.hasKey("dates") ? in.dates("dates") : List.of();
+            in.limit(dates.size() > 10_000, "dates");
+            in.gate();
+            JointSolver.Funding f = JointSolver.funding(ci.build(), ends, rates, dates.toArray(new LocalDate[0]));
+            List<Map<String, Object>> p = new ArrayList<>();
+            for (int i = 0; i < ends.length; i++) {
+                p.add(Operations.out("date", ends[i].toString(), "discount_factor", f.pillarFactors()[i]).outputs());
+            }
+            return Operations.out("spreads", f.spreads(), "pillars", p, "discount_factors", f.discountFactors());
         });
         table.put("calib.curve.smooth", in -> {
             double[] knots = in.reals("knots");

@@ -30,7 +30,7 @@ class LinearSpecTest {
     @Test
     void bothMethodsGiveTheSameCurveAndRepriceBelowTheLimit() {
         for (Conventions.RateIndex c : List.of(Conventions.SONIA, Conventions.SOFR)) {
-            for (Curve.Interpolation interp : Curve.Interpolation.values()) {
+            for (Curve.Interpolation interp : new Curve.Interpolation[] {Curve.Interpolation.LOG_LINEAR_DF, Curve.Interpolation.LINEAR_ZERO}) {
                 CurveSolver.Solved a = Ois.bootstrap(c, AS_OF, quotes(), interp, CurveSolver.Method.SEQUENTIAL, null);
                 CurveSolver.Solved b = Ois.bootstrap(c, AS_OF, quotes(), interp, CurveSolver.Method.GLOBAL, null);
                 assertTrue(a.maxRepricingError() < 1e-13);

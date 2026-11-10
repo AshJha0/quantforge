@@ -108,6 +108,13 @@ public final class Ois {
     public static CurveSolver.Solved bootstrap(Conventions.RateIndex c, LocalDate asOf, List<Quote> quotes,
                                                Curve.Interpolation interp, CurveSolver.Method method, double[] bump,
                                                Jumps jumps) {
+        return bootstrap(c, asOf, quotes, interp, method, bump, jumps, Curve.Shape.NONE);
+    }
+
+    /** As above with the parameters of the stage F interpolations. */
+    public static CurveSolver.Solved bootstrap(Conventions.RateIndex c, LocalDate asOf, List<Quote> quotes,
+                                               Curve.Interpolation interp, CurveSolver.Method method, double[] bump,
+                                               Jumps jumps, Curve.Shape shape) {
         Finite.check("bump", bump);
         jumps.check(asOf);
         if (quotes.isEmpty()) {
@@ -131,7 +138,7 @@ public final class Ois {
             }
             target[j] = quotes.get(j).mid() + (bump == null ? 0.0 : bump[j]);
         }
-        return CurveSolver.solve(asOf, interp, dates, target, models, method, jumps);
+        return CurveSolver.solve(asOf, interp, dates, target, models, method, jumps, shape);
     }
 
     /** Compounded in arrears from actual fixings. */

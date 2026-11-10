@@ -179,7 +179,7 @@ public final class CurveRisk {
                     double[] bumped = df.clone();
                     bumped[pillar] *= Math.exp(-s * h * curve.time(dates[pillar]));
                     return product.applyAsDouble(Curve.of(curve.asOf(), curve.interpolation(), dates, bumped,
-                            curve.jumps()));
+                            curve.jumps(), curve.shape()));
                 }, base, bumpBp, scheme);
             }
         }

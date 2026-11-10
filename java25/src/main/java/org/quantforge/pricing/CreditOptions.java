@@ -91,9 +91,85 @@ public final class CreditOptions {
         Finite.check("vol", vol);
         Legs l = legs(asOf, expiry, maturity, r, h, rec);
         double t = years(asOf, expiry);
-        double fep = n * (1 - rec) * (1 - Math.exp(-h * t)) * Math.exp(-r * t);
+        double fep = n * (1 - rec) * (-Math.expm1(-h * t)) * Math.exp(-r * t);
         double opt = n * l.annuity() * Black.lognormal(payer ? 1.0 : -1.0, l.forward(), k, t, 1.0, vol);
         return new OptionPrice(opt + (payer && !knockOut ? fep : 0.0), l.forward(), l.annuity(), fep);
+    }
+
+    /** Index option result (credit-options-and-copulas.md, credit.cdsindex.option_price). */
+    public record IndexOption(double price, double forward, double adjustedForward, double adjustedStrike,
+                              double annuity, double strikeAnnuity, double strikeHazard, double exerciseUpfront,
+                              double frontEnd) {}
+
+    /** Ruling F-8: the flat hazard from {@code expiry} whose stylised spread is {@code k}, solved by bisection. */
+    static double strikeHazard(LocalDate expiry, LocalDate maturity, double r, double rec, double k) {
+        double hi = 2.0 * k / (1.0 - rec);
+        while (legs(expiry, expiry, maturity, r, hi, rec).forward() <= k) {
+            hi *= 2.0;
+        }
+        double lo = 0.0;
+        while (true) {
+            double mid = lo + (hi - lo) / 2.0;
+            if (mid <= lo || mid >= hi || hi - lo <= 1e-15 * Math.max(1.0, mid)) {
+                return mid;
+            }
+            if (legs(expiry, expiry, maturity, r, mid, rec).forward() < k) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+    }
+
+    /** Pedersen adjusted pair (rulings F-7 to F-10). Checks in the order of the spec. */
+    public static IndexOption indexOption(LocalDate asOf, LocalDate expiry, LocalDate maturity, double r, double h,
+                                          double rec, boolean payer, double k, double c, double n, double vol) {
+        Finite.check("r", r);
+        Finite.check("h", h);
+        Finite.check("rec", rec);
+        Finite.check("k", k);
+        Finite.check("c", c);
+        Finite.check("n", n);
+        Finite.check("vol", vol);
+        if (!expiry.isAfter(asOf) || !maturity.isAfter(expiry)) {
+            throw new QfError("E_INPUT", "need as_of < expiry < maturity", "expiry");
+        }
+        if (!(rec >= 0.0 && rec < 1.0)) {
+            throw new QfError("E_DOMAIN", "recovery must be in [0, 1)", "recovery");
+        }
+        if (!(h >= 0.0)) {
+            throw new QfError("E_DOMAIN", "hazard_rate is negative", "hazard_rate");
+        }
+        if (!(k > 0.0)) {
+            throw new QfError("E_DOMAIN", "strike must be positive", "strike");
+        }
+        if (!(c >= 0.0)) {
+            throw new QfError("E_DOMAIN", "coupon is negative", "coupon");
+        }
+        if (!(vol >= 0.0)) {
+            throw new QfError("E_DOMAIN", "vol is negative", "vol");
+        }
+        if (!(n > 0.0)) {
+            throw new QfError("E_DOMAIN", "notional must be positive", "notional");
+        }
+        Legs l = legs(asOf, expiry, maturity, r, h, rec);
+        double t = years(asOf, expiry);
+        double pT = Math.exp(-r * t);
+        double fep = (1 - rec) * (-Math.expm1(-h * t)) * pT;
+        double hk = strikeHazard(expiry, maturity, r, rec, k);
+        double ak = legs(expiry, expiry, maturity, r, hk, rec).annuity();
+        double g = (k - c) * ak;
+        double a = l.annuity();
+        double fAdj = l.forward() + fep / a;
+        double kAdj = c + g * pT / a;
+        if (!(fAdj > 0.0)) {
+            throw new QfError("E_DOMAIN", "adjusted forward is not positive", "hazard_rate");
+        }
+        if (!(kAdj > 0.0)) {
+            throw new QfError("E_DOMAIN", "adjusted strike is not positive", "strike");
+        }
+        double price = n * a * Black.lognormal(payer ? 1.0 : -1.0, fAdj, kAdj, t, 1.0, vol);
+        return new IndexOption(price, l.forward(), fAdj, kAdj, a, ak, hk, n * g, n * fep);
     }
 
     /** Knock-out options only (ruling E-B23); bisection on vol to the last midpoint. */
