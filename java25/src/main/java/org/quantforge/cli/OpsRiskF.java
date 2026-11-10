@@ -1,15 +1,23 @@
 package org.quantforge.cli;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
+import org.quantforge.core.Conventions;
+import org.quantforge.curves.Curve;
+import org.quantforge.curves.Ois;
+import org.quantforge.risk.BookRisk;
 import org.quantforge.risk.FrtbGirr;
 import org.quantforge.risk.PortfolioRisk;
 
 /** Stage F slices F3 and F4: book sensitivities, curve risk, VaR/ES, backtests, FRTB. Inputs read before the gate. */
 final class OpsRiskF {
     private OpsRiskF() {}
+
+    private enum SwapSide { PAYER, RECEIVER }
 
     private static Map<String, Object> varEs(PortfolioRisk.VarEs r) {
         return Operations.out("var", r.var(), "es", r.es(), "tail_count", r.tailCount()).outputs();
@@ -71,6 +79,93 @@ final class OpsRiskF {
                         "alternative_used", s.alternativeUsed()).outputs());
             }
             return Operations.out("scenarios", sc, "capital", r.capital(), "binding_scenario", r.binding());
+        });
+        table.put("risk.book.ois_sensitivity", in -> {
+            LocalDate asOf = in.date("as_of");
+            Conventions.RateIndex c = Conventions.overnight(in.string("convention"));
+            List<Ois.Quote> quotes = OpsLinear.quotes(in);
+            Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
+            List<In> list = in.objects("swaps");
+            in.limit(list.size() > 100_000, "swaps");
+            List<BookRisk.Swap> swaps = new ArrayList<>();
+            for (In s : list) {
+                swaps.add(new BookRisk.Swap(s.string("id"), s.integer("tenor_years"), s.real("fixed_rate"),
+                        s.choice("side", SwapSide.class) == SwapSide.PAYER));
+            }
+            in.gate();
+            BookRisk.OisSensitivity r = BookRisk.oisSensitivity(c, asOf, quotes, interp, swaps);
+            List<String> ids = new ArrayList<>();
+            for (BookRisk.Swap s : swaps) {
+                ids.add(s.id());
+            }
+            List<String> tenors = new ArrayList<>();
+            for (Ois.Quote q : quotes) {
+                tenors.add(q.tenor());
+            }
+            List<String> pillars = new ArrayList<>();
+            for (LocalDate d : r.pillars()) {
+                pillars.add(d.toString());
+            }
+            return Operations.out("pv", r.pv(), "book_pv", r.bookPv(),
+                    "quote_sensitivity", Operations.out("swaps", ids, "quotes", tenors, "matrix",
+                            r.quoteSensitivity()).outputs(),
+                    "book_sensitivity", r.bookSensitivity(),
+                    "zero_jacobian", Operations.out("pillars", pillars, "quotes", tenors, "matrix",
+                            r.zeroJacobian()).outputs());
+        });
+        table.put("risk.curve.pca", in -> {
+            double[][] ch = in.anyMatrix("changes");
+            long k = in.integer("components");
+            in.gate();
+            BookRisk.Pca r = BookRisk.pca(ch, k);
+            return Operations.out("eigenvalues", r.eigenvalues(), "loadings", r.loadings(),
+                    "explained_ratio", r.explained());
+        });
+        table.put("risk.curve.cross_gamma", in -> {
+            OpsLinear.CurveInput ci = OpsLinear.curve(in, "curve");
+            In prod = in.object("product");
+            if (!prod.string("kind").equals("OIS")) {
+                throw new org.quantforge.core.QfError("E_SCHEMA", "product kind must be OIS", "kind");
+            }
+            In t = prod.object("trade");
+            Conventions.RateIndex tc = Conventions.overnight(t.string("convention"));
+            String tenor = t.string("tenor");
+            Ois.checkTenor(tenor);
+            double k = t.real("fixed_rate");
+            double notional = t.real("notional");
+            // The cross_gamma goldens spell the side PAYER/RECEIVER; par-and-key-rate.md trades use PAY/RECEIVE.
+            String side = t.string("side");
+            org.quantforge.pricing.Pricing.Side sd = switch (side) {
+                case "PAY", "PAYER" -> org.quantforge.pricing.Pricing.Side.PAY;
+                case "RECEIVE", "RECEIVER" -> org.quantforge.pricing.Pricing.Side.RECEIVE;
+                default -> throw new org.quantforge.core.QfError("E_SCHEMA", "side: not a listed value", "side");
+            };
+            org.quantforge.pricing.Pricing.OisTrade trade = new org.quantforge.pricing.Pricing.OisTrade(tc, tenor, k,
+                    notional, sd);
+            double bump = in.real("bump_bp");
+            in.gate();
+            Curve curve = ci.build();
+            Ois.Legs legs = Ois.legs(tc, curve.asOf(), tenor);
+            double signed = (sd == org.quantforge.pricing.Pricing.Side.PAY ? 1.0 : -1.0) * notional;
+            BookRisk.CrossGamma g = BookRisk.crossGammaOis(curve, legs, signed, k,
+                    cv -> org.quantforge.pricing.Pricing.oisPv(trade, legs, cv), bump);
+            return Operations.out("value", g.value(), "cross_gamma", g.gamma());
+        });
+        table.put("risk.credit.jtd", in -> {
+            List<In> list = in.objects("positions");
+            in.limit(list.size() > 100_000, "positions");
+            List<BookRisk.JtdPosition> ps = new ArrayList<>();
+            for (In p : list) {
+                ps.add(new BookRisk.JtdPosition(p.string("id"), p.choice("kind", BookRisk.JtdKind.class),
+                        p.real("notional"), p.real("recovery"), p.real("market_value")));
+            }
+            in.gate();
+            double[] j = BookRisk.jtd(ps);
+            double total = 0.0;
+            for (double v : j) {
+                total += v;
+            }
+            return Operations.out("jtd", j, "total", total);
         });
         table.put("risk.backtest.kupiec", in -> {
             long n = in.integer("observations");

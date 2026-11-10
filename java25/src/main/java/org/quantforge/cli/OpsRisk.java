@@ -20,7 +20,7 @@ final class OpsRisk {
     private OpsRisk() {}
 
     /** A parsed product: its OIS convention (null for a bond), notional rule, and a value on a given curve. */
-    private record Product(Conventions.RateIndex convention, Double notional, Pricing.OisTrade trade, Bonds.Bond bond,
+    record Product(Conventions.RateIndex convention, Double notional, Pricing.OisTrade trade, Bonds.Bond bond,
                            LocalDate settlement) {
         void checkNotional() {
             if (notional != null && !(notional > 0.0)) {
@@ -43,7 +43,7 @@ final class OpsRisk {
         }
     }
 
-    private static Product product(In in) {
+    static Product product(In in) {
         In p = in.object("product");
         String kind = p.string("kind");
         return switch (kind) {
