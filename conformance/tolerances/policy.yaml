@@ -39,6 +39,13 @@ classes:
     # central differences (about 1e-9 relative); the inverse carries it at the system's condition number.
     absolute: 1.0e-9
     relative: 1.0e-6
+  jacobian_piecewise:
+    # Stage F (joint_f-0001, R5 audit, ruling F-40): the IFT Jacobian of a system with a monotone convex curve, which is
+    # piecewise in its data. dR/dx is itself a difference quotient near region boundaries, and stencils that pass the
+    # kink checks still differ by about 2e-8 between builds (Rust, measured). A kink-straddling error is 5e-4 or more,
+    # so this bound keeps three orders of margin on both sides.
+    absolute: 1.0e-7
+    relative: 1.0e-5
   standard_error:
     # Stage F (garch.md R8, ruling F-13): sqrt of the diagonal of an inverted Hessian. Builds may form the Hessian by
     # central differences of an analytic score (error about 1e-9 relative); the inverse amplifies it by the condition number.

@@ -302,7 +302,7 @@ Stage F operations are added to the table below as each wave lands.
 | `book.lifecycle.apply`, `book.marks.resolve` | `07-portfolio/book-lifecycle.md` | F5 |
 | `usecase.factor_attribution` | `04-pricing/use-cases.md` | F5 (use case 4) |
 
-Batch notes: `rates.curve.joint_solve` and `vol.garch.estimate` iterate; a line that fails returns `E_NO_CONVERGENCE` and the batch goes on. `null` is a legal value only where a spec says so (VIX quotes, `zero_rates` outputs); elsewhere it stays `E_SCHEMA`. New policy classes: `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian` (`conformance/tolerances/policy.yaml`).
+Batch notes: `rates.curve.joint_solve` and `vol.garch.estimate` iterate; a line that fails returns `E_NO_CONVERGENCE` and the batch goes on. `null` is a legal value only where a spec says so (VIX quotes, `zero_rates` outputs); elsewhere it stays `E_SCHEMA`. New policy classes: `jacobian`, `jacobian_piecewise`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. New runner check `exact_zero` for structural zeros (ruling F-44). `E_LIMIT` sizes for the stage F operations: ruling F-42 (`conformance/tolerances/policy.yaml`).
 
 ## Versioning
 

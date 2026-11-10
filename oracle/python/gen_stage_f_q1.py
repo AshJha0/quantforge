@@ -129,6 +129,7 @@ def main():
     import gen_stage_d
     gen_stage_d.add_estr() if hasattr(gen_stage_d, "add_estr") else RT.CONV.setdefault("ESTR", dict(gen_stage_d.ESTR))
     s = Suite("curve_f", "specifications/02-curves/curve-framework.md", G)
+    s.compact = True  # over 1 MB indented (hygiene gate E11)
     bop, iop = "rates.ois.bootstrap", "rates.curve.inspect"
     turn = [(date(2026, 12, 31), math.exp(-0.0025 * 1 / 365))]
     builds, hyman, fpos = [], [], []
@@ -246,6 +247,26 @@ def main():
         s.add(iop, {"curve": cur, "dates": ["2030-01-01"]}, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
     s.add(iop, {"curve": curve_obj(pil, dfs, "MONOTONE_CONVEX"), "dates": ["2026-11-08"]}, error="E_OUT_OF_RANGE", cls=E, tags=["invalid", "stage-f"],
           description="date before as_of")
+    # R5 audit (appended): tension limits and the small-z forms (ruling F-35, amended)
+    lin = inspect(CurveF(pil, dfs, "LOG_LINEAR_DF"), ds)
+    for sig, d in ((1e-6, "tension 1e-6: every z below 3e-5 (cancellation-free forms); discount factors within 1e-12 of tension 1e-9, the natural cubic limit"),
+                   (500.0, "")):
+        out = inspect(CurveF(pil, dfs, "TENSION_SPLINE", sig), ds)
+        if sig > 1:
+            # convergence to LOG_LINEAR_DF is O(1/sigma) (far from the knots R(u) is about -u/(h sigma^2) and M grows like
+            # sigma): the gap up to the last pillar halves when sigma doubles
+            k = [i for i, d_ in enumerate(ds) if d_ <= pil[-1]]
+            g500 = max(abs(out["discount_factors"][i] - lin["discount_factors"][i]) for i in k)
+            o1000 = inspect(CurveF(pil, dfs, "TENSION_SPLINE", 1000.0), ds)
+            g1000 = max(abs(o1000["discount_factors"][i] - lin["discount_factors"][i]) for i in k)
+            assert 1.8 < g500 / g1000 < 2.2, (g500, g1000)
+            d = f"tension 500: within {g500:.1e} of LOG_LINEAR_DF in discount factors up to the last pillar, halving at tension 1000 (O(1/sigma))"
+        else:
+            c3 = CurveF(pil, dfs, "TENSION_SPLINE", 1e-9)
+            gapc = gap(inspect(c3, ds)["discount_factors"], out["discount_factors"])
+            assert gapc < 1e-12, gapc
+        s.add(iop, {"curve": curve_obj(pil, dfs, "TENSION_SPLINE", sig), "dates": [d_.isoformat() for d_ in ds]}, out, cls=I,
+              verified=["independent-replay", "limit check in the generator"], tags=["curve", "inspect", "tension_spline", "limit", "stage-f"], description=d)
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / "stage_f"
     for c in s.cases:

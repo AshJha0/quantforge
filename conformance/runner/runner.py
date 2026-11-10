@@ -111,7 +111,28 @@ def compare(actual, expected, cls, limit, path):
     return [f"{path}: {actual!r} vs {expected!r}, error {abs(actual - expected):.3e}, limit abs {ab:g} rel {re_:g}"]
 
 
+def exact_zero(check, outputs):
+    """Stage F (rulings F-25, F-26, F-30): structural zeros. `output` is a dotted path to a matrix (a list of rows);
+    every [row, column] in `positions` must be exactly 0.0 or -0.0, not merely within tolerance."""
+    m = outputs
+    for k in check["output"].split("."):
+        m = m.get(k) if isinstance(m, dict) else None
+    if not isinstance(m, list):
+        return [f"extra check: {check['output']} missing"]
+    bad = []
+    for i, j in check["positions"]:
+        try:
+            v = m[i][j]
+        except (IndexError, TypeError):
+            return [f"extra check {check['output']}: position [{i}, {j}] missing"]
+        if not (is_num(v) and v == 0.0):
+            bad.append(f"[{i}, {j}] = {v!r}")
+    return [] if not bad else [f"extra check {check['output']}: not exactly zero at {len(bad)} structural positions, e.g. {bad[:3]}"]
+
+
 def extra_check(check, outputs):
+    if check["method"] == "exact_zero":
+        return exact_zero(check, outputs)
     a = outputs.get(check["output"])
     if not is_num(a):
         return [f"extra check: {check['output']} missing"]
