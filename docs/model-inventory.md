@@ -453,7 +453,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MF-9 FRTB-SA GIRR delta (Q2)
 - **Purpose:** standardised capital for interest rate delta under MAR21.
 - **Inputs:** delta sensitivities per currency, curve and tenor.
-- **Limitations:** GIRR delta only; the `low` scenario formula is transcribed from an image (ruling F-33, known issue).
+- **Limitations:** GIRR delta only; the `low` scenario formula is confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma) (ruling F-33).
 - **Validation:** 40-digit replica; tenor correlation reproduces MAR21.46 Table 2. **Review:** 2026-11-10.
 - **Tier:** 1.
 - **Challenger:** none free.
