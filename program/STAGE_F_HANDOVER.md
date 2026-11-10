@@ -119,3 +119,14 @@ Outside share after wave 1: 52 of 171 = 30.4% (ruling F-23), below the 60% floor
 - `USD-TERM-3M` pillars 2028-11-13, 2031-11-12, 2036-11-12 / `SOFR-2Y`: errors of about 5e-4 each.
 
 No XCCY column appears, so the xccy suspect is unlikely. The errors sit in SOFR quote columns (3M near the turn, 2Y), which points to the monotone-convex SOFR curve. Check whether a section near 3M or 2Y switches branch rule under a 1e-4 quote bump (compare `interp_f._cm_sections` branch kinds at `x` and at the bumped solutions). If it does, the 1e-4 Richardson bump straddles a kink: use a smaller bump for the reference (1e-6) and compare again, then either keep the quotes off the boundary with an asserted margin or state one-sided derivatives in the spec.
+
+## Q4 FOUR-CURVE GOLDEN READY (2026-11-10): `joint_f` is now 14 cases, re-run it
+
+The held-back four-curve system (SOFR monotone convex with a solved turn + term + ESTR monotonic log cubic + EUR xccy) is in the goldens as `joint_f-0001`. **Case ids moved by one**: re-run the whole `joint_f` suite, do not compare by old id. Read ruling F-28 and the amended F-26 in `specifications/stage-f-rulings.md`, and the amended `dR/dq` line in `joint-solve-and-funding.md`.
+
+- **Cause:** the 2e-3 mismatch was the bump reference, not the IFT golden. The monotone convex SOFR curve is piecewise in its data, and a middle section changes region about 6e-5 away in the SOFR-2Y quote (SOFR-3M similar), so a `h = 1e-4` Richardson bump straddled a kink. The first and last sections sit at `g1/g0 = -2` and `-1/2` exactly by the endpoint rule; rounding flips there are harmless (the regions agree on that line).
+- **Fix (F-28):** the generator halves the reference step from 1e-4 until no interior section changes region under any `+-h`, `+-h/2` bump and the `h^4` error estimate is below half the `jacobian` tolerance. The four-curve case needs `h = 6.25e-6` (in its `verified_by`); the other three keep `5e-5`.
+- **Build note (from the Rust lane, thanks):** your own `dR/dx` stencil can also straddle a kink. A fixed five-point 1e-5 stencil puts `turn` / `SOFR-1M` at 0.11714 instead of 0.11790. The oracle's Richardson 1e-5 / 5e-6 central differences give 0.1178976 and pass. Rust's per-column adaptive stencil (shrink until two steps agree) is a good pattern.
+- **F-26 amended:** `turn_sensitivity` is exactly 0 for non-spanning instruments only on `OIS_STEPS` curves. On pillar curves it is the honest `dR/dx` column: in the four-curve case `SOFR-1M` has about -0.023.
+- **XCCY `dR/dq`:** the spread annuity `sum alpha_i D_f(e_i)`, not -1 (the oracle always used this; the text now says so).
+- Stub replay 14 of 14. Outside: still 1 of 14 (the log-linear system); the four-curve case has an xccy curve, which QuantLib cannot build.
