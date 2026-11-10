@@ -193,3 +193,64 @@ def _credit_jtd(i: Inputs) -> Any:
     positions = [(p.string("id"), p.enum("kind", JTD_KINDS), p.real("notional"),
                   p.real("recovery"), p.real("market_value")) for p in _objects(i, "positions")]
     return core.book_risk.jtd(positions)
+
+
+@op("risk.var.historical")
+def _var_historical(i: Inputs) -> Any:
+    return core.var_risk.historical(i.reals("pnl"), i.real("confidence"))
+
+
+@op("risk.var.filtered_historical")
+def _var_fhs(i: Inputs) -> Any:
+    return core.var_risk.filtered_historical(i.reals("returns"), i.real("position_value"),
+                                             i.real("lambda"), i.real("confidence"))
+
+
+@op("risk.var.parametric")
+def _var_parametric(i: Inputs) -> Any:
+    return core.var_risk.parametric(i.real("mean"), i.real("std"), i.real("confidence"))
+
+
+@op("risk.var.monte_carlo")
+def _var_mc(i: Inputs) -> Any:
+    return core.var_risk.monte_carlo(i.reals("mean"), i.matrix("covariance"), i.reals("weights"),
+                                     i.integer("paths"), _seed(i), i.real("confidence"))
+
+
+def _seed(i: Inputs) -> int:
+    """`seed` is a JSON integer in the stage F goldens; a u64 string is also read."""
+    if isinstance(i.raw.get("seed"), str):
+        return i.u64("seed")
+    seed = i.integer("seed")
+    if not 0 <= seed < 2 ** 64:
+        raise QfError("E_DOMAIN", "seed must be a u64", "seed")
+    return seed
+
+
+@op("risk.backtest.kupiec")
+def _kupiec(i: Inputs) -> Any:
+    return core.var_risk.kupiec(i.integer("observations"), i.integer("exceptions"),
+                                i.real("confidence"))
+
+
+@op("risk.backtest.christoffersen")
+def _christoffersen(i: Inputs) -> Any:
+    flags = i.array("exceptions")
+    if any(not isinstance(v, bool) for v in flags):
+        raise QfError("E_SCHEMA", "exceptions must be booleans", "exceptions")
+    return core.var_risk.christoffersen(flags, i.real("confidence"))
+
+
+@op("risk.backtest.traffic_light")
+def _traffic_light(i: Inputs) -> Any:
+    return core.var_risk.traffic_light(i.integer("observations"), i.integer("exceptions"),
+                                       i.real("confidence"))
+
+
+@op("risk.frtb.girr_delta")
+def _girr_delta(i: Inputs) -> Any:
+    from ..var_risk import GIRR_FACTORS
+    rows = [(s.string("currency"), s.string("curve"), s.enum("risk_factor", GIRR_FACTORS),
+             s.real("sensitivity")) for s in _objects(i, "sensitivities")]
+    return core.var_risk.girr_delta(rows, i.opt_boolean("specified_currency_reduction", False),
+                                    i.opt_string("reporting_currency"))
