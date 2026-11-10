@@ -665,7 +665,11 @@ mod tests {
     fn two_pillar(t: Date) -> (Hazard, [Date; 2], [f64; 2]) {
         let ds = [d("2028-12-20"), d("2031-12-20")];
         let qs = [0.97, 0.88];
-        (Hazard::new(t, &[(ds[0], qs[0]), (ds[1], qs[1])]).unwrap(), ds, qs)
+        (
+            Hazard::new(t, &[(ds[0], qs[0]), (ds[1], qs[1])]).unwrap(),
+            ds,
+            qs,
+        )
     }
 
     /// `[(start, end, h, Q(start))]` in years from `t`; the last segment runs on forever.
@@ -783,7 +787,11 @@ mod tests {
         for x in ["2027-05-01", "2028-12-20", "2030-02-02", "2035-01-01"] {
             let u = years(t, d(x));
             let (s0, _, hz, q0) = *segs.iter().find(|s| u >= s.0 && u <= s.1).unwrap();
-            close(h.survival(d(x)).unwrap(), q0 * (-hz * (u - s0)).exp(), 1e-14);
+            close(
+                h.survival(d(x)).unwrap(),
+                q0 * (-hz * (u - s0)).exp(),
+                1e-14,
+            );
         }
         assert_eq!(years(d("2026-01-01"), d("2027-01-01")), 1.0);
         assert_eq!(years(d("2026-01-01"), d("2026-03-15")), 0.2);
@@ -795,7 +803,11 @@ mod tests {
         assert_eq!(tenor_maturity(t, (2, 'Y')).unwrap(), d("2028-12-20"));
         assert_eq!(tenor_maturity(t, (1200, 'M')).unwrap(), d("2126-12-20"));
         for bad in [(0, 'M'), (-1, 'Y'), (1201, 'M'), (101, 'Y'), (1, 'D')] {
-            assert_eq!(tenor_maturity(t, bad).unwrap_err().code, "E_INPUT", "{bad:?}");
+            assert_eq!(
+                tenor_maturity(t, bad).unwrap_err().code,
+                "E_INPUT",
+                "{bad:?}"
+            );
         }
         assert_eq!(last_imm_on_or_before(d("2027-03-10")), d("2026-12-20"));
         assert_eq!(last_imm_on_or_before(d("2027-03-20")), d("2027-03-20"));
@@ -880,7 +892,19 @@ mod tests {
             buy: true,
         };
         assert!(tr.is_all_finite());
-        assert!(!CdsTrade { coupon: f64::NAN, ..tr }.is_all_finite());
-        assert!(!CdsTrade { notional: f64::INFINITY, ..tr }.is_all_finite());
+        assert!(
+            !CdsTrade {
+                coupon: f64::NAN,
+                ..tr
+            }
+            .is_all_finite()
+        );
+        assert!(
+            !CdsTrade {
+                notional: f64::INFINITY,
+                ..tr
+            }
+            .is_all_finite()
+        );
     }
 }
