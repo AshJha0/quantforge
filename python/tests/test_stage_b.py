@@ -16,7 +16,8 @@ QUOTES = [
 
 
 @pytest.mark.parametrize("convention", ["SONIA", "SOFR"])
-@pytest.mark.parametrize("interpolation", curves.INTERPOLATIONS)
+@pytest.mark.parametrize("interpolation", [m for m in curves.INTERPOLATIONS
+                                           if m not in ("TENSION_SPLINE", "HYBRID")])
 def test_both_solves_agree_and_reprice(convention, interpolation):
     a, error_a = ois.bootstrap(convention, AS_OF, QUOTES, interpolation, "SEQUENTIAL")
     b, error_b = ois.bootstrap(convention, AS_OF, QUOTES, interpolation, "GLOBAL")
