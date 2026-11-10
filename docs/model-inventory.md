@@ -510,6 +510,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a PDE or MC barrier engine in the library.
 - **Validation report:** `specifications/04-pricing/exotics.md`, section "Stage G addition".
 
+### MG-3 Monte Carlo Greeks (Q9 part 1)
+- **Purpose:** delta and vega of GBM payoffs by pathwise, likelihood-ratio, smoothed-digital and common-draw bump estimators, with standard errors.
+- **Inputs:** Black-Scholes inputs, payoff, method, paths and seed; smoothing width or bump size.
+- **Limitations:** one-step GBM only (no path-dependent payoffs yet); three payoffs; the smoothed digital is biased by `O(eps^2)`.
+- **Validation:** float64 replica on the `core.rng` stream; Black-Scholes closed forms (`oracle/Q9_ACCEPTANCE.json`). **Review:** 2026-11-10.
+- **Tier:** 2.
+- **Challenger:** closed-form Greeks where they exist.
+- **Monitoring thresholds:** MC Greek beyond 3 SE of a closed form on a desk sample.
+- **Data lineage hash:** sha256 8c17b12b1f1ded1c73f2b1850ec8605c564c2f5c449c0a7d00f5ca466ee2ddda
+- **Retirement trigger:** AAD through the MC engine (Q3b) for smooth payoffs.
+- **Validation report:** `specifications/06-risk/mc-greeks.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

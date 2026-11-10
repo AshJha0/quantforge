@@ -314,6 +314,7 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `exotic.barrier.price`: new optional inputs `monitoring`, `monitoring_per_year` | `04-pricing/exotics.md`, section "Stage G addition" | R9 (wave 1) |
 | `rates.shortrate.swaption` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.swaption`" | G2a (wave 2a) |
 | `rates.g2pp.zcb`, `rates.g2pp.zcb_option` | `04-pricing/short-rate-models.md`, section "G2++" | G2b (wave 2b) |
+| `risk.mc.greeks` | `06-risk/mc-greeks.md` | Q9 part 1 (wave 3a) |
 
 `E_LIMIT` sizes for the stage G operations: ruling G-6.
 

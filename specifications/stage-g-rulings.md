@@ -28,6 +28,12 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-14 | G2++ operations and states | G2++ has its own operations (`rates.g2pp.*`), not a `model` value of `rates.shortrate.*`, because its state is two numbers (`x`, `y`) and `G2PP` is already pinned as an unknown `model` there (`shortrate_g` error case). `rho` must be strictly inside `(-1, 1)` (at `+-1` the model is one-factor and the swaption integral of a later wave is singular); `a = b` is allowed, since no formula divides by `a - b` |
 
+## Wave 3a, Q9 part 1 Monte Carlo Greeks
+
+| # | Point | Ruling |
+|---|---|---|
+| G-15 | MC Greeks draws and estimators | One normal per path from `core.rng` stream 0 (AS 241), path `i` the `i`-th normal; terminal value sampled exactly. Estimators, smoothing and bump exactly as `06-risk/mc-greeks.md`; standard errors with divisor `n - 1`. Goldens keep every path at least 1e-9 relative from a kink, so builds agree to `common_rng`. The G-10 variance condition passes by a ratio of 0.9985 only; that is recorded as an open item, and G-10 is not changed after the result (12.10 rule) |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |

@@ -4994,6 +4994,59 @@
     "scenarios"
    ]
   },
+  "risk.mc.greeks": {
+   "spec": "specifications/06-risk/mc-greeks.md",
+   "rust": "quantforge::risk::mc_greeks",
+   "python": "quantforge.risk.mc_greeks",
+   "java": "Risk.mcGreeks",
+   "cpp": "qf::risk::mc_greeks",
+   "inputs": {
+    "bump_relative": {
+     "java": "bumpRelative"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "method": {
+     "java": "method"
+    },
+    "paths": {
+     "java": "paths"
+    },
+    "payoff": {
+     "java": "payoff"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "smoothing_width": {
+     "java": "smoothingWidth"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "delta",
+    "delta_se",
+    "price",
+    "price_se",
+    "vega",
+    "vega_se"
+   ]
+  },
   "risk.ois.dv01": {
    "spec": "specifications/01-core/limits.md",
    "rust": "quantforge::risk::ois_dv01",
@@ -5108,7 +5161,7 @@
    ]
   },
   "risk.var.monte_carlo": {
-   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "spec": "specifications/06-risk/mc-greeks.md",
    "rust": "quantforge::risk::var_monte_carlo",
    "python": "quantforge.risk.var_monte_carlo",
    "java": "Risk.varMonteCarlo",
@@ -6559,6 +6612,7 @@
   "eq.futures.basis: financing_spread",
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
+  "risk.mc.greeks: bump_relative",
   "risk.vol.greeks: shift",
   "usecase.fx_hedge: half_spread",
   "vol.equity.price: expiry",

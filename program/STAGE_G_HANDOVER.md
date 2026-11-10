@@ -65,3 +65,18 @@ Read: `specifications/04-pricing/short-rate-models.md`, section "G2++"; ruling G
 
 ### Outside-oracle status
 `g2pp_g` 30 of 38 (every value case except the one-factor limit; QuantLib 1.44 `G2`). Stage G so far: 126 of 188 = 67.0%.
+
+## WAVE 3a READY (2026-11-10): Q9 part 1, Monte Carlo Greeks
+
+Read: `specifications/06-risk/mc-greeks.md`; rulings G-10, G-15; cli-contract block "Stage G operations"; `specifications/name-map.json` (232 operations); `specifications/01-core/rng.md`.
+
+### Q9 part 1 (suite `mcgreeks_g`, 21 cases)
+- New operation `risk.mc.greeks`: price, delta and vega with standard errors, for `CALL`, `PUT`, `DIGITAL_CALL` by `PATHWISE` (digital smoothed by a call spread of half-width `smoothing_width`), `LIKELIHOOD_RATIO` and `BUMP` (central, common draws).
+- Build notes: draws are `core.rng` stream 0, one AS 241 normal per path, in path order. Standard errors use divisor `n - 1`. `price` is always the unsmoothed payoff. Class `common_rng`; the goldens keep paths away from kinks, so indicator flips cannot happen.
+- Property test (G-10 acceptance): the digital-call check in the spec at 100,000 paths, seed 20261109.
+
+### Open item for the coordinator and owner
+G-10's variance condition (smoothed pathwise below bump) passes by a ratio of 0.9985 only: at `h S = eps` the two estimators are nearly the same call spread, so the test has little power. Its parameters were fixed before the run and are not changed here; a stronger setting needs an owner ruling.
+
+### Outside-oracle status
+`mcgreeks_g` 0 of 21: no library reproduces the `core.rng` stream (as `risk.var.monte_carlo` in stage F). Stage G so far: 126 of 209 = 60.3%, just above the 60% floor.
