@@ -125,13 +125,13 @@ def swap_periods(conv, years):
 
 
 def book_from_rng(n, seed=SEED):
-    """Q3a book (T row): tenor = 1 + floor(30 u1); spread = (-100 + 200 u2) bp on the par rate; PAYER if u3 < 0.5.
+    """Q3a book (T row): tenor = 1 + floor(30 u1); spread = (-100 + 200 u2) bp on the par rate; PAY if u3 < 0.5.
     One stream (stream 0 of core.rng seed `seed`), three uniforms per swap in that order."""
     g = Xo(seed)
     out = []
     for k in range(n):
         u1, u2, u3 = g.uniform(), g.uniform(), g.uniform()
-        out.append((1 + int(math.floor(30 * u1)), -0.01 + 0.02 * u2, "PAYER" if u3 < 0.5 else "RECEIVER"))
+        out.append((1 + int(math.floor(30 * u1)), -0.01 + 0.02 * u2, "PAY" if u3 < 0.5 else "RECEIVE"))
     return out
 
 
@@ -146,7 +146,7 @@ def book_case(conv, quotes, raw, swaps=None):
     pv, sens = [], []
     for s in swaps:
         per = swap_periods(conv, s["tenor_years"])
-        sg = 1 if s["side"] == "PAYER" else -1
+        sg = 1 if s["side"] == "PAY" else -1
         K = mp.mpf(s["fixed_rate"])
         fn = lambda xx: [sg * (lambda a: a[1] - K * a[0])(m.legs(xx, per))]  # noqa: E731
         pv.append(fn(x)[0])
@@ -191,7 +191,7 @@ def f3_book(s):
     m = MpOIS("SOFR", SOFR12)
     m.solve()
     an, fl = m.legs(m.x, swap_periods("SOFR", 5))
-    i3, o3, _ = book_case("SOFR", SOFR12, None, swaps=[{"id": "PAR5", "tenor_years": 5, "fixed_rate": f(fl / an), "side": "PAYER"}])
+    i3, o3, _ = book_case("SOFR", SOFR12, None, swaps=[{"id": "PAR5", "tenor_years": 5, "fixed_rate": f(fl / an), "side": "PAY"}])
     o3["zero_jacobian"]["matrix"] = [[0.0 if j > i else v for j, v in enumerate(r)] for i, r in enumerate(o3["zero_jacobian"]["matrix"])]
     assert abs(o3["quote_sensitivity"]["matrix"][0][6] - f(an)) < 1e-6 * f(an)  # d(fl - K an)/dq5Y = an at par (K fixed), payer
     s.add(op, i3, o3, cls=AADC, output_classes=cls, verified=["mpmath 40-digit solve, exact IFT", "limit: par payer, dPV/dq_own = annuity"],
@@ -200,7 +200,7 @@ def f3_book(s):
     for d, chg, code in (("empty book", lambda i: {**i, "swaps": []}, "E_INPUT"),
                          ("tenor 0", lambda i: {**i, "swaps": [dict(i["swaps"][0], tenor_years=0)]}, "E_DOMAIN"),
                          ("duplicate swap id", lambda i: {**i, "swaps": i["swaps"] * 2}, "E_INPUT"),
-                         ("side not PAYER or RECEIVER", lambda i: {**i, "swaps": [dict(i["swaps"][0], side="LONG")]}, "E_SCHEMA")):
+                         ("side not PAY or RECEIVE", lambda i: {**i, "swaps": [dict(i["swaps"][0], side="LONG")]}, "E_SCHEMA")):
         s.add(op, chg(base), error=code, cls=E, tags=["invalid", "stage-f"], description=d)
 
 
@@ -271,9 +271,9 @@ def f3_cross_gamma(s):
     op = "risk.curve.cross_gamma"
     m = MpOIS("SOFR", SOFR12)
     x = m.solve()
-    for yrs_, K, side, h in ((5, .0360, "PAYER", 1), (10, .0350, "RECEIVER", 1), (30, .0380, "PAYER", 1), (2, .0365, "PAYER", 5), (7, .0, "RECEIVER", 1), (20, .05, "PAYER", 10)):
+    for yrs_, K, side, h in ((5, .0360, "PAY", 1), (10, .0350, "RECEIVE", 1), (30, .0380, "PAY", 1), (2, .0365, "PAY", 5), (7, .0, "RECEIVE", 1), (20, .05, "PAY", 10)):
         per = swap_periods("SOFR", yrs_)
-        sg = 1 if side == "PAYER" else -1
+        sg = 1 if side == "PAY" else -1
         Km = mp.mpf(K)
         hd = mp.mpf(h) / 10000
 
@@ -304,6 +304,7 @@ def f3_cross_gamma(s):
         Gn = [[f(v * 1000000) for v in r] for r in Gm]
         s.add(op, {"curve": curve, "product": {"kind": "OIS", "trade": trade}, "bump_bp": float(h)},
               {"value": f(base * 1000000), "cross_gamma": Gn}, cls=IP, verified=["mpmath 40-digit revaluation"], tags=["cross-gamma", "stage-f"],
+              limit={"absolute": 1e-9, "relative": 1e-8},  # ruling F-36: binary64 cancellation in the four-point formula
               description=f"{yrs_}Y {side} at {K}, bump {h} bp")
         if yrs_ == 5:
             caught("cross_gamma", "per unit decimal instead of per bp^2", gap(np.array(Gn) * 1e8, Gn), 1e-10 + 1e-8 * max(abs(v) for r in Gn for v in r))

@@ -38,6 +38,8 @@ ROWS = {
     "NUMPY.QUANTILE": ("06-risk/var-es-and-backtests.md historical VaR", "numpy.quantile(losses, c, method='inverted_cdf') (Hyndman and Fan type 1); ES as the mean of losses at or above it (continuous data, no ties)"),
     "SCIPY.EIGH": ("06-risk/book-sensitivities.md PCA", "numpy.cov(ddof=1); scipy.linalg.eigh (LAPACK syevr); sign rule of the spec"),
     "SCIPY.LSTSQ": ("04-pricing/use-cases.md use case 4 factor attribution", "scipy.linalg.lstsq on [1, F] (LAPACK gelsd); R^2, residual vol and standard errors from its residuals and numpy.linalg.inv of X'X"),
+    "SCIPY.QUAD": ("02-curves/curve-framework.md discount factors of MONOTONE_CONVEX from its forward", "scipy.integrate.quad (QUADPACK qags) of QuantLib ConvexMonotoneInterpolation, per section, epsrel 1e-13"),
+    "ARCH.GARCH": ("05-volatility/garch.md loglik, estimate; 06-risk/var-es-and-backtests.md FHS", "arch 7.2.0 (run under WSL): GARCH(1,0,1).compute_variance with backcast = (v0 - omega)/(alpha + beta) so that sigma2_1 = v0; Normal / StudentsT (standardised) loglikelihood; EWMAVariance(lam) with backcast = mean square; fits maximise that objective (scipy Nelder-Mead, Newton on a finite-difference Hessian); oracle/python/outside_garch_arch.py"),
     "CBOE.SAMPLE": ("05-volatility/vix-index.md Cboe sample", "Cboe Volatility Index Methodology v6.0, Appendix 3 printed values (F, K0, sigma^2, VIX)"),
 }
 LAGS = {"SOFR": (2, 2), "ESTR": (2, 2), "SONIA": (0, 0)}
@@ -71,8 +73,44 @@ def h_bootstrap(i):
     return {"pillars": [{"date": h.pillarDate().ISO(), "discount_factor": c.discount(h.pillarDate())} for h in hs]}, {"CRV." + i["interpolation"], "OIS.HELPER", "IDX"}
 
 
+def h_inspect_cm(i):
+    """MONOTONE_CONVEX: forwards from QuantLib ConvexMonotoneInterpolation(0, 1, forcePositive false) on the discrete
+    forwards of the pillars (ruling F-19); discount factors by scipy.integrate.quad of that forward, section by section
+    (the wheel does not expose the primitive); flat f(t_n-) beyond the last pillar (ruling F-20)."""
+    from scipy import integrate
+    cv = i["curve"]
+    a = D(cv["as_of"])
+    tn = [0.0] + [(D(p["date"]) - a).days / 365 for p in cv["pillars"]]
+    S = [1.0] + [p["discount_factor"] for p in cv["pillars"]]
+    fd = [math.log(S[k - 1] / S[k]) / (tn[k] - tn[k - 1]) for k in range(1, len(tn))]
+    ip = ql.ConvexMonotoneInterpolation(tn, [fd[0]] + fd, 0.0, 1.0, False)
+    fend = ip(tn[-1], True)
+    fwd = lambda u: ip(u, True) if u < tn[-1] else fend  # noqa: E731
+
+    def prim(u):
+        acc, lo = 0.0, 0.0
+        for k in range(1, len(tn)):
+            hi = min(u, tn[k])
+            if hi > lo:
+                acc += integrate.quad(fwd, lo, hi, epsabs=1e-16, epsrel=1e-13, limit=200)[0]
+            lo = tn[k]
+            if u <= tn[k]:
+                return acc
+        return acc + fend * (u - tn[-1])
+    out = {"discount_factors": [], "zero_rates": [], "instantaneous_forwards": []}
+    for s in i["dates"]:
+        u = (D(s) - a).days / 365
+        df = math.exp(-prim(u))
+        out["discount_factors"].append(df)
+        out["zero_rates"].append(None if u == 0 else -math.log(df) / u)
+        out["instantaneous_forwards"].append(fwd(min(u, tn[-1])) if u < tn[-1] else fend)
+    return out, {"CRV.MONOTONE_CONVEX", "SCIPY.QUAD"}
+
+
 def h_inspect(i):
     cv = i["curve"]
+    if cv["interpolation"] == "MONOTONE_CONVEX" and not cv.get("jumps"):
+        return h_inspect_cm(i)
     if cv["interpolation"] != "MONOTONIC_LOG_CUBIC" or cv.get("jumps"):
         raise NotImplementedError("only MONOTONIC_LOG_CUBIC without jumps has a QuantLib discount curve from pillars")
     a = D(cv["as_of"])
@@ -263,6 +301,10 @@ HANDLERS = {"usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupie
             "rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
 
 
+_A = json.loads((ROOT / "oracle" / "outside_arch_f.json").read_text(encoding="utf-8")) if (ROOT / "oracle" / "outside_arch_f.json").exists() else {"cases": {}, "version": None}
+ARCH, ARCH_VERSION = _A["cases"], _A["version"]
+
+
 def main():
     reg, partly, table = [], [], []
     for p in sorted((ROOT / "datasets" / "golden" / "stage_f").glob("*.json")):
@@ -279,6 +321,15 @@ def main():
                     n_ok += 1
                     reg.append({"case_id": c["case_id"], "operation": c["operation"], "source": "Cboe Volatility Index Methodology v6.0, Appendix 3",
                                 "convention_rows": ["CBOE.SAMPLE"], "map_review": REVIEW})
+                continue
+            if c["case_id"] in ARCH:
+                ok, why, _ = judge(c, ARCH[c["case_id"]])
+                if ok:
+                    n_ok += 1
+                    reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": "arch", "version": ARCH_VERSION,
+                                "convention_rows": ["ARCH.GARCH"], "map_review": REVIEW})
+                else:
+                    print(f"  NOT VERIFIED {c['case_id']} (arch): {why}")
                 continue
             h = HANDLERS.get(c["operation"])
             if not h:

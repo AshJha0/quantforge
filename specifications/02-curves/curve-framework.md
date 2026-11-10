@@ -94,7 +94,7 @@ interior nodes i = 1..n-1:  alpha_{i-1} M_{i-1} + (beta_{i-1} + beta_i) M_i + al
 alpha_i = 1/(sigma^2 h_i) - 1/(sigma sinh(z_i)),   beta_i = coth(z_i)/sigma - 1/(sigma^2 h_i)
 ```
 
-Evaluate in stable forms: `sinh(sigma u)/sinh(sigma h) = e^{-sigma (h - u)} (1 - e^{-2 sigma u})/(1 - e^{-2z})`, `1/sinh(z) = 2 e^{-z}/(1 - e^{-2z})`, `coth(z) = (1 + e^{-2z})/(1 - e^{-2z})`, with `1 - e^{-x}` computed as `-expm1(-x)`. When `z < 1e-3` use the cubic-spline limits `alpha = h/6 (1 - z^2/60)`, `beta = h/3 (1 - z^2/15)` and `R(u) = (u/h)(u^2 - h^2)/6`. Limits: `sigma -> 0` gives the natural cubic spline in `ln S` (QuantLib `NaturalLogCubicDiscountCurve`); `sigma -> infinity` gives `LOG_LINEAR_DF`. Checks: `tension` missing for `TENSION_SPLINE`: `E_INPUT`; `tension <= 0` or above 1000: `E_DOMAIN`. `tension` is ignored by the other methods.
+Evaluate in stable forms: `sinh(sigma u)/sinh(sigma h) = e^{-sigma (h - u)} (1 - e^{-2 sigma u})/(1 - e^{-2z})`, `1/sinh(z) = 2 e^{-z}/(1 - e^{-2z})`, `coth(z) = (1 + e^{-2z})/(1 - e^{-2z})`, with `1 - e^{-x}` computed as `-expm1(-x)`. When `z < 1e-3` use the series to `O(z^4)` (ruling F-35): `alpha = h/6 (1 - 7 z^2/60)`, `beta = h/3 (1 - z^2/15)` and `R(u) = (u/h)(u^2 - h^2)/6 (1 + sigma^2 (3 u^2 - 7 h^2)/60)`; the omitted terms are below `z^4 = 1e-12` relative. Limits: `sigma -> 0` gives the natural cubic spline in `ln S` (QuantLib `NaturalLogCubicDiscountCurve`); `sigma -> infinity` gives `LOG_LINEAR_DF`. Checks: `tension` missing for `TENSION_SPLINE`: `E_INPUT`; `tension <= 0` or above 1000: `E_DOMAIN`. `tension` is ignored by the other methods.
 
 ### `HYBRID`
 
