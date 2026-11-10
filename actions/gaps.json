@@ -11,7 +11,7 @@
   "from": "2026-11-07",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/cftc-cot-disaggregated",
@@ -25,7 +25,7 @@
   "from": "2026-11-07",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/ecb-estr",
@@ -41,7 +41,7 @@
   "from": "2026-11-07",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/eia-ng-bulk",
@@ -76,21 +76,21 @@
   "from": "2026-11-07",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/nyfed-sofr",
   "from": "2026-11-07",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/nyfed-tgcr",
   "from": "2026-11-07",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/ons-chaw",
@@ -118,41 +118,41 @@
   "from": "2026-11-09",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/us-treasury-par-yields",
   "from": "2026-11-07",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "recorder/us-treasury-real-yields",
   "from": "2026-11-09",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "study/R3-01",
   "from": "2026-11-09",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "study/R3-02",
   "from": "2026-11-09",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  },
  {
   "series": "study/R3-03",
   "from": "2026-11-09",
   "expected": 2,
   "missing": [],
-  "unchanged_run": 1
+  "unchanged_run": 0
  }
 ]
