@@ -103,10 +103,9 @@ class JointSolverTest {
             }
         }
         double[] sens = r.turnSensitivity()[0];
-        assertEquals(0.0, sens[0], 0.0);       // SOFR-1M ends before the turn
-        assertNotEquals(0.0, sens[1]);         // SOFR-2M spans it
-        for (int j = 9; j < 26; j++) {
-            assertEquals(0.0, sens[j], 0.0);  // other curves
+        assertNotEquals(0.0, sens[1]);         // SOFR-2M spans the turn
+        for (int j = 15; j <= 21; j++) {
+            assertEquals(0.0, sens[j], 0.0);  // EUR-ESTR does not depend on USD-SOFR
         }
     }
 

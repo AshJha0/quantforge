@@ -334,16 +334,48 @@ public final class JointSolver {
         return y;
     }
 
-    /** Fourth-order central difference: (8 (f(h) - f(-h)) - (f(2h) - f(-2h))) / (12 h). */
+    /**
+     * Central differences with Richardson extrapolation at h and h/2, h halved from 1e-5 until two successive
+     * extrapolated values agree (ruling F-28: a fixed stencil can straddle a kink of a piecewise interpolation).
+     */
     private static double[] stencil(java.util.function.DoubleFunction<double[]> f) {
         double h = H_JACOBIAN;
-        double[] p1 = f.apply(h);
-        double[] m1 = f.apply(-h);
-        double[] p2 = f.apply(2 * h);
-        double[] m2 = f.apply(-2 * h);
-        double[] d = new double[p1.length];
+        double[] dPrev = central(f, h);
+        double[] rPrev = null;
+        double[] best = null;
+        double bestGap = Double.POSITIVE_INFINITY;
+        for (int k = 0; k < 7; k++) {
+            double[] dHalf = central(f, h / 2.0);
+            double[] r = new double[dHalf.length];
+            for (int i = 0; i < r.length; i++) {
+                r[i] = (4.0 * dHalf[i] - dPrev[i]) / 3.0;
+            }
+            if (rPrev != null) {
+                double gap = 0.0;
+                for (int i = 0; i < r.length; i++) {
+                    gap = Math.max(gap, Math.abs(r[i] - rPrev[i]) / (1e-9 + 1e-6 * Math.abs(r[i])));
+                }
+                if (gap < bestGap) {
+                    bestGap = gap;
+                    best = r;
+                }
+                if (gap < 0.05) {
+                    return r;
+                }
+            }
+            rPrev = r;
+            dPrev = dHalf;
+            h /= 2.0;
+        }
+        return best;
+    }
+
+    private static double[] central(java.util.function.DoubleFunction<double[]> f, double h) {
+        double[] p = f.apply(h);
+        double[] m = f.apply(-h);
+        double[] d = new double[p.length];
         for (int i = 0; i < d.length; i++) {
-            d[i] = (8.0 * (p1[i] - m1[i]) - (p2[i] - m2[i])) / (12.0 * h);
+            d[i] = (p[i] - m[i]) / (2.0 * h);
         }
         return d;
     }
@@ -580,7 +612,8 @@ public final class JointSolver {
                     int jb = blockOf[j];
                     LocalDate[] span = blocks[jb].spans[rowOf[j]];
                     boolean straddles = !span[0].isAfter(td) && span[1].isAfter(td);
-                    if (!mine.contains(j) || !straddles) {
+                    boolean steps = b.spec.type() == CurveType.OIS_STEPS;
+                    if (jb < b.index || (steps && mine.contains(j) && !straddles)) {
                         row[j] = 0.0;
                         continue;
                     }
