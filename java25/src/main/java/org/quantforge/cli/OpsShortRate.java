@@ -6,6 +6,7 @@ import org.quantforge.cli.Operations.Out;
 import org.quantforge.core.QfError;
 import org.quantforge.pricing.G2pp;
 import org.quantforge.pricing.ShortRate;
+import org.quantforge.risk.McGreeks;
 
 /** Stage G short-rate models: bonds, bond options and the Hull-White swaption (short-rate-models.md). */
 final class OpsShortRate {
@@ -13,16 +14,16 @@ final class OpsShortRate {
 
     private static final int MAX_PILLARS = 10_000; // ruling G-6
 
-    private static QfError domain(String key) {
+    static QfError domain(String key) {
         return new QfError("E_DOMAIN", key + " is out of range", key);
     }
 
-    private static QfError input(String key) {
+    static QfError input(String key) {
         return new QfError("E_INPUT", key + " is not a listed value", key);
     }
 
     /** A string input whose unknown value is E_INPUT, as the stage G specs say. */
-    private static <E extends Enum<E>> E listed(In in, String key, Class<E> type) {
+    static <E extends Enum<E>> E listed(In in, String key, Class<E> type) {
         String s = in.string(key);
         for (E e : type.getEnumConstants()) {
             if (e.name().equals(s)) {
@@ -233,6 +234,57 @@ final class OpsShortRate {
             }
             return Operations.out("price", notional * G2pp.bondOption(p, type.equals("CALL"), k, t, s),
                     "bond_price_expiry", p.curve().df(t), "bond_price_maturity", p.curve().df(s));
+        });
+
+        table.put("risk.mc.greeks", in -> {
+            McGreeks.Payoff pay = listed(in, "payoff", McGreeks.Payoff.class);
+            McGreeks.Method method = listed(in, "method", McGreeks.Method.class);
+            long n = in.integer("paths");
+            long seed = in.u64("seed");
+            double s = in.real("spot");
+            double k = in.real("strike");
+            double t = in.real("expiry_years");
+            double r = in.real("rate");
+            double q = in.real("dividend_yield");
+            double v = in.real("vol");
+            boolean smoothed = method == McGreeks.Method.PATHWISE && pay == McGreeks.Payoff.DIGITAL_CALL;
+            boolean hasWidth = in.has("smoothing_width");
+            boolean hasBump = in.has("bump_relative");
+            double width = hasWidth ? in.real("smoothing_width") : 0.0;
+            double bump = hasBump ? in.real("bump_relative") : 0.0;
+            in.limit(n > 10_000_000L, "paths");
+            if (n < 2) {
+                throw input("paths");
+            }
+            in.gate();
+            if (!(s > 0.0)) {
+                throw domain("spot");
+            }
+            if (!(k > 0.0)) {
+                throw domain("strike");
+            }
+            if (!(t > 0.0)) {
+                throw domain("expiry_years");
+            }
+            if (!(v > 0.0)) {
+                throw domain("vol");
+            }
+            if (hasWidth != smoothed) {
+                throw input("smoothing_width");
+            }
+            boolean bumped = method == McGreeks.Method.BUMP;
+            if (hasBump != bumped) {
+                throw input("bump_relative");
+            }
+            if (smoothed && !(width > 0.0)) {
+                throw domain("smoothing_width");
+            }
+            if (bumped && !(bump > 0.0 && bump < 1.0)) {
+                throw domain("bump_relative");
+            }
+            McGreeks.Result g = McGreeks.run(pay, method, s, k, t, r, q, v, n, seed, width, bump);
+            return Operations.out("price", g.price(), "price_se", g.priceSe(), "delta", g.delta(), "delta_se",
+                    g.deltaSe(), "vega", g.vega(), "vega_se", g.vegaSe());
         });
     }
 }
