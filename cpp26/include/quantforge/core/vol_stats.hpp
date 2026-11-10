@@ -31,6 +31,31 @@ struct GarchFit {
 };
 GarchFit garch_fit(const std::vector<double>& returns, std::optional<double> initial_variance);
 
+// Stage F (R8, garch.md "Stage F additions", rulings F-11 to F-14).
+enum class GarchDistribution { Normal, StudentT };
+
+/// Innovation law and mean for the stage F log-likelihood. degrees_of_freedom is required for StudentT
+/// (else E_INPUT) and must be above 2 (else E_DOMAIN); it is ignored for Normal. The recursion runs on
+/// e_t = r_t - mean, and "SAMPLE" is (1/n) sum e_t^2.
+struct GarchLaw {
+    GarchDistribution distribution = GarchDistribution::Normal;
+    std::optional<double> degrees_of_freedom;
+    double mean = 0.0;
+};
+GarchLoglik garch_loglik(const std::vector<double>& returns, double omega, double alpha, double beta,
+                         std::optional<double> initial_variance, const GarchLaw& law);
+
+struct GarchEstimate {
+    double omega, alpha, beta;
+    std::optional<double> degrees_of_freedom;  // nullopt for Normal
+    double mean, loglik, persistence;
+    double se_omega, se_alpha, se_beta;
+    std::optional<double> se_degrees_of_freedom;
+};
+/// Maximum likelihood with observed-information standard errors. demean: mu is the sample mean, held fixed.
+GarchEstimate garch_estimate(const std::vector<double>& returns, std::optional<double> initial_variance,
+                             GarchDistribution distribution, bool demean);
+
 // ---- variance swaps ----
 
 struct StrikeVol {
@@ -56,8 +81,10 @@ VarSwapRealized varswap_realized(const std::vector<double>& prices, double perio
 
 // ---- VIX-style index ----
 
+/// A quote may be nullopt (stage F, ruling F-15): the series on that side is a null series.
 struct VixQuote {
-    double strike, call_bid, call_ask, put_bid, put_ask;
+    double strike;
+    std::optional<double> call_bid, call_ask, put_bid, put_ask;
 };
 struct VixTerm {
     long long minutes;

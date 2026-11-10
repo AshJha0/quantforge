@@ -4,7 +4,7 @@ use crate::conventions::{
     TERM_CALENDAR, TERM_CURRENCY, TERM_DAY_COUNT, TERM_FIXED_DAY_COUNT, TERM_FIXED_MONTHS,
     TERM_INDEX, TERM_MONTHS, TERM_SPOT_LAG,
 };
-use crate::curve::{Curve, Interpolation, SolveMethod, Solved, solve_curve};
+use crate::curve::{Curve, Discount, Interpolation, SolveMethod, Solved, solve_curve};
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
 
@@ -58,7 +58,11 @@ impl SwapLegs {
     }
 
     /// `(F, A)`.
-    pub fn legs(&self, discount: &Curve, projection: &Curve) -> Result<(f64, f64)> {
+    pub fn legs<D: Discount + ?Sized, P: Discount + ?Sized>(
+        &self,
+        discount: &D,
+        projection: &P,
+    ) -> Result<(f64, f64)> {
         let mut a = 0.0;
         for p in &self.fixed {
             a += alpha(TERM_FIXED_DAY_COUNT, p.start, p.end)? * discount.discount(p.end)?;
@@ -79,31 +83,22 @@ pub enum ProjectionQuote {
     Swap { months: i64, rate: f64 },
 }
 
-enum Instrument {
+/// A projection instrument with its dates fixed.
+#[derive(Debug, Clone)]
+pub enum Instrument {
     Simple(Date, Date),
     Swap(SwapLegs),
 }
 
-fn simple_rate(p: &Curve, s: Date, e: Date) -> Result<f64> {
+fn simple_rate<P: Discount + ?Sized>(p: &P, s: Date, e: Date) -> Result<f64> {
     Ok((p.discount(s)? / p.discount(e)? - 1.0) / alpha(TERM_DAY_COUNT, s, e)?)
 }
 
-pub fn bootstrap(
-    discount: &Curve,
-    as_of: Date,
-    quotes: &[ProjectionQuote],
-    interpolation: Interpolation,
-) -> Result<Solved> {
-    crate::error::finite("quotes", &quotes)?;
-    if quotes.is_empty() {
-        return fail("E_INPUT", "no quotes");
-    }
-    let s = spot(as_of)?;
-    let mut items = Vec::new();
-    let mut rates = Vec::new();
-    let mut dates = Vec::new();
-    for q in quotes {
-        let (item, rate, date) = match *q {
+impl Instrument {
+    /// `(instrument, quoted rate, pillar date)`, with the quote's own checks.
+    pub fn new(as_of: Date, q: &ProjectionQuote) -> Result<(Instrument, f64, Date)> {
+        let s = spot(as_of)?;
+        Ok(match *q {
             ProjectionQuote::Deposit { months, rate } => {
                 check_months(months)?;
                 let e = plus_months(s, months)?;
@@ -122,7 +117,40 @@ pub fn bootstrap(
                 let e = legs.last_end();
                 (Instrument::Swap(legs), rate, e)
             }
-        };
+        })
+    }
+
+    /// The model rate, projecting on `projection` and discounting swaps on `discount`.
+    pub fn model<D: Discount + ?Sized, P: Discount + ?Sized>(
+        &self,
+        discount: &D,
+        projection: &P,
+    ) -> Result<f64> {
+        match self {
+            Instrument::Simple(s, e) => simple_rate(projection, *s, *e),
+            Instrument::Swap(legs) => {
+                let (f, a) = legs.legs(discount, projection)?;
+                Ok(f / a)
+            }
+        }
+    }
+}
+
+pub fn bootstrap(
+    discount: &Curve,
+    as_of: Date,
+    quotes: &[ProjectionQuote],
+    interpolation: Interpolation,
+) -> Result<Solved> {
+    crate::error::finite("quotes", &quotes)?;
+    if quotes.is_empty() {
+        return fail("E_INPUT", "no quotes");
+    }
+    let mut items = Vec::new();
+    let mut rates = Vec::new();
+    let mut dates = Vec::new();
+    for q in quotes {
+        let (item, rate, date) = Instrument::new(as_of, q)?;
         items.push(item);
         rates.push(rate);
         dates.push(date);
@@ -130,13 +158,7 @@ pub fn bootstrap(
     if dates[0] <= as_of || dates.windows(2).any(|w| w[1] <= w[0]) {
         return fail("E_INPUT", "quotes are not in pillar order");
     }
-    let model = |c: &Curve, j: usize| match &items[j] {
-        Instrument::Simple(s, e) => simple_rate(c, *s, *e),
-        Instrument::Swap(legs) => {
-            let (f, a) = legs.legs(discount, c)?;
-            Ok(f / a)
-        }
-    };
+    let model = |c: &Curve, j: usize| items[j].model(discount, c);
     solve_curve(
         as_of,
         interpolation,

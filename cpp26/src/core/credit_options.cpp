@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <utility>
 #include <cmath>
 #include <numbers>
 #include <string>
@@ -211,7 +212,7 @@ CdsOptionPrice cds_option_price(const CdsOptionInputs& in, double vol) {
     const Legs l = cds_legs(in);
     if (!(vol >= 0)) throw Error("E_DOMAIN", "vol is negative", "vol");
     const double f = l.protection / l.annuity, phi = in.payer ? 1.0 : -1.0;
-    const double fep = in.notional * (1 - in.recovery) * (1 - l.s_expiry) * l.p_expiry;
+    const double fep = in.notional * (1 - in.recovery) * (-std::expm1(-in.hazard_rate * l.t_expiry)) * l.p_expiry;
     double price = in.notional * l.annuity * black_price(f, in.strike, vol, l.t_expiry, 1.0, phi);
     if (in.payer && !in.knock_out) price += fep;
     return {price, f, l.annuity, fep};
@@ -229,6 +230,75 @@ double cds_option_implied_vol(const CdsOptionInputs& in, double premium) {
     double hi = 1.0;
     for (int i = 0; gap(hi) < 0 && i < 200; ++i) hi *= 2;
     return bisect(gap, 0.0, hi);
+}
+
+namespace {
+// Strike legs measured from expiry on a flat hazard x (ruling F-8): returns {prot', A'}.
+struct StrikeLegs {
+    std::vector<Date> dates;
+    Date expiry;
+    double rate, recovery;
+    std::pair<double, double> at(double x) const {
+        const auto t = [&](Date d) { return double(days_between(expiry, d)) / 365.0; };
+        double prot = 0.0, ann = 0.0;
+        for (std::size_t i = 0; i + 1 < dates.size(); ++i) {
+            const Date a = dates[i], b = dates[i + 1];
+            const int len = days_between(a, b);
+            const Date m = a + std::chrono::days{len / 2};
+            const double sa = std::exp(-x * t(a)), sb = std::exp(-x * t(b)), pm = std::exp(-rate * t(m));
+            const double pb = std::exp(-rate * t(b));
+            prot += (1 - recovery) * pm * (sa - sb);
+            ann += double(len) / 360.0 * pb * sb + double(days_between(a, m)) / 360.0 * pm * (sa - sb);
+        }
+        return {prot, ann};
+    }
+};
+}  // namespace
+
+CdsIndexOptionPrice cds_index_option_price(const CdsIndexOptionInputs& in) {
+    require_finite(in.rate, "rate");
+    require_finite(in.hazard_rate, "hazard_rate");
+    require_finite(in.recovery, "recovery");
+    require_finite(in.strike, "strike");
+    require_finite(in.coupon, "coupon");
+    require_finite(in.notional, "notional");
+    require_finite(in.vol, "vol");
+    const CdsOptionInputs base{in.as_of, in.expiry, in.maturity, in.rate, in.hazard_rate, in.recovery, in.payer, in.strike, in.notional, false};
+    const Legs l = cds_legs(base);  // dates, recovery, hazard_rate, strike checks
+    if (!(in.coupon >= 0)) throw Error("E_DOMAIN", "coupon is negative", "coupon");
+    if (!(in.vol >= 0)) throw Error("E_DOMAIN", "vol is negative", "vol");
+    if (!(in.notional > 0)) throw Error("E_DOMAIN", "notional is not above 0", "notional");
+    const double a = l.annuity, f = l.protection / a;
+    const double fep = (1 - in.recovery) * (-std::expm1(-in.hazard_rate * l.t_expiry)) * l.p_expiry;
+    // Strike hazard h_K: prot'/A' = K, bisection on [0, x_hi] to the last representable step.
+    StrikeLegs sl{{in.expiry}, in.expiry, in.rate, in.recovery};
+    for (int k = 1;; ++k) {
+        const Date d = add_months(in.expiry, 3 * k);
+        if (d >= in.maturity) break;
+        sl.dates.push_back(d);
+    }
+    sl.dates.push_back(in.maturity);
+    const auto gap = [&](double x) {
+        const auto [p, an] = sl.at(x);
+        return p / an - in.strike;
+    };
+    double lo = 0.0, hi = 2 * in.strike / (1 - in.recovery);
+    for (int i = 0; gap(hi) <= 0 && i < 2000; ++i) lo = hi, hi *= 2;
+    for (int i = 0; i < 2000; ++i) {
+        const double mid = 0.5 * (lo + hi);
+        if (mid <= lo || mid >= hi) break;
+        if (gap(mid) < 0) lo = mid;
+        else hi = mid;
+    }
+    const double hk = std::fabs(gap(lo)) <= std::fabs(gap(hi)) ? lo : hi;
+    const double ak = sl.at(hk).second;
+    const double g = (in.strike - in.coupon) * ak;
+    const double fadj = f + fep / a, kadj = in.coupon + g * l.p_expiry / a;
+    if (!(fadj > 0)) throw Error("E_DOMAIN", "adjusted forward is not above 0", "hazard_rate");
+    if (!(kadj > 0)) throw Error("E_DOMAIN", "adjusted strike is not above 0", "strike");
+    const double phi = in.payer ? 1.0 : -1.0;
+    const double unit = in.vol > 0 ? black_price(fadj, kadj, in.vol, l.t_expiry, 1.0, phi) : std::max(phi * (fadj - kadj), 0.0);
+    return {in.notional * a * unit, f, fadj, kadj, a, ak, hk, in.notional * g, in.notional * fep};
 }
 
 JointDefault copula_joint_default(CopulaKind kind, const std::vector<double>& p, double rho, std::optional<double> nu) {

@@ -6,8 +6,10 @@ sqrt(w_i) (m_i - y_i), then sqrt(lambda) (p - prior).
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
+from datetime import date
 
 from . import linalg, ois
+from .curves import CurveData
 from .errors import QfError
 from .finite import guard
 
@@ -39,7 +41,8 @@ def _model(name: str, x: float, p: Floats) -> float:
 
 
 class _Problem:
-    def __init__(self, model, x, y, weights, lam, prior):
+    def __init__(self, model: str, x: Floats, y: Floats, weights: Floats, lam: float,
+                 prior: Floats) -> None:
         self.model, self.x, self.y = model, x, y
         self.root_w = [math.sqrt(w) for w in weights]
         self.root_lam = math.sqrt(lam)
@@ -322,7 +325,7 @@ def check_bid_ask(fitted: Floats, bid: Floats, ask: Floats) -> list[dict[str, ob
     return breaches
 
 
-def _zero_rates(data: ois.CurveData) -> list[float]:
+def _zero_rates(data: CurveData) -> list[float]:
     return [
         -math.log(v) / ((d - data.as_of).days / 365)
         for d, v in zip(data.dates, data.discount_factors, strict=True)
@@ -330,7 +333,7 @@ def _zero_rates(data: ois.CurveData) -> list[float]:
 
 
 def curve_report(
-    convention: str, as_of, quotes: Sequence[ois.Quote], interpolation: str
+    convention: str, as_of: date, quotes: Sequence[ois.Quote], interpolation: str
 ) -> tuple[list[list[float]], float, float]:
     """Returns (jacobian, condition number, max repricing error), by a central bump of 1e-5."""
     import numpy  # loaded only here, to keep CLI start-up short

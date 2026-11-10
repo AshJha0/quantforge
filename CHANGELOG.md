@@ -1,10 +1,25 @@
 # Changelog
 
-## Unreleased: stage F, part 1 (wave 0, lanes)
+## 0.6.0: stage F, curve layer, portfolio risk and book (unreleased)
 
-Stage F (target v0.6.0) lands in two pull requests. This first one holds wave 0 and the parallel lanes; the curve layer, risk and book follow in part 2. No golden value of an earlier stage changed.
+Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
 
-### Added
+### Verified on the merged part 2 tree (`db99d87`, 2026-11-10)
+- On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases: Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Observed, one full run per language.
+- Gates: `quality_gate.py --check-specs` and `--check-register` (no new gaps), `check_hygiene.py`, `gen_name_map.py --check`, `governance_gate.py`, the site build (0 broken links) and the banned-word check (`git grep -i` for the word the project does not use; no hits) all pass.
+- Outside oracle: 225 of 438 stage F value cases (51.4%), **below the 60% floor** (known issue below).
+- The CLIs of Java and Python reported version 0.4.0 at `db99d87`; both now report 0.6.0, like C++ and Rust. That changes no output.
+
+### Added (part 2)
+- F1 curve layer: monotone convex (Hagan and West), monotonic log cubic, tension spline and hybrid interpolation, and `rates.curve.inspect` (`02-curves/curve-framework.md`, rulings F-18 to F-22, F-35). `rates.curve.joint_solve` adds a joint multi-curve solve with solved turns, meeting-date steps fitted to SR3 futures after convexity, and the IFT Jacobian. `rates.funding.curve` adds a funding curve over OIS (`02-curves/joint-solve-and-funding.md`, F-24 to F-28).
+- F3 sensitivities: `risk.book.ois_sensitivity` (Q3a: exact par-quote risk and zero Jacobian of an OIS book, with an AAD reference in Rust), `risk.curve.pca`, `risk.curve.cross_gamma`, `risk.credit.jtd` (`06-risk/book-sensitivities.md`, F-29, F-30, F-36).
+- F4 portfolio risk: historical, filtered historical, parametric and Monte Carlo VaR and ES; Kupiec, Christoffersen and the Basel traffic light (`06-risk/var-es-and-backtests.md`, F-31, F-32, F-39); FRTB-SA GIRR delta under MAR21 (`06-risk/frtb-sa-girr.md`, F-33).
+- F5 book and use case 4: `book.lifecycle.apply`, `book.marks.resolve` (`07-portfolio/book-lifecycle.md`, F-34); `usecase.factor_attribution` (`04-pricing/use-cases.md`).
+- F6 model fixes: R7 CDS index option on Pedersen's adjusted forward, R8 GARCH estimates with standard errors and Student-t innovations (the coverage study puts every parameter inside its preregistered band), R10 VIX null quotes and local-vol continuity at slice expiries.
+- 438 stage F value goldens in 11 suites, besides the 5,207 E1 goldens: 12,462 golden cases in 125 suite files (counted from `datasets/golden/`). New tolerance classes `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. Model inventory entries MF-1 to MF-11.
+- Outside oracle for stage F (`oracle/outside_f.py`): QuantLib 1.44, SciPy, NumPy and `arch` 7.2.0. `arch` runs under WSL, because Windows Application Control blocks pandas on the host.
+
+### Added (part 1)
 - T: tightened acceptance rows for A3, A4, A5, A7, Q1, Q3a and the equivalent-mutant sign-off, with parameters fixed before the items are built (`program/STAGE_F_HANDOVER.md`).
 - E1: every public numeric input must be finite, else `E_DOMAIN`; a token in an Integer field is `E_SCHEMA` (ruling F-1). 5,207 shared goldens with NaN, +inf, -inf and -0.0 per input of every verb, passed by all four languages.
 - E4: cross-language name map generated from the specs, and the API style ADR. Q5b: convergence order and limit-case field in the spec template, checked by `tools/quality_gate.py --check-specs`.
@@ -15,8 +30,20 @@ Stage F (target v0.6.0) lands in two pull requests. This first one holds wave 0 
 - R4: the forward-log head hash is anchored to OpenTimestamps by the recorder, with a verifier that detects a rewritten history.
 
 ### Changed
+- Versions are 0.6.0 in all four builds (`cpp26/CMakeLists.txt`, `java25/pom.xml`, `python/pyproject.toml`, `rust/Cargo.toml` and their lock files), the oracle (`oracle/python/pyproject.toml`, `uv.lock`) and `oracle/strata/pom.xml`; the site facts name stage F as the pending release.
 - G4: modules are named by domain, not by stage letter, in all four languages, and CLI dispatch uses a registry. Conformance is unchanged. Mutation and quality configs follow the new paths.
 - G9: Rust denies `clippy::unwrap_used` outside tests.
+
+### Known issues (0.6.0)
+- **Outside-oracle share is 51.4% (225 of 438): the 60% floor is not met.** Error cases stay in the denominator (coordinator ruling). `oracle/OUTSIDE_GAPS_F.md` lists every case without a free outside source, with its reason; 79 of the 213 are error cases. The R5 second review of the outside register is still owed.
+- **R7 has no outside case.** Pedersen (2003), the CDS index option's reference example, is not freely available.
+- **FRTB-SA GIRR `low` scenario formula is unconfirmed:** it is an image in MAR21.6 (ruling F-33). The equity FRTB parameters were read only in summary.
+- **Deferred to wave 2b:**
+  - F3: Inflation01, dividend and borrow sensitivity, correlation sensitivity;
+  - F4: reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves;
+  - FRTB: vega, curvature and the other risk classes.
+- **E1 cases for the stage F operations are not yet generated** (`gen_stage_f_e1.py` skips `stage_f`).
+- **Mutation scores below 80% remain.** PR #25's mutation report (Actions run 42705795220) put 33 module and language pairs below the 80% target; C++, Python and Rust there sample 12 mutants per module, so those figures are coarse. Part 2 adds tests aimed at the named survivors. Local reruns, observed 2026-11-10: Java PIT puts all seven listed modules above 80%; C++ rates_vol 100%, arb_surface 100%, correlation 83.3%, while credit and multicurve stay below 80% with survivors judged equivalent (not yet signed off); Python bonds 12 of 12 sampled mutants killed (was 8), with tests added for fx_smile, variance, CPI, compounding and swaptions but no fresh full score; Rust adds targeted xccy tests, and has no local score, because the `cargo-mutants` copy build fails on a data file outside `rust/`. The PR mutation job gives the CI figures.
 
 ## 0.5.0: stage E, full volatility and exotics (2026-11-09)
 

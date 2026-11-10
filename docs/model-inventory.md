@@ -336,6 +336,156 @@ Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "
 
 Every cell is at or above the 80% target after the closeout tests, on the evidence classes above.
 
+## Stage F models (waves 1 to 3: F1 curve layer, F3 sensitivities, F4 portfolio risk, F5 book, F6 model fixes)
+
+Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of the golden suite file that pins the model, as committed by the spec session (`sha256sum datasets/golden/stage_f/<suite>.json`); a golden regeneration changes it and must be recorded here. Tier: 1 = feeds prices or risk that a desk would act on; 2 = feeds analytics and reports; 3 = research or challenger.
+
+| # | Model | Spec | Stage | Status | Outside-checked |
+|---|---|---|---|---|---|
+| MF-1 | CDS index option, Pedersen adjusted forward | `04-pricing/credit-options-and-copulas.md` | F (R7) | Implemented | none (no free outside source) |
+| MF-2 | GARCH(1,1) estimate with standard errors, Student-t, demeaning | `05-volatility/garch.md` | F (R8) | Implemented | arch 7.2.0, 8 of 17 |
+| MF-3 | VIX null-quote rule; local vol at slice expiries | `05-volatility/vix-index.md`, `05-volatility/local-and-forward-vol.md` | F (R10) | Implemented | VIX: Cboe sample calculation, 3 of 10 |
+| MF-4 | Curve interpolation: monotone convex, monotonic log cubic, tension spline, hybrid | `02-curves/curve-framework.md` | F (Q1) | Implemented | 67 of 86 (QuantLib 1.44, SciPy quad) |
+| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Implemented | 1 of 15 (QuantLib 1.44 rebuild with Jacobian) |
+| MF-6 | Funding curve (spread over OIS) | `02-curves/joint-solve-and-funding.md` | F | Implemented | none |
+| MF-7 | Book sensitivities: AAD reference, IFT zero Jacobian, PCA, cross gamma, jump to default | `06-risk/book-sensitivities.md` | F (Q3a, F3) | Implemented | PCA: SciPy; cross gamma: QuantLib (30 of 57) |
+| MF-8 | VaR and ES (historical, filtered historical, parametric, Monte Carlo) and backtests | `06-risk/var-es-and-backtests.md` | F (Q2) | Implemented | SciPy, NumPy, arch (92 of 108) |
+| MF-9 | FRTB-SA GIRR delta | `06-risk/frtb-sa-girr.md` | F (Q2) | Implemented | none (no worked example in MAR21) |
+| MF-10 | Book lifecycle and end-of-day marks | `07-portfolio/book-lifecycle.md` | F (F5) | Implemented | none (own conventions) |
+| MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F (F5) | Implemented | SciPy lstsq (24 of 27) |
+
+### MF-1 CDS index option (Pedersen)
+- **Purpose:** payer and receiver options on a CDS index with front-end protection inside the forward and the strike converted for the fixed coupon.
+- **Inputs:** dates, flat index rate and hazard, recovery, strike spread, index coupon, notional, vol.
+- **Limitations:** stylised legs (ruling E-B22), not the ISDA standard model; flat hazard for the strike annuity; Black on the adjusted pair is Pedersen's approximation, not his exact integral; no index factor or defaulted-name bookkeeping.
+- **Validation:** parity `payer - receiver = N A (F_adj - K_adj)` on every pair; limit cases; five wrong conventions caught. The Pedersen (2003) worked example is not reproduced (paper not freely available). **Review:** 2026-11-09.
+- **Tier:** 1 (prices a traded option).
+- **Challenger:** Pedersen's exact model (lognormal loss-adjusted index value integrated numerically), stage G.
+- **Monitoring thresholds:** parity residual above 1e-10 relative, or any golden outside 1e-9 per unit notional, fails conformance.
+- **Data lineage hash:** sha256 ad2336be619b7ed8d6f51621479f34c7986ae8b0f5334dfebffa4444538d6f25
+- **Retirement trigger:** an ISDA-standard-model index option (stage G) that matches market upfronts replaces the stylised legs.
+- **Validation report:** `oracle/REPORT.md` (stage F section) and `specifications/04-pricing/credit-options-and-copulas.md` (R7 acceptance).
+
+### MF-2 GARCH estimate
+- **Purpose:** maximum-likelihood GARCH(1,1) parameters with observed-information standard errors, Gaussian or unit-variance Student-t innovations, optional two-step demeaning.
+- **Inputs:** returns, initial variance rule, distribution, demean flag.
+- **Limitations:** interior optima only (boundary fits return `E_NO_CONVERGENCE`); the demeaning step's error is not in the standard errors; no QML sandwich; univariate only.
+- **Validation:** 50-digit Newton optimum with exact second derivatives; scipy multi-start does not beat it; simulated parameters recovered within 2 SE on the golden series; coverage study over 200 series per distribution in `oracle/R8_COVERAGE.json`. **Review:** 2026-11-09.
+- **Tier:** 2 (volatility forecasts for analytics and VaR filtering).
+- **Challenger:** the `arch` Python package (not a dependency; an offline comparison is allowed in stage J).
+- **Monitoring thresholds:** parameters outside 1e-6 relative or standard errors outside 1e-5 relative across languages fail conformance; coverage outside [0.90, 0.99] fails the oracle run.
+- **Data lineage hash:** sha256 e84b9fe4a6af37a249755f1545110840883360bd464f79898a559cb4eceeb457
+- **Retirement trigger:** a multivariate or asymmetric (GJR, EGARCH) model with its own goldens supersedes it for VaR filtering.
+- **Validation report:** `oracle/REPORT.md`; `oracle/R8_COVERAGE.json`.
+
+### MF-3 VIX null quotes and local-vol continuity
+- **Purpose:** the Cboe rule for null quotes in the VIX strip; a stated and tested behaviour of Dupire local vol at SVI slice expiries.
+- **Inputs:** option strip with nullable quotes; SVI slices and points.
+- **Limitations:** crossed quotes are refused, not filtered (Cboe filters them with quote history); local vol jumps at slice expiries by construction (linear total variance in time).
+- **Validation:** the Cboe v6.0 sample calculation reproduced to every printed digit; continuity and jump formulas asserted at every slice expiry. **Review:** 2026-11-09.
+- **Tier:** 2.
+- **Challenger:** a C1-in-time surface (stage G) for local vol.
+- **Monitoring thresholds:** the Cboe sample case must round to the printed values; any continuity assertion failing stops the oracle run.
+- **Data lineage hash:** sha256 c2a308ff9004a417aa74c2c2c6c99f2458078c9ccc12debdae6c745eba5ac2c2; sha256 04a242b21faacd43475d19edbd9aa649614f07588a41a9b6a97d04674cf14491
+- **Retirement trigger:** a C1 surface interpolation in time replaces the documented jump.
+- **Validation report:** `specifications/05-volatility/vix-index.md` and `local-and-forward-vol.md` (stage F sections).
+
+### MF-4 Curve interpolation (Q1)
+- **Purpose:** four more interpolations for discount and projection curves: monotone convex (Hagan-West), monotonic log cubic (Hyman), exponential tension spline, hybrid step-then-smooth.
+- **Inputs:** curve object with `interpolation`, `tension`, `step_end`.
+- **Limitations:** monotone convex without QuantLib's forcePositive (it breaks repricing; ruling F-19), so a negative forward is possible on steep data; tension is a single global parameter; non-local methods need a global bootstrap.
+- **Validation:** QuantLib 1.44 `ConvexMonotoneInterpolation`, `MonotonicLogCubicDiscountCurve` and full `PiecewiseYieldCurve` builds; locality, continuity and limit cases. **Review:** 2026-11-09.
+- **Tier:** 1 (curves feed every price).
+- **Challenger:** `LOG_LINEAR_DF` (the stage B default) on the same quotes; the hybrid against `MONOTONE_CONVEX`.
+- **Monitoring thresholds:** pillars or zero rates more than 1e-10 from QuantLib on the golden builds; a forward jump above 1e-12 at an interior pillar.
+- **Data lineage hash:** sha256 291dd8a43870fa08437b0557e65e93f50a61eb865b584ae5fc5bb76733cdcbbf
+- **Retirement trigger:** a smoothing method with a published market standard (for example an ISDA SIMM curve rule) that QuantLib also implements.
+- **Validation report:** `oracle/outside_register_f.json`; `specifications/02-curves/curve-framework.md` (stage F acceptance).
+
+### MF-5 Joint multi-curve solve (Q4)
+- **Purpose:** OIS, term projection and cross-currency curves solved together, with year-end turns solved from quotes, meeting-date steps fitted to SOFR futures after Hull-White convexity, and the full Jacobian of curve unknowns to quotes.
+- **Inputs:** curve definitions in dependency order; instruments with quotes.
+- **Limitations:** constant-notional cross-currency swaps only (synthetic, ruling R1-1); convexity from a one-factor Hull-White model with caller-given parameters; no bid/offer; turn sizes are solved, so a turn needs a quote that spans it.
+- **Validation:** repricing to 1e-13; IFT Jacobian against bump-and-rebuild of the whole system; turn sensitivity zero on non-spanning instruments; QuantLib repricing of the curves it can build. **Review:** 2026-11-09.
+- **Tier:** 1.
+- **Challenger:** sequential stage B and D bootstraps on the same quotes (`rates.ois.bootstrap`, `rates.curve.joint_bootstrap`).
+- **Monitoring thresholds:** any residual above 1e-13; Jacobian outside `1e-9 + 1e-6 |ref|` of bump-and-rebuild.
+- **Data lineage hash:** sha256 9e85177418877d2d7de85f831f16863820248b9d93a154c0262696cf41fe208f
+- **Retirement trigger:** mark-to-market cross-currency swaps and a calibrated convexity model (stage G) replace the synthetic pieces.
+- **Validation report:** `specifications/02-curves/joint-solve-and-funding.md` (acceptance); `oracle/outside_register_f.json`.
+
+### MF-6 Funding curve
+- **Purpose:** an unsecured funding discount curve as OIS times a piecewise-flat spread, for uncollateralised discounting and stage G FVA.
+- **Inputs:** OIS curve, simple ACT/360 funding quotes, dates.
+- **Limitations:** zero-coupon money-market quotes only (no bond-implied funding); flat spread beyond the last quote; one funding curve per currency.
+- **Validation:** closed form, the zero-spread limit, repricing of every quote to 1e-15. **Review:** 2026-11-09.
+- **Tier:** 2 (feeds FVA, not prices, until stage G).
+- **Challenger:** a bond-implied funding curve (Z-spread of own issuance) in stage G.
+- **Monitoring thresholds:** a quote not repriced to 1e-12.
+- **Data lineage hash:** sha256 9e85177418877d2d7de85f831f16863820248b9d93a154c0262696cf41fe208f
+- **Retirement trigger:** a funding model with term structure from issued bonds and CDS supersedes the money-market version.
+- **Validation report:** `specifications/02-curves/joint-solve-and-funding.md`.
+
+### MF-7 Book sensitivities (Q3a, F3)
+- **Purpose:** exact par-quote sensitivities of an OIS swap book and the zero-rate Jacobian of the curve (AAD in Rust, IFT elsewhere); principal components of curve moves; cross gamma on pillar zero rates; jump-to-default loss.
+- **Inputs:** OIS quotes and a swap book; a matrix of curve changes; a curve object and an OIS trade; credit positions.
+- **Limitations:** OIS books only for AAD; JTD without accrued premium or the FRTB default risk charge weighting; PCA rejects repeated eigenvalues.
+- **Validation:** 40-digit IFT goldens (no bump in the golden); T row Q3a bounds; PCA against SciPy. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** bump and revalue (`risk.curve.par`, R2).
+- **Monitoring thresholds:** AAD outside `1e-10 + 1e-8 |ref|` of the Richardson bump in the Rust unit tests.
+- **Data lineage hash:** sha256 4038828afe7c4244702949e846effbf7c2837adfab623c267bec655060e7fade
+- **Retirement trigger:** AAD through every pricer replaces bump risk as the default (a later stage, by ADR).
+- **Validation report:** `specifications/06-risk/book-sensitivities.md`; `oracle/outside_register_f.json`.
+
+### MF-8 VaR, ES and backtests (Q2)
+- **Purpose:** loss quantile and tail mean from historical, volatility-rescaled, normal and simulated P&L; Kupiec, Christoffersen and the Basel traffic light.
+- **Inputs:** P&L or return series, positions, covariance, exception series.
+- **Limitations:** one-asset FHS; normal parametric only; Monte Carlo on a multivariate normal; no liquidity horizon scaling.
+- **Validation:** 40-digit replicas; SciPy and NumPy outside checks. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** full revaluation against sensitivity P&L (`risk.pnl.explain`).
+- **Monitoring thresholds:** a traffic-light zone of YELLOW or RED on the bank's own backtest.
+- **Data lineage hash:** sha256 325cffa5419606d7099fe040897e0dc14f77b9836538c467f90448b2d72beaaa
+- **Retirement trigger:** a full-revaluation historical engine on real positions (stage G and later).
+- **Validation report:** `specifications/06-risk/var-es-and-backtests.md`.
+
+### MF-9 FRTB-SA GIRR delta (Q2)
+- **Purpose:** standardised capital for interest rate delta under MAR21.
+- **Inputs:** delta sensitivities per currency, curve and tenor.
+- **Limitations:** GIRR delta only; the `low` scenario formula is transcribed from an image (ruling F-33, known issue).
+- **Validation:** 40-digit replica; tenor correlation reproduces MAR21.46 Table 2. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** none free.
+- **Monitoring thresholds:** a change in MAR21 parameters.
+- **Data lineage hash:** sha256 19af72de698789e30aae463a478edb8686b86c0a49fd566adf72a70c00e2c7b9
+- **Retirement trigger:** the full SBM (all risk classes, vega and curvature).
+- **Validation report:** `specifications/06-risk/frtb-sa-girr.md`.
+
+### MF-10 Book lifecycle and marks (F5)
+- **Purpose:** positions, average cost and realised P&L through trades, expiry, default and rolls; fixings; end-of-day marks with source fallback and independent price verification.
+- **Inputs:** opening positions and dated events; quote sources in priority order; independent prices.
+- **Limitations:** average cost only; no corporate actions, settlement dates or multi-currency cash.
+- **Validation:** exact rational replay. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** none (own conventions).
+- **Monitoring thresholds:** any IPV breach; any MISSING mark.
+- **Data lineage hash:** sha256 9da28acc6934e4b88f5d32ca702a2ac32c0ba94216a03c6ab46c7897bd2b255b
+- **Retirement trigger:** a lot-level book with settlement accounting.
+- **Validation report:** `specifications/07-portfolio/book-lifecycle.md`.
+
+### MF-11 Factor attribution (use case 4)
+- **Purpose:** split a portfolio's mean return into factor contributions and alpha by least squares with an intercept.
+- **Inputs:** portfolio and factor return series.
+- **Limitations:** static betas over the window; no Brinson sector attribution.
+- **Validation:** 40-digit normal equations; SciPy lstsq outside check. **Review:** 2026-11-10.
+- **Tier:** 2.
+- **Challenger:** rolling-window regression.
+- **Monitoring thresholds:** `r_squared` below a desk-set floor.
+- **Data lineage hash:** sha256 64021394cb4fe8252e1724f76054935cdee1a23eb8006db0925c767673efc6f5
+- **Retirement trigger:** a holdings-based factor model.
+- **Validation report:** `specifications/04-pricing/use-cases.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

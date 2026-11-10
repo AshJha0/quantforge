@@ -1,11 +1,11 @@
 {
   "note": "Release facts for the site home (tools/site_home.html). A release edits this file only: tools/build_site.py fills {{name}} placeholders from here, and counts the rest (version from python/pyproject.toml unless set here, golden cases, suite files and stage E cases and operations from datasets/golden, recorder sources from tools/recorder/sources.json). The build fails on an unknown or unfilled placeholder.",
-  "release": "stage E, full volatility and exotics: SVI and SSVI surfaces, local and stochastic volatility, FX smile, exotics",
-  "released": "2026-11-09",
-  "implemented_stages": "A to E",
+  "release": "stage F, curve layer, portfolio risk and book: joint curve solve with IFT Jacobian, AAD risk, VaR/ES and backtests, FRTB-SA GIRR delta, book lifecycle",
+  "released": "not yet tagged (part 2 merge pending)",
+  "implemented_stages": "A to F",
   "languages": "Java 25, C++26, Python 3.15, Rust 2024",
   "domains": "12",
   "stages": "11 stages, A to K",
-  "version": "0.5.0",
-  "outside_share": "62.2%"
+  "version": "0.6.0",
+  "outside_share": "51.4% (stage F, below the 60% floor)"
 }

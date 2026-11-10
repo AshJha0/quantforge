@@ -24,7 +24,7 @@ def _parse(amount: str) -> int:
     if len(whole) > 18 or len(fraction) > _PLACES:
         raise QfError("E_LIMIT", "an amount has more digits than allowed", "amount")
     units = int(whole) * _SCALE + int(fraction.ljust(_PLACES, "0"))
-    return -units if negative else units
+    return int(-units if negative else units)
 
 
 def _format(units: int, places: int | None = None) -> str:

@@ -161,6 +161,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "exotic.american.crr": _caps(steps=20_000),
     "exotic.american.fd": _fd_grid,
     "vol.sabr.arbfree": _caps(cells=20_000, steps=20_000),
+    "risk.var.monte_carlo": _caps(paths=10_000_000),
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -173,7 +174,42 @@ SURFACE_GRIDS = {"vol.svi.surface_check": "log_moneyness", "vol.svi.fit_surface"
                    "vol.local.dupire": "points"}
 
 
-def _check_arrays(raw: Raw) -> None:
+# Ruling F-42: stage F sizes. key -> limit on that array's length, wherever the key appears; these
+# keys are exempt from the generic MAX_ARRAY. "#rows"/"#cols" name the shape of a matrix key.
+STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
+    "risk.book.ois_sensitivity": {"swaps": 10_000},
+    "risk.curve.pca": {"changes": 100_000, "changes#cols": 200},
+    "risk.var.historical": {"pnl": 1_000_000},
+    "risk.var.filtered_historical": {"returns": 1_000_000},
+    "risk.var.monte_carlo": {"mean": 100, "weights": 100, "covariance": 100},
+    "risk.backtest.christoffersen": {"exceptions": 1_000_000},
+    "risk.frtb.girr_delta": {"sensitivities": 100_000},
+    "book.lifecycle.apply": {"events": 1_000_000, "positions": 100_000},
+    "book.marks.resolve": {"instruments": 100_000, "quotes": 1_000_000},
+    "usecase.factor_attribution": {"portfolio_returns": 100_000, "factor_returns": 100_000,
+                                   "factor_names": 50, "factor_returns#cols": 50},
+}
+
+
+def _check_stage_f(raw: Raw, limits: Mapping[str, int]) -> None:
+    stack: list[Any] = [raw]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, dict):
+            for key, value in item.items():
+                if isinstance(value, list) and key in limits and len(value) > limits[key]:
+                    raise _over(key, limits[key])
+                cols = limits.get(f"{key}#cols")
+                if cols is not None and isinstance(value, list) and any(
+                        isinstance(r, list) and len(r) > cols for r in value):
+                    raise _over(key, cols)
+                if isinstance(value, (list, dict)):
+                    stack.append(value)
+        elif isinstance(item, list):
+            stack.extend(v for v in item if isinstance(v, (list, dict)))
+
+
+def _check_arrays(raw: Raw, exempt: Mapping[str, int] | None = None) -> None:
     stack: list[Any] = [raw]
     while stack:
         item = stack.pop()
@@ -182,7 +218,11 @@ def _check_arrays(raw: Raw) -> None:
                 raise _over("an array", MAX_ARRAY)
             stack.extend(v for v in item if isinstance(v, (list, dict)))
         elif isinstance(item, dict):
-            stack.extend(v for v in item.values() if isinstance(v, (list, dict)))
+            for key, value in item.items():
+                if exempt and key in exempt and isinstance(value, list):
+                    stack.extend(v for v in value if isinstance(v, (list, dict)))
+                elif isinstance(value, (list, dict)):
+                    stack.append(value)
 
 
 def _check_curve_sizes(raw: Raw) -> None:
@@ -224,8 +264,12 @@ def _check_surface_grid(raw: Raw, grid: str) -> None:
 
 
 def check_limits(operation: str, raw: Raw) -> None:
-    _check_arrays(raw)
-    _check_curve_sizes(raw)
+    stage_f = STAGE_F_ARRAYS.get(operation)
+    _check_arrays(raw, stage_f)
+    if stage_f is not None:
+        _check_stage_f(raw, stage_f)
+    if operation != "book.marks.resolve":  # its quotes are marks, not curve quotes
+        _check_curve_sizes(raw)
     grid = SURFACE_GRIDS.get(operation)
     if grid is not None:
         _check_surface_grid(raw, grid)

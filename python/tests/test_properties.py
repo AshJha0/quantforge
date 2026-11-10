@@ -86,3 +86,22 @@ def test_discount_factors_never_rise_when_forwards_are_not_negative(rates, gaps,
     assert factors[0] <= 1.0 + 1e-15
     for a, b in itertools.pairwise(factors):
         assert b <= a * (1 + 1e-14)
+
+
+@SETTINGS
+@given(st.floats(min_value=0.0005, max_value=0.08), st.floats(min_value=0.0005, max_value=0.05),
+       st.sampled_from((0.01, 0.05)), st.floats(min_value=0.0, max_value=1.2),
+       st.floats(min_value=0.0, max_value=0.6), st.integers(min_value=30, max_value=360))
+def test_cds_index_option_parity(hazard, strike, coupon, v, recovery, days):
+    from quantforge_core import credit_options
+
+    as_of = date(2026, 11, 9)
+    args = (as_of, as_of + timedelta(days=days), date(2031, 12, 20), 0.03, hazard, recovery)
+    try:
+        payer = credit_options.cds_index_option_price(*args, "PAYER", strike, coupon, 1e7, v)
+    except QfError as e:
+        assert e.code == "E_DOMAIN"  # K_adj <= 0 far below a large coupon (ruling F-10)
+        return
+    receiver = credit_options.cds_index_option_price(*args, "RECEIVER", strike, coupon, 1e7, v)
+    parity = 1e7 * payer["risky_annuity"] * (payer["adjusted_forward"] - payer["adjusted_strike"])
+    assert payer["price"] - receiver["price"] == pytest.approx(parity, rel=1e-10, abs=1e-6)

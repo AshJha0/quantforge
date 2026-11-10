@@ -80,7 +80,7 @@ class RatesCurvesSpecTest {
         List<Ois.Quote> q = List.of(new Ois.Quote("1M", 0.022, null, null), new Ois.Quote("1Y", 0.0205, null, null),
                 new Ois.Quote("5Y", 0.019, null, null), new Ois.Quote("30Y", 0.0225, null, null));
         Jumps j = new Jumps(new LocalDate[] {LocalDate.of(2026, 12, 31)}, new double[] {Math.exp(-0.002 * 1 / 365.0)});
-        for (Curve.Interpolation interp : Curve.Interpolation.values()) {
+        for (Curve.Interpolation interp : new Curve.Interpolation[] {Curve.Interpolation.LOG_LINEAR_DF, Curve.Interpolation.LINEAR_ZERO}) {
             CurveSolver.Solved a = Ois.bootstrap(Conventions.ESTR, AS_OF, q, interp, CurveSolver.Method.SEQUENTIAL, null, j);
             CurveSolver.Solved b = Ois.bootstrap(Conventions.ESTR, AS_OF, q, interp, CurveSolver.Method.GLOBAL, null, j);
             assertTrue(a.maxRepricingError() < 1e-13 && b.maxRepricingError() < 1e-13);

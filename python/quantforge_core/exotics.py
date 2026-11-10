@@ -75,8 +75,8 @@ def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_t
         return phi * s * carry * big_n(phi * x) - phi * k * disc * big_n(phi * x - phi * sd)
 
     def cd(y: float) -> float:
-        return (phi * s * carry * ratio ** (2 * (mu + 1)) * big_n(eta * y)
-                - phi * k * disc * ratio ** (2 * mu) * big_n(eta * y - eta * sd))
+        return (float(phi * s * carry * ratio ** (2 * (mu + 1)) * big_n(eta * y)
+                - phi * k * disc * ratio ** (2 * mu) * big_n(eta * y - eta * sd)))
 
     a, bb, c, d = ab(x1), ab(x2), cd(y1), cd(y2)
     e = rebate * disc * (big_n(eta * x2 - eta * sd) - ratio ** (2 * mu) * big_n(eta * y2 - eta * sd))
@@ -94,7 +94,7 @@ def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_t
         ("UP_OUT", -1.0): (bb - d + f, a - c + f),
     }
     high, low = table[(barrier_type, phi)]
-    return high if above else low
+    return float(high if above else low)
 
 
 def asian_geometric(s: float, k: float, t: float, r: float, q: float, v: float,
@@ -135,10 +135,10 @@ def lookback(s: float, t: float, r: float, q: float, v: float, option_type: str,
     shift = 2 * b * math.sqrt(t) / v
     carry, disc = math.exp((b - r) * t), math.exp(-r * t)
     if call:
-        return (s * carry * big_n(x1) - extreme * disc * big_n(x2)
-                + s * disc * half * (power * big_n(-x1 + shift) - math.exp(b * t) * big_n(-x1)))
-    return (-s * carry * big_n(-x1) + extreme * disc * big_n(-x2)
-            + s * disc * half * (-power * big_n(x1 - shift) + math.exp(b * t) * big_n(x1)))
+        return (float(s * carry * big_n(x1) - extreme * disc * big_n(x2)
+                + s * disc * half * (power * big_n(-x1 + shift) - math.exp(b * t) * big_n(-x1))))
+    return (float(-s * carry * big_n(-x1) + extreme * disc * big_n(-x2)
+            + s * disc * half * (-power * big_n(x1 - shift) + math.exp(b * t) * big_n(x1))))
 
 
 def quanto(s: float, k: float, t: float, rd: float, rf: float, q: float, v: float,
@@ -262,7 +262,7 @@ def baw(s: float, k: float, t: float, r: float, q: float, v: float, option_type:
         if s >= star:
             return s - k
         a2 = (star / q2) * (1 - carry * big_n(d1(star)))
-        return gbs(1.0, s, k, t, r, b, v) + a2 * (s / star) ** q2
+        return float(gbs(1.0, s, k, t, r, b, v) + a2 * (s / star) ** q2)
     q1 = (-(big_n_ - 1) - root) / 2
 
     def g(x: float) -> float:
@@ -275,7 +275,7 @@ def baw(s: float, k: float, t: float, r: float, q: float, v: float, option_type:
     if s <= star:
         return k - s
     a1 = -(star / q1) * (1 - carry * big_n(-d1(star)))
-    return gbs(-1.0, s, k, t, r, b, v) + a1 * (s / star) ** q1
+    return float(gbs(-1.0, s, k, t, r, b, v) + a1 * (s / star) ** q1)
 
 
 def fd(s: float, k: float, t: float, r: float, q: float, v: float, option_type: str,

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 #include "quantforge/core/error.hpp"
 
@@ -328,6 +329,232 @@ MonotoneConvexResult monotone_convex(const Vec& t_in, const Vec& r_in, const Vec
         out.zero_rates.push_back((rt[i - 1] + width * (fd[i] * x + shape.integral(x))) / s);
     }
     return out;
+}
+
+
+namespace {
+
+struct Piece {
+    double integral, value;  // integral of f over [0, x] in units of x, and f(x)
+};
+
+// Section of the convex monotone forward (curve-framework.md "MONOTONE_CONVEX", rules (a) to (e) in order).
+Piece convex_monotone_piece(double fl, double fr, double y, double x) {
+    const double g0 = fl - y, g1 = fr - y;
+    if (std::fabs(g0) < 1e-14 && std::fabs(g1) < 1e-14) return {fl * x + (fr - fl) * x * x / 2.0, fl + (fr - fl) * x};
+    if ((g0 > 0.0 && -2.0 * g0 <= g1 && g1 <= -0.5 * g0) || (g0 < 0.0 && -0.5 * g0 <= g1 && g1 <= -2.0 * g0)) {
+        const double a = 3.0 * fl + 3.0 * fr - 6.0 * y, b = -(4.0 * fl + 2.0 * fr - 6.0 * y), c = fl;
+        return {((a * x / 3.0 + b / 2.0) * x + c) * x, (a * x + b) * x + c};
+    }
+    const auto falling = [](double eta, double x_) {  // integral of ((eta - s)/eta)^2 on [0, min(x, eta)]
+        const double rest = eta - std::min(x_, eta);
+        return (eta * eta * eta - rest * rest * rest) / (3.0 * eta * eta);
+    };
+    const auto rule_e = [&](double eta) {
+        const double a = -(eta * g0 + (1.0 - eta) * g1) / 2.0;
+        double integral = (y + a) * x, value = 0.0;
+        if (eta > 0.0) integral += (g0 - a) * falling(eta, x);
+        if (x > eta) {
+            const double w = x - eta, d = 1.0 - eta;
+            integral += (g1 - a) * w * w * w / (3.0 * d * d);
+            value = y + a + (g1 - a) * (w / d) * (w / d);
+        } else if (eta > 0.0) {
+            const double q = (eta - x) / eta;
+            value = y + a + (g0 - a) * q * q;
+        } else {
+            value = fl;  // eta = 0 and x = 0: the point piece (ruling F-19)
+        }
+        return Piece{integral, value};
+    };
+    if ((g0 < 0.0 && g1 > -2.0 * g0) || (g0 > 0.0 && g1 < -2.0 * g0)) {
+        const double eta = (g1 + 2.0 * g0) / (g1 - g0);
+        if (eta >= 1.0) return rule_e(1.0);
+        double integral = (y + g0) * x, value = y + g0;
+        if (x > eta) {
+            const double w = x - eta, d = 1.0 - eta;
+            integral += (g1 - g0) * w * w * w / (3.0 * d * d);
+            value += (g1 - g0) * (w / d) * (w / d);
+        }
+        return {integral, value};
+    }
+    if ((g0 > 0.0 && g1 < 0.0 && g1 > -0.5 * g0) || (g0 < 0.0 && g1 > 0.0 && g1 < -0.5 * g0)) {
+        const double eta = 3.0 * g1 / (g1 - g0);
+        if (eta <= 0.0) return rule_e(0.0);
+        double value = y + g1;
+        if (x <= eta) {
+            const double q = (eta - x) / eta;
+            value += (g0 - g1) * q * q;
+        }
+        return {(y + g1) * x + (g0 - g1) * falling(eta, x), value};
+    }
+    return rule_e(std::clamp(g1 / (g0 + g1), 0.0, 1.0));
+}
+
+// sinh(sigma u)/sinh(sigma h) and cosh(sigma u)/sinh(sigma h) in the stable forms.
+double sinh_ratio(double sigma, double u, double h) {
+    return std::exp(-sigma * (h - u)) * (-std::expm1(-2.0 * sigma * u)) / (-std::expm1(-2.0 * sigma * h));
+}
+double cosh_ratio(double sigma, double u, double h) {
+    return std::exp(-sigma * (h - u)) * (1.0 + std::exp(-2.0 * sigma * u)) / (-std::expm1(-2.0 * sigma * h));
+}
+
+constexpr double small_z = 1e-3;
+
+}  // namespace
+
+NodeLogCurve::NodeLogCurve(NodeCurveMethod method, Vec t, Vec ln_s, double tension)
+    : method_(method), t_(std::move(t)), y_(std::move(ln_s)), sigma_(tension) {
+    const std::size_t n = t_.size() - 1;
+    Vec h(n), s(n);
+    for (std::size_t i = 0; i < n; ++i) {
+        h[i] = t_[i + 1] - t_[i];
+        s[i] = (y_[i + 1] - y_[i]) / h[i];
+    }
+    switch (method_) {
+        case NodeCurveMethod::MonotoneConvex: {
+            c_.assign(n + 1, 0.0);
+            fn_.assign(n + 1, 0.0);
+            for (std::size_t i = 1; i <= n; ++i) c_[i] = (y_[i - 1] - y_[i]) / (t_[i] - t_[i - 1]);
+            if (n == 1) {
+                fn_[0] = fn_[1] = c_[1];
+                break;
+            }
+            for (std::size_t i = 1; i < n; ++i) {
+                const double dl = t_[i] - t_[i - 1], dr = t_[i + 1] - t_[i];
+                fn_[i] = (dr * c_[i] + dl * c_[i + 1]) / (dl + dr);
+            }
+            fn_[0] = 1.5 * c_[1] - 0.5 * fn_[1];
+            fn_[n] = 1.5 * c_[n] - 0.5 * fn_[n - 1];
+            break;
+        }
+        case NodeCurveMethod::MonotonicLogCubic: {
+            Vec lo(n + 1, 0.0), mid(n + 1, 2.0), up(n + 1, 0.0), rhs(n + 1, 0.0);
+            up[0] = 1.0;
+            rhs[0] = 3.0 * s[0];
+            for (std::size_t i = 1; i < n; ++i) {
+                lo[i] = h[i];
+                mid[i] = 2.0 * (h[i - 1] + h[i]);
+                up[i] = h[i - 1];
+                rhs[i] = 3.0 * (h[i] * s[i - 1] + h[i - 1] * s[i]);
+            }
+            lo[n] = 1.0;
+            rhs[n] = 3.0 * s[n - 1];
+            const Vec raw = thomas(lo, mid, up, rhs, 0, n);
+            c_ = raw;
+            const auto sign = [](double v) { return v < 0.0 ? -1.0 : 1.0; };
+            const auto end = [&](double m, double chord) {
+                return m * chord > 0.0 ? sign(m) * std::min(std::fabs(m), 3.0 * std::fabs(chord)) : 0.0;
+            };
+            c_[0] = end(raw[0], s[0]);
+            c_[n] = end(raw[n], s[n - 1]);
+            for (std::size_t i = 1; i < n; ++i) {
+                const double p = (s[i - 1] * h[i] + s[i] * h[i - 1]) / (h[i - 1] + h[i]);
+                double big = 3.0 * std::min({std::fabs(s[i - 1]), std::fabs(s[i]), std::fabs(p)});
+                if (i > 1 && (s[i - 1] - s[i - 2]) * (s[i] - s[i - 1]) > 0.0) {
+                    const double pd = (s[i - 1] * (2.0 * h[i - 1] + h[i - 2]) - s[i - 2] * h[i - 1]) / (h[i - 2] + h[i - 1]);
+                    if (p * pd > 0.0 && p * (s[i - 1] - s[i - 2]) > 0.0)
+                        big = std::max(big, 1.5 * std::min(std::fabs(p), std::fabs(pd)));
+                }
+                if (i + 1 < n && (s[i] - s[i - 1]) * (s[i + 1] - s[i]) > 0.0) {
+                    const double pu = (s[i] * (2.0 * h[i] + h[i + 1]) - s[i + 1] * h[i]) / (h[i] + h[i + 1]);
+                    if (p * pu > 0.0 && -p * (s[i] - s[i - 1]) > 0.0)
+                        big = std::max(big, 1.5 * std::min(std::fabs(p), std::fabs(pu)));
+                }
+                c_[i] = raw[i] * p > 0.0 ? sign(raw[i]) * std::min(std::fabs(raw[i]), big) : 0.0;
+            }
+            break;
+        }
+        case NodeCurveMethod::TensionSpline: {
+            c_.assign(n + 1, 0.0);
+            if (n < 2) break;
+            const double sg = sigma_;
+            Vec alpha(n), beta(n);
+            for (std::size_t i = 0; i < n; ++i) {
+                const double z = sg * h[i];
+                if (z < small_z) {
+                    alpha[i] = h[i] / 6.0 * (1.0 - 7.0 * z * z / 60.0);  // ruling F-35
+                    beta[i] = h[i] / 3.0 * (1.0 - z * z / 15.0);
+                } else {
+                    const double e2 = -std::expm1(-2.0 * z);
+                    alpha[i] = 1.0 / (sg * sg * h[i]) - 2.0 * std::exp(-z) / e2 / sg;
+                    beta[i] = (1.0 + std::exp(-2.0 * z)) / e2 / sg - 1.0 / (sg * sg * h[i]);
+                }
+            }
+            Vec lo(n + 1, 0.0), mid(n + 1, 1.0), up(n + 1, 0.0), rhs(n + 1, 0.0);
+            for (std::size_t i = 1; i < n; ++i) {
+                lo[i] = alpha[i - 1];
+                mid[i] = beta[i - 1] + beta[i];
+                up[i] = alpha[i];
+                rhs[i] = s[i] - s[i - 1];
+            }
+            c_ = thomas(lo, mid, up, rhs, 1, n - 1);
+            c_[0] = c_[n] = 0.0;
+            break;
+        }
+    }
+}
+
+NodeLogCurve::Value NodeLogCurve::section(std::size_t i, double t) const {
+    const double h = t_[i + 1] - t_[i];
+    switch (method_) {
+        case NodeCurveMethod::MonotoneConvex: {
+            const Piece p = convex_monotone_piece(fn_[i], fn_[i + 1], c_[i + 1], (t - t_[i]) / h);
+            return {y_[i] - h * p.integral, p.value};
+        }
+        case NodeCurveMethod::MonotonicLogCubic: {
+            const double d = t - t_[i], s = (y_[i + 1] - y_[i]) / h;
+            const double m0 = c_[i], m1 = c_[i + 1];
+            const double b = (3.0 * s - m1 - 2.0 * m0) / h, c = (m1 + m0 - 2.0 * s) / (h * h);
+            return {y_[i] + d * (m0 + d * (b + d * c)), -(m0 + 2.0 * b * d + 3.0 * c * d * d)};
+        }
+        case NodeCurveMethod::TensionSpline:
+        default: {
+            const double a = t - t_[i], b = t_[i + 1] - t, sg = sigma_;
+            double ra = 0.0, rb = 0.0, da = 0.0, db = 0.0;  // R(a), R(b), R'(a), R'(b)
+            if (sg * h < small_z) {
+                // Ruling F-35: R(u) = (u/h)(u^2 - h^2)/6 (1 + sigma^2 (3 u^2 - 7 h^2)/60), and its derivative.
+                const double s2 = sg * sg;
+                const auto r = [&](double u) { return (u / h) * (u * u - h * h) / 6.0 * (1.0 + s2 * (3.0 * u * u - 7.0 * h * h) / 60.0); };
+                const auto dr = [&](double u) {
+                    return (3.0 * u * u - h * h) / (6.0 * h) * (1.0 + s2 * (3.0 * u * u - 7.0 * h * h) / 60.0) +
+                           (u / h) * (u * u - h * h) / 6.0 * (s2 * u / 10.0);
+                };
+                ra = r(a);
+                rb = r(b);
+                da = dr(a);
+                db = dr(b);
+            } else {
+                const double s2 = sg * sg;
+                ra = (sinh_ratio(sg, a, h) - a / h) / s2;
+                rb = (sinh_ratio(sg, b, h) - b / h) / s2;
+                da = cosh_ratio(sg, a, h) / sg - 1.0 / (s2 * h);
+                db = cosh_ratio(sg, b, h) / sg - 1.0 / (s2 * h);
+            }
+            const double value = y_[i] * b / h + y_[i + 1] * a / h + c_[i] * rb + c_[i + 1] * ra;
+            const double slope = (y_[i + 1] - y_[i]) / h - c_[i] * db + c_[i + 1] * da;
+            return {value, -slope};
+        }
+    }
+}
+
+double NodeLogCurve::left_forward_at_end() const {
+    const std::size_t n = t_.size() - 1;
+    return section(n - 1, t_[n]).forward;
+}
+
+double NodeLogCurve::ln_s(double t) const {
+    const std::size_t n = t_.size() - 1;
+    if (t >= t_[n]) return t == t_[n] ? y_[n] : y_[n] - left_forward_at_end() * (t - t_[n]);
+    const auto i = std::size_t(std::upper_bound(t_.begin(), t_.end(), t) - t_.begin()) - 1;
+    if (t == t_[i]) return y_[i];
+    return section(i, t).ln_s;
+}
+
+double NodeLogCurve::forward(double t) const {
+    const std::size_t n = t_.size() - 1;
+    if (t >= t_[n]) return left_forward_at_end();
+    const auto i = std::size_t(std::upper_bound(t_.begin(), t_.end(), t) - t_.begin()) - 1;
+    return section(i, t).forward;
 }
 
 }  // namespace quantforge

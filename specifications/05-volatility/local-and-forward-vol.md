@@ -78,3 +78,29 @@ Changes `x_i = ln(v_i/v_{i-1})` (`LOG`) or `v_i - v_{i-1}` (`ABSOLUTE`). Outputs
 - sticky delta on spot moneyness `K/S` instead of `K/F`;
 - sticky-delta delta without the smile term;
 - vol of vol with divisor `n`, or not annualised.
+
+## Continuity at slice expiries (stage F, plan item R10)
+
+Ruling `stage-f-rulings.md` F-17. Suite `stage_f/lvc_f`. Nothing above changes: this section states, and the goldens pin, how the surface behaves at each slice expiry `T_j`, including the short end `T_1`.
+
+**What is continuous.** At fixed `k`, `w(T, k)` is continuous in `T` everywhere (both sides of `T_j` give `w_j(k)`), and so are `implied_vol`, `w_k` and `w_kk`. Within each open interval `(0, T_1)`, `(T_j, T_{j+1})` and `(T_n, infinity)` local vol is continuous (smooth) in `T` and `k`.
+
+**What jumps, and by how much.** `w_T` is piecewise constant in `T` at fixed `k`, so local vol jumps at every slice expiry. At `T_1` (the short end) the left value uses the flat-vol extrapolation and the right value the first interval:
+
+```
+left  w_T(T_1-) = w_1(k) / T_1
+right w_T(T_1+) = (w_2(k) - w_1(k)) / (T_2 - T_1)        (n >= 2)
+local_vol(T_1-) = sqrt(w_T(T_1-) / g(T_1, k)),  local_vol(T_1+) = sqrt(w_T(T_1+) / g(T_1, k))
+```
+
+and at an inner `T_j` the two neighbouring interval slopes. `g` is the same on both sides (it uses only `w`, `w_k`, `w_kk`). The jump is zero only where the slopes agree, for example when all slices have the same implied vol at that `k` and the interval slopes equal `w_j/T_j`. A node itself uses the interval to its right (ruling E-A4), so the value at `T_j` equals the right limit.
+
+**Why not smooth it here.** A C1 interpolation in `T` (for example monotone cubic in `w`) would remove the jump but changes every stage E local-vol and SLV golden and the SLV leverage calibration; that is a model change for the stage G rates and vol model work, not a fix. Plan item R10 allows "fixed or documented with a continuity test"; this is the documented route.
+
+**Continuity test (goldens and property).** For the stage E three-slice surface and for a two-slice surface, at `k` in {-0.4, 0, 0.3}: points at `T_j (1 - 1e-9)`, at `T_j`, and at `T_j (1 + 1e-9)` for every slice expiry, and five points spread inside each interval. Each language also asserts, as a property test on its own outputs: `|w(T_j(1 - 1e-9)) - w(T_j)| <= 1e-9 (T_j |w_T(T_j-)| + w(T_j))`, with `w_T(T_j-)` the left slope in `T` (ruling F-37; a step of `1e-9 T_j` moves `w` by about `1e-9 T_j w_T`, so the earlier bound `1e-9 w(T_j)` failed at an inner node with a steep interval), and the same form for `implied_vol`; the left and right local vols equal the two formulas above to 1e-8 relative; and inside an interval, local vol at `T` and `T(1 + 1e-9)` differ by at most 1e-6 relative.
+
+### Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Local vol from the slice surface | closed form at each point (no grid) | none | one slice: no jump at all (flat vol on both sides, `w_T = w_1/T_1`) | the 40-digit price-based Dupire `mp_dupire` of stage E |

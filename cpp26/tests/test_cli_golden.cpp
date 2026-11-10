@@ -15,7 +15,7 @@ struct Row {
     std::string_view input, status, outputs;
     double abs_tol, rel_tol;
 };
-constexpr Row rows[] = {
+const Row rows[] = {  // not constexpr: Clang hits its constant-evaluation step limit on this table
 #include "cli_cases.inc"
 };
 

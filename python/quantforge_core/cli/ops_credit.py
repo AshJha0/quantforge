@@ -82,6 +82,14 @@ def _cds_option_price(i: Inputs) -> Any:
     return core.credit_options.cds_option_price(*args)
 
 
+@op("credit.cdsindex.option_price")
+def _cds_index_option_price(i: Inputs) -> Any:
+    args = (i.date("as_of"), i.date("expiry"), i.date("maturity"), i.real("rate"),
+            i.real("hazard_rate"), i.real("recovery"), i.enum("type", ("PAYER", "RECEIVER")),
+            i.real("strike"), i.real("coupon"), i.real("notional"), i.real("vol"))
+    return core.credit_options.cds_index_option_price(*args)
+
+
 @op("credit.cdsoption.implied_vol")
 def _cds_option_implied(i: Inputs) -> Any:
     args = (*_cds_option(i), i.real("premium"), i.boolean("knock_out"))

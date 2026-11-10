@@ -158,8 +158,21 @@ std::optional<Instant> maybe_instant(const In& in, string_view k) {
 }
 
 
-constexpr EnumTable<CurveInterpolation> curve_interpolations = {{"LOG_LINEAR_DF", CurveInterpolation::LogLinearDf},
-                                                                {"LINEAR_ZERO", CurveInterpolation::LinearZero}};
+constexpr EnumTable<CurveInterpolation> curve_interpolations = {
+    {"LOG_LINEAR_DF", CurveInterpolation::LogLinearDf},
+    {"LINEAR_ZERO", CurveInterpolation::LinearZero},
+    {"MONOTONE_CONVEX", CurveInterpolation::MonotoneConvex},
+    {"MONOTONIC_LOG_CUBIC", CurveInterpolation::MonotonicLogCubic},
+    {"TENSION_SPLINE", CurveInterpolation::TensionSpline},
+    {"HYBRID", CurveInterpolation::Hybrid}};
+
+// Stage F (Q1): the optional `tension` and `step_end` keys of a curve object or a bootstrap.
+CurveShape curve_shape_of(const In& in) {
+    CurveShape s;
+    if (in.find("tension")) s.tension = in.real("tension");
+    if (in.find("step_end")) s.step_end = in.date("step_end");
+    return s;
+}
 
 constexpr EnumTable<FixedSide> fixed_sides = {{"PAY", FixedSide::Pay}, {"RECEIVE", FixedSide::Receive}};
 
@@ -216,16 +229,17 @@ struct CurveInput {
     CurveInterpolation interpolation;
     std::vector<Pillar> pillars;
     std::vector<Jump> jumps;
+    CurveShape shape;
 
     void limit() const { limit_if(pillars.size() > max_quotes, "pillars"); }
-    Curve build() const { return Curve(as_of, interpolation, pillars, jumps); }
+    Curve build() const { return Curve(as_of, interpolation, pillars, jumps, shape); }
 };
 
 CurveInput curve_of(const In& in, string_view key) {
     const Value& v = in.need(key);
     if (v.kind != Kind::Object) schema(key, "expected an object");
     const In c(v);
-    CurveInput out{c.date("as_of"), c.choice("interpolation", curve_interpolations), {}, {}};
+    CurveInput out{c.date("as_of"), c.choice("interpolation", curve_interpolations), {}, {}, {}};
     const Value& p = c.need("pillars");
     if (p.kind != Kind::Array) schema("pillars", "expected an array");
     for (const Value& item : p.items) {
@@ -234,6 +248,7 @@ CurveInput curve_of(const In& in, string_view key) {
         out.pillars.push_back({row.date("date"), row.real("discount_factor")});
     }
     out.jumps = jumps_of(c, false);
+    out.shape = curve_shape_of(c);
     return out;
 }
 
@@ -955,7 +970,7 @@ VixTerm vix_term_of(const In& in) {
     return t;
 }
 
-VixTerm vix_term_at(const In& in, string_view key) {
+[[maybe_unused]] VixTerm vix_term_at(const In& in, string_view key) {
     const Value& v = in.need(key);
     if (v.kind != Kind::Object) schema(key, "expected an object");
     return vix_term_of(In(v));

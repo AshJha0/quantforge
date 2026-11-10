@@ -7,6 +7,7 @@
 //   valuation       Valuation
 // Everything is a pure function of its inputs.
 #include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -42,7 +43,18 @@ std::vector<Period> generate_schedule(Date start, Date end, long long frequency_
 
 // ---- curves ----
 
-enum class CurveInterpolation { LogLinearDf, LinearZero };
+enum class CurveInterpolation { LogLinearDf, LinearZero, MonotoneConvex, MonotonicLogCubic, TensionSpline, Hybrid };
+
+/// Stage F (Q1) parameters: tension for TensionSpline, step_end for Hybrid; ignored by the other methods.
+struct CurveShape {
+    std::optional<double> tension;
+    std::optional<Date> step_end;
+};
+/// True for the stage F methods, whose pillars move earlier sections (ruling F-21).
+bool non_local(CurveInterpolation interpolation);
+/// E_INPUT when tension (TensionSpline) or step_end (Hybrid) is missing, or step_end is not in pillar_dates
+/// (skipped when pillar_dates is empty); E_DOMAIN unless 0 < tension <= 1000.
+void check_shape(CurveInterpolation interpolation, const CurveShape& shape, const std::vector<Date>& pillar_dates);
 
 /// A curve jump (curve-framework.md): multiplies discount factors for dates strictly after `date`.
 struct Jump {
@@ -60,13 +72,18 @@ struct Pillar {
     double discount_factor;
 };
 
+struct SmoothPart;
+
 class Curve {
 public:
     /// An empty curve, holding only the implied node at as_of.
     Curve(Date as_of, CurveInterpolation interpolation);
     /// Checks pillars: E_INPUT on order, E_DOMAIN on a factor <= 0.
     Curve(Date as_of, CurveInterpolation interpolation, const std::vector<Pillar>& pillars,
-          const std::vector<Jump>& jumps = {});
+          const std::vector<Jump>& jumps = {}, const CurveShape& shape = {});
+    /// Checks the shape (check_shape without pillar dates); call before any push.
+    void set_shape(const CurveShape& shape);
+    const CurveShape& shape() const { return shape_; }
     /// Checks jumps; call before any push. Stored values are then ln(D/J).
     void set_jumps(const std::vector<Jump>& jumps);
 
@@ -75,13 +92,19 @@ public:
     double time(Date d) const { return double(days_between(as_of_, d)) / 365.0; }
     /// Throws E_OUT_OF_RANGE before as_of.
     double discount(Date d) const;
+    /// Instantaneous forward of the smooth curve S = D/J at d: right-hand at a pillar and at as_of; at and
+    /// after the last pillar, the extrapolation forward. Throws E_OUT_OF_RANGE before as_of.
+    double instantaneous_forward(Date d) const;
 
     std::size_t size() const { return dates_.size(); }
     /// Solver primitives: they store raw log discount factors.
     /// unchecked: caller guarantees finite inputs
     void push(Date d, double log_df);
     /// unchecked: caller guarantees finite inputs
-    void set_log_df(std::size_t pillar, double log_df) { log_df_[pillar + 1] = log_df; }
+    void set_log_df(std::size_t pillar, double log_df) {
+        log_df_[pillar + 1] = log_df;
+        smooth_.reset();
+    }
     double log_df(std::size_t pillar) const { return log_df_[pillar + 1]; }
     std::vector<Pillar> pillars() const;
     /// The same curve times exp(-s(t) t) at every date: a continuously compounded zero shift s(t).
@@ -94,6 +117,9 @@ private:
     std::vector<double> t_, log_df_;  // index 0 is the node at as_of; ln of the jump-free curve
     std::vector<Jump> jumps_;
     std::function<double(double)> zero_shift_;  // empty: no shift
+    CurveShape shape_;
+    mutable std::shared_ptr<const SmoothPart> smooth_;  // stage F methods: built on first use
+    const SmoothPart* smooth() const;
     double plain_discount(double t) const;
 };
 
@@ -114,7 +140,7 @@ using ModelRate = std::function<double(std::size_t, const Curve&)>;
 /// up to pillar j. Throws E_NO_CONVERGENCE unless every error is below 1e-13.
 SolvedCurve solve_curve(Date as_of, CurveInterpolation interpolation, const std::vector<Date>& dates,
                         const std::vector<double>& targets, const ModelRate& model, SolveMethod method,
-                        const std::vector<Jump>& jumps = {});
+                        const std::vector<Jump>& jumps = {}, const CurveShape& shape = {});
 
 // ---- OIS ----
 
@@ -133,7 +159,8 @@ Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const
 Legs ois_legs(const RateConvention& c, const std::vector<Period>& periods, const std::function<double(Date)>& discount);
 
 SolvedCurve ois_bootstrap(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
-                          CurveInterpolation interpolation, SolveMethod method, const std::vector<Jump>& jumps = {});
+                          CurveInterpolation interpolation, SolveMethod method, const std::vector<Jump>& jumps = {},
+                          const CurveShape& shape = {});
 
 /// rates and days must be checked by this call: E_INPUT.
 double ois_compound(const std::vector<double>& rates, const std::vector<long long>& days, double denominator);
@@ -171,9 +198,22 @@ struct ProjectionQuote {
     double rate;
 };
 
+/// One projection-curve instrument (deposit, FRA or swap on a term index), dated from as_of.
+struct ProjectionInstrument {
+    Date start, end;  // deposit and FRA accrual; for a swap, spot and the last fixed end
+    double alpha;     // deposit and FRA ACT/360 accrual
+    std::vector<Period> fixed, floating;  // swap legs; empty for a deposit or FRA
+    Date pillar() const { return end; }
+};
+ProjectionInstrument projection_instrument(const RateConvention& index, Date as_of, const ProjectionQuote& q);
+/// Par rate of the instrument: projection forwards, swaps discounted by `discount`.
+/// unchecked: caller guarantees finite inputs
+double projection_model(const RateConvention& index, const ProjectionInstrument& it, const std::function<double(Date)>& discount,
+                        const Curve& projection);
+
 Curve projection_bootstrap(const Curve& discount, const RateConvention& index, Date as_of,
                            const std::vector<ProjectionQuote>& quotes, CurveInterpolation interpolation,
-                           double* max_repricing_error = nullptr);
+                           double* max_repricing_error = nullptr, const CurveShape& shape = {});
 
 struct SwapTrade {
     const RateConvention* index;

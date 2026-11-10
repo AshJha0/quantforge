@@ -58,6 +58,30 @@ final class OpsCreditOptions {
             return Operations.out("price", p.price(), "forward_spread", p.forward(), "risky_annuity", p.annuity(),
                     "front_end_protection", p.frontEnd());
         });
+        table.put("credit.cdsindex.option_price", in -> {
+            LocalDate a = in.date("as_of");
+            LocalDate e = in.date("expiry");
+            LocalDate m = in.date("maturity");
+            double r = in.real("rate");
+            double h = in.real("hazard_rate");
+            double rec = in.real("recovery");
+            String type = in.string("type");
+            double k = in.real("strike");
+            double c = in.real("coupon");
+            double n = in.real("notional");
+            double vol = in.real("vol");
+            boolean payer = switch (type) {
+                case "PAYER" -> true;
+                case "RECEIVER" -> false;
+                default -> throw new QfError("E_SCHEMA", "type must be PAYER or RECEIVER", "type");
+            };
+            in.gate();
+            CreditOptions.IndexOption o = CreditOptions.indexOption(a, e, m, r, h, rec, payer, k, c, n, vol);
+            return Operations.out("price", o.price(), "forward_spread", o.forward(), "adjusted_forward",
+                    o.adjustedForward(), "adjusted_strike", o.adjustedStrike(), "risky_annuity", o.annuity(),
+                    "strike_annuity", o.strikeAnnuity(), "strike_hazard", o.strikeHazard(), "exercise_upfront",
+                    o.exerciseUpfront(), "front_end_protection", o.frontEnd());
+        });
         table.put("credit.cdsoption.implied_vol", in -> {
             Option o = option(in, "premium");
             if (!o.knockOut()) {

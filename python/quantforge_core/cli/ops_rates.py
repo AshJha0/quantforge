@@ -61,9 +61,20 @@ def bootstrap(i: Inputs) -> Any:
     data, error = core.ois.bootstrap(
         i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), _quotes(i),
         i.enum("interpolation", curves.INTERPOLATIONS),
-        i.enum("method", ("SEQUENTIAL", "GLOBAL")), jumps(i),
+        i.enum("method", ("SEQUENTIAL", "GLOBAL")), jumps(i), *_options(i),
     )
     return {"pillars": _pillars(data)}, {"max_repricing_error": error}
+
+
+def _options(i: Inputs) -> tuple[float | None, Any]:
+    """The stage F bootstrap keys `tension` and `step_end` (optional, top level)."""
+    return (i.real("tension") if i.has("tension") else None), i.opt_date("step_end")
+
+
+@op("rates.curve.inspect")
+def curve_inspect(i: Inputs) -> Any:
+    factors, zeros, forwards = core.curves.inspect(_curve(i), i.dates("dates"))
+    return {"discount_factors": factors, "zero_rates": zeros, "instantaneous_forwards": forwards}
 
 
 @op("rates.ois.compound")
@@ -208,7 +219,8 @@ def _joint(i: Inputs) -> Any:
     ois_quotes = _quotes(Inputs({"quotes": i.array("ois_quotes")}, "ois_"))
     args = (_convention(i, "convention", conventions.OVERNIGHT), _convention(i, "index", conventions.TERM),
             i.date("as_of"), ois_quotes, [_term_quote(q) for q in _objects(i, "term_quotes")],
-            i.enum("interpolation", curves.INTERPOLATIONS), i.enum("method", _BOOT))
+            i.enum("interpolation", curves.INTERPOLATIONS), i.enum("method", _BOOT),
+            *_options(i))
     disc, proj, error = core.csa.joint_bootstrap(*args)
     return ({"discount_pillars": _pillars(disc), "projection_pillars": _pillars(proj)},
             {"max_repricing_error": error})
@@ -281,3 +293,67 @@ def _bondfut_implied(i: Inputs) -> Any:
     args = (*_futures(i), i.real("premium"), i.real("ctd_yield"), i.real("ctd_modified_duration"))
     price_vol, yield_vol = core.rates_vol.bondfut_implied(*args)
     return {"price_vol": price_vol, "yield_vol": yield_vol}
+
+
+_CURVE_KINDS = ("OIS", "OIS_STEPS", "PROJECTION", "XCCY")
+_INSTRUMENT_KINDS = ("OIS", "FUTURE", "DEPOSIT", "FRA", "SWAP", "XCCY")
+
+
+def _joint_curve(c: Inputs) -> Any:
+    kind = c.enum("type", _CURVE_KINDS)
+    spec = core.joint.CurveSpec(c.string("name"), kind)
+    if kind in ("OIS", "OIS_STEPS"):
+        spec.convention = _convention(c, "convention", conventions.OVERNIGHT)
+        spec.jumps = jumps(c)
+        spec.turns = tuple(t.date("date") for t in _objects(c, "turns")) if c.has("turns") else ()
+    if kind == "OIS_STEPS":
+        spec.step_dates = tuple(c.dates("step_dates"))
+    else:
+        spec.interpolation = c.enum("interpolation", curves.INTERPOLATIONS)
+        spec.tension, spec.step_end = _options(c)
+    if kind == "PROJECTION":
+        spec.index = _convention(c, "index", conventions.TERM)
+        spec.discount = c.string("discount")
+    if kind == "XCCY":
+        spec.domestic, spec.foreign_projection = c.string("domestic"), c.string("foreign_projection")
+        spec.domestic_convention = _convention(c, "domestic_convention", conventions.OVERNIGHT)
+        spec.foreign_convention = _convention(c, "foreign_convention", conventions.OVERNIGHT)
+        spec.start = c.date("start")
+    return spec
+
+
+def _joint_instrument(q: Inputs) -> Any:
+    kind = q.enum("type", _INSTRUMENT_KINDS)
+    spec = core.joint.InstrumentSpec(q.string("id"), q.string("curve"), kind,
+                                     q.opt_boolean("turn", False))
+    if kind == "OIS":
+        spec.tenor, spec.rate = _tenor(q), q.real("rate")
+    elif kind == "FUTURE":
+        spec.start, spec.end, spec.price = q.date("start"), q.date("end"), q.real("price")
+        spec.sigma, spec.mean_reversion = q.real("sigma"), q.real("mean_reversion")
+    elif kind == "FRA":
+        spec.start_months, spec.rate = q.integer("start_months"), q.real("rate")
+    elif kind == "XCCY":
+        spec.months, spec.spread = q.integer("months"), q.real("spread")
+    else:
+        spec.months, spec.rate = q.integer("months"), q.real("rate")
+    return spec
+
+
+@op("rates.curve.joint_solve")
+def _joint_solve(i: Inputs) -> Any:
+    as_of = i.date("as_of")
+    specs = [_joint_curve(c) for c in _objects(i, "curves")]
+    instruments = [_joint_instrument(q) for q in _objects(i, "instruments")]
+    result = core.joint.joint_solve(as_of, specs, instruments)
+    return core.joint.outputs(as_of, result), {"max_repricing_error": result.max_error}
+
+
+@op("rates.funding.curve")
+def _funding(i: Inputs) -> Any:
+    quotes = [(q.date("end"), q.real("rate")) for q in _objects(i, "quotes")]
+    dates = i.dates("dates") if i.has("dates") else []
+    spreads, pillars, factors = core.joint.funding_curve(_curve(i, "discount"), quotes, dates)
+    return {"spreads": spreads,
+            "pillars": [{"date": d.isoformat(), "discount_factor": v} for d, v in pillars],
+            "discount_factors": factors}

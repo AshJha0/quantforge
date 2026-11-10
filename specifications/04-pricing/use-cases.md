@@ -1,4 +1,4 @@
-# Use cases 1 to 3
+# Use cases 1 to 4
 
 Spec version 1.0.0. Status: Implemented, not Validated. All data in the cases is synthetic.
 
@@ -35,6 +35,19 @@ Added in stage C. Inputs: `as_of`, `funding_curve`, `slices`, array of `{expiry,
 
 Outputs: `forwards`, `svi_rmse`, `arbitrage_free`, `vol`, `valuation` (`model` `BLACK_76_EQUITY`, `conventions` `EQUITY_FORWARD`), `delta`, `vega`.
 
+## Use case 4: `usecase.factor_attribution`
+
+Added in stage F (slice F5, suite `stage_f/uc4_f`, generator `oracle/python/gen_stage_f_w3.py`). **Plain idea:** a portfolio earned 0.8% a month; how much of that came from the market, from small caps, from rates, and how much was the manager's own (alpha)? Regress the portfolio's returns on the factors' returns; each factor's share of the average return is its beta times the factor's average return.
+
+Inputs: `portfolio_returns` (`T`), `factor_returns` (`T x K`), `factor_names` (`K`, else `E_INPUT`); rows of unequal length: `E_INPUT`; these shape checks come before `T >= K + 2`, else `E_INPUT` (ruling F-39).
+
+Ordinary least squares with an intercept on `X = [1, F]`. If the smallest singular value of `X` is below `1e-12` times the largest, the factors are collinear: `E_DOMAIN`. Outputs:
+- `alpha`, `betas`;
+- `contributions`: `beta_k` times the mean of factor `k`; with `mean_return` (the mean of `portfolio_returns`), `mean_return = alpha + sum contributions` exactly, a property of least squares with an intercept;
+- `r_squared` `= 1 - SSR/SST`; `residual_vol` `= sqrt(SSR/(T - K - 1))`; `beta_se` `= sqrt(residual_vol^2 [(X'X)^-1]_kk)`.
+
+Class `interpolation`. Goldens: 40-digit normal equations. Outside: `scipy.linalg.lstsq` (rule 11.2.5) [S2, S3].
+
 ## Acceptance
 
 Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are checked against QuantLib. Use case 1's book PV and delta are checked against QuantLib `FxForward`. The hedge sums, and use case 2's, have no outside source. Trades, hedges and costs are calculations on synthetic data: nothing is traded. Real output is in `examples/README.md`.
@@ -44,3 +57,5 @@ Limits are in `stage-b-targets.md`. Oracle: replay built on parts that are check
 Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
 
 - [S1] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapters "Hedging Strategies Using Futures" and "Swaps" (not opened)
+- [S2] Fama, E. F. and French, K. R., "Common risk factors in the returns on stocks and bonds", *Journal of Financial Economics* 33(1), 1993, 3-56 (factor regressions with an intercept) (not opened)
+- [S3] Grinold, R. C. and Kahn, R. N., *Active Portfolio Management*, 2nd ed., McGraw-Hill, 2000, chapter "Performance Analysis" (return attribution to factors) (not opened)

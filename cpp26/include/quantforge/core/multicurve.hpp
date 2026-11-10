@@ -59,6 +59,7 @@ StepFit fit_steps(const RateConvention& c, Date as_of, const std::vector<Date>& 
 
 struct Convexity {
     double futures_rate, convexity, forward_rate;
+    double z = 0.0;  // the convexity exponent: convexity = (1 - e^{-z}) (futures_rate + 1/(T - t))
 };
 Convexity futures_convexity(double price, double start_years, double end_years, double sigma, double mean_reversion);
 
@@ -81,7 +82,7 @@ struct JointCurves {
 };
 JointCurves joint_bootstrap(const RateConvention& c, const RateConvention& index, Date as_of,
                             const std::vector<OisQuote>& ois_quotes, const std::vector<ProjectionQuote>& term_quotes,
-                            CurveInterpolation interpolation, SolveMethod method);
+                            CurveInterpolation interpolation, SolveMethod method, const CurveShape& shape = {});
 
 struct SmoothFit {
     std::vector<double> forwards, fitted;

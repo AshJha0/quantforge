@@ -116,6 +116,32 @@ super::registry! {
                 ("front_end_protection", p.front_end_protection.into()),
             ]))
         },
+        "credit.cdsindex.option_price" => {
+            let x = credit_options::IndexOption {
+                as_of: i.date("as_of")?,
+                expiry: i.date("expiry")?,
+                maturity: i.date("maturity")?,
+                rate: i.f64("rate")?,
+                hazard_rate: i.f64("hazard_rate")?,
+                recovery: i.f64("recovery")?,
+                payer: kind(i, "PAYER", "RECEIVER")?,
+                strike: i.f64("strike")?,
+                coupon: i.f64("coupon")?,
+                notional: i.f64("notional")?,
+            };
+            let p = credit_options::index_option_price(&x, i.f64("vol")?)?;
+            plain(obj([
+                ("price", p.price.into()),
+                ("forward_spread", p.forward_spread.into()),
+                ("adjusted_forward", p.adjusted_forward.into()),
+                ("adjusted_strike", p.adjusted_strike.into()),
+                ("risky_annuity", p.risky_annuity.into()),
+                ("strike_annuity", p.strike_annuity.into()),
+                ("strike_hazard", p.strike_hazard.into()),
+                ("exercise_upfront", p.exercise_upfront.into()),
+                ("front_end_protection", p.front_end_protection.into()),
+            ]))
+        },
         "credit.cdsoption.implied_vol" => {
             let (o, p) = (cds_option(i)?, i.f64("premium")?);
             plain(obj([(

@@ -34,6 +34,33 @@ classes:
     # Stage E spec B (garch.md): a log-likelihood summed over hundreds of terms. Each ln may differ in its last bit across libms.
     absolute: 1.0e-9
     relative: 1.0e-10
+  jacobian:
+    # Stage F (joint-solve-and-funding.md, Q4): d unknown / d quote by the implicit function theorem. A build may form dR/dx by
+    # central differences (about 1e-9 relative); the inverse carries it at the system's condition number.
+    absolute: 1.0e-9
+    relative: 1.0e-6
+  jacobian_piecewise:
+    # Stage F (joint_f-0001, R5 audit, ruling F-40): the IFT Jacobian of a system with a monotone convex curve, which is
+    # piecewise in its data. dR/dx is itself a difference quotient near region boundaries, and stencils that pass the
+    # kink checks still differ by about 2e-8 between builds (Rust, measured). A kink-straddling error is 5e-4 or more,
+    # so this bound keeps three orders of margin on both sides.
+    absolute: 1.0e-7
+    relative: 1.0e-5
+  standard_error:
+    # Stage F (garch.md R8, ruling F-13): sqrt of the diagonal of an inverted Hessian. Builds may form the Hessian by
+    # central differences of an analytic score (error about 1e-9 relative); the inverse amplifies it by the condition number.
+    absolute: 1.0e-15
+    relative: 1.0e-5
+  aad_sensitivity:
+    # Stage F (book-sensitivities.md, Q3a, T row): dPV/dquote per unit notional and per unit quote, by AAD (Rust reference)
+    # or by the IFT chain rule. Bound fixed by the T row before the stage started.
+    absolute: 1.0e-10
+    relative: 1.0e-8
+  ift_jacobian:
+    # Stage F (book-sensitivities.md, Q3a, T row): d zero rate / d quote on a sequential log-linear build. Tighter than
+    # `jacobian` because dR/dx is analytic on this build; the absolute term makes structural zeros pass only near 0.
+    absolute: 1.0e-11
+    relative: 1.0e-9
   numerical_scheme:
     # The same grid recipe in another language: rounding through hundreds of tridiagonal solves.
     absolute: 1.0e-8

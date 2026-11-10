@@ -34,6 +34,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Local volatility](local-vol.md) | Implemented, not Validated | E | 2 golden cases |
 | [Swaption cube](swaption-cube.md) | Implemented, not Validated | E | 42 golden cases |
 | [Vol term structure](vol-term-structure.md) | Implemented, not Validated | E | 7 golden cases |
+| [Five interpolation methods](interpolation-methods.md) | Implemented, not Validated | F | 47 golden cases for `rates.curve.inspect`, 36 reproduced by an outside library |
 | Financing curves | Planned | D | None yet |
 | Sector and rating curves | Planned | D | None yet |
 | Funding curve | Planned | F | None yet |

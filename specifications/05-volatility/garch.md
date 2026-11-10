@@ -69,3 +69,53 @@ Wrong-convention checks (each caught): initial variance `r_1^2`; the `ln(2 pi)` 
 - [S3] Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Estimating Volatilities and Correlations" (chapter number not checked; the edition matches the other QuantForge specs that cite Hull) (GARCH(1,1), long-run variance `omega/(1 - alpha - beta)`, the forecast `V_L + (alpha + beta)^k (sigma2 - V_L)`, maximum likelihood) (not opened)
 
 "(not opened)" means the reference was written from memory in this session and not re-read; the formulas above are fully stated here and checked by the goldens, so no rule depends on the reference.
+
+## Stage F additions (plan item R8)
+
+Spec version 1.1.0 for this section. Rulings: `stage-f-rulings.md` F-11 to F-14. Suite `stage_f/garch_f`. Everything above is unchanged; old cases send none of the new keys and get the old results.
+
+### Student-t innovations and a mean, in `vol.garch.loglik`
+
+New optional inputs: `distribution` (`NORMAL`, the default, or `STUDENT_T`), `degrees_of_freedom` `nu` (required for `STUDENT_T`, ignored for `NORMAL`), `mean` `mu` (a number, default 0). The recursion runs on `e_t = r_t - mu`: `sigma2_{t+1} = omega + alpha e_t^2 + beta sigma2_t`, and `"SAMPLE"` is `(1/n) sum e_t^2`. The Gaussian log-likelihood is the one above with `e_t` in place of `r_t`. The Student-t log-likelihood uses the t distribution scaled to unit variance [S4]:
+
+```
+loglik = sum_{t=1..n} [ lnGamma((nu+1)/2) - lnGamma(nu/2) - (1/2) ln(pi (nu - 2)) - (1/2) ln sigma2_t
+                        - ((nu + 1)/2) ln(1 + e_t^2 / ((nu - 2) sigma2_t)) ]
+```
+
+Checks, after the existing ones: `distribution` not listed: `E_SCHEMA`; `STUDENT_T` without `degrees_of_freedom`: `E_INPUT`; `nu <= 2`: `E_DOMAIN` (the variance is not finite). `lnGamma` must be accurate to 1e-14 relative on `[1, 1000]` (Java has no library `lgamma`: a Lanczos (g = 7, 9 terms) or Stirling series with recurrence meets it).
+
+### `vol.garch.estimate`
+
+Maximum likelihood with parameters, standard errors and the options above (`vol.garch.fit` stays as it is, judged on the objective only).
+
+Inputs: `returns` (at least 30, else `E_INPUT`; at least 100 for `STUDENT_T`, else `E_INPUT`), `initial_variance` (`"SAMPLE"` or a positive number, held fixed), `distribution` (`NORMAL` or `STUDENT_T`), `demean` (boolean). With `demean = true`, `mu` is the sample mean `(1/n) sum r_t`, removed first and held fixed (a two-step estimate: its error is not in the standard errors, ruling F-12); with `demean = false`, `mu = 0`.
+
+Parameters `theta = (omega, alpha, beta)`, plus `nu` for `STUDENT_T`. Feasible set: `omega > 0`, `alpha >= 0`, `beta >= 0`, `alpha + beta < 1`, and `2 < nu <= 500`.
+
+**Optimum (ruling F-11).** The maximum of the log-likelihood over the feasible set. A result is accepted only at an interior maximum: `omega / v >= 1e-6` (`v` the sample variance of the returns after demeaning), `alpha >= 1e-6`, `beta >= 1e-6`, `1 - alpha - beta >= 1e-6`, and for Student-t `nu - 2 >= 1e-6` and `500 - nu >= 5e-4` (ruling F-43), with the gradient zero and the Hessian negative definite. A build may use any optimiser, but must finish with Newton steps on an analytic (or 1e-10-accurate) gradient and Hessian until the largest relative step is below 1e-12; parameters then agree to 1e-8 relative across languages (ruling F-43; the plan asked 1e-6). If the maximum is on or near a bound, or the polished point is not a maximum: `E_NO_CONVERGENCE` (a boundary optimum has no standard errors in this sense).
+
+**Standard errors (ruling F-13).** Observed information: `V = (-H)^{-1}`, `H` the Hessian of the log-likelihood in `theta` (and `nu`) at the optimum, `std_errors = sqrt(diag V)`. Not the sandwich (QML) form, and not the expected information. Any `H` accurate to 1e-8 relative passes (analytic recursion derivatives, or central differences of an analytic gradient with relative step 1e-5).
+
+Outputs: `omega`, `alpha`, `beta`, `degrees_of_freedom` (`null` for `NORMAL`), `mean` (`mu`; `0.0` when `demean = false`), `loglik`, `std_errors` (object with the same parameter keys; `degrees_of_freedom` `null` for `NORMAL`), `persistence` (`alpha + beta`).
+
+Checks, in order: `distribution` not listed, `demean` not a boolean: `E_SCHEMA`; too few returns: `E_INPUT`; `initial_variance` a string other than `"SAMPLE"`: `E_INPUT`; a numeric `initial_variance <= 0`, or `"SAMPLE"` on all-zero (demeaned) returns: `E_DOMAIN`; no interior maximum: `E_NO_CONVERGENCE`.
+
+### Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Newton polish of the MLE | quadratic: the relative step at least squares each iteration once below 1e-3 | the golden series, 4 iterations from the optimiser's point | `nu -> infinity`: Student-t loglik tends to the Gaussian one (at `nu = 1e6` within 1e-5 on the golden series, an oracle check) | mpmath 50-digit optimum |
+| Hessian by central differences of the score | 2 in the step | relative steps 1e-3, 5e-4, 2.5e-4, 1.25e-4 | the exact Hessian at 50 digits | mpmath `diff` |
+
+### Acceptance (plan 13.2 R8)
+
+- Parameters 1e-6 relative (with 1e-14 absolute) across languages: class `root_finding` with that `tolerance_limit`; `loglik` class `likelihood_sum`; standard errors 1e-5 relative.
+- **Recovery.** In the oracle, 200 series of 2,000 returns simulated from known parameters (NORMAL: `omega = 2e-6`, `alpha = 0.08`, `beta = 0.90`; STUDENT_T: the same and `nu = 6`), seeds `20261109 + i`: the share of series whose `+-2 SE` interval holds the true value is reported for each parameter and must lie in [0.90, 0.99] (nominal 0.954; the band is 3.5 binomial SE at 200 series). The single golden series per distribution (seed 20261109) also holds every true parameter within 2 SE; this is reported, and the series was not chosen for it (it is the first seed).
+- Goldens: mpmath at 50 digits, Newton to a gradient below 1e-20 relative, Hessian checked negative definite; a scipy multi-start search must not find a better point. No outside library: QuantLib's `Garch11` is not in its Python wheel and the `arch` package is not a dependency (zero new dependencies); `arch` 7.x was not used.
+- Wrong conventions, each caught: unit-scale t density with `nu` in place of `nu - 2` (not variance-normalised); `demean` ignored; sandwich standard errors in place of observed information; Gaussian loglik on t data.
+
+### Sources (this section)
+
+- [S4] Bollerslev, T., "A conditionally heteroskedastic time series model for speculative prices and rates of return", *Review of Economics and Statistics* 69(3), 1987, 542-547: GARCH with standardised Student-t innovations (not opened)
+- [S5] Bollerslev, T. and Wooldridge, J. M., "Quasi-maximum likelihood estimation and inference in dynamic models with time-varying covariances", *Econometric Reviews* 11(2), 1992, 143-172: the sandwich form, named here only as the form not used (not opened)

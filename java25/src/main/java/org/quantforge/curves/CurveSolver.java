@@ -23,13 +23,13 @@ public final class CurveSolver {
     public record Solved(Curve curve, double maxRepricingError) {}
 
     private record Setup(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
-                         List<ToDoubleFunction<Curve>> models, Jumps jumps) {
+                         List<ToDoubleFunction<Curve>> models, Jumps jumps, Curve.Shape shape) {
         double years(int j) {
             return j < 0 ? 0.0 : ChronoUnit.DAYS.between(asOf, dates[j]) / 365.0;
         }
 
         double[] residuals(double[] x) {
-            Curve c = Curve.fromLogs(asOf, interp, dates, x, jumps);
+            Curve c = Curve.fromLogs(asOf, interp, dates, x, jumps, shape);
             double[] r = new double[x.length];
             for (int j = 0; j < r.length; j++) {
                 r[j] = models.get(j).applyAsDouble(c) - quotes[j];
@@ -50,14 +50,24 @@ public final class CurveSolver {
 
     public static Solved solve(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
                                List<ToDoubleFunction<Curve>> models, Method method, Jumps jumps) {
+        return solve(asOf, interp, dates, quotes, models, method, jumps, Curve.Shape.NONE);
+    }
+
+    /**
+     * As above with the stage F parameters. The stage F methods are not local, so SEQUENTIAL and GLOBAL both return
+     * the global solution (ruling F-21).
+     */
+    public static Solved solve(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
+                               List<ToDoubleFunction<Curve>> models, Method method, Jumps jumps, Curve.Shape shape) {
         Finite.check("quotes", quotes);
-        Setup s = new Setup(asOf, interp, dates, quotes, models, jumps);
-        double[] x = method == Method.SEQUENTIAL ? sequential(s) : global(s);
+        shape.check(interp, dates);
+        Setup s = new Setup(asOf, interp, dates, quotes, models, jumps, shape);
+        double[] x = method == Method.SEQUENTIAL && !interp.smooth() ? sequential(s) : global(s);
         double worst = norm(s.residuals(x));
         if (!(worst < ACCEPT)) {
             throw new QfError("E_NO_CONVERGENCE", "curve solve stopped at repricing error " + worst);
         }
-        return new Solved(Curve.fromLogs(asOf, interp, dates, x, jumps), worst);
+        return new Solved(Curve.fromLogs(asOf, interp, dates, x, jumps, shape), worst);
     }
 
     /** The largest absolute entry; NaN if any entry is NaN. */

@@ -207,3 +207,31 @@ upheld in effect by goldens and E-A35.
 - F-Q2 (G4). Core modules are named by domain; `stage_d3` was split into `caps_swaptions`, `commodity` and
   `mbs`; `vol_e1` is `arb_surface`, `vol_e7` is `variance`, `credit_e8` is `credit_options`, `equity_d` is
   `equity_curves`. CLI handlers live in `cli/ops_<domain>.py` by verb prefix; the verb table is the registry.
+- F-Q3 (F-1 tokens). Python converts `"NaN"`, `"Infinity"` and `"-Infinity"` anywhere in the inputs before the
+  handlers read them, so the field types decide: a Real takes the value, any other type is `E_SCHEMA`. A
+  free-text field (an id, a store record's `value`) holding exactly one of the three strings is therefore
+  read as a number. Asked: whether such fields keep the string (Python would then convert per Real field).
+- F-Q4 (R8). The estimate starts from Nelder-Mead on an unconstrained map, then Newton on the analytic score
+  with the Hessian from central differences of the score (relative step 1e-5), until the largest relative
+  step (omega scaled by the sample variance) is below 1e-12. Interior means 1e-6 from every bound.
+- F-Q5 (Q4, XCCY `dR/dq`). The page says `dR/dq` is `-1` for rate and spread quotes. For an `XCCY`
+  instrument the residual is `L_foreign` itself and the spread enters the model, so Python uses the true
+  derivative, the spread annuity `sum (e - s)/360 D_f(e)` at the solution; `-1` would not match a
+  bump-and-rebuild. Asked: confirm.
+- F-Q6 (Q4, ruling F-26 on pillar curves). On `OIS_STEPS` a turn factor leaves every instrument on one side
+  of its date unchanged, and Python sets those entries to exact zeros. On a pillar curve the unknowns are
+  `ln D` (full `D`), so a turn moves `S = D/J` at every later pillar; with a non-local interpolation that
+  moves sections on both sides of the turn, and the derivative is genuinely nonzero. Python reports the
+  computed value there. Asked: whether F-26 is meant for step curves only.
+- F-Q7 (Q4, IFT `dR/dx` stencil). `dR/dx` for the Jacobian is Richardson on central differences, starting
+  at `h = 1e-4` and quartering until two estimates agree (to `1e-14/h + 1e-7` relative), because the
+  monotone-convex curve is piecewise in its data and a fixed `1e-4` stencil can straddle a branch
+  boundary. Newton itself uses one central difference at `1e-7`.
+
+Ruled (2026-11-10): F-Q3 by F-38 (tokens become numbers only in Real fields and at the top level of an
+any-JSON field; Python changed to match: the conversion moved from a pass over all inputs into the Real
+readers, and `core.store.*` record `value`). F-Q5 by the amended `dR/dq` line of `joint-solve-and-funding.md`
+(as built). F-Q6 by F-26 as amended (as built). F-Q7 by F-28 (as built). Also applied: F-35 (tension
+spline small-`z` series with its `z^2` terms), F-36 (`side` is `PAY` / `RECEIVE` in `risk_f3`), F-39
+(Monte Carlo `seed` a u64 string; `E_NOT_POSITIVE_DEFINITE`; duplicate opening position `E_INPUT`).
+F-Q1, F-Q2 and F-Q4 have no ruling yet.
