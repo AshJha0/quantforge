@@ -331,6 +331,20 @@ def _block_jacobian(as_of: date, blocks: Sequence[_Block], x: list[float], k: in
     return out
 
 
+def _check_conditioned(a: list[list[float]]) -> None:
+    """Ruling F-40: a singular dR/dx (reciprocal condition below 1e-14) is E_NO_CONVERGENCE."""
+    import numpy  # loaded only here, to keep CLI start-up short
+
+    m = numpy.array(a, dtype=float)
+    with numpy.errstate(all="ignore"):
+        try:
+            rcond = 1 / numpy.linalg.cond(m, 1)
+        except numpy.linalg.LinAlgError:
+            rcond = 0.0
+    if not rcond >= 1e-14:
+        raise QfError("E_NO_CONVERGENCE", "dR/dx is singular at an iterate", "instruments")
+
+
 def _solve_block(as_of: date, blocks: Sequence[_Block], x: list[float], k: int) -> None:
     b = blocks[k]
     cols = range(b.offset, b.offset + b.size)
@@ -339,11 +353,12 @@ def _solve_block(as_of: date, blocks: Sequence[_Block], x: list[float], k: int) 
         return _residuals(as_of, blocks, v, k)[b.offset:]
 
     r = own(x)
-    for _ in range(60):
+    for _ in range(50):  # ruling F-40
         size = max(abs(v) for v in r)
         if size < 1e-15:
             return
         a = _block_jacobian(as_of, blocks, x, k, cols)
+        _check_conditioned(a)
         step = linalg.lu_solve(a, [-v for v in r])
         scale = 1.0
         for _ in range(30):  # backtracking keeps a far start from overshooting

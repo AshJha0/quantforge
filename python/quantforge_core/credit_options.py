@@ -75,7 +75,7 @@ def _terms(as_of: date, expiry: date, maturity: date, rate: float, hazard: float
     protection, annuity = _legs(as_of, expiry, maturity, rate, hazard, recovery)
     forward = protection / annuity
     t = (expiry - as_of).days / 365
-    front = notional * (1 - recovery) * (1 - math.exp(-hazard * t)) * math.exp(-rate * t)
+    front = notional * (1 - recovery) * (-math.expm1(-hazard * t)) * math.exp(-rate * t)
     option = Option(black.BLACK_76, "CALL" if kind == "PAYER" else "PUT", strike, t, forward)
     return forward, annuity, front, option
 
@@ -132,7 +132,7 @@ def cds_index_option_price(as_of: date, expiry: date, maturity: date, rate: floa
     forward = protection / annuity
     t = (expiry - as_of).days / 365
     p_expiry = math.exp(-rate * t)
-    fep = (1 - recovery) * (1 - math.exp(-hazard * t)) * p_expiry
+    fep = (1 - recovery) * (-math.expm1(-hazard * t)) * p_expiry
     h_k, a_k = _strike_hazard(expiry, maturity, rate, recovery, strike)
     upfront = (strike - coupon) * a_k
     f_adj = forward + fep / annuity

@@ -138,10 +138,12 @@ def _inverse(a: list[list[float]]) -> list[list[float]]:
 
 def ois_sensitivity(as_of: date, convention: str, quotes: Sequence[Quote], interpolation: str,
                     swaps: Sequence[BookSwap]) -> dict[str, object]:
+    if interpolation not in ("LOG_LINEAR_DF", "LINEAR_ZERO"):  # ruling F-41
+        raise QfError("E_INPUT", "the book needs a sequential build", "interpolation")
     if not swaps:
         raise QfError("E_INPUT", "the book has no swaps", "swaps")
-    if any(s.tenor_years < 1 for s in swaps):
-        raise QfError("E_DOMAIN", "tenor_years must be at least 1", "swaps")
+    if any(not 1 <= s.tenor_years <= 100 for s in swaps):
+        raise QfError("E_DOMAIN", "tenor_years must be in [1, 100]", "swaps")
     if len({s.id for s in swaps}) != len(swaps):
         raise QfError("E_INPUT", "duplicate swap id", "swaps")
     data, _ = ois.bootstrap(convention, as_of, quotes, interpolation)
