@@ -446,7 +446,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** full revaluation against sensitivity P&L (`risk.pnl.explain`).
 - **Monitoring thresholds:** a traffic-light zone of YELLOW or RED on the bank's own backtest.
-- **Data lineage hash:** sha256 29111a2d9ec9d6095ce42e9bd27d3c183ed6014db9d69396a32f9908d90f8e98
+- **Data lineage hash:** sha256 eb615bed83742b4fbb9b62d6dbb5eab06ba93315559752a370d10c935994ec9a
 - **Retirement trigger:** a full-revaluation historical engine on real positions (stage G and later).
 - **Validation report:** `specifications/06-risk/var-es-and-backtests.md`.
 

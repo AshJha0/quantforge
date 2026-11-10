@@ -447,11 +447,11 @@ def f4_mc(s):
         Ls = sorted(-v for v in pnl)
         k = math.ceil(n * c)
         var, es = Ls[k - 1], math.fsum(Ls[k - 1:]) / (n - k + 1)
-        s.add(op, {"mean": mu, "covariance": Sg, "weights": w, "paths": n, "seed": seed, "confidence": c},
+        s.add(op, {"mean": mu, "covariance": Sg, "weights": w, "paths": n, "seed": str(seed), "confidence": c},
               {"var": var, "es": es, "tail_count": n - k + 1}, cls=RNG, output_classes={"tail_count": E}, verified=["core.rng replay"],
               tags=["var", "mc", "stage-f"], description=f"{N} assets, {n} paths, confidence {c}")
-    s.add(op, {"mean": [0.0, 0.0], "covariance": [[1e-4, 2e-4], [2e-4, 1e-4]], "weights": [1.0, 1.0], "paths": 100, "seed": 1, "confidence": .99},
-          error="E_DOMAIN", cls=E, tags=["invalid", "stage-f"], description="covariance not positive definite")
+    s.add(op, {"mean": [0.0, 0.0], "covariance": [[1e-4, 2e-4], [2e-4, 1e-4]], "weights": [1.0, 1.0], "paths": 100, "seed": "1", "confidence": .99},
+          error="E_NOT_POSITIVE_DEFINITE", cls=E, tags=["invalid", "stage-f"], description="covariance not positive definite")
 
 
 # ===================================================================================== F4 backtests
