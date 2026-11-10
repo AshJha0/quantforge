@@ -34,14 +34,14 @@ public final class Projection {
     }
 
     /** Simple forward on the projection curve. */
-    public static double forward(Conventions.RateIndex ix, Curve p, LocalDate s, LocalDate e) {
+    public static double forward(Conventions.RateIndex ix, Discounting p, LocalDate s, LocalDate e) {
         return (p.discount(s) / p.discount(e) - 1.0) / accrual(ix, s, e);
     }
 
     /** The fixed and floating schedules of a swap. */
     public record Swap(Conventions.RateIndex index, List<Schedule.Period> fixed, double[] alpha,
                        List<Schedule.Period> floating) {
-        public double annuity(Curve d) {
+        public double annuity(Discounting d) {
             double a = 0.0;
             for (int i = 0; i < alpha.length; i++) {
                 a += alpha[i] * d.discount(fixed.get(i).end());
@@ -49,7 +49,7 @@ public final class Projection {
             return a;
         }
 
-        public double floatingLeg(Curve d, Curve p) {
+        public double floatingLeg(Discounting d, Discounting p) {
             double f = 0.0;
             for (Schedule.Period q : floating) {
                 f += (p.discount(q.start()) / p.discount(q.end()) - 1.0) * d.discount(q.end());
@@ -57,7 +57,7 @@ public final class Projection {
             return f;
         }
 
-        public double parRate(Curve d, Curve p) {
+        public double parRate(Discounting d, Discounting p) {
             return floatingLeg(d, p) / annuity(d);
         }
     }
