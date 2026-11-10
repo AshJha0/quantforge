@@ -91,7 +91,7 @@ public final class CreditOptions {
         Finite.check("vol", vol);
         Legs l = legs(asOf, expiry, maturity, r, h, rec);
         double t = years(asOf, expiry);
-        double fep = n * (1 - rec) * (1 - Math.exp(-h * t)) * Math.exp(-r * t);
+        double fep = n * (1 - rec) * (-Math.expm1(-h * t)) * Math.exp(-r * t);
         double opt = n * l.annuity() * Black.lognormal(payer ? 1.0 : -1.0, l.forward(), k, t, 1.0, vol);
         return new OptionPrice(opt + (payer && !knockOut ? fep : 0.0), l.forward(), l.annuity(), fep);
     }
@@ -155,7 +155,7 @@ public final class CreditOptions {
         Legs l = legs(asOf, expiry, maturity, r, h, rec);
         double t = years(asOf, expiry);
         double pT = Math.exp(-r * t);
-        double fep = (1 - rec) * (1 - Math.exp(-h * t)) * pT;
+        double fep = (1 - rec) * (-Math.expm1(-h * t)) * pT;
         double hk = strikeHazard(expiry, maturity, r, rec, k);
         double ak = legs(expiry, expiry, maturity, r, hk, rec).annuity();
         double g = (k - c) * ak;

@@ -26,11 +26,13 @@ final class OpsRiskF {
     static void register(Map<String, Function<In, Out>> table) {
         table.put("risk.var.historical", in -> {
             double[] pnl = in.reals("pnl");
+            in.limit(pnl.length > 1_000_000, "pnl");
             double c = in.gate(in.real("confidence"));
             return new Out(varEs(PortfolioRisk.historical(pnl, c)), Map.of());
         });
         table.put("risk.var.filtered_historical", in -> {
             double[] r = in.reals("returns");
+            in.limit(r.length > 1_000_000, "returns");
             double p = in.real("position_value");
             double lambda = in.real("lambda");
             double c = in.gate(in.real("confidence"));
@@ -49,6 +51,7 @@ final class OpsRiskF {
             double[] mean = in.reals("mean");
             double[][] cov = in.anyMatrix("covariance");
             double[] w = in.reals("weights");
+            in.limit(mean.length > 100, "mean");
             long paths = in.integer("paths");
             in.limit(paths > 10_000_000, "paths");
             long seed = in.u64("seed");
@@ -86,13 +89,24 @@ final class OpsRiskF {
             List<Ois.Quote> quotes = OpsLinear.quotes(in);
             Curve.Interpolation interp = in.choice("interpolation", Curve.Interpolation.class);
             List<In> list = in.objects("swaps");
-            in.limit(list.size() > 100_000, "swaps");
+            in.limit(list.size() > 10_000, "swaps");
             List<BookRisk.Swap> swaps = new ArrayList<>();
             for (In s : list) {
                 swaps.add(new BookRisk.Swap(s.string("id"), s.integer("tenor_years"), s.real("fixed_rate"),
                         s.choice("side", SwapSide.class) == SwapSide.PAY));
             }
             in.gate();
+            // ruling F-41: checked after the gate, so E_SCHEMA and E_LIMIT come first
+            if (interp != Curve.Interpolation.LOG_LINEAR_DF && interp != Curve.Interpolation.LINEAR_ZERO) {
+                throw new org.quantforge.core.QfError("E_INPUT",
+                        "ois_sensitivity takes LOG_LINEAR_DF or LINEAR_ZERO", "interpolation");
+            }
+            for (BookRisk.Swap s : swaps) {
+                if (s.tenorYears() < 1 || s.tenorYears() > 100) {
+                    throw new org.quantforge.core.QfError("E_DOMAIN", "tenor_years must be in [1, 100]",
+                            "tenor_years");
+                }
+            }
             BookRisk.OisSensitivity r = BookRisk.oisSensitivity(c, asOf, quotes, interp, swaps);
             List<String> ids = new ArrayList<>();
             for (BookRisk.Swap s : swaps) {
@@ -116,6 +130,8 @@ final class OpsRiskF {
         table.put("risk.curve.pca", in -> {
             double[][] ch = in.anyMatrix("changes");
             long k = in.integer("components");
+            in.limit(ch.length > 100_000, "changes");
+            in.limit(ch.length > 0 && ch[0].length > 200, "changes");
             in.gate();
             BookRisk.Pca r = BookRisk.pca(ch, k);
             return Operations.out("eigenvalues", r.eigenvalues(), "loadings", r.loadings(),
@@ -171,6 +187,7 @@ final class OpsRiskF {
         table.put("risk.backtest.christoffersen", in -> {
             List<?> raw = in.anyValue("exceptions") instanceof List<?> l ? l : null;
             boolean[] e = bools(in, raw);
+            in.limit(e.length > 1_000_000, "exceptions");
             double c = in.gate(in.real("confidence"));
             PortfolioRisk.Christoffersen r = PortfolioRisk.christoffersen(e, c);
             return Operations.out("lr_uc", r.lrUc(), "lr_ind", r.lrInd(), "lr_cc", r.lrCc(), "p_uc", r.pUc(),
