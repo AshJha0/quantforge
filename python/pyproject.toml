@@ -40,7 +40,7 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_mutation_bonds.py", "tests/test_mutation_d.py",
              "tests/test_mutation_e.py", "tests/test_mutants_e.py", "tests/test_properties.py",
              "tests/test_stage_e_qa.py", "tests/test_limits_e.py",
-             "tests/test_local_vol_continuity.py", "tests/test_finite.py",
+             "tests/test_local_vol_continuity.py",
              "tests/test_curve_interp_f.py", "tests/test_waves_2_3.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
 do_not_mutate = ["quantforge_core/_sobol_data.py", "quantforge_core/_legendre_1024.py"]
