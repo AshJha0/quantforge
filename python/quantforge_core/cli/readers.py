@@ -49,6 +49,8 @@ def _curve(i: Inputs, key: str = "curve") -> CurveData:
         tuple(p.date("date") for p in pillars),
         tuple(p.real("discount_factor") for p in pillars),
         jumps(c),
+        c.real("tension") if c.has("tension") else None,
+        c.opt_date("step_end"),
     )
 
 

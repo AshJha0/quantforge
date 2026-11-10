@@ -3,13 +3,12 @@
 Instrument: OisTrade. Product model: periods. Market data: Curve. Pricing model: legs, ois_pv.
 """
 import itertools
-import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 from typing import Protocol
 
-from . import calendars, curves, daycount, linalg, schedules
+from . import calendars, curve_interp, curves, daycount, schedules
 from .conventions import REGISTRY
 from .curves import Curve, CurveData
 from .errors import QfError, required
@@ -133,42 +132,6 @@ def _models(convention: str, swaps: Sequence[Sequence[Period]]) -> list[curves.M
     return [model(ps) for ps in swaps]
 
 
-def _global_solve(
-    as_of: date, interpolation: str, pillars: Sequence[date], models: Sequence[curves.Model],
-    targets: Sequence[float], jumps: tuple[tuple[date, float], ...] = (),
-) -> tuple[list[float], float]:
-    """Newton on all pillars together, on log discount factors, with a bumped Jacobian."""
-    n = len(pillars)
-    xs = [-q * (d - as_of).days / 365 for q, d in zip(targets, pillars, strict=True)]
-
-    def errors(x: Sequence[float]) -> list[float]:
-        data = CurveData(as_of, interpolation, tuple(pillars), tuple(math.exp(v) for v in x),
-                         jumps)
-        curve = Curve(data)
-        return [m(curve) - q for m, q in zip(models, targets, strict=True)]
-
-    best = math.inf
-    for _ in range(50):
-        r = errors(xs)
-        size = max(abs(v) for v in r)
-        best = min(best, size)
-        if size < 1e-15:
-            break
-        jacobian = [[0.0] * n for _ in range(n)]
-        h = 1e-7
-        for j in range(n):
-            up = errors([*xs[:j], xs[j] + h, *xs[j + 1:]])
-            down = errors([*xs[:j], xs[j] - h, *xs[j + 1:]])
-            for i in range(n):
-                jacobian[i][j] = (up[i] - down[i]) / (2 * h)
-        step = linalg.lu_solve(jacobian, [-v for v in r])
-        xs = [x + s for x, s in zip(xs, step, strict=True)]
-        if max(abs(s) for s in step) < 1e-15:
-            break
-    final = errors(xs)
-    return [math.exp(v) for v in xs], max(abs(v) for v in final)
-
-
 def _check_quotes(
     convention: str, as_of: date, quotes: Sequence[Quote]
 ) -> tuple[list[list[Period]], list[date]]:
@@ -186,16 +149,21 @@ def _check_quotes(
 def bootstrap(
     convention: str, as_of: date, quotes: Sequence[Quote], interpolation: str,
     method: str = "SEQUENTIAL", jumps: tuple[tuple[date, float], ...] = (),
+    tension: float | None = None, step_end: date | None = None,
 ) -> tuple[CurveData, float]:
     """Returns (curve, max_repricing_error)."""
     curves.check_jumps(as_of, jumps)
     swaps, pillars = _check_quotes(convention, as_of, quotes)
     models = _models(convention, swaps)
     targets = [q.mid for q in quotes]
-    solve = curves.solve_pillars if method == "SEQUENTIAL" else _global_solve
-    factors, error = solve(as_of, interpolation, pillars, models, targets, jumps)
+    # A stage F method is solved globally whatever the method (ruling F-21).
+    local = method == "SEQUENTIAL" or interpolation in curve_interp.NEW_METHODS
+    solve = curves.solve_pillars if local else curves.global_solve
+    factors, error = solve(as_of, interpolation, pillars, models, targets, jumps,
+                           tension, step_end)
     curves.check_solved(error)
-    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors), jumps), error
+    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors), jumps,
+                     tension, step_end), error
 
 
 def compound(rates: Sequence[float], days: Sequence[int], denominator: int) -> float:

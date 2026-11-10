@@ -61,9 +61,20 @@ def bootstrap(i: Inputs) -> Any:
     data, error = core.ois.bootstrap(
         i.enum("convention", conventions.OVERNIGHT), i.date("as_of"), _quotes(i),
         i.enum("interpolation", curves.INTERPOLATIONS),
-        i.enum("method", ("SEQUENTIAL", "GLOBAL")), jumps(i),
+        i.enum("method", ("SEQUENTIAL", "GLOBAL")), jumps(i), *_options(i),
     )
     return {"pillars": _pillars(data)}, {"max_repricing_error": error}
+
+
+def _options(i: Inputs) -> tuple[float | None, Any]:
+    """The stage F bootstrap keys `tension` and `step_end` (optional, top level)."""
+    return (i.real("tension") if i.has("tension") else None), i.opt_date("step_end")
+
+
+@op("rates.curve.inspect")
+def curve_inspect(i: Inputs) -> Any:
+    factors, zeros, forwards = core.curves.inspect(_curve(i), i.dates("dates"))
+    return {"discount_factors": factors, "zero_rates": zeros, "instantaneous_forwards": forwards}
 
 
 @op("rates.ois.compound")
@@ -208,7 +219,8 @@ def _joint(i: Inputs) -> Any:
     ois_quotes = _quotes(Inputs({"quotes": i.array("ois_quotes")}, "ois_"))
     args = (_convention(i, "convention", conventions.OVERNIGHT), _convention(i, "index", conventions.TERM),
             i.date("as_of"), ois_quotes, [_term_quote(q) for q in _objects(i, "term_quotes")],
-            i.enum("interpolation", curves.INTERPOLATIONS), i.enum("method", _BOOT))
+            i.enum("interpolation", curves.INTERPOLATIONS), i.enum("method", _BOOT),
+            *_options(i))
     disc, proj, error = core.csa.joint_bootstrap(*args)
     return ({"discount_pillars": _pillars(disc), "projection_pillars": _pillars(proj)},
             {"max_repricing_error": error})

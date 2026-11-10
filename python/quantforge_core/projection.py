@@ -90,7 +90,7 @@ def _swap_legs(
 
 def bootstrap(
     discount_data: CurveData, index: str, as_of: date, quotes: Sequence[ProjectionQuote],
-    interpolation: str,
+    interpolation: str, tension: float | None = None, step_end: date | None = None,
 ) -> tuple[CurveData, float]:
     discount = curves.build(discount_data)
     if not quotes:
@@ -129,9 +129,11 @@ def bootstrap(
     if any(b <= a for a, b in itertools.pairwise(pillars)):
         raise QfError("E_INPUT", "quotes are not in pillar order", "quotes")
     targets = [q.rate for q in quotes]
-    factors, error = curves.solve_pillars(as_of, interpolation, pillars, models, targets)
+    factors, error = curves.solve_pillars(as_of, interpolation, pillars, models, targets,
+                                          (), tension, step_end)
     curves.check_solved(error)
-    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors)), error
+    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors), (), tension,
+                     step_end), error
 
 
 def swap_pv(
