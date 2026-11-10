@@ -38,5 +38,10 @@
   "counted": 36,
   "total": 41,
   "rule": "QuantLib Vasicek, CoxIngersollRoss, HullWhite discountBondOption per caplet, scaled by (1 + K tau) and summed"
+ },
+ "swaption_affine_g": {
+  "counted": 36,
+  "total": 39,
+  "rule": "G-13 method on QuantLib Vasicek and CoxIngersollRoss objects"
  }
 }

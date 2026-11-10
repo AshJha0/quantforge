@@ -63,6 +63,16 @@ Errors in order (after F-2): `short_rate` present `E_INPUT`; `a`, `sigma`, curve
 
 Validation: 33 value cases (expiries 0.5 to 10 years, 2 to 20 annual periods, strikes at the forward and 100 bp either side, both types, a semi-annual swap, high mean reversion `a = 0.5`, a zero strike on the negative-rate curve) and 7 error cases. Values: 50-digit mpmath, `r*` to 1e-45. Payer minus receiver equals `annuity (F - K)` to 1e-8 on every pair (asserted). Outside: QuantLib 1.44 `HullWhite` `discountBond` and `discountBondOption`, `r*` by QuantLib's `Brent` to 1e-15, combined by arithmetic, and `DiscountCurve` discounts: 33 of 40 count. `JamshidianSwaptionEngine` itself agrees only to about 3e-7 relative (its internal root accuracy), so the engine is not the counted check. Wrong conventions caught: Ho-Lee `sigma_p`; strike 1 on every bond option.
 
+### Stage G wave 2f: `model` on `rates.shortrate.swaption` (Vasicek and CIR)
+
+Suite `stage_g/swaption_affine_g` (39 cases), generator slice `G2F`. Ruling G-20.
+
+New optional input `model` (`VASICEK`, `CIR`, `HULL_WHITE`; absent means `HULL_WHITE`, so wave 2a cases keep their meaning; another value `E_INPUT`). With `VASICEK` or `CIR` the inputs are those of `rates.shortrate.zcb_option` for that model (`mean_reversion`, `long_term_mean`, `sigma`, `short_rate` required, else `E_SCHEMA`), and no `curve`. The method is unchanged: `r*` solves `sum c_i P(T0, Ti; r*) = 1` with the model's bond formula at `tau = Ti - T0`, then the sum of the model's bond options at strikes `X_i = P(T0, Ti; r*)`. `forward_swap_rate` and `annuity` use the model's bond prices `P(0, t)` at `short_rate`.
+
+CIR needs `r* >= 0` (the bond formula is for `r >= 0`): if `sum c_i P(T0, Ti; 0) < 1` there is no such root, and the case is `E_DOMAIN`.
+
+Validation: two models x three expiry and tenor pairs x strikes at the forward and 100 bp either side x payer and receiver (36 cases); 3 error cases. Asserted: payer minus receiver equals `annuity (F - K)`. Outside: QuantLib 1.44 `Vasicek` and `CoxIngersollRoss` objects by the G-13 method: 36 of 39 count.
+
 ## `rates.shortrate.hw_calibrate` (stage G wave 2c)
 
 Hull-White `sigma` fitted to a strip of European swaption prices with `a` fixed. Suite `stage_g/hwcal_g` (6 cases), generator slice `G2C`. Ruling G-17.

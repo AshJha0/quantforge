@@ -168,3 +168,14 @@ Read: `specifications/04-pricing/short-rate-models.md`, section "`rates.shortrat
 
 ### Status update (after wave 2e)
 `capfloor_g` 36 of 41 count (QuantLib model objects). **Stage G: 169 of 286 = 59.1%**, still 0.9 points below the 60% floor. Counted per suite: shortrate 61/78, barrier 2/32, swaption 33/40, g2pp 30/38, capfloor 36/41, exposure 7/15; hwcal 0/6, bermudan 0/15, mcgreeks 0/21. Rulings G-1 to G-19; G-10 open for the owner. Next step: relay wave 2e; then callable bonds on the G-18 scheme, and the remaining QuantLib-countable items (CIR Jamshidian swaption, G2++ swaption if `G2SwaptionEngine` can be set tight enough).
+
+## WAVE 2f READY (2026-11-10): Jamshidian swaptions for Vasicek and CIR
+
+Read: `specifications/04-pricing/short-rate-models.md`, section "Stage G wave 2f"; ruling G-20.
+
+### G2f (suite `swaption_affine_g`, 39 cases)
+- `rates.shortrate.swaption` gains optional `model`; absent means `HULL_WHITE` (wave 2a goldens unchanged).
+- Build notes: the critical-rate solve uses the model's own bond formula; for CIR check `sum c_i P(T0, Ti; 0) >= 1` first, else `E_DOMAIN`. CIR cases use the noncentral chi-square of wave 1.
+
+### Status update (after wave 2f)
+`swaption_affine_g` 36 of 39 count. **Stage G: 205 of 325 = 63.1%, above the 60% floor** (error cases in the denominator). Per suite: shortrate 61/78, barrier 2/32, swaption 33/40, swaption_affine 36/39, g2pp 30/38, capfloor 36/41, exposure 7/15; hwcal 0/6, bermudan 0/15, mcgreeks 0/21. Rulings G-1 to G-20; G-10 open for the owner. Left: callable bonds (G-18 scheme), G2++ swaptions, LMM, Q3b, Q9 part 2, the rest of xVA, A5, the R5 audit; stage F carry-over 3 unchanged at 51.4%. Next step: relay waves 2c to 2f; then callable bonds.

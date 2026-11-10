@@ -1,0 +1,1932 @@
+{
+ "schema_version": "1.0",
+ "suite": "swaption_affine_g",
+ "spec": "specifications/04-pricing/short-rate-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "swaption_affine_g-0001",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.029085,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 45002.553644675114,
+     "forward_swap_rate": 0.03908462872827848,
+     "annuity": 4312116.275292193
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 1.0y into 5y, K=0.029085",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0002",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.029085,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1882.991858586133,
+     "forward_swap_rate": 0.03908462872827848,
+     "annuity": 4312116.275292193
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 1.0y into 5y, K=0.029085",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0003",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.039085,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14165.633299669533,
+     "forward_swap_rate": 0.03908462872827848,
+     "annuity": 4312116.275292193
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 1.0y into 5y, K=0.039085",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0004",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.039085,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14167.234266502448,
+     "forward_swap_rate": 0.03908462872827848,
+     "annuity": 4312116.275292193
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 1.0y into 5y, K=0.039085",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0005",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.049085,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1986.032217872197,
+     "forward_swap_rate": 0.03908462872827848,
+     "annuity": 4312116.275292193
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 1.0y into 5y, K=0.049085",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0006",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.049085,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 45108.79593762702,
+     "forward_swap_rate": 0.03908462872827848,
+     "annuity": 4312116.275292193
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 1.0y into 5y, K=0.049085",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0007",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.030548,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 78672.73737114885,
+     "forward_swap_rate": 0.04054825053129683,
+     "annuity": 7540294.134349769
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 2.0y into 10y, K=0.030548",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0008",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.030548,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3267.906947983208,
+     "forward_swap_rate": 0.04054825053129683,
+     "annuity": 7540294.134349769
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 2.0y into 10y, K=0.030548",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0009",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.040548,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 24922.573735781105,
+     "forward_swap_rate": 0.04054825053129683,
+     "annuity": 7540294.134349769
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 2.0y into 10y, K=0.040548",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0010",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.040548,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 24920.68465611318,
+     "forward_swap_rate": 0.04054825053129683,
+     "annuity": 7540294.134349769
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 2.0y into 10y, K=0.040548",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0011",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.050548,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3643.3140243555445,
+     "forward_swap_rate": 0.04054825053129683,
+     "annuity": 7540294.134349769
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 2.0y into 10y, K=0.050548",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0012",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.050548,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 79044.3662881854,
+     "forward_swap_rate": 0.04054825053129683,
+     "annuity": 7540294.134349769
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 2.0y into 10y, K=0.050548",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0013",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.03103,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 44203.62251527044,
+     "forward_swap_rate": 0.04103032927362188,
+     "annuity": 3679902.5442482773
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 5.0y into 5y, K=0.03103",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0014",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.03103,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7403.385377948714,
+     "forward_swap_rate": 0.04103032927362188,
+     "annuity": 3679902.5442482773
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 5.0y into 5y, K=0.03103",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0015",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.04103,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 20995.48584160011,
+     "forward_swap_rate": 0.04103032927362188,
+     "annuity": 3679902.5442482773
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 5.0y into 5y, K=0.04103",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0016",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.04103,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 20994.274146761178,
+     "forward_swap_rate": 0.04103032927362188,
+     "annuity": 3679902.5442482773
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 5.0y into 5y, K=0.04103",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0017",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.05103,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7654.195892993206,
+     "forward_swap_rate": 0.04103032927362188,
+     "annuity": 3679902.5442482773
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "payer",
+    "synthetic"
+   ],
+   "description": "VASICEK PAYER 5.0y into 5y, K=0.05103",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0018",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.05103,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 44452.00964063707,
+     "forward_swap_rate": 0.04103032927362188,
+     "annuity": 3679902.5442482773
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "vasicek",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "VASICEK RECEIVER 5.0y into 5y, K=0.05103",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0019",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.025553,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 44271.16192448604,
+     "forward_swap_rate": 0.035552670107435354,
+     "annuity": 4376933.875500686
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 1.0y into 5y, K=0.025553",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0020",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.025553,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 503.2670874206994,
+     "forward_swap_rate": 0.035552670107435354,
+     "annuity": 4376933.875500686
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 1.0y into 5y, K=0.025553",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0021",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035553,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12789.546773437045,
+     "forward_swap_rate": 0.035552670107435354,
+     "annuity": 4376933.875500686
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 1.0y into 5y, K=0.035553",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0022",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035553,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12790.990691378493,
+     "forward_swap_rate": 0.035552670107435354,
+     "annuity": 4376933.875500686
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 1.0y into 5y, K=0.035553",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0023",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.045553,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2064.5811670754133,
+     "forward_swap_rate": 0.035552670107435354,
+     "annuity": 4376933.875500686
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 1.0y into 5y, K=0.045553",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0024",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.045553,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 45835.3638400238,
+     "forward_swap_rate": 0.035552670107435354,
+     "annuity": 4376933.875500686
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 1.0y into 5y, K=0.045553",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0025",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.027243,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 77399.53730771021,
+     "forward_swap_rate": 0.03724297563551817,
+     "annuity": 7732615.586047872
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 2.0y into 10y, K=0.027243",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0026",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.027243,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 73.56984840340249,
+     "forward_swap_rate": 0.03724297563551817,
+     "annuity": 7732615.586047872
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 2.0y into 10y, K=0.027243",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0027",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.037243,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19156.84677463123,
+     "forward_swap_rate": 0.03724297563551817,
+     "annuity": 7732615.586047872
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 2.0y into 10y, K=0.037243",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0028",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.037243,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19157.035175803132,
+     "forward_swap_rate": 0.03724297563551817,
+     "annuity": 7732615.586047872
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 2.0y into 10y, K=0.037243",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0029",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.047243,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2532.544165138247,
+     "forward_swap_rate": 0.03724297563551817,
+     "annuity": 7732615.586047872
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 2.0y into 10y, K=0.047243",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0030",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.047243,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 79858.88842678888,
+     "forward_swap_rate": 0.03724297563551817,
+     "annuity": 7732615.586047872
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 2.0y into 10y, K=0.047243",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0031",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.027816,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 40323.82810672821,
+     "forward_swap_rate": 0.03781628993417491,
+     "annuity": 3782400.3428284344
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 5.0y into 5y, K=0.027816",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0032",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.027816,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2498.7280313213255,
+     "forward_swap_rate": 0.03781628993417491,
+     "annuity": 3782400.3428284344
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 5.0y into 5y, K=0.027816",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0033",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.037816,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17292.75969620002,
+     "forward_swap_rate": 0.03781628993417491,
+     "annuity": 3782400.3428284344
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 5.0y into 5y, K=0.037816",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0034",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.037816,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17291.66304907749,
+     "forward_swap_rate": 0.03781628993417491,
+     "annuity": 3782400.3428284344
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 5.0y into 5y, K=0.037816",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0035",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.047816,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6447.16516664798,
+     "forward_swap_rate": 0.03781628993417491,
+     "annuity": 3782400.3428284344
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "payer",
+    "synthetic"
+   ],
+   "description": "CIR PAYER 5.0y into 5y, K=0.047816",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0036",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.047816,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 44270.07194780972,
+     "forward_swap_rate": 0.03781628993417491,
+     "annuity": 3782400.3428284344
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "cir",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "CIR RECEIVER 5.0y into 5y, K=0.047816",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_affine_g-0037",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "G2PP",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "notional": 1.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": 0.04,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "unknown model"
+  },
+  {
+   "case_id": "swaption_affine_g-0038",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "notional": 1.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": 0.04,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "VASICEK without short_rate"
+  },
+  {
+   "case_id": "swaption_affine_g-0039",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "notional": 1.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": 0.0,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "CIR critical rate below 0 (bond sum at r = 0 below 1)"
+  }
+ ]
+}

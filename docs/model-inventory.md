@@ -494,7 +494,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** G2++ (`rates.g2pp.*`, wave 2b; QuantLib `G2` outside check, 30 of 38).
 - **Monitoring thresholds:** calibration error once calibration lands.
-- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`); b0630a25f4a701810eb1596c3fcdf7ab70736a6759973bc6771345576b7f1188 (`g2pp_g`); f2f683d408b844b83fa054864b36bf089491c6c6a277f701a1045c69d75c0a49 (`hwcal_g`); 3455c11ece1804fc729463fcad1ec8020f444233cfc7ab1a4c9e355125a22287 (`bermudan_g`); 0fda39dc4e71a228d3029a2879cebbdc3e314e915ac5560260e70cd03886728c (`capfloor_g`)
+- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`); b0630a25f4a701810eb1596c3fcdf7ab70736a6759973bc6771345576b7f1188 (`g2pp_g`); f2f683d408b844b83fa054864b36bf089491c6c6a277f701a1045c69d75c0a49 (`hwcal_g`); 3455c11ece1804fc729463fcad1ec8020f444233cfc7ab1a4c9e355125a22287 (`bermudan_g`); 0fda39dc4e71a228d3029a2879cebbdc3e314e915ac5560260e70cd03886728c (`capfloor_g`); f0f6e80f5740683fc4da985dd249517ea3184118b9829202369badf520fc1352 (`swaption_affine_g`)
 - **Retirement trigger:** a multi-factor or market model for the desk's products.
 - **Validation report:** `specifications/04-pricing/short-rate-models.md`.
 

@@ -58,6 +58,12 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-19 | Cap rate and accrual | Single curve: the fixing is the model's simple rate over its own period, `1/P(t_(i-1), t_i) - 1` over `tau_i`, accruals are time differences, payment at period end. A projection curve, fixing lag or a day count other than the time grid waits for a multi-curve wave and will be a new input |
 
+## Wave 2f, Jamshidian for Vasicek and CIR
+
+| # | Point | Ruling |
+|---|---|---|
+| G-20 | `model` on the swaption | `rates.shortrate.swaption` gains optional `model` (default `HULL_WHITE`, a minor contract change: no existing case changes meaning). The G-5 `short_rate` rule is per model as in `zcb_option`. CIR with no non-negative critical rate is `E_DOMAIN` (checked as `sum c_i P(T0, Ti; 0) < 1`) |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |

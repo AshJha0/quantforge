@@ -4467,8 +4467,14 @@
     "fixed_rate": {
      "java": "fixedRate"
     },
+    "long_term_mean": {
+     "java": "longTermMean"
+    },
     "mean_reversion": {
      "java": "meanReversion"
+    },
+    "model": {
+     "java": "model"
     },
     "notional": {
      "java": "notional"
