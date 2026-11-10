@@ -22,5 +22,17 @@ Classes:
 | vol_stats.cpp:458 | `-` to `+` | `1.0 + alpha - beta >= tol` | Accepted | The stationarity part of the interior check (ruling F-11). The Newton polish keeps `alpha + beta < 1` (`feasible`), so the mutant differs only when the polish converges (`done`) to a stationary point with `1 - 1e-6 <= alpha + beta < 1`. A series whose likelihood peaks on the boundary stops the polish (`feasible` fails) and is rejected by `done` in both. | |
 | vol_stats.cpp:459 | `>=` to `>` | `nu - 2.0 >= tol * 2.0` | Accepted | Differs only when the fitted `nu` is exactly `2 + 2e-6` in floating point. | |
 
-Killed by `cpp26/tests/test_mut_kill_g.cpp` (stage G): vol_stats.cpp:272 (`digamma(nu * 2)` in the score in nu)
-and vol_stats.cpp:287 (sign of the last term of the second derivative in nu). See that file for vol_stats.cpp:209.
+Killed by `cpp26/tests/test_mut_kill_g.cpp` (stage G), each checked by applying the mutant by hand in a scratch copy
+(2026-11-10): vol_stats.cpp:272 (`digamma(nu * 2)` in the score in nu) and vol_stats.cpp:287 (sign of the last term
+of the second derivative in nu), both by the Student-t estimate test; vol_stats.cpp:209 (`gain = fbest + fx`) by the
+garch_fit test on returns of variance near 1, where the objective is positive and the stop rule is never met.
+
+Scores on the PR #29 sample, counting only killed mutants (rule M: the unsigned rows above still count as surviving):
+
+| Module | Before | After (hand-applied) | Left |
+|---|---|---|---|
+| garch_varswap_vix (vol_stats.cpp) | 7/12, 58.3% | 10/12, 83.3% | 458, 459 accepted, unsigned |
+| rates_d (multicurve.cpp) | 8/12, 66.7% | 8/12, 66.7%; 12/12 once the four equivalent rows are signed | 385, 390, 415, 418 |
+| credit_options (credit_options.cpp) | 10/12, 83.3% | unchanged | 109, 285, unsigned |
+
+This is a hand-applied check of the sampled survivors, not a fresh mutation run.

@@ -117,17 +117,19 @@ TEST_CASE("garch estimate student-t: maximum in nu and errors from a finite-diff
     }
 }
 
-// Kills vol_stats.cpp:209 if the restart rule matters: garch_fit restarts Nelder-Mead until a restart gains at most
-// 1e-12 relative, so its loglik reaches the Newton-polished garch_estimate maximum to about 1e-13.
+// garch_fit restarts Nelder-Mead until a restart gains at most 1e-12 relative, so its loglik reaches the
+// Newton-polished garch_estimate maximum to about 1e-13. Returns of variance near 1 give a negative loglik (a positive
+// objective): that kills vol_stats.cpp:209 (gain = fbest + fx never meets the stop rule, and the fit fails).
 TEST_CASE("garch fit: restarts reach the polished maximum") {
-    for (const int nu : {4, 5})
-        for (const std::size_t n : {300, 1000, 2000}) {
-            const std::vector<double> r = garch_t_series(n, 2e-6, 0.08, 0.90, nu);
-            const GarchFit f = garch_fit(r, std::nullopt);
-            const GarchEstimate e = garch_estimate(r, std::nullopt, GarchDistribution::Normal, false);
-            INFO("nu " << nu << " n " << n);
-            CHECK(std::fabs(f.loglik - e.loglik) <= 1e-13 * std::fabs(e.loglik));
-            CHECK(std::fabs(f.alpha - e.alpha) <= 1e-5 * e.alpha);
-            CHECK(std::fabs(f.beta - e.beta) <= 1e-5 * e.beta);
-        }
+    for (const double omega : {2e-6, 0.05})
+        for (const int nu : {4, 5})
+            for (const std::size_t n : {300, 1000, 2000}) {
+                const std::vector<double> r = garch_t_series(n, omega, 0.08, 0.90, nu);
+                const GarchFit f = garch_fit(r, std::nullopt);
+                const GarchEstimate e = garch_estimate(r, std::nullopt, GarchDistribution::Normal, false);
+                INFO("omega " << omega << " nu " << nu << " n " << n);
+                CHECK(std::fabs(f.loglik - e.loglik) <= 1e-13 * std::fabs(e.loglik));
+                CHECK(std::fabs(f.alpha - e.alpha) <= 1e-5 * e.alpha);
+                CHECK(std::fabs(f.beta - e.beta) <= 1e-5 * e.beta);
+            }
 }
