@@ -336,7 +336,7 @@ Evidence classes. Java: PIT on unit tests, full mutant set (observed, CI). C++ "
 
 Every cell is at or above the 80% target after the closeout tests, on the evidence classes above.
 
-## Stage F models (wave 1: F1 curve layer, F6 model fixes)
+## Stage F models (waves 1 to 3: F1 curve layer, F3 sensitivities, F4 portfolio risk, F5 book, F6 model fixes)
 
 Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of the golden suite file that pins the model, as committed by the spec session (`sha256sum datasets/golden/stage_f/<suite>.json`); a golden regeneration changes it and must be recorded here. Tier: 1 = feeds prices or risk that a desk would act on; 2 = feeds analytics and reports; 3 = research or challenger.
 
@@ -398,7 +398,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1 (curves feed every price).
 - **Challenger:** `LOG_LINEAR_DF` (the stage B default) on the same quotes; the hybrid against `MONOTONE_CONVEX`.
 - **Monitoring thresholds:** pillars or zero rates more than 1e-10 from QuantLib on the golden builds; a forward jump above 1e-12 at an interior pillar.
-- **Data lineage hash:** sha256 036a7971c773ca5e910de9168301574f34016a236ebfbb52f47442458ad84d46
+- **Data lineage hash:** sha256 9ee455cdb93e45f00a98b9dcbfcb88669b13cd11d5907b72aeb38d579530e0d7
 - **Retirement trigger:** a smoothing method with a published market standard (for example an ISDA SIMM curve rule) that QuantLib also implements.
 - **Validation report:** `oracle/outside_register_f.json`; `specifications/02-curves/curve-framework.md` (stage F acceptance).
 
@@ -434,7 +434,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** bump and revalue (`risk.curve.par`, R2).
 - **Monitoring thresholds:** AAD outside `1e-10 + 1e-8 |ref|` of the Richardson bump in the Rust unit tests.
-- **Data lineage hash:** sha256 7073c764673ad4ca0a5b795067c623e6ac6a352362c2de0799edc23ceba99161
+- **Data lineage hash:** sha256 ae4ead0413fdd9c0c171b8b08126cbb724b9dc063a7f7bf3ee5780f6b347fe46
 - **Retirement trigger:** AAD through every pricer replaces bump risk as the default (a later stage, by ADR).
 - **Validation report:** `specifications/06-risk/book-sensitivities.md`; `oracle/outside_register_f.json`.
 

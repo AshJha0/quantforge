@@ -231,7 +231,8 @@ def f3_pca(s):
     op = "risk.curve.pca"
     g = Xo(SEED, stream=1)
     cases = 0
-    for n_ten, T, k in ((5, 60, 2), (8, 120, 3), (10, 250, 3), (12, 500, 4), (6, 30, 6), (10, 1000, 3)) * 4:
+    # series capped at 250 days and inputs at 12 significant digits, to keep the suite under the 1 MB hygiene limit (E11)
+    for n_ten, T, k in ((5, 60, 2), (8, 120, 3), (10, 250, 3), (12, 250, 4), (6, 30, 6), (10, 120, 3)) * 4:
         # factor model: level, slope, curvature shapes plus noise, scales drawn per case
         ten = np.linspace(0.25, 30, n_ten)
         shapes = np.array([np.ones(n_ten), (ten - ten.mean()) / ten.std(), ((ten - ten.mean()) / ten.std()) ** 2 - 1])
@@ -240,7 +241,7 @@ def f3_pca(s):
         for _ in range(T):
             z = [ppnd16(g.uniform()) for _ in range(3)]
             e = [ppnd16(g.uniform()) * 2e-5 for _ in range(n_ten)]
-            X.append([f(sum(sc[a] * z[a] * shapes[a][j] for a in range(3)) + e[j]) for j in range(n_ten)])
+            X.append([float(f"{sum(sc[a] * z[a] * shapes[a][j] for a in range(3)) + e[j]:.12g}") for j in range(n_ten)])
         lam, vecs, tot = pca_ref(X, k)
         gaps = [(lam[i] - lam[i + 1]) / lam[0] for i in range(k if k < n_ten else n_ten - 1)]
         if min(gaps) < 1e-6:
@@ -339,6 +340,7 @@ def f3_jtd(s):
 
 def F3():
     s = S("risk_f3", "06-risk/book-sensitivities.md")
+    s.compact = True  # the 500-swap book and the PCA series: over 1 MB indented (hygiene gate E11)
     f3_book(s)
     f3_pca(s)
     f3_cross_gamma(s)

@@ -129,3 +129,21 @@ flowchart LR
   E4 & E6 & E7 & E8 --> GB[goldens stage_e_b]
   GA & GB --> QL[QuantLib 1.44 outside check: 557 of 895]
 ```
+
+## Stage F: from quotes to capital and the book
+
+```mermaid
+flowchart LR
+  Q[OIS, term, futures and xccy quotes] --> JS[rates.curve.joint_solve]
+  JS -->|curves| PV[pricers]
+  JS -->|IFT Jacobian dx/dq| AAD[risk.book.ois_sensitivity]
+  PV --> AAD
+  PV -->|scenario P&L| VAR[risk.var.*]
+  VAR -->|exceptions| BT[risk.backtest.*]
+  AAD -->|delta sensitivities| FRTB[risk.frtb.girr_delta]
+  EV[trades and lifecycle events] --> BK[book.lifecycle.apply]
+  MK[quote sources and IPV prices] --> MR[book.marks.resolve]
+  BK & MR --> PV
+```
+
+The joint solve feeds both the prices and the Jacobian that AAD carries back to the quotes (ruling F-29). VaR and the backtests work on P&L scenarios; FRTB-SA works on sensitivities. Specs: `02-curves/joint-solve-and-funding.md`, `06-risk/book-sensitivities.md`, `06-risk/var-es-and-backtests.md`, `06-risk/frtb-sa-girr.md`, `07-portfolio/book-lifecycle.md`.

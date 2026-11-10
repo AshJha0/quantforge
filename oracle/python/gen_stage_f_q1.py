@@ -129,6 +129,7 @@ def main():
     import gen_stage_d
     gen_stage_d.add_estr() if hasattr(gen_stage_d, "add_estr") else RT.CONV.setdefault("ESTR", dict(gen_stage_d.ESTR))
     s = Suite("curve_f", "specifications/02-curves/curve-framework.md", G)
+    s.compact = True  # over 1 MB indented (hygiene gate E11)
     bop, iop = "rates.ois.bootstrap", "rates.curve.inspect"
     turn = [(date(2026, 12, 31), math.exp(-0.0025 * 1 / 365))]
     builds, hyman, fpos = [], [], []

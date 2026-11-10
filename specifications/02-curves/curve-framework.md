@@ -116,7 +116,7 @@ Locality is stated on the pillar inputs, not on quotes, because a bootstrap spre
 - `MONOTONE_CONVEX` and `MONOTONIC_LOG_CUBIC`: `f` continuous at every interior pillar (jump at most 1e-12). `TENSION_SPLINE`: `f` and `f'` continuous (`f'` jump at most 1e-8).
 - Positivity: on the golden SOFR pillars every new method's forward is positive on a 10,000-point grid to 30 years (an oracle check).
 
-### Convergence and limit cases
+## Convergence and limit cases
 
 | Method | Asserted order | Measured on | Limit case | Reference |
 |---|---|---|---|---|
@@ -124,7 +124,7 @@ Locality is stated on the pillar inputs, not on quotes, because a bootstrap spre
 | Global bootstrap (Newton) | quadratic in the repricing error | iterations 1 to 3 on the golden quotes | one quote: one pillar, flat forward | stage B `rates.ois.bootstrap` |
 | `MONOTONE_CONVEX` | closed form | none | all discrete forwards equal: a flat curve (rule (a)) | hand |
 
-### Acceptance (plan Q1, as tightened by T)
+## Stage F acceptance (plan Q1, as tightened by T)
 
 - Inputs reprice to `|PV| <= 1e-12` per unit notional with every method (the bootstrap's 1e-13 rule implies it).
 - Against QuantLib 1.44 (rule 11.2.5; convention rows `CRV.MONOTONE_CONVEX` and `CRV.MONOTONIC_LOG_CUBIC` in `oracle/CONVENTION_MAP_F.md`):
@@ -132,7 +132,7 @@ Locality is stated on the pillar inputs, not on quotes, because a bootstrap spre
   - (b) full SOFR, SONIA and ESTR builds (`PiecewiseConvexMonotoneForward` with `ConvexMonotone(0, 1, false)`, `PiecewiseLogCubicDiscount`, `OISRateHelper`): pillars, and zero rates at 200 dates, within 1e-10 (measured 1.6e-12 and 2.7e-12; QuantLib's bootstrap accuracy is 1e-12).
 - `TENSION_SPLINE` and `HYBRID` have no outside library: the limit cases above, and each part of the hybrid equals the plain method on its own nodes.
 
-### Sources (this section)
+## Stage F sources
 
 - [S2] Hagan and West (2006) as above: the monotone convex method and its regions (not opened); West, G. and Hagan, P., "Methods for constructing a yield curve", *Wilmott Magazine*, May 2008, 70-81 (not opened)
 - [S3] Hyman, J. M., "Accurate monotonicity preserving cubic interpolation", *SIAM Journal on Scientific and Statistical Computing* 4(4), 1983, 645-654 (not opened)

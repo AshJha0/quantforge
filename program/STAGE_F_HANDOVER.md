@@ -192,3 +192,12 @@ State: `stage-f` holds 8d55279 (Q4 four-curve golden, F-28), 9f5a7a5 (waves 2 an
 No case ids moved. Spec texts updated for F-39 (the C++ lane's F4 and F5 choices are accepted and written in), and for F-35 to F-38 above.
 
 **Outside share update (2026-11-10, later):** 222 of 403 = 55.1%. WSL came back: both GARCH fits now verify with `arch`; added QuantLib checks for cross gamma (6, `MakeOIS` revaluations) and two more curve inspect cases (log-linear; log cubic with a jump). No free-source candidate is left (`oracle/OUTSIDE_GAPS_F.md`).
+
+## Docs pass, 0.6.0 versions, and two golden files rewritten (2026-11-10, spec session)
+
+| Suite | Change | Re-merge and re-run |
+|---|---|---|
+| `risk_f3` | Now compact JSON. The 24 PCA cases are capped at 250 days, with inputs at 12 significant digits, to stay under the 1 MB hygiene limit (E11). **PCA inputs and outputs changed**; other cases unchanged; no ids moved | **all four** |
+| `curve_f` | Compact JSON only (was 1.06 MB indented); the same values | none needed (re-run is harmless) |
+
+Versions are 0.6.0 in all four builds, the lock files, the oracle and `oracle/strata` (lanes: merge before your next build so `implementation_version` reports 0.6.0). The docs pass covers README, LEARN (stage F section), COOKBOOK (stage F recipes by golden case), ARCHITECTURE, `docs/diagrams` (stage F flow), the CHANGELOG 0.6.0 entry with its known issues (`OUTSIDE_GAPS_F`, R7, F-33, wave 2b, E1 for stage F), `tools/site_facts.json` and the model inventory. Stage F is written as *Specified* everywhere; the part 2 merge must replace that with the measured language results (README Status, CHANGELOG "Verified on the merged tree", site facts `implemented_stages` and `released`).

@@ -20,4 +20,4 @@ Written by the spec session on 2026-11-10, last updated after `outside_f.py` rep
 ## Notes
 
 - `arch` cannot run on the Windows host: Windows Application Control blocks the pandas DLLs it imports (the same block as Clang, README known issues). `outside_garch_arch.py` runs under WSL with `uv run --no-project --with arch==7.2.0 --with pandas==2.2.3 --with "numpy<2.3" --with scipy`, writes `oracle/outside_arch_f.json`, and `outside_f.py` judges it. `arch` is not added to the oracle's locked environment.
-- No free-source candidate is left. With every error case in the denominator, 60% would need 20 more outside cases than exist.
+- No free-source candidate is left. With every error case in the denominator, 60% needs 242 of 403, 20 more than now, and none of the 109 value cases left has a free source.

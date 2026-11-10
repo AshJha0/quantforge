@@ -1,10 +1,19 @@
 # Changelog
 
-## Unreleased: stage F, part 1 (wave 0, lanes)
+## 0.6.0: stage F, curve layer, portfolio risk and book (unreleased)
 
-Stage F (target v0.6.0) lands in two pull requests. This first one holds wave 0 and the parallel lanes; the curve layer, risk and book follow in part 2. No golden value of an earlier stage changed.
+Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Language results for part 2 are recorded here at its merge; until then the stage F operations are *Specified*.
 
-### Added
+### Added (part 2)
+- F1 curve layer: monotone convex (Hagan and West), monotonic log cubic, tension spline and hybrid interpolation, and `rates.curve.inspect` (`02-curves/curve-framework.md`, rulings F-18 to F-22, F-35). `rates.curve.joint_solve` adds a joint multi-curve solve with solved turns, meeting-date steps fitted to SR3 futures after convexity, and the IFT Jacobian. `rates.funding.curve` adds a funding curve over OIS (`02-curves/joint-solve-and-funding.md`, F-24 to F-28).
+- F3 sensitivities: `risk.book.ois_sensitivity` (Q3a: exact par-quote risk and zero Jacobian of an OIS book, with an AAD reference in Rust), `risk.curve.pca`, `risk.curve.cross_gamma`, `risk.credit.jtd` (`06-risk/book-sensitivities.md`, F-29, F-30, F-36).
+- F4 portfolio risk: historical, filtered historical, parametric and Monte Carlo VaR and ES; Kupiec, Christoffersen and the Basel traffic light (`06-risk/var-es-and-backtests.md`, F-31, F-32, F-39); FRTB-SA GIRR delta under MAR21 (`06-risk/frtb-sa-girr.md`, F-33).
+- F5 book and use case 4: `book.lifecycle.apply`, `book.marks.resolve` (`07-portfolio/book-lifecycle.md`, F-34); `usecase.factor_attribution` (`04-pricing/use-cases.md`).
+- F6 model fixes: R7 CDS index option on Pedersen's adjusted forward, R8 GARCH estimates with standard errors and Student-t innovations (the coverage study puts every parameter inside its preregistered band), R10 VIX null quotes and local-vol continuity at slice expiries.
+- 403 stage F value goldens in 11 suites, besides the 5,207 E1 goldens: 12,427 golden cases in 125 suite files (counted from `datasets/golden/`). New tolerance classes `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. Model inventory entries MF-1 to MF-11.
+- Outside oracle for stage F (`oracle/outside_f.py`): QuantLib 1.44, SciPy, NumPy and `arch` 7.2.0. `arch` runs under WSL, because Windows Application Control blocks pandas on the host.
+
+### Added (part 1)
 - T: tightened acceptance rows for A3, A4, A5, A7, Q1, Q3a and the equivalent-mutant sign-off, with parameters fixed before the items are built (`program/STAGE_F_HANDOVER.md`).
 - E1: every public numeric input must be finite, else `E_DOMAIN`; a token in an Integer field is `E_SCHEMA` (ruling F-1). 5,207 shared goldens with NaN, +inf, -inf and -0.0 per input of every verb, passed by all four languages.
 - E4: cross-language name map generated from the specs, and the API style ADR. Q5b: convergence order and limit-case field in the spec template, checked by `tools/quality_gate.py --check-specs`.
@@ -15,8 +24,19 @@ Stage F (target v0.6.0) lands in two pull requests. This first one holds wave 0 
 - R4: the forward-log head hash is anchored to OpenTimestamps by the recorder, with a verifier that detects a rewritten history.
 
 ### Changed
+- Versions are 0.6.0 in all four builds (`cpp26/CMakeLists.txt`, `java25/pom.xml`, `python/pyproject.toml`, `rust/Cargo.toml` and their lock files), the oracle (`oracle/python/pyproject.toml`, `uv.lock`) and `oracle/strata/pom.xml`; the site facts name stage F as the pending release.
 - G4: modules are named by domain, not by stage letter, in all four languages, and CLI dispatch uses a registry. Conformance is unchanged. Mutation and quality configs follow the new paths.
 - G9: Rust denies `clippy::unwrap_used` outside tests.
+
+### Known issues (0.6.0)
+- **Outside-oracle share is 55.1% (222 of 403), below the 60% floor.** `oracle/OUTSIDE_GAPS_F.md` lists every case without a free outside source, with its reason. 72 of the 181 are error cases, which no library can check; without them the share is 67.1%. Changing the denominator is the owner's decision.
+- **R7 has no outside case.** Pedersen (2003), the CDS index option's reference example, is not freely available.
+- **FRTB-SA GIRR `low` scenario formula is unconfirmed:** it is an image in MAR21.6 (ruling F-33). The equity FRTB parameters were read only in summary.
+- **Deferred to wave 2b:**
+  - F3: Inflation01, dividend and borrow sensitivity, correlation sensitivity;
+  - F4: reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves;
+  - FRTB: vega, curvature and the other risk classes.
+- **E1 cases for the stage F operations are not yet generated** (`gen_stage_f_e1.py` skips `stage_f`).
 
 ## 0.5.0: stage E, full volatility and exotics (2026-11-09)
 
