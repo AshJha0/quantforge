@@ -160,3 +160,11 @@ Inflation01, dividend and borrow sensitivity, correlation sensitivity (F3); reve
 ## R8 coverage study done (2026-11-10)
 
 `oracle/R8_COVERAGE.json`: 200 simulated series of 2,000 per distribution; share of fits whose ±2 SE interval holds the true parameter. NORMAL (omega, alpha, beta) 0.98, 0.94, 0.98; STUDENT_T (omega, alpha, beta, nu) 0.95, 0.935, 0.955, 0.96. Every value is inside the preregistered band [0.90, 0.99], so the R8 standard errors are confirmed. (Run: `uv run python -W ignore gen_stage_f_f6.py COVER`, several hours when the machine is shared.)
+
+### Resume here (spec session checkpoint, 2026-11-10)
+State: `stage-f` holds 8d55279 (Q4 four-curve golden, F-28), 9f5a7a5 (waves 2 and 3), a3cd572 (R8 coverage), and this note. Everything is committed locally; **nothing is pushed**.
+1. **E1 for the stage F operations.** In `gen_stage_f_e1.py`, change the skip rule to skip only `e1_*` files, rerun, then stub-replay `e1_*`. This adds E1 cases for every wave 1 to 3 operation. Announce the new case count, since ids renumber.
+2. **Outside share 45.2% (182 of 403), floor 60%.** Candidates: add `arch` to the oracle environment and check `garch_f` estimates and the FHS cases against it; check FRTB against any published bank or vendor example the R5 audit can find. Otherwise ask the owner for a ruling on the floor for stage F.
+3. **Known issues to carry into the release notes:** R7 has no outside case (Pedersen 2003); the FRTB `low` scenario formula needs checking against the BIS PDF (F-33); the equity FRTB parameters were read only in summary.
+4. **Wave 2b list** (above): specify it when the lanes are through waves 2 and 3, or move it to stage G with a ruling.
+5. Then the R5 audit (Sonnet, read-only) over waves 1 to 3, the docs review, and the part 2 PR and v0.6.0 as in `STAGE_F_RESUME.md`.
