@@ -212,7 +212,7 @@ CdsOptionPrice cds_option_price(const CdsOptionInputs& in, double vol) {
     const Legs l = cds_legs(in);
     if (!(vol >= 0)) throw Error("E_DOMAIN", "vol is negative", "vol");
     const double f = l.protection / l.annuity, phi = in.payer ? 1.0 : -1.0;
-    const double fep = in.notional * (1 - in.recovery) * (1 - l.s_expiry) * l.p_expiry;
+    const double fep = in.notional * (1 - in.recovery) * (-std::expm1(-in.hazard_rate * l.t_expiry)) * l.p_expiry;
     double price = in.notional * l.annuity * black_price(f, in.strike, vol, l.t_expiry, 1.0, phi);
     if (in.payer && !in.knock_out) price += fep;
     return {price, f, l.annuity, fep};
@@ -269,7 +269,7 @@ CdsIndexOptionPrice cds_index_option_price(const CdsIndexOptionInputs& in) {
     if (!(in.vol >= 0)) throw Error("E_DOMAIN", "vol is negative", "vol");
     if (!(in.notional > 0)) throw Error("E_DOMAIN", "notional is not above 0", "notional");
     const double a = l.annuity, f = l.protection / a;
-    const double fep = (1 - in.recovery) * (1 - l.s_expiry) * l.p_expiry;
+    const double fep = (1 - in.recovery) * (-std::expm1(-in.hazard_rate * l.t_expiry)) * l.p_expiry;
     // Strike hazard h_K: prot'/A' = K, bisection on [0, x_hi] to the last representable step.
     StrikeLegs sl{{in.expiry}, in.expiry, in.rate, in.recovery};
     for (int k = 1;; ++k) {

@@ -34,6 +34,9 @@ void op_book_ois_sensitivity(const In& in, Out& out) {
     const auto quotes = checked_quotes(raw);
     limit_if(swaps.size() > 100000, "swaps");
     check_crossed(raw);
+    // F-41: only the sequential builds; anything else is E_INPUT on this operation.
+    if (interpolation != CurveInterpolation::LogLinearDf && interpolation != CurveInterpolation::LinearZero)
+        throw Error("E_INPUT", "interpolation must be LOG_LINEAR_DF or LINEAR_ZERO", "interpolation");
     const BookSensitivity r = ois_book_sensitivity(*c, as_of, quotes, interpolation, swaps);
     out.key_reals("pv", r.pv);
     out.key_real("book_pv", r.book_pv);
