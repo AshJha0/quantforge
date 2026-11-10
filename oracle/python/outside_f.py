@@ -107,25 +107,54 @@ def h_inspect_cm(i):
     return out, {"CRV.MONOTONE_CONVEX", "SCIPY.QUAD"}
 
 
+def h_inspect_ll(i):
+    """LOG_LINEAR_DF: discount factors from QuantLib DiscountCurve (LogLinear on ACT/365F, which extrapolates the last
+    segment as the stage B rule does); the forward is -d ln D/dt of that curve, taken on the segment that starts at or
+    before t (right-continuous at pillars, the spec's one-sided rule), from QuantLib's discount factors at the segment ends."""
+    cv = i["curve"]
+    a = D(cv["as_of"])
+    ql.Settings.instance().evaluationDate = Q(a)
+    ds = [Q(a)] + [Q(D(p["date"])) for p in cv["pillars"]]
+    c = ql.DiscountCurve(ds, [1.0] + [p["discount_factor"] for p in cv["pillars"]], A365)
+    c.enableExtrapolation()
+    tn = [0.0] + [(D(p["date"]) - a).days / 365 for p in cv["pillars"]]
+    out = {"discount_factors": [], "zero_rates": [], "instantaneous_forwards": []}
+    for s in i["dates"]:
+        u = (D(s) - a).days / 365
+        df = c.discount(u, True)
+        k = next((k for k in range(len(tn) - 1) if u < tn[k + 1]), len(tn) - 2)
+        out["discount_factors"].append(df)
+        out["zero_rates"].append(None if u == 0 else -math.log(df) / u)
+        out["instantaneous_forwards"].append(math.log(c.discount(tn[k], True) / c.discount(tn[k + 1], True)) / (tn[k + 1] - tn[k]))
+    return out, {"CRV.LOG_LINEAR_DF"}
+
+
 def h_inspect(i):
     cv = i["curve"]
     if cv["interpolation"] == "MONOTONE_CONVEX" and not cv.get("jumps"):
         return h_inspect_cm(i)
-    if cv["interpolation"] != "MONOTONIC_LOG_CUBIC" or cv.get("jumps"):
-        raise NotImplementedError("only MONOTONIC_LOG_CUBIC without jumps has a QuantLib discount curve from pillars")
+    if cv["interpolation"] == "LOG_LINEAR_DF" and not cv.get("jumps"):
+        return h_inspect_ll(i)
+    if cv["interpolation"] != "MONOTONIC_LOG_CUBIC":
+        raise NotImplementedError("no QuantLib discount curve from pillars for this method")
     a = D(cv["as_of"])
+    # jumps (curve-framework.md): pillars hold full D; the interpolation is on S = D/J, J the product of factors dated
+    # strictly before the date; reported forwards are those of S (the smooth curve)
+    js = [(D(j["date"]), j["factor"]) for j in cv.get("jumps") or []]
+    J = lambda d: math.prod(fc for jd, fc in js if jd < d)  # noqa: E731
     ql.Settings.instance().evaluationDate = Q(a)
     ds = [Q(a)] + [Q(D(p["date"])) for p in cv["pillars"]]
-    c = ql.MonotonicLogCubicDiscountCurve(ds, [1.0] + [p["discount_factor"] for p in cv["pillars"]], A365)
+    Sp = [p["discount_factor"] / J(D(p["date"])) for p in cv["pillars"]]
+    c = ql.MonotonicLogCubicDiscountCurve(ds, [1.0] + Sp, A365)
     c.enableExtrapolation()
     # instantaneous forward from QuantLib's own spline slope on ln D (forwardRate(t, t) is a 1e-4 finite difference)
     tn = [0.0] + [(D(p["date"]) - a).days / 365 for p in cv["pillars"]]
-    sp = ql.MonotonicCubicNaturalSpline(tn, [0.0] + [math.log(p["discount_factor"]) for p in cv["pillars"]])
+    sp = ql.MonotonicCubicNaturalSpline(tn, [0.0] + [math.log(v) for v in Sp])
     out = {"discount_factors": [], "zero_rates": [], "instantaneous_forwards": []}
     for s in i["dates"]:
         d = D(s)
         t = (d - a).days / 365
-        df = c.discount(t, True)
+        df = c.discount(t, True) * J(d)
         out["discount_factors"].append(df)
         out["zero_rates"].append(None if t == 0 else -math.log(df) / t)
         out["instantaneous_forwards"].append(-sp.derivative(min(t, tn[-1]), True))
@@ -296,7 +325,42 @@ def h_uc4(i):
             "beta_se": [math.sqrt(s2 * inv[k + 1, k + 1]) for k in range(K)]}, {"SCIPY.LSTSQ"}
 
 
-HANDLERS = {"usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
+def h_cross_gamma(i):
+    """06-risk/book-sensitivities.md: the spec's four-point formula, every revaluation by QuantLib: MakeOIS (SOFR, 2
+    settlement days, payment lag 2, telescopic value dates) on a DiscountCurve (LogLinear, ACT/365F) of the pillars with
+    the PILLAR zero-rate bumps D exp(-h t)."""
+    cv, tr, bp = i["curve"], i["product"]["trade"], i["bump_bp"]
+    if cv["interpolation"] != "LOG_LINEAR_DF" or cv.get("jumps") or tr["convention"] != "SOFR":
+        raise NotImplementedError("log-linear SOFR only")
+    a = D(cv["as_of"])
+    ql.Settings.instance().evaluationDate = Q(a)
+    pd = [D(p["date"]) for p in cv["pillars"]]
+    tn = [(d - a).days / 365 for d in pd]
+    df0 = [p["discount_factor"] for p in cv["pillars"]]
+    h = bp * 1e-4
+
+    def V(dz):
+        crv = ql.DiscountCurve([Q(a)] + [Q(d) for d in pd], [1.0] + [v * math.exp(-z * t) for v, z, t in zip(df0, dz, tn)], A365)
+        crv.enableExtrapolation()
+        hd = ql.YieldTermStructureHandle(crv)
+        sw = ql.MakeOIS(ql.Period(tr["tenor"]), ql.Sofr(hd), tr["fixed_rate"], ql.Period(0, ql.Days),
+                        swapType=ql.OvernightIndexedSwap.Payer if tr["side"] == "PAY" else ql.OvernightIndexedSwap.Receiver,
+                        nominal=tr["notional"], settlementDays=2, paymentLag=2, telescopicValueDates=True, discountingTermStructure=hd)
+        return sw.NPV()
+    n = len(pd)
+    e = lambda pairs: [sum(s * h for k, s in pairs if k == j) for j in range(n)]  # noqa: E731
+    base = V([0.0] * n)
+    G = [[0.0] * n for _ in range(n)]
+    for x in range(n):
+        for y in range(x, n):
+            if x == y:
+                G[x][x] = (V(e([(x, 1)])) - 2 * base + V(e([(x, -1)]))) / bp ** 2
+            else:
+                G[x][y] = G[y][x] = (V(e([(x, 1), (y, 1)])) - V(e([(x, 1), (y, -1)])) - V(e([(x, -1), (y, 1)])) + V(e([(x, -1), (y, -1)]))) / (4 * bp ** 2)
+    return {"value": base, "cross_gamma": G}, {"OIS.HELPER", "IDX", "CRV.LOG_LINEAR_DF"}
+
+
+HANDLERS = {"risk.curve.cross_gamma": h_cross_gamma, "usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
             "risk.var.parametric": h_param, "risk.var.historical": h_hist, "risk.curve.pca": h_pca,
             "rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
 
