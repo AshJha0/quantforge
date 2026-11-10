@@ -207,6 +207,8 @@ class System:
         return x, err
 
     def jacobian(self):
+        # Richardson central differences at 1e-5 and 5e-6 (ruling F-28: checked against a kink-free bump reference; a
+        # build's own stencil must not straddle a kink either, see the ruling)
         h = 1e-5
         Jx = (4 * self.dRdx(self.x, h / 2) - self.dRdx(self.x, h)) / 3
         # exact block structure: a residual never depends on unknowns of later curves
@@ -235,6 +237,49 @@ def bump_jacobian(inp, h, x0, Jx):
         d2 = (solve_with(j, h / 2) - solve_with(j, -h / 2)) / h
         cols.append((4 * d2 - d1) / 3)
     return np.column_stack(cols)
+
+
+def cm_kinds(sysm, x):
+    """Rule kinds of the interior monotone-convex sections of every MONOTONE_CONVEX curve (ruling F-28). The first and
+    last sections are left out: the endpoint rule puts them at g1/g0 = -2 and -1/2 exactly, where the neighbouring
+    rules give the same function, so a rounding flip there is not a kink."""
+    cs = sysm.build(x)
+    return tuple((c["name"], tuple(cs[c["name"]].ip.secs[i][0] for i in sorted(cs[c["name"]].ip.secs)[1:-1]))
+                 for c in sysm.curves if c.get("interpolation") == "MONOTONE_CONVEX")
+
+
+def reference_jacobian(inp, x0, Jx, h=1e-4, floor=1e-6):
+    """Bump-and-rebuild reference with a step it proves sound (ruling F-28). Halve h from 1e-4 until (a) no interior
+    convex-monotone section changes rule under any quote bump of +-h or +-h/2, and (b) the h^4 error estimate of the
+    h/2 Richardson value, |R(h) - R(h/2)| / 15, is below half the check tolerance, 0.5 (1e-9 + 1e-6 |ref|). Returns the
+    finer step and its estimate. A piecewise
+    method can be smooth but strongly curved near a kink, so (a) alone is not enough."""
+    sysm = System(inp)
+    base = cm_kinds(sysm, x0)
+
+    def stable(hh):
+        for j, q in enumerate(inp["instruments"]):
+            key = {"FUTURE": "price", "XCCY": "spread"}.get(q["type"], "rate")
+            for dq in (hh, -hh, hh / 2, -hh / 2):
+                q2 = [dict(v) for v in inp["instruments"]]
+                q2[j][key] += dq
+                s2 = System({**inp, "instruments": q2})
+                if cm_kinds(s2, s2.chord(np.array(x0), Jx)) != base:
+                    return False
+        return True
+
+    prev = None
+    while h >= floor:
+        if not base or stable(h):
+            cur = bump_jacobian(inp, h, x0, Jx)
+            # Richardson error estimate for an h^4 method: |R(h) - R(h/2)| / (2^4 - 1)
+            if prev is not None and np.max(np.abs(cur - prev) / 15 - 0.5 * (1e-9 + 1e-6 * np.abs(cur))) <= 0:
+                return h, cur  # h is already the finer step: prev was computed at 2h
+            prev = cur
+        else:
+            prev = None
+        h /= 2
+    raise AssertionError(f"bump-and-rebuild reference not converged down to h = {floor}")
 
 
 def spans(sysm, q, turn):
@@ -274,11 +319,13 @@ def outputs(sysm, x, J, Jx):
             for j, q in enumerate(sysm.ins):
                 affected = q["curve"] == c["name"] or any(c["name"] in (cc.get("discount"), cc.get("domestic"), cc.get("foreign_projection"))
                                                           for cc in sysm.curves if cc["name"] == q["curve"])
-                if affected and spans(sysm, q, d):
-                    row.append(float(col[j]))
-                else:
-                    assert abs(col[j]) < 1e-9, (q["id"], col[j])
+                # ruling F-26 (amended): the honest d model / d ln factor; exactly 0 on OIS_STEPS curves for a non-spanning
+                # instrument; on pillar curves it need not be (four-curve case: SOFR-1M about -0.023)
+                if c["type"] == "OIS_STEPS" and not (affected and spans(sysm, q, d)):
+                    assert abs(col[j]) < 1e-9, (q["id"], col[j])  # exactly 0 by construction; the difference is noise
                     row.append(0.0)
+                else:
+                    row.append(float(col[j]))
             ts.append(row)
     return {"curves": cur, "turn_factors": tf,
             "jacobian": {"unknowns": sysm.labels, "quotes": [q["id"] for q in sysm.ins], "matrix": [[float(v) for v in r] for r in J]},
@@ -373,21 +420,16 @@ def main():
     op = "rates.curve.joint_solve"
     JL = {"jacobian": "jacobian", "turn_sensitivity": "jacobian"}
     for desc, inp in systems():
-        if desc.startswith("full"):
-            # OPEN (2026-11-09): the full system's IFT Jacobian differs from bump-and-rebuild by up to 2e-3; not yet diagnosed
-            # (suspects: convex-monotone branch boundaries, the xccy dR/dq). Left out of the goldens until fixed.
-            print(f"  skipped {desc[:40]}: open item", flush=True)
-            continue
         sysm = System(inp)
         x, err = sysm.solve()
         J, Jx = sysm.jacobian()
         print(f"  solved {desc[:40]} ({len(x)} unknowns), max residual {err:.1e}", flush=True)
-        ref = bump_jacobian(inp, 1e-4, x, Jx)
-        print("  bump-and-rebuild done", flush=True)
+        h, ref = reference_jacobian(inp, x, Jx)
+        print(f"  bump-and-rebuild done (h = {h:.3e})", flush=True)
         dev = np.max(np.abs(J - ref) - (1e-9 + 1e-6 * np.abs(ref)))
         assert dev <= 0, f"{desc}: IFT Jacobian against bump-and-rebuild: {dev:.3e}"
         out = outputs(sysm, x, J, Jx)
-        s.add(op, inp, out, cls=I, verified=["independent-replay newton 1e-14", "bump-and-rebuild richardson"], tags=["joint", "stage-f"],
+        s.add(op, inp, out, cls=I, verified=["independent-replay newton 1e-14", f"bump-and-rebuild richardson h={h:.3e}"], tags=["joint", "stage-f"],
               output_classes=JL, description=f"{desc}; max residual {err:.1e}")
         # wrong conventions: futures without convexity; turn not solved (factor 1)
         if any(q["type"] == "FUTURE" for q in inp["instruments"]):

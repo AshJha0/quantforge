@@ -8,7 +8,8 @@ for desc, inp in G.systems()[::-1]:
     s = G.System(inp)
     x, err = s.solve()
     J, Jx = s.jacobian()
-    ref = G.bump_jacobian(inp, 1e-4, x, Jx)
+    h, ref = G.reference_jacobian(inp, x, Jx)
+    print("reference step", h, flush=True)
     dev = np.abs(J - ref) - (1e-9 + 1e-6 * np.abs(ref))
     idx = np.dstack(np.unravel_index(np.argsort(-dev.ravel())[:4], dev.shape))[0]
     print(desc[:30], "max dev", dev.max(), flush=True)
