@@ -20,7 +20,9 @@ def _soft(v: float, limit: float) -> float:
     return math.copysign(max(abs(v) - limit, 0.0), v)
 
 
-def _exact_on_pattern(g, h, penalty, x) -> list[float] | None:
+def _exact_on_pattern(
+    g: Sequence[Sequence[float]], h: Sequence[float], penalty: Sequence[float], x: list[float],
+) -> list[float] | None:
     """Solves on the current support and signs. None if the conditions fail there."""
     n = len(x)
     support = [i for i in range(n) if x[i] != 0]

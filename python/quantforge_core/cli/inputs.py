@@ -1,4 +1,5 @@
 """Typed reading of a case's inputs. Everything here fails with E_SCHEMA."""
+import math
 import re
 from collections.abc import Mapping
 from datetime import date
@@ -22,8 +23,24 @@ def _bad(key: str, why: str) -> QfError:
     return QfError("E_SCHEMA", f"{key}: {why}", key)
 
 
+TOKENS = {"NaN": math.nan, "Infinity": math.inf, "-Infinity": -math.inf}
+# Paths of non-finite Real inputs read so far in this operation, in reading order: the finite rule
+# (F-2) reports the first at the gate. Reset by registry.execute.
+NONFINITE: list[str] = []
+
+
 def _is_real(v: Any) -> bool:
-    return isinstance(v, (int, float)) and not isinstance(v, bool)
+    return (isinstance(v, (int, float)) and not isinstance(v, bool)) or (
+        isinstance(v, str) and v in TOKENS)
+
+
+def real_value(v: Any, path: str) -> float:
+    """A Real field's value: a number, or one of the F-1 tokens (ruling F-38: only here, and at
+    the top level of an any-JSON field)."""
+    value = TOKENS[v] if isinstance(v, str) else float(v)
+    if not math.isfinite(value):
+        NONFINITE.append(path)
+    return value
 
 
 def parse_date(text: Any, key: str) -> date:
@@ -83,7 +100,7 @@ class Inputs:
         v = self._get(key)
         if not _is_real(v):
             raise _bad(key, "not a number")
-        return float(v)
+        return real_value(v, self.prefix + key)
 
     @overload
     def opt_real(self, key: str) -> float | None: ...
@@ -169,7 +186,7 @@ class Inputs:
         v = self.array(key)
         if not all(_is_real(e) for e in v):
             raise _bad(key, "not an array of numbers")
-        return [float(e) for e in v]
+        return [real_value(e, f"{self.prefix}{key}/{k}") for k, e in enumerate(v)]
 
     def integer_list(self, key: str) -> list[int]:
         v = self.array(key)
@@ -182,7 +199,8 @@ class Inputs:
         v = self.array(key)
         if not all(e is None or _is_real(e) for e in v):
             raise _bad(key, "not an array of numbers and nulls")
-        return [None if e is None else float(e) for e in v]
+        return [None if e is None else real_value(e, f"{self.prefix}{key}/{k}")
+                for k, e in enumerate(v)]
 
     def dates(self, key: str) -> list[Date]:
         return [parse_date(e, key) for e in self.array(key)]
@@ -192,7 +210,8 @@ class Inputs:
         rows = self.array(key)
         if not all(isinstance(r, list) and all(_is_real(e) for e in r) for r in rows):
             raise _bad(key, "not an array of rows of numbers")
-        return [[float(e) for e in r] for r in rows]
+        return [[real_value(e, f"{self.prefix}{key}/{a}/{b}") for b, e in enumerate(r)]
+                for a, r in enumerate(rows)]
 
     def object(self, key: str) -> Inputs:
         v = self._get(key)

@@ -5,6 +5,7 @@ import math
 from bisect import bisect_right
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import cast
 
 lazy import numpy as np
 
@@ -197,7 +198,7 @@ def svi_calibrate(ks: Floats, ws: Floats, weights: Floats | None) -> tuple[Svi, 
 
     def residual(x: np.ndarray) -> np.ndarray:
         a, b, rho, m, sigma = _svi_from(x)
-        return root_weight * (a + b * (rho * (k - m) + np.sqrt((k - m) ** 2 + sigma**2)) - w)
+        return cast("np.ndarray", root_weight * (a + b * (rho * (k - m) + np.sqrt((k - m) ** 2 + sigma**2)) - w))
 
     best = best_of(residual, _svi_starts(k, w, root_weight))
     if best is None:
@@ -209,7 +210,7 @@ def svi_calibrate(ks: Floats, ws: Floats, weights: Floats | None) -> tuple[Svi, 
 
 
 def _ssvi_phi(theta: float, eta: float, gamma: float) -> float:
-    return eta * theta**-gamma * (1 + theta) ** (gamma - 1)
+    return float(eta * theta**-gamma * (1 + theta) ** (gamma - 1))
 
 
 def _ssvi_w(k: float, theta: float, rho: float, phi: float) -> float:
@@ -258,7 +259,7 @@ def ssvi_calibrate(
         rho, eta, gamma = unpack(x)
         u = eta * th**-gamma * (1 + th) ** (gamma - 1) * k
         w = th / 2 * (1 + rho * u + np.sqrt((u + rho) ** 2 + 1 - rho * rho))
-        return (w - target).ravel()
+        return cast("np.ndarray", (w - target).ravel())
 
     starts = [
         np.array((math.atanh(r), math.log(e), g))

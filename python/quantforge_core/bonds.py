@@ -268,7 +268,7 @@ def conversion_factor(
     b = (c / 2) * (6 - v) / 6
     big_c = 1.03 ** (-2 * n) if z < 7 else 1.03 ** (-2 * n - 1)
     cf = a * (c / 2 + (c / 0.06) * (1 - big_c) + big_c) - b
-    return round(cf, 4)
+    return float(round(cf, 4))
 
 
 def _num(v: float | None) -> float:

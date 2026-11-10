@@ -2,6 +2,7 @@
 table is REGISTRY itself, so it cannot drift from the handlers."""
 from . import (  # noqa: F401 - imported to register their verbs
     ops_bonds,
+    ops_book,
     ops_calibration,
     ops_commodity,
     ops_core,

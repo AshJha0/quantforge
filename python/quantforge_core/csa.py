@@ -59,12 +59,15 @@ def ois_spread(
 def joint_bootstrap(
     convention: str, index: str, as_of: date, ois_quotes: Sequence[Quote],
     term_quotes: Sequence[ProjectionQuote], interpolation: str, method: str,
+    tension: float | None = None, step_end: date | None = None,
 ) -> tuple[CurveData, CurveData, float]:
     """Block triangular: the OIS block is solved first, then the term block on it (ruling D9)."""
     if not ois_quotes or not term_quotes:
         raise QfError("E_INPUT", "both quote lists need quotes", "ois_quotes")
-    disc, e1 = ois.bootstrap(convention, as_of, ois_quotes, interpolation, method)
-    proj, e2 = projection.bootstrap(disc, index, as_of, term_quotes, interpolation)
+    disc, e1 = ois.bootstrap(convention, as_of, ois_quotes, interpolation, method, (),
+                             tension, step_end)
+    proj, e2 = projection.bootstrap(disc, index, as_of, term_quotes, interpolation,
+                                    tension, step_end)
     return disc, proj, max(e1, e2)
 
 

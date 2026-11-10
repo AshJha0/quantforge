@@ -1,6 +1,6 @@
 """Projection curves, FRAs, swaps, basis (specifications/02-curves/projection-and-fra.md)."""
 import itertools
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date
 
@@ -88,11 +88,14 @@ def _swap_legs(
     return annuity, leg
 
 
-def bootstrap(
-    discount_data: CurveData, index: str, as_of: date, quotes: Sequence[ProjectionQuote],
-    interpolation: str,
-) -> tuple[CurveData, float]:
-    discount = curves.build(discount_data)
+TermModel = Callable[[Curve, Curve], float]
+
+
+def term_models(
+    index: str, as_of: date, quotes: Sequence[ProjectionQuote],
+) -> tuple[list[date], list[TermModel], list[list[date]]]:
+    """For each quote: its pillar, its model rate as a function of (projection, discount), and
+    the dates the model reads."""
     if not quotes:
         raise QfError("E_INPUT", "no quotes", "quotes")
     for q in quotes:
@@ -102,14 +105,16 @@ def bootstrap(
             raise QfError("E_INPUT", "start_months must be 0 to 1200")
     spot = _spot(index, as_of)
     pillars: list[date] = []
-    models: list[curves.Model] = []
+    models: list[TermModel] = []
+    dates: list[list[date]] = []
     for q in quotes:
         if q.kind == "SWAP":
             fixed = _fixed_periods(index, spot, q.months)
             floating = _float_periods(index, spot, q.months)
             pillars.append(fixed[-1].end)
+            dates.append(sorted({d for x in (*fixed, *floating) for d in (x.start, x.end)}))
 
-            def swap_rate(p: Curve, fixed: list[Period] = fixed,
+            def swap_rate(p: Curve, discount: Curve, fixed: list[Period] = fixed,
                           floating: list[Period] = floating) -> float:
                 annuity, leg = _swap_legs(index, fixed, floating, discount, p)
                 return leg / annuity
@@ -120,18 +125,33 @@ def bootstrap(
             e = _plus_months(index, spot if q.kind == "DEPOSIT" else s,
                              q.months if q.kind == "DEPOSIT" else REGISTRY[index]["months"])
             pillars.append(e)
+            dates.append([s, e])
             alpha = _alpha(index, s, e)
 
-            def simple_rate(p: Curve, s: date = s, e: date = e, alpha: float = alpha) -> float:
+            def simple_rate(p: Curve, discount: Curve, s: date = s, e: date = e,
+                            alpha: float = alpha) -> float:
                 return (p.discount(s) / p.discount(e) - 1) / alpha
 
             models.append(simple_rate)
+    return pillars, models, dates
+
+
+def bootstrap(
+    discount_data: CurveData, index: str, as_of: date, quotes: Sequence[ProjectionQuote],
+    interpolation: str, tension: float | None = None, step_end: date | None = None,
+) -> tuple[CurveData, float]:
+    discount = curves.build(discount_data)
+    pillars, terms, _ = term_models(index, as_of, quotes)
+    models: list[curves.Model] = [
+        lambda p, m=m: m(p, discount) for m in terms]  # type: ignore[misc]
     if any(b <= a for a, b in itertools.pairwise(pillars)):
         raise QfError("E_INPUT", "quotes are not in pillar order", "quotes")
     targets = [q.rate for q in quotes]
-    factors, error = curves.solve_pillars(as_of, interpolation, pillars, models, targets)
+    factors, error = curves.solve_pillars(as_of, interpolation, pillars, models, targets,
+                                          (), tension, step_end)
     curves.check_solved(error)
-    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors)), error
+    return CurveData(as_of, interpolation, tuple(pillars), tuple(factors), (), tension,
+                     step_end), error
 
 
 def swap_pv(

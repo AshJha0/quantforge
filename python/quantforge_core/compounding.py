@@ -35,7 +35,7 @@ def _discount(rate: float, t: float, c: Compounding) -> float:
         return 1 / (1 + rate * t)
     if c.kind == "PERIODIC":
         n = required(c.frequency, "frequency")
-        return (1 + rate / n) ** (-n * t)
+        return float((1 + rate / n) ** (-n * t))
     return math.exp(-rate * t)
 
 
@@ -44,7 +44,7 @@ def _rate(d: float, t: float, c: Compounding) -> float:
         return (1 / d - 1) / t
     if c.kind == "PERIODIC":
         n = required(c.frequency, "frequency")
-        return n * (d ** (-1 / (n * t)) - 1)
+        return float(n * (d ** (-1 / (n * t)) - 1))
     return -math.log(d) / t
 
 

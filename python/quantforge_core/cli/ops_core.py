@@ -480,6 +480,15 @@ def _check_quotes(i: Inputs) -> Result:
     return {"results": results}
 
 
+def _any_value(value: Any) -> Any:
+    """Ruling F-38: an F-1 token at the top level of an any-JSON value is read as a Real (and
+    refused by the finite rule); nested inside it, it stays a string."""
+    from .inputs import TOKENS, real_value
+    if isinstance(value, str) and value in TOKENS:
+        return real_value(value, "records.value")
+    return value
+
+
 def _record(raw: Any) -> store_module.Record:
     if not isinstance(raw, dict):
         raise QfError("E_SCHEMA", "a record is not an object", "records")
@@ -491,7 +500,7 @@ def _record(raw: Any) -> store_module.Record:
         raise QfError("E_SCHEMA", "bad sequence, series_id or string in a record", "records")
     return store_module.Record(
         sequence, series_id, r.instant("event_time"), r.instant("knowledge_time"),
-        raw["value"], r.opt_boolean("deleted", False), raw,
+        _any_value(raw["value"]), r.opt_boolean("deleted", False), raw,
     )
 
 
