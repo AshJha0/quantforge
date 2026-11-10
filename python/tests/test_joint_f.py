@@ -16,7 +16,11 @@ GOLDEN = Path(__file__).resolve().parents[2] / "datasets/golden/stage_f/joint_f.
 
 
 def _case(n: int) -> dict:
-    return json.loads(GOLDEN.read_text())["cases"][n - 1]["inputs"]
+    """1: the steps-with-turn system; 2: SOFR + term log-linear (found by description, since
+    case ids move when spec adds cases)."""
+    words = {1: "meeting steps", 2: "log-linear"}[n]
+    cases = json.loads(GOLDEN.read_text())["cases"]
+    return next(c["inputs"] for c in cases if words in c.get("description", ""))
 
 
 def _solve(inputs: dict) -> dict:
