@@ -2,7 +2,13 @@
 
 ## 0.6.0: stage F, curve layer, portfolio risk and book (unreleased)
 
-Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Language results for part 2 are recorded here at its merge; until then the stage F operations are *Specified*.
+Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
+
+### Verified on the merged part 2 tree (`db99d87`, 2026-11-10)
+- On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases: Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Observed, one full run per language.
+- Gates: `quality_gate.py --check-specs` and `--check-register` (no new gaps), `check_hygiene.py`, `gen_name_map.py --check`, `governance_gate.py`, the site build (0 broken links) and the banned-word check (`git grep -i` for the word the project does not use; no hits) all pass.
+- Outside oracle: 225 of 438 stage F value cases (51.4%), **below the 60% floor** (known issue below).
+- The CLIs of Java and Python reported version 0.4.0 at `db99d87`; both now report 0.6.0, like C++ and Rust. That changes no output.
 
 ### Added (part 2)
 - F1 curve layer: monotone convex (Hagan and West), monotonic log cubic, tension spline and hybrid interpolation, and `rates.curve.inspect` (`02-curves/curve-framework.md`, rulings F-18 to F-22, F-35). `rates.curve.joint_solve` adds a joint multi-curve solve with solved turns, meeting-date steps fitted to SR3 futures after convexity, and the IFT Jacobian. `rates.funding.curve` adds a funding curve over OIS (`02-curves/joint-solve-and-funding.md`, F-24 to F-28).

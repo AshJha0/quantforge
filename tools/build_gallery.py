@@ -35,6 +35,7 @@ import gallery_real  # noqa: E402
 import gallery_pnl  # noqa: E402
 import gallery_r2  # noqa: E402
 import gallery_e  # noqa: E402
+import gallery_f  # noqa: E402
 
 OUT = ROOT / "docs" / "curves"
 DATA = OUT / "data"
@@ -665,6 +666,10 @@ def index_page(all_data):
         n = all_data[slug]["evidence"]["cases"] if live else 0
         rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "E",
                      f"{n} golden case{'s' if n != 1 else ''}" if live else "None yet"])
+    if gallery_f.SLUG in all_data:
+        e = all_data[gallery_f.SLUG]["evidence"]
+        rows.append([f"[Five interpolation methods]({gallery_f.SLUG}.md)", "Implemented, not Validated", "F",
+                     f"{e['cases']} golden cases for `{e['operation']}`, {e['outside']} reproduced by an outside library"])
     rows += [[name, "Planned", stage, "None yet"] for name, stage in PLANNED]
     real = ""
     if gallery_real.SLUG in all_data:
@@ -709,6 +714,8 @@ def render_all(all_data):
     this = types.SimpleNamespace(LANGS=LANGS, status_block=status_block, table=table)
     for slug, spec in gallery_e.STAGE_E.items():
         pages[f"{slug}.md"] = gallery_e.page(slug, spec, all_data.get(slug), this)
+    if gallery_f.SLUG in all_data:
+        pages[f"{gallery_f.SLUG}.md"] = gallery_f.page(all_data[gallery_f.SLUG], table, gallery_e.lines, status_block, LANGS)
     if gallery_real.SLUG in all_data:
         d = all_data[gallery_real.SLUG]
         versions = ", ".join(f"{NAMES[k]} {v['implementation_version']}" for k, v in d["meta"]["cli"].items())
@@ -1073,7 +1080,7 @@ def generate_pnl(meta, refresh):
 
 def committed_slugs():
     return list(CURVES) + list(VOLS) + [s for s, spec in STAGE_D.items() if is_live(spec) and (DATA / f"{s}.json").is_file()] \
-        + [s for s, spec in gallery_e.STAGE_E.items() if gallery_e.is_live(spec) and (DATA / f"{s}.json").is_file()]
+        + [s for s, spec in gallery_e.STAGE_E.items() if gallery_e.is_live(spec) and (DATA / f"{s}.json").is_file()]         + ([gallery_f.SLUG] if (DATA / f"{gallery_f.SLUG}.json").is_file() else [])
 
 
 def refresh_evidence():
@@ -1124,12 +1131,31 @@ def generate_e(meta, all_data):
         (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
 
 
-def generate(refresh_real=False, real_only=False, stage_e_only=False):
+def generate_f(meta, all_data):
+    results = {lang: gallery_f.run(lang, batch, read_example) for lang in LANGS}
+    d = {"meta": {**meta, "example_hashes": {gallery_f.EXAMPLE: example_hash(gallery_f.EXAMPLE)}},
+         "inputs": read_example(gallery_f.EXAMPLE)["inputs"], "reference": results["python"],
+         "agreement": gallery_f.agreement(results, LANGS), "against_golden": gallery_f.against_golden(results["python"]),
+         "evidence": gallery_f.evidence()}
+    all_data[gallery_f.SLUG] = d
+    (DATA / f"{gallery_f.SLUG}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
+
+
+def generate(refresh_real=False, real_only=False, stage_e_only=False, stage_f_only=False):
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     meta = {"commit": commit, "date": dt.date.today().isoformat(), "reference_language": "python", "tolerance": TOL,
             "data": "synthetic", "cli": {lang: json.loads(call(lang, "version")) for lang in LANGS}}
     DATA.mkdir(parents=True, exist_ok=True)
     all_data = {}
+    if stage_f_only:  # keep every other page's committed data; run the stage F page and re-render
+        all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs() if s != gallery_f.SLUG}
+        for extra in (gallery_real.SLUG, gallery_pnl.SLUG):
+            all_data[extra] = json.loads((DATA / f"{extra}.json").read_text(encoding="utf-8"))
+        generate_f(meta, all_data)
+        for name, text in render_all(all_data).items():
+            (OUT / name).write_text(text, encoding="utf-8", newline="\n")
+        print(f"stage F page written to {OUT}")
+        return 0
     if stage_e_only:  # keep every other page's committed data; run the stage E pages and re-render
         all_data = {s: json.loads((DATA / f"{s}.json").read_text(encoding="utf-8")) for s in committed_slugs() if s not in gallery_e.STAGE_E}
         for extra in (gallery_real.SLUG, gallery_pnl.SLUG):
@@ -1178,6 +1204,7 @@ def generate(refresh_real=False, real_only=False, stage_e_only=False):
         all_data[slug] = d
         (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
     generate_e(meta, all_data)
+    generate_f(meta, all_data)
     for name, text in render_all(all_data).items():
         (OUT / name).write_text(text, encoding="utf-8", newline="\n")
     print(f"{len(all_data)} pages of data, {len(all_data) + 1} pages written to {OUT}")
@@ -1248,6 +1275,15 @@ def check():
         compare(d["reference"], e_run("python", spec), slug, bad)
         if d["evidence"] != gallery_e.golden(spec["examples"]):
             bad.append(f"{slug}: golden evidence changed")
+    path = DATA / f"{gallery_f.SLUG}.json"
+    if path.is_file():
+        d = json.loads(path.read_text(encoding="utf-8"))
+        all_data[gallery_f.SLUG] = d
+        if d["meta"]["example_hashes"].get(gallery_f.EXAMPLE) != example_hash(gallery_f.EXAMPLE):
+            bad.append(f"{gallery_f.SLUG}: {gallery_f.EXAMPLE} changed")
+        compare(d["reference"], gallery_f.run("python", batch, read_example), gallery_f.SLUG, bad)
+        if d["evidence"] != gallery_f.evidence():
+            bad.append(f"{gallery_f.SLUG}: golden evidence changed")
     d = json.loads((DATA / f"{gallery_real.SLUG}.json").read_text(encoding="utf-8"))
     all_data[gallery_real.SLUG] = d
     compare(d["reference"], gallery_real.run("python", d["inputs"], batch), gallery_real.SLUG, bad)
@@ -1273,10 +1309,11 @@ def main():
     ap.add_argument("--real-only", action="store_true", help="rebuild only the real-data page and the index")
     ap.add_argument("--evidence-only", action="store_true", help="recount golden evidence and re-render; no CLI runs")
     ap.add_argument("--stage-e-only", action="store_true", help="run only the stage E pages; keep other committed data")
+    ap.add_argument("--stage-f-only", action="store_true", help="run only the stage F page; keep other committed data")
     a = ap.parse_args()
     if a.evidence_only:
         return refresh_evidence()
-    return check() if a.check else generate(a.refresh_real, a.real_only, a.stage_e_only)
+    return check() if a.check else generate(a.refresh_real, a.real_only, a.stage_e_only, a.stage_f_only)
 
 
 if __name__ == "__main__":

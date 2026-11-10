@@ -342,17 +342,17 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 
 | # | Model | Spec | Stage | Status | Outside-checked |
 |---|---|---|---|---|---|
-| MF-1 | CDS index option, Pedersen adjusted forward | `04-pricing/credit-options-and-copulas.md` | F (R7) | Specified | none (no free outside source) |
-| MF-2 | GARCH(1,1) estimate with standard errors, Student-t, demeaning | `05-volatility/garch.md` | F (R8) | Specified | arch 7.2.0, 8 of 17 |
-| MF-3 | VIX null-quote rule; local vol at slice expiries | `05-volatility/vix-index.md`, `05-volatility/local-and-forward-vol.md` | F (R10) | Specified | VIX: Cboe sample calculation, 3 of 10 |
-| MF-4 | Curve interpolation: monotone convex, monotonic log cubic, tension spline, hybrid | `02-curves/curve-framework.md` | F (Q1) | Specified | 67 of 86 (QuantLib 1.44, SciPy quad) |
-| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Specified | 1 of 15 (QuantLib 1.44 rebuild with Jacobian) |
-| MF-6 | Funding curve (spread over OIS) | `02-curves/joint-solve-and-funding.md` | F | Specified | none |
-| MF-7 | Book sensitivities: AAD reference, IFT zero Jacobian, PCA, cross gamma, jump to default | `06-risk/book-sensitivities.md` | F (Q3a, F3) | Specified | PCA: SciPy; cross gamma: QuantLib (30 of 57) |
-| MF-8 | VaR and ES (historical, filtered historical, parametric, Monte Carlo) and backtests | `06-risk/var-es-and-backtests.md` | F (Q2) | Specified | SciPy, NumPy, arch (92 of 108) |
-| MF-9 | FRTB-SA GIRR delta | `06-risk/frtb-sa-girr.md` | F (Q2) | Specified | none (no worked example in MAR21) |
-| MF-10 | Book lifecycle and end-of-day marks | `07-portfolio/book-lifecycle.md` | F (F5) | Specified | none (own conventions) |
-| MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F (F5) | Specified | SciPy lstsq (24 of 27) |
+| MF-1 | CDS index option, Pedersen adjusted forward | `04-pricing/credit-options-and-copulas.md` | F (R7) | Implemented | none (no free outside source) |
+| MF-2 | GARCH(1,1) estimate with standard errors, Student-t, demeaning | `05-volatility/garch.md` | F (R8) | Implemented | arch 7.2.0, 8 of 17 |
+| MF-3 | VIX null-quote rule; local vol at slice expiries | `05-volatility/vix-index.md`, `05-volatility/local-and-forward-vol.md` | F (R10) | Implemented | VIX: Cboe sample calculation, 3 of 10 |
+| MF-4 | Curve interpolation: monotone convex, monotonic log cubic, tension spline, hybrid | `02-curves/curve-framework.md` | F (Q1) | Implemented | 67 of 86 (QuantLib 1.44, SciPy quad) |
+| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Implemented | 1 of 15 (QuantLib 1.44 rebuild with Jacobian) |
+| MF-6 | Funding curve (spread over OIS) | `02-curves/joint-solve-and-funding.md` | F | Implemented | none |
+| MF-7 | Book sensitivities: AAD reference, IFT zero Jacobian, PCA, cross gamma, jump to default | `06-risk/book-sensitivities.md` | F (Q3a, F3) | Implemented | PCA: SciPy; cross gamma: QuantLib (30 of 57) |
+| MF-8 | VaR and ES (historical, filtered historical, parametric, Monte Carlo) and backtests | `06-risk/var-es-and-backtests.md` | F (Q2) | Implemented | SciPy, NumPy, arch (92 of 108) |
+| MF-9 | FRTB-SA GIRR delta | `06-risk/frtb-sa-girr.md` | F (Q2) | Implemented | none (no worked example in MAR21) |
+| MF-10 | Book lifecycle and end-of-day marks | `07-portfolio/book-lifecycle.md` | F (F5) | Implemented | none (own conventions) |
+| MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F (F5) | Implemented | SciPy lstsq (24 of 27) |
 
 ### MF-1 CDS index option (Pedersen)
 - **Purpose:** payer and receiver options on a CDS index with front-end protection inside the forward and the strike converted for the fixed coupon.

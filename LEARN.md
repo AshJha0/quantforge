@@ -21,7 +21,7 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Credit and correlation](#credit-and-correlation) | ISDA CDS, CDS options, copulas, correlation matrices and dispersion |
 | [Risk, hedging and use cases](#risk-hedging-and-use-cases) | Bump and rebuild, par and key-rate risk, the Jacobian, P&L explain, hedges, use cases 1 to 3 |
 | [Validation and evidence](#validation-and-evidence) | What a pass means, tolerances in money, what an outside library does not check |
-| [Stage F: curves, portfolio risk and the book](#stage-f-curves-portfolio-risk-and-the-book-specified) | Interpolation, joint solve, AAD, VaR and backtests, FRTB GIRR, book (specified) |
+| [Stage F: curves, portfolio risk and the book](#stage-f-curves-portfolio-risk-and-the-book) | Interpolation, joint solve, AAD, VaR and backtests, FRTB GIRR, book |
 
 ## Foundations
 
@@ -380,9 +380,9 @@ Every topic is Implemented, not Validated, and all inputs are synthetic unless a
 
 - **Curves and fixed income (stage D).** Stage D is Implemented, not Validated. All inputs are synthetic. The ESTR payment lag of 2 is a library choice (Strata), not a market standard; TP ICAP terms use 1 (ruling R1-2). From R1, bond-future conversion factors take an optional `contract` input with CME rounding; `null` keeps the stage D `TEN_YEAR` behaviour (ruling R1-3). The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 419 of the 654 stage D cases (64.1%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
 
-## Stage F: curves, portfolio risk and the book (specified)
+## Stage F: curves, portfolio risk and the book
 
-Stage F (target v0.6.0) is **specified**: specs, rulings F-1 to F-44 and goldens are on the `stage-f` branch, and the four builds are being written from them. Nothing below is claimed as built until the part 2 merge reports the conformance results. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
+Stage F (v0.6.0) is at Implemented, not Validated. On the merged part 2 tree (`stage-f-part2` at `db99d87`, 2026-11-10, observed on one Windows machine through the neutral runner), each of the four builds passed 12,462 of 12,462 golden cases: Java (JDK 25.0.5), Python (CPython 3.15.2), Rust (1.99.1) and C++ (GCC 15.2.0 under WSL, built with `-DQF_WERROR=ON`). Specs and rulings F-1 to F-44 are in `specifications/`. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
 
 ### Five more ways to draw a curve
 **Plain idea.** Between quoted dates a curve must be filled in, and the method changes the forward rates a trader sees. Stage F adds monotone convex (Hagan and West), monotonic log cubic, a tension spline and a hybrid that is stepwise at the front and smooth behind. Spec: `02-curves/curve-framework.md`, "Stage F: pluggable interpolation". **Watch for:** monotone convex is piecewise in its data, so its derivative jumps where a section changes rule. Ruling F-28 shows how a too-large bump straddled such a kink and looked like a 2e-3 error.

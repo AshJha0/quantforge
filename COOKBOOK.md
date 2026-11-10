@@ -487,7 +487,7 @@ The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves
 
 ## Stage F recipes
 
-Copy the inputs of the named case from `datasets/golden/stage_f/` and send them to any build that has the operation. Its `expected.outputs` are the oracle's answer. These are golden cases, not runs of a build: the four builds report their stage F results at the part 2 merge.
+Copy the inputs of the named case from `datasets/golden/stage_f/` and send them to any build that has the operation. Its `expected.outputs` are the oracle's answer. All four builds reproduce them: each passed every stage F golden case on the merged part 2 tree (2026-11-10, observed). For one curve under five interpolation methods, drawn from real runs of the four CLIs, see the [gallery page](docs/curves/interpolation-methods.md).
 
 | Task | Operation | Case |
 |---|---|---|
