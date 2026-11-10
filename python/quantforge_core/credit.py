@@ -9,6 +9,7 @@ from datetime import date, timedelta
 from . import curves, roots, schedules
 from .curves import Curve, CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 DAY = timedelta(days=1)
@@ -284,3 +285,6 @@ def composite(
                for j in range(len(tenors))]
     pillars = bootstrap(trade_date, discount, recovery, list(zip(tenors, spreads, strict=True)))
     return spreads, pillars
+
+
+guard(globals())

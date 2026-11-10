@@ -4,6 +4,7 @@ from collections.abc import Callable
 from functools import lru_cache
 
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 
 Fn = Callable[[float], float]
@@ -173,3 +174,6 @@ def gauss_kronrod(
         mid = left + (right - left) / 2
         intervals.append((left, mid, *_kronrod(f, left, mid)))
         intervals.append((mid, right, *_kronrod(f, mid, right)))
+
+
+guard(globals())

@@ -7,6 +7,7 @@ from typing import Any
 
 from .equity import ForwardResult
 from .errors import QfError
+from .finite import guard
 
 _SQRT2 = math.sqrt(2.0)
 _INV_SQRT_2PI = 1.0 / math.sqrt(2.0 * math.pi)
@@ -257,3 +258,6 @@ def equity_option(
     n = small_n(_d1(f, strike, vol, t))
     gamma = signed * r.discount_factor * n / (f * vol * math.sqrt(t) * c * c)
     return {"pv": pv, "delta": forward_delta / c, "gamma": gamma, "vega": vega}
+
+
+guard(globals())

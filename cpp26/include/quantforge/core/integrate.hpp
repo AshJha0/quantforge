@@ -3,6 +3,7 @@
 
 namespace quantforge {
 
+/// Quadrature on a callback, used inside pricers; unchecked: caller guarantees finite inputs.
 double trapezoid(const Fn& f, double a, double b, long long n);
 double simpson(const Fn& f, double a, double b, long long n);
 double gauss_legendre(const Fn& f, double a, double b, long long n);

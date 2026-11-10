@@ -1,7 +1,7 @@
-"""Stage E, E4: SABR swaption cube, caplet stripping, bond futures options and inflation caps.
+"""SABR swaption cube, caplet stripping, bond futures options and inflation caps.
 
 Spec: specifications/05-volatility/rates-vol-cube.md, rulings E-B8 to E-B13 in
-specifications/stage-e-rulings-b.md. Caps and swaptions are D7's (stage_d3.py); the smile is the
+specifications/stage-e-rulings-b.md. Caps and swaptions are D7's (caps_swaptions.py); the smile is the
 stage C Hagan expansion (sabr.py).
 """
 import itertools
@@ -9,10 +9,11 @@ from collections.abc import Callable, Sequence
 
 from . import black, curves, daycount, projection, roots, sabr
 from .black import Option
+from .caps_swaptions import INDEX, _check_black, _check_tenor, _option
 from .curves import CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
-from .stage_d3 import INDEX, _check_black, _check_tenor, _option
 
 Matrix = Sequence[Sequence[float]]
 
@@ -233,3 +234,6 @@ def zc_price(model: str, kind: str, forward_ratio: float, years: float, strike: 
         raise _domain("years must be above 0", "years")
     ratio = (1 + strike) ** years
     return notional * df * _inflation_option(model, kind, forward_ratio, ratio, vol, years), ratio
+
+
+guard(globals())

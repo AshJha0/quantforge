@@ -5,6 +5,7 @@
 #include <numbers>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/stats.hpp"
 
 namespace quantforge {
@@ -144,6 +145,11 @@ double normal_inverse(double p) {
 }
 
 double delta_to_strike(double forward, double vol, double t, OptionType type, double delta, double scale) {
+    require_finite(forward, "forward");
+    require_finite(vol, "vol");
+    require_finite(t, "expiry_years");
+    require_finite(delta, "delta");
+    require_finite(scale, "scale");
     if (forward <= 0 || vol <= 0 || t <= 0) domain("forward, vol and expiry_years must be above 0");
     const double phi = type == OptionType::Call ? 1.0 : -1.0, p = phi * delta / scale;
     if (!(p > 0 && p < 1)) domain("delta is out of range");
@@ -152,6 +158,11 @@ double delta_to_strike(double forward, double vol, double t, OptionType type, do
 }
 
 double delta_from_strike(double forward, double vol, double t, OptionType type, double strike, double scale) {
+    require_finite(forward, "forward");
+    require_finite(vol, "vol");
+    require_finite(t, "expiry_years");
+    require_finite(strike, "strike");
+    require_finite(scale, "scale");
     if (forward <= 0 || vol <= 0 || t <= 0 || strike <= 0) domain("forward, vol, expiry_years and strike must be above 0");
     const double phi = type == OptionType::Call ? 1.0 : -1.0, s = vol * std::sqrt(t);
     return phi * scale * normal_cdf(phi * (std::log(forward / strike) + s * s / 2) / s);
@@ -169,12 +180,20 @@ double Svi::g(double k) const {
     return lead * lead - (w1 * w1 / 4) * (1 / v + 0.25) + w2 / 2;
 }
 
+void require_finite(const Svi& s, std::string_view field) {
+    for (const double x : {s.a, s.b, s.rho, s.m, s.sigma}) require_finite(x, field);
+}
+
 void check_svi(const Svi& s) {
+    require_finite(s, "svi");
     if (s.b < 0 || std::fabs(s.rho) >= 1 || s.sigma <= 0 || s.a + s.b * s.sigma * std::sqrt(1 - s.rho * s.rho) <= 0)
         domain("svi parameters are out of domain");
 }
 
 SviFit svi_calibrate(const Vec& k, const Vec& w, const std::optional<Vec>& weights) {
+    require_finite(k, "log_moneyness");
+    require_finite(w, "total_variance");
+    require_finite(weights, "weights");
     const std::size_t n = k.size();
     if (n != w.size() || (weights && weights->size() != n) || n < 5) throw Error("E_INPUT", "too few points, or lengths differ");
     for (std::size_t i = 1; i < n; ++i)
@@ -239,7 +258,15 @@ double Ssvi::w(double k, double theta) const {
     return theta / 2 * (1 + rho * x + std::sqrt((x + rho) * (x + rho) + 1 - rho * rho));
 }
 
+namespace {
+void require_finite_ssvi(const Ssvi& s, const Vec& thetas) {
+    for (const double x : {s.rho, s.eta, s.gamma}) require_finite(x, "ssvi");
+    require_finite(thetas, "thetas");
+}
+}  // namespace
+
 void check_ssvi(const Ssvi& s, const Vec& thetas) {
+    require_finite_ssvi(s, thetas);
     if (std::fabs(s.rho) >= 1 || s.eta <= 0 || s.gamma <= 0 || s.gamma > 1) domain("ssvi parameters are out of domain");
     for (const double t : thetas)
         if (t <= 0) domain("theta is not above 0");
@@ -248,6 +275,7 @@ void check_ssvi(const Ssvi& s, const Vec& thetas) {
 }
 
 bool ssvi_butterfly_free(const Ssvi& s, const Vec& thetas) {
+    require_finite_ssvi(s, thetas);
     const double lift = 1 + std::fabs(s.rho);
     return std::ranges::all_of(thetas, [&](double t) {
         const double p = s.phi(t);
@@ -256,11 +284,15 @@ bool ssvi_butterfly_free(const Ssvi& s, const Vec& thetas) {
 }
 
 bool ssvi_calendar_free(const Ssvi& s, const Vec& thetas) {
+    require_finite_ssvi(s, thetas);
     const double bound = 1 + std::sqrt(1 - s.rho * s.rho);
     return std::ranges::all_of(thetas, [&](double t) { return s.rho * s.rho * (1 - s.gamma) / (1 + t) <= bound; });
 }
 
 SsviFit ssvi_calibrate(const Vec& thetas, const Vec& k, const Matrix& w) {
+    require_finite(thetas, "thetas");
+    require_finite(k, "log_moneyness");
+    require_finite(w, "total_variance");
     if (w.size() != thetas.size()) throw Error("E_INPUT", "rows do not match thetas");
     for (const Vec& row : w)
         if (row.size() != k.size()) throw Error("E_INPUT", "ragged rows");

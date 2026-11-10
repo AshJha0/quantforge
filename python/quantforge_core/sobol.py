@@ -4,6 +4,7 @@ from functools import lru_cache
 
 from ._sobol_data import DIRECTION_DATA
 from .errors import QfError
+from .finite import guard
 
 MAX_DIMENSIONS = 64
 _BITS = 32
@@ -52,3 +53,6 @@ def points(dimensions: int, count: int, skip: int = 0) -> list[list[float]]:
     if skip < 0:
         raise QfError("E_INPUT", "skip must not be negative", "skip")
     return list(iter_points(dimensions, count, skip))
+
+
+guard(globals())

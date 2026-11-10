@@ -7,6 +7,7 @@
 
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 namespace {
@@ -121,6 +122,11 @@ void operator_rows(const std::vector<double>& mu, const std::vector<double>& s, 
 }  // namespace
 
 void check_heston(const HestonParams& h) {
+    require_finite(h.v0, "heston");
+    require_finite(h.kappa, "heston");
+    require_finite(h.theta, "heston");
+    require_finite(h.xi, "heston");
+    require_finite(h.rho, "heston");
     if (!(h.v0 > 0)) domain("v0 is not above 0", "heston");
     if (!(h.kappa > 0)) domain("kappa is not above 0", "heston");
     if (!(h.theta > 0)) domain("theta is not above 0", "heston");
@@ -129,6 +135,9 @@ void check_heston(const HestonParams& h) {
 }
 
 void check_jumps(const Jumps& j) {
+    require_finite(j.intensity, "jumps");
+    require_finite(j.mean_log_jump, "jumps");
+    require_finite(j.log_jump_vol, "jumps");
     if (!(j.intensity >= 0)) domain("intensity is negative", "jumps");
     if (!(j.log_jump_vol >= 0)) domain("log_jump_vol is negative", "jumps");
 }
@@ -145,12 +154,35 @@ cd heston_cf(double t, const HestonParams& h, cd u) {
 }
 
 std::vector<double> heston_price(const EquityOption& o, const HestonParams& h) {
+    require_finite(o.spot, "spot");
+    require_finite(o.expiry_years, "expiry_years");
+    require_finite(o.rate, "rate");
+    require_finite(o.dividend_yield, "dividend_yield");
+    require_finite(o.strikes, "strikes");
+    require_finite(h.v0, "heston");
+    require_finite(h.kappa, "heston");
+    require_finite(h.theta, "heston");
+    require_finite(h.xi, "heston");
+    require_finite(h.rho, "heston");
     check_option(o);
     check_heston(h);
     return lewis(o, [&](cd u) { return heston_cf(o.expiry_years, h, u); });
 }
 
 std::vector<double> bates_price(const EquityOption& o, const HestonParams& h, const Jumps& j) {
+    require_finite(o.spot, "spot");
+    require_finite(o.expiry_years, "expiry_years");
+    require_finite(o.rate, "rate");
+    require_finite(o.dividend_yield, "dividend_yield");
+    require_finite(o.strikes, "strikes");
+    require_finite(h.v0, "heston");
+    require_finite(h.kappa, "heston");
+    require_finite(h.theta, "heston");
+    require_finite(h.xi, "heston");
+    require_finite(h.rho, "heston");
+    require_finite(j.intensity, "jumps");
+    require_finite(j.mean_log_jump, "jumps");
+    require_finite(j.log_jump_vol, "jumps");
     check_option(o);
     check_heston(h);
     check_jumps(j);
@@ -158,6 +190,15 @@ std::vector<double> bates_price(const EquityOption& o, const HestonParams& h, co
 }
 
 std::vector<double> merton_price(const EquityOption& o, double vol, const Jumps& j) {
+    require_finite(o.spot, "spot");
+    require_finite(o.expiry_years, "expiry_years");
+    require_finite(o.rate, "rate");
+    require_finite(o.dividend_yield, "dividend_yield");
+    require_finite(o.strikes, "strikes");
+    require_finite(vol, "vol");
+    require_finite(j.intensity, "jumps");
+    require_finite(j.mean_log_jump, "jumps");
+    require_finite(j.log_jump_vol, "jumps");
     check_option(o);
     if (!(vol > 0)) domain("vol is not above 0", "vol");
     check_jumps(j);
@@ -184,6 +225,19 @@ SlvLeverage slv_leverage(double spot, double t, double r, double q, const Heston
     if (slices.size() > 100) throw Error("E_LIMIT", "slices is above its limit", "slices");
     if (g.nx > (long long)max_grid || g.nv > (long long)max_grid || g.nt > (long long)max_steps)
         throw Error("E_LIMIT", "the grid is above its limit", "grid");
+    require_finite(spot, "spot");
+    require_finite(t, "expiry_years");
+    require_finite(r, "rate");
+    require_finite(q, "dividend_yield");
+    require_finite(h.v0, "heston");
+    require_finite(h.kappa, "heston");
+    require_finite(h.theta, "heston");
+    require_finite(h.xi, "heston");
+    require_finite(h.rho, "heston");
+    require_finite(slices, "slices");
+    require_finite(g.x_min, "grid");
+    require_finite(g.x_max, "grid");
+    require_finite(g.v_max, "grid");
     check_slices_input(slices);
     if (g.nx < 5 || g.nv < 5 || g.nt < 2) throw Error("E_INPUT", "nx and nv need 5, nt needs 2", "grid");
     if (!(g.x_min < std::log(spot) && std::log(spot) < g.x_max))

@@ -12,10 +12,19 @@
         coverage.py JSON (python), JaCoCo XML (java), LCOV (rust, cargo llvm-cov --lcov) or Cobertura XML
         (cpp, gcovr --cobertura). Exit 1 if a filled module is below the minimum or has no lines in the report.
 
+    python tools/quality_gate.py --coverage REPORT --lang LANG --floor
+        Also gates line coverage over the whole library of that language against
+        conformance/quality/floors.json (plan 12.2 G6, the per-language fail_under).
+
     python tools/quality_gate.py --check-dsr --trials N [--ledger research/trials.csv] [--expect-family 24]
         Research gate (plan 13.1 R6). A deflated Sharpe ratio for an R3 study must be computed with at
         least the family trial count, which is the number of rows in the trial ledger. Exit 1 if N is
         smaller, if the ledger has duplicate trial ids, or if its row count differs from --expect-family.
+
+    python tools/quality_gate.py --check-register --check-specs [--baseline FILE] | --write-baseline
+        Model register (plan 12.2 A2): every docs/model-inventory.md entry has the A2 fields, and every
+        model spec page has an entry. Convergence rule (Q5b): a spec page with a numerical method has a
+        filled "## Convergence and limit cases" table. Ratchets over a baseline; see tools/governance_gate.py.
 
 Entries left as TODO are skipped, so the gate passes before the language sessions land.
 """
@@ -27,6 +36,9 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import governance_gate as gov  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "research" / "trials.csv"
@@ -177,6 +189,43 @@ def check_dsr_trials(rows, n_used, expect_family=None):
     return bad
 
 
+# ---- whole-language floor (plan 12.2 G6) ----------------------------------------------------------
+
+FLOORS = ROOT / "conformance" / "quality" / "floors.json"
+LIBRARY = {"python": ("quantforge_*/*.py", "python/quantforge_*/*.py"), "java": ("java25/src/main/java/*",),
+           "rust": ("rust/crates/*/src/*",), "cpp": ("cpp26/src/*", "cpp26/include/*")}
+
+
+def floor_gate(lang, rows, floor):
+    """Line coverage over every library file of one language against its floor. Returns (line, ok)."""
+    sel = [(f, c, t) for f, c, t in rows if any(matches(f, g) for g in LIBRARY[lang])]
+    cov, tot = sum(r[1] for r in sel), sum(r[2] for r in sel)
+    if not tot:
+        return f"{lang}: no library lines in the report", False
+    ok = cov / tot >= floor
+    return f"{lang}: library {cov}/{tot} lines, {cov / tot:.1%} against the floor {floor:.0%}{'' if ok else ' (BELOW)'}", ok
+
+
+def check_governance(register, specs, baseline, now=None):
+    """A2 register and Q5b convergence ratchets (tools/governance_gate.py). Returns the exit code."""
+    base = json.loads(baseline.read_text(encoding="utf-8")) if baseline.exists() else {}
+    now = now or gov.current()
+    rc = 0
+    for key, on in (("register", register), ("specs", specs)):
+        if not on:
+            continue
+        new, old, stale = gov.ratchet(now[key], base.get(key, []))
+        for x in old:
+            print("WARN (baseline)", x)
+        for x in new:
+            print("BAD", x)
+        for x in stale:
+            print("WARN stale baseline entry, now fixed (rerun --write-baseline to shrink the list):", x)
+        print(f"{key}: {len(new)} new gaps, {len(old)} baseline gaps, {len(stale)} stale")
+        rc |= bool(new)
+    return int(rc)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--config", default=str(DEFAULT))
@@ -187,7 +236,19 @@ def main(argv=None):
     ap.add_argument("--trials", type=int)
     ap.add_argument("--ledger", default=str(LEDGER))
     ap.add_argument("--expect-family", type=int)
+    ap.add_argument("--floor", action="store_true", help="also gate whole-language coverage on floors.json")
+    ap.add_argument("--check-register", action="store_true")
+    ap.add_argument("--check-specs", action="store_true")
+    ap.add_argument("--write-baseline", action="store_true")
+    ap.add_argument("--baseline", default=str(gov.BASELINE))
     a = ap.parse_args(argv)
+    if a.write_baseline:
+        base = gov.current()
+        Path(a.baseline).write_text(json.dumps(base, indent=1) + "\n", encoding="utf-8")
+        print(f"baseline: {len(base['register'])} register gaps, {len(base['specs'])} spec gaps")
+        return 0
+    if a.check_register or a.check_specs:
+        return check_governance(a.check_register, a.check_specs, Path(a.baseline))
     if a.check_dsr:
         if a.trials is None:
             ap.error("--check-dsr needs --trials")
@@ -207,11 +268,16 @@ def main(argv=None):
         return 1 if bad else 0
     if not (a.coverage and a.lang):
         ap.error("--coverage needs --lang")
-    out, fails = gate(cfg, a.lang, READERS[a.lang](Path(a.coverage).read_text(encoding="utf-8")))
+    rows = READERS[a.lang](Path(a.coverage).read_text(encoding="utf-8"))
+    floor_ok = True
+    if a.floor:
+        line, floor_ok = floor_gate(a.lang, rows, json.loads(FLOORS.read_text(encoding="utf-8"))[a.lang])
+        print(line)
+    out, fails = gate(cfg, a.lang, rows)
     for line in out:
         print(line)
     print(f"{a.lang}: {len(out)} modules gated at {cfg['coverage_min']:.0%}; {len(fails)} below" if out else f"{a.lang}: no filled modules yet, nothing gated")
-    return 1 if fails else 0
+    return 1 if fails or not floor_ok else 0
 
 
 if __name__ == "__main__":

@@ -22,7 +22,8 @@ struct CpiCurve {
 
     /// The checks of infl.curve.cpi, in order, short of the month check.
     void check() const;
-    /// E_OUT_OF_RANGE before base_month.
+    /// E_OUT_OF_RANGE before base_month. Call check() first.
+    /// unchecked: caller guarantees finite inputs
     double cpi(long long month) const;
 };
 

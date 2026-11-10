@@ -26,6 +26,7 @@ public final class Money {
     private static final Pattern FORM = Pattern.compile("-?([0-9]+)(\\.([0-9]+))?");
 
     public static double convert(double value, RateUnit from, RateUnit to) {
+        Finite.check("value", value);
         return from == to ? value : value / from.perUnit * to.perUnit;
     }
 

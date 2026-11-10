@@ -31,6 +31,8 @@ public final class Compounding {
     }
 
     public static double discountFactor(double r, double t, Basis b) {
+        Finite.check("r", r);
+        Finite.check("t", t);
         if (t < 0.0) {
             throw new QfError("E_DOMAIN", "t is negative", "t");
         }
@@ -39,6 +41,8 @@ public final class Compounding {
     }
 
     public static double convert(double r, double t, Basis from, Basis to) {
+        Finite.check("r", r);
+        Finite.check("t", t);
         if (t <= 0.0) {
             throw new QfError("E_DOMAIN", "t must be positive", "t");
         }

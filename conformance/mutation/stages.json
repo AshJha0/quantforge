@@ -1,6 +1,6 @@
 {
   "note": "Modules per stage and language, for the per-stage mutation report (plan 11.5.6). The stage D target is 80%: killed / (killed + survived), with unviable and non-building mutants left out. Python and Rust count a mutant killed if the unit tests or the golden cases catch it. C++ uses the golden cases only. Java uses PIT with the unit tests. 'suite' is the golden-file glob each mutant is checked against; '<lang>_suite' overrides it for one language (Python's xccy code sits in the shared cli/stage_d.py, so every stage D suite applies). Module lists come from the files the stage D branches added; extend this file when a stage adds modules. Stage E modules have the same names as conformance/quality/stage_e.json; a null target is skipped by the plan job. Suites match stage_e and stage_e_b file names.",
-  "target": {"D": 0.80, "E": 0.80},
+  "target": {"D": 0.80, "E": 0.80, "F": 0.80},
   "stages": {
     "D": [
       {"module": "bonds", "suite": "*bond*_d",
@@ -10,27 +10,32 @@
       {"module": "inflation", "suite": "inflation_d",
        "java": "org.quantforge.pricing.Inflation", "cpp": "cpp26/src/core/inflation.cpp", "python": "quantforge_core.inflation*", "rust": "**/inflation.rs"},
       {"module": "equity_d", "suite": "*_d",
-       "java": "org.quantforge.pricing.EquityD", "cpp": "cpp26/src/core/equity_d.cpp", "python": "quantforge_core.equity_d*", "rust": "**/equity_d.rs"},
+       "java": "org.quantforge.pricing.EquityCurves", "cpp": "cpp26/src/core/equity_carry.cpp", "python": "quantforge_core.equity_curves*", "rust": "**/equity_carry.rs"},
       {"module": "curve_fits", "suite": "*fit*_d",
        "java": "org.quantforge.calibration.CurveFits", "cpp": null, "python": "quantforge_core.curve_fits*", "rust": "**/curve_fits.rs"},
       {"module": "rates_d", "suite": "*_d",
-       "java": "org.quantforge.curves.RatesD", "cpp": "cpp26/src/core/rates_d.cpp", "python": "quantforge_core.overnight*", "rust": "**/rates_d.rs"},
+       "java": "org.quantforge.curves.RatesCurves", "cpp": "cpp26/src/core/multicurve.cpp", "python": "quantforge_core.overnight*", "rust": "**/rates_overnight.rs"},
       {"module": "xccy", "suite": "xccy_d",
-       "java": "org.quantforge.curves.Xccy", "cpp": null, "python": "quantforge_core.cli.stage_d*", "python_suite": "*_d", "rust": "**/xccy.rs"},
+       "java": "org.quantforge.curves.Xccy", "cpp": null, "python": "quantforge_core.cli.ops_fx*", "python_suite": "*_d", "rust": "**/xccy.rs"},
       {"module": "misc_d", "suite": "*_d",
-       "java": "org.quantforge.pricing.CmdtyMbs", "cpp": "cpp26/src/core/misc_d.cpp", "python": "quantforge_core.stage_d3*", "rust": "**/stage_d3.rs"},
+       "java": "org.quantforge.pricing.CmdtyMbs", "cpp": "cpp26/src/core/rates_vol.cpp", "python": "quantforge_core.caps_swaptions*", "rust": "**/caps.rs"},
+      {"module": "misc_d_commodity", "suite": "*_d",
+       "java": null, "cpp": null, "python": "quantforge_core.commodity*", "rust": "**/commodity.rs"},
+      {"module": "misc_d_mbs", "suite": "*_d",
+       "java": null, "cpp": null, "python": "quantforge_core.mbs*", "rust": "**/mbs.rs"},
       {"module": "compounding_d", "suite": "compound_d",
        "java": "org.quantforge.curves.DatedCompounding", "cpp": null, "python": "quantforge_core.overnight*", "rust": null}
     ],
     "E": [
-      {"module": "surfaces_local_vol", "suite": "surf_e", "java": "org.quantforge.vol.Surfaces", "cpp": "cpp26/src/core/arb_surface.cpp", "python": "quantforge_core.vol_e1*", "rust": "**/surface_e.rs"},
+      {"module": "surfaces_local_vol", "suite": "surf_e", "java": "org.quantforge.vol.Surfaces", "cpp": "cpp26/src/core/arb_surface.cpp", "python": "quantforge_core.arb_surface*", "rust": "**/arb_surface.rs"},
       {"module": "heston_slv", "suite": "heston_e", "java": "org.quantforge.vol.Heston*", "cpp": "cpp26/src/core/heston.cpp", "python": "quantforge_core.heston*", "rust": "**/heston.rs"},
       {"module": "fx_smile", "suite": "fxs_e", "java": "org.quantforge.vol.FxSmile", "cpp": "cpp26/src/core/fx_smile.cpp", "python": "quantforge_core.fx_smile*", "rust": "**/fx_smile.rs"},
       {"module": "exotics", "suite": "*_e", "java": "org.quantforge.pricing.Exotics", "cpp": "cpp26/src/core/exotics.cpp", "python": "quantforge_core.exotics*", "rust": "**/exotics.rs"},
-      {"module": "rates_vol", "suite": "ratesvol_e", "java": "org.quantforge.pricing.RatesVol", "cpp": "cpp26/src/core/misc_d.cpp", "python": "quantforge_core.rates_vol*", "rust": "**/rates_e.rs"},
-      {"module": "garch_varswap_vix", "suite": "*_e", "java": "org.quantforge.vol.Garch*", "cpp": "cpp26/src/core/vol_stats.cpp", "python": "quantforge_core.vol_e7*", "rust": "**/garch.rs"},
+      {"module": "rates_vol", "suite": "ratesvol_e", "java": "org.quantforge.pricing.RatesVol", "cpp": "cpp26/src/core/rates_vol.cpp", "python": "quantforge_core.rates_vol*", "rust": "**/rates_vol.rs"},
+      {"module": "garch_varswap_vix", "suite": "*_e", "java": "org.quantforge.vol.Garch*", "cpp": "cpp26/src/core/vol_stats.cpp", "python": "quantforge_core.variance*", "rust": "**/garch.rs"},
       {"module": "correlation", "suite": "corr_e", "java": "org.quantforge.risk.Correlation", "cpp": "cpp26/src/core/correlation.cpp", "python": "quantforge_core.correlation*", "rust": "**/corr.rs"},
-      {"module": "credit_options", "suite": "creditopt_e", "java": "org.quantforge.pricing.CreditOptions", "cpp": "cpp26/src/core/credit_e.cpp", "python": "quantforge_core.credit_e8*", "rust": "**/credit_e.rs"}
-    ]
+      {"module": "credit_options", "suite": "creditopt_e", "java": "org.quantforge.pricing.CreditOptions", "cpp": "cpp26/src/core/credit_options.cpp", "python": "quantforge_core.credit_options*", "rust": "**/credit_options.rs"}
+    ],
+    "F": []
   }
 }

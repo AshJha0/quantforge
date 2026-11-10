@@ -30,7 +30,7 @@ final class In {
 
     /** Wraps a case's inputs and notes any array over the general limit, used by the operation or not. */
     In(Map<?, ?> values) {
-        this(values, new QfError[1]);
+        this(values, new QfError[2]);
         scanArrays(values);
     }
 
@@ -55,6 +55,28 @@ final class In {
         return a > 0 && b > 0 && (double) a * (double) b > max;
     }
 
+    /** Ruling F-1: the exact strings "NaN", "Infinity" and "-Infinity" in a Real field; NaN for anything else. */
+    static double nonFiniteToken(Object v) {
+        if (!(v instanceof String s)) {
+            return Double.NaN;
+        }
+        return switch (s) {
+            case "Infinity" -> Double.POSITIVE_INFINITY;
+            case "-Infinity" -> Double.NEGATIVE_INFINITY;
+            default -> Double.NaN;
+        };
+    }
+
+    /** True if v is one of the three non-finite tokens of ruling F-1. */
+    static boolean isNonFiniteToken(Object v) {
+        return "NaN".equals(v) || "Infinity".equals(v) || "-Infinity".equals(v);
+    }
+
+    /** Ruling F-2: the first non-finite Real read, raised after any held E_LIMIT and before every rule check. */
+    QfError pendingDomain() {
+        return pending[1];
+    }
+
     QfError pendingLimit() {
         return pending[0];
     }
@@ -63,6 +85,9 @@ final class In {
     void gate() {
         if (pending[0] != null) {
             throw pending[0];
+        }
+        if (pending[1] != null) {
+            throw pending[1];
         }
     }
 
@@ -123,9 +148,16 @@ final class In {
         return v;
     }
 
-    private static double realOf(String key, Object v) {
+    private double realOf(String key, Object v) {
         if (v instanceof Json.Number n) {
             return n.value();
+        }
+        double token = nonFiniteToken(v);
+        if (!Double.isNaN(token) || "NaN".equals(v)) {
+            if (pending[1] == null) {
+                pending[1] = new QfError("E_DOMAIN", key + " must be finite", key);
+            }
+            return token;
         }
         throw schema(key, "expected a number");
     }
@@ -244,7 +276,7 @@ final class In {
         return realsOf(key, list(key));
     }
 
-    private static double[] realsOf(String key, List<?> l) {
+    private double[] realsOf(String key, List<?> l) {
         double[] out = new double[l.size()];
         for (int i = 0; i < out.length; i++) {
             out[i] = realOf(key, l.get(i));

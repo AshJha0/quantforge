@@ -3,6 +3,7 @@ import math
 from collections.abc import Sequence
 
 from .errors import QfError
+from .finite import guard
 
 MASK = (1 << 64) - 1
 _JUMP = (0x180EC6D33CFD0ABA, 0xD5A61266F0C9392C, 0xA9582618E03FC9AA, 0x39ABDC4529B1661C)
@@ -227,3 +228,6 @@ def set_state_next_u64(state: Sequence[int], count: int) -> list[int]:
         raise QfError("E_INPUT", "the all-zero state is not allowed", "state")
     g = Xoshiro256(state)
     return [g.next_u64() for _ in range(count)]
+
+
+guard(globals())

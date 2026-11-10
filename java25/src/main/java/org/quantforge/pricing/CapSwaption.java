@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -19,6 +21,11 @@ public final class CapSwaption {
     }
 
     public static double option(boolean normal, double phi, double f, double k, double t, double v) {
+        Finite.check("phi", phi);
+        Finite.check("f", f);
+        Finite.check("k", k);
+        Finite.check("t", t);
+        Finite.check("v", v);
         return normal ? Black.normal(phi, f, k, t, 1.0, v) : Black.lognormal(phi, f, k, t, 1.0, v);
     }
 
@@ -59,6 +66,9 @@ public final class CapSwaption {
     /** {@code vols} has one entry (flat) or one per caplet. */
     public static Cap cap(Curve d, Curve p, boolean normal, double[] vols, boolean listed, boolean isCap,
                           long startMonths, long tenorMonths, double k, double n) {
+        Finite.check("vols", vols);
+        Finite.check("k", k);
+        Finite.check("n", n);
         if (startMonths < 1) {
             throw new QfError("E_INPUT", "start_months must be at least 1", "start_months");
         }
@@ -85,6 +95,8 @@ public final class CapSwaption {
     }
 
     public static void checkBlack(boolean normal, double k, double... fwd) {
+        Finite.check("k", k);
+        Finite.check("fwd", fwd);
         if (normal) {
             return;
         }
@@ -102,6 +114,9 @@ public final class CapSwaption {
 
     public static Swaption swaption(Curve d, Curve p, boolean normal, double vol, boolean payer, long expiryMonths,
                                     long tenorMonths, double k, double n) {
+        Finite.check("vol", vol);
+        Finite.check("k", k);
+        Finite.check("n", n);
         if (expiryMonths < 1) {
             throw new QfError("E_INPUT", "expiry_months must be at least 1", "expiry_months");
         }

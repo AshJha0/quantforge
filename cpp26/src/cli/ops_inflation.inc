@@ -1,26 +1,5 @@
-// Stage D, D6 inflation. Included by dispatch.cpp after ops_bonds.inc.
-
-long long month_of_text(const Value& v, string_view key) {
-    const string& s = to_string(v, key);
-    const auto d = s.size() == 7 ? parse_date(s + "-01") : std::nullopt;
-    if (!d) schema(key, "expected YYYY-MM");
-    return month_index(*d);
-}
-
-CpiCurve cpi_curve_fields(const In& c) {
-    CpiCurve out{month_of_text(c.need("base_month"), "base_month"), c.real("base_cpi"), {}, std::nullopt};
-    out.quotes = rows_of<ZcisQuote>(c, "quotes", [](const In& q) { return ZcisQuote{q.real("years"), q.real("rate")}; });
-    const Value* s = c.raw().find("seasonality");
-    if (!s) schema("seasonality", "missing");
-    if (s->kind != Kind::Null) out.seasonality = to_reals(*s, "seasonality");
-    return out;
-}
-
-CpiCurve cpi_curve_of(const In& in) {
-    const Value& v = in.need("curve");
-    if (v.kind != Kind::Object) schema("curve", "expected an object");
-    return cpi_curve_fields(In(v));
-}
+// CLI handlers, the inflation verbs.
+// Included by dispatch.cpp inside its unnamed namespace; not a translation unit of its own.
 
 void op_infl_cpi(const In& in, Out& out) {
     const CpiCurve c = cpi_curve_fields(in);
@@ -82,3 +61,36 @@ void op_linker_price_curve(const In& in, Out& out) {
     limit_if(c.quotes.size() > max_quotes, "quotes");
     out.key_real("nominal_dirty", linker_price_curve(b, s, base, c, d.build()));
 }
+
+void op_yoy_cap_price(const In& in, Out& out) {
+    const auto model = in.choice("model", rate_vol_models);
+    const double phi = in.choice<double>("type", {{"CAP", 1.0}, {"FLOOR", -1.0}});
+    const double k = in.real("strike"), n = in.real("notional");
+    const auto periods = rows_of<YoyPeriod>(in, "periods", [](const In& q) {
+        return YoyPeriod{q.real("accrual"), q.real("discount_factor"), q.real("yoy_forward"), q.real("expiry_years"), q.real("vol")};
+    });
+    in.ready();
+    const CapPrice r = yoy_cap_price(model, phi, k, n, periods);
+    out.key_reals("caplets", r.caplets);
+    out.key_real("price", r.price);
+}
+
+void op_zc_cap_price(const In& in, Out& out) {
+    const auto model = in.choice("model", rate_vol_models);
+    const double phi = in.choice<double>("type", {{"CAP", 1.0}, {"FLOOR", -1.0}});
+    const double fi = in.real("forward_index_ratio"), years = in.real("years"), k = in.real("strike");
+    const double df = in.real("discount_factor"), vol = in.real("vol"), n = in.real("notional");
+    in.ready();
+    const ZcCap r = zc_cap_price(model, phi, fi, years, k, df, vol, n);
+    out.key_real("price", r.price);
+    out.key_real("strike_ratio", r.strike_ratio);
+}
+
+constexpr Entry inflation_ops[] = {
+    {"infl.cap.yoy_price", op_yoy_cap_price},
+    {"infl.cap.zc_price", op_zc_cap_price},
+    {"infl.curve.cpi", op_infl_cpi},
+    {"infl.linker.price", op_linker_price},
+    {"infl.linker.price_curve", op_linker_price_curve},
+    {"infl.zcis.pv", op_zcis_pv},
+};

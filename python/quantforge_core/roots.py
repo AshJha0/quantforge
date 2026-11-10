@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from .errors import QfError
+from .finite import guard
 
 Fn = Callable[[float], float]
 _EPS = 2.0**-52
@@ -180,3 +181,6 @@ def newton(
             return RootResult(x_new, it, f_new, "EXACT" if f_new == 0 else "F_TOL")
         x, fx = x_new, f_new
     raise _no_convergence(max_iter)
+
+
+guard(globals())
