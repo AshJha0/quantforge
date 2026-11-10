@@ -64,6 +64,7 @@ pub mod root;
 pub mod sabr;
 pub mod schedule;
 pub mod sha256;
+pub mod shortrate;
 pub mod smile;
 pub mod snapshot;
 pub mod sobol;

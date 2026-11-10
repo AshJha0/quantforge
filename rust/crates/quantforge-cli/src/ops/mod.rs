@@ -16,6 +16,7 @@ mod mbs;
 mod rates;
 mod repo;
 mod risk;
+mod shortrate;
 mod usecase;
 mod vol;
 
@@ -73,6 +74,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("infl", infl::NAMES, infl::dispatch),
     ("mbs", mbs::NAMES, mbs::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
+    ("rates", shortrate::NAMES, shortrate::dispatch),
     ("repo", repo::NAMES, repo::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
@@ -93,8 +95,8 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     let domain = op.split('.').next().unwrap_or_default();
     DOMAINS
         .iter()
-        .find(|d| d.0 == domain)
-        .and_then(|d| (d.2)(op, i))
+        .filter(|d| d.0 == domain)
+        .find_map(|d| (d.2)(op, i))
         .unwrap_or_else(|| {
             fail(
                 "E_UNSUPPORTED_OPERATION",
