@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased: stage G (target 0.7.0)
+
+### Known issues (stage G, in progress)
+- **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, is registered in `specifications/stage-g-rulings.md`.
+- F-33 (FRTB-SA GIRR `low` scenario) stays open for the owner.
+
 ## 0.6.0: stage F, curve layer, portfolio risk and book (2026-11-10)
 
 Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
