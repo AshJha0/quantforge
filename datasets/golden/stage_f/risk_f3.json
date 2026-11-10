@@ -68,3001 +68,3001 @@
       "id": "S001",
       "tenor_years": 22,
       "fixed_rate": 0.03969457301465843,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S002",
       "tenor_years": 28,
       "fixed_rate": 0.0318125174432163,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S003",
       "tenor_years": 22,
       "fixed_rate": 0.0283570068655175,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S004",
       "tenor_years": 12,
       "fixed_rate": 0.033996868460251885,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S005",
       "tenor_years": 6,
       "fixed_rate": 0.0313045453739668,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S006",
       "tenor_years": 7,
       "fixed_rate": 0.03746601844975656,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S007",
       "tenor_years": 5,
       "fixed_rate": 0.037721737635741076,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S008",
       "tenor_years": 7,
       "fixed_rate": 0.04460886009939159,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S009",
       "tenor_years": 21,
       "fixed_rate": 0.042749413423232845,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S010",
       "tenor_years": 30,
       "fixed_rate": 0.03861193193686759,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S011",
       "tenor_years": 22,
       "fixed_rate": 0.030211753453888292,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S012",
       "tenor_years": 6,
       "fixed_rate": 0.032447078003392374,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S013",
       "tenor_years": 11,
       "fixed_rate": 0.03974083295375272,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S014",
       "tenor_years": 5,
       "fixed_rate": 0.04357039391492732,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S015",
       "tenor_years": 27,
       "fixed_rate": 0.0434729864259091,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S016",
       "tenor_years": 27,
       "fixed_rate": 0.02990489937464263,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S017",
       "tenor_years": 30,
       "fixed_rate": 0.04520493810398249,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S018",
       "tenor_years": 11,
       "fixed_rate": 0.04653990154333137,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S019",
       "tenor_years": 1,
       "fixed_rate": 0.03065338522627754,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S020",
       "tenor_years": 26,
       "fixed_rate": 0.03573058505195284,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S021",
       "tenor_years": 19,
       "fixed_rate": 0.035272157758131244,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S022",
       "tenor_years": 11,
       "fixed_rate": 0.0327570701771745,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S023",
       "tenor_years": 16,
       "fixed_rate": 0.03730591332334873,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S024",
       "tenor_years": 15,
       "fixed_rate": 0.03582534021339867,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S025",
       "tenor_years": 2,
       "fixed_rate": 0.03146068979149985,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S026",
       "tenor_years": 9,
       "fixed_rate": 0.04574580052437798,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S027",
       "tenor_years": 20,
       "fixed_rate": 0.04726497950293142,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S028",
       "tenor_years": 30,
       "fixed_rate": 0.028335037810382175,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S029",
       "tenor_years": 1,
       "fixed_rate": 0.02959297482901349,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S030",
       "tenor_years": 17,
       "fixed_rate": 0.02843773031654025,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S031",
       "tenor_years": 18,
       "fixed_rate": 0.03359133358485887,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S032",
       "tenor_years": 12,
       "fixed_rate": 0.032641775983447564,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S033",
       "tenor_years": 6,
       "fixed_rate": 0.029613592939650196,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S034",
       "tenor_years": 6,
       "fixed_rate": 0.04462992964010668,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S035",
       "tenor_years": 16,
       "fixed_rate": 0.04060224281719294,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S036",
       "tenor_years": 3,
       "fixed_rate": 0.0312545803930444,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S037",
       "tenor_years": 1,
       "fixed_rate": 0.02984254043564346,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S038",
       "tenor_years": 21,
       "fixed_rate": 0.04339372852609075,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S039",
       "tenor_years": 22,
       "fixed_rate": 0.04454356143750871,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S040",
       "tenor_years": 9,
       "fixed_rate": 0.03351760003114237,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S041",
       "tenor_years": 26,
       "fixed_rate": 0.033828951022721286,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S042",
       "tenor_years": 16,
       "fixed_rate": 0.028593640195355135,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S043",
       "tenor_years": 22,
       "fixed_rate": 0.03134750544277997,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S044",
       "tenor_years": 19,
       "fixed_rate": 0.038601030242090564,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S045",
       "tenor_years": 10,
       "fixed_rate": 0.041069075097824766,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S046",
       "tenor_years": 18,
       "fixed_rate": 0.027974043119766263,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S047",
       "tenor_years": 11,
       "fixed_rate": 0.03833631144388355,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S048",
       "tenor_years": 2,
       "fixed_rate": 0.03668904462567672,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S049",
       "tenor_years": 14,
       "fixed_rate": 0.04529942182975245,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S050",
       "tenor_years": 4,
       "fixed_rate": 0.028911646705167257,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S051",
       "tenor_years": 16,
       "fixed_rate": 0.0353688705869345,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S052",
       "tenor_years": 10,
       "fixed_rate": 0.040302077153173216,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S053",
       "tenor_years": 18,
       "fixed_rate": 0.034284262743138866,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S054",
       "tenor_years": 17,
       "fixed_rate": 0.046438135024093406,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S055",
       "tenor_years": 3,
       "fixed_rate": 0.027980866636489413,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S056",
       "tenor_years": 3,
       "fixed_rate": 0.0329614908457344,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S057",
       "tenor_years": 18,
       "fixed_rate": 0.041782082588978676,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S058",
       "tenor_years": 12,
       "fixed_rate": 0.0470005646510718,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S059",
       "tenor_years": 27,
       "fixed_rate": 0.032626045191564854,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S060",
       "tenor_years": 24,
       "fixed_rate": 0.03700507645416621,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S061",
       "tenor_years": 7,
       "fixed_rate": 0.03473153694147339,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S062",
       "tenor_years": 28,
       "fixed_rate": 0.0293346679638872,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S063",
       "tenor_years": 14,
       "fixed_rate": 0.03332719951852161,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S064",
       "tenor_years": 25,
       "fixed_rate": 0.03377516363821901,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S065",
       "tenor_years": 21,
       "fixed_rate": 0.030872083361168284,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S066",
       "tenor_years": 27,
       "fixed_rate": 0.04137021266924345,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S067",
       "tenor_years": 5,
       "fixed_rate": 0.03937684086692348,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S068",
       "tenor_years": 21,
       "fixed_rate": 0.03659947376773062,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S069",
       "tenor_years": 9,
       "fixed_rate": 0.040618354398247736,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S070",
       "tenor_years": 7,
       "fixed_rate": 0.03064322997130079,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S071",
       "tenor_years": 19,
       "fixed_rate": 0.04274583042729004,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S072",
       "tenor_years": 1,
       "fixed_rate": 0.03733379783404004,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S073",
       "tenor_years": 30,
       "fixed_rate": 0.02764588889876736,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S074",
       "tenor_years": 30,
       "fixed_rate": 0.029677627694100206,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S075",
       "tenor_years": 22,
       "fixed_rate": 0.04599315729472969,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S076",
       "tenor_years": 8,
       "fixed_rate": 0.034437268659117636,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S077",
       "tenor_years": 25,
       "fixed_rate": 0.04533477435294311,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S078",
       "tenor_years": 27,
       "fixed_rate": 0.0409046539670472,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S079",
       "tenor_years": 8,
       "fixed_rate": 0.040129288643305415,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S080",
       "tenor_years": 29,
       "fixed_rate": 0.04192524364836483,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S081",
       "tenor_years": 21,
       "fixed_rate": 0.039064630486721603,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S082",
       "tenor_years": 2,
       "fixed_rate": 0.043072579150016124,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S083",
       "tenor_years": 11,
       "fixed_rate": 0.0463417665686126,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S084",
       "tenor_years": 20,
       "fixed_rate": 0.04544469832929508,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S085",
       "tenor_years": 26,
       "fixed_rate": 0.031151380991461423,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S086",
       "tenor_years": 19,
       "fixed_rate": 0.03923479193811833,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S087",
       "tenor_years": 16,
       "fixed_rate": 0.02918772433965787,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S088",
       "tenor_years": 9,
       "fixed_rate": 0.042380511043920245,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S089",
       "tenor_years": 13,
       "fixed_rate": 0.041938509185083496,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S090",
       "tenor_years": 5,
       "fixed_rate": 0.03924163048484901,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S091",
       "tenor_years": 29,
       "fixed_rate": 0.030902953705829312,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S092",
       "tenor_years": 22,
       "fixed_rate": 0.045988609717004816,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S093",
       "tenor_years": 10,
       "fixed_rate": 0.03982460046991177,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S094",
       "tenor_years": 16,
       "fixed_rate": 0.04193987751597953,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S095",
       "tenor_years": 30,
       "fixed_rate": 0.031367726199907124,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S096",
       "tenor_years": 18,
       "fixed_rate": 0.04185125923234011,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S097",
       "tenor_years": 15,
       "fixed_rate": 0.035779084956384294,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S098",
       "tenor_years": 10,
       "fixed_rate": 0.026967965500348377,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S099",
       "tenor_years": 19,
       "fixed_rate": 0.0459246558749983,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S100",
       "tenor_years": 22,
       "fixed_rate": 0.03287262191996304,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S101",
       "tenor_years": 25,
       "fixed_rate": 0.030699244019091024,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S102",
       "tenor_years": 29,
       "fixed_rate": 0.03252315075905416,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S103",
       "tenor_years": 25,
       "fixed_rate": 0.036438430103480406,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S104",
       "tenor_years": 11,
       "fixed_rate": 0.04293671671622467,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S105",
       "tenor_years": 26,
       "fixed_rate": 0.03453857945458563,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S106",
       "tenor_years": 4,
       "fixed_rate": 0.03006621306790277,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S107",
       "tenor_years": 11,
       "fixed_rate": 0.04374801634439753,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S108",
       "tenor_years": 25,
       "fixed_rate": 0.028487076166429755,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S109",
       "tenor_years": 4,
       "fixed_rate": 0.035107898379826356,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S110",
       "tenor_years": 5,
       "fixed_rate": 0.034789092019322114,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S111",
       "tenor_years": 11,
       "fixed_rate": 0.037941430564233394,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S112",
       "tenor_years": 21,
       "fixed_rate": 0.04294005689529538,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S113",
       "tenor_years": 23,
       "fixed_rate": 0.03939746212494542,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S114",
       "tenor_years": 2,
       "fixed_rate": 0.031846607589787655,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S115",
       "tenor_years": 2,
       "fixed_rate": 0.043387556268698876,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S116",
       "tenor_years": 16,
       "fixed_rate": 0.03172116691600615,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S117",
       "tenor_years": 12,
       "fixed_rate": 0.029268436774726788,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S118",
       "tenor_years": 18,
       "fixed_rate": 0.0446160711255508,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S119",
       "tenor_years": 2,
       "fixed_rate": 0.038064582116099824,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S120",
       "tenor_years": 13,
       "fixed_rate": 0.04035892822813638,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S121",
       "tenor_years": 12,
       "fixed_rate": 0.04220219525230406,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S122",
       "tenor_years": 1,
       "fixed_rate": 0.04844910872039259,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S123",
       "tenor_years": 27,
       "fixed_rate": 0.03412614047645766,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S124",
       "tenor_years": 28,
       "fixed_rate": 0.04499805385206131,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S125",
       "tenor_years": 10,
       "fixed_rate": 0.03606491062942469,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S126",
       "tenor_years": 15,
       "fixed_rate": 0.029375617923670834,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S127",
       "tenor_years": 27,
       "fixed_rate": 0.027422484157774873,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S128",
       "tenor_years": 27,
       "fixed_rate": 0.028582825116751732,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S129",
       "tenor_years": 30,
       "fixed_rate": 0.02817067400467697,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S130",
       "tenor_years": 29,
       "fixed_rate": 0.04575442432257548,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S131",
       "tenor_years": 9,
       "fixed_rate": 0.031336184278147446,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S132",
       "tenor_years": 6,
       "fixed_rate": 0.02854959283628299,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S133",
       "tenor_years": 23,
       "fixed_rate": 0.029223252199753996,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S134",
       "tenor_years": 3,
       "fixed_rate": 0.0426204367750678,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S135",
       "tenor_years": 1,
       "fixed_rate": 0.04153251128610718,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S136",
       "tenor_years": 8,
       "fixed_rate": 0.027833201904127136,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S137",
       "tenor_years": 1,
       "fixed_rate": 0.03417387741278536,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S138",
       "tenor_years": 9,
       "fixed_rate": 0.028576664282260127,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S139",
       "tenor_years": 3,
       "fixed_rate": 0.03425710114798164,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S140",
       "tenor_years": 5,
       "fixed_rate": 0.04353033079965766,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S141",
       "tenor_years": 6,
       "fixed_rate": 0.03151823108191101,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S142",
       "tenor_years": 21,
       "fixed_rate": 0.04779230076168932,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S143",
       "tenor_years": 19,
       "fixed_rate": 0.034331309163778495,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S144",
       "tenor_years": 18,
       "fixed_rate": 0.028278094317295322,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S145",
       "tenor_years": 15,
       "fixed_rate": 0.04027228501223833,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S146",
       "tenor_years": 17,
       "fixed_rate": 0.029749207311481125,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S147",
       "tenor_years": 12,
       "fixed_rate": 0.04517272167688953,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S148",
       "tenor_years": 20,
       "fixed_rate": 0.02896480219034445,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S149",
       "tenor_years": 20,
       "fixed_rate": 0.04374881116184638,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S150",
       "tenor_years": 23,
       "fixed_rate": 0.041577585935930673,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S151",
       "tenor_years": 30,
       "fixed_rate": 0.03921443386337604,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S152",
       "tenor_years": 8,
       "fixed_rate": 0.04358475449019561,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S153",
       "tenor_years": 28,
       "fixed_rate": 0.03754650360608938,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S154",
       "tenor_years": 6,
       "fixed_rate": 0.0329750344166645,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S155",
       "tenor_years": 26,
       "fixed_rate": 0.045034931304428885,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S156",
       "tenor_years": 27,
       "fixed_rate": 0.04124581788973915,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S157",
       "tenor_years": 3,
       "fixed_rate": 0.04100256507061347,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S158",
       "tenor_years": 7,
       "fixed_rate": 0.029576081739795097,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S159",
       "tenor_years": 30,
       "fixed_rate": 0.03863923746635883,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S160",
       "tenor_years": 14,
       "fixed_rate": 0.045357042446568754,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S161",
       "tenor_years": 21,
       "fixed_rate": 0.03728785350715842,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S162",
       "tenor_years": 20,
       "fixed_rate": 0.03569539904269031,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S163",
       "tenor_years": 2,
       "fixed_rate": 0.03825799348521947,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S164",
       "tenor_years": 23,
       "fixed_rate": 0.04318994625206953,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S165",
       "tenor_years": 1,
       "fixed_rate": 0.04147067502315818,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S166",
       "tenor_years": 9,
       "fixed_rate": 0.03592769274636309,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S167",
       "tenor_years": 23,
       "fixed_rate": 0.04491955367373203,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S168",
       "tenor_years": 17,
       "fixed_rate": 0.04494460950410536,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S169",
       "tenor_years": 4,
       "fixed_rate": 0.032324041637851415,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S170",
       "tenor_years": 8,
       "fixed_rate": 0.029150066934522337,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S171",
       "tenor_years": 8,
       "fixed_rate": 0.03960163933504627,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S172",
       "tenor_years": 5,
       "fixed_rate": 0.03621136554591113,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S173",
       "tenor_years": 2,
       "fixed_rate": 0.030986403979749704,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S174",
       "tenor_years": 23,
       "fixed_rate": 0.031207317722056156,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S175",
       "tenor_years": 7,
       "fixed_rate": 0.028995193041576935,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S176",
       "tenor_years": 21,
       "fixed_rate": 0.042877715429121464,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S177",
       "tenor_years": 16,
       "fixed_rate": 0.033395557626238644,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S178",
       "tenor_years": 14,
       "fixed_rate": 0.03450823408497031,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S179",
       "tenor_years": 24,
       "fixed_rate": 0.04104932641929591,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S180",
       "tenor_years": 4,
       "fixed_rate": 0.038402523843955004,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S181",
       "tenor_years": 24,
       "fixed_rate": 0.04622832514796779,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S182",
       "tenor_years": 19,
       "fixed_rate": 0.042643264103713704,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S183",
       "tenor_years": 10,
       "fixed_rate": 0.03352436828128244,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S184",
       "tenor_years": 6,
       "fixed_rate": 0.031100517625626073,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S185",
       "tenor_years": 25,
       "fixed_rate": 0.0388397942631222,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S186",
       "tenor_years": 19,
       "fixed_rate": 0.03836964193151814,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S187",
       "tenor_years": 24,
       "fixed_rate": 0.04633936201794206,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S188",
       "tenor_years": 11,
       "fixed_rate": 0.027322247443358056,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S189",
       "tenor_years": 18,
       "fixed_rate": 0.03337290311960342,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S190",
       "tenor_years": 30,
       "fixed_rate": 0.0333550249392371,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S191",
       "tenor_years": 30,
       "fixed_rate": 0.028913722333966295,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S192",
       "tenor_years": 1,
       "fixed_rate": 0.044472730294809165,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S193",
       "tenor_years": 15,
       "fixed_rate": 0.032648319336852076,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S194",
       "tenor_years": 21,
       "fixed_rate": 0.043602622162734826,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S195",
       "tenor_years": 4,
       "fixed_rate": 0.03157573054510664,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S196",
       "tenor_years": 30,
       "fixed_rate": 0.03787931247712849,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S197",
       "tenor_years": 2,
       "fixed_rate": 0.03733925012587521,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S198",
       "tenor_years": 30,
       "fixed_rate": 0.040859437604327926,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S199",
       "tenor_years": 23,
       "fixed_rate": 0.03479070542149674,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S200",
       "tenor_years": 20,
       "fixed_rate": 0.04447633049231163,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S201",
       "tenor_years": 5,
       "fixed_rate": 0.03153389306685271,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S202",
       "tenor_years": 16,
       "fixed_rate": 0.02907845967657586,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S203",
       "tenor_years": 16,
       "fixed_rate": 0.047244475834793256,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S204",
       "tenor_years": 5,
       "fixed_rate": 0.0436358692135189,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S205",
       "tenor_years": 4,
       "fixed_rate": 0.035100196910853323,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S206",
       "tenor_years": 16,
       "fixed_rate": 0.0382861055382802,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S207",
       "tenor_years": 1,
       "fixed_rate": 0.04434753806504674,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S208",
       "tenor_years": 13,
       "fixed_rate": 0.038400541040197675,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S209",
       "tenor_years": 20,
       "fixed_rate": 0.030448956330494468,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S210",
       "tenor_years": 7,
       "fixed_rate": 0.026395273560436694,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S211",
       "tenor_years": 19,
       "fixed_rate": 0.04279786712681609,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S212",
       "tenor_years": 9,
       "fixed_rate": 0.034805035188384,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S213",
       "tenor_years": 3,
       "fixed_rate": 0.029576732385357518,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S214",
       "tenor_years": 8,
       "fixed_rate": 0.0384881694655676,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S215",
       "tenor_years": 26,
       "fixed_rate": 0.04127097029342939,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S216",
       "tenor_years": 19,
       "fixed_rate": 0.03332742574740479,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S217",
       "tenor_years": 8,
       "fixed_rate": 0.030390005676890014,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S218",
       "tenor_years": 3,
       "fixed_rate": 0.044519006614050574,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S219",
       "tenor_years": 11,
       "fixed_rate": 0.03269828598811236,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S220",
       "tenor_years": 21,
       "fixed_rate": 0.04320329295848551,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S221",
       "tenor_years": 17,
       "fixed_rate": 0.028789496626693313,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S222",
       "tenor_years": 11,
       "fixed_rate": 0.03397700243363533,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S223",
       "tenor_years": 28,
       "fixed_rate": 0.03365535834104041,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S224",
       "tenor_years": 3,
       "fixed_rate": 0.040346088102996135,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S225",
       "tenor_years": 29,
       "fixed_rate": 0.044578279957055184,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S226",
       "tenor_years": 3,
       "fixed_rate": 0.026877881088952425,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S227",
       "tenor_years": 19,
       "fixed_rate": 0.029471830682459642,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S228",
       "tenor_years": 30,
       "fixed_rate": 0.04207282469005212,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S229",
       "tenor_years": 6,
       "fixed_rate": 0.034514818937555765,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S230",
       "tenor_years": 3,
       "fixed_rate": 0.038461594809528196,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S231",
       "tenor_years": 27,
       "fixed_rate": 0.040354539371985694,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S232",
       "tenor_years": 14,
       "fixed_rate": 0.0344552268651986,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S233",
       "tenor_years": 3,
       "fixed_rate": 0.03279188372568548,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S234",
       "tenor_years": 5,
       "fixed_rate": 0.041439556996212,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S235",
       "tenor_years": 8,
       "fixed_rate": 0.041991064743836175,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S236",
       "tenor_years": 21,
       "fixed_rate": 0.03292347420697762,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S237",
       "tenor_years": 19,
       "fixed_rate": 0.045099708675110074,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S238",
       "tenor_years": 6,
       "fixed_rate": 0.03866376704169343,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S239",
       "tenor_years": 25,
       "fixed_rate": 0.030339971809662903,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S240",
       "tenor_years": 15,
       "fixed_rate": 0.02809721983420685,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S241",
       "tenor_years": 7,
       "fixed_rate": 0.04373241584484888,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S242",
       "tenor_years": 13,
       "fixed_rate": 0.03706328447939818,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S243",
       "tenor_years": 18,
       "fixed_rate": 0.028775082431508194,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S244",
       "tenor_years": 22,
       "fixed_rate": 0.028523563574324045,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S245",
       "tenor_years": 7,
       "fixed_rate": 0.03169337467196293,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S246",
       "tenor_years": 22,
       "fixed_rate": 0.04741943037075406,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S247",
       "tenor_years": 22,
       "fixed_rate": 0.028207508768899554,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S248",
       "tenor_years": 3,
       "fixed_rate": 0.044056257976944804,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S249",
       "tenor_years": 13,
       "fixed_rate": 0.03333672987406119,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S250",
       "tenor_years": 13,
       "fixed_rate": 0.0373581798578122,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S251",
       "tenor_years": 28,
       "fixed_rate": 0.033306416595734224,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S252",
       "tenor_years": 26,
       "fixed_rate": 0.04033759328406388,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S253",
       "tenor_years": 3,
       "fixed_rate": 0.029068007847259724,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S254",
       "tenor_years": 16,
       "fixed_rate": 0.04301666486264069,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S255",
       "tenor_years": 3,
       "fixed_rate": 0.04491817350899559,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S256",
       "tenor_years": 13,
       "fixed_rate": 0.028788414627814795,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S257",
       "tenor_years": 19,
       "fixed_rate": 0.036811242439490334,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S258",
       "tenor_years": 28,
       "fixed_rate": 0.04150646659178431,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S259",
       "tenor_years": 15,
       "fixed_rate": 0.04373038851997,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S260",
       "tenor_years": 6,
       "fixed_rate": 0.04223611032079716,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S261",
       "tenor_years": 2,
       "fixed_rate": 0.04624603159592696,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S262",
       "tenor_years": 2,
       "fixed_rate": 0.03342446982789443,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S263",
       "tenor_years": 5,
       "fixed_rate": 0.029632706593202947,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S264",
       "tenor_years": 20,
       "fixed_rate": 0.0443725383148869,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S265",
       "tenor_years": 13,
       "fixed_rate": 0.042195084474064476,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S266",
       "tenor_years": 27,
       "fixed_rate": 0.032942904359682654,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S267",
       "tenor_years": 26,
       "fixed_rate": 0.03149996178045118,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S268",
       "tenor_years": 25,
       "fixed_rate": 0.04062060065379882,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S269",
       "tenor_years": 26,
       "fixed_rate": 0.03430664458767463,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S270",
       "tenor_years": 16,
       "fixed_rate": 0.04223382750890328,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S271",
       "tenor_years": 29,
       "fixed_rate": 0.03316386875778637,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S272",
       "tenor_years": 1,
       "fixed_rate": 0.04230600348899563,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S273",
       "tenor_years": 28,
       "fixed_rate": 0.04123519134621539,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S274",
       "tenor_years": 25,
       "fixed_rate": 0.03914489552585102,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S275",
       "tenor_years": 7,
       "fixed_rate": 0.040481713164087614,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S276",
       "tenor_years": 7,
       "fixed_rate": 0.026475840536551578,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S277",
       "tenor_years": 28,
       "fixed_rate": 0.03780392370545339,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S278",
       "tenor_years": 24,
       "fixed_rate": 0.03927833449098739,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S279",
       "tenor_years": 18,
       "fixed_rate": 0.04060895108907481,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S280",
       "tenor_years": 22,
       "fixed_rate": 0.03980013166378533,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S281",
       "tenor_years": 12,
       "fixed_rate": 0.04052000203587846,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S282",
       "tenor_years": 17,
       "fixed_rate": 0.029691401952553077,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S283",
       "tenor_years": 10,
       "fixed_rate": 0.032936031513736315,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S284",
       "tenor_years": 14,
       "fixed_rate": 0.029144723774174444,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S285",
       "tenor_years": 26,
       "fixed_rate": 0.0467372239991924,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S286",
       "tenor_years": 2,
       "fixed_rate": 0.04085617290371137,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S287",
       "tenor_years": 4,
       "fixed_rate": 0.044943911843027505,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S288",
       "tenor_years": 19,
       "fixed_rate": 0.03552525192157693,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S289",
       "tenor_years": 5,
       "fixed_rate": 0.044307371427873166,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S290",
       "tenor_years": 26,
       "fixed_rate": 0.04424112842036947,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S291",
       "tenor_years": 15,
       "fixed_rate": 0.04137918597532261,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S292",
       "tenor_years": 5,
       "fixed_rate": 0.032186335083094965,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S293",
       "tenor_years": 6,
       "fixed_rate": 0.02978298321257536,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S294",
       "tenor_years": 25,
       "fixed_rate": 0.042414223570849625,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S295",
       "tenor_years": 24,
       "fixed_rate": 0.03820452138338088,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S296",
       "tenor_years": 17,
       "fixed_rate": 0.037183893419634316,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S297",
       "tenor_years": 6,
       "fixed_rate": 0.03513268968503123,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S298",
       "tenor_years": 5,
       "fixed_rate": 0.03116818326575892,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S299",
       "tenor_years": 10,
       "fixed_rate": 0.0379833226700425,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S300",
       "tenor_years": 25,
       "fixed_rate": 0.03937544347600607,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S301",
       "tenor_years": 19,
       "fixed_rate": 0.03217785564767542,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S302",
       "tenor_years": 2,
       "fixed_rate": 0.03134580220562641,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S303",
       "tenor_years": 22,
       "fixed_rate": 0.04705917030564366,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S304",
       "tenor_years": 20,
       "fixed_rate": 0.035379946097403914,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S305",
       "tenor_years": 29,
       "fixed_rate": 0.033642309278982485,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S306",
       "tenor_years": 19,
       "fixed_rate": 0.02935590399478396,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S307",
       "tenor_years": 18,
       "fixed_rate": 0.038014328520215544,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S308",
       "tenor_years": 24,
       "fixed_rate": 0.04673779678572696,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S309",
       "tenor_years": 26,
       "fixed_rate": 0.042460941457364,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S310",
       "tenor_years": 19,
       "fixed_rate": 0.03474487760160732,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S311",
       "tenor_years": 12,
       "fixed_rate": 0.04161155473157461,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S312",
       "tenor_years": 22,
       "fixed_rate": 0.038730070336184565,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S313",
       "tenor_years": 13,
       "fixed_rate": 0.033524734145111194,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S314",
       "tenor_years": 12,
       "fixed_rate": 0.04380633491510317,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S315",
       "tenor_years": 17,
       "fixed_rate": 0.036426082456502494,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S316",
       "tenor_years": 4,
       "fixed_rate": 0.0346972124591505,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S317",
       "tenor_years": 1,
       "fixed_rate": 0.04583942200233839,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S318",
       "tenor_years": 2,
       "fixed_rate": 0.04609377138885071,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S319",
       "tenor_years": 30,
       "fixed_rate": 0.03886908344427198,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S320",
       "tenor_years": 28,
       "fixed_rate": 0.03054368846523313,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S321",
       "tenor_years": 22,
       "fixed_rate": 0.03664274127523913,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S322",
       "tenor_years": 22,
       "fixed_rate": 0.04020488334109964,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S323",
       "tenor_years": 4,
       "fixed_rate": 0.03134949816761271,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S324",
       "tenor_years": 30,
       "fixed_rate": 0.03452074203987817,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S325",
       "tenor_years": 20,
       "fixed_rate": 0.0467576204075222,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S326",
       "tenor_years": 22,
       "fixed_rate": 0.029117500281915235,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S327",
       "tenor_years": 8,
       "fixed_rate": 0.04286610368371611,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S328",
       "tenor_years": 23,
       "fixed_rate": 0.03559259421101605,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S329",
       "tenor_years": 10,
       "fixed_rate": 0.04296418290668787,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S330",
       "tenor_years": 13,
       "fixed_rate": 0.036325429206178386,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S331",
       "tenor_years": 19,
       "fixed_rate": 0.02937925264007475,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S332",
       "tenor_years": 29,
       "fixed_rate": 0.03840445619835362,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S333",
       "tenor_years": 25,
       "fixed_rate": 0.03347289833260446,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S334",
       "tenor_years": 11,
       "fixed_rate": 0.038032417224565435,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S335",
       "tenor_years": 16,
       "fixed_rate": 0.0475648468793228,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S336",
       "tenor_years": 14,
       "fixed_rate": 0.03563606661649162,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S337",
       "tenor_years": 23,
       "fixed_rate": 0.03801492123821284,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S338",
       "tenor_years": 24,
       "fixed_rate": 0.04278048309626022,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S339",
       "tenor_years": 20,
       "fixed_rate": 0.043033688721092506,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S340",
       "tenor_years": 2,
       "fixed_rate": 0.0337428343524176,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S341",
       "tenor_years": 11,
       "fixed_rate": 0.03986541413419838,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S342",
       "tenor_years": 8,
       "fixed_rate": 0.035581832534054884,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S343",
       "tenor_years": 26,
       "fixed_rate": 0.04321696176434937,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S344",
       "tenor_years": 26,
       "fixed_rate": 0.046412635060607714,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S345",
       "tenor_years": 21,
       "fixed_rate": 0.030214479133022613,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S346",
       "tenor_years": 30,
       "fixed_rate": 0.04383187755254072,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S347",
       "tenor_years": 13,
       "fixed_rate": 0.04260550430373089,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S348",
       "tenor_years": 30,
       "fixed_rate": 0.0437548511809108,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S349",
       "tenor_years": 16,
       "fixed_rate": 0.042800904502495844,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S350",
       "tenor_years": 14,
       "fixed_rate": 0.047330569608567456,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S351",
       "tenor_years": 18,
       "fixed_rate": 0.04771044862539495,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S352",
       "tenor_years": 13,
       "fixed_rate": 0.037859149760657185,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S353",
       "tenor_years": 2,
       "fixed_rate": 0.035017847455868105,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S354",
       "tenor_years": 25,
       "fixed_rate": 0.0307543819211072,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S355",
       "tenor_years": 2,
       "fixed_rate": 0.032292390292423825,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S356",
       "tenor_years": 20,
       "fixed_rate": 0.034284094805177814,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S357",
       "tenor_years": 18,
       "fixed_rate": 0.028319315448395128,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S358",
       "tenor_years": 18,
       "fixed_rate": 0.02880726753218626,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S359",
       "tenor_years": 18,
       "fixed_rate": 0.038303790970697464,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S360",
       "tenor_years": 30,
       "fixed_rate": 0.04034767470882965,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S361",
       "tenor_years": 23,
       "fixed_rate": 0.043895901438401747,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S362",
       "tenor_years": 6,
       "fixed_rate": 0.030017659466891288,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S363",
       "tenor_years": 24,
       "fixed_rate": 0.031100334208952553,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S364",
       "tenor_years": 10,
       "fixed_rate": 0.04482018547227213,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S365",
       "tenor_years": 4,
       "fixed_rate": 0.03162682301210213,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S366",
       "tenor_years": 14,
       "fixed_rate": 0.03119893748639064,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S367",
       "tenor_years": 10,
       "fixed_rate": 0.039991484836731095,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S368",
       "tenor_years": 14,
       "fixed_rate": 0.03463043639522901,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S369",
       "tenor_years": 11,
       "fixed_rate": 0.039745290231298996,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S370",
       "tenor_years": 5,
       "fixed_rate": 0.04267698999914664,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S371",
       "tenor_years": 2,
       "fixed_rate": 0.04336914093362906,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S372",
       "tenor_years": 28,
       "fixed_rate": 0.03146343854573682,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S373",
       "tenor_years": 11,
       "fixed_rate": 0.03189983030721721,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S374",
       "tenor_years": 3,
       "fixed_rate": 0.045468547512067754,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S375",
       "tenor_years": 19,
       "fixed_rate": 0.04454695129951865,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S376",
       "tenor_years": 5,
       "fixed_rate": 0.03671950951361767,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S377",
       "tenor_years": 28,
       "fixed_rate": 0.028567571663589357,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S378",
       "tenor_years": 15,
       "fixed_rate": 0.031454835853302304,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S379",
       "tenor_years": 27,
       "fixed_rate": 0.043975892006785526,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S380",
       "tenor_years": 23,
       "fixed_rate": 0.030423028163208247,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S381",
       "tenor_years": 21,
       "fixed_rate": 0.034993650304893736,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S382",
       "tenor_years": 1,
       "fixed_rate": 0.030135975788771932,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S383",
       "tenor_years": 22,
       "fixed_rate": 0.033440111101516026,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S384",
       "tenor_years": 25,
       "fixed_rate": 0.04587564081994426,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S385",
       "tenor_years": 20,
       "fixed_rate": 0.03735852544076565,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S386",
       "tenor_years": 28,
       "fixed_rate": 0.03361995533298962,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S387",
       "tenor_years": 23,
       "fixed_rate": 0.04458290611779184,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S388",
       "tenor_years": 5,
       "fixed_rate": 0.035204215973928546,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S389",
       "tenor_years": 3,
       "fixed_rate": 0.04507675626344202,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S390",
       "tenor_years": 1,
       "fixed_rate": 0.03654879101444435,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S391",
       "tenor_years": 3,
       "fixed_rate": 0.03761617353530483,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S392",
       "tenor_years": 23,
       "fixed_rate": 0.04420084600749988,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S393",
       "tenor_years": 13,
       "fixed_rate": 0.030515984416771443,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S394",
       "tenor_years": 6,
       "fixed_rate": 0.04315888316493838,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S395",
       "tenor_years": 9,
       "fixed_rate": 0.03793794478814936,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S396",
       "tenor_years": 6,
       "fixed_rate": 0.034287367001258465,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S397",
       "tenor_years": 29,
       "fixed_rate": 0.03653376549312297,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S398",
       "tenor_years": 9,
       "fixed_rate": 0.030474792438392993,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S399",
       "tenor_years": 24,
       "fixed_rate": 0.04238646970050802,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S400",
       "tenor_years": 30,
       "fixed_rate": 0.04216079102256099,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S401",
       "tenor_years": 6,
       "fixed_rate": 0.040623879538109024,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S402",
       "tenor_years": 27,
       "fixed_rate": 0.0399408826063741,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S403",
       "tenor_years": 11,
       "fixed_rate": 0.03949368507035614,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S404",
       "tenor_years": 21,
       "fixed_rate": 0.04094048229212526,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S405",
       "tenor_years": 18,
       "fixed_rate": 0.036675194465991885,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S406",
       "tenor_years": 8,
       "fixed_rate": 0.03768794525414884,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S407",
       "tenor_years": 4,
       "fixed_rate": 0.03952169254040413,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S408",
       "tenor_years": 7,
       "fixed_rate": 0.03294576870022051,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S409",
       "tenor_years": 4,
       "fixed_rate": 0.027123185442343798,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S410",
       "tenor_years": 27,
       "fixed_rate": 0.029669133686497536,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S411",
       "tenor_years": 11,
       "fixed_rate": 0.04334689911693921,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S412",
       "tenor_years": 11,
       "fixed_rate": 0.03363739401404716,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S413",
       "tenor_years": 7,
       "fixed_rate": 0.03685317249540983,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S414",
       "tenor_years": 26,
       "fixed_rate": 0.04643830560900679,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S415",
       "tenor_years": 6,
       "fixed_rate": 0.039932100024483615,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S416",
       "tenor_years": 27,
       "fixed_rate": 0.03526138121769909,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S417",
       "tenor_years": 12,
       "fixed_rate": 0.03935858865492086,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S418",
       "tenor_years": 16,
       "fixed_rate": 0.03588166766956443,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S419",
       "tenor_years": 5,
       "fixed_rate": 0.034430921930808114,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S420",
       "tenor_years": 9,
       "fixed_rate": 0.043544298639983964,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S421",
       "tenor_years": 20,
       "fixed_rate": 0.04794133691095331,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S422",
       "tenor_years": 19,
       "fixed_rate": 0.032587280795660596,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S423",
       "tenor_years": 17,
       "fixed_rate": 0.035775785092779976,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S424",
       "tenor_years": 7,
       "fixed_rate": 0.03075393604299149,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S425",
       "tenor_years": 21,
       "fixed_rate": 0.0460692416371578,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S426",
       "tenor_years": 23,
       "fixed_rate": 0.0327755534768654,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S427",
       "tenor_years": 10,
       "fixed_rate": 0.02700387458509007,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S428",
       "tenor_years": 6,
       "fixed_rate": 0.036649626149361944,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S429",
       "tenor_years": 28,
       "fixed_rate": 0.04615941995808525,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S430",
       "tenor_years": 12,
       "fixed_rate": 0.04108041545095489,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S431",
       "tenor_years": 4,
       "fixed_rate": 0.030977843167063264,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S432",
       "tenor_years": 3,
       "fixed_rate": 0.029181679775957998,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S433",
       "tenor_years": 10,
       "fixed_rate": 0.04623590684025804,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S434",
       "tenor_years": 17,
       "fixed_rate": 0.03066605274225352,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S435",
       "tenor_years": 3,
       "fixed_rate": 0.04236281082244285,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S436",
       "tenor_years": 5,
       "fixed_rate": 0.03815892018808202,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S437",
       "tenor_years": 3,
       "fixed_rate": 0.03798735640102959,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S438",
       "tenor_years": 12,
       "fixed_rate": 0.04568141773072654,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S439",
       "tenor_years": 28,
       "fixed_rate": 0.04012960913348056,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S440",
       "tenor_years": 15,
       "fixed_rate": 0.038604922846878456,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S441",
       "tenor_years": 6,
       "fixed_rate": 0.043542516844220704,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S442",
       "tenor_years": 13,
       "fixed_rate": 0.03342187741080791,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S443",
       "tenor_years": 29,
       "fixed_rate": 0.037039734015355014,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S444",
       "tenor_years": 4,
       "fixed_rate": 0.04173301639450073,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S445",
       "tenor_years": 21,
       "fixed_rate": 0.046176055564343184,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S446",
       "tenor_years": 12,
       "fixed_rate": 0.030154709174838236,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S447",
       "tenor_years": 4,
       "fixed_rate": 0.0334051535075222,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S448",
       "tenor_years": 11,
       "fixed_rate": 0.04649948042604877,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S449",
       "tenor_years": 7,
       "fixed_rate": 0.03425849481739278,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S450",
       "tenor_years": 5,
       "fixed_rate": 0.03238534230916943,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S451",
       "tenor_years": 12,
       "fixed_rate": 0.028397305102113357,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S452",
       "tenor_years": 22,
       "fixed_rate": 0.043250244005549346,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S453",
       "tenor_years": 21,
       "fixed_rate": 0.0428151392863233,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S454",
       "tenor_years": 17,
       "fixed_rate": 0.045798147489939316,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S455",
       "tenor_years": 23,
       "fixed_rate": 0.04140908469307038,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S456",
       "tenor_years": 18,
       "fixed_rate": 0.032055435985290974,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S457",
       "tenor_years": 24,
       "fixed_rate": 0.036725837771658304,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S458",
       "tenor_years": 10,
       "fixed_rate": 0.04461659495637888,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S459",
       "tenor_years": 25,
       "fixed_rate": 0.04575831952794292,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S460",
       "tenor_years": 8,
       "fixed_rate": 0.032075876465470346,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S461",
       "tenor_years": 7,
       "fixed_rate": 0.03852702010550518,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S462",
       "tenor_years": 7,
       "fixed_rate": 0.03732678802298664,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S463",
       "tenor_years": 21,
       "fixed_rate": 0.030854718334786587,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S464",
       "tenor_years": 6,
       "fixed_rate": 0.035520108329581766,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S465",
       "tenor_years": 18,
       "fixed_rate": 0.035502476690728084,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S466",
       "tenor_years": 7,
       "fixed_rate": 0.029688337896663648,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S467",
       "tenor_years": 14,
       "fixed_rate": 0.04081137184098536,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S468",
       "tenor_years": 7,
       "fixed_rate": 0.03499227591740992,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S469",
       "tenor_years": 12,
       "fixed_rate": 0.031082934952109405,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S470",
       "tenor_years": 20,
       "fixed_rate": 0.029493907415702895,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S471",
       "tenor_years": 4,
       "fixed_rate": 0.03278894342730037,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S472",
       "tenor_years": 18,
       "fixed_rate": 0.03633315732728744,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S473",
       "tenor_years": 23,
       "fixed_rate": 0.034369014879996176,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S474",
       "tenor_years": 11,
       "fixed_rate": 0.032925176002189416,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S475",
       "tenor_years": 2,
       "fixed_rate": 0.042406903702631206,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S476",
       "tenor_years": 26,
       "fixed_rate": 0.04661014911226919,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S477",
       "tenor_years": 9,
       "fixed_rate": 0.03414346442277894,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S478",
       "tenor_years": 26,
       "fixed_rate": 0.041084417633706426,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S479",
       "tenor_years": 5,
       "fixed_rate": 0.039278880778571744,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S480",
       "tenor_years": 6,
       "fixed_rate": 0.029206283119108657,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S481",
       "tenor_years": 8,
       "fixed_rate": 0.03914010235863896,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S482",
       "tenor_years": 30,
       "fixed_rate": 0.03259525078006941,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S483",
       "tenor_years": 20,
       "fixed_rate": 0.028754706682432928,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S484",
       "tenor_years": 29,
       "fixed_rate": 0.0315777236569767,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S485",
       "tenor_years": 23,
       "fixed_rate": 0.027856180640588063,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S486",
       "tenor_years": 30,
       "fixed_rate": 0.02778114129765084,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S487",
       "tenor_years": 7,
       "fixed_rate": 0.03629812042271656,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S488",
       "tenor_years": 20,
       "fixed_rate": 0.031548065106049586,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S489",
       "tenor_years": 14,
       "fixed_rate": 0.035110047596151175,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S490",
       "tenor_years": 20,
       "fixed_rate": 0.040966280502760535,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S491",
       "tenor_years": 5,
       "fixed_rate": 0.025348732446851343,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S492",
       "tenor_years": 2,
       "fixed_rate": 0.03060494965307703,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S493",
       "tenor_years": 25,
       "fixed_rate": 0.028535104173721994,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S494",
       "tenor_years": 19,
       "fixed_rate": 0.0371688604794306,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S495",
       "tenor_years": 16,
       "fixed_rate": 0.03678395085002207,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S496",
       "tenor_years": 16,
       "fixed_rate": 0.04074905097418417,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S497",
       "tenor_years": 27,
       "fixed_rate": 0.03270724833375016,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S498",
       "tenor_years": 8,
       "fixed_rate": 0.040344006283685556,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S499",
       "tenor_years": 18,
       "fixed_rate": 0.03897682474399124,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S500",
       "tenor_years": 10,
       "fixed_rate": 0.032791895531449046,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      }
     ]
    },
@@ -11389,19 +11389,19 @@
       "id": "S001",
       "tenor_years": 27,
       "fixed_rate": 0.041077931489636774,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S002",
       "tenor_years": 19,
       "fixed_rate": 0.047521535572044506,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S003",
       "tenor_years": 22,
       "fixed_rate": 0.028799238421434288,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      }
     ]
    },
@@ -11767,31 +11767,31 @@
       "id": "S001",
       "tenor_years": 5,
       "fixed_rate": 0.027489286200256886,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S002",
       "tenor_years": 25,
       "fixed_rate": 0.03425044553932874,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S003",
       "tenor_years": 13,
       "fixed_rate": 0.03324451724070893,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S004",
       "tenor_years": 25,
       "fixed_rate": 0.03609648044098857,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S005",
       "tenor_years": 20,
       "fixed_rate": 0.0348228063211594,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      }
     ]
    },
@@ -12111,25 +12111,25 @@
       "id": "S001",
       "tenor_years": 7,
       "fixed_rate": 0.0310525943758853,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S002",
       "tenor_years": 6,
       "fixed_rate": 0.035351333142715845,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      },
      {
       "id": "S003",
       "tenor_years": 2,
       "fixed_rate": 0.03471688899283526,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "S004",
       "tenor_years": 1,
       "fixed_rate": 0.03096275034186949,
-      "side": "RECEIVER"
+      "side": "RECEIVE"
      }
     ]
    },
@@ -12374,7 +12374,7 @@
       "id": "PAR5",
       "tenor_years": 5,
       "fixed_rate": 0.0352,
-      "side": "PAYER"
+      "side": "PAY"
      }
     ]
    },
@@ -12792,7 +12792,7 @@
       "id": "PAR5",
       "tenor_years": 0,
       "fixed_rate": 0.0352,
-      "side": "PAYER"
+      "side": "PAY"
      }
     ]
    },
@@ -12873,13 +12873,13 @@
       "id": "PAR5",
       "tenor_years": 5,
       "fixed_rate": 0.0352,
-      "side": "PAYER"
+      "side": "PAY"
      },
      {
       "id": "PAR5",
       "tenor_years": 5,
       "fixed_rate": 0.0352,
-      "side": "PAYER"
+      "side": "PAY"
      }
     ]
    },
@@ -12977,7 +12977,7 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "side not PAYER or RECEIVER"
+   "description": "side not PAY or RECEIVE"
   },
   {
    "case_id": "risk_f3-0010",
@@ -110537,7 +110537,7 @@
       "convention": "SOFR",
       "tenor": "5Y",
       "fixed_rate": 0.036,
-      "side": "PAYER",
+      "side": "PAY",
       "notional": 1000000.0
      }
     },
@@ -110728,7 +110728,11 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "5Y PAYER at 0.036, bump 1 bp"
+   "description": "5Y PAY at 0.036, bump 1 bp",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-08
+   }
   },
   {
    "case_id": "risk_f3-0040",
@@ -110794,7 +110798,7 @@
       "convention": "SOFR",
       "tenor": "10Y",
       "fixed_rate": 0.035,
-      "side": "RECEIVER",
+      "side": "RECEIVE",
       "notional": 1000000.0
      }
     },
@@ -110985,7 +110989,11 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "10Y RECEIVER at 0.035, bump 1 bp"
+   "description": "10Y RECEIVE at 0.035, bump 1 bp",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-08
+   }
   },
   {
    "case_id": "risk_f3-0041",
@@ -111051,7 +111059,7 @@
       "convention": "SOFR",
       "tenor": "30Y",
       "fixed_rate": 0.038,
-      "side": "PAYER",
+      "side": "PAY",
       "notional": 1000000.0
      }
     },
@@ -111242,7 +111250,11 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "30Y PAYER at 0.038, bump 1 bp"
+   "description": "30Y PAY at 0.038, bump 1 bp",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-08
+   }
   },
   {
    "case_id": "risk_f3-0042",
@@ -111308,7 +111320,7 @@
       "convention": "SOFR",
       "tenor": "2Y",
       "fixed_rate": 0.0365,
-      "side": "PAYER",
+      "side": "PAY",
       "notional": 1000000.0
      }
     },
@@ -111499,7 +111511,11 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "2Y PAYER at 0.0365, bump 5 bp"
+   "description": "2Y PAY at 0.0365, bump 5 bp",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-08
+   }
   },
   {
    "case_id": "risk_f3-0043",
@@ -111565,7 +111581,7 @@
       "convention": "SOFR",
       "tenor": "7Y",
       "fixed_rate": 0.0,
-      "side": "RECEIVER",
+      "side": "RECEIVE",
       "notional": 1000000.0
      }
     },
@@ -111756,7 +111772,11 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "7Y RECEIVER at 0.0, bump 1 bp"
+   "description": "7Y RECEIVE at 0.0, bump 1 bp",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-08
+   }
   },
   {
    "case_id": "risk_f3-0044",
@@ -111822,7 +111842,7 @@
       "convention": "SOFR",
       "tenor": "20Y",
       "fixed_rate": 0.05,
-      "side": "PAYER",
+      "side": "PAY",
       "notional": 1000000.0
      }
     },
@@ -112013,7 +112033,11 @@
     "stage-f",
     "synthetic"
    ],
-   "description": "20Y PAYER at 0.05, bump 10 bp"
+   "description": "20Y PAY at 0.05, bump 10 bp",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-08
+   }
   },
   {
    "case_id": "risk_f3-0045",
@@ -112079,7 +112103,7 @@
       "convention": "SOFR",
       "tenor": "20Y",
       "fixed_rate": 0.05,
-      "side": "PAYER",
+      "side": "PAY",
       "notional": 1000000.0
      }
     },

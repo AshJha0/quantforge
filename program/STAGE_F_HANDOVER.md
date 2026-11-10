@@ -168,3 +168,25 @@ State: `stage-f` holds 8d55279 (Q4 four-curve golden, F-28), 9f5a7a5 (waves 2 an
 3. **Known issues to carry into the release notes:** R7 has no outside case (Pedersen 2003); the FRTB `low` scenario formula needs checking against the BIS PDF (F-33); the equity FRTB parameters were read only in summary.
 4. **Wave 2b list** (above): specify it when the lanes are through waves 2 and 3, or move it to stage G with a ruling.
 5. Then the R5 audit (Sonnet, read-only) over waves 1 to 3, the docs review, and the part 2 PR and v0.6.0 as in `STAGE_F_RESUME.md`.
+
+## Outside share and lane rulings (2026-11-10, spec session)
+
+**Rulings F-35 to F-38** (`stage-f-rulings.md`, "Lane questions"): read them before your next slice.
+- **F-35 (C++ was right):** the tension spline small-`z` branch is now `alpha = h/6 (1 - 7 z^2/60)`, and `R(u)` gains its `z^2` term. No golden changes; fix the branch anyway.
+- **F-36:** `risk_f3` now spells `side` as `PAY` / `RECEIVE` (it had `PAYER` / `RECEIVER`). Cross gamma cases carry a 1e-9 absolute limit. **`risk_f3` regenerated:** values are unchanged, so re-run it.
+- **F-37 (Java F-J7):** the local vol continuity property bound is now `1e-9 (T_j |w_T(T_j-)| + w(T_j))`.
+- **F-38 (Python F-Q3):** the F-1 tokens become numbers only in Real fields and at the top level of an any-JSON field; ids and names keep the string. Python changes to match.
+- The xccy `dR/dq` and F-26 questions from all lanes were already settled in the Q4 note above.
+
+**Outside oracle: 212 of 403 = 52.6%** (was 45.2%). Added: monotone-convex `rates.curve.inspect` (17, QuantLib forwards integrated by SciPy `quad`); GARCH loglik and estimates, and FHS (13, `arch` 7.2.0 under WSL; the Windows host blocks pandas). Every remaining case is listed with its reason in `oracle/OUTSIDE_GAPS_F.md`. The 60% floor is not reachable with free sources while the 72 error cases stay in the denominator; without them it is 64.0%. That denominator change is the owner's decision, not a spec ruling.
+
+**Open:** two GARCH fits (`garch_f-0009`, `0012`) miss only on standard errors (1.6e-5 against 1e-5) from the verifier's own Hessian. A fix is in `outside_garch_arch.py` but not yet run, because WSL stopped starting at about 23:00 (`CreateVm` timeout). Rerun it when WSL is back (command in the file's docstring), then `outside_f.py`. The two candidates in the gaps file (cross gamma through QuantLib swaps; three curve inspect cases) would add 9 more.
+
+## Golden fixes from lane questions (2026-11-10, spec session): who must re-merge `stage-f`
+
+| Suite | Change | Ruling | Re-merge and re-run |
+|---|---|---|---|
+| `risk_f3` | OIS `side` is `PAY` / `RECEIVE` (was `PAYER` / `RECEIVER`) in the book and cross gamma cases; cross gamma cases carry a 1e-9 absolute limit | F-36 | **all four** (C++, Java, Python, Rust); Rust can drop its dual spelling |
+| `risk_f4` | `risk.var.monte_carlo` `seed` is a u64 string (`"7"`, was `7`); the non-positive-definite case expects `E_NOT_POSITIVE_DEFINITE` (was `E_DOMAIN`) | F-39 | **all four** |
+
+No case ids moved. Spec texts updated for F-39 (the C++ lane's F4 and F5 choices are accepted and written in), and for F-35 to F-38 above.

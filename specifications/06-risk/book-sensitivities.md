@@ -11,11 +11,11 @@ Risk before stage F was bump and revalue only (ADR-0010). AAD is added here as a
 ### Inputs
 
 - `as_of`, `convention` (`SOFR`, `SONIA`, `ESTR`), `quotes` (`[{tenor, rate}]`), `interpolation` (`LOG_LINEAR_DF` in the goldens; any value `rates.ois.bootstrap` takes): the curve is `rates.ois.bootstrap` of these quotes (`02-curves/ois-curves.md`).
-- `swaps`: at least one, else `E_INPUT`; ids unique, else `E_INPUT`. Each has `id`, `tenor_years` (integer, `>= 1`, else `E_DOMAIN`), `fixed_rate` (decimal), `side` (`PAYER` or `RECEIVER`, else `E_SCHEMA`). A swap is an OIS on the curve's convention from spot, with the periods of an OIS of tenor `"<n>Y"` on that convention (`ois-curves.md`), notional 1.
+- `swaps`: at least one, else `E_INPUT`; ids unique, else `E_INPUT`. Each has `id`, `tenor_years` (integer, `>= 1`, else `E_DOMAIN`), `fixed_rate` (decimal), `side` (`PAY` or `RECEIVE`, as `ois-curves.md`, else `E_SCHEMA`; ruling F-36). A swap is an OIS on the curve's convention from spot, with the periods of an OIS of tenor `"<n>Y"` on that convention (`ois-curves.md`), notional 1.
 
 ### Values
 
-- `pv` of a swap: `s (L_float - K A)`, with `A` and `L_float` the legs of `ois-curves.md`, `K` the fixed rate, `s = +1` for `PAYER`, `-1` for `RECEIVER`. Per unit notional.
+- `pv` of a swap: `s (L_float - K A)`, with `A` and `L_float` the legs of `ois-curves.md`, `K` the fixed rate, `s = +1` for `PAY` (pay fixed), `-1` for `RECEIVE`. Per unit notional.
 - `quote_sensitivity.matrix[i][j] = d pv_i / d q_j`, per unit quote (a quote in decimal; multiply by 1e-4 for money per bp). The curve is rebuilt in the derivative: this is par-quote risk (`par-and-key-rate.md`), not zero-rate risk.
 - `zero_jacobian.matrix[i][j] = d z_i / d q_j`, with `z_i = -ln D(p_i) / t_i` the continuous ACT/365 zero rate at pillar `i` (`t_i = (p_i - as_of)/365` days).
 - `book_pv` and `book_sensitivity` (column sums).
@@ -31,7 +31,7 @@ By the IFT, with unknowns `x_i = ln D(p_i)` and residuals `R_j(x, q) = par_j(x) 
 
 The oracle solves the bootstrap at 40 digits (mpmath) and forms `dR/dx` and `d pv/dx` by central differences with `h = 1e-18` at 40 digits (error below 1e-21), so the goldens are the exact IFT values rounded once. No bump-and-rebuild enters a golden.
 
-The 500-swap book of the T row is drawn from `core.rng` (`01-core/rng.md`), seed 20261109, stream 0, three uniforms per swap in order: `tenor_years = 1 + floor(30 u1)`, `spread = -0.01 + 0.02 u2` added to the swap's own par rate on the curve, `PAYER` if `u3 < 0.5`. The book is written into the case input, so a build does not need to regenerate it.
+The 500-swap book of the T row is drawn from `core.rng` (`01-core/rng.md`), seed 20261109, stream 0, three uniforms per swap in order: `tenor_years = 1 + floor(30 u1)`, `spread = -0.01 + 0.02 u2` added to the swap's own par rate on the curve, `PAY` if `u3 < 0.5`. The book is written into the case input, so a build does not need to regenerate it.
 
 Classes (policy): `aad_sensitivity` (`1e-10` absolute, `1e-8` relative) for PVs and sensitivities; `ift_jacobian` (`1e-11`, `1e-9`) for the zero Jacobian. Both bounds are the T row's, fixed before the stage.
 
@@ -54,7 +54,7 @@ Gamma_ii = (V(+h e_i) - 2 V(0) + V(-h e_i)) / bump_bp^2
 Gamma_ij = (V(+h e_i + h e_j) - V(+h e_i - h e_j) - V(-h e_i + h e_j) + V(-h e_i - h e_j)) / (4 bump_bp^2)     (i != j)
 ```
 
-Outputs: `value` (`V(0)`), `cross_gamma` (`N x N`, symmetric, money per bp squared). Class `interpolation`.
+Outputs: `value` (`V(0)`), `cross_gamma` (`N x N`, symmetric, money per bp squared). Class `interpolation`, with a case limit of 1e-9 absolute (ruling F-36): the four-point formula at 1 bp on a 1e6 notional loses about 1.5e-10 to binary64 cancellation, which a direct evaluation cannot avoid. A build may evaluate it in closed form per exponential term instead (Rust does on log-linear curves).
 
 ## `risk.credit.jtd`
 
