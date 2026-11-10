@@ -3,76 +3,7 @@
  "library": "QuantLib",
  "version": "1.44",
  "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit",
- "partly_outside_not_counted": [
-  {
-   "case_id": "curve_f-0002",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0006",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0010",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0020",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0024",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0028",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0032",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0036",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0040",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0044",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0048",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0052",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0056",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0060",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0064",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0070",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  },
-  {
-   "case_id": "curve_f-0077",
-   "why": "forwards checked against ConvexMonotoneInterpolation; its integral is not in the wheel"
-  }
- ],
+ "partly_outside_not_counted": [],
  "cases": [
   {
    "case_id": "curve_f-0001",
@@ -83,6 +14,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0002",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -121,6 +63,17 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0006",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0007",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -151,6 +104,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0010",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -201,6 +165,17 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0020",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0021",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -231,6 +206,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0024",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -269,6 +255,17 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0028",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0029",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -299,6 +296,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0032",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -337,6 +345,17 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0036",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0037",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -367,6 +386,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0040",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -405,6 +435,17 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0044",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0045",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -435,6 +476,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0048",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -473,6 +525,17 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0052",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0053",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -503,6 +566,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0056",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -541,6 +615,17 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0060",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0061",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -571,6 +656,17 @@
     "CRV.MONOTONE_CONVEX",
     "IDX",
     "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0064",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -607,12 +703,104 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0070",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0071",
    "operation": "rates.curve.inspect",
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
     "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "curve_f-0077",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONE_CONVEX",
+    "SCIPY.QUAD"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0001",
+   "operation": "vol.garch.loglik",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0002",
+   "operation": "vol.garch.loglik",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0003",
+   "operation": "vol.garch.loglik",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0004",
+   "operation": "vol.garch.loglik",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0005",
+   "operation": "vol.garch.loglik",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0010",
+   "operation": "vol.garch.estimate",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0011",
+   "operation": "vol.garch.estimate",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1016,6 +1204,66 @@
    "version": "1.44",
    "convention_rows": [
     "NUMPY.QUANTILE"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0019",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0020",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0021",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0022",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0023",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0024",
+   "operation": "risk.var.filtered_historical",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },

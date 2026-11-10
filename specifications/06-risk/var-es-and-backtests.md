@@ -21,7 +21,7 @@ Inputs: `pnl` (at least one, else `E_INPUT`), `confidence`. Outputs: `var`, `es`
 
 ## `risk.var.filtered_historical`
 
-Inputs: `returns` `r_1..r_T` (at least one), `position_value` `P` (signed), `lambda` (`0 < lambda < 1`, else `E_DOMAIN`), `confidence`.
+Inputs: `returns` `r_1..r_T` (at least one), `position_value` `P` (signed), `lambda` (`0 < lambda < 1`, else `E_DOMAIN`), `confidence`. All returns 0 (so every `sigma_t` is 0): `E_DOMAIN` (ruling F-39).
 
 EWMA variance [S2, S3]: `sigma_1^2 = (1/T) sum r_t^2`; `sigma_{t+1}^2 = lambda sigma_t^2 + (1 - lambda) r_t^2` for `t = 1..T`. Rescaled scenario `t`: `pnl_t = P r_t sigma_{T+1} / sigma_t`. Then the order statistic rule. Outputs: `var`, `es`, `tail_count`, `sigma_next` (`sigma_{T+1}`). Class `interpolation`.
 
@@ -31,7 +31,7 @@ Inputs: `mean` `mu` and `std` `sigma > 0` (else `E_DOMAIN`) of the P&L, `confide
 
 ## `risk.var.monte_carlo`
 
-Inputs: `mean` (`N`), `covariance` (`N x N`, symmetric positive definite, else `E_DOMAIN`), `weights` (`N` position values), `paths` (`>= 1`), `seed`, `confidence`.
+Inputs: `mean` (`N`), `covariance` (`N x N`, symmetric; a non-positive Cholesky pivot is `E_NOT_POSITIVE_DEFINITE`, as `01-core/differentiation-and-linalg.md`), `weights` (`N` position values), `paths` (`>= 1`), `seed` (a decimal u64 string, as `core.rng`, else `E_SCHEMA`), `confidence`. Ruling F-39.
 
 Draws: `core.rng` (`01-core/rng.md`) with `seed`, stream 0; normals by AS 241, path by path and within a path asset by asset. Returns `r = mean + L z`, `L` the lower Cholesky factor (Cholesky-Banachiewicz order). `pnl = weights . r`, then the order statistic rule. Outputs: `var`, `es`, `tail_count`. Class `common_rng`.
 
@@ -59,7 +59,7 @@ p-values: chi-square with 1, 1 and 2 degrees of freedom. Ruling F-32 applies to 
 
 ## `risk.backtest.traffic_light`
 
-Inputs: `observations`, `exceptions` (`>= 0`), `confidence`. `cumulative_probability = P(X <= x)`, `X ~ Binomial(n, 1 - c)`. Zone: `GREEN` below 0.95, `YELLOW` below 0.9999, else `RED` [S8]. At `n = 250` and `c = 0.99` this gives green for 0 to 4 exceptions, yellow for 5 to 9, red from 10, as Table 2 of [S8]; `plus_factor` is that table's value (0 for 0 to 4; 0.40, 0.50, 0.65, 0.75, 0.85 for 5 to 9; 1.00 from 10). For any other `n` or `c`, `plus_factor` is `null`.
+Inputs: `observations` (`>= 1`), `exceptions` (`0 <= x <= n`, else `E_DOMAIN`), `confidence`. `cumulative_probability = P(X <= x)`, `X ~ Binomial(n, 1 - c)`. Zone: `GREEN` below 0.95, `YELLOW` below 0.9999, else `RED` [S8]. At `n = 250` and `c = 0.99` this gives green for 0 to 4 exceptions, yellow for 5 to 9, red from 10, as Table 2 of [S8]; `plus_factor` is that table's value (0 for 0 to 4; 0.40, 0.50, 0.65, 0.75, 0.85 for 5 to 9; 1.00 from 10). For any other `n` or `c`, `plus_factor` is `null`.
 
 ## Convergence and limit cases
 

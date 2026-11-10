@@ -8,7 +8,7 @@ Spec version 1.0.0. Status: Specified (stage F, slice F5). Ruling: `stage-f-ruli
 
 ### Inputs
 
-- `positions`: the opening book, `[{instrument, quantity, average_cost}]` (quantity signed: negative is short).
+- `positions`: the opening book, `[{instrument, quantity, average_cost}]` (quantity signed: negative is short). An instrument twice is `E_INPUT`; a zero quantity is ignored (ruling F-39).
 - `events`: in non-decreasing `date` order, else `E_INPUT`. Each has `date` and `type`; another type is `E_SCHEMA`:
 
 | `type` | Keys | Effect |
@@ -43,7 +43,7 @@ Goldens replay in exact rational arithmetic; class `simple_analytic` (`fixings` 
 ### Inputs
 
 - `as_of`, `instruments`, `sources` (in priority order, names unique, else `E_INPUT`; each `{name, quotes: [{instrument, date, price}]}`), `max_age_days` (`>= 0`, else `E_DOMAIN`).
-- `ipv` (`[{instrument, price}]`, independent prices, each `> 0`, else `E_DOMAIN`) and `ipv_threshold` (relative).
+- `ipv` (optional, `[{instrument, price}]`, independent prices, each `> 0`, else `E_DOMAIN`) and `ipv_threshold` (relative). A quote dated after `as_of` is never a mark (ruling F-39).
 
 ### Rule (data fallback)
 
