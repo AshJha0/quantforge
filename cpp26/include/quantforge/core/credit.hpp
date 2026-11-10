@@ -12,7 +12,8 @@ struct HazardCurve {
     std::vector<double> survival;
     /// E_INPUT on dates, E_DOMAIN on survival <= 0.
     void check() const;
-    /// -ln Q linear in time between nodes, flat hazard after the last.
+    /// -ln Q linear in time between nodes, flat hazard after the last. Call check() first.
+    /// unchecked: caller guarantees finite inputs
     double q(Date d) const;
 };
 

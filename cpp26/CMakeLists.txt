@@ -52,11 +52,13 @@ add_library(quantforge_core
   src/core/money.cpp
   src/core/pde.cpp
   src/core/rates.cpp
-  src/core/rates_d.cpp
+  src/core/multicurve.cpp
   src/core/bonds.cpp
-  src/core/misc_d.cpp
+  src/core/rates_vol.cpp
+  src/core/commodity.cpp
+  src/core/mbs.cpp
   src/core/inflation.cpp
-  src/core/equity_d.cpp
+  src/core/equity_carry.cpp
   src/core/credit.cpp
   src/core/risk.cpp
   src/core/rng.cpp
@@ -73,7 +75,7 @@ add_library(quantforge_core
   src/core/heston.cpp
   src/core/correlation.cpp
   src/core/exotics.cpp
-  src/core/credit_e.cpp)
+  src/core/credit_options.cpp)
 target_include_directories(quantforge_core PUBLIC include)
 target_compile_features(quantforge_core PUBLIC cxx_std_26)
 # sobol.cpp pulls the direction numbers in with #embed, so no command reads a file at run time.
@@ -102,11 +104,31 @@ if(BUILD_TESTING)
     GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024) # v3.16.1
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_stage_b.cpp tests/test_stage_c.cpp tests/test_stage_d.cpp tests/test_bonds.cpp tests/test_stage_d2.cpp tests/test_stage_d3.cpp tests/test_cli_golden.cpp tests/test_r2.cpp tests/test_mutants_d.cpp tests/test_mutants_e.cpp tests/test_coverage.cpp tests/test_stage_e.cpp tests/test_limits_e.cpp)
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   qf_strict(quantforge_core_tests)
   if(MINGW)
     target_link_options(quantforge_core_tests PRIVATE -static)
   endif()
   add_test(NAME quantforge_core_tests COMMAND quantforge_core_tests)
+endif()
+
+# G2 microbenchmarks (Google Benchmark). Off by default; -DQF_BENCH=ON builds qf_micro.
+option(QF_BENCH "Build the qf_micro Google Benchmark target" OFF)
+if(QF_BENCH)
+  include(FetchContent)
+  set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
+  set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(googlebenchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG v1.9.4)
+  FetchContent_MakeAvailable(googlebenchmark)
+  add_executable(qf_micro bench/micro.cpp)
+  target_link_libraries(qf_micro PRIVATE quantforge_core benchmark::benchmark)
+  target_compile_definitions(qf_micro PRIVATE QF_REPO_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/..")
+  if(MINGW)
+    target_link_options(qf_micro PRIVATE -static)
+  endif()
 endif()

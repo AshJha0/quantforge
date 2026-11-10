@@ -7,6 +7,7 @@ from datetime import date
 
 from . import daycount, roots
 from .errors import QfError
+from .finite import guard
 
 INTERPOLATIONS = ("LOG_LINEAR_DF", "LINEAR_ZERO")
 MAX_REPRICING_ERROR = 1e-13
@@ -211,3 +212,6 @@ def repricing_error(curve: Curve, models: Sequence[Model], targets: Sequence[flo
 def check_solved(error: float) -> None:
     if not error < MAX_REPRICING_ERROR:
         raise QfError("E_NO_CONVERGENCE", f"repricing error {error} is above the limit")
+
+
+guard(globals())

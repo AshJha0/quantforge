@@ -13,6 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("forward_log", ROOT / "tools/forward-log/forward_log.py")
 fl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(fl)
+aspec = importlib.util.spec_from_file_location("anchor", ROOT / "tools/forward-log/anchor.py")
+anchor = importlib.util.module_from_spec(aspec)
+aspec.loader.exec_module(anchor)
 RECORD = ROOT / "tools/recorder/record.py"
 
 
@@ -570,6 +573,94 @@ class QualityGate(unittest.TestCase):
         _, fails = self.qg.gate({"coverage_min": 0.85, "modules": [{"module": "x", "cpp": "cpp26/src/core/x.cpp"}]}, "cpp", [])
         self.assertEqual(fails, ["x"])
 
+    def test_language_floor(self):
+        rows = [("quantforge_core/a.py", 80, 100), ("tests/test_a.py", 0, 50)]
+        self.assertTrue(self.qg.floor_gate("python", rows, 0.80)[1])  # tests are not library lines
+        self.assertFalse(self.qg.floor_gate("python", rows, 0.81)[1])
+        self.assertFalse(self.qg.floor_gate("rust", rows, 0.5)[1])  # no rust library lines at all
+        floors = json.loads((ROOT / "conformance/quality/floors.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(k for k in floors if not k.startswith("_")), ["cpp", "java", "python", "rust"])
+
+
+class Governance(unittest.TestCase):
+    """Plan 12.2 A2 (model register) and Q5b (convergence rule)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.qg = load("quality_gate", "tools/quality_gate.py")
+        cls.gov = cls.qg.gov
+
+    def test_a2_fields(self):
+        full = "\n".join(f"- **{f}:** x" for f in self.gov.A2_FIELDS)
+        inv = (f"## Index\n| M1 | m | `02-curves/a.md` |\n## Entries\n### M1 Curve\n{full}\n"
+               "### M2 Other\n- **Tier:** 2\n- **Challenger:** TODO\n")
+        gaps = self.gov.register_gaps(inv, ["02-curves/a.md", "02-curves/b.md"])
+        self.assertEqual(len(gaps), 2)
+        self.assertTrue(gaps[0].startswith("entry M2: missing Challenger, Monitoring thresholds"))  # TODO is not filled
+        self.assertEqual(gaps[1], "spec 02-curves/b.md: no inventory entry")
+        self.assertTrue(self.gov.has_field("| Data lineage hash | sha256:ab |", "Data lineage hash"))
+
+    def test_convergence_section(self):
+        g = self.gov.convergence_gap
+        self.assertIsNone(g("# Day count\nNo numerics here."))
+        self.assertIn("without", g("# Pricer\nSolved by Newton iteration."))
+        empty = ("# P\nMonte Carlo.\n## Convergence and limit cases\n| Method | Asserted order |\n|---|---|\n"
+                 "| <name> | <p> |\n## Next\n")
+        self.assertIn("no filled", g(empty))
+        ok = empty.replace("| <name> | <p> |", "| MC | 0.5 |")
+        self.assertIsNone(g(ok))
+
+    def test_ratchet_and_shipped_tree(self):
+        self.assertEqual(self.gov.ratchet(["a", "b"], ["b", "c"]), (["a"], ["b"], ["c"]))
+        base = ROOT / "conformance/quality/governance_baseline.json"
+        self.assertEqual(self.qg.check_governance(True, True, base), 0)
+        now = {"register": ["entry X9: missing Tier"], "specs": []}
+        self.assertEqual(self.qg.check_governance(True, True, base, now), 1)  # a new gap fails
+
+
+class ForwardLogAnchor(unittest.TestCase):
+    def _log(self, d, n=5):
+        p = Path(d) / "log.jsonl"
+        for i in range(n):
+            fl.append(p, "a", f"2026-01-0{i + 1}T00:00:00Z", float(i))
+        return p
+
+    def test_honest_log_and_growth_pass(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._log(d, 3)
+            anchor.make(p, Path(d) / "an", "t1")
+            fl.append(p, "a", "2026-02-01T00:00:00Z", 9.0)
+            self.assertEqual(anchor.check_anchors(p, Path(d) / "an"), 1)
+
+    def test_full_rewrite_with_recomputed_hashes_is_caught(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._log(d, 5)
+            anchor.make(p, Path(d) / "an", "t1")
+            rows = fl.read(p)
+            rows[1]["record"]["value"]["payload"] = 99.0  # rewrite an old line
+            head = fl.ZERO
+            for r in rows:  # recompute every hash so the chain alone is consistent
+                head = fl.link(head, r["record"])
+                r["hash"] = head
+            p.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows), encoding="utf-8")
+            self.assertEqual(fl.verify(p)[0], 5)  # the chain by itself cannot see it
+            with self.assertRaises(ValueError):
+                anchor.check_anchors(p, Path(d) / "an")
+
+    def test_truncation_is_caught(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = self._log(d, 4)
+            anchor.make(p, Path(d) / "an", "t1")
+            lines = p.read_text(encoding="utf-8").splitlines()
+            p.write_text("\n".join(lines[:2]) + "\n",encoding="utf-8")
+            with self.assertRaises(ValueError):
+                anchor.check_anchors(p, Path(d) / "an")
+
+    def test_empty_log_not_anchored(self):
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(ValueError):
+                anchor.make(Path(d) / "none.jsonl", Path(d) / "an")
+
 
 class ResearchDsrGate(unittest.TestCase):
     @classmethod
@@ -609,7 +700,7 @@ class SiteHome(unittest.TestCase):
     def test_home_figures_come_from_one_place(self):
         sf = load("site_figures", "tools/site_figures.py")
         template = (ROOT / "tools/site_home.html").read_text(encoding="utf-8")
-        figures = sf.home_figures()
+        figures = {**sf.home_figures(), "nav": "<nav></nav>"}
         self.assertNotIn("{{", sf.render_home(template, figures))
         version = figures["version"]
         import re
@@ -621,6 +712,32 @@ class SiteHome(unittest.TestCase):
             self.assertNotIn(literal, template)  # no release figure hard-coded in the template
         with self.assertRaisesRegex(ValueError, "nope"):
             sf.render_home("{{nope}}", figures)
+
+    def test_stage_table_follows_roadmap(self):
+        """Plan 13.2 E7: the home stage table is generated from ROADMAP, and site_facts must agree with it."""
+        sf = load("site_figures", "tools/site_figures.py")
+        rows = sf.roadmap_stages()
+        self.assertEqual([r[0] for r in rows][:5], ["A", "B", "C", "D", "E"])
+        self.assertIn("<td>E</td>", sf.home_figures()["stage_rows"])
+        self.assertEqual(sf.check_status(sf.home_figures(), rows), [])
+        self.assertTrue(sf.check_status({"implemented_stages": "A to D"}, rows))  # drift fails the build
+        self.assertNotIn("<tr><td>", (ROOT / "tools/site_home.html").read_text(encoding="utf-8"))
+
+    def test_site_search_and_accessibility_markup(self):
+        """Plan 13.2 E6 and E7: aria-current on the nav, and a search for SOFR finds the curve pages first."""
+        try:
+            bs = load("build_site", "tools/build_site.py")
+        except ImportError:
+            self.skipTest("markdown not installed; docs.yml runs this with it")
+        self.assertIn('href="../LEARN.html" aria-current="page"', bs.nav("LEARN.html", "../"))
+        self.assertEqual(bs.nav("x.html", "").count("aria-current"), 0)
+        index = [bs.search_entry("docs/curves/sofr-ois.html", "SOFR OIS curve", "Bootstrap from SOFR quotes."),
+                 bs.search_entry("LEARN.html", "Learn", "Mentions sofr once in passing."),
+                 bs.search_entry("GLOSSARY.html", "Glossary", "No match here.")]
+        self.assertEqual(bs.search(index, "SOFR"), ["docs/curves/sofr-ois.html", "LEARN.html"])
+        for needle in ('class="skip"', '<main id="main"', "search.js"):
+            self.assertIn(needle, bs.PAGE)
+        self.assertIn(":focus-visible", bs.CSS)
 
 
 class DoctorAndQuickstart(unittest.TestCase):
@@ -666,6 +783,56 @@ class DoctorAndQuickstart(unittest.TestCase):
         changed[0]["outputs"]["year_fraction"] = 0.5
         self.assertEqual(len(self.qs.compare(expected, "\n".join(json.dumps(e) for e in changed))), 1)
         self.assertTrue(self.qs.compare(expected, ""))
+
+
+    def test_tutorial_has_a_block_per_language_and_one_expected_output(self):
+        sys.path.insert(0, str(ROOT / "tools"))
+        import check_tutorial
+        runs, expected = check_tutorial.blocks(check_tutorial.PAGE.read_text(encoding="utf-8"))
+        self.assertEqual(set(runs), {"python", "rust", "java", "cpp"})
+        self.assertEqual(runs["python"][0], "python")
+        self.assertEqual(len(expected), 4)
+        with self.assertRaises(ValueError):
+            check_tutorial.blocks("no markers")
+
+
+class StageFInfra(unittest.TestCase):
+    """Plan 13.2 E11 hygiene gate and 12.2 G6 / 13.2 E10 incremental mutation planner."""
+
+    def test_hygiene(self):
+        h = load("check_hygiene", "tools/check_hygiene.py")
+        big = h.LIMIT + 1
+        sizes = {"a.json": big, "b.json": big, "c.txt": 5}
+        bad = h.large_files(list(sizes), sizes, {"a.json": True, "c.txt": True, "gone.json": True})
+        self.assertEqual(len(bad), 3)  # b.json unlisted; c.txt under the limit; gone.json untracked
+        files = ["python/quantforge_x/.gitkeep", "rust/crates/a/src/lib.rs", "python/quantforge_y/__init__.py"]
+        bad = h.empty_packages(files, {files[0]: 0, files[1]: 10, files[2]: 0})
+        self.assertEqual(len(bad), 2)
+        self.assertEqual(h.main(), 0)  # the shipped tree is clean
+
+    def test_bench_gate_fails_on_injected_slowdown(self):
+        bg = load("bench_gate", "tools/bench_gate.py")
+        clean = {"py": {"implied_vol": {"ns_per_op": 25000.0, "allocs_per_op": 1.4}}}
+        slow = {"py": {"implied_vol": {"ns_per_op": 225000.0, "allocs_per_op": 1.4}}}
+        base = {"machine": "m", "results": clean}
+        self.assertEqual(bg.compare(clean, base, "m")[1], [])
+        self.assertEqual(len(bg.compare(slow, base, "m")[1]), 1)  # 9x slower fails
+        self.assertEqual(bg.compare(slow, base, "other")[1], [])  # another machine class: reported, not gated
+        leaky = {"py": {"implied_vol": {"ns_per_op": 25000.0, "allocs_per_op": 5.0}}}
+        self.assertIn("allocs", bg.compare(leaky, base, "m")[1][0])
+        self.assertEqual(bg.compare({}, base, "m")[1], ["py implied_vol: no result"])
+
+    def test_mutation_plan(self):
+        pm = load("plan_matrix", "conformance/mutation/plan_matrix.py")
+        cfg = {"stages": {"E": [{"module": "m", "suite": "s", "java": "org.q.vol.Surf", "cpp": "cpp26/src/core/m.cpp",
+                                 "python": "quantforge_core.m_e*", "rust": "**/m.rs"}]}}
+        inc, frag = pm.plan(cfg, changed=["python/quantforge_core/m_e1.py", "README.md"])
+        self.assertEqual([e["lang"] for e in inc], ["python"])
+        self.assertEqual(list(frag["stages"]["PR"][0]), ["module", "suite", "python"])
+        inc, _ = pm.plan(cfg, changed=["java25/src/main/java/org/q/vol/Surf.java", "rust/crates/c/src/m.rs"])
+        self.assertEqual(sorted(e["lang"] for e in inc), ["java", "rust"])
+        self.assertEqual(pm.plan(cfg, changed=["docs/x.md"])[0], [])
+        self.assertEqual(len(pm.plan(cfg, stage="E")[0]), 4)
 
 
 if __name__ == "__main__":

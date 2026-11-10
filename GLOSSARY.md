@@ -64,8 +64,6 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Bachelier model | Option model with a normally distributed forward; vol is in price units |
 | Black-76 | Option model with a lognormal forward; Black-Scholes is Black-76 with the forward taken from spot |
 | Borrow curve | Discount factors `B` for the fee earned by lending the stock out |
-| Butterfly arbitrage | Call prices not convex in strike, which is a negative density |
-| Calendar arbitrage | Total variance falling as expiry rises, at fixed moneyness |
 | Carry factor | `C = D/B`: grows the stock and carries dividends to expiry (ruling C2) |
 | Delta convention | Whether a quoted delta is spot delta, with a discount factor, or forward delta, without one |
 | Greeks | Slopes of a price: delta, gamma, vega, theta, rho, vanna, volga |
@@ -148,3 +146,12 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Tranche, attachment, detachment | A slice of pool losses between two levels; the slice's expected loss as a fraction of its width |
 
 Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at merge `597abf2`), not Validated. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, and no SLV or American FD reference, so those goldens rest on hand cases and high-precision replicas; 557 of 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28.
+
+## Stage F terms (planned)
+
+| Term | Meaning |
+|---|---|
+| Bit-exact | Identical binary64 bits in every language and on every platform; see [determinism](docs/determinism.md) |
+| Name map | `specifications/name-map.json`: each operation's public name in each language, generated from the specs ([ADR-0011](architecture/decisions/ADR-0011-api-style.md)) |
+| Value at risk (VaR), expected shortfall (ES) | *Planned for stage F.* A loss quantile, and the mean loss beyond it, over a horizon |
+| FRTB-SA | *Planned for stage F.* The Basel standardised approach to market-risk capital |

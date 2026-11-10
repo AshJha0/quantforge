@@ -4,6 +4,7 @@
 #include <string>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/smile.hpp"
 #include "quantforge/core/stats.hpp"
 
@@ -38,6 +39,13 @@ double bisect(auto&& f, double lo, double hi) {
 double GkMarket::forward() const { return spot * std::exp((domestic_rate - foreign_rate) * expiry_years); }
 
 GkPrice fx_option_price(const GkMarket& m, double k, double v, OptionType type, double notional) {
+    require_finite(m.spot, "spot");
+    require_finite(m.expiry_years, "expiry_years");
+    require_finite(m.domestic_rate, "domestic_rate");
+    require_finite(m.foreign_rate, "foreign_rate");
+    require_finite(k, "strike");
+    require_finite(v, "vol");
+    require_finite(notional, "notional");
     positive(m.spot, "spot");
     positive(k, "strike");
     positive(m.expiry_years, "expiry_years");
@@ -69,6 +77,12 @@ double fx_delta(const GkMarket& m, double k, double v, OptionType type, FxDeltaT
 }
 
 FxDeltas fx_deltas_from_strike(const GkMarket& m, double k, double v, OptionType type) {
+    require_finite(m.spot, "spot");
+    require_finite(m.expiry_years, "expiry_years");
+    require_finite(m.domestic_rate, "domestic_rate");
+    require_finite(m.foreign_rate, "foreign_rate");
+    require_finite(k, "strike");
+    require_finite(v, "vol");
     positive(m.spot, "spot");
     positive(k, "strike");
     positive(m.expiry_years, "expiry_years");
@@ -79,6 +93,12 @@ FxDeltas fx_deltas_from_strike(const GkMarket& m, double k, double v, OptionType
 }
 
 double fx_delta_to_strike(const GkMarket& m, double v, OptionType type, double delta, FxDeltaType dt) {
+    require_finite(m.spot, "spot");
+    require_finite(m.expiry_years, "expiry_years");
+    require_finite(m.domestic_rate, "domestic_rate");
+    require_finite(m.foreign_rate, "foreign_rate");
+    require_finite(v, "vol");
+    require_finite(delta, "delta");
     check_market(m);
     positive(v, "vol");
     const bool call = type == OptionType::Call;
@@ -105,6 +125,11 @@ double fx_delta_to_strike(const GkMarket& m, double v, OptionType type, double d
 }
 
 double fx_atm_strike(const GkMarket& m, double v, FxAtmType atm, FxDeltaType dt) {
+    require_finite(m.spot, "spot");
+    require_finite(m.expiry_years, "expiry_years");
+    require_finite(m.domestic_rate, "domestic_rate");
+    require_finite(m.foreign_rate, "foreign_rate");
+    require_finite(v, "vol");
     check_market(m);
     positive(v, "vol");
     const double f = m.forward(), half = v * v * m.expiry_years / 2;
@@ -119,6 +144,14 @@ double fx_atm_strike(const GkMarket& m, double v, FxAtmType atm, FxDeltaType dt)
 
 FxSmile fx_smile_from_quotes(const GkMarket& m, double atm_vol, double rr, double bf, double delta, FxDeltaType dt,
                              FxAtmType atm) {
+    require_finite(m.spot, "spot");
+    require_finite(m.expiry_years, "expiry_years");
+    require_finite(m.domestic_rate, "domestic_rate");
+    require_finite(m.foreign_rate, "foreign_rate");
+    require_finite(atm_vol, "atm_vol");
+    require_finite(rr, "rr");
+    require_finite(bf, "bf");
+    require_finite(delta, "delta");
     check_market(m);
     positive(atm_vol, "atm_vol");
     if (!(delta > 0 && delta < 0.5)) throw Error("E_DOMAIN", "delta must be in (0, 0.5)", "delta");

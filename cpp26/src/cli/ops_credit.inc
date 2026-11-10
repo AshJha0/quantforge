@@ -1,39 +1,5 @@
-// Stage D, D4 credit. Included by dispatch.cpp after ops_bonds.inc.
-
-HazardCurve hazard_of(const Value& v, string_view key) {
-    if (v.kind != Kind::Object) schema(key, "expected an object");
-    const In h(v);
-    HazardCurve out{h.date("as_of"), {}, {}};
-    for (const auto& [d, s] : rows_of<std::pair<Date, double>>(h, "pillars", [](const In& row) {
-             return std::pair{row.date("date"), row.real("survival")};
-         })) {
-        out.dates.push_back(d);
-        out.survival.push_back(s);
-    }
-    return out;
-}
-
-void write_survival(Out& out, const HazardCurve& h) {
-    out.values.key("pillars");
-    out.values.begin_array();
-    for (std::size_t i = 0; i < h.dates.size(); ++i) {
-        out.values.begin_object();
-        out.key_string("date", format_date(h.dates[i]));
-        out.key_real("survival", h.survival[i]);
-        out.values.end_object();
-    }
-    out.values.end_array();
-}
-
-// Ruling R1-4: ISDA flat forwards only, checked before every other rule check.
-void require_flat_forwards(const CurveInput& d) {
-    if (d.interpolation != CurveInterpolation::LogLinearDf)
-        throw Error("E_INPUT", "credit needs a LOG_LINEAR_DF discount curve", "discount");
-}
-
-std::vector<CdsQuote> cds_quotes_of(const In& in) {
-    return rows_of<CdsQuote>(in, "quotes", [](const In& q) { return CdsQuote{parse_tenor(q.text("tenor")), q.real("spread")}; });
-}
+// CLI handlers, the credit verbs.
+// Included by dispatch.cpp inside its unnamed namespace; not a translation unit of its own.
 
 void op_cds_price(const In& in, Out& out) {
     const Date t = in.date("trade_date");
@@ -147,3 +113,59 @@ void op_credit_composite(const In& in, Out& out) {
     out.key_reals("spreads", spreads);
     write_survival(out, h);
 }
+
+void op_cds_option_price(const In& in, Out& out) {
+    const CdsOptionInputs c = cds_option_of(in);
+    const double vol = in.real("vol");
+    in.ready();
+    const CdsOptionPrice r = cds_option_price(c, vol);
+    out.key_real("price", r.price);
+    out.key_real("forward_spread", r.forward_spread);
+    out.key_real("risky_annuity", r.risky_annuity);
+    out.key_real("front_end_protection", r.front_end_protection);
+}
+
+void op_cds_option_implied_vol(const In& in, Out& out) {
+    const CdsOptionInputs c = cds_option_of(in);
+    const double premium = in.real("premium");
+    in.ready();
+    out.key_real("vol", cds_option_implied_vol(c, premium));
+}
+
+void op_copula_joint_default(const In& in, Out& out) {
+    const CopulaKind kind = in.choice<CopulaKind>("copula", {{"GAUSSIAN", CopulaKind::Gaussian}, {"STUDENT_T", CopulaKind::StudentT}});
+    const Vec p = in.reals("default_probabilities");
+    const double rho = in.real("correlation");
+    std::optional<double> nu;
+    if (in.find("degrees_of_freedom")) nu = in.real("degrees_of_freedom");
+    in.ready();
+    const JointDefault r = copula_joint_default(kind, p, rho, nu);
+    out.key_real("joint_default_probability", r.joint);
+    out.key_real("default_correlation", r.default_correlation);
+}
+
+void op_lhp_tranche_loss(const In& in, Out& out) {
+    const double p = in.real("default_probability"), rho = in.real("correlation"), r = in.real("recovery");
+    const double a = in.real("attachment"), d = in.real("detachment");
+    in.ready();
+    out.key_real("expected_loss_fraction", lhp_tranche_loss(p, rho, r, a, d));
+}
+
+void op_lhp_loss_cdf(const In& in, Out& out) {
+    const double p = in.real("default_probability"), rho = in.real("correlation"), r = in.real("recovery");
+    const Vec x = in.reals("losses");
+    in.ready();
+    out.key_reals("cdf", lhp_loss_cdf(p, rho, r, x));
+}
+
+constexpr Entry credit_ops[] = {
+    {"credit.cds.bootstrap", op_cds_bootstrap},
+    {"credit.cds.price", op_cds_price},
+    {"credit.cdsoption.implied_vol", op_cds_option_implied_vol},
+    {"credit.cdsoption.price", op_cds_option_price},
+    {"credit.copula.joint_default", op_copula_joint_default},
+    {"credit.curve.composite", op_credit_composite},
+    {"credit.index.intrinsic", op_index_intrinsic},
+    {"credit.lhp.loss_cdf", op_lhp_loss_cdf},
+    {"credit.lhp.tranche_loss", op_lhp_tranche_loss},
+};

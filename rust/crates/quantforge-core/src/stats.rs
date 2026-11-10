@@ -1,17 +1,21 @@
 //! Distributions and moments (`statistics-and-time-series.md`).
+
 use crate::error::{Result, fail};
 
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn mean(x: &[f64]) -> f64 {
     x.iter().sum::<f64>() / x.len() as f64
 }
 
 /// True when all values are equal. Rounding in a mean cannot fake a non-zero variance here.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn is_constant(x: &[f64]) -> bool {
     x.iter().all(|v| *v == x[0])
 }
 
 /// The mean and deviations from it, by way of a shift to the first value. The shift is exact for
 /// nearby values, so a large offset does not reach the moments through a rounded mean.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn centered(x: &[f64]) -> (f64, Vec<f64>) {
     let y: Vec<f64> = x.iter().map(|v| v - x[0]).collect();
     let my = mean(&y);
@@ -19,6 +23,7 @@ pub fn centered(x: &[f64]) -> (f64, Vec<f64>) {
 }
 
 /// Two-pass sample variance, divisor `n - 1`.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn variance(x: &[f64]) -> f64 {
     let m = mean(x);
     x.iter().map(|v| (v - m) * (v - m)).sum::<f64>() / (x.len() - 1) as f64
@@ -112,12 +117,14 @@ fn erfcx(y: f64) -> f64 {
     }
 }
 
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn normal_pdf(x: f64) -> f64 {
     (-x * x / 2.0).exp() / (2.0 * std::f64::consts::PI).sqrt()
 }
 
 /// `N(x)`. The Gaussian factor is formed from `x` itself, split so that `x^2/2` loses no bits;
 /// going through `y = |x|/sqrt 2` would cost about 1e-13 relative at `x = -37`.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn normal_cdf(x: f64) -> f64 {
     let ax = x.abs();
     let y = ax / std::f64::consts::SQRT_2;
@@ -148,6 +155,7 @@ pub struct Summary {
 }
 
 pub fn summary(x: &[f64]) -> Result<Summary> {
+    crate::error::finite("x", &x)?;
     if x.len() < 2 {
         return fail("E_INPUT", "at least 2 values are needed");
     }
@@ -174,6 +182,8 @@ pub fn summary(x: &[f64]) -> Result<Summary> {
 }
 
 pub fn quantile(x: &[f64], p: &[f64]) -> Result<Vec<f64>> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("p", &p)?;
     if x.is_empty() {
         return fail("E_INPUT", "at least 1 value is needed");
     }
@@ -202,6 +212,8 @@ fn cross(x: &[f64], y: &[f64]) -> f64 {
 }
 
 pub fn covariance(x: &[f64], y: &[f64]) -> Result<(f64, Option<f64>)> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("y", &y)?;
     if x.len() != y.len() || x.len() < 2 {
         return fail("E_INPUT", "equal lengths of at least 2 are needed");
     }
@@ -222,6 +234,8 @@ pub struct Ols {
 }
 
 pub fn ols(x: &[f64], y: &[f64]) -> Result<Ols> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("y", &y)?;
     if x.len() != y.len() || x.len() < 3 {
         return fail("E_INPUT", "equal lengths of at least 3 are needed");
     }
@@ -250,4 +264,27 @@ pub fn ols(x: &[f64], y: &[f64]) -> Result<Ols> {
         se_beta: (s2 / sxx).sqrt(),
         rss,
     })
+}
+
+impl crate::error::Finite for Ols {
+    fn is_all_finite(&self) -> bool {
+        self.alpha.is_all_finite()
+            && self.beta.is_all_finite()
+            && self.r_squared.is_all_finite()
+            && self.se_alpha.is_all_finite()
+            && self.se_beta.is_all_finite()
+            && self.rss.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Summary {
+    fn is_all_finite(&self) -> bool {
+        self.mean.is_all_finite()
+            && self.variance.is_all_finite()
+            && self.stdev.is_all_finite()
+            && self.skewness.is_all_finite()
+            && self.excess_kurtosis.is_all_finite()
+            && self.min.is_all_finite()
+            && self.max.is_all_finite()
+    }
 }

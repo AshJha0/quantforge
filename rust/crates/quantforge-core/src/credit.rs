@@ -1,6 +1,7 @@
 //! ISDA CDS, index intrinsic and composite curves (`04-pricing/credit.md`).
 use crate::curve::Curve;
 use crate::dates::Date;
+
 use crate::error::{Result, err, fail};
 use crate::schedule::add_months;
 
@@ -18,6 +19,7 @@ fn years(a: Date, b: Date) -> f64 {
 
 impl Hazard {
     pub fn new(as_of: Date, pillars: &[(Date, f64)]) -> Result<Hazard> {
+        crate::error::finite("pillars", &pillars)?;
         if pillars.is_empty()
             || pillars[0].0 <= as_of
             || pillars.windows(2).any(|w| w[1].0 <= w[0].0)
@@ -304,6 +306,8 @@ pub fn price(
     trade: &CdsTrade,
     digital: bool,
 ) -> Result<CdsPrice> {
+    crate::error::finite("recovery", &recovery)?;
+    crate::error::finite("trade", &trade)?;
     check_recovery(recovery)?;
     check_as_of(t, discount, hazard)?;
     let ps = periods(t, trade.maturity)?;
@@ -341,6 +345,7 @@ pub fn bootstrap(
     recovery: f64,
     quotes: &[((i64, char), f64)],
 ) -> Result<Hazard> {
+    crate::error::finite("recovery", &recovery)?;
     check_recovery(recovery)?;
     if discount.as_of != t {
         return fail("E_INPUT", "discount as_of must be trade_date");
@@ -417,6 +422,7 @@ pub fn index_intrinsic(
     maturity: Date,
     coupon: f64,
 ) -> Result<(Vec<f64>, f64)> {
+    crate::error::finite("coupon", &coupon)?;
     if names.is_empty() {
         return fail("E_INPUT", "no names");
     }
@@ -451,6 +457,7 @@ pub fn composite_spreads(
     constituents: &[(Vec<CdsQuote>, f64)],
     scale: f64,
 ) -> Result<Vec<((i64, char), f64)>> {
+    crate::error::finite("scale", &scale)?;
     if constituents.is_empty() {
         return fail("E_INPUT", "no constituents");
     }
@@ -479,6 +486,23 @@ pub fn composite_spreads(
             (*t, scale * s / wsum)
         })
         .collect())
+}
+
+impl crate::error::Finite for CdsPrice {
+    fn is_all_finite(&self) -> bool {
+        self.protection_leg.is_all_finite()
+            && self.rpv01.is_all_finite()
+            && self.accrued.is_all_finite()
+            && self.par_spread.is_all_finite()
+            && self.upfront.is_all_finite()
+            && self.pv.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for CdsTrade {
+    fn is_all_finite(&self) -> bool {
+        self.coupon.is_all_finite() && self.notional.is_all_finite()
+    }
 }
 
 #[cfg(test)]

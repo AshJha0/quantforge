@@ -26,7 +26,7 @@ CLASSES = RUNNER.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml"
 
 @pytest.mark.parametrize("path", GOLDEN, ids=lambda p: p.stem)
 def test_golden_suite(path):
-    failures = []
+    failures, results = [], {}
     for case in json.loads(path.read_text(encoding="utf-8"))["cases"]:
         document = {
             "schema_version": "1.0",
@@ -35,7 +35,8 @@ def test_golden_suite(path):
             "inputs": case["inputs"],
         }
         result = json.loads(json.dumps(run_case(json.dumps(document))))
-        status, messages = RUNNER.judge(case, result, CLASSES)
+        results[case["case_id"]] = result
+        status, messages = RUNNER.judge(case, result, CLASSES, results)
         if status != "pass":
             failures.append((case["case_id"], status, messages[:2]))
     assert not failures, failures[:10]

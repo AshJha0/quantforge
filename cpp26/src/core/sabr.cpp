@@ -5,6 +5,7 @@
 
 #include "quantforge/core/black.hpp"
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/smile.hpp"
 
 namespace quantforge {
@@ -16,7 +17,15 @@ using Vec = std::vector<double>;
 
 }  // namespace
 
+void require_finite(const SabrParameters& p, std::string_view field) {
+    for (const double x : {p.alpha, p.beta, p.rho, p.nu}) require_finite(x, field);
+}
+
 void check_sabr(double t, const SabrParameters& p, double f, const Vec& strikes) {
+    require_finite(t, "expiry_years");
+    require_finite(p, "sabr");
+    require_finite(f, "forward");
+    require_finite(strikes, "strikes");
     if (t <= 0) domain("expiry_years is not above 0");
     if (p.alpha <= 0) domain("alpha is not above 0");
     if (p.beta < 0 || p.beta > 1) domain("beta is outside [0, 1]");
@@ -44,6 +53,11 @@ double hagan_vol(double f, double x, double t, const SabrParameters& p) {
 }
 
 SabrDensity sabr_density(double f, const Vec& strikes, double t, const SabrParameters& p, double h) {
+    require_finite(f, "forward");
+    require_finite(strikes, "strikes");
+    require_finite(t, "expiry_years");
+    require_finite(p, "sabr");
+    require_finite(h, "h");
     const auto call = [&](double x) { return black_price(f, x, hagan_vol(f, x, t, p), t, 1.0, 1.0); };
     SabrDensity out{{}, INFINITY, false};
     for (const double x : strikes) {
@@ -55,6 +69,12 @@ SabrDensity sabr_density(double f, const Vec& strikes, double t, const SabrParam
 }
 
 SabrFit sabr_calibrate(double f, double t, double beta, const Vec& strikes, const Vec& vols, const std::optional<Vec>& weights) {
+    require_finite(f, "forward");
+    require_finite(t, "expiry_years");
+    require_finite(beta, "beta");
+    require_finite(strikes, "strikes");
+    require_finite(vols, "vols");
+    require_finite(weights, "weights");
     const std::size_t n = strikes.size();
     if (n < 3 || vols.size() != n || (weights && weights->size() != n)) throw Error("E_INPUT", "too few strikes, or lengths differ");
     for (std::size_t i = 1; i < n; ++i)
@@ -93,6 +113,10 @@ SabrFit sabr_calibrate(double f, double t, double beta, const Vec& strikes, cons
 }
 
 ArbFreeResult sabr_arbfree(double f0, const Vec& strikes, double t, const SabrParameters& p, const ArbFreeGrid& grid) {
+    require_finite(f0, "forward");
+    require_finite(strikes, "strikes");
+    require_finite(t, "expiry_years");
+    require_finite(p, "sabr");
     const std::size_t cells = std::size_t(grid.cells), start = std::size_t(grid.cells_below) - 1;  // 0-based cell of f0
     const double beta = p.beta, one = 1 - beta;
     const double h = f0 / (double(grid.cells_below) - 0.5), u_max = double(grid.cells) * h;
@@ -164,7 +188,7 @@ ArbFreeResult sabr_arbfree(double f0, const Vec& strikes, double t, const SabrPa
         OptionInput o{VolModel::Black76, OptionType::Call, x, t};
         o.forward = f0;
         o.discount_factor = 1.0;
-        out.vols.push_back(implied_vol(o, call));
+        out.vols.push_back(implied_vol_unchecked(o, call));
     }
     return out;
 }

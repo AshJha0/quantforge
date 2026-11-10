@@ -1,5 +1,6 @@
 //! Correlation: validation, nearest correlation matrix, implied correlation, dispersion
 //! (`06-risk/correlation.md`, rulings E-B18 to E-B21).
+
 use crate::error::{Result, fail};
 use crate::linalg::Matrix;
 
@@ -172,6 +173,9 @@ fn implied_unchecked(w: &[f64], v: &[f64], index: f64) -> f64 {
 
 /// Average correlation, not clipped (ruling E-B20).
 pub fn implied(weights: &[f64], vols: &[f64], index_vol: f64) -> Result<f64> {
+    crate::error::finite("weights", &weights)?;
+    crate::error::finite("vols", &vols)?;
+    crate::error::finite("index_vol", &index_vol)?;
     if weights.len() < 2 || weights.len() != vols.len() {
         return fail("E_INPUT", "at least two names, one vol each");
     }
@@ -250,6 +254,22 @@ pub fn dispersion(x: &Dispersion) -> Result<DispersionOut> {
         constituent_variance_notionals: legs,
         index_variance_notional: ni,
     })
+}
+
+impl crate::error::Finite for DispersionOut {
+    fn is_all_finite(&self) -> bool {
+        self.pnl.is_all_finite()
+            && self.implied_correlation.is_all_finite()
+            && self.realized_correlation.is_all_finite()
+            && self.constituent_variance_notionals.is_all_finite()
+            && self.index_variance_notional.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Validation {
+    fn is_all_finite(&self) -> bool {
+        self.min_eigenvalue.is_all_finite()
+    }
 }
 
 #[cfg(test)]

@@ -3,6 +3,7 @@
 #include <numbers>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/models.hpp"
 
 namespace quantforge {
@@ -33,6 +34,17 @@ Complex phi_heston(double u, const CosInputs& in) {
 }  // namespace
 
 CosResult cos_european(const CosInputs& in) {
+    require_finite(in.spot, "spot");
+    require_finite(in.strike, "strike");
+    require_finite(in.r, "r");
+    require_finite(in.q, "q");
+    require_finite(in.t, "t");
+    require_finite(in.model.sigma, "sigma");
+    require_finite(in.model.v0, "v0");
+    require_finite(in.model.kappa, "kappa");
+    require_finite(in.model.theta, "theta");
+    require_finite(in.model.rho, "rho");
+    require_finite(in.truncation, "truncation");
     const CosModel& m = in.model;
     const bool heston = m.name == CosModelName::Heston;
     if (in.spot <= 0.0 || in.strike <= 0.0 || in.t <= 0.0 || in.truncation <= 0.0 || m.sigma <= 0.0)

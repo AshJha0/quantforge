@@ -5,6 +5,8 @@ array order, so float sums here go through ordered_sum.
 """
 from collections.abc import Iterable, Sequence
 
+from .finite import guard
+
 
 def ordered_sum(values: Iterable[float]) -> float:
     total = 0.0
@@ -31,3 +33,6 @@ def thomas(
     for i in range(n - 2, -1, -1):
         x[i] = d[i] - c[i] * x[i + 1]
     return x
+
+
+guard(globals())

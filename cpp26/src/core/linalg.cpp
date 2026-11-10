@@ -1,3 +1,4 @@
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/linalg.hpp"
 
 #include <algorithm>
@@ -110,6 +111,7 @@ std::vector<double> solve_linear(const Matrix& a, const std::vector<double>& b) 
 }
 
 Matrix cholesky(const Matrix& a) {
+    require_finite(a, "a");
     check_square(a);
     check_symmetric(a);
     const std::size_t n = a.size();
@@ -130,6 +132,7 @@ Matrix cholesky(const Matrix& a) {
 
 // Cyclic Jacobi rotations: slow for large matrices, accurate for the small ones used here.
 std::vector<double> eigen_symmetric(const Matrix& input) {
+    require_finite(input, "a");
     check_square(input);
     check_symmetric(input);
     Matrix a = input;

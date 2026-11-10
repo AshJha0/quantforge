@@ -8,6 +8,7 @@ from . import calendars, curves, daycount, schedules
 from .conventions import REGISTRY
 from .curves import Curve, CurveData
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .ois import valuation
 from .schedules import Period
@@ -181,3 +182,6 @@ def basis_spread(
         for x in ps
     )
     return top / ordered_sum(_alpha(index, x.start, x.end) * d.discount(x.end) for x in ps)
+
+
+guard(globals())

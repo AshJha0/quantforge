@@ -1,5 +1,6 @@
 //! Vol surface on a grid: query, node checks, bucket vega (`smile-and-surface.md`, `vol-greeks.md`).
 use crate::black::black;
+
 use crate::error::{Result, fail};
 
 const TOL: f64 = 1e-12;
@@ -37,6 +38,7 @@ pub struct SurfaceVega {
 
 impl Surface {
     pub fn validate(&self) -> Result<()> {
+        crate::error::finite("self", self)?;
         let rising = |v: &[f64]| v.windows(2).all(|w| w[1] > w[0]);
         if self.t.is_empty()
             || self.k.is_empty()
@@ -70,6 +72,7 @@ impl Surface {
     }
 
     /// Total variance at a point, for `t` above 0.
+    /// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
     pub fn w(&self, t: f64, k: f64) -> f64 {
         let g = &self.t;
         let n = g.len() - 1;
@@ -85,6 +88,8 @@ impl Surface {
     }
 
     pub fn query(&self, points: &[(f64, f64)]) -> Result<Vec<(f64, f64)>> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("points", &points)?;
         self.validate()?;
         if points.iter().any(|p| p.0 <= 0.0) {
             return fail("E_DOMAIN", "expiry_years must be above 0");
@@ -99,6 +104,7 @@ impl Surface {
     }
 
     pub fn check(&self) -> Result<Check> {
+        crate::error::finite("self", self)?;
         self.validate()?;
         let w = |j: usize, i: usize| self.vols[j][i] * self.vols[j][i] * self.t[j];
         let mut calendar = Vec::new();
@@ -148,6 +154,8 @@ impl Surface {
 
     pub fn vega(&self, p: &[Position]) -> Result<SurfaceVega> {
         const H: f64 = 1e-4;
+        crate::error::finite("self", self)?;
+        crate::error::finite("p", &p)?;
         self.validate()?;
         if p.iter()
             .any(|x| x.t <= 0.0 || x.forward <= 0.0 || x.strike <= 0.0 || x.discount <= 0.0)
@@ -183,6 +191,31 @@ impl Surface {
             bucket,
             bucket_sum,
         })
+    }
+}
+
+impl crate::error::Finite for Position {
+    fn is_all_finite(&self) -> bool {
+        self.forward.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.discount.is_all_finite()
+            && self.t.is_all_finite()
+            && self.quantity.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Surface {
+    fn is_all_finite(&self) -> bool {
+        self.t.is_all_finite() && self.k.is_all_finite() && self.vols.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for SurfaceVega {
+    fn is_all_finite(&self) -> bool {
+        self.pv.is_all_finite()
+            && self.bucket.is_all_finite()
+            && self.parallel.is_all_finite()
+            && self.bucket_sum.is_all_finite()
     }
 }
 

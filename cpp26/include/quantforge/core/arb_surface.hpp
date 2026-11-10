@@ -2,6 +2,7 @@
 // Stage E, E1: arbitrage-free SVI surfaces (05-volatility/arb-free-surfaces.md) and local vol, forward vol,
 // smile dynamics and vol of vol (05-volatility/local-and-forward-vol.md). Rulings E-A1 to E-A8.
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "quantforge/core/black.hpp"
@@ -13,6 +14,8 @@ struct SviSlice {
     double expiry_years;
     Svi svi;
 };
+/// E_DOMAIN unless every expiry and SVI parameter is finite (F-2).
+void require_finite(const std::vector<SviSlice>& slices, std::string_view field);
 /// The slices object checks, in the spec's order (E_INPUT, E_DOMAIN, then E_LIMIT above 100 slices).
 void check_slices(const std::vector<SviSlice>& slices);
 /// The two halves of check_slices, for operations that put every E_INPUT rule first (ruling E-A37).

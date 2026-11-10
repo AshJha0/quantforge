@@ -7,6 +7,7 @@ from datetime import date
 from . import curves, ois, roots
 from .conventions import REGISTRY
 from .errors import QfError
+from .finite import guard
 from .ois import Quote
 from .schedules import Period
 
@@ -106,3 +107,6 @@ def _solve(f: Callable[[float], float], guess: float) -> float:
             return roots.brent(f, low, high, x_tol=1e-16, max_iter=500).root
         width *= 2
     raise QfError("E_NO_CONVERGENCE", "the step fit found no bracket")
+
+
+guard(globals())

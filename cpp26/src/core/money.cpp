@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "quantforge/core/finite.hpp"
+
 namespace quantforge {
 namespace {
 
@@ -37,6 +39,7 @@ std::string digits_of(Fixed v) {
 }  // namespace
 
 double convert_unit(double value, RateUnit from, RateUnit to) {
+    require_finite(value, "value");
     if (from == to) return value;
     return value / per_decimal(from) * per_decimal(to);
 }

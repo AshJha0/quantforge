@@ -5,6 +5,7 @@ from bisect import bisect_left, bisect_right
 from collections.abc import Sequence
 
 from .errors import QfError, required
+from .finite import guard
 from .numeric import thomas
 
 Floats = Sequence[float]
@@ -262,3 +263,6 @@ def monotone_convex(
         forwards.append(fd[i] + g)
         zero_rates.append((rt[i - 1] + width * (fd[i] * x + big_g)) / s)
     return forwards, zero_rates
+
+
+guard(globals())

@@ -5,6 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from .errors import QfError
+from .finite import guard
 
 
 @dataclass(frozen=True)
@@ -106,3 +107,6 @@ def european(
     if option == "PUT":
         return put, a, b
     return put + spot * math.exp(-q * t) - strike * math.exp(-r * t), a, b
+
+
+guard(globals())

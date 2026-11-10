@@ -5,9 +5,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/site_facts.json', 'tools/site_figures.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   pull_request:
-    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/site_facts.json', 'tools/site_figures.py', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
+    paths: ['**.md', 'tools/build_site.py', 'tools/build_gallery.py', 'tools/site_home.html', 'docs/curves/data/**', 'examples/**', 'python/**', 'datasets/golden/stage_b/**', 'datasets/golden/stage_c/**', 'datasets/golden/stage_d/**', 'datasets/golden/stage_e/**', 'datasets/golden/stage_e_b/**', 'tools/test_tools.py', 'tools/check_quickstart.py', 'tools/doctor.py', 'tools/forward-log/**', 'tools/recorder/**', 'tools/workflows/**', 'tools/gallery_real.py', 'tools/gallery_e.py', 'tools/site_facts.json', 'tools/site_figures.py', '.pa11yci.json', 'tools/quality_gate.py', 'conformance/quality/**', 'conformance/mutation/stages.json', '.github/workflows/docs.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,7 +17,7 @@ concurrency:
 jobs:
   site:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -27,7 +27,13 @@ jobs:
       - run: python3 tools/test_tools.py
       - run: python3 tools/check_quickstart.py  # README quick start still prints what it shows (E8)
       - run: python3 tools/build_gallery.py --check
+      # Also fails if the home stage table or site_facts.json disagree with ROADMAP.md (plan 13.2 E7)
       - run: uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site
+      # WCAG 2 AA, zero errors, on home, LEARN, COOKBOOK and the Curves gallery (plan 13.2 E6)
+      - name: accessibility (pa11y-ci, axe and HTML_CodeSniffer)
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 --directory site >/dev/null 2>&1 &
+          npx --yes pa11y-ci@3.1.0 --config .pa11yci.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: docs-site
