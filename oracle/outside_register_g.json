@@ -23,5 +23,15 @@
   "counted": 7,
   "total": 15,
   "rule": "each EE point is the swaption_g QuantLib check; cva is arithmetic on those values"
+ },
+ "hwcal_g": {
+  "counted": 0,
+  "total": 6,
+  "rule": "not counted: the fitted sigma is this platform's least-squares optimum; QuantLib reprices the fitted prices (evidence only)"
+ },
+ "bermudan_g": {
+  "counted": 0,
+  "total": 15,
+  "rule": "not counted: the golden is the pinned scheme; QuantLib FD and tree values are convergence evidence (oracle/BERMUDAN_EVIDENCE_G.json)"
  }
 }

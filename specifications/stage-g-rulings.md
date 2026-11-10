@@ -40,6 +40,18 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-16 | Exposure dates and CVA buckets | Exposure is defined only at reset dates before the last payment, where the remaining swap is a swaption and the EE is exact; between resets the floating coupon already fixed makes the exposure path-dependent, which the simulation wave covers. CVA uses default buckets `(t_(k-1), t_k]` with the exposure at the bucket end, `t_0 = 0`, independence of default and rates. Both are stylised and stated as such; the simulation wave must reproduce these numbers on the same grid |
 
+## Wave 2c, Hull-White calibration
+
+| # | Point | Ruling |
+|---|---|---|
+| G-17 | Calibration objective and outside status | One parameter (`sigma`, `a` fixed), unweighted squared price errors per unit notional, search interval `[1e-4, 1]`, `E_NO_CONVERGENCE` at an end. Judged on `sigma` (1e-9 relative) as well as on repricing, since the optimum is unique. Not counted as outside: QuantLib's `HullWhite.calibrate` needs date-based `SwaptionHelper`s with Black or normal vols and stops at its optimiser's accuracy, so it cannot reproduce this objective to 1e-9; QuantLib's repricing of the fitted prices is recorded as evidence only. A two-parameter (`a`, `sigma`) or piecewise `sigma(t)` fit waits for a later wave |
+
+## Wave 2d, Bermudan swaption reference scheme
+
+| # | Point | Ruling |
+|---|---|---|
+| G-18 | Pinned Bermudan scheme | The golden is the reference scheme of `short-rate-models.md` in binary64 (fully implicit, linear-extrapolation boundaries, exercise at the knots), as E-A23 for American options; any build implements exactly that scheme. Accuracy is shown by convergence to Jamshidian with one exercise date and by QuantLib's FD and tree engines (evidence file), not by golden tolerance. Not counted as outside: no library implements this scheme. A higher-order engine (Crank-Nicolson with Rannacher steps) may be added later as a separate `method` value; this one keeps its meaning |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |

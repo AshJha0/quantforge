@@ -123,3 +123,37 @@ Rulings G-1 to G-16 (`specifications/stage-g-rulings.md`); G-9 to G-11 fix the Q
 **Carry-over 3 (stage F outside share 51.4%): not advanced.** `oracle/OUTSIDE_GAPS_F.md` already concludes no free source is left for the 134 value cases. The only runnable item, the `garch_f-0009` arch check under WSL, adds one case and was not attempted tonight.
 
 **Next step:** the coordinator relays waves 1, 2a, 2b, 3a and 4a to the four language sessions. The spec session then continues with wave 2 (Hull-White calibration, then Bermudans with a pinned tree or PDE reference scheme and the QuantLib `TreeSwaptionEngine` and `FdHullWhiteSwaptionEngine` as convergence evidence).
+
+## WAVE 2c READY (2026-11-10): Hull-White sigma calibration
+
+Read: `specifications/04-pricing/short-rate-models.md`, section "`rates.shortrate.hw_calibrate`"; ruling G-17; cli-contract block "Stage G operations"; `specifications/name-map.json` (235 operations).
+
+### G2c (suite `hwcal_g`, 6 cases)
+- New operation `rates.shortrate.hw_calibrate`: `sigma` with `a` fixed, least squares on prices per unit notional over `[1e-4, 1]`; outputs `sigma`, `fitted_prices`, `rmse`.
+- Build notes: reuse the wave 2a swaption code. The objective is smooth and has one interior minimum on the goldens; bracket it by a scan, then Newton or Brent on `F'` until the relative step is below 1e-12. `sigma` is judged at 1e-9 relative. The exact-fit case (`a = 0.01`) has `rmse` near 1e-18: judged at 1e-12 absolute.
+
+## WAVE 2d READY (2026-11-10): Bermudan swaption, pinned reference scheme
+
+Read: `specifications/04-pricing/short-rate-models.md`, sections "`rates.shortrate.bermudan_swaption`" and "Convergence and limit cases (Bermudan scheme)"; ruling G-18.
+
+### G2d (suite `bermudan_g`, 15 cases)
+- New operation `rates.shortrate.bermudan_swaption`. Implement the seven-step scheme exactly: fully implicit, coefficients at the earlier time, linear-extrapolation boundaries substituted into the tridiagonal rows, exercise applied on arrival at each exercise time except at 0. Golden generator runs in about 11 seconds.
+- Property tests: one exercise date converges to your `rates.shortrate.swaption` price as the grid is refined (order about 1); a Bermudan price is at least the European price for its first exercise date.
+
+### Outside-oracle status after waves 2c and 2d
+Neither suite counts (G-17, G-18): the calibration objective and the pinned scheme are this platform's own, and QuantLib values are recorded as evidence only (`oracle/BERMUDAN_EVIDENCE_G.json`: QuantLib FD and tree within about 0.2% of the scheme at the default grid). **Stage G now stands at 133 of 245 = 54.3%, below the 60% floor.** The expectation that wave 2 would lift the share was wrong for these two slices. Candidates that would count: QuantLib-checkable closed forms still to be specified (Hull-White caps and floors as bond-option portfolios, G2++ European swaptions by `G2SwaptionEngine` if its integration can be set tight enough, CIR swaptions by Jamshidian), and ORE exposure profiles in wave 4.
+
+## Status update (2026-11-10, after waves 2c and 2d)
+
+Supersedes the counts in the status section above; everything else there still holds.
+
+| Wave | Suite | Cases | Outside |
+|---|---|---|---|
+| 1 | `shortrate_g`, `barrier_g` | 110 | 63 |
+| 2a, 2b | `swaption_g`, `g2pp_g` | 78 | 63 |
+| 2c, 2d | `hwcal_g`, `bermudan_g` | 21 | 0 |
+| 3a | `mcgreeks_g` | 21 | 0 |
+| 4a | `exposure_g` | 15 | 7 |
+| | **Stage G** | **245** | **133 = 54.3%** |
+
+Rulings now G-1 to G-18. G-10 stays open for the owner (Q9 variance test with low power). Left for stage G: callable bonds (the same scheme with a call schedule), G2++ swaptions, two-parameter or time-dependent Hull-White calibration, LMM, Q3b, Q9 part 2, the rest of xVA, A5, the R5 audit, and the outside share. **Next step:** relay waves 2c and 2d; the spec session continues with the QuantLib-countable closed forms listed above (Hull-White caps and floors first), then callable bonds on the G-18 scheme.

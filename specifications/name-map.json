@@ -4343,6 +4343,71 @@
     "periods"
    ]
   },
+  "rates.shortrate.bermudan_swaption": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_bermudan_swaption",
+   "python": "quantforge.rates.shortrate_bermudan_swaption",
+   "java": "Rates.shortrateBermudanSwaption",
+   "cpp": "qf::rates::shortrate_bermudan_swaption",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "exercise_times": {
+     "java": "exerciseTimes"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "grid": {
+     "java": "grid"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "start_years": {
+     "java": "startYears"
+    },
+    "swaption_type": {
+     "java": "swaptionType"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "rates.shortrate.hw_calibrate": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_hw_calibrate",
+   "python": "quantforge.rates.shortrate_hw_calibrate",
+   "java": "Rates.shortrateHwCalibrate",
+   "cpp": "qf::rates::shortrate_hw_calibrate",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "swaptions": {
+     "java": "swaptions"
+    }
+   },
+   "outputs": [
+    "fitted_prices",
+    "rmse",
+    "sigma"
+   ]
+  },
   "rates.shortrate.swaption": {
    "spec": "specifications/04-pricing/short-rate-models.md",
    "rust": "quantforge::rates::shortrate_swaption",

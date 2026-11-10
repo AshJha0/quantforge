@@ -63,6 +63,45 @@ Errors in order (after F-2): `short_rate` present `E_INPUT`; `a`, `sigma`, curve
 
 Validation: 33 value cases (expiries 0.5 to 10 years, 2 to 20 annual periods, strikes at the forward and 100 bp either side, both types, a semi-annual swap, high mean reversion `a = 0.5`, a zero strike on the negative-rate curve) and 7 error cases. Values: 50-digit mpmath, `r*` to 1e-45. Payer minus receiver equals `annuity (F - K)` to 1e-8 on every pair (asserted). Outside: QuantLib 1.44 `HullWhite` `discountBond` and `discountBondOption`, `r*` by QuantLib's `Brent` to 1e-15, combined by arithmetic, and `DiscountCurve` discounts: 33 of 40 count. `JamshidianSwaptionEngine` itself agrees only to about 3e-7 relative (its internal root accuracy), so the engine is not the counted check. Wrong conventions caught: Ho-Lee `sigma_p`; strike 1 on every bond option.
 
+## `rates.shortrate.hw_calibrate` (stage G wave 2c)
+
+Hull-White `sigma` fitted to a strip of European swaption prices with `a` fixed. Suite `stage_g/hwcal_g` (6 cases), generator slice `G2C`. Ruling G-17.
+
+Inputs: `curve`, `mean_reversion` (> 0), `swaptions`: at least one (else `E_INPUT`), each `{expiry_years, payment_times, fixed_rate, swaption_type, target_price}` with the rules of `rates.shortrate.swaption` and `target_price` >= 0 per unit notional (else `E_DOMAIN`).
+
+Objective: `F(sigma) = sum_i (model_i(sigma) - target_i)^2`, unweighted, `model_i` the Jamshidian price per unit notional. Output `sigma` = the minimiser of `F` on `[1e-4, 1]`, `fitted_prices` (model prices at `sigma`, in input order), `rmse` = `sqrt(F(sigma) / n)`. If the minimum on that interval is at an end, `E_NO_CONVERGENCE`.
+
+Method: any solver that reaches `F'(sigma) = 0` to a relative step below 1e-12 (for example a bracketing scan, then Newton or Brent on `F'` with `model'` analytic or by central differences of the closed form). The goldens assert a unique interior minimum by a scan on `[0.001, 0.04]`, so the answer does not depend on the solver.
+
+Validation: three ten-year co-terminal strips (expiries 1, 2, 3, 5, 7 years, strikes at the forward), targets from a known `sigma` with stated percentage perturbations (`a = 0.05`, payers; `a = 0.2`, receivers; `a = 0.01`, unperturbed, an exact fit recovering `sigma = 0.007`); 3 error cases. Values: 30-digit mpmath, `F'` root. Outside: none counted (ruling G-17); QuantLib 1.44 `HullWhite` objects reprice every fitted price at the golden `sigma` to 1e-10 relative (evidence).
+
+## `rates.shortrate.bermudan_swaption` (stage G wave 2d)
+
+Bermudan swaption on Hull-White by a pinned reference scheme (ruling G-18), as `exotic.american.fd` pins its scheme (E-A23). Suite `stage_g/bermudan_g` (15 cases), generator `oracle/python/gen_stage_g_berm.py`.
+
+Inputs: `curve`, `mean_reversion`, `sigma` (Hull-White); the underlying swap `start_years` `T0` (> 0), `payment_times` (the `rates.shortrate.swaption` rules, first payment after `T0`), `fixed_rate`, `swaption_type` (`PAYER`, `RECEIVER`), `notional`; `exercise_times`: at least one, strictly increasing, each one of `T0, T1, ..., T(n-1)` (a reset date before the last payment), else `E_INPUT`; `grid` `{nx, steps_per_year, width}`: `nx` odd and at least 5 (else `E_INPUT`), at most 10,001 (`E_LIMIT`); `steps_per_year` at least 1 (else `E_INPUT`), at most 100,000 (`E_LIMIT`); `width` > 0 (else `E_DOMAIN`). Exercising at `t` enters the swap paying from `t` to `Tn` (fixed periods after `t`).
+
+**Reference scheme.**
+1. State `x = r - alpha(t)`, `alpha(t) = f(0,t) + sigma^2/(2a^2) (1 - e^{-at})^2`, `f` the curve's right-hand forward (G-3); `dx = -a x dt + sigma dW`, `x(0) = 0`.
+2. Space grid: `sx = sigma sqrt((1 - e^{-2a t_m}) / (2a))` with `t_m` the last exercise time; `h = width sx`; `x_i = -h + i dx`, `dx = 2h/(nx - 1)`, `i = 0..nx-1` (the centre node is `x = 0`).
+3. Time grid: knots `0, t_1, ..., t_m` (the exercise times). Interval `[t_(k-1), t_k]` gets `n = max(1, ceil(steps_per_year (t_k - t_(k-1))))` equal steps.
+4. Exercise value at `t` and node `i` (per unit notional): `phi (1 - P(t, Tn) - K sum tau_j P(t, Tj))` over the payments after `t`, `tau` the time differences starting at `t`, `P(t, T)` the Hull-White bond of `rates.shortrate.zcb` with `r = x_i + alpha(t)`, `phi = +1` payer, `-1` receiver.
+5. Start at `t_m` with `V = max(exercise, 0)`. Step backward fully implicitly: from `t + dt` to `t`, solve `(I - dt L(t)) V(t) = V(t + dt)` on interior nodes `1..nx-2`, where `(L V)_i = (sigma^2/2)(V_(i+1) - 2V_i + V_(i-1))/dx^2 - a x_i (V_(i+1) - V_(i-1))/(2 dx) - (x_i + alpha(t)) V_i`, coefficients at the earlier time `t`. Boundaries: `V_0 = 2V_1 - V_2` and `V_(nx-1) = 2V_(nx-2) - V_(nx-3)`, substituted into the first and last interior rows (the system stays tridiagonal), then set after the solve.
+6. On arriving at an exercise time `t_k` (`k < m`), `V = max(V, exercise(t_k))`. Do not apply exercise at `t = 0`.
+7. `price = notional x V` at the centre node at `t = 0`.
+
+Output: `price`. Class `root_finding` with a limit of 1e-9 relative: the scheme is deterministic, so builds differ only by rounding in the tridiagonal solve.
+
+## Convergence and limit cases (Bermudan scheme)
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Fully implicit FD on the Hull-White state | 1 in time (space second order, refined together) | `nx = 51, 101, 201, 401` with `steps_per_year = 25, 50, 100, 200`, width 6, one exercise date at 1y into a 5y payer at 4%: errors against Jamshidian -149.7, -52.2, -23.9, -12.9 on 1e6 notional; observed orders 1.52, 1.13, 0.89 (the last two within 0.2 of 1) | one exercise date: the European swaption (`swaption_g`, Jamshidian) | Jamshidian closed form; QuantLib 1.44 `FdHullWhiteSwaptionEngine` (400 x 400) and `TreeSwaptionEngine` (400 steps) |
+
+At the default grid (201 nodes, 100 steps a year) the scheme sits about 0.1% to 0.2% below QuantLib's FD and tree engines on the ten value cases (`oracle/BERMUDAN_EVIDENCE_G.json`). That is the first-order time bias of the reference scheme; it is a pinned reference, not the most accurate engine. On the coarse pinned grid (51 nodes, 12 steps a year) it is about 1.2% below. No case counts as outside (G-18).
+
+Validation: payer and receiver at the forward and 50 bp either side, annual exercise into a 1-into-5-year swap (6 cases); the European limit; two exercise dates; high mean reversion; a coarse pinned grid; 5 error cases.
+
 ## G2++: `rates.g2pp.zcb`, `rates.g2pp.zcb_option` (stage G wave 2b)
 
 Two-factor Gaussian model [BM 4.2, eqs. 4.10, 4.14 and 4.31] (not opened; checked against QuantLib 1.44 `G2`). Suite `stage_g/g2pp_g` (38 cases), generator slice `G2B`. Ruling G-14.

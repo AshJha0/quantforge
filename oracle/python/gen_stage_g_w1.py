@@ -705,6 +705,95 @@ def g5a():
     reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
 
 
+# ================================================================================================ G2c Hull-White sigma calibration
+CAL = "rates.shortrate.hw_calibrate"
+
+
+def cal_obj(inp, sg):
+    tot = mp.mpf(0)
+    for q in inp["swaptions"]:
+        w = dict(mean_reversion=inp["mean_reversion"], sigma=sg, curve=inp["curve"], notional=1.0, **q)
+        w.pop("target_price")
+        m = jam_mp(w)
+        tot += (m - mp.mpf(q["target_price"])) ** 2
+    return tot
+
+
+def jam_mp(inp):
+    cv, a, sg = Curve(**inp["curve"]), inp["mean_reversion"], inp["sigma"]
+    T0 = mp.mpf(inp["expiry_years"])
+    Ts = [mp.mpf(x) for x in inp["payment_times"]]
+    K = mp.mpf(inp["fixed_rate"])
+    acc = [Ts[0] - T0] + [Ts[i] - Ts[i - 1] for i in range(1, len(Ts))]
+    c = [K * x for x in acc]
+    c[-1] += 1
+    a_, = (mp.mpf(a),)
+    f = lambda r: sum(ci * hw_bond(cv, a_, sg, T0, Ti, r)[0] for ci, Ti in zip(c, Ts)) - 1  # noqa: E731
+    rs = mp.findroot(f, 0.0, tol=mp.mpf(10) ** -45)
+    typ = "CALL" if inp["swaption_type"] == "RECEIVER" else "PUT"
+    return sum(ci * gauss_opt(typ, cv.P(T0), cv.P(Ti), hw_bond(cv, a_, sg, T0, Ti, rs)[0], sigma_p(a_, sg, T0, Ti))
+               for ci, Ti in zip(c, Ts))
+
+
+def calibrate(inp):
+    g = lambda x: mp.diff(lambda y: cal_obj(inp, y), x)  # noqa: E731
+    grid = [mp.mpf(k) / 2000 for k in range(2, 81)]
+    vals = [cal_obj(inp, x) for x in grid]
+    i = min(range(len(vals)), key=lambda k: vals[k])
+    assert 0 < i < len(vals) - 1, "optimum at the scan edge"
+    sg = mp.findroot(g, (grid[i - 1], grid[i + 1]), solver="anderson")
+    return sg
+
+
+def g2c():
+    mp.mp.dps = 30
+    s = Suite("hwcal_g", "specifications/04-pricing/short-rate-models.md", G)
+    strips = []
+    # co-terminal 10y strip, ATM-ish strikes, targets from sigma 0.0115 with stated perturbations (so the fit is not exact)
+    for a, true_s, pert, typ in ((0.05, 0.0115, (1.02, 0.99, 1.01, 0.985, 1.0), "PAYER"), (0.2, 0.009, (0.97, 1.03, 1.0, 1.01, 0.99), "RECEIVER"),
+                                 (0.01, 0.007, (1.0, 1.0, 1.0, 1.0, 1.0), "PAYER")):
+        sw = []
+        for T0, p in zip((1.0, 2.0, 3.0, 5.0, 7.0), pert):
+            Ts = [T0 + k for k in range(1, int(10 - T0) + 1)]
+            base = dict(mean_reversion=a, sigma=true_s, curve=CURVE, notional=1.0, expiry_years=T0, payment_times=Ts, fixed_rate=0.03, swaption_type=typ)
+            K = round(jam_price(base)["forward_swap_rate"], 6)
+            px = float(jam_mp(dict(base, fixed_rate=K)) * p)
+            sw.append(dict(expiry_years=T0, payment_times=Ts, fixed_rate=K, swaption_type=typ, target_price=px))
+        strips.append(dict(mean_reversion=a, curve=CURVE, swaptions=sw))
+    n_out = 0
+    for inp in strips:
+        sg = calibrate(inp)
+        fitted = [float(jam_mp(dict(mean_reversion=inp["mean_reversion"], sigma=sg, curve=CURVE, notional=1.0, **{k: v for k, v in q.items() if k != "target_price"}))) for q in inp["swaptions"]]
+        rmse = float(mp.sqrt(cal_obj(inp, sg) / len(fitted)))
+        out = {"sigma": float(sg), "fitted_prices": fitted, "rmse": rmse}
+        # outside: fitted prices by QuantLib HullWhite objects at the golden sigma (G-13 method), and QL's own gradient sign change
+        q = [ql_jam(dict(mean_reversion=inp["mean_reversion"], sigma=float(sg), curve=CURVE, notional=1.0, **{k: v for k, v in x.items() if k != "target_price"}))["price"] for x in inp["swaptions"]]
+        ok = all(abs(a - b) <= 1e-12 + 1e-10 * abs(a) for a, b in zip(fitted, q))
+        note(f"  hwcal sigma {float(sg):.12f} rmse {rmse:.3e} QL fitted match {ok}")
+        s.add(CAL, inp, out, cls=R, verified=["mpmath-30", "grid-scan-unique"], tags=["shortrate", "calibration"],
+              output_classes={"sigma": R, "fitted_prices": R, "rmse": R},
+              limit={"absolute": 1e-12, "relative": 1e-9, "reason": "1-D optimum; sigma judged at 1e-9 relative"},
+              description=f"HW sigma to a 10y co-terminal strip, a = {inp['mean_reversion']}")
+    e = strips[0]
+    errs = [(dict(e, swaptions=[]), "E_INPUT", "empty strip"),
+            (dict(e, swaptions=[dict(e["swaptions"][0], target_price=-0.01)]), "E_DOMAIN", "negative target"),
+            (dict(e, mean_reversion=0.0), "E_DOMAIN", "a = 0")]
+    for inp, code, d in errs:
+        s.add(CAL, inp, error=code, cls="date_and_convention", tags=["invalid", "calibration"], description=d)
+    for c in s.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    mp.mp.dps = 50
+    note(f"hwcal_g outside: {n_out} of {len(s.cases)} (sigma is not a library value)")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["hwcal_g"] = {"counted": n_out, "total": len(s.cases), "rule": "not counted: the fitted sigma is this platform's least-squares optimum; QuantLib reprices the fitted prices (evidence only)"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2 or "G1" in sys.argv:
@@ -717,3 +806,5 @@ if __name__ == "__main__":
         g2b()
     if len(sys.argv) < 2 or "G5A" in sys.argv:
         g5a()
+    if len(sys.argv) < 2 or "G2C" in sys.argv:
+        g2c()
