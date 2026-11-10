@@ -73,3 +73,29 @@ def test_cpi_curve_checks() -> None:
         assert error_of(CpiCurve, CpiCurveData(24300, 300.0, quotes, None))[:2] == years_rule
     assert error_of(CpiCurve, CpiCurveData(24300, 300.0, ((1.0, 0.02),), (1.0,) * 11)) == (
         "E_INPUT", "seasonality needs 12 factors", "seasonality")
+
+
+def test_compound_dated_checks() -> None:
+    from quantforge_core.overnight import compound_dated
+    mon, next_mon = date(2026, 11, 2), date(2026, 11, 9)
+    fix = [(date(2026, 10, 26) + __import__("datetime").timedelta(days=i), 0.04)
+           for i in range(15)]
+    shift = ("E_INPUT", "shift_days is out of range for the method", "shift_days")
+    assert error_of(compound_dated, "SOFR", mon, next_mon, "LOCKOUT", 5, fix) == shift
+    assert error_of(compound_dated, "SOFR", mon, next_mon, "LOCKOUT", 0, fix) == shift
+    assert error_of(compound_dated, "SOFR", date(2026, 11, 7), next_mon, "NONE", 0, fix) == (
+        "E_INPUT", "start and end must be business days", "start")
+    assert error_of(compound_dated, "SOFR", mon, next_mon, "NONE", 0,
+                    [(mon, 0.04), (mon, 0.05)]) == (
+        "E_INPUT", "two fixings on 2026-11-02", "fixings")
+    compound_dated("SOFR", mon, next_mon, "LOCKOUT", 4, fix)  # k = n - 1 is allowed
+
+
+def test_swaption_input_checks() -> None:
+    from quantforge_core.caps_swaptions import swaption_price
+    curve = CurveData(date(2026, 11, 9), "LOG_LINEAR_DF", (date(2027, 11, 9), date(2036, 11, 10)),
+                      (0.96, 0.69))
+    assert error_of(swaption_price, curve, curve, "BLACK_76", 0.2, "PAYER", 0, 60, 0.04,
+                    1e6) == ("E_INPUT", "expiry_months must be at least 1", "expiry_months")
+    assert error_of(swaption_price, curve, curve, "BLACK_76", -0.2, "PAYER", 12, 60, 0.04,
+                    1e6) == ("E_DOMAIN", "vol is negative", "vol")
