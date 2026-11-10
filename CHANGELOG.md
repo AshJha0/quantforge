@@ -3,7 +3,7 @@
 ## Unreleased: stage G (target 0.7.0)
 
 ### Known issues (stage G, in progress)
-- **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, is registered in `specifications/stage-g-rulings.md`.
+- **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, was registered in `specifications/stage-g-rulings.md` with its power calculation before it ran, and passed (variance ratio 0.102, 95% interval 0.089 to 0.116, Z = 33.4; `oracle/G10B_RESULT.json`). G-10's own outcome stays inconclusive.
 - F-33 (FRTB-SA GIRR `low` scenario) stays open for the owner.
 
 ## 0.6.0: stage F, curve layer, portfolio risk and book (2026-11-10)

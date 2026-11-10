@@ -210,3 +210,9 @@ All work committed locally on `stage-g`, not pushed. Waves READY: 1, 2a to 2g, 3
 **Left for stage G:** G2++ swaptions; two-parameter or time-dependent Hull-White calibration; LMM; Q3b AAD core (G-9); Q9 part 2 model-reserve report; the rest of xVA (CSA, netting, MPoR, collateral simulation, PFE and EPE, DVA, FVA, MVA, SIMM-style IM, wrong-way risk, KVA, ORE demo); A5 surrogate (G-11); the R5 audit; QuantLib comparison for callable bonds. **Open for the owner:** G-10 (Q9 variance test, low power). **Carry-over 3** (stage F 51.4%): not advanced.
 
 **Next step:** relay waves 2c to 2g to the language sessions; the spec session continues with G2++ swaptions and then the xVA simulation wave, keeping the outside share above 60% (it is 60.8% now, with little margin).
+
+## Owner decision on G-10, and G-10b (2026-11-10)
+
+G-10 is kept as registered and recorded as **inconclusive, low power** (rulings, CHANGELOG known issues). G-10b was registered with a closed-form power calculation (33,541 paths per estimator for 80% power at a variance ratio of 0.8; 60,000 registered) and committed (`ea11299`) before it ran. It then **passed**: ratio 0.1015 [0.0888, 0.1161], `Z = 33.35`. Language sessions: the Q9 property test now has two parts, G-10 as in the spec (report only, not gating) and G-10b (gating, same seed, streams and path count). F-33 stays open for the owner.
+
+Final status otherwise unchanged from "Final status, 2026-11-10" above: 12 suites, 337 cases, outside 205 of 337 = 60.8%, rulings G-1 to G-21 plus G-10b; nothing pushed.
