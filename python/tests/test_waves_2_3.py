@@ -16,7 +16,7 @@ def test_par_payer_limit() -> None:
     curve = curves.build(data)
     ps = ois.periods("SOFR", AS_OF, "5Y")
     annuity, floating = ois.legs("SOFR", ps, curve)
-    swap = book_risk.BookSwap("P", 5, floating / annuity, "PAYER")
+    swap = book_risk.BookSwap("P", 5, floating / annuity, "PAY")
     out = book_risk.ois_sensitivity(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", [swap])
     assert abs(out["pv"][0]) < 1e-15  # type: ignore[index]
     row = out["quote_sensitivity"]["matrix"][0]  # type: ignore[index]
@@ -26,7 +26,7 @@ def test_par_payer_limit() -> None:
 
 def test_zero_jacobian_upper_triangle_exact() -> None:
     out = book_risk.ois_sensitivity(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF",
-                                    [book_risk.BookSwap("A", 3, 0.04, "RECEIVER")])
+                                    [book_risk.BookSwap("A", 3, 0.04, "RECEIVE")])
     m = out["zero_jacobian"]["matrix"]  # type: ignore[index]
     assert all(m[i][j] == 0.0 for i in range(len(m)) for j in range(i + 1, len(m)))
 
@@ -64,3 +64,17 @@ def test_attribution_identity() -> None:
     out = book.factor_attribution(y, f, ["A", "B"])
     total = out["alpha"] + sum(out["contributions"])  # type: ignore[arg-type,operator]
     assert abs(total - out["mean_return"]) < 1e-15  # type: ignore[operator]
+
+
+def test_tokens_only_in_real_fields() -> None:
+    """Ruling F-38: "NaN" in a string field is a name; in a Real field it is E_DOMAIN."""
+    import pytest
+
+    from quantforge_core.cli.registry import execute
+    from quantforge_core.errors import QfError
+    position = {"id": "NaN", "kind": "BOND", "notional": 100.0, "recovery": 0.4,
+                "market_value": 90.0}
+    assert execute("risk.credit.jtd", {"positions": [position]})["total"] == -50.0
+    with pytest.raises(QfError) as e:
+        execute("risk.credit.jtd", {"positions": [dict(position, notional="Infinity")]})
+    assert e.value.code == "E_DOMAIN"

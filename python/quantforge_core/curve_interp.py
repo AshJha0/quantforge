@@ -235,7 +235,7 @@ class TensionSpline(Interpolator):
         for hi in h:
             z = sigma * hi
             if z < 1e-3:
-                alpha.append(hi / 6 * (1 - z * z / 60))
+                alpha.append(hi / 6 * (1 - 7 * z * z / 60))  # ruling F-35
                 beta.append(hi / 3 * (1 - z * z / 15))
             else:
                 den = _one_minus_exp(2 * z)
@@ -258,7 +258,15 @@ class TensionSpline(Interpolator):
         """R(u), R'(u), R''(u) on an interval of length h."""
         sg = self.sigma
         if sg * h < 1e-3:
-            return (u / h) * (u * u - h * h) / 6, (3 * u * u - h * h) / (6 * h), u / h
+            # Ruling F-35: the cubic limit with its sigma^2 term.
+            k = sg * sg / 60
+            cubic = u ** 3 - h * h * u
+            value = cubic / (6 * h) * (1 + k * (3 * u * u - 7 * h * h))
+            slope = ((3 * u * u - h * h) * (1 + k * (3 * u * u - 7 * h * h))
+                     + cubic * k * 6 * u) / (6 * h)
+            second = (6 * u * (1 + k * (3 * u * u - 7 * h * h)) + 2 * (3 * u * u - h * h) * k * 6 * u
+                      + cubic * k * 6) / (6 * h)
+            return value, slope, second
         den = _one_minus_exp(2 * sg * h)
         e = math.exp(-sg * (h - u))
         sinh_ratio = e * _one_minus_exp(2 * sg * u) / den

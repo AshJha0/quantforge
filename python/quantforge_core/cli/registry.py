@@ -3,14 +3,13 @@
 
 Reading inputs is the E_SCHEMA stage, and the first call into the core ends it. So each core
 module is reached through a gate, which applies limits.md at exactly that point."""
-import math
 from collections.abc import Callable
 from importlib import import_module
 from types import FunctionType, ModuleType, SimpleNamespace
 from typing import Any
 
 from ..errors import QfError
-from .inputs import Inputs
+from .inputs import NONFINITE, Inputs
 from .limits import check_limits
 
 Handler = Callable[[Inputs], Any]
@@ -37,41 +36,19 @@ def op(name: str) -> Callable[[Handler], Handler]:
     return register
 
 
-_TOKENS = {"NaN": math.nan, "Infinity": math.inf, "-Infinity": -math.inf}
-_pending: tuple[str, Inputs, str | None] | None = None
-
-
-def read_tokens(value: Any, path: str = "") -> tuple[Any, str | None]:
-    """Rule F-1: the strings "NaN", "Infinity" and "-Infinity" are read as binary64 values, so a
-    Real field takes them and any other field type rejects them with E_SCHEMA as before. Returns
-    the converted value and the path of the first non-finite value, depth first in document order."""
-    if isinstance(value, str):
-        return (_TOKENS[value], path) if value in _TOKENS else (value, None)
-    if isinstance(value, dict):
-        out, first = {}, None
-        for key, item in value.items():
-            out[key], found = read_tokens(item, f"{path}/{key}")
-            first = first or found
-        return out, first
-    if isinstance(value, list):
-        items, first = [], None
-        for k, item in enumerate(value):
-            converted, found = read_tokens(item, f"{path}/{k}")
-            items.append(converted)
-            first = first or found
-        return items, first
-    return value, None
+_pending: tuple[str, Inputs] | None = None
 
 
 def _pass_gate() -> None:
     """Ends the E_SCHEMA stage: E_LIMIT, then the finite rule (F-2), then the core's own checks."""
     global _pending
     if _pending is not None:
-        name, i, nonfinite = _pending
+        name, i = _pending
         _pending = None
         check_limits(name, i.raw)
-        if nonfinite is not None:
-            raise QfError("E_DOMAIN", f"{nonfinite} is not finite", nonfinite.lstrip("/"))
+        if NONFINITE:
+            first = NONFINITE[0]
+            raise QfError("E_DOMAIN", f"{first} is not finite", first)
 
 
 class _Core:
@@ -100,9 +77,9 @@ core = SimpleNamespace(**{m: _Core(m) for m in CORE_MODULES})
 
 def execute(operation: str, raw: dict[str, Any]) -> Any:
     global _pending
-    converted, nonfinite = read_tokens(raw)
-    i = Inputs(converted)
-    _pending = (operation, i, nonfinite)
+    NONFINITE.clear()
+    i = Inputs(raw)
+    _pending = (operation, i)
     result = REGISTRY[operation](i)
     _pass_gate()
     return result

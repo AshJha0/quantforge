@@ -29,7 +29,9 @@ class Event:
 class _Book:
     def __init__(self, positions: Sequence[tuple[str, float, float]]):
         self.held: dict[str, tuple[float, float]] = {}
-        for instrument, q, a in positions:
+        if len({p[0] for p in positions}) != len(positions):
+            raise QfError("E_INPUT", "duplicate opening position", "positions")
+        for instrument, q, a in positions:  # a zero quantity is ignored (ruling F-39)
             if q != 0:
                 self.held[instrument] = (q, a)
         self.realized: dict[str, float] = {}

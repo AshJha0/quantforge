@@ -227,3 +227,11 @@ upheld in effect by goldens and E-A35.
   at `h = 1e-4` and quartering until two estimates agree (to `1e-14/h + 1e-7` relative), because the
   monotone-convex curve is piecewise in its data and a fixed `1e-4` stencil can straddle a branch
   boundary. Newton itself uses one central difference at `1e-7`.
+
+Ruled (2026-11-10): F-Q3 by F-38 (tokens become numbers only in Real fields and at the top level of an
+any-JSON field; Python changed to match: the conversion moved from a pass over all inputs into the Real
+readers, and `core.store.*` record `value`). F-Q5 by the amended `dR/dq` line of `joint-solve-and-funding.md`
+(as built). F-Q6 by F-26 as amended (as built). F-Q7 by F-28 (as built). Also applied: F-35 (tension
+spline small-`z` series with its `z^2` terms), F-36 (`side` is `PAY` / `RECEIVE` in `risk_f3`), F-39
+(Monte Carlo `seed` a u64 string; `E_NOT_POSITIVE_DEFINITE`; duplicate opening position `E_INPUT`).
+F-Q1, F-Q2 and F-Q4 have no ruling yet.

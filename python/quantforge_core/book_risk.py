@@ -159,7 +159,7 @@ def ois_sensitivity(as_of: date, convention: str, quotes: Sequence[Quote], inter
     for s in swaps:
         ps = ois.periods(convention, as_of, f"{s.tenor_years}Y")
         a, f, d_a, d_f = _legs(convention, ps, curve)
-        sign = 1.0 if s.side == "PAYER" else -1.0
+        sign = 1.0 if s.side == "PAY" else -1.0
         pvs.append(sign * (f - s.fixed_rate * a))
         dpv = [sign * (d_f.get(k, 0.0) - s.fixed_rate * d_a.get(k, 0.0)) for k in range(n)]
         row = []

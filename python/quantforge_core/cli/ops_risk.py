@@ -157,7 +157,7 @@ def _book_ois_sensitivity(i: Inputs) -> Any:
     from ..book_risk import BookSwap
     from .readers import _quotes
     swaps = [BookSwap(s.string("id"), s.integer("tenor_years"), s.real("fixed_rate"),
-                      s.enum("side", ("PAYER", "RECEIVER"))) for s in _objects(i, "swaps")]
+                      s.enum("side", ("PAY", "RECEIVE"))) for s in _objects(i, "swaps")]
     return core.book_risk.ois_sensitivity(
         i.date("as_of"), _convention(i, "convention", conventions.OVERNIGHT), _quotes(i),
         i.enum("interpolation", curves.INTERPOLATIONS), swaps)
@@ -170,16 +170,11 @@ def _curve_pca(i: Inputs) -> Any:
 
 @op("risk.curve.cross_gamma")
 def _curve_cross_gamma(i: Inputs) -> Any:
-    from ..ois import OisTrade
     from ..risk_curve import Product
     data = _curve(i)
     p = i.object("product")
     p.enum("kind", ("OIS",))
-    t = p.object("trade")
-    side = t.enum("side", ("PAYER", "RECEIVER"))  # book-sensitivities.md names the sides so
-    product = Product("OIS", trade=OisTrade(
-        t.enum("convention", conventions.OVERNIGHT), _tenor(t), t.real("fixed_rate"),
-        t.real("notional"), "PAY" if side == "PAYER" else "RECEIVE"))
+    product = Product("OIS", trade=_ois_trade(p))
     bump = i.real("bump_bp")
     if not 0 < bump <= 100:
         raise QfError("E_DOMAIN", "bump_bp must be in (0, 100]", "bump_bp")
@@ -214,17 +209,7 @@ def _var_parametric(i: Inputs) -> Any:
 @op("risk.var.monte_carlo")
 def _var_mc(i: Inputs) -> Any:
     return core.var_risk.monte_carlo(i.reals("mean"), i.matrix("covariance"), i.reals("weights"),
-                                     i.integer("paths"), _seed(i), i.real("confidence"))
-
-
-def _seed(i: Inputs) -> int:
-    """`seed` is a JSON integer in the stage F goldens; a u64 string is also read."""
-    if isinstance(i.raw.get("seed"), str):
-        return i.u64("seed")
-    seed = i.integer("seed")
-    if not 0 <= seed < 2 ** 64:
-        raise QfError("E_DOMAIN", "seed must be a u64", "seed")
-    return seed
+                                     i.integer("paths"), i.u64("seed"), i.real("confidence"))
 
 
 @op("risk.backtest.kupiec")

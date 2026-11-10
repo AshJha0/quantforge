@@ -80,7 +80,7 @@ def monte_carlo(mean: Sequence[float], covariance: Sequence[Sequence[float]],
             s = covariance[i][j] - sum(lower[i][k] * lower[j][k] for k in range(j))
             if i == j:
                 if not s > 0:
-                    raise QfError("E_DOMAIN", "covariance is not positive definite",
+                    raise QfError("E_NOT_POSITIVE_DEFINITE", "covariance is not positive definite",
                                   "covariance")
                 lower[i][i] = math.sqrt(s)
             else:
