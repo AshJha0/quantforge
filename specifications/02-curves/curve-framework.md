@@ -94,7 +94,7 @@ interior nodes i = 1..n-1:  alpha_{i-1} M_{i-1} + (beta_{i-1} + beta_i) M_i + al
 alpha_i = 1/(sigma^2 h_i) - 1/(sigma sinh(z_i)),   beta_i = coth(z_i)/sigma - 1/(sigma^2 h_i)
 ```
 
-Evaluate in stable forms: `sinh(sigma u)/sinh(sigma h) = e^{-sigma (h - u)} (1 - e^{-2 sigma u})/(1 - e^{-2z})`, `1/sinh(z) = 2 e^{-z}/(1 - e^{-2z})`, `coth(z) = (1 + e^{-2z})/(1 - e^{-2z})`, with `1 - e^{-x}` computed as `-expm1(-x)`. When `z < 1e-3` use the series to `O(z^4)` (ruling F-35): `alpha = h/6 (1 - 7 z^2/60)`, `beta = h/3 (1 - z^2/15)` and `R(u) = (u/h)(u^2 - h^2)/6 (1 + sigma^2 (3 u^2 - 7 h^2)/60)`; the omitted terms are below `z^4 = 1e-12` relative. Limits: `sigma -> 0` gives the natural cubic spline in `ln S` (QuantLib `NaturalLogCubicDiscountCurve`); `sigma -> infinity` gives `LOG_LINEAR_DF`. Checks: `tension` missing for `TENSION_SPLINE`: `E_INPUT`; `tension <= 0` or above 1000: `E_DOMAIN`. `tension` is ignored by the other methods.
+Evaluate in stable forms: `sinh(sigma u)/sinh(sigma h) = e^{-sigma (h - u)} (1 - e^{-2 sigma u})/(1 - e^{-2z})`, `1/sinh(z) = 2 e^{-z}/(1 - e^{-2z})`, `coth(z) = (1 + e^{-2z})/(1 - e^{-2z})`, with `1 - e^{-x}` computed as `-expm1(-x)`. Those forms lose about `epsilon / z^2` to cancellation for small `z` (4e-8 relative at `z = 1e-3`), so when `z < 1` use instead, with `shm(x) = sinh x - x` (a series below 0.5: `x^3/6 + x^5/120 + ...`, terms to `x^19`) and `chm(x) = cosh x - 1 = 2 sinh^2(x/2)` (ruling F-35, amended): `alpha = shm(z) / (sigma^2 h sinh z)`, `beta = (z chm(z) - shm(z)) / (sigma^2 h sinh z)`, `R(u) = (h shm(sigma u) - u shm(sigma h)) / (sigma^2 h sinh(sigma h))` and `R'(u) = (h sigma chm(sigma u) - shm(sigma h)) / (sigma^2 h sinh(sigma h))`. The linear terms of `sinh` cancel analytically, so nothing cancels in floating point; measured against 40 digits, `R` and `R'` agree to 1.2e-14 and `alpha`, `beta` to 1e-15 over `z` from 1e-7 to 1. Limits: `sigma -> 0` gives the natural cubic spline in `ln S` (QuantLib `NaturalLogCubicDiscountCurve`); `sigma -> infinity` gives `LOG_LINEAR_DF`. Checks: `tension` missing for `TENSION_SPLINE`: `E_INPUT`; `tension <= 0` or above 1000: `E_DOMAIN`. `tension` is ignored by the other methods.
 
 ### `HYBRID`
 
@@ -116,7 +116,7 @@ Locality is stated on the pillar inputs, not on quotes, because a bootstrap spre
 - `MONOTONE_CONVEX` and `MONOTONIC_LOG_CUBIC`: `f` continuous at every interior pillar (jump at most 1e-12). `TENSION_SPLINE`: `f` and `f'` continuous (`f'` jump at most 1e-8).
 - Positivity: on the golden SOFR pillars every new method's forward is positive on a 10,000-point grid to 30 years (an oracle check).
 
-### Convergence and limit cases
+## Convergence and limit cases
 
 | Method | Asserted order | Measured on | Limit case | Reference |
 |---|---|---|---|---|
@@ -124,7 +124,7 @@ Locality is stated on the pillar inputs, not on quotes, because a bootstrap spre
 | Global bootstrap (Newton) | quadratic in the repricing error | iterations 1 to 3 on the golden quotes | one quote: one pillar, flat forward | stage B `rates.ois.bootstrap` |
 | `MONOTONE_CONVEX` | closed form | none | all discrete forwards equal: a flat curve (rule (a)) | hand |
 
-### Acceptance (plan Q1, as tightened by T)
+## Stage F acceptance (plan Q1, as tightened by T)
 
 - Inputs reprice to `|PV| <= 1e-12` per unit notional with every method (the bootstrap's 1e-13 rule implies it).
 - Against QuantLib 1.44 (rule 11.2.5; convention rows `CRV.MONOTONE_CONVEX` and `CRV.MONOTONIC_LOG_CUBIC` in `oracle/CONVENTION_MAP_F.md`):
@@ -132,7 +132,7 @@ Locality is stated on the pillar inputs, not on quotes, because a bootstrap spre
   - (b) full SOFR, SONIA and ESTR builds (`PiecewiseConvexMonotoneForward` with `ConvexMonotone(0, 1, false)`, `PiecewiseLogCubicDiscount`, `OISRateHelper`): pillars, and zero rates at 200 dates, within 1e-10 (measured 1.6e-12 and 2.7e-12; QuantLib's bootstrap accuracy is 1e-12).
 - `TENSION_SPLINE` and `HYBRID` have no outside library: the limit cases above, and each part of the hybrid equals the plain method on its own nodes.
 
-### Sources (this section)
+## Stage F sources
 
 - [S2] Hagan and West (2006) as above: the monotone convex method and its regions (not opened); West, G. and Hagan, P., "Methods for constructing a yield curve", *Wilmott Magazine*, May 2008, 70-81 (not opened)
 - [S3] Hyman, J. M., "Accurate monotonicity preserving cubic interpolation", *SIAM Journal on Scientific and Statistical Computing* 4(4), 1983, 645-654 (not opened)

@@ -10,8 +10,8 @@ Risk before stage F was bump and revalue only (ADR-0010). AAD is added here as a
 
 ### Inputs
 
-- `as_of`, `convention` (`SOFR`, `SONIA`, `ESTR`), `quotes` (`[{tenor, rate}]`), `interpolation` (`LOG_LINEAR_DF` in the goldens; any value `rates.ois.bootstrap` takes): the curve is `rates.ois.bootstrap` of these quotes (`02-curves/ois-curves.md`).
-- `swaps`: at least one, else `E_INPUT`; ids unique, else `E_INPUT`. Each has `id`, `tenor_years` (integer, `>= 1`, else `E_DOMAIN`), `fixed_rate` (decimal), `side` (`PAY` or `RECEIVE`, as `ois-curves.md`, else `E_SCHEMA`; ruling F-36). A swap is an OIS on the curve's convention from spot, with the periods of an OIS of tenor `"<n>Y"` on that convention (`ois-curves.md`), notional 1.
+- `as_of`, `convention` (`SOFR`, `SONIA`, `ESTR`), `quotes` (`[{tenor, rate}]`), `interpolation` (`LOG_LINEAR_DF` or `LINEAR_ZERO`, the sequential builds; another value is `E_INPUT`, ruling F-41): the curve is `rates.ois.bootstrap` of these quotes (`02-curves/ois-curves.md`).
+- `swaps`: at least one, else `E_INPUT`; ids unique, else `E_INPUT`. Each has `id`, `tenor_years` (integer in `[1, 100]`, else `E_DOMAIN`, ruling F-41), `fixed_rate` (decimal), `side` (`PAY` or `RECEIVE`, as `ois-curves.md`, else `E_SCHEMA`; ruling F-36). A swap is an OIS on the curve's convention from spot, with the periods of an OIS of tenor `"<n>Y"` on that convention (`ois-curves.md`), notional 1.
 
 ### Values
 

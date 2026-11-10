@@ -292,6 +292,23 @@ def _em1(z):
     return -math.expm1(-z)
 
 
+def _shm(x):
+    """sinh(x) - x without cancellation (ruling F-35, amended): series below 0.5 (terms to x^19, truncation below 1e-22
+    relative), the difference itself above."""
+    if abs(x) < 0.5:
+        x2, term, acc = x * x, x * x * x / 6, 0.0
+        for k in range(1, 10):
+            acc += term
+            term *= x2 / ((2 * k + 2) * (2 * k + 3))
+        return acc
+    return math.sinh(x) - x
+
+
+def _chm(x):
+    """cosh(x) - 1 = 2 sinh^2(x/2), without cancellation."""
+    return 2 * math.sinh(x / 2) ** 2
+
+
 class TensionSpline:
     """Exponential tension spline on ln S, tension s > 0 per year, natural ends (M_0 = M_n = 0). Stable forms (spec)."""
 
@@ -303,9 +320,10 @@ class TensionSpline:
         al, be = [], []
         for hi in h:
             z = s * hi
-            if z < 1e-3:   # series: alpha = h/6 (1 - z^2/60), beta = h/3 (1 - z^2/15)  (error below 1e-16 relative)
-                al.append(hi / 6 * (1 - z * z / 60))
-                be.append(hi / 3 * (1 - z * z / 15))
+            if z < 1.0:   # cancellation-free forms (ruling F-35, amended)
+                sz = math.sinh(z)
+                al.append(_shm(z) / (s * s * hi * sz))
+                be.append((z * _chm(z) - _shm(z)) / (s * s * hi * sz))
             else:
                 # alpha = 1/(s^2 h) - 1/(s sinh z),  beta = coth(z)/s - 1/(s^2 h)
                 e2 = math.exp(-2 * z)
@@ -330,13 +348,18 @@ class TensionSpline:
         s, h, x0 = self.s, self.h[j], self.x[j]
         a, b = t - x0, self.x[j + 1] - t
         z = s * h
-        if z < 1e-3:
-            # cubic-spline limit with the O(z^2) term dropped: |error| below 1e-12 h^2 |M|
-            ra = (a / h) * (a * a - h * h) / 6
-            rb = (b / h) * (b * b - h * h) / 6
-            dra = (3 * a * a - h * h) / (6 * h)
-            drb = -(3 * b * b - h * h) / (6 * h)
-            return ra, rb, dra, drb
+        if z < 1.0:
+            # cancellation-free forms (ruling F-35, amended): the linear terms of sinh cancel analytically
+            # R(u) = [h shm(s u) - u shm(s h)] / (s^2 h sinh(s h));  R'(u) = [h s chm(s u) - shm(s h)] / (s^2 h sinh(s h))
+            d = s * s * h * math.sinh(z)
+            shz = _shm(z)
+
+            def R(u):
+                return (h * _shm(s * u) - u * shz) / d
+
+            def dR(u):
+                return (h * s * _chm(s * u) - shz) / d
+            return R(a), R(b), dR(a), -dR(b)
         den = 1 - math.exp(-2 * z)
         # sinh(s a)/sinh(s h) = e^{-s b} (1 - e^{-2 s a}) / (1 - e^{-2 z}), the same with a and b swapped
         sa = math.exp(-s * b) * _em1(2 * s * a) / den

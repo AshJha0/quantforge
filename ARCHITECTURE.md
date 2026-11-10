@@ -95,6 +95,11 @@ No new error code and no wire-format change; `E_ARBITRAGE` (stage C) is reused f
 
 Worked example: `ratesvol_e-0006` touches four layers: the stage B curves (input), the D7 swap schedule and annuity (4.27337), the E4 parameter interpolation (`rho = -0.27995` between nodes), the stage C Hagan formula (vol 25.27%) and the D7 Black swaption price (205,137.03 on 10m). Status: implemented in all four languages; 277 of these 449 cases are outside-checked (ruling E-B28, `specifications/05-volatility/stage-e-targets-b.md`).
 
-### Stage F: risk, portfolio and book (v0.6, planned)
+### Stage F: curve layer, portfolio risk and book (v0.6.0, specified)
 
-*Planned.* This section is written at the stage F merge. Already decided for it: public names across the four languages follow one generated name map, with units in names, enums for closed choices, validated constructors and a thread-safety line per type ([ADR-0011](architecture/decisions/ADR-0011-api-style.md)); what must be bit-exact and what is within tolerance is in [docs/determinism.md](docs/determinism.md).
+Specified on the `stage-f` branch; the builds land with the part 2 merge. What changes in the structure:
+- **Curves (domain 02)** take a pluggable interpolation on `S = D/J`: monotone convex, monotonic log cubic, tension spline and hybrid. A joint solver treats several curves as one system and returns the IFT Jacobian. Curves are passed in dependency order, so `dR/dx` is block lower triangular and the cross-curve zeros are exact (ruling F-25).
+- **Risk (domain 06)** gains its first non-bump method. `risk.book.ois_sensitivity` defines exact derivatives; Rust computes them on an AAD tape through the IFT, and the other builds by the chain rule (ruling F-29; ADR-0010 still governs every older risk operation). Portfolio risk adds VaR and ES (four methods), the Kupiec, Christoffersen and traffic-light backtests, and FRTB-SA GIRR delta.
+- **Portfolio (domain 07)** gets its first operations: the book lifecycle and end-of-day marks, with a new `book` module in each language (name map, ADR-0011).
+- **Inputs:** a Real input may be the string `"NaN"`, `"Infinity"` or `"-Infinity"`, and every operation refuses a non-finite input first (rulings F-1 to F-4).
+- Public names across the four languages follow one generated name map, with units in names, enums for closed choices, validated constructors and a thread-safety line per type ([ADR-0011](architecture/decisions/ADR-0011-api-style.md)). What must be bit-exact and what is within tolerance is in [docs/determinism.md](docs/determinism.md).

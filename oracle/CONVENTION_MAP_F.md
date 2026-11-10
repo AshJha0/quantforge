@@ -13,7 +13,7 @@ QuantLib 1.44. self-reviewed 2026-11-09 (spec session); second review by the R5 
 | `SCIPY.CHI2` | 06-risk/var-es-and-backtests.md Kupiec, Christoffersen p-values | scipy.stats.chi2.sf(lr, dof); likelihood ratios from scipy.stats.binom.logpmf and scipy.special.xlogy |
 | `SCIPY.BINOM` | 06-risk/var-es-and-backtests.md traffic light | scipy.stats.binom.cdf(x, n, 1 - c); zones at 0.95 and 0.9999; plus factor Basel 1996 Table 2 |
 | `SCIPY.NORM` | 06-risk/var-es-and-backtests.md parametric VaR and ES | scipy.stats.norm.ppf; ES by scipy.integrate.quad of the normal tail (not the closed form) |
-| `NUMPY.QUANTILE` | 06-risk/var-es-and-backtests.md historical VaR | numpy.quantile(losses, c, method='inverted_cdf') (Hyndman and Fan type 1); ES as the mean of losses at or above it (continuous data, no ties) |
+| `NUMPY.QUANTILE` | 06-risk/var-es-and-backtests.md historical VaR | numpy.quantile(losses, c, method='inverted_cdf') (Hyndman and Fan type 1); ES as the mean of the sorted losses from the first position holding that quantile (agrees with the spec without ties; a tie at the VaR scenario, risk_f4-0107, is not outside-checked) |
 | `SCIPY.EIGH` | 06-risk/book-sensitivities.md PCA | numpy.cov(ddof=1); scipy.linalg.eigh (LAPACK syevr); sign rule of the spec |
 | `SCIPY.LSTSQ` | 04-pricing/use-cases.md use case 4 factor attribution | scipy.linalg.lstsq on [1, F] (LAPACK gelsd); R^2, residual vol and standard errors from its residuals and numpy.linalg.inv of X'X |
 | `SCIPY.QUAD` | 02-curves/curve-framework.md discount factors of MONOTONE_CONVEX from its forward | scipy.integrate.quad (QUADPACK qags) of QuantLib ConvexMonotoneInterpolation, per section, epsrel 1e-13 |

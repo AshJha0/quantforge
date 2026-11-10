@@ -2349,6 +2349,1186 @@
     "synthetic"
    ],
    "description": "type not listed"
+  },
+  {
+   "case_id": "cdsidx_f-0046",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.0105,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.012,
+    "coupon": 0.01,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 180.25957676585193,
+     "forward_spread": 0.006242251539712263,
+     "adjusted_forward": 0.006638259698725055,
+     "adjusted_strike": 0.011961228190116106,
+     "risky_annuity": 4.308405717364725,
+     "strike_annuity": 4.267928765226642,
+     "strike_hazard": 0.020185086742746338,
+     "exercise_upfront": 85358.57530453285,
+     "front_end_protection": 17061.638164137938
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "IG 3m, K = 120 bp above C = 100 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0047",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.0105,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.012,
+    "coupon": 0.01,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 229515.33839338075,
+     "forward_spread": 0.006242251539712263,
+     "adjusted_forward": 0.006638259698725055,
+     "adjusted_strike": 0.011961228190116106,
+     "risky_annuity": 4.308405717364725,
+     "strike_annuity": 4.267928765226642,
+     "strike_hazard": 0.020185086742746338,
+     "exercise_upfront": 85358.57530453285,
+     "front_end_protection": 17061.638164137938
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "IG 3m, K = 120 bp above C = 100 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0048",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.0105,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.015,
+    "coupon": 0.01,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.112221762418384,
+     "forward_spread": 0.006242251539712263,
+     "adjusted_forward": 0.006638259698725055,
+     "adjusted_strike": 0.014846396526204769,
+     "risky_annuity": 4.308405717364725,
+     "strike_annuity": 4.2185963359336185,
+     "strike_hazard": 0.025231408940024243,
+     "exercise_upfront": 210929.8167966809,
+     "front_end_protection": 17061.638164137938
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "IG 3m, K = 150 bp above C = 100 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0049",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.0105,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.015,
+    "coupon": 0.01,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 353647.94858601806,
+     "forward_spread": 0.006242251539712263,
+     "adjusted_forward": 0.006638259698725055,
+     "adjusted_strike": 0.014846396526204769,
+     "risky_annuity": 4.308405717364725,
+     "strike_annuity": 4.2185963359336185,
+     "strike_hazard": 0.025231408940024243,
+     "exercise_upfront": 210929.8167966809,
+     "front_end_protection": 17061.638164137938
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "IG 3m, K = 150 bp above C = 100 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0050",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.0105,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 0.02,
+    "coupon": 0.01,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.05461345362160642,
+     "forward_spread": 0.006242251539712263,
+     "adjusted_forward": 0.006638259698725055,
+     "adjusted_strike": 0.019507834012351104,
+     "risky_annuity": 4.308405717364725,
+     "strike_annuity": 4.1380965744645195,
+     "strike_hazard": 0.03364201102790713,
+     "exercise_upfront": 413809.6574464519,
+     "front_end_protection": 17061.638164137938
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "IG 3m, K = 200 bp above C = 100 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0051",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.0105,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 0.02,
+    "coupon": 0.01,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 554473.5301422206,
+     "forward_spread": 0.006242251539712263,
+     "adjusted_forward": 0.006638259698725055,
+     "adjusted_strike": 0.019507834012351104,
+     "risky_annuity": 4.308405717364725,
+     "strike_annuity": 4.1380965744645195,
+     "strike_hazard": 0.03364201102790713,
+     "exercise_upfront": 413809.6574464519,
+     "front_end_protection": 17061.638164137938
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "IG 3m, K = 200 bp above C = 100 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0052",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.055,
+    "recovery": 0.3,
+    "type": "PAYER",
+    "strike": 0.055,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 53212.37351542448,
+     "forward_spread": 0.03814623849390622,
+     "adjusted_forward": 0.0408416325282404,
+     "adjusted_strike": 0.054809635741693376,
+     "risky_annuity": 3.8448127360853572,
+     "strike_annuity": 3.7361113490889,
+     "strike_hazard": 0.07930175926945675,
+     "exercise_upfront": 186805.5674544449,
+     "front_end_protection": 103632.85311976528
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY 3m, K = 550 bp above C = 500 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0053",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.055,
+    "recovery": 0.3,
+    "type": "RECEIVER",
+    "strike": 0.055,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 590255.9400430765,
+     "forward_spread": 0.03814623849390622,
+     "adjusted_forward": 0.0408416325282404,
+     "adjusted_strike": 0.054809635741693376,
+     "risky_annuity": 3.8448127360853572,
+     "strike_annuity": 3.7361113490889,
+     "strike_hazard": 0.07930175926945675,
+     "exercise_upfront": 186805.5674544449,
+     "front_end_protection": 103632.85311976528
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY 3m, K = 550 bp above C = 500 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0054",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.055,
+    "recovery": 0.3,
+    "type": "PAYER",
+    "strike": 0.07,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13365.643166101136,
+     "forward_spread": 0.03814623849390622,
+     "adjusted_forward": 0.0408416325282404,
+     "adjusted_strike": 0.06835523522045314,
+     "risky_annuity": 3.8448127360853572,
+     "strike_annuity": 3.564573613540776,
+     "strike_hazard": 0.1009319389731716,
+     "exercise_upfront": 712914.7227081553,
+     "front_end_protection": 103632.85311976528
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY 3m, K = 700 bp above C = 500 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0055",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.055,
+    "recovery": 0.3,
+    "type": "RECEIVER",
+    "strike": 0.07,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1071212.1436322208,
+     "forward_spread": 0.03814623849390622,
+     "adjusted_forward": 0.0408416325282404,
+     "adjusted_strike": 0.06835523522045314,
+     "risky_annuity": 3.8448127360853572,
+     "strike_annuity": 3.564573613540776,
+     "strike_hazard": 0.1009319389731716,
+     "exercise_upfront": 712914.7227081553,
+     "front_end_protection": 103632.85311976528
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY 3m, K = 700 bp above C = 500 bp",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0056",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 1e-10,
+    "recovery": 0.4,
+    "type": "PAYER",
+    "strike": 1e-08,
+    "coupon": 0.0,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2.6827295097735973e-106,
+     "forward_spread": 5.945014675250224e-11,
+     "adjusted_forward": 6.312490010001647e-11,
+     "adjusted_strike": 9.99999960760892e-09,
+     "risky_annuity": 4.428205372641627,
+     "strike_annuity": 4.473322142900163,
+     "strike_hazard": 1.682081634155963e-08,
+     "exercise_upfront": 0.4473322142900163,
+     "front_end_protection": 0.0001627256251659536
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "hazard 1e-10: F_adj about 6e-11, still valid (F-10 refuses only F_adj <= 0)",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0057",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-02-17",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 1e-10,
+    "recovery": 0.4,
+    "type": "RECEIVER",
+    "strike": 1e-08,
+    "coupon": 0.0,
+    "notional": 10000000.0,
+    "vol": 0.45
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.44002521967057623,
+     "forward_spread": 5.945014675250224e-11,
+     "adjusted_forward": 6.312490010001647e-11,
+     "adjusted_strike": 9.99999960760892e-09,
+     "risky_annuity": 4.428205372641627,
+     "strike_annuity": 4.473322142900163,
+     "strike_hazard": 1.682081634155963e-08,
+     "exercise_upfront": 0.4473322142900163,
+     "front_end_protection": 0.0001627256251659536
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "hazard 1e-10: F_adj about 6e-11, still valid (F-10 refuses only F_adj <= 0)",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0058",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2026-12-09",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "PAYER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 301512.1510584736,
+     "forward_spread": 0.05548632614049099,
+     "adjusted_forward": 0.05668925035447258,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 3.8021599595947304,
+     "strike_annuity": 3.908717448341805,
+     "strike_hazard": 0.07208931127417656,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 45737.10280827745
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2026-12-09: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0059",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2026-12-09",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "RECEIVER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 47176.15248366885,
+     "forward_spread": 0.05548632614049099,
+     "adjusted_forward": 0.05668925035447258,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 3.8021599595947304,
+     "strike_annuity": 3.908717448341805,
+     "strike_hazard": 0.07208931127417656,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 45737.10280827745
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2026-12-09: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0060",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-05-10",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "PAYER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 598920.0523207164,
+     "forward_spread": 0.05548373337957302,
+     "adjusted_forward": 0.06339694778278782,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 3.396001578810569,
+     "strike_annuity": 3.6605132333049926,
+     "strike_hazard": 0.07209260470275458,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 268732.88606783963
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2027-05-10: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0061",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-05-10",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "RECEIVER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 143959.4941048149,
+     "forward_spread": 0.05548373337957302,
+     "adjusted_forward": 0.06339694778278782,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 3.396001578810569,
+     "strike_annuity": 3.6605132333049926,
+     "strike_hazard": 0.07209260470275458,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 268732.88606783963
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2027-05-10: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0062",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-11-09",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "PAYER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 844928.1125568547,
+     "forward_spread": 0.05548346534443389,
+     "adjusted_forward": 0.07316987781463301,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 2.932401334489831,
+     "strike_annuity": 3.3462071446980435,
+     "strike_hazard": 0.07209298726461917,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 518636.59529949486
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2027-11-09: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0063",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2027-11-09",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "RECEIVER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 165494.30632089314,
+     "forward_spread": 0.05548346534443389,
+     "adjusted_forward": 0.07316987781463301,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 2.932401334489831,
+     "strike_annuity": 3.3462071446980435,
+     "strike_hazard": 0.07209298726461917,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 518636.59529949486
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2027-11-09: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0064",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2028-11-09",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "PAYER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1211268.1670106628,
+     "forward_spread": 0.05548276592516997,
+     "adjusted_forward": 0.10168154838868912,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 2.082924167502106,
+     "strike_annuity": 2.663580208017423,
+     "strike_hazard": 0.07209397229852174,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 962285.6050243654
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "payer",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2028-11-09: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
+  },
+  {
+   "case_id": "cdsidx_f-0065",
+   "operation": "credit.cdsindex.option_price",
+   "inputs": {
+    "as_of": "2026-11-09",
+    "expiry": "2028-11-09",
+    "maturity": "2031-12-20",
+    "rate": 0.037,
+    "hazard_rate": 0.08,
+    "recovery": 0.3,
+    "type": "RECEIVER",
+    "strike": 0.05,
+    "coupon": 0.05,
+    "notional": 10000000.0,
+    "vol": 0.6
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 134780.7054833616,
+     "forward_spread": 0.05548276592516997,
+     "adjusted_forward": 0.10168154838868912,
+     "adjusted_strike": 0.05,
+     "risky_annuity": 2.082924167502106,
+     "strike_annuity": 2.663580208017423,
+     "strike_hazard": 0.07209397229852174,
+     "exercise_upfront": 0.0,
+     "front_end_protection": 962285.6050243654
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "parity-check"
+   ],
+   "tags": [
+    "cdsindex",
+    "receiver",
+    "pedersen",
+    "r5-audit",
+    "synthetic"
+   ],
+   "description": "HY hazard 8%, expiry 2028-11-09: FEP grows with expiry",
+   "output_classes": {
+    "forward_spread": "root_finding",
+    "adjusted_forward": "root_finding",
+    "adjusted_strike": "root_finding",
+    "risky_annuity": "root_finding",
+    "strike_annuity": "root_finding",
+    "strike_hazard": "root_finding",
+    "exercise_upfront": "root_finding",
+    "front_end_protection": "simple_analytic"
+   },
+   "tolerance_limit": {
+    "absolute": 0.01,
+    "relative": 1e-09,
+    "reason": "1e-9 per unit notional, as stage D credit"
+   }
   }
  ]
 }
