@@ -221,6 +221,25 @@ def _one_minus_exp(x: float) -> float:
     return -math.expm1(-x)
 
 
+def shm(x: float) -> float:
+    """sinh x - x: the series x^3/3! + ... + x^19/19! below 0.5, else direct."""
+    if abs(x) >= 0.5:
+        return math.sinh(x) - x
+    x2, term, total = x * x, x * x * x / 6, 0.0
+    terms = [term]
+    for k in range(2, 10):  # x^5 ... x^19
+        term *= x2 / ((2 * k) * (2 * k + 1))
+        terms.append(term)
+    for t in reversed(terms):  # smallest first
+        total += t
+    return total
+
+
+def chm(x: float) -> float:
+    """cosh x - 1 = 2 sinh^2(x/2)."""
+    return 2 * math.sinh(x / 2) ** 2
+
+
 class TensionSpline(Interpolator):
     """Exponential tension spline in ln S with natural ends."""
 
@@ -234,9 +253,10 @@ class TensionSpline(Interpolator):
         alpha, beta = [], []
         for hi in h:
             z = sigma * hi
-            if z < 1e-3:
-                alpha.append(hi / 6 * (1 - 7 * z * z / 60))  # ruling F-35
-                beta.append(hi / 3 * (1 - z * z / 15))
+            if z < 1:  # ruling F-35 (amended): cancellation-free forms
+                d = sigma * sigma * hi * math.sinh(z)
+                alpha.append(shm(z) / d)
+                beta.append((z * chm(z) - shm(z)) / d)
             else:
                 den = _one_minus_exp(2 * z)
                 inv_sinh = 2 * math.exp(-z) / den
@@ -257,16 +277,11 @@ class TensionSpline(Interpolator):
     def _r(self, u: float, h: float) -> tuple[float, float, float]:
         """R(u), R'(u), R''(u) on an interval of length h."""
         sg = self.sigma
-        if sg * h < 1e-3:
-            # Ruling F-35: the cubic limit with its sigma^2 term.
-            k = sg * sg / 60
-            cubic = u ** 3 - h * h * u
-            value = cubic / (6 * h) * (1 + k * (3 * u * u - 7 * h * h))
-            slope = ((3 * u * u - h * h) * (1 + k * (3 * u * u - 7 * h * h))
-                     + cubic * k * 6 * u) / (6 * h)
-            second = (6 * u * (1 + k * (3 * u * u - 7 * h * h)) + 2 * (3 * u * u - h * h) * k * 6 * u
-                      + cubic * k * 6) / (6 * h)
-            return value, slope, second
+        if sg * h < 1:  # ruling F-35 (amended): the linear terms of sinh cancel analytically
+            d = sg * sg * h * math.sinh(sg * h)
+            value = (h * shm(sg * u) - u * shm(sg * h)) / d
+            slope = (h * sg * chm(sg * u) - shm(sg * h)) / d
+            return value, slope, math.sinh(sg * u) / math.sinh(sg * h)
         den = _one_minus_exp(2 * sg * h)
         e = math.exp(-sg * (h - u))
         sinh_ratio = e * _one_minus_exp(2 * sg * u) / den

@@ -113,3 +113,23 @@ def test_option_checks() -> None:
     with pytest.raises(QfError) as e:
         curves.build(_data("HYBRID", step_end=AS_OF + timedelta(days=3)))
     assert e.value.code == "E_INPUT"
+
+
+def test_tension_small_z_against_series() -> None:
+    """Ruling F-35: below z = 1e-3 the coefficients match their Taylor series."""
+    from quantforge_core.curve_interp import TensionSpline, chm, shm
+    for x in (1e-7, 1e-4, 1e-3, 0.3, 0.7):
+        assert abs(shm(x) - (x ** 3 / 6 + x ** 5 / 120 + x ** 7 / 5040)) <= 1e-15 * x ** 3 + x ** 9
+        assert abs(chm(x) - (x * x / 2 + x ** 4 / 24 + x ** 6 / 720)) <= 1e-15 * x * x + x ** 8
+    sigma, h = 1e-3, 0.5  # z = 5e-4
+    z = sigma * h
+    f = TensionSpline([0.0, h, 2 * h], [0.0, -0.02, -0.035], sigma)
+    alpha = h / 6 * (1 - 7 * z * z / 60)
+    beta = h / 3 * (1 - z * z / 15)
+    # M_1 solves (beta + beta) M_1 = s_1 - s_0 with natural ends.
+    expected = ((-0.035 + 0.02) / h - (-0.02) / h) / (2 * beta)
+    assert abs(f.big_m[1] - expected) < 1e-12 * abs(expected)
+    for u in (0.0, 0.1, 0.25, 0.5):
+        series = (u / h) * (u * u - h * h) / 6 * (1 + sigma ** 2 * (3 * u * u - 7 * h * h) / 60)
+        assert abs(f._r(u, h)[0] - series) <= 1e-15 + 1e-12 * abs(series)
+    assert alpha > 0
