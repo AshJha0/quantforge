@@ -38,6 +38,8 @@ ROWS = {
     "NUMPY.QUANTILE": ("06-risk/var-es-and-backtests.md historical VaR", "numpy.quantile(losses, c, method='inverted_cdf') (Hyndman and Fan type 1); ES as the mean of losses at or above it (continuous data, no ties)"),
     "SCIPY.EIGH": ("06-risk/book-sensitivities.md PCA", "numpy.cov(ddof=1); scipy.linalg.eigh (LAPACK syevr); sign rule of the spec"),
     "SCIPY.LSTSQ": ("04-pricing/use-cases.md use case 4 factor attribution", "scipy.linalg.lstsq on [1, F] (LAPACK gelsd); R^2, residual vol and standard errors from its residuals and numpy.linalg.inv of X'X"),
+    "SCIPY.QUAD": ("02-curves/curve-framework.md discount factors of MONOTONE_CONVEX from its forward", "scipy.integrate.quad (QUADPACK qags) of QuantLib ConvexMonotoneInterpolation, per section, epsrel 1e-13"),
+    "ARCH.GARCH": ("05-volatility/garch.md loglik, estimate; 06-risk/var-es-and-backtests.md FHS", "arch 7.2.0 (run under WSL): GARCH(1,0,1).compute_variance with backcast = (v0 - omega)/(alpha + beta) so that sigma2_1 = v0; Normal / StudentsT (standardised) loglikelihood; EWMAVariance(lam) with backcast = mean square; fits maximise that objective (scipy Nelder-Mead, Newton on a finite-difference Hessian); oracle/python/outside_garch_arch.py"),
     "CBOE.SAMPLE": ("05-volatility/vix-index.md Cboe sample", "Cboe Volatility Index Methodology v6.0, Appendix 3 printed values (F, K0, sigma^2, VIX)"),
 }
 LAGS = {"SOFR": (2, 2), "ESTR": (2, 2), "SONIA": (0, 0)}
@@ -71,23 +73,88 @@ def h_bootstrap(i):
     return {"pillars": [{"date": h.pillarDate().ISO(), "discount_factor": c.discount(h.pillarDate())} for h in hs]}, {"CRV." + i["interpolation"], "OIS.HELPER", "IDX"}
 
 
-def h_inspect(i):
+def h_inspect_cm(i):
+    """MONOTONE_CONVEX: forwards from QuantLib ConvexMonotoneInterpolation(0, 1, forcePositive false) on the discrete
+    forwards of the pillars (ruling F-19); discount factors by scipy.integrate.quad of that forward, section by section
+    (the wheel does not expose the primitive); flat f(t_n-) beyond the last pillar (ruling F-20)."""
+    from scipy import integrate
     cv = i["curve"]
-    if cv["interpolation"] != "MONOTONIC_LOG_CUBIC" or cv.get("jumps"):
-        raise NotImplementedError("only MONOTONIC_LOG_CUBIC without jumps has a QuantLib discount curve from pillars")
+    a = D(cv["as_of"])
+    tn = [0.0] + [(D(p["date"]) - a).days / 365 for p in cv["pillars"]]
+    S = [1.0] + [p["discount_factor"] for p in cv["pillars"]]
+    fd = [math.log(S[k - 1] / S[k]) / (tn[k] - tn[k - 1]) for k in range(1, len(tn))]
+    ip = ql.ConvexMonotoneInterpolation(tn, [fd[0]] + fd, 0.0, 1.0, False)
+    fend = ip(tn[-1], True)
+    fwd = lambda u: ip(u, True) if u < tn[-1] else fend  # noqa: E731
+
+    def prim(u):
+        acc, lo = 0.0, 0.0
+        for k in range(1, len(tn)):
+            hi = min(u, tn[k])
+            if hi > lo:
+                acc += integrate.quad(fwd, lo, hi, epsabs=1e-16, epsrel=1e-13, limit=200)[0]
+            lo = tn[k]
+            if u <= tn[k]:
+                return acc
+        return acc + fend * (u - tn[-1])
+    out = {"discount_factors": [], "zero_rates": [], "instantaneous_forwards": []}
+    for s in i["dates"]:
+        u = (D(s) - a).days / 365
+        df = math.exp(-prim(u))
+        out["discount_factors"].append(df)
+        out["zero_rates"].append(None if u == 0 else -math.log(df) / u)
+        out["instantaneous_forwards"].append(fwd(min(u, tn[-1])) if u < tn[-1] else fend)
+    return out, {"CRV.MONOTONE_CONVEX", "SCIPY.QUAD"}
+
+
+def h_inspect_ll(i):
+    """LOG_LINEAR_DF: discount factors from QuantLib DiscountCurve (LogLinear on ACT/365F, which extrapolates the last
+    segment as the stage B rule does); the forward is -d ln D/dt of that curve, taken on the segment that starts at or
+    before t (right-continuous at pillars, the spec's one-sided rule), from QuantLib's discount factors at the segment ends."""
+    cv = i["curve"]
     a = D(cv["as_of"])
     ql.Settings.instance().evaluationDate = Q(a)
     ds = [Q(a)] + [Q(D(p["date"])) for p in cv["pillars"]]
-    c = ql.MonotonicLogCubicDiscountCurve(ds, [1.0] + [p["discount_factor"] for p in cv["pillars"]], A365)
+    c = ql.DiscountCurve(ds, [1.0] + [p["discount_factor"] for p in cv["pillars"]], A365)
+    c.enableExtrapolation()
+    tn = [0.0] + [(D(p["date"]) - a).days / 365 for p in cv["pillars"]]
+    out = {"discount_factors": [], "zero_rates": [], "instantaneous_forwards": []}
+    for s in i["dates"]:
+        u = (D(s) - a).days / 365
+        df = c.discount(u, True)
+        k = next((k for k in range(len(tn) - 1) if u < tn[k + 1]), len(tn) - 2)
+        out["discount_factors"].append(df)
+        out["zero_rates"].append(None if u == 0 else -math.log(df) / u)
+        out["instantaneous_forwards"].append(math.log(c.discount(tn[k], True) / c.discount(tn[k + 1], True)) / (tn[k + 1] - tn[k]))
+    return out, {"CRV.LOG_LINEAR_DF"}
+
+
+def h_inspect(i):
+    cv = i["curve"]
+    if cv["interpolation"] == "MONOTONE_CONVEX" and not cv.get("jumps"):
+        return h_inspect_cm(i)
+    if cv["interpolation"] == "LOG_LINEAR_DF" and not cv.get("jumps"):
+        return h_inspect_ll(i)
+    if cv["interpolation"] != "MONOTONIC_LOG_CUBIC":
+        raise NotImplementedError("no QuantLib discount curve from pillars for this method")
+    a = D(cv["as_of"])
+    # jumps (curve-framework.md): pillars hold full D; the interpolation is on S = D/J, J the product of factors dated
+    # strictly before the date; reported forwards are those of S (the smooth curve)
+    js = [(D(j["date"]), j["factor"]) for j in cv.get("jumps") or []]
+    J = lambda d: math.prod(fc for jd, fc in js if jd < d)  # noqa: E731
+    ql.Settings.instance().evaluationDate = Q(a)
+    ds = [Q(a)] + [Q(D(p["date"])) for p in cv["pillars"]]
+    Sp = [p["discount_factor"] / J(D(p["date"])) for p in cv["pillars"]]
+    c = ql.MonotonicLogCubicDiscountCurve(ds, [1.0] + Sp, A365)
     c.enableExtrapolation()
     # instantaneous forward from QuantLib's own spline slope on ln D (forwardRate(t, t) is a 1e-4 finite difference)
     tn = [0.0] + [(D(p["date"]) - a).days / 365 for p in cv["pillars"]]
-    sp = ql.MonotonicCubicNaturalSpline(tn, [0.0] + [math.log(p["discount_factor"]) for p in cv["pillars"]])
+    sp = ql.MonotonicCubicNaturalSpline(tn, [0.0] + [math.log(v) for v in Sp])
     out = {"discount_factors": [], "zero_rates": [], "instantaneous_forwards": []}
     for s in i["dates"]:
         d = D(s)
         t = (d - a).days / 365
-        df = c.discount(t, True)
+        df = c.discount(t, True) * J(d)
         out["discount_factors"].append(df)
         out["zero_rates"].append(None if t == 0 else -math.log(df) / t)
         out["instantaneous_forwards"].append(-sp.derivative(min(t, tn[-1]), True))
@@ -258,9 +325,48 @@ def h_uc4(i):
             "beta_se": [math.sqrt(s2 * inv[k + 1, k + 1]) for k in range(K)]}, {"SCIPY.LSTSQ"}
 
 
-HANDLERS = {"usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
+def h_cross_gamma(i):
+    """06-risk/book-sensitivities.md: the spec's four-point formula, every revaluation by QuantLib: MakeOIS (SOFR, 2
+    settlement days, payment lag 2, telescopic value dates) on a DiscountCurve (LogLinear, ACT/365F) of the pillars with
+    the PILLAR zero-rate bumps D exp(-h t)."""
+    cv, tr, bp = i["curve"], i["product"]["trade"], i["bump_bp"]
+    if cv["interpolation"] != "LOG_LINEAR_DF" or cv.get("jumps") or tr["convention"] != "SOFR":
+        raise NotImplementedError("log-linear SOFR only")
+    a = D(cv["as_of"])
+    ql.Settings.instance().evaluationDate = Q(a)
+    pd = [D(p["date"]) for p in cv["pillars"]]
+    tn = [(d - a).days / 365 for d in pd]
+    df0 = [p["discount_factor"] for p in cv["pillars"]]
+    h = bp * 1e-4
+
+    def V(dz):
+        crv = ql.DiscountCurve([Q(a)] + [Q(d) for d in pd], [1.0] + [v * math.exp(-z * t) for v, z, t in zip(df0, dz, tn)], A365)
+        crv.enableExtrapolation()
+        hd = ql.YieldTermStructureHandle(crv)
+        sw = ql.MakeOIS(ql.Period(tr["tenor"]), ql.Sofr(hd), tr["fixed_rate"], ql.Period(0, ql.Days),
+                        swapType=ql.OvernightIndexedSwap.Payer if tr["side"] == "PAY" else ql.OvernightIndexedSwap.Receiver,
+                        nominal=tr["notional"], settlementDays=2, paymentLag=2, telescopicValueDates=True, discountingTermStructure=hd)
+        return sw.NPV()
+    n = len(pd)
+    e = lambda pairs: [sum(s * h for k, s in pairs if k == j) for j in range(n)]  # noqa: E731
+    base = V([0.0] * n)
+    G = [[0.0] * n for _ in range(n)]
+    for x in range(n):
+        for y in range(x, n):
+            if x == y:
+                G[x][x] = (V(e([(x, 1)])) - 2 * base + V(e([(x, -1)]))) / bp ** 2
+            else:
+                G[x][y] = G[y][x] = (V(e([(x, 1), (y, 1)])) - V(e([(x, 1), (y, -1)])) - V(e([(x, -1), (y, 1)])) + V(e([(x, -1), (y, -1)]))) / (4 * bp ** 2)
+    return {"value": base, "cross_gamma": G}, {"OIS.HELPER", "IDX", "CRV.LOG_LINEAR_DF"}
+
+
+HANDLERS = {"risk.curve.cross_gamma": h_cross_gamma, "usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
             "risk.var.parametric": h_param, "risk.var.historical": h_hist, "risk.curve.pca": h_pca,
             "rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
+
+
+_A = json.loads((ROOT / "oracle" / "outside_arch_f.json").read_text(encoding="utf-8")) if (ROOT / "oracle" / "outside_arch_f.json").exists() else {"cases": {}, "version": None}
+ARCH, ARCH_VERSION = _A["cases"], _A["version"]
 
 
 def main():
@@ -279,6 +385,15 @@ def main():
                     n_ok += 1
                     reg.append({"case_id": c["case_id"], "operation": c["operation"], "source": "Cboe Volatility Index Methodology v6.0, Appendix 3",
                                 "convention_rows": ["CBOE.SAMPLE"], "map_review": REVIEW})
+                continue
+            if c["case_id"] in ARCH:
+                ok, why, _ = judge(c, ARCH[c["case_id"]])
+                if ok:
+                    n_ok += 1
+                    reg.append({"case_id": c["case_id"], "operation": c["operation"], "library": "arch", "version": ARCH_VERSION,
+                                "convention_rows": ["ARCH.GARCH"], "map_review": REVIEW})
+                else:
+                    print(f"  NOT VERIFIED {c['case_id']} (arch): {why}")
                 continue
             h = HANDLERS.get(c["operation"])
             if not h:
