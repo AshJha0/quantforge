@@ -102,6 +102,18 @@ At the default grid (201 nodes, 100 steps a year) the scheme sits about 0.1% to 
 
 Validation: payer and receiver at the forward and 50 bp either side, annual exercise into a 1-into-5-year swap (6 cases); the European limit; two exercise dates; high mean reversion; a coarse pinned grid; 5 error cases.
 
+## `rates.shortrate.capfloor` (stage G wave 2e)
+
+Caps and floors under Vasicek, CIR and Hull-White as portfolios of bond options [BM 2.6 and 3.3.2]. Suite `stage_g/capfloor_g` (41 cases), generator slice `G2E`. Ruling G-19.
+
+Inputs: `model` and its parameters as `rates.shortrate.zcb_option` (including the `short_rate` rule G-5); `period_times` `t_0 < t_1 < ... < t_m` (at least two, strictly increasing, else `E_INPUT`; `t_0 > 0`, else `E_DOMAIN`); `strike` `K` (simple rate; `1 + K tau_i > 0` for every period, else `E_DOMAIN`); `cap_floor` (`CAP`, `FLOOR`; else `E_INPUT`); `notional`.
+
+Each period `[t_(i-1), t_i]`, `tau_i = t_i - t_(i-1)`, pays `notional tau_i max(L_i - K, 0)` (cap) or `max(K - L_i, 0)` (floor) at `t_i`, where `L_i` is the simple model rate fixed at `t_(i-1)`: `1 + tau_i L_i = 1 / P(t_(i-1), t_i)` (single curve, ruling G-19). Then caplet `= notional (1 + K tau_i) ZBP(0, t_(i-1), t_i, 1/(1 + K tau_i))` and floorlet `= notional (1 + K tau_i) ZBC(...)` with the bond options of `zcb_option`.
+
+Outputs: `price` (the sum) and `caplet_prices` (per period, in order; floorlets for a floor).
+
+Validation: three models x two schedules (semi-annual to 5 years, annual to 7 years) x cap and floor x strikes 3%, 4%, 5% (36 cases), 5 error cases. Values: 50-digit mpmath (CIR through the noncentral chi-square). Asserted: cap minus floor equals `notional sum (P(t_(i-1)) - (1 + K tau_i) P(t_i))` on all 18 pairs. Outside: QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` `discountBondOption` per period, scaled and summed: 36 of 41 count. Wrong convention caught: a cap priced with bond calls.
+
 ## G2++: `rates.g2pp.zcb`, `rates.g2pp.zcb_option` (stage G wave 2b)
 
 Two-factor Gaussian model [BM 4.2, eqs. 4.10, 4.14 and 4.31] (not opened; checked against QuantLib 1.44 `G2`). Suite `stage_g/g2pp_g` (38 cases), generator slice `G2B`. Ruling G-14.

@@ -794,6 +794,84 @@ def g2c():
     reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
 
 
+# ================================================================================================ G2e caps and floors
+CAPOP = "rates.shortrate.capfloor"
+
+
+def cap_value(inp, mut=None):
+    Ts, K, n = inp["period_times"], mp.mpf(inp["strike"]), inp["notional"]
+    typ = "PUT" if inp["cap_floor"] == "CAP" else "CALL"
+    if mut == "type":
+        typ = "CALL" if typ == "PUT" else "PUT"
+    lets = []
+    for t0, t1 in zip(Ts, Ts[1:]):
+        tau = mp.mpf(t1) - mp.mpf(t0)
+        q = {k: v for k, v in inp.items() if k not in ("period_times", "strike", "cap_floor", "notional")}
+        o = opt_value(dict(q, option_type=typ, strike=float(1 / (1 + K * tau)), expiry_years=t0, maturity_years=t1, notional=1.0))
+        lets.append((1 + K * tau) * mp.mpf(o["price"]) * n)
+    return {"price": float(sum(lets)), "caplet_prices": [float(x) for x in lets]}
+
+
+def ql_cap(inp):
+    m = ql_model(inp)
+    Ts, K, n = inp["period_times"], inp["strike"], inp["notional"]
+    t = ql.Option.Put if inp["cap_floor"] == "CAP" else ql.Option.Call
+    lets = [(1 + K * (t1 - t0)) * m.discountBondOption(t, 1 / (1 + K * (t1 - t0)), t0, t1) * n for t0, t1 in zip(Ts, Ts[1:])]
+    return {"price": sum(lets), "caplet_prices": lets}
+
+
+def g2e():
+    s = Suite("capfloor_g", "specifications/04-pricing/short-rate-models.md", G)
+    models = [dict(model="VASICEK", mean_reversion=0.15, long_term_mean=0.045, sigma=0.012, short_rate=0.035),
+              dict(model="CIR", mean_reversion=0.25, long_term_mean=0.04, sigma=0.08, short_rate=0.03),
+              dict(model="HULL_WHITE", mean_reversion=0.05, sigma=0.01, curve=CURVE)]
+    n_out = 0
+    for m in models:
+        for Ts in ([0.5 * k for k in range(1, 11)], [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]):
+            for cf in ("CAP", "FLOOR"):
+                for K in (0.03, 0.04, 0.05):
+                    inp = dict(m, period_times=Ts, strike=K, cap_floor=cf, notional=1e6)
+                    out = cap_value(inp)
+                    q = ql_cap(inp)
+                    ok = all(abs(a - b) <= 1e-6 + 1e-9 * abs(a) for a, b in zip(out["caplet_prices"] + [out["price"]], q["caplet_prices"] + [q["price"]]))
+                    n_out += ok
+                    if not ok:
+                        note(f"  QL cap differs {m['model']} {cf} {K}: {q['price']} {out['price']}")
+                    s.add(CAPOP, inp, out, cls=R if m["model"] == "CIR" else A,
+                          verified=["mpmath-50", "cap-floor-parity"] + (["quantlib-1.44"] if ok else []),
+                          tags=["shortrate", "capfloor", m["model"].lower(), cf.lower()],
+                          limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-12 per unit notional"},
+                          description=f"{m['model']} {cf} K={K}, {len(Ts) - 1} periods to {Ts[-1]}y")
+    # parity: cap - floor = sum notional (P(t0) - (1 + K tau) P(t1)), asserted on every pair
+    for i in range(0, 36, 6):
+        for j in range(3):
+            cap, flo = s.cases[i + j], s.cases[i + 3 + j]
+            inp = cap["inputs"]
+            Pm = (lambda t: Curve(**inp["curve"]).P(t)) if inp["model"] == "HULL_WHITE" else                 (lambda t: mp.mpf(zcb_value(dict(inp, t_years=0.0, maturity_years=t))["discount_factor"]))
+            Ts, K = inp["period_times"], inp["strike"]
+            sw = sum(Pm(t0) - (1 + K * (t1 - t0)) * Pm(t1) for t0, t1 in zip(Ts, Ts[1:])) * inp["notional"]
+            assert abs(cap["expected"]["outputs"]["price"] - flo["expected"]["outputs"]["price"] - float(sw)) < 1e-6
+    b = dict(models[2], period_times=[1.0, 2.0, 3.0], strike=0.04, cap_floor="CAP", notional=1e6)
+    caught("cap priced with bond calls", abs(cap_value(b)["price"] - cap_value(b, "type")["price"]), 1e-6)
+    e = dict(models[2], period_times=[1.0, 2.0, 3.0], strike=0.04, cap_floor="CAP", notional=1.0)
+    errs = [(dict(e, period_times=[1.0]), "E_INPUT", "one period time"), (dict(e, period_times=[0.0, 1.0]), "E_DOMAIN", "first fixing at 0"),
+            (dict(e, period_times=[2.0, 1.0]), "E_INPUT", "period times not increasing"), (dict(e, strike=-0.5), "E_DOMAIN", "1 + K tau <= 0"),
+            (dict(e, cap_floor="COLLAR"), "E_INPUT", "unknown cap_floor")]
+    for inp, code, d in errs:
+        s.add(CAPOP, inp, error=code, cls="date_and_convention", tags=["invalid", "capfloor"], description=d)
+    for c in s.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    note(f"capfloor_g outside (QuantLib 1.44 model objects): {n_out} of {len(s.cases)}")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["capfloor_g"] = {"counted": n_out, "total": len(s.cases), "rule": "QuantLib Vasicek, CoxIngersollRoss, HullWhite discountBondOption per caplet, scaled by (1 + K tau) and summed"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2 or "G1" in sys.argv:
@@ -808,3 +886,5 @@ if __name__ == "__main__":
         g5a()
     if len(sys.argv) < 2 or "G2C" in sys.argv:
         g2c()
+    if len(sys.argv) < 2 or "G2E" in sys.argv:
+        g2e()

@@ -316,6 +316,7 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `rates.g2pp.zcb`, `rates.g2pp.zcb_option` | `04-pricing/short-rate-models.md`, section "G2++" | G2b (wave 2b) |
 | `rates.shortrate.hw_calibrate` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.hw_calibrate`" | G2c (wave 2c) |
 | `rates.shortrate.bermudan_swaption` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.bermudan_swaption`" | G2d (wave 2d) |
+| `rates.shortrate.capfloor` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.capfloor`" | G2e (wave 2e) |
 | `risk.mc.greeks` | `06-risk/mc-greeks.md` | Q9 part 1 (wave 3a) |
 | `xva.exposure.swap_ee_hw` | `06-risk/xva-exposure.md` | G5a (wave 4a) |
 

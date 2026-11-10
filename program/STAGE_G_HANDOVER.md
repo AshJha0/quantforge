@@ -157,3 +157,14 @@ Supersedes the counts in the status section above; everything else there still h
 | | **Stage G** | **245** | **133 = 54.3%** |
 
 Rulings now G-1 to G-18. G-10 stays open for the owner (Q9 variance test with low power). Left for stage G: callable bonds (the same scheme with a call schedule), G2++ swaptions, two-parameter or time-dependent Hull-White calibration, LMM, Q3b, Q9 part 2, the rest of xVA, A5, the R5 audit, and the outside share. **Next step:** relay waves 2c and 2d; the spec session continues with the QuantLib-countable closed forms listed above (Hull-White caps and floors first), then callable bonds on the G-18 scheme.
+
+## WAVE 2e READY (2026-11-10): caps and floors under the short-rate models
+
+Read: `specifications/04-pricing/short-rate-models.md`, section "`rates.shortrate.capfloor`"; ruling G-19; `specifications/name-map.json` (236 operations).
+
+### G2e (suite `capfloor_g`, 41 cases)
+- New operation `rates.shortrate.capfloor` for `VASICEK`, `CIR`, `HULL_WHITE`: a portfolio of wave 1 bond options (put for a cap, call for a floor, strike `1/(1 + K tau)`, scaled by `1 + K tau`).
+- Property test: cap minus floor equals the swaplet sum on the model's bond prices.
+
+### Status update (after wave 2e)
+`capfloor_g` 36 of 41 count (QuantLib model objects). **Stage G: 169 of 286 = 59.1%**, still 0.9 points below the 60% floor. Counted per suite: shortrate 61/78, barrier 2/32, swaption 33/40, g2pp 30/38, capfloor 36/41, exposure 7/15; hwcal 0/6, bermudan 0/15, mcgreeks 0/21. Rulings G-1 to G-19; G-10 open for the owner. Next step: relay wave 2e; then callable bonds on the G-18 scheme, and the remaining QuantLib-countable items (CIR Jamshidian swaption, G2++ swaption if `G2SwaptionEngine` can be set tight enough).

@@ -33,5 +33,10 @@
   "counted": 0,
   "total": 15,
   "rule": "not counted: the golden is the pinned scheme; QuantLib FD and tree values are convergence evidence (oracle/BERMUDAN_EVIDENCE_G.json)"
+ },
+ "capfloor_g": {
+  "counted": 36,
+  "total": 41,
+  "rule": "QuantLib Vasicek, CoxIngersollRoss, HullWhite discountBondOption per caplet, scaled by (1 + K tau) and summed"
  }
 }

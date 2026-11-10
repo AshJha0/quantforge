@@ -4385,6 +4385,49 @@
     "price"
    ]
   },
+  "rates.shortrate.capfloor": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_capfloor",
+   "python": "quantforge.rates.shortrate_capfloor",
+   "java": "Rates.shortrateCapfloor",
+   "cpp": "qf::rates::shortrate_capfloor",
+   "inputs": {
+    "cap_floor": {
+     "java": "capFloor"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "long_term_mean": {
+     "java": "longTermMean"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "model": {
+     "java": "model"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "period_times": {
+     "java": "periodTimes"
+    },
+    "short_rate": {
+     "java": "shortRate"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "strike": {
+     "java": "strike"
+    }
+   },
+   "outputs": [
+    "caplet_prices",
+    "price"
+   ]
+  },
   "rates.shortrate.hw_calibrate": {
    "spec": "specifications/04-pricing/short-rate-models.md",
    "rust": "quantforge::rates::shortrate_hw_calibrate",
