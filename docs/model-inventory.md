@@ -522,6 +522,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** AAD through the MC engine (Q3b) for smooth payoffs.
 - **Validation report:** `specifications/06-risk/mc-greeks.md`.
 
+### MG-4 Closed-form swap exposure and CVA (G5a)
+- **Purpose:** discounted expected exposure of a vanilla swap under Hull-White at its reset dates, and a bucketed unilateral CVA; the exact anchor for the simulated exposure engine.
+- **Inputs:** Hull-White model and curve; swap times, rate, side, notional; exposure dates; flat hazard and recovery.
+- **Limitations:** single swap, no netting or collateral; reset dates only; independence of default and rates (no wrong-way risk); flat hazard; single curve.
+- **Validation:** 50-digit Jamshidian; QuantLib 1.44 `HullWhite` objects (7 of 15). **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** the simulated exposure engine (next xVA wave) and ORE.
+- **Monitoring thresholds:** simulated EE beyond 3 SE of these values.
+- **Data lineage hash:** sha256 cf24a7e0571b5adb0c854b0dfce6b8f2a5848472e812afbc6d1f911e02227660
+- **Retirement trigger:** the netting-set simulation engine.
+- **Validation report:** `specifications/06-risk/xva-exposure.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

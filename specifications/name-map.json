@@ -6594,6 +6594,52 @@
     "mean_change",
     "vol_of_vol"
    ]
+  },
+  "xva.exposure.swap_ee_hw": {
+   "spec": "specifications/06-risk/xva-exposure.md",
+   "rust": "quantforge::xva::exposure_swap_ee_hw",
+   "python": "quantforge.xva.exposure_swap_ee_hw",
+   "java": "Xva.exposureSwapEeHw",
+   "cpp": "qf::xva::exposure_swap_ee_hw",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "exposure_times": {
+     "java": "exposureTimes"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "hazard_rate": {
+     "java": "hazardRate"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "side": {
+     "java": "side"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "start_years": {
+     "java": "startYears"
+    }
+   },
+   "outputs": [
+    "cva",
+    "discounted_ee"
+   ]
   }
  },
  "unit_warnings": [

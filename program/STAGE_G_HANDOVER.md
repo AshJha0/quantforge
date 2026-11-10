@@ -80,3 +80,15 @@ G-10's variance condition (smoothed pathwise below bump) passes by a ratio of 0.
 
 ### Outside-oracle status
 `mcgreeks_g` 0 of 21: no library reproduces the `core.rng` stream (as `risk.var.monte_carlo` in stage F). Stage G so far: 126 of 209 = 60.3%, just above the 60% floor.
+
+## WAVE 4a READY (2026-11-10): closed-form swap exposure and CVA under Hull-White
+
+Read: `specifications/06-risk/xva-exposure.md`; ruling G-16 (and G-12, G-13); cli-contract block "Stage G operations"; `specifications/name-map.json` (233 operations).
+
+### G5a (suite `exposure_g`, 15 cases)
+- New operation `xva.exposure.swap_ee_hw`: discounted EE at reset dates (each point is the wave 2a swaption on the remaining swap; payer for `PAY`, receiver for `RECEIVE`) and an optional bucketed CVA.
+- Build notes: call your `rates.shortrate.swaption` code per date. Exposure times are compared to the reset dates exactly as binary64 numbers. `cva` is present only when both credit inputs are given.
+- Property test: `PAY` minus `RECEIVE` EE equals the forward value of the remaining swap.
+
+### Outside-oracle status
+`exposure_g` 7 of 15 (every value case). Stage G so far: 133 of 224 = 59.4%, just below the 60% floor (the 21 `mcgreeks_g` cases have no outside source by construction).

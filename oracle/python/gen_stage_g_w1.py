@@ -615,6 +615,96 @@ def g2b():
     reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
 
 
+# ================================================================================================ G5a swap EE and CVA under Hull-White
+EEOP = "xva.exposure.swap_ee_hw"
+
+
+def ee_profile(inp, mut=None):
+    """Discounted EE of a fixed-for-floating swap at its reset dates: the European swaption on the remaining swap."""
+    T0, Ts = inp["start_years"], inp["payment_times"]
+    resets = [T0] + Ts[:-1]
+    st = "PAYER" if inp["side"] == "PAY" else "RECEIVER"
+    if mut == "side":
+        st = "RECEIVER" if st == "PAYER" else "PAYER"
+    out = []
+    for t in inp["exposure_times"]:
+        k = resets.index(t)
+        rest = Ts[k:]
+        out.append(dict(mean_reversion=inp["mean_reversion"], sigma=inp["sigma"], curve=inp["curve"], notional=inp["notional"],
+                        expiry_years=t, payment_times=rest, fixed_rate=inp["fixed_rate"], swaption_type=st))
+    return out
+
+
+def cva_from(ee, times, h, R):
+    surv = [1.0] + [math.exp(-h * t) for t in times]
+    return (1 - R) * math.fsum(e * (surv[i] - surv[i + 1]) for i, e in enumerate(ee))
+
+
+def g5a():
+    s = Suite("exposure_g", "specifications/06-risk/xva-exposure.md", G)
+    base = dict(mean_reversion=0.05, sigma=0.01, curve=CURVE, notional=1e7)
+    rows = []
+    Ts5 = [1.0, 2.0, 3.0, 4.0, 5.0]
+    for side in ("PAY", "RECEIVE"):
+        for K in (0.03, 0.045):
+            rows.append(dict(base, start_years=0.0, payment_times=Ts5, fixed_rate=K, side=side, exposure_times=[1.0, 2.0, 3.0, 4.0],
+                             hazard_rate=0.02, recovery=0.4))
+    Ts10 = [0.5 * k for k in range(1, 21)]
+    rows.append(dict(base, start_years=0.0, payment_times=Ts10, fixed_rate=0.04, side="PAY", exposure_times=Ts10[:-1], hazard_rate=0.015, recovery=0.4))
+    rows.append(dict(base, start_years=2.0, payment_times=[3.0, 4.0, 5.0, 6.0, 7.0], fixed_rate=0.04, side="RECEIVE",
+                     exposure_times=[2.0, 4.0, 6.0]))
+    rows.append(dict(base, mean_reversion=0.3, sigma=0.015, start_years=0.0, payment_times=Ts5, fixed_rate=0.04, side="PAY",
+                     exposure_times=[1.0, 2.0, 3.0, 4.0], hazard_rate=0.05, recovery=0.25))
+    n_out = 0
+    for inp in rows:
+        sws = ee_profile(inp)
+        ee = [jam_price(w)["price"] for w in sws]
+        qee = [ql_jam(w)["price"] for w in sws]
+        out = {"discounted_ee": ee}
+        if "hazard_rate" in inp:
+            out["cva"] = cva_from(ee, inp["exposure_times"], inp["hazard_rate"], inp["recovery"])
+        ok = all(abs(a - b) <= 1e-6 + 1e-10 * abs(a) for a, b in zip(ee, qee))
+        n_out += ok
+        s.add(EEOP, inp, out, cls=R, verified=["mpmath-50", "jamshidian"] + (["quantlib-1.44"] if ok else []),
+              tags=["xva", "exposure", inp["side"].lower()], limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-12 per unit notional"},
+              description=f"{inp['side']} {inp['fixed_rate']} swap {inp['start_years']}-{inp['payment_times'][-1]}y, {len(inp['exposure_times'])} dates")
+    # PAY minus RECEIVE EE at each date = the forward swap value at that date (deterministic part), asserted
+    for i, j in ((0, 2), (1, 3)):
+        a, b = s.cases[i]["expected"]["outputs"]["discounted_ee"], s.cases[j]["expected"]["outputs"]["discounted_ee"]
+        inp = rows[i]
+        cv = Curve(**inp["curve"])
+        for t, x, y in zip(inp["exposure_times"], a, b):
+            k = ([inp["start_years"]] + inp["payment_times"][:-1]).index(t)
+            rest = inp["payment_times"][k:]
+            ann = sum((Ti - Tp) * cv.P(Ti) for Tp, Ti in zip([t] + rest[:-1], rest))
+            fwd = inp["notional"] * (cv.P(t) - cv.P(rest[-1]) - inp["fixed_rate"] * ann)
+            assert abs(x - y - float(fwd)) < 1e-6
+    b = rows[0]
+    caught("receiver swaption for a pay-fixed swap", abs(jam_price(ee_profile(b)[1])["price"] - jam_price(ee_profile(b, "side")[1])["price"]), 1e-6)
+    e = dict(base, start_years=0.0, payment_times=Ts5, fixed_rate=0.03, side="PAY", exposure_times=[1.0, 2.0])
+    errs = [(dict(e, exposure_times=[1.5]), "E_INPUT", "exposure time not a reset date"),
+            (dict(e, exposure_times=[5.0]), "E_INPUT", "exposure at the last payment"),
+            (dict(e, exposure_times=[2.0, 1.0]), "E_INPUT", "exposure times not increasing"),
+            (dict(e, exposure_times=[0.0]), "E_DOMAIN", "exposure at time 0"),
+            (dict(e, side="BUY"), "E_INPUT", "unknown side"),
+            (dict(e, hazard_rate=0.02), "E_INPUT", "hazard_rate without recovery"),
+            (dict(e, hazard_rate=-0.01, recovery=0.4), "E_DOMAIN", "hazard_rate < 0"),
+            (dict(e, hazard_rate=0.01, recovery=1.0), "E_DOMAIN", "recovery = 1")]
+    for inp, code, d in errs:
+        s.add(EEOP, inp, error=code, cls="date_and_convention", tags=["invalid", "xva"], description=d)
+    for c in s.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    note(f"exposure_g outside (QuantLib 1.44 HullWhite objects): {n_out} of {len(s.cases)}")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["exposure_g"] = {"counted": n_out, "total": len(s.cases), "rule": "each EE point is the swaption_g QuantLib check; cva is arithmetic on those values"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2 or "G1" in sys.argv:
@@ -625,3 +715,5 @@ if __name__ == "__main__":
         g2a()
     if len(sys.argv) < 2 or "G2B" in sys.argv:
         g2b()
+    if len(sys.argv) < 2 or "G5A" in sys.argv:
+        g5a()

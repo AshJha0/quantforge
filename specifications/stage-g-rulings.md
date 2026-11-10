@@ -34,6 +34,12 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-15 | MC Greeks draws and estimators | One normal per path from `core.rng` stream 0 (AS 241), path `i` the `i`-th normal; terminal value sampled exactly. Estimators, smoothing and bump exactly as `06-risk/mc-greeks.md`; standard errors with divisor `n - 1`. Goldens keep every path at least 1e-9 relative from a kink, so builds agree to `common_rng`. The G-10 variance condition passes by a ratio of 0.9985 only; that is recorded as an open item, and G-10 is not changed after the result (12.10 rule) |
 
+## Wave 4a, closed-form swap exposure and CVA
+
+| # | Point | Ruling |
+|---|---|---|
+| G-16 | Exposure dates and CVA buckets | Exposure is defined only at reset dates before the last payment, where the remaining swap is a swaption and the EE is exact; between resets the floating coupon already fixed makes the exposure path-dependent, which the simulation wave covers. CVA uses default buckets `(t_(k-1), t_k]` with the exposure at the bucket end, `t_0 = 0`, independence of default and rates. Both are stylised and stated as such; the simulation wave must reproduce these numbers on the same grid |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |

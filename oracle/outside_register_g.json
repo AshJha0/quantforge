@@ -18,5 +18,10 @@
   "counted": 30,
   "total": 38,
   "rule": "QuantLib G2 discountBond and discountBondOption on a DiscountCurve; zero_rate and the curve discounts as arithmetic or curve values"
+ },
+ "exposure_g": {
+  "counted": 7,
+  "total": 15,
+  "rule": "each EE point is the swaption_g QuantLib check; cva is arithmetic on those values"
  }
 }
