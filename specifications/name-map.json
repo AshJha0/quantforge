@@ -238,6 +238,57 @@
     "yield"
    ]
   },
+  "book.lifecycle.apply": {
+   "spec": "specifications/07-portfolio/book-lifecycle.md",
+   "rust": "quantforge::book::lifecycle_apply",
+   "python": "quantforge.book.lifecycle_apply",
+   "java": "Book.lifecycleApply",
+   "cpp": "qf::book::lifecycle_apply",
+   "inputs": {
+    "events": {
+     "java": "events"
+    },
+    "positions": {
+     "java": "positions"
+    }
+   },
+   "outputs": [
+    "fixings",
+    "positions",
+    "realized_pnl",
+    "total_realized"
+   ]
+  },
+  "book.marks.resolve": {
+   "spec": "specifications/07-portfolio/book-lifecycle.md",
+   "rust": "quantforge::book::marks_resolve",
+   "python": "quantforge.book.marks_resolve",
+   "java": "Book.marksResolve",
+   "cpp": "qf::book::marks_resolve",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "instruments": {
+     "java": "instruments"
+    },
+    "ipv": {
+     "java": "ipv"
+    },
+    "ipv_threshold": {
+     "java": "ipvThreshold"
+    },
+    "max_age_days": {
+     "java": "maxAgeDays"
+    },
+    "sources": {
+     "java": "sources"
+    }
+   },
+   "outputs": [
+    "marks"
+   ]
+  },
   "calib.check_bid_ask": {
    "spec": "specifications/03-calibration/least-squares.md",
    "rust": "quantforge::calib::check_bid_ask_",
@@ -1865,6 +1916,59 @@
     "pv",
     "rpv01",
     "upfront"
+   ]
+  },
+  "credit.cdsindex.option_price": {
+   "spec": "specifications/04-pricing/credit-options-and-copulas.md",
+   "rust": "quantforge::credit::cdsindex_option_price",
+   "python": "quantforge.credit.cdsindex_option_price",
+   "java": "Credit.cdsindexOptionPrice",
+   "cpp": "qf::credit::cdsindex_option_price",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "coupon": {
+     "java": "coupon"
+    },
+    "expiry": {
+     "java": "expiry"
+    },
+    "hazard_rate": {
+     "java": "hazardRate"
+    },
+    "maturity": {
+     "java": "maturity"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "type": {
+     "java": "type"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "adjusted_forward",
+    "adjusted_strike",
+    "exercise_upfront",
+    "forward_spread",
+    "front_end_protection",
+    "price",
+    "risky_annuity",
+    "strike_annuity",
+    "strike_hazard"
    ]
   },
   "credit.cdsoption.implied_vol": {
@@ -3737,6 +3841,26 @@
     "forward"
    ]
   },
+  "rates.curve.inspect": {
+   "spec": "specifications/02-curves/curve-framework.md",
+   "rust": "quantforge::rates::curve_inspect",
+   "python": "quantforge.rates.curve_inspect",
+   "java": "Rates.curveInspect",
+   "cpp": "qf::rates::curve_inspect",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "dates": {
+     "java": "dates"
+    }
+   },
+   "outputs": [
+    "discount_factors",
+    "instantaneous_forwards",
+    "zero_rates"
+   ]
+  },
   "rates.curve.joint_bootstrap": {
    "spec": "specifications/02-curves/csa-and-basis.md",
    "rust": "quantforge::rates::curve_joint_bootstrap",
@@ -3769,6 +3893,30 @@
    "outputs": [
     "discount_pillars",
     "projection_pillars"
+   ]
+  },
+  "rates.curve.joint_solve": {
+   "spec": "specifications/02-curves/joint-solve-and-funding.md",
+   "rust": "quantforge::rates::curve_joint_solve",
+   "python": "quantforge.rates.curve_joint_solve",
+   "java": "Rates.curveJointSolve",
+   "cpp": "qf::rates::curve_joint_solve",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "curves": {
+     "java": "curves"
+    },
+    "instruments": {
+     "java": "instruments"
+    }
+   },
+   "outputs": [
+    "curves",
+    "jacobian",
+    "turn_factors",
+    "turn_sensitivity"
    ]
   },
   "rates.fallback.rate": {
@@ -3817,6 +3965,29 @@
    "outputs": [
     "forward_rate",
     "valuation"
+   ]
+  },
+  "rates.funding.curve": {
+   "spec": "specifications/02-curves/joint-solve-and-funding.md",
+   "rust": "quantforge::rates::funding_curve",
+   "python": "quantforge.rates.funding_curve",
+   "java": "Rates.fundingCurve",
+   "cpp": "qf::rates::funding_curve",
+   "inputs": {
+    "dates": {
+     "java": "dates"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "quotes": {
+     "java": "quotes"
+    }
+   },
+   "outputs": [
+    "discount_factors",
+    "pillars",
+    "spreads"
    ]
   },
   "rates.futures.convexity": {
@@ -3872,6 +4043,12 @@
     },
     "quotes": {
      "java": "quotes"
+    },
+    "step_end": {
+     "java": "stepEnd"
+    },
+    "tension": {
+     "java": "tension"
     }
    },
    "outputs": [
@@ -4208,6 +4385,106 @@
     "repo_rate"
    ]
   },
+  "risk.backtest.christoffersen": {
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "rust": "quantforge::risk::backtest_christoffersen",
+   "python": "quantforge.risk.backtest_christoffersen",
+   "java": "Risk.backtestChristoffersen",
+   "cpp": "qf::risk::backtest_christoffersen",
+   "inputs": {
+    "confidence": {
+     "java": "confidence"
+    },
+    "exceptions": {
+     "java": "exceptions"
+    }
+   },
+   "outputs": [
+    "lr_cc",
+    "lr_ind",
+    "lr_uc",
+    "p_cc",
+    "p_ind",
+    "p_uc",
+    "transitions"
+   ]
+  },
+  "risk.backtest.kupiec": {
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "rust": "quantforge::risk::backtest_kupiec",
+   "python": "quantforge.risk.backtest_kupiec",
+   "java": "Risk.backtestKupiec",
+   "cpp": "qf::risk::backtest_kupiec",
+   "inputs": {
+    "confidence": {
+     "java": "confidence"
+    },
+    "exceptions": {
+     "java": "exceptions"
+    },
+    "observations": {
+     "java": "observations"
+    }
+   },
+   "outputs": [
+    "lr_uc",
+    "p_value"
+   ]
+  },
+  "risk.backtest.traffic_light": {
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "rust": "quantforge::risk::backtest_traffic_light",
+   "python": "quantforge.risk.backtest_traffic_light",
+   "java": "Risk.backtestTrafficLight",
+   "cpp": "qf::risk::backtest_traffic_light",
+   "inputs": {
+    "confidence": {
+     "java": "confidence"
+    },
+    "exceptions": {
+     "java": "exceptions"
+    },
+    "observations": {
+     "java": "observations"
+    }
+   },
+   "outputs": [
+    "cumulative_probability",
+    "plus_factor",
+    "zone"
+   ]
+  },
+  "risk.book.ois_sensitivity": {
+   "spec": "specifications/06-risk/book-sensitivities.md",
+   "rust": "quantforge::risk::book_ois_sensitivity",
+   "python": "quantforge.risk.book_ois_sensitivity",
+   "java": "Risk.bookOisSensitivity",
+   "cpp": "qf::risk::book_ois_sensitivity",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "convention": {
+     "java": "convention"
+    },
+    "interpolation": {
+     "java": "interpolation"
+    },
+    "quotes": {
+     "java": "quotes"
+    },
+    "swaps": {
+     "java": "swaps"
+    }
+   },
+   "outputs": [
+    "book_pv",
+    "book_sensitivity",
+    "pv",
+    "quote_sensitivity",
+    "zero_jacobian"
+   ]
+  },
   "risk.cashflows": {
    "spec": "specifications/06-risk/rates-sensitivities.md",
    "rust": "quantforge::risk::cashflows_",
@@ -4319,8 +4596,46 @@
     "valid"
    ]
   },
+  "risk.credit.jtd": {
+   "spec": "specifications/06-risk/book-sensitivities.md",
+   "rust": "quantforge::risk::credit_jtd",
+   "python": "quantforge.risk.credit_jtd",
+   "java": "Risk.creditJtd",
+   "cpp": "qf::risk::credit_jtd",
+   "inputs": {
+    "positions": {
+     "java": "positions"
+    }
+   },
+   "outputs": [
+    "jtd",
+    "total"
+   ]
+  },
+  "risk.curve.cross_gamma": {
+   "spec": "specifications/06-risk/book-sensitivities.md",
+   "rust": "quantforge::risk::curve_cross_gamma",
+   "python": "quantforge.risk.curve_cross_gamma",
+   "java": "Risk.curveCrossGamma",
+   "cpp": "qf::risk::curve_cross_gamma",
+   "inputs": {
+    "bump_bp": {
+     "java": "bumpBp"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "product": {
+     "java": "product"
+    }
+   },
+   "outputs": [
+    "cross_gamma",
+    "value"
+   ]
+  },
   "risk.curve.jacobian": {
-   "spec": "specifications/06-risk/par-and-key-rate.md",
+   "spec": "specifications/02-curves/joint-solve-and-funding.md",
    "rust": "quantforge::risk::curve_jacobian",
    "python": "quantforge.risk.curve_jacobian",
    "java": "Risk.curveJacobian",
@@ -4415,6 +4730,46 @@
     "value"
    ]
   },
+  "risk.curve.pca": {
+   "spec": "specifications/06-risk/book-sensitivities.md",
+   "rust": "quantforge::risk::curve_pca",
+   "python": "quantforge.risk.curve_pca",
+   "java": "Risk.curvePca",
+   "cpp": "qf::risk::curve_pca",
+   "inputs": {
+    "changes": {
+     "java": "changes"
+    },
+    "components": {
+     "java": "components"
+    }
+   },
+   "outputs": [
+    "eigenvalues",
+    "explained_ratio",
+    "loadings"
+   ]
+  },
+  "risk.frtb.girr_delta": {
+   "spec": "specifications/06-risk/frtb-sa-girr.md",
+   "rust": "quantforge::risk::frtb_girr_delta",
+   "python": "quantforge.risk.frtb_girr_delta",
+   "java": "Risk.frtbGirrDelta",
+   "cpp": "qf::risk::frtb_girr_delta",
+   "inputs": {
+    "sensitivities": {
+     "java": "sensitivities"
+    },
+    "specified_currency_reduction": {
+     "java": "specifiedCurrencyReduction"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
   "risk.ois.dv01": {
    "spec": "specifications/01-core/limits.md",
    "rust": "quantforge::risk::ois_dv01",
@@ -4481,8 +4836,109 @@
     "value_start"
    ]
   },
+  "risk.var.filtered_historical": {
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "rust": "quantforge::risk::var_filtered_historical",
+   "python": "quantforge.risk.var_filtered_historical",
+   "java": "Risk.varFilteredHistorical",
+   "cpp": "qf::risk::var_filtered_historical",
+   "inputs": {
+    "confidence": {
+     "java": "confidence"
+    },
+    "lambda": {
+     "java": "lambda"
+    },
+    "position_value": {
+     "java": "positionValue"
+    },
+    "returns": {
+     "java": "returns"
+    }
+   },
+   "outputs": [
+    "es",
+    "sigma_next",
+    "tail_count",
+    "var"
+   ]
+  },
+  "risk.var.historical": {
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "rust": "quantforge::risk::var_historical",
+   "python": "quantforge.risk.var_historical",
+   "java": "Risk.varHistorical",
+   "cpp": "qf::risk::var_historical",
+   "inputs": {
+    "confidence": {
+     "java": "confidence"
+    },
+    "pnl": {
+     "java": "pnl"
+    }
+   },
+   "outputs": [
+    "es",
+    "tail_count",
+    "var"
+   ]
+  },
+  "risk.var.monte_carlo": {
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "rust": "quantforge::risk::var_monte_carlo",
+   "python": "quantforge.risk.var_monte_carlo",
+   "java": "Risk.varMonteCarlo",
+   "cpp": "qf::risk::var_monte_carlo",
+   "inputs": {
+    "confidence": {
+     "java": "confidence"
+    },
+    "covariance": {
+     "java": "covariance"
+    },
+    "mean": {
+     "java": "mean"
+    },
+    "paths": {
+     "java": "paths"
+    },
+    "seed": {
+     "java": "seed"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "es",
+    "tail_count",
+    "var"
+   ]
+  },
+  "risk.var.parametric": {
+   "spec": "specifications/06-risk/var-es-and-backtests.md",
+   "rust": "quantforge::risk::var_parametric",
+   "python": "quantforge.risk.var_parametric",
+   "java": "Risk.varParametric",
+   "cpp": "qf::risk::var_parametric",
+   "inputs": {
+    "confidence": {
+     "java": "confidence"
+    },
+    "mean": {
+     "java": "mean"
+    },
+    "std": {
+     "java": "std"
+    }
+   },
+   "outputs": [
+    "es",
+    "var"
+   ]
+  },
   "risk.vol.bump_greeks": {
-   "spec": "specifications/06-risk/vol-greeks.md",
+   "spec": "specifications/06-risk/book-sensitivities.md",
    "rust": "quantforge::risk::vol_bump_greeks",
    "python": "quantforge.risk.vol_bump_greeks",
    "java": "Risk.volBumpGreeks",
@@ -4598,6 +5054,33 @@
     "bucket_vega",
     "parallel_vega",
     "pv"
+   ]
+  },
+  "usecase.factor_attribution": {
+   "spec": "specifications/04-pricing/use-cases.md",
+   "rust": "quantforge::usecase::factor_attribution_",
+   "python": "quantforge.usecase.factor_attribution_",
+   "java": "Usecase.factorAttribution",
+   "cpp": "qf::usecase::factor_attribution_",
+   "inputs": {
+    "factor_names": {
+     "java": "factorNames"
+    },
+    "factor_returns": {
+     "java": "factorReturns"
+    },
+    "portfolio_returns": {
+     "java": "portfolioReturns"
+    }
+   },
+   "outputs": [
+    "alpha",
+    "beta_se",
+    "betas",
+    "contributions",
+    "mean_return",
+    "r_squared",
+    "residual_vol"
    ]
   },
   "usecase.fx_hedge": {
@@ -4886,6 +5369,37 @@
     "forward_vols"
    ]
   },
+  "vol.garch.estimate": {
+   "spec": "specifications/05-volatility/garch.md",
+   "rust": "quantforge::vol::garch_estimate",
+   "python": "quantforge.vol.garch_estimate",
+   "java": "Vol.garchEstimate",
+   "cpp": "qf::vol::garch_estimate",
+   "inputs": {
+    "demean": {
+     "java": "demean"
+    },
+    "distribution": {
+     "java": "distribution"
+    },
+    "initial_variance": {
+     "java": "initialVariance"
+    },
+    "returns": {
+     "java": "returns"
+    }
+   },
+   "outputs": [
+    "alpha",
+    "beta",
+    "degrees_of_freedom",
+    "loglik",
+    "mean",
+    "omega",
+    "persistence",
+    "std_errors"
+   ]
+  },
   "vol.garch.fit": {
    "spec": "specifications/05-volatility/garch.md",
    "rust": "quantforge::vol::garch_fit",
@@ -4950,8 +5464,17 @@
     "beta": {
      "java": "beta"
     },
+    "degrees_of_freedom": {
+     "java": "degreesOfFreedom"
+    },
+    "distribution": {
+     "java": "distribution"
+    },
     "initial_variance": {
      "java": "initialVariance"
+    },
+    "mean": {
+     "java": "mean"
     },
     "omega": {
      "java": "omega"
@@ -5800,6 +6323,8 @@
   "bond.frn.price: maturity",
   "core.calendar.add_tenor: tenor",
   "core.data.check_quotes: max_relative_spread",
+  "credit.cdsindex.option_price: expiry",
+  "credit.cdsindex.option_price: maturity",
   "credit.cdsoption.implied_vol: expiry",
   "credit.cdsoption.implied_vol: maturity",
   "credit.cdsoption.price: expiry",

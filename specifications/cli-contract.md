@@ -296,8 +296,13 @@ Stage F operations are added to the table below as each wave lands.
 | `vol.vix.term_variance`, `vol.vix.index`: quotes may be `null` | `05-volatility/vix-index.md` | F6 (R10) |
 | `rates.curve.inspect`; `interpolation` values `MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE`, `HYBRID` (curve keys `tension`, `step_end`) wherever a curve object or a bootstrap takes `interpolation` | `02-curves/curve-framework.md` | F1 (Q1) |
 | `rates.curve.joint_solve`, `rates.funding.curve` | `02-curves/joint-solve-and-funding.md` | F1 (Q4) |
+| `risk.book.ois_sensitivity`, `risk.curve.pca`, `risk.curve.cross_gamma`, `risk.credit.jtd` | `06-risk/book-sensitivities.md` | F3 (Q3a) |
+| `risk.var.historical`, `risk.var.filtered_historical`, `risk.var.parametric`, `risk.var.monte_carlo`, `risk.backtest.kupiec`, `risk.backtest.christoffersen`, `risk.backtest.traffic_light` | `06-risk/var-es-and-backtests.md` | F4 (Q2) |
+| `risk.frtb.girr_delta` | `06-risk/frtb-sa-girr.md` | F4 (Q2) |
+| `book.lifecycle.apply`, `book.marks.resolve` | `07-portfolio/book-lifecycle.md` | F5 |
+| `usecase.factor_attribution` | `04-pricing/use-cases.md` | F5 (use case 4) |
 
-Batch notes: `rates.curve.joint_solve` and `vol.garch.estimate` iterate; a line that fails returns `E_NO_CONVERGENCE` and the batch goes on. `null` is a legal value only where a spec says so (VIX quotes, `zero_rates` outputs); elsewhere it stays `E_SCHEMA`. New policy classes: `jacobian`, `standard_error` (`conformance/tolerances/policy.yaml`).
+Batch notes: `rates.curve.joint_solve` and `vol.garch.estimate` iterate; a line that fails returns `E_NO_CONVERGENCE` and the batch goes on. `null` is a legal value only where a spec says so (VIX quotes, `zero_rates` outputs); elsewhere it stays `E_SCHEMA`. New policy classes: `jacobian`, `standard_error`, `aad_sensitivity`, `ift_jacobian` (`conformance/tolerances/policy.yaml`).
 
 ## Versioning
 

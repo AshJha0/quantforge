@@ -346,8 +346,13 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 | MF-2 | GARCH(1,1) estimate with standard errors, Student-t, demeaning | `05-volatility/garch.md` | F (R8) | Specified | none |
 | MF-3 | VIX null-quote rule; local vol at slice expiries | `05-volatility/vix-index.md`, `05-volatility/local-and-forward-vol.md` | F (R10) | Specified | VIX: Cboe sample calculation, 3 of 10 |
 | MF-4 | Curve interpolation: monotone convex, monotonic log cubic, tension spline, hybrid | `02-curves/curve-framework.md` | F (Q1) | Specified | 48 of 84 (QuantLib 1.44) |
-| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Specified | 1 of 13 (QuantLib 1.44 rebuild with Jacobian) |
+| MF-5 | Joint multi-curve solve with turns, futures-fitted steps and IFT Jacobian | `02-curves/joint-solve-and-funding.md` | F (Q4) | Specified | 1 of 14 (QuantLib 1.44 rebuild with Jacobian) |
 | MF-6 | Funding curve (spread over OIS) | `02-curves/joint-solve-and-funding.md` | F | Specified | none |
+| MF-7 | Book sensitivities: AAD reference, IFT zero Jacobian, PCA, cross gamma, jump to default | `06-risk/book-sensitivities.md` | F (Q3a, F3) | Specified | PCA: SciPy (24 of 54) |
+| MF-8 | VaR and ES (historical, filtered historical, parametric, Monte Carlo) and backtests | `06-risk/var-es-and-backtests.md` | F (Q2) | Specified | SciPy and NumPy (82 of 102) |
+| MF-9 | FRTB-SA GIRR delta | `06-risk/frtb-sa-girr.md` | F (Q2) | Specified | none (no worked example in MAR21) |
+| MF-10 | Book lifecycle and end-of-day marks | `07-portfolio/book-lifecycle.md` | F (F5) | Specified | none (own conventions) |
+| MF-11 | Factor attribution (use case 4) | `04-pricing/use-cases.md` | F (F5) | Specified | SciPy lstsq (24 of 27) |
 
 ### MF-1 CDS index option (Pedersen)
 - **Purpose:** payer and receiver options on a CDS index with front-end protection inside the forward and the strike converted for the fixed coupon.
@@ -405,7 +410,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** sequential stage B and D bootstraps on the same quotes (`rates.ois.bootstrap`, `rates.curve.joint_bootstrap`).
 - **Monitoring thresholds:** any residual above 1e-13; Jacobian outside `1e-9 + 1e-6 |ref|` of bump-and-rebuild.
-- **Data lineage hash:** sha256 05d94767453f1447c65daa1b33e69a6b83f729dd2ffe0bb17879f4dc7ebd62a7
+- **Data lineage hash:** sha256 a35637ed63ff4a91c0092eec2c06caad14a47ad1e592dc64198e4f4627dce954
 - **Retirement trigger:** mark-to-market cross-currency swaps and a calibrated convexity model (stage G) replace the synthetic pieces.
 - **Validation report:** `specifications/02-curves/joint-solve-and-funding.md` (acceptance); `oracle/outside_register_f.json`.
 
@@ -417,9 +422,69 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2 (feeds FVA, not prices, until stage G).
 - **Challenger:** a bond-implied funding curve (Z-spread of own issuance) in stage G.
 - **Monitoring thresholds:** a quote not repriced to 1e-12.
-- **Data lineage hash:** sha256 05d94767453f1447c65daa1b33e69a6b83f729dd2ffe0bb17879f4dc7ebd62a7
+- **Data lineage hash:** sha256 a35637ed63ff4a91c0092eec2c06caad14a47ad1e592dc64198e4f4627dce954
 - **Retirement trigger:** a funding model with term structure from issued bonds and CDS supersedes the money-market version.
 - **Validation report:** `specifications/02-curves/joint-solve-and-funding.md`.
+
+### MF-7 Book sensitivities (Q3a, F3)
+- **Purpose:** exact par-quote sensitivities of an OIS swap book and the zero-rate Jacobian of the curve (AAD in Rust, IFT elsewhere); principal components of curve moves; cross gamma on pillar zero rates; jump-to-default loss.
+- **Inputs:** OIS quotes and a swap book; a matrix of curve changes; a curve object and an OIS trade; credit positions.
+- **Limitations:** OIS books only for AAD; JTD without accrued premium or the FRTB default risk charge weighting; PCA rejects repeated eigenvalues.
+- **Validation:** 40-digit IFT goldens (no bump in the golden); T row Q3a bounds; PCA against SciPy. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** bump and revalue (`risk.curve.par`, R2).
+- **Monitoring thresholds:** AAD outside `1e-10 + 1e-8 |ref|` of the Richardson bump in the Rust unit tests.
+- **Data lineage hash:** sha256 a01ee0b5b4042e8b31725d29af7a46d168c06e57b8672ec01c72e894bd8f36c2
+- **Retirement trigger:** AAD through every pricer replaces bump risk as the default (a later stage, by ADR).
+- **Validation report:** `specifications/06-risk/book-sensitivities.md`; `oracle/outside_register_f.json`.
+
+### MF-8 VaR, ES and backtests (Q2)
+- **Purpose:** loss quantile and tail mean from historical, volatility-rescaled, normal and simulated P&L; Kupiec, Christoffersen and the Basel traffic light.
+- **Inputs:** P&L or return series, positions, covariance, exception series.
+- **Limitations:** one-asset FHS; normal parametric only; Monte Carlo on a multivariate normal; no liquidity horizon scaling.
+- **Validation:** 40-digit replicas; SciPy and NumPy outside checks. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** full revaluation against sensitivity P&L (`risk.pnl.explain`).
+- **Monitoring thresholds:** a traffic-light zone of YELLOW or RED on the bank's own backtest.
+- **Data lineage hash:** sha256 29111a2d9ec9d6095ce42e9bd27d3c183ed6014db9d69396a32f9908d90f8e98
+- **Retirement trigger:** a full-revaluation historical engine on real positions (stage G and later).
+- **Validation report:** `specifications/06-risk/var-es-and-backtests.md`.
+
+### MF-9 FRTB-SA GIRR delta (Q2)
+- **Purpose:** standardised capital for interest rate delta under MAR21.
+- **Inputs:** delta sensitivities per currency, curve and tenor.
+- **Limitations:** GIRR delta only; the `low` scenario formula is transcribed from an image (ruling F-33, known issue).
+- **Validation:** 40-digit replica; tenor correlation reproduces MAR21.46 Table 2. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** none free.
+- **Monitoring thresholds:** a change in MAR21 parameters.
+- **Data lineage hash:** sha256 19af72de698789e30aae463a478edb8686b86c0a49fd566adf72a70c00e2c7b9
+- **Retirement trigger:** the full SBM (all risk classes, vega and curvature).
+- **Validation report:** `specifications/06-risk/frtb-sa-girr.md`.
+
+### MF-10 Book lifecycle and marks (F5)
+- **Purpose:** positions, average cost and realised P&L through trades, expiry, default and rolls; fixings; end-of-day marks with source fallback and independent price verification.
+- **Inputs:** opening positions and dated events; quote sources in priority order; independent prices.
+- **Limitations:** average cost only; no corporate actions, settlement dates or multi-currency cash.
+- **Validation:** exact rational replay. **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** none (own conventions).
+- **Monitoring thresholds:** any IPV breach; any MISSING mark.
+- **Data lineage hash:** sha256 9da28acc6934e4b88f5d32ca702a2ac32c0ba94216a03c6ab46c7897bd2b255b
+- **Retirement trigger:** a lot-level book with settlement accounting.
+- **Validation report:** `specifications/07-portfolio/book-lifecycle.md`.
+
+### MF-11 Factor attribution (use case 4)
+- **Purpose:** split a portfolio's mean return into factor contributions and alpha by least squares with an intercept.
+- **Inputs:** portfolio and factor return series.
+- **Limitations:** static betas over the window; no Brinson sector attribution.
+- **Validation:** 40-digit normal equations; SciPy lstsq outside check. **Review:** 2026-11-10.
+- **Tier:** 2.
+- **Challenger:** rolling-window regression.
+- **Monitoring thresholds:** `r_squared` below a desk-set floor.
+- **Data lineage hash:** sha256 64021394cb4fe8252e1724f76054935cdee1a23eb8006db0925c767673efc6f5
+- **Retirement trigger:** a holdings-based factor model.
+- **Validation report:** `specifications/04-pricing/use-cases.md`.
 
 ## Review cycle
 
