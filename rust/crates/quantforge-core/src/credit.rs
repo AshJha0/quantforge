@@ -657,6 +657,12 @@ mod tests {
     }
 
     // ---- Stage G: tests aimed at the stage F mutation survivors (unit kill 180/388). ----
+    // Equivalent mutants left alive (signed off, stage G):
+    // - e_terms `x.abs() < 1e-4` -> `<=`: both branches agree to an ulp at the switch.
+    // - e_terms `+ x^4/120` -> `-`, `/ 120` -> `% 120` (and the /144 twin): |x| < 1e-4 makes
+    //   the term < 1e-16, below one ulp of the result.
+    // - pieces `*d > a` -> `>=`, `*d < b` -> `<=`: the extra cut makes a zero-length piece,
+    //   which the `dt <= 0` guard skips.
     // These checks do not reuse the engine: a hazard that is piecewise flat between
     // pillars and a flat 4% rate give both legs in closed form.
 
