@@ -35,7 +35,11 @@ Class `simple_analytic`; `binding_scenario` and `alternative_used` exact.
 
 ## Convergence and limit cases
 
-Closed form, no iteration. Limit cases (goldens): one tenor, where `capital = RW |s|` in every scenario (`high` binds by the tie rule); two buckets of uncorrelated basis factors with opposite sign, where the alternative `S_b` is used in all three scenarios.
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| SBM aggregation | closed form, no iteration | none | one tenor: `capital = RW |s|` in every scenario (`high` binds by the tie rule) | `frtb_f-0001` |
+| Alternative `S_b` | closed form | none | two offsetting buckets of uncorrelated basis factors: the alternative `S_b` is used in all three scenarios | `frtb_f` "alternative S_b" case |
+| Tenor correlation | closed form | none | reproduces the printed MAR21.46 Table 2 (97.0% for 0.25Y against 0.5Y, the 40% floor) | MAR21.46 |
 
 ## Acceptance
 

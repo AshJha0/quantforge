@@ -21,7 +21,7 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Credit and correlation](#credit-and-correlation) | ISDA CDS, CDS options, copulas, correlation matrices and dispersion |
 | [Risk, hedging and use cases](#risk-hedging-and-use-cases) | Bump and rebuild, par and key-rate risk, the Jacobian, P&L explain, hedges, use cases 1 to 3 |
 | [Validation and evidence](#validation-and-evidence) | What a pass means, tolerances in money, what an outside library does not check |
-| [Planned: stage F](#planned-stage-f) | Placeholders for v0.6 topics |
+| [Stage F: curves, portfolio risk and the book](#stage-f-curves-portfolio-risk-and-the-book-specified) | Interpolation, joint solve, AAD, VaR and backtests, FRTB GIRR, book (specified) |
 
 ## Foundations
 
@@ -380,14 +380,36 @@ Every topic is Implemented, not Validated, and all inputs are synthetic unless a
 
 - **Curves and fixed income (stage D).** Stage D is Implemented, not Validated. All inputs are synthetic. The ESTR payment lag of 2 is a library choice (Strata), not a market standard; TP ICAP terms use 1 (ruling R1-2). From R1, bond-future conversion factors take an optional `contract` input with CME rounding; `null` keeps the stage D `TEN_YEAR` behaviour (ruling R1-3). The stage D data survey (2026-11-07) found free overnight fixings, fitted Bank of England curves, US Treasury par and real curves and UK CPI, but no free swap quotes, bond-level prices, special repo, cross-currency basis, CDS spreads, borrow, commodity curves or MBS factors; those studies stay method tests. Several suites have no outside oracle (CSA discounting, asset swap, FRN, repo, NDF, equity, inflation, commodities, MBS); `specifications/stage-d-rulings.md` lists them. R1 counts outside-oracle cases under a stricter rule: QuantLib is built from its own convention objects through one reviewed table, `oracle/CONVENTION_MAP.md`. On that rule, 419 of the 654 stage D cases (64.1%; most counted cases are fixed-rate bonds) count, suite by suite in `oracle/REPORT.md`.
 
-## Planned: stage F
+## Stage F: curves, portfolio risk and the book (specified)
 
-Stage F (target v0.6) adds the rest of risk, portfolio and the book. These topics are **planned**; each gets the same plain idea, formal statement and worked example when its slice lands. Scope is in the [Roadmap](ROADMAP.md).
+Stage F (target v0.6.0) is **specified**: specs, rulings F-1 to F-39 and goldens are on the `stage-f` branch, and the four builds are being written from them. Nothing below is claimed as built until the part 2 merge reports the conformance results. Every number quoted here is the expected output of the named golden case, computed by the oracle at 40 or more digits.
 
-- Pluggable interpolation and a joint multi-curve solve with meeting-date steps. *Planned.*
-- Value at risk, expected shortfall, FRTB standardised approach and backtests. *Planned.*
-- An algorithmic-differentiation prototype and the analytic solver Jacobian. *Planned.*
-- GARCH parameters with standard errors; CDS index options on the adjusted forward. *Planned.*
+### Five more ways to draw a curve
+**Plain idea.** Between quoted dates a curve must be filled in, and the method changes the forward rates a trader sees. Stage F adds monotone convex (Hagan and West), monotonic log cubic, a tension spline and a hybrid that is stepwise at the front and smooth behind. Spec: `02-curves/curve-framework.md`, "Stage F: pluggable interpolation". **Watch for:** monotone convex is piecewise in its data, so its derivative jumps where a section changes rule. Ruling F-28 shows how a too-large bump straddled such a kink and looked like a 2e-3 error.
+
+### Solving several curves at once
+**Plain idea.** The OIS curve, the term curve that discounts on it and the cross-currency curve are one system of equations. The same solve gives every curve point's sensitivity to every quote, by the implicit function theorem: `J = -(dR/dx)^{-1} dR/dq`. Spec: `02-curves/joint-solve-and-funding.md`. **Worked number:** in `joint_f-0001` the year-end turn on SOFR is solved from the 2M quote as a discount factor jump of 0.99999890 across 2026-12-31.
+
+### Risk of a whole book in one pass
+**Plain idea.** Bumping 12 quotes on 500 swaps means 12,000 revaluations. Algorithmic differentiation (AAD) gets all of them from one forward and one backward pass, exactly to rounding. Rust carries the reference tape, and the other three languages use the chain rule (ruling F-29). Spec: `06-risk/book-sensitivities.md`. **Worked number:** in `risk_f3-0001`, the 500-swap book's value moves by 2.0205 per unit of the 10Y quote, so 1 bp is 0.000202 per unit notional.
+
+### VaR, expected shortfall and backtests
+**Plain idea.** Take 250 days of P&L, sort the losses, and read off the third-largest: that is the 99% VaR. ES is the mean of the losses from there up. Then ask whether real losses broke VaR as often as they should. Spec: `06-risk/var-es-and-backtests.md`. **Worked numbers:**
+- `risk_f4-0001` (250 days, 99%): VaR 4,597,347.01 and ES 5,360,005.88, over three tail scenarios (ruling F-31).
+- A normal P&L with standard deviation 1 million (`risk_f4-0026`) gives VaR 2,326,347.87, which is 2.326 sigma.
+- In the Basel traffic light, 4 exceptions in 250 days is green, 5 is yellow (plus factor 0.40), and 10 is red (`risk_f4-0086`, `0087`, `0092`).
+
+### FRTB standardised capital for rates
+**Plain idea.** Regulators fix the recipe: weight each sensitivity, add them within a currency with set correlations, then across currencies, under three correlation scenarios, and keep the worst. Spec: `06-risk/frtb-sa-girr.md`, from the Basel Framework MAR21. **Worked number:** a 2Y long and a 10Y short on one curve (`frtb_f-0002`) need 8,812.37 of capital, with the `low` scenario binding. **Open:** the `low` formula is transcribed from an image and still needs checking against the PDF (F-33).
+
+### The book, and where returns came from
+**Plain idea.** Positions carry an average cost, and selling realises the difference. Expiry, default and rolls are trades at their settlement, recovery or roll prices. At the end of the day each position gets a mark from the best available source, and an independent price flags marks that look wrong. Spec: `07-portfolio/book-lifecycle.md`. **Worked number:** buy 100 at 99.50 and 50 at 100.25 (average 99.75), sell 120 at 100.50: realised P&L 90.00, with 30 left at 99.75 (`book_f-0001`).
+
+Use case 4 regresses a portfolio's returns on factor returns, and each factor's share of the mean return is its beta times the factor mean (`04-pricing/use-cases.md`). In `uc4_f-0002`, the mean monthly return of 0.279% splits into alpha 0.073% and three factor contributions (0.186%, -0.008%, 0.029%) that add up exactly.
+
+### What stage F's evidence does and does not show
+- **Outside oracle: 222 of 403 cases (55.1%), below the 60% floor.** The checks use QuantLib 1.44, SciPy, NumPy and `arch`. Every case without a free outside source is listed with the reason in `oracle/OUTSIDE_GAPS_F.md`. 72 of them are error cases, which no library can check; the CDS index option (R7) is the largest value-case gap, because its reference paper is not freely available.
+- **All inputs are synthetic.** The 500-swap book, the VaR series and the factor returns are drawn from `core.rng` with fixed seeds.
 - [Determinism](docs/determinism.md): what is bit-exact across languages and platforms, and what is within tolerance.
 
 ## Appendix: stage history

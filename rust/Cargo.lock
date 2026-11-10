@@ -281,7 +281,7 @@ dependencies = [
 
 [[package]]
 name = "quantforge-bench"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "criterion",
  "quantforge-core",
@@ -289,14 +289,14 @@ dependencies = [
 
 [[package]]
 name = "quantforge-cli"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "quantforge-core",
 ]
 
 [[package]]
 name = "quantforge-core"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "proptest",
 ]

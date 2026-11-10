@@ -39,7 +39,7 @@ Outputs: `forwards`, `svi_rmse`, `arbitrage_free`, `vol`, `valuation` (`model` `
 
 Added in stage F (slice F5, suite `stage_f/uc4_f`, generator `oracle/python/gen_stage_f_w3.py`). **Plain idea:** a portfolio earned 0.8% a month; how much of that came from the market, from small caps, from rates, and how much was the manager's own (alpha)? Regress the portfolio's returns on the factors' returns; each factor's share of the average return is its beta times the factor's average return.
 
-Inputs: `portfolio_returns` (`T`), `factor_returns` (`T x K`), `factor_names` (`K`, else `E_INPUT`). `T >= K + 2`, else `E_INPUT`.
+Inputs: `portfolio_returns` (`T`), `factor_returns` (`T x K`), `factor_names` (`K`, else `E_INPUT`); rows of unequal length: `E_INPUT`; these shape checks come before `T >= K + 2`, else `E_INPUT` (ruling F-39).
 
 Ordinary least squares with an intercept on `X = [1, F]`. If the smallest singular value of `X` is below `1e-12` times the largest, the factors are collinear: `E_DOMAIN`. Outputs:
 - `alpha`, `betas`;
