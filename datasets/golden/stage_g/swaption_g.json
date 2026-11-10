@@ -1,0 +1,2833 @@
+{
+ "schema_version": "1.0",
+ "suite": "swaption_g",
+ "spec": "specifications/04-pricing/short-rate-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "swaption_g-0001",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.029462,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 45445.78442596593,
+     "forward_swap_rate": 0.039462456263301415,
+     "annuity": 4289707.361827088
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 1.0y into 5 periods, K=0.029462",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0002",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.029462,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2546.7535716520356,
+     "forward_swap_rate": 0.039462456263301415,
+     "annuity": 4289707.361827088
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 1.0y into 5 periods, K=0.029462",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0003",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15409.247099177188,
+     "forward_swap_rate": 0.039462456263301415,
+     "annuity": 4289707.361827088
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 1.0y into 5 periods, K=0.039462",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0004",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.039462,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15407.289863134154,
+     "forward_swap_rate": 0.039462456263301415,
+     "annuity": 4289707.361827088
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 1.0y into 5 periods, K=0.039462",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0005",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.049462,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2643.172437079846,
+     "forward_swap_rate": 0.039462456263301415,
+     "annuity": 4289707.361827088
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 1.0y into 5 periods, K=0.049462",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0006",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.049462,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 45538.28881930769,
+     "forward_swap_rate": 0.039462456263301415,
+     "annuity": 4289707.361827088
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 1.0y into 5 periods, K=0.049462",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0007",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.029366,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 83625.28624570725,
+     "forward_swap_rate": 0.03936635244111235,
+     "annuity": 7526771.575109286
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 2.0y into 10 periods, K=0.029366",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0008",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.029366,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8354.917750868088,
+     "forward_swap_rate": 0.03936635244111235,
+     "annuity": 7526771.575109286
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 2.0y into 10 periods, K=0.029366",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0009",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.039366,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 33590.74492725808,
+     "forward_swap_rate": 0.03936635244111235,
+     "annuity": 7526771.575109286
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 2.0y into 10 periods, K=0.039366",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0010",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.039366,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 33588.09218351176,
+     "forward_swap_rate": 0.03936635244111235,
+     "annuity": 7526771.575109286
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 2.0y into 10 periods, K=0.039366",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0011",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.049366,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8745.477695948352,
+     "forward_swap_rate": 0.03936635244111235,
+     "annuity": 7526771.575109286
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 2.0y into 10 periods, K=0.049366",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0012",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0
+    ],
+    "fixed_rate": 0.049366,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 84010.54070329492,
+     "forward_swap_rate": 0.03936635244111235,
+     "annuity": 7526771.575109286
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 2.0y into 10 periods, K=0.049366",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0013",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.029604,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 48967.96602999763,
+     "forward_swap_rate": 0.039603642121749695,
+     "annuity": 3672486.5018405644
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 5.0y into 5 periods, K=0.029604",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0014",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.029604,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12244.415314635524,
+     "forward_swap_rate": 0.039603642121749695,
+     "annuity": 3672486.5018405644
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 5.0y into 5 periods, K=0.029604",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0015",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.039604,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26836.379333311528,
+     "forward_swap_rate": 0.039603642121749695,
+     "annuity": 3672486.5018405644
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 5.0y into 5 periods, K=0.039604",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0016",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.039604,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26837.693636355074,
+     "forward_swap_rate": 0.039603642121749695,
+     "annuity": 3672486.5018405644
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 5.0y into 5 periods, K=0.039604",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0017",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.049604,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12510.187047070149,
+     "forward_swap_rate": 0.039603642121749695,
+     "annuity": 3672486.5018405644
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 5.0y into 5 periods, K=0.049604",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0018",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.049604,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 49236.366368519346,
+     "forward_swap_rate": 0.039603642121749695,
+     "annuity": 3672486.5018405644
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 5.0y into 5 periods, K=0.049604",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0019",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 10.0,
+    "payment_times": [
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0
+    ],
+    "fixed_rate": 0.026713,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 122614.74374210593,
+     "forward_swap_rate": 0.036713139765427026,
+     "annuity": 9441478.77199624
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 10.0y into 20 periods, K=0.026713",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0020",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 10.0,
+    "payment_times": [
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0
+    ],
+    "fixed_rate": 0.026713,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 28198.63642983118,
+     "forward_swap_rate": 0.036713139765427026,
+     "annuity": 9441478.77199624
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 10.0y into 20 periods, K=0.026713",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0021",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 10.0,
+    "payment_times": [
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0
+    ],
+    "fixed_rate": 0.036713,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 66020.5323010728,
+     "forward_swap_rate": 0.036713139765427026,
+     "annuity": 9441478.77199624
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 10.0y into 20 periods, K=0.036713",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0022",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 10.0,
+    "payment_times": [
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0
+    ],
+    "fixed_rate": 0.036713,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 66019.21270876047,
+     "forward_swap_rate": 0.036713139765427026,
+     "annuity": 9441478.77199624
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 10.0y into 20 periods, K=0.036713",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0023",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 10.0,
+    "payment_times": [
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0
+    ],
+    "fixed_rate": 0.046713,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 30337.81471716658,
+     "forward_swap_rate": 0.036713139765427026,
+     "annuity": 9441478.77199624
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 10.0y into 20 periods, K=0.046713",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0024",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 10.0,
+    "payment_times": [
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0
+    ],
+    "fixed_rate": 0.046713,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 124751.2828448166,
+     "forward_swap_rate": 0.036713139765427026,
+     "annuity": 9441478.77199624
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 10.0y into 20 periods, K=0.046713",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0025",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 0.5,
+    "payment_times": [
+     1.5,
+     2.5
+    ],
+    "fixed_rate": 0.029412,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 18927.766286513594,
+     "forward_swap_rate": 0.0394124048598119,
+     "annuity": 1851306.7744721118
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 0.5y into 2 periods, K=0.029412",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0026",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 0.5,
+    "payment_times": [
+     1.5,
+     2.5
+    ],
+    "fixed_rate": 0.029412,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 413.9490220799929,
+     "forward_swap_rate": 0.0394124048598119,
+     "annuity": 1851306.7744721118
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 0.5y into 2 periods, K=0.029412",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0027",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 0.5,
+    "payment_times": [
+     1.5,
+     2.5
+    ],
+    "fixed_rate": 0.039412,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5104.9480460539135,
+     "forward_swap_rate": 0.0394124048598119,
+     "annuity": 1851306.7744721118
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 0.5y into 2 periods, K=0.039412",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0028",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 0.5,
+    "payment_times": [
+     1.5,
+     2.5
+    ],
+    "fixed_rate": 0.039412,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5104.198526341434,
+     "forward_swap_rate": 0.0394124048598119,
+     "annuity": 1851306.7744721118
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 0.5y into 2 periods, K=0.039412",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0029",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 0.5,
+    "payment_times": [
+     1.5,
+     2.5
+    ],
+    "fixed_rate": 0.049412,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 431.7319885501667,
+     "forward_swap_rate": 0.0394124048598119,
+     "annuity": 1851306.7744721118
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 0.5y into 2 periods, K=0.049412",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0030",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 0.5,
+    "payment_times": [
+     1.5,
+     2.5
+    ],
+    "fixed_rate": 0.049412,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 18944.050213558796,
+     "forward_swap_rate": 0.0394124048598119,
+     "annuity": 1851306.7744721118
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 0.5y into 2 periods, K=0.049412",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0031",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0,
+     5.5,
+     6.0
+    ],
+    "fixed_rate": 0.04,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13358.72053731616,
+     "forward_swap_rate": 0.03908063002687049,
+     "annuity": 4331618.733681387
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 1.0y into 10 periods, K=0.04",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0032",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.5,
+    "sigma": 0.02,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.04,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11302.382679026094,
+     "forward_swap_rate": 0.03931758659667362,
+     "annuity": 2571689.7509755506
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER 2.0y into 3 periods, K=0.04",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0033",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      1.0,
+      5.002739726027397,
+      10.005479452054795
+     ],
+     "discount_factors": [
+      1.0045,
+      1.008,
+      0.995
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.0,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12516.162433876014,
+     "forward_swap_rate": -0.0008685934626452474,
+     "annuity": 4026740.201396527
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER 1.0y into 4 periods, K=0.0",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "swaption_g-0034",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     3.0,
+     2.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "payment times not increasing"
+  },
+  {
+   "case_id": "swaption_g-0035",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     1.0,
+     2.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "first payment on expiry"
+  },
+  {
+   "case_id": "swaption_g-0036",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "no payments"
+  },
+  {
+   "case_id": "swaption_g-0037",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 0.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "expiry = 0"
+  },
+  {
+   "case_id": "swaption_g-0038",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "STRADDLE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "unknown swaption_type"
+  },
+  {
+   "case_id": "swaption_g-0039",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "sigma = 0"
+  },
+  {
+   "case_id": "swaption_g-0040",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER",
+    "short_rate": 0.01
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "short_rate given"
+  }
+ ]
+}

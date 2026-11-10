@@ -2658,6 +2658,12 @@
     "expiry_years": {
      "java": "expiryYears"
     },
+    "monitoring": {
+     "java": "monitoring"
+    },
+    "monitoring_per_year": {
+     "java": "monitoringPerYear"
+    },
     "option_type": {
      "java": "optionType"
     },
@@ -4242,6 +4248,131 @@
    },
    "outputs": [
     "periods"
+   ]
+  },
+  "rates.shortrate.swaption": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_swaption",
+   "python": "quantforge.rates.shortrate_swaption",
+   "java": "Rates.shortrateSwaption",
+   "cpp": "qf::rates::shortrate_swaption",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "short_rate": {
+     "java": "shortRate"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "swaption_type": {
+     "java": "swaptionType"
+    }
+   },
+   "outputs": [
+    "annuity",
+    "forward_swap_rate",
+    "price"
+   ]
+  },
+  "rates.shortrate.zcb": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_zcb",
+   "python": "quantforge.rates.shortrate_zcb",
+   "java": "Rates.shortrateZcb",
+   "cpp": "qf::rates::shortrate_zcb",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "long_term_mean": {
+     "java": "longTermMean"
+    },
+    "maturity_years": {
+     "java": "maturityYears"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "model": {
+     "java": "model"
+    },
+    "short_rate": {
+     "java": "shortRate"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "t_years": {
+     "java": "tYears"
+    }
+   },
+   "outputs": [
+    "discount_factor",
+    "zero_rate"
+   ]
+  },
+  "rates.shortrate.zcb_option": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_zcb_option",
+   "python": "quantforge.rates.shortrate_zcb_option",
+   "java": "Rates.shortrateZcbOption",
+   "cpp": "qf::rates::shortrate_zcb_option",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "long_term_mean": {
+     "java": "longTermMean"
+    },
+    "maturity_years": {
+     "java": "maturityYears"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "model": {
+     "java": "model"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "short_rate": {
+     "java": "shortRate"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "strike": {
+     "java": "strike"
+    }
+   },
+   "outputs": [
+    "bond_price_expiry",
+    "bond_price_maturity",
+    "price"
    ]
   },
   "rates.swap.pv": {

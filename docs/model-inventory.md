@@ -486,6 +486,30 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a holdings-based factor model.
 - **Validation report:** `specifications/04-pricing/use-cases.md`.
 
+### MG-1 One-factor short-rate models (G1)
+- **Purpose:** zero-coupon bond prices and European bond options under Vasicek, CIR and Hull-White, and European swaptions on Hull-White by Jamshidian; the base of the stage G Bermudan, callable-bond and exposure models.
+- **Inputs:** model parameters (`a`, `sigma`, `b`), short rate, and for Hull-White a log-linear discount curve.
+- **Limitations:** one factor (perfectly correlated rates); constant parameters (no time-dependent `sigma`); Vasicek and Hull-White allow negative rates without bound; no market price of risk; no calibration yet (later wave).
+- **Validation:** 50-digit mpmath replicas; QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` outside check (61 of 78 bond cases, 33 of 40 swaption cases). **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** G2++ (later wave).
+- **Monitoring thresholds:** calibration error once calibration lands.
+- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`)
+- **Retirement trigger:** a multi-factor or market model for the desk's products.
+- **Validation report:** `specifications/04-pricing/short-rate-models.md`.
+
+### MG-2 Discrete barrier correction (R9)
+- **Purpose:** price discretely monitored barriers by the Broadie-Glasserman-Kou shift of the continuous formula.
+- **Inputs:** as `exotic.barrier.price`, plus monitoring frequency.
+- **Limitations:** an approximation; error grows when spot is near the barrier or monitoring is sparse (monthly); flat vol only.
+- **Validation:** exact-date Monte Carlo within 3 SE at daily monitoring (`oracle/R9_ACCEPTANCE.json`). **Review:** 2026-11-10.
+- **Tier:** 2.
+- **Challenger:** exact-date Monte Carlo.
+- **Monitoring thresholds:** BGK against MC beyond 3 SE on a desk sample.
+- **Data lineage hash:** sha256 51ed99b349c200ddbf85d89f49a20623683d1a9ce81437163d54944b1a4d95d3
+- **Retirement trigger:** a PDE or MC barrier engine in the library.
+- **Validation report:** `specifications/04-pricing/exotics.md`, section "Stage G addition".
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.
