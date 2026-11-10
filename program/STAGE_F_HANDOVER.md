@@ -156,3 +156,7 @@ Read ruling F-34 and the cli-contract rows F5.
 
 ### Deferred to wave 2b (not specified here)
 Inflation01, dividend and borrow sensitivity, correlation sensitivity (F3); reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves (F4); FRTB vega, curvature and the other risk classes. E1 cases for the stage F operations are still missing (`gen_stage_f_e1.py` skips `stage_f`; change it to skip only `e1_*` and rerun).
+
+## R8 coverage study done (2026-11-10)
+
+`oracle/R8_COVERAGE.json`: 200 simulated series of 2,000 per distribution; share of fits whose ±2 SE interval holds the true parameter. NORMAL (omega, alpha, beta) 0.98, 0.94, 0.98; STUDENT_T (omega, alpha, beta, nu) 0.95, 0.935, 0.955, 0.96. Every value is inside the preregistered band [0.90, 0.99], so the R8 standard errors are confirmed. (Run: `uv run python -W ignore gen_stage_f_f6.py COVER`, several hours when the machine is shared.)
