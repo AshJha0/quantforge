@@ -388,15 +388,24 @@ JointResult System::solve() {
         const std::vector<double> d1 = central(u, h), d2 = central(u, h / 2.0);
         for (std::size_t j = 0; j < n; ++j) a[j][u] = d1[j] == d2[j] ? d2[j] : (4.0 * d2[j] - d1[j]) / 3.0;
     }
-    // Ruling F-26: an instrument whose dates lie on one side of a turn date has exactly zero sensitivity.
+    // Ruling F-26 (amended): pillar unknowns are full ln D. The solve holds ln S = ln D - ln factor at a pillar
+    // after the turn, so the turn column at fixed ln D is the column at fixed ln S minus the columns of the
+    // pillars dated strictly after the turn. On OIS_STEPS curves an instrument whose dates lie on one side of
+    // the turn date has exactly zero sensitivity.
     std::vector<std::size_t> turn_unknowns;
     for (const Block& bl : blocks_)
         for (std::size_t t = 0; t < bl.spec->turns.size(); ++t) {
             const std::size_t u = bl.first + bl.base_count + t;
             const Date td = bl.spec->turns[t];
             turn_unknowns.push_back(u);
-            for (std::size_t j = 0; j < n; ++j)
-                if (!(prep_[j].first <= td && td < prep_[j].last)) a[j][u] = 0.0;
+            if (pillar_curve(bl.spec->type)) {
+                for (std::size_t i = 0; i < bl.pillars.size(); ++i)
+                    if (td < bl.pillars[i])
+                        for (std::size_t j = 0; j < n; ++j) a[j][u] -= a[j][bl.first + i];
+            } else {
+                for (std::size_t j = 0; j < n; ++j)
+                    if (!(prep_[j].first <= td && td < prep_[j].last)) a[j][u] = 0.0;
+            }
         }
 
     // dR/dq at the solution.
@@ -453,16 +462,8 @@ JointResult System::solve() {
         }
         out.curves.push_back(std::move(c));
     }
-    // The solve holds ln of the turn-free curve at a pillar; the reported unknown is ln D, which adds
-    // ln factor for each turn strictly before the pillar date.
+    // dR/dx is in ln D at pillars, so the rows are already the reported unknowns.
     Matrix reported = jac;
-    for (const Block& bl : blocks_) {
-        if (!pillar_curve(bl.spec->type)) continue;
-        for (std::size_t i = 0; i < bl.pillars.size(); ++i)
-            for (std::size_t t = 0; t < bl.spec->turns.size(); ++t)
-                if (bl.spec->turns[t] < bl.pillars[i])
-                    for (std::size_t q = 0; q < n; ++q) reported[bl.first + i][q] += jac[bl.first + bl.base_count + t][q];
-    }
     out.jacobian = std::move(reported);
     for (const JointInstrument& in : inst_) out.quotes.push_back(in.id);
     for (const std::size_t u : turn_unknowns) {

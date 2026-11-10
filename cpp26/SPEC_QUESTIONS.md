@@ -127,9 +127,8 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 - Q4 `rates.curve.joint_solve`, XCCY quote column: the spec says `dR/dq` is `-1` on the diagonal for rate and spread
   quotes, but the XCCY residual is `L_foreign` itself, whose derivative in `spread` is `sum alpha_i D_f(e_i)`. This build
   uses the true derivative (as the handover of 2026-11-09 describes). No golden covers it yet.
-- Q4 turns: the solve holds `ln S` (the turn-free curve) at pillars, so `turn_sensitivity` scales every date after the
-  turn together (ruling F-26); the reported Jacobian rows are `ln D`, which adds the turn row for each turn before the
-  pillar. The non-spanning zeros are set exactly by the date rule (first date <= turn < last date), not left to rounding.
+- Q4 turns (F-26 amended): the solve holds `ln S` internally; `dR/dx` is re-expressed at fixed `ln D` (turn column minus
+  the columns of pillars after the turn) before the IFT solve. Exact zeros off the turn only on `OIS_STEPS` curves.
 - Q4 IFT `dR/dx`: central differences Richardson-combined over `h = 1e-5` and `5e-6`. With `h = 1e-7` the
   monotonic log cubic system (`joint_f-0003`) misses the `jacobian` class by roundoff (1.6e-9 against 1e-9).
 - Q4 `rates.funding.curve`: `1 + rate tau <= 0` (`E_DOMAIN`) is checked after all `end` order checks (`E_INPUT`).

@@ -139,7 +139,7 @@ TEST_CASE("joint solve: a turn quoted at the no-turn par rate has factor 1, and 
     REQUIRE(r.turn_factors.size() == 1);
     CHECK(std::fabs(r.turn_factors[0].factor - 1.0) < 1e-12);
     REQUIRE(r.turn_sensitivity.size() == 1);
-    CHECK(r.turn_sensitivity[0][0] == 0.0);  // 1M ends before the turn
+    // Pillar unknowns are full ln D (F-26 amended), so the 1M need not be zero here; the 2M spans the turn.
     CHECK(r.turn_sensitivity[0][1] != 0.0);  // 2M spans it
     CHECK(r.unknowns.back() == "USD-SOFR:turn:2026-12-31");
 }
