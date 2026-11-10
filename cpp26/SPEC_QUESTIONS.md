@@ -120,28 +120,20 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
   case keeps its base case's `extra_checks`), and `e1_core-0129` to `0131` (`"NaN"` in the Integer `n` expects
   `E_DOMAIN`; F-1 says `E_SCHEMA`). This build follows F-1.
 - R7 `credit.cdsindex.option_price`: domain checks in the spec order (recovery, hazard, strike, coupon, vol), notional last; `F_adj <= 0` names field `hazard_rate`, `K_adj <= 0` names `strike`; `h_K` bisection to the floating-point limit; vol = 0 is the intrinsic value; notional scales outputs only.
-- Q1 tension spline: the small-z limit of alpha is coded as the spec writes it, `h/6 (1 - z^2/60)`; the exact series is `h(1/6 - 7 z^2/360)`. Goldens pass as written; flagged to the spec owner.
+- Q1 tension spline: settled by ruling F-35; the small-z branch uses `alpha = h/6 (1 - 7 z^2/60)` and `R(u)` with its `z^2` term.
 - Q1 `step_end` must be a pillar of every curve it is applied to (in `rates.curve.joint_bootstrap` both curves). `rates.projection.bootstrap` has no `tension`/`step_end` keys, so TENSION_SPLINE and HYBRID are `E_INPUT` there. `rates.curve.inspect` forwards are of the smooth curve (no jumps, no zero shift); LINEAR_ZERO forward before the first pillar is the first zero rate.
 - R8 `vol.garch.loglik`: STUDENT_T checks (missing nu `E_INPUT`, nu <= 2 `E_DOMAIN`) run after the existing checks; a non-finite `degrees_of_freedom` is `E_DOMAIN` even under NORMAL. `vol.garch.estimate` interior test for nu: `nu - 2 >= 2e-6` and `500 - nu >= 5e-4`.
 - R10 VIX: a missing quote key stays `E_SCHEMA`; only an explicit `null` is a null quote. A present negative quote is `E_DOMAIN` even if the other side of that series is null.
-- Q4 `rates.curve.joint_solve`, XCCY quote column: the spec says `dR/dq` is `-1` on the diagonal for rate and spread
-  quotes, but the XCCY residual is `L_foreign` itself, whose derivative in `spread` is `sum alpha_i D_f(e_i)`. This build
-  uses the true derivative (as the handover of 2026-11-09 describes). No golden covers it yet.
+- Q4 XCCY quote column: `dR/dq = sum alpha_i D_f(e_i)` (the true derivative of `L_foreign` in `spread`); `joint_f-0001` covers it and passes.
 - Q4 turns (F-26 amended): the solve holds `ln S` internally; `dR/dx` is re-expressed at fixed `ln D` (turn column minus
   the columns of pillars after the turn) before the IFT solve. Exact zeros off the turn only on `OIS_STEPS` curves.
 - Q4 IFT `dR/dx`: central differences Richardson-combined over `h = 1e-5` and `5e-6`. With `h = 1e-7` the
   monotonic log cubic system (`joint_f-0003`) misses the `jacobian` class by roundoff (1.6e-9 against 1e-9).
 - Q4 `rates.funding.curve`: `1 + rate tau <= 0` (`E_DOMAIN`) is checked after all `end` order checks (`E_INPUT`).
-- F3 `risk.curve.cross_gamma`: the golden trade `side` is `PAYER`/`RECEIVER`, while `par-and-key-rate.md` products use
-  `PAY`/`RECEIVE`; this verb reads `PAYER`/`RECEIVER`. Plain revaluation misses the 1e-10 absolute class by about 2e-10 at
-  notional 1e6 (each V about 1e6); the build sums `V(bump) - V(0)` per cash flow with `expm1` of the exact log shift.
+- F3 `risk.curve.cross_gamma`: settled by ruling F-36 (`PAY`/`RECEIVE`, 1e-9 absolute). The build still sums `V(bump) - V(0)` per cash flow with `expm1`.
 - F3 `risk.book.ois_sensitivity`: exact derivatives for LOG_LINEAR_DF and LINEAR_ZERO; the stage F interpolations are
   `E_DOMAIN` here (no golden). `tenor_years` above 100 is `E_DOMAIN` (calendar range). E_LIMIT sizes (100000 swaps or rows,
   100 PCA columns) are this build's choice.
-- F4 `risk.var.monte_carlo`: `seed` is a JSON integer in the goldens (other seeds in the contract are u64 strings); a negative
-  seed is `E_DOMAIN`. A covariance that is not positive definite is `E_DOMAIN` here, not `E_NOT_POSITIVE_DEFINITE`.
-- F4: filtered historical with all returns 0 (sigma 0) and traffic light with exceptions above observations are `E_DOMAIN`
-  (not specified, no golden).
-- F5 book: a duplicate instrument in the opening `positions` is `E_INPUT`; a zero opening quantity is ignored; `ipv` is
-  optional; a quote dated after `as_of` is never a mark. UC4: `factor_names` against the column count and ragged rows are
-  `E_INPUT`, checked before `T >= K + 2`.
+- F4 `risk.var.monte_carlo`: settled by ruling F-39 (`seed` a decimal u64 string; `E_NOT_POSITIVE_DEFINITE`).
+- F4 FHS with all returns 0 and traffic light with exceptions above observations: `E_DOMAIN`, accepted by F-39.
+- F5 book and UC4 choices (duplicate opening position, zero quantity, optional `ipv`, later quotes, shape checks first): accepted by F-39.

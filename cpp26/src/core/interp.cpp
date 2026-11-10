@@ -472,7 +472,7 @@ NodeLogCurve::NodeLogCurve(NodeCurveMethod method, Vec t, Vec ln_s, double tensi
             for (std::size_t i = 0; i < n; ++i) {
                 const double z = sg * h[i];
                 if (z < small_z) {
-                    alpha[i] = h[i] / 6.0 * (1.0 - z * z / 60.0);
+                    alpha[i] = h[i] / 6.0 * (1.0 - 7.0 * z * z / 60.0);  // ruling F-35
                     beta[i] = h[i] / 3.0 * (1.0 - z * z / 15.0);
                 } else {
                     const double e2 = -std::expm1(-2.0 * z);
@@ -512,10 +512,17 @@ NodeLogCurve::Value NodeLogCurve::section(std::size_t i, double t) const {
             const double a = t - t_[i], b = t_[i + 1] - t, sg = sigma_;
             double ra = 0.0, rb = 0.0, da = 0.0, db = 0.0;  // R(a), R(b), R'(a), R'(b)
             if (sg * h < small_z) {
-                ra = (a / h) * (a * a - h * h) / 6.0;
-                rb = (b / h) * (b * b - h * h) / 6.0;
-                da = (3.0 * a * a - h * h) / (6.0 * h);
-                db = (3.0 * b * b - h * h) / (6.0 * h);
+                // Ruling F-35: R(u) = (u/h)(u^2 - h^2)/6 (1 + sigma^2 (3 u^2 - 7 h^2)/60), and its derivative.
+                const double s2 = sg * sg;
+                const auto r = [&](double u) { return (u / h) * (u * u - h * h) / 6.0 * (1.0 + s2 * (3.0 * u * u - 7.0 * h * h) / 60.0); };
+                const auto dr = [&](double u) {
+                    return (3.0 * u * u - h * h) / (6.0 * h) * (1.0 + s2 * (3.0 * u * u - 7.0 * h * h) / 60.0) +
+                           (u / h) * (u * u - h * h) / 6.0 * (s2 * u / 10.0);
+                };
+                ra = r(a);
+                rb = r(b);
+                da = dr(a);
+                db = dr(b);
             } else {
                 const double s2 = sg * sg;
                 ra = (sinh_ratio(sg, a, h) - a / h) / s2;

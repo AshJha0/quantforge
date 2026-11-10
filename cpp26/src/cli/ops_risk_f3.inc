@@ -28,7 +28,7 @@ void op_book_ois_sensitivity(const In& in, Out& out) {
     const auto interpolation = in.choice("interpolation", curve_interpolations);
     const auto swaps = rows_of<BookSwap>(in, "swaps", [](const In& r) {
         return BookSwap{r.text("id"), r.integer("tenor_years"), r.real("fixed_rate"),
-                        r.choice<FixedSide>("side", {{"PAYER", FixedSide::Pay}, {"RECEIVER", FixedSide::Receive}})};
+                        r.choice<FixedSide>("side", {{"PAY", FixedSide::Pay}, {"RECEIVE", FixedSide::Receive}})};
     });
     in.ready();
     const auto quotes = checked_quotes(raw);
@@ -70,7 +70,7 @@ void op_curve_pca(const In& in, Out& out) {
 
 void op_curve_cross_gamma(const In& in, Out& out) {
     const CurveInput ci = curve_of(in, "curve");
-    // The product is {kind: "OIS", trade} with side PAYER or RECEIVER (the golden spelling of this verb).
+    // The product is {kind: "OIS", trade} with side PAY or RECEIVE (ruling F-36).
     const Value& pv = in.need("product");
     if (pv.kind != Kind::Object) schema("product", "expected an object");
     const In p(pv);
@@ -80,7 +80,7 @@ void op_curve_cross_gamma(const In& in, Out& out) {
     const In t(tv);
     const OisTrade trade{ois_convention_of(t.need("convention"), "convention"), parse_tenor(t.text("tenor")),
                          t.real("fixed_rate"), t.real("notional"),
-                         t.choice<FixedSide>("side", {{"PAYER", FixedSide::Pay}, {"RECEIVER", FixedSide::Receive}})};
+                         t.choice<FixedSide>("side", {{"PAY", FixedSide::Pay}, {"RECEIVE", FixedSide::Receive}})};
     const double bump = in.real("bump_bp");
     in.ready();
     ci.limit();

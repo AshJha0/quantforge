@@ -56,7 +56,7 @@ TEST_CASE("Monte Carlo VaR tends to the parametric one for one asset", "[f4]") {
     const VarResult r = var_monte_carlo({0.0}, {{1e-4}}, {1e6}, 10000, 11, 0.99);
     const double target = var_parametric(0.0, 1e4, 0.99).var;
     CHECK(std::fabs(r.var - target) / target < 0.05);
-    CHECK(f4_code_of([] { var_monte_carlo({0, 0}, {{1e-4, 2e-4}, {2e-4, 1e-4}}, {1, 1}, 10, 1, 0.99); }) == "E_DOMAIN");
+    CHECK(f4_code_of([] { var_monte_carlo({0, 0}, {{1e-4, 2e-4}, {2e-4, 1e-4}}, {1, 1}, 10, 1, 0.99); }) == "E_NOT_POSITIVE_DEFINITE");
 }
 
 TEST_CASE("Kupiec: x = n p gives LR 0 and p-value 1 (F-32)", "[f4]") {

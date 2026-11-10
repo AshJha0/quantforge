@@ -45,13 +45,12 @@ void op_var_monte_carlo(const In& in, Out& out) {
     const Matrix cov = in.matrix("covariance");
     const Vec w = in.reals("weights");
     const long long paths = in.integer("paths");
-    const long long seed = in.integer("seed");
+    const std::uint64_t seed = in.u64("seed");  // ruling F-39: a decimal u64 string
     const double c = in.real("confidence");
     in.ready();
     limit_if(mean.size() > max_quotes, "mean");
     limit_if(paths > 0 && double(paths) * double(std::max<std::size_t>(mean.size(), 1)) > 1e7, "paths");
-    if (seed < 0) throw Error("E_DOMAIN", "seed must not be negative", "seed");
-    put_var(out, var_monte_carlo(mean, cov, w, paths, static_cast<std::uint64_t>(seed), c));
+    put_var(out, var_monte_carlo(mean, cov, w, paths, seed, c));
 }
 
 void op_backtest_kupiec(const In& in, Out& out) {

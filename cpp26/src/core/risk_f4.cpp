@@ -119,7 +119,7 @@ VarResult var_monte_carlo(const std::vector<double>& mean, const std::vector<std
             double s = covariance[i][j];
             for (std::size_t k = 0; k < j; ++k) s -= l[i][k] * l[j][k];
             if (i == j) {
-                if (!(s > 0.0)) throw Error("E_DOMAIN", "covariance is not positive definite", "covariance");
+                if (!(s > 0.0)) throw Error("E_NOT_POSITIVE_DEFINITE", "covariance is not positive definite", "covariance");  // F-39
                 l[i][i] = std::sqrt(s);
             } else {
                 l[i][j] = s / l[j][j];
