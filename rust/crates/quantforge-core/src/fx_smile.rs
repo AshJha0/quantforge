@@ -1,5 +1,6 @@
 //! Garman-Kohlhagen vanillas, FX delta conventions and smile quotes (`05-volatility/fx-smile.md`,
 //! rulings E-A9 to E-A11).
+
 use crate::error::{Result, fail};
 use crate::rng::ppnd16;
 use crate::stats::{normal_cdf, normal_pdf};
@@ -110,6 +111,10 @@ pub struct Price {
 }
 
 pub fn price(m: &Market, strike: f64, vol: f64, call: bool, notional: f64) -> Result<Price> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("strike", &strike)?;
+    crate::error::finite("vol", &vol)?;
+    crate::error::finite("notional", &notional)?;
     m.check(vol)?;
     if !positive(strike) || !positive(notional) {
         return fail("E_DOMAIN", "strike and notional must be above 0");
@@ -130,6 +135,9 @@ pub fn price(m: &Market, strike: f64, vol: f64, call: bool, notional: f64) -> Re
 
 /// The four deltas in `DeltaType::ALL` order.
 pub fn deltas(m: &Market, strike: f64, vol: f64, call: bool) -> Result<[f64; 4]> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("strike", &strike)?;
+    crate::error::finite("vol", &vol)?;
     m.check(vol)?;
     if !positive(strike) {
         return fail("E_DOMAIN", "strike must be above 0");
@@ -174,6 +182,9 @@ pub fn strike_from_delta(
     delta: f64,
     t: DeltaType,
 ) -> Result<f64> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("vol", &vol)?;
+    crate::error::finite("delta", &delta)?;
     m.check(vol)?;
     let disc = if t.is_spot() { m.df() } else { 1.0 };
     let (f, s) = (m.forward(), vol * m.expiry_years.sqrt());
@@ -220,6 +231,8 @@ pub fn strike_from_delta(
 }
 
 pub fn atm_strike(m: &Market, vol: f64, atm: AtmType, t: DeltaType) -> Result<f64> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("vol", &vol)?;
     m.check(vol)?;
     let half = vol * vol * m.expiry_years / 2.0;
     Ok(match atm {
@@ -248,6 +261,8 @@ pub struct Quotes {
 }
 
 pub fn smile(m: &Market, q: &Quotes, t: DeltaType, atm: AtmType) -> Result<Smile> {
+    crate::error::finite("m", &m)?;
+    crate::error::finite("q", &q)?;
     m.check(q.atm_vol)?;
     if !(q.delta > 0.0 && q.delta < 0.5) {
         return fail("E_DOMAIN", "delta must lie in (0, 0.5)");
@@ -264,6 +279,45 @@ pub fn smile(m: &Market, q: &Quotes, t: DeltaType, atm: AtmType) -> Result<Smile
         call_strike: strike_from_delta(m, call_vol, true, q.delta, t)?,
         put_strike: strike_from_delta(m, put_vol, false, -q.delta, t)?,
     })
+}
+
+impl crate::error::Finite for Market {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite()
+            && self.expiry_years.is_all_finite()
+            && self.domestic_rate.is_all_finite()
+            && self.foreign_rate.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Price {
+    fn is_all_finite(&self) -> bool {
+        self.price.is_all_finite()
+            && self.premium_pct_foreign.is_all_finite()
+            && self.forward.is_all_finite()
+            && self.delta.is_all_finite()
+            && self.gamma.is_all_finite()
+            && self.vega.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Quotes {
+    fn is_all_finite(&self) -> bool {
+        self.atm_vol.is_all_finite()
+            && self.rr.is_all_finite()
+            && self.bf.is_all_finite()
+            && self.delta.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Smile {
+    fn is_all_finite(&self) -> bool {
+        self.atm_strike.is_all_finite()
+            && self.call_vol.is_all_finite()
+            && self.put_vol.is_all_finite()
+            && self.call_strike.is_all_finite()
+            && self.put_strike.is_all_finite()
+    }
 }
 
 #[cfg(test)]

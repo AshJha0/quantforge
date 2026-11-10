@@ -4,11 +4,14 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 
 EquityForward equity_forward(double spot, Date as_of, Date expiry, const Curve& funding, const Curve* borrow,
                              const std::vector<Dividend>& dividends) {
+    require_finite(spot, "spot");
+    for (const Dividend& d : dividends) require_finite(d.amount, "dividends");
     if (funding.as_of() != as_of || (borrow && borrow->as_of() != as_of)) throw Error("E_INPUT", "a curve as_of differs");
     if (expiry < as_of) throw Error("E_DATE_ORDER", "expiry is before as_of");
     for (const Dividend& d : dividends)
@@ -29,6 +32,14 @@ EquityForward equity_forward(double spot, Date as_of, Date expiry, const Curve& 
 
 double equity_forward_flat(double spot, double rate, double borrow, double expiry_years,
                            const std::vector<TimedDividend>& dividends) {
+    require_finite(spot, "spot");
+    require_finite(rate, "rate");
+    require_finite(borrow, "borrow");
+    require_finite(expiry_years, "expiry_years");
+    for (const TimedDividend& d : dividends) {
+        require_finite(d.time_years, "dividends");
+        require_finite(d.amount, "dividends");
+    }
     if (spot <= 0) throw Error("E_DOMAIN", "spot is not above 0");
     if (expiry_years < 0) throw Error("E_DOMAIN", "expiry_years below 0");
     for (const TimedDividend& d : dividends)
@@ -45,6 +56,9 @@ double equity_forward_flat(double spot, double rate, double borrow, double expir
 }
 
 ParityForward parity_forward(const std::vector<ParityQuote>& quotes, std::optional<double> discount_factor) {
+    for (const ParityQuote& q : quotes)
+        for (const double x : {q.strike, q.call_bid, q.call_ask, q.put_bid, q.put_ask}) require_finite(x, "quotes");
+    require_finite(discount_factor, "discount_factor");
     if (quotes.empty()) throw Error("E_INPUT", "quotes is empty");
     for (const ParityQuote& q : quotes) {
         if (q.strike <= 0) throw Error("E_DOMAIN", "strike is not above 0");

@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/models.hpp"
 #include "quantforge/core/rng.hpp"
 #include "quantforge/core/sobol.hpp"
@@ -42,6 +43,12 @@ McResult mean_and_error(const Vec& y) {
 }  // namespace
 
 McResult mc_gbm_european(const McInputs& in) {
+    require_finite(in.spot, "spot");
+    require_finite(in.strike, "strike");
+    require_finite(in.r, "r");
+    require_finite(in.q, "q");
+    require_finite(in.sigma, "sigma");
+    require_finite(in.t, "t");
     if (in.spot <= 0.0 || in.strike <= 0.0 || in.sigma <= 0.0 || in.t <= 0.0)
         throw Error("E_DOMAIN", "spot, strike, sigma and t must be positive");
     if (in.paths < 2) throw Error("E_INPUT", "paths must be at least 2", "paths");

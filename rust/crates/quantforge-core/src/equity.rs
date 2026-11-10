@@ -1,6 +1,7 @@
 //! Equity forward from spot, carry and cash dividends (`equity-forward.md`).
 use crate::curve::{Curve, CurveInput};
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -20,6 +21,10 @@ pub fn outright(
     borrow: Option<&CurveInput>,
     dividends: &[(Date, f64)],
 ) -> Result<Outright> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("funding", &funding)?;
+    crate::error::finite("borrow", &borrow)?;
+    crate::error::finite("dividends", &dividends)?;
     if spot <= 0.0 {
         return fail("E_DOMAIN", "spot must be above 0");
     }
@@ -61,6 +66,11 @@ pub fn outright(
 }
 
 pub fn flat(spot: f64, rate: f64, borrow: f64, t: f64, dividends: &[(f64, f64)]) -> Result<f64> {
+    crate::error::finite("spot", &spot)?;
+    crate::error::finite("rate", &rate)?;
+    crate::error::finite("borrow", &borrow)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("dividends", &dividends)?;
     if spot <= 0.0 || t < 0.0 || dividends.iter().any(|v| v.1 < 0.0) {
         return fail(
             "E_DOMAIN",
@@ -101,6 +111,8 @@ pub struct Parity {
 }
 
 pub fn parity(q: &[ParityQuote], given: Option<f64>) -> Result<Parity> {
+    crate::error::finite("q", &q)?;
+    crate::error::finite("given", &given)?;
     if q.is_empty() {
         return fail("E_INPUT", "quotes is empty");
     }
@@ -166,6 +178,34 @@ pub fn parity(q: &[ParityQuote], given: Option<f64>) -> Result<Parity> {
         max_residual,
         outside_spread,
     })
+}
+
+impl crate::error::Finite for Outright {
+    fn is_all_finite(&self) -> bool {
+        self.forward.is_all_finite()
+            && self.discount_factor.is_all_finite()
+            && self.carry_factor.is_all_finite()
+            && self.pv_dividends.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Parity {
+    fn is_all_finite(&self) -> bool {
+        self.forward.is_all_finite()
+            && self.discount_factor.is_all_finite()
+            && self.max_residual.is_all_finite()
+            && self.outside_spread.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for ParityQuote {
+    fn is_all_finite(&self) -> bool {
+        self.strike.is_all_finite()
+            && self.call_bid.is_all_finite()
+            && self.call_ask.is_all_finite()
+            && self.put_bid.is_all_finite()
+            && self.put_ask.is_all_finite()
+    }
 }
 
 #[cfg(test)]

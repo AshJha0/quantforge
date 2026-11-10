@@ -1,4 +1,5 @@
 //! Regularised and outlier-robust curve fits (`curve-fits.md`).
+
 use crate::error::{Result, err, fail};
 use crate::linalg::solve;
 
@@ -17,6 +18,11 @@ pub fn smooth(
     lambda: f64,
     weights: Option<&[f64]>,
 ) -> Result<Smooth> {
+    crate::error::finite("knots", &knots)?;
+    crate::error::finite("maturities", &maturities)?;
+    crate::error::finite("zero_rates", &zero_rates)?;
+    crate::error::finite("lambda", &lambda)?;
+    crate::error::finite("weights", &weights)?;
     let n_obs = maturities.len();
     if n_obs == 0 || zero_rates.len() != n_obs || weights.is_some_and(|w| w.len() != n_obs) {
         return fail(
@@ -126,6 +132,10 @@ fn residuals(x: &[[f64; 3]], y: &[f64], b: &[f64; 3]) -> Vec<f64> {
 /// `calib.curve.robust`: Nelson-Siegel with fixed `tau`, Huber loss. IRLS to find the region,
 /// then exact Newton steps on the inlier set and outlier signs until they stop changing.
 pub fn robust(maturities: &[f64], zero_rates: &[f64], tau: f64, delta: f64) -> Result<Robust> {
+    crate::error::finite("maturities", &maturities)?;
+    crate::error::finite("zero_rates", &zero_rates)?;
+    crate::error::finite("tau", &tau)?;
+    crate::error::finite("delta", &delta)?;
     let n = maturities.len();
     if zero_rates.len() != n || n < 3 {
         return fail("E_INPUT", "need at least 3 points of equal length");
@@ -201,6 +211,22 @@ pub fn robust(maturities: &[f64], zero_rates: &[f64], tau: f64, delta: f64) -> R
         outliers,
         objective,
     })
+}
+
+impl crate::error::Finite for Robust {
+    fn is_all_finite(&self) -> bool {
+        self.betas.is_all_finite()
+            && self.residuals.is_all_finite()
+            && self.objective.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Smooth {
+    fn is_all_finite(&self) -> bool {
+        self.forwards.is_all_finite()
+            && self.fitted.is_all_finite()
+            && self.objective.is_all_finite()
+    }
 }
 
 #[cfg(test)]

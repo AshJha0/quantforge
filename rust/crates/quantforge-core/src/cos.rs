@@ -1,4 +1,5 @@
 //! COS Fourier pricing (`cos.md`).
+
 use crate::error::{Result, fail};
 use std::f64::consts::PI;
 use std::ops::{Add, Div, Mul, Sub};
@@ -130,6 +131,7 @@ fn characteristic(p: &CosInputs, u: f64) -> Complex {
 
 /// Returns `(price, a, b)`.
 pub fn european(p: &CosInputs) -> Result<(f64, f64, f64)> {
+    crate::error::finite("p", &p)?;
     let mut positive = vec![p.spot, p.strike, p.t, p.truncation];
     match p.model {
         Model::BlackScholes { sigma } => positive.push(sigma),
@@ -182,4 +184,39 @@ pub fn european(p: &CosInputs) -> Result<(f64, f64, f64)> {
         put
     };
     Ok((price, a, b))
+}
+
+impl crate::error::Finite for CosInputs {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.r.is_all_finite()
+            && self.q.is_all_finite()
+            && self.t.is_all_finite()
+            && self.model.is_all_finite()
+            && self.truncation.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Model {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::BlackScholes { sigma, .. } => sigma.is_all_finite(),
+            Self::Heston {
+                v0,
+                kappa,
+                theta,
+                sigma,
+                rho,
+                ..
+            } => {
+                v0.is_all_finite()
+                    && kappa.is_all_finite()
+                    && theta.is_all_finite()
+                    && sigma.is_all_finite()
+                    && rho.is_all_finite()
+            }
+        }
+    }
 }

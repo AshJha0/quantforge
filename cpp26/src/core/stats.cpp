@@ -1,3 +1,4 @@
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/stats.hpp"
 
 #include <algorithm>
@@ -43,6 +44,7 @@ double normal_cdf(double x) {
 }
 
 Summary summary(const std::vector<double>& x) {
+    require_finite(x, "x");
     if (x.size() < 2) throw Error("E_INPUT", "at least 2 values are needed", "x");
     const double n = double(x.size());
     const auto [m, dev] = centre(x);
@@ -64,6 +66,8 @@ Summary summary(const std::vector<double>& x) {
 }
 
 std::vector<double> quantiles(std::vector<double> x, const std::vector<double>& p) {
+    require_finite(x, "x");
+    require_finite(p, "p");
     if (x.empty()) throw Error("E_INPUT", "at least 1 value is needed", "x");
     for (const double v : p)
         if (v < 0.0 || v > 1.0) throw Error("E_DOMAIN", "p must lie in [0, 1]", "p");
@@ -80,6 +84,8 @@ std::vector<double> quantiles(std::vector<double> x, const std::vector<double>& 
 }
 
 Covariance covariance(const std::vector<double>& x, const std::vector<double>& y) {
+    require_finite(x, "x");
+    require_finite(y, "y");
     if (x.size() != y.size() || x.size() < 2) throw Error("E_INPUT", "x and y must have equal length of at least 2");
     const auto dx = centre(x).d, dy = centre(y).d;
     double sxy = 0.0, sxx = 0.0, syy = 0.0;
@@ -95,6 +101,8 @@ Covariance covariance(const std::vector<double>& x, const std::vector<double>& y
 }
 
 Ols ols(const std::vector<double>& x, const std::vector<double>& y) {
+    require_finite(x, "x");
+    require_finite(y, "y");
     if (x.size() != y.size() || x.size() < 3) throw Error("E_INPUT", "x and y must have equal length of at least 3");
     const double n = double(x.size());
     const auto [mx, dx] = centre(x);

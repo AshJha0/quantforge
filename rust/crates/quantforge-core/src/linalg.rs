@@ -30,6 +30,7 @@ fn check_symmetric(a: &Matrix) -> Result<usize> {
 
 /// LU with partial pivoting.
 pub fn solve(a: &Matrix, b: &[f64]) -> Result<Vec<f64>> {
+    crate::error::finite("b", &b)?;
     let n = check_square(a)?;
     if b.len() != n {
         return fail("E_INPUT", "vector length differs from the matrix");
@@ -182,6 +183,7 @@ pub fn singular_values(a: &Matrix) -> Vec<f64> {
 }
 
 /// Thomas algorithm for a constant tridiagonal system. The solution replaces `rhs`.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn thomas(lower: f64, diag: f64, upper: f64, rhs: &mut [f64]) {
     let n = rhs.len();
     let mut c = vec![0.0; n];

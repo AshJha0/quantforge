@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/error.hpp"
 
 namespace quantforge {
@@ -58,6 +59,13 @@ QuoteCheckResult check_one(const Quote& q, const QuoteCheckInputs& in) {
 }  // namespace
 
 std::vector<QuoteCheckResult> check_quotes(const QuoteCheckInputs& in) {
+    for (const Quote& q : in.quotes) {
+        require_finite(q.bid, "bid");
+        require_finite(q.ask, "ask");
+    }
+    require_finite(in.max_relative_spread, "max_relative_spread");
+    require_finite(in.outlier_threshold, "outlier_threshold");
+    for (const auto& [id, h] : in.history) require_finite(h, "history");
     if (in.stale_after_seconds <= 0) throw Error("E_INPUT", "stale_after_seconds must be positive", "stale_after_seconds");
     if (in.max_relative_spread && *in.max_relative_spread <= 0.0)
         throw Error("E_INPUT", "max_relative_spread must be positive", "max_relative_spread");

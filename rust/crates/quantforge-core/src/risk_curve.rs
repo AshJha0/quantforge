@@ -4,6 +4,7 @@ use crate::bonds::{Bond, dirty_on};
 use crate::conventions::Overnight;
 use crate::curve::{Curve, CurveInput, Discount, Interpolation, SolveMethod, curve_time};
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 use crate::ois::{OisCurveProblem, OisLegs, OisQuote, OisTrade, pv_of_legs};
 
@@ -34,6 +35,7 @@ pub struct Bump {
 
 impl Bump {
     pub fn new(bp: f64, scheme: Scheme) -> Result<Bump> {
+        crate::error::finite("bp", &bp)?;
         if bp == 0.0 || !(0.0..=100.0).contains(&bp) {
             return fail("E_DOMAIN", "bump_bp must be in (0, 100]");
         }
@@ -100,6 +102,7 @@ impl<'a> Priced<'a> {
 
 /// `E_DOMAIN` for the notional comes before the `E_INPUT` rules, so it is checked on its own.
 pub fn check_notional(product: &Product) -> Result<()> {
+    crate::error::finite("product", &product)?;
     match product {
         Product::Bond { notional, .. } if notional.is_nan() || *notional <= 0.0 => {
             fail("E_DOMAIN", "notional must be positive")
@@ -127,6 +130,9 @@ pub fn par(
     product: &Product,
     bump: Bump,
 ) -> Result<ParRisk> {
+    crate::error::finite("quotes", &quotes)?;
+    crate::error::finite("product", &product)?;
+    crate::error::finite("bump", &bump)?;
     check_notional(product)?;
     if let Product::Ois(t) = product
         && t.convention.id != convention.id
@@ -193,6 +199,9 @@ pub fn key_rate(
     product: &Product,
     bump: Bump,
 ) -> Result<KeyRateRisk> {
+    crate::error::finite("curve", &curve)?;
+    crate::error::finite("product", &product)?;
+    crate::error::finite("bump", &bump)?;
     check_notional(product)?;
     if let KeyMode::Triangular(keys) = mode
         && (keys.is_empty() || keys[0] <= curve.as_of || keys.windows(2).any(|w| w[1] <= w[0]))
@@ -253,6 +262,8 @@ pub fn jacobian(
     interpolation: Interpolation,
     bump_bp: f64,
 ) -> Result<Jacobian> {
+    crate::error::finite("quotes", &quotes)?;
+    crate::error::finite("bump_bp", &bump_bp)?;
     let bump = Bump::new(bump_bp, Scheme::Central)?;
     let p = OisCurveProblem::new(convention, as_of, quotes, interpolation)?;
     let base = p.solve(&p.mids, SolveMethod::Sequential)?;
@@ -311,6 +322,10 @@ pub fn pnl_explain(
     product: &Product,
     bump_bp: f64,
 ) -> Result<PnlExplain> {
+    crate::error::finite("start", &start)?;
+    crate::error::finite("end", &end)?;
+    crate::error::finite("product", &product)?;
+    crate::error::finite("bump_bp", &bump_bp)?;
     let r = par(
         convention,
         as_of,
@@ -355,6 +370,57 @@ pub fn pnl_explain(
         threshold,
         explained: unexplained.abs() <= threshold,
     })
+}
+
+impl crate::error::Finite for Bump {
+    fn is_all_finite(&self) -> bool {
+        self.bp.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Jacobian {
+    fn is_all_finite(&self) -> bool {
+        self.zero_rates.is_all_finite() && self.jacobian.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for KeyRateRisk {
+    fn is_all_finite(&self) -> bool {
+        self.value.is_all_finite()
+            && self.key_rates.is_all_finite()
+            && self.zero_dv01.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for ParRisk {
+    fn is_all_finite(&self) -> bool {
+        self.value.is_all_finite()
+            && self.par_dv01.is_all_finite()
+            && self.par_buckets.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for PnlExplain {
+    fn is_all_finite(&self) -> bool {
+        self.value_start.is_all_finite()
+            && self.value_end.is_all_finite()
+            && self.full_pnl.is_all_finite()
+            && self.par_buckets.is_all_finite()
+            && self.risk_pnl.is_all_finite()
+            && self.gross_risk_pnl.is_all_finite()
+            && self.unexplained.is_all_finite()
+            && self.threshold.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Product {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Ois(x0) => x0.is_all_finite(),
+            Self::Bond { bond, notional, .. } => bond.is_all_finite() && notional.is_all_finite(),
+        }
+    }
 }
 
 #[cfg(test)]

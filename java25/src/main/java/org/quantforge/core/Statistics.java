@@ -27,6 +27,7 @@ public final class Statistics {
 
     /** Mean, exact for a constant series so that its deviations are exactly zero. */
     public static double mean(double[] x) {
+        Finite.check("x", x);
         if (constant(x)) {
             return x[0];
         }
@@ -80,6 +81,7 @@ public final class Statistics {
     }
 
     public static Summary summary(double[] x) {
+        Finite.check("x", x);
         int n = x.length;
         if (n < 2) {
             throw new QfError("E_INPUT", "need at least 2 values", "x");
@@ -111,6 +113,8 @@ public final class Statistics {
     }
 
     public static double[] quantile(double[] x, double[] p) {
+        Finite.check("x", x);
+        Finite.check("p", p);
         if (x.length < 1) {
             throw new QfError("E_INPUT", "need at least 1 value", "x");
         }
@@ -129,6 +133,8 @@ public final class Statistics {
     }
 
     public static Covariance covariance(double[] x, double[] y) {
+        Finite.check("x", x);
+        Finite.check("y", y);
         if (x.length != y.length || x.length < 2) {
             throw new QfError("E_INPUT", "need equal lengths of at least 2");
         }
@@ -168,6 +174,8 @@ public final class Statistics {
     }
 
     public static Ols ols(double[] x, double[] y) {
+        Finite.check("x", x);
+        Finite.check("y", y);
         if (x.length != y.length || x.length < 3) {
             throw new QfError("E_INPUT", "need equal lengths of at least 3");
         }

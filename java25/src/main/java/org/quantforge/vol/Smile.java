@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.quantforge.core.QfError;
@@ -41,6 +43,9 @@ public final class Smile {
     }
 
     public static SviFit calibrateSvi(double[] k, double[] w, double[] weights) {
+        Finite.check("k", k);
+        Finite.check("w", w);
+        Finite.check("weights", weights);
         int n = k.length;
         if (n < 5 || w.length != n || (weights != null && weights.length != n)) {
             throw new QfError("E_INPUT", "too few points, or lengths differ");
@@ -122,6 +127,7 @@ public final class Smile {
     }
 
     public static void checkThetas(double[] thetas) {
+        Finite.check("thetas", thetas);
         for (double t : thetas) {
             if (t <= 0.0) {
                 throw new QfError("E_DOMAIN", "theta is not positive");
@@ -147,6 +153,9 @@ public final class Smile {
     }
 
     public static SsviFit calibrateSsvi(double[] thetas, double[] k, double[][] w) {
+        Finite.check("thetas", thetas);
+        Finite.check("k", k);
+        Finite.check("w", w);
         int count = 0;
         boolean ragged = w.length != thetas.length;
         for (double[] row : w) {

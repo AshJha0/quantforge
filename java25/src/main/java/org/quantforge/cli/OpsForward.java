@@ -26,7 +26,7 @@ final class OpsForward {
     }
 
     /** The inputs of eq.forward.outright as read. */
-    record Input(double spot, LocalDate asOf, LocalDate expiry, StageB.CurveInput funding, StageB.CurveInput borrow,
+    record Input(double spot, LocalDate asOf, LocalDate expiry, OpsLinear.CurveInput funding, OpsLinear.CurveInput borrow,
                  List<EquityForward.Dividend> dividends) {
         EquityForward.Result solve() {
             if (spot <= 0.0) {
@@ -42,8 +42,8 @@ final class OpsForward {
         double spot = in.real("spot");
         LocalDate asOf = in.date("as_of");
         LocalDate expiry = in.date("expiry");
-        StageB.CurveInput funding = StageB.curve(in, "funding_curve");
-        StageB.CurveInput borrow = in.anyValue("borrow_curve") == null ? null : StageB.curve(in, "borrow_curve");
+        OpsLinear.CurveInput funding = OpsLinear.curve(in, "funding_curve");
+        OpsLinear.CurveInput borrow = in.anyValue("borrow_curve") == null ? null : OpsLinear.curve(in, "borrow_curve");
         List<In> list = in.objects("dividends");
         in.limit(list.size() > MAX_LIST, "dividends");
         List<EquityForward.Dividend> dividends = new ArrayList<>();

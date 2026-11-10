@@ -1,5 +1,7 @@
 package org.quantforge.curves;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -42,11 +44,13 @@ public final class CurveSolver {
 
     public static Solved solve(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
                                List<ToDoubleFunction<Curve>> models, Method method) {
+        Finite.check("quotes", quotes);
         return solve(asOf, interp, dates, quotes, models, method, Jumps.NONE);
     }
 
     public static Solved solve(LocalDate asOf, Curve.Interpolation interp, LocalDate[] dates, double[] quotes,
                                List<ToDoubleFunction<Curve>> models, Method method, Jumps jumps) {
+        Finite.check("quotes", quotes);
         Setup s = new Setup(asOf, interp, dates, quotes, models, jumps);
         double[] x = method == Method.SEQUENTIAL ? sequential(s) : global(s);
         double worst = norm(s.residuals(x));

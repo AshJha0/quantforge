@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import org.quantforge.core.Normal;
 import org.quantforge.core.QfError;
 
@@ -20,6 +22,7 @@ public final class Greeks {
     }
 
     public static Analytic analytic(Black.Option o, double v) {
+        Finite.check("v", v);
         check(o, v);
         double p = o.phi();
         double t = o.t();
@@ -52,6 +55,7 @@ public final class Greeks {
     }
 
     public static Bumped bumped(Black.Option o, double v) {
+        Finite.check("v", v);
         check(o, v);
         double u = o.underlying();
         double hu = o.normal() ? 1e-4 * Math.max(Math.abs(u), 1.0) : 1e-4 * (u + o.shift());

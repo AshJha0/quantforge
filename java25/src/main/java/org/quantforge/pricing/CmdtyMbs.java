@@ -1,5 +1,7 @@
 package org.quantforge.pricing;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.quantforge.core.QfError;
@@ -11,6 +13,8 @@ public final class CmdtyMbs {
 
     /** Month indexes {@code k}, quote prices; checks in the spec's order. */
     public static double[] forwards(long[] k, double[] prices, double[] season, long[] months) {
+        Finite.check("prices", prices);
+        Finite.check("season", season);
         if (k.length == 0) {
             throw new QfError("E_INPUT", "no quotes", "quotes");
         }
@@ -55,6 +59,8 @@ public final class CmdtyMbs {
     public record Carry(double[] yields, double[] values, boolean[] arbitrage) {}
 
     public static Carry carry(Curve f, LocalDate[] dates, double[] prices, double u) {
+        Finite.check("prices", prices);
+        Finite.check("u", u);
         if (dates.length < 2) {
             throw new QfError("E_INPUT", "need at least two forwards", "forwards");
         }
@@ -133,6 +139,7 @@ public final class CmdtyMbs {
     public record Price(double price, double duration, double wal) {}
 
     public static Price price(Pool p, double y, long delay) {
+        Finite.check("y", y);
         if (delay < 0) {
             throw new QfError("E_INPUT", "delay_days must not be negative", "delay_days");
         }

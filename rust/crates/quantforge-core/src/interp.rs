@@ -1,4 +1,5 @@
 //! Interpolation (`interpolation.md`).
+
 use crate::error::{Result, fail};
 use crate::linalg::{Matrix, solve};
 
@@ -174,6 +175,10 @@ fn tension_eval(x: &[f64], y: &[f64], m: &[f64], p: f64, t: f64) -> (f64, f64) {
 }
 
 pub fn evaluate(method: Method, x: &[f64], y: &[f64], at: &[f64]) -> Result<Evaluated> {
+    crate::error::finite("method", &method)?;
+    crate::error::finite("x", &x)?;
+    crate::error::finite("y", &y)?;
+    crate::error::finite("at", &at)?;
     if x.len() != y.len() || x.len() < method.min_knots() {
         return fail("E_INPUT", "x and y differ in length, or too few knots");
     }
@@ -304,6 +309,9 @@ pub fn monotone_convex(
     at: &[f64],
     positive: bool,
 ) -> Result<(Vec<f64>, Vec<f64>)> {
+    crate::error::finite("t", &t)?;
+    crate::error::finite("r", &r)?;
+    crate::error::finite("at", &at)?;
     if t.len() != r.len() || t.len() < 2 {
         return fail("E_INPUT", "t and r differ in length, or too few");
     }
@@ -351,4 +359,25 @@ pub fn monotone_convex(
         zeros.push((rt[i - 1] + w * (fd[i] * x + big_g)) / s);
     }
     Ok((forwards, zeros))
+}
+
+impl crate::error::Finite for Evaluated {
+    fn is_all_finite(&self) -> bool {
+        self.values.is_all_finite() && self.derivatives.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Method {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Linear => true,
+            Self::LogLinear => true,
+            Self::CubicNatural => true,
+            Self::CubicClamped { start, end, .. } => start.is_all_finite() && end.is_all_finite(),
+            Self::CubicNotAKnot => true,
+            Self::Pchip => true,
+            Self::Tension(x0) => x0.is_all_finite(),
+        }
+    }
 }

@@ -1,5 +1,7 @@
 package org.quantforge.risk;
 
+import org.quantforge.core.Finite;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +70,7 @@ public final class RatesRisk {
     }
 
     public static CashflowMeasures cashflows(List<Cashflow> flows, double yield) {
+        Finite.check("yield", yield);
         if (flows.isEmpty()) {
             throw new QfError("E_INPUT", "no cashflows", "cashflows");
         }

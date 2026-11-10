@@ -24,6 +24,7 @@ struct Bracket {
     double a, b;
 };
 
+/// Root finders on a callback, used inside solvers; unchecked: caller guarantees finite inputs.
 RootResult bisection(const Fn& f, double a, double b, const RootOptions& opt = {});
 RootResult brent(const Fn& f, double a, double b, const RootOptions& opt = {});
 RootResult newton(const Fn& f, const Fn& df, double x0, std::optional<Bracket> bracket, const RootOptions& opt = {});

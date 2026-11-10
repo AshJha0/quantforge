@@ -108,3 +108,14 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 17. **Spec A second audit (E-A26, E-A28, E-A30).** Heston and Bates use Gauss-Legendre 1024 on `[0, 200/sqrt(min(T, 1))]`. In the lookback, `|b| <= 1e-8 v^2` is `E_DOMAIN`, checked after `running_extreme`. In BAW, `r <= 0` is `E_DOMAIN`, checked after the common checks.
 18. **Cross-language rulings (E-A34 to E-A40).** The C10 cap of 100 applies to the forward-vol lists, smile-dynamics strikes, Heston, Bates and Merton strikes, Heston `u`, Asian fixings, basket lists, and the fit-surface expiries and grid. The vol-of-vol series is capped at 10,000. SLV runs its E_LIMIT checks, then the slice and grid E_INPUT rules, then E_DOMAIN. An SLV spot of 0 or below fails the `ln(spot)` grid rule (E_INPUT) first.
 19. **Spec B cross-language rulings (E-B34 to E-B40).** All applied. Replicated variance below 0 is `E_DOMAIN` (E-B36). The three malformed goldens (`rulings_e_b-0008`, `-0009`, `-0015`) were rebuilt upstream and pass.
+
+## Stage F
+
+- F-2 order in the CLI: a non-finite Real is recorded when read and raised as `E_DOMAIN` in `In::ready()`, after
+  `E_SCHEMA` and `E_LIMIT`. A few older handlers run a rule check before `ready()`; for a non-finite input there the
+  code is still `E_DOMAIN` (their own domain check), only the message differs.
+- F-1 and a field that is any JSON value (`core.store.*` record `value`): a top-level `"NaN"`, `"Infinity"` or
+  `"-Infinity"` string is read as a Real and rejected by F-2; other strings stay record values. Not stated for this field.
+- Golden defects reported to the spec session on 2026-11-09: `e1_core-0033`, `0038`, `0275`, `0280`, `0305` (a `same_as`
+  case keeps its base case's `extra_checks`), and `e1_core-0129` to `0131` (`"NaN"` in the Integer `n` expects
+  `E_DOMAIN`; F-1 says `E_SCHEMA`). This build follows F-1.
