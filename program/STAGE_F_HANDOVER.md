@@ -130,3 +130,29 @@ The held-back four-curve system (SOFR monotone convex with a solved turn + term 
 - **F-26 amended:** `turn_sensitivity` is exactly 0 for non-spanning instruments only on `OIS_STEPS` curves. On pillar curves it is the honest `dR/dx` column: in the four-curve case `SOFR-1M` has about -0.023.
 - **XCCY `dR/dq`:** the spread annuity `sum alpha_i D_f(e_i)`, not -1 (the oracle always used this; the text now says so).
 - Stub replay 14 of 14. Outside: still 1 of 14 (the log-linear system); the four-curve case has an xccy curve, which QuantLib cannot build.
+
+## WAVE 2 READY (2026-11-10): F3 sensitivities and F4 portfolio risk
+
+Read with every slice: `specifications/cli-contract.md` (rows F3, F4), `specifications/stage-f-rulings.md` F-29 to F-33, `conformance/tolerances/policy.yaml` (new classes `aad_sensitivity`, `ift_jacobian`), `specifications/name-map.json` (regenerated: 226 operations).
+
+### F3 (suite `risk_f3`, 54 cases): `06-risk/book-sensitivities.md`
+- `risk.book.ois_sensitivity` (Q3a, the T row): PVs, par-quote sensitivities and the zero-rate Jacobian of an OIS book. Case 1 is the 500-swap book (core.rng seed 20261109, written into the input). **Rust:** reverse-mode AAD through the IFT (the reference, ruling F-29), plus a unit test against its own Richardson bump (`h = 1e-4`, `5e-5`). **C++, Java, Python:** an exact chain rule (closed form or forward duals). Central differences on the unknowns are not enough for `1e-8` relative. Zero-Jacobian entries above the diagonal are exactly 0 (F-30).
+- `risk.curve.pca`, `risk.curve.cross_gamma`, `risk.credit.jtd`: small. PCA's sign rule is the largest-absolute entry positive; repeated eigenvalues are `E_DOMAIN`.
+- Goldens come from a 40-digit replica, with no bump in the golden.
+
+### F4 (suites `risk_f4`, 102 cases, and `frtb_f`, 16): `06-risk/var-es-and-backtests.md`, `06-risk/frtb-sa-girr.md`
+- VaR/ES: historical, filtered historical (EWMA seeded with the mean square), parametric, Monte Carlo (core.rng, Cholesky). Order statistic `k = ceil(n c)`; ES includes the VaR scenario (F-31).
+- Backtests: Kupiec, Christoffersen, traffic light (Basel 1996 zones and plus factors). An LR below 1e-12 is 0 (F-32): implement this, or p-values near 1 fail by 1e-7.
+- FRTB-SA GIRR delta under MAR21, three correlation scenarios, with the alternative `S_b` (F-33).
+
+## WAVE 3 READY (2026-11-10): F5 book and use case 4
+
+Read ruling F-34 and the cli-contract rows F5.
+- `book.lifecycle.apply`, `book.marks.resolve` (suite `book_f`, 32 cases): `07-portfolio/book-lifecycle.md`. Average cost; expiry, default and roll as trades; marks fall back by source, then to stale within `max_age_days`; IPV flag. This is a new `book` domain in each language (name map).
+- `usecase.factor_attribution` (suite `uc4_f`, 27 cases): `04-pricing/use-cases.md` use case 4. OLS with an intercept; `mean_return = alpha + sum contributions`.
+
+### Outside-oracle status after waves 2 and 3 (ruling F-23)
+182 of 403 = 45.2% (was 52 of 171 = 30.4%). New outside: PCA 24 (SciPy `eigh`), VaR/backtests 82 (SciPy, NumPy `inverted_cdf`), use case 4 24 (SciPy `lstsq`). The floor of 60% is still not met. What remains has no free outside source: R7 (Pedersen 2003 not available; known issue in the README), GARCH, FRTB (MAR21 has no worked example), the book rules (own conventions), FHS and MC VaR. Raising the share further needs either new outside sources (the `arch` package for GARCH and FHS would be the next candidate, if added to the oracle environment) or a ruling on the floor.
+
+### Deferred to wave 2b (not specified here)
+Inflation01, dividend and borrow sensitivity, correlation sensitivity (F3); reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves (F4); FRTB vega, curvature and the other risk classes. E1 cases for the stage F operations are still missing (`gen_stage_f_e1.py` skips `stage_f`; change it to skip only `e1_*` and rerun).

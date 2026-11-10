@@ -44,6 +44,16 @@ classes:
     # central differences of an analytic score (error about 1e-9 relative); the inverse amplifies it by the condition number.
     absolute: 1.0e-15
     relative: 1.0e-5
+  aad_sensitivity:
+    # Stage F (book-sensitivities.md, Q3a, T row): dPV/dquote per unit notional and per unit quote, by AAD (Rust reference)
+    # or by the IFT chain rule. Bound fixed by the T row before the stage started.
+    absolute: 1.0e-10
+    relative: 1.0e-8
+  ift_jacobian:
+    # Stage F (book-sensitivities.md, Q3a, T row): d zero rate / d quote on a sequential log-linear build. Tighter than
+    # `jacobian` because dR/dx is analytic on this build; the absolute term makes structural zeros pass only near 0.
+    absolute: 1.0e-11
+    relative: 1.0e-9
   numerical_scheme:
     # The same grid recipe in another language: rounding through hundreds of tridiagonal solves.
     absolute: 1.0e-8
