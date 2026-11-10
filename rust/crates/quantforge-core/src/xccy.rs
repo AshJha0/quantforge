@@ -291,4 +291,89 @@ mod tests {
             "E_DATE_ORDER"
         );
     }
+
+    #[test]
+    fn leg_spread_is_its_annuity_and_schedule_edges() {
+        let c = flat(0.03);
+        let dates = schedule(d("2026-11-10"), 12).unwrap();
+        let ann: f64 = dates
+            .windows(2)
+            .map(|w| (w[1].serial() - w[0].serial()) as f64 / 360.0 * c.discount(w[1]).unwrap())
+            .sum();
+        let v = leg(&dates, &c, &c, 0.002).unwrap();
+        assert!((v - 0.002 * ann).abs() < 1e-15, "{v} {ann}");
+        // Month end on a Sunday rolls back inside the month (modified following).
+        let s = schedule(d("2026-11-30"), 3).unwrap();
+        assert_eq!(s[1], d("2027-02-26"));
+        // A plain weekend inside the month rolls forward.
+        let s = schedule(d("2026-11-16"), 3).unwrap();
+        assert_eq!(s[1], d("2027-02-16"));
+        for m in [0, -3, 1203] {
+            assert_eq!(schedule(d("2026-11-10"), m).unwrap_err().code, "E_INPUT");
+        }
+        assert_eq!(schedule(d("2026-11-10"), 600).unwrap().len(), 201);
+        let e = bootstrap(
+            &c,
+            d("2026-11-05"),
+            &[(12, 0.0)],
+            Interpolation::LogLinearDf,
+        )
+        .unwrap_err();
+        assert_eq!(e.code, "E_OUT_OF_RANGE");
+    }
+
+    #[test]
+    fn pv_uses_spot_and_both_legs() {
+        let (dom, fp) = (flat(0.04), flat(0.03));
+        let t = XccyTrade {
+            start: d("2026-11-10"),
+            months: 12,
+            foreign_notional: 1e6,
+            spread: 0.001,
+            receive_foreign: true,
+        };
+        let (p, f, dl) = pv(&dom, &fp, &fp, 1.25, &t).unwrap();
+        let dates = schedule(t.start, 12).unwrap();
+        let fe = 1e6 * leg(&dates, &fp, &fp, 0.001).unwrap();
+        let de = 1e6 * 1.25 * leg(&dates, &dom, &dom, 0.0).unwrap();
+        assert_eq!(f, fe);
+        assert_eq!(dl, de);
+        assert_eq!(p, 1.25 * fe - de);
+    }
+
+    #[test]
+    fn ndf_sell_and_domain_errors() {
+        let (u, o) = (flat(0.04), flat(0.06));
+        let t = Ndf {
+            fixing_date: d("2027-05-06"),
+            payment_date: d("2027-05-06"),
+            strike: 90.0,
+            usd_notional: 1e6,
+            buy: false,
+        };
+        let (p, f) = ndf_pv(&u, &o, 88.0, &t, None).unwrap();
+        let du = u.discount(t.payment_date).unwrap();
+        assert!((p + 1e6 * (1.0 - 90.0 / f) * du).abs() < 1e-8);
+        assert!(p > 0.0);
+        for (spot, k) in [(0.0, 90.0), (88.0, 0.0), (-1.0, 90.0)] {
+            let t2 = Ndf { strike: k, ..t };
+            assert_eq!(
+                ndf_pv(&u, &o, spot, &t2, None).unwrap_err().code,
+                "E_DOMAIN"
+            );
+        }
+        let on_as_of = Ndf {
+            fixing_date: u.as_of,
+            payment_date: d("2026-11-12"),
+            ..t
+        };
+        assert_eq!(
+            ndf_pv(&u, &o, 88.0, &on_as_of, None).unwrap_err().code,
+            "E_INPUT"
+        );
+        assert_eq!(
+            ndf_pv(&u, &o, 88.0, &on_as_of, Some(0.0)).unwrap_err().code,
+            "E_DOMAIN"
+        );
+    }
 }
