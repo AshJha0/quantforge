@@ -43,6 +43,7 @@ Stage F lands in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds w
   - F4: reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves;
   - FRTB: vega, curvature and the other risk classes.
 - **E1 cases for the stage F operations are not yet generated** (`gen_stage_f_e1.py` skips `stage_f`).
+- **Mutation scores below 80% remain.** PR #25's mutation report (Actions run 42705795220) put 33 module and language pairs below the 80% target; C++, Python and Rust there sample 12 mutants per module, so those figures are coarse. Part 2 adds tests aimed at the named survivors. Local reruns, observed 2026-11-10: Java PIT puts all seven listed modules above 80%; C++ rates_vol 100%, arb_surface 100%, correlation 83.3%, while credit and multicurve stay below 80% with survivors judged equivalent (not yet signed off); Python bonds 12 of 12 sampled mutants killed (was 8), with tests added for fx_smile, variance, CPI, compounding and swaptions but no fresh full score; Rust adds targeted xccy tests, and has no local score, because the `cargo-mutants` copy build fails on a data file outside `rust/`. The PR mutation job gives the CI figures.
 
 ## 0.5.0: stage E, full volatility and exotics (2026-11-09)
 
