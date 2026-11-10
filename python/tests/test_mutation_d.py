@@ -64,3 +64,12 @@ def test_mbs_error_contracts() -> None:
             "E_DOMAIN", "balance, rate or speed out of domain", "pool")
     assert error_of(mbs.mbs_price, good, -12.0, 0) == (
         "E_DOMAIN", "1 + yield/12 must be positive", "yield")
+
+
+def test_cpi_curve_checks() -> None:
+    from quantforge_core.inflation import CpiCurve, CpiCurveData
+    years_rule = ("E_INPUT", "years must be strictly increasing positive integers")
+    for quotes in (((0.0, 0.02),), ((1.0, 0.02), (1.0, 0.03)), ((101.0, 0.02),), ((1.5, 0.02),)):
+        assert error_of(CpiCurve, CpiCurveData(24300, 300.0, quotes, None))[:2] == years_rule
+    assert error_of(CpiCurve, CpiCurveData(24300, 300.0, ((1.0, 0.02),), (1.0,) * 11)) == (
+        "E_INPUT", "seasonality needs 12 factors", "seasonality")
