@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/error.hpp"
 
 namespace quantforge {
@@ -71,6 +72,7 @@ double pair_correlation(const std::vector<double>& w, const std::vector<double>&
 }  // namespace
 
 CorrValidation corr_validate(const Matrix& m) {
+    require_finite(m, "matrix");
     check_square(m);
     const std::size_t n = m.size();
     CorrValidation r{true, true, true, false, false, 0.0};
@@ -91,6 +93,7 @@ CorrValidation corr_validate(const Matrix& m) {
 }
 
 NearestCorr corr_nearest(const Matrix& m) {
+    require_finite(m, "matrix");
     check_square(m);
     const std::size_t n = m.size();
     for (std::size_t i = 0; i < n; ++i)
@@ -129,6 +132,9 @@ NearestCorr corr_nearest(const Matrix& m) {
 }
 
 double corr_implied(const std::vector<double>& w, const std::vector<double>& vols, double index_vol) {
+    require_finite(w, "weights");
+    require_finite(vols, "vols");
+    require_finite(index_vol, "index_vol");
     if (w.size() < 2 || w.size() != vols.size()) throw Error("E_INPUT", "two names or more, with lists of one length");
     for (const double x : w)
         if (!(x >= 0)) throw Error("E_DOMAIN", "a weight is negative", "weights");
@@ -143,6 +149,12 @@ double corr_implied(const std::vector<double>& w, const std::vector<double>& vol
 
 Dispersion corr_dispersion(const std::vector<double>& w, const std::vector<double>& k, double ki,
                            const std::vector<double>& s, double si, double n) {
+    require_finite(w, "weights");
+    require_finite(k, "vol_strikes");
+    require_finite(ki, "index_vol_strike");
+    require_finite(s, "realized_vols");
+    require_finite(si, "index_realized_vol");
+    require_finite(n, "vega_notional");
     if (w.size() < 2 || k.size() != w.size() || s.size() != w.size())
         throw Error("E_INPUT", "two names or more, with lists of one length");
     for (const double x : k)

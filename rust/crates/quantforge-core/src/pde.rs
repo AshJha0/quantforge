@@ -1,4 +1,5 @@
 //! Finite-difference Black-Scholes solver (`pde.md`).
+
 use crate::error::{Result, fail};
 use crate::linalg::thomas;
 
@@ -68,6 +69,7 @@ impl Grid {
 }
 
 pub fn bs_european(p: &PdeInputs) -> Result<PdeResult> {
+    crate::error::finite("p", &p)?;
     if p.spot <= 0.0 || p.strike <= 0.0 || p.sigma <= 0.0 || p.t <= 0.0 || p.width <= 0.0 {
         return fail(
             "E_DOMAIN",
@@ -133,4 +135,25 @@ pub fn bs_european(p: &PdeInputs) -> Result<PdeResult> {
         gamma: (vxx - vx) / (p.spot * p.spot),
         grid_h: h,
     })
+}
+
+impl crate::error::Finite for PdeInputs {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.r.is_all_finite()
+            && self.q.is_all_finite()
+            && self.sigma.is_all_finite()
+            && self.t.is_all_finite()
+            && self.width.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for PdeResult {
+    fn is_all_finite(&self) -> bool {
+        self.price.is_all_finite()
+            && self.delta.is_all_finite()
+            && self.gamma.is_all_finite()
+            && self.grid_h.is_all_finite()
+    }
 }

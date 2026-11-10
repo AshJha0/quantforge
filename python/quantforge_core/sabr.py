@@ -9,6 +9,7 @@ lazy import numpy as np
 
 from .black import BLACK_76, Option, _value, implied
 from .errors import QfError
+from .finite import guard
 from .fitting import best_of
 from .numeric import thomas
 
@@ -210,3 +211,6 @@ def arbfree(
         "mean": float((u * qa).sum()) * h + u_max * p_right, "absorbed": p_left,
         "min_density": float(qa.min()),
     }
+
+
+guard(globals())

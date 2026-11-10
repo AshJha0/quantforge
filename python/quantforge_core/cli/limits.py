@@ -162,14 +162,14 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "exotic.american.fd": _fd_grid,
     "vol.sabr.arbfree": _caps(cells=20_000, steps=20_000),
 }
-STAGE_C_ARRAY = 100
-STAGE_C_PREFIXES = ("eq.", "vol.", "risk.vol.")
+OPTION_ARRAY = 100
+OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
 # Stage E spec B (cli-contract): their arrays (returns, prices, strip) count like any array, so
 # the stage C cap of 100 does not reach them.
-STAGE_E_B_PREFIXES = ("vol.garch.", "vol.varswap.", "vol.vix.")
+SERIES_PREFIXES = ("vol.garch.", "vol.varswap.", "vol.vix.")
 # Stage E spec A, E1: slices at most 100, grids and points at most 10,000 (arb-free-surfaces.md,
 # local-and-forward-vol.md), in place of the stage C cap.
-STAGE_E_A_GRIDS = {"vol.svi.surface_check": "log_moneyness", "vol.svi.fit_surface": "log_moneyness",
+SURFACE_GRIDS = {"vol.svi.surface_check": "log_moneyness", "vol.svi.fit_surface": "log_moneyness",
                    "vol.local.dupire": "points"}
 
 
@@ -201,14 +201,14 @@ def _check_curve_sizes(raw: Raw) -> None:
                     stack.append(value)
 
 
-def _check_stage_c(raw: Raw) -> None:
+def _check_option_arrays(raw: Raw) -> None:
     """Rulings C10: 100 for any quote, strike, point, dividend or position list, and surface grid."""
     stack: list[Any] = [raw]
     while stack:
         item = stack.pop()
         if isinstance(item, list):
-            if len(item) > STAGE_C_ARRAY:
-                raise _over("an array", STAGE_C_ARRAY)
+            if len(item) > OPTION_ARRAY:
+                raise _over("an array", OPTION_ARRAY)
             stack.extend(v for v in item if isinstance(v, (list, dict)))
         elif isinstance(item, dict):
             stack.extend(
@@ -216,7 +216,7 @@ def _check_stage_c(raw: Raw) -> None:
             )
 
 
-def _check_e1(raw: Raw, grid: str) -> None:
+def _check_surface_grid(raw: Raw, grid: str) -> None:
     for key, limit in (("slices", 100), ("expiry_years", 100), (grid, 10_000)):
         value = raw.get(key)
         if isinstance(value, list) and len(value) > limit:
@@ -226,14 +226,14 @@ def _check_e1(raw: Raw, grid: str) -> None:
 def check_limits(operation: str, raw: Raw) -> None:
     _check_arrays(raw)
     _check_curve_sizes(raw)
-    grid = STAGE_E_A_GRIDS.get(operation)
+    grid = SURFACE_GRIDS.get(operation)
     if grid is not None:
-        _check_e1(raw, grid)
-    stage_c = (operation.startswith(STAGE_C_PREFIXES) and grid is None
+        _check_surface_grid(raw, grid)
+    options = (operation.startswith(OPTION_PREFIXES) and grid is None
                and operation != "vol.volofvol.measure"  # ruling E-A35: 10,000
-               and not operation.startswith(STAGE_E_B_PREFIXES))
-    if stage_c or operation == "usecase.vol_surface":
-        _check_stage_c(raw)
+               and not operation.startswith(SERIES_PREFIXES))
+    if options or operation == "usecase.vol_surface":
+        _check_option_arrays(raw)
     specific = _BY_OPERATION.get(operation)
     if specific is not None:
         specific(raw)

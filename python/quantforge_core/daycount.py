@@ -3,6 +3,7 @@ from datetime import date
 
 from . import _cal, calendars
 from .errors import QfError, required
+from .finite import guard
 
 FREQUENCIES = (1, 2, 3, 4, 6, 12)
 _SIMPLE = {"ACT_360": 360.0, "ACT_365F": 365.0, "ACT_364": 364.0, "ACT_365_25": 365.25}
@@ -185,3 +186,6 @@ def year_fraction(
         span = (required(ref_end, "ref_end") - required(ref_start, "ref_start")).days
         return days / (required(frequency, "frequency") * span)
     return _afb(start, end)
+
+
+guard(globals())

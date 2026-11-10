@@ -38,16 +38,18 @@ struct Parsed {
 };
 
 /// Throws Error E_PARSE on anything that is not JSON. Rule breaks are flagged in the result.
+/// Exempt from the finite rule: an overflowing number is flagged as number_overflow, and the caller ranks it.
 Parsed parse(std::string_view text);
 
 /// The lexical depth scan of limits.md B2: no syntax is checked, so it can run before parsing.
 bool deeper_than(std::string_view text, int limit);
 
 /// Shortest text that reads back to the same binary64. The value must be finite.
+/// unchecked: caller guarantees finite inputs
 std::string format_real(double v);
 void append_string(std::string& out, std::string_view s);
 
-/// Streaming writer. A non-finite real throws Error E_NON_FINITE.
+/// Streaming writer. A non-finite real throws Error E_NON_FINITE (output rule, not the E_DOMAIN input rule).
 class Writer {
 public:
     void begin_object();

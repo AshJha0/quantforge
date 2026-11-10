@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/models.hpp"
 
 namespace quantforge {
@@ -64,6 +65,13 @@ double cell_average(const PdeInputs& in, double x, double h) {
 }  // namespace
 
 PdeResult pde_bs_european(const PdeInputs& in) {
+    require_finite(in.spot, "spot");
+    require_finite(in.strike, "strike");
+    require_finite(in.r, "r");
+    require_finite(in.q, "q");
+    require_finite(in.sigma, "sigma");
+    require_finite(in.t, "t");
+    require_finite(in.width, "width");
     if (in.spot <= 0.0 || in.strike <= 0.0 || in.sigma <= 0.0 || in.t <= 0.0 || in.width <= 0.0)
         throw Error("E_DOMAIN", "spot, strike, sigma, t and width must be positive");
     if (in.space_steps % 2 != 0 || in.space_steps < 20) throw Error("E_INPUT", "space_steps must be even and at least 20", "space_steps");

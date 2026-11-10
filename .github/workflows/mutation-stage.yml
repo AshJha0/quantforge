@@ -1,14 +1,20 @@
 name: Mutation by stage
-# Per-stage mutation report (plan 11.5.6): every module in conformance/mutation/stages.json for one stage,
-# in all four languages, then one report scored against the stage target (80% for stage D).
-# Manual and monthly only, never on pull requests: a full stage D run is about 30 jobs.
+# Per-stage mutation report (plan 11.5.6) and the core-maths mutation gate (plan 12.2 G6, 13.2 E10).
+#  - Pull requests: incremental. Only modules (from any stage in conformance/mutation/stages.json) whose
+#    target file the PR changes, with a small sample per module, gated at 80%. A PR touching no mapped
+#    module runs the plan job alone (seconds).
+#  - Weekly and manual: every module of one stage (default F) in all four languages, scored against the
+#    stage target. The weekly run gates; a manual run gates only when asked.
 on:
+  pull_request:
+    paths: ['cpp26/src/**', 'java25/src/main/**', 'python/quantforge_core/**', 'rust/crates/*/src/**',
+            'conformance/mutation/**', '.github/workflows/mutation-stage.yml']
   schedule:
-    - cron: '41 5 1 * *'
+    - cron: '41 5 * * 0'
   workflow_dispatch:
     inputs:
       stage:
-        default: D
+        default: F
       max:
         description: 'mutants sampled per module (python, rust, cpp)'
         default: '40'
@@ -22,8 +28,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
-  STAGE: ${{ inputs.stage || 'D' }}
-  MAX: ${{ inputs.max || '40' }}
+  STAGE: ${{ github.event_name == 'pull_request' && 'PR' || inputs.stage || 'F' }}
+  MAX: ${{ github.event_name == 'pull_request' && '12' || inputs.max || '40' }}
 jobs:
   plan:
     runs-on: ubuntu-24.04
@@ -35,16 +41,23 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - id: m
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
-          cfg = json.load(open("conformance/mutation/stages.json"))
-          inc = [{"lang": l, "module": m["module"], "target": m[l], "suite": m.get(l + "_suite", m["suite"])}
-                 for m in cfg["stages"][os.environ["STAGE"]] for l in ("java", "cpp", "python", "rust") if m.get(l)]
-          print("matrix=" + json.dumps({"include": inc}))
-          print("any=" + ("true" if inc else "false"))  # stage E starts with every target null
-          PY
+          if [ "$STAGE" = PR ]; then
+            git diff --name-only "$BASE...$HEAD_SHA" > changed.txt
+            python3 conformance/mutation/plan_matrix.py --changed changed.txt --stages-out pr-stages.json >> "$GITHUB_OUTPUT"
+          else
+            python3 conformance/mutation/plan_matrix.py --stage "$STAGE" >> "$GITHUB_OUTPUT"
+            echo '{}' > pr-stages.json
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mutation-plan
+          path: pr-stages.json
   mutate:
     needs: plan
     if: needs.plan.outputs.any == 'true'
@@ -93,8 +106,8 @@ jobs:
           path: results/
           if-no-files-found: ignore
   report:
-    needs: mutate
-    if: always()
+    needs: [plan, mutate]
+    if: always() && needs.plan.outputs.any == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -106,13 +119,18 @@ jobs:
           path: results
           pattern: mutation-*
           merge-multiple: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mutation-plan
       - name: Stage report
         env:
-          GATE: ${{ inputs.gate && '--gate' || '' }}
+          GATE: ${{ (github.event_name != 'workflow_dispatch' || inputs.gate) && '--gate' || '' }}
         run: |
+          STAGES=conformance/mutation/stages.json
+          [ "$STAGE" = PR ] && STAGES=pr-stages.json
           # GATE is intentionally unquoted: empty means no flag.
           # shellcheck disable=SC2086
-          python3 conformance/mutation/stage_report.py --stage "$STAGE" --results results --out mutation-report.md $GATE
+          python3 conformance/mutation/stage_report.py --stage "$STAGE" --stages "$STAGES" --results results --out mutation-report.md $GATE
           cat mutation-report.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

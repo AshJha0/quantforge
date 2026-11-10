@@ -11,6 +11,7 @@ from datetime import date
 from typing import Any
 
 from .errors import QfError
+from .finite import guard
 from .snapshot import canonical, hash_value
 from .timezones import DAY, date_seconds
 
@@ -128,3 +129,6 @@ def replay(
         snapshots.append({"as_of": fmt(as_of), "row_count": count, "snapshot_id": snapshot_id})
     hashes = chain(records)
     return snapshots, hashes[-1] if hashes else GENESIS
+
+
+guard(globals())

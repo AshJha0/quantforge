@@ -11,6 +11,8 @@ fn check_range(a: f64, b: f64) -> Result<()> {
 }
 
 pub fn trapezoid(f: F, a: f64, b: f64, n: i64) -> Result<f64> {
+    crate::error::finite("a", &a)?;
+    crate::error::finite("b", &b)?;
     check_range(a, b)?;
     if n < 1 {
         return fail("E_INPUT", "n must be at least 1");
@@ -25,6 +27,8 @@ pub fn trapezoid(f: F, a: f64, b: f64, n: i64) -> Result<f64> {
 }
 
 pub fn simpson(f: F, a: f64, b: f64, n: i64) -> Result<f64> {
+    crate::error::finite("a", &a)?;
+    crate::error::finite("b", &b)?;
     check_range(a, b)?;
     if n < 2 || n % 2 != 0 {
         return fail("E_INPUT", "n must be even and at least 2");
@@ -74,6 +78,8 @@ pub fn gauss_legendre_rule(n: usize) -> Vec<(f64, f64)> {
 }
 
 pub fn gauss_legendre(f: F, a: f64, b: f64, n: i64) -> Result<f64> {
+    crate::error::finite("a", &a)?;
+    crate::error::finite("b", &b)?;
     check_range(a, b)?;
     if n < 1 || n > 64 {
         return fail("E_INPUT", "n must be 1 to 64");
@@ -145,6 +151,9 @@ fn adaptive(f: F, p: Panel, tol: f64, depth: i64, max_depth: i64, calls: &mut i6
 }
 
 pub fn adaptive_simpson(f: F, a: f64, b: f64, tol: f64, max_depth: i64) -> Result<f64> {
+    crate::error::finite("a", &a)?;
+    crate::error::finite("b", &b)?;
+    crate::error::finite("tol", &tol)?;
     check_range(a, b)?;
     if tol <= 0.0 || max_depth < 1 {
         return fail("E_INPUT", "tol or max_depth out of range");
@@ -210,6 +219,9 @@ fn kronrod(f: F, l: f64, r: f64) -> (f64, f64, f64, f64) {
 
 /// Returns the value and the error estimate.
 pub fn gauss_kronrod(f: F, a: f64, b: f64, tol: f64, max_intervals: i64) -> Result<(f64, f64)> {
+    crate::error::finite("a", &a)?;
+    crate::error::finite("b", &b)?;
+    crate::error::finite("tol", &tol)?;
     check_range(a, b)?;
     if tol <= 0.0 || max_intervals < 1 {
         return fail("E_INPUT", "tol or max_intervals out of range");

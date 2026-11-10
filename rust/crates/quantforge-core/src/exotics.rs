@@ -1,5 +1,6 @@
 //! Stage E5 exotic options and American exercise (`04-pricing/exotics.md`, rulings E-A19 to
 //! E-A23).
+
 use crate::error::{Result, fail};
 use crate::stats::normal_cdf as n;
 
@@ -21,6 +22,7 @@ pub struct Vanilla {
 
 impl Vanilla {
     pub fn check(&self) -> Result<()> {
+        crate::error::finite("self", self)?;
         if [self.spot, self.strike, self.expiry_years, self.vol]
             .iter()
             .all(|v| *v > 0.0)
@@ -48,6 +50,7 @@ impl Vanilla {
 }
 
 /// Generalised Black-Scholes.
+/// unchecked: caller guarantees finite inputs (F-4). NaN or infinity in gives NaN out.
 pub fn gbs(call: bool, s: f64, k: f64, t: f64, r: f64, b: f64, v: f64) -> f64 {
     let sd = v * t.sqrt();
     let d1 = ((s / k).ln() + (b + v * v / 2.0) * t) / sd;
@@ -57,6 +60,8 @@ pub fn gbs(call: bool, s: f64, k: f64, t: f64, r: f64, b: f64, v: f64) -> f64 {
 }
 
 pub fn digital(x: &Vanilla, cash_or_nothing: bool, cash: f64) -> Result<f64> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("cash", &cash)?;
     x.check()?;
     if cash.is_nan() || cash <= 0.0 {
         return fail("E_DOMAIN", "cash must be above 0");
@@ -81,6 +86,9 @@ pub enum BarrierType {
 /// Reiner-Rubinstein, continuous monitoring; a touched barrier is `E_DOMAIN` (ruling E-A19).
 pub fn barrier(x: &Vanilla, h: f64, rebate: f64, kind: BarrierType) -> Result<f64> {
     use BarrierType::{DownIn, DownOut, UpIn, UpOut};
+    crate::error::finite("x", &x)?;
+    crate::error::finite("h", &h)?;
+    crate::error::finite("rebate", &rebate)?;
     x.check()?;
     if h.is_nan() || h <= 0.0 || rebate.is_nan() || rebate < 0.0 {
         return fail("E_DOMAIN", "barrier must be above 0 and rebate at least 0");
@@ -130,6 +138,8 @@ pub fn barrier(x: &Vanilla, h: f64, rebate: f64, kind: BarrierType) -> Result<f6
 
 /// Geometric average-price Asian: continuous (Kemna-Vorst) when `fixings` is `None`.
 pub fn asian_geometric(x: &Vanilla, fixings: Option<&[f64]>) -> Result<f64> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("fixings", &fixings)?;
     let (s, k, t, r, b, v) = (x.spot, x.strike, x.expiry_years, x.rate, x.carry(), x.vol);
     // Input order (ruling E-A38): the common checks come before `fixing_years`.
     x.check()?;
@@ -171,6 +181,8 @@ pub fn asian_geometric(x: &Vanilla, fixings: Option<&[f64]>) -> Result<f64> {
 
 /// Goldman-Sosin-Gatto floating-strike lookback; `strike` is unused. `b = 0` is `E_DOMAIN`.
 pub fn lookback_floating(x: &Vanilla, extreme: f64) -> Result<f64> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("extreme", &extreme)?;
     let (s, t, r, b, v) = (x.spot, x.expiry_years, x.rate, x.carry(), x.vol);
     if !(s > 0.0 && t > 0.0 && v > 0.0) {
         return fail("E_DOMAIN", "spot, expiry_years and vol must be above 0");
@@ -220,6 +232,7 @@ pub struct Quanto {
 }
 
 pub fn quanto(x: &Quanto) -> Result<f64> {
+    crate::error::finite("x", &x)?;
     let pos = [x.spot, x.strike, x.expiry_years, x.vol, x.fx_vol];
     if !pos.iter().all(|v| *v > 0.0) || !(-1.0..=1.0).contains(&x.correlation) {
         return fail(
@@ -241,6 +254,8 @@ pub fn quanto(x: &Quanto) -> Result<f64> {
 
 /// Rubinstein simple chooser; `call` is unused.
 pub fn chooser(x: &Vanilla, choose: f64) -> Result<f64> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("choose", &choose)?;
     x.check()?;
     if !(choose > 0.0 && choose <= x.expiry_years) {
         return fail("E_INPUT", "choose_years must lie in (0, expiry_years]");
@@ -265,6 +280,7 @@ pub struct Spread {
 
 /// Kirk's call on `F1 - F2 - K`.
 pub fn kirk(x: &Spread) -> Result<f64> {
+    crate::error::finite("x", &x)?;
     let pos = [x.forward_1, x.forward_2, x.expiry_years, x.vol_1, x.vol_2];
     if !pos.iter().all(|v| *v > 0.0) || !(-1.0..=1.0).contains(&x.correlation) {
         return fail(
@@ -349,6 +365,7 @@ pub struct Tree {
 
 /// CRR with Hull's dividend-yield probability (ruling E-A23).
 pub fn crr(x: &Vanilla, steps: i64) -> Result<Tree> {
+    crate::error::finite("x", &x)?;
     if !(1..=20_000).contains(&steps) {
         return fail("E_INPUT", "steps must be 1 to 20,000");
     }
@@ -400,6 +417,7 @@ fn bisect(f: &dyn Fn(f64) -> f64, mut lo: f64, mut hi: f64) -> f64 {
 
 /// Barone-Adesi-Whaley; `r = 0` is `E_DOMAIN` (ruling E-A22).
 pub fn baw(x: &Vanilla) -> Result<f64> {
+    crate::error::finite("x", &x)?;
     x.check()?;
     let (s, k, t, r, b, v) = (x.spot, x.strike, x.expiry_years, x.rate, x.carry(), x.vol);
     if r.is_nan() || r <= 0.0 {
@@ -461,6 +479,8 @@ pub struct Fd {
 
 /// Backward-Euler reference scheme in `ln S` with exercise projection (ruling E-A23).
 pub fn american_fd(x: &Vanilla, american: bool, g: &FdGrid) -> Result<Fd> {
+    crate::error::finite("x", &x)?;
+    crate::error::finite("g", &g)?;
     if g.nx < 5 || g.nx % 2 == 0 || g.nt < 1 {
         return fail("E_INPUT", "nx must be odd and at least 5, nt at least 1");
     }
@@ -517,6 +537,62 @@ pub fn american_fd(x: &Vanilla, american: bool, g: &FdGrid) -> Result<Fd> {
         delta: (vp - vm) / (2.0 * dx * s),
         gamma: ((vp - 2.0 * v0 + vm) / (dx * dx) - (vp - vm) / (2.0 * dx)) / (s * s),
     })
+}
+
+impl crate::error::Finite for Fd {
+    fn is_all_finite(&self) -> bool {
+        self.price.is_all_finite() && self.delta.is_all_finite() && self.gamma.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for FdGrid {
+    fn is_all_finite(&self) -> bool {
+        self.width.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Quanto {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.expiry_years.is_all_finite()
+            && self.domestic_rate.is_all_finite()
+            && self.foreign_rate.is_all_finite()
+            && self.dividend_yield.is_all_finite()
+            && self.vol.is_all_finite()
+            && self.fx_vol.is_all_finite()
+            && self.correlation.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Spread {
+    fn is_all_finite(&self) -> bool {
+        self.forward_1.is_all_finite()
+            && self.forward_2.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.expiry_years.is_all_finite()
+            && self.rate.is_all_finite()
+            && self.vol_1.is_all_finite()
+            && self.vol_2.is_all_finite()
+            && self.correlation.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Tree {
+    fn is_all_finite(&self) -> bool {
+        self.american.is_all_finite() && self.european.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Vanilla {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.expiry_years.is_all_finite()
+            && self.rate.is_all_finite()
+            && self.dividend_yield.is_all_finite()
+            && self.vol.is_all_finite()
+    }
 }
 
 #[cfg(test)]

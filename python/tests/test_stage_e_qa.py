@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from quantforge_core import correlation, credit_e8, rates_vol, vol_e1
+from quantforge_core import arb_surface, correlation, credit_options, rates_vol
 from quantforge_core.errors import QfError
 
 
@@ -29,11 +29,11 @@ def test_implied_correlation_is_zero_for_the_independent_index_vol():
 
 
 def test_loss_cdf_rejects_an_empty_loss_list():
-    assert error_of(credit_e8.loss_cdf, 0.02, 0.3, 0.4, []) == ("E_INPUT", "losses")
+    assert error_of(credit_options.loss_cdf, 0.02, 0.3, 0.4, []) == ("E_INPUT", "losses")
 
 
 def test_loss_cdf_rises_and_stays_within_zero_and_one():
-    cdf = credit_e8.loss_cdf(0.05, 0.3, 0.4, [0.001, 0.01, 0.05, 0.2, 0.59])
+    cdf = credit_options.loss_cdf(0.05, 0.3, 0.4, [0.001, 0.01, 0.05, 0.2, 0.59])
     assert all(0.0 <= c <= 1.0 for c in cdf)
     assert all(a <= b + 1e-12 for a, b in itertools.pairwise(cdf))
 
@@ -61,13 +61,13 @@ def test_bond_future_implied_rejects_a_bad_yield_or_duration_after_the_premium_c
 
 
 def test_forward_vols_reject_a_first_expiry_at_zero():
-    assert error_of(vol_e1.forward_vols, [0.0, 1.0], [0.2, 0.2]) == ("E_DOMAIN", "expiry_years")
+    assert error_of(arb_surface.forward_vols, [0.0, 1.0], [0.2, 0.2]) == ("E_DOMAIN", "expiry_years")
 
 
 def test_forward_vols_of_a_flat_term_structure_are_flat():
-    assert vol_e1.forward_vols([0.5, 1.0, 2.0], [0.2, 0.2, 0.2]) == pytest.approx([0.2] * 3)
+    assert arb_surface.forward_vols([0.5, 1.0, 2.0], [0.2, 0.2, 0.2]) == pytest.approx([0.2] * 3)
 
 
 def test_forward_vol_by_hand():
     # Total variance 0.04 at 1y and 0.18 at 2y: forward variance 0.14 over one year.
-    assert vol_e1.forward_vols([1.0, 2.0], [0.2, 0.3]) == pytest.approx([0.2, math.sqrt(0.14)])
+    assert arb_surface.forward_vols([1.0, 2.0], [0.2, 0.3]) == pytest.approx([0.2, math.sqrt(0.14)])

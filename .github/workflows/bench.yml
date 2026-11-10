@@ -1,0 +1,86 @@
+name: Microbenchmarks
+# In-language microbenchmarks (plan 12.2 G2): bootstrap, swap PV and implied vol in each language, with ns/op and
+# allocations per call, gated by tools/bench_gate.py against benchmarks/micro/baseline.json.
+#  - Time (1.5x) and allocations (1.1x) are gated only against a baseline recorded on the same machine class
+#    (github-ubuntu-24.04); the first committed baseline is from a Windows laptop, so it reports without gating.
+#    Refresh it from the "bench-results" artifact with: tools/bench_gate.py --current DIR --write-baseline
+#    --machine github-ubuntu-24.04.
+#  - Each job also proves that the gate fails: it reruns one benchmark with QF_BENCH_INJECT_NS (a busy-wait added to
+#    every op) and checks that bench_gate rejects the slowed run against the clean run from the same runner.
+# Pull requests that touch library code or the benchmarks, weekly, and manual.
+on:
+  pull_request:
+    paths: ['cpp26/**', 'java25/**', 'python/**', 'rust/**', 'benchmarks/micro/**', 'tools/bench_gate.py',
+            '.github/workflows/bench.yml']
+  schedule:
+    - cron: '17 5 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  MACHINE: github-ubuntu-24.04
+  INJECT_NS: '200000'
+jobs:
+  bench:
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [rust, java, cpp, python]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        if: matrix.lang == 'java'
+        with:
+          distribution: temurin
+          java-version: "25.0.5"
+          cache: maven
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        if: matrix.lang == 'python'
+      - name: run
+        env:
+          LANG_: ${{ matrix.lang }}
+        run: |
+          set -euo pipefail
+          run() {
+            case "$LANG_" in
+              rust) (cd rust && rustup show >/dev/null && cargo bench --locked -p quantforge-bench --bench micro) ;;
+              java) mvn -f java25/pom.xml -B -q -Pbench -DskipTests package exec:exec@bench
+                    python3 benchmarks/micro/jmh_to_json.py java25/target/jmh.json benchmarks/micro/out/java.json ;;
+              cpp) docker run --rm -v "$PWD:/w" -w /w -e QF_BENCH_INJECT_NS gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b \
+                     bash -c 'set -e; apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 >/dev/null
+                       cmake -S cpp26 -B build/bench -G Ninja -DQF_BENCH=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF >/dev/null
+                       cmake --build build/bench --target qf_micro >/dev/null
+                       build/bench/qf_micro --benchmark_min_time=0.5s --benchmark_format=json --benchmark_out=build/bench/raw.json >/dev/null
+                       python3 benchmarks/micro/gbench_to_json.py build/bench/raw.json benchmarks/micro/out/cpp.json' ;;
+              python) uv run --project python pytest python/benchmarks -p no:cacheprovider --benchmark-max-time=0.5 -q ;;
+            esac
+          }
+          run
+          mkdir -p clean injected
+          cp "benchmarks/micro/out/$LANG_.json" clean/
+          QF_BENCH_INJECT_NS="$INJECT_NS" run
+          cp "benchmarks/micro/out/$LANG_.json" injected/
+      - name: gate against the stored baseline
+        run: |
+          python3 tools/bench_gate.py --current clean --machine "$MACHINE" > gate.md || rc=$?
+          cat gate.md >> "$GITHUB_STEP_SUMMARY"; cat gate.md
+          exit "${rc:-0}"
+      - name: the gate fails on an injected slowdown
+        run: |
+          python3 tools/bench_gate.py --current clean --write-baseline --machine same-runner --baseline self.json
+          if python3 tools/bench_gate.py --current injected --baseline self.json --machine same-runner; then
+            echo "::error::bench_gate passed a run slowed by ${INJECT_NS} ns per op"; exit 1
+          fi
+          echo "injected slowdown rejected, as it should be"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: bench-results-${{ matrix.lang }}
+          path: clean/

@@ -11,6 +11,9 @@ public final class MonotoneConvex {
     }
 
     public static Result evaluate(double[] times, double[] rates, double[] at, boolean positive) {
+        Finite.check("times", times);
+        Finite.check("rates", rates);
+        Finite.check("at", at);
         int n = times.length;
         if (n != rates.length || n < 2 || !(times[0] > 0.0)) {
             throw new QfError("E_INPUT", "need at least 2 matching points with t_1 > 0");

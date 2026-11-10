@@ -1,11 +1,13 @@
 //! Delta conventions and smile quotes (`smile-and-surface.md`).
 use crate::black::{d1_d2, phi};
+
 use crate::error::{Result, fail};
 use crate::rng::ppnd16;
 use crate::stats::normal_cdf;
 
 /// `None` is `FORWARD`, whose `s` is 1; `Some(scale)` is `SPOT`.
 pub fn delta_scale(convention_spot: bool, scale: Option<f64>) -> Result<f64> {
+    crate::error::finite("scale", &scale)?;
     match (convention_spot, scale) {
         (false, None) => Ok(1.0),
         (false, Some(_)) => fail("E_INPUT", "FORWARD takes a null scale"),
@@ -23,6 +25,11 @@ fn check(f: f64, v: f64, t: f64) -> Result<()> {
 }
 
 pub fn to_strike(f: f64, v: f64, t: f64, call: bool, delta: f64, s: f64) -> Result<f64> {
+    crate::error::finite("f", &f)?;
+    crate::error::finite("v", &v)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("delta", &delta)?;
+    crate::error::finite("s", &s)?;
     check(f, v, t)?;
     let p = phi(call);
     let x = p * delta / s;
@@ -34,6 +41,11 @@ pub fn to_strike(f: f64, v: f64, t: f64, call: bool, delta: f64, s: f64) -> Resu
 }
 
 pub fn from_strike(f: f64, v: f64, t: f64, call: bool, k: f64, s: f64) -> Result<f64> {
+    crate::error::finite("f", &f)?;
+    crate::error::finite("v", &v)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("k", &k)?;
+    crate::error::finite("s", &s)?;
     check(f, v, t)?;
     if k <= 0.0 {
         return fail("E_DOMAIN", "strike must be above 0");
@@ -61,6 +73,13 @@ pub fn rr_bf(
     delta: f64,
     s: f64,
 ) -> Result<RrBf> {
+    crate::error::finite("f", &f)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("atm", &atm)?;
+    crate::error::finite("rr", &rr)?;
+    crate::error::finite("bf", &bf)?;
+    crate::error::finite("delta", &delta)?;
+    crate::error::finite("s", &s)?;
     let (call_vol, put_vol) = (atm + bf + rr / 2.0, atm + bf - rr / 2.0);
     if atm <= 0.0 || call_vol <= 0.0 || put_vol <= 0.0 {
         return fail("E_DOMAIN", "a vol is not positive");
@@ -76,6 +95,16 @@ pub fn rr_bf(
         call_strike: to_strike(f, call_vol, t, true, delta, s)?,
         put_strike: to_strike(f, put_vol, t, false, -delta, s)?,
     })
+}
+
+impl crate::error::Finite for RrBf {
+    fn is_all_finite(&self) -> bool {
+        self.atm_strike.is_all_finite()
+            && self.call_vol.is_all_finite()
+            && self.put_vol.is_all_finite()
+            && self.call_strike.is_all_finite()
+            && self.put_strike.is_all_finite()
+    }
 }
 
 #[cfg(test)]

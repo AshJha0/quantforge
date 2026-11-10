@@ -1,5 +1,7 @@
 package org.quantforge.risk;
 
+import org.quantforge.core.Finite;
+
 import org.quantforge.core.QfError;
 
 /** Correlation validation, nearest correlation (Higham with Dykstra), implied correlation and dispersion
@@ -8,6 +10,7 @@ public final class Correlation {
     private Correlation() {}
 
     public static void checkSquare(double[][] m) {
+        Finite.check("m", m);
         if (m.length == 0) {
             throw new QfError("E_INPUT", "matrix is empty", "matrix");
         }
@@ -19,6 +22,7 @@ public final class Correlation {
     }
 
     public static boolean symmetric(double[][] m) {
+        Finite.check("m", m);
         for (int i = 0; i < m.length; i++) {
             for (int j = 0; j < i; j++) {
                 if (m[i][j] != m[j][i]) {
@@ -40,6 +44,7 @@ public final class Correlation {
     }
 
     public static Validation validate(double[][] m) {
+        Finite.check("m", m);
         checkSquare(m);
         int n = m.length;
         boolean unit = true;
@@ -150,6 +155,7 @@ public final class Correlation {
 
     /** Higham's alternating projections with Dykstra's correction, until the iterate stops changing. */
     public static Nearest nearest(double[][] m) {
+        Finite.check("m", m);
         checkSquare(m);
         if (!symmetric(m)) {
             throw new QfError("E_INPUT", "matrix must be symmetric", "matrix");
@@ -217,6 +223,9 @@ public final class Correlation {
 
     /** (sigma_I^2 - sum w^2 sigma^2) / sum_{i != j} w_i w_j sigma_i sigma_j; not clipped (E-B20). */
     public static double implied(double[] w, double[] s, double index) {
+        Finite.check("w", w);
+        Finite.check("s", s);
+        Finite.check("index", index);
         double own = 0.0;
         double ws = 0.0;
         for (int i = 0; i < w.length; i++) {
@@ -228,11 +237,13 @@ public final class Correlation {
 
     /** Weights >= 0 with at least two positive (ruling E-B33); a zero weight drops its name. */
     public static void checkWeights(double[] w) {
+        Finite.check("w", w);
         checkNonNegative(w);
         checkTwoPositive(w);
     }
 
     public static void checkNonNegative(double[] w) {
+        Finite.check("w", w);
         for (double x : w) {
             if (!(x >= 0.0)) {
                 throw new QfError("E_DOMAIN", "weights must not be negative", "weights");
@@ -241,6 +252,7 @@ public final class Correlation {
     }
 
     public static void checkTwoPositive(double[] w) {
+        Finite.check("w", w);
         int positive = 0;
         for (double x : w) {
             if (x > 0.0) {
@@ -261,6 +273,7 @@ public final class Correlation {
     }
 
     public static void checkPositive(String key, double... x) {
+        Finite.check("x", x);
         for (double v : x) {
             if (!(v > 0.0)) {
                 throw new QfError("E_DOMAIN", key + " must be above 0", key);

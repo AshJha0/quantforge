@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/stats.hpp"
 
 namespace quantforge {
@@ -53,13 +54,22 @@ double black_forward(double f, double k, double v, double t, double d, OptionTyp
 
 }  // namespace
 
+void require_finite(const std::vector<SviSlice>& sl, std::string_view field) {
+    for (const SviSlice& s : sl) {
+        require_finite(s.expiry_years, field);
+        require_finite(s.svi, field);
+    }
+}
+
 void check_slices(const std::vector<SviSlice>& sl) {
     if (sl.size() > max_slices) throw Error("E_LIMIT", "slices is above its limit", "slices");  // ruling E-A34
+    require_finite(sl, "slices");
     check_slices_input(sl);
     check_slices_domain(sl);
 }
 
 void check_slices_input(const std::vector<SviSlice>& sl) {
+    require_finite(sl, "slices");
     if (sl.empty()) throw Error("E_INPUT", "slices is empty", "slices");
     for (std::size_t j = 1; j < sl.size(); ++j)
         if (!(sl[j - 1].expiry_years < sl[j].expiry_years))
@@ -67,6 +77,7 @@ void check_slices_input(const std::vector<SviSlice>& sl) {
 }
 
 void check_slices_domain(const std::vector<SviSlice>& sl) {
+    require_finite(sl, "slices");
     for (const SviSlice& s : sl)
         if (s.expiry_years <= 0) throw Error("E_DOMAIN", "expiry_years is not above 0", "slices");
     for (const SviSlice& s : sl) check_svi(s.svi);
@@ -74,6 +85,10 @@ void check_slices_domain(const std::vector<SviSlice>& sl) {
 
 SviSurfaceCheck svi_surface_check(const std::vector<SviSlice>& sl, const std::vector<double>& k, bool reject) {
     if (k.size() > max_points) throw Error("E_LIMIT", "log_moneyness is above its limit", "log_moneyness");
+    if (sl.size() <= max_slices) {  // E_LIMIT on slices comes first, in check_slices
+        require_finite(sl, "slices");
+        require_finite(k, "log_moneyness");
+    }
     check_slices(sl);
     check_increasing(k, "log_moneyness", 1);
     SviSurfaceCheck c;
@@ -103,6 +118,10 @@ SviSurfaceCheck svi_surface_check(const std::vector<SviSlice>& sl, const std::ve
 }
 
 Svi ssvi_to_svi(double rho, double eta, double gamma, double theta) {
+    require_finite(rho, "rho");
+    require_finite(eta, "eta");
+    require_finite(gamma, "gamma");
+    require_finite(theta, "theta");
     const Ssvi s{rho, eta, gamma};
     check_ssvi(s, {theta});
     const double phi = s.phi(theta);
@@ -111,6 +130,9 @@ Svi ssvi_to_svi(double rho, double eta, double gamma, double theta) {
 
 SurfaceFit svi_fit_surface(const std::vector<double>& t, const std::vector<double>& k,
                            const std::vector<std::vector<double>>& w, bool reject) {
+    require_finite(t, "expiry_years");
+    require_finite(k, "log_moneyness");
+    require_finite(w, "total_variance");
     check_increasing(t, "expiry_years", 1);
     if (w.size() != t.size()) throw Error("E_INPUT", "total_variance needs one row per expiry", "total_variance");
     SurfaceFit out;
@@ -125,6 +147,13 @@ SurfaceFit svi_fit_surface(const std::vector<double>& t, const std::vector<doubl
 
 LocalVol local_vol_dupire(const std::vector<SviSlice>& sl, const std::vector<LocalVolPoint>& pts) {
     if (pts.size() > max_points) throw Error("E_LIMIT", "points is above its limit", "points");
+    if (sl.size() <= max_slices) {  // E_LIMIT on slices comes first, in check_slices
+        require_finite(sl, "slices");
+        for (const LocalVolPoint& p : pts) {
+            require_finite(p.expiry_years, "points");
+            require_finite(p.log_moneyness, "points");
+        }
+    }
     check_slices(sl);
     if (pts.empty()) throw Error("E_INPUT", "points is empty", "points");
     for (const LocalVolPoint& p : pts)
@@ -145,6 +174,8 @@ LocalVol local_vol_dupire(const std::vector<SviSlice>& sl, const std::vector<Loc
 }
 
 std::vector<double> forward_vols(const std::vector<double>& t, const std::vector<double>& v) {
+    require_finite(t, "expiry_years");
+    require_finite(v, "vols");
     check_increasing(t, "expiry_years", 1);
     if (v.size() != t.size()) throw Error("E_INPUT", "vols and expiry_years differ in length", "vols");
     if (!(t[0] > 0)) throw Error("E_DOMAIN", "the first expiry is not above 0", "expiry_years");  // ruling E-A36
@@ -160,6 +191,13 @@ std::vector<double> forward_vols(const std::vector<double>& t, const std::vector
 }
 
 SmileDynamics smile_dynamics(const SmileDynamicsInputs& in) {
+    require_finite(in.svi, "svi");
+    require_finite(in.expiry_years, "expiry_years");
+    require_finite(in.spot, "spot");
+    require_finite(in.spot_shifted, "spot_shifted");
+    require_finite(in.rate, "rate");
+    require_finite(in.dividend_yield, "dividend_yield");
+    require_finite(in.strikes, "strikes");
     if (in.strikes.empty()) throw Error("E_INPUT", "strikes is empty", "strikes");
     check_svi(in.svi);
     if (in.expiry_years <= 0) throw Error("E_DOMAIN", "expiry_years is not above 0", "expiry_years");
@@ -191,6 +229,8 @@ SmileDynamics smile_dynamics(const SmileDynamicsInputs& in) {
 }
 
 VolOfVol vol_of_vol(const std::vector<double>& v, double ppy, VolChange method) {
+    require_finite(v, "vols");
+    require_finite(ppy, "periods_per_year");
     if (v.size() < 3) throw Error("E_INPUT", "at least 3 vols are needed", "vols");
     for (const double x : v)
         if (x <= 0) throw Error("E_DOMAIN", "a vol is not above 0", "vols");

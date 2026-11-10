@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 namespace quantforge {
 namespace {
@@ -49,6 +50,8 @@ void check_frequency(const Compounding& c) {
 }
 
 double discount_factor(double rate, double t, const Compounding& c) {
+    require_finite(rate, "rate");
+    require_finite(t, "t");
     check_frequency(c);
     if (t < 0.0) throw Error("E_DOMAIN", "t is negative", "t");
     check_base(rate, t, c);
@@ -57,6 +60,8 @@ double discount_factor(double rate, double t, const Compounding& c) {
 }
 
 double convert_rate(double rate, double t, const Compounding& from, const Compounding& to) {
+    require_finite(rate, "rate");
+    require_finite(t, "t");
     check_frequency(from);
     check_frequency(to);
     if (t < 0.0) throw Error("E_DOMAIN", "t is negative", "t");

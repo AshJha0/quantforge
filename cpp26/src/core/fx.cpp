@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/finite.hpp"
 
 using namespace std::chrono;
 
@@ -54,10 +55,12 @@ Date fx_spot_date(const FxPair& p, Date d) {
 }
 
 void check_fx_market(const FxMarket& m) {
+    require_finite(m.spot, "spot");
     if (m.spot <= 0.0) throw Error("E_DOMAIN", "spot must be positive", "spot");
 }
 
 FxOutright fx_outright(const FxMarket& m, Date value_date) {
+    require_finite(m.spot, "spot");
     check_fx_market(m);
     const Date sp = fx_spot_date(*m.pair, m.as_of);
     if (value_date < sp) throw Error("E_DATE_ORDER", "value_date is before spot", "value_date");
@@ -66,12 +69,19 @@ FxOutright fx_outright(const FxMarket& m, Date value_date) {
 }
 
 FxPrice fx_forward_price(const FxMarket& m, const FxForwardTrade& t) {
+    require_finite(m.spot, "spot");
+    require_finite(t.notional_base, "notional_base");
+    require_finite(t.strike, "strike");
     check_fx_market(m);
     const Leg leg = forward_leg(m, fx_spot_date(*m.pair, m.as_of), t);
     return {{leg.pv, m.pair->quote, "FX_FORWARD_DISCOUNTING", std::nullopt, m.pair->id, m.as_of}, leg.delta};
 }
 
 FxPrice fx_swap_price(const FxMarket& m, const FxSwapTrade& t) {
+    require_finite(m.spot, "spot");
+    require_finite(t.notional_base, "notional_base");
+    require_finite(t.near_rate, "near_rate");
+    require_finite(t.far_rate, "far_rate");
     check_fx_market(m);
     const Date sp = fx_spot_date(*m.pair, m.as_of);
     if (t.near_date >= t.far_date) throw Error("E_DATE_ORDER", "near_date must be before far_date", "near_date");
@@ -82,6 +92,8 @@ FxPrice fx_swap_price(const FxMarket& m, const FxSwapTrade& t) {
 }
 
 std::vector<FxNode> fx_implied(const FxMarket& m, const std::vector<FxPoint>& points) {
+    require_finite(m.spot, "spot");
+    for (const FxPoint& p : points) require_finite(p.points, "points");
     check_fx_market(m);
     const Date sp = fx_spot_date(*m.pair, m.as_of);
     std::vector<FxNode> out;

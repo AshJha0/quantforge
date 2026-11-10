@@ -18,6 +18,7 @@ struct Jumps {
 void check_jumps(const Jumps& j);
 
 /// Characteristic function of ln(S_T/F) at complex u, little-trap form [Alb07].
+/// unchecked: caller guarantees finite inputs
 std::complex<double> heston_cf(double t, const HestonParams& h, std::complex<double> u);
 
 struct EquityOption {

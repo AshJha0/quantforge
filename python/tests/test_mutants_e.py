@@ -11,11 +11,11 @@ from pathlib import Path
 
 import pytest
 
-from quantforge_core import credit_e8 as ce
+from quantforge_core import arb_surface, rates_vol, variance
+from quantforge_core import credit_options as ce
 from quantforge_core import exotics as ex
 from quantforge_core import fx_smile as fx
 from quantforge_core import heston as hm
-from quantforge_core import rates_vol, vol_e1, vol_e7
 from quantforge_core.cli.main import run_case
 from quantforge_core.errors import QfError
 from quantforge_core.smile import Svi
@@ -51,7 +51,7 @@ def cli_err(operation, inputs):
     return e["code"], e.get("field"), e["message"]
 
 
-# --- credit_options (credit_e8) ---
+# --- credit_options (credit_options) ---
 
 DATES = (date(2026, 11, 6), date(2027, 3, 20), date(2032, 3, 20))
 MARKET = (*DATES, 0.035, 0.02, 0.4)
@@ -188,7 +188,7 @@ def test_pa_put_with_a_tiny_delta_walks_left(monkeypatch):
     assert m.delta("FORWARD_PA", -1.0, strike) == pytest.approx(-1e-6, rel=1e-8)
 
 
-# --- garch_varswap_vix (vol_e7) ---
+# --- garch_varswap_vix (variance) ---
 
 def _fair(**over):
     args = {"as_of": date(2026, 11, 6), "maturity": date(2027, 11, 6), "spot": 100.0, "rate": 0.04,
@@ -197,28 +197,28 @@ def _fair(**over):
             "vols": [(k, 0.2) for k in (80.0, 90.0, 100.0, 110.0, 120.0)],
             "extension_step": 10.0, "variance_strike": 0.04, "variance_notional": 1e6}
     args.update(over)
-    return vol_e7.varswap_fair_strike(**args)
+    return variance.varswap_fair_strike(**args)
 
 
 def test_garch_errors():
     # _initial_variance 19, _check_initial_text 7 and 9, _check_weights 20 and 29
     r = [0.01, -0.02, 0.005]
-    assert err(vol_e7.garch_loglik, r, 1e-5, 0.1, 0.8, -1.0) == \
+    assert err(variance.garch_loglik, r, 1e-5, 0.1, 0.8, -1.0) == \
         ("E_DOMAIN", "initial_variance", "initial_variance must be positive")
-    assert err(vol_e7.garch_loglik, r, 1e-5, 0.1, 0.8, "BAD") == \
+    assert err(variance.garch_loglik, r, 1e-5, 0.1, 0.8, "BAD") == \
         ("E_INPUT", "initial_variance", "initial_variance must be SAMPLE or a number")
-    assert err(vol_e7.garch_loglik, r, 1e-5, -0.1, 0.8, "SAMPLE") == \
+    assert err(variance.garch_loglik, r, 1e-5, -0.1, 0.8, "SAMPLE") == \
         ("E_DOMAIN", "alpha", "alpha must not be negative")
-    assert err(vol_e7.garch_loglik, r, 1e-5, 0.1, -0.8, "SAMPLE") == \
+    assert err(variance.garch_loglik, r, 1e-5, 0.1, -0.8, "SAMPLE") == \
         ("E_DOMAIN", "beta", "beta must not be negative")
     # garch_fit 3
-    assert err(vol_e7.garch_fit, r, "SAMPLE") == \
+    assert err(variance.garch_fit, r, "SAMPLE") == \
         ("E_INPUT", "returns", "at least 30 returns are needed")
 
 
 def test_garch_forecast_boundaries():
     # garch_forecast 9, 42 and 46
-    f = vol_e7.garch_forecast
+    f = variance.garch_forecast
     assert err(f, 1e-5, 0.1, 0.8, 2e-4, 0, 252) == ("E_INPUT", "horizon", "horizon must be at least 1")
     assert err(f, 1e-5, 0.3, 0.7, 2e-4, 5, 252) == \
         ("E_DOMAIN", "alpha", "alpha + beta must be below 1 for a long-run variance")
@@ -234,7 +234,7 @@ def test_varswap_negative_spot_field():
     assert out == ("E_DOMAIN", "spot", "spot must be positive")
 
 
-Quote = vol_e7.Quote
+Quote = variance.Quote
 STRIP = [Quote(90, 10.5, 11.5, 0.5, 0.7), Quote(95, 6.0, 6.6, 1.4, 1.6),
          Quote(100, 2.9, 3.1, 2.9, 3.3), Quote(105, 1.0, 1.2, 5.8, 6.6),
          Quote(110, 0.3, 0.5, 10.0, 11.0)]
@@ -242,8 +242,8 @@ STRIP = [Quote(90, 10.5, 11.5, 0.5, 0.7), Quote(95, 6.0, 6.6, 1.4, 1.6),
 
 def test_vix_terms_must_differ():
     # vix_index 6: two terms both exactly at 30 days bracket nothing
-    n = vol_e7.MINUTES_30D
-    assert err(vol_e7.vix_index, (n, 0.0, STRIP), (n, 0.0, STRIP)) == \
+    n = variance.MINUTES_30D
+    assert err(variance.vix_index, (n, 0.0, STRIP), (n, 0.0, STRIP)) == \
         ("E_INPUT", "near", "the terms must bracket 30 days with near before next")
 
 
@@ -252,15 +252,15 @@ def test_vix_negative_interpolated_variance():
     # (F / K0 - 1)^2 term wins and both term variances are negative
     strip = [Quote(101, 50, 50, 0.01, 0.01), Quote(102, 1.5, 1.5, 0, 0),
              Quote(130, 0.01, 0.01, 1.01, 1.01)]
-    assert vol_e7.vix_term_variance(43200, 0.0, strip)[2] < 0
-    assert err(vol_e7.vix_index, (43100, 0.0, strip), (43300, 0.0, strip)) == \
+    assert variance.vix_term_variance(43200, 0.0, strip)[2] < 0
+    assert err(variance.vix_index, (43100, 0.0, strip), (43300, 0.0, strip)) == \
         ("E_DOMAIN", "near", "the interpolated variance is negative")
 
 
 # --- heston_slv (heston) ---
 
 H = hm.Heston(0.04, 1.5, 0.04, 0.5, -0.7)
-FLAT = [vol_e1.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
+FLAT = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
 
 
 def test_heston_errors():
@@ -304,7 +304,7 @@ def test_slv_reference_values():
 def test_slv_start_density_uses_the_drifted_local_vol():
     # slv_leverage 151: the t = 0 local vol is read at ln S + (r - q) dt; a skewed slice makes
     # the point matter (a flat one does not)
-    skew = [vol_e1.Slice(1.0, Svi(0.03, 0.1, -0.5, 0.0, 0.2))]
+    skew = [arb_surface.Slice(1.0, Svi(0.03, 0.1, -0.5, 0.0, 0.2))]
     lo, hi = math.log(100) - 1.0, math.log(100) + 1.0
     out = hm.slv_leverage(100.0, 1.0, 0.05, 0.01, H, skew, hm.Grid(11, 7, 6, lo, hi, 0.25))
     assert out["leverage"][5] == pytest.approx(0.8221523246794936, rel=1e-12)
@@ -368,31 +368,31 @@ def test_yoy_black_refuses_a_negative_forward():
         ("E_DOMAIN", "strike")
 
 
-# --- surfaces_local_vol (vol_e1) ---
+# --- surfaces_local_vol (arb_surface) ---
 
 SVI = Svi(0.02, 0.1, -0.4, 0.02, 0.2)
 
 
 def test_surface_errors():
     # check_slices_input 3, check_slices 11, _check 108
-    assert err(vol_e1.surface_check, [], [0.0], True) == ("E_INPUT", "slices", "slices is empty")
-    assert err(vol_e1.surface_check, [vol_e1.Slice(-1.0, SVI)], [0.0], True) == \
+    assert err(arb_surface.surface_check, [], [0.0], True) == ("E_INPUT", "slices", "slices is empty")
+    assert err(arb_surface.surface_check, [arb_surface.Slice(-1.0, SVI)], [0.0], True) == \
         ("E_DOMAIN", "slices", "an expiry_years is not positive")
     vogt = Svi(-0.0410, 0.1331, 0.3060, 0.3586, 0.4153)
-    assert err(vol_e1.surface_check, [vol_e1.Slice(1.0, vogt)], [0.0, 0.8], True) == \
+    assert err(arb_surface.surface_check, [arb_surface.Slice(1.0, vogt)], [0.0, 0.8], True) == \
         ("E_ARBITRAGE", "slices", "the surface has arbitrage")
 
 
 def test_dupire_forward_vol_errors():
     # dupire 4 and 10, forward_vols 14
-    assert err(vol_e1.dupire, [vol_e1.Slice(1.0, SVI)], []) == ("E_INPUT", "points", "points is empty")
-    assert err(vol_e1.forward_vols, [1.0, 0.5], [0.2, 0.2]) == \
+    assert err(arb_surface.dupire, [arb_surface.Slice(1.0, SVI)], []) == ("E_INPUT", "points", "points is empty")
+    assert err(arb_surface.forward_vols, [1.0, 0.5], [0.2, 0.2]) == \
         ("E_INPUT", "expiry_years", "expiry_years must be strictly increasing")
 
 
 def test_smile_dynamics_errors_and_call_delta():
     # smile_dynamics 13, 26, 33 and 68
-    f = vol_e1.smile_dynamics
+    f = arb_surface.smile_dynamics
     args = (SVI, 1.0, 100.0, 101.0, 0.02, 0.01, [100.0], "STICKY_STRIKE", "CALL")
     assert err(f, SVI, 0.0, *args[2:]) == ("E_DOMAIN", "expiry_years", "expiry_years must be above 0")
     assert err(f, SVI, 1.0, 0.0, *args[3:]) == ("E_DOMAIN", "spot", "spot must be above 0")
@@ -408,20 +408,20 @@ def test_smile_dynamics_errors_and_call_delta():
 
 def test_vol_of_vol_by_hand():
     # vol_of_vol 51: changes 1, 2, 1 have mean 4/3 and sample variance 1/3
-    vov, mean = vol_e1.vol_of_vol([1.0, 2.0, 4.0, 5.0], 4.0, "ABSOLUTE")
+    vov, mean = arb_surface.vol_of_vol([1.0, 2.0, 4.0, 5.0], 4.0, "ABSOLUTE")
     assert mean == pytest.approx(4 / 3, rel=1e-15)
     assert vov == pytest.approx(2 * math.sqrt(1 / 3), rel=1e-14)
 
 
 # Equivalent mutants (no observable change), one line each:
-# credit_e8 cds_option_implied 94: the E_NO_CONVERGENCE bracket error is unreachable; the Black
+# credit_options cds_option_implied 94: the E_NO_CONVERGENCE bracket error is unreachable; the Black
 #   price reaches the cap (forward or strike times scale) long before vol 1e6.
-# credit_e8 cds_option_implied 107: max_iter 500 -> brent default 200; Brent converges in far fewer.
-# credit_e8 _beta_fraction 25: 999 -> 1000 iterations; the fraction converges in well under 100.
-# credit_e8 _beta_fraction 68: the tiny guard only acts when |1 + num / c| <= 1e-300, never here.
-# credit_e8 _beta_fraction 84: < vs <= 1e-16 on a float difference; the tie is not reachable.
-# credit_e8 tranche_loss 52: min(a / (1 - R), 2.0) vs 1.0; _capped_mean returns p for any k >= 1.
-# credit_e8 _incomplete_beta 28: both branches are the same function (symmetry I_x(a, b) =
+# credit_options cds_option_implied 107: max_iter 500 -> brent default 200; Brent converges in far fewer.
+# credit_options _beta_fraction 25: 999 -> 1000 iterations; the fraction converges in well under 100.
+# credit_options _beta_fraction 68: the tiny guard only acts when |1 + num / c| <= 1e-300, never here.
+# credit_options _beta_fraction 84: < vs <= 1e-16 on a float difference; the tie is not reachable.
+# credit_options tranche_loss 52: min(a / (1 - R), 2.0) vs 1.0; _capped_mean returns p for any k >= 1.
+# credit_options _incomplete_beta 28: both branches are the same function (symmetry I_x(a, b) =
 #   1 - I_{1-x}(b, a)); moving the switch point changes only rounding.
 # exotics basket 92: strict=None is falsy like strict=False; lengths are checked equal before.
 # fx_smile _pa_call_peak 15: high 1.0 -> 2.0 only widens a Brent bracket; same root to 1e-15.
@@ -429,7 +429,7 @@ def test_vol_of_vol_by_hand():
 #   or not at all, see 128.
 # fx_smile delta_to_strike 128 and 133: unreachable; a put's PA delta tends to -0 on the left, so
 #   gap = delta(x) - target is positive for any target below 0 long before x = -1e4.
-# vol_e1 _check 43: strict=False; ws and previous both have len(ks) entries.
+# arb_surface _check 43: strict=False; ws and previous both have len(ks) entries.
 # heston: none.
 # rates_vol price_cube 206: forward <= 0 vs < 0 differs only at a swap rate of exactly 0.0.
 # rates_vol _futures_option 41: black.price treats any model other than BACHELIER as Black-76.

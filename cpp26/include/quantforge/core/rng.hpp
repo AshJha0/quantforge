@@ -22,6 +22,7 @@ private:
 
 double uniform_from_bits(std::uint64_t x);
 /// Wichura's AS 241. p must lie in (0, 1).
+/// unchecked: caller guarantees finite inputs
 double ppnd16(double p);
 
 }  // namespace quantforge

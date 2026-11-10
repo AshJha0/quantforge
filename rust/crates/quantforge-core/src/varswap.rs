@@ -2,6 +2,7 @@
 //! rulings E-B3, E-B4).
 use crate::black::black;
 use crate::dates::Date;
+
 use crate::error::{Result, fail};
 
 pub struct Replication<'a> {
@@ -130,6 +131,10 @@ pub fn realized(
     strike: f64,
     notional: f64,
 ) -> Result<Realized> {
+    crate::error::finite("prices", &prices)?;
+    crate::error::finite("periods_per_year", &periods_per_year)?;
+    crate::error::finite("strike", &strike)?;
+    crate::error::finite("notional", &notional)?;
     if prices.len() < 2 {
         return fail("E_INPUT", "at least 2 prices are required");
     }
@@ -143,6 +148,22 @@ pub fn realized(
         realized_vol: v.sqrt(),
         payoff: notional * (v - strike),
     })
+}
+
+impl crate::error::Finite for Fair {
+    fn is_all_finite(&self) -> bool {
+        self.fair_variance.is_all_finite()
+            && self.fair_vol.is_all_finite()
+            && self.pv.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Realized {
+    fn is_all_finite(&self) -> bool {
+        self.realized_variance.is_all_finite()
+            && self.realized_vol.is_all_finite()
+            && self.payoff.is_all_finite()
+    }
 }
 
 #[cfg(test)]

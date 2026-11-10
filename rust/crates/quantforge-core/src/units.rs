@@ -13,6 +13,7 @@ fn per_decimal(unit: &str) -> Option<f64> {
 }
 
 pub fn convert(value: f64, from: &str, to: &str) -> Result<f64> {
+    crate::error::finite("value", &value)?;
     match (per_decimal(from), per_decimal(to)) {
         (Some(a), Some(b)) if a == b => Ok(value),
         (Some(a), Some(b)) => Ok(value / a * b),

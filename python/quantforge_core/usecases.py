@@ -5,6 +5,7 @@ from typing import cast
 
 from . import curves, fx, hedging, ois, sensitivities
 from .errors import QfError
+from .finite import guard
 from .numeric import ordered_sum
 from .ois import OisTrade, Quote
 
@@ -57,3 +58,6 @@ def rates_hedge(
         "pv": pv, "dv01": dv01, "key_rate": key_rate, "hedge_units": units,
         "residual_key_rate": residual, "hedge_cost": cost,
     }
+
+
+guard(globals())

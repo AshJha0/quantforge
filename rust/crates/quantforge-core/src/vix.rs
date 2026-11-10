@@ -1,4 +1,5 @@
 //! VIX-style index from a given option strip (`05-volatility/vix-index.md`, rulings E-B5, E-B6).
+
 use crate::error::{Result, fail};
 
 const N30: f64 = 43_200.0;
@@ -54,6 +55,8 @@ fn walk<'a>(
 }
 
 pub fn term_variance(minutes: i64, rate: f64, strip: &[Quote]) -> Result<Term> {
+    crate::error::finite("rate", &rate)?;
+    crate::error::finite("strip", &strip)?;
     if minutes < 1 {
         return fail("E_INPUT", "minutes_to_expiry must be at least 1");
     }
@@ -130,6 +133,8 @@ pub struct Index {
 /// Interpolates to 30 days with no extrapolation (ruling E-B6). The bracket rule is checked
 /// before either term is built.
 pub fn index(near: (i64, f64, &[Quote]), next: (i64, f64, &[Quote])) -> Result<Index> {
+    crate::error::finite("near", &near)?;
+    crate::error::finite("next", &next)?;
     let (n1, n2) = (near.0 as f64, next.0 as f64);
     if !(near.0 < next.0 && n1 <= N30 && N30 <= n2) {
         return fail(
@@ -151,6 +156,34 @@ pub fn index(near: (i64, f64, &[Quote]), next: (i64, f64, &[Quote])) -> Result<I
         near_variance: a.variance,
         next_variance: b.variance,
     })
+}
+
+impl crate::error::Finite for Index {
+    fn is_all_finite(&self) -> bool {
+        self.index.is_all_finite()
+            && self.near_variance.is_all_finite()
+            && self.next_variance.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Quote {
+    fn is_all_finite(&self) -> bool {
+        self.strike.is_all_finite()
+            && self.call_bid.is_all_finite()
+            && self.call_ask.is_all_finite()
+            && self.put_bid.is_all_finite()
+            && self.put_ask.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Term {
+    fn is_all_finite(&self) -> bool {
+        self.forward.is_all_finite()
+            && self.k0.is_all_finite()
+            && self.variance.is_all_finite()
+            && self.strikes_used.is_all_finite()
+            && self.t.is_all_finite()
+    }
 }
 
 #[cfg(test)]

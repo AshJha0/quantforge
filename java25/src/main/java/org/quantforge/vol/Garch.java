@@ -1,5 +1,7 @@
 package org.quantforge.vol;
 
+import org.quantforge.core.Finite;
+
 import java.util.Arrays;
 import java.util.function.ToDoubleFunction;
 import org.quantforge.core.QfError;
@@ -14,6 +16,7 @@ public final class Garch {
 
     /** {@code (1/n) sum r^2}: divisor n, no demeaning (ruling E-B1). */
     public static double sampleVariance(double[] r) {
+        Finite.check("r", r);
         double s = 0.0;
         for (double x : r) {
             s += x * x;
@@ -22,6 +25,9 @@ public final class Garch {
     }
 
     public static void checkParameters(double omega, double alpha, double beta) {
+        Finite.check("omega", omega);
+        Finite.check("alpha", alpha);
+        Finite.check("beta", beta);
         if (!(omega > 0.0) || !(alpha >= 0.0) || !(beta >= 0.0)) {
             throw new QfError("E_DOMAIN", "need omega > 0, alpha >= 0, beta >= 0");
         }
@@ -29,6 +35,11 @@ public final class Garch {
 
     /** The recursion and its likelihood, every term from t = 1 and the ln(2 pi) constant kept. */
     public static Path path(double[] r, double omega, double alpha, double beta, double v0) {
+        Finite.check("r", r);
+        Finite.check("omega", omega);
+        Finite.check("alpha", alpha);
+        Finite.check("beta", beta);
+        Finite.check("v0", v0);
         double[] v = new double[r.length];
         double s = v0;
         double ll = 0.0;
@@ -44,6 +55,11 @@ public final class Garch {
     public record Forecast(double[] variances, double total, double annualizedVol, double longRun) {}
 
     public static Forecast forecast(double omega, double alpha, double beta, double next, int h, double ppy) {
+        Finite.check("omega", omega);
+        Finite.check("alpha", alpha);
+        Finite.check("beta", beta);
+        Finite.check("next", next);
+        Finite.check("ppy", ppy);
         double p = alpha + beta;
         double vl = omega / (1.0 - p);
         double[] v = new double[h];
@@ -59,6 +75,8 @@ public final class Garch {
 
     /** Maximum log-likelihood over omega > 0, alpha, beta >= 0, alpha + beta < 1, initial variance fixed. */
     public static double fit(double[] r, double v0) {
+        Finite.check("r", r);
+        Finite.check("v0", v0);
         double var = sampleVariance(r);
         if (!(var > 0.0)) {
             throw new QfError("E_DOMAIN", "returns are all zero");

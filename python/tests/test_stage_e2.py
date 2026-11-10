@@ -5,8 +5,8 @@ import math
 
 import pytest
 
+from quantforge_core import arb_surface
 from quantforge_core import heston as hm
-from quantforge_core import vol_e1
 from quantforge_core.cli.main import run_case
 from quantforge_core.errors import QfError
 from quantforge_core.smile import Svi
@@ -83,7 +83,7 @@ def test_bates_without_jumps_is_heston_and_merton_matches_lewis():
     assert code(hm.merton_price, 100.0, KS, 1.0, 0, 0, 0.0, none, "CALL") == "E_DOMAIN"
 
 
-FLAT = [vol_e1.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
+FLAT = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
 GRID = hm.Grid(41, 20, 20, math.log(100) - 1.0, math.log(100) + 1.0, 0.25)
 
 

@@ -38,6 +38,9 @@ public final class Interpolation {
     }
 
     public static Result evaluate(Method method, double[] x, double[] y, double[] at, Params params) {
+        Finite.check("x", x);
+        Finite.check("y", y);
+        Finite.check("at", at);
         checkKnots(x, y, method.minKnots);
         Method m = method;
         double p = params.tension();

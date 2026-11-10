@@ -7,6 +7,7 @@ use crate::conventions::{
 use crate::curve::{Curve, Interpolation, SolveMethod, Solved, solve_curve};
 use crate::dates::Date;
 use crate::daycount::{DayCountInputs, year_fraction};
+
 use crate::error::{Result, fail};
 use crate::ois::Valuation;
 use crate::schedule::{Period, add_months, generate};
@@ -93,6 +94,7 @@ pub fn bootstrap(
     quotes: &[ProjectionQuote],
     interpolation: Interpolation,
 ) -> Result<Solved> {
+    crate::error::finite("quotes", &quotes)?;
     if quotes.is_empty() {
         return fail("E_INPUT", "no quotes");
     }
@@ -170,6 +172,8 @@ pub fn swap_pv(
     pay: bool,
     id: Option<String>,
 ) -> Result<(Valuation, f64)> {
+    crate::error::finite("fixed_rate", &fixed_rate)?;
+    crate::error::finite("notional", &notional)?;
     let legs = SwapLegs::new(discount.as_of, tenor_months)?;
     let (f, a) = legs.legs(discount, projection)?;
     let pv = sign(pay) * notional * (f - fixed_rate * a);
@@ -186,6 +190,8 @@ pub fn fra_pv(
     pay: bool,
     id: Option<String>,
 ) -> Result<(Valuation, f64)> {
+    crate::error::finite("fixed_rate", &fixed_rate)?;
+    crate::error::finite("notional", &notional)?;
     let e = plus_months(start, TERM_MONTHS)?;
     let a = alpha(TERM_DAY_COUNT, start, e)?;
     let f = simple_rate(projection, start, e)?;
@@ -205,4 +211,15 @@ pub fn basis_spread(discount: &Curve, projection: &Curve, tenor_months: i64) -> 
         bottom += alpha(TERM_DAY_COUNT, p.start, p.end)? * d;
     }
     Ok(top / bottom)
+}
+
+impl crate::error::Finite for ProjectionQuote {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Deposit { rate, .. } => rate.is_all_finite(),
+            Self::Fra { rate, .. } => rate.is_all_finite(),
+            Self::Swap { rate, .. } => rate.is_all_finite(),
+        }
+    }
 }

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <string>
 
+#include "quantforge/core/finite.hpp"
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/stats.hpp"
 
@@ -47,6 +48,15 @@ void thomas(const std::vector<double>& a, std::vector<double> b, const std::vect
     for (std::size_t k = n - 1; k-- > 0;) d[k] = (d[k] - c[k] * d[k + 1]) / b[k];
 }
 
+void finite_market(const ExoticMarket& m) {
+    require_finite(m.spot, "spot");
+    require_finite(m.strike, "strike");
+    require_finite(m.expiry_years, "expiry_years");
+    require_finite(m.rate, "rate");
+    require_finite(m.dividend_yield, "dividend_yield");
+    require_finite(m.vol, "vol");
+}
+
 }  // namespace
 
 double gbs(OptionType type, double s, double k, double t, double r, double b, double v) {
@@ -56,6 +66,8 @@ double gbs(OptionType type, double s, double k, double t, double r, double b, do
 }
 
 double digital_price(const ExoticMarket& m, DigitalPayoff payoff, double cash) {
+    finite_market(m);
+    require_finite(cash, "cash");
     check_common(m);
     positive(cash, "cash");
     const double t = m.expiry_years, sd = m.vol * std::sqrt(t), b = m.rate - m.dividend_yield, phi = phi_of(m.type);
@@ -65,6 +77,9 @@ double digital_price(const ExoticMarket& m, DigitalPayoff payoff, double cash) {
 }
 
 double barrier_price(const ExoticMarket& m, double h, double rebate, BarrierType type) {
+    finite_market(m);
+    require_finite(h, "barrier");
+    require_finite(rebate, "rebate");
     check_common(m);
     positive(h, "barrier");
     if (!(rebate >= 0)) throw Error("E_DOMAIN", "rebate is negative", "rebate");
@@ -102,6 +117,8 @@ double barrier_price(const ExoticMarket& m, double h, double rebate, BarrierType
 }
 
 double asian_geometric(const ExoticMarket& m, bool continuous, const std::vector<double>& fix) {
+    finite_market(m);
+    require_finite(fix, "fixing_years");
     check_common(m);  // input order: the common checks come before the fixing rules (ruling E-A38)
     if (continuous) {
         if (!fix.empty()) throw Error("E_INPUT", "CONTINUOUS takes no fixing_years", "fixing_years");
@@ -128,6 +145,8 @@ double asian_geometric(const ExoticMarket& m, bool continuous, const std::vector
 }
 
 double lookback_floating(const ExoticMarket& m, double ext) {
+    finite_market(m);
+    require_finite(ext, "running_extreme");
     check_common(m, false);
     const bool call = m.type == OptionType::Call;
     if (call ? !(ext > 0 && ext <= m.spot) : !(ext >= m.spot))
@@ -145,6 +164,15 @@ double lookback_floating(const ExoticMarket& m, double ext) {
 }
 
 double quanto_price(const QuantoInputs& q) {
+    require_finite(q.spot, "spot");
+    require_finite(q.strike, "strike");
+    require_finite(q.expiry_years, "expiry_years");
+    require_finite(q.domestic_rate, "domestic_rate");
+    require_finite(q.foreign_rate, "foreign_rate");
+    require_finite(q.dividend_yield, "dividend_yield");
+    require_finite(q.vol, "vol");
+    require_finite(q.fx_vol, "fx_vol");
+    require_finite(q.correlation, "correlation");
     positive(q.spot, "spot");
     positive(q.strike, "strike");
     positive(q.expiry_years, "expiry_years");
@@ -156,6 +184,8 @@ double quanto_price(const QuantoInputs& q) {
 }
 
 double chooser_price(const ExoticMarket& m, double tc) {
+    finite_market(m);
+    require_finite(tc, "choose_years");
     check_common(m);
     if (!(tc > 0 && tc <= m.expiry_years)) throw Error("E_INPUT", "choose_years must be in (0, T]", "choose_years");
     const double s = m.spot, k = m.strike, t = m.expiry_years, r = m.rate, v = m.vol, b = r - m.dividend_yield;
@@ -166,6 +196,14 @@ double chooser_price(const ExoticMarket& m, double tc) {
 }
 
 double kirk_spread(double f1, double f2, double k, double t, double r, double v1, double v2, double rho) {
+    require_finite(f1, "forward_1");
+    require_finite(f2, "forward_2");
+    require_finite(k, "strike");
+    require_finite(t, "expiry_years");
+    require_finite(r, "rate");
+    require_finite(v1, "vol_1");
+    require_finite(v2, "vol_2");
+    require_finite(rho, "correlation");
     positive(f1, "forward_1");
     positive(f2, "forward_2");
     if (!(f2 + k > 0)) throw Error("E_DOMAIN", "forward_2 + strike is not above 0", "strike");
@@ -180,6 +218,13 @@ double kirk_spread(double f1, double f2, double k, double t, double r, double v1
 
 BasketPrice basket_moment(const std::vector<double>& f, const std::vector<double>& w, const std::vector<double>& v,
                           const Matrix& c, double k, double t, double r, OptionType type) {
+    require_finite(f, "forwards");
+    require_finite(w, "weights");
+    require_finite(v, "vols");
+    require_finite(c, "correlation");
+    require_finite(k, "strike");
+    require_finite(t, "expiry_years");
+    require_finite(r, "rate");
     const std::size_t n = f.size();
     if (n == 0 || w.size() != n || v.size() != n) throw Error("E_INPUT", "forwards, weights and vols differ in length");
     if (c.size() != n) throw Error("E_INPUT", "correlation is not n x n", "correlation");
@@ -211,6 +256,7 @@ BasketPrice basket_moment(const std::vector<double>& f, const std::vector<double
 }
 
 AmericanTree american_crr(const ExoticMarket& m, long long steps) {
+    finite_market(m);
     if (steps > 20000) throw Error("E_LIMIT", "steps is above its limit", "steps");
     if (steps < 1) throw Error("E_INPUT", "steps must be at least 1", "steps");
     check_common(m);
@@ -234,6 +280,7 @@ AmericanTree american_crr(const ExoticMarket& m, long long steps) {
 }
 
 double american_baw(const ExoticMarket& m) {
+    finite_market(m);
     check_common(m);
     const double s = m.spot, k = m.strike, t = m.expiry_years, r = m.rate, v = m.vol, b = r - m.dividend_yield;
     if (!(r > 0)) throw Error("E_DOMAIN", "BAW needs a positive rate (ruling E-A30)", "rate");
@@ -265,6 +312,8 @@ double american_baw(const ExoticMarket& m) {
 }
 
 FdResult american_fd(const ExoticMarket& m, bool american, const FdGrid& g) {
+    finite_market(m);
+    require_finite(g.width, "width");
     if (g.nx > 1001) throw Error("E_LIMIT", "nx is above its limit", "grid");
     if (g.nt > 10000) throw Error("E_LIMIT", "nt is above its limit", "grid");
     if (g.nx < 5 || g.nx % 2 == 0) throw Error("E_INPUT", "nx must be odd and at least 5", "grid");

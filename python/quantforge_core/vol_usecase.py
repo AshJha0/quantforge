@@ -11,6 +11,7 @@ from .black import BLACK_76, Option, black76_position, implied
 from .curves import CurveData
 from .equity import ParityQuote
 from .errors import QfError
+from .finite import guard
 
 
 def vol_surface(
@@ -64,3 +65,6 @@ def vol_surface(
         "forwards": forwards, "svi_rmse": rmses, "arbitrage_free": check["arbitrage_free"],
         "vol": vol, "pv": pv, "delta": delta, "vega": vega,
     }
+
+
+guard(globals())

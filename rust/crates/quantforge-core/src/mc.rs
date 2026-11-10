@@ -1,4 +1,5 @@
 //! Monte Carlo engine (`monte-carlo.md`).
+
 use crate::error::{Result, fail};
 use crate::rng::{Xoshiro, ppnd16};
 use crate::sobol::Sobol;
@@ -49,6 +50,7 @@ impl Draws {
 
 /// Returns `(price, stderr)`.
 pub fn gbm_european(p: &McInputs) -> Result<(f64, f64)> {
+    crate::error::finite("p", &p)?;
     if p.spot <= 0.0 || p.strike <= 0.0 || p.sigma <= 0.0 || p.t <= 0.0 {
         return fail("E_DOMAIN", "spot, strike, sigma and t must be positive");
     }
@@ -116,4 +118,28 @@ pub fn gbm_european(p: &McInputs) -> Result<(f64, f64)> {
         }
     }
     Ok((mean(&samples), (variance(&samples) / n as f64).sqrt()))
+}
+
+impl crate::error::Finite for McInputs {
+    fn is_all_finite(&self) -> bool {
+        self.spot.is_all_finite()
+            && self.strike.is_all_finite()
+            && self.r.is_all_finite()
+            && self.q.is_all_finite()
+            && self.sigma.is_all_finite()
+            && self.t.is_all_finite()
+            && self.method.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Method {
+    #[allow(clippy::match_same_arms)]
+    fn is_all_finite(&self) -> bool {
+        match self {
+            Self::Plain => true,
+            Self::Antithetic => true,
+            Self::ControlVariate => true,
+            Self::Sobol => true,
+        }
+    }
 }

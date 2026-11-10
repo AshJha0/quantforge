@@ -1,5 +1,6 @@
 //! Hagan SABR, its density check and fit, and the arbitrage-free recipe (`sabr.md`).
 use crate::black::{Model, Option_, black};
+
 use crate::error::{Result, fail};
 use crate::svi::minimise;
 
@@ -16,6 +17,8 @@ pub struct Sabr {
 
 impl Sabr {
     pub fn check(&self, strikes: &[f64]) -> Result<()> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("strikes", &strikes)?;
         if self.t <= 0.0
             || self.alpha <= 0.0
             || !(0.0..=1.0).contains(&self.beta)
@@ -61,6 +64,8 @@ impl Sabr {
     }
 
     pub fn hagan(&self, strikes: &[f64]) -> Result<Vec<f64>> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("strikes", &strikes)?;
         self.check(strikes)?;
         Ok(strikes
             .iter()
@@ -70,6 +75,9 @@ impl Sabr {
 
     /// `density`, `min_density`. The caller judges the sign.
     pub fn density(&self, strikes: &[f64], h: f64) -> Result<(Vec<f64>, f64)> {
+        crate::error::finite("self", self)?;
+        crate::error::finite("strikes", &strikes)?;
+        crate::error::finite("h", &h)?;
         self.check(strikes)?;
         if h <= 0.0 {
             return fail("E_DOMAIN", "h_strike must be above 0");
@@ -101,6 +109,13 @@ pub fn calibrate(
     vols: &[f64],
     weights: Option<&[f64]>,
 ) -> Result<[f64; 4]> {
+    crate::error::finite("forward", &forward)?;
+    crate::error::finite("t", &t)?;
+    crate::error::finite("beta", &beta)?;
+    crate::error::finite("shift", &shift)?;
+    crate::error::finite("k", &k)?;
+    crate::error::finite("vols", &vols)?;
+    crate::error::finite("weights", &weights)?;
     if k.len() < 3 || k.len() != vols.len() || weights.is_some_and(|w| w.len() != k.len()) {
         return fail("E_INPUT", "needs 3 strikes and equal lengths");
     }
@@ -188,6 +203,8 @@ pub struct ArbFree {
 }
 
 pub fn arbfree(s: &Sabr, cells: i64, below: i64, steps: i64, strikes: &[f64]) -> Result<ArbFree> {
+    crate::error::finite("s", &s)?;
+    crate::error::finite("strikes", &strikes)?;
     s.check(strikes)?;
     if s.beta >= 1.0 {
         return fail("E_DOMAIN", "beta must be below 1");
@@ -306,6 +323,29 @@ pub fn arbfree(s: &Sabr, cells: i64, below: i64, steps: i64, strikes: &[f64]) ->
         absorbed: p_l,
         min_density: q.iter().copied().fold(f64::INFINITY, f64::min),
     })
+}
+
+impl crate::error::Finite for ArbFree {
+    fn is_all_finite(&self) -> bool {
+        self.call_prices.is_all_finite()
+            && self.vols.is_all_finite()
+            && self.mass.is_all_finite()
+            && self.mean.is_all_finite()
+            && self.absorbed.is_all_finite()
+            && self.min_density.is_all_finite()
+    }
+}
+
+impl crate::error::Finite for Sabr {
+    fn is_all_finite(&self) -> bool {
+        self.t.is_all_finite()
+            && self.alpha.is_all_finite()
+            && self.beta.is_all_finite()
+            && self.rho.is_all_finite()
+            && self.nu.is_all_finite()
+            && self.forward.is_all_finite()
+            && self.shift.is_all_finite()
+    }
 }
 
 #[cfg(test)]
