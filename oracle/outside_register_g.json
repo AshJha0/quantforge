@@ -1,0 +1,52 @@
+{
+ "suite": "shortrate_g",
+ "library": "QuantLib 1.44",
+ "counted": 61,
+ "total": 78,
+ "rule": "11.2.5 and G-4: every output is a QuantLib value (discountBond, discountBondOption, the curve discount) or plain arithmetic on one (zero_rate)",
+ "barrier_g": {
+  "counted": 2,
+  "total": 32,
+  "rule": "continuous-monitoring rows only; the BGK rows have MC evidence, not an outside library value"
+ },
+ "swaption_g": {
+  "counted": 33,
+  "total": 40,
+  "rule": "QuantLib HullWhite discountBond and discountBondOption, r* by QuantLib Brent to 1e-15, combined by arithmetic; DiscountCurve discounts for the annuity and forward"
+ },
+ "g2pp_g": {
+  "counted": 30,
+  "total": 38,
+  "rule": "QuantLib G2 discountBond and discountBondOption on a DiscountCurve; zero_rate and the curve discounts as arithmetic or curve values"
+ },
+ "exposure_g": {
+  "counted": 7,
+  "total": 15,
+  "rule": "each EE point is the swaption_g QuantLib check; cva is arithmetic on those values"
+ },
+ "hwcal_g": {
+  "counted": 0,
+  "total": 6,
+  "rule": "not counted: the fitted sigma is this platform's least-squares optimum; QuantLib reprices the fitted prices (evidence only)"
+ },
+ "capfloor_g": {
+  "counted": 36,
+  "total": 41,
+  "rule": "QuantLib Vasicek, CoxIngersollRoss, HullWhite discountBondOption per caplet, scaled by (1 + K tau) and summed"
+ },
+ "swaption_affine_g": {
+  "counted": 36,
+  "total": 39,
+  "rule": "G-13 method on QuantLib Vasicek and CoxIngersollRoss objects"
+ },
+ "bermudan_g": {
+  "counted": 0,
+  "total": 15,
+  "rule": "not counted: the golden is the pinned scheme; QuantLib FD and tree values are convergence evidence (oracle/BERMUDAN_EVIDENCE_G.json)"
+ },
+ "callable_g": {
+  "counted": 0,
+  "total": 12,
+  "rule": "not counted: pinned scheme (G-18)"
+ }
+}

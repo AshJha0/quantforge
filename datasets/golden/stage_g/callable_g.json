@@ -1,0 +1,934 @@
+{
+ "schema_version": "1.0",
+ "suite": "callable_g",
+ "spec": "specifications/04-pricing/short-rate-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_berm.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "callable_g-0001",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.03,
+    "call_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 90.38100696077336
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.03 calls=[3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0] K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0002",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.03,
+    "call_times": [
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 91.02062511154713
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.03 calls=[5.0] K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0003",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.045,
+    "call_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 99.03284827488655
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.045 calls=[3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0] K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0004",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.045,
+    "call_times": [
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 100.68658722283783
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.045 calls=[5.0] K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0005",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.06,
+    "call_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 105.1753692403312
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.06 calls=[3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0] K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0006",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.06,
+    "call_times": [
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 108.72301801206505
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.06 calls=[5.0] K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0007",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.045,
+    "call_times": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 104.48531341086765
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.045 calls=[] K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0008",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.2,
+    "sigma": 0.015,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.02,
+    "coupon_rate": 0.05,
+    "call_times": [
+     2.0,
+     4.0,
+     6.0,
+     8.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 102.35669281802285
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "reference-scheme-float64",
+    "straight-bond-bound"
+   ],
+   "tags": [
+    "shortrate",
+    "callable",
+    "synthetic"
+   ],
+   "description": "HW callable bond c=0.05 calls=[2.0, 4.0, 6.0, 8.0] K=1.02",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "reason": "pinned scheme; tridiagonal rounding only"
+   }
+  },
+  {
+   "case_id": "callable_g-0009",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.04,
+    "call_times": [
+     2.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "callable",
+    "synthetic"
+   ],
+   "description": "call not a coupon date"
+  },
+  {
+   "case_id": "callable_g-0010",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.04,
+    "call_times": [
+     10.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "callable",
+    "synthetic"
+   ],
+   "description": "call at maturity"
+  },
+  {
+   "case_id": "callable_g-0011",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 0.0,
+    "coupon_rate": 0.04,
+    "call_times": [
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "callable",
+    "synthetic"
+   ],
+   "description": "call_price 0"
+  },
+  {
+   "case_id": "callable_g-0012",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [],
+    "grid": {
+     "nx": 201,
+     "steps_per_year": 100,
+     "width": 6.0
+    },
+    "call_price": 1.0,
+    "coupon_rate": 0.04,
+    "call_times": [
+     3.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "callable",
+    "synthetic"
+   ],
+   "description": "no payments"
+  }
+ ]
+}
