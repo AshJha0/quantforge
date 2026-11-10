@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
 import org.quantforge.core.QfError;
+import org.quantforge.pricing.G2pp;
 import org.quantforge.pricing.ShortRate;
 
 /** Stage G short-rate models: bonds, bond options and the Hull-White swaption (short-rate-models.md). */
@@ -71,6 +72,40 @@ final class OpsShortRate {
         }
         ShortRate.Curve curve = m == ShortRate.Model.HULL_WHITE ? new ShortRate.Curve(r.times(), r.dfs()) : null;
         return new ShortRate.Params(m, r.a(), r.sigma(), r.b(), curve);
+    }
+
+    /** Raw G2++ parameters; the curve is built (and its rules applied) in {@link #checkG2}. */
+    private record Raw2(double[] times, double[] dfs, double a, double sigma, double b, double eta, double rho) {}
+
+    private static Raw2 g2(In in) {
+        double[] times = in.object("curve").reals("times");
+        double[] dfs = in.object("curve").reals("discount_factors");
+        in.limit(times.length > MAX_PILLARS, "curve");
+        double a = in.real("a");
+        double sigma = in.real("sigma");
+        double b = in.real("b");
+        double eta = in.real("eta");
+        double rho = in.real("rho");
+        return new Raw2(times, dfs, a, sigma, b, eta, rho);
+    }
+
+    private static G2pp.Params checkG2(Raw2 r) {
+        if (!(r.a() > 0.0)) {
+            throw domain("a");
+        }
+        if (!(r.sigma() > 0.0)) {
+            throw domain("sigma");
+        }
+        if (!(r.b() > 0.0)) {
+            throw domain("b");
+        }
+        if (!(r.eta() > 0.0)) {
+            throw domain("eta");
+        }
+        if (!(r.rho() > -1.0 && r.rho() < 1.0)) {
+            throw domain("rho");
+        }
+        return new G2pp.Params(new ShortRate.Curve(r.times(), r.dfs()), r.a(), r.sigma(), r.b(), r.eta(), r.rho());
     }
 
     static void register(Map<String, Function<In, Out>> table) {
@@ -152,6 +187,52 @@ final class OpsShortRate {
             ShortRate.Swaption sw = ShortRate.swaption(p, t0, pay, rate, type.equals("PAYER"), notional);
             return Operations.out("price", sw.price(), "forward_swap_rate", sw.forwardSwapRate(), "annuity",
                     sw.annuity());
+        });
+
+        table.put("rates.g2pp.zcb", in -> {
+            Raw2 raw = g2(in);
+            double x = in.real("x");
+            double y = in.real("y");
+            double t = in.real("t_years");
+            double mat = in.real("maturity_years");
+            in.gate();
+            G2pp.Params p = checkG2(raw);
+            if (!(t >= 0.0)) {
+                throw domain("t_years");
+            }
+            if (!(mat > t)) {
+                throw domain("maturity_years");
+            }
+            double df = G2pp.zcb(p, x, y, t, mat);
+            return Operations.out("discount_factor", df, "zero_rate", -Math.log(df) / (mat - t));
+        });
+        table.put("rates.g2pp.zcb_option", in -> {
+            Raw2 raw = g2(in);
+            boolean states = in.has("x") || in.has("y");
+            String type = in.string("option_type");
+            double k = in.real("strike");
+            double t = in.real("expiry_years");
+            double s = in.real("maturity_years");
+            double notional = in.real("notional");
+            in.gate();
+            G2pp.Params p = checkG2(raw);
+            if (states) {
+                throw new QfError("E_INPUT", "x and y are not allowed: both factors start at 0", "x");
+            }
+            if (!(t > 0.0)) {
+                throw domain("expiry_years");
+            }
+            if (!(s > t)) {
+                throw domain("maturity_years");
+            }
+            if (!(k > 0.0)) {
+                throw domain("strike");
+            }
+            if (!type.equals("CALL") && !type.equals("PUT")) {
+                throw input("option_type");
+            }
+            return Operations.out("price", notional * G2pp.bondOption(p, type.equals("CALL"), k, t, s),
+                    "bond_price_expiry", p.curve().df(t), "bond_price_maturity", p.curve().df(s));
         });
     }
 }

@@ -191,6 +191,11 @@ public final class ShortRate {
     /** Vasicek and Hull-White bond call [J89]. */
     public static double gaussianCall(double a, double sigma, double k, double t, double s, double pt, double ps) {
         double sp = sigma * bFactor(a, s - t) * Math.sqrt(-Math.expm1(-2.0 * a * t) / (2.0 * a));
+        return gaussianCallSp(sp, k, pt, ps);
+    }
+
+    /** The Gaussian bond call for a given total volatility sp. */
+    public static double gaussianCallSp(double sp, double k, double pt, double ps) {
         double h = Math.log(ps / (k * pt)) / sp + sp / 2.0;
         return ps * Normal.cdf(h) - k * pt * Normal.cdf(h - sp);
     }
