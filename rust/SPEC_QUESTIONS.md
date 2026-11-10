@@ -216,3 +216,12 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
   linear-zero curves Rust evaluates the same formula in closed form per exponential term
   (`4 sinh^2(g h/2)` and `sinh(g_i h) sinh(g_j h)`), which matches the 40-digit goldens. Other
   products and interpolations use the direct formula.
+
+## Stage F wave 2 (F4), choices and findings
+
+- `risk.var.monte_carlo` goldens give `seed` as a JSON integer (`7`); the contract (row "64-bit
+  unsigned") and every older seed golden use a decimal string. Rust reads both for this operation.
+- Traffic light: `P(X <= x)` is summed in log space from `n ln(1 - p)`; exceptions above
+  `observations` give 1 (not an error: the spec only bounds `exceptions >= 0`).
+- FRTB GIRR: inflation against a tenor is 40% whatever the curve; with `reporting_currency`
+  absent only the seven listed currencies are reduced.

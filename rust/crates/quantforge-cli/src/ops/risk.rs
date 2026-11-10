@@ -19,6 +19,7 @@ use quantforge_core::corr;
 use quantforge_core::curve::Interpolation;
 use quantforge_core::error::Result;
 use quantforge_core::error::fail;
+use quantforge_core::frtb;
 use quantforge_core::greeks;
 use quantforge_core::json::Json;
 use quantforge_core::json::obj;
@@ -31,6 +32,7 @@ use quantforge_core::risk_curve::Product;
 use quantforge_core::risk_curve::Scheme;
 use quantforge_core::risk_tools;
 use quantforge_core::surface::Position;
+use quantforge_core::var;
 
 super::registry! {
 (op, i)
@@ -248,6 +250,136 @@ super::registry! {
             i.gate()?;
             let (v, t) = risk_tools::jtd(&ps)?;
             plain(obj([("jtd", v.into()), ("total", t.into())]))
+        },
+        "risk.var.historical" => {
+            let (x, c) = (i.reals("pnl")?, i.f64("confidence")?);
+            i.gate()?;
+            let r = var::historical(&x, c)?;
+            plain(var_json(r, true))
+        },
+        "risk.var.filtered_historical" => {
+            let x = i.reals("returns")?;
+            let (p, l, c) = (i.f64("position_value")?, i.f64("lambda")?, i.f64("confidence")?);
+            i.gate()?;
+            let (r, next) = var::filtered_historical(&x, p, l, c)?;
+            let mut o = var_json(r, true);
+            if let Json::Obj(m) = &mut o {
+                m.push(("sigma_next".into(), next.into()));
+            }
+            plain(o)
+        },
+        "risk.var.parametric" => {
+            let (m, s, c) = (i.f64("mean")?, i.f64("std")?, i.f64("confidence")?);
+            i.gate()?;
+            plain(var_json(var::parametric(m, s, c)?, false))
+        },
+        "risk.var.monte_carlo" => {
+            let (m, cov, w) = (i.reals("mean")?, i.matrix("covariance")?, i.reals("weights")?);
+            let (paths, seed, c) = (i.int("paths")?, mc_seed(i)?, i.f64("confidence")?);
+            i.gate()?;
+            plain(var_json(var::monte_carlo(&m, &cov, &w, paths, seed, c)?, true))
+        },
+        "risk.backtest.kupiec" => {
+            let (n, x, c) = (i.int("observations")?, i.int("exceptions")?, i.f64("confidence")?);
+            i.gate()?;
+            let (lr, p) = var::kupiec(n, x, c)?;
+            plain(obj([("lr_uc", lr.into()), ("p_value", p.into())]))
+        },
+        "risk.backtest.christoffersen" => {
+            let e = i
+                .array("exceptions")?
+                .iter()
+                .map(|v| match v {
+                    Json::Bool(b) => Ok(*b),
+                    _ => i.fail("exceptions", "expected booleans"),
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let c = i.f64("confidence")?;
+            i.gate()?;
+            let r = var::christoffersen(&e, c)?;
+            let [n00, n01, n10, n11] = r.transitions;
+            plain(obj([
+                ("lr_uc", r.lr_uc.into()),
+                ("lr_ind", r.lr_ind.into()),
+                ("lr_cc", r.lr_cc.into()),
+                ("p_uc", r.p_uc.into()),
+                ("p_ind", r.p_ind.into()),
+                ("p_cc", r.p_cc.into()),
+                (
+                    "transitions",
+                    obj([
+                        ("n00", n00.into()),
+                        ("n01", n01.into()),
+                        ("n10", n10.into()),
+                        ("n11", n11.into()),
+                    ]),
+                ),
+            ]))
+        },
+        "risk.backtest.traffic_light" => {
+            let (n, x, c) = (i.int("observations")?, i.int("exceptions")?, i.f64("confidence")?);
+            i.gate()?;
+            let (p, zone, plus) = var::traffic_light(n, x, c)?;
+            plain(obj([
+                ("cumulative_probability", p.into()),
+                ("zone", zone.into()),
+                ("plus_factor", plus.into()),
+            ]))
+        },
+        "risk.frtb.girr_delta" => {
+            let sens = items(i, "sensitivities")?
+                .iter()
+                .map(|s| {
+                    let f = s.str("risk_factor")?;
+                    let Some(factor) = frtb::Factor::parse(f) else {
+                        return s.fail("risk_factor", "unknown risk factor");
+                    };
+                    Ok(frtb::Sensitivity {
+                        currency: s.str("currency")?.to_string(),
+                        curve: s.str("curve")?.to_string(),
+                        factor,
+                        sensitivity: s.f64("sensitivity")?,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let red = i.bool_or("specified_currency_reduction", false)?;
+            let rep = match i.opt("reporting_currency") {
+                None | Some(Json::Null) => None,
+                Some(_) => Some(i.str("reporting_currency")?),
+            };
+            i.gate()?;
+            let r = frtb::girr_delta(&sens, red, rep)?;
+            let scen: Vec<(String, Json)> = r
+                .scenarios
+                .iter()
+                .map(|s| {
+                    let b: Vec<Json> = s
+                        .buckets
+                        .iter()
+                        .map(|b| {
+                            obj([
+                                ("currency", b.currency.as_str().into()),
+                                ("k", b.k.into()),
+                                ("s", b.s.into()),
+                                ("s_used", b.s_used.into()),
+                            ])
+                        })
+                        .collect();
+                    (
+                        s.name.to_string(),
+                        obj([
+                            ("buckets", Json::Arr(b)),
+                            ("delta", s.delta.into()),
+                            ("alternative_used", Json::Bool(s.alternative_used)),
+                        ]),
+                    )
+                })
+                .collect();
+            plain(obj([
+                ("scenarios", Json::Obj(scen)),
+                ("capital", r.capital.into()),
+                ("binding_scenario", r.binding_scenario.into()),
+            ]))
         },
         "risk.curve.par" => {
             let c = overnight(i, "convention")?;
@@ -479,4 +611,21 @@ fn cross_gamma_product(i: &Inputs) -> Result<Product> {
         }));
     }
     product(i)
+}
+
+fn var_json(r: var::VarEs, tail: bool) -> Json {
+    let mut v: Vec<(String, Json)> = vec![("var".into(), r.var.into()), ("es".into(), r.es.into())];
+    if tail {
+        v.push(("tail_count".into(), r.tail_count.into()));
+    }
+    Json::Obj(v)
+}
+
+/// The `risk_f4` goldens give `seed` as a JSON integer, while the contract's u64 is a decimal
+/// string; both are read here (`SPEC_QUESTIONS.md`, wave 2).
+fn mc_seed(i: &Inputs) -> Result<u64> {
+    match i.req("seed")? {
+        Json::Int(v) if *v >= 0 => Ok(*v as u64),
+        _ => i.seed(),
+    }
 }
