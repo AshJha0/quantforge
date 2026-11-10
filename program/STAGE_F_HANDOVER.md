@@ -87,3 +87,35 @@ Read with every slice: `specifications/cli-contract.md` (block "Stage F operatio
 ### Open items
 - R7: the Pedersen (2003) worked example is not reproduced (paper not freely available); added to the known issues for a human with access.
 - T amendments made by this wave (rulings F-19, F-22): the Q1 row now names `forcePositive = false` and states locality on pillars. Both are written into the plan's section 12.10 and into the T table above.
+
+### Where to resume (spec session checkpoint, 2026-11-09 22:05)
+- Wave 1b (Q4): `cd oracle/python && uv run python -u -W ignore gen_stage_f_q4.py` writes `datasets/golden/stage_f/joint_f.json` (it prints a line per system solved and per bump-and-rebuild check). Then `uv run python -W ignore outside_f.py` (QuantLib check of the OIS + projection systems and the stage F share), the stub replay `python conformance/runner/runner.py --impl stub --suite joint_f`, fill the `TODO wave 1b` lineage hashes in `docs/model-inventory.md` (MF-5, MF-6), and add a "WAVE 1b READY" heading here.
+- R8 coverage study: `uv run python -W ignore gen_stage_f_f6.py COVER` (about an hour; writes `oracle/R8_COVERAGE.json`, asserts the [0.90, 0.99] band).
+- Regenerate E1 after new operations land: `gen_stage_f_e1.py` reads only suites outside `stage_f`, so the stage F operations (`credit.cdsindex.option_price`, `vol.garch.estimate`, `rates.curve.inspect`, `rates.curve.joint_solve`, `rates.funding.curve`) still need E1 cases: change its skip rule to skip only `e1_*` files, then rerun.
+- Then waves 2 and 3 as in the task order (F3 and F4 specs, the E9 MC hash golden, F5 book).
+
+
+## WAVE 1b READY (2026-11-09 22:12): F1 Q4 joint solve and funding curve, with one open system
+
+The Q4 section above ("F1 Q4 joint solve and funding curve") is now ready, with `joint_f` at 13 cases: three joint systems (SOFR meeting steps fitted to SR3 futures with convexity and a solved year-end turn; SOFR + term log-linear; SOFR + term monotonic log cubic), four error cases and six funding-curve cases (one is the zero-spread limit). Stub replay 13 of 13. Each system's IFT Jacobian matches a bump-and-rebuild of the whole system (Richardson, `h = 1e-4`) within `1e-9 + 1e-6 |ref|`; structural zeros are exact. QuantLib 1.44 rebuilds the log-linear system and its bump Jacobian (counted). The monotonic log cubic system's QuantLib bump Jacobian differs by 3e-6 relative, which is QuantLib's 1e-12 bootstrap accuracy over a 1e-4 bump, so it is not counted.
+
+**Open item (spec session, next turn):** the full system (SOFR monotone convex with a solved turn + term + ESTR monotonic log cubic + EUR xccy) solves to 1.6e-15, but its IFT Jacobian differs from bump-and-rebuild by up to 2e-3, so it is left out of the goldens (`gen_stage_f_q4.py`, `systems()[0]`, skipped in `main`). Suspects: a convex-monotone section at a branch boundary (the method is piecewise in its data, so its Jacobian is one-sided there), or the xccy `dR/dq`. Diagnostic script pattern: solve, `jacobian()`, `bump_jacobian()`, print the worst entries. Builds should implement the full operation regardless; the missing golden does not change the spec.
+
+Outside share after wave 1: 52 of 171 = 30.4% (ruling F-23), below the 60% floor.
+
+
+### Resume here (checkpoint 2026-11-09 22:15; laptop off at 23:00)
+1. **Merge main first.** Part 1 merged to main as PR #25 (`5c8fa9d`): `git merge main` into `stage-f` before any new work.
+2. **Four-curve Jacobian mismatch (Q4 open item).** Run `cd oracle/python && uv run python -u -W ignore diag_q4_jacobian.py`. The three committed systems pass (max excess below 0). Only `systems()[0]` fails (up to 2e-3 against bump-and-rebuild), and the script prints its four worst entries last. The 2026-11-09 run was stopped at the shutdown, before that output. Read the worst entries' rows and columns:
+   - **XCCY quote columns wrong.** Check `System.dRdq` for `XCCY`: the residual is `L_foreign` and its derivative in `spread` is `sum alpha_i D_f(e_i)` on the foreign discount curve being solved. Also check that bumping `spread` in `bump_jacobian` uses the same key.
+   - **USD-SOFR rows wrong** (monotone convex with the turn). Test whether a section sits on a branch boundary (`g0`, `g1` near a rule switch in `interp_f._cm_sections`). If so, either move the quotes off the boundary and assert a margin in the generator, as the stage E goldens do with `away()`, or state in the spec that the Jacobian of a piecewise method is one-sided at a boundary.
+   - **Turn column wrong.** Check that the turn unknown's columns in `dR/dx` and the `turn_sensitivity` zeroing agree.
+
+   When it passes, remove the skip in `gen_stage_f_q4.py` `main` (the "OPEN" comment) and rerun it (about 5 minutes). Then rerun `outside_f.py` and the stub replay, update the `joint_f` hash in `docs/model-inventory.md` (MF-5, MF-6), and tell the coordinator the new case count.
+3. Then the items in "Where to resume" above: R8 coverage, E1 for the new stage F operations, waves 2 and 3.
+
+**Diagnostic result (2026-11-09 22:17).** Full system max excess 1.99e-3. The worst entries, IFT against bump:
+- `USD-SOFR:turn:2026-12-31` / `SOFR-3M`: 0.18997 against 0.19196.
+- `USD-TERM-3M` pillars 2028-11-13, 2031-11-12, 2036-11-12 / `SOFR-2Y`: errors of about 5e-4 each.
+
+No XCCY column appears, so the xccy suspect is unlikely. The errors sit in SOFR quote columns (3M near the turn, 2Y), which points to the monotone-convex SOFR curve. Check whether a section near 3M or 2Y switches branch rule under a 1e-4 quote bump (compare `interp_f._cm_sections` branch kinds at `x` and at the bumped solutions). If it does, the 1e-4 Richardson bump straddles a kink: use a smaller bump for the reference (1e-6) and compare again, then either keep the quotes off the boundary with an asserted margin or state one-sided derivatives in the spec.
