@@ -836,4 +836,55 @@ mod tests {
             "E_DOMAIN"
         );
     }
+
+    // ---- Stage G: risk measures checked against finite differences, other frequencies. ----
+
+    #[test]
+    fn durations_match_finite_differences() {
+        let s = d("2026-11-09");
+        for (b, y) in [
+            (bond(), 0.041),
+            (Bond::new(d("2031-02-28"), 0.04, 4), 0.055),
+            (Bond::new(d("2030-08-17"), 0.03, 1), 0.02),
+        ] {
+            let p = price_from_yield(&b, s, y).unwrap();
+            let h = 1e-4;
+            let up = price_from_yield(&b, s, y + h).unwrap().dirty;
+            let dn = price_from_yield(&b, s, y - h).unwrap().dirty;
+            let d1 = (up - dn) / (2.0 * h);
+            let d2 = (up - 2.0 * p.dirty + dn) / (h * h);
+            assert!((p.modified_duration + d1 / p.dirty).abs() < 1e-5, "{b:?}");
+            assert!(
+                (p.convexity - d2 / p.dirty).abs() < 1e-4 * p.convexity,
+                "{b:?}"
+            );
+            let f = b.frequency as f64;
+            let mac = p.modified_duration * (1.0 + y / f);
+            assert!((p.macaulay_duration - mac).abs() < 1e-12);
+            assert!((p.clean - (p.dirty - p.accrued)).abs() < 1e-12);
+            let (yy, _, acc) = yield_from_price(&b, s, p.clean).unwrap();
+            assert!((yy - y).abs() < 1e-13 && acc == p.accrued);
+        }
+    }
+
+    #[test]
+    fn accrued_counts_actual_days() {
+        // 178 of 184 days into the 2026-05-15 to 2026-11-15 period
+        let a = bond().accrued(d("2026-11-09")).unwrap();
+        assert!((a - 2.125 * 178.0 / 184.0).abs() < 1e-14);
+        let f = bond().flows(d("2026-11-09")).unwrap();
+        assert!((f.w - 6.0 / 184.0).abs() < 1e-15);
+        let q = Bond::new(d("2031-02-28"), 0.04, 4);
+        assert_eq!(q.amount(), 1.0);
+        let fq = q.flows(d("2026-11-09")).unwrap();
+        assert_eq!((fq.prev, fq.next), (d("2026-08-31"), d("2026-11-30")));
+        assert_eq!(fq.flows.len(), 18);
+        assert_eq!(fq.flows[17], (d("2031-02-28"), 101.0));
+        // zero-coupon flows: one redemption, no accrual
+        let z = Bond::new(d("2028-11-15"), 0.0, 2)
+            .flows(d("2026-11-09"))
+            .unwrap();
+        assert_eq!(z.accrued, 0.0);
+        assert_eq!(z.flows.last().unwrap().1, 100.0);
+    }
 }
