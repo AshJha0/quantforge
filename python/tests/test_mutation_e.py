@@ -72,3 +72,22 @@ def test_exotic_positivity_checks() -> None:
     assert error_of(exotics.basket, [100.0, 90.0], [0.0, 0.0], [0.2, 0.3], corr, 95.0, 1.0,
                     0.03, "CALL") == ("E_DOMAIN", "weights must be non-negative and not all 0",
                                       "weights")
+
+
+def test_credit_option_error_fields() -> None:
+    from quantforge_core import credit_options
+    assert error_of(credit_options.loss_cdf, 0.02, 0.3, 0.4, [0.7]) == (
+        "E_DOMAIN", "a loss is outside (0, 1 - R)", "losses")
+    assert error_of(credit_options._check_option, date(2026, 1, 2), date(2026, 6, 2),
+                    date(2031, 6, 2), 0.02, 1.0, 0.01) == (
+        "E_DOMAIN", "recovery must be in [0, 1)", "recovery")
+
+
+def test_index_option_strike_hazard_matches_golden() -> None:
+    from quantforge_core.cli.operations import execute
+    case = next(c for c in _golden("cdsidx_f.json")["cases"] if c["case_id"] == "cdsidx_f-0055")
+    out = execute(case["operation"], case["inputs"])
+    out = out[0] if isinstance(out, tuple) else out
+    want = case["expected"]["outputs"]
+    assert out["strike_hazard"] == pytest.approx(want["strike_hazard"], rel=1e-10)
+    assert out["strike_annuity"] == pytest.approx(want["strike_annuity"], rel=1e-10)
