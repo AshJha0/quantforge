@@ -19,7 +19,7 @@ CORE_MODULES = (
     "arb_surface", "black", "bonds", "calendars", "calibration", "caps_swaptions", "commodity",
     "compounding", "conventions", "correlation", "cos", "credit", "credit_options", "csa",
     "curve_fits", "curves", "data_checks", "daycount", "equity", "equity_curves", "exotics",
-    "futures", "fx", "fx_smile", "hedging", "heston", "inflation", "integrate", "interp", "joint", "linalg",
+    "futures", "fx", "fx_smile", "hedging", "heston", "inflation", "integrate", "interp", "joint", "linalg", "book_risk",
     "mbs", "money", "monte_carlo", "ois", "overnight", "pde", "projection", "rates_vol",
     "risk_curve", "rng", "roots", "sabr", "schedules", "sensitivities", "smile", "snapshot",
     "sobol", "stats", "steps", "store", "timezones", "usecases", "variance", "vol_usecase", "xccy",

@@ -2,11 +2,13 @@
 from typing import Any
 
 from .. import conventions, curves
+from ..errors import QfError
 from ..smile import Position
 from .inputs import Inputs
 from .readers import (
     OPTIONS,
     _bond,
+    _convention,
     _curve,
     _objects,
     _ois_trade,
@@ -148,3 +150,46 @@ def _corr_dispersion(i: Inputs) -> Any:
     args = (i.reals("weights"), i.reals("vol_strikes"), i.real("index_vol_strike"),
             i.reals("realized_vols"), i.real("index_realized_vol"), i.real("vega_notional"))
     return core.correlation.dispersion(*args)
+
+
+@op("risk.book.ois_sensitivity")
+def _book_ois_sensitivity(i: Inputs) -> Any:
+    from ..book_risk import BookSwap
+    from .readers import _quotes
+    swaps = [BookSwap(s.string("id"), s.integer("tenor_years"), s.real("fixed_rate"),
+                      s.enum("side", ("PAYER", "RECEIVER"))) for s in _objects(i, "swaps")]
+    return core.book_risk.ois_sensitivity(
+        i.date("as_of"), _convention(i, "convention", conventions.OVERNIGHT), _quotes(i),
+        i.enum("interpolation", curves.INTERPOLATIONS), swaps)
+
+
+@op("risk.curve.pca")
+def _curve_pca(i: Inputs) -> Any:
+    return core.book_risk.pca(i.matrix("changes"), i.integer("components"))
+
+
+@op("risk.curve.cross_gamma")
+def _curve_cross_gamma(i: Inputs) -> Any:
+    from ..ois import OisTrade
+    from ..risk_curve import Product
+    data = _curve(i)
+    p = i.object("product")
+    p.enum("kind", ("OIS",))
+    t = p.object("trade")
+    side = t.enum("side", ("PAYER", "RECEIVER"))  # book-sensitivities.md names the sides so
+    product = Product("OIS", trade=OisTrade(
+        t.enum("convention", conventions.OVERNIGHT), _tenor(t), t.real("fixed_rate"),
+        t.real("notional"), "PAY" if side == "PAYER" else "RECEIVE"))
+    bump = i.real("bump_bp")
+    if not 0 < bump <= 100:
+        raise QfError("E_DOMAIN", "bump_bp must be in (0, 100]", "bump_bp")
+    assert product.trade is not None
+    return core.book_risk.cross_gamma(data, product.trade, bump)
+
+
+@op("risk.credit.jtd")
+def _credit_jtd(i: Inputs) -> Any:
+    from ..book_risk import JTD_KINDS
+    positions = [(p.string("id"), p.enum("kind", JTD_KINDS), p.real("notional"),
+                  p.real("recovery"), p.real("market_value")) for p in _objects(i, "positions")]
+    return core.book_risk.jtd(positions)
