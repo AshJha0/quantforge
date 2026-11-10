@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
+import org.quantforge.risk.FrtbGirr;
 import org.quantforge.risk.PortfolioRisk;
 
 /** Stage F slices F3 and F4: book sensitivities, curve risk, VaR/ES, backtests, FRTB. Inputs read before the gate. */
@@ -45,6 +46,31 @@ final class OpsRiskF {
             long seed = in.integer("seed");
             double c = in.gate(in.real("confidence"));
             return new Out(varEs(PortfolioRisk.monteCarlo(mean, cov, w, paths, seed, c)), Map.of());
+        });
+        table.put("risk.frtb.girr_delta", in -> {
+            List<In> list = in.objects("sensitivities");
+            in.limit(list.size() > 100_000, "sensitivities");
+            List<FrtbGirr.Sensitivity> ss = new java.util.ArrayList<>();
+            for (In x : list) {
+                String rf = x.string("risk_factor");
+                FrtbGirr.factor(rf);
+                ss.add(new FrtbGirr.Sensitivity(x.string("currency"), x.string("curve"), rf, x.real("sensitivity")));
+            }
+            boolean red = in.bool("specified_currency_reduction", false);
+            String rep = in.has("reporting_currency") ? in.string("reporting_currency") : null;
+            in.gate();
+            FrtbGirr.Result r = FrtbGirr.delta(ss, red, rep);
+            Map<String, Object> sc = new java.util.LinkedHashMap<>();
+            for (FrtbGirr.Scenario s : r.scenarios()) {
+                List<Map<String, Object>> bl = new java.util.ArrayList<>();
+                for (FrtbGirr.Bucket b : s.buckets()) {
+                    bl.add(Operations.out("currency", b.currency(), "k", b.k(), "s", b.s(), "s_used", b.sUsed())
+                            .outputs());
+                }
+                sc.put(s.name(), Operations.out("buckets", bl, "delta", s.delta(),
+                        "alternative_used", s.alternativeUsed()).outputs());
+            }
+            return Operations.out("scenarios", sc, "capital", r.capital(), "binding_scenario", r.binding());
         });
         table.put("risk.backtest.kupiec", in -> {
             long n = in.integer("observations");
