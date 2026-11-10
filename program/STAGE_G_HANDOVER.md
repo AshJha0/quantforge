@@ -92,3 +92,34 @@ Read: `specifications/06-risk/xva-exposure.md`; ruling G-16 (and G-12, G-13); cl
 
 ### Outside-oracle status
 `exposure_g` 7 of 15 (every value case). Stage G so far: 133 of 224 = 59.4%, just below the 60% floor (the 21 `mcgreeks_g` cases have no outside source by construction).
+
+## Status at the end of the 2026-11-10 spec session (hard stop 23:15)
+
+All work is committed locally on `stage-g` (not pushed). Nothing in the language worktrees was touched.
+
+**Specified, with goldens and oracle evidence (224 cases, 6 suites in `datasets/golden/stage_g/`):**
+
+| Wave | Suite | Cases | Outside (QuantLib 1.44) | Spec |
+|---|---|---|---|---|
+| 1 | `shortrate_g` (Vasicek, CIR, Hull-White bonds and bond options) | 78 | 61 | `04-pricing/short-rate-models.md` |
+| 1 | `barrier_g` (R9, BGK discrete monitoring) | 32 | 2 | `04-pricing/exotics.md`, "Stage G addition" |
+| 2a | `swaption_g` (Jamshidian on Hull-White) | 40 | 33 | `short-rate-models.md` |
+| 2b | `g2pp_g` (G2++ bonds and bond options) | 38 | 30 | `short-rate-models.md`, "G2++" |
+| 3a | `mcgreeks_g` (Q9 part 1) | 21 | 0 (core.rng stream) | `06-risk/mc-greeks.md` |
+| 4a | `exposure_g` (swap EE and CVA, closed form) | 15 | 7 | `06-risk/xva-exposure.md` |
+| | **Stage G so far** | **224** | **133 = 59.4%** | |
+
+Rulings G-1 to G-16 (`specifications/stage-g-rulings.md`); G-9 to G-11 fix the Q3b, Q9 and A5 parameters before any result. Acceptance runs: R9 passes (`oracle/R9_ACCEPTANCE.json`); Q9 part 1 passes (`oracle/Q9_ACCEPTANCE.json`), with the weak-power open item above. Inventory rows MG-1 to MG-4; edge-case rows G1 to G5; name map 233 operations; `quality_gate --check-specs` and `--check-register` show no new gaps. Generators: `oracle/python/gen_stage_g_w1.py` (slices G1, R9, G2A, G2B, G5A) and `gen_stage_g_q9.py`; a clean rerun reproduces every golden byte for byte.
+
+**Left for stage G:**
+- Wave 2 rest: Hull-White calibration to a swaption strip; Bermudan swaptions (tree and PDE, with a pinned reference scheme, as `exotic.american.fd`); callable bonds; G2++ swaptions.
+- Wave 3 rest: LMM; Q3b AAD core in four languages (ruling G-9 ladder benchmark); Q9 part 2, the model-reserve dispersion report (Heston, SLV, local vol) on every exotic.
+- Wave 4 rest: CSA terms, netting sets, margin period of risk, collateral simulation; simulated EE, PFE, EPE (must reproduce `exposure_g` within 3 SE); DVA, FVA with the overlap defined, MVA, SIMM-style IM, wrong-way risk, KVA; the ORE exposure demo.
+- A5 surrogate (Python research module, challenger, ruling G-11).
+- The R5 audit of the stage G specs (different model).
+- Outside share: 59.4%, 0.6 points below the floor. The QuantLib-checkable wave 2 items (calibration, Bermudans, callable bonds) should lift it.
+- Open owner decision: G-10's variance test has little power at its fixed parameters (ratio 0.9985).
+
+**Carry-over 3 (stage F outside share 51.4%): not advanced.** `oracle/OUTSIDE_GAPS_F.md` already concludes no free source is left for the 134 value cases. The only runnable item, the `garch_f-0009` arch check under WSL, adds one case and was not attempted tonight.
+
+**Next step:** the coordinator relays waves 1, 2a, 2b, 3a and 4a to the four language sessions. The spec session then continues with wave 2 (Hull-White calibration, then Bermudans with a pinned tree or PDE reference scheme and the QuantLib `TreeSwaptionEngine` and `FdHullWhiteSwaptionEngine` as convergence evidence).
