@@ -122,8 +122,8 @@ pub fn monte_carlo(
     if (0..n).any(|i| (0..i).any(|j| covariance[i][j] != covariance[j][i])) {
         return fail("E_DOMAIN", "covariance must be symmetric");
     }
-    let l = cholesky(&covariance.to_vec())
-        .map_err(|_| crate::error::err("E_DOMAIN", "covariance is not positive definite"))?;
+    // Ruling F-39: a non-positive pivot is `E_NOT_POSITIVE_DEFINITE`.
+    let l = cholesky(&covariance.to_vec())?;
     let mut rng = Xoshiro::seeded(seed, 0);
     let mut z = vec![0.0; n];
     let mut pnl = Vec::with_capacity(paths as usize);
@@ -249,7 +249,7 @@ pub fn traffic_light(
         );
     }
     let (n, p) = (observations, 1.0 - c);
-    let x = exceptions.min(n);
+    let x = exceptions;
     // P(X <= x) by summing pmf in log space.
     let (lp, lq) = (p.ln(), (-p).ln_1p());
     let mut lpmf = n as f64 * lq;

@@ -167,9 +167,9 @@ super::registry! {
                 .iter()
                 .map(|s| {
                     let payer = match s.str("side")? {
-                        "PAYER" => true,
-                        "RECEIVER" => false,
-                        _ => return s.fail("side", "PAYER or RECEIVER"),
+                        "PAY" => true,
+                        "RECEIVE" => false,
+                        _ => return s.fail("side", "PAY or RECEIVE"),
                     };
                     Ok(book_risk::BookSwap {
                         id: s.str("id")?.to_string(),
@@ -221,7 +221,7 @@ super::registry! {
         },
         "risk.curve.cross_gamma" => {
             let curve = curve_input(i, "curve")?;
-            let p = cross_gamma_product(i)?;
+            let p = product(i)?;
             let bp = i.f64("bump_bp")?;
             i.gate()?;
             let (v, g) = risk_curve::cross_gamma(&curve, &p, bp)?;
@@ -275,7 +275,7 @@ super::registry! {
         },
         "risk.var.monte_carlo" => {
             let (m, cov, w) = (i.reals("mean")?, i.matrix("covariance")?, i.reals("weights")?);
-            let (paths, seed, c) = (i.int("paths")?, mc_seed(i)?, i.f64("confidence")?);
+            let (paths, seed, c) = (i.int("paths")?, i.seed()?, i.f64("confidence")?);
             i.gate()?;
             plain(var_json(var::monte_carlo(&m, &cov, &w, paths, seed, c)?, true))
         },
@@ -591,41 +591,10 @@ pub(crate) fn key_dates(i: &Inputs) -> Result<Option<Vec<quantforge_core::dates:
     }
 }
 
-/// The cross-gamma goldens spell the OIS side `PAYER` / `RECEIVER` (as the book swaps do), while
-/// `ois-curves.md` says `PAY` / `RECEIVE`; both are read here (`SPEC_QUESTIONS.md`, wave 2).
-fn cross_gamma_product(i: &Inputs) -> Result<Product> {
-    let p = sub(i, "product")?;
-    if p.str("kind")? == "OIS" {
-        let t = sub(&p, "trade")?;
-        let pay = match t.str("side")? {
-            "PAY" | "PAYER" => true,
-            "RECEIVE" | "RECEIVER" => false,
-            _ => return t.fail("side", "unknown side"),
-        };
-        return Ok(Product::Ois(quantforge_core::ois::OisTrade {
-            convention: overnight(&t, "convention")?,
-            tenor: tenor(&t, "tenor")?,
-            fixed_rate: t.f64("fixed_rate")?,
-            notional: t.f64("notional")?,
-            pay,
-        }));
-    }
-    product(i)
-}
-
 fn var_json(r: var::VarEs, tail: bool) -> Json {
     let mut v: Vec<(String, Json)> = vec![("var".into(), r.var.into()), ("es".into(), r.es.into())];
     if tail {
         v.push(("tail_count".into(), r.tail_count.into()));
     }
     Json::Obj(v)
-}
-
-/// The `risk_f4` goldens give `seed` as a JSON integer, while the contract's u64 is a decimal
-/// string; both are read here (`SPEC_QUESTIONS.md`, wave 2).
-fn mc_seed(i: &Inputs) -> Result<u64> {
-    match i.req("seed")? {
-        Json::Int(v) if *v >= 0 => Ok(*v as u64),
-        _ => i.seed(),
-    }
 }

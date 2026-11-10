@@ -86,6 +86,10 @@ pub fn apply(opening: &[(String, f64, f64)], events: &[(Date, Event)]) -> Result
         }
     }
     let mut b = BookState::default();
+    let mut names = HashSet::new();
+    if !opening.iter().all(|o| names.insert(o.0.as_str())) {
+        return fail("E_INPUT", "duplicate opening position (F-39)");
+    }
     for (i, q, a) in opening {
         if *q != 0.0 {
             b.positions.insert(i.clone(), (*q, *a));

@@ -208,9 +208,7 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
   Jacobian solves `dR/dx` by forward substitution when it is exactly lower triangular, so the
   F-30 zeros are exact. The tape mirrors `LOG_LINEAR_DF` and `LINEAR_ZERO`; other methods are
   `E_INPUT` for now (the spec allows any `rates.ois.bootstrap` method; the goldens use log-linear).
-- `risk.curve.cross_gamma` goldens spell the OIS `side` as `PAYER` / `RECEIVER`, but
-  `ois-curves.md` and every older OIS trade golden use `PAY` / `RECEIVE`. Rust reads both
-  spellings for this operation only. Spec: please pick one.
+- OIS `side` in `risk_f3`: closed by F-36 (`PAY` / `RECEIVE` everywhere; the dual reading is gone).
 - Cross gamma at 1 bp on a 1e6 notional loses about 1.5e-10 to binary64 cancellation if the
   formula is summed directly, which is over the `interpolation` 1e-10 limit. On log-linear and
   linear-zero curves Rust evaluates the same formula in closed form per exponential term
@@ -219,9 +217,8 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 
 ## Stage F wave 2 (F4), choices and findings
 
-- `risk.var.monte_carlo` goldens give `seed` as a JSON integer (`7`); the contract (row "64-bit
-  unsigned") and every older seed golden use a decimal string. Rust reads both for this operation.
-- Traffic light: `P(X <= x)` is summed in log space from `n ln(1 - p)`; exceptions above
-  `observations` give 1 (not an error: the spec only bounds `exceptions >= 0`).
+- Monte Carlo seed, Cholesky code, traffic-light bound, duplicate opening position: closed by
+  F-39 and applied.
+- Traffic light: `P(X <= x)` is summed in log space from `n ln(1 - p)`.
 - FRTB GIRR: inflation against a tenor is 40% whatever the curve; with `reporting_currency`
   absent only the seven listed currencies are reduced.
