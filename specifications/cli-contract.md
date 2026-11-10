@@ -304,6 +304,26 @@ Stage F operations are added to the table below as each wave lands.
 
 Batch notes: `rates.curve.joint_solve` and `vol.garch.estimate` iterate; a line that fails returns `E_NO_CONVERGENCE` and the batch goes on. `null` is a legal value only where a spec says so (VIX quotes, `zero_rates` outputs); elsewhere it stays `E_SCHEMA`. New policy classes: `jacobian`, `jacobian_piecewise`, `standard_error`, `aad_sensitivity`, `ift_jacobian`. New runner check `exact_zero` for structural zeros (ruling F-44). `E_LIMIT` sizes for the stage F operations: ruling F-42 (`conformance/tolerances/policy.yaml`).
 
+## Stage G operations (target contract 1.10.0)
+
+Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Operations are added to the table as each wave lands.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `rates.shortrate.zcb`, `rates.shortrate.zcb_option` | `04-pricing/short-rate-models.md` | G1 (wave 1) |
+| `exotic.barrier.price`: new optional inputs `monitoring`, `monitoring_per_year` | `04-pricing/exotics.md`, section "Stage G addition" | R9 (wave 1) |
+| `rates.shortrate.swaption` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.swaption`" | G2a (wave 2a) |
+| `rates.g2pp.zcb`, `rates.g2pp.zcb_option` | `04-pricing/short-rate-models.md`, section "G2++" | G2b (wave 2b) |
+| `rates.shortrate.hw_calibrate` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.hw_calibrate`" | G2c (wave 2c) |
+| `rates.shortrate.bermudan_swaption` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.bermudan_swaption`" | G2d (wave 2d) |
+| `rates.shortrate.capfloor` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.capfloor`" | G2e (wave 2e) |
+| `rates.shortrate.swaption`: new optional input `model` (`VASICEK`, `CIR`; default `HULL_WHITE`) | `04-pricing/short-rate-models.md`, "Stage G wave 2f" | G2f (wave 2f) |
+| `rates.shortrate.callable_bond` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.callable_bond`" | G3 (wave 2g) |
+| `risk.mc.greeks` | `06-risk/mc-greeks.md` | Q9 part 1 (wave 3a) |
+| `xva.exposure.swap_ee_hw` | `06-risk/xva-exposure.md` | G5a (wave 4a) |
+
+`E_LIMIT` sizes for the stage G operations: ruling G-6. `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
+
 ## Versioning
 
 Adding an operation or an error code is a minor version. Changing the meaning of a key, a code or an

@@ -1,0 +1,1137 @@
+{
+ "schema_version": "1.0",
+ "suite": "exposure_g",
+ "spec": "specifications/06-risk/xva-exposure.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "exposure_g-0001",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      352680.9772639925,
+      285620.69243392465,
+      204079.27487319024,
+      107026.76598534334
+     ],
+     "cva": 11043.404548926937
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "jamshidian",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "xva",
+    "exposure",
+    "pay",
+    "synthetic"
+   ],
+   "description": "PAY 0.03 swap 0.0-5.0y, 4 dates",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "exposure_g-0002",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.045,
+    "side": "PAY",
+    "exposure_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      53486.373489600956,
+      73281.87707839716,
+      66867.75260466491,
+      40535.810821338775
+     ],
+     "cva": 2705.711000311127
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "jamshidian",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "xva",
+    "exposure",
+    "pay",
+    "synthetic"
+   ],
+   "description": "PAY 0.045 swap 0.0-5.0y, 4 dates",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "exposure_g-0003",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "RECEIVE",
+    "exposure_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      25681.55771906553,
+      46001.27288899749,
+      45279.85532826363,
+      29162.776209523516
+     ],
+     "cva": 1683.993763802817
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "jamshidian",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "xva",
+    "exposure",
+    "receive",
+    "synthetic"
+   ],
+   "description": "RECEIVE 0.03 swap 0.0-5.0y, 4 dates",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "exposure_g-0004",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.045,
+    "side": "RECEIVE",
+    "exposure_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      251050.4165910066,
+      219415.9201798026,
+      160231.7957060709,
+      86314.92587295506
+     ],
+     "cva": 8332.702779186977
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "jamshidian",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "xva",
+    "exposure",
+    "receive",
+    "synthetic"
+   ],
+   "description": "RECEIVE 0.045 swap 0.0-5.0y, 4 dates",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "exposure_g-0005",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0,
+     5.5,
+     6.0,
+     6.5,
+     7.0,
+     7.5,
+     8.0,
+     8.5,
+     9.0,
+     9.5,
+     10.0
+    ],
+    "fixed_rate": 0.04,
+    "side": "PAY",
+    "exposure_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0,
+     5.5,
+     6.0,
+     6.5,
+     7.0,
+     7.5,
+     8.0,
+     8.5,
+     9.0,
+     9.5
+    ],
+    "hazard_rate": 0.015,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      144933.62920263186,
+      203167.88047943934,
+      238434.97243606544,
+      260135.93146901584,
+      273229.7929045167,
+      279192.89915871056,
+      278671.5998930892,
+      273455.7913205479,
+      264269.9552931439,
+      251664.92422867529,
+      235066.22687820307,
+      215842.90626951802,
+      194285.0721618925,
+      170628.87134661572,
+      146165.4865624092,
+      119950.72302943138,
+      92113.85110213264,
+      62776.01125573463,
+      32041.41561490203
+     ],
+     "cva": 15838.11794075477
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "jamshidian",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "xva",
+    "exposure",
+    "pay",
+    "synthetic"
+   ],
+   "description": "PAY 0.04 swap 0.0-10.0y, 19 dates",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "exposure_g-0006",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 2.0,
+    "payment_times": [
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "fixed_rate": 0.04,
+    "side": "RECEIVE",
+    "exposure_times": [
+     2.0,
+     4.0,
+     6.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      213829.48513863623,
+      169217.45082814834,
+      65677.97761934703
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "jamshidian",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "xva",
+    "exposure",
+    "receive",
+    "synthetic"
+   ],
+   "description": "RECEIVE 0.04 swap 2.0-7.0y, 3 dates",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "exposure_g-0007",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.3,
+    "sigma": 0.015,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.04,
+    "side": "PAY",
+    "exposure_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0
+    ],
+    "hazard_rate": 0.05,
+    "recovery": 0.25
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discounted_ee": [
+      100454.61222312844,
+      106152.71315307851,
+      88457.17661258364,
+      52292.395625780635
+     ],
+     "cva": 11941.891489091786
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "jamshidian",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "xva",
+    "exposure",
+    "pay",
+    "synthetic"
+   ],
+   "description": "PAY 0.04 swap 0.0-5.0y, 4 dates",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "exposure_g-0008",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     1.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "exposure time not a reset date"
+  },
+  {
+   "case_id": "exposure_g-0009",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "exposure at the last payment"
+  },
+  {
+   "case_id": "exposure_g-0010",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     2.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "exposure times not increasing"
+  },
+  {
+   "case_id": "exposure_g-0011",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "exposure at time 0"
+  },
+  {
+   "case_id": "exposure_g-0012",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "BUY",
+    "exposure_times": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "unknown side"
+  },
+  {
+   "case_id": "exposure_g-0013",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     1.0,
+     2.0
+    ],
+    "hazard_rate": 0.02
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "hazard_rate without recovery"
+  },
+  {
+   "case_id": "exposure_g-0014",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     1.0,
+     2.0
+    ],
+    "hazard_rate": -0.01,
+    "recovery": 0.4
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "hazard_rate < 0"
+  },
+  {
+   "case_id": "exposure_g-0015",
+   "operation": "xva.exposure.swap_ee_hw",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 10000000.0,
+    "start_years": 0.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": 0.03,
+    "side": "PAY",
+    "exposure_times": [
+     1.0,
+     2.0
+    ],
+    "hazard_rate": 0.01,
+    "recovery": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "recovery = 1"
+  }
+ ]
+}

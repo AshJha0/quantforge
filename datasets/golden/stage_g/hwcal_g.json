@@ -1,0 +1,671 @@
+{
+ "schema_version": "1.0",
+ "suite": "hwcal_g",
+ "spec": "specifications/04-pricing/short-rate-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hwcal_g-0001",
+   "operation": "rates.shortrate.hw_calibrate",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "swaptions": [
+     {
+      "expiry_years": 1.0,
+      "payment_times": [
+       2.0,
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.03948,
+      "swaption_type": "PAYER",
+      "target_price": 0.027739189051503528
+     },
+     {
+      "expiry_years": 2.0,
+      "payment_times": [
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039486,
+      "swaption_type": "PAYER",
+      "target_price": 0.03302750501350072
+     },
+     {
+      "expiry_years": 3.0,
+      "payment_times": [
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039554,
+      "swaption_type": "PAYER",
+      "target_price": 0.035288652993578785
+     },
+     {
+      "expiry_years": 5.0,
+      "payment_times": [
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039604,
+      "swaption_type": "PAYER",
+      "target_price": 0.030395873006313835
+     },
+     {
+      "expiry_years": 7.0,
+      "payment_times": [
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039345,
+      "swaption_type": "PAYER",
+      "target_price": 0.021061314962415565
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "sigma": 0.011504087642907404,
+     "fitted_prices": [
+      0.027204944319867745,
+      0.033372964272704135,
+      0.03495166696435742,
+      0.030869713936937007,
+      0.021068798111838906
+     ],
+     "rmse": 0.00038546085196799616
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-30",
+    "grid-scan-unique"
+   ],
+   "tags": [
+    "shortrate",
+    "calibration",
+    "synthetic"
+   ],
+   "description": "HW sigma to a 10y co-terminal strip, a = 0.05",
+   "output_classes": {
+    "sigma": "root_finding",
+    "fitted_prices": "root_finding",
+    "rmse": "root_finding"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "1-D optimum; sigma judged at 1e-9 relative"
+   }
+  },
+  {
+   "case_id": "hwcal_g-0002",
+   "operation": "rates.shortrate.hw_calibrate",
+   "inputs": {
+    "mean_reversion": 0.2,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "swaptions": [
+     {
+      "expiry_years": 1.0,
+      "payment_times": [
+       2.0,
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.03948,
+      "swaption_type": "RECEIVER",
+      "target_price": 0.011464331268766718
+     },
+     {
+      "expiry_years": 2.0,
+      "payment_times": [
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039486,
+      "swaption_type": "RECEIVER",
+      "target_price": 0.01459806165751459
+     },
+     {
+      "expiry_years": 3.0,
+      "payment_times": [
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039554,
+      "swaption_type": "RECEIVER",
+      "target_price": 0.01464224158303066
+     },
+     {
+      "expiry_years": 5.0,
+      "payment_times": [
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039604,
+      "swaption_type": "RECEIVER",
+      "target_price": 0.01306877150723518
+     },
+     {
+      "expiry_years": 7.0,
+      "payment_times": [
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039345,
+      "swaption_type": "RECEIVER",
+      "target_price": 0.009061266070615451
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "sigma": 0.009029826067099338,
+     "fitted_prices": [
+      0.011858065064074825,
+      0.014219835789495712,
+      0.01469075990327388,
+      0.012982250521960077,
+      0.009183122278206836
+     ],
+     "rmse": 0.00025407477341409283
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-30",
+    "grid-scan-unique"
+   ],
+   "tags": [
+    "shortrate",
+    "calibration",
+    "synthetic"
+   ],
+   "description": "HW sigma to a 10y co-terminal strip, a = 0.2",
+   "output_classes": {
+    "sigma": "root_finding",
+    "fitted_prices": "root_finding",
+    "rmse": "root_finding"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "1-D optimum; sigma judged at 1e-9 relative"
+   }
+  },
+  {
+   "case_id": "hwcal_g-0003",
+   "operation": "rates.shortrate.hw_calibrate",
+   "inputs": {
+    "mean_reversion": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "swaptions": [
+     {
+      "expiry_years": 1.0,
+      "payment_times": [
+       2.0,
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.03948,
+      "swaption_type": "PAYER",
+      "target_price": 0.01985073524739449
+     },
+     {
+      "expiry_years": 2.0,
+      "payment_times": [
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039486,
+      "swaption_type": "PAYER",
+      "target_price": 0.02443189856035179
+     },
+     {
+      "expiry_years": 3.0,
+      "payment_times": [
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039554,
+      "swaption_type": "PAYER",
+      "target_price": 0.025650082377603373
+     },
+     {
+      "expiry_years": 5.0,
+      "payment_times": [
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039604,
+      "swaption_type": "PAYER",
+      "target_price": 0.02270500529047743
+     },
+     {
+      "expiry_years": 7.0,
+      "payment_times": [
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039345,
+      "swaption_type": "PAYER",
+      "target_price": 0.015477765965868924
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "sigma": 0.007,
+     "fitted_prices": [
+      0.01985073524739449,
+      0.02443189856035179,
+      0.025650082377603373,
+      0.02270500529047743,
+      0.015477765965868926
+     ],
+     "rmse": 8.656950326778717e-19
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-30",
+    "grid-scan-unique"
+   ],
+   "tags": [
+    "shortrate",
+    "calibration",
+    "synthetic"
+   ],
+   "description": "HW sigma to a 10y co-terminal strip, a = 0.01",
+   "output_classes": {
+    "sigma": "root_finding",
+    "fitted_prices": "root_finding",
+    "rmse": "root_finding"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "1-D optimum; sigma judged at 1e-9 relative"
+   }
+  },
+  {
+   "case_id": "hwcal_g-0004",
+   "operation": "rates.shortrate.hw_calibrate",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "swaptions": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "calibration",
+    "synthetic"
+   ],
+   "description": "empty strip"
+  },
+  {
+   "case_id": "hwcal_g-0005",
+   "operation": "rates.shortrate.hw_calibrate",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "swaptions": [
+     {
+      "expiry_years": 1.0,
+      "payment_times": [
+       2.0,
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.03948,
+      "swaption_type": "PAYER",
+      "target_price": -0.01
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "calibration",
+    "synthetic"
+   ],
+   "description": "negative target"
+  },
+  {
+   "case_id": "hwcal_g-0006",
+   "operation": "rates.shortrate.hw_calibrate",
+   "inputs": {
+    "mean_reversion": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "swaptions": [
+     {
+      "expiry_years": 1.0,
+      "payment_times": [
+       2.0,
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.03948,
+      "swaption_type": "PAYER",
+      "target_price": 0.027739189051503528
+     },
+     {
+      "expiry_years": 2.0,
+      "payment_times": [
+       3.0,
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039486,
+      "swaption_type": "PAYER",
+      "target_price": 0.03302750501350072
+     },
+     {
+      "expiry_years": 3.0,
+      "payment_times": [
+       4.0,
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039554,
+      "swaption_type": "PAYER",
+      "target_price": 0.035288652993578785
+     },
+     {
+      "expiry_years": 5.0,
+      "payment_times": [
+       6.0,
+       7.0,
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039604,
+      "swaption_type": "PAYER",
+      "target_price": 0.030395873006313835
+     },
+     {
+      "expiry_years": 7.0,
+      "payment_times": [
+       8.0,
+       9.0,
+       10.0
+      ],
+      "fixed_rate": 0.039345,
+      "swaption_type": "PAYER",
+      "target_price": 0.021061314962415565
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "calibration",
+    "synthetic"
+   ],
+   "description": "a = 0"
+  }
+ ]
+}
