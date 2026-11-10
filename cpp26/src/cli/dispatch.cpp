@@ -304,6 +304,7 @@ struct Entry {
 #include "ops_risk_f3.inc"
 #include "ops_risk_f4.inc"
 #include "ops_book.inc"
+#include "ops_shortrate.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -327,6 +328,7 @@ constexpr std::span<const Entry> registry[] = {
     risk_f3_ops,
     risk_f4_ops,
     book_ops,
+    shortrate_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
