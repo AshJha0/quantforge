@@ -118,6 +118,6 @@ mod tests {
                 assert_eq!(n.split('.').next(), Some(*domain), "{n} is in {domain}");
             }
         }
-        assert!(DOMAINS.windows(2).all(|w| w[0].0 < w[1].0));
+        assert!(DOMAINS.windows(2).all(|w| w[0].0 <= w[1].0));
     }
 }

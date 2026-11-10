@@ -144,3 +144,53 @@ pub fn zcb(m: &Model, r: f64, t: f64, maturity: f64) -> Result<(f64, f64)> {
     };
     Ok((ln_p.exp(), -ln_p / tau))
 }
+
+/// `rates.shortrate.zcb_option` for Vasicek and Hull-White (Jamshidian):
+/// `(price, P(0, T), P(0, S))`. `r` is `r(0)` for Vasicek and ignored for Hull-White.
+pub fn zcb_option(
+    m: &Model,
+    r: f64,
+    call: bool,
+    strike: f64,
+    expiry: f64,
+    maturity: f64,
+    notional: f64,
+) -> Result<(f64, f64, f64)> {
+    crate::error::finite("strike", &strike)?;
+    crate::error::finite("expiry_years", &expiry)?;
+    crate::error::finite("notional", &notional)?;
+    if !(0.0 < expiry && expiry < maturity) || strike <= 0.0 {
+        return fail("E_DOMAIN", "need 0 < expiry < maturity and strike > 0");
+    }
+    let (a, sigma, pt, ps) = match m {
+        Model::Vasicek { a, sigma, .. } => (
+            *a,
+            *sigma,
+            zcb(m, r, 0.0, expiry)?.0,
+            zcb(m, r, 0.0, maturity)?.0,
+        ),
+        Model::HullWhite { a, sigma, curve } => {
+            zcb(m, 0.0, 0.0, maturity)?;
+            (
+                *a,
+                *sigma,
+                curve.ln_discount(expiry).exp(),
+                curve.ln_discount(maturity).exp(),
+            )
+        }
+        Model::Cir { .. } => {
+            return fail(
+                "E_UNSUPPORTED_OPERATION",
+                "CIR bond options are not in this build",
+            );
+        }
+    };
+    let sp = sigma / a
+        * -(-a * (maturity - expiry)).exp_m1()
+        * (-(-2.0 * a * expiry).exp_m1() / (2.0 * a)).sqrt();
+    let h = (ps / (strike * pt)).ln() / sp + sp / 2.0;
+    let n = crate::stats::normal_cdf;
+    let c = ps * n(h) - strike * pt * n(h - sp);
+    let v = if call { c } else { c - ps + strike * pt };
+    Ok((notional * v, pt, ps))
+}
