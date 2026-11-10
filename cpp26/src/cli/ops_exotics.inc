@@ -17,8 +17,28 @@ void op_barrier(const In& in, Out& out) {
                                                               {"DOWN_OUT", BarrierType::DownOut},
                                                               {"UP_IN", BarrierType::UpIn},
                                                               {"UP_OUT", BarrierType::UpOut}});
+    // Stage G (R9, rulings G-7, G-8): discrete monitoring by the BGK barrier shift.
+    bool discrete = false;
+    if (const auto* mon = in.find("monitoring")) {
+        if (mon->kind != Kind::String) schema("monitoring", "expected a string");
+        if (mon->text == "DISCRETE") discrete = true;
+        else if (mon->text != "CONTINUOUS") throw Error("E_INPUT", "monitoring is CONTINUOUS or DISCRETE", "monitoring");
+    }
+    const bool has_m = in.find("monitoring_per_year") != nullptr;
+    if (discrete && !has_m) throw Error("E_INPUT", "monitoring_per_year is required with DISCRETE", "monitoring_per_year");
+    if (!discrete && has_m) throw Error("E_INPUT", "monitoring_per_year is only allowed with DISCRETE", "monitoring_per_year");
+    const long long per_year = has_m ? in.integer("monitoring_per_year") : 0;
     in.ready();
-    out.key_real("price", barrier_price(m, h, rebate, type));
+    if (has_m && per_year < 1) throw Error("E_DOMAIN", "monitoring_per_year is below 1", "monitoring_per_year");
+    const double unshifted = barrier_price(m, h, rebate, type);  // the domain check uses the unshifted barrier (G-8)
+    if (!discrete) {
+        out.key_real("price", unshifted);
+        return;
+    }
+    const double beta = 0.5826;
+    const bool down = type == BarrierType::DownIn || type == BarrierType::DownOut;
+    const double shift = std::exp((down ? -beta : beta) * m.vol * std::sqrt(1.0 / double(per_year)));
+    out.key_real("price", barrier_price(m, h * shift, rebate, type));
 }
 
 void op_asian_geometric(const In& in, Out& out) {
