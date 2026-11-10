@@ -153,6 +153,16 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0014",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.MONOTONIC_LOG_CUBIC"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0019",
    "operation": "rates.ois.bootstrap",
    "library": "QuantLib",
@@ -703,6 +713,16 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "curve_f-0068",
+   "operation": "rates.curve.inspect",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "curve_f-0070",
    "operation": "rates.curve.inspect",
    "library": "QuantLib",
@@ -785,6 +805,16 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "garch_f-0009",
+   "operation": "vol.garch.estimate",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "garch_f-0010",
    "operation": "vol.garch.estimate",
    "library": "arch",
@@ -796,6 +826,16 @@
   },
   {
    "case_id": "garch_f-0011",
+   "operation": "vol.garch.estimate",
+   "library": "arch",
+   "version": "7.2.0",
+   "convention_rows": [
+    "ARCH.GARCH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "garch_f-0012",
    "operation": "vol.garch.estimate",
    "library": "arch",
    "version": "7.2.0",
@@ -1054,6 +1094,78 @@
    "version": "1.44",
    "convention_rows": [
     "SCIPY.EIGH"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3-0039",
+   "operation": "risk.curve.cross_gamma",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3-0040",
+   "operation": "risk.curve.cross_gamma",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3-0041",
+   "operation": "risk.curve.cross_gamma",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3-0042",
+   "operation": "risk.curve.cross_gamma",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3-0043",
+   "operation": "risk.curve.cross_gamma",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX",
+    "OIS.HELPER"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3-0044",
+   "operation": "risk.curve.cross_gamma",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "CRV.LOG_LINEAR_DF",
+    "IDX",
+    "OIS.HELPER"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },

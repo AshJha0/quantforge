@@ -190,3 +190,5 @@ State: `stage-f` holds 8d55279 (Q4 four-curve golden, F-28), 9f5a7a5 (waves 2 an
 | `risk_f4` | `risk.var.monte_carlo` `seed` is a u64 string (`"7"`, was `7`); the non-positive-definite case expects `E_NOT_POSITIVE_DEFINITE` (was `E_DOMAIN`) | F-39 | **all four** |
 
 No case ids moved. Spec texts updated for F-39 (the C++ lane's F4 and F5 choices are accepted and written in), and for F-35 to F-38 above.
+
+**Outside share update (2026-11-10, later):** 222 of 403 = 55.1%. WSL came back: both GARCH fits now verify with `arch`; added QuantLib checks for cross gamma (6, `MakeOIS` revaluations) and two more curve inspect cases (log-linear; log cubic with a jump). No free-source candidate is left (`oracle/OUTSIDE_GAPS_F.md`).
