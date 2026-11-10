@@ -63,6 +63,9 @@ public final class PortfolioRisk {
         for (double v : r) {
             ms += v * v;
         }
+        if (ms == 0.0) {
+            throw new QfError("E_DOMAIN", "all returns are 0", "returns"); // ruling F-39
+        }
         var[0] = ms / t;
         for (int i = 0; i < t; i++) {
             var[i + 1] = lambda * var[i] + (1.0 - lambda) * r[i] * r[i];
@@ -112,7 +115,7 @@ public final class PortfolioRisk {
         try {
             l = LinearAlgebra.cholesky(cov);
         } catch (QfError e) {
-            throw new QfError("E_DOMAIN", "covariance is not positive definite", "covariance");
+            throw new QfError("E_NOT_POSITIVE_DEFINITE", "covariance is not positive definite", "covariance");
         }
         Rng rng = Rng.seeded(seed, 0);
         double[] pnl = new double[Math.toIntExact(paths)];

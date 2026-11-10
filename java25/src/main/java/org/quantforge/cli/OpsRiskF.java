@@ -17,7 +17,7 @@ import org.quantforge.risk.PortfolioRisk;
 final class OpsRiskF {
     private OpsRiskF() {}
 
-    private enum SwapSide { PAYER, RECEIVER }
+    private enum SwapSide { PAY, RECEIVE }
 
     private static Map<String, Object> varEs(PortfolioRisk.VarEs r) {
         return Operations.out("var", r.var(), "es", r.es(), "tail_count", r.tailCount()).outputs();
@@ -51,7 +51,7 @@ final class OpsRiskF {
             double[] w = in.reals("weights");
             long paths = in.integer("paths");
             in.limit(paths > 10_000_000, "paths");
-            long seed = in.integer("seed");
+            long seed = in.u64("seed");
             double c = in.gate(in.real("confidence"));
             return new Out(varEs(PortfolioRisk.monteCarlo(mean, cov, w, paths, seed, c)), Map.of());
         });
@@ -90,7 +90,7 @@ final class OpsRiskF {
             List<BookRisk.Swap> swaps = new ArrayList<>();
             for (In s : list) {
                 swaps.add(new BookRisk.Swap(s.string("id"), s.integer("tenor_years"), s.real("fixed_rate"),
-                        s.choice("side", SwapSide.class) == SwapSide.PAYER));
+                        s.choice("side", SwapSide.class) == SwapSide.PAY));
             }
             in.gate();
             BookRisk.OisSensitivity r = BookRisk.oisSensitivity(c, asOf, quotes, interp, swaps);
@@ -133,13 +133,7 @@ final class OpsRiskF {
             Ois.checkTenor(tenor);
             double k = t.real("fixed_rate");
             double notional = t.real("notional");
-            // The cross_gamma goldens spell the side PAYER/RECEIVER; par-and-key-rate.md trades use PAY/RECEIVE.
-            String side = t.string("side");
-            org.quantforge.pricing.Pricing.Side sd = switch (side) {
-                case "PAY", "PAYER" -> org.quantforge.pricing.Pricing.Side.PAY;
-                case "RECEIVE", "RECEIVER" -> org.quantforge.pricing.Pricing.Side.RECEIVE;
-                default -> throw new org.quantforge.core.QfError("E_SCHEMA", "side: not a listed value", "side");
-            };
+            org.quantforge.pricing.Pricing.Side sd = t.choice("side", org.quantforge.pricing.Pricing.Side.class);
             org.quantforge.pricing.Pricing.OisTrade trade = new org.quantforge.pricing.Pricing.OisTrade(tc, tenor, k,
                     notional, sd);
             double bump = in.real("bump_bp");

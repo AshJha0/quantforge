@@ -64,8 +64,14 @@ class StageFVolTest {
             for (double tj : new double[] {0.5, 1.0}) {
                 double[] t = {tj * (1 - 1e-9), tj, tj * (1 + 1e-9)};
                 Surfaces.LocalVol lv = Surfaces.dupire(s, t, new double[] {k, k, k});
-                assertEquals(lv.totalVariance()[1], lv.totalVariance()[0], 3e-9 * lv.totalVariance()[1]); // SQ F-J7
-                assertEquals(lv.impliedVol()[1], lv.impliedVol()[0], 3e-9 * lv.impliedVol()[1]); // SQ F-J7
+                // ruling F-37: a step of 1e-9 T_j moves w by 1e-9 T_j w_T(T_j-)
+                double w1k = s.get(0).svi().w(k);
+                double leftSlope = tj == 0.5 ? w1k / 0.5 : (s.get(1).svi().w(k) - w1k) / 0.5;
+                double wj = lv.totalVariance()[1];
+                double bound = 1e-9 * (tj * Math.abs(leftSlope) + wj);
+                assertEquals(wj, lv.totalVariance()[0], bound);
+                // iv = sqrt(w/T): relative move at most half of (bound/w + 1e-9)
+                assertEquals(lv.impliedVol()[1], lv.impliedVol()[0], 0.5 * (bound / wj + 1e-9) * lv.impliedVol()[1]);
                 assertEquals(lv.localVol()[1], lv.localVol()[2], 1e-6 * lv.localVol()[1]); // a node is its right limit
             }
             // the short-end jump: left uses w_1/T_1, right the first interval slope; g is shared

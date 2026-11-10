@@ -270,7 +270,7 @@ abstract class SmoothCurve {
                 double z = sigma * h;
                 s[i] = (ln[i + 1] - ln[i]) / h;
                 if (z < 1e-3) {
-                    al[i] = h / 6 * (1 - z * z / 60);
+                    al[i] = h / 6 * (1 - 7 * z * z / 60); // ruling F-35
                     be[i] = h / 3 * (1 - z * z / 15);
                 } else {
                     double q = -Math.expm1(-2 * z);
@@ -300,7 +300,11 @@ abstract class SmoothCurve {
         private double[] r(double u, double h) {
             double z = sigma * h;
             if (z < 1e-3) {
-                return new double[] {(u / h) * (u * u - h * h) / 6, (3 * u * u - h * h) / (6 * h)};
+                // ruling F-35: the z^2 term of R(u) and of its derivative
+                double s2 = sigma * sigma;
+                double f = (u / h) * (u * u - h * h) / 6;
+                double g = 1 + s2 * (3 * u * u - 7 * h * h) / 60;
+                return new double[] {f * g, (3 * u * u - h * h) / (6 * h) * g + f * s2 * u / 10};
             }
             double q = -Math.expm1(-2 * z);
             double e = Math.exp(-sigma * (h - u));
