@@ -101,3 +101,8 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | F8 | Monotone convex section with eta clamped to 0 | Rule | `curve-framework.md` rule (e) | QuantLib divides 0 by 0 at the section start; the spec defines the limit |
 | F9 | Negative overnight rates under the new interpolations | Pinned | `stage_f/curve_f` ESTR builds (1W at -0.05%) | Forwards returned as computed (ruling F-19) |
 | F10 | Year-end turn solved from a spanning quote | Pinned | `stage_f/joint_f` turn cases; `turn_sensitivity` exactly 0 off the turn | Ruling F-26 |
+| G1 | Negative and zero short rates in Vasicek and Hull-White; zero short rate in CIR | Pinned | `stage_g/shortrate_g` (`r = -0.01`, `0.0`, `-0.005`; CIR `r = 0.0005`; CIR `r < 0` is `E_DOMAIN`) | Ruling G-1 |
+| G2 | Mean reversion near zero (Ho-Lee limit) | Pinned | `stage_g/shortrate_g` `a = 1e-4` case | Ruling G-2: series below `a tau = 1e-2` |
+| G3 | Hull-White bond priced at a curve pillar time | Pinned | `stage_g/shortrate_g` `t = 2.0` case | Ruling G-3: right-hand forward |
+| G4 | Negative-rate Hull-White curve (discount factors above 1) | Pinned | `stage_g/shortrate_g` `NEG` curve cases | Spec rule: no positivity check on rates |
+| G5 | Discrete barrier: absent monitoring, monthly monitoring, spot near the barrier | Pinned | `stage_g/barrier_g` | Rulings G-7, G-8 |

@@ -1,0 +1,125 @@
+# Stage G handover
+
+From the stage G spec and oracle session to the four language sessions and the lanes. Append-only. Each wave section says what a language session may read. Never read anything under `oracle/`: that is the oracle, and reading it breaks the clean room.
+
+Stage G (v0.7): rates models and xVA (plan section 4, row G), plus Q3b, Q9, A5 (plan 12.3, parameters in 12.10) and R9 (plan 13.3). All stage G goldens are in `datasets/golden/stage_g/`, run through `conformance/runner/runner.py` (it finds them by suite name). Always read `specifications/cli-contract.md` (block "Stage G operations") and `specifications/stage-g-rulings.md` with any stage G slice. The stage F rules (F-1 to F-3 finite and negative-zero inputs, F-5 names, F-6 spec template) apply to every new operation.
+
+## Wave plan
+
+| Wave | Slices | Content | Main outside oracle |
+|---|---|---|---|
+| 1 | G1, R9 | Vasicek, CIR, Hull-White bond prices and bond options; discrete barrier monitoring (BGK) | QuantLib 1.44 model objects |
+| 2 | G2, G3 | Jamshidian European swaption on Hull-White; Hull-White calibration to a swaption strip; G2++; Bermudan swaptions (tree and PDE); callable bonds | QuantLib `JamshidianSwaptionEngine`, `G2SwaptionEngine`, `TreeSwaptionEngine`, `FdHullWhiteSwaptionEngine`, `TreeCallableFixedRateBondEngine` |
+| 3 | G4, Q3b, Q9 | LMM (caplet and swaption calibration, MC pricing); AAD core in four languages on the rates models (Q3b, ruling G-9); MC Greeks by pathwise, likelihood ratio and smoothed digitals, and the model-reserve dispersion report (Q9, ruling G-10) | QuantLib `LiborForwardModel`; closed forms for the Greeks tests |
+| 4 | G5, G6 | CSA terms, netting sets, margin period of risk, collateral simulation; EE, PFE, EPE; CVA, DVA, FVA with the overlap defined, MVA, SIMM-style IM, wrong-way risk, KVA. Demo: exposure checked against ORE | ORE (Open Source Risk Engine, free) for exposure profiles; closed-form EE of a single swap under Hull-White |
+| any | A5 | Heston and SABR calibration surrogate, Python research module only, challenger tier (ruling G-11) | the full pricers |
+
+The parameters of Q3b, Q9 and A5 are fixed now (rulings G-9 to G-11), before any result is seen.
+
+## WAVE 1 READY (2026-11-10): G1 short-rate models and R9 discrete barriers
+
+Read with every slice: `specifications/cli-contract.md` (block "Stage G operations"), `specifications/stage-g-rulings.md` G-1 to G-8, `specifications/edge-case-register.md` (rows G1 to G5), `specifications/name-map.json` (regenerated: 228 operations).
+
+### G1 (suite `shortrate_g`, 78 cases): `04-pricing/short-rate-models.md`
+- New operations `rates.shortrate.zcb` and `rates.shortrate.zcb_option`, models `VASICEK`, `CIR`, `HULL_WHITE`.
+- Build notes:
+  - Small mean reversion (G-2): use `expm1` for `B` and a series for `(B - tau)/a^2` below `a tau = 1e-2`. The `a = 1e-4` golden fails a direct double evaluation by about 1e-9 relative.
+  - Hull-White curve: log-linear discount factors with `(0, 1)` as the first node; the forward at a pillar time is the right-hand one (G-3); flat forward beyond the last pillar.
+  - CIR options need a noncentral chi-square CDF to about 1e-15 relative. A Poisson-weighted sum of regularised lower incomplete gammas works (stop when past the Poisson mode and the term is below 1e-17 of the sum). Java and C++ need their own regularised incomplete gamma (series for `x < s + 1`, continued fraction otherwise). CIR option cases use class `root_finding` (1e-10).
+  - `short_rate` is required by `zcb` for every model, required by `zcb_option` for `VASICEK` and `CIR`, and refused (`E_INPUT`) by `zcb_option` for `HULL_WHITE` (G-5).
+- Property tests: put-call parity to 1e-12 per unit face; Hull-White `zcb` at `t = 0` equals the curve; `zero_rate -> short_rate` as `T - t -> 0`.
+
+### R9 (suite `barrier_g`, 32 cases): `04-pricing/exotics.md`, section "Stage G addition"
+- `exotic.barrier.price` gains `monitoring` (`CONTINUOUS` default, `DISCRETE`) and `monitoring_per_year`. Shift the barrier away from spot by `exp(0.5826 v sqrt(1/m))`, then use the stage E formula. `beta = 0.5826` exactly (G-7); the domain check uses the unshifted barrier (G-8).
+- Property test (the R9 acceptance): daily down-and-out call and put against your own exact-date MC, 40,000 paths, `core.rng` seed 20261109, within 3 SE (parameters in the spec).
+
+### Outside-oracle status (rule 11.2.5, ruling G-4)
+`shortrate_g` 61 of 78 counted (QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` on a `DiscountCurve`; every output a QuantLib value or `zero_rate` arithmetic on one). Not counted: the 15 error cases, the small-`a` case (QuantLib's cancellation) and the pillar-time case (QuantLib's centred forward). `barrier_g` 2 of 32 (the continuous rows, `AnalyticBarrierEngine`); the 25 BGK rows rest on the MC acceptance, and 5 are error cases. Wave 1: 63 of 110 = 57.3%, below the 60% floor on its own; with wave 2a (below) the stage stands at 96 of 150 = 64.0%. The floor is measured over the stage at release (G-4), error cases in the denominator.
+
+### Model inventory
+Rows MG-1 (short-rate models) and MG-2 (discrete barrier correction) added to `docs/model-inventory.md` with golden hashes.
+
+## WAVE 2a READY (2026-11-10): Jamshidian swaption on Hull-White
+
+Read: `specifications/04-pricing/short-rate-models.md`, section "`rates.shortrate.swaption`"; rulings G-12, G-13; cli-contract block "Stage G operations"; `specifications/name-map.json` (229 operations).
+
+### G2a (suite `swaption_g`, 40 cases)
+- New operation `rates.shortrate.swaption` (Hull-White only in this wave).
+- Build notes:
+  - Reuse the wave 1 Hull-White bond and bond-option code. The critical rate `r*` solves `sum c_i P(T0, Ti; r*) = 1`; the sum is strictly decreasing in `r`, so Newton from 0 with a bracket fallback converges. Solve until the sum is within 1e-15 relative of 1; a looser solve (QuantLib's engine stops near 1e-8) misses the goldens by about 3e-7 relative.
+  - Fixed accruals are time differences, first one from expiry (G-12). `payment_times` must start after `expiry_years`.
+  - `short_rate` is refused (`E_INPUT`), as for the Hull-White bond option.
+- Property test: payer minus receiver equals `annuity (forward_swap_rate - K)` to 1e-8 per unit notional.
+
+### Outside-oracle status
+`swaption_g` 33 of 40 (every value case; the 7 error cases are not counted). Stage G so far: 96 of 150 = 64.0% (`oracle/outside_register_g.json`).
+
+## WAVE 2b READY (2026-11-10): G2++ bond prices and bond options
+
+Read: `specifications/04-pricing/short-rate-models.md`, section "G2++"; ruling G-14; cli-contract block "Stage G operations"; `specifications/name-map.json` (231 operations).
+
+### G2b (suite `g2pp_g`, 38 cases)
+- New operations `rates.g2pp.zcb` (with factor states `x`, `y`) and `rates.g2pp.zcb_option` (states start at 0; `x` or `y` present is `E_INPUT`).
+- Build notes: the curve and its rules are the Hull-White ones (log-linear, `(0, 1)` first node); `P(0,t)` ratios only, no instantaneous forward, so no pillar rule is needed. Apply the G-2 small-`a` series to each factor. `rho` strictly inside `(-1, 1)`.
+- Property tests: put-call parity; `eta -> 0` gives the Hull-White price (golden `g2pp_g-0031`); `x = y = 0`, `t = 0` gives the curve.
+
+### Outside-oracle status
+`g2pp_g` 30 of 38 (every value case except the one-factor limit; QuantLib 1.44 `G2`). Stage G so far: 126 of 188 = 67.0%.
+
+## WAVE 3a READY (2026-11-10): Q9 part 1, Monte Carlo Greeks
+
+Read: `specifications/06-risk/mc-greeks.md`; rulings G-10, G-15; cli-contract block "Stage G operations"; `specifications/name-map.json` (232 operations); `specifications/01-core/rng.md`.
+
+### Q9 part 1 (suite `mcgreeks_g`, 21 cases)
+- New operation `risk.mc.greeks`: price, delta and vega with standard errors, for `CALL`, `PUT`, `DIGITAL_CALL` by `PATHWISE` (digital smoothed by a call spread of half-width `smoothing_width`), `LIKELIHOOD_RATIO` and `BUMP` (central, common draws).
+- Build notes: draws are `core.rng` stream 0, one AS 241 normal per path, in path order. Standard errors use divisor `n - 1`. `price` is always the unsmoothed payoff. Class `common_rng`; the goldens keep paths away from kinks, so indicator flips cannot happen.
+- Property test (G-10 acceptance): the digital-call check in the spec at 100,000 paths, seed 20261109.
+
+### Open item for the coordinator and owner
+G-10's variance condition (smoothed pathwise below bump) passes by a ratio of 0.9985 only: at `h S = eps` the two estimators are nearly the same call spread, so the test has little power. Its parameters were fixed before the run and are not changed here; a stronger setting needs an owner ruling.
+
+### Outside-oracle status
+`mcgreeks_g` 0 of 21: no library reproduces the `core.rng` stream (as `risk.var.monte_carlo` in stage F). Stage G so far: 126 of 209 = 60.3%, just above the 60% floor.
+
+## WAVE 4a READY (2026-11-10): closed-form swap exposure and CVA under Hull-White
+
+Read: `specifications/06-risk/xva-exposure.md`; ruling G-16 (and G-12, G-13); cli-contract block "Stage G operations"; `specifications/name-map.json` (233 operations).
+
+### G5a (suite `exposure_g`, 15 cases)
+- New operation `xva.exposure.swap_ee_hw`: discounted EE at reset dates (each point is the wave 2a swaption on the remaining swap; payer for `PAY`, receiver for `RECEIVE`) and an optional bucketed CVA.
+- Build notes: call your `rates.shortrate.swaption` code per date. Exposure times are compared to the reset dates exactly as binary64 numbers. `cva` is present only when both credit inputs are given.
+- Property test: `PAY` minus `RECEIVE` EE equals the forward value of the remaining swap.
+
+### Outside-oracle status
+`exposure_g` 7 of 15 (every value case). Stage G so far: 133 of 224 = 59.4%, just below the 60% floor (the 21 `mcgreeks_g` cases have no outside source by construction).
+
+## Status at the end of the 2026-11-10 spec session (hard stop 23:15)
+
+All work is committed locally on `stage-g` (not pushed). Nothing in the language worktrees was touched.
+
+**Specified, with goldens and oracle evidence (224 cases, 6 suites in `datasets/golden/stage_g/`):**
+
+| Wave | Suite | Cases | Outside (QuantLib 1.44) | Spec |
+|---|---|---|---|---|
+| 1 | `shortrate_g` (Vasicek, CIR, Hull-White bonds and bond options) | 78 | 61 | `04-pricing/short-rate-models.md` |
+| 1 | `barrier_g` (R9, BGK discrete monitoring) | 32 | 2 | `04-pricing/exotics.md`, "Stage G addition" |
+| 2a | `swaption_g` (Jamshidian on Hull-White) | 40 | 33 | `short-rate-models.md` |
+| 2b | `g2pp_g` (G2++ bonds and bond options) | 38 | 30 | `short-rate-models.md`, "G2++" |
+| 3a | `mcgreeks_g` (Q9 part 1) | 21 | 0 (core.rng stream) | `06-risk/mc-greeks.md` |
+| 4a | `exposure_g` (swap EE and CVA, closed form) | 15 | 7 | `06-risk/xva-exposure.md` |
+| | **Stage G so far** | **224** | **133 = 59.4%** | |
+
+Rulings G-1 to G-16 (`specifications/stage-g-rulings.md`); G-9 to G-11 fix the Q3b, Q9 and A5 parameters before any result. Acceptance runs: R9 passes (`oracle/R9_ACCEPTANCE.json`); Q9 part 1 passes (`oracle/Q9_ACCEPTANCE.json`), with the weak-power open item above. Inventory rows MG-1 to MG-4; edge-case rows G1 to G5; name map 233 operations; `quality_gate --check-specs` and `--check-register` show no new gaps. Generators: `oracle/python/gen_stage_g_w1.py` (slices G1, R9, G2A, G2B, G5A) and `gen_stage_g_q9.py`; a clean rerun reproduces every golden byte for byte.
+
+**Left for stage G:**
+- Wave 2 rest: Hull-White calibration to a swaption strip; Bermudan swaptions (tree and PDE, with a pinned reference scheme, as `exotic.american.fd`); callable bonds; G2++ swaptions.
+- Wave 3 rest: LMM; Q3b AAD core in four languages (ruling G-9 ladder benchmark); Q9 part 2, the model-reserve dispersion report (Heston, SLV, local vol) on every exotic.
+- Wave 4 rest: CSA terms, netting sets, margin period of risk, collateral simulation; simulated EE, PFE, EPE (must reproduce `exposure_g` within 3 SE); DVA, FVA with the overlap defined, MVA, SIMM-style IM, wrong-way risk, KVA; the ORE exposure demo.
+- A5 surrogate (Python research module, challenger, ruling G-11).
+- The R5 audit of the stage G specs (different model).
+- Outside share: 59.4%, 0.6 points below the floor. The QuantLib-checkable wave 2 items (calibration, Bermudans, callable bonds) should lift it.
+- Open owner decision: G-10's variance test has little power at its fixed parameters (ratio 0.9985).
+
+**Carry-over 3 (stage F outside share 51.4%): not advanced.** `oracle/OUTSIDE_GAPS_F.md` already concludes no free source is left for the 134 value cases. The only runnable item, the `garch_f-0009` arch check under WSL, adds one case and was not attempted tonight.
+
+**Next step:** the coordinator relays waves 1, 2a, 2b, 3a and 4a to the four language sessions. The spec session then continues with wave 2 (Hull-White calibration, then Bermudans with a pinned tree or PDE reference scheme and the QuantLib `TreeSwaptionEngine` and `FdHullWhiteSwaptionEngine` as convergence evidence).
