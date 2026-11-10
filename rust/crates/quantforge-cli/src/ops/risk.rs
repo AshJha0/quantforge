@@ -14,6 +14,7 @@ use super::{Outcome, plain};
 use crate::input::Inputs;
 use quantforge_core::black::Model;
 use quantforge_core::black::Option_;
+use quantforge_core::book_risk;
 use quantforge_core::corr;
 use quantforge_core::curve::Interpolation;
 use quantforge_core::error::Result;
@@ -28,6 +29,7 @@ use quantforge_core::risk_curve::Bump;
 use quantforge_core::risk_curve::KeyMode;
 use quantforge_core::risk_curve::Product;
 use quantforge_core::risk_curve::Scheme;
+use quantforge_core::risk_tools;
 use quantforge_core::surface::Position;
 
 super::registry! {
@@ -149,6 +151,103 @@ super::registry! {
                 ),
                 ("index_variance_notional", o.index_variance_notional.into()),
             ]))
+        },
+        "risk.book.ois_sensitivity" => {
+            let c = overnight(i, "convention")?;
+            let (t, m) = (i.date("as_of")?, interpolation(i)?);
+            let raw = items(i, "quotes")?;
+            let q = ois_quotes(i)?;
+            let labels: Vec<String> = raw
+                .iter()
+                .map(|r| r.str("tenor").map(str::to_string))
+                .collect::<Result<_>>()?;
+            let swaps = items(i, "swaps")?
+                .iter()
+                .map(|s| {
+                    let payer = match s.str("side")? {
+                        "PAYER" => true,
+                        "RECEIVER" => false,
+                        _ => return s.fail("side", "PAYER or RECEIVER"),
+                    };
+                    Ok(book_risk::BookSwap {
+                        id: s.str("id")?.to_string(),
+                        tenor_years: s.int("tenor_years")?,
+                        fixed_rate: s.f64("fixed_rate")?,
+                        payer,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let r = book_risk::ois_sensitivity(&c, t, &q, m, &swaps)?;
+            let strs = |v: Vec<String>| Json::Arr(v.into_iter().map(Json::from).collect());
+            let rows = |m: Vec<Vec<f64>>| Json::Arr(m.into_iter().map(Json::from).collect());
+            let ids: Vec<String> = swaps.iter().map(|s| s.id.clone()).collect();
+            let pillars: Vec<String> = r.pillars.iter().map(ToString::to_string).collect();
+            plain(obj([
+                ("pv", r.pv.into()),
+                ("book_pv", r.book_pv.into()),
+                (
+                    "quote_sensitivity",
+                    obj([
+                        ("swaps", strs(ids)),
+                        ("quotes", strs(labels.clone())),
+                        ("matrix", rows(r.quote_sensitivity)),
+                    ]),
+                ),
+                ("book_sensitivity", r.book_sensitivity.into()),
+                (
+                    "zero_jacobian",
+                    obj([
+                        ("pillars", strs(pillars)),
+                        ("quotes", strs(labels)),
+                        ("matrix", rows(r.zero_jacobian)),
+                    ]),
+                ),
+            ]))
+        },
+        "risk.curve.pca" => {
+            let x = i.matrix("changes")?;
+            let k = i.int("components")?;
+            i.gate()?;
+            let r = risk_tools::pca(&x, k)?;
+            let rows: Vec<Json> = r.loadings.into_iter().map(Json::from).collect();
+            plain(obj([
+                ("eigenvalues", r.eigenvalues.into()),
+                ("loadings", Json::Arr(rows)),
+                ("explained_ratio", r.explained_ratio.into()),
+            ]))
+        },
+        "risk.curve.cross_gamma" => {
+            let curve = curve_input(i, "curve")?;
+            let p = cross_gamma_product(i)?;
+            let bp = i.f64("bump_bp")?;
+            i.gate()?;
+            let (v, g) = risk_curve::cross_gamma(&curve, &p, bp)?;
+            let rows: Vec<Json> = g.into_iter().map(Json::from).collect();
+            plain(obj([("value", v.into()), ("cross_gamma", Json::Arr(rows))]))
+        },
+        "risk.credit.jtd" => {
+            let ps = items(i, "positions")?
+                .iter()
+                .map(|p| {
+                    let kind = match p.str("kind")? {
+                        "BOND" => risk_tools::JtdKind::Bond,
+                        "CDS_PROTECTION_BUYER" => risk_tools::JtdKind::ProtectionBuyer,
+                        "CDS_PROTECTION_SELLER" => risk_tools::JtdKind::ProtectionSeller,
+                        _ => return p.fail("kind", "unknown kind"),
+                    };
+                    p.str("id")?;
+                    Ok(risk_tools::JtdPosition {
+                        kind,
+                        notional: p.f64("notional")?,
+                        recovery: p.f64("recovery")?,
+                        market_value: p.f64("market_value")?,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let (v, t) = risk_tools::jtd(&ps)?;
+            plain(obj([("jtd", v.into()), ("total", t.into())]))
         },
         "risk.curve.par" => {
             let c = overnight(i, "convention")?;
@@ -358,4 +457,26 @@ pub(crate) fn key_dates(i: &Inputs) -> Result<Option<Vec<quantforge_core::dates:
         None | Some(Json::Null) => Ok(None),
         Some(_) => Ok(Some(i.dates("key_dates")?)),
     }
+}
+
+/// The cross-gamma goldens spell the OIS side `PAYER` / `RECEIVER` (as the book swaps do), while
+/// `ois-curves.md` says `PAY` / `RECEIVE`; both are read here (`SPEC_QUESTIONS.md`, wave 2).
+fn cross_gamma_product(i: &Inputs) -> Result<Product> {
+    let p = sub(i, "product")?;
+    if p.str("kind")? == "OIS" {
+        let t = sub(&p, "trade")?;
+        let pay = match t.str("side")? {
+            "PAY" | "PAYER" => true,
+            "RECEIVE" | "RECEIVER" => false,
+            _ => return t.fail("side", "unknown side"),
+        };
+        return Ok(Product::Ois(quantforge_core::ois::OisTrade {
+            convention: overnight(&t, "convention")?,
+            tenor: tenor(&t, "tenor")?,
+            fixed_rate: t.f64("fixed_rate")?,
+            notional: t.f64("notional")?,
+            pay,
+        }));
+    }
+    product(i)
 }

@@ -200,3 +200,19 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
   (or anywhere, for a non-local method) does move. Rust reports the honest `d model / d ln factor`
   (it is the `dR/dx` column), so those zeros are not forced. On `OIS_STEPS` curves the zeros are
   exact. The goldens only have steps-curve turns, so nothing fails today.
+
+## Stage F wave 2 (F3), choices and findings
+
+- `risk.book.ois_sensitivity`: reverse-mode AAD on a tape (`aad.rs`), one sweep per residual
+  for `dR/dx` and one per swap for `x_bar`, then `(dR/dx)^T lambda = x_bar` (F-29). The zero
+  Jacobian solves `dR/dx` by forward substitution when it is exactly lower triangular, so the
+  F-30 zeros are exact. The tape mirrors `LOG_LINEAR_DF` and `LINEAR_ZERO`; other methods are
+  `E_INPUT` for now (the spec allows any `rates.ois.bootstrap` method; the goldens use log-linear).
+- `risk.curve.cross_gamma` goldens spell the OIS `side` as `PAYER` / `RECEIVER`, but
+  `ois-curves.md` and every older OIS trade golden use `PAY` / `RECEIVE`. Rust reads both
+  spellings for this operation only. Spec: please pick one.
+- Cross gamma at 1 bp on a 1e6 notional loses about 1.5e-10 to binary64 cancellation if the
+  formula is summed directly, which is over the `interpolation` 1e-10 limit. On log-linear and
+  linear-zero curves Rust evaluates the same formula in closed form per exponential term
+  (`4 sinh^2(g h/2)` and `sinh(g_i h) sinh(g_j h)`), which matches the 40-digit goldens. Other
+  products and interpolations use the direct formula.

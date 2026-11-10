@@ -144,6 +144,73 @@ pub fn eigen_symmetric(a: &Matrix) -> Result<Vec<f64>> {
 }
 
 /// Singular values by one-sided Jacobi rotations.
+/// Cyclic Jacobi on a symmetric matrix: `(values, vectors)` with `vectors[k]` the unit
+/// eigenvector of `values[k]`, in descending order of value.
+pub fn eigen_pairs(a: &Matrix) -> Result<(Vec<f64>, Vec<Vec<f64>>)> {
+    let n = check_symmetric(a)?;
+    let mut m = a.clone();
+    for i in 0..n {
+        for j in 0..i {
+            let v = (m[i][j] + m[j][i]) / 2.0;
+            m[i][j] = v;
+            m[j][i] = v;
+        }
+    }
+    let mut v: Matrix = (0..n)
+        .map(|i| (0..n).map(|j| f64::from(u8::from(i == j))).collect())
+        .collect();
+    for _ in 0..100 {
+        let off: f64 = (0..n)
+            .flat_map(|i| (0..i).map(move |j| (i, j)))
+            .map(|(i, j)| m[i][j] * m[i][j])
+            .sum();
+        if off == 0.0 {
+            break;
+        }
+        for p in 0..n {
+            for q in p + 1..n {
+                if m[p][q] == 0.0 {
+                    continue;
+                }
+                let theta = (m[q][q] - m[p][p]) / (2.0 * m[p][q]);
+                let sign = if theta < 0.0 { -1.0 } else { 1.0 };
+                let t = if theta.abs() > 1e150 {
+                    0.5 / theta
+                } else {
+                    sign / (theta.abs() + (theta * theta + 1.0).sqrt())
+                };
+                let c = 1.0 / (t * t + 1.0).sqrt();
+                let s = t * c;
+                for k in 0..n {
+                    let (kp, kq) = (m[k][p], m[k][q]);
+                    m[k][p] = c * kp - s * kq;
+                    m[k][q] = s * kp + c * kq;
+                }
+                for k in 0..n {
+                    let (pk, qk) = (m[p][k], m[q][k]);
+                    m[p][k] = c * pk - s * qk;
+                    m[q][k] = s * pk + c * qk;
+                }
+                for k in 0..n {
+                    let (kp, kq) = (v[k][p], v[k][q]);
+                    v[k][p] = c * kp - s * kq;
+                    v[k][q] = s * kp + c * kq;
+                }
+                m[p][q] = 0.0;
+                m[q][p] = 0.0;
+            }
+        }
+    }
+    let mut order: Vec<usize> = (0..n).collect();
+    order.sort_by(|&x, &y| m[y][y].total_cmp(&m[x][x]));
+    let values = order.iter().map(|&k| m[k][k]).collect();
+    let vectors = order
+        .iter()
+        .map(|&k| (0..n).map(|i| v[i][k]).collect())
+        .collect();
+    Ok((values, vectors))
+}
+
 pub fn singular_values(a: &Matrix) -> Vec<f64> {
     let (rows, n) = (a.len(), a.first().map_or(0, Vec::len));
     let mut m = a.clone();

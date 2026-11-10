@@ -7,9 +7,11 @@
     clippy::manual_range_contains
 )]
 
+pub mod aad;
 pub mod arb_surface;
 pub mod black;
 pub mod bonds;
+pub mod book_risk;
 pub mod calendar;
 pub mod calib;
 pub mod caps;
@@ -53,6 +55,7 @@ pub mod rates_overnight;
 pub mod rates_vol;
 pub mod risk;
 pub mod risk_curve;
+pub mod risk_tools;
 pub mod rng;
 pub mod root;
 pub mod sabr;
