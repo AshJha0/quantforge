@@ -50,8 +50,8 @@ All residuals together, by Newton or any proven method, until every residual is 
 
 - `curves`: one entry per curve in input order: `{name, pillars: [{date, discount_factor}]}` (`discount_factor` the full `D`, jumps and turns included) for pillar curves; `{name, base_rate, step_rates}` for `OIS_STEPS`.
 - `turn_factors`: `[{curve, date, factor}]` in unknown order.
-- `jacobian`: `{unknowns: [labels], quotes: [ids], matrix}` with `matrix[i][j] = d unknown_i / d quote_j` at the solution, by the implicit function theorem: `J = -(dR/dx)^{-1} (dR/dq)`. `dR/dq` is `-1` on the diagonal for rate and spread quotes; for a `FUTURE` quoted by `price` it is `0.01 e^{-z}` (the derivative of `-(futures_rate - convexity)` in `price`, with `z` from `futures-convexity.md`). Entries for an unknown of a curve and a quote of a later curve are exactly 0 (block structure, ruling F-25).
-- `turn_sensitivity`: one row per turn, in turn order: `d model_j / d ln factor` for every instrument `j` (in instrument order), at the solution with all other unknowns held. An instrument whose dates all lie on one side of the turn date has exactly 0 (ruling F-26).
+- `jacobian`: `{unknowns: [labels], quotes: [ids], matrix}` with `matrix[i][j] = d unknown_i / d quote_j` at the solution, by the implicit function theorem: `J = -(dR/dx)^{-1} (dR/dq)`. `dR/dq` is diagonal: `-1` for rate quotes; for an `XCCY` quote (the residual is the leg value with the spread inside it) it is the spread annuity `sum alpha_i D_f(e_i)` on the solved foreign discount curve; for a `FUTURE` quoted by `price` it is `0.01 e^{-z}` (the derivative of `-(futures_rate - convexity)` in `price`, with `z` from `futures-convexity.md`). Entries for an unknown of a curve and a quote of a later curve are exactly 0 (block structure, ruling F-25).
+- `turn_sensitivity`: one row per turn, in turn order: `d model_j / d ln factor` for every instrument `j` (in instrument order), at the solution with all other unknowns held. On an `OIS_STEPS` curve an instrument whose dates all lie on one side of the turn date has exactly 0; on a pillar curve it may not, because the pillar unknowns are full `ln D` (ruling F-26, amended).
 - Diagnostic: `max_repricing_error`, required.
 
 ### Checks, in order
@@ -82,8 +82,8 @@ and `s` stays at `s_n` beyond the last quote. Outputs: `spreads` (`s_i`, continu
 ## Acceptance (plan Q4)
 
 - The joint build reprices every instrument to 1e-13 (the plan asks 1e-10); goldens compare pillars, step rates and turn factors in class `interpolation`.
-- Cross-curve Jacobian: matches bump-and-rebuild (Richardson, `h = 1e-4` and `5e-5` on each quote, the full joint solve rebuilt each time) to `|J - ref| <= 1e-9 + 1e-6 |ref|` (policy class `jacobian`; a build that forms `dR/dx` by central differences meets it). The structural zeros are exact.
-- A turn move affects only overlapping instruments: `turn_sensitivity` is exactly 0 for every instrument that does not span the turn, nonzero for those that do (goldens).
+- Cross-curve Jacobian: matches bump-and-rebuild (Richardson at `h` and `h/2` on each quote, the full joint solve rebuilt each time; `h` starts at 1e-4 and is halved until the reference is kink-free and converged, ruling F-28; the four-curve monotone convex system needs a step near 1e-6, recorded in its case's `verified_by`) to `|J - ref| <= 1e-9 + 1e-6 |ref|` (policy class `jacobian`; a build that forms `dR/dx` by central differences meets it). The structural zeros are exact.
+- On `OIS_STEPS` curves a turn move affects only overlapping instruments: `turn_sensitivity` is exactly 0 for every instrument that does not span the turn and nonzero for those that do. On pillar curves the goldens hold the honest column (ruling F-26, amended).
 - Outside checks (rule 11.2.5): each `OIS` and `PROJECTION` curve of a log-linear or stage F interpolation is rebuilt by QuantLib 1.44 (`PiecewiseYieldCurve` with `OISRateHelper`, `DepositRateHelper`, `FraRateHelper`, `SwapRateHelper` with the exogenous discount handle) and its pillars compared; the Jacobian is compared with bump-and-rebuild through QuantLib. Cases where every output is reproduced count; `XCCY` (constant notional, synthetic), `OIS_STEPS` with futures and turns have no QuantLib builder that reproduces them and do not count.
 
 ## Sources

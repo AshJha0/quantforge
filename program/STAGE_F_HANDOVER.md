@@ -102,3 +102,69 @@ The Q4 section above ("F1 Q4 joint solve and funding curve") is now ready, with 
 **Open item (spec session, next turn):** the full system (SOFR monotone convex with a solved turn + term + ESTR monotonic log cubic + EUR xccy) solves to 1.6e-15, but its IFT Jacobian differs from bump-and-rebuild by up to 2e-3, so it is left out of the goldens (`gen_stage_f_q4.py`, `systems()[0]`, skipped in `main`). Suspects: a convex-monotone section at a branch boundary (the method is piecewise in its data, so its Jacobian is one-sided there), or the xccy `dR/dq`. Diagnostic script pattern: solve, `jacobian()`, `bump_jacobian()`, print the worst entries. Builds should implement the full operation regardless; the missing golden does not change the spec.
 
 Outside share after wave 1: 52 of 171 = 30.4% (ruling F-23), below the 60% floor.
+
+
+### Resume here (checkpoint 2026-11-09 22:15; laptop off at 23:00)
+1. **Merge main first.** Part 1 merged to main as PR #25 (`5c8fa9d`): `git merge main` into `stage-f` before any new work.
+2. **Four-curve Jacobian mismatch (Q4 open item).** Run `cd oracle/python && uv run python -u -W ignore diag_q4_jacobian.py`. The three committed systems pass (max excess below 0). Only `systems()[0]` fails (up to 2e-3 against bump-and-rebuild), and the script prints its four worst entries last. The 2026-11-09 run was stopped at the shutdown, before that output. Read the worst entries' rows and columns:
+   - **XCCY quote columns wrong.** Check `System.dRdq` for `XCCY`: the residual is `L_foreign` and its derivative in `spread` is `sum alpha_i D_f(e_i)` on the foreign discount curve being solved. Also check that bumping `spread` in `bump_jacobian` uses the same key.
+   - **USD-SOFR rows wrong** (monotone convex with the turn). Test whether a section sits on a branch boundary (`g0`, `g1` near a rule switch in `interp_f._cm_sections`). If so, either move the quotes off the boundary and assert a margin in the generator, as the stage E goldens do with `away()`, or state in the spec that the Jacobian of a piecewise method is one-sided at a boundary.
+   - **Turn column wrong.** Check that the turn unknown's columns in `dR/dx` and the `turn_sensitivity` zeroing agree.
+
+   When it passes, remove the skip in `gen_stage_f_q4.py` `main` (the "OPEN" comment) and rerun it (about 5 minutes). Then rerun `outside_f.py` and the stub replay, update the `joint_f` hash in `docs/model-inventory.md` (MF-5, MF-6), and tell the coordinator the new case count.
+3. Then the items in "Where to resume" above: R8 coverage, E1 for the new stage F operations, waves 2 and 3.
+
+**Diagnostic result (2026-11-09 22:17).** Full system max excess 1.99e-3. The worst entries, IFT against bump:
+- `USD-SOFR:turn:2026-12-31` / `SOFR-3M`: 0.18997 against 0.19196.
+- `USD-TERM-3M` pillars 2028-11-13, 2031-11-12, 2036-11-12 / `SOFR-2Y`: errors of about 5e-4 each.
+
+No XCCY column appears, so the xccy suspect is unlikely. The errors sit in SOFR quote columns (3M near the turn, 2Y), which points to the monotone-convex SOFR curve. Check whether a section near 3M or 2Y switches branch rule under a 1e-4 quote bump (compare `interp_f._cm_sections` branch kinds at `x` and at the bumped solutions). If it does, the 1e-4 Richardson bump straddles a kink: use a smaller bump for the reference (1e-6) and compare again, then either keep the quotes off the boundary with an asserted margin or state one-sided derivatives in the spec.
+
+## Q4 FOUR-CURVE GOLDEN READY (2026-11-10): `joint_f` is now 14 cases, re-run it
+
+The held-back four-curve system (SOFR monotone convex with a solved turn + term + ESTR monotonic log cubic + EUR xccy) is in the goldens as `joint_f-0001`. **Case ids moved by one**: re-run the whole `joint_f` suite, do not compare by old id. Read ruling F-28 and the amended F-26 in `specifications/stage-f-rulings.md`, and the amended `dR/dq` line in `joint-solve-and-funding.md`.
+
+- **Cause:** the 2e-3 mismatch was the bump reference, not the IFT golden. The monotone convex SOFR curve is piecewise in its data, and a middle section changes region about 6e-5 away in the SOFR-2Y quote (SOFR-3M similar), so a `h = 1e-4` Richardson bump straddled a kink. The first and last sections sit at `g1/g0 = -2` and `-1/2` exactly by the endpoint rule; rounding flips there are harmless (the regions agree on that line).
+- **Fix (F-28):** the generator halves the reference step from 1e-4 until no interior section changes region under any `+-h`, `+-h/2` bump and the `h^4` error estimate is below half the `jacobian` tolerance. The four-curve case needs `h = 6.25e-6` (in its `verified_by`); the other three keep `5e-5`.
+- **Build note (from the Rust lane, thanks):** your own `dR/dx` stencil can also straddle a kink. A fixed five-point 1e-5 stencil puts `turn` / `SOFR-1M` at 0.11714 instead of 0.11790. The oracle's Richardson 1e-5 / 5e-6 central differences give 0.1178976 and pass. Rust's per-column adaptive stencil (shrink until two steps agree) is a good pattern.
+- **F-26 amended:** `turn_sensitivity` is exactly 0 for non-spanning instruments only on `OIS_STEPS` curves. On pillar curves it is the honest `dR/dx` column: in the four-curve case `SOFR-1M` has about -0.023.
+- **XCCY `dR/dq`:** the spread annuity `sum alpha_i D_f(e_i)`, not -1 (the oracle always used this; the text now says so).
+- Stub replay 14 of 14. Outside: still 1 of 14 (the log-linear system); the four-curve case has an xccy curve, which QuantLib cannot build.
+
+## WAVE 2 READY (2026-11-10): F3 sensitivities and F4 portfolio risk
+
+Read with every slice: `specifications/cli-contract.md` (rows F3, F4), `specifications/stage-f-rulings.md` F-29 to F-33, `conformance/tolerances/policy.yaml` (new classes `aad_sensitivity`, `ift_jacobian`), `specifications/name-map.json` (regenerated: 226 operations).
+
+### F3 (suite `risk_f3`, 54 cases): `06-risk/book-sensitivities.md`
+- `risk.book.ois_sensitivity` (Q3a, the T row): PVs, par-quote sensitivities and the zero-rate Jacobian of an OIS book. Case 1 is the 500-swap book (core.rng seed 20261109, written into the input). **Rust:** reverse-mode AAD through the IFT (the reference, ruling F-29), plus a unit test against its own Richardson bump (`h = 1e-4`, `5e-5`). **C++, Java, Python:** an exact chain rule (closed form or forward duals). Central differences on the unknowns are not enough for `1e-8` relative. Zero-Jacobian entries above the diagonal are exactly 0 (F-30).
+- `risk.curve.pca`, `risk.curve.cross_gamma`, `risk.credit.jtd`: small. PCA's sign rule is the largest-absolute entry positive; repeated eigenvalues are `E_DOMAIN`.
+- Goldens come from a 40-digit replica, with no bump in the golden.
+
+### F4 (suites `risk_f4`, 102 cases, and `frtb_f`, 16): `06-risk/var-es-and-backtests.md`, `06-risk/frtb-sa-girr.md`
+- VaR/ES: historical, filtered historical (EWMA seeded with the mean square), parametric, Monte Carlo (core.rng, Cholesky). Order statistic `k = ceil(n c)`; ES includes the VaR scenario (F-31).
+- Backtests: Kupiec, Christoffersen, traffic light (Basel 1996 zones and plus factors). An LR below 1e-12 is 0 (F-32): implement this, or p-values near 1 fail by 1e-7.
+- FRTB-SA GIRR delta under MAR21, three correlation scenarios, with the alternative `S_b` (F-33).
+
+## WAVE 3 READY (2026-11-10): F5 book and use case 4
+
+Read ruling F-34 and the cli-contract rows F5.
+- `book.lifecycle.apply`, `book.marks.resolve` (suite `book_f`, 32 cases): `07-portfolio/book-lifecycle.md`. Average cost; expiry, default and roll as trades; marks fall back by source, then to stale within `max_age_days`; IPV flag. This is a new `book` domain in each language (name map).
+- `usecase.factor_attribution` (suite `uc4_f`, 27 cases): `04-pricing/use-cases.md` use case 4. OLS with an intercept; `mean_return = alpha + sum contributions`.
+
+### Outside-oracle status after waves 2 and 3 (ruling F-23)
+182 of 403 = 45.2% (was 52 of 171 = 30.4%). New outside: PCA 24 (SciPy `eigh`), VaR/backtests 82 (SciPy, NumPy `inverted_cdf`), use case 4 24 (SciPy `lstsq`). The floor of 60% is still not met. What remains has no free outside source: R7 (Pedersen 2003 not available; known issue in the README), GARCH, FRTB (MAR21 has no worked example), the book rules (own conventions), FHS and MC VaR. Raising the share further needs either new outside sources (the `arch` package for GARCH and FHS would be the next candidate, if added to the oracle environment) or a ruling on the floor.
+
+### Deferred to wave 2b (not specified here)
+Inflation01, dividend and borrow sensitivity, correlation sensitivity (F3); reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves (F4); FRTB vega, curvature and the other risk classes. E1 cases for the stage F operations are still missing (`gen_stage_f_e1.py` skips `stage_f`; change it to skip only `e1_*` and rerun).
+
+## R8 coverage study done (2026-11-10)
+
+`oracle/R8_COVERAGE.json`: 200 simulated series of 2,000 per distribution; share of fits whose ±2 SE interval holds the true parameter. NORMAL (omega, alpha, beta) 0.98, 0.94, 0.98; STUDENT_T (omega, alpha, beta, nu) 0.95, 0.935, 0.955, 0.96. Every value is inside the preregistered band [0.90, 0.99], so the R8 standard errors are confirmed. (Run: `uv run python -W ignore gen_stage_f_f6.py COVER`, several hours when the machine is shared.)
+
+### Resume here (spec session checkpoint, 2026-11-10)
+State: `stage-f` holds 8d55279 (Q4 four-curve golden, F-28), 9f5a7a5 (waves 2 and 3), a3cd572 (R8 coverage), and this note. Everything is committed locally; **nothing is pushed**.
+1. **E1 for the stage F operations.** In `gen_stage_f_e1.py`, change the skip rule to skip only `e1_*` files, rerun, then stub-replay `e1_*`. This adds E1 cases for every wave 1 to 3 operation. Announce the new case count, since ids renumber.
+2. **Outside share 45.2% (182 of 403), floor 60%.** Candidates: add `arch` to the oracle environment and check `garch_f` estimates and the FHS cases against it; check FRTB against any published bank or vendor example the R5 audit can find. Otherwise ask the owner for a ruling on the floor for stage F.
+3. **Known issues to carry into the release notes:** R7 has no outside case (Pedersen 2003); the FRTB `low` scenario formula needs checking against the BIS PDF (F-33); the equity FRTB parameters were read only in summary.
+4. **Wave 2b list** (above): specify it when the lanes are through waves 2 and 3, or move it to stage G with a ruling.
+5. Then the R5 audit (Sonnet, read-only) over waves 1 to 3, the docs review, and the part 2 PR and v0.6.0 as in `STAGE_F_RESUME.md`.

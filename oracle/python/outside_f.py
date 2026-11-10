@@ -32,6 +32,12 @@ ROWS = {
     "IDX": ("01-core/conventions.md SOFR, SONIA, ESTR", "ql.Sofr(), ql.Sonia(), ql.Estr()"),
     "TERM.HELPERS": ("02-curves/projection-and-fra.md USD-TERM-3M deposits, FRAs, swaps", "IborIndex TERM 3M (2 days, US GovernmentBond, ModifiedFollowing, Actual360); DepositRateHelper, FraRateHelper, SwapRateHelper(Annual, ModifiedFollowing, Thirty360 BondBasis, exogenous discount)"),
     "CRV.LOG_LINEAR_DF": ("02-curves/curve-framework.md LOG_LINEAR_DF", "PiecewiseLogLinearDiscount(ref, helpers, Actual365Fixed)"),
+    "SCIPY.CHI2": ("06-risk/var-es-and-backtests.md Kupiec, Christoffersen p-values", "scipy.stats.chi2.sf(lr, dof); likelihood ratios from scipy.stats.binom.logpmf and scipy.special.xlogy"),
+    "SCIPY.BINOM": ("06-risk/var-es-and-backtests.md traffic light", "scipy.stats.binom.cdf(x, n, 1 - c); zones at 0.95 and 0.9999; plus factor Basel 1996 Table 2"),
+    "SCIPY.NORM": ("06-risk/var-es-and-backtests.md parametric VaR and ES", "scipy.stats.norm.ppf; ES by scipy.integrate.quad of the normal tail (not the closed form)"),
+    "NUMPY.QUANTILE": ("06-risk/var-es-and-backtests.md historical VaR", "numpy.quantile(losses, c, method='inverted_cdf') (Hyndman and Fan type 1); ES as the mean of losses at or above it (continuous data, no ties)"),
+    "SCIPY.EIGH": ("06-risk/book-sensitivities.md PCA", "numpy.cov(ddof=1); scipy.linalg.eigh (LAPACK syevr); sign rule of the spec"),
+    "SCIPY.LSTSQ": ("04-pricing/use-cases.md use case 4 factor attribution", "scipy.linalg.lstsq on [1, F] (LAPACK gelsd); R^2, residual vol and standard errors from its residuals and numpy.linalg.inv of X'X"),
     "CBOE.SAMPLE": ("05-volatility/vix-index.md Cboe sample", "Cboe Volatility Index Methodology v6.0, Appendix 3 printed values (F, K0, sigma^2, VIX)"),
 }
 LAGS = {"SOFR": (2, 2), "ESTR": (2, 2), "SONIA": (0, 0)}
@@ -165,7 +171,96 @@ def h_joint(i):
             "turn_sensitivity": []}, {"CRV." + c["interpolation"] for c in i["curves"]} | {"OIS.HELPER", "IDX", "TERM.HELPERS"}
 
 
-HANDLERS = {"rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
+def h_kupiec(i):
+    from scipy import stats, special
+    n, x, p = i["observations"], i["exceptions"], 1 - i["confidence"]
+    lr = max(2 * (stats.binom.logpmf(x, n, x / n) - stats.binom.logpmf(x, n, p)), 0.0)
+    lr = 0.0 if lr < 1e-12 else lr  # spec rule, ruling F-32
+    return {"lr_uc": lr, "p_value": float(stats.chi2.sf(lr, 1))}, {"SCIPY.CHI2"}
+
+
+def h_christ(i):
+    from scipy import stats
+    from scipy.special import xlogy
+    I = [int(v) for v in i["exceptions"]]
+    out, _ = h_kupiec({"observations": len(I), "exceptions": sum(I), "confidence": i["confidence"]})
+    nn = {(a, b): 0 for a in (0, 1) for b in (0, 1)}
+    for a, b in zip(I, I[1:]):
+        nn[(a, b)] += 1
+    n00, n01, n10, n11 = nn[(0, 0)], nn[(0, 1)], nn[(1, 0)], nn[(1, 1)]
+    pi = (n01 + n11) / (n00 + n01 + n10 + n11)
+    p01 = n01 / (n00 + n01) if n00 + n01 else 0.0
+    p11 = n11 / (n10 + n11) if n10 + n11 else 0.0
+    l0 = xlogy(n00 + n10, 1 - pi) + xlogy(n01 + n11, pi)
+    l1 = xlogy(n00, 1 - p01) + xlogy(n01, p01) + xlogy(n10, 1 - p11) + xlogy(n11, p11)
+    ind = max(-2 * (l0 - l1), 0.0)
+    ind = 0.0 if ind < 1e-12 else ind  # ruling F-32
+    cc = out["lr_uc"] + ind
+    return {"lr_uc": out["lr_uc"], "lr_ind": ind, "lr_cc": cc, "p_uc": out["p_value"], "p_ind": float(stats.chi2.sf(ind, 1)), "p_cc": float(stats.chi2.sf(cc, 2)),
+            "transitions": {"n00": n00, "n01": n01, "n10": n10, "n11": n11}}, {"SCIPY.CHI2"}
+
+
+def h_traffic(i):
+    from scipy import stats
+    n, x, c = i["observations"], i["exceptions"], i["confidence"]
+    cum = float(stats.binom.cdf(x, n, 1 - c))
+    zone = "GREEN" if cum < 0.95 else ("YELLOW" if cum < 0.9999 else "RED")
+    plus = ({5: .40, 6: .50, 7: .65, 8: .75, 9: .85}.get(x, 0.0 if x <= 4 else 1.0)) if (n == 250 and c == .99) else None
+    return {"cumulative_probability": cum, "zone": zone, "plus_factor": plus}, {"SCIPY.BINOM"}
+
+
+def h_param(i):
+    from scipy import stats, integrate
+    mu, sd, c = i["mean"], i["std"], i["confidence"]
+    z = stats.norm.ppf(c)
+    tail = integrate.quad(lambda u: u * stats.norm.pdf(u), z, math.inf, epsabs=0, epsrel=1e-13, limit=200)[0] / (1 - c)
+    return {"var": -mu + sd * z, "es": -mu + sd * tail}, {"SCIPY.NORM"}
+
+
+def h_hist(i):
+    import numpy as np
+    L = -np.array(i["pnl"], float)
+    v = float(np.quantile(L, i["confidence"], method="inverted_cdf"))
+    t = L[L >= v]
+    return {"var": v, "es": float(np.mean(t)), "tail_count": int(t.size)}, {"NUMPY.QUANTILE"}
+
+
+def h_pca(i):
+    import numpy as np
+    from scipy import linalg
+    X = np.array(i["changes"], float)
+    w, V = linalg.eigh(np.cov(X.T, ddof=1))
+    o = np.argsort(-w)
+    w, V = w[o], V[:, o]
+    k = i["components"]
+    L = []
+    for j in range(k):
+        v = V[:, j]
+        b = max(range(len(v)), key=lambda r: (abs(v[r]), -r))
+        L.append(list(-v if v[b] < 0 else v))
+    return {"eigenvalues": list(w), "loadings": L, "explained_ratio": list(w[:k] / w.sum())}, {"SCIPY.EIGH"}
+
+
+def h_uc4(i):
+    import numpy as np
+    from scipy import linalg
+    y = np.array(i["portfolio_returns"], float)
+    F = np.array(i["factor_returns"], float)
+    T, K = F.shape
+    X = np.column_stack([np.ones(T), F])
+    b, ssr, _, _ = linalg.lstsq(X, y)
+    res = y - X @ b
+    ssr = float(res @ res)
+    s2 = ssr / (T - K - 1)
+    inv = np.linalg.inv(X.T @ X)
+    return {"alpha": float(b[0]), "betas": list(b[1:]), "r_squared": 1 - ssr / float(((y - y.mean()) ** 2).sum()),
+            "contributions": list(b[1:] * F.mean(axis=0)), "mean_return": float(y.mean()), "residual_vol": math.sqrt(s2),
+            "beta_se": [math.sqrt(s2 * inv[k + 1, k + 1]) for k in range(K)]}, {"SCIPY.LSTSQ"}
+
+
+HANDLERS = {"usecase.factor_attribution": h_uc4, "risk.backtest.kupiec": h_kupiec, "risk.backtest.christoffersen": h_christ, "risk.backtest.traffic_light": h_traffic,
+            "risk.var.parametric": h_param, "risk.var.historical": h_hist, "risk.curve.pca": h_pca,
+            "rates.ois.bootstrap": h_bootstrap, "rates.curve.inspect": h_inspect, "rates.curve.joint_solve": h_joint}
 
 
 def main():
