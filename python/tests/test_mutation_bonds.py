@@ -102,3 +102,23 @@ def test_repo_setup_coupon_on_end_counts_and_on_start_does_not() -> None:
     acc0, acc1, two = bonds._repo_setup(BOND, date(2026, 12, 1), date(2027, 12, 20))
     assert [d for d, _ in two] == [date(2026, 12, 15), date(2027, 6, 15), date(2027, 12, 15)]
     assert acc0 > 0 and acc1 > 0
+
+
+def test_error_fields_and_messages() -> None:
+    with pytest.raises(QfError) as e:
+        bonds._repo_setup(BOND, date(2027, 1, 1), date(2026, 12, 1))
+    assert e.value.field == "end"
+    with pytest.raises(QfError) as e:
+        bonds.dates_around(date(2030, 6, 15), 2, date(2030, 6, 15))
+    assert str(e.value.message) == "settlement is not before maturity"
+    assert e.value.field == "settlement"
+
+
+def test_z_spread_exactly_at_the_first_lower_bound() -> None:
+    """Settlement on a coupon date (accrued 0), so the gap at z = -0.1 is exactly 0: the bracket
+    must still widen below it."""
+    settlement = date(2026, 6, 15)
+    fl, _ = bonds._curve_setup(BOND, settlement, FLAT)
+    assert fl.accrued == 0.0
+    clean = _dirty(-0.1, settlement)
+    assert abs(bonds.z_spread(BOND, settlement, FLAT, clean) + 0.1) < 1e-12
