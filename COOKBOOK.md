@@ -487,4 +487,23 @@ The swaption cube, caplet strip, variance swap and GARCH fit take stage D curves
 
 ## Stage F recipes
 
-*Planned.* Recipes for the stage F risk, portfolio and book operations are added at the stage F merge, with real outputs.
+Copy the inputs of the named case from `datasets/golden/stage_f/` and send them to any build that has the operation. Its `expected.outputs` are the oracle's answer. These are golden cases, not runs of a build: the four builds report their stage F results at the part 2 merge.
+
+| Task | Operation | Case |
+|---|---|---|
+| Fill a curve with monotone convex, monotonic log cubic, tension spline or hybrid | `rates.curve.inspect`, `rates.ois.bootstrap` | `curve_f` cases by `interpolation` |
+| Solve SOFR, term, ESTR and EUR xccy curves together, with a year-end turn and the full Jacobian | `rates.curve.joint_solve` | `joint_f-0001` |
+| Meeting-date steps fitted to SR3 futures after convexity | `rates.curve.joint_solve` | `joint_f-0002` |
+| Funding curve as a spread over OIS | `rates.funding.curve` | `joint_f` cases tagged `funding` |
+| Par-quote risk and zero Jacobian of a 500-swap book (AAD in Rust) | `risk.book.ois_sensitivity` | `risk_f3-0001` |
+| Principal components of curve moves | `risk.curve.pca` | `risk_f3` cases tagged `pca` |
+| Cross gamma on pillar zero rates | `risk.curve.cross_gamma` | `risk_f3` cases tagged `cross-gamma` |
+| Jump to default | `risk.credit.jtd` | `risk_f3` cases tagged `jtd` |
+| Historical, filtered historical, parametric and Monte Carlo VaR and ES | `risk.var.*` | `risk_f4-0001` (historical, 250 days at 99%), `risk_f4-0026` (parametric) |
+| Kupiec, Christoffersen, Basel traffic light | `risk.backtest.*` | `risk_f4-0047`, `risk_f4` cases tagged `backtest` |
+| FRTB-SA GIRR delta capital | `risk.frtb.girr_delta` | `frtb_f-0002` |
+| Book lifecycle: trades, expiry, default, roll; end-of-day marks | `book.lifecycle.apply`, `book.marks.resolve` | `book_f-0001`, `book_f` cases tagged `marks` |
+| Factor attribution (use case 4) | `usecase.factor_attribution` | `uc4_f-0002` |
+| A CDS index option on the adjusted forward; GARCH with standard errors | `credit.cdsindex.option_price`, `vol.garch.estimate` | `cdsidx_f-0001`, `garch_f` |
+
+To check a whole suite against a build: `python conformance/runner/runner.py --impl python --suite risk_f4` (any language name from `conformance/runner/implementations.json`).
