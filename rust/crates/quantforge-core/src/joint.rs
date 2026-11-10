@@ -680,7 +680,33 @@ pub fn joint_solve(
         return Err(no_convergence());
     }
     // IFT Jacobian, block by block (exact zeros across blocks, ruling F-25).
-    let a = sys.drdx(&x)?;
+    let mut a = sys.drdx(&x)?;
+    // F-26 on `OIS_STEPS`: an own instrument whose dates all lie on one side of a turn does not
+    // move with it (both legs scale together or not at all); the stencil leaves rounding there.
+    for blk in &sys.blocks {
+        if !matches!(blk.shape, Shape::Steps { .. }) {
+            continue;
+        }
+        let k = blk.turns.len();
+        for (t, turn) in blk.turns.iter().enumerate() {
+            let col = blk.offset + blk.size - k + t;
+            for &j in &blk.instruments {
+                let dates: Vec<Date> = match &sys.insts[j].model {
+                    Model::Ois(legs) => legs
+                        .periods()
+                        .iter()
+                        .flat_map(|(p, _)| [p.start, p.end, p.payment])
+                        .collect(),
+                    Model::Future(s, e, _) => vec![*s, *e],
+                    _ => continue,
+                };
+                let after = dates.iter().filter(|d| *d > turn).count();
+                if after == 0 || after == dates.len() {
+                    a[j][col] = 0.0;
+                }
+            }
+        }
+    }
     let m = sys.insts.len();
     let curves_built = sys.built(&x, sys.blocks.len() - 1);
     let mut dq = vec![0.0; m];

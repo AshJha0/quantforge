@@ -90,7 +90,7 @@ impl CdsOption {
         let te = self.t(self.expiry);
         let fep = self.notional
             * (1.0 - self.recovery)
-            * (1.0 - (-self.hazard_rate * te).exp())
+            * -(-self.hazard_rate * te).exp_m1()
             * (-self.rate * te).exp();
         (prot / ann, ann, fep)
     }

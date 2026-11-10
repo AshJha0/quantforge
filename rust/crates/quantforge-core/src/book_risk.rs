@@ -132,8 +132,8 @@ pub fn ois_sensitivity(
     if !swaps.iter().all(|s| ids.insert(s.id.as_str())) {
         return fail("E_INPUT", "duplicate swap id");
     }
-    if swaps.iter().any(|s| s.tenor_years < 1) {
-        return fail("E_DOMAIN", "tenor_years must be at least 1");
+    if swaps.iter().any(|s| !(1..=100).contains(&s.tenor_years)) {
+        return fail("E_DOMAIN", "tenor_years must be in [1, 100] (F-41)");
     }
     if !matches!(
         interpolation,
