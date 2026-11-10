@@ -117,9 +117,19 @@ double sr_ncx2_cdf(double x, double k, double lambda) {
     return sum;
 }
 
+// An enum whose unknown value is E_INPUT (spec errors list), not E_SCHEMA.
+template <class T>
+T sr_enum(const In& in, string_view k, std::initializer_list<std::pair<const char*, T>> table) {
+    const Value& v = in.need(k);
+    if (v.kind != Kind::String) schema(k, "expected a string");
+    for (const auto& [name, val] : table)
+        if (v.text == name) return val;
+    throw Error("E_INPUT", "unknown value", string(k));
+}
+
 SrParams sr_params(const In& in, std::optional<double>& short_rate, bool option) {
     SrParams p{};
-    p.model = in.choice<SrModel>("model", {{"VASICEK", SrModel::Vasicek}, {"CIR", SrModel::Cir}, {"HULL_WHITE", SrModel::HullWhite}});
+    p.model = sr_enum<SrModel>(in, "model", {{"VASICEK", SrModel::Vasicek}, {"CIR", SrModel::Cir}, {"HULL_WHITE", SrModel::HullWhite}});
     p.a = in.real("mean_reversion");
     p.sigma = in.real("sigma");
     if (!(p.a > 0)) throw Error("E_DOMAIN", "mean_reversion is not positive", "mean_reversion");
@@ -172,7 +182,7 @@ void op_sr_zcb_option(const In& in, Out& out) {
     const SrParams p = sr_params(in, r, true);
     const double T = in.real("expiry_years"), S = in.real("maturity_years"), K = in.real("strike");
     const double notional = in.real("notional");
-    const bool call = in.choice<bool>("option_type", {{"CALL", true}, {"PUT", false}});
+    const bool call = sr_enum<bool>(in, "option_type", {{"CALL", true}, {"PUT", false}});
     in.ready();
     if (!(T > 0)) throw Error("E_DOMAIN", "expiry_years is not positive", "expiry_years");
     if (!(S > T)) throw Error("E_DOMAIN", "maturity_years is not after expiry_years", "maturity_years");
