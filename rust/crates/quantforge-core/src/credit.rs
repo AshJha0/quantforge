@@ -655,4 +655,232 @@ mod tests {
         let e = bootstrap(d("2026-11-09"), &c, &pil, 0.4, &[((5, 'Y'), 0.01)]).unwrap_err();
         assert_eq!(e.code, "E_INPUT");
     }
+
+    // ---- Stage G: tests aimed at the stage F mutation survivors (unit kill 180/388). ----
+    // These checks do not reuse the engine: a hazard that is piecewise flat between
+    // pillars and a flat 4% rate give both legs in closed form.
+
+    const R: f64 = 0.04;
+
+    fn two_pillar(t: Date) -> (Hazard, [Date; 2], [f64; 2]) {
+        let ds = [d("2028-12-20"), d("2031-12-20")];
+        let qs = [0.97, 0.88];
+        (Hazard::new(t, &[(ds[0], qs[0]), (ds[1], qs[1])]).unwrap(), ds, qs)
+    }
+
+    /// `[(start, end, h, Q(start))]` in years from `t`; the last segment runs on forever.
+    fn segments(t: Date, ds: [Date; 2], qs: [f64; 2]) -> Vec<(f64, f64, f64, f64)> {
+        let (t1, t2) = (years(t, ds[0]), years(t, ds[1]));
+        let h1 = -qs[0].ln() / t1;
+        let h2 = -(qs[1].ln() - qs[0].ln()) / (t2 - t1);
+        vec![
+            (0.0, t1, h1, 1.0),
+            (t1, t2, h2, qs[0]),
+            (t2, f64::INFINITY, h2, qs[1]),
+        ]
+    }
+
+    /// `(∫ h Q P du, ∫ h Q P (u - c) du)` over `[a, b]`.
+    fn exact(segs: &[(f64, f64, f64, f64)], a: f64, b: f64, c: f64) -> (f64, f64) {
+        let (mut p, mut m) = (0.0, 0.0);
+        for &(s0, s1, h, q0) in segs {
+            let (x, y) = (a.max(s0), b.min(s1));
+            if y <= x {
+                continue;
+            }
+            let k = h + R;
+            let w = h * q0 * (h * s0).exp();
+            let g = |u: f64| -(-k * u).exp() * ((u - c) / k + 1.0 / (k * k));
+            p += w * ((-k * x).exp() - (-k * y).exp()) / k;
+            m += w * (g(y) - g(x));
+        }
+        (p, m)
+    }
+
+    fn close(a: f64, b: f64, tol: f64) {
+        assert!((a - b).abs() <= tol * b.abs().max(1e-300), "{a} vs {b}");
+    }
+
+    #[test]
+    fn legs_match_closed_form() {
+        let (c, pil) = flat();
+        let t = d("2026-11-06");
+        let (h, ds, qs) = two_pillar(t);
+        let segs = segments(t, ds, qs);
+        // maturities inside, on and past the last hazard pillar
+        for m in [d("2030-06-20"), d("2031-12-20"), d("2033-12-20")] {
+            let tr = CdsTrade {
+                maturity: m,
+                coupon: 0.01,
+                notional: 1e7,
+                buy: true,
+            };
+            let p = price(t, &c, &pil, &h, 0.4, &tr, false).unwrap();
+            let prot = 0.6 * exact(&segs, 0.0, years(t, m), 0.0).0;
+            close(p.protection_leg, prot, 1e-12);
+            let mut rpv = 0.0;
+            let ps = periods(t, m).unwrap();
+            for q in &ps {
+                let obs = q.payment.add_days(-1);
+                let acc = q.start.add_days(-1);
+                let (tobs, tpay) = (years(t, obs), years(t, q.payment));
+                rpv += q.alpha * h.survival(obs).unwrap() * (-R * tpay).exp();
+                let s = years(t, acc).max(0.0);
+                rpv += 365.0 / 360.0 * exact(&segs, s, tobs, years(t, acc)).1;
+            }
+            close(p.rpv01, rpv, 1e-12);
+            // price-level formulas, recomputed from the legs; T+3 weekdays is 2026-11-11
+            let days = (t.add_days(1).serial() - ps[0].start.serial()) as f64 / 360.0;
+            let pcs = (-R * years(t, d("2026-11-11"))).exp();
+            close(p.accrued, 0.01 * days, 1e-14);
+            close(p.par_spread, prot / (rpv - days * pcs), 1e-12);
+            close(p.upfront, (prot - 0.01 * rpv) / pcs + 0.01 * days, 1e-12);
+            close(p.pv, 1e7 * (prot - 0.01 * rpv + 0.01 * days * pcs), 1e-12);
+        }
+    }
+
+    #[test]
+    fn e_terms_series_and_closed_form() {
+        // a = sum (-x)^n / (n+1)!, b = sum (-x)^n (n+1) / (n+2)!
+        let series = |x: f64| {
+            let (mut a, mut b, mut f) = (0.0, 0.0, 1.0);
+            for n in 0..14 {
+                let xn = (-x).powi(n);
+                f *= f64::from(n + 1);
+                a += xn / f;
+                b += xn * f64::from(n + 1) / (f * f64::from(n + 2));
+            }
+            (a, b)
+        };
+        for x in [9.9e-5, -9.9e-5, 3e-5, 0.0] {
+            let (a, b) = e_terms(x);
+            let (ea, eb) = series(x);
+            assert!((a - ea).abs() <= 2e-16 && (b - eb).abs() <= 2e-16, "{x}");
+        }
+        for x in [1e-4, 0.05, 0.7, -0.5] {
+            let (a, b) = e_terms(x);
+            let (ea, eb) = series(x);
+            close(a, ea, 1e-12);
+            if x.abs() > 0.01 {
+                close(b, eb, 1e-9);
+            }
+        }
+        close(e_terms(2.0).0, (1.0 - (-2.0_f64).exp()) / 2.0, 1e-15);
+        close(e_terms(2.0).1, (1.0 - 3.0 * (-2.0_f64).exp()) / 4.0, 1e-15);
+    }
+
+    #[test]
+    fn hazard_curve_shape() {
+        let t = d("2026-11-06");
+        let (h, ds, qs) = two_pillar(t);
+        assert_eq!(h.pillars().len(), 2);
+        for (got, (dd, q)) in h.pillars().iter().zip(ds.iter().zip(qs)) {
+            assert_eq!(got.0, *dd);
+            close(got.1, q, 1e-15);
+        }
+        assert_eq!(h.survival(t).unwrap(), 1.0);
+        let segs = segments(t, ds, qs);
+        for x in ["2027-05-01", "2028-12-20", "2030-02-02", "2035-01-01"] {
+            let u = years(t, d(x));
+            let (s0, _, hz, q0) = *segs.iter().find(|s| u >= s.0 && u <= s.1).unwrap();
+            close(h.survival(d(x)).unwrap(), q0 * (-hz * (u - s0)).exp(), 1e-14);
+        }
+        assert_eq!(years(d("2026-01-01"), d("2027-01-01")), 1.0);
+        assert_eq!(years(d("2026-01-01"), d("2026-03-15")), 0.2);
+    }
+
+    #[test]
+    fn tenors_and_imm_dates() {
+        let t = d("2026-11-06");
+        assert_eq!(tenor_maturity(t, (2, 'Y')).unwrap(), d("2028-12-20"));
+        assert_eq!(tenor_maturity(t, (1200, 'M')).unwrap(), d("2126-12-20"));
+        for bad in [(0, 'M'), (-1, 'Y'), (1201, 'M'), (101, 'Y'), (1, 'D')] {
+            assert_eq!(tenor_maturity(t, bad).unwrap_err().code, "E_INPUT", "{bad:?}");
+        }
+        assert_eq!(last_imm_on_or_before(d("2027-03-10")), d("2026-12-20"));
+        assert_eq!(last_imm_on_or_before(d("2027-03-20")), d("2027-03-20"));
+        assert_eq!(last_imm_on_or_before(d("2027-01-05")), d("2026-12-20"));
+        assert_eq!(last_imm_on_or_before(d("2027-08-31")), d("2027-06-20"));
+        assert_eq!(last_imm_on_or_before(d("2027-12-31")), d("2027-12-20"));
+    }
+
+    #[test]
+    fn period_schedule() {
+        let (t, m) = (d("2026-11-06"), d("2028-06-20"));
+        let p = periods(t, m).unwrap();
+        // IMM 2026-09-20 to 2028-06-20: seven quarterly periods
+        assert_eq!(p.len(), 7);
+        for (i, q) in p.iter().enumerate() {
+            assert!(!q.payment.is_weekend() && !q.start.is_weekend());
+            if i + 1 < p.len() {
+                assert_eq!(p[i + 1].start, q.payment);
+                let days = (q.payment.serial() - q.start.serial()) as f64;
+                close(q.alpha, days / 360.0, 1e-15);
+            } else {
+                // the last period runs to the unadjusted maturity, plus one day
+                let days = (m.serial() - q.start.serial() + 1) as f64;
+                close(q.alpha, days / 360.0, 1e-15);
+                assert_eq!(q.payment, d("2028-06-20"));
+            }
+        }
+        assert_eq!(p[1].start, d("2026-12-21"));
+        assert_eq!(p[2].start, d("2027-03-22"));
+        assert_eq!(periods(t, t).unwrap_err().code, "E_INPUT");
+    }
+
+    #[test]
+    fn weight_domains() {
+        let (c, pil) = flat();
+        let t = d("2026-11-06");
+        let m = d("2031-12-20");
+        let h = Hazard::new(t, &[(m, 0.9)]).unwrap();
+        let mixed = [(h.clone(), 0.4, -1.0), (h.clone(), 0.4, 3.0)];
+        let e = index_intrinsic(t, &c, &pil, &mixed, m, 0.01).unwrap_err();
+        assert_eq!(e.code, "E_DOMAIN");
+        let zero = [(h.clone(), 0.4, 0.0), (h, 0.4, 1.0)];
+        assert!(index_intrinsic(t, &c, &pil, &zero, m, 0.01).is_ok());
+        let a = vec![((1, 'Y'), 0.01)];
+        let e = composite_spreads(&[(a.clone(), -1.0), (a.clone(), 3.0)], 1.0).unwrap_err();
+        assert_eq!(e.code, "E_DOMAIN");
+        let s = composite_spreads(&[(a.clone(), 0.0), (a, 1.0)], 1.0).unwrap();
+        close(s[0].1, 0.01, 1e-15);
+    }
+
+    #[test]
+    fn finite_checks_see_every_field() {
+        use crate::error::Finite;
+        let ok = CdsPrice {
+            protection_leg: 1.0,
+            rpv01: 1.0,
+            accrued: 1.0,
+            par_spread: 1.0,
+            upfront: 1.0,
+            pv: 1.0,
+        };
+        assert!(ok.is_all_finite());
+        for i in 0..6 {
+            let mut p = ok;
+            let f = [
+                &mut p.protection_leg,
+                &mut p.rpv01,
+                &mut p.accrued,
+                &mut p.par_spread,
+                &mut p.upfront,
+                &mut p.pv,
+            ];
+            if let Some(x) = f.into_iter().nth(i) {
+                *x = f64::NAN;
+            }
+            assert!(!p.is_all_finite(), "field {i}");
+        }
+        let tr = CdsTrade {
+            maturity: d("2031-12-20"),
+            coupon: 0.01,
+            notional: 1.0,
+            buy: true,
+        };
+        assert!(tr.is_all_finite());
+        assert!(!CdsTrade { coupon: f64::NAN, ..tr }.is_all_finite());
+        assert!(!CdsTrade { notional: f64::INFINITY, ..tr }.is_all_finite());
+    }
 }
