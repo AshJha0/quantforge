@@ -247,6 +247,123 @@ pub fn key_rate(
     })
 }
 
+/// The `PILLAR` cross gamma of an OIS on a log-linear or linear-zero curve without binary64
+/// cancellation. On these curves `ln D(t)` is linear in the pillar shifts, `ln D(t) - sum_k
+/// c_k(t) s_k`, so the value is a sum of exponentials `w exp(L)`, and the spec's bump formula
+/// has a closed form per term. Summed directly, the formula loses about 1e-10 to cancellation
+/// on a large notional at 1 bp.
+fn ois_gamma_exact(
+    curve: &CurveInput,
+    base: &Curve,
+    trade: &OisTrade,
+    legs: &OisLegs,
+    h: f64,
+    b2: f64,
+) -> Result<Vec<Vec<f64>>> {
+    let n = curve.pillars.len();
+    let shifted: Vec<Curve> = (0..n)
+        .map(|k| {
+            let mut c = curve.clone();
+            let (d, df) = c.pillars[k];
+            c.pillars[k].1 = df * (-curve_time(curve.as_of, d)).exp();
+            Curve::new(&c)
+        })
+        .collect::<Result<_>>()?;
+    // Gradient of ln D(date) in the shifts (unit shift, exact by linearity up to rounding).
+    let grad = |d: Date| -> Result<(f64, Vec<f64>)> {
+        let l0 = base.discount(d)?.ln();
+        let g = shifted
+            .iter()
+            .map(|c| Ok(c.discount(d)?.ln() - l0))
+            .collect::<Result<Vec<f64>>>()?;
+        Ok((l0, g))
+    };
+    let sign = if trade.pay { 1.0 } else { -1.0 } * trade.notional;
+    let mut gamma = vec![vec![0.0; n]; n];
+    // The bump formula on `w exp(L - g.s)`, in closed form: diagonal `4 sinh^2(g_i h / 2)`,
+    // off-diagonal `sinh(g_i h) sinh(g_j h)` (shifts enter as `-s`, and both are even in sign).
+    let mut add = |w: f64, l: f64, g: &[f64]| {
+        let e = w * l.exp();
+        let sh: Vec<f64> = g.iter().map(|x| (x * h).sinh()).collect();
+        for i in 0..n {
+            if g[i] == 0.0 {
+                continue;
+            }
+            let half = (g[i] * h / 2.0).sinh();
+            gamma[i][i] += e * 4.0 * half * half;
+            for j in 0..n {
+                if j != i && g[j] != 0.0 {
+                    gamma[i][j] += e * sh[i] * sh[j];
+                }
+            }
+        }
+    };
+    for (p, alpha) in legs.periods() {
+        let (ls, gs) = grad(p.start)?;
+        let (le, ge) = grad(p.end)?;
+        let (lp, gp) = grad(p.payment)?;
+        let g1: Vec<f64> = (0..n).map(|k| gs[k] - ge[k] + gp[k]).collect();
+        add(sign, ls - le + lp, &g1);
+        add(-sign * (1.0 + trade.fixed_rate * alpha), lp, &gp);
+    }
+    for row in &mut gamma {
+        for v in row.iter_mut() {
+            *v /= b2;
+        }
+    }
+    Ok(gamma)
+}
+
+/// `risk.curve.cross_gamma` (`book-sensitivities.md`): `(value, gamma)` with the `PILLAR` bump,
+/// money per bp squared.
+pub fn cross_gamma(
+    curve: &CurveInput,
+    product: &Product,
+    bump_bp: f64,
+) -> Result<(f64, Vec<Vec<f64>>)> {
+    crate::error::finite("curve", &curve)?;
+    crate::error::finite("product", &product)?;
+    crate::error::finite("bump_bp", &bump_bp)?;
+    if bump_bp.is_nan() || bump_bp <= 0.0 || bump_bp > 100.0 {
+        return fail("E_DOMAIN", "bump_bp must be in (0, 100]");
+    }
+    check_notional(product)?;
+    let base_curve = Curve::new(curve)?;
+    let priced = Priced::new(product, curve.as_of)?;
+    let v0 = priced.value(&base_curve)?;
+    let h = bump_bp * BP;
+    let n = curve.pillars.len();
+    let at = |moves: &[(usize, f64)]| -> Result<f64> {
+        let mut c = curve.clone();
+        for &(i, s) in moves {
+            let (d, df) = c.pillars[i];
+            c.pillars[i].1 = df * (-s * curve_time(curve.as_of, d)).exp();
+        }
+        priced.value(&Curve::new(&c)?)
+    };
+    let b2 = bump_bp * bump_bp;
+    if let (Product::Ois(trade), Some(legs)) = (product, &priced.legs)
+        && matches!(
+            curve.interpolation,
+            Interpolation::LogLinearDf | Interpolation::LinearZero
+        )
+    {
+        return Ok((v0, ois_gamma_exact(curve, &base_curve, trade, legs, h, b2)?));
+    }
+    let mut g = vec![vec![0.0; n]; n];
+    for i in 0..n {
+        g[i][i] = (at(&[(i, h)])? - 2.0 * v0 + at(&[(i, -h)])?) / b2;
+        for j in 0..i {
+            let v = (at(&[(i, h), (j, h)])? - at(&[(i, h), (j, -h)])? - at(&[(i, -h), (j, h)])?
+                + at(&[(i, -h), (j, -h)])?)
+                / (4.0 * b2);
+            g[i][j] = v;
+            g[j][i] = v;
+        }
+    }
+    Ok((v0, g))
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Jacobian {
     pub pillar_dates: Vec<Date>,

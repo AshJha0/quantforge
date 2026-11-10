@@ -208,9 +208,84 @@ fn stage_c_above(op: &str, i: &Json) -> bool {
         || above(i, "steps", 20_000)
 }
 
+/// Stage F lists whose stated limit (ruling F-42) is above the generic 100,000.
+fn stage_f_raised(op: &str) -> &'static [&'static str] {
+    match op {
+        "risk.var.historical" => &["pnl"],
+        "risk.var.filtered_historical" => &["returns"],
+        "risk.backtest.christoffersen" => &["exceptions"],
+        "book.lifecycle.apply" => &["events"],
+        _ => &[],
+    }
+}
+
+/// The generic array rule, with the F-42 raised lists judged at 1,000,000 instead.
+fn too_long_stage_f(op: &str, i: &Json) -> bool {
+    let raised = stage_f_raised(op);
+    let Json::Obj(keys) = i else {
+        return too_long(i);
+    };
+    keys.iter().any(|(k, v)| {
+        if raised.contains(&k.as_str()) {
+            return match v {
+                Json::Arr(a) => a.len() > 1_000_000 || a.iter().any(too_long),
+                _ => false,
+            };
+        }
+        if op == "book.marks.resolve" && k == "sources" {
+            return match v {
+                Json::Arr(a) => {
+                    a.len() > MAX_ARRAY
+                        || a.iter().any(|src| match src {
+                            Json::Obj(f) => f.iter().any(|(n, q)| match q {
+                                Json::Arr(qs) if n == "quotes" => {
+                                    qs.len() > 1_000_000 || qs.iter().any(too_long)
+                                }
+                                _ => too_long(q),
+                            }),
+                            _ => false,
+                        })
+                }
+                _ => too_long(v),
+            };
+        }
+        too_long(v)
+    })
+}
+
+/// Ruling F-42: stated sizes of the stage F operations.
+fn stage_f_above(op: &str, i: &Json) -> bool {
+    let over = |k: &str, n: i128| len(i, k).is_some_and(|m| m > n);
+    let first_row = |k: &str| {
+        i.get(k)
+            .and_then(Json::as_array)
+            .and_then(|a| a.first())
+            .and_then(Json::as_array)
+            .map(|r| r.len() as i128)
+    };
+    match op {
+        "risk.book.ois_sensitivity" => over("swaps", 10_000),
+        "risk.curve.pca" => {
+            over("changes", 100_000) || first_row("changes").is_some_and(|n| n > 200)
+        }
+        "risk.curve.cross_gamma" => i
+            .get("curve")
+            .is_some_and(|c| len(c, "pillars").is_some_and(|n| n > 100)),
+        "risk.var.monte_carlo" => above(i, "paths", 10_000_000) || over("mean", 100),
+        "risk.frtb.girr_delta" => over("sensitivities", 100_000),
+        "book.lifecycle.apply" => over("positions", 100_000),
+        "book.marks.resolve" => over("instruments", 100_000),
+        "usecase.factor_attribution" => {
+            over("portfolio_returns", 100_000) || over("factor_names", 50)
+        }
+        _ => false,
+    }
+}
+
 /// The `E_LIMIT` this case breaks, if any.
 pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
-    (too_long(inputs)
+    (too_long_stage_f(op, inputs)
+        || stage_f_above(op, inputs)
         || matrix_above(op, inputs)
         || curve_points_above(inputs)
         || value_too_deep(op, inputs)

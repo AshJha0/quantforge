@@ -99,6 +99,11 @@ impl OisLegs {
         Ok(OisLegs { periods })
     }
 
+    /// The periods with their fixed-leg accruals.
+    pub fn periods(&self) -> &[(Period, f64)] {
+        &self.periods
+    }
+
     pub fn last_payment(&self) -> Date {
         self.periods.last().expect("at least one period").0.payment
     }

@@ -129,3 +129,70 @@ fn bs_vega(s: f64, k: f64, v: f64, t: f64) -> f64 {
     let d1 = ((s / k).ln() + (0.03 - 0.01 + 0.5 * v * v) * t) / (v * t.sqrt());
     s * (-0.01 * t).exp() * (-0.5 * d1 * d1).exp() / (2.0 * std::f64::consts::PI).sqrt() * t.sqrt()
 }
+
+mod index_option {
+    use proptest::prelude::*;
+    use quantforge_core::credit_options::{IndexOption, index_option_price};
+    use quantforge_core::dates::Date;
+
+    fn opt(payer: bool, h: f64, k: f64, c: f64, months: i64) -> IndexOption {
+        let as_of = Date::new(2026, 11, 9);
+        IndexOption {
+            as_of,
+            expiry: as_of.add_days(months * 30),
+            maturity: as_of.add_days(5 * 365),
+            rate: 0.03,
+            hazard_rate: h,
+            recovery: 0.4,
+            payer,
+            strike: k,
+            coupon: c,
+            notional: 1e7,
+        }
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(256))]
+
+        /// R7 acceptance: payer - receiver = N A (F_adj - K_adj) to 1e-10 relative.
+        #[test]
+        fn parity(h in 0.001..0.2_f64, k in 0.002..0.1_f64, c in prop_oneof![Just(0.01), Just(0.05)],
+                  v in 0.0..1.5_f64, months in 1..24_i64) {
+            let (p, r) = (index_option_price(&opt(true, h, k, c, months), v),
+                          index_option_price(&opt(false, h, k, c, months), v));
+            prop_assume!(p.is_ok());
+            let (p, r) = (p.unwrap(), r.unwrap());
+            let rhs = 1e7 * p.risky_annuity * (p.adjusted_forward - p.adjusted_strike);
+            prop_assert!((p.price - r.price - rhs).abs() <= 1e-10 * (p.price.abs() + r.price.abs()).max(rhs.abs()).max(1e-300));
+        }
+    }
+
+    #[test]
+    fn edges() {
+        let base = index_option_price(&opt(true, 0.02, 0.01, 0.01, 6), 0.4).unwrap();
+        // C = K: no exercise upfront, K_adj = K.
+        assert_eq!(base.exercise_upfront, 0.0);
+        assert!((base.adjusted_strike - 0.01).abs() < 1e-15);
+        // vol = 0 is intrinsic, not an error.
+        let z = index_option_price(&opt(true, 0.02, 0.01, 0.01, 6), 0.0).unwrap();
+        let intrinsic = 1e7 * z.risky_annuity * (z.adjusted_forward - z.adjusted_strike).max(0.0);
+        assert!((z.price - intrinsic).abs() <= 1e-9 * 1e7);
+        // h = 0 gives F_adj = 0: E_DOMAIN.
+        let code = |x: IndexOption, v: f64| index_option_price(&x, v).unwrap_err().code;
+        assert_eq!(code(opt(true, 0.0, 0.01, 0.01, 6), 0.4), "E_DOMAIN");
+        assert_eq!(code(opt(true, -1e-300, 0.01, 0.01, 6), 0.4), "E_DOMAIN");
+        assert_eq!(code(opt(true, 0.02, 0.0, 0.01, 6), 0.4), "E_DOMAIN");
+        assert_eq!(code(opt(true, 0.02, 0.01, -1e-300, 6), 0.4), "E_DOMAIN");
+        assert_eq!(code(opt(true, 0.02, 0.01, 0.01, 6), -1e-300), "E_DOMAIN");
+        assert_eq!(code(opt(true, 0.02, 0.01, 0.01, 0), 0.4), "E_INPUT");
+        let mut r1 = opt(true, 0.02, 0.01, 0.01, 6);
+        r1.recovery = 1.0;
+        assert_eq!(code(r1, 0.4), "E_DOMAIN");
+        let mut n0 = opt(true, 0.02, 0.01, 0.01, 6);
+        n0.notional = 0.0;
+        assert_eq!(code(n0, 0.4), "E_DOMAIN");
+        assert_eq!(code(opt(true, 0.02, 0.01, f64::NAN, 6), 0.4), "E_DOMAIN");
+        // h_K reprices the strike from expiry.
+        assert!(base.strike_hazard > 0.0 && base.strike_annuity > 0.0);
+    }
+}

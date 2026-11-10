@@ -159,3 +159,66 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - `-0.0`: F-3, same result as `+0.0`; the `negative_zero` cases pass with no change.
 - Library `field` for a non-finite value inside a struct is the argument name (`self` for a
   receiver); F-4 does not fix the field, so this stays a Rust choice.
+
+## Stage F wave 1a (F6, Q1), choices made where the spec is silent
+
+- Q1 `TENSION_SPLINE` and `HYBRID` read `tension` and `step_end` from the same object as
+  `interpolation` (the curve object, or the top level of a bootstrap). The order of checks is
+  `tension` missing `E_INPUT`, out of `(0, 1000]` `E_DOMAIN`, then the pillar checks; a
+  `step_end` that is not a pillar date is `E_INPUT` after the pillar order checks.
+- Q1 bootstrap: for the four stage F methods `SEQUENTIAL` runs the same global Newton solve as
+  `GLOBAL` (ruling F-21 allows either route to the unique solution).
+- R8 `vol.garch.estimate`: the search is the stage E multi-start Nelder-Mead (27 starts for
+  Student-t, over `nu` in 5, 10 and 30), then Newton on the exact gradient with a central-difference
+  Hessian (relative step 1e-5). The Student-t golden series take about 10 s each in a release
+  build; a faster start would come from the Gaussian estimate.
+- R7: `h_K` is bisected until the bracket cannot shrink, which is within 1e-15 relative.
+
+## Stage F wave 1b (Q4 joint solve), choices and findings
+
+- `rates.curve.joint_solve` is solved block by block (F-25): Newton on each curve's own
+  unknowns with a central-difference block Jacobian and backtracking, to 1e-16 where reachable.
+  Starting point as the spec, except `XCCY`, which starts from its foreign projection curve's
+  discount factors at its pillars (the "first quote" of an xccy curve is a spread, not a rate).
+- IFT Jacobian: `dR/dx` by a five-point stencil per unknown, with a step that starts at 1e-5 and
+  shrinks by 4 until two steps agree within residual roundoff (4e-9 times 1e-5/h, plus 1e-6
+  relative). Then block forward substitution, so cross-curve zeros are exact (F-25).
+- Finding for the held-back four-curve case: the 2e-3 mismatch has two causes, neither in the
+  spec. (1) The h = 1e-4 Richardson reference crosses a monotone-convex branch boundary for the
+  `SOFR-3M` and `SOFR-2Y` columns (one-sided derivatives of the turn factor in `SOFR-3M` are
+  0.18997 for |h| up to 1e-5, but 0.17804 at +1e-4). (2) A fixed 1e-5 five-point `dR/dx`
+  stencil also crosses a boundary in one SOFR pillar column, which put `turn` / `SOFR-1M` off by
+  7.5e-4 (0.11714 against 0.11790 on both sides). With the adaptive stencil the Rust IFT
+  matches small-step bump-and-rebuild (h = 1e-6 central, or 1e-5 / 5e-6 Richardson) to about
+  2e-8 above the `jacobian` limit, and that remainder is the spread between the references.
+- `XCCY` `dR/dq` is `sum alpha_i D_f(e_i)` on the solved foreign curve, not `-1`. The text says
+  "-1 on the diagonal for rate and spread quotes", but the xccy residual is the leg value with the
+  spread inside it, so its exact derivative is the annuity.
+- F-26 with `ln D` pillar unknowns: on a pillar curve, holding the full `ln D` at pillars while
+  the turn's `ln factor` moves changes `S = D/J` at pillars after the turn, so an instrument whose
+  dates all sit before the turn but inside the section that ends at the first pillar after it
+  (or anywhere, for a non-local method) does move. Rust reports the honest `d model / d ln factor`
+  (it is the `dR/dx` column), so those zeros are not forced. On `OIS_STEPS` curves the zeros are
+  exact. The goldens only have steps-curve turns, so nothing fails today.
+
+## Stage F wave 2 (F3), choices and findings
+
+- `risk.book.ois_sensitivity`: reverse-mode AAD on a tape (`aad.rs`), one sweep per residual
+  for `dR/dx` and one per swap for `x_bar`, then `(dR/dx)^T lambda = x_bar` (F-29). The zero
+  Jacobian solves `dR/dx` by forward substitution when it is exactly lower triangular, so the
+  F-30 zeros are exact. The tape mirrors `LOG_LINEAR_DF` and `LINEAR_ZERO`; other methods are
+  `E_INPUT` for now (the spec allows any `rates.ois.bootstrap` method; the goldens use log-linear).
+- OIS `side` in `risk_f3`: closed by F-36 (`PAY` / `RECEIVE` everywhere; the dual reading is gone).
+- Cross gamma at 1 bp on a 1e6 notional loses about 1.5e-10 to binary64 cancellation if the
+  formula is summed directly, which is over the `interpolation` 1e-10 limit. On log-linear and
+  linear-zero curves Rust evaluates the same formula in closed form per exponential term
+  (`4 sinh^2(g h/2)` and `sinh(g_i h) sinh(g_j h)`), which matches the 40-digit goldens. Other
+  products and interpolations use the direct formula.
+
+## Stage F wave 2 (F4), choices and findings
+
+- Monte Carlo seed, Cholesky code, traffic-light bound, duplicate opening position: closed by
+  F-39 and applied.
+- Traffic light: `P(X <= x)` is summed in log space from `n ln(1 - p)`.
+- FRTB GIRR: inflation against a tenor is 40% whatever the curve; with `reporting_currency`
+  absent only the seven listed currencies are reduced.

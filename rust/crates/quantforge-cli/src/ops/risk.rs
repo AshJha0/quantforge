@@ -14,10 +14,12 @@ use super::{Outcome, plain};
 use crate::input::Inputs;
 use quantforge_core::black::Model;
 use quantforge_core::black::Option_;
+use quantforge_core::book_risk;
 use quantforge_core::corr;
 use quantforge_core::curve::Interpolation;
 use quantforge_core::error::Result;
 use quantforge_core::error::fail;
+use quantforge_core::frtb;
 use quantforge_core::greeks;
 use quantforge_core::json::Json;
 use quantforge_core::json::obj;
@@ -28,7 +30,9 @@ use quantforge_core::risk_curve::Bump;
 use quantforge_core::risk_curve::KeyMode;
 use quantforge_core::risk_curve::Product;
 use quantforge_core::risk_curve::Scheme;
+use quantforge_core::risk_tools;
 use quantforge_core::surface::Position;
+use quantforge_core::var;
 
 super::registry! {
 (op, i)
@@ -150,6 +154,233 @@ super::registry! {
                 ("index_variance_notional", o.index_variance_notional.into()),
             ]))
         },
+        "risk.book.ois_sensitivity" => {
+            let c = overnight(i, "convention")?;
+            let (t, m) = (i.date("as_of")?, interpolation(i)?);
+            let raw = items(i, "quotes")?;
+            let q = ois_quotes(i)?;
+            let labels: Vec<String> = raw
+                .iter()
+                .map(|r| r.str("tenor").map(str::to_string))
+                .collect::<Result<_>>()?;
+            let swaps = items(i, "swaps")?
+                .iter()
+                .map(|s| {
+                    let payer = match s.str("side")? {
+                        "PAY" => true,
+                        "RECEIVE" => false,
+                        _ => return s.fail("side", "PAY or RECEIVE"),
+                    };
+                    Ok(book_risk::BookSwap {
+                        id: s.str("id")?.to_string(),
+                        tenor_years: s.int("tenor_years")?,
+                        fixed_rate: s.f64("fixed_rate")?,
+                        payer,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let r = book_risk::ois_sensitivity(&c, t, &q, m, &swaps)?;
+            let strs = |v: Vec<String>| Json::Arr(v.into_iter().map(Json::from).collect());
+            let rows = |m: Vec<Vec<f64>>| Json::Arr(m.into_iter().map(Json::from).collect());
+            let ids: Vec<String> = swaps.iter().map(|s| s.id.clone()).collect();
+            let pillars: Vec<String> = r.pillars.iter().map(ToString::to_string).collect();
+            plain(obj([
+                ("pv", r.pv.into()),
+                ("book_pv", r.book_pv.into()),
+                (
+                    "quote_sensitivity",
+                    obj([
+                        ("swaps", strs(ids)),
+                        ("quotes", strs(labels.clone())),
+                        ("matrix", rows(r.quote_sensitivity)),
+                    ]),
+                ),
+                ("book_sensitivity", r.book_sensitivity.into()),
+                (
+                    "zero_jacobian",
+                    obj([
+                        ("pillars", strs(pillars)),
+                        ("quotes", strs(labels)),
+                        ("matrix", rows(r.zero_jacobian)),
+                    ]),
+                ),
+            ]))
+        },
+        "risk.curve.pca" => {
+            let x = i.matrix("changes")?;
+            let k = i.int("components")?;
+            i.gate()?;
+            let r = risk_tools::pca(&x, k)?;
+            let rows: Vec<Json> = r.loadings.into_iter().map(Json::from).collect();
+            plain(obj([
+                ("eigenvalues", r.eigenvalues.into()),
+                ("loadings", Json::Arr(rows)),
+                ("explained_ratio", r.explained_ratio.into()),
+            ]))
+        },
+        "risk.curve.cross_gamma" => {
+            let curve = curve_input(i, "curve")?;
+            let p = product(i)?;
+            let bp = i.f64("bump_bp")?;
+            i.gate()?;
+            let (v, g) = risk_curve::cross_gamma(&curve, &p, bp)?;
+            let rows: Vec<Json> = g.into_iter().map(Json::from).collect();
+            plain(obj([("value", v.into()), ("cross_gamma", Json::Arr(rows))]))
+        },
+        "risk.credit.jtd" => {
+            let ps = items(i, "positions")?
+                .iter()
+                .map(|p| {
+                    let kind = match p.str("kind")? {
+                        "BOND" => risk_tools::JtdKind::Bond,
+                        "CDS_PROTECTION_BUYER" => risk_tools::JtdKind::ProtectionBuyer,
+                        "CDS_PROTECTION_SELLER" => risk_tools::JtdKind::ProtectionSeller,
+                        _ => return p.fail("kind", "unknown kind"),
+                    };
+                    p.str("id")?;
+                    Ok(risk_tools::JtdPosition {
+                        kind,
+                        notional: p.f64("notional")?,
+                        recovery: p.f64("recovery")?,
+                        market_value: p.f64("market_value")?,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let (v, t) = risk_tools::jtd(&ps)?;
+            plain(obj([("jtd", v.into()), ("total", t.into())]))
+        },
+        "risk.var.historical" => {
+            let (x, c) = (i.reals("pnl")?, i.f64("confidence")?);
+            i.gate()?;
+            let r = var::historical(&x, c)?;
+            plain(var_json(r, true))
+        },
+        "risk.var.filtered_historical" => {
+            let x = i.reals("returns")?;
+            let (p, l, c) = (i.f64("position_value")?, i.f64("lambda")?, i.f64("confidence")?);
+            i.gate()?;
+            let (r, next) = var::filtered_historical(&x, p, l, c)?;
+            let mut o = var_json(r, true);
+            if let Json::Obj(m) = &mut o {
+                m.push(("sigma_next".into(), next.into()));
+            }
+            plain(o)
+        },
+        "risk.var.parametric" => {
+            let (m, s, c) = (i.f64("mean")?, i.f64("std")?, i.f64("confidence")?);
+            i.gate()?;
+            plain(var_json(var::parametric(m, s, c)?, false))
+        },
+        "risk.var.monte_carlo" => {
+            let (m, cov, w) = (i.reals("mean")?, i.matrix("covariance")?, i.reals("weights")?);
+            let (paths, seed, c) = (i.int("paths")?, i.seed()?, i.f64("confidence")?);
+            i.gate()?;
+            plain(var_json(var::monte_carlo(&m, &cov, &w, paths, seed, c)?, true))
+        },
+        "risk.backtest.kupiec" => {
+            let (n, x, c) = (i.int("observations")?, i.int("exceptions")?, i.f64("confidence")?);
+            i.gate()?;
+            let (lr, p) = var::kupiec(n, x, c)?;
+            plain(obj([("lr_uc", lr.into()), ("p_value", p.into())]))
+        },
+        "risk.backtest.christoffersen" => {
+            let e = i
+                .array("exceptions")?
+                .iter()
+                .map(|v| match v {
+                    Json::Bool(b) => Ok(*b),
+                    _ => i.fail("exceptions", "expected booleans"),
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let c = i.f64("confidence")?;
+            i.gate()?;
+            let r = var::christoffersen(&e, c)?;
+            let [n00, n01, n10, n11] = r.transitions;
+            plain(obj([
+                ("lr_uc", r.lr_uc.into()),
+                ("lr_ind", r.lr_ind.into()),
+                ("lr_cc", r.lr_cc.into()),
+                ("p_uc", r.p_uc.into()),
+                ("p_ind", r.p_ind.into()),
+                ("p_cc", r.p_cc.into()),
+                (
+                    "transitions",
+                    obj([
+                        ("n00", n00.into()),
+                        ("n01", n01.into()),
+                        ("n10", n10.into()),
+                        ("n11", n11.into()),
+                    ]),
+                ),
+            ]))
+        },
+        "risk.backtest.traffic_light" => {
+            let (n, x, c) = (i.int("observations")?, i.int("exceptions")?, i.f64("confidence")?);
+            i.gate()?;
+            let (p, zone, plus) = var::traffic_light(n, x, c)?;
+            plain(obj([
+                ("cumulative_probability", p.into()),
+                ("zone", zone.into()),
+                ("plus_factor", plus.into()),
+            ]))
+        },
+        "risk.frtb.girr_delta" => {
+            let sens = items(i, "sensitivities")?
+                .iter()
+                .map(|s| {
+                    let f = s.str("risk_factor")?;
+                    let Some(factor) = frtb::Factor::parse(f) else {
+                        return s.fail("risk_factor", "unknown risk factor");
+                    };
+                    Ok(frtb::Sensitivity {
+                        currency: s.str("currency")?.to_string(),
+                        curve: s.str("curve")?.to_string(),
+                        factor,
+                        sensitivity: s.f64("sensitivity")?,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let red = i.bool_or("specified_currency_reduction", false)?;
+            let rep = match i.opt("reporting_currency") {
+                None | Some(Json::Null) => None,
+                Some(_) => Some(i.str("reporting_currency")?),
+            };
+            i.gate()?;
+            let r = frtb::girr_delta(&sens, red, rep)?;
+            let scen: Vec<(String, Json)> = r
+                .scenarios
+                .iter()
+                .map(|s| {
+                    let b: Vec<Json> = s
+                        .buckets
+                        .iter()
+                        .map(|b| {
+                            obj([
+                                ("currency", b.currency.as_str().into()),
+                                ("k", b.k.into()),
+                                ("s", b.s.into()),
+                                ("s_used", b.s_used.into()),
+                            ])
+                        })
+                        .collect();
+                    (
+                        s.name.to_string(),
+                        obj([
+                            ("buckets", Json::Arr(b)),
+                            ("delta", s.delta.into()),
+                            ("alternative_used", Json::Bool(s.alternative_used)),
+                        ]),
+                    )
+                })
+                .collect();
+            plain(obj([
+                ("scenarios", Json::Obj(scen)),
+                ("capital", r.capital.into()),
+                ("binding_scenario", r.binding_scenario.into()),
+            ]))
+        },
         "risk.curve.par" => {
             let c = overnight(i, "convention")?;
             let (t, q, m) = (i.date("as_of")?, ois_quotes(i)?, interpolation(i)?);
@@ -234,9 +465,22 @@ super::registry! {
 }
 
 pub(crate) fn interpolation(i: &Inputs) -> Result<Interpolation> {
-    match Interpolation::parse(i.str("interpolation")?) {
-        Some(v) => Ok(v),
-        None => i.fail("interpolation", "unknown interpolation"),
+    match i.str("interpolation")? {
+        "TENSION_SPLINE" => match i.opt_f64("tension")? {
+            None => quantforge_core::error::fail("E_INPUT", "TENSION_SPLINE needs tension"),
+            Some(s) if !(s > 0.0 && s <= 1000.0) => {
+                quantforge_core::error::fail("E_DOMAIN", "tension must be in (0, 1000]")
+            }
+            Some(s) => Ok(Interpolation::TensionSpline(s)),
+        },
+        "HYBRID" => match i.0.get("step_end") {
+            None => quantforge_core::error::fail("E_INPUT", "HYBRID needs step_end"),
+            Some(_) => Ok(Interpolation::Hybrid(i.date("step_end")?)),
+        },
+        s => match Interpolation::parse(s) {
+            Some(v) => Ok(v),
+            None => i.fail("interpolation", "unknown interpolation"),
+        },
     }
 }
 
@@ -345,4 +589,12 @@ pub(crate) fn key_dates(i: &Inputs) -> Result<Option<Vec<quantforge_core::dates:
         None | Some(Json::Null) => Ok(None),
         Some(_) => Ok(Some(i.dates("key_dates")?)),
     }
+}
+
+fn var_json(r: var::VarEs, tail: bool) -> Json {
+    let mut v: Vec<(String, Json)> = vec![("var".into(), r.var.into()), ("es".into(), r.es.into())];
+    if tail {
+        v.push(("tail_count".into(), r.tail_count.into()));
+    }
+    Json::Obj(v)
 }

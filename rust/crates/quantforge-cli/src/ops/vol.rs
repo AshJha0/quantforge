@@ -3,6 +3,7 @@ use super::eq::forward_inputs;
 use super::eq::items;
 use super::eq::outright;
 use super::fx::call_or_put;
+use super::fx::nullable_f64;
 use super::rates::present;
 use super::rates::snapshot_id;
 use super::rates::start;
@@ -24,6 +25,7 @@ use quantforge_core::black;
 use quantforge_core::error::Result;
 use quantforge_core::error::fail;
 use quantforge_core::garch;
+use quantforge_core::garch_estimate::{self, Distribution};
 use quantforge_core::heston;
 use quantforge_core::json::Json;
 use quantforge_core::json::obj;
@@ -380,16 +382,67 @@ super::registry! {
             let r = i.reals("returns")?;
             let (o, a, b) = (i.f64("omega")?, i.f64("alpha")?, i.f64("beta")?);
             let s = start(i)?;
+            let student = distribution(i)?;
+            let nu = if student {
+                i.opt_f64("degrees_of_freedom")?
+            } else {
+                None
+            };
+            let mean = i.f64_or("mean", 0.0)?;
             i.gate()?;
             if r.len() < 2 {
                 return fail("E_INPUT", "at least 2 returns are required");
             }
             let Ok(s) = s else { return bad_start() };
-            let l = garch::loglik(&r, o, a, b, s)?;
+            let dist = match (student, nu) {
+                (false, _) => Distribution::Normal,
+                (true, Some(nu)) => Distribution::StudentT(nu),
+                (true, None) => {
+                    return fail("E_INPUT", "STUDENT_T needs degrees_of_freedom");
+                }
+            };
+            let l = garch_estimate::loglik_with(&r, (o, a, b), s, dist, mean)?;
             plain(obj([
                 ("loglik", l.loglik.into()),
                 ("variances", l.variances.into()),
                 ("next_variance", l.next_variance.into()),
+            ]))
+        },
+        "vol.garch.estimate" => {
+            let r = i.reals("returns")?;
+            let s = start(i)?;
+            let student = distribution(i)?;
+            let demean = i.bool("demean")?;
+            i.gate()?;
+            let Ok(s) = s else {
+                if r.len() < 30 || (student && r.len() < 100) {
+                    return fail("E_INPUT", "too few returns");
+                }
+                return bad_start();
+            };
+            let e = garch_estimate::estimate(&r, s, student, demean)?;
+            let se = |k: usize| Json::from(e.std_errors[k]);
+            let nu_se = if student { se(3) } else { Json::Null };
+            plain(obj([
+                ("omega", e.omega.into()),
+                ("alpha", e.alpha.into()),
+                ("beta", e.beta.into()),
+                (
+                    "degrees_of_freedom",
+                    e.degrees_of_freedom.map_or(Json::Null, Json::from),
+                ),
+                ("mean", e.mean.into()),
+                ("loglik", e.loglik.into()),
+                (
+                    "std_errors",
+                    obj([
+                        ("omega", se(0)),
+                        ("alpha", se(1)),
+                        ("beta", se(2)),
+                        ("degrees_of_freedom", nu_se),
+                    ]),
+                ),
+                ("persistence", (e.alpha + e.beta).into()),
             ]))
         },
         "vol.garch.forecast" => {
@@ -614,6 +667,18 @@ pub(crate) fn nonempty(i: &Inputs, keys: &[&str]) -> Result<()> {
     Ok(())
 }
 
+/// `distribution`: `NORMAL` (the default) or `STUDENT_T`; anything else is `E_SCHEMA`.
+fn distribution(i: &Inputs) -> Result<bool> {
+    match i.0.get("distribution") {
+        None => Ok(false),
+        Some(_) => match i.str("distribution")? {
+            "NORMAL" => Ok(false),
+            "STUDENT_T" => Ok(true),
+            _ => i.fail("distribution", "must be NORMAL or STUDENT_T"),
+        },
+    }
+}
+
 pub(crate) fn bad_start<T>() -> Result<T> {
     fail("E_INPUT", "initial_variance must be \"SAMPLE\" or a number")
 }
@@ -626,10 +691,10 @@ pub(crate) fn strip(i: &Inputs) -> Result<(i64, f64, Vec<VixQuote>)> {
         .map(|q| {
             Ok(VixQuote {
                 strike: q.f64("strike")?,
-                call_bid: q.f64("call_bid")?,
-                call_ask: q.f64("call_ask")?,
-                put_bid: q.f64("put_bid")?,
-                put_ask: q.f64("put_ask")?,
+                call_bid: nullable_f64(q, "call_bid")?,
+                call_ask: nullable_f64(q, "call_ask")?,
+                put_bid: nullable_f64(q, "put_bid")?,
+                put_ask: nullable_f64(q, "put_ask")?,
             })
         })
         .collect::<Result<Vec<_>>>()?;
