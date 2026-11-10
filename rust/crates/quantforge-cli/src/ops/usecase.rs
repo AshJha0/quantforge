@@ -73,7 +73,30 @@ super::registry! {
                 ("hedge_cost", r.hedge_cost.into()),
             ]))
         },
-        "usecase.vol_surface" => vol_surface(i)
+        "usecase.vol_surface" => vol_surface(i),
+        "usecase.factor_attribution" => {
+            let y = i.reals("portfolio_returns")?;
+            let f = i.matrix("factor_returns")?;
+            let names: Vec<String> = i
+                .array("factor_names")?
+                .iter()
+                .map(|v| match v {
+                    Json::Str(s) => Ok(s.clone()),
+                    _ => i.fail("factor_names", "expected strings"),
+                })
+                .collect::<Result<_>>()?;
+            i.gate()?;
+            let r = quantforge_core::attribution::factor_attribution(&y, &f, names.len())?;
+            plain(obj([
+                ("alpha", r.alpha.into()),
+                ("betas", r.betas.into()),
+                ("r_squared", r.r_squared.into()),
+                ("contributions", r.contributions.into()),
+                ("mean_return", r.mean_return.into()),
+                ("residual_vol", r.residual_vol.into()),
+                ("beta_se", r.beta_se.into()),
+            ]))
+        }
 }
 
 pub(crate) fn tenor_text(i: &Inputs, k: &str, s: &str) -> Result<(i64, char)> {

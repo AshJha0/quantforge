@@ -2,6 +2,7 @@
 //! `registry!`, which yields both its name table and its dispatcher. The verb table
 //! (`operations()`) is generated from the registry, so a name cannot exist without a handler.
 mod bond;
+mod book;
 mod calib;
 mod cmdty;
 mod core;
@@ -60,6 +61,7 @@ type Handler = fn(&str, &Inputs) -> Option<Result<Outcome>>;
 /// One row per domain: the first segment of its operation names, the names, the handler.
 const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("bond", bond::NAMES, bond::dispatch),
+    ("book", book::NAMES, book::dispatch),
     ("calib", calib::NAMES, calib::dispatch),
     ("cmdty", cmdty::NAMES, cmdty::dispatch),
     ("core", core::NAMES, core::dispatch),

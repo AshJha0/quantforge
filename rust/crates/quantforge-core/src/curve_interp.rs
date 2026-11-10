@@ -184,7 +184,7 @@ pub(crate) fn tension_moments(t: &[f64], l: &[f64], sigma: f64) -> Vec<f64> {
         let z = sigma * hi;
         if z < 1e-3 {
             (
-                hi / 6.0 * (1.0 - z * z / 60.0),
+                hi / 6.0 * (1.0 - 7.0 * z * z / 60.0),
                 hi / 3.0 * (1.0 - z * z / 15.0),
             )
         } else {
@@ -224,9 +224,13 @@ pub(crate) fn tension_moments(t: &[f64], l: &[f64], sigma: f64) -> Vec<f64> {
 fn tension_r(u: f64, h: f64, sigma: f64) -> (f64, f64) {
     let z = sigma * h;
     if z < 1e-3 {
+        // Ruling F-35: the series keeps its sigma^2 term.
+        let s2 = sigma * sigma;
+        let base = (u / h) * (u * u - h * h) / 6.0;
+        let corr = 1.0 + s2 * (3.0 * u * u - 7.0 * h * h) / 60.0;
         return (
-            (u / h) * (u * u - h * h) / 6.0,
-            (3.0 * u * u - h * h) / (6.0 * h),
+            base * corr,
+            (3.0 * u * u - h * h) / (6.0 * h) * corr + base * s2 * u / 10.0,
         );
     }
     let q = one_minus_exp(2.0 * z);
@@ -321,5 +325,26 @@ mod tests {
         let a = tension_moments(&t, &l, 1e-4);
         let b = tension_moments(&t, &l, 2e-3);
         assert!(a.iter().zip(&b).all(|(x, y)| (x - y).abs() < 1e-6));
+    }
+
+    #[test]
+    fn tension_series_joins_the_exact_form_at_the_switch() {
+        let h = 2.0;
+        // F-35: the two branches agree to the exact branch's cancellation error (about 1e-9).
+        for u in [0.3, 1.0, 1.7] {
+            let (a, da) = tension_r(u, h, 0.999e-3 / h);
+            let (b, db) = tension_r(u, h, 1.001e-3 / h);
+            assert!((a - b).abs() <= 2e-8 * b.abs(), "{u}: {a} {b}");
+            // The exact branch loses about 1e-9 to cancellation here, so R' is checked loosely
+            // across the switch and tightly against the series value's own slope.
+            assert!(
+                (da - db).abs() <= 2e-8 * db.abs().max(1e-3),
+                "{u}: {da} {db}"
+            );
+            let e = 1e-5;
+            let sigma = 0.999e-3 / h;
+            let fd = (tension_r(u + e, h, sigma).0 - tension_r(u - e, h, sigma).0) / (2.0 * e);
+            assert!((da - fd).abs() <= 1e-9, "{u}: {da} {fd}");
+        }
     }
 }

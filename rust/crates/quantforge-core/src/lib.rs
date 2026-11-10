@@ -9,8 +9,10 @@
 
 pub mod aad;
 pub mod arb_surface;
+pub mod attribution;
 pub mod black;
 pub mod bonds;
+pub mod book;
 pub mod book_risk;
 pub mod calendar;
 pub mod calib;
