@@ -23,6 +23,8 @@ import importlib.util
 import io
 import json
 import sys
+import time
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,10 +39,25 @@ USER_AGENT = "Mozilla/5.0 (compatible; quantforge-recorder/0.2)"
 REQUIRED = ("id", "url", "licence", "licence_url", "terms_checked", "attribution", "redistribute_raw", "notice", "enabled")
 
 
-def fetch(url, timeout):
+RETRY_STATUS = (429, 500, 502, 503, 504)
+
+
+def fetch(url, timeout, attempts=4, backoff=15.0, sleep=time.sleep):
+    """GET url. Transient failures (HTTP 429/5xx, timeouts, connection resets) are retried with
+    linear backoff, because public statistics APIs (the ECB data API in particular) return
+    occasional 504s. Other errors, and the last failed attempt, are raised to the caller."""
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code not in RETRY_STATUS or attempt == attempts:
+                raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if attempt == attempts:
+                raise
+        sleep(backoff * attempt)
 
 
 def parse_treasury_csv(raw, fields):
