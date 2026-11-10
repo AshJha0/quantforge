@@ -53,3 +53,15 @@ Read: `specifications/04-pricing/short-rate-models.md`, section "`rates.shortrat
 
 ### Outside-oracle status
 `swaption_g` 33 of 40 (every value case; the 7 error cases are not counted). Stage G so far: 96 of 150 = 64.0% (`oracle/outside_register_g.json`).
+
+## WAVE 2b READY (2026-11-10): G2++ bond prices and bond options
+
+Read: `specifications/04-pricing/short-rate-models.md`, section "G2++"; ruling G-14; cli-contract block "Stage G operations"; `specifications/name-map.json` (231 operations).
+
+### G2b (suite `g2pp_g`, 38 cases)
+- New operations `rates.g2pp.zcb` (with factor states `x`, `y`) and `rates.g2pp.zcb_option` (states start at 0; `x` or `y` present is `E_INPUT`).
+- Build notes: the curve and its rules are the Hull-White ones (log-linear, `(0, 1)` first node); `P(0,t)` ratios only, no instantaneous forward, so no pillar rule is needed. Apply the G-2 small-`a` series to each factor. `rho` strictly inside `(-1, 1)`.
+- Property tests: put-call parity; `eta -> 0` gives the Hull-White price (golden `g2pp_g-0031`); `x = y = 0`, `t = 0` gives the curve.
+
+### Outside-oracle status
+`g2pp_g` 30 of 38 (every value case except the one-factor limit; QuantLib 1.44 `G2`). Stage G so far: 126 of 188 = 67.0%.

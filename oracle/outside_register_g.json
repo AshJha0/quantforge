@@ -13,5 +13,10 @@
   "counted": 33,
   "total": 40,
   "rule": "QuantLib HullWhite discountBond and discountBondOption, r* by QuantLib Brent to 1e-15, combined by arithmetic; DiscountCurve discounts for the annuity and forward"
+ },
+ "g2pp_g": {
+  "counted": 30,
+  "total": 38,
+  "rule": "QuantLib G2 discountBond and discountBondOption on a DiscountCurve; zero_rate and the curve discounts as arithmetic or curve values"
  }
 }

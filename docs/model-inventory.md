@@ -492,9 +492,9 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Limitations:** one factor (perfectly correlated rates); constant parameters (no time-dependent `sigma`); Vasicek and Hull-White allow negative rates without bound; no market price of risk; no calibration yet (later wave).
 - **Validation:** 50-digit mpmath replicas; QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` outside check (61 of 78 bond cases, 33 of 40 swaption cases). **Review:** 2026-11-10.
 - **Tier:** 1.
-- **Challenger:** G2++ (later wave).
+- **Challenger:** G2++ (`rates.g2pp.*`, wave 2b; QuantLib `G2` outside check, 30 of 38).
 - **Monitoring thresholds:** calibration error once calibration lands.
-- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`)
+- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`); b0630a25f4a701810eb1596c3fcdf7ab70736a6759973bc6771345576b7f1188 (`g2pp_g`)
 - **Retirement trigger:** a multi-factor or market model for the desk's products.
 - **Validation report:** `specifications/04-pricing/short-rate-models.md`.
 

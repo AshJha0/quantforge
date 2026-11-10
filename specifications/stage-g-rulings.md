@@ -22,6 +22,12 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 | G-12 | Swaption conventions | Single curve, fixed accruals from the payment times (first period from expiry), floating leg a par floater at expiry. Multi-curve (projection on a separate curve, a basis spread on the floating leg) waits for the calibration wave and will be a new input, not a change of meaning |
 | G-13 | Outside check of Jamshidian | QuantLib's `JamshidianSwaptionEngine` stops its critical-rate solve near 1e-8, which moves the price by about 3e-7 relative; it is not the counted check. The counted check uses QuantLib's own `HullWhite` bond and bond-option values at a critical rate solved by QuantLib's `Brent` to 1e-15. `r*` is not an output, because no library returns it |
 
+## Wave 2b, G2++
+
+| # | Point | Ruling |
+|---|---|---|
+| G-14 | G2++ operations and states | G2++ has its own operations (`rates.g2pp.*`), not a `model` value of `rates.shortrate.*`, because its state is two numbers (`x`, `y`) and `G2PP` is already pinned as an unknown `model` there (`shortrate_g` error case). `rho` must be strictly inside `(-1, 1)` (at `+-1` the model is one-factor and the swaption integral of a later wave is singular); `a = b` is allowed, since no formula divides by `a - b` |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |

@@ -514,6 +514,107 @@ def g2a():
     reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
 
 
+# ================================================================================================ G2b G2++
+G2Z, G2O = "rates.g2pp.zcb", "rates.g2pp.zcb_option"
+
+
+def g2_V(a, sg, b, et, rho, tau):
+    a, sg, b, et, rho, tau = map(mp.mpf, (a, sg, b, et, rho, tau))
+    va = sg ** 2 / a ** 2 * (tau + 2 / a * mp.exp(-a * tau) - 1 / (2 * a) * mp.exp(-2 * a * tau) - 3 / (2 * a))
+    vb = et ** 2 / b ** 2 * (tau + 2 / b * mp.exp(-b * tau) - 1 / (2 * b) * mp.exp(-2 * b * tau) - 3 / (2 * b))
+    vab = 2 * rho * sg * et / (a * b) * (tau + (mp.exp(-a * tau) - 1) / a + (mp.exp(-b * tau) - 1) / b
+                                         - (mp.exp(-(a + b) * tau) - 1) / (a + b))
+    return va + vb + vab
+
+
+def g2_zcb(inp, mut=None):
+    cv = Curve(**inp["curve"])
+    a, sg, b, et, rho = (inp[k] for k in ("a", "sigma", "b", "eta", "rho"))
+    t, T, x, y = (mp.mpf(inp[k]) for k in ("t_years", "maturity_years", "x", "y"))
+    half = (g2_V(a, sg, b, et, rho, T - t) - g2_V(a, sg, b, et, rho, T) + g2_V(a, sg, b, et, rho, t)) / 2
+    if mut == "no_half":
+        half *= 2
+    P = cv.P(T) / cv.P(t) * mp.exp(half - (1 - mp.exp(-a * (T - t))) / a * x - (1 - mp.exp(-b * (T - t))) / b * y)
+    return {"discount_factor": float(P), "zero_rate": float(-mp.log(P) / (T - t))}
+
+
+def g2_opt(inp, mut=None):
+    cv = Curve(**inp["curve"])
+    a, sg, b, et, rho = (mp.mpf(inp[k]) for k in ("a", "sigma", "b", "eta", "rho"))
+    T, S, K = (mp.mpf(inp[k]) for k in ("expiry_years", "maturity_years", "strike"))
+    if mut == "rho_sign":
+        rho = -rho
+    S2 = (sg ** 2 / (2 * a ** 3) * (1 - mp.exp(-a * (S - T))) ** 2 * (1 - mp.exp(-2 * a * T))
+          + et ** 2 / (2 * b ** 3) * (1 - mp.exp(-b * (S - T))) ** 2 * (1 - mp.exp(-2 * b * T))
+          + 2 * rho * sg * et / (a * b * (a + b)) * (1 - mp.exp(-a * (S - T))) * (1 - mp.exp(-b * (S - T))) * (1 - mp.exp(-(a + b) * T)))
+    PT, PS = cv.P(T), cv.P(S)
+    v = gauss_opt(inp["option_type"], PT, PS, K, mp.sqrt(S2)) * inp["notional"]
+    return {"price": float(v), "bond_price_expiry": float(PT), "bond_price_maturity": float(PS)}
+
+
+def ql_g2(inp):
+    return ql.G2(ql_curve(inp["curve"]), inp["a"], inp["sigma"], inp["b"], inp["eta"], inp["rho"])
+
+
+def g2b():
+    s = Suite("g2pp_g", "specifications/04-pricing/short-rate-models.md", G)
+    pars = [dict(a=0.5, sigma=0.01, b=0.05, eta=0.008, rho=-0.75), dict(a=0.1, sigma=0.012, b=0.8, eta=0.01, rho=0.3),
+            dict(a=0.2, sigma=0.015, b=0.03, eta=0.006, rho=0.0)]
+    n_out = 0
+    for pr in pars:
+        for t, T, x, y in ((0.0, 5.0, 0.0, 0.0), (1.5, 7.5, 0.004, -0.002), (2.5, 30.0, -0.01, 0.006), (0.3, 0.31, 0.002, 0.001)):
+            inp = dict(pr, curve=CURVE, t_years=t, maturity_years=T, x=x, y=y)
+            out = g2_zcb(inp)
+            q = ql_g2(inp).discountBond(t, T, ql.Array([x, y]))
+            ok = close(q, out["discount_factor"])
+            n_out += ok
+            if not ok:
+                note(f"  QL g2 zcb differs: {q} {out}")
+            s.add(G2Z, inp, out, verified=["mpmath-50"] + (["quantlib-1.44"] if ok else []), tags=["g2pp"],
+                  description=f"G2++ P(t={t}, T={T} | x={x}, y={y})")
+        for typ in ("CALL", "PUT"):
+            for T, S, K in ((1.0, 5.0, 0.86), (5.0, 10.0, 0.80), (0.5, 20.0, 0.50)):
+                inp = dict(pr, curve=CURVE, option_type=typ, strike=K, expiry_years=T, maturity_years=S, notional=1e6)
+                out = g2_opt(inp)
+                q = 1e6 * ql_g2(inp).discountBondOption(ql.Option.Call if typ == "CALL" else ql.Option.Put, K, T, S)
+                ok = abs(q - out["price"]) <= 1e-6 + 1e-9 * abs(out["price"])
+                n_out += ok
+                if not ok:
+                    note(f"  QL g2 opt differs: {q} {out}")
+                s.add(G2O, inp, out, verified=["mpmath-50", "put-call-parity"] + (["quantlib-1.44"] if ok else []),
+                      tags=["g2pp", typ.lower()], limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-12 per unit notional"},
+                      description=f"G2++ {typ} on ZCB T={T} S={S} K={K}")
+    # one-factor limit: eta -> 0 recovers Hull-White (asserted, and a golden)
+    lim = dict(a=0.05, sigma=0.01, b=0.3, eta=1e-12, rho=0.0, curve=CURVE, option_type="CALL", strike=0.86, expiry_years=1.0, maturity_years=5.0, notional=1e6)
+    hwv = opt_value(dict(model="HULL_WHITE", mean_reversion=0.05, sigma=0.01, curve=CURVE, option_type="CALL", strike=0.86, expiry_years=1.0, maturity_years=5.0, notional=1e6))["price"]
+    assert abs(g2_opt(lim)["price"] - hwv) < 1e-6
+    s.add(G2O, lim, g2_opt(lim), verified=["mpmath-50", "hull-white-limit"], tags=["g2pp", "limit"],
+          limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-12 per unit notional"}, description="eta near 0: the Hull-White price")
+    b0 = dict(pars[0], curve=CURVE, t_years=1.5, maturity_years=7.5, x=0.004, y=-0.002)
+    caught("G2++ without the 1/2 on the variance terms", abs(g2_zcb(b0)["discount_factor"] - g2_zcb(b0, "no_half")["discount_factor"]))
+    b1 = dict(pars[0], curve=CURVE, option_type="CALL", strike=0.86, expiry_years=1.0, maturity_years=5.0, notional=1e6)
+    caught("G2++ cross term with the wrong sign", abs(g2_opt(b1)["price"] - g2_opt(b1, "rho_sign")["price"]), 1e-6)
+    e = dict(pars[0], curve=CURVE, t_years=0.0, maturity_years=5.0, x=0.0, y=0.0)
+    eo = dict(pars[0], curve=CURVE, option_type="CALL", strike=0.9, expiry_years=1.0, maturity_years=5.0, notional=1.0)
+    errs = [(G2Z, dict(e, rho=1.0), "E_DOMAIN", "rho = 1"), (G2Z, dict(e, rho=-1.2), "E_DOMAIN", "rho < -1"),
+            (G2Z, dict(e, a=0.0), "E_DOMAIN", "a = 0"), (G2Z, dict(e, eta=0.0), "E_DOMAIN", "eta = 0"),
+            (G2Z, dict(e, maturity_years=0.0), "E_DOMAIN", "T = t"), (G2O, dict(eo, expiry_years=5.0), "E_DOMAIN", "expiry = maturity"),
+            (G2O, dict(eo, x=0.0), "E_INPUT", "state given to the option")]
+    for op, inp, code, d in errs:
+        s.add(op, inp, error=code, cls="date_and_convention", tags=["invalid", "g2pp"], description=d)
+    for c in s.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    note(f"g2pp_g outside (QuantLib 1.44 G2): {n_out} of {len(s.cases)}")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["g2pp_g"] = {"counted": n_out, "total": len(s.cases), "rule": "QuantLib G2 discountBond and discountBondOption on a DiscountCurve; zero_rate and the curve discounts as arithmetic or curve values"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2 or "G1" in sys.argv:
@@ -522,3 +623,5 @@ if __name__ == "__main__":
         r9()
     if len(sys.argv) < 2 or "G2A" in sys.argv:
         g2a()
+    if len(sys.argv) < 2 or "G2B" in sys.argv:
+        g2b()

@@ -63,6 +63,26 @@ Errors in order (after F-2): `short_rate` present `E_INPUT`; `a`, `sigma`, curve
 
 Validation: 33 value cases (expiries 0.5 to 10 years, 2 to 20 annual periods, strikes at the forward and 100 bp either side, both types, a semi-annual swap, high mean reversion `a = 0.5`, a zero strike on the negative-rate curve) and 7 error cases. Values: 50-digit mpmath, `r*` to 1e-45. Payer minus receiver equals `annuity (F - K)` to 1e-8 on every pair (asserted). Outside: QuantLib 1.44 `HullWhite` `discountBond` and `discountBondOption`, `r*` by QuantLib's `Brent` to 1e-15, combined by arithmetic, and `DiscountCurve` discounts: 33 of 40 count. `JamshidianSwaptionEngine` itself agrees only to about 3e-7 relative (its internal root accuracy), so the engine is not the counted check. Wrong conventions caught: Ho-Lee `sigma_p`; strike 1 on every bond option.
 
+## G2++: `rates.g2pp.zcb`, `rates.g2pp.zcb_option` (stage G wave 2b)
+
+Two-factor Gaussian model [BM 4.2, eqs. 4.10, 4.14 and 4.31] (not opened; checked against QuantLib 1.44 `G2`). Suite `stage_g/g2pp_g` (38 cases), generator slice `G2B`. Ruling G-14.
+
+`r(t) = x(t) + y(t) + phi(t)`, `dx = -a x dt + sigma dW1`, `dy = -b y dt + eta dW2`, `dW1 dW2 = rho dt`, `x(0) = y(0) = 0`, `phi` fitted to the curve (the Hull-White `curve` input and rules).
+
+Inputs: `curve`, `a`, `sigma`, `b`, `eta` (all > 0, else `E_DOMAIN`; `a = b` is allowed), `rho` (strictly inside `(-1, 1)`, else `E_DOMAIN`).
+- `rates.g2pp.zcb`: plus `x`, `y` (the factor values at `t`), `t_years` (>= 0), `maturity_years` (> `t_years`). Outputs `discount_factor`, `zero_rate` as `rates.shortrate.zcb`.
+- `rates.g2pp.zcb_option`: plus `option_type`, `strike`, `expiry_years`, `maturity_years`, `notional` as `rates.shortrate.zcb_option`; `x` or `y` present is `E_INPUT` (both start at 0). Outputs `price`, `bond_price_expiry`, `bond_price_maturity`.
+
+With `tau = T - t`:
+`V(tau) = sigma^2/a^2 (tau + (2/a) e^{-a tau} - (1/(2a)) e^{-2 a tau} - 3/(2a)) + eta^2/b^2 (same in b) + (2 rho sigma eta / (a b)) (tau + (e^{-a tau} - 1)/a + (e^{-b tau} - 1)/b - (e^{-(a+b) tau} - 1)/(a + b))`;
+`P(t, T) = (P(0,T) / P(0,t)) exp(0.5 (V(T - t) - V(T) + V(t)) - ((1 - e^{-a tau})/a) x - ((1 - e^{-b tau})/b) y)`.
+
+Bond option at `T` on the bond to `S`: `Sigma^2 = sigma^2/(2a^3) (1 - e^{-a(S-T)})^2 (1 - e^{-2aT}) + eta^2/(2b^3) (1 - e^{-b(S-T)})^2 (1 - e^{-2bT}) + (2 rho sigma eta / (a b (a+b))) (1 - e^{-a(S-T)})(1 - e^{-b(S-T)})(1 - e^{-(a+b)T})`, then the Gaussian bond-option formula of `zcb_option` with `sigma_p = Sigma` and the curve's `P(0,T)`, `P(0,S)`.
+
+Small `a` or `b`: the cancellations of ruling G-2 apply to each factor; use the same series.
+
+Validation: three parameter sets (negative, positive and zero `rho`; fast and slow factors in both orders), 12 bond prices (`t = 0` and `t > 0` with non-zero states, a 30-year bond, a 0.01-year bond) and 18 options; a one-factor limit case (`eta = 1e-12`, equal to the Hull-White price, asserted); 7 error cases. Outside: QuantLib 1.44 `G2` `discountBond` (with the factor array) and `discountBondOption`: 30 of 38 count. Wrong conventions caught: the variance terms without the 1/2; the cross term with the wrong sign.
+
 ## Error checks for `zcb` and `zcb_option`, in order (after F-2)
 
 `model` unknown `E_INPUT`; `a <= 0` or `sigma <= 0` `E_DOMAIN`; `CIR` with `b <= 0` or `r < 0` `E_DOMAIN`; `curve` rules (above); `short_rate` presence rule (G-5) `E_INPUT`, absence where required `E_SCHEMA`; `t_years < 0`, `maturity_years <= t_years`, `expiry_years <= 0`, `maturity_years <= expiry_years`, `strike <= 0` `E_DOMAIN`; `option_type` `E_INPUT`. `E_LIMIT`: curve pillars 10,000 (ruling G-6).

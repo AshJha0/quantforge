@@ -4025,6 +4025,99 @@
     "futures_rate"
    ]
   },
+  "rates.g2pp.zcb": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::g2pp_zcb",
+   "python": "quantforge.rates.g2pp_zcb",
+   "java": "Rates.g2ppZcb",
+   "cpp": "qf::rates::g2pp_zcb",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "eta": {
+     "java": "eta"
+    },
+    "maturity_years": {
+     "java": "maturityYears"
+    },
+    "rho": {
+     "java": "rho"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "t_years": {
+     "java": "tYears"
+    },
+    "x": {
+     "java": "x"
+    },
+    "y": {
+     "java": "y"
+    }
+   },
+   "outputs": [
+    "discount_factor",
+    "zero_rate"
+   ]
+  },
+  "rates.g2pp.zcb_option": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::g2pp_zcb_option",
+   "python": "quantforge.rates.g2pp_zcb_option",
+   "java": "Rates.g2ppZcbOption",
+   "cpp": "qf::rates::g2pp_zcb_option",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "eta": {
+     "java": "eta"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "maturity_years": {
+     "java": "maturityYears"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rho": {
+     "java": "rho"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "bond_price_expiry",
+    "bond_price_maturity",
+    "price"
+   ]
+  },
   "rates.ois.bootstrap": {
    "spec": "specifications/02-curves/csa-and-basis.md",
    "rust": "quantforge::rates::ois_bootstrap",
