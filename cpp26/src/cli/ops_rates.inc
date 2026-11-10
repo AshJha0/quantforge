@@ -449,6 +449,210 @@ void op_bondfut_implied_vol(const In& in, Out& out) {
     out.key_real("yield_vol", r.yield_vol);
 }
 
+
+// ---- stage F (Q4): joint solve and funding curve ----
+
+std::vector<Date> turns_of(const In& in) {
+    const Value* a = in.find("turns");
+    if (!a) return {};
+    if (a->kind != Kind::Array) schema("turns", "expected an array");
+    std::vector<Date> out;
+    for (const Value& item : a->items) {
+        if (item.kind != Kind::Object) schema("turns", "expected an object");
+        out.push_back(In(item).date("date"));
+    }
+    return out;
+}
+
+void op_joint_solve(const In& in, Out& out) {
+    const Date as_of = in.date("as_of");
+    const Value& cs = in.need("curves");
+    if (cs.kind != Kind::Array) schema("curves", "expected an array");
+    std::vector<JointCurveSpec> curves;
+    std::vector<const Value*> xccy_curves;
+    for (const Value& v : cs.items) {
+        if (v.kind != Kind::Object) schema("curves", "expected an object");
+        const In c(v);
+        JointCurveSpec s;
+        s.name = c.text("name");
+        s.type = c.choice<JointCurveType>("type", {{"OIS", JointCurveType::Ois},
+                                                   {"OIS_STEPS", JointCurveType::OisSteps},
+                                                   {"PROJECTION", JointCurveType::Projection},
+                                                   {"XCCY", JointCurveType::Xccy}});
+        switch (s.type) {
+            case JointCurveType::Ois:
+                s.convention = ois_convention_of(c.need("convention"), "convention");
+                s.interpolation = c.choice("interpolation", curve_interpolations);
+                s.shape = curve_shape_of(c);
+                s.jumps = jumps_of(c, false);
+                s.turns = turns_of(c);
+                break;
+            case JointCurveType::OisSteps:
+                s.convention = ois_convention_of(c.need("convention"), "convention");
+                s.step_dates = dates_of(c, "step_dates");
+                s.jumps = jumps_of(c, false);
+                s.turns = turns_of(c);
+                break;
+            case JointCurveType::Projection:
+                s.convention = index_of(c.need("index"), "index");
+                s.discount = c.text("discount");
+                s.interpolation = c.choice("interpolation", curve_interpolations);
+                s.shape = curve_shape_of(c);
+                break;
+            case JointCurveType::Xccy:
+                s.domestic = c.text("domestic");
+                s.foreign_projection = c.text("foreign_projection");
+                (void)overnight_of_key(c, "domestic_convention");
+                (void)overnight_of_key(c, "foreign_convention");
+                s.start = c.date("start");
+                s.interpolation = c.choice("interpolation", curve_interpolations);
+                s.shape = curve_shape_of(c);
+                xccy_curves.push_back(&v);
+                break;
+        }
+        curves.push_back(std::move(s));
+    }
+    const Value& is = in.need("instruments");
+    if (is.kind != Kind::Array) schema("instruments", "expected an array");
+    std::vector<JointInstrument> instruments;
+    for (const Value& v : is.items) {
+        if (v.kind != Kind::Object) schema("instruments", "expected an object");
+        const In q(v);
+        JointInstrument j;
+        j.id = q.text("id");
+        j.curve = q.text("curve");
+        j.type = q.choice<JointInstrumentType>("type", {{"OIS", JointInstrumentType::Ois},
+                                                       {"FUTURE", JointInstrumentType::Future},
+                                                       {"DEPOSIT", JointInstrumentType::Deposit},
+                                                       {"FRA", JointInstrumentType::Fra},
+                                                       {"SWAP", JointInstrumentType::Swap},
+                                                       {"XCCY", JointInstrumentType::Xccy}});
+        j.turn = q.boolean("turn", false);
+        switch (j.type) {
+            case JointInstrumentType::Ois:
+                j.tenor = parse_tenor(q.text("tenor"));
+                j.rate = q.real("rate");
+                break;
+            case JointInstrumentType::Future:
+                j.start = q.date("start");
+                j.end = q.date("end");
+                j.price = q.real("price");
+                j.sigma = q.real("sigma");
+                j.mean_reversion = q.real("mean_reversion");
+                break;
+            case JointInstrumentType::Deposit:
+            case JointInstrumentType::Swap:
+                j.months = q.integer("months");
+                j.rate = q.real("rate");
+                break;
+            case JointInstrumentType::Fra:
+                j.months = q.integer("start_months");
+                j.rate = q.real("rate");
+                break;
+            case JointInstrumentType::Xccy:
+                j.months = q.integer("months");
+                j.spread = q.real("spread");
+                break;
+        }
+        instruments.push_back(std::move(j));
+    }
+    in.ready();
+    limit_if(curves.size() > max_quotes, "curves");
+    limit_if(instruments.size() > max_quotes, "instruments");
+    for (const Value* v : xccy_curves) xccy_conventions(In(*v));
+    for (const JointInstrument& j : instruments) {
+        const bool fra = j.type == JointInstrumentType::Fra;
+        if ((j.type == JointInstrumentType::Deposit || j.type == JointInstrumentType::Swap || fra) &&
+            (j.months > 1200 || j.months < (fra ? 0 : 1)))
+            throw Error("E_INPUT", "months is out of range", "instruments");
+    }
+    const JointResult r = joint_solve(as_of, curves, instruments);
+    out.values.key("curves");
+    out.values.begin_array();
+    for (const JointCurveResult& c : r.curves) {
+        out.values.begin_object();
+        out.key_string("name", c.name);
+        if (c.steps) {
+            out.key_real("base_rate", c.base_rate);
+            out.key_reals("step_rates", c.step_rates);
+        } else {
+            out.values.key("pillars");
+            out.values.begin_array();
+            for (const Pillar& p : c.pillars) {
+                out.values.begin_object();
+                out.key_string("date", format_date(p.date));
+                out.key_real("discount_factor", p.discount_factor);
+                out.values.end_object();
+            }
+            out.values.end_array();
+        }
+        out.values.end_object();
+    }
+    out.values.end_array();
+    out.values.key("turn_factors");
+    out.values.begin_array();
+    for (const TurnFactor& t : r.turn_factors) {
+        out.values.begin_object();
+        out.key_string("curve", t.curve);
+        out.key_string("date", format_date(t.date));
+        out.key_real("factor", t.factor);
+        out.values.end_object();
+    }
+    out.values.end_array();
+    const auto strings = [&](const char* key, const std::vector<string>& items) {
+        out.values.key(key);
+        out.values.begin_array();
+        for (const string& s : items) out.values.string(s);
+        out.values.end_array();
+    };
+    const auto matrix = [&](const char* key, const Matrix& m) {
+        out.values.key(key);
+        out.values.begin_array();
+        for (const auto& row : m) {
+            out.values.begin_array();
+            for (const double x : row) out.values.real(x);
+            out.values.end_array();
+        }
+        out.values.end_array();
+    };
+    out.values.key("jacobian");
+    out.values.begin_object();
+    strings("unknowns", r.unknowns);
+    strings("quotes", r.quotes);
+    matrix("matrix", r.jacobian);
+    out.values.end_object();
+    matrix("turn_sensitivity", r.turn_sensitivity);
+    out.diagnostic("max_repricing_error", r.max_repricing_error);
+}
+
+void op_funding_curve(const In& in, Out& out) {
+    const CurveInput di = curve_of(in, "discount");
+    const Value& a = in.need("quotes");
+    if (a.kind != Kind::Array) schema("quotes", "expected an array");
+    std::vector<FundingQuote> quotes;
+    for (const Value& v : a.items) {
+        if (v.kind != Kind::Object) schema("quotes", "expected an object");
+        const In q(v);
+        quotes.push_back({q.date("end"), q.real("rate")});
+    }
+    const std::vector<Date> dates = in.find("dates") ? dates_of(in, "dates") : std::vector<Date>{};
+    in.ready();
+    di.limit();
+    limit_if(quotes.size() > max_quotes, "quotes");
+    const FundingCurve f = funding_curve(di.build(), quotes, dates);
+    out.key_reals("spreads", f.spreads);
+    out.values.key("pillars");
+    out.values.begin_array();
+    for (const Pillar& p : f.pillars) {
+        out.values.begin_object();
+        out.key_string("date", format_date(p.date));
+        out.key_real("discount_factor", p.discount_factor);
+        out.values.end_object();
+    }
+    out.values.end_array();
+    out.key_reals("discount_factors", f.discount_factors);
+}
+
 constexpr Entry rates_ops[] = {
     {"rates.basis.ois_spread", op_ois_spread},
     {"rates.basis.spread", op_basis_spread},
@@ -461,8 +665,10 @@ constexpr Entry rates_ops[] = {
     {"rates.curve.forward", op_curve_forward},
     {"rates.curve.inspect", op_curve_inspect},
     {"rates.curve.joint_bootstrap", op_joint_bootstrap},
+    {"rates.curve.joint_solve", op_joint_solve},
     {"rates.fallback.rate", op_fallback_rate},
     {"rates.fra.pv", op_fra_pv},
+    {"rates.funding.curve", op_funding_curve},
     {"rates.futures.convexity", op_futures_convexity},
     {"rates.ois.bootstrap", op_ois_bootstrap},
     {"rates.ois.compound", op_ois_compound},

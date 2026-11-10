@@ -232,7 +232,7 @@ Convexity futures_convexity(double price, double t, double big_t, double sigma, 
     const double futures = (100.0 - price) / 100.0;
     const double z = sigma * sigma / 2.0 * (l * bd * bd + bd * bt * bt);
     const double cv = -std::expm1(-z) * (futures + 1.0 / d);
-    return {futures, cv, futures - cv};
+    return {futures, cv, futures - cv, z};
 }
 
 // ---- CSA, basis, joint ----

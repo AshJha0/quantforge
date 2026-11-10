@@ -59,6 +59,7 @@ StepFit fit_steps(const RateConvention& c, Date as_of, const std::vector<Date>& 
 
 struct Convexity {
     double futures_rate, convexity, forward_rate;
+    double z = 0.0;  // the convexity exponent: convexity = (1 - e^{-z}) (futures_rate + 1/(T - t))
 };
 Convexity futures_convexity(double price, double start_years, double end_years, double sigma, double mean_reversion);
 

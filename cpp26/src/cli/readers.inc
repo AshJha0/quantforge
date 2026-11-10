@@ -239,7 +239,7 @@ CurveInput curve_of(const In& in, string_view key) {
     const Value& v = in.need(key);
     if (v.kind != Kind::Object) schema(key, "expected an object");
     const In c(v);
-    CurveInput out{c.date("as_of"), c.choice("interpolation", curve_interpolations), {}, {}};
+    CurveInput out{c.date("as_of"), c.choice("interpolation", curve_interpolations), {}, {}, {}};
     const Value& p = c.need("pillars");
     if (p.kind != Kind::Array) schema("pillars", "expected an array");
     for (const Value& item : p.items) {
@@ -970,7 +970,7 @@ VixTerm vix_term_of(const In& in) {
     return t;
 }
 
-VixTerm vix_term_at(const In& in, string_view key) {
+[[maybe_unused]] VixTerm vix_term_at(const In& in, string_view key) {
     const Value& v = in.need(key);
     if (v.kind != Kind::Object) schema(key, "expected an object");
     return vix_term_of(In(v));

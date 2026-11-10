@@ -198,6 +198,19 @@ struct ProjectionQuote {
     double rate;
 };
 
+/// One projection-curve instrument (deposit, FRA or swap on a term index), dated from as_of.
+struct ProjectionInstrument {
+    Date start, end;  // deposit and FRA accrual; for a swap, spot and the last fixed end
+    double alpha;     // deposit and FRA ACT/360 accrual
+    std::vector<Period> fixed, floating;  // swap legs; empty for a deposit or FRA
+    Date pillar() const { return end; }
+};
+ProjectionInstrument projection_instrument(const RateConvention& index, Date as_of, const ProjectionQuote& q);
+/// Par rate of the instrument: projection forwards, swaps discounted by `discount`.
+/// unchecked: caller guarantees finite inputs
+double projection_model(const RateConvention& index, const ProjectionInstrument& it, const std::function<double(Date)>& discount,
+                        const Curve& projection);
+
 Curve projection_bootstrap(const Curve& discount, const RateConvention& index, Date as_of,
                            const std::vector<ProjectionQuote>& quotes, CurveInterpolation interpolation,
                            double* max_repricing_error = nullptr, const CurveShape& shape = {});

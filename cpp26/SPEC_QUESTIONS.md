@@ -124,3 +124,12 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 - Q1 `step_end` must be a pillar of every curve it is applied to (in `rates.curve.joint_bootstrap` both curves). `rates.projection.bootstrap` has no `tension`/`step_end` keys, so TENSION_SPLINE and HYBRID are `E_INPUT` there. `rates.curve.inspect` forwards are of the smooth curve (no jumps, no zero shift); LINEAR_ZERO forward before the first pillar is the first zero rate.
 - R8 `vol.garch.loglik`: STUDENT_T checks (missing nu `E_INPUT`, nu <= 2 `E_DOMAIN`) run after the existing checks; a non-finite `degrees_of_freedom` is `E_DOMAIN` even under NORMAL. `vol.garch.estimate` interior test for nu: `nu - 2 >= 2e-6` and `500 - nu >= 5e-4`.
 - R10 VIX: a missing quote key stays `E_SCHEMA`; only an explicit `null` is a null quote. A present negative quote is `E_DOMAIN` even if the other side of that series is null.
+- Q4 `rates.curve.joint_solve`, XCCY quote column: the spec says `dR/dq` is `-1` on the diagonal for rate and spread
+  quotes, but the XCCY residual is `L_foreign` itself, whose derivative in `spread` is `sum alpha_i D_f(e_i)`. This build
+  uses the true derivative (as the handover of 2026-11-09 describes). No golden covers it yet.
+- Q4 turns: the solve holds `ln S` (the turn-free curve) at pillars, so `turn_sensitivity` scales every date after the
+  turn together (ruling F-26); the reported Jacobian rows are `ln D`, which adds the turn row for each turn before the
+  pillar. The non-spanning zeros are set exactly by the date rule (first date <= turn < last date), not left to rounding.
+- Q4 IFT `dR/dx`: central differences Richardson-combined over `h = 1e-5` and `5e-6`. With `h = 1e-7` the
+  monotonic log cubic system (`joint_f-0003`) misses the `jacobian` class by roundoff (1.6e-9 against 1e-9).
+- Q4 `rates.funding.curve`: `1 + rate tau <= 0` (`E_DOMAIN`) is checked after all `end` order checks (`E_INPUT`).

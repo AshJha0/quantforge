@@ -446,43 +446,53 @@ OisPrice ois_price(const OisTrade& trade, const Curve& curve, std::optional<std:
     return {value_of(pv, c.currency, "OIS_DISCOUNTING", std::move(snapshot_id), c.id, curve.as_of()), legs.par(), legs.annuity};
 }
 
+ProjectionInstrument projection_instrument(const RateConvention& index, Date as_of, const ProjectionQuote& q) {
+    ProjectionInstrument it{};
+    const Date spot = spot_of(index, as_of);
+    if (q.type == ProjectionQuoteType::Swap) {
+        SwapLegs legs = swap_legs(index, as_of, q.months);
+        it.fixed = std::move(legs.fixed);
+        it.floating = std::move(legs.floating);
+        it.start = spot;
+        it.end = it.fixed.back().end;
+    } else {
+        it.start = q.type == ProjectionQuoteType::Deposit ? spot : plus_months(index, spot, q.months);
+        it.end = plus_months(index, q.type == ProjectionQuoteType::Deposit ? spot : it.start,
+                             q.type == ProjectionQuoteType::Deposit ? q.months : index.months);
+        it.alpha = year_fraction(DayCount::Act360, it.start, it.end);
+    }
+    return it;
+}
+
+double projection_model(const RateConvention& index, const ProjectionInstrument& it, const std::function<double(Date)>& discount,
+                        const Curve& projection) {
+    if (it.fixed.empty()) return (projection.discount(it.start) / projection.discount(it.end) - 1.0) / it.alpha;
+    double annuity = 0.0, floating = 0.0;
+    for (const Period& p : it.fixed) annuity += year_fraction(index.fixed_day_count, p.start, p.end) * discount(p.end);
+    for (const Period& p : it.floating)
+        floating += (projection.discount(p.start) / projection.discount(p.end) - 1.0) * discount(p.end);
+    return floating / annuity;
+}
+
 Curve projection_bootstrap(const Curve& discount, const RateConvention& index, Date as_of,
                            const std::vector<ProjectionQuote>& quotes, CurveInterpolation interpolation,
                            double* max_repricing_error, const CurveShape& shape) {
     for (const ProjectionQuote& q : quotes) require_finite(q.rate, "quotes");
     if (quotes.empty()) throw Error("E_INPUT", "no quotes", "quotes");
-    struct Instrument {
-        Date start, end;
-        double alpha;
-        SwapLegs legs;
-    };
-    const Date spot = spot_of(index, as_of);
-    std::vector<Instrument> instruments;
+    std::vector<ProjectionInstrument> instruments;
     std::vector<Date> dates;
     std::vector<double> targets;
     for (const ProjectionQuote& q : quotes) {
-        Instrument it{};
-        if (q.type == ProjectionQuoteType::Swap) {
-            it.legs = swap_legs(index, as_of, q.months);
-            it.end = it.legs.fixed.back().end;
-        } else {
-            it.start = q.type == ProjectionQuoteType::Deposit ? spot : plus_months(index, spot, q.months);
-            it.end = plus_months(index, q.type == ProjectionQuoteType::Deposit ? spot : it.start,
-                                 q.type == ProjectionQuoteType::Deposit ? q.months : index.months);
-            it.alpha = year_fraction(DayCount::Act360, it.start, it.end);
-        }
+        ProjectionInstrument it = projection_instrument(index, as_of, q);
         if (!dates.empty() && it.end <= dates.back()) throw Error("E_INPUT", "quotes must be in pillar order", "quotes");
         dates.push_back(it.end);
         targets.push_back(q.rate);
         instruments.push_back(std::move(it));
     }
+    const std::function<double(Date)> d = [&](Date x) { return discount.discount(x); };
     SolvedCurve s = solve_curve(
         as_of, interpolation, dates, targets,
-        [&](std::size_t j, const Curve& p) {
-            const Instrument& it = instruments[j];
-            if (!it.legs.fixed.empty()) return swap_values(index, it.legs, discount, p).par();
-            return (p.discount(it.start) / p.discount(it.end) - 1.0) / it.alpha;
-        },
+        [&](std::size_t j, const Curve& p) { return projection_model(index, instruments[j], d, p); },
         SolveMethod::Sequential, {}, shape);
     if (max_repricing_error) *max_repricing_error = s.max_repricing_error;
     return std::move(s.curve);

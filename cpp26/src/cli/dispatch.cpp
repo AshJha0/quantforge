@@ -54,6 +54,7 @@
 #include "quantforge/core/correlation.hpp"
 #include "quantforge/core/heston.hpp"
 #include "quantforge/core/vol_stats.hpp"
+#include "quantforge/core/joint.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
