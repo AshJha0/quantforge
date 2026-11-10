@@ -69,7 +69,8 @@ final class Operations {
             new Registry.Module("sabr", OpsSabr::register),
             new Registry.Module("usecase_vol_surface", OpsUseCaseVolSurface::register),
             new Registry.Module("risk", OpsRisk::register),
-            new Registry.Module("book", OpsBook::register)
+            new Registry.Module("book", OpsBook::register),
+            new Registry.Module("risk_f", OpsRiskF::register)
     );
 
     static final Registry REGISTRY = Registry.of(MODULES);
