@@ -184,5 +184,51 @@ super::registry! {
         i.gate()?;
         let (cva, a) = xva::wwr_cva_hw(&t, &v, &d, h, r, b)?;
         plain(obj([("cva", cva.into()), ("a", a.into())]))
+    },
+    "xva.exposure.portfolio_hw" => {
+        let (a, sigma) = (i.f64("mean_reversion")?, i.f64("sigma")?);
+        let c = super::rates::sub(i, "curve")?;
+        let (ts, ds) = (c.reals("times")?, c.reals("discount_factors")?);
+        let mut raw = Vec::new();
+        for t in i.array("trades")? {
+            if !matches!(t, Json::Obj(_)) {
+                return i.fail("trades", "entries must be objects");
+            }
+            let q = Inputs::new(t);
+            let payer = match q.str("side")? {
+                "PAY" => true,
+                "RECEIVE" => false,
+                _ => return fail("E_INPUT", "side must be PAY or RECEIVE"),
+            };
+            raw.push((
+                q.f64("notional")?,
+                q.f64("fixed_rate")?,
+                payer,
+                q.f64("start_years")?,
+                q.reals("payment_times")?,
+            ));
+        }
+        let ex = i.reals("exposure_times")?;
+        let qs = i.reals("pfe_quantiles")?;
+        let (h, r) = (i.f64("hazard_rate")?, i.f64("recovery")?);
+        i.gate()?;
+        let curve = HwCurve::new(&ts, &ds)?;
+        let legs: Vec<sr::SwapLeg> = raw
+            .iter()
+            .map(|(n, k, p, st, pay)| sr::SwapLeg { start: *st, pay, fixed_rate: *k, payer: *p, notional: *n })
+            .collect();
+        let o = quantforge_core::xva_port::portfolio_hw(&curve, a, sigma, &legs, &ex, &qs, h, r)?;
+        let mut out = vec![
+            ("discounted_ee".to_string(), Json::from(o.discounted_ee)),
+            ("discounted_ene".to_string(), o.discounted_ene.into()),
+        ];
+        for (q, p) in qs.iter().zip(o.pfe) {
+            let pct = q * 100.0;
+            let label = if pct == pct.round() { format!("{pct:.0}") } else { format!("{pct}") };
+            out.push((format!("pfe_{label}"), p.into()));
+        }
+        out.push(("epe".to_string(), o.epe.into()));
+        out.push(("cva".to_string(), o.cva.into()));
+        plain(Json::Obj(out))
     }
 }
