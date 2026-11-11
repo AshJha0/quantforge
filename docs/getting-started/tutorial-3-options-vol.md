@@ -99,6 +99,8 @@ surface T=0.7 k=-0.1  vol 0.237690  total variance 0.039547
 - ρ = −0.4 tilts the smile: low strikes get higher volatility (0.354 at 80) than high strikes (0.275 at 120);
 - ν, the volatility of volatility, curves it.
 
+Why α prints as 3.0000 and not 0.30: α is the volatility of `F^β`, not of `F`, so its scale depends on β and on the level of the forward. With β = 0.5, `dF = α F^{0.5} dW` gives a lognormal volatility of about `α F^{β−1}`, here 3 × 100^{−0.5} = 0.30. The same smile at β = 1 would need α near 0.30, and at F = 1 (a rate, say) the β = 0.5 fit would put α near 0.30 as well. Compare α across fits only at the same β and forward.
+
 **Vol surface.** A surface stores volatility by expiry `T` and log-moneyness `k = ln(K/F)`. The rule (spec `05-volatility/smile-and-surface.md`, `vol.surface.query`) interpolates **total variance** `w = v²T`, not volatility: linear in `k` on each expiry, then linear in `T` between expiries, flat volatility outside the grid. Worked example at T = 0.7, k = 0: the grid gives `w = 0.225² × 0.4 = 0.02025` at T = 0.4 and `0.22² × 1.0 = 0.0484` at T = 1.0. Halfway between them, `w = 0.034325`, and `v = √(0.034325/0.7) = 0.221440`. The first point sits on a node, so it returns the node's 0.22.
 
 ## Step 2: the same in Rust, Java and C++

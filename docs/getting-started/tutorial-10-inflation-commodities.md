@@ -2,7 +2,7 @@
 
 The plain idea: an inflation curve and a commodity curve are both forward curves for a price, not for a rate. Inflation swap quotes tell you what the market expects the consumer price index (CPI) to be in one, two, five years; futures quotes tell you what gas or oil will cost in each delivery month. Between quotes you interpolate, and both markets have a pattern by calendar month, [seasonality](../../GLOSSARY.md#stage-d-curves-and-fixed-income), that straight-line interpolation would smear out. With the inflation curve you can price a zero-coupon inflation swap; with commodity forwards and a funding curve you can ask whether buying now, storing and selling later makes money.
 
-This tutorial does four things with library calls: a CPI curve with and without seasonality, a zero-coupon inflation swap (ZCIS: one payment at maturity, inflation over the period against a fixed rate compounded over the period), a seasonal gas forward curve, and storage carry on an oil curve. It runs in Python, then the same cases through the Rust, Java and C++ command-line programs. Budget 10 to 15 minutes. All data is synthetic, taken from the golden cases `inflation_d-0002` and `inflation_d-0007` and the examples `examples/commodity_forward_d.json` and `examples/commodity_carry_d.json`; it is not market data. CI runs every code block on this page (`.github/workflows/tutorial.yml`) and fails if a printed line differs.
+This tutorial does four things with library operations: a CPI curve with and without seasonality, a zero-coupon inflation swap (ZCIS: one payment at maturity, inflation over the period against a fixed rate compounded over the period), a seasonal gas forward curve, and storage carry on an oil curve. It runs in Python, then the same cases through the Rust, Java and C++ command-line programs. Budget 10 to 15 minutes. All data is synthetic, taken from the golden cases `inflation_d-0002` and `inflation_d-0007` and the examples `examples/commodity_forward_d.json` and `examples/commodity_carry_d.json`; it is not market data. CI runs every code block on this page (`.github/workflows/tutorial.yml`) and fails if a printed line differs.
 
 ## What you need
 
@@ -16,55 +16,88 @@ This tutorial does four things with library calls: a CPI curve with and without 
 uv sync --locked --project python
 ```
 
-Save the next block as `inflation.py`:
+The script `examples/tutorials/t10_inflation_commodities.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t10_inflation_commodities.py -->
 ```python
-from datetime import date
+"""Tutorial 10: a CPI curve with seasonality, a zero-coupon inflation
+swap, a commodity forward curve and storage carry.
 
-from quantforge_core import commodity, inflation
-from quantforge_core.curves import CurveData
-from quantforge_core.inflation import CpiCurveData, index
+  uv run --project python python examples/tutorials/t10_inflation_commodities.py         # Python
+  python examples/tutorials/t10_inflation_commodities.py rust/target/release/quantforge  # or any other build
 
-# 1. CPI curve: zero-coupon inflation swap quotes (synthetic), base month August 2026.
-quotes = ((1, 0.0265), (2, 0.0255), (3, 0.025), (5, 0.0245), (7, 0.0245), (10, 0.025), (20, 0.0255))
-season = (0.9978, 0.9992, 1.0011, 1.0018, 1.0012, 1.0005,
-          0.9989, 0.9994, 1.0006, 1.0003, 0.9995, 0.9997)  # January to December
-smooth = CpiCurveData(index(2026, 8), 322.15, quotes, None)
-seasonal = CpiCurveData(index(2026, 8), 322.15, quotes, season)
-months = [index(2026, 12), index(2027, 1), index(2027, 8)]
-for label, data in (("smooth  ", smooth), ("seasonal", seasonal)):
-    print(label, " ".join(f"{x:.4f}" for x in inflation.cpi(data, months)))
+It sends the cases of docs/getting-started/tutorial-10-inflation-commodities.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
+"""
+import json
+import sys
 
-# 2. Zero-coupon inflation swap: receive inflation on 10m for 5 years against 2.60% fixed.
-discount = CurveData(date(2026, 11, 6), "LOG_LINEAR_DF",
-                     (date(2027, 11, 15), date(2028, 11, 14), date(2029, 11, 15), date(2031, 11, 13)),
-                     (0.9634397330592425, 0.9318539967570951, 0.9012037662703272, 0.839287128565213))
-pv, ratio = inflation.zcis_pv(seasonal, discount, 5, 0.026, 10_000_000.0, "RECEIVE_INFLATION",
-                              date(2031, 11, 10))
-print(f"ZCIS index ratio {ratio:.10f}")
-print(f"ZCIS PV {pv:.2f}")
+from qf import runner
 
-# 3. Commodity forward curve: natural-gas-like futures (synthetic) with additive log seasonality.
-gas = [(index(2026, 12), 3.42), (index(2027, 3), 3.105), (index(2027, 6), 2.88),
-       (index(2027, 12), 3.56), (index(2028, 12), 3.64), (index(2030, 12), 3.7)]
-gas_season = [0.06, 0.045, 0.01, -0.03, -0.045, -0.04, -0.02, -0.015, -0.02, 0.0, 0.025, 0.03]
-fwd = commodity.commodity_forwards(gas, gas_season, [index(2027, 1), index(2027, 8), index(2028, 7)])
-print("gas forwards", " ".join(f"{x:.6f}" for x in fwd))
+QUOTES = [{"years": y, "rate": r} for y, r in
+          [(1, 0.0265), (2, 0.0255), (3, 0.025), (5, 0.0245), (7, 0.0245), (10, 0.025), (20, 0.0255)]]
+SEASON = [0.9978, 0.9992, 1.0011, 1.0018, 1.0012, 1.0005,
+          0.9989, 0.9994, 1.0006, 1.0003, 0.9995, 0.9997]
+DISCOUNT = {"as_of": "2026-11-06", "interpolation": "LOG_LINEAR_DF", "pillars": [
+    {"date": d, "discount_factor": v} for d, v in
+    [("2027-11-15", 0.9634397330592425), ("2028-11-14", 0.9318539967570951),
+     ("2029-11-15", 0.9012037662703272), ("2031-11-13", 0.839287128565213)]]}
+GAS = [{"month": m, "price": p} for m, p in
+       [("2026-12", 3.42), ("2027-03", 3.105), ("2027-06", 2.88),
+        ("2027-12", 3.56), ("2028-12", 3.64), ("2030-12", 3.7)]]
+GAS_SEASON = [0.06, 0.045, 0.01, -0.03, -0.045, -0.04, -0.02, -0.015, -0.02, 0.0, 0.025, 0.03]
+FUNDING = {"as_of": "2026-11-06", "interpolation": "LOG_LINEAR_DF", "pillars": [
+    {"date": d, "discount_factor": v} for d, v in
+    [("2027-05-06", 0.9803598150999601), ("2027-11-08", 0.9615452062959098),
+     ("2028-11-06", 0.9267197211276171), ("2031-11-06", 0.8310200391947283)]]}
+OIL = [{"date": d, "price": p} for d, p in
+       [("2026-12-15", 75.2), ("2027-03-15", 74.1), ("2027-06-15", 75.9),
+        ("2027-12-15", 78.4), ("2028-12-15", 76.0)]]
 
-# 4. Storage carry: oil-like forwards (synthetic), 2% a year storage cost.
-funding = CurveData(date(2026, 11, 6), "LOG_LINEAR_DF",
-                    (date(2027, 5, 6), date(2027, 11, 8), date(2028, 11, 6), date(2031, 11, 6)),
-                    (0.9803598150999601, 0.9615452062959098, 0.9267197211276171, 0.8310200391947283))
-oil = [(date(2026, 12, 15), 75.2), (date(2027, 3, 15), 74.1), (date(2027, 6, 15), 75.9),
-       (date(2027, 12, 15), 78.4), (date(2028, 12, 15), 76.0)]
-ys, values, flags = commodity.storage_carry(funding, oil, 0.02)
-for (d, _), y, v, a in zip(oil[1:], ys, values, flags):
-    print(f"to {d} convenience yield {y:+.6f} carry {v:+.6f} arbitrage {a}")
+
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
+
+
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return [r["outputs"] for r in results]
+
+
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    smooth = {"base_month": "2026-08", "base_cpi": 322.15, "quotes": QUOTES, "seasonality": None}
+    seasonal = {**smooth, "seasonality": SEASON}
+    months = ["2026-12", "2027-01", "2027-08"]
+    trade = {"years": 5, "fixed_rate": 0.026, "notional": 10_000_000.0, "side": "RECEIVE_INFLATION",
+             "payment_date": "2031-11-10"}
+    cpi_s, cpi_x, zcis, gas, carry = batch(cli, [
+        case("t10-cpi-smooth", "infl.curve.cpi", {**smooth, "months": months}),
+        case("t10-cpi-seasonal", "infl.curve.cpi", {**seasonal, "months": months}),
+        case("t10-zcis", "infl.zcis.pv", {"curve": seasonal, "discount": DISCOUNT, "trade": trade}),
+        case("t10-gas", "cmdty.curve.forward", {"quotes": GAS, "seasonality": GAS_SEASON,
+                                                "months": ["2027-01", "2027-08", "2028-07"]}),
+        case("t10-carry", "cmdty.storage.carry", {"funding": FUNDING, "forwards": OIL,
+                                                  "storage_cost": 0.02})])
+    for label, out in (("smooth  ", cpi_s), ("seasonal", cpi_x)):
+        print(label, " ".join(f"{x:.4f}" for x in out["cpi"]))
+    print(f"ZCIS index ratio {zcis['index_ratio']:.10f}")
+    print(f"ZCIS PV {zcis['pv']:.2f}")
+    print("gas forwards", " ".join(f"{x:.6f}" for x in gas["forwards"]))
+    for f, y, v, a in zip(OIL[1:], carry["convenience_yields"], carry["carry_values"], carry["arbitrage"]):
+        print(f"to {f['date']} convenience yield {y:+.6f} carry {v:+.6f} arbitrage {a}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python inflation.py
+uv run --project python python examples/tutorials/t10_inflation_commodities.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -108,14 +141,14 @@ From `specifications/02-curves/commodity.md`:
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_inflation_commodities.py` sends the five cases above (`infl.curve.cpi` twice, `infl.zcis.pv`, `cmdty.curve.forward`, `cmdty.storage.carry`) to whichever CLI you name and prints the same lines. It uses only the Python standard library.
+`examples/tutorials/t10_inflation_commodities.py` sends the five cases above (`infl.curve.cpi` twice, `infl.zcis.pv`, `cmdty.curve.forward`, `cmdty.storage.carry`) to whichever CLI you name and prints the same lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_inflation_commodities.py rust/target/release/quantforge
+python examples/tutorials/t10_inflation_commodities.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -123,7 +156,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_inflation_commodities.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t10_inflation_commodities.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -131,14 +164,14 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_inflation_commodities.py cpp26/build/quantforge
+python examples/tutorials/t10_inflation_commodities.py cpp26/build/quantforge
 ```
 
 Each prints the nine lines of step 1, digit for digit at the precision shown. The full checks are `python conformance/runner/runner.py --impl rust --suite inflation_d` and `--suite commodity_d`.
 
 ## For practitioners
 
-- **Lag and interpolation.** The spec takes the lag as already applied in `base_month` and puts pillars on whole months. US CPI swaps and TIPS use a three-month lag with daily interpolation of the index (31 CFR 356); euro HICP swaps use a three-month lag without interpolation. QuantLib's zero-inflation curves carry an observation lag and an interpolation choice on the index, so its numbers differ from these unless the conventions are matched. The spec runs no outside library for this suite for that reason.
+- **Lag and interpolation.** The spec takes the lag as already applied in `base_month` and puts pillars on whole months. US CPI swaps and TIPS use a three-month lag with daily interpolation of the index (31 CFR 356); euro HICPxT zero-coupon swaps are usually traded on a three-month lag to a whole month, without interpolation (market practice; the confirmation, under the ISDA 2008 Inflation Derivatives Definitions, decides; not opened). Euro inflation-linked bonds, by contrast, do interpolate: the daily reference index is a linear interpolation between the HICPxT of months M−3 and M−2 (Ejsing, García and Werner, ECB Working Paper 830, 2007, appendix A, opened 2026-11-11), so do not carry a swap's lag rule over to OAT€i or BTP€i pricing. QuantLib's zero-inflation curves carry an observation lag and an interpolation choice on the index, so its numbers differ from these unless the conventions are matched. The spec runs no outside library for this suite for that reason.
 - **Seasonality.** Here the factors are inputs. Desks usually estimate them from several years of CPI prints and normalise them so the product over a year is one; the spec does not require that, because only the ratio s(k)/s(b) enters.
 - **No convexity.** The ZCIS PV is linear in the index ratio. Year-on-year swaps need a convexity adjustment and are not priced here; `infl.cap.yoy_price` takes YoY forwards as inputs.
 - **Two seasonality conventions.** Commodity terms are additive in log price (a factor e^σ); CPI factors are multiplicative. Both reprice every quote.
@@ -169,6 +202,8 @@ You built a CPI curve that reprices seven ZCIS quotes, added a monthly pattern t
 - Our specs: `specifications/02-curves/inflation.md` and `specifications/02-curves/commodity.md`; golden suites `datasets/golden/stage_d/inflation_d.json` and `commodity_d.json`.
 - [LEARN: curves and fixed income](../../LEARN.md#curves-and-fixed-income) and [stage D status](../../LEARN.md#stage-d-curves-and-fixed-income); [Glossary, stage D terms](../../GLOSSARY.md#stage-d-curves-and-fixed-income).
 - US Treasury, 31 CFR Part 356, Appendix B: reference CPI and index ratio for TIPS (three-month lag, daily interpolation). [Text at Cornell LII](https://www.law.cornell.edu/cfr/text/31/part-356). The spec marks it not opened.
+- Ejsing, J., García, J. A. and Werner, T., *The term structure of euro area break-even inflation rates: the impact of seasonality*, ECB Working Paper 830, November 2007, appendix A: the daily, interpolated reference index of euro inflation-linked bonds. [PDF at the ECB](https://www.ecb.europa.eu/pub/pdf/scpwps/ecbwp830.pdf). Opened 2026-11-11.
+- ISDA, *2008 Inflation Derivatives Definitions*: the lag and interpolation terms of inflation swap confirmations. Not opened; members only, no public link.
 - Kerkhof, J., *Inflation Derivatives Explained*, Lehman Brothers Fixed Income Quantitative Research, 2005: zero-coupon inflation swaps and seasonality. The spec marks it not opened; no stable link.
 - Brigo, D. and Mercurio, F., *Interest Rate Models: Theory and Practice*, 2nd ed., Springer, 2006, chapter on inflation derivatives. [doi:10.1007/978-3-540-34604-3](https://doi.org/10.1007/978-3-540-34604-3) (paywalled). The spec marks it not opened.
 - Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Determination of Forward and Futures Prices": storage costs, convenience yield, cash and carry. The spec marks it not opened; no stable link.

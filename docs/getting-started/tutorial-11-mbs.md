@@ -20,37 +20,73 @@ Three terms, all in the [glossary](../../GLOSSARY.md#stage-d-curves-and-fixed-in
 uv sync --locked --project python
 ```
 
-Save the next block as `mbs.py`:
+The script `examples/tutorials/t11_mbs.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t11_mbs.py -->
 ```python
-from quantforge_core import mbs
+"""Tutorial 11: prepayment (PSA against CPR), pass-through cash flows,
+price, modified duration and WAL, and price at bumped yields and speeds.
 
-# A pass-through pool (synthetic): 2.5m balance, 5.75% gross WAC, 5.25% net coupon,
-# 357 months remaining, 3 months seasoned. Pool = (balance, wac, net, wam, age, model, speed).
+  uv run --project python python examples/tutorials/t11_mbs.py         # Python
+  python examples/tutorials/t11_mbs.py rust/target/release/quantforge  # or any other build
+
+It sends the cases of docs/getting-started/tutorial-11-mbs.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
+"""
+import json
+import sys
+
+from qf import runner
+
+
 def pool(model, speed):
-    return (2_500_000.0, 0.0575, 0.0525, 357, 3, model, speed)
+    key = "speed" if model == "PSA" else "rate"
+    return {"balance": 2_500_000.0, "wac": 0.0575, "net_coupon": 0.0525, "wam": 357, "age": 3,
+            "prepayment": {"model": model, key: speed}}
 
-# 1. Prepayment: 100% PSA ramps CPR up over 30 months of loan age; 6% CPR is flat.
-for model, speed in (("PSA", 100.0), ("CPR", 0.06)):
-    flows = mbs.mbs_cashflows(pool(model, speed))
-    print(f"{model} {speed:g}: prepayment month 1 {flows['prepayment'][0]:.2f}, "
-          f"month 27 {flows['prepayment'][26]:.2f}, WAL {flows['wal']:.4f}")
 
-# 2. Price, modified duration and WAL at a 5.90% yield (monthly compounding), 24-day delay.
-price, duration, wal = mbs.mbs_price(pool("PSA", 100.0), 0.059, 24)
-print(f"price {price:.6f} modified duration {duration:.6f} WAL {wal:.6f}")
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
-# 3. Sensitivity: yield 50bp down and up at the same speed, then speed at the same yield.
-for y in (0.054, 0.064):
-    print(f"yield {y:.3f}: price {mbs.mbs_price(pool('PSA', 100.0), y, 24)[0]:.6f}")
-for speed in (50.0, 200.0, 300.0):
-    p, d, w = mbs.mbs_price(pool("PSA", speed), 0.059, 24)
-    print(f"PSA {speed:g}: price {p:.6f} modified duration {d:.6f} WAL {w:.6f}")
+
+def price_case(case_id, model, speed, y):
+    return case(case_id, "mbs.price", {"pool": pool(model, speed), "yield": y, "delay_days": 24})
+
+
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return [r["outputs"] for r in results]
+
+
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    models = (("PSA", 100.0), ("CPR", 0.06))
+    flows = batch(cli, [case(f"t11-flows-{m}", "mbs.cashflows", {"pool": pool(m, s)}) for m, s in models])
+    for (model, speed), f in zip(models, flows):
+        print(f"{model} {speed:g}: prepayment month 1 {f['prepayment'][0]:.2f}, "
+              f"month 27 {f['prepayment'][26]:.2f}, WAL {f['wal']:.4f}")
+    yields, speeds = (0.054, 0.064), (50.0, 200.0, 300.0)
+    base, *rest = batch(cli, [price_case("t11-base", "PSA", 100.0, 0.059),
+                              *(price_case(f"t11-y{y}", "PSA", 100.0, y) for y in yields),
+                              *(price_case(f"t11-s{s}", "PSA", s, 0.059) for s in speeds)])
+    print(f"price {base['price']:.6f} modified duration {base['modified_duration']:.6f} WAL {base['wal']:.6f}")
+    for y, out in zip(yields, rest[:2]):
+        print(f"yield {y:.3f}: price {out['price']:.6f}")
+    for s, out in zip(speeds, rest[2:]):
+        print(f"PSA {s:g}: price {out['price']:.6f} modified duration {out['modified_duration']:.6f} "
+              f"WAL {out['wal']:.6f}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python mbs.py
+uv run --project python python examples/tutorials/t11_mbs.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -89,14 +125,14 @@ No calendar enters: months are equal, and the delay is counted in 30-day months.
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_mbs.py` sends the same cases (two `mbs.cashflows`, six `mbs.price`) to whichever CLI you name and prints the same lines. It uses only the Python standard library.
+`examples/tutorials/t11_mbs.py` sends the same cases (two `mbs.cashflows`, six `mbs.price`) to whichever CLI you name and prints the same lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_mbs.py rust/target/release/quantforge
+python examples/tutorials/t11_mbs.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -104,7 +140,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_mbs.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t11_mbs.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -112,7 +148,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_mbs.py cpp26/build/quantforge
+python examples/tutorials/t11_mbs.py cpp26/build/quantforge
 ```
 
 Each prints the eight lines of step 1, digit for digit at the precision shown. The full check is `python conformance/runner/runner.py --impl rust --suite mbs_d`.
@@ -120,7 +156,7 @@ Each prints the eight lines of step 1, digit for digit at the precision shown. T
 ## For practitioners
 
 - **Static speed, no OAS.** The speed here is fixed whatever the yield, so modified duration is a static duration. Desk effective duration lets prepayments speed up when rates fall (refinancing), which shortens the bond as rates fall and gives the negative convexity MBS are known for. You can see the two ingredients separately here (the yield bump and the speed bump) but nothing joins them. OAS, which needs an interest-rate model and a rate-dependent prepayment model, is not in QuantForge.
-- **Monthly compounding and delay.** The yield is monthly compounded, as MBS cash-flow yields are quoted; compare with a bond-equivalent yield only after converting. The 24-day delay in this example is the one Fannie Mae pass-throughs use; Ginnie Mae and Freddie Mac programmes use other delays. The spec counts the delay as `delay_days/30` months.
+- **Monthly compounding and delay.** The yield is monthly compounded, as MBS cash-flow yields are quoted; compare with a bond-equivalent yield only after converting. The 24 days in this example are the actual delay of a UMBS pass-through, issued by Fannie Mae or, since June 2019, by Freddie Mac: a 55-day stated delay, paid on the 25th of the month after the accrual month. Ginnie Mae I pays on the 15th (45-day stated, 14 days actual), Ginnie Mae II on the 20th (50-day stated, 19 actual), and legacy Freddie Mac Gold PCs, no longer issued, on the 15th (45-day stated, 14 actual). The stated delays and payment days are from SIFMA's *Uniform Practices*, chapter 3 (opened 2026-11-11). The stated delay counts from the first day of the accrual month and the actual delay from its end; SIFMA gives the stated figures, and the actual ones follow from the payment day. The spec counts the delay as `delay_days/30` months.
 - **Simplified PSA.** The ramp follows the standard benchmark (0.2% CPR per month of age to 6% at month 30). Real pools are pools of loans with different rates, ages and balances; here one WAC and one age stand for the pool.
 - **No settlement date.** Pricing is as of the start of month 1. A desk prices to a settlement date with accrued interest and a clean price; adjust for that before comparing.
 
@@ -147,6 +183,7 @@ You projected a pass-through pool's cash flows under 100 PSA and 6% CPR, priced 
 - Our spec: `specifications/04-pricing/mbs.md`; golden suite `datasets/golden/stage_d/mbs_d.json`.
 - [LEARN: curves and fixed income](../../LEARN.md#curves-and-fixed-income) and [stage D status](../../LEARN.md#stage-d-curves-and-fixed-income); [Glossary, stage D terms](../../GLOSSARY.md#stage-d-curves-and-fixed-income) (CPR, SMM, PSA, MBS, WAL).
 - SIFMA, *Uniform Practices for the Clearance and Settlement of Mortgage-Backed Securities and Other Related Securities*, Chapter SF, *Standard Formulas*: the PSA benchmark, SMM from CPR, level-pay amortisation. The spec marks it not opened. No stable public link: the SIFMA page we tried returned 404.
+- SIFMA, *Uniform Practices for the Clearance and Settlement of Mortgage-Backed Securities and Other Related Securities*, 2019 edition, chapter 3, *Mortgage-Backed Securities*: <https://www.sifma.org/wp-content/uploads/2017/08/ch03.pdf>. Opened 2026-11-11: it gives the 55-day delay paid on the 25th for Fannie Mae and Freddie Mac UMBS, 45 days on the 15th for Ginnie Mae I and for Gold PCs (issuance ceased 3 June 2019), and 50 days on the 20th for Ginnie Mae II.
 - Fabozzi, F. J. (ed.), *The Handbook of Mortgage-Backed Securities*, 7th ed., Oxford University Press, 2016. The spec marks it not opened; no stable link.
 - QuantLib has no pass-through MBS pricer to cross-check against, and the spec runs no outside library: the goldens are analytic.
 

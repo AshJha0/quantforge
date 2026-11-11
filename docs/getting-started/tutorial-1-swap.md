@@ -97,6 +97,27 @@ python examples/tutorial_swap.py cpp26/build/quantforge
 
 Each prints the four lines shown in step 1, digit for digit. That is the project's claim in small: four independent implementations of one specification agree. The full check is the conformance suite: `python conformance/runner/runner.py --impl rust --suite ois`.
 
+## For practitioners
+
+- **Conventions.** The `SOFR` convention is the one in `specifications/01-core/conventions.md`: spot two business days after the trade date on the US government securities calendar, an annual fixed leg on ACT/360, modified following, and payment two business days after each period end. It matches Strata's `USD-FIXED-1Y-SOFR-OIS`. Check that your quotes follow the same conventions before you bootstrap them.
+- **Payment lag.** Because each period pays two business days after it ends, the floating leg is `Σ (D(sᵢ)/D(eᵢ) − 1) D(pᵢ)`, not the telescoped `D(s₀) − D(eₙ)`. The spec measures the error of the shortcut at about 1.1e-4 per unit notional on a 10Y SOFR swap, which is 1,100 USD on 10 million.
+- **One curve.** Here the SOFR curve both projects the floating rate and discounts every cash flow. That is right for a SOFR swap collateralised in USD cash at SOFR. A swap on a term rate, or under other collateral, needs a second curve: [Tutorial 8](tutorial-8-multicurve.md).
+- **Outside check.** The spec checks this bootstrap against QuantLib's `OISRateHelper` and `OvernightIndexedSwap`: pillars within 2e-11, swap PVs within 1e-5 on 1e6 (`specifications/02-curves/ois-curves.md`, "Acceptance"; `oracle/REPORT.md`).
+
+## Common mistakes
+
+- **Getting the sign of the PV backwards.** `side` is the fixed leg: `PAY` means you pay fixed and receive SOFR. Paying 3.40% when par is 3.35% is a loss, so the PV is negative and the DV01 positive.
+- **Reading DV01 as one quote's risk.** The DV01 here bumps every quote together. The split by quote is `key_rates`; on this swap almost all of it is on the 5Y quote.
+- **Interpolating rates and expecting the same curve.** Every interpolation reprices the quotes exactly, so a reprice test cannot tell them apart. They differ between pillars, which moves the PV of any trade whose dates fall there.
+
+## What you just did
+
+You turned six SOFR swap quotes into a discount curve that reprices them exactly, priced a 5-year swap on it, checked the PV against the par rate and the annuity, and measured its DV01 by rebuilding the curve with every quote bumped. Python, Rust, Java and C++ gave the same digits.
+
+- Maths in context: [LEARN, curves and fixed income](../../LEARN.md#curves-and-fixed-income).
+- Commands for other operations: [COOKBOOK](../../COOKBOOK.md).
+- Terms: [GLOSSARY, tutorial terms](../../GLOSSARY.md#tutorial-terms) (discount factor, bootstrap, par rate, annuity, DV01).
+
 ## Try next
 
 - Change the fixed rate to 0.0335. The PV goes to about zero, because that is the par rate.
@@ -104,3 +125,14 @@ Each prints the four lines shown in step 1, digit for digit. That is the project
 - Print `key_rates`: the DV01 split by quote.
 - Read [LEARN](../../LEARN.md#curves-and-fixed-income) for why bootstrapping works, and the [Cookbook](../../COOKBOOK.md) for the other operations.
 - Go on to [Tutorial 2: bonds and repo](tutorial-2-bonds-repo.md), which prices a bond off this curve, or pick any tutorial from the [series](README.md).
+
+## References and further reading
+
+The specs list these as sources; "not opened" there means the spec authors cited them from memory and did not re-read them.
+
+- Federal Reserve Bank of New York, *Additional Information about Reference Rates Administered by the New York Fed*, section "Calculation Methodology for the TGCR, BGCR, and SOFR": how SOFR itself is computed. `specifications/02-curves/ois-curves.md` [S2], opened 2026-11-07.
+- ISDA, *2021 ISDA Interest Rate Derivatives Definitions*, the overnight compounding Floating Rate Options for SOFR, SONIA and €STR. [S4] there, not opened; members only.
+- Ametrano, F. M. and Bianchetti, M., "Everything you always wanted to know about multiple interest rate curve bootstrapping but were afraid to ask", SSRN 2219548, 2013. [S5] there, not opened.
+- Hull, J. C., *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter "Interest Rate Risk": DV01 and partial durations. `specifications/06-risk/rates-sensitivities.md` [S1], not opened.
+- QuantLib, the outside check: [`OISRateHelper`](https://www.quantlib.org/reference/class_quant_lib_1_1_o_i_s_rate_helper.html).
+- This project: `specifications/02-curves/ois-curves.md`, `specifications/06-risk/rates-sensitivities.md`, `specifications/01-core/conventions.md`; golden suite `ois` (`python conformance/runner/runner.py --impl rust --suite ois`).
