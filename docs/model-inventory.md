@@ -694,6 +694,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a multi-curve or dividend-term-structure need.
 - **Validation report:** `specifications/08-hedging/cross-asset-hedge.md`.
 
+### MI-4 Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a)
+- **Purpose:** weighted least-squares hedge with spread cost, linear market impact, liquidity bounds and a margin limit; frontier of risk against cost.
+- **Inputs:** the `hedge.qp.solve` inputs plus half-spreads, impact coefficients, cost weight(s), margin rates and limit.
+- **Limitations:** linear impact only (no square-root impact); the hedge starts from no position; margin is per instrument with no netting.
+- **Validation:** 50-digit state enumeration with subgradient checks; wave 1 goldens reproduced exactly; HiGHS infeasibility; scipy BVLS, trust-constr and SLSQP outside checks (14 of 32). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** scipy 1.18 trust-constr and SLSQP on the split-variable QP.
+- **Monitoring thresholds:** a frontier that is not monotone, or a realised cost above the modelled cost by more than the desk's tolerance.
+- **Data lineage hash:** sha256 e1e2ea2afa1f9fbd695f553f26257ff8bdd0b78fadcdf4b8e7f1261856d8d54a (`hedgecost_i`); 7e4a0069d2d7eb68d4c4f2153ef2fdaff4a4e75b98f4e0ef368c4dfbb37246b7 (`hedgefrontier_i`)
+- **Retirement trigger:** a need for square-root impact or portfolio margin.
+- **Validation report:** `specifications/08-hedging/hedge-costs-and-frontier.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

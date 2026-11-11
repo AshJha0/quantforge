@@ -101,3 +101,28 @@ Read: `specifications/08-hedging/cross-asset-hedge.md`; rulings I-20 to I-23 (an
 
 ### Outside-oracle status
 `hedgexa_i` 9 of 17 (QuantLib `ZeroCurve` and `AnalyticEuropeanEngine`, the same half-differences, numpy `lstsq`). Every value case counts; no error case does. Stage I so far: 72 of 177 = 40.7% (`oracle/outside_register_i.json`).
+
+## WAVE 4a READY (2026-11-11): costs, impact, liquidity and margin; risk-against-cost frontier
+
+Read: `specifications/08-hedging/hedge-costs-and-frontier.md`; rulings I-24 to I-28 (and I-13); cli-contract block "Stage I operations"; edge-case row I10; `specifications/name-map.json` (270 operations).
+
+### Suites (32 cases)
+
+| Suite | Operation | Cases |
+|---|---|---|
+| `hedgecost_i` | `hedge.qp.solve` with the new optional inputs | 22 (13 value, 9 error) |
+| `hedgefrontier_i` | `hedge.frontier.solve` | 10 (4, 6) |
+
+### Build notes
+- Extend your wave 1 `hedge.qp.solve`. Without the new inputs nothing changes, and your `hedgeqp_i` results must stay the same: the generator checked that the extended reference reproduces every `hedgeqp_i` golden exactly.
+- The `|x|` terms are non-smooth. Either enumerate sign states (positive, negative, zero, at a bound) with the subgradient test at zero, or solve the split QP `x = p - n`, `p, n >= 0`, where spread and margin are linear. Make sure an instrument whose cost exceeds its benefit comes out at exactly `0.0` (`hedgecost_i-0002`). Most iterative solvers return about 1e-12 there unless they snap to the kink.
+- Impact enters the Hessian (`cost_weight diag(impact)`) and can make a singular problem regular; a spread cost cannot (I-26).
+- Outputs `risk`, `cost` and `margin` appear only when a new input is given (I-27).
+- Frontier: run the solve once per weight, in order; the first error stops it.
+
+### Property tests
+- `cost_weight = 0` gives the wave 1 answer; the frontier's risk is non-decreasing and its cost non-increasing.
+- With a margin constraint active, `margin` equals `margin_limit`.
+
+### Outside-oracle status
+`hedgecost_i` 12 of 22, `hedgefrontier_i` 2 of 10 (scipy BVLS or lstsq where exact, else trust-constr or SLSQP on the split form; I-28). Stage I so far: 86 of 209 = 41.1% (`oracle/outside_register_i.json`).
