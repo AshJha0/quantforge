@@ -62,6 +62,8 @@ final class Operations {
             new Registry.Module("exotics", OpsExotics::register),
             new Registry.Module("short_rate", OpsShortRate::register),
             new Registry.Module("rates_g", OpsRatesG::register),
+            new Registry.Module("xva", OpsXva::register),
+            new Registry.Module("wave_2b", OpsWave2b::register),
             new Registry.Module("credit_options", OpsCreditOptions::register),
             new Registry.Module("forward", OpsForward::register),
             new Registry.Module("black", OpsBlack::register),
