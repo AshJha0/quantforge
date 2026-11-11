@@ -23322,6 +23322,7 @@
      ]
     },
     "model": "HULL_WHITE",
+    "short_rate": 0.01,
     "t_years": 0.0,
     "maturity_years": 1.0
    },
