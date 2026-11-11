@@ -1,0 +1,1882 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgecredit_i",
+ "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w2.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgecredit_i-0001",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      12873915.053075029
+     ],
+     "book": {
+      "pv": -206016.1966992434,
+      "cs01": -5634.246622178082,
+      "jtd": -5793983.803300756,
+      "buckets": [
+       -1047.666195400504,
+       -1710.0900742593808,
+       -1519.6310331060115,
+       -1356.8582177821836,
+       0.0
+      ]
+     },
+     "after": {
+      "cs01": 0.0,
+      "jtd": 1814546.6337418333,
+      "buckets": [
+       328.9929253346495,
+       541.3352185919184,
+       486.53068663324416,
+       -1356.8582796070443,
+       0.0
+      ]
+     },
+     "hedge_upfront": 115880.48702144338
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "CS01 hedge of a sold 7Y with a 5Y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0002",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      10000000.0
+     ],
+     "book": {
+      "pv": -206016.1966992434,
+      "cs01": -5634.246622178082,
+      "jtd": -5793983.803300756,
+      "buckets": [
+       -1047.666195400504,
+       -1710.0900742593808,
+       -1519.6310331060115,
+       -1356.8582177821836,
+       0.0
+      ]
+     },
+     "after": {
+      "cs01": 0.0,
+      "jtd": 0.0,
+      "buckets": [
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "hedge_upfront": 206126.28955254145
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "CS01 hedge with the same 7Y contract: notional matches",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0003",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2029-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "JTD"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      9610085.910160003
+     ],
+     "book": {
+      "pv": -206016.1966992434,
+      "cs01": -5634.246622178082,
+      "jtd": -5793983.803300756,
+      "buckets": [
+       -1047.666195400504,
+       -1710.0900742593808,
+       -1519.6310331060115,
+       -1356.8582177821836,
+       0.0
+      ]
+     },
+     "after": {
+      "cs01": -2866.4192250860797,
+      "jtd": 0.0,
+      "buckets": [
+       1.341561231632113,
+       8.729483650945667,
+       -1519.6310331060115,
+       -1356.8582177821836,
+       0.0
+      ]
+     },
+     "hedge_upfront": -27947.183904421905
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "JTD hedge of a sold 7Y with a 3Y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0004",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2029-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2036-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01",
+     "JTD"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      3574641.0247884872,
+      6476350.555941001
+     ],
+     "book": {
+      "pv": -206016.1966992434,
+      "cs01": -5634.246622178082,
+      "jtd": -5793983.803300756,
+      "buckets": [
+       -1047.666195400504,
+       -1710.0900742593808,
+       -1519.6310331060115,
+       -1356.8582177821836,
+       0.0
+      ]
+     },
+     "after": {
+      "cs01": 9.094947017729282e-13,
+      "jtd": 0.0,
+      "buckets": [
+       -0.1754446164284218,
+       -1.1416367505294147,
+       -573.3239485549908,
+       -516.0203502238711,
+       1090.6606830142896
+      ]
+     },
+     "hedge_upfront": 236737.58760363326
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "CS01 and JTD together with a 3Y and a 10Y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0005",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     },
+     {
+      "maturity": "2028-12-20",
+      "coupon": 0.01,
+      "notional": 25000000.0,
+      "side": "BUY_PROTECTION"
+     },
+     {
+      "maturity": "2036-12-20",
+      "coupon": 0.05,
+      "notional": 5000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2027-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2029-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2036-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "BUCKET_1",
+     "BUCKET_2",
+     "BUCKET_3",
+     "BUCKET_4",
+     "BUCKET_5"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      -11796574.340100326,
+      -12430306.18940261,
+      508488.0665974691,
+      10713155.1976519,
+      5498647.549648816
+     ],
+     "book": {
+      "pv": 1038089.6878085397,
+      "cs01": -5297.096827352067,
+      "jtd": 4961910.312191461,
+      "buckets": [
+       912.9991334712233,
+       -605.869922724123,
+       -2510.6905038961568,
+       -2167.5239465965974,
+       -926.0089676049743
+      ]
+     },
+     "after": {
+      "cs01": -2.369159847148694e-05,
+      "jtd": -65059.65176450182,
+      "buckets": [
+       1.1368683772161603e-13,
+       -1.1368683772161603e-13,
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "hedge_upfront": 523295.6288246391
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "bucket hedge: five buckets, five tenors",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0006",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     },
+     {
+      "maturity": "2028-12-20",
+      "coupon": 0.01,
+      "notional": 25000000.0,
+      "side": "BUY_PROTECTION"
+     },
+     {
+      "maturity": "2036-12-20",
+      "coupon": 0.05,
+      "notional": 5000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.05
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      10375231.583601762
+     ],
+     "book": {
+      "pv": 1038089.6878085397,
+      "cs01": -5297.096827352067,
+      "jtd": 4961910.312191461,
+      "buckets": [
+       912.9991334712233,
+       -605.869922724123,
+       -2510.6905038961568,
+       -2167.5239465965974,
+       -926.0089676049743
+      ]
+     },
+     "after": {
+      "cs01": 0.0,
+      "jtd": 12960499.697250832,
+      "buckets": [
+       2328.087713225919,
+       1551.7940425843046,
+       -786.346452380744,
+       -2167.524195723354,
+       -926.0089676049743
+      ]
+     },
+     "hedge_upfront": -1774398.147853358
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "mixed book, CS01 with a 5Y at a 500 bp coupon",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0007",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     },
+     {
+      "maturity": "2028-12-20",
+      "coupon": 0.01,
+      "notional": 25000000.0,
+      "side": "BUY_PROTECTION"
+     },
+     {
+      "maturity": "2036-12-20",
+      "coupon": 0.05,
+      "notional": 5000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "BUCKET_3",
+     "BUCKET_4"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      533549.4891930687,
+      15974579.515770996
+     ],
+     "book": {
+      "pv": 1038089.6878085397,
+      "cs01": -5297.096827352067,
+      "jtd": 4961910.312191461,
+      "buckets": [
+       912.9991334712233,
+       -605.869922724123,
+       -2510.6905038961568,
+       -2167.5239465965974,
+       -926.0089676049743
+      ]
+     },
+     "after": {
+      "cs01": 3936.8822500985916,
+      "jtd": 14532885.491183128,
+      "buckets": [
+       2643.6564043665385,
+       2219.235650708465,
+       0.0,
+       4.547473508864641e-13,
+       -926.0089676049743
+      ]
+     },
+     "hedge_upfront": 334080.6577660077
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "mixed book, buckets 3 and 4 only",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0008",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9644786875593541
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.8573759580073939
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.7046755812304293
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.5704809387147153
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.397236316993604
+      }
+     ]
+    },
+    "recovery": 0.25,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.05,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2029-12-20",
+      "coupon": 0.05
+     },
+     {
+      "maturity": "2036-12-20",
+      "coupon": 0.05
+     }
+    ],
+    "targets": [
+     "CS01",
+     "JTD"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      2693501.727695931,
+      7511123.046680315
+     ],
+     "book": {
+      "pv": -205293.14846159442,
+      "cs01": -4738.086124358998,
+      "jtd": -7294706.851538406,
+      "buckets": [
+       -1024.9099333287104,
+       -1534.2414120861347,
+       -1212.0104171145508,
+       -966.9238349577225,
+       0.0
+      ]
+     },
+     "after": {
+      "cs01": 0.0,
+      "jtd": 0.0,
+      "buckets": [
+       -1.3293634097201448,
+       -8.46493894013588,
+       -384.1634408882451,
+       -323.27734992184446,
+       717.2347991813576
+      ]
+     },
+     "hedge_upfront": 358953.4476768903
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "high-yield curve, recovery 25%: CS01 and JTD",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0009",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "BUY_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      -12873915.053075029
+     ],
+     "book": {
+      "pv": 206016.1966992434,
+      "cs01": 5634.246622178082,
+      "jtd": 5793983.803300756,
+      "buckets": [
+       1047.666195400504,
+       1710.0900742593808,
+       1519.6310331060115,
+       1356.8582177821836,
+       0.0
+      ]
+     },
+     "after": {
+      "cs01": 0.0,
+      "jtd": -1814546.6337418333,
+      "buckets": [
+       -328.9929253346495,
+       -541.3352185919184,
+       -486.53068663324416,
+       1356.8582796070443,
+       0.0
+      ]
+     },
+     "hedge_upfront": -115880.48702144338
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "bought protection hedged by selling (negative notional out)",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0010",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.0
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "notionals": [
+      13433350.280684778
+     ],
+     "book": {
+      "pv": -206016.1966992434,
+      "cs01": -5634.246622178082,
+      "jtd": -5793983.803300756,
+      "buckets": [
+       -1047.666195400504,
+       -1710.0900742593808,
+       -1519.6310331060115,
+       -1356.8582177821836,
+       0.0
+      ]
+     },
+     "after": {
+      "cs01": 0.0,
+      "jtd": 1540917.451161136,
+      "buckets": [
+       289.8888688248337,
+       528.0761328953395,
+       538.8937547714274,
+       -1356.8582177821836,
+       0.0
+      ]
+     },
+     "hedge_upfront": 725496.4044015092
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "isda-replay",
+    "quantlib-1.44-isda-cds-engine",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "credit",
+    "isda-cds",
+    "synthetic"
+   ],
+   "description": "zero coupon hedge contract",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-08,
+    "reason": "ISDA replay agrees with QuantLib to 1e-15 per unit; notionals up to 1e8, a solve of condition up to 1e3"
+   }
+  },
+  {
+   "case_id": "hedgecredit_i-0011",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LINEAR_ZERO",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "discount not LOG_LINEAR_DF (R1-4)"
+  },
+  {
+   "case_id": "hedgecredit_i-0012",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2029-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "two hedges, one target"
+  },
+  {
+   "case_id": "hedgecredit_i-0013",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2029-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01",
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "repeated target"
+  },
+  {
+   "case_id": "hedgecredit_i-0014",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "BUCKET_6"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "bucket beyond the last hazard pillar"
+  },
+  {
+   "case_id": "hedgecredit_i-0015",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2026-11-06",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "hedge maturing on the trade date"
+  },
+  {
+   "case_id": "hedgecredit_i-0016",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 1.0,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "recovery 1"
+  },
+  {
+   "case_id": "hedgecredit_i-0017",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": -1.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "negative book notional"
+  },
+  {
+   "case_id": "hedgecredit_i-0018",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2031-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "CS01",
+     "JTD"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "the same contract twice"
+  },
+  {
+   "case_id": "hedgecredit_i-0019",
+   "operation": "hedge.credit.cds",
+   "inputs": {
+    "trade_date": "2026-11-06",
+    "discount": {
+     "as_of": "2026-11-06",
+     "interpolation": "LOG_LINEAR_DF",
+     "pillars": [
+      {
+       "date": "2046-11-06",
+       "discount_factor": 0.458161174870904
+      }
+     ]
+    },
+    "hazard": {
+     "as_of": "2026-11-06",
+     "pillars": [
+      {
+       "date": "2027-12-20",
+       "survival": 0.9887612955056266
+      },
+      {
+       "date": "2029-12-20",
+       "survival": 0.9533647856547852
+      },
+      {
+       "date": "2031-12-20",
+       "survival": 0.8989450529594715
+      },
+      {
+       "date": "2033-12-20",
+       "survival": 0.8450453062401858
+      },
+      {
+       "date": "2036-12-20",
+       "survival": 0.7636148113028429
+      }
+     ]
+    },
+    "recovery": 0.4,
+    "book": [
+     {
+      "maturity": "2033-12-20",
+      "coupon": 0.01,
+      "notional": 10000000.0,
+      "side": "SELL_PROTECTION"
+     }
+    ],
+    "hedges": [
+     {
+      "maturity": "2027-12-20",
+      "coupon": 0.01
+     },
+     {
+      "maturity": "2029-12-20",
+      "coupon": 0.01
+     }
+    ],
+    "targets": [
+     "BUCKET_4",
+     "BUCKET_5"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "credit",
+    "synthetic"
+   ],
+   "description": "short hedges have no risk in late buckets"
+  }
+ ]
+}

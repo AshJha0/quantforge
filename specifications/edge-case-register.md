@@ -111,3 +111,5 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | I3 | Integer lots: exact ties and rounding that is not optimal | Pinned | `stage_i/hedgeint_i-0007` to `-0010` | Ruling I-7 |
 | I4 | Beta futures exactly half a contract | Pinned | `stage_i/hedgebeta_i-0006` (`-2.5 -> -3`) | Ruling I-10 |
 | I5 | Book already hedged, or nothing to hedge | Pinned | `hedgeqp_i-0026` (`b = 0` gives `x = 0`); `hedgeres_i` `E_DOMAIN` for `b^T S b = 0`; `hedgemv_i` zero exposure variance | Ruling I-11 |
+| I6 | Credit hedge instrument with no risk in the targeted hazard sections | Pinned | `stage_i/hedgecredit_i` `E_SINGULAR` (1Y and 3Y contracts against buckets 4 and 5) | Ruling I-15 |
+| I7 | Correlation 1 with unequal vols; exchange options that cannot separate vega from correlation | Pinned | `stage_i/hedgecorr_i` (`rho = 1`, `s = 0.05`; exchange-only `E_SINGULAR`; `s = 0` `E_DOMAIN`) | Ruling I-17 |

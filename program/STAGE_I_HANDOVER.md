@@ -51,3 +51,32 @@ Read with every slice: `specifications/08-hedging/hedge-solvers.md`; `specificat
 
 ### Model inventory
 Row MI-1 (hedge solvers) added to `docs/model-inventory.md` with golden hashes.
+
+## Q6 status (2026-11-11): terms checked, churn bound registered, no data, no fit
+
+The Cboe delayed-quote pages prohibit automated download, and the Cboe website terms (section 2) and the Deribit terms of service (clause 32.3) forbid publishing derived data without written consent. Q6 waits for an owner decision on the data source (details and links in the plan folder, `STAGE_I_DATA_TERMS.md`). The churn bound is registered before any download or fit: `research/preregs/Q6-01-churn-bound.md`, hash-checked by `research/test_preregs.py`. Language sessions have nothing to build for Q6.
+
+## WAVE 2 READY (2026-11-11): credit and correlation hedges
+
+Read: `specifications/08-hedging/credit-and-correlation-hedges.md`; rulings I-15 to I-19 (and I-1 to I-4, I-12); `specifications/04-pricing/credit.md` (the CDS legs, normative here); `specifications/06-risk/f3-sensitivities.md` (`risk.sens.correlation`, same Margrabe formula); cli-contract block "Stage I operations"; edge-case rows I6, I7; `specifications/name-map.json` (268 operations).
+
+### Suites (39 cases)
+
+| Suite | Operation | Cases |
+|---|---|---|
+| `hedgecredit_i` | `hedge.credit.cds` | 19 (10 value, 9 error) |
+| `hedgecorr_i` | `hedge.correlation.neutralise` | 20 (9, 11) |
+
+### Build notes
+- Credit: reuse your `credit.cds.price` legs. Derive hazards from the survival pillars (`h_k = ln(Q_{k-1}/Q_k)/(t_k - t_{k-1})`, `t` in ACT/365F from the trade date); bump them by `+-1e-4/(1-R)` and rebuild the survival curve from the bumped hazards; CS01 is half the difference of the two pvs (I-15), never a derivative. `JTD = (1 - R) - pv` per unit of bought protection, with pv including `accrued Pcs` (I-16).
+- The discount check (`LOG_LINEAR_DF`, R1-4) comes before every other rule check, as in all `credit.*` operations.
+- A bucket beyond a contract's maturity has zero risk exactly; a matrix of such rows is `E_SINGULAR` (I-3).
+- Correlation: an exchange option's vega and correlation rows are proportional (I-17), so a hedge of correlation and a vega needs a vanilla (`CALL_k`, `PUT_k`). Correlation sensitivity is per 0.01 (I-18).
+- Every instrument kind has a fixed key set; any other key, or a missing one, is `E_INPUT`.
+
+### Property tests
+- Credit: hedging a book with its own contract returns the book's notional with the opposite sign; `after` is zero on every target; the sum of bucket CS01s is close to the parallel CS01 (equal to first order, not exactly).
+- Correlation: `correlation01` of a long exchange option is negative; a vanilla has zero correlation risk.
+
+### Outside-oracle status
+`hedgecredit_i` 10 of 19 (QuantLib `IsdaCdsEngine` on bumped hazard curves), `hedgecorr_i` 9 of 20 (QuantLib Margrabe engine and `BlackCalculator.vega`). Every value case counts; no error case does. Stage I so far: 63 of 160 = 39.4% (`oracle/outside_register_i.json`). The floor (60%, I-2) is measured at release. Error cases are 61 of the 160, so the value suites still to come must count nearly all their cases, or the stage reports a gap as G-42 did.
