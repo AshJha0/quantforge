@@ -47,13 +47,29 @@ def _least_squares(i: Inputs) -> tuple[list[list[float]], list[float], list[floa
     return i.matrix("a"), i.reals("b"), i.reals("weights"), i.opt_real("ridge", 0.0)
 
 
+def _qp_args(i: Inputs) -> tuple[Any, ...]:
+    """Every `hedge.qp.solve` input after a, b, weights and ridge, wave 4a ones included."""
+    singular = i.enum("singular", ("ERROR", "MIN_NORM")) if i.has("singular") else "ERROR"
+    return (_opt_matrix(i, "eq_matrix"), _opt_reals(i, "eq_rhs"), _opt_bounds(i, "lower"),
+            _opt_bounds(i, "upper"), singular, _opt_reals(i, "half_spreads"),
+            _opt_reals(i, "impact"))
+
+
 @op("hedge.qp.solve")
 def hedge_qp_solve(i: Inputs) -> Any:
     a, b, weights, ridge = _least_squares(i)
-    args = (_opt_matrix(i, "eq_matrix"), _opt_reals(i, "eq_rhs"), _opt_bounds(i, "lower"),
-            _opt_bounds(i, "upper"))
-    singular = i.enum("singular", ("ERROR", "MIN_NORM")) if i.has("singular") else "ERROR"
-    return core.hedge_solvers.qp_solve(a, b, weights, ridge, *args, singular)
+    args = (*_qp_args(i), i.opt_real("cost_weight"), _opt_reals(i, "margin_rates"),
+            i.opt_real("margin_limit"))
+    return core.hedge_solvers.qp_solve(a, b, weights, ridge, *args)
+
+
+@op("hedge.frontier.solve")
+def hedge_frontier_solve(i: Inputs) -> Any:
+    a, b, weights, ridge = _least_squares(i)
+    args = (*_qp_args(i), _opt_reals(i, "margin_rates"), i.opt_real("margin_limit"),
+            i.opt_real("cost_weight"))
+    return core.hedge_solvers.frontier_solve(a, b, weights, i.reals("cost_weights"), ridge,
+                                             *args)
 
 
 @op("hedge.integer.solve")
@@ -131,11 +147,12 @@ def hedge_credit_cds(i: Inputs) -> Any:
 _KINDS = ("EXCHANGE", "CALL_1", "PUT_1", "CALL_2", "PUT_2", "UNDERLYING_1", "UNDERLYING_2")
 
 
-def _positions(i: Inputs, key: str) -> list[tuple[str, dict[str, float]]]:
+def _positions(i: Inputs, key: str,
+               kinds: tuple[str, ...] = _KINDS) -> list[tuple[str, dict[str, float]]]:
     """(instrument, its other keys as numbers). Which keys a kind takes is the core's E_INPUT."""
     out = []
     for p in _objects(i, key):
-        kind = p.enum("instrument", _KINDS)
+        kind = p.enum("instrument", kinds)
         out.append((kind, {k: p.real(k) for k in p.raw if k != "instrument" and p.has(k)}))
     return out
 
@@ -146,3 +163,15 @@ def hedge_correlation_neutralise(i: Inputs) -> Any:
                                        "vol2", "correlation"))
     args = (*market, _positions(i, "book"), _positions(i, "hedges"), _targets(i))
     return core.credit_correlation_hedges.correlation_neutralise(*args)
+
+
+# Stage I wave 3 (08-hedging/cross-asset-hedge.md).
+
+@op("hedge.crossasset.solve")
+def hedge_crossasset_solve(i: Inputs) -> Any:
+    curve = i.object("curve")
+    kinds = ("CALL", "PUT", "FORWARD", "ZCB", "UNDERLYING")
+    args = (i.real("spot"), i.real("dividend_yield"), i.real("volatility"), curve.reals("times"),
+            curve.reals("zero_rates"), _positions(i, "book", kinds),
+            _positions(i, "hedges", kinds), i.reals("weights"), i.opt_real("ridge", 0.0))
+    return core.cross_asset_hedge.crossasset_solve(*args)

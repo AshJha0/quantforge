@@ -21,3 +21,16 @@ contract's maturity has zero bucket risk exactly). Conformance 39 of 39 (`hedgec
 `hedgecorr_i`); stage I total 160 of 160. Tests in `python/tests/test_credit_correlation_hedges.py`
 (own-contract notional, targets zero after, buckets against the parallel CS01, a hand-built CS01,
 Margrabe Greeks against finite differences, correlation signs). SPEC_QUESTIONS: none.
+
+## Waves 3 and 4a (cross-asset hedge; costs, margin and frontier)
+
+Wave 3 in `python/quantforge_core/cross_asset_hedge.py` (risks by repricing, then the wave 1
+solve). Wave 4a extends `hedge_solvers.qp_solve`: with no new input the wave 1 path runs unchanged
+(`hedgeqp_i` still 44 of 44); with a spread cost or a margin, an orthant search solves a smooth QP
+per sign orthant (linear cost term, the margin as one inequality) and flips an instrument sitting
+at 0 only when the subgradient test fails, so a costly instrument comes out at exactly `0.0`. The
+feasible start with a margin is the least-margin point from a two-phase simplex. Conformance:
+`hedgexa_i` 17 of 17, `hedgecost_i` 22 of 22, `hedgefrontier_i` 10 of 10; stage I total 209 of 209.
+Tests in `python/tests/test_hedge_costs_cross_asset.py`, including SciPy SLSQP on the split form
+as a second check. One commit for both waves: they were released together and share the handler
+and limits files. SPEC_QUESTIONS: none.

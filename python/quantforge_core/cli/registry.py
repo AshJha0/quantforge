@@ -16,7 +16,7 @@ Handler = Callable[[Inputs], Any]
 REGISTRY: dict[str, Handler] = {}
 CORE_MODULES = (
     "arb_surface", "black", "bonds", "calendars", "calibration", "caps_swaptions", "commodity",
-    "compounding", "conventions", "correlation", "cos", "credit", "credit_correlation_hedges", "credit_options", "csa",
+    "compounding", "conventions", "correlation", "cos", "credit", "credit_correlation_hedges", "credit_options", "cross_asset_hedge", "csa",
     "curve_fits", "curves", "data_checks", "daycount", "equity", "equity_curves", "exotics",
     "futures", "fx", "fx_smile", "hedge_solvers", "hedging", "heston", "inflation", "integrate", "interp", "joint", "linalg", "book_risk", "var_risk", "book",
     "mbs", "money", "monte_carlo", "ois", "overnight", "pde", "projection", "rates_vol",

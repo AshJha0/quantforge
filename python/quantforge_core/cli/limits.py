@@ -176,6 +176,15 @@ _HEDGE_GREEKS = _all(_caps_list("portfolio", 1000), _caps_list("hedges", 3))
 # Ruling I-19: credit book 1,000 trades and 50 hedges; correlation book 1,000 and 5 hedges.
 _HEDGE_CREDIT = _all(_caps_list("book", 1000), _caps_list("hedges", 50))
 _HEDGE_CORRELATION = _all(_caps_list("book", 1000), _caps_list("hedges", 5))
+# Ruling I-23: cross-asset book 1,000 positions, hedges 200, curve pillars 100.
+def _crossasset_curve(raw: Raw) -> None:
+    curve = raw.get("curve")
+    if isinstance(curve, dict):
+        _caps_list("times", 100)(curve)
+        _caps_list("zero_rates", 100)(curve)
+
+
+_HEDGE_CROSSASSET = _all(_caps_list("book", 1000), _caps_list("hedges", 200), _crossasset_curve)
 _HEDGE_RESIDUAL = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
                        _rows_cols("covariance", _I_FACTORS, _I_FACTORS))
 
@@ -234,6 +243,8 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "hedge.residual.report": _HEDGE_RESIDUAL,
     "hedge.credit.cds": _HEDGE_CREDIT,
     "hedge.correlation.neutralise": _HEDGE_CORRELATION,
+    "hedge.crossasset.solve": _HEDGE_CROSSASSET,
+    "hedge.frontier.solve": _all(_HEDGE_QP, _caps_list("cost_weights", 50)),
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
