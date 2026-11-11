@@ -645,3 +645,116 @@ TEST_CASE("I3 cross-asset: the check ladder") {
                         R"({"spot":100,"dividend_yield":0.01,"volatility":0.2,"curve":{"times":[2,1],"zero_rates":[0.03,0.032]},"weights":[1,1,1],"book":[{"instrument":"ZCB","quantity":1}],"hedges":[{"instrument":"UNDERLYING"}]})")) ==
           "E_INPUT");
 }
+
+// ---- wave 4a: costs, impact and margin; the frontier ----
+
+namespace {
+
+double i_true_objective(const hg::QpProblem& p, const Vec& x) {
+    double f = i_objective(p.a, p.b, p.weights, p.ridge, x), c = 0.0;
+    for (std::size_t j = 0; j < x.size(); ++j) {
+        if (p.half_spreads) c += (*p.half_spreads)[j] * std::fabs(x[j]);
+        if (p.impact) c += (*p.impact)[j] * x[j] * x[j];
+    }
+    return f + p.cost_weight.value_or(1.0) * c;
+}
+
+double i_margin(const hg::QpProblem& p, const Vec& x) {
+    double m = 0.0;
+    for (std::size_t j = 0; j < x.size(); ++j) m += (*p.margin_rates)[j] * std::fabs(x[j]);
+    return m;
+}
+
+}  // namespace
+
+TEST_CASE("I4a costs: cost_weight = 0 gives the wave 1 answer; no feasible perturbation does better") {
+    std::mt19937_64 rng(404);
+    for (int trial = 0; trial < 30; ++trial) {
+        const std::size_t n = 2 + std::size_t(trial % 4);
+        hg::QpProblem p = i_qp(rng, n + 3, n, 0, trial % 2 == 0);
+        const hg::QpResult plain = hg::solve_qp(p);
+        p.half_spreads = i_vector(rng, n, 0.0, 1.5);
+        p.impact = i_vector(rng, n, 0.0, 0.2);
+        p.cost_weight = 0.0;
+        const hg::QpResult zero = hg::solve_qp(p);
+        for (std::size_t j = 0; j < n; ++j) CHECK(std::fabs(zero.x[j] - plain.x[j]) < 1e-12 * (1.0 + std::fabs(plain.x[j])));
+        CHECK(zero.objective == zero.risk);
+        p.cost_weight = 1.0;
+        const hg::QpResult r = hg::solve_qp(p);
+        CHECK(std::fabs(r.objective - (r.risk + r.cost)) < 1e-14 * (1.0 + r.objective));
+        std::uniform_real_distribution<double> step(-0.02, 0.02);
+        for (int probe = 0; probe < 40; ++probe) {
+            Vec y = r.x;
+            for (std::size_t j = 0; j < n; ++j) {
+                y[j] += step(rng);
+                if (p.lower && (*p.lower)[j]) y[j] = std::max(y[j], *(*p.lower)[j]);
+                if (p.upper && (*p.upper)[j]) y[j] = std::min(y[j], *(*p.upper)[j]);
+            }
+            CHECK(i_true_objective(p, y) >= r.objective - 1e-12 * (1.0 + r.objective));
+        }
+    }
+}
+
+TEST_CASE("I4a costs: a costly instrument is left out exactly; an active margin equals its limit") {
+    hg::QpProblem p;
+    p.a = {{1.0, 0.2}, {0.3, 1.0}, {0.5, 0.5}};
+    p.b = {-1.0, 0.4, -0.2};
+    p.weights = {1.0, 1.0, 1.0};
+    p.half_spreads = Vec{0.0, 50.0};
+    const hg::QpResult r = hg::solve_qp(p);
+    CHECK(r.x[1] == 0.0);
+    CHECK(!std::signbit(r.x[1]));
+    hg::QpProblem m;
+    m.a = p.a;
+    m.b = p.b;
+    m.weights = p.weights;
+    m.margin_rates = Vec{0.1, 0.2};
+    m.margin_limit = 0.05;
+    const hg::QpResult limited = hg::solve_qp(m);
+    REQUIRE(limited.margined);
+    CHECK(std::fabs(limited.margin - 0.05) < 1e-14);
+    CHECK(std::fabs(i_margin(m, limited.x) - 0.05) < 1e-14);
+    m.lower = std::vector<hg::Bound>{1.0, std::nullopt};
+    CHECK(i_error([&] { hg::solve_qp(m); }) == "E_INFEASIBLE");  // the bound alone needs margin 0.1
+    hg::QpProblem s = p;
+    s.a = {{1.0, 1.0}, {0.5, 0.5}};
+    s.b = {-1.0, 0.5};
+    s.weights = {1.0, 1.0};
+    s.half_spreads = Vec{0.1, 0.1};
+    CHECK(i_error([&] { hg::solve_qp(s); }) == "E_SINGULAR");  // a spread does not regularise (I-26)
+    s.impact = Vec{0.0, 0.01};
+    CHECK(i_error([&] { hg::solve_qp(s); }) == "ok");          // impact does
+    s.singular = hg::Singular::MinNorm;
+    CHECK(i_error([&] { hg::solve_qp(s); }) == "E_INPUT");
+}
+
+TEST_CASE("I4a frontier: risk non-decreasing and cost non-increasing in the cost weight") {
+    const std::string base =
+        R"({"a":[[1.0,0.5,0.2],[0.3,1.2,0.4],[0.1,0.6,1.5],[0.8,0.2,0.9]],"b":[-2.0,1.5,-0.7,0.9],"weights":[1,2,0.5,1.5],"half_spreads":[0.05,0.3,0.1],"impact":[0.01,0.02,0.0],"cost_weights":[0,0.25,0.5,1,2,4,8,16]})";
+    const json::Value o = i_outputs("hedge.frontier.solve", base);
+    const auto& points = o.find("points")->items;
+    REQUIRE(points.size() == 8);
+    for (std::size_t i = 1; i < points.size(); ++i) {
+        CHECK(points[i].find("risk")->number >= points[i - 1].find("risk")->number * (1.0 - 1e-12));
+        CHECK(points[i].find("cost")->number <= points[i - 1].find("cost")->number * (1.0 + 1e-12));
+    }
+    CHECK(i_code(i_case("hedge.frontier.solve",
+                        R"({"a":[[1.0]],"b":[1.0],"weights":[1],"half_spreads":[0.1],"cost_weights":[1,0.5]})")) ==
+          "E_INPUT");
+    CHECK(i_code(i_case("hedge.frontier.solve",
+                        R"({"a":[[1.0]],"b":[1.0],"weights":[1],"margin_rates":[0.1],"margin_limit":1,"cost_weights":[1]})")) ==
+          "E_INPUT");
+}
+
+TEST_CASE("I4a costs: the sign enumeration is capped at 20 free instruments") {
+    hg::QpProblem p;
+    const std::size_t n = 21;
+    p.a = Matrix(n, Vec(n, 0.0));
+    for (std::size_t i = 0; i < n; ++i) p.a[i][i] = 1.0;
+    p.b = Vec(n, 1.0);
+    p.weights = Vec(n, 1.0);
+    p.half_spreads = Vec(n, 0.1);
+    CHECK(i_error([&] { hg::solve_qp(p); }) == "E_LIMIT");
+    p.lower = std::vector<hg::Bound>(n, 0.0);  // every sign fixed by a bound: nothing to enumerate
+    CHECK(i_error([&] { hg::solve_qp(p); }) == "ok");
+}

@@ -62,7 +62,8 @@ void write_ls(Out& out, const Vec& x, const Vec& residual, double objective) {
     out.key_real("objective", objective);
 }
 
-void op_hedge_qp_solve(const In& in, Out& out) {
+// The inputs of hedge.qp.solve other than cost_weight, shared with hedge.frontier.solve. Limits are checked here.
+hedging::QpProblem qp_problem_of(const In& in) {
     hedging::QpProblem p;
     p.a = in.matrix("a");
     p.b = in.reals("b");
@@ -75,13 +76,59 @@ void op_hedge_qp_solve(const In& in, Out& out) {
     if (present(in, "singular"))
         p.singular = in.choice<hedging::Singular>(
             "singular", {{"ERROR", hedging::Singular::Error}, {"MIN_NORM", hedging::Singular::MinNorm}});
+    if (present(in, "half_spreads")) p.half_spreads = in.reals("half_spreads");
+    if (present(in, "impact")) p.impact = in.reals("impact");
+    if (present(in, "margin_rates")) p.margin_rates = in.reals("margin_rates");
+    if (present(in, "margin_limit")) p.margin_limit = in.real("margin_limit");
     limit_if(p.a.size() > max_factors, "a");
     limit_if(widest_row(p.a) > max_instruments, "a");
     limit_if(p.eq_matrix && p.eq_matrix->size() > max_equalities, "eq_matrix");
+    return p;
+}
+
+void op_hedge_qp_solve(const In& in, Out& out) {
+    hedging::QpProblem p = qp_problem_of(in);
+    if (present(in, "cost_weight")) p.cost_weight = in.real("cost_weight");
     in.ready();
     const hedging::QpResult r = hedging::solve_qp(p);
     write_ls(out, r.x, r.residual, r.objective);
     key_int(out, "rank", r.rank);
+    if (r.costed) {  // I-27
+        out.key_real("risk", r.risk);
+        out.key_real("cost", r.cost);
+    }
+    if (r.margined) out.key_real("margin", r.margin);
+}
+
+// Wave 4a: risk against cost, one solve per weight in order; the first error stops it.
+void op_hedge_frontier_solve(const In& in, Out& out) {
+    hedging::QpProblem p = qp_problem_of(in);
+    const bool has_single = present(in, "cost_weight");
+    if (has_single) (void)in.real("cost_weight");
+    const Vec weights = in.reals("cost_weights");
+    limit_if(weights.size() > 50, "cost_weights");
+    in.ready();
+    if (has_single) throw Error("E_INPUT", "cost_weight goes with hedge.qp.solve, not the frontier", "cost_weight");
+    if (weights.empty()) throw Error("E_INPUT", "cost_weights is empty", "cost_weights");
+    for (std::size_t i = 1; i < weights.size(); ++i)
+        if (!(weights[i] > weights[i - 1])) throw Error("E_INPUT", "cost_weights must increase strictly", "cost_weights");
+    if (!p.half_spreads && !p.impact) throw Error("E_INPUT", "a frontier needs half_spreads or impact", "half_spreads");
+    std::vector<hedging::QpResult> points;
+    for (const double w : weights) {
+        p.cost_weight = w;
+        points.push_back(hedging::solve_qp(p));
+    }
+    out.values.key("points");
+    out.values.begin_array();
+    for (std::size_t i = 0; i < points.size(); ++i) {
+        out.values.begin_object();
+        out.key_real("cost_weight", weights[i]);
+        out.key_reals("x", points[i].x);
+        out.key_real("risk", points[i].risk);
+        out.key_real("cost", points[i].cost);
+        out.values.end_object();
+    }
+    out.values.end_array();
 }
 
 void op_hedge_integer_solve(const In& in, Out& out) {
@@ -437,4 +484,5 @@ constexpr Entry hedge_ops[] = {
     {"hedge.credit.cds", op_hedge_credit_cds},
     {"hedge.correlation.neutralise", op_hedge_correlation_neutralise},
     {"hedge.crossasset.solve", op_hedge_crossasset_solve},
+    {"hedge.frontier.solve", op_hedge_frontier_solve},
 };

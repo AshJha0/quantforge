@@ -29,6 +29,13 @@ Built: `hedge.crossasset.solve` (`cpp26/src/core/hedging_w3.cpp`): the risk matr
 - Conformance: `hedgexa_i` 17 of 17 on the first build.
 - ctest: 3 new test cases (square hedge leaves no residual, bonds have `EQ01 = 0` exactly, key-rate sharing between neighbours and before pillar 1, weight scaling, the check ladder). `tests/test_cli.cpp` expects 269 operations.
 
+## Wave 4a, costs, impact, margin and the frontier
+
+Built: the new optional inputs of `hedge.qp.solve` and `hedge.frontier.solve` (`cpp26/src/core/hedging.cpp`). Impact goes into `H` (I-26). With a spread or margin term the solve enumerates closed orthants: inside one, `|x_j|` is linear, so each is a strictly convex QP for the same dual active-set method, and the margin is one more linear row. The least orthant minimum is the answer; no feasible orthant is `E_INFEASIBLE`, decided exactly. Signs fixed by bounds are not enumerated.
+
+- Conformance: `hedgecost_i` 22 of 22, `hedgefrontier_i` 10 of 10, `hedgeqp_i` still 44 of 44, on the first build. Full run: 14,701 passed, 0 failures (only the 25 wave 4b cases not implemented at that point). ctest passed.
+- ctest: 4 new test cases (`cost_weight = 0` equals wave 1, no feasible perturbation does better, a costly instrument at exactly `+0.0`, an active margin equals its limit, spread against impact regularity, frontier monotonicity, the sign cap). `tests/test_cli.cpp` expects 270 operations.
+
 ## SPEC_QUESTIONS
 
 | # | Where | Question | What the C++ build does |
@@ -37,6 +44,8 @@ Built: `hedge.crossasset.solve` (`cpp26/src/core/hedging_w3.cpp`): the risk matr
 | C-I2 | `hedge.integer.solve` | The spec does not say what happens when the search would need lot counts beyond `2^53` (huge `b` with small lot sizes). | `E_LIMIT` on `lot_sizes`. No golden reaches it |
 
 ## Open
+
+- Wave 4a enumerates signs, `2^k` orthants for `k` instruments with a spread or margin term whose sign the bounds leave open. Above `k = 20` this build returns `E_LIMIT` (`max_sign_free_instruments`), while the spec allows 200 instruments. No golden reaches it. A sign-state active-set method (start from the smooth solution, flip a sign when a zero coordinate's subgradient test fails) would remove the cap.
 
 - `Q3b AAD ladder ... costs at most 5 prices (G-9)` (stage G, `tests/test_stage_g.cpp:515`) is a wall-clock ratio. It failed once tonight at 5.09 against 5.0 while other lanes were compiling, and passed when rerun alone (2.80 earlier in the evening). Not touched by stage I.
 - ASan and UBSan need WSL; not run tonight (no WSL by the coordinator's rule).

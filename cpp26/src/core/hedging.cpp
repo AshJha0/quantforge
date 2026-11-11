@@ -389,9 +389,10 @@ struct BoundRow {
     double bound;
 };
 
-// Minimises the strictly convex quadratic y'Gy/2 + g'y over the bounds on x = xp + Z y. Throws E_INFEASIBLE.
+// Minimises the strictly convex quadratic y'Gy/2 + g'y over the bounds on x = xp + Z y and, when given, one
+// general row: general . x >= general_rhs (the 4a margin within an orthant). Throws E_INFEASIBLE.
 Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns, const std::vector<Bound>& lower,
-                      const std::vector<Bound>& upper) {
+                      const std::vector<Bound>& upper, const Vec* general = nullptr, double general_rhs = 0.0) {
     const std::size_t n = ns.xp.size(), r = reduced.size();
     std::vector<BoundRow> rows;
     for (std::size_t j = 0; j < n; ++j) {
@@ -405,6 +406,14 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
             if (gap < -1e-12 * (std::fabs(b.bound) + std::fabs(x[b.index])))
                 throw Error("E_INFEASIBLE", "the equalities fix x outside the bounds");
         }
+        if (general) {
+            double lhs = 0.0, scale = std::fabs(general_rhs);
+            for (std::size_t j = 0; j < n; ++j) {
+                lhs += (*general)[j] * x[j];
+                scale += std::fabs((*general)[j] * x[j]);
+            }
+            if (lhs - general_rhs < -1e-12 * scale) throw Error("E_INFEASIBLE", "the equalities break the margin limit");
+        }
         return x;
     }
     Matrix normals;
@@ -416,12 +425,23 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
         normals.push_back(std::move(row));
         rhs.push_back(sign * (b.bound - ns.xp[b.index]));
     }
+    if (general) {
+        Vec row(r, 0.0);
+        double at_xp = 0.0;
+        for (std::size_t j = 0; j < n; ++j) {
+            at_xp += (*general)[j] * ns.xp[j];
+            for (std::size_t c = 0; c < r; ++c) row[c] += (*general)[j] * ns.z[j][c];
+        }
+        normals.push_back(std::move(row));
+        rhs.push_back(general_rhs - at_xp);
+    }
     DualActiveSet qp(reduced, g0, normals, rhs);
     if (!qp.solve()) throw Error("E_INFEASIBLE", "no point satisfies the equalities and the bounds");
     for (std::size_t j = 0; j < n; ++j)
         for (std::size_t c = 0; c < r; ++c) x[j] += ns.z[j][c] * qp.y()[c];
     if (r == n)  // Z = I: an active bound holds exactly
-        for (const std::size_t i : qp.active()) x[rows[i].index] = rows[i].bound;
+        for (const std::size_t i : qp.active())
+            if (i < rows.size()) x[rows[i].index] = rows[i].bound;
     return x;
 }
 
@@ -479,6 +499,90 @@ Eigen jacobi_eigen(Matrix a) {
 
 // ---- hedge.qp.solve ----
 
+namespace {
+
+double trading_cost(const QpProblem& p, const Vec& x) {
+    double c = 0.0;
+    for (std::size_t j = 0; j < x.size(); ++j) {
+        if (p.half_spreads) c += (*p.half_spreads)[j] * std::fabs(x[j]);
+        if (p.impact) c += (*p.impact)[j] * x[j] * x[j];
+    }
+    return c;
+}
+
+double margin_used(const QpProblem& p, const Vec& x) {
+    double m = 0.0;
+    if (p.margin_rates)
+        for (std::size_t j = 0; j < x.size(); ++j) m += (*p.margin_rates)[j] * std::fabs(x[j]);
+    return m;
+}
+
+// Wave 4a with a spread or margin term. In each closed orthant (a sign for every instrument with such a term)
+// |x_j| = s_j x_j, so the spread cost is linear and the margin one linear row: a strictly convex QP for the
+// dual active-set method. The orthants cover the space, so the least of their minima is the minimiser of the
+// whole problem, and no feasible orthant means no feasible point (E_INFEASIBLE, exactly). Signs fixed by the
+// bounds are not enumerated; the rest are, up to max_sign_free_instruments.
+Vec orthant_minimiser(const QpProblem& p, const Normal& q, const Matrix& reduced, const NullSpace& ns,
+                      const std::vector<Bound>& lower, const std::vector<Bound>& upper, double cost_weight) {
+    const std::size_t n = q.c.size();
+    std::vector<std::size_t> free;
+    std::vector<int> sign(n, 0);
+    for (std::size_t j = 0; j < n; ++j) {
+        const bool term = (p.half_spreads && (*p.half_spreads)[j] > 0.0) || (p.margin_rates && (*p.margin_rates)[j] > 0.0);
+        if (!term) continue;
+        const bool lo_pos = !lower.empty() && lower[j] && *lower[j] >= 0.0;
+        const bool up_neg = !upper.empty() && upper[j] && *upper[j] <= 0.0;
+        if (lo_pos) sign[j] = 1;
+        else if (up_neg) sign[j] = -1;
+        else free.push_back(j);
+    }
+    if (free.size() > max_sign_free_instruments)
+        throw Error("E_LIMIT", "this build enumerates the signs of at most 20 instruments with a spread or margin",
+                    "half_spreads");
+    std::optional<Vec> best;
+    double best_f = 0.0;
+    for (std::size_t mask = 0; mask < (std::size_t{1} << free.size()); ++mask) {
+        for (std::size_t i = 0; i < free.size(); ++i) sign[free[i]] = (mask >> i) & 1 ? -1 : 1;
+        std::vector<Bound> lo(n), up(n);
+        bool empty = false;
+        Vec c = q.c;
+        for (std::size_t j = 0; j < n; ++j) {
+            if (!lower.empty()) lo[j] = lower[j];
+            if (!upper.empty()) up[j] = upper[j];
+            if (sign[j] > 0) lo[j] = std::max(lo[j].value_or(0.0), 0.0);
+            if (sign[j] < 0) up[j] = std::min(up[j].value_or(0.0), 0.0);
+            if (lo[j] && up[j] && *lo[j] > *up[j]) empty = true;
+            if (p.half_spreads) c[j] += 0.5 * cost_weight * (*p.half_spreads)[j] * double(sign[j]);
+        }
+        if (empty) continue;
+        Vec hxp(c);
+        for (std::size_t i = 0; i < n; ++i) hxp[i] += dot(q.h[i], ns.xp);
+        const Vec g0 = project(ns.z, hxp);
+        Vec margin_row;  // -sum m_j s_j x_j >= -limit
+        if (p.margin_rates) {
+            margin_row.assign(n, 0.0);
+            for (std::size_t j = 0; j < n; ++j) margin_row[j] = -(*p.margin_rates)[j] * double(sign[j]);
+        }
+        Vec x;
+        try {
+            x = bounded_minimiser(reduced, g0, ns, lo, up, p.margin_rates ? &margin_row : nullptr,
+                                  p.margin_limit ? -*p.margin_limit : 0.0);
+        } catch (const Error& e) {
+            if (e.code() == "E_INFEASIBLE") continue;
+            throw;
+        }
+        const double f = objective_of(residual_of(p.a, p.b, x), p.weights, p.ridge, x) + cost_weight * trading_cost(p, x);
+        if (!best || f < best_f) {
+            best = std::move(x);
+            best_f = f;
+        }
+    }
+    if (!best) throw Error("E_INFEASIBLE", "no point satisfies the equalities, the bounds and the margin limit");
+    return *best;
+}
+
+}  // namespace
+
 QpResult solve_qp(const QpProblem& p) {
     // Check 1: shapes.
     const std::size_t n = check_ls_shapes(p.a, p.b, p.weights);
@@ -502,6 +606,21 @@ QpResult solve_qp(const QpProblem& p) {
     check_ls_domain(p.weights, p.ridge);
     for (std::size_t j = 0; j < lower.size() && j < upper.size(); ++j)
         domain_if(lower[j] && upper[j] && *lower[j] > *upper[j], "lower", "a lower bound is above its upper bound");
+    // Wave 4a checks, after wave 1 checks 1 to 3 (I-25).
+    const bool costed = p.half_spreads || p.impact || p.cost_weight || p.margin_rates || p.margin_limit;
+    for (const auto& [v, field] : {std::pair{&p.half_spreads, "half_spreads"}, {&p.impact, "impact"},
+                                   {&p.margin_rates, "margin_rates"}})
+        input_if(*v && (*v)->size() != n, field, "length differs from the instruments");
+    input_if(p.margin_rates.has_value() != p.margin_limit.has_value(), "margin_rates",
+             "margin_rates and margin_limit go together");
+    input_if(p.singular == Singular::MinNorm && costed, "singular", "MIN_NORM does not take costs or margin");
+    for (const auto& [v, field] : {std::pair{&p.half_spreads, "half_spreads"}, {&p.impact, "impact"},
+                                   {&p.margin_rates, "margin_rates"}})
+        if (*v)
+            for (const double x : **v) domain_if(x < 0.0, field, "entries must be at least 0");
+    const double cost_weight = p.cost_weight.value_or(1.0);
+    domain_if(cost_weight < 0.0, "cost_weight", "must be at least 0");
+    domain_if(p.margin_limit && *p.margin_limit < 0.0, "margin_limit", "must be at least 0");
     // Check 4: equality rank.
     const std::size_t k = e.size();
     if (k > 0) {
@@ -515,7 +634,9 @@ QpResult solve_qp(const QpProblem& p) {
             throw Error("E_SINGULAR", "the equality rows are linearly dependent", "eq_matrix");
     }
     // Check 5: reduced Hessian, against the largest eigenvalue of H (I-3, Q-I3).
-    const Normal q = normal_equations(p.a, p.b, p.weights, p.ridge);
+    Normal q = normal_equations(p.a, p.b, p.weights, p.ridge);
+    if (p.impact)  // impact counts like a ridge (I-26)
+        for (std::size_t j = 0; j < n; ++j) q.h[j][j] += cost_weight * (*p.impact)[j];
     const double h_max = largest_abs(jacobi_eigen(q.h).values);
     const NullSpace ns = null_space(e, k ? *p.eq_rhs : Vec{}, n);
     const Matrix reduced = project(ns.z, q.h);
@@ -540,14 +661,21 @@ QpResult solve_qp(const QpProblem& p) {
         }
         x = ns.xp;
         for (std::size_t j = 0; j < n; ++j) x[j] += dot(ns.z[j], y);
-    } else {
+    } else if (!p.half_spreads && !p.margin_rates) {
         // Check 6 (feasibility) happens inside: E_INFEASIBLE when no point exists (I-14).
         x = bounded_minimiser(reduced, g0, ns, lower, upper);
+    } else {
+        x = orthant_minimiser(p, q, reduced, ns, lower, upper, cost_weight);
     }
     for (double& v : x) v += 0.0;  // no negative zero in outputs (F-3)
     QpResult out;
     out.residual = residual_of(p.a, p.b, x);
-    out.objective = objective_of(out.residual, p.weights, p.ridge, x);
+    out.risk = objective_of(out.residual, p.weights, p.ridge, x);
+    out.cost = trading_cost(p, x);
+    out.margin = margin_used(p, x);
+    out.objective = out.risk + cost_weight * out.cost;
+    out.costed = costed;
+    out.margined = p.margin_rates.has_value();
     out.x = std::move(x);
     out.rank = rank;
     return out;

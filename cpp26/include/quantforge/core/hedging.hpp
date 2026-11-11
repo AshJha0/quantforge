@@ -36,14 +36,22 @@ struct QpProblem {
     std::optional<Vec> eq_rhs;
     std::optional<std::vector<Bound>> lower, upper;
     Singular singular = Singular::Error;
+    // Wave 4a (08-hedging/hedge-costs-and-frontier.md, I-24 to I-27): C(x) = sum hs |x| + impact x^2,
+    // weighted by cost_weight (default 1), and sum margin_rates |x| <= margin_limit.
+    std::optional<Vec> half_spreads, impact, margin_rates;
+    std::optional<double> cost_weight, margin_limit;
 };
 struct QpResult {
     Vec x, residual;
     double objective = 0.0;
     long long rank = 0;
+    bool costed = false, margined = false;  // which of the I-27 outputs to write
+    double risk = 0.0, cost = 0.0, margin = 0.0;
 };
 /// Checks in the spec's order: E_INPUT, E_DOMAIN, E_SINGULAR, E_INFEASIBLE.
 QpResult solve_qp(const QpProblem& p);
+/// Instruments whose sign the 4a solve enumerates (a spread or margin term and a sign not fixed by bounds).
+inline constexpr std::size_t max_sign_free_instruments = 20;
 
 /// hedge.integer.solve: the same objective over x = lot_sizes * n, n integer within optional lot bounds.
 struct IntegerProblem {
