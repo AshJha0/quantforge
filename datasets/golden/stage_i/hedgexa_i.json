@@ -1,0 +1,1557 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgexa_i",
+ "spec": "specifications/08-hedging/cross-asset-hedge.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w3.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgexa_i-0001",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "FORWARD",
+      "strike": 4000.0,
+      "expiry_years": 1.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 1.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 10.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      32.112913820618836,
+      0.0645279210796159,
+      -0.07055399713069699,
+      -1.5617366454129118,
+      -0.6355791497805887
+     ],
+     "book_risk": [
+      -1265.3925928054327,
+      -6.20345024482978,
+      -13.236000497334105,
+      -655.5054231049346,
+      -434.64812547629026
+     ],
+     "residual_risk": [
+      1.6148197750110734e-13,
+      7.630007768211718e-16,
+      1.102386270725439e-15,
+      8.598210171861303e-15,
+      -2.3465029931717877e-14
+     ],
+     "objective": 2.6702763331199367e-26
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "equity and four key rates with a future and four bonds (exact)",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0002",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 10.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      31.63481482013582,
+      -0.07055399713069699,
+      -0.6355791497805887
+     ],
+     "book_risk": [
+      -1265.3925928054327,
+      -6.20345024482978,
+      -13.236000497334105,
+      -655.5054231049346,
+      -434.64812547629026
+     ],
+     "residual_risk": [
+      5.711551463963194e-14,
+      -6.20345024482978,
+      1.102386270725439e-15,
+      -655.5054231049346,
+      -2.3465029931717877e-14
+     ],
+     "objective": 429725.84251491947
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "equity with the underlying, rates with two bonds (least squares)",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0003",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "FORWARD",
+      "strike": 4000.0,
+      "expiry_years": 1.0
+     },
+     {
+      "instrument": "FORWARD",
+      "strike": 4000.0,
+      "expiry_years": 5.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      -319.63908191851704,
+      373.5377085128599
+     ],
+     "book_risk": [
+      -1265.3925928054327,
+      -6.20345024482978,
+      -13.236000497334105,
+      -655.5054231049346,
+      -434.64812547629026
+     ],
+     "residual_risk": [
+      1.283407562841426,
+      -130.2803782097729,
+      -13.236000497334105,
+      -28.367693107872718,
+      -434.64812547629026
+     ],
+     "objective": 206873.53478293467
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "forward carries rate risk: futures only",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0004",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "FORWARD",
+      "strike": 4000.0,
+      "expiry_years": 1.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     100.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      32.112898165425776,
+      -1.5617366454129118
+     ],
+     "book_risk": [
+      -1265.3925928054327,
+      -6.20345024482978,
+      -13.236000497334105,
+      -655.5054231049346,
+      -434.64812547629026
+     ],
+     "residual_risk": [
+      -0.0006168847038421727,
+      6.262077213520311,
+      -13.236000497334105,
+      8.598210171861303e-15,
+      -434.64812547629026
+     ],
+     "objective": 189133.39833830114
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "equity weighted 100 times the rates",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0005",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "ZCB",
+      "expiry_years": 4.0,
+      "notional": 1000000.0,
+      "quantity": 1.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 8.0,
+      "notional": 1000000.0,
+      "quantity": -0.5
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 10.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      -0.6203539282431967,
+      -0.2705593688289687,
+      0.2614488847720277
+     ],
+     "book_risk": [
+      0.0,
+      0.0,
+      -116.3790180099893,
+      -113.56148558091002,
+      178.79483257633302
+     ],
+     "residual_risk": [
+      0.0,
+      0.0,
+      6.68224447569616e-15,
+      4.779121640359201e-15,
+      1.0742046974928024e-14
+     ],
+     "objective": 1.8288396809788177e-28
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "rates-only book hedged with bonds; equity row is zero",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0006",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.002739726027397,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "ridge": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      4.204081634151902,
+      -5.766659005018781,
+      31.438325287091498
+     ],
+     "book_risk": [
+      -1265.3925928054327,
+      -6.20345024482978,
+      -13.236000497334105,
+      -655.5054231049346,
+      -434.64812547629026
+     ],
+     "residual_risk": [
+      -7.859581321772817,
+      -6.20345024482978,
+      -13.236000497334105,
+      0.10016192264658332,
+      -433.3212732396956
+     ],
+     "objective": 198435.75295037826
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "ridge 10 shrinks a near-duplicate bond pair",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0007",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4000.0,
+      "expiry_years": 3.4986301369863013,
+      "quantity": -100.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 5.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      60.799183723686966,
+      -0.1691837229331572,
+      -0.07548002042160563
+     ],
+     "book_risk": [
+      -2431.9673489474785,
+      0.0,
+      -31.739035801698208,
+      -31.681117855406534,
+      0.0
+     ],
+     "residual_risk": [
+      -1.9643871941710373e-13,
+      0.0,
+      2.368186500441116e-15,
+      1.6427681665225092e-15,
+      0.0
+     ],
+     "objective": 3.859647748078142e-26
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "maturity between pillars splits its key-rate risk",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0008",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "FORWARD",
+      "strike": 3900.0,
+      "expiry_years": 0.4986301369863014,
+      "quantity": 10.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 1.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      -9.925484494407568,
+      0.019741283936421487
+     ],
+     "book_risk": [
+      397.01937977630274,
+      1.9157840854542878,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "residual_risk": [
+      -1.3244768257923589e-14,
+      -2.2185682527013807e-16,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 1.7547310665701923e-28
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "maturity before the first pillar loads on pillar 1 only",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0009",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.05,
+      0.045,
+      0.04,
+      0.037
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "FORWARD",
+      "strike": 4000.0,
+      "expiry_years": 1.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 10.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "positions": [
+      33.436304290459574,
+      -0.0701469540830614,
+      -0.6179061778335576
+     ],
+     "book_risk": [
+      -1317.5982475642184,
+      -6.700663568205133,
+      -12.821897863139064,
+      -643.2925571395313,
+      -426.80908127738724
+     ],
+     "residual_risk": [
+      -0.058144654904929975,
+      6.0215750480564445,
+      -7.489046798307797e-16,
+      -643.2925571395313,
+      4.04108613887118e-16
+     ],
+     "objective": 413861.5768179774
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "wave-1-qp",
+    "quantlib-1.44-zerocurve-analytic-european",
+    "numpy-2.5-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "inverted curve",
+   "tolerance_limit": {
+    "absolute": 1e-08,
+    "relative": 1e-09,
+    "reason": "risks are half-differences of prices of size up to 1e6; least-squares solve"
+   }
+  },
+  {
+   "case_id": "hedgexa_i-0010",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "weights shorter than 1 + pillars"
+  },
+  {
+   "case_id": "hedgexa_i-0011",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      1.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "curve times not increasing"
+  },
+  {
+   "case_id": "hedgexa_i-0012",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 10.95890410958904,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "bond beyond the last pillar"
+  },
+  {
+   "case_id": "hedgexa_i-0013",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0,
+      "strike": 1.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "bond with a strike"
+  },
+  {
+   "case_id": "hedgexa_i-0014",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.0,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "zero volatility"
+  },
+  {
+   "case_id": "hedgexa_i-0015",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "zero weight"
+  },
+  {
+   "case_id": "hedgexa_i-0016",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "the underlying twice"
+  },
+  {
+   "case_id": "hedgexa_i-0017",
+   "operation": "hedge.crossasset.solve",
+   "inputs": {
+    "spot": 4000.0,
+    "dividend_yield": 0.015,
+    "volatility": 0.18,
+    "curve": {
+     "times": [
+      1.0,
+      2.0,
+      5.0,
+      10.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.032,
+      0.035,
+      0.038
+     ]
+    },
+    "book": [
+     {
+      "instrument": "CALL",
+      "strike": 4200.0,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -50.0
+     },
+     {
+      "instrument": "PUT",
+      "strike": 3600.0,
+      "expiry_years": 3.0,
+      "quantity": 30.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 7.0,
+      "notional": 2000000.0,
+      "quantity": 1.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     },
+     {
+      "instrument": "ZCB",
+      "expiry_years": 2.0,
+      "notional": 1000000.0
+     }
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "cross-asset",
+    "synthetic"
+   ],
+   "description": "the same bond twice"
+  }
+ ]
+}

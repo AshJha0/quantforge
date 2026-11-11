@@ -113,3 +113,8 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | I5 | Book already hedged, or nothing to hedge | Pinned | `hedgeqp_i-0026` (`b = 0` gives `x = 0`); `hedgeres_i` `E_DOMAIN` for `b^T S b = 0`; `hedgemv_i` zero exposure variance | Ruling I-11 |
 | I6 | Credit hedge instrument with no risk in the targeted hazard sections | Pinned | `stage_i/hedgecredit_i` `E_SINGULAR` (1Y and 3Y contracts against buckets 4 and 5) | Ruling I-15 |
 | I7 | Correlation 1 with unequal vols; exchange options that cannot separate vega from correlation | Pinned | `stage_i/hedgecorr_i` (`rho = 1`, `s = 0.05`; exchange-only `E_SINGULAR`; `s = 0` `E_DOMAIN`) | Ruling I-17 |
+| I8 | Cross-asset maturity outside the curve: before the first pillar, or after the last | Pinned | `stage_i/hedgexa_i-0008` (flat short end, pillar 1 only); `E_INPUT` case beyond the last pillar | Ruling I-20 |
+| I9 | Hedge instruments of very different unit sizes | Rule | `stage_i/hedgexa_i` uses `ZCB` notionals of 1e6 | Ruling I-22: the relative singularity test is not scale-invariant |
+| I10 | A hedge instrument too costly to use; a margin limit the constraints cannot meet | Pinned | `stage_i/hedgecost_i-0002` (`x_2 = 0.0` exactly); `hedgecost_i` `E_INFEASIBLE` cases | Rulings I-25, I-26 |
+| I11 | Backtest path that ends at expiry, or stops before it; zero position | Pinned | `stage_i/hedgebt_i` (payoff at expiry; value mark at day 30; `quantity = 0` is `E_DOMAIN`) | Rulings I-29, I-31 |
+| I12 | Effectiveness when the hedged item's total change is zero or small | Pinned | `stage_i/hedgeeff_i` `E_DOMAIN` (sum zero); `hedgebt_i-0001` (offset 1.31 at R² 0.996) | Ruling I-30; dollar-offset instability (Finnerty and Grant 2002) |

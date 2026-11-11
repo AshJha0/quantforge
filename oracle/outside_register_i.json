@@ -47,10 +47,35 @@
   "rule": "QuantLib 1.44 AnalyticEuropeanMargrabeEngine delta1 and delta2, and BlackCalculator.vega (the Margrabe price as a Black price in the spread volatility, asserted equal to the engine NPV) for the vegas and correlation, then numpy solve; quantities and before-Greeks within root_finding"
  },
  "_stage": {
-  "counted": 63,
-  "total": 160,
-  "share": 0.3937,
+  "counted": 98,
+  "total": 234,
+  "share": 0.4188,
   "floor": 0.6,
   "note": "Stage I so far, error cases in the denominator (ruling I-2); the floor applies at release"
+ },
+ "hedgexa_i": {
+  "counted": 9,
+  "total": 17,
+  "rule": "QuantLib 1.44 ZeroCurve (linear zero, continuous, ACT/365F) and AnalyticEuropeanEngine values, the spec's half-differences of them, numpy lstsq on the weighted system; positions and book risk within the case limit"
+ },
+ "hedgecost_i": {
+  "counted": 12,
+  "total": 22,
+  "rule": "scipy 1.18 solvers on the same problem, first that agrees: lsq_linear BVLS or lstsq (no spread, margin or equality: exact), minimize trust-constr, minimize SLSQP (both on the split form x = p - n, p, n >= 0); x within root_finding; verified_by names the solver"
+ },
+ "hedgefrontier_i": {
+  "counted": 2,
+  "total": 10,
+  "rule": "the hedgecost_i solver list at every frontier point; a case counts if every point's x agrees within root_finding"
+ },
+ "hedgebt_i": {
+  "counted": 7,
+  "total": 15,
+  "rule": "QuantLib 1.44 AnalyticEuropeanEngine NPV and delta on each date (evaluation date moved, exercise fixed), then the spec's cash-account arithmetic; every output within the case limit"
+ },
+ "hedgeeff_i": {
+  "counted": 5,
+  "total": 10,
+  "rule": "numpy 2.5 polyfit (slope), corrcoef (R2), var ddof=1 (variance reduction) and sums (dollar offset); every output within root_finding"
  }
 }
