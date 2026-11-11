@@ -12,10 +12,20 @@ use quantforge_core::hedge_cross::{
     self as hx, CorrKind, CorrLeg, CorrMarket, CorrTarget, CreditMarket, CreditRisk,
 };
 use quantforge_core::hedge_crossasset::{self as xa, XaKind, XaLeg, XaMarket, ZeroCurve};
+use quantforge_core::hedge_dynamic::{self as hd, BacktestOption, BacktestSetup, Effectiveness};
 use quantforge_core::hedge_solvers::{
     self as hs, Greek, IntegerProblem, Leg, LegKind, MinVarInput, QpProblem, Singular,
 };
 use quantforge_core::json::{Json, obj};
+
+fn effectiveness_fields(e: &Effectiveness) -> [(&'static str, Json); 4] {
+    [
+        ("dollar_offset", e.dollar_offset.into()),
+        ("regression_slope", e.regression_slope.into()),
+        ("regression_r2", e.regression_r2.into()),
+        ("variance_reduction", e.variance_reduction.into()),
+    ]
+}
 
 /// An optional key. `null` means "absent" only inside the bound lists (ruling I-12); the key
 /// itself set to `null` is `E_SCHEMA`.
@@ -461,6 +471,43 @@ super::registry! {
                 ("book_risk", r.book_risk.into()),
                 ("residual_risk", r.residual_risk.into()),
                 ("objective", r.objective.into()),
+            ]))
+        },
+        "hedge.effectiveness" => {
+            let (x, y) = (i.reals("item_changes")?, i.reals("hedge_changes")?);
+            i.gate()?;
+            plain(obj(effectiveness_fields(&hd::effectiveness(&x, &y)?)))
+        },
+        "hedge.backtest.delta" => {
+            let o = super::rates::sub(i, "option")?;
+            let option = BacktestOption {
+                call: match o.str("type")? {
+                    "CALL" => true,
+                    "PUT" => false,
+                    _ => return o.fail("type", "must be CALL or PUT"),
+                },
+                strike: o.f64("strike")?,
+                expiry: o.f64("expiry_years")?,
+            };
+            let setup = BacktestSetup {
+                quantity: i.f64("quantity")?,
+                rate: i.f64("rate")?,
+                dividend_yield: i.f64("dividend_yield")?,
+                hedge_volatility: i.f64("hedge_volatility")?,
+            };
+            let (times, spots) = (i.reals("times")?, i.reals("spots")?);
+            i.gate()?;
+            let r = hd::backtest_delta(&option, &setup, &times, &spots)?;
+            let [d, s, r2, v] = effectiveness_fields(&r.effectiveness);
+            plain(obj([
+                ("option_values", r.option_values.into()),
+                ("shares", r.shares.into()),
+                ("portfolio_values", r.portfolio_values.into()),
+                ("final_pnl", r.final_pnl.into()),
+                d,
+                s,
+                r2,
+                v,
             ]))
         },
         "hedge.residual.report" => {
