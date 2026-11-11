@@ -63,6 +63,7 @@
 #include "quantforge/core/book.hpp"
 #include "quantforge/core/shortrate.hpp"
 #include "quantforge/core/lmm.hpp"
+#include "quantforge/core/hedging.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {

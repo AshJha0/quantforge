@@ -28,6 +28,15 @@ with `#embed`, so no command reads a file.
 
 Property tests for these waves are in `tests/test_stage_g.cpp`: the acceptance checks of each spec (R9 barrier MC, G-10 report and G-10b gate, LMM caplets against simulation, Q3b ladder against Richardson bumps and its cost ratio), plus parity and limit cases. Bounds on the G-18 scheme compare with the scheme's own value of the bounding product (G-28).
 
+## Stage I modules
+
+| File | Holds | Spec |
+|---|---|---|
+| `core/hedging.{hpp,cpp}` | Wave 1 hedge solvers. `hedge.qp.solve` works in the null space of the equalities (`x = E^+ e + Z y`, `Z` from a Householder QR of `E^T`); the reduced problem is solved by the Goldfarb-Idnani dual active-set method, which also proves infeasibility (I-14). `MIN_NORM` uses the pseudo-inverse of `Z^T H Z` with the I-3 threshold taken on `H`. Integer lots by ellipsoid enumeration around the free minimiser, clipped to the lot box, then the I-7 tie rule. Minimum variance in extended precision, so the sign of a near-zero hedged variance is right. Greek, beta and residual-risk reports | `08-hedging/hedge-solvers.md`, rulings I-1 to I-14 |
+| `cli/ops_hedge.inc` | CLI side of the hedge operations, with the I-4 limits and the I-12 `null` rule | `cli-contract.md`, "Stage I operations" |
+
+Property tests are in `tests/test_stage_i.cpp`: the KKT conditions on random bounded and equality-constrained problems, `MIN_NORM` against the unique solution, integer optimality against every one-lot neighbour, minimum-variance effectiveness against the OLS `R^2`, and the residual contributions summing to the variance.
+
 ## Build
 
 ```bash
