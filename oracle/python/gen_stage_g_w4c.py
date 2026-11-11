@@ -288,3 +288,107 @@ def write_suite():
 
 if __name__ == "__main__" and "suite" in sys.argv:
     write_suite()
+
+
+# ------------------------------------------------------------------------------------------------ G-42b (registered before its runs)
+SEED_B = 20261211
+H_SIM = 30 / 365
+
+
+def eps_p():
+    """Bound on ORE's log bond-price error from log-linear re-interpolation of the simulated curve at pillars H_SIM apart:
+    a forward jump df inside an interval misprices ln P by at most H_SIM df / 4; doubled for the LGM shift term and the
+    index curve (G-42b)."""
+    t = [0.0] + CURVE["times"]
+    p = [1.0] + CURVE["discount_factors"]
+    f = [-(math.log(p[i]) - math.log(p[i - 1])) / (t[i] - t[i - 1]) for i in range(1, len(t))]
+    return H_SIM * max(abs(f[i] - f[i - 1]) for i in range(1, len(f))) / 2
+
+
+def gross_deflated(inp, t):
+    """Deflated gross PV at x = 0 of every remaining leg cash flow (notional at the end plus fixed coupons, and the par leg)."""
+    cv = Curve(**inp["curve"])
+    g = 0
+    for sw in inp["trades"]:
+        Ts = [x for x in sw["payment_times"] if x > t]
+        if not Ts:
+            continue
+        prev = [t] + Ts[:-1]
+        g += sw["notional"] * (float(cv.P(t)) + float(cv.P(Ts[-1])) + sw["fixed_rate"] * sum((T - p) * float(cv.P(T)) for p, T in zip(prev, Ts)))
+    return g
+
+
+def prob_positive(inp, t, sign=1):
+    f, sd = deflated_value(inp, t)
+    z, _, _ = zeros(f, sd)
+    pts = [-12 * sd] + z + [12 * sd]
+    return float(sum(mp.ncdf(b / sd) - mp.ncdf(a / sd) for a, b in zip(pts, pts[1:]) if sign * f((a + b) / 2) > 0))
+
+
+def check_case_b(gold, inp, samples):
+    from statistics import NormalDist
+    ts = inp["exposure_times"]
+    X = [[samples[round(t, 9)][k] for k in sorted(samples[round(t, 9)])] for t in ts]
+    n = len(X[0])
+    eps = eps_p()
+    checks = []  # (name, time, ok or None for not testable)
+    raw = []
+
+    def mean_check(vals, g):
+        m = sum(vals) / n
+        se = math.sqrt(sum((v - m) ** 2 for v in vals) / (n - 1) / n)
+        return m, se, g
+    for i, t in enumerate(ts):
+        pp, pn = prob_positive(inp, t, 1), prob_positive(inp, t, -1)
+        raw.append(("ee", t, mean_check([max(v, 0) for v in X[i]], gold["discounted_ee"][i]) if n * pp >= 3 else None))
+        raw.append(("ene", t, mean_check([min(v, 0) for v in X[i]], gold["discounted_ene"][i]) if n * pn >= 3 else None))
+        D = eps * gross_deflated(inp, t)
+        s = sorted(max(v, 0) for v in X[i])
+        for q, key in zip(Q, ("pfe_95", "pfe_99")):
+            raw.append((key, t, ("pfe", s, q, gold[key][i], D) if n * (1 - q) >= 3 else None))
+    t0 = [0.0] + ts
+    raw.append(("epe", None, mean_check([sum(max(X[i][p], 0) * (t0[i + 1] - t0[i]) for i in range(len(ts))) / ts[-1] for p in range(n)], gold["epe"])))
+    raw.append(("cva", None, mean_check([sum((1 - REC) * max(X[i][p], 0) * (math.exp(-HAZ * t0[i]) - math.exp(-HAZ * t0[i + 1])) for i in range(len(ts))) for p in range(n)], gold["cva"])))
+    m = sum(1 for r in raw if r[2] is not None)
+    zc = max(3.0, NormalDist().inv_cdf(1 - 0.01 / (2 * m)))
+    worst = (None, None, 0.0)
+    for name, t, r in raw:
+        if r is None:
+            checks.append((name, t, None))
+            continue
+        if r[0] == "pfe":
+            _, s, q, y, D = r
+            half = zc * math.sqrt(n * q * (1 - q))
+            lo = s[max(0, math.floor(n * q - half) - 1)]
+            hi = s[min(n - 1, math.ceil(n * q + half) - 1)]
+            ok = lo - D <= y <= hi + D
+            checks.append((name, t, ok))
+            if not ok:
+                worst = (name, t, (y - hi - D) if y > hi + D else (y - lo + D))
+        else:
+            mm, se, g = r
+            z = (mm - g) / se if se > 0 else float("inf")
+            ok = abs(z) <= zc
+            checks.append((name, t, ok))
+            if abs(z) > abs(worst[2]):
+                worst = (name, t, z)
+    testable = [c for c in checks if c[2] is not None]
+    counted = bool(testable) and all(c[2] for c in testable) and any(c[0] == "ee" and c[2] is not None for c in checks)
+    return counted, worst, len(testable), len(checks) - len(testable), zc
+
+
+def write_ore_cases_b(samples=5000):
+    sys.path.insert(0, str(ORE))
+    import build_case
+    for i, (a, s, sets) in enumerate(cases()):
+        case = dict(curve=CURVE, mean_reversion=a, sigma=s, samples=samples, seed=SEED_B + i, grid=[float(t) for t in range(1, 21)],
+                    netting_sets={k: {"trades": v} for k, v in sets.items()})
+        build_case.write(str(ORE / f"runb{i}"), case)
+        txt = (ORE / f"runb{i}" / "ore.xml").read_text()
+        (ORE / f"runb{i}" / "ore.xml").write_text(txt.replace('<Parameter name="outputPath">Output</Parameter>', f'<Parameter name="outputPath">/home/ashish/ore_out/runb{i}</Parameter>'))
+        (ORE / f"runb{i}.json").write_text(json.dumps(case, indent=1) + "\n")
+
+
+if __name__ == "__main__" and "oreb" in sys.argv:
+    write_ore_cases_b()
+    print("eps_p", eps_p())
