@@ -7,6 +7,7 @@
 - R9 acceptance has modest power (ruling G-34, R5 L6): the continuous price is 3.7 SE from the daily call MC at 40,000 paths, just outside the 3 SE band, and the put (z = -1.72) cannot discriminate; parameters were fixed before the run (plan 12.10).
 - Outside share counted strictly against library pricing engines (ruling G-27, R5 H1): the Jamshidian suites now count only against QuantLib's `JamshidianSwaptionEngine`; the share is 61.0%, or 52.8%-equivalent if the Rebonato suite were excluded (owner reading open).
 - FRTB vega and curvature: specified from the owner-supplied Basel Framework PDF (ruling G-51), closing the G-49 item; CSR securitisations remain out of scope.
+- Stage G outside share 57.4% (338 of 589) under ruling G-42 as registered, below the 60% floor; the registered re-test G-42b on independent ORE paths has not run yet (WSL unavailable).
 - F-33 (FRTB-SA GIRR `low` scenario) closed: confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma).
 
 ## 0.6.0: stage F, curve layer, portfolio risk and book (2026-11-10)
