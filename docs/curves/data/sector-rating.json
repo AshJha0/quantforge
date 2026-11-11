@@ -1,0 +1,224 @@
+{
+ "meta": {
+  "commit": "e150116",
+  "date": "2026-11-11",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.6.0",
+    "contract_version": "1.0.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.6.0",
+    "contract_version": "1.0.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.6.0",
+    "contract_version": "1.0.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.6.0",
+    "contract_version": "1.0.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "credit_composite_d.json": "sha256:f2f77e48cde115c632f8efb913bdc410c22b7edd53b0186e69fd18f355da9c80"
+  }
+ },
+ "inputs": {
+  "credit.curve.composite": {
+   "trade_date": "2026-11-06",
+   "discount": {
+    "as_of": "2026-11-06",
+    "interpolation": "LOG_LINEAR_DF",
+    "pillars": [
+     {
+      "date": "2046-11-06",
+      "discount_factor": 0.458161174870904
+     }
+    ]
+   },
+   "recovery": 0.4,
+   "constituents": [
+    {
+     "quotes": [
+      {
+       "tenor": "6M",
+       "spread": 0.0045
+      },
+      {
+       "tenor": "1Y",
+       "spread": 0.006
+      },
+      {
+       "tenor": "3Y",
+       "spread": 0.009
+      },
+      {
+       "tenor": "5Y",
+       "spread": 0.012
+      },
+      {
+       "tenor": "7Y",
+       "spread": 0.0135
+      },
+      {
+       "tenor": "10Y",
+       "spread": 0.015
+      }
+     ],
+     "weight": 2.0
+    },
+    {
+     "quotes": [
+      {
+       "tenor": "6M",
+       "spread": 0.00585
+      },
+      {
+       "tenor": "1Y",
+       "spread": 0.0078000000000000005
+      },
+      {
+       "tenor": "3Y",
+       "spread": 0.0117
+      },
+      {
+       "tenor": "5Y",
+       "spread": 0.015600000000000001
+      },
+      {
+       "tenor": "7Y",
+       "spread": 0.01755
+      },
+      {
+       "tenor": "10Y",
+       "spread": 0.0195
+      }
+     ],
+     "weight": 1.0
+    },
+    {
+     "quotes": [
+      {
+       "tenor": "6M",
+       "spread": 0.0036
+      },
+      {
+       "tenor": "1Y",
+       "spread": 0.0048000000000000004
+      },
+      {
+       "tenor": "3Y",
+       "spread": 0.0072
+      },
+      {
+       "tenor": "5Y",
+       "spread": 0.009600000000000001
+      },
+      {
+       "tenor": "7Y",
+       "spread": 0.0108
+      },
+      {
+       "tenor": "10Y",
+       "spread": 0.012
+      }
+     ],
+     "weight": 1.0
+    }
+   ],
+   "scale": 1.0
+  }
+ },
+ "reference": {
+  "credit.curve.composite": {
+   "spreads": [
+    0.004612499999999999,
+    0.006150000000000001,
+    0.009224999999999999,
+    0.012300000000000002,
+    0.013837499999999999,
+    0.015375
+   ],
+   "pillars": [
+    {
+     "date": "2027-06-20",
+     "survival": 0.9952113485609257
+    },
+    {
+     "date": "2027-12-20",
+     "survival": 0.9884375397513033
+    },
+    {
+     "date": "2029-12-20",
+     "survival": 0.9521758343425821
+    },
+    {
+     "date": "2031-12-20",
+     "survival": 0.8964761262017944
+    },
+    {
+     "date": "2033-12-20",
+     "survival": 0.8413849562364609
+    },
+    {
+     "date": "2036-12-20",
+     "survival": 0.7583012931616859
+    }
+   ]
+  }
+ },
+ "agreement": [
+  {
+   "output": "credit.curve.composite: spreads",
+   "count": 6,
+   "largest_difference": 0.0,
+   "last": {
+    "java": 0.015375,
+    "cpp": 0.015375,
+    "python": 0.015375,
+    "rust": 0.015375
+   }
+  },
+  {
+   "output": "credit.curve.composite: pillars",
+   "count": 6,
+   "largest_difference": 2.220446049250313e-16,
+   "last": {
+    "java": 0.7583012931616858,
+    "cpp": 0.7583012931616859,
+    "python": 0.7583012931616859,
+    "rust": 0.758301293161686
+   }
+  }
+ ],
+ "evidence": {
+  "operations": [
+   "credit.curve.composite"
+  ],
+  "cases": 2,
+  "by_source": {
+   "credit.curve.composite: independent-replay, quantlib-1.44-isda-cds-engine": 2
+  }
+ }
+}

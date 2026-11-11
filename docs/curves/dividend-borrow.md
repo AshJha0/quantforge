@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-Dividend schedules and borrow cost by term, and their effect on equity forwards. Stage D, target v0.4.
+Dividend schedules and borrow cost by term, and their effect on equity forwards. Stage D.
 
 ## Runs
 

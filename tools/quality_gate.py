@@ -239,6 +239,7 @@ def main(argv=None):
     ap.add_argument("--floor", action="store_true", help="also gate whole-language coverage on floors.json")
     ap.add_argument("--check-register", action="store_true")
     ap.add_argument("--check-specs", action="store_true")
+    ap.add_argument("--check-docs", action="store_true", help="curve status table and release wording (tools/check_docs_status.py)")
     ap.add_argument("--write-baseline", action="store_true")
     ap.add_argument("--baseline", default=str(gov.BASELINE))
     a = ap.parse_args(argv)
@@ -247,6 +248,12 @@ def main(argv=None):
         Path(a.baseline).write_text(json.dumps(base, indent=1) + "\n", encoding="utf-8")
         print(f"baseline: {len(base['register'])} register gaps, {len(base['specs'])} spec gaps")
         return 0
+    if a.check_docs:
+        import check_docs_status
+        docs_rc = check_docs_status.main()
+        if not (a.check_register or a.check_specs):
+            return docs_rc
+        return max(docs_rc, check_governance(a.check_register, a.check_specs, Path(a.baseline)))
     if a.check_register or a.check_specs:
         return check_governance(a.check_register, a.check_specs, Path(a.baseline))
     if a.check_dsr:

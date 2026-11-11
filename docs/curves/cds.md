@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-Survival probabilities and hazard rates from CDS quotes. Every credit operation needs a `LOG_LINEAR_DF` discount curve, the ISDA flat-forward rule; anything else is `E_INPUT` (ruling R1-4). Stage D, target v0.4.
+Survival probabilities and hazard rates from CDS quotes. Every credit operation needs a `LOG_LINEAR_DF` discount curve, the ISDA flat-forward rule; anything else is `E_INPUT` (ruling R1-4). Stage D.
 
 ## Runs
 

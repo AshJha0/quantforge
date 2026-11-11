@@ -1,8 +1,16 @@
 # Changelog
 
-## 0.7.0: stage G, rates models and xVA (unreleased)
+## Unreleased
 
-Not yet tagged. Stage G is at Implemented, not Validated. No golden value of an earlier stage changed.
+### Added
+- Tutorials 2 to 7 (`docs/getting-started/`): bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, with a [Tutorials](docs/getting-started/README.md) index and site navigation entry. Each runs one script in `examples/tutorials/` against all four builds; every printed number is checked in CI in Python, Rust, Java and C++.
+- Tutorials 8 to 16 (`docs/getting-started/`): multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk, and the LIBOR market model. Each follows Tutorial 1's layout (Python library calls on the page, then `examples/tutorial_<topic>.py` against the Rust, Java and C++ CLIs) and is checked in CI in all four languages. `tools/check_tutorial.py` now orders pages by number.
+- `tools/check_tutorial.py` checks every `tutorial-*.md` page by default, and checks that a script listed on a page equals the file (`tutorial:source`). `tutorial.yml` runs all pages and watches the new paths.
+- GLOSSARY: a section of tutorial terms.
+
+## 0.7.0: stage G, rates models and xVA (2026-11-11)
+
+Tag `v0.7.0` on `e150116`. Stage G is at Implemented, not Validated. No golden value of an earlier stage changed.
 
 ### Verified on the integration tree (`stage-g-int`, 2026-11-11)
 - Each of the four builds passed 14,492 of 14,492 golden cases through the neutral runner, `expsim_g` 102 of 102 included (observed, one Windows machine): Java (JDK 25), Python (CPython 3.15.2), Rust (1.99.1) and C++ (WinLibs GCC 16.2, `-DQF_WERROR=ON`). Of these, 589 are stage G cases in 20 suites over 21 operations and 1,026 are E1 cases for the first 20 stage G operations (`datasets/golden/stage_g/`, `stage_g_e1/`).
@@ -28,6 +36,7 @@ Not yet tagged. Stage G is at Implemented, not Validated. No golden value of an 
 - **Outside-oracle share is 57.4% (338 of 589): the 60% floor is not met.** Wave 4c checked simulated exposure against ORE 1.8.17 (`oracle/ore/ORE_CHECK_4C.json`); 80 of 102 `expsim_g` cases count under ruling G-42 as registered. The re-test G-42b was registered (`c158c5c`) before any of its runs, but its ORE runs need WSL; owner decision G-52 (2026-11-11) ships v0.7.0 without WSL and carries G-42b to stage I.
 - **18 `expsim_g` `pfe_99` goldens in 8 cases were wrong and are fixed (G-Q4, the G-42 golden-fix row).** The generator's grid scan missed level crossings near the flat peak of a payer's deflated value. The fixed values were regenerated in double precision by `oracle/python/fix_w4c_pfe.py` and checked against the 50-digit generator on case 0039 to 1e-12; a full 50-digit regeneration is a follow-up. The G-42 recount on the existing ORE outputs is unchanged.
 - **CSR securitisations are out of scope** for FRTB-SA in this release.
+- **Binaries built from the tag `v0.7.0` report version 0.6.0** (`quantforge version` in all four languages, and the oracle's `pyproject.toml` and Strata `pom.xml`): the tag was cut without the version bump. `main` after the docs PR (`docs-curve-status`) sets 0.7.0 in all four builds, their lock files and the oracle; the tag itself is not moved.
 - **The C++ sanitizer builds (address, undefined, float-cast-overflow) for wave 4c run in CI on the PR, not locally** (G-52).
 - **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, was registered in `specifications/stage-g-rulings.md` with its power calculation before it ran, and passed (variance ratio 0.102, 95% interval 0.089 to 0.116, Z = 33.4; `oracle/G10B_RESULT.json`). G-10's own outcome stays inconclusive.
 - R9 acceptance has modest power (ruling G-34, R5 L6): the continuous price is 3.7 SE from the daily call MC at 40,000 paths, just outside the 3 SE band, and the put (z = -1.72) cannot discriminate; parameters were fixed before the run (plan 12.10).
