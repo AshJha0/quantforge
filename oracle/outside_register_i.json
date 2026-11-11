@@ -6,17 +6,17 @@
  },
  "hedgeint_i": {
   "counted": 0,
-  "total": 18,
+  "total": 19,
   "rule": "no outside library solves integer least squares; uncounted (exact rational enumeration is the oracle)"
  },
  "hedgemv_i": {
   "counted": 9,
-  "total": 17,
+  "total": 18,
   "rule": "numpy 2.5 linalg.solve on the hedge block (covariance input) and linalg.lstsq OLS with intercept (series input); hedge within root_finding; variances are arithmetic"
  },
  "hedgegreeks_i": {
   "counted": 10,
-  "total": 19,
+  "total": 21,
   "rule": "QuantLib 1.44 AnalyticEuropeanEngine delta, gamma and vega per instrument, then numpy 2.5 linalg.solve; quantities and before-Greeks within root_finding"
  },
  "hedgebeta_i": {
@@ -31,8 +31,8 @@
  },
  "_wave1": {
   "counted": 44,
-  "total": 121,
-  "share": 0.3636,
+  "total": 125,
+  "share": 0.352,
   "floor": 0.6,
   "note": "Floor is measured over the stage at release, error cases in the denominator (ruling I-2)"
  },
@@ -48,8 +48,8 @@
  },
  "_stage": {
   "counted": 113,
-  "total": 271,
-  "share": 0.417,
+  "total": 276,
+  "share": 0.4094,
   "floor": 0.6,
   "note": "Stage I so far, error cases in the denominator (ruling I-2); the floor applies at release"
  },
@@ -70,7 +70,7 @@
  },
  "hedgebt_i": {
   "counted": 7,
-  "total": 15,
+  "total": 16,
   "rule": "QuantLib 1.44 AnalyticEuropeanEngine NPV and delta on each date (evaluation date moved, exercise fixed), then the spec's cash-account arithmetic; every output within the case limit"
  },
  "hedgeeff_i": {

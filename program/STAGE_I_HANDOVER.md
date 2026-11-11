@@ -237,3 +237,26 @@ Numbered from 17, after tutorials 2 to 16 on branch `docs-curve-status`. Each pa
 | (22) | Calibration on real noisy quotes | Q6: parameter time series, churn penalty, arbitrage repair | not specified | Q6 | **Blocked:** the Cboe and Deribit terms forbid automated download or publishing derived data without consent (`STAGE_I_DATA_TERMS.md` in the plan folder). It waits for the owner's decision on the data source, then for the preregistered fit (`research/preregs/Q6-01-churn-bound.md`) |
 
 Every Domain 08 stage I row appears in at least one of tutorials 17 to 21. Each tutorial needs only READY waves, so all five can be written once the language lanes pass the waves they depend on.
+
+## Rulings after the builds (2026-11-11)
+
+Rulings I-41 to I-52 in `specifications/stage-i-rulings.md` answer every question in the four lanes' notes. Five computed cases were appended; every earlier case is byte-identical (checked by rerunning all eight generators): `hedgegreeks_i-0020`, `-0021`, `hedgeint_i-0019`, `hedgemv_i-0018`, `hedgebt_i-0016`. Stage I now has 276 cases; outside 113 of 276 = 40.9%.
+
+What each language must change (run the four suites above again afterwards):
+
+| Ruling | Java | Python | C++ | Rust |
+|---|---|---|---|---|
+| I-41 fixed keys on Greek instruments (`hedgegreeks_i-0020`) | check | change (ignored `quantity`) | check | change (ignored `quantity`) |
+| I-42 unknown Greek or correlation target is `E_SCHEMA` (`-0021`) | check | check | check | none |
+| I-43 relative zero-variance tests (`hedgebt_i-0016`) | change (exact test) | change (exact test) | check | check |
+| I-44 hedged-variance tolerance (`hedgemv_i-0018`) | check | check | change (drop the long-double workaround for the rule) | check |
+| I-45 instruments are columns of `a` (`hedgeint_i-0019`) | none | change (lot_sizes length is `E_INPUT`) | check | none |
+| I-46 feasibility tolerance up to 1e-9 | none | none | check | check |
+| I-47 `null` optional key is `E_SCHEMA` | none | check | check | check |
+| I-48 no `E_LIMIT` below 200 instruments in `hedge.qp.solve` | change (orthant cap) | none | change (orthant cap) | none |
+| I-49 `E_LIMIT` for lot counts above `2^52` | add | add | none | add |
+| I-50 per-order `fills` keep the 100,000 array limit | check | check | check | none |
+| I-51 `contract_version` 1.11.0 at release | change | change | change | change |
+| I-52 tutorials import `quantforge_core` modules | none | none | none | none |
+
+"check" means the lane's notes did not state its reading, so it runs the new case or confirms the rule. **Correction to the follow-up note's item 2 (Python API):** the tutorials import `quantforge_core` modules, as tutorial 1 does (I-52); `quantforge.hedge.*` in `name-map.json` is a logical name.
