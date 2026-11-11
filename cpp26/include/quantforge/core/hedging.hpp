@@ -215,10 +215,17 @@ struct DeltaBacktest {
     Vec option_values, shares, portfolio_values;
     double final_pnl = 0.0;
     Effectiveness stats;
+    bool costed = false;  // trading_cost is output only with a cost input (I-40)
+    double trading_cost = 0.0;
 };
-/// hedge.backtest.delta: the self-financing replay of I-29 on the given path.
+/// Wave 4e (I-39): a trade of dq shares costs half_spread |dq| + impact dq^2.
+struct BacktestCosts {
+    std::optional<double> half_spread, impact;
+};
+/// hedge.backtest.delta: the self-financing replay of I-29 on the given path, with the I-39 costs when given.
 DeltaBacktest backtest_delta(const BacktestOption& option, double quantity, double rate, double dividend_yield,
-                             double hedge_volatility, const Vec& times, const Vec& spots);
+                             double hedge_volatility, const Vec& times, const Vec& spots,
+                             const BacktestCosts& costs = {});
 
 // ---- wave 4c: instrument selection (08-hedging/instrument-selection.md, I-33 to I-35) ----
 

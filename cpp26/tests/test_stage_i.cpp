@@ -871,3 +871,26 @@ TEST_CASE("I4d slippage: shortfall = execution + opportunity; slippage = executi
     CHECK(i_error([&] { hg::slippage_report(orders); }) == "E_DOMAIN");
     CHECK(i_error([] { hg::slippage_report({}); }) == "E_INPUT");
 }
+
+// ---- wave 4e: costs in the backtest ----
+
+TEST_CASE("I4e backtest costs: zero costs equal the replay; without carry the P&L falls by the costs paid") {
+    const hg::BacktestOption call{true, 100.0, 0.25};
+    const Vec times{0.0, 0.05, 0.1, 0.15, 0.2, 0.25};
+    const Vec spots{100.0, 101.0, 99.0, 102.5, 101.5, 103.0};
+    const hg::DeltaBacktest free = hg::backtest_delta(call, -100.0, 0.0, 0.0, 0.2, times, spots);
+    CHECK(!free.costed);
+    const hg::DeltaBacktest zero = hg::backtest_delta(call, -100.0, 0.0, 0.0, 0.2, times, spots, {0.0, 0.0});
+    CHECK(zero.costed);
+    CHECK(zero.trading_cost == 0.0);
+    CHECK(zero.final_pnl == free.final_pnl);
+    const hg::DeltaBacktest paid = hg::backtest_delta(call, -100.0, 0.0, 0.0, 0.2, times, spots, {0.02, 0.001});
+    CHECK(paid.trading_cost > 0.0);
+    CHECK(std::fabs(paid.final_pnl - (free.final_pnl - paid.trading_cost)) < 1e-10);
+    CHECK(paid.portfolio_values.front() < 0.0);  // Pi_0 = -cost(h_0)
+    // The opening trade alone: half_spread |h_0| + impact h_0^2.
+    const double h0 = paid.shares.front();
+    CHECK(std::fabs(-paid.portfolio_values.front() - (0.02 * std::fabs(h0) + 0.001 * h0 * h0)) < 1e-12);
+    CHECK(i_error([&] { hg::backtest_delta(call, -100.0, 0.0, 0.0, 0.2, times, spots, {-0.01, std::nullopt}); }) ==
+          "E_DOMAIN");
+}

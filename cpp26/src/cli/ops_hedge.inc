@@ -500,15 +500,19 @@ void op_hedge_backtest_delta(const In& in, Out& out) {
     const double quantity = in.real("quantity"), rate = in.real("rate"), q = in.real("dividend_yield"),
                  vol = in.real("hedge_volatility");
     const Vec times = in.reals("times"), spots = in.reals("spots");
+    hedging::BacktestCosts costs;
+    if (present(in, "half_spread")) costs.half_spread = in.real("half_spread");
+    if (present(in, "impact")) costs.impact = in.real("impact");
     limit_if(times.size() > max_path, "times");
     limit_if(spots.size() > max_path, "spots");
     in.ready();
-    const hedging::DeltaBacktest r = hedging::backtest_delta(option, quantity, rate, q, vol, times, spots);
+    const hedging::DeltaBacktest r = hedging::backtest_delta(option, quantity, rate, q, vol, times, spots, costs);
     out.key_reals("option_values", r.option_values);
     out.key_reals("shares", r.shares);
     out.key_reals("portfolio_values", r.portfolio_values);
     out.key_real("final_pnl", r.final_pnl);
     write_effectiveness(out, r.stats);
+    if (r.costed) out.key_real("trading_cost", r.trading_cost);  // I-40
 }
 
 // ---- stage I wave 4c: instrument selection (08-hedging/instrument-selection.md) ----

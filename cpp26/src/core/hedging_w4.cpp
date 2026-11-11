@@ -80,7 +80,7 @@ Effectiveness effectiveness(const Vec& x, const Vec& y) {
 }
 
 DeltaBacktest backtest_delta(const BacktestOption& o, double quantity, double r, double q, double vol,
-                             const Vec& times, const Vec& spots) {
+                             const Vec& times, const Vec& spots, const BacktestCosts& costs) {
     // Check 1.
     input_if(times.size() != spots.size(), "spots", "length differs from times");
     input_if(times.size() < 4, "times", "needs at least 4 points");
@@ -92,6 +92,11 @@ DeltaBacktest backtest_delta(const BacktestOption& o, double quantity, double r,
     domain_if(o.strike <= 0.0, "option", "strike must be above 0");
     domain_if(o.expiry_years <= 0.0, "option", "expiry_years must be above 0");
     domain_if(vol <= 0.0, "hedge_volatility", "must be above 0");
+    // Wave 4e, after the wave 4b domain checks (I-39).
+    const double half_spread = costs.half_spread.value_or(0.0), impact = costs.impact.value_or(0.0);
+    domain_if(half_spread < 0.0, "half_spread", "must be at least 0");
+    domain_if(impact < 0.0, "impact", "must be at least 0");
+    const auto trade_cost = [&](double dq) { return half_spread * std::fabs(dq) + impact * dq * dq; };
     // The replay (I-29).
     const std::size_t m = times.size();
     DeltaBacktest out;
@@ -102,8 +107,12 @@ DeltaBacktest backtest_delta(const BacktestOption& o, double quantity, double r,
         delta[i] = k.delta;
     }
     for (std::size_t i = 0; i + 1 < m; ++i) out.shares.push_back(-quantity * delta[i] + 0.0);
-    double cash = -quantity * out.option_values[0] - out.shares[0] * spots[0];
-    out.portfolio_values.push_back(0.0);
+    // The initial purchase is a trade (I-39): Pi_0 = -cost(h_0).
+    const double opening = trade_cost(out.shares[0]);
+    double cash = -quantity * out.option_values[0] - out.shares[0] * spots[0] - opening;
+    out.trading_cost = opening;
+    out.portfolio_values.push_back(-opening + 0.0);
+    double paid = 0.0;  // the rebalance cost paid at the start of the step, after the last Pi was recorded
     Vec item, hedge;
     for (std::size_t i = 0; i + 1 < m; ++i) {
         const double dt = times[i + 1] - times[i];
@@ -113,11 +122,18 @@ DeltaBacktest backtest_delta(const BacktestOption& o, double quantity, double r,
         item.push_back(quantity * (out.option_values[i + 1] - out.option_values[i]));
         // hedge_i = (Pi_{i+1} - Pi_i) - item_i, summed from its terms: exactly 0 on a constant path without carry,
         // where the difference of portfolio values would leave rounding noise in front of the I-31 test.
-        hedge.push_back(out.shares[i] * (spots[i + 1] - spots[i]) + interest + dividends);
+        hedge.push_back(out.shares[i] * (spots[i + 1] - spots[i]) + interest + dividends - paid);
         out.portfolio_values.push_back(pi);
-        if (i + 2 < m) cash -= (out.shares[i + 1] - out.shares[i]) * spots[i + 1];
+        paid = 0.0;
+        if (i + 2 < m) {  // rebalance, except on the last date; its cost shows in the next step (I-39)
+            const double dq = out.shares[i + 1] - out.shares[i];
+            paid = trade_cost(dq);
+            cash -= dq * spots[i + 1] + paid;
+            out.trading_cost += paid;
+        }
     }
     out.final_pnl = out.portfolio_values.back();
+    out.costed = costs.half_spread.has_value() || costs.impact.has_value();
     out.stats = effectiveness(item, hedge);  // check 3 (I-31)
     return out;
 }

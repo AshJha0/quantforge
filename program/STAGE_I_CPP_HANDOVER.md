@@ -57,6 +57,13 @@ Built: `hedge.slippage.report` (`cpp26/src/core/hedging_w4.cpp`), the I-36 arith
 - Conformance: `hedgeslip_i` 12 of 12 on the first build; full run as for 4c.
 - ctest: 1 new test case (shortfall, slippage and totals identities, `null` price, sign of a sell's cost, the check ladder). `tests/test_cli.cpp` expects 274 operations.
 
+## Wave 4e, costs in the backtest
+
+Built: the optional `half_spread` and `impact` of `hedge.backtest.delta` (`cpp26/src/core/hedging_w4.cpp`, I-39, I-40). The opening purchase is a trade (`Pi_0 = -cost(h_0)`); each rebalance cost is paid after that date's `Pi` and enters the next step's hedge leg; no unwind; `trading_cost` only with a cost input.
+
+- Conformance: `hedgebtcost_i` 8 of 8, `hedgebt_i` unchanged at 15 of 15.
+- ctest: 1 new test case (zero costs equal the replay; without carry `final_pnl` falls by exactly `trading_cost`; the opening cost; the domain check).
+
 ## SPEC_QUESTIONS
 
 | # | Where | Question | What the C++ build does |
