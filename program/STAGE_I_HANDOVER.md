@@ -51,3 +51,7 @@ Read with every slice: `specifications/08-hedging/hedge-solvers.md`; `specificat
 
 ### Model inventory
 Row MI-1 (hedge solvers) added to `docs/model-inventory.md` with golden hashes.
+
+## Q6 status (2026-11-11): terms checked, churn bound registered, no data, no fit
+
+The Cboe delayed-quote pages prohibit automated download, and the Cboe website terms (section 2) and the Deribit terms of service (clause 32.3) forbid publishing derived data without written consent. Q6 waits for an owner decision on the data source (details and links in the plan folder, `STAGE_I_DATA_TERMS.md`). The churn bound is registered before any download or fit: `research/preregs/Q6-01-churn-bound.md`, hash-checked by `research/test_preregs.py`. Language sessions have nothing to build for Q6.

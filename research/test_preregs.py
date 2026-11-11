@@ -27,5 +27,10 @@ class PreregHashes(unittest.TestCase):
                 self.assertIn("Prior knowledge", b.decode())
 
 
+class Q6Prereg(unittest.TestCase):
+    def test_q6_churn_bound_matches_its_recorded_hash(self):
+        b = (D / "Q6-01-churn-bound.md").read_bytes()
+        self.assertIn(body_sha(b), b[:b.index(MARK)].decode())
+
 if __name__ == "__main__":
     unittest.main()
