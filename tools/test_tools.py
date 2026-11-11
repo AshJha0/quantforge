@@ -208,6 +208,65 @@ class Recorder(unittest.TestCase):
             self.assertFalse(log.exists())
 
 
+class RecorderRetry(unittest.TestCase):
+    """fetch retries transient HTTP errors (the ECB data API returned 504 twice on 2026-11-10)."""
+
+    def setUp(self):
+        import urllib.error
+        import urllib.request
+        self.err = urllib.error
+        rspec = importlib.util.spec_from_file_location("record_retry", RECORD)
+        self.rec = importlib.util.module_from_spec(rspec)
+        rspec.loader.exec_module(self.rec)
+        self.orig = urllib.request.urlopen
+        self.addCleanup(setattr, urllib.request, "urlopen", self.orig)
+        self.req = urllib.request
+
+    def _script(self, outcomes):
+        calls = []
+
+        class Resp:
+            def __init__(self, body): self.body = body
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self): return self.body
+
+        def fake(req, timeout):
+            calls.append(timeout)
+            o = outcomes[len(calls) - 1]
+            if isinstance(o, Exception):
+                raise o
+            return Resp(o)
+        self.req.urlopen = fake
+        return calls
+
+    def http(self, code):
+        return self.err.HTTPError("https://x", code, "err", {}, None)
+
+    def test_retries_504_then_succeeds(self):
+        calls = self._script([self.http(504), self.http(504), b"ok"])
+        waits = []
+        self.assertEqual(self.rec.fetch("https://x", 5, sleep=waits.append), b"ok")
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(waits, [15.0, 30.0])
+
+    def test_gives_up_after_last_attempt(self):
+        self._script([self.http(504)] * 4)
+        with self.assertRaises(self.err.HTTPError):
+            self.rec.fetch("https://x", 5, sleep=lambda s: None)
+
+    def test_does_not_retry_client_error(self):
+        calls = self._script([self.http(404), b"never"])
+        with self.assertRaises(self.err.HTTPError):
+            self.rec.fetch("https://x", 5, sleep=lambda s: None)
+        self.assertEqual(len(calls), 1)
+
+    def test_retries_timeout(self):
+        calls = self._script([TimeoutError("slow"), b"ok"])
+        self.assertEqual(self.rec.fetch("https://x", 5, sleep=lambda s: None), b"ok")
+        self.assertEqual(len(calls), 2)
+
+
 class GapMonitor(unittest.TestCase):
     GAP = ROOT / "tools/recorder/gap_monitor.py"
 
