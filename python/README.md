@@ -2,7 +2,7 @@
 
 One of four equal implementations; it is not a reference for the others.
 
-Stages A to G, and stage I wave 1 (hedge solvers), on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
+Stages A to G, and stage I waves 1 and 2 (hedge solvers; credit and correlation hedges), on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
 
 Install: `uv sync`
 

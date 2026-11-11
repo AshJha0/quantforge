@@ -3,6 +3,8 @@ from typing import Any
 
 from ..errors import QfError
 from .inputs import Inputs
+from .ops_credit import _hazard
+from .readers import _curve, _objects
 from .registry import core, op
 
 
@@ -104,3 +106,43 @@ def hedge_beta_futures(i: Inputs) -> Any:
 def hedge_residual_report(i: Inputs) -> Any:
     return core.hedge_solvers.residual_report(
         i.matrix("a"), i.reals("b"), i.reals("x"), i.matrix("covariance"))
+
+
+# Stage I wave 2 (08-hedging/credit-and-correlation-hedges.md).
+
+def _targets(i: Inputs) -> list[str]:
+    targets = i.array("targets")
+    if not all(isinstance(t, str) for t in targets):
+        raise QfError("E_SCHEMA", "targets: not an array of strings", "targets")
+    return targets
+
+
+@op("hedge.credit.cds")
+def hedge_credit_cds(i: Inputs) -> Any:
+    as_of, dates, survival = _hazard(i.object("hazard"))
+    book = [(t.date("maturity"), t.real("coupon"), t.real("notional"),
+             t.enum("side", ("BUY_PROTECTION", "SELL_PROTECTION"))) for t in _objects(i, "book")]
+    hedges = [(t.date("maturity"), t.real("coupon")) for t in _objects(i, "hedges")]
+    args = (i.date("trade_date"), _curve(i, "discount"), as_of, dates, survival,
+            i.real("recovery"), book, hedges, _targets(i))
+    return core.credit_correlation_hedges.credit_cds(*args)
+
+
+_KINDS = ("EXCHANGE", "CALL_1", "PUT_1", "CALL_2", "PUT_2", "UNDERLYING_1", "UNDERLYING_2")
+
+
+def _positions(i: Inputs, key: str) -> list[tuple[str, dict[str, float]]]:
+    """(instrument, its other keys as numbers). Which keys a kind takes is the core's E_INPUT."""
+    out = []
+    for p in _objects(i, key):
+        kind = p.enum("instrument", _KINDS)
+        out.append((kind, {k: p.real(k) for k in p.raw if k != "instrument" and p.has(k)}))
+    return out
+
+
+@op("hedge.correlation.neutralise")
+def hedge_correlation_neutralise(i: Inputs) -> Any:
+    market = tuple(i.real(k) for k in ("spot1", "spot2", "rate", "yield1", "yield2", "vol1",
+                                       "vol2", "correlation"))
+    args = (*market, _positions(i, "book"), _positions(i, "hedges"), _targets(i))
+    return core.credit_correlation_hedges.correlation_neutralise(*args)

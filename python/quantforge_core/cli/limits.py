@@ -173,6 +173,9 @@ _HEDGE_INTEGER = _all(_rows_cols("a", _I_FACTORS, 12), _caps_list("lot_sizes", 1
 _HEDGE_MINVAR = _all(_rows_cols("covariance", _I_INSTRUMENTS + 1, _I_INSTRUMENTS + 1),
                      _rows_cols("hedge_changes", _I_INSTRUMENTS, MAX_ARRAY))
 _HEDGE_GREEKS = _all(_caps_list("portfolio", 1000), _caps_list("hedges", 3))
+# Ruling I-19: credit book 1,000 trades and 50 hedges; correlation book 1,000 and 5 hedges.
+_HEDGE_CREDIT = _all(_caps_list("book", 1000), _caps_list("hedges", 50))
+_HEDGE_CORRELATION = _all(_caps_list("book", 1000), _caps_list("hedges", 5))
 _HEDGE_RESIDUAL = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
                        _rows_cols("covariance", _I_FACTORS, _I_FACTORS))
 
@@ -229,6 +232,8 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "hedge.minvar.ratio": _HEDGE_MINVAR,
     "hedge.greeks.neutralise": _HEDGE_GREEKS,
     "hedge.residual.report": _HEDGE_RESIDUAL,
+    "hedge.credit.cds": _HEDGE_CREDIT,
+    "hedge.correlation.neutralise": _HEDGE_CORRELATION,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
