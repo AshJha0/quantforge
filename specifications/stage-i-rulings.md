@@ -40,6 +40,41 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-22 | Units of hedge instruments | The wave 1 singularity test (I-3) is relative to the largest eigenvalue, so it is not invariant to instrument units. A unit zero-coupon bond's 1bp risk (about 5e-4) next to a forward's 1% equity risk (about 40) made a regular problem look singular (ratio 6e-12, found while generating `hedgexa_i`). `ZCB` therefore takes a `notional`, and hedge instruments are expected to carry comparable risk per unit. I-3 is not changed (Q-I10) |
 | I-23 | `E_LIMIT` sizes, wave 3 | Book 1,000 positions, hedges 200, curve pillars 100 |
 
+## Wave 4a, costs, impact, liquidity and margin; frontier
+
+| # | Point | Ruling |
+|---|---|---|
+| I-24 | Traded size | Costs and margin apply to `x`, the new hedge, which starts from no position. Rebalancing from existing positions is a later input (Q-I11) |
+| I-25 | Order of the new checks in `hedge.qp.solve` | After wave 1 checks 1 to 3: lengths and the `margin_rates`/`margin_limit` pair (`E_INPUT`), `MIN_NORM` with any new input (`E_INPUT`), negative values (`E_DOMAIN`); then wave 1 checks 4 to 6, with the margin constraint part of feasibility |
+| I-26 | Regularity with costs | The singularity test (I-3) uses `A^T W A + ridge I + cost_weight diag(impact)`. Impact counts like a ridge; a spread cost does not, because `|x|` has no curvature away from 0 |
+| I-27 | Outputs with costs | `risk`, `cost` and (with margin inputs) `margin` are output only when a new input is present, so every wave 1 result keeps its exact output set; `objective = risk + cost_weight cost` |
+| I-28 | Several outside solvers | An outside check may try several library solvers on the same problem and count the case if one agrees with every compared output within the case tolerance; `verified_by` names it. Goldens never depend on which solver agreed |
+
+## Wave 4b, dynamic hedge backtest and effectiveness
+
+| # | Point | Ruling |
+|---|---|---|
+| I-29 | Backtest cash account | Self-financing from zero wealth. Each step credits interest `cash (e^{r dt} - 1)` and dividends `h_i S_i (e^{q dt} - 1)` on the shares held at the step's start, then rebalances, except on the last date. Options are marked and hedged at `hedge_volatility`; at expiry the mark is the payoff |
+| I-30 | Dollar offset | Cumulative: `-sum(hedge changes) / sum(item changes)`. No period-by-period ratio |
+| I-31 | Effectiveness domain | `sum(item changes) = 0`, or a series with zero sample variance, is `E_DOMAIN`; a backtest with `quantity = 0` therefore fails there. Sample (co)variances use `n - 1` |
+| I-32 | `E_LIMIT` sizes, wave 4b | Path and series length 100,000 |
+
+## Wave 4c, instrument selection
+
+| # | Point | Ruling |
+|---|---|---|
+| I-33 | Selection inputs | `hedge.select.solve` takes the `hedge.qp.solve` inputs without equalities or a singular policy (`E_INPUT` if present), and every bound must admit 0 (`E_DOMAIN`). The full problem must be regular (I-3) |
+| I-34 | Selection rule | The least objective over all subsets of at most `K` instruments. Ties within `1e-12` relative go to the smaller subset, then to the lexicographically smaller index list. Indices are 0-based |
+| I-35 | `E_LIMIT` size, wave 4c | 20 instruments |
+
+## Wave 4d, hedge slippage
+
+| # | Point | Ruling |
+|---|---|---|
+| I-36 | Slippage definition | `execution_cost = sum q (p - d)` against the decision price; `opportunity_cost = (Q - q_f)(final_price - d)`; `model_cost` is the wave 4a model on the filled size; `slippage = execution_cost - model_cost` |
+| I-37 | `null` average price | `average_price` is `null` for an order with no fills; this extends I-12's list of places where `null` is legal |
+| I-38 | `E_LIMIT` sizes, wave 4d | 10,000 orders; 1,000,000 fills in total |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).

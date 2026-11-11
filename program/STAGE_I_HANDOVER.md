@@ -101,3 +101,85 @@ Read: `specifications/08-hedging/cross-asset-hedge.md`; rulings I-20 to I-23 (an
 
 ### Outside-oracle status
 `hedgexa_i` 9 of 17 (QuantLib `ZeroCurve` and `AnalyticEuropeanEngine`, the same half-differences, numpy `lstsq`). Every value case counts; no error case does. Stage I so far: 72 of 177 = 40.7% (`oracle/outside_register_i.json`).
+
+## WAVE 4a READY (2026-11-11): costs, impact, liquidity and margin; risk-against-cost frontier
+
+Read: `specifications/08-hedging/hedge-costs-and-frontier.md`; rulings I-24 to I-28 (and I-13); cli-contract block "Stage I operations"; edge-case row I10; `specifications/name-map.json` (270 operations).
+
+### Suites (32 cases)
+
+| Suite | Operation | Cases |
+|---|---|---|
+| `hedgecost_i` | `hedge.qp.solve` with the new optional inputs | 22 (13 value, 9 error) |
+| `hedgefrontier_i` | `hedge.frontier.solve` | 10 (4, 6) |
+
+### Build notes
+- Extend your wave 1 `hedge.qp.solve`. Without the new inputs nothing changes, and your `hedgeqp_i` results must stay the same: the generator checked that the extended reference reproduces every `hedgeqp_i` golden exactly.
+- The `|x|` terms are non-smooth. Either enumerate sign states (positive, negative, zero, at a bound) with the subgradient test at zero, or solve the split QP `x = p - n`, `p, n >= 0`, where spread and margin are linear. Make sure an instrument whose cost exceeds its benefit comes out at exactly `0.0` (`hedgecost_i-0002`). Most iterative solvers return about 1e-12 there unless they snap to the kink.
+- Impact enters the Hessian (`cost_weight diag(impact)`) and can make a singular problem regular; a spread cost cannot (I-26).
+- Outputs `risk`, `cost` and `margin` appear only when a new input is given (I-27).
+- Frontier: run the solve once per weight, in order; the first error stops it.
+
+### Property tests
+- `cost_weight = 0` gives the wave 1 answer; the frontier's risk is non-decreasing and its cost non-increasing.
+- With a margin constraint active, `margin` equals `margin_limit`.
+
+### Outside-oracle status
+`hedgecost_i` 12 of 22, `hedgefrontier_i` 2 of 10 (scipy BVLS or lstsq where exact, else trust-constr or SLSQP on the split form; I-28). Stage I so far: 86 of 209 = 41.1% (`oracle/outside_register_i.json`).
+
+## WAVE 4b READY (2026-11-11): dynamic delta-hedge backtest and hedge effectiveness
+
+Read: `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`; rulings I-29 to I-32; cli-contract block "Stage I operations"; edge-case rows I11, I12; `specifications/name-map.json` (272 operations).
+
+### Suites (25 cases)
+
+| Suite | Operation | Cases |
+|---|---|---|
+| `hedgebt_i` | `hedge.backtest.delta` | 15 (7 value, 8 error) |
+| `hedgeeff_i` | `hedge.effectiveness` | 10 (5, 5) |
+
+### Build notes
+- Follow the replay order of I-29 exactly: interest on cash, then dividends on the shares held at the step's start, then the mark, then the rebalance (none on the last date). Another order changes `final_pnl` by about `q dt` per step, far above the tolerance.
+- The value at `tau = 0` is the payoff; a path may stop before expiry, and then the last mark is a model value.
+- Reuse one statistics routine for both operations; `quantity = 0` reaches `E_DOMAIN` through it (I-31).
+- Paths are inputs with up to 64 dates; tolerance `1e-9` absolute and relative (case limit).
+
+### Property tests
+- A perfect offset gives dollar offset 1, slope -1, R² 1, variance reduction 1.
+- On a path with constant spot and zero rates and dividends, the hedge leg is zero and `final_pnl` equals the option's time decay times the quantity.
+
+### Outside-oracle status
+`hedgebt_i` 7 of 15 (QuantLib `AnalyticEuropeanEngine` on each date), `hedgeeff_i` 5 of 10 (numpy). Every value case counts. Stage I so far: 98 of 234 = 41.9% (`oracle/outside_register_i.json`).
+
+**Correction to the wave 4b property tests (2026-11-11):** on a constant-spot path the hedge leg has zero variance, so `hedge.backtest.delta` returns `E_DOMAIN` (I-31). Test the replay itself instead: on such a path, with zero rates and dividends, `portfolio_values` end at `quantity (V_last - V_0)`.
+
+## WAVE 4c READY (2026-11-11): instrument selection
+
+Read: `specifications/08-hedging/instrument-selection.md`; rulings I-33 to I-35; cli-contract block "Stage I operations"; edge-case row I13; `specifications/name-map.json` (273 operations).
+
+### Suite (17 cases)
+
+`hedgeselect_i`, operation `hedge.select.solve`: 10 value cases, 7 error cases.
+
+### Build notes
+- Enumerate subsets of size 1 to `K` and solve each with your `hedge.qp.solve` on those columns. Keep the best by the I-34 tie rule: within 1e-12 relative, the smaller subset wins, then the lexicographically smaller index list. Indices are 0-based.
+- Do not select greedily: `hedgeselect_i-0009` defeats forward selection by 0.5.
+- `selected` is compared exactly; `x` has zeros for instruments left out.
+
+### Property test
+- `K = n` gives the `hedge.qp.solve` answer, and the best objective never rises as `K` grows.
+
+### Outside-oracle status
+`hedgeselect_i` 10 of 17 (scipy per subset); every value case counts. Stage I so far: 108 of 251 = 43.0% (`oracle/outside_register_i.json`).
+
+## WAVE 4d READY (2026-11-11): hedge slippage
+
+Read: `specifications/08-hedging/hedge-slippage.md`; rulings I-36 to I-38; cli-contract block "Stage I operations"; edge-case row I14; `specifications/name-map.json` (274 operations).
+
+`hedgeslip_i`, operation `hedge.slippage.report`: 12 cases (6 value, 6 error). Plain arithmetic. Signs follow I-36, so a positive cost is a cost for buys and for sells alike. `average_price` is `null` when nothing was filled (I-37). Property tests: `shortfall = execution_cost + opportunity_cost`; `slippage = execution_cost - model_cost`; totals are the sums over orders.
+
+## Stage I spec status after session 1 (2026-11-11)
+
+Domain 08 rows for stage I are all specified: multi-instrument, delta, gamma, vega, equity beta, credit, correlation, cross-asset, dynamic hedge and effectiveness, minimum variance, constrained least squares, integer contracts, instrument selection, transaction cost, liquidity, impact, margin, position constraints, residual risk, slippage, frontier, singular handling. 14 suites, 263 cases, rulings I-1 to I-38.
+
+**Open: the outside share is 108 of 263 = 41.1%, below the 60% floor (I-2).** Error cases are 89 of the 263 and never count. Uncounted value suites are `hedgeint_i` (12; no free integer least-squares library), `hedgebeta_i` (8) and `hedgeres_i` (7) and `hedgeslip_i` (6), which are all arithmetic, plus a few cases where scipy's general solvers stop near 1e-8. Even if every value case counted, the share would be 174 of 263 = 66%. Reaching 60% honestly needs an owner decision: an outside reference for integer lots (for example a free MIQP solver), or a ruling on how arithmetic-only suites are treated. The G-42 precedent was to report the gap, not to add cases to pad the share.

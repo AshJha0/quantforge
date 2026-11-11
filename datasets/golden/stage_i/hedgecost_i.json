@@ -1,0 +1,1794 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgecost_i",
+ "spec": "specifications/08-hedging/hedge-costs-and-frontier.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w4a.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgecost_i-0001",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.05,
+     0.05
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2016219490255016,
+      -0.568436977708047,
+      -0.7277727018914835
+     ],
+     "residual": [
+      -1.2281510802068187,
+      0.8872531307014007,
+      -2.012559044559503,
+      1.0926147319764568,
+      -1.3492763108944867
+     ],
+     "objective": 8.844136838981443,
+     "rank": 3,
+     "risk": 8.719245257550192,
+     "cost": 0.12489158143125162
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-trust-constr-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "half-spread cost shrinks every position",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0002",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.01,
+     5.0,
+     0.01
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.9593664257212245,
+      0.0,
+      -1.0036965663483512
+     ],
+     "residual": [
+      -1.2413728875484458,
+      1.3863313011770269,
+      -2.1096082069504045,
+      0.7641662308634635,
+      -1.0173623996160157
+     ],
+     "objective": 9.540640917264254,
+     "rank": 3,
+     "risk": 9.52101028734356,
+     "cost": 0.01963062992069576
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-trust-constr-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "a costly instrument is left out (x = 0)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0003",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.3,
+     0.3,
+     0.3
+    ],
+    "cost_weight": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2389484039547414,
+      -0.579151887583752,
+      -0.7518047108371649
+     ],
+     "residual": [
+      -1.2009884820045675,
+      0.875980371751054,
+      -2.0513033584105242,
+      1.0987041058935945,
+      -1.35119875049463
+     ],
+     "objective": 8.717443423206426,
+     "rank": 3,
+     "risk": 8.717443423206426,
+     "cost": 0.7709715007126975
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-slsqp-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "cost weight 0 equals the wave 1 answer",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0004",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weight": 4.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.0941877951928924,
+      -0.4834054404250442,
+      -0.7188354537220323
+     ],
+     "residual": [
+      -1.2912820157640361,
+      0.9606356285590018,
+      -1.9588776653187856,
+      1.031717239719476,
+      -1.3130404144219925
+     ],
+     "objective": 9.222094115305316,
+     "rank": 3,
+     "risk": 8.752387543798958,
+     "cost": 0.11742664287658969
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-trust-constr-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "cost weight 4",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0005",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "impact": [
+     0.5,
+     0.5,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.6733517569287463,
+      -0.5062323373210563,
+      -0.2666016642222619
+     ],
+     "residual": [
+      -1.6330847445762342,
+      0.9878860566044515,
+      -1.336306723033152,
+      1.0974934402787502,
+      -1.366248900084131
+     ],
+     "objective": 9.682024946496282,
+     "rank": 3,
+     "risk": 9.18503516780984,
+     "cost": 0.49698977868644395
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-bvls-or-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "linear impact only (quadratic cost)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0006",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "impact": [
+     0.2,
+     0.2,
+     0.2
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.9631490130803548,
+      -0.49785439390992775,
+      -0.5957187457917915
+     ],
+     "residual": [
+      -1.4049219330329674,
+      0.9532319329154765,
+      -1.7959758537256085,
+      1.034801460469686,
+      -1.3415249730243306
+     ],
+     "objective": 9.22571928805759,
+     "rank": 3,
+     "risk": 8.809782854492578,
+     "cost": 0.41593643356501203
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-trust-constr-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "spread and impact together",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0007",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.02,
+     0.02,
+     0.02
+    ],
+    "lower": [
+     -0.6,
+     -0.4,
+     -0.4
+    ],
+    "upper": [
+     0.6,
+     0.4,
+     0.4
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.6,
+      -0.4,
+      -0.4
+     ],
+     "residual": [
+      -1.68,
+      1.04,
+      -1.48,
+      0.94,
+      -1.34
+     ],
+     "objective": 9.229800000000001,
+     "rank": 3,
+     "risk": 9.2018,
+     "cost": 0.028
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-slsqp-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "liquidity caps as bounds, with costs",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0008",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "margin_rates": [
+     0.1,
+     0.2,
+     0.15
+    ],
+    "margin_limit": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.6753530358866267,
+      -0.3547739004652618,
+      -0.41006610878856653
+     ],
+     "residual": [
+      -1.5840471361037176,
+      1.1128507866922472,
+      -1.4604281998733442,
+      1.0002681507065392,
+      -1.272175128700655
+     ],
+     "objective": 9.171738457835492,
+     "rank": 3,
+     "risk": 9.171738457835492,
+     "cost": 0.0,
+     "margin": 0.2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-slsqp-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "margin limit binds",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0009",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "margin_rates": [
+     0.1,
+     0.2,
+     0.15
+    ],
+    "margin_limit": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2389484039547414,
+      -0.579151887583752,
+      -0.7518047108371649
+     ],
+     "residual": [
+      -1.2009884820045675,
+      0.875980371751054,
+      -2.0513033584105242,
+      1.0987041058935945,
+      -1.35119875049463
+     ],
+     "objective": 8.717443423206426,
+     "rank": 3,
+     "risk": 8.717443423206426,
+     "cost": 0.0,
+     "margin": 0.3524959245377993
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-slsqp-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "margin limit slack",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0010",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.02,
+     0.02,
+     0.02
+    ],
+    "margin_rates": [
+     0.1,
+     0.1,
+     0.1
+    ],
+    "margin_limit": 0.15,
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.7499999999999999,
+      -0.40635888501742146,
+      -0.34364111498257843
+     ],
+     "residual": [
+      -1.5219076655052266,
+      1.0999128919860628,
+      -1.3842770034843206,
+      1.109451219512195,
+      -1.268815331010453
+     ],
+     "objective": 9.180146450348433,
+     "rank": 2,
+     "risk": 9.150146450348432,
+     "cost": 0.03,
+     "margin": 0.15
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-slsqp-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "margin, costs and a budget equality",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0011",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     0.5,
+     null,
+     null
+    ],
+    "margin_rates": [
+     0.2,
+     0.1,
+     0.1
+    ],
+    "margin_limit": 0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.6007919683283436,
+      -0.4118239730307936,
+      -0.38659209031251934
+     ],
+     "residual": [
+      -1.6824384362495572,
+      1.031411986736543,
+      -1.4669033224544208,
+      0.9503358987752487,
+      -1.3463024154901326
+     ],
+     "objective": 9.201360817957415,
+     "rank": 3,
+     "risk": 9.201360817957415,
+     "cost": 0.0,
+     "margin": 0.2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-slsqp-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "margin binds with a bound at a positive level",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0012",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "impact": [
+     0.1,
+     0.1,
+     0.1
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.9533898305084746,
+      0.9533898305084746,
+      0.04237288135593221
+     ],
+     "residual": [
+      -0.09322033898305085,
+      -0.004237288135593221
+     ],
+     "objective": 0.19067796610169493,
+     "rank": 3,
+     "risk": 0.00870798621085895,
+     "cost": 0.18196997989083596
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-bvls-or-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "singular A made regular by impact",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0013",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.1,
+     0.1,
+     0.1
+    ],
+    "lower": [
+     null,
+     -0.3,
+     null
+    ],
+    "upper": [
+     null,
+     -0.3,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.0427540852072872,
+      -0.3,
+      -0.8183954323048379
+     ],
+     "residual": [
+      -1.2709250012536804,
+      1.125468052640251,
+      -2.003317739936528,
+      0.9376473790914757,
+      -1.1984169956085367
+     ],
+     "objective": 9.126340175801818,
+     "rank": 3,
+     "risk": 8.910225224050606,
+     "cost": 0.2161149517512125
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "cost on a fixed position",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgecost_i-0014",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.05
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "half_spreads of the wrong length"
+  },
+  {
+   "case_id": "hedgecost_i-0015",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "margin_rates": [
+     0.1,
+     0.1,
+     0.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "margin_rates without margin_limit"
+  },
+  {
+   "case_id": "hedgecost_i-0016",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.05,
+     0.05
+    ],
+    "singular": "MIN_NORM"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "MIN_NORM with costs"
+  },
+  {
+   "case_id": "hedgecost_i-0017",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     -0.01,
+     0.05
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "negative half-spread"
+  },
+  {
+   "case_id": "hedgecost_i-0018",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.05,
+     0.05
+    ],
+    "cost_weight": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "negative cost weight"
+  },
+  {
+   "case_id": "hedgecost_i-0019",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "margin_rates": [
+     0.1,
+     0.1,
+     0.1
+    ],
+    "margin_limit": -1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "negative margin limit"
+  },
+  {
+   "case_id": "hedgecost_i-0020",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "half_spreads": [
+     0.1,
+     0.1,
+     0.1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "spread cost does not make a singular problem regular"
+  },
+  {
+   "case_id": "hedgecost_i-0021",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "margin_rates": [
+     0.1,
+     0.1,
+     0.1
+    ],
+    "margin_limit": 0.05,
+    "lower": [
+     1.0,
+     null,
+     null
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INFEASIBLE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "a bound needs more margin than the limit"
+  },
+  {
+   "case_id": "hedgecost_i-0022",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "margin_rates": [
+     0.1,
+     0.1,
+     0.1
+    ],
+    "margin_limit": 0.05,
+    "eq_matrix": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "eq_rhs": [
+     -1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INFEASIBLE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "an equality needs more margin than the limit"
+  }
+ ]
+}
