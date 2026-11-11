@@ -266,3 +266,6 @@ Read: `specifications/06-risk/aad-core.md`; rulings G-9, G-35. New operation `ra
 ## WAVE 3e READY (2026-11-11): Q9 part 2, model-reserve dispersion
 
 Read: `specifications/06-risk/model-reserve.md`; ruling G-36. New operation `risk.model_reserve.dispersion` (suite `reserve_g`, 9 cases: 6 values, 3 errors; outside none). The report over every single-asset exotic is registered with fixed parameters and belongs to the Python research lane; it has not been run. Stage G share: 258 of 444 = 58.1%.
+
+## Answers to G-J1 to G-J3 and a golden fix (ruling G-38)
+`capfloor_g-0040` fixed (strike -1.0, so `1 + K tau = 0`, `E_DOMAIN`): all builds rerun that case. G-J1: negative `start_years` is `E_DOMAIN` after `side`, before `payment_times`. G-J2: the Java method is acceptable. `aadladder_g` (wave 3d) is READY (section above).
