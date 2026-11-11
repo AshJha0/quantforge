@@ -6,7 +6,7 @@ New here? [Tutorial 1](docs/getting-started/tutorial-1-swap.md) builds a curve, 
 
 ## Run a tutorial script
 
-Tutorials 2 to 7 each have a script in `examples/tutorials/` that sends its operations to any build: Python in process with no argument, or another build's CLI. Tutorials 8 to 16, like Tutorial 1, have a script `examples/tutorial_<topic>.py` that takes a build's CLI command.
+Tutorials 2 to 16 each have a script in `examples/tutorials/` that sends its operations to any build: Python in process with no argument, or another build's CLI. Tutorial 1's script, `examples/tutorial_swap.py`, takes a build's CLI command.
 
 ```bash
 uv run --project python python examples/tutorials/t2_bonds.py                  # Python

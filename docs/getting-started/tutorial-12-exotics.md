@@ -26,56 +26,88 @@ Terms used below, all in the [Glossary, stage E](../../GLOSSARY.md#stage-e-full-
 uv sync --locked --project python
 ```
 
-Save the next block as `exotics.py` (or paste it into `uv run --project python python -`):
+The script `examples/tutorials/t12_exotics.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t12_exotics.py -->
 ```python
+"""Tutorial 12: American puts, a barrier call, Heston and local-vol calls.
+
+  uv run --project python python examples/tutorials/t12_exotics.py         # Python
+  python examples/tutorials/t12_exotics.py rust/target/release/quantforge  # or any other build
+
+It sends the cases of docs/getting-started/tutorial-12-exotics.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
+"""
+import json
 import math
+import sys
 
-from quantforge_core import arb_surface, black, exotics, heston
-from quantforge_core.arb_surface import Slice
-from quantforge_core.black import Option
-from quantforge_core.heston import Heston
-from quantforge_core.smile import Svi
+from qf import runner
 
-# One option set, synthetic: spot, strike, years, rate, dividend yield, vol (continuous, annual).
-S, K, T, r, q, vol = 100.0, 100.0, 1.0, 0.05, 0.02, 0.25
+S, K, T, R, Q, VOL = 100.0, 100.0, 1.0, 0.05, 0.02, 0.25
+COMMON = {"spot": S, "strike": K, "expiry_years": T, "rate": R, "dividend_yield": Q, "vol": VOL}
+BS = {"model": "BLACK_SCHOLES", "strike": K, "expiry_years": T, "spot": S, "rate": R, "yield": Q}
+BARRIER = {**COMMON, "option_type": "CALL", "barrier": 90.0, "rebate": 0.0, "barrier_type": "DOWN_OUT"}
+HESTON = {"v0": 0.0625, "kappa": 1.5, "theta": 0.0625, "xi": 0.5, "rho": -0.7}
+SURFACE = [{"expiry_years": 1.0, "svi": {"a": 0.035, "b": 0.11, "rho": -0.35, "m": 0.03, "sigma": 0.25}}]
 
-# 1. European put by Black-Scholes, then the American put three ways.
-euro_put = black.price(Option("BLACK_SCHOLES", "PUT", K, T, S, rate=r, dividend_yield=q), vol)
-baw = exotics.baw(S, K, T, r, q, vol, "PUT")
-crr = exotics.crr(S, K, T, r, q, vol, "PUT", 200)                        # 200 tree steps
-fd = exotics.fd(S, K, T, r, q, vol, "PUT", "AMERICAN", 201, 200, 5.0)   # nx, nt, width
-print(f"European put (BS)   {euro_put:.6f}")
-print(f"American put BAW    {baw:.6f}")
-print(f"American put CRR200 {crr['american']:.6f}")
-print(f"American put FD     {fd['price']:.6f}")
 
-# 2. Down-and-out call, barrier 90, no rebate: watched continuously, daily (252/yr), weekly (52/yr).
-call = black.price(Option("BLACK_SCHOLES", "CALL", K, T, S, rate=r, dividend_yield=q), vol)
-cont = exotics.barrier(S, K, T, r, q, vol, "CALL", 90.0, 0.0, "DOWN_OUT")
-daily = exotics.barrier(S, K, T, r, q, vol, "CALL", 90.0, 0.0, "DOWN_OUT", "DISCRETE", 252)
-weekly = exotics.barrier(S, K, T, r, q, vol, "CALL", 90.0, 0.0, "DOWN_OUT", "DISCRETE", 52)
-print(f"Vanilla call (BS)   {call:.6f}")
-print(f"Down-out continuous {cont:.6f}")
-print(f"Down-out daily      {daily:.6f}")
-print(f"Down-out weekly     {weekly:.6f}")
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
-# 3. The same vanilla call under Heston: v0 = theta = 0.25^2, kappa 1.5, xi 0.5, rho -0.7.
-[hc] = heston.heston_price(S, [K], T, r, q, Heston(0.0625, 1.5, 0.0625, 0.5, -0.7), "CALL")
-print(f"Heston call         {hc:.6f}")
 
-# 4. ...and under local vol fitted to a one-slice SVI surface. k is ln(K / forward).
-surface = [Slice(1.0, Svi(0.035, 0.11, -0.35, 0.03, 0.25))]
-k = math.log(K / (S * math.exp((r - q) * T)))
-w, iv, lv = arb_surface.dupire(surface, [(T, k)])
-lvc = black.price(Option("BLACK_SCHOLES", "CALL", K, T, S, rate=r, dividend_yield=q), iv[0])
-print(f"Surface vol {iv[0]:.6f} local vol {lv[0]:.6f}")
-print(f"Local-vol call      {lvc:.6f}")
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return [r["outputs"] for r in results]
+
+
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    k = math.log(K / (S * math.exp((R - Q) * T)))  # forward log-moneyness of the strike
+    put = {**COMMON, "option_type": "PUT"}
+    euro, baw, crr, fd, call, cont, daily, weekly, hes, lv = batch(cli, [
+        case("t12-euro", "vol.option.price", {**BS, "option_type": "PUT", "vol": VOL}),
+        case("t12-baw", "exotic.american.baw", put),
+        case("t12-crr", "exotic.american.crr", {**put, "steps": 200}),
+        case("t12-fd", "exotic.american.fd",
+             {**put, "exercise": "AMERICAN", "grid": {"nx": 201, "nt": 200, "width": 5.0}}),
+        case("t12-call", "vol.option.price", {**BS, "option_type": "CALL", "vol": VOL}),
+        case("t12-cont", "exotic.barrier.price", BARRIER),
+        case("t12-daily", "exotic.barrier.price",
+             {**BARRIER, "monitoring": "DISCRETE", "monitoring_per_year": 252}),
+        case("t12-weekly", "exotic.barrier.price",
+             {**BARRIER, "monitoring": "DISCRETE", "monitoring_per_year": 52}),
+        case("t12-heston", "vol.heston.price",
+             {"spot": S, "strikes": [K], "expiry_years": T, "rate": R, "dividend_yield": Q,
+              "heston": HESTON, "option_type": "CALL"}),
+        case("t12-dupire", "vol.local.dupire",
+             {"slices": SURFACE, "points": [{"expiry_years": T, "log_moneyness": k}]}),
+    ])
+    iv = lv["implied_vol"][0]
+    [lv_call] = batch(cli, [case("t12-lvcall", "vol.option.price", {**BS, "option_type": "CALL", "vol": iv})])
+    print(f"European put (BS)   {euro['price']:.6f}")
+    print(f"American put BAW    {baw['price']:.6f}")
+    print(f"American put CRR200 {crr['american']:.6f}")
+    print(f"American put FD     {fd['price']:.6f}")
+    print(f"Vanilla call (BS)   {call['price']:.6f}")
+    print(f"Down-out continuous {cont['price']:.6f}")
+    print(f"Down-out daily      {daily['price']:.6f}")
+    print(f"Down-out weekly     {weekly['price']:.6f}")
+    print(f"Heston call         {hes['prices'][0]:.6f}")
+    print(f"Surface vol {iv:.6f} local vol {lv['local_vol'][0]:.6f}")
+    print(f"Local-vol call      {lv_call['price']:.6f}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python exotics.py
+uv run --project python python examples/tutorials/t12_exotics.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -114,14 +146,14 @@ Local-vol call      11.355515
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_exotics.py` sends the same cases (`vol.option.price`, `exotic.american.baw`, `exotic.american.crr`, `exotic.american.fd`, `exotic.barrier.price`, `vol.heston.price`, `vol.local.dupire`) to whichever CLI you name and prints the same lines. It uses only the Python standard library.
+`examples/tutorials/t12_exotics.py` sends the same cases (`vol.option.price`, `exotic.american.baw`, `exotic.american.crr`, `exotic.american.fd`, `exotic.barrier.price`, `vol.heston.price`, `vol.local.dupire`) to whichever CLI you name and prints the same lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_exotics.py rust/target/release/quantforge
+python examples/tutorials/t12_exotics.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -129,7 +161,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_exotics.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t12_exotics.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -137,7 +169,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_exotics.py cpp26/build/quantforge
+python examples/tutorials/t12_exotics.py cpp26/build/quantforge
 ```
 
 Each prints the eleven lines of step 1, digit for digit at six decimals. The golden suites behind these operations are `stage_e/american_e`, `stage_e/exotic_e`, `stage_g/barrier_g`, `stage_e/heston_e` and `stage_e/lv_e`.

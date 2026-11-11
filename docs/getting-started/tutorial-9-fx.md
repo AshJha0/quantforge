@@ -2,7 +2,7 @@
 
 The plain idea: today's exchange rate and the rate for a later date are linked by the two currencies' interest rates. If you can borrow in one currency and lend in the other, the forward rate is pinned by what the two deposits grow to. That is covered interest parity. A cross-currency swap exchanges floating interest in two currencies, and its quoted spread (the cross-currency basis) measures how far the market sits from that parity. An FX option is the right to exchange at a fixed rate. It is priced like an equity option, with the foreign interest rate in place of a dividend yield, and the market quotes it by delta and volatility rather than by strike and price.
 
-This tutorial does all three with library calls: an FX forward and its basis, a cross-currency swap curve and a trade on it, and FX options with the smile conventions the market quotes in. First Python, then Rust, Java and C++. Budget 15 minutes. All data is synthetic: the curves are the ones shipped in `examples/fx_forward_outright.json` and `examples/xccy_bootstrap_d.json`, and the option inputs are those of golden cases `fxs_e-0001`, `fxs_e-0118` and `fxs_e-0120` in `datasets/golden/stage_e/fxs_e.json`. Every number shown is a real output, and CI checks that every code block on this page prints it.
+This tutorial does all three with library operations: an FX forward and its basis, a cross-currency swap curve and a trade on it, and FX options with the smile conventions the market quotes in. First Python, then Rust, Java and C++. Budget 15 minutes. All data is synthetic: the curves are the ones shipped in `examples/fx_forward_outright.json` and `examples/xccy_bootstrap_d.json`, and the option inputs are those of golden cases `fxs_e-0001`, `fxs_e-0118` and `fxs_e-0120` in `datasets/golden/stage_e/fxs_e.json`. Every number shown is a real output, and CI checks that every code block on this page prints it.
 
 Terms are defined where they first appear, and in the glossary: forward points under [stage B](../../GLOSSARY.md#stage-b-fx-and-rates-slices), cross-currency basis and NDF under [stage D](../../GLOSSARY.md#stage-d-curves-and-fixed-income), premium-adjusted delta, DNS, risk reversal and butterfly under [stage E](../../GLOSSARY.md#stage-e-full-volatility-exotics-rates-vol-correlation-and-credit).
 
@@ -18,70 +18,97 @@ Terms are defined where they first appear, and in the glossary: forward points u
 uv sync --locked --project python
 ```
 
-Save the next block as `fx.py` in the repository root (or paste it into `uv run --project python python -`):
+The script `examples/tutorials/t9_fx.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t9_fx.py -->
 ```python
+"""Tutorial 9: FX forwards, a cross-currency swap and FX options.
+
+  uv run --project python python examples/tutorials/t9_fx.py         # Python
+  python examples/tutorials/t9_fx.py rust/target/release/quantforge  # or any other build
+
+It sends the cases of docs/getting-started/tutorial-9-fx.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
+Run it from the repository root: the curves are read from examples/*.json (synthetic data).
+"""
 import json
-from datetime import date
+import sys
 
-from quantforge_core import fx, fx_smile, xccy
-from quantforge_core.curves import CurveData
-from quantforge_core.fx import FxMarket
+from qf import runner
 
-
-def curve(c):  # a curve as the JSON examples store it: as_of, interpolation, pillars
-    return CurveData(date.fromisoformat(c["as_of"]), c["interpolation"],
-                     tuple(date.fromisoformat(p["date"]) for p in c["pillars"]),
-                     tuple(p["discount_factor"] for p in c["pillars"]))
+EURUSD = {"spot": 1.085, "expiry_years": 0.2493150684931507, "domestic_rate": 0.043, "foreign_rate": 0.031}
+USDJPY = {"spot": 151.2, "expiry_years": 0.4986301369863014, "domestic_rate": 0.001, "foreign_rate": 0.045}
 
 
-def example(name):  # synthetic market data shipped in examples/
+def example(name):
     with open(f"examples/{name}.json") as f:
         return json.load(f)["inputs"]
 
 
-# 1. FX forward from two curves. GBPUSD 1.28: 1 GBP (base) costs 1.28 USD (quote).
-g = example("fx_forward_outright")
-market = FxMarket("GBPUSD", 1.28, date(2026, 11, 6), curve(g["base_curve"]), curve(g["quote_curve"]))
-spot_date = fx.spot_date("GBPUSD", date(2026, 11, 6))
-forward, points = fx.outright(market, date(2027, 11, 10))
-node = fx.implied(market, [(12, -71.0)])[0]  # quoted 1Y points: -71.0
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
-# 2. Cross-currency: solve the EUR discount curve that makes EUR ESTR + spread par against USD SOFR flat.
-x = example("xccy_bootstrap_d")
-usd, estr = curve(x["domestic"]), curve(x["foreign_projection"])
-quotes = [(q["months"], q["spread"]) for q in x["quotes"]]
-eur_disc, error = xccy.bootstrap(usd, estr, "SOFR", "ESTR", date(2026, 11, 10), quotes, "LOG_LINEAR_DF")
-# Receive EUR ESTR + 15bp on 10m EUR for 2 years, pay USD SOFR flat on 10.85m USD.
-eur_leg, usd_leg, xpv = xccy.pv(usd, estr, eur_disc, 1.085, date(2026, 11, 10), 24,
-                                10_000_000.0, 0.0015, "RECEIVE_FOREIGN")
 
-# 3. Garman-Kohlhagen: 3-month EURUSD call, strike 1.1209, on 1m EUR (USD is domestic).
-eurusd = (1.085, 0.2493150684931507, 0.043, 0.031)  # spot, years, r_USD, r_EUR
-gk = fx_smile.option_price(eurusd[0], 1.1209, *eurusd[1:], 0.075, "CALL", 1_000_000.0)
-deltas = fx_smile.delta_from_strike(eurusd[0], 1.1209, *eurusd[1:], 0.075, "CALL")
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return results
 
-# 4. Smile from quotes: ATM 7.5%, 25-delta risk reversal -0.45%, butterfly 0.20%, spot delta, ATM DNS.
-eu = fx_smile.smile_from_quotes(*eurusd, 0.075, -0.0045, 0.002, 0.25, "SPOT", "DNS")
-# USDJPY-like: premium paid in USD (foreign), so premium-adjusted spot delta.
-jp = fx_smile.smile_from_quotes(151.2, 0.4986301369863014, 0.001, 0.045, 0.105, -0.015, 0.0035,
-                                0.25, "SPOT_PA", "DNS")
 
-print(f"spot date {spot_date}")
-print(f"1Y forward {forward:.8f}  points {points:.4f}")
-print(f"1Y node {node['value_date']}  basis {node['basis_bp']:.4f} bp")
-print(f"EUR xccy discount 2Y {eur_disc.discount_factors[1]:.10f}  repriced {error < 1e-13}")
-print(f"xccy PV {xpv:.2f} USD  EUR leg {eur_leg:.2f} EUR")
-print(f"GK price {gk['price']:.4f} USD  forward {gk['forward']:.8f}")
-print(f"GK delta {gk['delta']:.4f} EUR  vega {gk['vega']:.4f}")
-print("deltas " + "  ".join(f"{k} {v:.8f}" for k, v in deltas.items()))
-print(f"EURUSD ATM {eu['atm_strike']:.8f}  25C {eu['call_strike']:.8f}  25P {eu['put_strike']:.8f}")
-print(f"USDJPY ATM {jp['atm_strike']:.6f}  25C {jp['call_strike']:.6f}  25P {jp['put_strike']:.6f}")
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    g = example("fx_forward_outright")
+    market = {"pair": "GBPUSD", "spot": 1.28, "as_of": "2026-11-06",
+              "base_curve": g["base_curve"], "quote_curve": g["quote_curve"]}
+    x = example("xccy_bootstrap_d")
+    usd, estr = x["domestic"], x["foreign_projection"]
+    smile = {"atm_vol": 0.075, "rr": -0.0045, "bf": 0.002, "delta": 0.25, "delta_type": "SPOT", "atm_type": "DNS"}
+    jp_smile = {"atm_vol": 0.105, "rr": -0.015, "bf": 0.0035, "delta": 0.25, "delta_type": "SPOT_PA",
+                "atm_type": "DNS"}
+    option = {**EURUSD, "strike": 1.1209, "vol": 0.075, "option_type": "CALL"}
+    first = batch(cli, [
+        case("t9-spot", "fx.spot_date", {"pair": "GBPUSD", "trade_date": "2026-11-06"}),
+        case("t9-fwd", "fx.forward.outright", {**market, "value_date": "2027-11-10"}),
+        case("t9-implied", "fx.curve.implied", {**market, "points": [{"tenor": "1Y", "points": -71.0}]}),
+        case("t9-xccy", "fx.xccy.bootstrap", {"domestic": usd, "foreign_projection": estr,
+                                              "domestic_convention": "SOFR", "foreign_convention": "ESTR",
+                                              "start": "2026-11-10", "quotes": x["quotes"],
+                                              "interpolation": "LOG_LINEAR_DF"}),
+        case("t9-gk", "fx.option.price", {**option, "notional": 1_000_000.0}),
+        case("t9-deltas", "fx.delta.from_strike", option),
+        case("t9-eu", "fx.smile.from_quotes", {**EURUSD, **smile}),
+        case("t9-jp", "fx.smile.from_quotes", {**USDJPY, **jp_smile}),
+    ])
+    spot, fwd, implied, boot, gk, deltas, eu, jp = (r["outputs"] for r in first)
+    error = first[3]["diagnostics"]["max_repricing_error"]
+    eur_disc = {"as_of": usd["as_of"], "interpolation": "LOG_LINEAR_DF", "pillars": boot["pillars"]}
+    trade = {"start": "2026-11-10", "months": 24, "foreign_notional": 10_000_000.0, "spread": 0.0015,
+             "side": "RECEIVE_FOREIGN"}
+    [xpv] = (r["outputs"] for r in batch(cli, [case("t9-xpv", "fx.xccy.pv", {
+        "domestic": usd, "foreign_projection": estr, "foreign_discount": eur_disc, "spot": 1.085,
+        "trade": trade})]))
+    node = implied["nodes"][0]
+    print(f"spot date {spot['spot_date']}")
+    print(f"1Y forward {fwd['forward']:.8f}  points {fwd['points']:.4f}")
+    print(f"1Y node {node['value_date']}  basis {node['basis_bp']:.4f} bp")
+    print(f"EUR xccy discount 2Y {boot['pillars'][1]['discount_factor']:.10f}  repriced {error < 1e-13}")
+    print(f"xccy PV {xpv['pv']:.2f} USD  EUR leg {xpv['foreign_leg']:.2f} EUR")
+    print(f"GK price {gk['price']:.4f} USD  forward {gk['forward']:.8f}")
+    print(f"GK delta {gk['delta']:.4f} EUR  vega {gk['vega']:.4f}")
+    print("deltas " + "  ".join(f"{k} {deltas['deltas'][k]:.8f}" for k in ("SPOT", "FORWARD", "SPOT_PA", "FORWARD_PA")))
+    print(f"EURUSD ATM {eu['atm_strike']:.8f}  25C {eu['call_strike']:.8f}  25P {eu['put_strike']:.8f}")
+    print(f"USDJPY ATM {jp['atm_strike']:.6f}  25C {jp['call_strike']:.6f}  25P {jp['put_strike']:.6f}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python fx.py
+uv run --project python python examples/tutorials/t9_fx.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -132,14 +159,14 @@ The printed values reproduce the goldens: the 2Y pillar of `xccy_d-0001`, and `f
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_fx.py` sends the same inputs to the CLI you name (`specifications/cli-contract.md`) as `fx.spot_date`, `fx.forward.outright`, `fx.curve.implied`, `fx.xccy.bootstrap`, `fx.xccy.pv`, `fx.option.price`, `fx.delta.from_strike` and `fx.smile.from_quotes`, and prints the same ten lines. It uses only the Python standard library.
+`examples/tutorials/t9_fx.py` sends the same inputs to the CLI you name (`specifications/cli-contract.md`) as `fx.spot_date`, `fx.forward.outright`, `fx.curve.implied`, `fx.xccy.bootstrap`, `fx.xccy.pv`, `fx.option.price`, `fx.delta.from_strike` and `fx.smile.from_quotes`, and prints the same ten lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_fx.py rust/target/release/quantforge
+python examples/tutorials/t9_fx.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -147,7 +174,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_fx.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t9_fx.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -155,7 +182,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_fx.py cpp26/build/quantforge
+python examples/tutorials/t9_fx.py cpp26/build/quantforge
 ```
 
 Each prints the ten lines of step 1, digit for digit at the precision shown. The full checks are the conformance suites: `python conformance/runner/runner.py --impl rust --suite fxs_e` and `--suite xccy_d`.

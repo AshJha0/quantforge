@@ -13,86 +13,134 @@ Terms used below, all in the [glossary](../../GLOSSARY.md#stage-b-fx-and-rates-s
 
 ## Step 1: Python
 
-Save the next block as `multicurve.py`:
+The script `examples/tutorials/t8_multicurve.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t8_multicurve.py -->
 ```python
+"""Tutorial 8: SOFR and term curves, the joint solve, the turn, interpolation.
+
+  uv run --project python python examples/tutorials/t8_multicurve.py         # Python
+  python examples/tutorials/t8_multicurve.py rust/target/release/quantforge  # or any other build
+
+It sends the cases of docs/getting-started/tutorial-8-multicurve.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
+"""
+import json
+import sys
 from datetime import date
 
-from quantforge_core import curves, joint, ois, projection, risk_curve
-from quantforge_core.joint import CurveSpec, InstrumentSpec
-from quantforge_core.ois import Quote
-from quantforge_core.projection import ProjectionQuote
+from qf import runner
 
-# 1. Quotes (synthetic, the inputs of golden case joint_f-0003).
-as_of = date(2026, 11, 9)
-sofr = [("1M", 0.043), ("3M", 0.0425), ("6M", 0.0412), ("1Y", 0.039),
+AS_OF = "2026-11-09"
+SOFR = [("1M", 0.043), ("3M", 0.0425), ("6M", 0.0412), ("1Y", 0.039),
         ("2Y", 0.0365), ("3Y", 0.0355), ("5Y", 0.0352), ("10Y", 0.0364)]
-term = [("DEPOSIT", 3, 0.0445), ("FRA", 3, 0.0432), ("FRA", 6, 0.0418),
+TERM = [("DEPOSIT", 3, 0.0445), ("FRA", 3, 0.0432), ("FRA", 6, 0.0418),
         ("SWAP", 24, 0.0388), ("SWAP", 60, 0.0376), ("SWAP", 120, 0.0389)]
-ois_quotes = [Quote(t, r) for t, r in sofr]
+OIS_QUOTES = [{"tenor": t, "rate": r} for t, r in SOFR]
+START, END = "2027-11-16", "2028-02-16"
+PROBE = ["2028-05-15", "2033-11-15"]
+METHODS = ("LOG_LINEAR_DF", "LINEAR_ZERO", "MONOTONE_CONVEX")
 
-# 2. One after the other: the SOFR discount curve, then the term curve that discounts on it.
-disc, err_disc = ois.bootstrap("SOFR", as_of, ois_quotes, "LOG_LINEAR_DF")
-proj, err_proj = projection.bootstrap(disc, "USD-TERM-3M", as_of,
-                                      [ProjectionQuote(k, m, r) for k, m, r in term], "LOG_LINEAR_DF")
-start, end = date(2027, 11, 16), date(2028, 2, 16)
-f_ois = curves.forward(disc, start, end, "ACT_360")
-f_term = curves.forward(proj, start, end, "ACT_360")
-print(f"SOFR curve {len(disc.dates)} pillars, term curve {len(proj.dates)}, "
-      f"both reprice below 1e-13: {max(err_disc, err_proj) < 1e-13}")
-print(f"SOFR 10Y discount factor {disc.discount_factors[-1]:.12f}")
-print(f"TERM 10Y discount factor {proj.discount_factors[-1]:.12f}")
-print(f"3M forward from {start}: SOFR {f_ois:.4%}  TERM {f_term:.4%}  "
-      f"basis {(f_term - f_ois) * 1e4:.2f} bp")
 
-# 3. Together: one system, one unknown (ln D at a pillar) per instrument.
-specs = [CurveSpec("USD-SOFR", "OIS", convention="SOFR"),
-         CurveSpec("USD-TERM-3M", "PROJECTION", index="USD-TERM-3M", discount="USD-SOFR")]
-instruments = [InstrumentSpec(f"SOFR-{t}", "USD-SOFR", "OIS", tenor=t, rate=r) for t, r in sofr]
-for kind, months, rate in term:
-    i = InstrumentSpec(f"T-{kind}{months}", "USD-TERM-3M", kind, rate=rate)
-    if kind == "FRA":
-        i.start_months = months
-    else:
-        i.months = months
-    instruments.append(i)
-solved = joint.outputs(as_of, joint.joint_solve(as_of, specs, instruments))
-jac = solved["jacobian"]
-row = {u: k for k, u in enumerate(jac["unknowns"])}
-col = {q: k for k, q in enumerate(jac["quotes"])}
-J = lambda unknown, quote: jac["matrix"][row[unknown]][col[quote]]  # d ln D / d quote
-term10, sofr10 = "USD-TERM-3M:pillar:2036-11-12", "USD-SOFR:pillar:2036-11-14"
-print(f"joint TERM 10Y discount factor {solved['curves'][1]['pillars'][-1]['discount_factor']:.12f}")
-print(f"J[TERM 10Y, T-SWAP120] {J(term10, 'T-SWAP120'):.4f}  J[TERM 10Y, SOFR-10Y] {J(term10, 'SOFR-10Y'):.4f}")
-print(f"J[SOFR 10Y, T-SWAP120] is exactly zero: {J(sofr10, 'T-SWAP120') == 0.0}")
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
-# 4. The single-curve Jacobian in zero rates, against the joint one (z = -ln D / t).
-zero_jac = risk_curve.jacobian(as_of, "SOFR", ois_quotes, "LOG_LINEAR_DF", 1.0)
-t10 = (date(2036, 11, 14) - as_of).days / 365
-print(f"dz(SOFR 10Y)/dq(SOFR-10Y): bump {zero_jac['jacobian'][-1][-1]:.4f}  "
-      f"joint -J/t {-J(sofr10, 'SOFR-10Y') / t10:.4f}")
 
-# 5. The year-end turn: a jump at 2026-12-31 solved from a 2M quote that spans it.
-turn_specs = [CurveSpec("USD-SOFR", "OIS", convention="SOFR", turns=(date(2026, 12, 31),))]
-turn_inst = [i for i in instruments if i.curve == "USD-SOFR"]
-turn_inst.insert(1, InstrumentSpec("SOFR-2M", "USD-SOFR", "OIS", turn=True, tenor="2M", rate=0.0428))
-turned = joint.outputs(as_of, joint.joint_solve(as_of, turn_specs, turn_inst))
-sens = turned["turn_sensitivity"][0]
-print(f"turn factor {turned['turn_factors'][0]['factor']:.8f}")
-print(f"turn sensitivity: SOFR-1M zero {abs(sens[0]) < 1e-12}  SOFR-2M {sens[1]:.4f}  SOFR-3M {sens[2]:.4f}")
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return results
 
-# 6. Same quotes, three interpolations: pillars reprice, values between them do not agree.
-probe = [date(2028, 5, 15), date(2033, 11, 15)]
-for method in ("LOG_LINEAR_DF", "LINEAR_ZERO", "MONOTONE_CONVEX"):
-    c, _ = ois.bootstrap("SOFR", as_of, ois_quotes, method)
-    _, _, fwd = curves.inspect(c, probe)
-    print(f"{method:<16}10Y DF {c.discount_factors[-1]:.6f}  "
-          f"fwd {probe[0]} {fwd[0]:.4%}  fwd {probe[1]} {fwd[1]:.4%}")
+
+def curve(pillars, interpolation="LOG_LINEAR_DF"):
+    return {"as_of": AS_OF, "interpolation": interpolation, "pillars": pillars}
+
+
+def term_quote(kind, months, rate):
+    key = "start_months" if kind == "FRA" else "months"
+    return {"type": kind, key: months, "rate": rate}
+
+
+def ois_bootstrap(case_id, method):
+    return case(case_id, "rates.ois.bootstrap", {"convention": "SOFR", "as_of": AS_OF, "quotes": OIS_QUOTES,
+                                                 "interpolation": method, "method": "SEQUENTIAL"})
+
+
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    [disc] = batch(cli, [ois_bootstrap("t8-sofr", "LOG_LINEAR_DF")])
+    disc_curve = curve(disc["outputs"]["pillars"])
+    [proj] = batch(cli, [case("t8-term", "rates.projection.bootstrap", {
+        "discount": disc_curve, "index": "USD-TERM-3M", "as_of": AS_OF,
+        "quotes": [term_quote(*q) for q in TERM], "interpolation": "LOG_LINEAR_DF"})])
+    proj_curve = curve(proj["outputs"]["pillars"])
+
+    sofr_inst = [{"id": f"SOFR-{t}", "curve": "USD-SOFR", "type": "OIS", "tenor": t, "rate": r} for t, r in SOFR]
+    term_inst = [{"id": f"T-{k}{m}", "curve": "USD-TERM-3M", **term_quote(k, m, r)} for k, m, r in TERM]
+    turn_inst = [sofr_inst[0], {"id": "SOFR-2M", "curve": "USD-SOFR", "type": "OIS", "tenor": "2M",
+                                "rate": 0.0428, "turn": True}, *sofr_inst[1:]]
+    cases = [
+        case("t8-fwd-ois", "rates.curve.forward", {"curve": disc_curve, "start": START, "end": END, "day_count": "ACT_360"}),
+        case("t8-fwd-term", "rates.curve.forward", {"curve": proj_curve, "start": START, "end": END, "day_count": "ACT_360"}),
+        case("t8-joint", "rates.curve.joint_solve", {"as_of": AS_OF, "curves": [
+            {"name": "USD-SOFR", "type": "OIS", "convention": "SOFR", "interpolation": "LOG_LINEAR_DF"},
+            {"name": "USD-TERM-3M", "type": "PROJECTION", "index": "USD-TERM-3M", "discount": "USD-SOFR",
+             "interpolation": "LOG_LINEAR_DF"}], "instruments": sofr_inst + term_inst}),
+        case("t8-zero-jac", "risk.curve.jacobian", {"as_of": AS_OF, "convention": "SOFR", "quotes": OIS_QUOTES,
+                                                    "interpolation": "LOG_LINEAR_DF", "bump_bp": 1.0}),
+        case("t8-turn", "rates.curve.joint_solve", {"as_of": AS_OF, "curves": [
+            {"name": "USD-SOFR", "type": "OIS", "convention": "SOFR", "interpolation": "LOG_LINEAR_DF",
+             "turns": [{"date": "2026-12-31"}]}], "instruments": turn_inst}),
+        *[ois_bootstrap(f"t8-{m}", m) for m in METHODS],
+    ]
+    fwd_ois, fwd_term, joint, zero_jac, turned, *by_method = batch(cli, cases)
+    f_ois, f_term = fwd_ois["outputs"]["forward"], fwd_term["outputs"]["forward"]
+    err = max(disc["diagnostics"]["max_repricing_error"], proj["diagnostics"]["max_repricing_error"])
+    print(f"SOFR curve {len(disc_curve['pillars'])} pillars, term curve {len(proj_curve['pillars'])}, "
+          f"both reprice below 1e-13: {err < 1e-13}")
+    print(f"SOFR 10Y discount factor {disc_curve['pillars'][-1]['discount_factor']:.12f}")
+    print(f"TERM 10Y discount factor {proj_curve['pillars'][-1]['discount_factor']:.12f}")
+    print(f"3M forward from {START}: SOFR {f_ois:.4%}  TERM {f_term:.4%}  basis {(f_term - f_ois) * 1e4:.2f} bp")
+
+    solved = joint["outputs"]
+    jac = solved["jacobian"]
+    row = {u: k for k, u in enumerate(jac["unknowns"])}
+    col = {q: k for k, q in enumerate(jac["quotes"])}
+
+    def J(unknown, quote):
+        return jac["matrix"][row[unknown]][col[quote]]
+
+    term10, sofr10 = "USD-TERM-3M:pillar:2036-11-12", "USD-SOFR:pillar:2036-11-14"
+    print(f"joint TERM 10Y discount factor {solved['curves'][1]['pillars'][-1]['discount_factor']:.12f}")
+    print(f"J[TERM 10Y, T-SWAP120] {J(term10, 'T-SWAP120'):.4f}  J[TERM 10Y, SOFR-10Y] {J(term10, 'SOFR-10Y'):.4f}")
+    print(f"J[SOFR 10Y, T-SWAP120] is exactly zero: {J(sofr10, 'T-SWAP120') == 0.0}")
+
+    t10 = (date(2036, 11, 14) - date.fromisoformat(AS_OF)).days / 365
+    print(f"dz(SOFR 10Y)/dq(SOFR-10Y): bump {zero_jac['outputs']['jacobian'][-1][-1]:.4f}  "
+          f"joint -J/t {-J(sofr10, 'SOFR-10Y') / t10:.4f}")
+
+    sens = turned["outputs"]["turn_sensitivity"][0]
+    print(f"turn factor {turned['outputs']['turn_factors'][0]['factor']:.8f}")
+    print(f"turn sensitivity: SOFR-1M zero {abs(sens[0]) < 1e-12}  SOFR-2M {sens[1]:.4f}  SOFR-3M {sens[2]:.4f}")
+
+    batch_inspect = [case(f"t8-inspect-{m}", "rates.curve.inspect",
+                          {"curve": curve(r["outputs"]["pillars"], m), "dates": PROBE})
+                     for m, r in zip(METHODS, by_method)]
+    for m, r, ins in zip(METHODS, by_method, batch(cli, batch_inspect)):
+        fwd = ins["outputs"]["instantaneous_forwards"]
+        print(f"{m:<16}10Y DF {r['outputs']['pillars'][-1]['discount_factor']:.6f}  "
+              f"fwd {PROBE[0]} {fwd[0]:.4%}  fwd {PROBE[1]} {fwd[1]:.4%}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python multicurve.py
+uv run --project python python examples/tutorials/t8_multicurve.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -141,14 +189,14 @@ MONOTONE_CONVEX 10Y DF 0.694601  fwd 2028-05-15 3.3547%  fwd 2033-11-15 3.7611%
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_multicurve.py` sends the same operations, `rates.ois.bootstrap`, `rates.projection.bootstrap`, `rates.curve.forward`, `rates.curve.joint_solve` (twice, the second with a turn), `risk.curve.jacobian` and `rates.curve.inspect`, to whichever CLI you name and prints the same lines. It uses only the Python standard library.
+`examples/tutorials/t8_multicurve.py` sends the same operations, `rates.ois.bootstrap`, `rates.projection.bootstrap`, `rates.curve.forward`, `rates.curve.joint_solve` (twice, the second with a turn), `risk.curve.jacobian` and `rates.curve.inspect`, to whichever CLI you name and prints the same lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_multicurve.py rust/target/release/quantforge
+python examples/tutorials/t8_multicurve.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -156,7 +204,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_multicurve.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t8_multicurve.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -164,7 +212,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_multicurve.py cpp26/build/quantforge
+python examples/tutorials/t8_multicurve.py cpp26/build/quantforge
 ```
 
 Each prints the lines shown in step 1, digit for digit at the printed precision. The Jacobian entries are printed to four decimals because the spec's `jacobian` tolerance class allows `1e-9 + 1e-6 |ref|` between builds (a build may form `∂R/∂x` by central differences); on this run all four languages agreed at that precision. The full check is `python conformance/runner/runner.py --impl rust --suite joint_f`.

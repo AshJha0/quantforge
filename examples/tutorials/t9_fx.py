@@ -1,17 +1,16 @@
-#!/usr/bin/env python3
-"""Tutorial 9 through any language's CLI: FX forwards, a cross-currency swap and FX options.
+"""Tutorial 9: FX forwards, a cross-currency swap and FX options.
 
-  python examples/tutorial_fx.py rust/target/release/quantforge
-  python examples/tutorial_fx.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t9_fx.py         # Python
+  python examples/tutorials/t9_fx.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the cases of docs/getting-started/tutorial-9-fx.md to
-`quantforge batch` and prints the same lines as the Python section of the tutorial.
+It sends the cases of docs/getting-started/tutorial-9-fx.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 Run it from the repository root: the curves are read from examples/*.json (synthetic data).
 """
 import json
-import shutil
-import subprocess
 import sys
+
+from qf import runner
 
 EURUSD = {"spot": 1.085, "expiry_years": 0.2493150684931507, "domestic_rate": 0.043, "foreign_rate": 0.031}
 USDJPY = {"spot": 151.2, "expiry_years": 0.4986301369863014, "domestic_rate": 0.001, "foreign_rate": 0.045}
@@ -26,10 +25,8 @@ def case(case_id, operation, inputs):
     return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -37,7 +34,7 @@ def batch(cli, cases):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     g = example("fx_forward_outright")
     market = {"pair": "GBPUSD", "spot": 1.28, "as_of": "2026-11-06",
               "base_curve": g["base_curve"], "quote_curve": g["quote_curve"]}
@@ -82,6 +79,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

@@ -15,15 +15,25 @@ Terms used here are defined in the [glossary, stage E section](../../GLOSSARY.md
 
 The inputs come from three golden files: case `garch_e-0028` (250 returns), case `garch_f-0009` (2,000 returns simulated with `omega = 2e-6`, `alpha = 0.08`, `beta = 0.90`, seed 20261109) and case `vix_e-0007` (two strips around 30 days). The term structure is `examples/vol_forward_term_e.json`.
 
-Save the block as `vol_indices.py` (or paste it into `uv run --project python python -`):
+The script `examples/tutorials/t13_vol_indices.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t13_vol_indices.py -->
 ```python
+"""Tutorial 13: fit GARCH(1,1), forecast vol, build a VIX-style index.
+
+  uv run --project python python examples/tutorials/t13_vol_indices.py         # Python
+  python examples/tutorials/t13_vol_indices.py rust/target/release/quantforge  # or any other build
+
+It sends the cases of docs/getting-started/tutorial-13-vol-indices.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines. Inputs are
+synthetic and come from golden cases garch_e-0028, garch_f-0009 and vix_e-0007, and from
+examples/vol_forward_term_e.json.
+"""
 import json
 import math
+import sys
 
-from quantforge_core import arb_surface, variance
-from quantforge_core.variance import Quote
+from qf import runner
 
 
 def golden(path, case_id):
@@ -33,53 +43,63 @@ def golden(path, case_id):
     return next(c["inputs"] for c in cases if c["case_id"] == case_id)
 
 
-# Synthetic inputs from the golden files.
-r250 = golden("datasets/golden/stage_e_b/garch_e.json", "garch_e-0028")["returns"]
-r2000 = golden("datasets/golden/stage_f/garch_f.json", "garch_f-0009")["returns"]
-vix = golden("datasets/golden/stage_e_b/vix_e.json", "vix_e-0007")
-with open("examples/vol_forward_term_e.json", encoding="utf-8") as f:
-    term = json.load(f)["inputs"]
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
-# 1. Fit GARCH(1,1) by maximum likelihood; vol.garch.fit returns only the log-likelihood.
-fit_loglik = variance.garch_fit(r250, "SAMPLE")
 
-# 2. Estimate with standard errors (observed information), Gaussian, no demeaning.
-est = variance.garch_estimate(r2000, "SAMPLE", "NORMAL", False)
-w, a, b = est["omega"], est["alpha"], est["beta"]
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return [r["outputs"] for r in results]
 
-# 3. Run the recursion at the estimate to get tomorrow's variance, then forecast 21 days.
-_, _, nxt = variance.garch_loglik_t(r2000, w, a, b, "SAMPLE", "NORMAL", None, 0.0)
-_, _, vol21, long_run = variance.garch_forecast(w, a, b, nxt, 21, 252.0)
 
-# 4. VIX-style index from a near and a next strip (Cboe method, rate and minutes given).
-def term_input(t):
-    strip = [Quote(q["strike"], q["call_bid"], q["call_ask"], q["put_bid"], q["put_ask"])
-             for q in t["strip"]]
-    return t["minutes_to_expiry"], t["rate"], strip
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    r250 = golden("datasets/golden/stage_e_b/garch_e.json", "garch_e-0028")["returns"]
+    r2000 = golden("datasets/golden/stage_f/garch_f.json", "garch_f-0009")["returns"]
+    vix = golden("datasets/golden/stage_e_b/vix_e.json", "vix_e-0007")
+    with open("examples/vol_forward_term_e.json", encoding="utf-8") as f:
+        term = json.load(f)["inputs"]
 
-forward, k0, _, _ = variance.vix_term_variance(*term_input(vix["near"]))
-index, near_var, next_var = variance.vix_index(term_input(vix["near"]), term_input(vix["next"]))
+    fit, est = batch(cli, [
+        case("t13-fit", "vol.garch.fit", {"returns": r250, "initial_variance": "SAMPLE"}),
+        case("t13-est", "vol.garch.estimate", {"returns": r2000, "initial_variance": "SAMPLE",
+                                               "distribution": "NORMAL", "demean": False})])
+    weights = {k: est[k] for k in ("omega", "alpha", "beta")}
+    [ll] = batch(cli, [case("t13-ll", "vol.garch.loglik",
+                            {"returns": r2000, "initial_variance": "SAMPLE", **weights})])
+    nxt = ll["next_variance"]
+    fc, near, index, fwd = batch(cli, [
+        case("t13-fc", "vol.garch.forecast", {**weights, "next_variance": nxt, "horizon": 21,
+                                              "periods_per_year": 252.0}),
+        case("t13-near", "vol.vix.term_variance", vix["near"]),
+        case("t13-index", "vol.vix.index", vix),
+        case("t13-fwd", "vol.forward.vol", term)])
+    se = est["std_errors"]
 
-# 5. Forward vols between consecutive expiries of an ATM term structure.
-fwd = arb_surface.forward_vols(term["expiry_years"], term["vols"])
+    print(f"fit loglik, 250 returns  {fit['loglik']:.4f}")
+    print(f"omega {est['omega']:.4e}  SE {se['omega']:.3e}")
+    print(f"alpha {est['alpha']:.6f}  SE {se['alpha']:.6f}")
+    print(f"beta  {est['beta']:.6f}  SE {se['beta']:.6f}")
+    print(f"persistence {est['persistence']:.6f}")
+    print(f"next-day vol, annualised {math.sqrt(nxt * 252):.4f}")
+    print(f"21-day forecast vol      {fc['annualized_vol']:.4f}")
+    print(f"long-run vol             {math.sqrt(fc['long_run_variance'] * 252):.4f}")
+    print(f"near forward {near['forward']:.4f}  K0 {near['k0']:.1f}")
+    print(f"near variance {index['near_variance']:.6f}  next variance {index['next_variance']:.6f}")
+    print(f"VIX-style index {index['index']:.4f}")
+    print("forward vols " + " ".join(f"{v:.4f}" for v in fwd["forward_vols"]))
 
-se = est["std_errors"]
-print(f"fit loglik, 250 returns  {fit_loglik:.4f}")
-print(f"omega {w:.4e}  SE {se['omega']:.3e}")
-print(f"alpha {a:.6f}  SE {se['alpha']:.6f}")
-print(f"beta  {b:.6f}  SE {se['beta']:.6f}")
-print(f"persistence {est['persistence']:.6f}")
-print(f"next-day vol, annualised {math.sqrt(nxt * 252):.4f}")
-print(f"21-day forecast vol      {vol21:.4f}")
-print(f"long-run vol             {math.sqrt(long_run * 252):.4f}")
-print(f"near forward {forward:.4f}  K0 {k0:.1f}")
-print(f"near variance {near_var:.6f}  next variance {next_var:.6f}")
-print(f"VIX-style index {index:.4f}")
-print("forward vols " + " ".join(f"{v:.4f}" for v in fwd))
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python vol_indices.py
+uv run --project python python examples/tutorials/t13_vol_indices.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -121,14 +141,14 @@ Forward vol ([`local-and-forward-vol.md`](../../specifications/05-volatility/loc
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_vol_indices.py` sends the same six operations, `vol.garch.fit`, `vol.garch.estimate`, `vol.garch.loglik`, `vol.garch.forecast`, `vol.vix.term_variance`, `vol.vix.index` and `vol.forward.vol`, to whichever CLI you name (`specifications/cli-contract.md`) and prints the same lines. It uses only the Python standard library.
+`examples/tutorials/t13_vol_indices.py` sends the same seven operations, `vol.garch.fit`, `vol.garch.estimate`, `vol.garch.loglik`, `vol.garch.forecast`, `vol.vix.term_variance`, `vol.vix.index` and `vol.forward.vol`, to whichever CLI you name (`specifications/cli-contract.md`) and prints the same lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_vol_indices.py rust/target/release/quantforge
+python examples/tutorials/t13_vol_indices.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -136,7 +156,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_vol_indices.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t13_vol_indices.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -144,7 +164,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_vol_indices.py cpp26/build/quantforge
+python examples/tutorials/t13_vol_indices.py cpp26/build/quantforge
 ```
 
 Each prints the twelve lines of step 1. The precision printed is chosen to sit inside the cross-language tolerances: the fit is judged to 1e-6 on the log-likelihood, estimated parameters to 1e-6 relative and standard errors to 1e-5 relative (`garch.md`, stage F acceptance), so the page prints six significant digits of parameters and four of standard errors. Every language printed the same digits in this run.

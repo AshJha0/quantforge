@@ -1,16 +1,15 @@
-#!/usr/bin/env python3
-"""Tutorial 15 through any language's CLI: AAD ladder, Monte Carlo Greeks, model reserve, FRTB, SIMM.
+"""Tutorial 15: AAD ladder, Monte Carlo Greeks, model reserve, FRTB, SIMM.
 
-  python examples/tutorial_advanced_risk.py rust/target/release/quantforge
-  python examples/tutorial_advanced_risk.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t15_advanced_risk.py         # Python
+  python examples/tutorials/t15_advanced_risk.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the cases of docs/getting-started/tutorial-15-advanced-risk.md to
-`quantforge batch` and prints the same lines as the Python section of the tutorial.
+It sends the cases of docs/getting-started/tutorial-15-advanced-risk.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import json
-import shutil
-import subprocess
 import sys
+
+from qf import runner
 
 CURVE = {"times": [0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
                    10.005479452054795, 15.01095890410959, 20.013698630136986, 30.019178082191782],
@@ -43,10 +42,8 @@ def case(case_id, operation, inputs):
     return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -54,7 +51,7 @@ def batch(cli, cases):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     lad, g1, g2, r, v, c, m = batch(cli, [
         case("t15-ladder", "rates.shortrate.bermudan_ladder", LADDER),
         *[case(f"t15-mc-{k}", "risk.mc.greeks", {**OPTION, "method": k}) for k in METHODS],
@@ -75,6 +72,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

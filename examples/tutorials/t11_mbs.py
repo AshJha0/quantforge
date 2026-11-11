@@ -1,17 +1,16 @@
-#!/usr/bin/env python3
-"""Tutorial 11 through any language's CLI: prepayment (PSA against CPR), pass-through cash flows,
+"""Tutorial 11: prepayment (PSA against CPR), pass-through cash flows,
 price, modified duration and WAL, and price at bumped yields and speeds.
 
-  python examples/tutorial_mbs.py rust/target/release/quantforge
-  python examples/tutorial_mbs.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t11_mbs.py         # Python
+  python examples/tutorials/t11_mbs.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the cases of docs/getting-started/tutorial-11-mbs.md to
-`quantforge batch` and prints the same lines as the Python section of the tutorial.
+It sends the cases of docs/getting-started/tutorial-11-mbs.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import json
-import shutil
-import subprocess
 import sys
+
+from qf import runner
 
 
 def pool(model, speed):
@@ -28,10 +27,8 @@ def price_case(case_id, model, speed, y):
     return case(case_id, "mbs.price", {"pool": pool(model, speed), "yield": y, "delay_days": 24})
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -39,7 +36,7 @@ def batch(cli, cases):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     models = (("PSA", 100.0), ("CPR", 0.06))
     flows = batch(cli, [case(f"t11-flows-{m}", "mbs.cashflows", {"pool": pool(m, s)}) for m, s in models])
     for (model, speed), f in zip(models, flows):
@@ -58,6 +55,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

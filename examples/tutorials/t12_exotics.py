@@ -1,17 +1,16 @@
-#!/usr/bin/env python3
-"""Tutorial 12 through any language's CLI: American puts, a barrier call, Heston and local-vol calls.
+"""Tutorial 12: American puts, a barrier call, Heston and local-vol calls.
 
-  python examples/tutorial_exotics.py rust/target/release/quantforge
-  python examples/tutorial_exotics.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t12_exotics.py         # Python
+  python examples/tutorials/t12_exotics.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the cases of docs/getting-started/tutorial-12-exotics.md to
-`quantforge batch` and prints the same lines as the Python section of the tutorial.
+It sends the cases of docs/getting-started/tutorial-12-exotics.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import json
 import math
-import shutil
-import subprocess
 import sys
+
+from qf import runner
 
 S, K, T, R, Q, VOL = 100.0, 100.0, 1.0, 0.05, 0.02, 0.25
 COMMON = {"spot": S, "strike": K, "expiry_years": T, "rate": R, "dividend_yield": Q, "vol": VOL}
@@ -25,10 +24,8 @@ def case(case_id, operation, inputs):
     return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -36,7 +33,7 @@ def batch(cli, cases):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     k = math.log(K / (S * math.exp((R - Q) * T)))  # forward log-moneyness of the strike
     put = {**COMMON, "option_type": "PUT"}
     euro, baw, crr, fd, call, cont, daily, weekly, hes, lv = batch(cli, [
@@ -73,6 +70,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

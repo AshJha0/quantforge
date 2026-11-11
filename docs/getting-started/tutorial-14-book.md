@@ -16,61 +16,93 @@ This tutorial runs the three operations that do this: `book.lifecycle.apply`, `b
 uv sync --locked --project python
 ```
 
-Save the next block as `book.py`:
+The script `examples/tutorials/t14_book.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t14_book.py -->
 ```python
-from datetime import date
+"""Tutorial 14: book lifecycle events, end-of-day marks, P&L explain.
 
-from quantforge_core import book, risk_curve
-from quantforge_core.book import Event, Source
-from quantforge_core.ois import OisTrade, Quote
-from quantforge_core.risk_curve import Product
+  uv run --project python python examples/tutorials/t14_book.py         # Python
+  python examples/tutorials/t14_book.py rust/target/release/quantforge  # or any other build
 
-# 1. Lifecycle: an opening book, then a week of events (synthetic, not market data).
-opening = [("SPX-C-6000", 5.0, 42.0), ("BOND-X", 1000.0, 0.97)]
-events = [
-    Event(date(2026, 11, 2), "TRADE", "UST10", 100.0, 99.5),
-    Event(date(2026, 11, 2), "FIXING", index="SOFR", value=0.0431),
-    Event(date(2026, 11, 3), "TRADE", "UST10", 50.0, 100.25),
-    Event(date(2026, 11, 4), "TRADE", "UST10", -120.0, 100.5),
-    Event(date(2026, 11, 20), "DEFAULT", "BOND-X", price=0.38),
-    Event(date(2026, 12, 18), "EXPIRY", "SPX-C-6000", price=57.25),
+It sends the three cases of docs/getting-started/tutorial-14-book.md through examples/tutorials/qf.py,
+to the Python package or to the build named, and prints the page's lines.
+"""
+import json
+import sys
+
+from qf import runner
+
+OPENING = [{"instrument": "SPX-C-6000", "quantity": 5.0, "average_cost": 42.0},
+           {"instrument": "BOND-X", "quantity": 1000.0, "average_cost": 0.97}]
+EVENTS = [
+    {"date": "2026-11-02", "type": "TRADE", "instrument": "UST10", "quantity": 100.0, "price": 99.5},
+    {"date": "2026-11-02", "type": "FIXING", "index": "SOFR", "value": 0.0431},
+    {"date": "2026-11-03", "type": "TRADE", "instrument": "UST10", "quantity": 50.0, "price": 100.25},
+    {"date": "2026-11-04", "type": "TRADE", "instrument": "UST10", "quantity": -120.0, "price": 100.5},
+    {"date": "2026-11-20", "type": "DEFAULT", "instrument": "BOND-X", "recovery_price": 0.38},
+    {"date": "2026-12-18", "type": "EXPIRY", "instrument": "SPX-C-6000", "settlement_price": 57.25},
 ]
-after = book.lifecycle_apply(opening, events)
-for p in after["positions"]:
-    print(f"hold {p['instrument']} {p['quantity']:.0f} @ {p['average_cost']:.4f}")
-for r in after["realized_pnl"]:
-    print(f"realised {r['instrument']:<10} {r['pnl']:10.2f}")
-print(f"realised total {after['total_realized']:.2f}, fixings kept {len(after['fixings'])}")
-
-# 2. End-of-day marks: two vendors in priority order, a 3-day stale limit, an IPV check at 0.5%.
-sources = [
-    Source("VENDOR_A", (("UST10", date(2026, 11, 10), 99.75), ("SPX", date(2026, 11, 7), 6012.5))),
-    Source("VENDOR_B", (("BUND10", date(2026, 11, 10), 131.2), ("UST10", date(2026, 11, 10), 99.8),
-                        ("SPX", date(2026, 11, 9), 6020.0), ("ILLIQ", date(2026, 11, 1), 88.0))),
+SOURCES = [
+    {"name": "VENDOR_A", "quotes": [{"instrument": "UST10", "date": "2026-11-10", "price": 99.75},
+                                    {"instrument": "SPX", "date": "2026-11-07", "price": 6012.5}]},
+    {"name": "VENDOR_B", "quotes": [{"instrument": "BUND10", "date": "2026-11-10", "price": 131.2},
+                                    {"instrument": "UST10", "date": "2026-11-10", "price": 99.8},
+                                    {"instrument": "SPX", "date": "2026-11-09", "price": 6020.0},
+                                    {"instrument": "ILLIQ", "date": "2026-11-01", "price": 88.0}]},
 ]
-ipv = [("UST10", 99.7), ("BUND10", 130.0)]
-marks = book.marks_resolve(date(2026, 11, 10), ["UST10", "BUND10", "SPX", "ILLIQ"], sources, 3, ipv, 0.005)
-for m in marks["marks"]:
-    price = "-" if m["price"] is None else f"{m['price']:.2f} from {m['source']}"
-    diff = "-" if m["ipv_diff"] is None else f"{m['ipv_diff']:+.6f}"
-    print(f"mark {m['instrument']:<6} {m['status']:<8} {price:<20} ipv {diff} breach {m['ipv_breach']}")
+MARKS = {"as_of": "2026-11-10", "instruments": ["UST10", "BUND10", "SPX", "ILLIQ"], "sources": SOURCES,
+         "max_age_days": 3, "ipv": [{"instrument": "UST10", "price": 99.7}, {"instrument": "BUND10", "price": 130.0}],
+         "ipv_threshold": 0.005}
+TENORS = ["1W", "1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "15Y", "20Y", "30Y"]
+RATES = [0.0387, 0.0386, 0.0383, 0.0377, 0.0365, 0.035, 0.0345, 0.035, 0.036, 0.0375, 0.039, 0.0395, 0.0385]
+EXPLAIN = {"as_of": "2026-11-06", "convention": "SOFR", "interpolation": "LOG_LINEAR_DF",
+           "quotes_start": [{"tenor": t, "rate": r} for t, r in zip(TENORS, RATES)],
+           "quotes_end": [{"tenor": t, "rate": r + 0.0001} for t, r in zip(TENORS, RATES)],
+           "product": {"kind": "OIS", "trade": {"convention": "SOFR", "tenor": "2Y", "fixed_rate": 0.0345,
+                                                "notional": 25_000_000.0, "side": "RECEIVE"}},
+           "bump_bp": 1.0}
 
-# 3. P&L explain: receive 3.45% on a 2Y SOFR swap, the whole curve up 1bp.
-tenors = ["1W", "1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "15Y", "20Y", "30Y"]
-rates = [0.0387, 0.0386, 0.0383, 0.0377, 0.0365, 0.035, 0.0345, 0.035, 0.036, 0.0375, 0.039, 0.0395, 0.0385]
-start = [Quote(t, r) for t, r in zip(tenors, rates)]
-end = [Quote(t, r + 0.0001) for t, r in zip(tenors, rates)]
-swap = Product("OIS", trade=OisTrade("SOFR", "2Y", 0.0345, 25_000_000.0, "RECEIVE"))
-x = risk_curve.pnl_explain(date(2026, 11, 6), "SOFR", "LOG_LINEAR_DF", start, end, swap, 1.0)
-print(f"full P&L    {x['full_pnl']:.2f}")
-print(f"risk P&L    {x['risk_pnl']:.2f}")
-print(f"unexplained {x['unexplained']:.2f} (threshold {x['threshold']:.2f}) explained {x['explained']}")
+
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
+
+
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return [r["outputs"] for r in results]
+
+
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    after, marks, x = batch(cli, [
+        case("t14-life", "book.lifecycle.apply", {"positions": OPENING, "events": EVENTS}),
+        case("t14-marks", "book.marks.resolve", MARKS),
+        case("t14-explain", "risk.pnl.explain", EXPLAIN)])
+    for p in after["positions"]:
+        print(f"hold {p['instrument']} {p['quantity']:.0f} @ {p['average_cost']:.4f}")
+    for r in after["realized_pnl"]:
+        print(f"realised {r['instrument']:<10} {r['pnl']:10.2f}")
+    print(f"realised total {after['total_realized']:.2f}, fixings kept {len(after['fixings'])}")
+    for m in marks["marks"]:
+        price = "-" if m["price"] is None else f"{m['price']:.2f} from {m['source']}"
+        diff = "-" if m["ipv_diff"] is None else f"{m['ipv_diff']:+.6f}"
+        print(f"mark {m['instrument']:<6} {m['status']:<8} {price:<20} ipv {diff} breach {m['ipv_breach']}")
+    print(f"full P&L    {x['full_pnl']:.2f}")
+    print(f"risk P&L    {x['risk_pnl']:.2f}")
+    print(f"unexplained {x['unexplained']:.2f} (threshold {x['threshold']:.2f}) explained {x['explained']}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python book.py
+uv run --project python python examples/tutorials/t14_book.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -125,14 +157,14 @@ The lifecycle and marks rules are in `specifications/07-portfolio/book-lifecycle
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_book.py` sends the three operations to whichever CLI you name and prints the same lines. It uses only the Python standard library.
+`examples/tutorials/t14_book.py` sends the three operations to whichever CLI you name and prints the same lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_book.py rust/target/release/quantforge
+python examples/tutorials/t14_book.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -140,7 +172,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_book.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t14_book.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -148,7 +180,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_book.py cpp26/build/quantforge
+python examples/tutorials/t14_book.py cpp26/build/quantforge
 ```
 
 Each prints the lines shown in step 1, digit for digit. The lifecycle and marks rules are exact arithmetic; the P&L figures are printed to the cent, far coarser than the tolerance of the curve solves (`conformance/tolerances`).

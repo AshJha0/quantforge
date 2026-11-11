@@ -16,53 +16,90 @@ This tutorial runs one example of each: `rates.shortrate.bermudan_ladder`, `risk
 uv sync --locked --project python
 ```
 
-Save the next block as `advanced_risk.py`:
+The script `examples/tutorials/t15_advanced_risk.py`, in full (CI checks this listing equals the file):
 
-<!-- tutorial:run python -->
+<!-- tutorial:source examples/tutorials/t15_advanced_risk.py -->
 ```python
-from quantforge_core import aad_ladder, frtb, mc_greeks, xva
+"""Tutorial 15: AAD ladder, Monte Carlo Greeks, model reserve, FRTB, SIMM.
 
-# 1. AAD ladder: a 1y-into-5y Bermudan payer swaption on 1,000,000, Hull-White a = 5%, sigma = 1%.
-times = [0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
-         10.005479452054795, 15.01095890410959, 20.013698630136986, 30.019178082191782]
-dfs = [0.98085, 0.9619, 0.9254, 0.8906, 0.8242, 0.762, 0.6787, 0.561, 0.467, 0.332]
-lad = aad_ladder.bermudan_ladder(times, dfs, 0.05, 0.01, False, 1.0, [2.0, 3.0, 4.0, 5.0, 6.0],
-                                 0.039462, "PAYER", 1_000_000.0, [1.0, 2.0, 3.0, 4.0, 5.0], 101, 50, 6.0)
-print(f"bermudan price {lad['price']:.4f}")
-print("dV/dP " + " ".join(f"{g:.1f}" for g in lad["d_price_d_discount_factors"][:6]))
-print(f"dV/da {lad['d_price_d_mean_reversion']:.1f}  dV/dsigma {lad['d_price_d_sigma']:.1f}")
+  uv run --project python python examples/tutorials/t15_advanced_risk.py         # Python
+  python examples/tutorials/t15_advanced_risk.py rust/target/release/quantforge  # or any other build
 
-# 2. Monte Carlo Greeks of a 1Y at-the-money call, 10,000 paths, the same seed for both methods.
-for method in ("PATHWISE", "LIKELIHOOD_RATIO"):
-    g = mc_greeks.greeks(100.0, 100.0, 1.0, 0.03, 0.01, 0.2, "CALL", method, 10_000, 20261109, None, None)
-    print(f"{method:<16} delta {g['delta']:.6f} +- {g['delta_se']:.6f}  vega {g['vega']:.4f} +- {g['vega_se']:.4f}")
+It sends the cases of docs/getting-started/tutorial-15-advanced-risk.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
+"""
+import json
+import sys
 
-# 3. Model reserve: one down-and-out call priced by three models that fit the same vanillas.
-r = xva.dispersion({"HESTON": 4.1832, "LOCAL_VOL": 4.6021, "SLV": 4.3907}, "SLV")
-print(f"reserve {r['reserve']:.4f} ({r['relative_reserve']:.4%}) worst {r['worst_model']} range {r['range']:.4f}")
+from qf import runner
 
-# 4. FRTB standardised approach: GIRR vega and curvature, three correlation scenarios each.
-v = frtb.vega("GIRR", [("EUR", None, 1.0, 5.0, 1_000_000.0), ("EUR", None, 5.0, 10.0, -600_000.0),
-                       ("USD", None, 1.0, 5.0, 800_000.0)])
-print(f"FRTB vega      {v['capital']:.2f} ({v['binding_scenario']}); medium K_EUR {v['scenarios']['medium']['buckets'][0]['k']:.2f}")
-c = frtb.curvature("GIRR", [("EUR", None, 500_000.0, 300_000.0), ("USD", None, -200_000.0, 400_000.0)], False)
-picks = ", ".join(f"{b['bucket']} {b['selected']}" for b in c["scenarios"]["high"]["buckets"])
-print(f"FRTB curvature {c['capital']:.2f} ({c['binding_scenario']}); {picks}")
-
-# 5. SIMM-style IR delta margin: six tenor buckets, given risk weights and correlations.
-rho = [[1.0, 0.659754, 0.535887, 0.407091, 0.33066, 0.237818],
+CURVE = {"times": [0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
+                   10.005479452054795, 15.01095890410959, 20.013698630136986, 30.019178082191782],
+         "discount_factors": [0.98085, 0.9619, 0.9254, 0.8906, 0.8242, 0.762, 0.6787, 0.561, 0.467, 0.332]}
+LADDER = {"mean_reversion": 0.05, "sigma": 0.01, "curve": CURVE, "notional": 1_000_000.0, "start_years": 1.0,
+          "payment_times": [2.0, 3.0, 4.0, 5.0, 6.0], "grid": {"nx": 101, "steps_per_year": 50, "width": 6.0},
+          "fixed_rate": 0.039462, "swaption_type": "PAYER", "exercise_times": [1.0, 2.0, 3.0, 4.0, 5.0]}
+OPTION = {"spot": 100.0, "strike": 100.0, "expiry_years": 1.0, "rate": 0.03, "dividend_yield": 0.01, "vol": 0.2,
+          "paths": 10_000, "seed": "20261109", "payoff": "CALL"}
+RESERVE = {"prices": {"HESTON": 4.1832, "LOCAL_VOL": 4.6021, "SLV": 4.3907}, "reference_model": "SLV"}
+VEGA = {"risk_class": "GIRR", "sensitivities": [
+    {"bucket": "EUR", "option_maturity": 1.0, "underlying_maturity": 5.0, "vega": 1_000_000.0},
+    {"bucket": "EUR", "option_maturity": 5.0, "underlying_maturity": 10.0, "vega": -600_000.0},
+    {"bucket": "USD", "option_maturity": 1.0, "underlying_maturity": 5.0, "vega": 800_000.0}]}
+CURVATURE = {"risk_class": "GIRR", "factors": [{"bucket": "EUR", "cvr_up": 500_000.0, "cvr_down": 300_000.0},
+                                               {"bucket": "USD", "cvr_up": -200_000.0, "cvr_down": 400_000.0}]}
+RHO = [[1.0, 0.659754, 0.535887, 0.407091, 0.33066, 0.237818],
        [0.659754, 1.0, 0.812252, 0.617034, 0.501187, 0.360465],
        [0.535887, 0.812252, 1.0, 0.759658, 0.617034, 0.443785],
        [0.407091, 0.617034, 0.759658, 1.0, 0.812252, 0.584191],
        [0.33066, 0.501187, 0.617034, 0.812252, 1.0, 0.719223],
        [0.237818, 0.360465, 0.443785, 0.584191, 0.719223, 1.0]]
-m = xva.simm_ir_delta([1000.0, -500.0, 2500.0, 4000.0, -1200.0, 300.0],
-                      [109.0, 105.0, 90.0, 71.0, 66.0, 66.0], rho, 1e9)
-print(f"SIMM IR delta margin {m['margin']:.2f} (CR {m['concentration_factor']:.1f})")
+SIMM = {"sensitivities": [1000.0, -500.0, 2500.0, 4000.0, -1200.0, 300.0],
+        "risk_weights": [109.0, 105.0, 90.0, 71.0, 66.0, 66.0], "correlations": RHO,
+        "concentration_threshold": 1e9}
+METHODS = ("PATHWISE", "LIKELIHOOD_RATIO")
+
+
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
+
+
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return [r["outputs"] for r in results]
+
+
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    lad, g1, g2, r, v, c, m = batch(cli, [
+        case("t15-ladder", "rates.shortrate.bermudan_ladder", LADDER),
+        *[case(f"t15-mc-{k}", "risk.mc.greeks", {**OPTION, "method": k}) for k in METHODS],
+        case("t15-reserve", "risk.model_reserve.dispersion", RESERVE),
+        case("t15-vega", "risk.frtb.vega", VEGA),
+        case("t15-curv", "risk.frtb.curvature", CURVATURE),
+        case("t15-simm", "xva.simm.ir_delta", SIMM)])
+    print(f"bermudan price {lad['price']:.4f}")
+    print("dV/dP " + " ".join(f"{x:.1f}" for x in lad["d_price_d_discount_factors"][:6]))
+    print(f"dV/da {lad['d_price_d_mean_reversion']:.1f}  dV/dsigma {lad['d_price_d_sigma']:.1f}")
+    for method, g in zip(METHODS, (g1, g2)):
+        print(f"{method:<16} delta {g['delta']:.6f} +- {g['delta_se']:.6f}  vega {g['vega']:.4f} +- {g['vega_se']:.4f}")
+    print(f"reserve {r['reserve']:.4f} ({r['relative_reserve']:.4%}) worst {r['worst_model']} range {r['range']:.4f}")
+    print(f"FRTB vega      {v['capital']:.2f} ({v['binding_scenario']}); medium K_EUR {v['scenarios']['medium']['buckets'][0]['k']:.2f}")
+    picks = ", ".join(f"{b['bucket']} {b['selected']}" for b in c["scenarios"]["high"]["buckets"])
+    print(f"FRTB curvature {c['capital']:.2f} ({c['binding_scenario']}); {picks}")
+    print(f"SIMM IR delta margin {m['margin']:.2f} (CR {m['concentration_factor']:.1f})")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python advanced_risk.py
+uv run --project python python examples/tutorials/t15_advanced_risk.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -130,14 +167,14 @@ SIMM IR delta margin 452205.34 (CR 1.0)
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_advanced_risk.py` sends the seven cases to whichever CLI you name and prints the same lines. It uses only the Python standard library.
+`examples/tutorials/t15_advanced_risk.py` sends the seven cases to whichever CLI you name and prints the same lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_advanced_risk.py rust/target/release/quantforge
+python examples/tutorials/t15_advanced_risk.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -145,7 +182,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_advanced_risk.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t15_advanced_risk.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -153,7 +190,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_advanced_risk.py cpp26/build/quantforge
+python examples/tutorials/t15_advanced_risk.py cpp26/build/quantforge
 ```
 
 Each prints the lines shown in step 1, digit for digit. The Monte Carlo lines agree because all four builds draw the same `core.rng` stream; the ladder agrees because each build's AAD matches the same bump reference within the `aad_sensitivity` tolerance (`conformance/tolerances`), far finer than the one decimal printed.

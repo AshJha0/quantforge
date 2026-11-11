@@ -1,16 +1,15 @@
-#!/usr/bin/env python3
-"""Tutorial 14 through any language's CLI: book lifecycle events, end-of-day marks, P&L explain.
+"""Tutorial 14: book lifecycle events, end-of-day marks, P&L explain.
 
-  python examples/tutorial_book.py rust/target/release/quantforge
-  python examples/tutorial_book.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t14_book.py         # Python
+  python examples/tutorials/t14_book.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the three cases of docs/getting-started/tutorial-14-book.md to
-`quantforge batch` and prints the same lines as the Python section of the tutorial.
+It sends the three cases of docs/getting-started/tutorial-14-book.md through examples/tutorials/qf.py,
+to the Python package or to the build named, and prints the page's lines.
 """
 import json
-import shutil
-import subprocess
 import sys
+
+from qf import runner
 
 OPENING = [{"instrument": "SPX-C-6000", "quantity": 5.0, "average_cost": 42.0},
            {"instrument": "BOND-X", "quantity": 1000.0, "average_cost": 0.97}]
@@ -47,10 +46,8 @@ def case(case_id, operation, inputs):
     return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -58,7 +55,7 @@ def batch(cli, cases):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     after, marks, x = batch(cli, [
         case("t14-life", "book.lifecycle.apply", {"positions": OPENING, "events": EVENTS}),
         case("t14-marks", "book.marks.resolve", MARKS),
@@ -78,6 +75,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

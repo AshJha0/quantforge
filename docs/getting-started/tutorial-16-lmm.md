@@ -13,37 +13,70 @@ Terms used here are in the [glossary, stage G section](../../GLOSSARY.md#stage-g
 
 ## Step 1: Python
 
-<!-- tutorial:run python -->
+The script `examples/tutorials/t16_lmm.py`, in full (CI checks this listing equals the file):
+
+<!-- tutorial:source examples/tutorials/t16_lmm.py -->
 ```python
-from quantforge_core import lmm
+"""Tutorial 16: LMM caplets from an abcd volatility, and a Rebonato swaption.
 
-# Synthetic discount curve: times in years (ACT/365F) and discount factors, log-linear between.
-TIMES = [0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
-         10.005479452054795, 15.01095890410959, 20.013698630136986, 30.019178082191782]
-DFS = [0.98085, 0.9619, 0.9254, 0.8906, 0.8242, 0.762, 0.6787, 0.561, 0.467, 0.332]
-HUMP = (-0.06, 0.17, 0.54, 0.17)       # abcd: a, b, c, d
-SEMI = [0.5 * k for k in range(1, 11)]  # period ends 0.5 .. 5.0: nine caplets fixing 0.5 .. 4.5
+  uv run --project python python examples/tutorials/t16_lmm.py         # Python
+  python examples/tutorials/t16_lmm.py rust/target/release/quantforge  # or any other build
 
-# 1. A 5-year semi-annual cap and floor at 3% on 1 million.
-cap = lmm.capfloor(TIMES, DFS, HUMP, SEMI, 0.03, "CAP", 1_000_000.0)
-floor = lmm.capfloor(TIMES, DFS, HUMP, SEMI, 0.03, "FLOOR", 1_000_000.0)
+It sends the cases of docs/getting-started/tutorial-16-lmm.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines. Inputs are
+synthetic and match golden cases lmmcap_g-0001, lmmcap_g-0003, lmmswn_g-0003 and lmmswn_g-0015.
+"""
+import json
+import sys
 
-# 2. A 5y into 5y payer swaption at 3.5%, annual payments, forward correlation exp(-beta |Ti - Tj|).
-pay = [6.0, 7.0, 8.0, 9.0, 10.0]
-s0 = lmm.swaption_rebonato(TIMES, DFS, HUMP, 0.0, 5.0, pay, 0.035, "PAY", 1_000_000.0)
-s5 = lmm.swaption_rebonato(TIMES, DFS, HUMP, 0.5, 5.0, pay, 0.035, "PAY", 1_000_000.0)
+from qf import runner
 
-print(f"cap price   {cap['price']:.2f}")
-print(f"floor price {floor['price']:.2f}")
-print("caplet Black vols " + " ".join(f"{v:.4f}" for v in cap["black_vols"][:3]))
-print(f"first caplet forward {cap['forward_rates'][0]:.6f}  price {cap['caplet_prices'][0]:.2f}")
-print(f"5y5y swap rate {s0['swap_rate']:.6f}  annuity {s0['annuity']:.6f}")
-print(f"5y5y payer, beta 0.0: vol {s0['black_vol']:.4f}  price {s0['price']:.2f}")
-print(f"5y5y payer, beta 0.5: vol {s5['black_vol']:.4f}  price {s5['price']:.2f}")
+CURVE = {"times": [0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
+                   10.005479452054795, 15.01095890410959, 20.013698630136986, 30.019178082191782],
+         "discount_factors": [0.98085, 0.9619, 0.9254, 0.8906, 0.8242, 0.762, 0.6787, 0.561, 0.467, 0.332]}
+HUMP = {"a": -0.06, "b": 0.17, "c": 0.54, "d": 0.17}
+SEMI = [0.5 * k for k in range(1, 11)]  # fixings 0.5 .. 4.5, last payment 5.0
+
+
+def case(case_id, operation, inputs):
+    return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
+
+
+def batch(run, cases):
+    results = run(cases)
+    for r in results:
+        if r["status"] != "ok":
+            raise SystemExit(f"{r['case_id']}: {r['error']}")
+    return [r["outputs"] for r in results]
+
+
+def main(cli):
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
+    cap_in = {"curve": CURVE, "abcd": HUMP, "period_times": SEMI, "strike": 0.03, "notional": 1_000_000.0}
+    swn_in = {"curve": CURVE, "abcd": HUMP, "expiry_years": 5.0, "payment_times": [6.0, 7.0, 8.0, 9.0, 10.0],
+              "fixed_rate": 0.035, "side": "PAY", "notional": 1_000_000.0}
+    cap, floor, s0, s5 = batch(cli, [
+        case("t16-cap", "rates.lmm.capfloor", {**cap_in, "cap_floor": "CAP"}),
+        case("t16-floor", "rates.lmm.capfloor", {**cap_in, "cap_floor": "FLOOR"}),
+        case("t16-swn0", "rates.lmm.swaption_rebonato", {**swn_in, "correlation_beta": 0.0}),
+        case("t16-swn5", "rates.lmm.swaption_rebonato", {**swn_in, "correlation_beta": 0.5})])
+
+    print(f"cap price   {cap['price']:.2f}")
+    print(f"floor price {floor['price']:.2f}")
+    print("caplet Black vols " + " ".join(f"{v:.4f}" for v in cap["black_vols"][:3]))
+    print(f"first caplet forward {cap['forward_rates'][0]:.6f}  price {cap['caplet_prices'][0]:.2f}")
+    print(f"5y5y swap rate {s0['swap_rate']:.6f}  annuity {s0['annuity']:.6f}")
+    print(f"5y5y payer, beta 0.0: vol {s0['black_vol']:.4f}  price {s0['price']:.2f}")
+    print(f"5y5y payer, beta 0.5: vol {s5['black_vol']:.4f}  price {s5['price']:.2f}")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
 ```
 
+<!-- tutorial:run python -->
 ```bash
-uv run --project python python lmm.py
+uv run --project python python examples/tutorials/t16_lmm.py
 ```
 
 Real output, 2026-11-11, Windows 11:
@@ -79,14 +112,14 @@ Tolerances: prices 1e-6 absolute plus 1e-9 relative on 1 million (1e-12 per unit
 
 ## Step 2: the same in Rust, Java and C++
 
-`examples/tutorial_lmm.py` sends `rates.lmm.capfloor` (twice) and `rates.lmm.swaption_rebonato` (twice) to the CLI you name and prints the same seven lines. Standard library only.
+`examples/tutorials/t16_lmm.py` sends `rates.lmm.capfloor` (twice) and `rates.lmm.swaption_rebonato` (twice) to the CLI you name and prints the same seven lines. Given a command line, the same script sends each case to that build's `batch` command (`specifications/cli-contract.md`) instead of the Python package.
 
 Rust:
 
 <!-- tutorial:run rust -->
 ```bash
 (cd rust && cargo build --release -p quantforge-cli)
-python examples/tutorial_lmm.py rust/target/release/quantforge
+python examples/tutorials/t16_lmm.py rust/target/release/quantforge
 ```
 
 Java 25 and Maven:
@@ -94,7 +127,7 @@ Java 25 and Maven:
 <!-- tutorial:run java -->
 ```bash
 (cd java25 && mvn -B -q -DskipTests package)
-python examples/tutorial_lmm.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t16_lmm.py java -jar java25/target/quantforge-cli.jar
 ```
 
 C++26 (GCC 16 or Clang 23, CMake and Ninja):
@@ -102,7 +135,7 @@ C++26 (GCC 16 or Clang 23, CMake and Ninja):
 <!-- tutorial:run cpp -->
 ```bash
 cmake -S cpp26 -B cpp26/build -G Ninja -DBUILD_TESTING=OFF && cmake --build cpp26/build
-python examples/tutorial_lmm.py cpp26/build/quantforge
+python examples/tutorials/t16_lmm.py cpp26/build/quantforge
 ```
 
 Each prints the seven lines of step 1, digit for digit, well inside the tolerances above.

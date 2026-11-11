@@ -1,19 +1,18 @@
-#!/usr/bin/env python3
-"""Tutorial 13 through any language's CLI: fit GARCH(1,1), forecast vol, build a VIX-style index.
+"""Tutorial 13: fit GARCH(1,1), forecast vol, build a VIX-style index.
 
-  python examples/tutorial_vol_indices.py rust/target/release/quantforge
-  python examples/tutorial_vol_indices.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t13_vol_indices.py         # Python
+  python examples/tutorials/t13_vol_indices.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the cases of docs/getting-started/tutorial-13-vol-indices.md to
-`quantforge batch` and prints the same lines as the Python section of the tutorial. Inputs are
+It sends the cases of docs/getting-started/tutorial-13-vol-indices.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines. Inputs are
 synthetic and come from golden cases garch_e-0028, garch_f-0009 and vix_e-0007, and from
 examples/vol_forward_term_e.json.
 """
 import json
 import math
-import shutil
-import subprocess
 import sys
+
+from qf import runner
 
 
 def golden(path, case_id):
@@ -27,10 +26,8 @@ def case(case_id, operation, inputs):
     return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -38,7 +35,7 @@ def batch(cli, cases):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     r250 = golden("datasets/golden/stage_e_b/garch_e.json", "garch_e-0028")["returns"]
     r2000 = golden("datasets/golden/stage_f/garch_f.json", "garch_f-0009")["returns"]
     vix = golden("datasets/golden/stage_e_b/vix_e.json", "vix_e-0007")
@@ -76,6 +73,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

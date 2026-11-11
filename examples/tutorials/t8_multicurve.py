@@ -1,17 +1,16 @@
-#!/usr/bin/env python3
-"""Tutorial 8 through any language's CLI: SOFR and term curves, the joint solve, the turn, interpolation.
+"""Tutorial 8: SOFR and term curves, the joint solve, the turn, interpolation.
 
-  python examples/tutorial_multicurve.py rust/target/release/quantforge
-  python examples/tutorial_multicurve.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t8_multicurve.py         # Python
+  python examples/tutorials/t8_multicurve.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the cases of docs/getting-started/tutorial-8-multicurve.md to
-`quantforge batch` and prints the same lines as the Python section of the tutorial.
+It sends the cases of docs/getting-started/tutorial-8-multicurve.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import json
-import shutil
-import subprocess
 import sys
 from datetime import date
+
+from qf import runner
 
 AS_OF = "2026-11-09"
 SOFR = [("1M", 0.043), ("3M", 0.0425), ("6M", 0.0412), ("1Y", 0.039),
@@ -28,10 +27,8 @@ def case(case_id, operation, inputs):
     return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -53,7 +50,7 @@ def ois_bootstrap(case_id, method):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     [disc] = batch(cli, [ois_bootstrap("t8-sofr", "LOG_LINEAR_DF")])
     disc_curve = curve(disc["outputs"]["pillars"])
     [proj] = batch(cli, [case("t8-term", "rates.projection.bootstrap", {
@@ -119,6 +116,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

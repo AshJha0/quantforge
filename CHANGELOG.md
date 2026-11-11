@@ -4,7 +4,7 @@
 
 ### Added
 - Tutorials 2 to 7 (`docs/getting-started/`): bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, with a [Tutorials](docs/getting-started/README.md) index and site navigation entry. Each runs one script in `examples/tutorials/` against all four builds; every printed number is checked in CI in Python, Rust, Java and C++.
-- Tutorials 8 to 16 (`docs/getting-started/`): multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk, and the LIBOR market model. Each follows Tutorial 1's layout (Python library calls on the page, then `examples/tutorial_<topic>.py` against the Rust, Java and C++ CLIs) and is checked in CI in all four languages. `tools/check_tutorial.py` now orders pages by number.
+- Tutorials 8 to 16 (`docs/getting-started/`): multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk, and the LIBOR market model. Each runs one script, `examples/tutorials/t<N>_<topic>.py`, shown in full on its page, unchanged against all four builds through the shared helper `examples/tutorials/qf.py` (its new `runner`, the batch form of `connect`), and is checked in CI in all four languages. `tools/check_tutorial.py` now orders pages by number.
 - `tools/check_tutorial.py` checks every `tutorial-*.md` page by default, and checks that a script listed on a page equals the file (`tutorial:source`). `tutorial.yml` runs all pages and watches the new paths.
 - GLOSSARY: a section of tutorial terms.
 

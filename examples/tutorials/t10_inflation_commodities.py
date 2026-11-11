@@ -1,17 +1,16 @@
-#!/usr/bin/env python3
-"""Tutorial 10 through any language's CLI: a CPI curve with seasonality, a zero-coupon inflation
+"""Tutorial 10: a CPI curve with seasonality, a zero-coupon inflation
 swap, a commodity forward curve and storage carry.
 
-  python examples/tutorial_inflation_commodities.py rust/target/release/quantforge
-  python examples/tutorial_inflation_commodities.py java -jar java25/target/quantforge-cli.jar
+  uv run --project python python examples/tutorials/t10_inflation_commodities.py         # Python
+  python examples/tutorials/t10_inflation_commodities.py rust/target/release/quantforge  # or any other build
 
-Standard library only. It sends the cases of docs/getting-started/tutorial-10-inflation-commodities.md
-to `quantforge batch` and prints the same lines as the Python section of the tutorial.
+It sends the cases of docs/getting-started/tutorial-10-inflation-commodities.md through
+examples/tutorials/qf.py, to the Python package or to the build named, and prints the page's lines.
 """
 import json
-import shutil
-import subprocess
 import sys
+
+from qf import runner
 
 QUOTES = [{"years": y, "rate": r} for y, r in
           [(1, 0.0265), (2, 0.0255), (3, 0.025), (5, 0.0245), (7, 0.0245), (10, 0.025), (20, 0.0255)]]
@@ -38,10 +37,8 @@ def case(case_id, operation, inputs):
     return {"schema_version": "1.0", "case_id": case_id, "operation": operation, "inputs": inputs}
 
 
-def batch(cli, cases):
-    text = "".join(json.dumps(c) + "\n" for c in cases)
-    p = subprocess.run(cli, input=text, capture_output=True, text=True, check=True)
-    results = [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+def batch(run, cases):
+    results = run(cases)
     for r in results:
         if r["status"] != "ok":
             raise SystemExit(f"{r['case_id']}: {r['error']}")
@@ -49,7 +46,7 @@ def batch(cli, cases):
 
 
 def main(cli):
-    cli = [shutil.which(cli[0]) or cli[0], *cli[1:], "batch"]  # finds quantforge.exe on Windows
+    cli = runner(cli)  # the Python package with no arguments, else that build's batch command
     smooth = {"base_month": "2026-08", "base_cpi": 322.15, "quotes": QUOTES, "seasonality": None}
     seasonal = {**smooth, "seasonality": SEASON}
     months = ["2026-12", "2027-01", "2027-08"]
@@ -73,6 +70,4 @@ def main(cli):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
     main(sys.argv[1:])

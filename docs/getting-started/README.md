@@ -27,7 +27,7 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 
 ## How the scripts work
 
-Tutorials 2 to 7 each run one script in `examples/tutorials/`. The script calls operations by their names in `specifications/name-map.json` through one helper, `examples/tutorials/qf.py`: with no argument it uses the Python package in the same process, and with a command line it sends each case to that build's `batch` command (`specifications/cli-contract.md`). So one script, unchanged, drives all four implementations, and the page shows it in full; CI checks that the listing on the page equals the file.
+Tutorials 2 to 16 each run one script in `examples/tutorials/`. The script calls operations by their names in `specifications/name-map.json` through one helper, `examples/tutorials/qf.py`: with no argument it uses the Python package in the same process, and with a command line it sends each case to that build's `batch` command (`specifications/cli-contract.md`). So one script, unchanged, drives all four implementations, and the page shows it in full; CI checks that the listing on the page equals the file.
 
 ```bash
 uv run --project python python examples/tutorials/t4_credit.py          # Python
@@ -36,7 +36,7 @@ python examples/tutorials/t4_credit.py rust/target/release/quantforge   # Rust, 
 
 To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Pages 2 to 16 use the builds that page 1 makes, so check page 1 first in a fresh clone.
 
-Tutorials 8 to 16 follow Tutorial 1's layout instead: the page shows the Python library calls, and a standard-library script, `examples/tutorial_<topic>.py`, sends the same cases to the Rust, Java or C++ `batch` command and prints the same lines.
+Scripts that send several cases at once and read their diagnostics, as in Tutorials 8 to 16, use `runner` from the same helper, the batch form of `connect`. Tutorial 1 is the one exception: to show what the library looks like from Python, its page calls the `quantforge_core` package directly, and a standard-library script, `examples/tutorial_swap.py`, sends the same three operations to the Rust, Java or C++ `batch` command. CI runs all sixteen pages in all four languages.
 
 ## Where to go next
 
