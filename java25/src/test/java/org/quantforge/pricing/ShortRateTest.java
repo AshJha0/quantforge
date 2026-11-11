@@ -112,4 +112,26 @@ class ShortRateTest {
             assertTrue(Math.abs(bgk - mean) < 3 * se, "case " + c + " bgk " + bgk + " mc " + mean + " se " + se);
         }
     }
+
+    /** xva-exposure.md: PAY minus RECEIVE EE at each reset equals the forward value of the remaining swap. */
+    @Test
+    void exposurePayMinusReceiveIsForwardSwap() {
+        ShortRate.Params p = models()[2];
+        double[] pay = {1.0, 2.0, 3.0, 4.0, 5.0};
+        double k = 0.045;
+        double n = 1e7;
+        for (int j = 0; j < pay.length - 1; j++) {
+            double t = j == 0 ? 0.5 : pay[j - 1];
+            double[] rest = java.util.Arrays.copyOfRange(pay, j, pay.length);
+            double fwd = CURVE.df(t) - CURVE.df(rest[rest.length - 1]);
+            double prev = t;
+            for (double ti : rest) {
+                fwd -= k * (ti - prev) * CURVE.df(ti);
+                prev = ti;
+            }
+            double diff = ShortRate.swaption(p, t, rest, k, true, n).price()
+                    - ShortRate.swaption(p, t, rest, k, false, n).price();
+            assertEquals(n * fwd, diff, 1e-6);
+        }
+    }
 }

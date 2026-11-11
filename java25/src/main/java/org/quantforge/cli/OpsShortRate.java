@@ -236,6 +236,8 @@ final class OpsShortRate {
                     "bond_price_expiry", p.curve().df(t), "bond_price_maturity", p.curve().df(s));
         });
 
+        table.put("xva.exposure.swap_ee_hw", in -> exposure(in));
+
         table.put("risk.mc.greeks", in -> {
             McGreeks.Payoff pay = listed(in, "payoff", McGreeks.Payoff.class);
             McGreeks.Method method = listed(in, "method", McGreeks.Method.class);
@@ -286,5 +288,92 @@ final class OpsShortRate {
             return Operations.out("price", g.price(), "price_se", g.priceSe(), "delta", g.delta(), "delta_se",
                     g.deltaSe(), "vega", g.vega(), "vega_se", g.vegaSe());
         });
+    }
+    /**
+     * Discounted expected exposure of a swap at its reset dates and the bucketed CVA (xva-exposure.md,
+     * ruling G-16). Each point is the Hull-White swaption on the remaining swap.
+     */
+    private static Out exposure(In in) {
+        Raw raw = read(in, true);
+        double t0 = in.real("start_years");
+        double[] pay = in.reals("payment_times");
+        double rate = in.real("fixed_rate");
+        String side = in.string("side");
+        double notional = in.real("notional");
+        double[] ex = in.reals("exposure_times");
+        boolean hasHazard = in.has("hazard_rate");
+        boolean hasRecovery = in.has("recovery");
+        double lambda = hasHazard ? in.real("hazard_rate") : 0.0;
+        double rec = hasRecovery ? in.real("recovery") : 0.0;
+        in.limit(pay.length > MAX_PILLARS, "payment_times");
+        in.limit(ex.length > MAX_PILLARS, "exposure_times");
+        in.gate();
+        ShortRate.Params p = params(raw, 0.0);
+        if (!side.equals("PAY") && !side.equals("RECEIVE")) {
+            throw input("side");
+        }
+        if (!(t0 >= 0.0)) {
+            throw domain("start_years");
+        }
+        boolean ok = pay.length > 0 && pay[0] > t0;
+        for (int i = 1; i < pay.length && ok; i++) {
+            ok = pay[i] > pay[i - 1];
+        }
+        if (!ok) {
+            throw input("payment_times");
+        }
+        if (ex.length == 0) {
+            throw input("exposure_times");
+        }
+        for (double t : ex) {
+            if (!(t > 0.0)) {
+                throw domain("exposure_times");
+            }
+        }
+        int[] first = new int[ex.length];
+        for (int j = 0; j < ex.length; j++) {
+            if (j > 0 && !(ex[j] > ex[j - 1])) {
+                throw input("exposure_times");
+            }
+            int k = -1;
+            if (ex[j] == t0) {
+                k = 0;
+            } else {
+                for (int i = 0; i < pay.length - 1; i++) {
+                    if (ex[j] == pay[i]) {
+                        k = i + 1;
+                    }
+                }
+            }
+            if (k < 0) {
+                throw input("exposure_times");
+            }
+            first[j] = k;
+        }
+        if (hasHazard != hasRecovery) {
+            throw input(hasHazard ? "recovery" : "hazard_rate");
+        }
+        if (hasHazard && !(lambda >= 0.0)) {
+            throw domain("hazard_rate");
+        }
+        if (hasRecovery && !(rec >= 0.0 && rec < 1.0)) {
+            throw domain("recovery");
+        }
+        double[] ee = new double[ex.length];
+        for (int j = 0; j < ex.length; j++) {
+            double[] rest = java.util.Arrays.copyOfRange(pay, first[j], pay.length);
+            ee[j] = ShortRate.swaption(p, ex[j], rest, rate, side.equals("PAY"), notional).price();
+        }
+        if (!hasHazard) {
+            return Operations.out("discounted_ee", ee);
+        }
+        double cva = 0.0;
+        double prev = 1.0;
+        for (int j = 0; j < ex.length; j++) {
+            double surv = Math.exp(-lambda * ex[j]);
+            cva += ee[j] * (prev - surv);
+            prev = surv;
+        }
+        return Operations.out("discounted_ee", ee, "cva", (1.0 - rec) * cva);
     }
 }
