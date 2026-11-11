@@ -936,6 +936,13 @@ class DocsStatus(unittest.TestCase):
         self.assertEqual(sorted(b.split(":")[0] for b in bad), ["CHANGELOG.md", "README.md", "ROADMAP.md"])
         self.assertTrue(all(":2:" not in b for b in bad if b.startswith("README")))  # stage H is not released
 
+    def test_unknown_operation_name_fails(self):
+        files = {"LEARN.md": "Use `credit.curve.composite` or `credit.curve.nope`; `core.x` and `foo.bar.baz` are not checked.\n",
+                 "CHANGELOG.md": "Renamed `credit.curve.old`.\n"}
+        bad = self.c.unknown_operations(files, self.ops)
+        self.assertEqual(len(bad), 1)
+        self.assertIn("credit.curve.nope", bad[0])
+
     def test_shipped_docs_pass(self):
         self.assertEqual(self.c.main(), 0)
 

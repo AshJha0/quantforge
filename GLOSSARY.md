@@ -91,6 +91,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | NDF | Non-deliverable forward: settled in USD on the fixing, without delivering the other currency |
 | CDS | Credit default swap: protection against a named borrower's default, paid for with a running premium |
 | Hazard rate | The default rate per year, given survival so far |
+| Sector or rating curve | A credit curve for a group of names: a weighted average of the constituents' CDS spreads, times a rating multiplier, bootstrapped like one name (`credit.curve.composite`, `04-pricing/credit.md`) |
 | Index ratio | Reference CPI over base CPI, scaling an inflation-linked bond |
 | Seasonality | A repeating monthly pattern in CPI or commodity prices |
 | Convenience yield | The benefit of holding a commodity, implied by its forward curve |
@@ -155,6 +156,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at mer
 | Name map | `specifications/name-map.json`: each operation's public name in each language, generated from the specs ([ADR-0011](architecture/decisions/ADR-0011-api-style.md)) |
 | Value at risk (VaR), expected shortfall (ES) | A loss quantile, and the mean loss beyond it, over a horizon |
 | FRTB-SA | The Basel standardised approach to market-risk capital |
+| Funding curve | The curve for unsecured borrowing: the OIS curve times a spread factor, used to discount uncollateralised cash flows and in FVA (`rates.funding.curve`, `02-curves/joint-solve-and-funding.md`) |
 
 ## Stage G terms
 

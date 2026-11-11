@@ -11,6 +11,8 @@ Two checks, run by `python tools/quality_gate.py --check-docs`:
 2. Release wording. CHANGELOG headings `## X.Y.Z: stage L, ...` map each stage to a version. For every stage whose
    version has a git tag (`vX.Y.Z`, or `vX.Y` for X.Y.0), a tracked Markdown line, or tools/site_facts.json, fails if it calls that
    version or that stage pending, unreleased or not yet tagged.
+3. Operation names. A backticked name in a tracked Markdown page (not CHANGELOG, specifications/, review/ or
+   program/) that starts with a known domain prefix and has two or more dots must be in the name map.
 
 Without git tags (a shallow CI checkout) check 2 has nothing to compare and passes; CI fetches tags for it.
 """
@@ -87,6 +89,20 @@ def implemented_pages(readme, folder):
     return pages
 
 
+def unknown_operations(files, ops):
+    """Backticked names that look like operations (a known domain prefix and two or more dots) but are not in the name map."""
+    prefixes = {o.split(".")[0] for o in ops}
+    bad = []
+    for path, text in files.items():
+        if path == "CHANGELOG.md" or path.startswith(("specifications/", "review/", "program/")):
+            continue  # history, and specs may name operations before they exist
+        for n, line in enumerate(text.splitlines(), 1):
+            for name in OP.findall(line):
+                if name.count(".") >= 2 and name.split(".")[0] in prefixes and name not in ops:
+                    bad.append(f"{path}:{n}: `{name}` is not an operation in specifications/name-map.json")
+    return bad
+
+
 def released_stages(changelog, tags):
     """{stage letter: version} for each CHANGELOG stage heading whose version is tagged."""
     tagged = {t.lstrip("v") for t in tags} | {t.lstrip("v") + ".0" for t in tags}  # tag v0.4 is release 0.4.0
@@ -126,7 +142,8 @@ def main():
     bad = curve_table_problems(readme, ops) + unlisted_curve_operations(implemented_pages(readme, folder), ops)
     tags = [t for t in git("tag", "-l", "v*") if t]
     released = released_stages((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"), tags)
-    bad += release_problems(docs_files(), released)
+    files = docs_files()
+    bad += release_problems(files, released) + unknown_operations(files, ops)
     for b in bad:
         print("BAD", b)
     print(f"docs status: curve table checked; {len(tags)} release tags, stages released {''.join(sorted(released)) or 'none found'}; {len(bad)} problems")

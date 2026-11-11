@@ -6,7 +6,7 @@ Generated on 2026-11-11 from commit `e150116`, by Java 0.6.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-A funding curve solved from term funding quotes over an OIS discount curve, with the funding spread it implies by date (`specifications/02-curves/joint-solve-and-funding.md`). Stage F.
+Unsecured funding: the OIS curve times a spread factor, `D_f(t) = D_ois(t) exp(-integral of s)`, with the spread `s` piecewise flat between the dates of simple ACT/360 funding quotes. It discounts uncollateralised cash flows and feeds FVA (`specifications/02-curves/joint-solve-and-funding.md`). Stage F.
 
 ## Runs
 
