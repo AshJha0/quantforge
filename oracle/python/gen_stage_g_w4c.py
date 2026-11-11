@@ -392,3 +392,33 @@ def write_ore_cases_b(samples=5000):
 if __name__ == "__main__" and "oreb" in sys.argv:
     write_ore_cases_b()
     print("eps_p", eps_p())
+
+
+def count_b():
+    import csv
+    from datetime import date
+    from collections import defaultdict
+    raw = json.loads((ORE / "W4C_GOLDEN_RAW.json").read_text())
+    params = [(a, sg) for a, sg, _ in cases()]
+    cache, rep, n = {}, [], 0
+    for name, a, sg, inp, gold in raw:
+        r = params.index((a, sg))
+        if r not in cache:
+            vals = defaultdict(lambda: defaultdict(dict))
+            for row in csv.reader(open(ORE / f"runb{r}" / "Output" / "netcube.csv")):
+                if row[0].startswith("#"):
+                    continue
+                t = (date.fromisoformat(row[3]) - date(2026, 11, 10)).days / 365
+                vals[row[0]][round(t, 9)][int(row[4])] = float(row[6])
+            cache = {r: vals}
+        ok, worst, ntest, nskip, zc = check_case_b(gold, inp, cache[r][name])
+        n += ok
+        rep.append({"case": name, "run": r, "mean_reversion": a, "sigma": sg, "counted": ok, "testable_checks": ntest, "not_testable": nskip,
+                    "z": zc, "worst": {"output": worst[0], "time": worst[1], "value": worst[2]}})
+    (ORE / "ORE_CHECK_4C_B.json").write_text(json.dumps({"rule": "G-42b", "seeds": [SEED_B + i for i in range(6)], "samples": 5000,
+                                                          "eps_p": eps_p(), "counted": n, "value_cases": len(raw), "cases": rep}, indent=1) + "\n")
+    print("G-42b counted", n, "of", len(raw))
+
+
+if __name__ == "__main__" and "countb" in sys.argv:
+    count_b()
