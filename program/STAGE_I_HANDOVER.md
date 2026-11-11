@@ -282,3 +282,5 @@ All 165 are value cases from seeded draws. Draws are rejected only by rules fixe
 ## Rulings after the builds, part 2 (2026-11-11)
 
 I-53: `hedge.select.solve` returns `E_LIMIT` above 100,000 candidate subsets (`hedgeselect_i-0018`, `n = 20`, `K = 7`); all four lanes add the check. I-54: costs in `hedge.qp.solve` must be exact at a switch point (`hedgecost_i-0023`); Rust changes its final step, and the others run the case. Both cases are appended; earlier cases are byte-identical.
+
+Verification (2026-11-11, 23:32): the full stub replay test (`conformance/runner/test_runner.py::StubTests::test_replay_passes_every_case`, every golden at contract 1.11.0, wave 5 and the after-build cases included) passes in 855 s; the other 21 runner tests pass.
