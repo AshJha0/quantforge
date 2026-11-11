@@ -24,6 +24,10 @@ The manifest follows the stage B data survey of 2026-11-06; `oracle/LICENCES.md`
 
 `tools/build_gallery.py` generates `docs/curves/` from real CLI runs, and `--check` reruns the Python CLI against it. See `docs/developer-guides/curves-gallery.md`.
 
+## References and external links
+
+`tools/build_references.py` writes `docs/references.md` from the `## Sources` sections of the specs and the tables in `specifications/stage-e-sources.md`; `--check` fails when the page is out of date (run in `docs.yml`). `tools/check_links.py` fetches every external link in the references and the top-level pages and exits 1 only on 404 or 410. Publishers often refuse automated clients (403), which is reported, not failed. It needs the network and prints `offline: skipped` without it, so it runs by hand rather than in CI.
+
 ## Forward log
 
 `tools/forward-log/log.jsonl` is append-only and hash-chained, using the records and chain in `specifications/01-core/asof-store.md`. Each entry carries a timestamp and the code commit.

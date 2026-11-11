@@ -72,3 +72,9 @@ the five new cases included. Not applied: I-51 (`contract_version` 1.11.0), beca
 `conformance/runner/runner.py` still checks `CONTRACT = "1.0.0"` and a 1.11.0 CLI would stop every
 run on this branch; it is a one-line change in `python/quantforge_core/cli/main.py` (and
 `tests/test_cli.py`) to make together with the runner in the integration PR. I-52: no facade.
+
+## I-51 and main eb251b9 (23:00)
+
+Merged `stage-i` with main `eb251b9`; one conflict, `python/README.md`, resolved to keep both the
+v0.7.0 release note and the stage I wave list. `contract_version` is 1.11.0 (I-51) in
+`cli/main.py`, with `tests/test_cli.py` following it.

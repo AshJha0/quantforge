@@ -393,7 +393,7 @@ class GalleryVol(unittest.TestCase):
             self.bg.surface_svg("t", [90, 100], ["3m"], [[0.3]], "c")
 
     def test_stage_c_moved_from_planned_to_pages(self):
-        planned = {n for n, _ in self.bg.PLANNED}
+        planned = {row[0] for row in self.bg.PLANNED}
         for n in ("Implied volatility smile", "Implied volatility surface"):
             self.assertNotIn(n, planned)
         self.assertEqual(set(self.bg.VOLS), {"equity-forward", "svi-smile", "ssvi-surface", "sabr"})
@@ -440,7 +440,7 @@ class GalleryVol(unittest.TestCase):
     def test_stage_d_pages_are_live_from_real_runs(self):
         out = ROOT / "docs/curves"
         self.assertEqual(set(self.bg.STAGE_D), {"ois-full", "bond-fit", "repo", "cross-currency", "cds", "dividend-borrow",
-                                                "inflation", "caps-swaptions", "commodities", "mbs"})
+                                                "inflation", "caps-swaptions", "commodities", "mbs", "sector-rating", "funding"})
         index = (out / "README.md").read_text(encoding="utf-8")
         for slug, spec in self.bg.STAGE_D.items():
             self.assertTrue(self.bg.is_live(spec), slug)
@@ -449,7 +449,7 @@ class GalleryVol(unittest.TestCase):
             for head in ("Implemented, not Validated", "## Four-language agreement", "## Oracle evidence and limits", self.bg.SYNTHETIC):
                 self.assertIn(head, text, f"{slug}: {head}")
             self.assertNotIn("nterview", text)
-            self.assertIn(f"]({slug}.md) | Implemented, not Validated | D |", index)
+            self.assertIn(f"]({slug}.md) | Implemented, not Validated | {spec.get('stage', 'D')} |", index)
             self.assertEqual(set(d["reference"]), set(spec["examples"]))
             for op, f in spec["examples"].items():
                 ex = json.loads((ROOT / "examples" / f).read_text(encoding="utf-8"))
@@ -460,9 +460,9 @@ class GalleryVol(unittest.TestCase):
                     self.assertIn(real[f], text)
                     self.assertIn("fetched", real[f])
                 self.assertEqual(d["meta"]["example_hashes"][f], self.bg.example_hash(f))
-            self.assertEqual(d["evidence"], self.bg.golden_d(spec["examples"]))
+            self.assertEqual(d["evidence"], self.bg.golden_d(spec["examples"], spec.get("golden", "stage_d")))
             self.assertTrue(all(r["largest_difference"] is not None and r["largest_difference"] < 1e-6 for r in d["agreement"]), slug)
-        planned = {n for n, _ in self.bg.PLANNED}
+        planned = {row[0] for row in self.bg.PLANNED}
         for gone in ("Full SOFR", "ESTR", "Cross-currency", "Credit and ISDA CDS", "Swaption cube and cap surface"):
             self.assertNotIn(gone, planned)
 
@@ -847,10 +847,18 @@ class DoctorAndQuickstart(unittest.TestCase):
     def test_tutorial_has_a_block_per_language_and_one_expected_output(self):
         sys.path.insert(0, str(ROOT / "tools"))
         import check_tutorial
-        runs, expected = check_tutorial.blocks(check_tutorial.PAGE.read_text(encoding="utf-8"))
-        self.assertEqual(set(runs), {"python", "rust", "java", "cpp"})
-        self.assertEqual(runs["python"][0], "python")
-        self.assertEqual(len(expected), 4)
+        self.assertGreaterEqual(len(check_tutorial.PAGES), 7)
+        for page in check_tutorial.PAGES:
+            text = page.read_text(encoding="utf-8")
+            runs, expected = check_tutorial.blocks(text)
+            self.assertEqual(set(runs), {"python", "rust", "java", "cpp"}, page.name)
+            self.assertGreaterEqual(len(expected), 4, page.name)
+            self.assertEqual(check_tutorial.sources(text), [], page.name)  # listings equal their scripts
+        first = check_tutorial.PAGES[0]
+        self.assertEqual(first.name, "tutorial-1-swap.md")
+        self.assertEqual(check_tutorial.blocks(first.read_text(encoding="utf-8"))[0]["python"][0], "python")
+        stale = "<!-- tutorial:source examples/tutorial_swap.py -->\n```python\nprint(1)\n```"
+        self.assertEqual(check_tutorial.sources(stale), ["examples/tutorial_swap.py"])
         with self.assertRaises(ValueError):
             check_tutorial.blocks("no markers")
 
@@ -892,6 +900,78 @@ class StageFInfra(unittest.TestCase):
         self.assertEqual(sorted(e["lang"] for e in inc), ["java", "rust"])
         self.assertEqual(pm.plan(cfg, changed=["docs/x.md"])[0], [])
         self.assertEqual(len(pm.plan(cfg, stage="E")[0]), 4)
+
+
+class DocsStatus(unittest.TestCase):
+    """tools/check_docs_status.py: stale Planned curve rows and stale release wording fail."""
+
+    TABLE = ("# Curves\n\n## Status of every curve in the plan\n\n| Curve | Status | Stage | Evidence |\n|---|---|---|---|\n"
+             "{rows}\n## Real data\n")
+
+    def setUp(self):
+        self.c = load("check_docs_status", "tools/check_docs_status.py")
+        self.ops = {"credit.curve.composite", "rates.funding.curve", "repo.forward", "rates.curve.discount"}
+
+    def test_planned_row_naming_an_implemented_operation_fails(self):
+        t = self.TABLE.format(rows="| Funding curve | Planned | F | `rates.funding.curve` |")
+        self.assertEqual(len(self.c.curve_table_problems(t, self.ops)), 1)
+        ok = self.TABLE.format(rows="| Liquidity curves | Planned | H | None yet |")
+        self.assertEqual(self.c.curve_table_problems(ok, self.ops), [])
+
+    def test_implemented_row_with_unknown_operation_fails(self):
+        t = self.TABLE.format(rows="| [X](x.md) | Implemented, not Validated | D | 2 golden cases for `credit.curve.nope` |")
+        self.assertIn("credit.curve.nope", self.c.curve_table_problems(t, self.ops)[0])
+
+    def test_curve_operation_on_no_implemented_page_fails(self):
+        # the old table: sector and funding curves done but still Planned with no operation named
+        old = self.TABLE.format(rows="| [Repo](repo.md) | Implemented, not Validated | D | `repo.forward` |\n"
+                                     "| Funding curve | Planned | F | None yet |")
+        bad = self.c.unlisted_curve_operations({"README.md": old}, self.ops)
+        self.assertEqual(bad[0].split()[2], "credit.curve.composite")
+        self.assertEqual(len(bad), 2)  # rates.curve.discount reads a curve, so it is not a builder
+        fixed = {"README.md": old, "f.md": "`rates.funding.curve` and `credit.curve.composite`"}
+        self.assertEqual(self.c.unlisted_curve_operations(fixed, self.ops), [])
+
+    def test_released_stage_called_pending_fails(self):
+        log = "# Changelog\n\n## 0.7.0: stage G, models (unreleased)\n\n## 0.4.0: stage D, curves (2026-11-07)\n\n## v0.2: stage B, FX\n"
+        rel = self.c.released_stages(log, ["v0.7.0", "v0.4", "v0.2"])
+        self.assertEqual(rel, {"G": "0.7.0", "D": "0.4.0", "B": "0.2"})
+        self.assertEqual(self.c.released_stages(log, ["v0.4"]), {"D": "0.4.0"})  # untagged G is not checked
+        files = {"README.md": "Stage G (v0.7.0, not yet tagged) adds models.\nStage H is pending.\n",
+                 "ROADMAP.md": "| G | Built, release `v0.7.0` pending |\n",
+                 "CHANGELOG.md": log + "- the site facts name stage F as the pending release.\n"}
+        bad = self.c.release_problems(files, rel)
+        self.assertEqual(sorted(b.split(":")[0] for b in bad), ["CHANGELOG.md", "README.md", "ROADMAP.md"])
+        self.assertTrue(all(":2:" not in b for b in bad if b.startswith("README")))  # stage H is not released
+
+    def test_unknown_operation_name_fails(self):
+        files = {"LEARN.md": "Use `credit.curve.composite` or `credit.curve.nope`; `core.x` and `foo.bar.baz` are not checked.\n",
+                 "CHANGELOG.md": "Renamed `credit.curve.old`.\n"}
+        bad = self.c.unknown_operations(files, self.ops)
+        self.assertEqual(len(bad), 1)
+        self.assertIn("credit.curve.nope", bad[0])
+
+    def test_references_page_is_current_and_marks_status(self):
+        r = load("build_references", "tools/build_references.py")
+        found = r.collect()
+        self.assertEqual((ROOT / "docs/references.md").read_text(encoding="utf-8"), r.render(found))
+        page = r.render({("05-volatility", "Merton, R.C. (1976), doi:10.1016/0304-405X(76)90022-2. Status: licensed (not opened)"):
+                         {"specifications/05-volatility/x.md"}})
+        self.assertIn("**Not opened.** **Paywalled.**", page)
+        self.assertIn("(https://doi.org/10.1016/0304-405X%2876%2990022-2)", page)
+        self.assertIn("[`05-volatility/x.md`](../specifications/05-volatility/x.md)", page)
+
+    def test_link_check_fails_only_on_gone_and_tolerates_offline(self):
+        lc = load("check_links", "tools/check_links.py")
+        self.assertEqual(lc.links("see <https://a.org/x>, [d](https://doi.org/10.1/a(76)b)."),
+                         ["https://a.org/x", "https://doi.org/10.1/a(76)b"])
+        self.assertEqual([lc.classify(c) for c in (200, 403, 404, None, 500)], ["ok", "refused", "gone", "unreachable", "error"])
+        self.assertEqual(lc.run(["docs/references.md"], check=lambda u: None)[0], 0)  # offline
+        self.assertEqual(lc.run(["docs/references.md"], check=lambda u: 403)[0], 0)
+        self.assertEqual(lc.run(["docs/references.md"], check=lambda u: 404)[0], 1)
+
+    def test_shipped_docs_pass(self):
+        self.assertEqual(self.c.main(), 0)
 
 
 if __name__ == "__main__":

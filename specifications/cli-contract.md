@@ -1,7 +1,7 @@
 # CLI contract
 
-Version 1.7.0. `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
-The `contract_version` a build reports stays `1.0.0`: nothing here breaks the wire format.
+Version 1.11.0 (stage I; the blocks below give the minor versions each stage added). `01-core/rulings.md` and `01-core/limits.md` are part of this contract.
+From stage I (ruling I-51) a build reports `contract_version` `1.11.0`, and the runner stops on any other value. Before stage I every build reported `1.0.0`; nothing in 1.1.0 to 1.11.0 breaks the wire format.
  Applies identically to the Java, C++, Python and Rust implementations.
 
 The idea: every implementation is a black box that reads a case and writes a result. The neutral
@@ -18,7 +18,7 @@ to start it from `conformance/runner/implementations.json`.
 | `quantforge run` | Read one case JSON document from stdin to end of file. Write one result JSON document to stdout. |
 | `quantforge batch` | Read JSON Lines from stdin, one case per line. Write one result per line to stdout, in the same order, flushing after each line. |
 | `quantforge --batch` | Exactly the same as `quantforge batch` (1.6.0). Both spellings must work. |
-| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.0.0", "toolchain":...}`. |
+| `quantforge version` | Write one JSON object: `{"language":..., "implementation_version":..., "contract_version":"1.11.0", "toolchain":...}`. |
 | `quantforge operations` | Write a JSON array of the operation names this build supports, sorted. |
 
 `batch` exists because a JVM start per case would dominate run time. `run` and `batch` must give
