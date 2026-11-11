@@ -5,6 +5,7 @@ name: Mutation by stage
 #    module runs the plan job alone (seconds).
 #  - Weekly and manual: every module of one stage (default F) in all four languages, scored against the
 #    stage target. The weekly run gates; a manual run gates only when asked.
+#  - Manual with `paths`: planned as a pull request touching those files (for example one Rust module).
 on:
   pull_request:
     paths: ['cpp26/src/**', 'java25/src/main/**', 'python/quantforge_core/**', 'rust/crates/*/src/**',
@@ -22,13 +23,16 @@ on:
         description: 'fail the run if the stage is below its target'
         type: boolean
         default: false
+      paths:
+        description: 'space-separated source paths: plan as a pull request touching them (ignores stage)'
+        default: ''
 permissions:
   contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
-  STAGE: ${{ github.event_name == 'pull_request' && 'PR' || inputs.stage || 'F' }}
+  STAGE: ${{ (github.event_name == 'pull_request' || inputs.paths) && 'PR' || inputs.stage || 'F' }}
   MAX: ${{ github.event_name == 'pull_request' && '12' || inputs.max || '40' }}
 jobs:
   plan:
@@ -46,9 +50,15 @@ jobs:
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PATHS: ${{ inputs.paths }}
         run: |
           if [ "$STAGE" = PR ]; then
-            git diff --name-only "$BASE...$HEAD_SHA" > changed.txt
+            if [ -n "$PATHS" ]; then
+              # shellcheck disable=SC2086  # word splitting of the space-separated list is intended
+              printf '%s\n' $PATHS > changed.txt
+            else
+              git diff --name-only "$BASE...$HEAD_SHA" > changed.txt
+            fi
             python3 conformance/mutation/plan_matrix.py --changed changed.txt --stages-out pr-stages.json >> "$GITHUB_OUTPUT"
           else
             python3 conformance/mutation/plan_matrix.py --stage "$STAGE" >> "$GITHUB_OUTPUT"
@@ -66,7 +76,8 @@ jobs:
       max-parallel: 8
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    # Rust exotics needed 89 of 90 minutes in stage F (1220 mutants) and has 1258 now.
+    timeout-minutes: 180
     env:
       TARGET: ${{ matrix.target }}
       SUITE: ${{ matrix.suite }}
@@ -97,6 +108,16 @@ jobs:
         run: |
           (cd rust && rustup show)
           cargo install cargo-mutants --version 27.1.0 --locked
+          # Memory cap (8 GiB of address space) for every test binary cargo runs and for the golden
+          # run. Mutants such as bonds.rs `periods` `k += 1` -> `k *= 1` (credit.rs `periods` alike)
+          # push to a Vec forever; uncapped, they exhaust the runner's memory and the runner agent
+          # dies ("runner has received a shutdown signal", exit 143) before any result is written,
+          # as in PR #31. Capped, the allocation fails, the test aborts and the mutant counts as
+          # killed. rustc and the release build are not capped.
+          printf '#!/bin/sh\nulimit -v 8388608\nexec "$@"\n' > "$RUNNER_TEMP/memcap"
+          chmod +x "$RUNNER_TEMP/memcap"
+          echo "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUNNER=$RUNNER_TEMP/memcap" >> "$GITHUB_ENV"
+          echo "QF_MUTANT_AS=8589934592" >> "$GITHUB_ENV"
       - if: matrix.lang == 'python' || matrix.lang == 'rust'
         run: python3 conformance/mutation/golden_mutants.py --impl "${{ matrix.lang }}" --target "$TARGET" --suite "$SUITE" --max "$MAX" --out "$OUT.json"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
