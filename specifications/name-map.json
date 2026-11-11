@@ -3331,6 +3331,46 @@
     "pv"
    ]
   },
+  "hedge.backtest.delta": {
+   "spec": "specifications/08-hedging/dynamic-hedge-and-effectiveness.md",
+   "rust": "quantforge::hedge::backtest_delta",
+   "python": "quantforge.hedge.backtest_delta",
+   "java": "Hedge.backtestDelta",
+   "cpp": "qf::hedge::backtest_delta",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "hedge_volatility": {
+     "java": "hedgeVolatility"
+    },
+    "option": {
+     "java": "option"
+    },
+    "quantity": {
+     "java": "quantity"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spots": {
+     "java": "spots"
+    },
+    "times": {
+     "java": "times"
+    }
+   },
+   "outputs": [
+    "dollar_offset",
+    "final_pnl",
+    "option_values",
+    "portfolio_values",
+    "regression_r2",
+    "regression_slope",
+    "shares",
+    "variance_reduction"
+   ]
+  },
   "hedge.beta.futures": {
    "spec": "specifications/08-hedging/hedge-solvers.md",
    "rust": "quantforge::hedge::beta_futures",
@@ -3363,8 +3403,193 @@
     "contracts_held"
    ]
   },
+  "hedge.correlation.neutralise": {
+   "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
+   "rust": "quantforge::hedge::correlation_neutralise",
+   "python": "quantforge.hedge.correlation_neutralise",
+   "java": "Hedge.correlationNeutralise",
+   "cpp": "qf::hedge::correlation_neutralise",
+   "inputs": {
+    "book": {
+     "java": "book"
+    },
+    "correlation": {
+     "java": "correlation"
+    },
+    "hedges": {
+     "java": "hedges"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot1": {
+     "java": "spot1"
+    },
+    "spot2": {
+     "java": "spot2"
+    },
+    "targets": {
+     "java": "targets"
+    },
+    "vol1": {
+     "java": "vol1"
+    },
+    "vol2": {
+     "java": "vol2"
+    },
+    "yield1": {
+     "java": "yield1"
+    },
+    "yield2": {
+     "java": "yield2"
+    }
+   },
+   "outputs": [
+    "greeks_after",
+    "greeks_before",
+    "quantities"
+   ]
+  },
+  "hedge.credit.cds": {
+   "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
+   "rust": "quantforge::hedge::credit_cds",
+   "python": "quantforge.hedge.credit_cds",
+   "java": "Hedge.creditCds",
+   "cpp": "qf::hedge::credit_cds",
+   "inputs": {
+    "book": {
+     "java": "book"
+    },
+    "discount": {
+     "java": "discount"
+    },
+    "hazard": {
+     "java": "hazard"
+    },
+    "hedges": {
+     "java": "hedges"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "targets": {
+     "java": "targets"
+    },
+    "trade_date": {
+     "java": "tradeDate"
+    }
+   },
+   "outputs": [
+    "after",
+    "book",
+    "hedge_upfront",
+    "notionals"
+   ]
+  },
+  "hedge.crossasset.solve": {
+   "spec": "specifications/08-hedging/cross-asset-hedge.md",
+   "rust": "quantforge::hedge::crossasset_solve",
+   "python": "quantforge.hedge.crossasset_solve",
+   "java": "Hedge.crossassetSolve",
+   "cpp": "qf::hedge::crossasset_solve",
+   "inputs": {
+    "book": {
+     "java": "book"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "hedges": {
+     "java": "hedges"
+    },
+    "ridge": {
+     "java": "ridge"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "volatility": {
+     "java": "volatility"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "book_risk",
+    "objective",
+    "positions",
+    "residual_risk"
+   ]
+  },
+  "hedge.effectiveness": {
+   "spec": "specifications/08-hedging/dynamic-hedge-and-effectiveness.md",
+   "rust": "quantforge::hedge::effectiveness_",
+   "python": "quantforge.hedge.effectiveness_",
+   "java": "Hedge.effectiveness",
+   "cpp": "qf::hedge::effectiveness_",
+   "inputs": {
+    "hedge_changes": {
+     "java": "hedgeChanges"
+    },
+    "item_changes": {
+     "java": "itemChanges"
+    }
+   },
+   "outputs": [
+    "dollar_offset",
+    "regression_r2",
+    "regression_slope",
+    "variance_reduction"
+   ]
+  },
+  "hedge.frontier.solve": {
+   "spec": "specifications/08-hedging/hedge-costs-and-frontier.md",
+   "rust": "quantforge::hedge::frontier_solve",
+   "python": "quantforge.hedge.frontier_solve",
+   "java": "Hedge.frontierSolve",
+   "cpp": "qf::hedge::frontier_solve",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "cost_weight": {
+     "java": "costWeight"
+    },
+    "cost_weights": {
+     "java": "costWeights"
+    },
+    "half_spreads": {
+     "java": "halfSpreads"
+    },
+    "impact": {
+     "java": "impact"
+    },
+    "lower": {
+     "java": "lower"
+    },
+    "margin_limit": {
+     "java": "marginLimit"
+    },
+    "margin_rates": {
+     "java": "marginRates"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "points"
+   ]
+  },
   "hedge.greeks.neutralise": {
-   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
    "rust": "quantforge::hedge::greeks_neutralise",
    "python": "quantforge.hedge.greeks_neutralise",
    "java": "Hedge.greeksNeutralise",
@@ -3399,7 +3624,7 @@
    ]
   },
   "hedge.integer.solve": {
-   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "spec": "specifications/08-hedging/cross-asset-hedge.md",
    "rust": "quantforge::hedge::integer_solve",
    "python": "quantforge.hedge.integer_solve",
    "java": "Hedge.integerSolve",
@@ -3437,7 +3662,7 @@
    ]
   },
   "hedge.minvar.ratio": {
-   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "spec": "specifications/08-hedging/dynamic-hedge-and-effectiveness.md",
    "rust": "quantforge::hedge::minvar_ratio",
    "python": "quantforge.hedge.minvar_ratio",
    "java": "Hedge.minvarRatio",
@@ -3461,7 +3686,7 @@
    ]
   },
   "hedge.qp.solve": {
-   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
    "rust": "quantforge::hedge::qp_solve",
    "python": "quantforge.hedge.qp_solve",
    "java": "Hedge.qpSolve",
@@ -3473,14 +3698,29 @@
     "b": {
      "java": "b"
     },
+    "cost_weight": {
+     "java": "costWeight"
+    },
     "eq_matrix": {
      "java": "eqMatrix"
     },
     "eq_rhs": {
      "java": "eqRhs"
     },
+    "half_spreads": {
+     "java": "halfSpreads"
+    },
+    "impact": {
+     "java": "impact"
+    },
     "lower": {
      "java": "lower"
+    },
+    "margin_limit": {
+     "java": "marginLimit"
+    },
+    "margin_rates": {
+     "java": "marginRates"
     },
     "ridge": {
      "java": "ridge"
@@ -3496,9 +3736,12 @@
     }
    },
    "outputs": [
+    "cost",
+    "margin",
     "objective",
     "rank",
     "residual",
+    "risk",
     "x"
    ]
   },

@@ -21,6 +21,44 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-13 | Costs in the QP | Not in wave 1 (spec question Q-I1). The cost wave adds new optional inputs; with them absent, `hedge.qp.solve` keeps the meaning fixed here |
 | I-14 | Order of `E_SINGULAR` and `E_INFEASIBLE` | The equality-rank and reduced-Hessian checks come before feasibility, so a problem that is both singular and infeasible returns `E_SINGULAR`. Feasibility is decided exactly (no tolerance): the generator confirms each `E_INFEASIBLE` golden by HiGHS and keeps feasible cases clear of the boundary |
 
+## Wave 2, credit and correlation hedges
+
+| # | Point | Ruling |
+|---|---|---|
+| I-15 | CS01 definition | A central difference of the piecewise-flat hazard rates with `eps = 1e-4 / (1 - R)` (about one basis point of spread by the credit triangle), with all sections shifted (`CS01`) or one (`BUCKET_k`). It is a definition, not an approximation, so builds agree to rounding. Sections are those of the `hazard` input; the last also covers the time after the last pillar. Quote bumps with a re-bootstrap are not used (spec question Q-I5) |
+| I-16 | Jump to default in the hedge | `JTD = (1 - R) - pv` per unit of bought protection, with `pv` the `credit.cds.price` value including `accrued Pcs`. This is `risk.credit.jtd` with the computed value in place of the clean market value input |
+| I-17 | One spread-volatility factor | Margrabe Greeks in `vol1`, `vol2` and `rho` are all proportional to `dV/ds` with factors common to every exchange option. A correlation hedge needs single-asset vanillas, so `CALL_k` and `PUT_k` are hedge instruments. Exchange options alone against two of `VEGA_1`, `VEGA_2`, `CORRELATION` are `E_SINGULAR` |
+| I-18 | Correlation sensitivity units | `CORRELATION` and `correlation01` are per 0.01 of correlation, as `risk.sens.correlation`; vegas are per unit volatility, as I-9 |
+| I-19 | `E_LIMIT` sizes, wave 2 | Credit: book 1,000 trades, 50 hedges. Correlation: book 1,000 positions, 5 hedges (the number of Greeks) |
+
+## Wave 3, cross-asset hedge (equity and rates)
+
+| # | Point | Ruling |
+|---|---|---|
+| I-20 | Curve for the cross-asset hedge | Continuously compounded zero rates on ACT/365F pillar times, linear in time between pillars, flat before the first pillar, and no extrapolation after the last: a maturity there is `E_INPUT` (spec question Q-I9) |
+| I-21 | Equity and key-rate risk factors | `EQ01` is half the value change between spot times 1.01 and spot times 0.99. `KR01_k` is half the change between pillar `k`'s zero rate plus and minus 1bp, other pillars fixed. Both are definitions, not derivative approximations |
+| I-22 | Units of hedge instruments | The wave 1 singularity test (I-3) is relative to the largest eigenvalue, so it is not invariant to instrument units. A unit zero-coupon bond's 1bp risk (about 5e-4) next to a forward's 1% equity risk (about 40) made a regular problem look singular (ratio 6e-12, found while generating `hedgexa_i`). `ZCB` therefore takes a `notional`, and hedge instruments are expected to carry comparable risk per unit. I-3 is not changed (Q-I10) |
+| I-23 | `E_LIMIT` sizes, wave 3 | Book 1,000 positions, hedges 200, curve pillars 100 |
+
+## Wave 4a, costs, impact, liquidity and margin; frontier
+
+| # | Point | Ruling |
+|---|---|---|
+| I-24 | Traded size | Costs and margin apply to `x`, the new hedge, which starts from no position. Rebalancing from existing positions is a later input (Q-I11) |
+| I-25 | Order of the new checks in `hedge.qp.solve` | After wave 1 checks 1 to 3: lengths and the `margin_rates`/`margin_limit` pair (`E_INPUT`), `MIN_NORM` with any new input (`E_INPUT`), negative values (`E_DOMAIN`); then wave 1 checks 4 to 6, with the margin constraint part of feasibility |
+| I-26 | Regularity with costs | The singularity test (I-3) uses `A^T W A + ridge I + cost_weight diag(impact)`. Impact counts like a ridge; a spread cost does not, because `|x|` has no curvature away from 0 |
+| I-27 | Outputs with costs | `risk`, `cost` and (with margin inputs) `margin` are output only when a new input is present, so every wave 1 result keeps its exact output set; `objective = risk + cost_weight cost` |
+| I-28 | Several outside solvers | An outside check may try several library solvers on the same problem and count the case if one agrees with every compared output within the case tolerance; `verified_by` names it. Goldens never depend on which solver agreed |
+
+## Wave 4b, dynamic hedge backtest and effectiveness
+
+| # | Point | Ruling |
+|---|---|---|
+| I-29 | Backtest cash account | Self-financing from zero wealth. Each step credits interest `cash (e^{r dt} - 1)` and dividends `h_i S_i (e^{q dt} - 1)` on the shares held at the step's start, then rebalances, except on the last date. Options are marked and hedged at `hedge_volatility`; at expiry the mark is the payoff |
+| I-30 | Dollar offset | Cumulative: `-sum(hedge changes) / sum(item changes)`. No period-by-period ratio |
+| I-31 | Effectiveness domain | `sum(item changes) = 0`, or a series with zero sample variance, is `E_DOMAIN`; a backtest with `quantity = 0` therefore fails there. Sample (co)variances use `n - 1` |
+| I-32 | `E_LIMIT` sizes, wave 4b | Path and series length 100,000 |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).
