@@ -287,3 +287,10 @@ Wave 1 (hedge solvers) passes 121 of 121 with no open question. Choices made whe
   statistics are computed on noise. No golden is affected. Asked: either pin the zero-variance
   test with a relative threshold (for example `var(y) <= 1e-24 var(x)`, in the spirit of I-3), or
   drop the claim from the property notes. Python's test checks the replay itself instead.
+- Rulings after the builds (I-41 to I-52) applied: I-41 fixed Greek key sets (`E_INPUT`), I-42
+  unknown correlation targets `E_SCHEMA`, I-43 relative zero tests (answers I-Q4), I-44 hedged
+  variance tolerance, I-45 (answers I-Q1; `lot_sizes` length is `E_INPUT`), I-46 (answers I-Q3;
+  no change), I-47 `null` outside the bound lists is `E_SCHEMA` in every stage I operation, I-49
+  lot counts beyond 2^52 `E_LIMIT`, I-50 confirmed. I-41 also answers I-Q2. I-51
+  (`contract_version` 1.11.0) is not applied on this branch: the runner still checks 1.0.0, so it
+  moves with the runner in the integration PR.

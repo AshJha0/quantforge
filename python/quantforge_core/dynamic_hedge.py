@@ -29,16 +29,16 @@ def effectiveness(item_changes: Floats, hedge_changes: Floats) -> dict[str, floa
     if len(x) < 3:
         raise QfError("E_INPUT", "at least 3 changes are needed", "item_changes")
     total = math.fsum(x)
-    if total == 0:
+    if abs(total) <= 1e-12 * math.fsum(abs(v) for v in x):  # ruling I-43
         raise QfError("E_DOMAIN", "the hedged item does not change in total", "item_changes")
     dx, dy = _centred(x), _centred(y)
     dsum = _centred([p + q for p, q in zip(x, y)])
     n1 = len(x) - 1
     var_x = math.fsum(v * v for v in dx) / n1
     var_y = math.fsum(v * v for v in dy) / n1
-    if var_x == 0:
+    if var_x <= 1e-20 * var_y:  # ruling I-43; also catches var_x = var_y = 0
         raise QfError("E_DOMAIN", "the hedged item has no variance", "item_changes")
-    if var_y == 0:
+    if var_y <= 1e-20 * var_x:
         raise QfError("E_DOMAIN", "the hedge has no variance", "hedge_changes")
     cov = math.fsum(p * q for p, q in zip(dx, dy)) / n1
     var_sum = math.fsum(v * v for v in dsum) / n1

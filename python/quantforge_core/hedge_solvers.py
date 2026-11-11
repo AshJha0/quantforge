@@ -811,6 +811,12 @@ def integer_solve(a: Matrix, b: Floats, weights: Floats, lot_sizes: Floats, ridg
     if int((s * s > THRESHOLD * s[0] ** 2).sum()) < n:
         raise QfError("E_SINGULAR", "the hedge in lot units has no unique solution", "a")
 
+    relaxed_out = _qp_core(a, b, weights, ridge, None, None,
+                           [None if v is None else v * lot_sizes[j] for j, v in enumerate(lo)],
+                           [None if v is None else v * lot_sizes[j] for j, v in enumerate(hi)],
+                           "ERROR")
+    if any(abs(v / s_j) > 2.0 ** 52 for v, s_j in zip(relaxed_out["x"], lot_sizes)):
+        raise QfError("E_LIMIT", "a lot count is beyond 2^52 (ruling I-49)", "lot_sizes")
     q, r = np.linalg.qr(lots_b)
     n0 = np.linalg.solve(r, -(q.T @ d))
     box = list(zip(lo, hi))
@@ -841,16 +847,14 @@ def integer_solve(a: Matrix, b: Floats, weights: Floats, lot_sizes: Floats, ridg
                     if t < current:
                         incumbent, current, improved = trial, t, True
     candidates = _integer_search(r, n0, box, incumbent) or [incumbent]
+
     scored = [(value(c), c) for c in candidates]
     top = min(v for v, _ in scored)
     tied = [c for v, c in scored if v - top <= THRESHOLD * abs(top)]
     lots = min(tied, key=lambda c: (sum(abs(v) for v in c), c))
     x = [lot_sizes[j] * lots[j] for j in range(n)]
     residual, objective = _objective(a, b, weights, ridge, x)
-    relaxed = _qp_core(a, b, weights, ridge, None, None,
-                       [None if v is None else v * lot_sizes[j] for j, v in enumerate(lo)],
-                       [None if v is None else v * lot_sizes[j] for j, v in enumerate(hi)],
-                       "ERROR")["objective"]
+    relaxed = relaxed_out["objective"]
     return {"lots": [int(v) for v in lots], "x": _zs(x), "residual": _zs(residual),
             "objective": _z(objective), "continuous_objective": _z(relaxed),
             "rounding_cost": _z(objective - relaxed)}
@@ -923,8 +927,9 @@ def minvar_ratio(covariance: Matrix | None = None, exposure_changes: Floats | No
         hedge[i] = (fwd[i] - math.fsum(low[p][i] * hedge[p] for p in range(i + 1, k))) / low[i][i]
     before = s[0][0]
     after = before + math.fsum(u * v for u, v in zip(s_he, hedge))
-    if after < 0:
+    if after < -THRESHOLD * before:
         raise QfError("E_NOT_POSITIVE_DEFINITE", "the hedged variance is negative", "covariance")
+    after = max(after, 0.0)  # ruling I-44: rounding of a perfect hedge
     return {"hedge": _zs(hedge), "variance_before": _z(before), "variance_after": _z(after),
             "effectiveness": _z(1 - after / before)}
 
@@ -952,12 +957,21 @@ Instrument = tuple[str, float | None, float | None]  # (kind, strike, expiry_yea
 
 
 def greeks_neutralise(spot: float, rate: float, dividend_yield: float, volatility: float,
-                      portfolio: Sequence[tuple[str, float | None, float | None, float]],
-                      hedges: Sequence[Instrument], targets: Sequence[str]) -> dict[str, Any]:
+                      portfolio: Sequence[tuple[str, float | None, float | None, float | None]],
+                      hedges: Sequence[Instrument], targets: Sequence[str],
+                      unexpected: Sequence[str] = ()) -> dict[str, Any]:
     """`hedge.greeks.neutralise`: quantities of the hedges that set the targeted Greeks of the
-    book to zero (I-9). Positions are (kind, strike, expiry_years, quantity).
+    book to zero (I-9). Positions are (kind, strike, expiry_years, quantity). `unexpected`
+    names keys outside an instrument's fixed set; those, and a missing portfolio `quantity`, are
+    E_INPUT (ruling I-41).
 
     Returns {quantities, greeks_before, greeks_after}."""
+    if unexpected:
+        raise QfError("E_INPUT", f"{unexpected[0]} is not a key of a Greek instrument (I-41)",
+                      unexpected[0])
+    if any(q is None for *_, q in portfolio):
+        raise QfError("E_INPUT", "a portfolio position needs a quantity (ruling I-41)",
+                      "quantity")
     every: list[Instrument] = [(kind, k, t) for kind, k, t, _ in portfolio] + list(hedges)
     for kind, strike, expiry in every:
         if kind == "UNDERLYING" and (strike is not None or expiry is not None):
@@ -983,7 +997,7 @@ def greeks_neutralise(spot: float, rate: float, dividend_yield: float, volatilit
     def greeks(kind: str, strike: float | None, expiry: float | None) -> tuple[float, ...]:
         return _unit_greeks(spot, rate, dividend_yield, volatility, kind, strike, expiry)
 
-    book_terms = [(q, greeks(kind, k, t)) for kind, k, t, q in portfolio]
+    book_terms = [(q or 0.0, greeks(kind, k, t)) for kind, k, t, q in portfolio]
     before = [math.fsum(q * g[c] for q, g in book_terms) for c in range(3)]
     per_hedge = [greeks(*h) for h in hedges]
     rows = [GREEKS.index(t) for t in targets]

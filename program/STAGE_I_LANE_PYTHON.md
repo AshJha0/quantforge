@@ -63,3 +63,12 @@ named golden case, and the golden outputs. Every stage I operation answers throu
 `greeks_neutralise`, `credit_cds`, ...) inside `quantforge_core` modules, as every earlier stage
 does; there is no `quantforge.hedge` package path. Open item for the tutorial owner: whether the
 Python step imports `quantforge_core.hedge_solvers` etc., or a `quantforge.hedge` facade is wanted.
+
+## Rulings after the builds (I-41 to I-52)
+
+Applied I-41, I-42, I-43, I-44, I-45, I-47, I-49; confirmed I-46 and I-50 (no change). One unit
+test per behaviour in `python/tests/test_stage_i_rulings.py`. Stage I conformance 276 of 276,
+the five new cases included. Not applied: I-51 (`contract_version` 1.11.0), because
+`conformance/runner/runner.py` still checks `CONTRACT = "1.0.0"` and a 1.11.0 CLI would stop every
+run on this branch; it is a one-line change in `python/quantforge_core/cli/main.py` (and
+`tests/test_cli.py`) to make together with the runner in the integration PR. I-52: no facade.

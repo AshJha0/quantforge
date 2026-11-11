@@ -169,7 +169,7 @@ def _slv_grid(raw: Raw) -> None:
 _I_FACTORS, _I_INSTRUMENTS = 1000, 200
 _HEDGE_QP = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
                  _rows_cols("eq_matrix", _I_INSTRUMENTS, _I_INSTRUMENTS))
-_HEDGE_INTEGER = _all(_rows_cols("a", _I_FACTORS, 12), _caps_list("lot_sizes", 12))
+_HEDGE_INTEGER = _rows_cols("a", _I_FACTORS, 12)  # instruments are columns of a (I-45)
 _HEDGE_MINVAR = _all(_rows_cols("covariance", _I_INSTRUMENTS + 1, _I_INSTRUMENTS + 1),
                      _rows_cols("hedge_changes", _I_INSTRUMENTS, MAX_ARRAY))
 _HEDGE_GREEKS = _all(_caps_list("portfolio", 1000), _caps_list("hedges", 3))

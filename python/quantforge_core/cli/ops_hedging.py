@@ -22,6 +22,20 @@ def spread_cost(i: Inputs) -> Any:
 
 # Stage I wave 1 (08-hedging/hedge-solvers.md). `null` is legal only inside the bound lists (I-12).
 
+def _no_nulls(raw: Any, path: str = "") -> None:
+    """Ruling I-47: in a stage I input, `null` is E_SCHEMA everywhere except as an entry of the
+    bound lists (I-12). Objects are walked; list entries are left to the typed reads."""
+    if isinstance(raw, dict):
+        for key, value in raw.items():
+            if value is None:
+                raise QfError("E_SCHEMA", f"{path}{key}: null is not allowed (ruling I-47)", key)
+            _no_nulls(value, f"{path}{key}.")
+    elif isinstance(raw, list):
+        for item in raw:
+            if isinstance(item, (dict, list)):
+                _no_nulls(item, path)
+
+
 def _opt_matrix(i: Inputs, key: str) -> list[list[float]] | None:
     return i.matrix(key) if i.has(key) else None
 
@@ -57,6 +71,7 @@ def _qp_args(i: Inputs) -> tuple[Any, ...]:
 
 @op("hedge.qp.solve")
 def hedge_qp_solve(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     a, b, weights, ridge = _least_squares(i)
     args = (*_qp_args(i), i.opt_real("cost_weight"), _opt_reals(i, "margin_rates"),
             i.opt_real("margin_limit"))
@@ -65,6 +80,7 @@ def hedge_qp_solve(i: Inputs) -> Any:
 
 @op("hedge.frontier.solve")
 def hedge_frontier_solve(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     a, b, weights, ridge = _least_squares(i)
     args = (*_qp_args(i), _opt_reals(i, "margin_rates"), i.opt_real("margin_limit"),
             i.opt_real("cost_weight"))
@@ -74,6 +90,7 @@ def hedge_frontier_solve(i: Inputs) -> Any:
 
 @op("hedge.integer.solve")
 def hedge_integer_solve(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     a, b, weights, ridge = _least_squares(i)
     lots = i.reals("lot_sizes")
     lower, upper = _opt_lot_bounds(i, "lower_lots"), _opt_lot_bounds(i, "upper_lots")
@@ -82,36 +99,46 @@ def hedge_integer_solve(i: Inputs) -> Any:
 
 @op("hedge.minvar.ratio")
 def hedge_minvar_ratio(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     return core.hedge_solvers.minvar_ratio(
         _opt_matrix(i, "covariance"), _opt_reals(i, "exposure_changes"),
         _opt_matrix(i, "hedge_changes"))
 
 
-def _instruments(i: Inputs, key: str, held: bool) -> list[tuple[Any, ...]]:
+def _instruments(i: Inputs, key: str, held: bool,
+                 unexpected: list[str]) -> list[tuple[Any, ...]]:
+    """Greek instruments; keys outside the fixed set (I-41) are collected in `unexpected`."""
+    allowed = {"instrument", "strike", "expiry_years"} | ({"quantity"} if held else set())
     out: list[tuple[Any, ...]] = []
     for k, item in enumerate(i.array(key)):
         if not isinstance(item, dict):
             raise QfError("E_SCHEMA", f"{key}/{k}: not an object", key)
         p = Inputs(item, f"{key}/{k}.")
+        _no_nulls(item)
+        unexpected.extend(f"{key}/{k}.{name}" for name in item if name not in allowed)
         entry = (p.enum("instrument", ("CALL", "PUT", "UNDERLYING")), p.opt_real("strike"),
                  p.opt_real("expiry_years"))
-        out.append((*entry, p.real("quantity")) if held else entry)
+        out.append((*entry, p.opt_real("quantity")) if held else entry)
     return out
 
 
 @op("hedge.greeks.neutralise")
 def hedge_greeks_neutralise(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     market = (i.real("spot"), i.real("rate"), i.real("dividend_yield"), i.real("volatility"))
-    portfolio = _instruments(i, "portfolio", True)
-    hedges = _instruments(i, "hedges", False)
+    unexpected: list[str] = []
+    portfolio = _instruments(i, "portfolio", True, unexpected)
+    hedges = _instruments(i, "hedges", False, unexpected)
     targets = i.array("targets")
     if not all(isinstance(t, str) and t in ("DELTA", "GAMMA", "VEGA") for t in targets):
         raise QfError("E_SCHEMA", "targets: each must be DELTA, GAMMA or VEGA", "targets")
-    return core.hedge_solvers.greeks_neutralise(*market, portfolio, hedges, targets)
+    return core.hedge_solvers.greeks_neutralise(*market, portfolio, hedges, targets,
+                                                unexpected)
 
 
 @op("hedge.beta.futures")
 def hedge_beta_futures(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     args = (i.real("portfolio_value"), i.real("portfolio_beta"), i.real("target_beta"),
             i.real("futures_price"), i.real("multiplier"))
     rounding = i.enum("rounding", ("NEAREST", "NONE")) if i.has("rounding") else "NEAREST"
@@ -120,6 +147,7 @@ def hedge_beta_futures(i: Inputs) -> Any:
 
 @op("hedge.residual.report")
 def hedge_residual_report(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     return core.hedge_solvers.residual_report(
         i.matrix("a"), i.reals("b"), i.reals("x"), i.matrix("covariance"))
 
@@ -135,6 +163,7 @@ def _targets(i: Inputs) -> list[str]:
 
 @op("hedge.credit.cds")
 def hedge_credit_cds(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     as_of, dates, survival = _hazard(i.object("hazard"))
     book = [(t.date("maturity"), t.real("coupon"), t.real("notional"),
              t.enum("side", ("BUY_PROTECTION", "SELL_PROTECTION"))) for t in _objects(i, "book")]
@@ -159,9 +188,13 @@ def _positions(i: Inputs, key: str,
 
 @op("hedge.correlation.neutralise")
 def hedge_correlation_neutralise(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     market = tuple(i.real(k) for k in ("spot1", "spot2", "rate", "yield1", "yield2", "vol1",
                                        "vol2", "correlation"))
-    args = (*market, _positions(i, "book"), _positions(i, "hedges"), _targets(i))
+    targets = _targets(i)
+    if not all(t in ("DELTA_1", "DELTA_2", "VEGA_1", "VEGA_2", "CORRELATION") for t in targets):
+        raise QfError("E_SCHEMA", "targets: not a listed Greek (ruling I-42)", "targets")
+    args = (*market, _positions(i, "book"), _positions(i, "hedges"), targets)
     return core.credit_correlation_hedges.correlation_neutralise(*args)
 
 
@@ -169,6 +202,7 @@ def hedge_correlation_neutralise(i: Inputs) -> Any:
 
 @op("hedge.crossasset.solve")
 def hedge_crossasset_solve(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     curve = i.object("curve")
     kinds = ("CALL", "PUT", "FORWARD", "ZCB", "UNDERLYING")
     args = (i.real("spot"), i.real("dividend_yield"), i.real("volatility"), curve.reals("times"),
@@ -181,6 +215,7 @@ def hedge_crossasset_solve(i: Inputs) -> Any:
 
 @op("hedge.backtest.delta")
 def hedge_backtest_delta(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     option = i.object("option")
     args = (option.enum("type", ("CALL", "PUT")), option.real("strike"),
             option.real("expiry_years"), i.real("quantity"), i.real("rate"),
@@ -191,11 +226,13 @@ def hedge_backtest_delta(i: Inputs) -> Any:
 
 @op("hedge.effectiveness")
 def hedge_effectiveness(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     return core.dynamic_hedge.effectiveness(i.reals("item_changes"), i.reals("hedge_changes"))
 
 
 @op("hedge.select.solve")
 def hedge_select_solve(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     a, b, weights, ridge = _least_squares(i)
     lower, upper = _opt_bounds(i, "lower"), _opt_bounds(i, "upper")
     extra = [k for k in ("eq_matrix", "eq_rhs", "singular") if i.has(k)]
@@ -207,6 +244,7 @@ def hedge_select_solve(i: Inputs) -> Any:
 
 @op("hedge.slippage.report")
 def hedge_slippage_report(i: Inputs) -> Any:
+    _no_nulls(i.raw)
     orders = []
     for o in _objects(i, "orders"):
         fills = [(f.real("quantity"), f.real("price")) for f in _objects(o, "fills")]
