@@ -109,6 +109,15 @@ public final class Tape {
     }
 
     /**
+     * The number of nodes recorded so far.
+     *
+     * @return the size
+     */
+    public int size() {
+        return n;
+    }
+
+    /**
      * Adjoints of every node with respect to {@code out}.
      *
      * @param out the output node
@@ -117,7 +126,17 @@ public final class Tape {
     public double[] gradient(int out) {
         double[] adj = new double[n];
         adj[out] = 1.0;
-        for (int i = out; i >= 0; i--) {
+        return sweep(adj);
+    }
+
+    /**
+     * Sweeps seeded adjoints backwards over the whole tape, in place.
+     *
+     * @param adj adjoints, one per node, holding the seeds on entry
+     * @return {@code adj}, now complete
+     */
+    public double[] sweep(double[] adj) {
+        for (int i = n - 1; i >= 0; i--) {
             double g = adj[i];
             if (g == 0.0) {
                 continue;

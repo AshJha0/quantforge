@@ -224,22 +224,13 @@ class ShortRateTest {
             assertEquals(ref, l.dDiscountFactors()[i], 1e-10 + 1e-6 * Math.abs(ref), "pillar " + i);
         }
         assertEquals(price(times, dfs, a, sig, pay, ex, g), l.price(), 1e-12);
-        double[] tp = new double[21];
-        double[] tl = new double[21];
-        for (int r = -5; r < 21; r++) {
-            long t0 = System.nanoTime();
-            price(times, dfs, a, sig, pay, ex, g);
-            long t1 = System.nanoTime();
-            BermudanLadder.ladder(times, dfs, a, sig, pay, 0.035, true, 1.0, ex, g);
-            long t2 = System.nanoTime();
-            if (r >= 0) {
-                tp[r] = t1 - t0;
-                tl[r] = t2 - t1;
-            }
+        BermudanLadder.Ladder tape = BermudanLadder.ladderTape(times, dfs, a, sig, pay, 0.035, true, 1.0, ex, g);
+        assertEquals(tape.price(), l.price(), 1e-15);
+        assertEquals(tape.dMeanReversion(), l.dMeanReversion(), 1e-11 * Math.abs(tape.dMeanReversion()));
+        assertEquals(tape.dSigma(), l.dSigma(), 1e-11 * Math.abs(tape.dSigma()));
+        for (int i = 0; i < dfs.length; i++) {
+            assertEquals(tape.dDiscountFactors()[i], l.dDiscountFactors()[i], 1e-14 + 1e-11 * Math.abs(tape.dDiscountFactors()[i]));
         }
-        java.util.Arrays.sort(tp);
-        java.util.Arrays.sort(tl);
-        System.out.println("G-9 AAD cost ratio (median ladder / median price): " + tl[10] / tp[10]);
     }
 
     private static double price(double[] times, double[] dfs, double a, double sig, double[] pay, double[] ex,
@@ -255,5 +246,40 @@ class ShortRateTest {
         double d1 = (v.applyAsDouble(h) - v.applyAsDouble(-h)) / (2 * h * x);
         double d2 = (v.applyAsDouble(h / 2) - v.applyAsDouble(-h / 2)) / (h * x);
         return (4 * d2 - d1) / 3;
+    }
+
+    /**
+     * G-9 performance record on the inputs of {@code aadladder_g-0001}: median of 21 timed runs after 5 warm-ups
+     * of one price and of price plus ladder, same thread. Printed, not asserted (timing is machine-dependent).
+     */
+    @Test
+    void aadCostRatioG9() {
+        double[] times = {0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
+            10.005479452054795, 15.01095890410959, 20.013698630136986, 30.019178082191782};
+        double[] dfs = {0.98085, 0.9619, 0.9254, 0.8906, 0.8242, 0.762, 0.6787, 0.561, 0.467, 0.332};
+        double[] pay = {2.0, 3.0, 4.0, 5.0, 6.0};
+        double[] ex = {1.0, 2.0, 3.0, 4.0, 5.0};
+        ShortRateFd.Grid g = new ShortRateFd.Grid(101, 50, 6.0);
+        ShortRate.Params p = new ShortRate.Params(ShortRate.Model.HULL_WHITE, 0.05, 0.01, 0.0,
+                new ShortRate.Curve(times, dfs));
+        double[] tp = new double[21];
+        double[] tl = new double[21];
+        double sink = 0.0;
+        for (int r = -5; r < 21; r++) {
+            long t0 = System.nanoTime();
+            sink += ShortRateFd.bermudan(p, pay, 0.039462, true, 1e6, ex, g);
+            long t1 = System.nanoTime();
+            sink += BermudanLadder.ladder(times, dfs, 0.05, 0.01, pay, 0.039462, true, 1e6, ex, g).dSigma();
+            long t2 = System.nanoTime();
+            if (r >= 0) {
+                tp[r] = t1 - t0;
+                tl[r] = t2 - t1;
+            }
+        }
+        java.util.Arrays.sort(tp);
+        java.util.Arrays.sort(tl);
+        assertTrue(Double.isFinite(sink));
+        System.out.printf("G-9 aadladder_g-0001: price %.3f ms, price+ladder %.3f ms, ratio %.3f%n", tp[10] / 1e6,
+                tl[10] / 1e6, tl[10] / tp[10]);
     }
 }
