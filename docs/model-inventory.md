@@ -715,7 +715,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** QuantLib 1.44 values on each date with the same cash arithmetic; numpy regression.
 - **Monitoring thresholds:** a live hedge's regression R² below 0.8 or dollar offset outside [0.8, 1.25] over a quarter.
-- **Data lineage hash:** sha256 6369d73df9b153ef8621b0bcf4978eb3dede5889b93baa4da4361888aad3735f (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`)
+- **Data lineage hash:** sha256 6369d73df9b153ef8621b0bcf4978eb3dede5889b93baa4da4361888aad3735f (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`); 4d8d4cf5d70a3dbd497fe4678a656409b137d1be9303d054ecc3750ff1dbbbb8 (`hedgebtcost_i`, wave 4e: costs in the backtest)
 - **Retirement trigger:** a need for cost-aware rebalancing or stochastic-volatility hedging.
 - **Validation report:** `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`.
 

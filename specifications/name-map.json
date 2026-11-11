@@ -3341,8 +3341,14 @@
     "dividend_yield": {
      "java": "dividendYield"
     },
+    "half_spread": {
+     "java": "halfSpread"
+    },
     "hedge_volatility": {
      "java": "hedgeVolatility"
+    },
+    "impact": {
+     "java": "impact"
     },
     "option": {
      "java": "option"
@@ -3368,6 +3374,7 @@
     "regression_r2",
     "regression_slope",
     "shares",
+    "trading_cost",
     "variance_reduction"
    ]
   },
@@ -7963,6 +7970,7 @@
   "eq.forward.outright: expiry",
   "eq.futures.basis: expiry",
   "eq.futures.basis: financing_spread",
+  "hedge.backtest.delta: half_spread",
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
   "risk.mc.greeks: bump_relative",

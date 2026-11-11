@@ -18,7 +18,7 @@ OPTIONAL = {"monitoring", "monitoring_per_year", "model", "independent_amount", 
             "smoothing_width", "bump_relative", "grid",
             "ridge", "eq_matrix", "eq_rhs", "lower", "upper", "singular", "lower_lots", "upper_lots",  # stage I hedge solvers
             "covariance", "exposure_changes", "hedge_changes", "rounding",
-            "half_spreads", "impact", "cost_weight", "margin_rates", "margin_limit", "max_instruments"}
+            "half_spreads", "impact", "cost_weight", "margin_rates", "margin_limit", "max_instruments", "half_spread"}
 
 
 UNION = {"initial_variance": {"str", "real", "int"}}  # spec: "SAMPLE" or a number (05-volatility/garch.md)

@@ -75,6 +75,13 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-37 | `null` average price | `average_price` is `null` for an order with no fills; this extends I-12's list of places where `null` is legal |
 | I-38 | `E_LIMIT` sizes, wave 4d | 10,000 orders; 1,000,000 fills in total |
 
+## Wave 4e, costs in the backtest
+
+| # | Point | Ruling |
+|---|---|---|
+| I-39 | Backtest costs | Optional `half_spread` and `impact` charge `half_spread |dq| + impact dq^2` on every share trade: the initial `h_0` at `t_0` (so `Pi_0 = -cost(h_0)`), and each rebalance after that date's `Pi` is recorded. No unwind at the end. Without the inputs the wave 4b result is unchanged (I-13 pattern) |
+| I-40 | `trading_cost` output | The undiscounted sum of the costs paid, present only when a cost input is given |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).

@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-hedge-integer-i","operation":"hedge.integer.solve","inputs":{"a":[[1.0,0.95],[0.95,1.0]],"b":[-1.265,-1.27],"weights":[1.0,1.0],"lot_sizes":[1.0,1.0]}}
