@@ -1,6 +1,6 @@
 # Java 25 implementation
 
-Stages A to G (stage G pending release as v0.7.0) of QuantForge, written from the specifications. It uses JDK 25
+Stages A to G (stage G released as v0.7.0) of QuantForge, written from the specifications. It uses JDK 25
 final features only, and has no runtime dependencies; JUnit is for tests only.
 
 ```bash

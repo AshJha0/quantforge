@@ -1,0 +1,109 @@
+{
+ "schema_version": "1.0",
+ "case_id": "example-synthetic-credit-composite-d",
+ "operation": "credit.curve.composite",
+ "inputs": {
+  "trade_date": "2026-11-06",
+  "discount": {
+   "as_of": "2026-11-06",
+   "interpolation": "LOG_LINEAR_DF",
+   "pillars": [
+    {
+     "date": "2046-11-06",
+     "discount_factor": 0.458161174870904
+    }
+   ]
+  },
+  "recovery": 0.4,
+  "constituents": [
+   {
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0045
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.006
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.009
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.012
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0135
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.015
+     }
+    ],
+    "weight": 2.0
+   },
+   {
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.00585
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.0078000000000000005
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.0117
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.015600000000000001
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.01755
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.0195
+     }
+    ],
+    "weight": 1.0
+   },
+   {
+    "quotes": [
+     {
+      "tenor": "6M",
+      "spread": 0.0036
+     },
+     {
+      "tenor": "1Y",
+      "spread": 0.0048000000000000004
+     },
+     {
+      "tenor": "3Y",
+      "spread": 0.0072
+     },
+     {
+      "tenor": "5Y",
+      "spread": 0.009600000000000001
+     },
+     {
+      "tenor": "7Y",
+      "spread": 0.0108
+     },
+     {
+      "tenor": "10Y",
+      "spread": 0.012
+     }
+    ],
+    "weight": 1.0
+   }
+  ],
+  "scale": 1.0
+ }
+}
