@@ -50,7 +50,7 @@ public final class Exotics {
 
     /**
      * Discrete monitoring m times a year: the continuous price at the barrier shifted away from spot by
-     * {@code exp(beta v sqrt(1/m))} (rulings G-7, G-8). The domain check uses the unshifted barrier.
+     * {@code exp(beta v sqrt(T/n))}, {@code n = floor(m T + 0.5)} (rulings G-7, G-8, G-30). The domain check uses the unshifted barrier.
      *
      * @param phi 1 for a call, -1 for a put
      * @param type the barrier type
@@ -71,7 +71,11 @@ public final class Exotics {
         if (down ? s <= h : s >= h) {
             throw new QfError("E_DOMAIN", "spot is on or beyond the barrier (ruling E-A19)", "barrier");
         }
-        double shift = Math.exp(BGK_BETA * v * Math.sqrt(1.0 / perYear));
+        long n = (long) Math.floor(perYear * t + 0.5); // ruling G-30, ties round up
+        if (n < 1) {
+            throw new QfError("E_DOMAIN", "no monitoring date before expiry (ruling G-30)", "monitoring_per_year");
+        }
+        double shift = Math.exp(BGK_BETA * v * Math.sqrt(t / n));
         return barrier(phi, type, s, k, t, r, q, v, down ? h / shift : h * shift, rebate);
     }
 

@@ -398,6 +398,24 @@ public final class ShortRate {
      * @return price, forward swap rate and annuity
      */
     public static Swaption swaption(Params p, double t0, double[] pay, double rate, boolean payer, double notional) {
+        return swaption(p, 0.0, t0, pay, rate, payer, notional);
+    }
+
+    /**
+     * European swaption by Jamshidian under any of the three models (ruling G-20). For Vasicek and CIR the
+     * curve is the model's own bonds at {@code r0}; Hull-White ignores {@code r0}.
+     *
+     * @param p the model
+     * @param r0 short rate today (Vasicek and CIR)
+     * @param t0 expiry and swap start in years
+     * @param pay payment times in years, increasing, after t0
+     * @param rate fixed rate
+     * @param payer true for a payer swaption, false for a receiver
+     * @param notional notional
+     * @return price, forward swap rate and annuity
+     */
+    public static Swaption swaption(Params p, double r0, double t0, double[] pay, double rate, boolean payer,
+                                    double notional) {
         int n = pay.length;
         double[] tau = new double[n];
         double[] c = new double[n];
@@ -405,34 +423,77 @@ public final class ShortRate {
         for (int i = 0; i < n; i++) {
             tau[i] = pay[i] - (i == 0 ? t0 : pay[i - 1]);
             c[i] = rate * tau[i] + (i == n - 1 ? 1.0 : 0.0);
-            annuity += tau[i] * p.curve().df(pay[i]);
+            annuity += tau[i] * df0(p, r0, pay[i]);
         }
-        double fwd = (p.curve().df(t0) - p.curve().df(pay[n - 1])) / annuity;
+        double fwd = (df0(p, r0, t0) - df0(p, r0, pay[n - 1])) / annuity;
         double rStar = criticalRate(p, t0, pay, c);
         double total = 0.0;
         for (int i = 0; i < n; i++) {
             double x = zcb(p, rStar, t0, pay[i]);
-            double call = gaussianCall(p.a(), p.sigma(), x, t0, pay[i], p.curve().df(t0), p.curve().df(pay[i]));
-            double v = payer ? call - p.curve().df(pay[i]) + x * p.curve().df(t0) : call;
-            total += c[i] * v;
+            total += c[i] * bondOption(p, r0, !payer, x, t0, pay[i]);
         }
         return new Swaption(notional * total, fwd, notional * annuity);
     }
 
-    private static double criticalRate(Params p, double t0, double[] pay, double[] c) {
+    /** P(0, t): the curve for Hull-White, the model bond at r0 otherwise. */
+    static double df0(Params p, double r0, double t) {
+        return p.model() == Model.HULL_WHITE ? p.curve().df(t) : zcb(p, r0, 0.0, t);
+    }
+
+    /** The coupon-bond equation {@code sum c_i P(t0, Ti; r) - 1} and its r-derivative. */
+    private static double[] couponBond(Params p, double t0, double[] pay, double[] c, double r) {
+        double f = -1.0;
+        double d = 0.0;
+        for (int i = 0; i < pay.length; i++) {
+            double pi = zcb(p, r, t0, pay[i]);
+            double tau = pay[i] - t0;
+            f += c[i] * pi;
+            d -= c[i] * pi * (p.model() == Model.CIR ? cirB(p, tau) : bFactor(p.a(), tau));
+        }
+        return new double[] {f, d};
+    }
+
+    /**
+     * Jamshidian critical rate: Newton from 0 kept inside the bracket {@code [-1, 1]} ({@code [0, 1]} for CIR),
+     * bisecting when a step leaves it (ruling G-29). No sign change on the bracket, or a last coupon
+     * {@code c_n <= 0}, is E_DOMAIN.
+     */
+    static double criticalRate(Params p, double t0, double[] pay, double[] c) {
+        if (!(c[c.length - 1] > 0.0)) {
+            throw new QfError("E_DOMAIN", "1 + K tau_n <= 0 (ruling G-29)", "fixed_rate");
+        }
+        double lo = p.model() == Model.CIR ? 0.0 : -1.0;
+        double hi = 1.0;
+        double flo = couponBond(p, t0, pay, c, lo)[0];
+        double fhi = couponBond(p, t0, pay, c, hi)[0];
+        if (flo == 0.0) {
+            return lo;
+        }
+        if (flo < 0.0 || fhi > 0.0) {
+            String why = p.model() == Model.CIR ? "no non-negative critical rate (ruling G-20)"
+                    : "no critical rate on [-1, 1] (ruling G-29)";
+            throw new QfError("E_DOMAIN", why, "fixed_rate");
+        }
         double r = 0.0;
-        for (int it = 0; it < 200; it++) {
-            double f = -1.0;
-            double d = 0.0;
-            for (int i = 0; i < pay.length; i++) {
-                double pi = zcb(p, r, t0, pay[i]);
-                f += c[i] * pi;
-                d -= c[i] * pi * bFactor(p.a(), pay[i] - t0);
-            }
+        for (int it = 0; it < 400; it++) {
+            double[] fd = couponBond(p, t0, pay, c, r);
+            double f = fd[0];
             if (Math.abs(f) <= 1e-15) {
                 return r;
             }
-            r -= f / d;
+            if (f > 0.0) {
+                lo = r;
+            } else {
+                hi = r;
+            }
+            double next = r - f / fd[1];
+            if (!(next > lo && next < hi)) {
+                next = 0.5 * (lo + hi);
+            }
+            if (Math.abs(next - r) <= 1e-17 * Math.max(1.0, Math.abs(r))) {
+                return next;
+            }
+            r = next;
         }
         throw new QfError("E_NO_CONVERGENCE", "critical rate did not converge");
     }

@@ -34,9 +34,9 @@ final class OpsShortRate {
     }
 
     /** The raw model inputs; checks run after the finite gate, in the spec order. */
-    private record Raw(String model, double a, double sigma, double b, double[] times, double[] dfs) {}
+    record Raw(String model, double a, double sigma, double b, double[] times, double[] dfs) {}
 
-    private static Raw read(In in, boolean hullWhiteOnly) {
+    static Raw read(In in, boolean hullWhiteOnly) {
         String name = hullWhiteOnly ? "HULL_WHITE" : in.string("model");
         double a = in.real("mean_reversion");
         double sigma = in.real("sigma");
@@ -63,7 +63,7 @@ final class OpsShortRate {
         throw input("model");
     }
 
-    private static ShortRate.Params params(Raw r, double shortRate) {
+    static ShortRate.Params params(Raw r, double shortRate) {
         ShortRate.Model m = model(r);
         if (!(r.a() > 0.0) || !(r.sigma() > 0.0)) {
             throw domain(r.a() > 0.0 ? "sigma" : "mean_reversion");
@@ -107,6 +107,17 @@ final class OpsShortRate {
             throw domain("rho");
         }
         return new G2pp.Params(new ShortRate.Curve(r.times(), r.dfs()), r.a(), r.sigma(), r.b(), r.eta(), r.rho());
+    }
+
+    /** Payment times: at least one, strictly increasing, the first after {@code t0}; else E_INPUT. */
+    static void checkPayments(double[] pay, double t0) {
+        boolean ok = pay.length > 0 && pay[0] > t0;
+        for (int i = 1; i < pay.length && ok; i++) {
+            ok = pay[i] > pay[i - 1];
+        }
+        if (!ok) {
+            throw input("payment_times");
+        }
     }
 
     static void register(Map<String, Function<In, Out>> table) {
@@ -159,8 +170,10 @@ final class OpsShortRate {
             return Operations.out("price", price, "bond_price_expiry", pt, "bond_price_maturity", ps);
         });
         table.put("rates.shortrate.swaption", in -> {
+            boolean hw = !in.has("model") || in.string("model").equals("HULL_WHITE");
             boolean hasRate = in.has("short_rate");
-            Raw raw = read(in, true);
+            Raw raw = read(in, !in.has("model"));
+            double r0 = hw ? 0.0 : in.real("short_rate");
             double t0 = in.real("expiry_years");
             double[] pay = in.reals("payment_times");
             double rate = in.real("fixed_rate");
@@ -168,24 +181,18 @@ final class OpsShortRate {
             double notional = in.real("notional");
             in.limit(pay.length > MAX_PILLARS, "payment_times");
             in.gate();
-            if (hasRate) {
+            ShortRate.Params p = params(raw, r0);
+            if (hw && hasRate) {
                 throw new QfError("E_INPUT", "short_rate is not allowed for the Hull-White swaption", "short_rate");
             }
-            ShortRate.Params p = params(raw, 0.0);
             if (!(t0 > 0.0)) {
                 throw domain("expiry_years");
             }
-            boolean ok = pay.length > 0 && pay[0] > t0;
-            for (int i = 1; i < pay.length && ok; i++) {
-                ok = pay[i] > pay[i - 1];
-            }
-            if (!ok) {
-                throw input("payment_times");
-            }
+            checkPayments(pay, t0);
             if (!type.equals("PAYER") && !type.equals("RECEIVER")) {
                 throw input("swaption_type");
             }
-            ShortRate.Swaption sw = ShortRate.swaption(p, t0, pay, rate, type.equals("PAYER"), notional);
+            ShortRate.Swaption sw = ShortRate.swaption(p, r0, t0, pay, rate, type.equals("PAYER"), notional);
             return Operations.out("price", sw.price(), "forward_swap_rate", sw.forwardSwapRate(), "annuity",
                     sw.annuity());
         });

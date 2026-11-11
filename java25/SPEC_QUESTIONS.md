@@ -208,3 +208,11 @@ Silent choices, wave 1a (F6, Q1):
 | F-J6 | R8: the Hessian is central differences of the exact (forward-mode) score with relative step 1e-5; Newton stops at a relative step below 1e-12, else `E_NO_CONVERGENCE`. The interior test for `nu` uses `nu - 2 >= 1e-6` and `500 - nu >= 5e-4` |
 | F-J7 | R10 continuity property: `local-and-forward-vol.md` asks for `abs(w(T_j(1 - 1e-9)) - w(T_j)) <= 1e-9 w(T_j)`. A step of 1e-9 T_j moves w by `w_T T_j 1e-9`, which equals the bound when the left slope is `w_j / T_j` and goes over it at an inner node with a steeper interval. Java asserts 3e-9; please state the bound as `(w_T T_j / w_j + 1) 1e-9` or similar |
 | F-J8 | Q1: `SEQUENTIAL` with a stage F method runs the global Newton solve directly (ruling F-21 allows either; both give the same curve) |
+
+Stage G:
+
+| # | Choice |
+|---|---|
+| G-J1 | `xva.exposure.swap_ee_hw`: the spec requires `start_years >= 0` but names no error code for a negative value, and no golden case covers it. Java returns `E_DOMAIN` (key `start_years`), checked after `side` and before `payment_times`. Please state the code and its place in the check order |
+| G-J2 | `rates.shortrate.hw_calibrate`: a 2,001-point log-spaced scan of `F` on `[1e-4, 1]` brackets the minimum (an end point gives `E_NO_CONVERGENCE`), then bisection on the analytic `F'` (bond-option vegas at fixed Jamshidian strikes) to a relative width of 1e-15 |
+| G-J3 | `capfloor_g-0040` ("1 + K tau <= 0") conflicts with the spec: it has `strike = -0.5` on annual periods, so `1 + K tau = 0.5 > 0`, and the rule in `short-rate-models.md` (`1 + K tau_i > 0`, else `E_DOMAIN`) makes it a valid case. The generator only asserts the code; it does not compute it. Java follows the spec and returns a price, so this case fails. Please fix the golden (for example `strike = -1.0`) or state the extra rule |

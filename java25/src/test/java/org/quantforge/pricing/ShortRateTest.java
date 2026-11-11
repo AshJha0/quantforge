@@ -134,4 +134,64 @@ class ShortRateTest {
             assertEquals(n * fwd, diff, 1e-6);
         }
     }
+
+    /** G-28: a Bermudan is at least the scheme's own single-date value; a callable bond at most its no-call bond. */
+    @Test
+    void schemeBounds() {
+        ShortRate.Params p = models()[2];
+        ShortRateFd.Grid g = new ShortRateFd.Grid(101, 50, 6.0);
+        double[] pay = {2.0, 3.0, 4.0, 5.0};
+        double one = ShortRateFd.bermudan(p, pay, 0.04, true, 1.0, new double[] {1.0}, g);
+        double berm = ShortRateFd.bermudan(p, pay, 0.04, true, 1.0, new double[] {1.0, 2.0, 3.0}, g);
+        assertTrue(berm >= one);
+        double euro = ShortRate.swaption(p, 1.0, pay, 0.04, true, 1.0).price();
+        assertEquals(euro, one, 0.02 * euro);
+        double[] bond = {1.0, 2.0, 3.0, 4.0, 5.0};
+        double straight = ShortRateFd.callable(p, bond, 0.05, 1.0, new double[0], 1.0, g);
+        double call = ShortRateFd.callable(p, bond, 0.05, 1.0, new double[] {2.0, 3.0}, 1.0, g);
+        assertTrue(call <= straight);
+        double cf = 0.0;
+        for (int i = 0; i < bond.length; i++) {
+            cf += 0.05 * CURVE.df(bond[i]);
+        }
+        cf += CURVE.df(5.0);
+        assertEquals(cf, straight, 1e-3);
+    }
+
+    /** Wave 2e: cap minus floor equals the swaplet sum on the model's bonds. */
+    @Test
+    void capFloorParity() {
+        double[] t = {0.5, 1.0, 1.5, 2.0};
+        for (ShortRate.Params p : models()) {
+            double r = 0.035;
+            double cap = sum(ShortRateProducts.capFloor(p, r, t, 0.04, true, 1.0));
+            double floor = sum(ShortRateProducts.capFloor(p, r, t, 0.04, false, 1.0));
+            double sw = 0.0;
+            for (int i = 1; i < t.length; i++) {
+                sw += ShortRate.df0(p, r, t[i - 1]) - (1.0 + 0.04 * (t[i] - t[i - 1])) * ShortRate.df0(p, r, t[i]);
+            }
+            assertEquals(sw, cap - floor, 1e-12, p.model().name());
+        }
+    }
+
+    /** Wave 2c: targets made at a known sigma give that sigma back. */
+    @Test
+    void calibrationRecoversSigma() {
+        ShortRate.Params p = new ShortRate.Params(ShortRate.Model.HULL_WHITE, 0.05, 0.007, 0.0, CURVE);
+        double[] pay = {2.0, 3.0, 4.0, 5.0};
+        ShortRateProducts.Quote[] q = new ShortRateProducts.Quote[2];
+        q[0] = new ShortRateProducts.Quote(1.0, pay, 0.04, true, ShortRate.swaption(p, 1.0, pay, 0.04, true, 1.0).price());
+        double[] pay2 = {3.0, 4.0, 5.0};
+        q[1] = new ShortRateProducts.Quote(2.0, pay2, 0.04, false,
+                ShortRate.swaption(p, 2.0, pay2, 0.04, false, 1.0).price());
+        assertEquals(0.007, ShortRateProducts.calibrate(CURVE, 0.05, q).sigma(), 1e-9);
+    }
+
+    private static double sum(double[] x) {
+        double s = 0.0;
+        for (double v : x) {
+            s += v;
+        }
+        return s;
+    }
 }
