@@ -240,3 +240,12 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
   pair rather than guess the table; no golden uses one. Owner item with G-49.
 - AAD ladder (Q3b): hand-written adjoint of the G-18 scheme; G-9 ratio measured by
   `cargo bench -p quantforge-bench --bench aad_ladder` (4.21 on 2026-11-11, loaded laptop).
+- `expsim_g` (wave 4c), eight `pfe_99` goldens on the flat top of a long payer
+  (`expsim_g-0039`, `-0045`, `-0055`, `-0061`, `-0071`, `-0077`, `-0087`, `-0093`; gaps 3e-5 to
+  1e-4 relative, all with Rust above the golden) do not meet the spec's own definition. For
+  `-0039` at 17 years the golden 291,322.04 leaves 1.234% of the Gaussian mass above it, so
+  `P(exposure <= y) = 98.77% < 99%`; Rust's 291,331.93 leaves 1.0000% (roots bracketed by
+  bisection; checked independently in Python). The same cases fail the ORE PFE99 check
+  (G-42). Only `-0039` was rechecked independently; the other seven show the same pattern.
+  Rust follows the definition; the generator's quantile search near the maximum of
+  `f` looks too coarse.
