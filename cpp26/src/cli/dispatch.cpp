@@ -58,6 +58,7 @@
 #include "quantforge/core/risk_f3.hpp"
 #include "quantforge/core/risk_f4.hpp"
 #include "quantforge/core/book.hpp"
+#include "quantforge/core/shortrate.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {

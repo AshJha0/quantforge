@@ -1,121 +1,9 @@
-// CLI handlers, stage G G1: one-factor short-rate models (04-pricing/short-rate-models.md, rulings G-1 to G-6).
+// CLI handlers, stage G: short-rate models, G2++, MC Greeks and swap exposure (04-pricing/short-rate-models.md,
+// 06-risk/mc-greeks.md, 06-risk/xva-exposure.md; rulings G-1 to G-21). The maths is in core/shortrate.cpp.
 // Included by dispatch.cpp inside its unnamed namespace; not a translation unit of its own.
-// Stage G wave 1 first cut: the maths lives here until it moves to a core module.
 
-enum class SrModel { Vasicek, Cir, HullWhite };
-
-struct SrCurve {
-    Vec t, lnp;  // nodes with (0, 0) first
-    double ln_p(double x) const {
-        const std::size_t n = t.size();
-        if (x >= t[n - 1]) {
-            const double f = (lnp[n - 2] - lnp[n - 1]) / (t[n - 1] - t[n - 2]);
-            return lnp[n - 1] - f * (x - t[n - 1]);
-        }
-        std::size_t i = 1;
-        while (t[i] <= x) ++i;  // t[i-1] <= x < t[i]
-        const double w = (x - t[i - 1]) / (t[i] - t[i - 1]);
-        return lnp[i - 1] + w * (lnp[i] - lnp[i - 1]);
-    }
-    double fwd(double x) const {  // right-hand instantaneous forward (G-3); flat beyond the last pillar
-        const std::size_t n = t.size();
-        std::size_t i = 1;
-        while (i < n && t[i] <= x) ++i;
-        if (i >= n) i = n - 1;
-        return -(lnp[i] - lnp[i - 1]) / (t[i] - t[i - 1]);
-    }
-};
-
-struct SrParams {
-    SrModel model;
-    double a, sigma, b = 0.0;
-    SrCurve curve;
-};
-
-// B = (1 - e^{-a tau}) / a, and (B - tau) / a^2 with a series for small a tau (G-2).
-double sr_b(double a, double tau) { return -std::expm1(-a * tau) / a; }
-double sr_bm_tau_over_a2(double a, double tau) {
-    const double x = a * tau;
-    if (x < 1e-2) {
-        // (B - tau)/a^2 = tau^3 sum_{k>=0} (-x)^k / (k+3)! * (-1)... : B - tau = sum_{k>=2} (-1)^{k+1} a^{k-1} tau^k / k!
-        double term = -tau * tau / 2.0, sum = 0.0;  // k = 2 term of (B - tau)/a = -tau^2/2 ...
-        for (int k = 2; k < 30; ++k) {
-            sum += term;
-            term *= -x / (k + 1);
-        }
-        return sum / a;  // (B - tau)/a^2 = [(B - tau)/a] / a
-    }
-    return (sr_b(a, tau) - tau) / (a * a);
-}
-
-// ln A and B for P(t, T) = A exp(-B r).
-std::pair<double, double> sr_ab(const SrParams& p, double t, double T) {
-    const double tau = T - t, a = p.a, s2 = p.sigma * p.sigma;
-    if (p.model == SrModel::Vasicek) {
-        const double B = sr_b(a, tau);
-        return {sr_bm_tau_over_a2(a, tau) * (a * a * p.b - s2 / 2) - s2 * B * B / (4 * a), B};
-    }
-    if (p.model == SrModel::Cir) {
-        const double g = std::sqrt(a * a + 2 * s2), em1 = std::expm1(g * tau);
-        const double den = (g + a) * em1 + 2 * g;
-        return {(2 * a * p.b / s2) * (std::log(2 * g / den) + (a + g) * tau / 2), 2 * em1 / den};
-    }
-    const double B = sr_b(a, tau);
-    const double lnA = p.curve.ln_p(T) - p.curve.ln_p(t) + B * p.curve.fwd(t) -
-                       s2 / (4 * a) * (-std::expm1(-2 * a * t)) * B * B;
-    return {lnA, B};
-}
-
-// Regularised lower incomplete gamma P(s, x): series for x < s + 1, continued fraction otherwise.
-double sr_gamma_p(double s, double x) {
-    if (x <= 0) return 0.0;
-    const double lead = s * std::log(x) - x - std::lgamma(s);
-    if (x < s + 1) {
-        double term = 1.0 / s, sum = term;
-        for (int n = 1; n < 100000; ++n) {
-            term *= x / (s + n);
-            sum += term;
-            if (term < sum * 1e-17) break;
-        }
-        return sum * std::exp(lead);
-    }
-    const double tiny = 1e-300;
-    double bb = x + 1 - s, c = 1 / tiny, d = 1 / bb, h = d;
-    for (int i = 1; i < 100000; ++i) {
-        const double an = -i * (i - s);
-        bb += 2;
-        d = an * d + bb;
-        if (std::fabs(d) < tiny) d = tiny;
-        c = bb + an / c;
-        if (std::fabs(c) < tiny) c = tiny;
-        d = 1 / d;
-        const double del = d * c;
-        h *= del;
-        if (std::fabs(del - 1) < 1e-17) break;
-    }
-    return 1.0 - std::exp(lead) * h;
-}
-
-// Noncentral chi-square CDF: Poisson(lambda/2) mixture of central chi-square CDFs, summed both ways from the mode.
-double sr_ncx2_cdf(double x, double k, double lambda) {
-    if (x <= 0) return 0.0;
-    const double mu = lambda / 2;
-    const long long mode = (long long)std::floor(mu);
-    const auto weight = [&](long long j) { return std::exp(-mu + double(j) * std::log(std::max(mu, 1e-300)) - std::lgamma(double(j) + 1.0)); };
-    const auto term = [&](long long j) { return (mu == 0 && j > 0) ? 0.0 : weight(j) * sr_gamma_p(k / 2 + double(j), x / 2); };
-    double sum = term(mode);
-    for (long long j = mode + 1; j < mode + 100000; ++j) {
-        const double t = term(j);
-        sum += t;
-        if (t < 1e-17 * sum) break;
-    }
-    for (long long j = mode - 1; j >= 0; --j) {
-        const double t = term(j);
-        sum += t;
-        if (t < 1e-17 * sum) break;
-    }
-    return sum;
-}
+namespace sr = quantforge::shortrate;
+namespace mcg = quantforge::mcgreeks;
 
 // An enum whose unknown value is E_INPUT (spec errors list), not E_SCHEMA.
 template <class T>
@@ -127,94 +15,344 @@ T sr_enum(const In& in, string_view k, std::initializer_list<std::pair<const cha
     throw Error("E_INPUT", "unknown value", string(k));
 }
 
-SrParams sr_params(const In& in, std::optional<double>& short_rate, bool option) {
-    SrParams p{};
-    p.model = sr_enum<SrModel>(in, "model", {{"VASICEK", SrModel::Vasicek}, {"CIR", SrModel::Cir}, {"HULL_WHITE", SrModel::HullWhite}});
+sr::Curve sr_curve(const In& in) {
+    const Value& cv = in.need("curve");
+    if (cv.kind != Kind::Object) schema("curve", "expected an object");
+    const In c(cv);
+    const Vec times = c.reals("times"), dfs = c.reals("discount_factors");
+    c.ready();
+    limit_if(times.size() > 10000, "curve");
+    if (times.empty() || times.size() != dfs.size()) throw Error("E_INPUT", "curve needs matching times and discount factors", "curve");
+    for (std::size_t i = 0; i < times.size(); ++i) {
+        if (!(times[i] > (i ? times[i - 1] : 0.0))) throw Error("E_INPUT", "curve times must increase from above 0", "curve");
+        if (!(dfs[i] > 0)) throw Error("E_DOMAIN", "curve discount factor is not positive", "curve");
+    }
+    return sr::Curve::from(times, dfs);
+}
+
+void sr_positive(double v, const char* key) {
+    if (!(v > 0)) throw Error("E_DOMAIN", string(key) + " is not positive", key);
+}
+
+// Model and parameters. `option`: the G-5 rule (short_rate refused for HULL_WHITE). `hw_default`: model may be absent.
+sr::Params sr_params(const In& in, bool option, bool hw_default = false) {
+    sr::Params p{};
+    p.model = (hw_default && !in.find("model"))
+                  ? sr::Model::HullWhite
+                  : sr_enum<sr::Model>(in, "model", {{"VASICEK", sr::Model::Vasicek}, {"CIR", sr::Model::Cir}, {"HULL_WHITE", sr::Model::HullWhite}});
+    const bool hw = p.model == sr::Model::HullWhite;
+    if (hw && option && in.find("short_rate")) throw Error("E_INPUT", "short_rate is not allowed for HULL_WHITE options", "short_rate");
     p.a = in.real("mean_reversion");
     p.sigma = in.real("sigma");
-    if (!(p.a > 0)) throw Error("E_DOMAIN", "mean_reversion is not positive", "mean_reversion");
-    if (!(p.sigma > 0)) throw Error("E_DOMAIN", "sigma is not positive", "sigma");
-    const bool hw = p.model == SrModel::HullWhite;
+    sr_positive(p.a, "mean_reversion");
+    sr_positive(p.sigma, "sigma");
     if (!hw) {
         p.b = in.real("long_term_mean");
-        if (p.model == SrModel::Cir && !(p.b > 0)) throw Error("E_DOMAIN", "long_term_mean is not positive", "long_term_mean");
+        if (p.model == sr::Model::Cir) sr_positive(p.b, "long_term_mean");
     }
-    const bool has_r = in.find("short_rate") != nullptr;
-    if (hw && option && has_r) throw Error("E_INPUT", "short_rate is not allowed for HULL_WHITE options", "short_rate");
     if (!(hw && option)) {
-        short_rate = in.real("short_rate");
-        if (p.model == SrModel::Cir && !(*short_rate >= 0)) throw Error("E_DOMAIN", "short_rate is negative", "short_rate");
+        p.r0 = in.real("short_rate");
+        if (p.model == sr::Model::Cir && !(p.r0 >= 0)) throw Error("E_DOMAIN", "short_rate is negative", "short_rate");
     }
-    if (hw) {
-        const Value& cv = in.need("curve");
-        if (cv.kind != Kind::Object) schema("curve", "expected an object");
-        const In c(cv);
-        const Vec times = c.reals("times"), dfs = c.reals("discount_factors");
-        c.ready();
-        limit_if(times.size() > 10000, "curve");
-        if (times.empty() || times.size() != dfs.size()) throw Error("E_INPUT", "curve needs matching times and discount factors", "curve");
-        for (std::size_t i = 0; i < times.size(); ++i) {
-            if (!(times[i] > (i ? times[i - 1] : 0.0))) throw Error("E_INPUT", "curve times must increase from above 0", "curve");
-            if (!(dfs[i] > 0)) throw Error("E_DOMAIN", "curve discount factor is not positive", "curve");
-        }
-        p.curve.t.push_back(0.0);
-        p.curve.lnp.push_back(0.0);
-        for (std::size_t i = 0; i < times.size(); ++i) p.curve.t.push_back(times[i]), p.curve.lnp.push_back(std::log(dfs[i]));
-    }
+    if (hw) p.curve = sr_curve(in);
     return p;
 }
 
+// Hull-White only (Bermudan, callable, calibration, exposure).
+sr::Params sr_hw(const In& in, bool with_sigma = true) {
+    sr::Params p{};
+    p.model = sr::Model::HullWhite;
+    p.a = in.real("mean_reversion");
+    sr_positive(p.a, "mean_reversion");
+    if (with_sigma) {
+        p.sigma = in.real("sigma");
+        sr_positive(p.sigma, "sigma");
+    }
+    p.curve = sr_curve(in);
+    return p;
+}
+
+// Payment times: at least one, strictly increasing, the first after `after`.
+Vec sr_payments(const In& in, const char* key, double after) {
+    const Vec t = in.reals(key);
+    limit_if(t.size() > 10000, key);
+    if (t.empty()) throw Error("E_INPUT", string(key) + " is empty", key);
+    for (std::size_t i = 0; i < t.size(); ++i)
+        if (!(t[i] > (i ? t[i - 1] : after))) throw Error("E_INPUT", string(key) + " must increase after the start", key);
+    return t;
+}
+
 void op_sr_zcb(const In& in, Out& out) {
-    std::optional<double> r;
-    const SrParams p = sr_params(in, r, false);
+    const sr::Params p = sr_params(in, false);
     const double t = in.real("t_years"), T = in.real("maturity_years");
     in.ready();
     if (!(t >= 0)) throw Error("E_DOMAIN", "t_years is negative", "t_years");
     if (!(T > t)) throw Error("E_DOMAIN", "maturity_years is not after t_years", "maturity_years");
-    const auto [lnA, B] = sr_ab(p, t, T);
-    const double lnP = lnA - B * *r;
+    const auto [lnA, B] = sr::ln_a_b(p, t, T);
+    const double lnP = lnA - B * p.r0;
     out.key_real("discount_factor", std::exp(lnP));
     out.key_real("zero_rate", -lnP / (T - t));
 }
 
+void sr_option_dates(double T, double S, double K) {
+    if (!(T > 0)) throw Error("E_DOMAIN", "expiry_years is not positive", "expiry_years");
+    if (!(S > T)) throw Error("E_DOMAIN", "maturity_years is not after expiry_years", "maturity_years");
+    if (!(K > 0)) throw Error("E_DOMAIN", "strike is not positive", "strike");
+}
+
 void op_sr_zcb_option(const In& in, Out& out) {
-    std::optional<double> r;
-    const SrParams p = sr_params(in, r, true);
+    const sr::Params p = sr_params(in, true);
     const double T = in.real("expiry_years"), S = in.real("maturity_years"), K = in.real("strike");
     const double notional = in.real("notional");
     const bool call = sr_enum<bool>(in, "option_type", {{"CALL", true}, {"PUT", false}});
     in.ready();
-    if (!(T > 0)) throw Error("E_DOMAIN", "expiry_years is not positive", "expiry_years");
-    if (!(S > T)) throw Error("E_DOMAIN", "maturity_years is not after expiry_years", "maturity_years");
-    if (!(K > 0)) throw Error("E_DOMAIN", "strike is not positive", "strike");
-    const auto bond0 = [&](double x) {
-        if (p.model == SrModel::HullWhite) return std::exp(p.curve.ln_p(x));
-        const auto [lnA, B] = sr_ab(p, 0.0, x);
-        return std::exp(lnA - B * *r);
-    };
-    const double pt = bond0(T), ps = bond0(S);
-    double c;
-    if (p.model == SrModel::Cir) {
-        const double a = p.a, s2 = p.sigma * p.sigma, g = std::sqrt(a * a + 2 * s2);
-        const double rho = 2 * g / (s2 * std::expm1(g * T)), psi = (a + g) / s2;
-        const auto [lnA, B] = sr_ab(p, T, S);
-        const double rbar = (lnA - std::log(K)) / B, k = 4 * a * p.b / s2;
-        const double ee = 2 * rho * rho * *r * std::exp(g * T);
-        c = ps * sr_ncx2_cdf(2 * rbar * (rho + psi + B), k, ee / (rho + psi + B)) -
-            K * pt * sr_ncx2_cdf(2 * rbar * (rho + psi), k, ee / (rho + psi));
-    } else {
-        const double a = p.a;
-        const double sp = p.sigma * sr_b(a, S - T) * std::sqrt(-std::expm1(-2 * a * T) / (2 * a));
-        const double h = std::log(ps / (K * pt)) / sp + sp / 2;
-        c = ps * normal_cdf(h) - K * pt * normal_cdf(h - sp);
+    sr_option_dates(T, S, K);
+    out.key_real("price", notional * sr::bond_option(p, T, S, K, call));
+    out.key_real("bond_price_expiry", sr::bond0(p, T));
+    out.key_real("bond_price_maturity", sr::bond0(p, S));
+}
+
+void op_sr_swaption(const In& in, Out& out) {
+    const sr::Params p = sr_params(in, true, true);
+    const double T0 = in.real("expiry_years");
+    if (!(T0 > 0)) throw Error("E_DOMAIN", "expiry_years is not positive", "expiry_years");
+    const Vec pay = sr_payments(in, "payment_times", T0);
+    const double K = in.real("fixed_rate"), notional = in.real("notional");
+    const bool payer = sr_enum<bool>(in, "swaption_type", {{"PAYER", true}, {"RECEIVER", false}});
+    in.ready();
+    const sr::Swaption s = sr::swaption(p, T0, pay, K, payer);
+    out.key_real("price", notional * s.price);
+    out.key_real("forward_swap_rate", s.forward_swap_rate);
+    out.key_real("annuity", notional * s.annuity);
+}
+
+void op_sr_capfloor(const In& in, Out& out) {
+    const sr::Params p = sr_params(in, true);
+    const Vec t = in.reals("period_times");
+    limit_if(t.size() > 10000, "period_times");
+    if (t.size() < 2) throw Error("E_INPUT", "period_times needs at least two times", "period_times");
+    for (std::size_t i = 1; i < t.size(); ++i)
+        if (!(t[i] > t[i - 1])) throw Error("E_INPUT", "period_times must increase", "period_times");
+    if (!(t[0] > 0)) throw Error("E_DOMAIN", "the first period time is not positive", "period_times");
+    const double K = in.real("strike"), notional = in.real("notional");
+    for (std::size_t i = 1; i < t.size(); ++i)
+        if (!(1 + K * (t[i] - t[i - 1]) > 0)) throw Error("E_DOMAIN", "1 + strike x accrual is not positive", "strike");
+    const bool cap = sr_enum<bool>(in, "cap_floor", {{"CAP", true}, {"FLOOR", false}});
+    in.ready();
+    sr::CapFloor c = sr::capfloor(p, t, K, cap);
+    for (double& v : c.caplets) v *= notional;
+    out.key_real("price", notional * c.price);
+    out.key_reals("caplet_prices", c.caplets);
+}
+
+void op_sr_hw_calibrate(const In& in, Out& out) {
+    const sr::Params p = sr_hw(in, false);
+    const Value& list = in.need("swaptions");
+    if (list.kind != Kind::Array) schema("swaptions", "expected an array");
+    limit_if(list.items.size() > 10000, "swaptions");
+    if (list.items.empty()) throw Error("E_INPUT", "swaptions is empty", "swaptions");
+    std::vector<sr::CalSwaption> strip;
+    for (const Value& v : list.items) {
+        if (v.kind != Kind::Object) schema("swaptions", "expected an object");
+        const In q(v);
+        sr::CalSwaption s{};
+        s.expiry = q.real("expiry_years");
+        if (!(s.expiry > 0)) throw Error("E_DOMAIN", "expiry_years is not positive", "expiry_years");
+        s.payment_times = sr_payments(q, "payment_times", s.expiry);
+        s.fixed_rate = q.real("fixed_rate");
+        s.payer = sr_enum<bool>(q, "swaption_type", {{"PAYER", true}, {"RECEIVER", false}});
+        s.target = q.real("target_price");
+        q.ready();
+        if (!(s.target >= 0)) throw Error("E_DOMAIN", "target_price is negative", "target_price");
+        strip.push_back(std::move(s));
     }
-    const double price = call ? c : c - ps + K * pt;
-    out.key_real("price", notional * price);
-    out.key_real("bond_price_expiry", pt);
-    out.key_real("bond_price_maturity", ps);
+    in.ready();
+    const sr::Calibration c = sr::hw_calibrate(p.curve, p.a, strip);
+    out.key_real("sigma", c.sigma);
+    out.key_reals("fitted_prices", c.fitted);
+    out.key_real("rmse", c.rmse);
+}
+
+sr::Grid sr_grid(const In& in) {
+    const Value& gv = in.need("grid");
+    if (gv.kind != Kind::Object) schema("grid", "expected an object");
+    const In g(gv);
+    sr::Grid r{g.integer("nx"), g.integer("steps_per_year"), g.real("width")};
+    g.ready();
+    if (r.nx < 5 || r.nx % 2 == 0) throw Error("E_INPUT", "nx must be odd and at least 5", "nx");
+    limit_if(r.nx > 10001, "nx");
+    if (r.steps_per_year < 1) throw Error("E_INPUT", "steps_per_year must be at least 1", "steps_per_year");
+    limit_if(r.steps_per_year > 100000, "steps_per_year");
+    if (!(r.width > 0)) throw Error("E_DOMAIN", "width is not positive", "width");
+    return r;
+}
+
+bool sr_contains(const Vec& v, double x) { return std::find(v.begin(), v.end(), x) != v.end(); }
+
+void op_sr_bermudan(const In& in, Out& out) {
+    const sr::Params p = sr_hw(in);
+    const double T0 = in.real("start_years");
+    if (!(T0 > 0)) throw Error("E_DOMAIN", "start_years is not positive", "start_years");
+    const Vec pay = sr_payments(in, "payment_times", T0);
+    const double K = in.real("fixed_rate"), notional = in.real("notional");
+    const bool payer = sr_enum<bool>(in, "swaption_type", {{"PAYER", true}, {"RECEIVER", false}});
+    const Vec ex = in.reals("exercise_times");
+    limit_if(ex.size() > 10000, "exercise_times");
+    Vec resets{T0};
+    resets.insert(resets.end(), pay.begin(), pay.end() - 1);
+    if (ex.empty()) throw Error("E_INPUT", "exercise_times is empty", "exercise_times");
+    for (std::size_t i = 0; i < ex.size(); ++i) {
+        if (i && !(ex[i] > ex[i - 1])) throw Error("E_INPUT", "exercise_times must increase", "exercise_times");
+        if (!sr_contains(resets, ex[i])) throw Error("E_INPUT", "an exercise time is not a reset date", "exercise_times");
+    }
+    const sr::Grid g = sr_grid(in);
+    in.ready();
+    out.key_real("price", notional * sr::bermudan_swaption(p, pay, K, payer, ex, g));
+}
+
+void op_sr_callable(const In& in, Out& out) {
+    const sr::Params p = sr_hw(in);
+    const Vec pay = sr_payments(in, "payment_times", 0.0);
+    const double c = in.real("coupon_rate"), notional = in.real("notional");
+    const Vec calls = in.reals("call_times");
+    limit_if(calls.size() > 10000, "call_times");
+    for (std::size_t i = 0; i < calls.size(); ++i) {
+        if (i && !(calls[i] > calls[i - 1])) throw Error("E_INPUT", "call_times must increase", "call_times");
+        if (!sr_contains(pay, calls[i]) || calls[i] == pay.back())
+            throw Error("E_INPUT", "a call time is not a payment time before the last", "call_times");
+    }
+    const double cp = in.real("call_price");
+    sr_positive(cp, "call_price");
+    const sr::Grid g = sr_grid(in);
+    in.ready();
+    out.key_real("price", notional * sr::callable_bond(p, pay, c, calls, cp, g));
+}
+
+sr::G2 g2_params(const In& in) {
+    sr::G2 m{};
+    m.a = in.real("a");
+    m.sigma = in.real("sigma");
+    m.b = in.real("b");
+    m.eta = in.real("eta");
+    m.rho = in.real("rho");
+    sr_positive(m.a, "a");
+    sr_positive(m.sigma, "sigma");
+    sr_positive(m.b, "b");
+    sr_positive(m.eta, "eta");
+    if (!(m.rho > -1 && m.rho < 1)) throw Error("E_DOMAIN", "rho must lie strictly inside (-1, 1)", "rho");
+    m.curve = sr_curve(in);
+    return m;
+}
+
+void op_g2_zcb(const In& in, Out& out) {
+    const sr::G2 m = g2_params(in);
+    const double x = in.real("x"), y = in.real("y"), t = in.real("t_years"), T = in.real("maturity_years");
+    in.ready();
+    if (!(t >= 0)) throw Error("E_DOMAIN", "t_years is negative", "t_years");
+    if (!(T > t)) throw Error("E_DOMAIN", "maturity_years is not after t_years", "maturity_years");
+    const double P = sr::g2_bond(m, t, T, x, y);
+    out.key_real("discount_factor", P);
+    out.key_real("zero_rate", -std::log(P) / (T - t));
+}
+
+void op_g2_zcb_option(const In& in, Out& out) {
+    const sr::G2 m = g2_params(in);
+    if (in.find("x") || in.find("y")) throw Error("E_INPUT", "x and y are not allowed for options (both start at 0)", "x");
+    const double T = in.real("expiry_years"), S = in.real("maturity_years"), K = in.real("strike");
+    const double notional = in.real("notional");
+    const bool call = sr_enum<bool>(in, "option_type", {{"CALL", true}, {"PUT", false}});
+    in.ready();
+    sr_option_dates(T, S, K);
+    out.key_real("price", notional * sr::g2_bond_option(m, T, S, K, call));
+    out.key_real("bond_price_expiry", m.curve.df(T));
+    out.key_real("bond_price_maturity", m.curve.df(S));
+}
+
+void op_xva_swap_ee_hw(const In& in, Out& out) {
+    const sr::Params p = sr_hw(in);
+    const bool pay_side = sr_enum<bool>(in, "side", {{"PAY", true}, {"RECEIVE", false}});
+    const double T0 = in.real("start_years");
+    if (!(T0 >= 0)) throw Error("E_DOMAIN", "start_years is negative", "start_years");
+    const Vec pay = sr_payments(in, "payment_times", T0);
+    const double K = in.real("fixed_rate"), notional = in.real("notional");
+    const Vec et = in.reals("exposure_times");
+    limit_if(et.size() > 10000, "exposure_times");
+    if (et.empty()) throw Error("E_INPUT", "exposure_times is empty", "exposure_times");
+    for (double t : et)
+        if (!(t > 0)) throw Error("E_DOMAIN", "an exposure time is not positive", "exposure_times");
+    Vec resets{T0};
+    resets.insert(resets.end(), pay.begin(), pay.end() - 1);
+    for (std::size_t i = 0; i < et.size(); ++i) {
+        if (i && !(et[i] > et[i - 1])) throw Error("E_INPUT", "exposure_times must increase", "exposure_times");
+        if (!sr_contains(resets, et[i])) throw Error("E_INPUT", "an exposure time is not a reset date", "exposure_times");
+    }
+    const bool has_h = in.find("hazard_rate") != nullptr, has_r = in.find("recovery") != nullptr;
+    if (has_h != has_r) throw Error("E_INPUT", "hazard_rate and recovery come together", has_h ? "recovery" : "hazard_rate");
+    std::optional<std::pair<double, double>> hr;
+    if (has_h) {
+        const double h = in.real("hazard_rate"), R = in.real("recovery");
+        if (!(h >= 0)) throw Error("E_DOMAIN", "hazard_rate is negative", "hazard_rate");
+        if (!(R >= 0 && R < 1)) throw Error("E_DOMAIN", "recovery must lie in [0, 1)", "recovery");
+        hr = std::pair{h, R};
+    }
+    in.ready();
+    sr::Exposure e = sr::swap_ee_hw(p, T0, pay, K, pay_side, et, hr);
+    for (double& v : e.discounted_ee) v *= notional;
+    out.key_reals("discounted_ee", e.discounted_ee);
+    if (e.cva) out.key_real("cva", notional * *e.cva);
+}
+
+void op_mc_greeks(const In& in, Out& out) {
+    mcg::Inputs q{};
+    q.payoff = sr_enum<mcg::Payoff>(in, "payoff", {{"CALL", mcg::Payoff::Call}, {"PUT", mcg::Payoff::Put}, {"DIGITAL_CALL", mcg::Payoff::DigitalCall}});
+    q.method = sr_enum<mcg::Method>(in, "method", {{"PATHWISE", mcg::Method::Pathwise}, {"LIKELIHOOD_RATIO", mcg::Method::LikelihoodRatio}, {"BUMP", mcg::Method::Bump}});
+    q.paths = in.integer("paths");
+    if (q.paths < 2) throw Error("E_INPUT", "paths must be at least 2", "paths");
+    limit_if(q.paths > 10000000, "paths");
+    q.seed = in.u64("seed");
+    q.spot = in.real("spot");
+    q.strike = in.real("strike");
+    q.expiry_years = in.real("expiry_years");
+    q.rate = in.real("rate");
+    q.dividend_yield = in.real("dividend_yield");
+    q.vol = in.real("vol");
+    sr_positive(q.spot, "spot");
+    sr_positive(q.strike, "strike");
+    sr_positive(q.expiry_years, "expiry_years");
+    sr_positive(q.vol, "vol");
+    const bool want_eps = q.method == mcg::Method::Pathwise && q.payoff == mcg::Payoff::DigitalCall;
+    const bool want_h = q.method == mcg::Method::Bump;
+    const bool has_eps = in.find("smoothing_width") != nullptr, has_h = in.find("bump_relative") != nullptr;
+    if (want_eps != has_eps) throw Error("E_INPUT", "smoothing_width is required for a pathwise digital only", "smoothing_width");
+    if (want_h != has_h) throw Error("E_INPUT", "bump_relative is required for BUMP only", "bump_relative");
+    if (has_eps) {
+        q.smoothing_width = in.real("smoothing_width");
+        sr_positive(q.smoothing_width, "smoothing_width");
+    }
+    if (has_h) {
+        q.bump_relative = in.real("bump_relative");
+        if (!(q.bump_relative > 0 && q.bump_relative < 1)) throw Error("E_DOMAIN", "bump_relative must lie in (0, 1)", "bump_relative");
+    }
+    in.ready();
+    const mcg::Result r = mcg::greeks(q);
+    out.key_real("price", r.price);
+    out.key_real("price_se", r.price_se);
+    out.key_real("delta", r.delta);
+    out.key_real("delta_se", r.delta_se);
+    out.key_real("vega", r.vega);
+    out.key_real("vega_se", r.vega_se);
 }
 
 constexpr Entry shortrate_ops[] = {
     {"rates.shortrate.zcb", op_sr_zcb},
     {"rates.shortrate.zcb_option", op_sr_zcb_option},
+    {"rates.shortrate.swaption", op_sr_swaption},
+    {"rates.shortrate.capfloor", op_sr_capfloor},
+    {"rates.shortrate.hw_calibrate", op_sr_hw_calibrate},
+    {"rates.shortrate.bermudan_swaption", op_sr_bermudan},
+    {"rates.shortrate.callable_bond", op_sr_callable},
+    {"rates.g2pp.zcb", op_g2_zcb},
+    {"rates.g2pp.zcb_option", op_g2_zcb_option},
+    {"xva.exposure.swap_ee_hw", op_xva_swap_ee_hw},
+    {"risk.mc.greeks", op_mc_greeks},
 };

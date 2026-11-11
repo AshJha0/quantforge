@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "quantforge/core/error.hpp"
+#include "quantforge/core/multicurve.hpp"
 #include "quantforge/core/vol_stats.hpp"
 
 using namespace quantforge;
@@ -132,4 +133,20 @@ TEST_CASE("garch fit: restarts reach the polished maximum") {
                 CHECK(std::fabs(f.alpha - e.alpha) <= 1e-5 * e.alpha);
                 CHECK(std::fabs(f.beta - e.beta) <= 1e-5 * e.beta);
             }
+}
+
+// multicurve.cpp solve_split loop (`j < n` to `j <= n`, second-reviewer audit): the mutant writes w[n] and c[n] out of
+// bounds. The exact split solve runs on a fit with one outlier; with _GLIBCXX_ASSERTIONS (test builds) or ASan the
+// out-of-range write aborts, so the mutant is killed.
+TEST_CASE("robust_fit split solve with an outlier stays in bounds") {
+    const std::vector<double> m{0.5, 1, 2, 3, 5, 7, 10, 20};
+    std::vector<double> y;
+    for (const double x : m) {
+        const double u = x / 2.0, e = -std::expm1(-u) / u;
+        y.push_back(0.04 - 0.01 * e + 0.005 * (e - std::exp(-u)));
+    }
+    y[3] += 0.01;
+    const auto r = robust_fit(m, y, 2.0, 5e-4);
+    REQUIRE(r.outliers.size() == 1);
+    CHECK(r.outliers[0] == 3);
 }
