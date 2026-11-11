@@ -1283,6 +1283,83 @@
     "synthetic"
    ],
    "description": "negative weight"
+  },
+  {
+   "case_id": "hedgeint_i-0019",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "13 lot sizes for 3 columns: instruments are the columns of a (I-45, after the builds)"
   }
  ]
 }

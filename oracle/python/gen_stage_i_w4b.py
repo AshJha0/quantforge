@@ -57,7 +57,8 @@ def stats(x, y):
     mz = sum(z) / n
     vz = sum((c - mz) ** 2 for c in z) / (n - 1)
     sx = sum(x)
-    if sx == 0 or vx == 0 or vy == 0:
+    # I-43: relative tests, so rounding noise in a leg that is zero in exact arithmetic counts as zero
+    if abs(sx) <= mp.mpf("1e-12") * sum(abs(a) for a in x) or vx <= mp.mpf("1e-20") * vy or vy <= mp.mpf("1e-20") * vx:
         fail("E_DOMAIN", "hedged item unchanged, or a series without variance")
     return {"dollar_offset": -sum(y) / sx, "regression_slope": cxy / vx, "regression_r2": cxy * cxy / (vx * vy),
             "variance_reduction": 1 - vz / vx}
@@ -200,6 +201,8 @@ def bt_suite():
         (dict(e, spots=[100.0, 0.0] + s3[2:]), "E_DOMAIN", "zero spot"),
         (dict(e, hedge_volatility=0.0), "E_DOMAIN", "zero hedge volatility"),
         (dict(e, quantity=0.0), "E_DOMAIN", "zero quantity: the hedged item never changes"),
+        (dict(base, rate=0.0, dividend_yield=0.0, option=call, times=t3, spots=[100.0] * len(t3)), "E_DOMAIN",
+         "constant spot, zero rates and dividends: the hedge leg is zero, so it has no variance (I-43, after the builds)"),
     ]
     for inp, code, desc in errs:
         run_error(s, BT, bt_ref, inp, code, desc, ["hedge", "backtest"])
