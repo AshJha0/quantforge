@@ -38,7 +38,7 @@ None of these blocked a golden. In each case the code follows the reading stated
 ## Open items
 
 - Selection enumerates every subset (`2^20` QPs in the worst case at the I-35 limit). That is correct but slow at the limit; branch and bound on the objective, which the spec allows, would cut it.
-- The 4a orthant step is exact only away from degenerate sign states (Q-I2). On a degenerate input the answer comes from the regularised split problem, within about 1e-6 relative.
+- Closed in the extension: the 4a solve was exact only away from switch points between holding and not holding an instrument. A sign-state correction loop now checks the subgradient condition at every zero coordinate with the multipliers of the exact orthant solve, and re-solves until it holds. Unit tests sit exactly on a switch point, 1e-9 past it and 1e-9 short of it, and on a binding margin; a property test checks the KKT residual of random cost problems.
 - Coverage: see the lane report. Line coverage of the new core modules was measured with `-C instrument-coverage` and `llvm-cov`, because `cargo llvm-cov` is not installed.
 
 ## After the rulings (I-41 to I-52, `stage-i` aa2297e)
@@ -51,3 +51,9 @@ None of these blocked a golden. In each case the code follows the reading stated
 - I-49 added: `E_LIMIT` (field `lot_sizes`) when a relaxed lot count exceeds `2^52`.
 - I-51 **not applied in this branch**: `conformance/runner/runner.py` on `stage-i` still has `CONTRACT = "1.0.0"` and stops on a mismatch, so a CLI at 1.11.0 alone fails every suite. The Rust change is one line (`CONTRACT` in `rust/crates/quantforge-cli/src/main.rs`), to land with the runner in the integration PR as I-51 says.
 - Each changed behaviour has a unit test (`stray_keys_are_input_errors`, `minvar_perfect_hedge_rounding_is_zero`, `huge_lot_counts_are_a_limit`, and the I-43 cases in `effectiveness_checks`).
+
+## Extension to 23:45
+
+- Wave 4a is now exact at and next to switch points (see Open items).
+- New property tests: KKT residuals of random cost problems, invariance of `hedge.qp.solve` (with costs and bounds) under a reordering of the instruments, and of the integer objective, with the integer optimum never below the relaxation.
+- Fuzz (`conformance/fuzz/fuzz_cli.py`, 90% of seeds from `datasets/golden/stage_i`): the only finding was `unknown error code 'E_INFEASIBLE'` on the `E_INFEASIBLE` goldens. The harness's known-code list predates contract 1.11.0 (I-1), so this is a harness gap, outside this lane. **Spec lane / tooling:** add `E_INFEASIBLE` to `CODES` in `fuzz_cli.py`. A second run with the code added in memory (file unchanged) is reported in the lane report.

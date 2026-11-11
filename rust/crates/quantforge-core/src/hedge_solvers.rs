@@ -258,6 +258,9 @@ fn general_inverse(m: &Matrix) -> Result<Matrix> {
     Ok(inv)
 }
 
+/// `(y, active constraint indices, their multipliers)`.
+type ActiveSetAnswer = (Vec<f64>, Vec<usize>, Vec<f64>);
+
 /// Dual active-set method of Goldfarb and Idnani for `min y^T G y / 2 + lin^T y` subject to
 /// `c_i^T y >= d_i`, `G` positive definite. Starts at the unconstrained minimiser and adds the
 /// most violated constraint while keeping dual feasibility, so it ends at the unique KKT point
@@ -268,7 +271,7 @@ fn dual_active_set(
     lin: &[f64],
     cons: &[Constraint],
     dependence: f64,
-) -> Result<Option<(Vec<f64>, Vec<usize>)>> {
+) -> Result<Option<ActiveSetAnswer>> {
     let ginv = spd_inverse(g)?;
     let mut y: Vec<f64> = mat_vec(&ginv, lin).iter().map(|v| -v).collect();
     let mut active: Vec<usize> = Vec::new();
@@ -300,7 +303,7 @@ fn dual_active_set(
                     *v += li * w;
                 }
             }
-            return Ok(Some((y, active)));
+            return Ok(Some((y, active, lambda)));
         };
         let mut up = 0.0;
         let normal = &cons[p].normal;
@@ -450,6 +453,19 @@ fn minimise(
     ineqs: &[Ineq],
     dependence: f64,
 ) -> Result<Option<Vec<f64>>> {
+    Ok(minimise_with_multipliers(g, lin, z_rows, xp, ineqs, dependence)?.map(|r| r.0))
+}
+
+/// As `minimise`, with one KKT multiplier per inequality (0 when inactive), for the problem
+/// scaled as `x^T H x / 2 + c^T x`.
+fn minimise_with_multipliers(
+    g: &Matrix,
+    lin: &[f64],
+    z_rows: &Matrix,
+    xp: &[f64],
+    ineqs: &[Ineq],
+    dependence: f64,
+) -> Result<Option<(Vec<f64>, Vec<f64>)>> {
     let dim = g.len();
     let cons: Vec<Constraint> = ineqs
         .iter()
@@ -471,7 +487,7 @@ fn minimise(
             }
         })
         .collect();
-    let Some((y, active)) = dual_active_set(g, lin, &cons, dependence)? else {
+    let Some((y, active, lambda)) = dual_active_set(g, lin, &cons, dependence)? else {
         return Ok(None);
     };
     let mut x: Vec<f64> = z_rows
@@ -479,12 +495,14 @@ fn minimise(
         .zip(xp)
         .map(|(row, p)| p + dot(row, &y))
         .collect();
-    for i in active {
+    let mut multipliers = vec![0.0; ineqs.len()];
+    for (i, l) in active.into_iter().zip(lambda) {
+        multipliers[i] = l;
         if let Some((j, v)) = ineqs[i].snap {
             x[j] = v;
         }
     }
-    Ok(Some(x))
+    Ok(Some((x, multipliers)))
 }
 
 /// Minimises `y^T G y + 2 lin^T y` with `x = xp + Z y` inside the bounds. Returns `x`, with
@@ -514,7 +532,9 @@ struct Kinks<'a> {
 /// small `delta (|p|^2 + |n|^2)` that makes its Hessian definite, finds the sign state: which
 /// `x_j` are zero, positive or negative. Then the exact problem is solved on that orthant
 /// (zeros fixed, signs as constraints), where it is smooth, so zeros come out as exactly `0.0`.
-/// The orthant holds the minimiser whenever the sign state is not degenerate (spec Q-I2).
+/// A sign-state correction loop then checks the subgradient condition at every zero coordinate
+/// with the multipliers of the orthant solve and re-solves until it holds, so the answer meets
+/// the KKT conditions also at and next to a switch point between holding and not holding.
 fn nonsmooth_minimiser(
     h: &Matrix,
     c: &[f64],
@@ -587,28 +607,63 @@ fn nonsmooth_minimiser(
             }
         })
         .collect();
-    let c3: Vec<f64> = (0..n).map(|j| c[j] + sign[j] * spread[j] / 2.0).collect();
-    let mut rows = bound_rows(lower, upper);
-    for (j, s) in sign.iter().enumerate() {
-        rows.push(Ineq::unit(n, j, if *s == 0.0 { 1.0 } else { *s }, 0.0, 0.0));
-        if *s == 0.0 {
-            rows.push(Ineq::unit(n, j, -1.0, 0.0, 0.0));
+    let (xp, z) = null_space(e, rhs, n);
+    let mut sign = sign;
+    let mut last = x0;
+    // Sign-state correction: solve exactly on the orthant, then test the subgradient condition
+    // at every zero coordinate with the multipliers of that solve. A coordinate that fails is
+    // released towards its descent direction; one pinned at 0 by its sign row is fixed at 0.
+    // Each change lowers the objective, and the loop ends at a point that meets the KKT
+    // conditions of the non-smooth problem, exactly where the split answer is only near.
+    for _ in 0..2 * n + 4 {
+        let c3: Vec<f64> = (0..n).map(|j| c[j] + sign[j] * spread[j] / 2.0).collect();
+        let mut rows = bound_rows(lower, upper);
+        let mut plus = vec![0; n];
+        let mut minus = vec![None; n];
+        for (j, s) in sign.iter().enumerate() {
+            plus[j] = rows.len();
+            rows.push(Ineq::unit(n, j, if *s == 0.0 { 1.0 } else { *s }, 0.0, 0.0));
+            if *s == 0.0 {
+                minus[j] = Some(rows.len());
+                rows.push(Ineq::unit(n, j, -1.0, 0.0, 0.0));
+            }
+        }
+        let margin_row = k.margin.map(|(m, limit)| {
+            rows.push(Ineq {
+                normal: (0..n).map(|j| -m[j] * sign[j]).collect(),
+                rhs: -limit,
+                snap: None,
+            });
+            rows.len() - 1
+        });
+        let (g, lin) = reduced(h, &c3, &xp, &z);
+        let Some((x, mult)) = minimise_with_multipliers(&g, &lin, &z, &xp, &rows, THRESHOLD)?
+        else {
+            // A sign state with no feasible point: keep the best answer so far.
+            return Ok(Some(last));
+        };
+        let mu = margin_row.map_or(0.0, |i| mult[i]);
+        let mut changed = false;
+        for j in 0..n {
+            if let Some(mi) = minus[j] {
+                // The net push on x_j = 0 against what the kink and the margin can absorb.
+                let nu = mult[plus[j]] - mult[mi];
+                let room = spread[j] / 2.0 + mu * k.margin.map_or(0.0, |(m, _)| m[j]);
+                if nu.abs() > room + THRESHOLD * (1.0 + nu.abs()) {
+                    sign[j] = -nu.signum();
+                    changed = true;
+                }
+            } else if x[j] == 0.0 && mult[plus[j]] > 0.0 {
+                sign[j] = 0.0;
+                changed = true;
+            }
+        }
+        last = x;
+        if !changed {
+            break;
         }
     }
-    if let Some((m, limit)) = k.margin {
-        rows.push(Ineq {
-            normal: (0..n).map(|j| -m[j] * sign[j]).collect(),
-            rhs: -limit,
-            snap: None,
-        });
-    }
-    let (xp, z) = null_space(e, rhs, n);
-    let (g, lin) = reduced(h, &c3, &xp, &z);
-    // The split answer is kept only if the orthant has no feasible point, which a correct sign
-    // state rules out; it is within about SPLIT_DELTA of the minimiser.
-    Ok(Some(
-        minimise(&g, &lin, &z, &xp, &rows, THRESHOLD)?.unwrap_or(x0),
-    ))
+    Ok(Some(last))
 }
 
 /// The finite rule F-2 on every input of `hedge.qp.solve`.
