@@ -46,3 +46,7 @@ Built (`hedging.DynamicHedge`, `cli.OpsHedgeDynamic`): `hedgebt_i` 15 of 15, `he
 
 Built (`hedging.InstrumentSelection`, `cli.OpsHedgeSelect`; exhaustive over subsets in size then index order, each
 solved by `LeastSquaresHedge`): `hedgeselect_i` 17 of 17. No spec question.
+
+## Wave 4d: hedge slippage
+
+Built (`hedging.Slippage`, `cli.OpsHedgeSlippage`): `hedgeslip_i` 12 of 12. No spec question.
