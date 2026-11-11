@@ -14,7 +14,7 @@ use quantforge_core::hedge_cross::{
 use quantforge_core::hedge_crossasset::{self as xa, XaKind, XaLeg, XaMarket, ZeroCurve};
 use quantforge_core::hedge_dynamic::{self as hd, BacktestOption, BacktestSetup, Effectiveness};
 use quantforge_core::hedge_solvers::{
-    self as hs, Greek, IntegerProblem, Leg, LegKind, MinVarInput, QpProblem, Singular,
+    self as hs, Costs, Greek, IntegerProblem, Leg, LegKind, MinVarInput, QpProblem, Singular,
 };
 use quantforge_core::json::{Json, obj};
 
@@ -70,6 +70,47 @@ fn opt_lot_bounds(i: &Inputs, k: &str) -> Result<Option<Vec<Option<i64>>>> {
 
 fn opt_str<'a>(i: &Inputs<'a>, k: &str) -> Result<Option<&'a str>> {
     present(i, k)?.map(|_| i.str(k)).transpose()
+}
+
+fn opt_f64(i: &Inputs, k: &str) -> Result<Option<f64>> {
+    present(i, k)?.map(|_| i.f64(k)).transpose()
+}
+
+/// The wave 4a cost lists, read before the gate.
+struct CostLists {
+    half_spreads: Option<Vec<f64>>,
+    impact: Option<Vec<f64>>,
+    margin_rates: Option<Vec<f64>>,
+    margin_limit: Option<f64>,
+}
+
+impl CostLists {
+    fn read(i: &Inputs) -> Result<CostLists> {
+        Ok(CostLists {
+            half_spreads: opt_reals(i, "half_spreads")?,
+            impact: opt_reals(i, "impact")?,
+            margin_rates: opt_reals(i, "margin_rates")?,
+            margin_limit: opt_f64(i, "margin_limit")?,
+        })
+    }
+
+    fn costs(&self, cost_weight: Option<f64>) -> Costs<'_> {
+        Costs {
+            half_spreads: self.half_spreads.as_deref(),
+            impact: self.impact.as_deref(),
+            cost_weight,
+            margin_rates: self.margin_rates.as_deref(),
+            margin_limit: self.margin_limit,
+        }
+    }
+}
+
+fn singular_policy(i: &Inputs) -> Result<Singular> {
+    match opt_str(i, "singular")? {
+        None | Some("ERROR") => Ok(Singular::Error),
+        Some("MIN_NORM") => Ok(Singular::MinNorm),
+        Some(_) => i.fail("singular", "must be ERROR or MIN_NORM"),
+    }
 }
 
 fn ridge(i: &Inputs) -> Result<f64> {
@@ -237,11 +278,9 @@ super::registry! {
             let ridge = ridge(i)?;
             let (e, r) = (opt_matrix(i, "eq_matrix")?, opt_reals(i, "eq_rhs")?);
             let (lo, hi) = (opt_bounds(i, "lower")?, opt_bounds(i, "upper")?);
-            let singular = match opt_str(i, "singular")? {
-                None | Some("ERROR") => Singular::Error,
-                Some("MIN_NORM") => Singular::MinNorm,
-                Some(_) => return i.fail("singular", "must be ERROR or MIN_NORM"),
-            };
+            let singular = singular_policy(i)?;
+            let lists = CostLists::read(i)?;
+            let cost_weight = opt_f64(i, "cost_weight")?;
             i.gate()?;
             let s = hs::qp_solve(&QpProblem {
                 a: &a,
@@ -253,13 +292,58 @@ super::registry! {
                 lower: lo.as_deref(),
                 upper: hi.as_deref(),
                 singular,
+                costs: lists.costs(cost_weight),
             })?;
-            plain(obj([
+            let mut out = vec![
                 ("x", s.x.into()),
                 ("residual", s.residual.into()),
                 ("objective", s.objective.into()),
                 ("rank", Json::Int(i64::try_from(s.rank).unwrap_or(i64::MAX))),
-            ]))
+            ];
+            for (k, v) in [("risk", s.risk), ("cost", s.cost), ("margin", s.margin)] {
+                if let Some(v) = v {
+                    out.push((k, v.into()));
+                }
+            }
+            plain(Json::Obj(out.into_iter().map(|(k, v)| (k.to_string(), v)).collect()))
+        },
+        "hedge.frontier.solve" => {
+            let (a, b, w) = (i.matrix("a")?, i.reals("b")?, i.reals("weights")?);
+            let ridge = ridge(i)?;
+            let (e, r) = (opt_matrix(i, "eq_matrix")?, opt_reals(i, "eq_rhs")?);
+            let (lo, hi) = (opt_bounds(i, "lower")?, opt_bounds(i, "upper")?);
+            let singular = singular_policy(i)?;
+            let lists = CostLists::read(i)?;
+            let cost_weight = opt_f64(i, "cost_weight")?;
+            let weights = i.reals("cost_weights")?;
+            i.gate()?;
+            let points = hs::frontier_solve(
+                &QpProblem {
+                    a: &a,
+                    b: &b,
+                    weights: &w,
+                    ridge,
+                    eq_matrix: e.as_ref(),
+                    eq_rhs: r.as_deref(),
+                    lower: lo.as_deref(),
+                    upper: hi.as_deref(),
+                    singular,
+                    costs: lists.costs(cost_weight),
+                },
+                &weights,
+            )?;
+            let rows: Vec<Json> = points
+                .into_iter()
+                .map(|p| {
+                    obj([
+                        ("cost_weight", p.cost_weight.into()),
+                        ("x", p.x.into()),
+                        ("risk", p.risk.into()),
+                        ("cost", p.cost.into()),
+                    ])
+                })
+                .collect();
+            plain(obj([("points", Json::Arr(rows))]))
         },
         "hedge.integer.solve" => {
             let (a, b, w) = (i.matrix("a")?, i.reals("b")?, i.reals("weights")?);

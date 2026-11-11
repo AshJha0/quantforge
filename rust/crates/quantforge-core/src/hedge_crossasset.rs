@@ -4,7 +4,7 @@
 //! `KR01_k` for a 1bp move of pillar `k`'s zero rate. The hedge is the wave 1 `hedge.qp.solve`.
 
 use crate::error::{Result, fail, finite};
-use crate::hedge_solvers::{QpProblem, Singular, qp_solve};
+use crate::hedge_solvers::{Costs, QpProblem, Singular, qp_solve};
 use crate::linalg::Matrix;
 use crate::stats::normal_cdf;
 
@@ -229,6 +229,7 @@ pub fn crossasset_solve(
         lower: None,
         upper: None,
         singular: Singular::Error,
+        costs: Costs::default(),
     })?;
     Ok(XaHedge {
         positions: s.x,

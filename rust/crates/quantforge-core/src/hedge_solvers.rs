@@ -11,6 +11,15 @@ use crate::stats::{normal_cdf, normal_pdf};
 /// The one relative threshold of ruling I-3.
 const THRESHOLD: f64 = 1e-12;
 
+/// Relative regularisation of the split problem that finds the sign state of the wave 4a
+/// problem. Only the sign state is taken from it; the answer is re-solved exactly.
+const SPLIT_DELTA: f64 = 1e-6;
+
+/// Dependence test of the active-set method on the split problem, whose Hessian has condition
+/// up to `2 / SPLIT_DELTA`: a new constraint whose primal step is below this share of its
+/// full-space curvature is treated as dependent on the active set.
+const SPLIT_DEPENDENCE: f64 = 1e-8;
+
 /// What `hedge.qp.solve` does with a singular reduced Hessian (ruling I-5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Singular {
@@ -33,6 +42,33 @@ pub struct QpProblem<'a> {
     pub lower: Option<&'a [Option<f64>]>,
     pub upper: Option<&'a [Option<f64>]>,
     pub singular: Singular,
+    /// The wave 4a inputs; all absent for the wave 1 problem.
+    pub costs: Costs<'a>,
+}
+
+/// The optional cost and margin inputs of `hedge.qp.solve` (wave 4a, rulings I-24 to I-27):
+/// `cost_weight * sum_j (half_spreads_j |x_j| + impact_j x_j^2)` joins the objective, and
+/// `sum_j margin_rates_j |x_j| <= margin_limit` the constraints.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Costs<'a> {
+    pub half_spreads: Option<&'a [f64]>,
+    pub impact: Option<&'a [f64]>,
+    /// Default 1.
+    pub cost_weight: Option<f64>,
+    pub margin_rates: Option<&'a [f64]>,
+    pub margin_limit: Option<f64>,
+}
+
+impl Costs<'_> {
+    /// Whether any new input is given (I-27 output rule).
+    #[must_use]
+    pub fn any(&self) -> bool {
+        self.half_spreads.is_some()
+            || self.impact.is_some()
+            || self.cost_weight.is_some()
+            || self.margin_rates.is_some()
+            || self.margin_limit.is_some()
+    }
 }
 
 /// Outputs of `hedge.qp.solve`.
@@ -43,6 +79,12 @@ pub struct QpSolution {
     pub objective: f64,
     /// Eigenvalues of the reduced Hessian above the threshold.
     pub rank: usize,
+    /// `sum w r^2 + ridge |x|^2`, present with any cost input (I-27).
+    pub risk: Option<f64>,
+    /// `C(x)`, present with any cost input.
+    pub cost: Option<f64>,
+    /// `sum m |x|`, present with `margin_rates`.
+    pub margin: Option<f64>,
 }
 
 fn mat_vec(a: &Matrix, x: &[f64]) -> Vec<f64> {
@@ -225,6 +267,7 @@ fn dual_active_set(
     g: &Matrix,
     lin: &[f64],
     cons: &[Constraint],
+    dependence: f64,
 ) -> Result<Option<(Vec<f64>, Vec<usize>)>> {
     let ginv = spd_inverse(g)?;
     let mut y: Vec<f64> = mat_vec(&ginv, lin).iter().map(|v| -v).collect();
@@ -281,7 +324,7 @@ fn dual_active_set(
                 }
             }
             let zn = dot(&z, normal);
-            let t2 = if zn > THRESHOLD * gn {
+            let t2 = if zn > dependence * gn {
                 -(dot(normal, &y) - cons[p].rhs) / zn
             } else {
                 f64::INFINITY
@@ -312,38 +355,123 @@ fn dual_active_set(
     fail("E_NO_CONVERGENCE", "active-set iteration limit reached")
 }
 
-/// Minimises `y^T G y + 2 lin^T y` with `x = xp + Z y` inside the bounds (`Z` given by its rows,
-/// one per instrument). Returns `x`, with active bounds set exactly, or `None` if infeasible.
-fn bounded_minimiser(
+/// An inequality `normal^T x >= rhs` in the variables of the problem; when it is active at the
+/// answer, `snap` sets one variable exactly (a bound, or zero for a sign or split constraint).
+struct Ineq {
+    normal: Vec<f64>,
+    rhs: f64,
+    snap: Option<(usize, f64)>,
+}
+
+impl Ineq {
+    fn unit(n: usize, j: usize, sign: f64, rhs: f64, snap: f64) -> Ineq {
+        let mut normal = vec![0.0; n];
+        normal[j] = sign;
+        Ineq {
+            normal,
+            rhs,
+            snap: Some((j, snap)),
+        }
+    }
+}
+
+/// The bounds as inequalities.
+fn bound_rows(lower: &[Option<f64>], upper: &[Option<f64>]) -> Vec<Ineq> {
+    let n = lower.len();
+    let mut out = Vec::new();
+    for j in 0..n {
+        if let Some(l) = lower[j] {
+            out.push(Ineq::unit(n, j, 1.0, l, l));
+        }
+        if let Some(u) = upper[j] {
+            out.push(Ineq::unit(n, j, -1.0, -u, u));
+        }
+    }
+    out
+}
+
+/// `E x = e` with `E` of full row rank: the minimum-norm solution `x_p` and the rows of `Z`, an
+/// orthonormal basis of the null space (`Z = I` when there is no equality).
+fn null_space(e: &[Vec<f64>], rhs: &[f64], n: usize) -> (Vec<f64>, Matrix) {
+    let k = e.len();
+    let (q, r) = householder_qr(e, n);
+    // x_p = Q_1 w with R^T w = e (forward substitution).
+    let mut w = vec![0.0; k];
+    for i in 0..k {
+        let s: f64 = (0..i).map(|j| r[j][i] * w[j]).sum();
+        w[i] = (rhs[i] - s) / r[i][i];
+    }
+    let xp = (0..n)
+        .map(|i| (0..k).map(|j| q[i][j] * w[j]).sum())
+        .collect();
+    (xp, (0..n).map(|i| q[i][k..].to_vec()).collect())
+}
+
+/// The reduced problem `G = Z^T H Z` (exactly symmetric) and `lin = Z^T (H x_p + c)`.
+fn reduced(h: &Matrix, c: &[f64], xp: &[f64], z_rows: &Matrix) -> (Matrix, Vec<f64>) {
+    let n = h.len();
+    let dim = z_rows.first().map_or(0, Vec::len);
+    let hz: Matrix = h
+        .iter()
+        .map(|row| {
+            (0..dim)
+                .map(|j| (0..n).map(|l| row[l] * z_rows[l][j]).sum())
+                .collect()
+        })
+        .collect();
+    let mut g: Matrix = (0..dim)
+        .map(|i| {
+            (0..dim)
+                .map(|j| (0..n).map(|l| z_rows[l][i] * hz[l][j]).sum())
+                .collect()
+        })
+        .collect();
+    for i in 0..dim {
+        for j in 0..i {
+            let v = (g[i][j] + g[j][i]) / 2.0;
+            g[i][j] = v;
+            g[j][i] = v;
+        }
+    }
+    let hxp: Vec<f64> = mat_vec(h, xp).iter().zip(c).map(|(u, v)| u + v).collect();
+    let lin = (0..dim)
+        .map(|j| (0..n).map(|l| z_rows[l][j] * hxp[l]).sum())
+        .collect();
+    (g, lin)
+}
+
+/// Minimises `y^T G y + 2 lin^T y` over `x = xp + Z y` subject to `ineqs` (in `x`). Returns
+/// `x` with the snaps of the active inequalities applied, or `None` if no point is feasible.
+fn minimise(
     g: &Matrix,
     lin: &[f64],
     z_rows: &Matrix,
     xp: &[f64],
-    lower: &[Option<f64>],
-    upper: &[Option<f64>],
+    ineqs: &[Ineq],
+    dependence: f64,
 ) -> Result<Option<Vec<f64>>> {
-    let mut cons = Vec::new();
-    let mut bound_of = Vec::new();
-    for (j, row) in z_rows.iter().enumerate() {
-        let norm = dot(row, row).sqrt().max(f64::MIN_POSITIVE);
-        if let Some(l) = lower[j] {
-            cons.push(Constraint {
-                normal: row.clone(),
-                rhs: l - xp[j],
-                scale: norm * l.abs().max(1.0),
-            });
-            bound_of.push((j, l));
-        }
-        if let Some(u) = upper[j] {
-            cons.push(Constraint {
-                normal: row.iter().map(|v| -v).collect(),
-                rhs: xp[j] - u,
-                scale: norm * u.abs().max(1.0),
-            });
-            bound_of.push((j, u));
-        }
-    }
-    let Some((y, active)) = dual_active_set(g, lin, &cons)? else {
+    let dim = g.len();
+    let cons: Vec<Constraint> = ineqs
+        .iter()
+        .map(|q| {
+            let normal: Vec<f64> = (0..dim)
+                .map(|j| {
+                    z_rows
+                        .iter()
+                        .zip(&q.normal)
+                        .map(|(row, a)| a * row[j])
+                        .sum()
+                })
+                .collect();
+            let norm = dot(&normal, &normal).sqrt().max(f64::MIN_POSITIVE);
+            Constraint {
+                rhs: q.rhs - dot(&q.normal, xp),
+                scale: norm * q.rhs.abs().max(1.0),
+                normal,
+            }
+        })
+        .collect();
+    let Some((y, active)) = dual_active_set(g, lin, &cons, dependence)? else {
         return Ok(None);
     };
     let mut x: Vec<f64> = z_rows
@@ -352,10 +480,182 @@ fn bounded_minimiser(
         .map(|(row, p)| p + dot(row, &y))
         .collect();
     for i in active {
-        let (j, v) = bound_of[i];
-        x[j] = v;
+        if let Some((j, v)) = ineqs[i].snap {
+            x[j] = v;
+        }
     }
     Ok(Some(x))
+}
+
+/// Minimises `y^T G y + 2 lin^T y` with `x = xp + Z y` inside the bounds. Returns `x`, with
+/// active bounds set exactly, or `None` if infeasible.
+fn bounded_minimiser(
+    g: &Matrix,
+    lin: &[f64],
+    z_rows: &Matrix,
+    xp: &[f64],
+    lower: &[Option<f64>],
+    upper: &[Option<f64>],
+) -> Result<Option<Vec<f64>>> {
+    minimise(g, lin, z_rows, xp, &bound_rows(lower, upper), THRESHOLD)
+}
+
+/// The cost and margin terms of the wave 4a problem: `spread_j = cost_weight half_spreads_j`
+/// and the margin row `sum m_j |x_j| <= limit`.
+struct Kinks<'a> {
+    spread: Vec<f64>,
+    margin: Option<(&'a [f64], f64)>,
+}
+
+/// The non-smooth wave 4a problem: `x^T H x + 2 c^T x + sum_j spread_j |x_j|` with the
+/// equalities, bounds and the optional margin row.
+///
+/// First the split problem `x = p - n`, `p, n >= 0` (costs and margin are linear there), with a
+/// small `delta (|p|^2 + |n|^2)` that makes its Hessian definite, finds the sign state: which
+/// `x_j` are zero, positive or negative. Then the exact problem is solved on that orthant
+/// (zeros fixed, signs as constraints), where it is smooth, so zeros come out as exactly `0.0`.
+/// The orthant holds the minimiser whenever the sign state is not degenerate (spec Q-I2).
+fn nonsmooth_minimiser(
+    h: &Matrix,
+    c: &[f64],
+    (e, rhs): (&[Vec<f64>], &[f64]),
+    (lower, upper): (&[Option<f64>], &[Option<f64>]),
+    k: &Kinks,
+) -> Result<Option<Vec<f64>>> {
+    let n = h.len();
+    let spread = &k.spread;
+    let delta = SPLIT_DELTA * spectral_scale(&eigen_symmetric(h)?).max(f64::MIN_POSITIVE);
+    let h2: Matrix = (0..2 * n)
+        .map(|i| {
+            (0..2 * n)
+                .map(|j| {
+                    let sign = if (i < n) == (j < n) { 1.0 } else { -1.0 };
+                    sign * h[i % n][j % n] + if i == j { delta } else { 0.0 }
+                })
+                .collect()
+        })
+        .collect();
+    let c2: Vec<f64> = (0..2 * n)
+        .map(|i| if i < n { c[i] } else { -c[i - n] } + spread[i % n] / 2.0)
+        .collect();
+    let e2: Matrix = e
+        .iter()
+        .map(|row| row.iter().copied().chain(row.iter().map(|v| -v)).collect())
+        .collect();
+    let mut rows2: Vec<Ineq> = (0..2 * n)
+        .map(|i| Ineq::unit(2 * n, i, 1.0, 0.0, 0.0))
+        .collect();
+    for j in 0..n {
+        let mut d = vec![0.0; 2 * n];
+        (d[j], d[n + j]) = (1.0, -1.0);
+        if let Some(l) = lower[j] {
+            rows2.push(Ineq {
+                normal: d.clone(),
+                rhs: l,
+                snap: None,
+            });
+        }
+        if let Some(u) = upper[j] {
+            rows2.push(Ineq {
+                normal: d.iter().map(|v| -v).collect(),
+                rhs: -u,
+                snap: None,
+            });
+        }
+    }
+    if let Some((m, limit)) = k.margin {
+        rows2.push(Ineq {
+            normal: (0..2 * n).map(|i| -m[i % n]).collect(),
+            rhs: -limit,
+            snap: None,
+        });
+    }
+    let (xp2, z2) = null_space(&e2, rhs, 2 * n);
+    let (g2, lin2) = reduced(&h2, &c2, &xp2, &z2);
+    let Some(split) = minimise(&g2, &lin2, &z2, &xp2, &rows2, SPLIT_DEPENDENCE)? else {
+        return Ok(None);
+    };
+    let x0: Vec<f64> = (0..n).map(|j| split[j] - split[n + j]).collect();
+    let sign: Vec<f64> = (0..n)
+        .map(|j| {
+            if split[j] == 0.0 && split[n + j] == 0.0 {
+                0.0
+            } else if x0[j] >= 0.0 {
+                1.0
+            } else {
+                -1.0
+            }
+        })
+        .collect();
+    let c3: Vec<f64> = (0..n).map(|j| c[j] + sign[j] * spread[j] / 2.0).collect();
+    let mut rows = bound_rows(lower, upper);
+    for (j, s) in sign.iter().enumerate() {
+        rows.push(Ineq::unit(n, j, if *s == 0.0 { 1.0 } else { *s }, 0.0, 0.0));
+        if *s == 0.0 {
+            rows.push(Ineq::unit(n, j, -1.0, 0.0, 0.0));
+        }
+    }
+    if let Some((m, limit)) = k.margin {
+        rows.push(Ineq {
+            normal: (0..n).map(|j| -m[j] * sign[j]).collect(),
+            rhs: -limit,
+            snap: None,
+        });
+    }
+    let (xp, z) = null_space(e, rhs, n);
+    let (g, lin) = reduced(h, &c3, &xp, &z);
+    // The split answer is kept only if the orthant has no feasible point, which a correct sign
+    // state rules out; it is within about SPLIT_DELTA of the minimiser.
+    Ok(Some(
+        minimise(&g, &lin, &z, &xp, &rows, THRESHOLD)?.unwrap_or(x0),
+    ))
+}
+
+/// The finite rule F-2 on every input of `hedge.qp.solve`.
+fn check_finite(p: &QpProblem) -> Result<()> {
+    finite("a", &p.a)?;
+    finite("b", &p.b)?;
+    finite("weights", &p.weights)?;
+    finite("ridge", &p.ridge)?;
+    finite("eq_matrix", &p.eq_matrix)?;
+    finite("eq_rhs", &p.eq_rhs)?;
+    finite("lower", &p.lower)?;
+    finite("upper", &p.upper)?;
+    let c = &p.costs;
+    finite("half_spreads", &c.half_spreads)?;
+    finite("impact", &c.impact)?;
+    finite("cost_weight", &c.cost_weight)?;
+    finite("margin_rates", &c.margin_rates)?;
+    finite("margin_limit", &c.margin_limit)
+}
+
+/// Checks I-25 1 to 3 on the cost inputs (after wave 1 checks 1 to 3).
+fn check_costs(c: &Costs, n: usize, min_norm: bool) -> Result<()> {
+    let lists = [c.half_spreads, c.impact, c.margin_rates];
+    if lists.iter().flatten().any(|v| v.len() != n)
+        || c.margin_rates.is_some() != c.margin_limit.is_some()
+    {
+        return fail(
+            "E_INPUT",
+            "cost lists need n entries; margin_rates and margin_limit go together",
+        );
+    }
+    if min_norm && c.any() {
+        return fail(
+            "E_INPUT",
+            "MIN_NORM does not take costs or margin (ruling I-25)",
+        );
+    }
+    if lists.iter().flatten().any(|v| v.iter().any(|x| *x < 0.0))
+        || c.cost_weight.is_some_and(|w| w < 0.0)
+        || c.margin_limit.is_some_and(|l| l < 0.0)
+    {
+        return fail(
+            "E_DOMAIN",
+            "costs, cost weight and margin must be non-negative",
+        );
+    }
+    Ok(())
 }
 
 /// `hedge.qp.solve`: weighted least squares on the residual `A x + b` with ridge, equalities and
@@ -366,14 +666,7 @@ fn bounded_minimiser(
 /// (shapes, `MIN_NORM` with a bound), `E_DOMAIN` (weights, ridge, crossed bounds), `E_SINGULAR`
 /// (equality rank, reduced Hessian under `ERROR`), `E_INFEASIBLE`.
 pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
-    finite("a", &p.a)?;
-    finite("b", &p.b)?;
-    finite("weights", &p.weights)?;
-    finite("ridge", &p.ridge)?;
-    finite("eq_matrix", &p.eq_matrix)?;
-    finite("eq_rhs", &p.eq_rhs)?;
-    finite("lower", &p.lower)?;
-    finite("upper", &p.upper)?;
+    check_finite(p)?;
     let (_, n) = check_system(p.a, p.b, p.weights)?;
     let (e, rhs): (&[Vec<f64>], &[f64]) = match (p.eq_matrix, p.eq_rhs) {
         (Some(e), Some(r)) => (e, r),
@@ -409,11 +702,12 @@ pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
     {
         return fail("E_DOMAIN", "a lower bound is above its upper bound");
     }
+    let costs = &p.costs;
+    check_costs(costs, n, p.singular == Singular::MinNorm)?;
     let k = e.len();
     if k > n {
         return fail("E_SINGULAR", "more equalities than instruments");
     }
-    let (q, r) = householder_qr(e, n);
     if k > 0 {
         let et: Matrix = (0..n).map(|i| (0..k).map(|j| e[j][i]).collect()).collect();
         let sv = singular_values(&et);
@@ -422,57 +716,31 @@ pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
             return fail("E_SINGULAR", "the equality rows are dependent");
         }
     }
-    // x_p = Q_1 w with R^T w = e (forward substitution), the minimum-norm solution of E x = e.
-    let mut w = vec![0.0; k];
-    for i in 0..k {
-        let s: f64 = (0..i).map(|j| r[j][i] * w[j]).sum();
-        w[i] = (rhs[i] - s) / r[i][i];
+    let (xp, z_rows) = null_space(e, rhs, n);
+    let cost_weight = costs.cost_weight.unwrap_or(1.0);
+    let zeros = vec![0.0; n];
+    let impact = costs.impact.unwrap_or(&zeros);
+    let half_spreads = costs.half_spreads.unwrap_or(&zeros);
+    // I-26: impact enters the Hessian like a ridge; a spread cost does not.
+    let (mut h, c) = normal_equations(p.a, p.b, p.weights, p.ridge);
+    for j in 0..n {
+        h[j][j] += cost_weight * impact[j];
     }
-    let xp: Vec<f64> = (0..n)
-        .map(|i| (0..k).map(|j| q[i][j] * w[j]).sum())
-        .collect();
-    // Z: the last n - k columns of Q, stored as rows (one per instrument); Z = I when k = 0.
-    let z_rows: Matrix = (0..n).map(|i| q[i][k..].to_vec()).collect();
-    let (h, c) = normal_equations(p.a, p.b, p.weights, p.ridge);
     let limit = THRESHOLD * spectral_scale(&eigen_symmetric(&h)?);
     let dim = n - k;
-    let hz: Matrix = h
-        .iter()
-        .map(|row| {
-            (0..dim)
-                .map(|j| (0..n).map(|l| row[l] * z_rows[l][j]).sum())
-                .collect()
-        })
-        .collect();
-    let mut g: Matrix = (0..dim)
-        .map(|i| {
-            (0..dim)
-                .map(|j| (0..n).map(|l| z_rows[l][i] * hz[l][j]).sum())
-                .collect()
-        })
-        .collect();
-    for i in 0..dim {
-        for j in 0..i {
-            let v = (g[i][j] + g[j][i]) / 2.0;
-            g[i][j] = v;
-            g[j][i] = v;
-        }
-    }
-    // lin = Z^T (H x_p + c).
-    let hxp: Vec<f64> = mat_vec(&h, &xp)
-        .iter()
-        .zip(&c)
-        .map(|(u, v)| u + v)
-        .collect();
-    let lin: Vec<f64> = (0..dim)
-        .map(|j| (0..n).map(|l| z_rows[l][j] * hxp[l]).sum())
-        .collect();
+    let (g, lin) = reduced(&h, &c, &xp, &z_rows);
     let (values, vectors) = if dim == 0 {
         (Vec::new(), Vec::new())
     } else {
         eigen_pairs(&g)?
     };
     let rank = values.iter().filter(|v| **v > limit).count();
+    let margin = costs.margin_rates.zip(costs.margin_limit);
+    let kinks = Kinks {
+        spread: half_spreads.iter().map(|s| cost_weight * s).collect(),
+        margin,
+    };
+    let nonsmooth = margin.is_some() || kinks.spread.iter().any(|s| *s > 0.0);
     let x = if rank < dim {
         if p.singular == Singular::Error {
             return fail("E_SINGULAR", "the reduced Hessian is singular");
@@ -496,28 +764,92 @@ pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
         let tol = |v: f64| THRESHOLD * v.abs().max(1.0);
         let outside = xp.iter().zip(lower.iter().zip(upper)).any(|(x, (l, u))| {
             l.is_some_and(|l| *x < l - tol(l)) || u.is_some_and(|u| *x > u + tol(u))
+        }) || margin.is_some_and(|(m, l)| {
+            m.iter().zip(&xp).map(|(m, x)| m * x.abs()).sum::<f64>() > l + tol(l)
         });
         if outside {
             return fail(
                 "E_INFEASIBLE",
-                "the equalities leave no point inside the bounds",
+                "the equalities leave no point inside the bounds and margin",
             );
         }
         xp
     } else {
-        match bounded_minimiser(&g, &lin, &z_rows, &xp, lower, upper)? {
+        let found = if nonsmooth {
+            nonsmooth_minimiser(&h, &c, (e, rhs), (lower, upper), &kinks)?
+        } else {
+            bounded_minimiser(&g, &lin, &z_rows, &xp, lower, upper)?
+        };
+        match found {
             Some(x) => x,
             None => return fail("E_INFEASIBLE", "no point satisfies the constraints"),
         }
     };
     let residual = residual_of(p.a, p.b, &x);
-    let objective = objective_of(&residual, p.weights, p.ridge, &x);
+    let risk = objective_of(&residual, p.weights, p.ridge, &x);
+    let cost: f64 = (0..n)
+        .map(|j| half_spreads[j] * x[j].abs() + impact[j] * x[j] * x[j])
+        .sum();
+    let with_costs = costs.any();
     Ok(QpSolution {
+        objective: if with_costs {
+            risk + cost_weight * cost
+        } else {
+            risk
+        },
+        risk: with_costs.then_some(risk),
+        cost: with_costs.then_some(cost),
+        margin: costs
+            .margin_rates
+            .map(|m| m.iter().zip(&x).map(|(m, x)| m * x.abs()).sum()),
         x,
         residual,
-        objective,
         rank,
     })
+}
+
+/// One point of `hedge.frontier.solve`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct FrontierPoint {
+    pub cost_weight: f64,
+    pub x: Vec<f64>,
+    pub risk: f64,
+    pub cost: f64,
+}
+
+/// `hedge.frontier.solve`: `hedge.qp.solve` once per cost weight, in order; the first error
+/// stops it. `p.costs.cost_weight` must be absent.
+///
+/// # Errors
+/// `E_DOMAIN` for a non-finite weight; `E_INPUT` (`cost_weight` given, weights empty or not
+/// strictly increasing, no `half_spreads` or `impact`); then the errors of `hedge.qp.solve`.
+pub fn frontier_solve(p: &QpProblem, cost_weights: &[f64]) -> Result<Vec<FrontierPoint>> {
+    check_finite(p)?;
+    finite("cost_weights", &cost_weights)?;
+    if p.costs.cost_weight.is_some()
+        || cost_weights.is_empty()
+        || cost_weights.windows(2).any(|w| w[1] <= w[0])
+        || (p.costs.half_spreads.is_none() && p.costs.impact.is_none())
+    {
+        return fail(
+            "E_INPUT",
+            "cost_weights strictly increasing, no cost_weight, and a cost to weigh",
+        );
+    }
+    cost_weights
+        .iter()
+        .map(|w| {
+            let mut q = p.clone();
+            q.costs.cost_weight = Some(*w);
+            let s = qp_solve(&q)?;
+            Ok(FrontierPoint {
+                cost_weight: *w,
+                risk: s.risk.unwrap_or(s.objective),
+                cost: s.cost.unwrap_or(0.0),
+                x: s.x,
+            })
+        })
+        .collect()
 }
 
 /// Inputs of `hedge.integer.solve`. Lot bounds hold `None` for "no bound".

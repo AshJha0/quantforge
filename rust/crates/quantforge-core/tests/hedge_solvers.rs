@@ -3,8 +3,8 @@
 #![allow(clippy::unwrap_used)] // tests may unwrap (G9)
 use proptest::prelude::*;
 use quantforge_core::hedge_solvers::{
-    Greek, GreekInstrument, GreekMarket, IntegerProblem, Leg, LegKind, MinVarInput, QpProblem,
-    Singular, beta_futures, greeks_neutralise, integer_solve, minvar_ratio, qp_solve,
+    Costs, Greek, GreekInstrument, GreekMarket, IntegerProblem, Leg, LegKind, MinVarInput,
+    QpProblem, Singular, beta_futures, greeks_neutralise, integer_solve, minvar_ratio, qp_solve,
     residual_report, unit_greeks,
 };
 use quantforge_core::linalg::{Matrix, solve};
@@ -24,6 +24,7 @@ fn problem<'a>(a: &'a Matrix, b: &'a [f64], w: &'a [f64]) -> QpProblem<'a> {
         lower: None,
         upper: None,
         singular: Singular::Error,
+        costs: Costs::default(),
     }
 }
 

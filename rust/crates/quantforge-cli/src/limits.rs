@@ -294,6 +294,12 @@ fn stage_i_above(op: &str, i: &Json) -> bool {
     };
     match op {
         "hedge.qp.solve" => over("a", 1_000) || columns_over(200) || over("eq_matrix", 200),
+        "hedge.frontier.solve" => {
+            over("a", 1_000)
+                || columns_over(200)
+                || over("eq_matrix", 200)
+                || over("cost_weights", 50)
+        }
         "hedge.integer.solve" => over("a", 1_000) || columns_over(12),
         "hedge.residual.report" => over("a", 1_000) || columns_over(200),
         "hedge.minvar.ratio" => over("covariance", 201) || over("hedge_changes", 200),
