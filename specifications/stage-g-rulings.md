@@ -104,6 +104,7 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 | G-42 | (reserved for the simulated EE/PFE/EPE and CVA slice checked against ORE, wave 4c) | |
 | G-43 | SIMM-style margin | One currency, IR delta only; risk weights, correlations and the concentration threshold are inputs (no ISDA calibration is distributed) |
 | G-44 | Wrong-way risk | Hull-White (2012) hazard `exp(a(t) + b V(t))`, `a(t)` fitted bucket by bucket to the survival curve on the given paths |
+| G-45 | E1 for the stage G operations | `gen_stage_f_e1.py G` writes `datasets/golden/stage_g_e1/e1g_*.json` (NaN, +inf, -inf and negative zero on every Real leaf of each operation's smallest ok case; rules F-1 to F-3). E1 suites are robustness checks and stay outside the G-4 denominator, as the stage F E1 suites stayed outside the stage F share; open for the owner to confirm |
 
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 

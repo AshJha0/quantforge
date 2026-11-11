@@ -281,3 +281,7 @@ Read (research lane only; language sessions have nothing to build): `specificati
 ## WAVE 4b READY (2026-11-11): deterministic xVA layer
 
 Read: `specifications/06-risk/xva-framework.md`; rulings G-40, G-41, G-43, G-44. New operations `xva.exposure.collateralised` (`collexp_g`, 17), `xva.adjustments.value` (`xvaadj_g`, 12), `xva.simm.ir_delta` (`simm_g`, 8), `xva.wwr.cva_hw` (`wwr_g`, 6). Build notes: everything is exact arithmetic on the inputs except the WWR root (monotone in `a`; Newton from `ln h`). Property tests: total EE equals the sum over sets; zero thresholds with no lag give zero exposure; `b = 0` WWR equals the independent CVA. Outside: none. **Stage G share: 258 of 487 = 53.0%** (below 60%; ORE-checked wave 4c is the planned recovery, G-39).
+
+## Stage F carry-over wave 2b, part 2 READY (2026-11-11): E1 for the stage G operations
+
+Ruling G-45. 1,026 cases over all 20 stage G operations in `datasets/golden/stage_g_e1/` (`e1g_exotic`, `e1g_rates`, `e1g_risk`, `e1g_xva`); the runner finds them by suite name. Builds: F-2 says NaN or infinity in any Real input is `E_DOMAIN`, and negative zero behaves as the base case (or as its +0 anchor). Stage F E1 unchanged (5,535). Outside share unchanged (E1 outside the denominator, G-45).
