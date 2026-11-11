@@ -14,13 +14,13 @@ import org.quantforge.pricing.Credit;
 final class OpsCredit {
     private OpsCredit() {}
 
-    private record HazardInput(LocalDate asOf, LocalDate[] dates, double[] survival) {
+    record HazardInput(LocalDate asOf, LocalDate[] dates, double[] survival) {
         Credit.Hazard build() {
             return new Credit.Hazard(asOf, dates, survival);
         }
     }
 
-    private static HazardInput hazard(In in) {
+    static HazardInput hazard(In in) {
         In h = in.object("hazard");
         LocalDate asOf = h.date("as_of");
         List<In> p = h.objects("pillars");
@@ -59,7 +59,7 @@ final class OpsCredit {
     }
 
     /** Ruling R1-4: every credit.* operation needs ISDA flat forwards, checked before any other rule. */
-    private static void logLinear(OpsLinear.CurveInput d) {
+    static void logLinear(OpsLinear.CurveInput d) {
         if (d.interp() != Curve.Interpolation.LOG_LINEAR_DF) {
             throw new QfError("E_INPUT", "discount interpolation must be LOG_LINEAR_DF", "discount");
         }

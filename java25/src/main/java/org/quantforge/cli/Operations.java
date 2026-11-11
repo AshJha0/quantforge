@@ -75,7 +75,8 @@ final class Operations {
             new Registry.Module("risk", OpsRisk::register),
             new Registry.Module("book", OpsBook::register),
             new Registry.Module("portfolio_risk", OpsRiskF::register),
-            new Registry.Module("hedge_solvers", OpsHedgeI::register)
+            new Registry.Module("hedge_solvers", OpsHedgeI::register),
+            new Registry.Module("hedge_credit_correlation", OpsHedgeCreditCorr::register)
     );
 
     static final Registry REGISTRY = Registry.of(MODULES);

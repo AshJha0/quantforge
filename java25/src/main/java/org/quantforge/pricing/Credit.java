@@ -79,6 +79,36 @@ public final class Credit {
         LocalDate[] dates() {
             return dates;
         }
+
+        /**
+         * The number of hazard sections, one per pillar.
+         *
+         * @return the section count
+         */
+        public int sections() {
+            return dates.length;
+        }
+
+        /**
+         * The curve with section {@code k}'s piecewise-flat hazard moved by {@code shift[k]} (ruling I-15): the
+         * section from pillar {@code k-1} (or {@code as_of}) to pillar {@code k}; the last section also covers the
+         * time after the last pillar. The result may have a negative hazard, so it is not range-checked.
+         *
+         * @param shift one hazard shift per section
+         * @return the shifted curve
+         */
+        public Hazard shifted(double[] shift) {
+            double[] l = new double[lnQ.length];
+            double acc = 0.0;
+            double tPrev = 0.0;
+            for (int k = 0; k < l.length; k++) {
+                double tk = t(dates[k]);
+                acc += shift[k] * (tk - tPrev);
+                l[k] = lnQ[k] - acc;
+                tPrev = tk;
+            }
+            return new Hazard(t0, dates, l, true);
+        }
     }
 
     static boolean weekend(LocalDate d) {
