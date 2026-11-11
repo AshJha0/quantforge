@@ -1,0 +1,3181 @@
+{
+ "schema_version": "1.0",
+ "suite": "lmmswn_g",
+ "spec": "specifications/04-pricing/lmm.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_lmm.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "lmmswn_g-0001",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26471.12253690493,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.23619289255592046
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.0 1.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0002",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7328.491052389461,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.23619289255592046
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.0 1.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0003",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 36842.11435972964,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.22833009523849745
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.0 5.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0004",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19935.30080829924,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.22833009523849745
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.0 5.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0005",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12857.770605590124,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.2469339441560261
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.0 2.0y into 2.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0006",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6013.690639675941,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.2469339441560261
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.0 2.0y into 2.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0007",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 25555.92850133906,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.2195524969587691
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.1 1.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0008",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6413.297016823589,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.2195524969587691
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.1 1.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0009",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 34951.41363917967,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.2118397261951013
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.1 5.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0010",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 18044.600087749266,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.2118397261951013
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.1 5.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0011",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12604.106125730854,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.23958798559927688
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.1 2.0y into 2.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0012",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5760.026159816672,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.23958798559927688
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.1 2.0y into 2.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0013",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23157.453662031858,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.1738021731264279
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.5 1.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0014",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4014.822177516387,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.1738021731264279
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.5 1.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0015",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 29834.19748065219,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.1670371294369515
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.5 5.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0016",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12927.383929221784,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.1670371294369515
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.5 5.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0017",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11748.442862379667,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.21468119965584573
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.5 2.0y into 2.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0018",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4904.3628964654845,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.21468119965584573
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "abcd",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato abcd beta=0.5 2.0y into 2.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0019",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 24506.197644031185,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.0 1.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0020",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5363.566159515713,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.0 1.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0021",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 33594.87278851879,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.0 5.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0022",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 16688.059237088382,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.0 5.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0023",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11248.33025042034,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.0 2.0y into 2.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0024",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.0,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4404.250284506159,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.0 2.0y into 2.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0025",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 23738.493989940427,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.18527282886467086
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.1 1.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0026",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4595.862505424956,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.18527282886467086
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.1 1.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0027",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31913.069398741085,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.18529408124067312
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.1 5.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0028",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15006.25584731068,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.18529408124067312
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.1 5.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0029",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11043.795722305129,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.19396066572958923
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.1 2.0y into 2.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0030",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.1,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 4199.715756390948,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.19396066572958923
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.1 2.0y into 2.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0031",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 21805.214508828667,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.14545653782478307
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.5 1.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0032",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2662.5830243131954,
+     "swap_rate": 0.039462456263301415,
+     "annuity": 4.289707361827087,
+     "black_vol": 0.14545653782478307
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.5 1.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0033",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 27407.05665195608,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.14552131755876818
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.5 5.0y into 5.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0034",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10500.243100525675,
+     "swap_rate": 0.039603642121749695,
+     "annuity": 3.672486501840565,
+     "black_vol": 0.14552131755876818
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.5 5.0y into 5.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0035",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10358.284821225974,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.17352418457509486
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "pay",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.5 2.0y into 2.0y PAY",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0036",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": 0.0,
+     "b": 0.0,
+     "c": 1.0,
+     "d": 0.2
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 2.0,
+    "payment_times": [
+     2.5,
+     3.0,
+     3.5,
+     4.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "RECEIVE",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3514.2048553117934,
+     "swap_rate": 0.03887901357317353,
+     "annuity": 1.7643867021364525,
+     "black_vol": 0.17352418457509486
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "payer-receiver-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "lmm",
+    "swaption",
+    "flat",
+    "receive",
+    "synthetic"
+   ],
+   "description": "LMM Rebonato flat beta=0.5 2.0y into 2.0y RECEIVE",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional; variance integrals by quadrature"
+   }
+  },
+  {
+   "case_id": "lmmswn_g-0037",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "lmm",
+    "synthetic"
+   ],
+   "description": "no payment times"
+  },
+  {
+   "case_id": "lmmswn_g-0038",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 0.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "lmm",
+    "synthetic"
+   ],
+   "description": "expiry = 0"
+  },
+  {
+   "case_id": "lmmswn_g-0039",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "lmm",
+    "synthetic"
+   ],
+   "description": "first payment not after expiry"
+  },
+  {
+   "case_id": "lmmswn_g-0040",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": -0.1,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "PAY",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "lmm",
+    "synthetic"
+   ],
+   "description": "beta < 0"
+  },
+  {
+   "case_id": "lmmswn_g-0041",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.0,
+    "side": "PAY",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "lmm",
+    "synthetic"
+   ],
+   "description": "fixed_rate <= 0"
+  },
+  {
+   "case_id": "lmmswn_g-0042",
+   "operation": "rates.lmm.swaption_rebonato",
+   "inputs": {
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "abcd": {
+     "a": -0.06,
+     "b": 0.17,
+     "c": 0.54,
+     "d": 0.17
+    },
+    "correlation_beta": 0.5,
+    "expiry_years": 5.0,
+    "payment_times": [
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "fixed_rate": 0.035,
+    "side": "BUY",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "lmm",
+    "synthetic"
+   ],
+   "description": "unknown side"
+  }
+ ]
+}

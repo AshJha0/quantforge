@@ -1,0 +1,73 @@
+{
+ "n": 400,
+ "exact": {
+  "heston": {
+   "points": 400,
+   "judged": 398,
+   "excluded_below_price_floor": 2,
+   "max_abs_error": 0.0,
+   "p999_abs_error": 0.0,
+   "valid": true,
+   "pass": true,
+   "faces": 16,
+   "faces_total": 16
+  },
+  "sabr": {
+   "points": 400,
+   "judged": 400,
+   "excluded_below_price_floor": 0,
+   "max_abs_error": 0.0,
+   "p999_abs_error": 0.0,
+   "valid": true,
+   "pass": true
+  }
+ },
+ "biased_2bp": {
+  "heston": {
+   "points": 400,
+   "judged": 398,
+   "excluded_below_price_floor": 2,
+   "max_abs_error": 0.00020000000000000573,
+   "p999_abs_error": 0.00020000000000000573,
+   "valid": true,
+   "pass": false,
+   "faces": 16,
+   "faces_total": 16
+  },
+  "sabr": {
+   "points": 400,
+   "judged": 400,
+   "excluded_below_price_floor": 0,
+   "max_abs_error": 0.00020000000040454324,
+   "p999_abs_error": 0.00020000000040454324,
+   "valid": true,
+   "pass": false
+  }
+ },
+ "no_domain_guard": {
+  "heston": {
+   "points": 400,
+   "judged": 398,
+   "excluded_below_price_floor": 2,
+   "max_abs_error": 0.0,
+   "p999_abs_error": 0.0,
+   "valid": true,
+   "pass": false,
+   "faces": 0,
+   "faces_total": 16
+  },
+  "sabr": {
+   "points": 400,
+   "judged": 400,
+   "excluded_below_price_floor": 0,
+   "max_abs_error": 0.0,
+   "p999_abs_error": 0.0,
+   "valid": true,
+   "pass": true
+  }
+ },
+ "quantlib_heston_check": {
+  "points": 200,
+  "max_abs_price_gap": 1.56697571584985e-14
+ }
+}

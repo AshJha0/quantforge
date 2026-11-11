@@ -1108,6 +1108,213 @@
     "synthetic"
    ],
    "description": "spot below the unshifted down barrier"
+  },
+  {
+   "case_id": "barrier_g-0033",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.3,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "monitoring": "DISCRETE",
+    "monitoring_per_year": 252
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5.581305332299255
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk"
+   ],
+   "tags": [
+    "barrier",
+    "r9",
+    "discrete",
+    "m3",
+    "synthetic"
+   ],
+   "description": "DOWN_OUT CALL T=0.3 m=252: n=76, dt=T/n"
+  },
+  {
+   "case_id": "barrier_g-0034",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.5,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "PUT",
+    "monitoring": "DISCRETE",
+    "monitoring_per_year": 3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.2352789329982103
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk"
+   ],
+   "tags": [
+    "barrier",
+    "r9",
+    "discrete",
+    "m3",
+    "synthetic"
+   ],
+   "description": "DOWN_OUT PUT T=0.5 m=3: n=2, dt=T/n"
+  },
+  {
+   "case_id": "barrier_g-0035",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.75,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 2.0,
+    "barrier": 115.0,
+    "barrier_type": "UP_OUT",
+    "option_type": "CALL",
+    "monitoring": "DISCRETE",
+    "monitoring_per_year": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.7523203499409656
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk"
+   ],
+   "tags": [
+    "barrier",
+    "r9",
+    "discrete",
+    "m3",
+    "synthetic"
+   ],
+   "description": "UP_OUT CALL T=0.75 m=10: n=8, dt=T/n"
+  },
+  {
+   "case_id": "barrier_g-0036",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.5,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 1.5,
+    "barrier": 120.0,
+    "barrier_type": "UP_IN",
+    "option_type": "PUT",
+    "monitoring": "DISCRETE",
+    "monitoring_per_year": 52
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.785202360944129
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "closed-form-bgk"
+   ],
+   "tags": [
+    "barrier",
+    "r9",
+    "discrete",
+    "m3",
+    "synthetic"
+   ],
+   "description": "UP_IN PUT T=1.5 m=52: n=78, dt=T/n"
+  },
+  {
+   "case_id": "barrier_g-0037",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.3,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "monitoring": "DISCRETE",
+    "monitoring_per_year": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "r9",
+    "synthetic"
+   ],
+   "description": "n = floor(m T + 0.5) = 0"
+  },
+  {
+   "case_id": "barrier_g-0038",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "monitoring": "DISCRETE",
+    "monitoring_per_year": 1000001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [],
+   "tags": [
+    "invalid",
+    "limit",
+    "r5",
+    "synthetic"
+   ],
+   "description": "monitoring_per_year 1,000,001"
   }
  ]
 }

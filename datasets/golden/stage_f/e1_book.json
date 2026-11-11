@@ -1,0 +1,1975 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1_book",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1_book-0001",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": "NaN",
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0006",
+    "input:/positions/0/quantity"
+   ]
+  },
+  {
+   "case_id": "e1_book-0002",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": "Infinity",
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0006",
+    "input:/positions/0/quantity"
+   ]
+  },
+  {
+   "case_id": "e1_book-0003",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": "-Infinity",
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0006",
+    "input:/positions/0/quantity"
+   ]
+  },
+  {
+   "case_id": "e1_book-0004",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 0.0,
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0006",
+    "input:/positions/0/quantity"
+   ]
+  },
+  {
+   "case_id": "e1_book-0005",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": -0.0,
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0004"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "fixings": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0006",
+    "input:/positions/0/quantity"
+   ]
+  },
+  {
+   "case_id": "e1_book-0006",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": "NaN"
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0006",
+    "input:/positions/0/average_cost"
+   ]
+  },
+  {
+   "case_id": "e1_book-0007",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": "Infinity"
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0006",
+    "input:/positions/0/average_cost"
+   ]
+  },
+  {
+   "case_id": "e1_book-0008",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": "-Infinity"
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0006",
+    "input:/positions/0/average_cost"
+   ]
+  },
+  {
+   "case_id": "e1_book-0009",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": 0.0
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0006",
+    "input:/positions/0/average_cost"
+   ]
+  },
+  {
+   "case_id": "e1_book-0010",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": -0.0
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.38
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0009"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "fixings": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0006",
+    "input:/positions/0/average_cost"
+   ]
+  },
+  {
+   "case_id": "e1_book-0011",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0006",
+    "input:/events/0/recovery_price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0012",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": "Infinity"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0006",
+    "input:/events/0/recovery_price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0013",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": "-Infinity"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0006",
+    "input:/events/0/recovery_price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0014",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": 0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0006",
+    "input:/events/0/recovery_price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0015",
+   "operation": "book.lifecycle.apply",
+   "inputs": {
+    "positions": [
+     {
+      "instrument": "BOND-X",
+      "quantity": 1000.0,
+      "average_cost": 0.97
+     }
+    ],
+    "events": [
+     {
+      "date": "2026-11-20",
+      "type": "DEFAULT",
+      "instrument": "BOND-X",
+      "recovery_price": -0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0014"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "fixings": "date_and_convention"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0006",
+    "input:/events/0/recovery_price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0016",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": "NaN",
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0028",
+    "input:/ipv_threshold"
+   ]
+  },
+  {
+   "case_id": "e1_book-0017",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": "Infinity",
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/ipv_threshold"
+   ]
+  },
+  {
+   "case_id": "e1_book-0018",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": "-Infinity",
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/ipv_threshold"
+   ]
+  },
+  {
+   "case_id": "e1_book-0019",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.0,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0028",
+    "input:/ipv_threshold"
+   ]
+  },
+  {
+   "case_id": "e1_book-0020",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": -0.0,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0019"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "marks": "simple_analytic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0028",
+    "input:/ipv_threshold"
+   ]
+  },
+  {
+   "case_id": "e1_book-0021",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": "NaN"
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0022",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": "Infinity"
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0023",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": "-Infinity"
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0024",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 0.0
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0025",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": -0.0
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0024"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "marks": "simple_analytic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0026",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": "NaN"
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0027",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": "Infinity"
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0028",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": "-Infinity"
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0029",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 0.0
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0030",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": -0.0
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0029"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "marks": "simple_analytic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0028",
+    "input:/sources/0/quotes/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0031",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": "NaN"
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0028",
+    "input:/ipv/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0032",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": "Infinity"
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/ipv/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0033",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": "-Infinity"
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/ipv/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0034",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 0.0
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0028",
+    "input:/ipv/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0035",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": -0.0
+     },
+     {
+      "instrument": "BUND10",
+      "price": 130.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0034"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "marks": "simple_analytic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0028",
+    "input:/ipv/0/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0036",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": "NaN"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:book_f-0028",
+    "input:/ipv/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0037",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": "Infinity"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/ipv/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0038",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": "-Infinity"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:book_f-0028",
+    "input:/ipv/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0039",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": 0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:book_f-0028",
+    "input:/ipv/1/price"
+   ]
+  },
+  {
+   "case_id": "e1_book-0040",
+   "operation": "book.marks.resolve",
+   "inputs": {
+    "as_of": "2026-11-10",
+    "instruments": [
+     "UST10",
+     "BUND10",
+     "SPX",
+     "ILLIQ"
+    ],
+    "max_age_days": 3,
+    "ipv_threshold": 0.005,
+    "sources": [
+     {
+      "name": "VENDOR_A",
+      "quotes": [
+       {
+        "instrument": "UST10",
+        "date": "2026-11-10",
+        "price": 99.75
+       },
+       {
+        "instrument": "SPX",
+        "date": "2026-11-07",
+        "price": 6012.5
+       }
+      ]
+     }
+    ],
+    "ipv": [
+     {
+      "instrument": "UST10",
+      "price": 99.7
+     },
+     {
+      "instrument": "BUND10",
+      "price": -0.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1_book-0039"
+   },
+   "tolerance_class": "simple_analytic",
+   "output_classes": {
+    "marks": "simple_analytic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:book_f-0028",
+    "input:/ipv/1/price"
+   ]
+  }
+ ]
+}

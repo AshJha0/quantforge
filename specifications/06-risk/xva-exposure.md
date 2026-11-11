@@ -14,7 +14,7 @@ Sources:
 ### Inputs
 
 - Model: `curve`, `mean_reversion`, `sigma` (Hull-White, as `short-rate-models.md`).
-- Swap: `start_years` `T0` (>= 0), `payment_times` `T1 < ... < Tn` (`T1 > T0`, else `E_INPUT`), `fixed_rate` `K`, `side` (`PAY` pays fixed, `RECEIVE` receives fixed; else `E_INPUT`), `notional`. Conventions of `rates.shortrate.swaption` (ruling G-12): single curve, accruals from the times, floating leg a par floater at each reset.
+- Swap: `start_years` `T0` (>= 0, else `E_DOMAIN`, checked after `side` and before `payment_times`; ruling G-38), `payment_times` `T1 < ... < Tn` (`T1 > T0`, else `E_INPUT`), `fixed_rate` `K`, `side` (`PAY` pays fixed, `RECEIVE` receives fixed; else `E_INPUT`), `notional`. Conventions of `rates.shortrate.swaption` (ruling G-12): single curve, accruals from the times, floating leg a par floater at each reset.
 - `exposure_times`: at least one, each > 0 (else `E_DOMAIN`), strictly increasing (else `E_INPUT`), and each one a reset date before the last payment, that is one of `T0, T1, ..., T(n-1)` (else `E_INPUT`; ruling G-16). Times are compared exactly as binary64 numbers.
 - Optional credit: `hazard_rate` `lambda` (>= 0, else `E_DOMAIN`) and `recovery` `R` (in `[0, 1)`, else `E_DOMAIN`), both or neither (else `E_INPUT`).
 

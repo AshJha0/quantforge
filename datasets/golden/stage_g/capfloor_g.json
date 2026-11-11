@@ -2623,7 +2623,7 @@
      2.0,
      3.0
     ],
-    "strike": -0.5,
+    "strike": -1.0,
     "cap_floor": "CAP",
     "notional": 1.0
    },
@@ -2640,7 +2640,7 @@
     "capfloor",
     "synthetic"
    ],
-   "description": "1 + K tau <= 0"
+   "description": "1 + K tau <= 0 (K = -1, tau = 1: exactly 0)"
   },
   {
    "case_id": "capfloor_g-0041",

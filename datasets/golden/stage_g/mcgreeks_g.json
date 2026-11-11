@@ -751,6 +751,35 @@
     "synthetic"
    ],
    "description": "vol = 0"
+  },
+  {
+   "case_id": "mcgreeks_g-0022",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "payoff": "CALL",
+    "method": "PATHWISE",
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "paths": 10000001,
+    "seed": "1"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [],
+   "tags": [
+    "invalid",
+    "limit",
+    "r5",
+    "synthetic"
+   ],
+   "description": "paths 10,000,001"
   }
  ]
 }
