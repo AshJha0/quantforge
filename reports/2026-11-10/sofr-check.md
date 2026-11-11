@@ -1,6 +1,6 @@
 # SOFR check: 2026-11-10
 
-Result: **PASS** (25 checks, 0 failed, 0 warnings). Generated 2026-11-10T21:14Z by `tools/workflows/`. Batch command: rust `quantforge --batch`.
+Result: **PASS** (25 checks, 0 failed, 0 warnings). Generated 2026-11-11T21:49Z by `tools/workflows/`. Batch command: rust `quantforge --batch`.
 
 
 ## Published averages against the library

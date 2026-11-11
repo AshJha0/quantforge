@@ -151,7 +151,7 @@
   },
   {
    "check": "SONIA level",
-   "detail": "2026-11-06: value withheld",
+   "detail": "2026-11-09: value withheld",
    "level": "fail",
    "ok": true
   },
@@ -169,7 +169,7 @@
   },
   {
    "check": "GBP BoE curves read",
-   "detail": "OIS 6 days, nominal 6 days",
+   "detail": "OIS 7 days, nominal 7 days",
    "level": "fail",
    "ok": true
   },
@@ -235,7 +235,7 @@
   },
   {
    "check": "GBP BoE curve date vs SONIA",
-   "detail": "BoE 2026-11-09, SONIA 2026-11-06",
+   "detail": "BoE 2026-11-10, SONIA 2026-11-09",
    "level": "warn",
    "ok": true
   }
@@ -243,7 +243,7 @@
  "curve_label": "USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not a SOFR swap curve.",
  "dv01": 79409.64127004871,
  "gbp_reference": {
-  "boe_date": "2026-11-09",
+  "boe_date": "2026-11-10",
   "nominal_maturities": 80,
   "ois_maturities": 50
  },
@@ -263,7 +263,7 @@
   "6M": 1.1413366739589037,
   "7Y": 45708.41244932388
  },
- "sonia_latest_date": "2026-11-06",
+ "sonia_latest_date": "2026-11-09",
  "usd_pillars": [
   {
    "date": "2026-12-16",
