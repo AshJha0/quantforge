@@ -63,3 +63,7 @@ The smoothed digital replaces the payoff by the call spread `(max(S_T - K + eps,
 Digital call, `S = K = 100`, `T = 1`, `r = 0.03`, `q = 0`, `v = 0.2`, 100,000 paths, seed 20261109, `eps = 1`, `h = 0.01`. Oracle run 2026-11-10 (`oracle/Q9_ACCEPTANCE.json`): closed-form delta 0.0193334; smoothed pathwise 0.0187660 with per-path variance 0.0087549; bump 0.0187976 with variance 0.0087677; likelihood ratio 0.0193332 +- 0.0000896 (z = -0.002). Both conditions pass. Note that at `eps = 1` the likelihood-ratio delta has the lowest standard error of the three (9.0e-5 against 3.0e-4). **Open item:** the variance condition passes by a ratio of 0.9985 only. At these parameters a central bump of the digital with `h S = eps` is nearly the same call-spread estimator as the smoothed pathwise one, so the test has little power. The parameters were fixed before the run (12.10 rule) and are not changed here; a stronger test (for example `h = 0.001`, where the bump variance grows as `1/h`) needs an owner ruling.
 
 Each language adds the acceptance as a property test with its own estimators (same seed and path count).
+
+## Owner decision on the variance test (2026-11-10)
+
+G-10 as registered is recorded as **inconclusive, low power** (not a pass). The powered test G-10b (registered with its power calculation before it ran; `stage-g-rulings.md`) compares smoothed pathwise (`eps = 1`) with a central bump at `h = 0.001` on independent `core.rng` streams, 60,000 paths each: variance ratio 0.1015, 95% interval [0.0888, 0.1161], `Z = 33.35`, **pass** (`oracle/G10B_RESULT.json`).
