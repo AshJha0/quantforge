@@ -16,7 +16,7 @@ Reference (the golden). Richardson-extrapolated central differences of the binar
 
 Tolerance (G-9): `abs(AAD - ref) <= 1e-10 + 1e-8 abs(ref)` per unit notional, class `aad_sensitivity`; the price at 1e-9 relative.
 
-Worked example (`aadladder_g-0001`, from `bermudan_g-0002` on `nx = 101`, 50 steps a year). Price 22,697.81 per 1,000,000. `dV/dsigma = 2,269,595`: a 1 bp rise in `sigma` adds about 227. `dV/da = -52,528`: more mean reversion damps rate moves and cheapens the option. The 6-month pillar has almost no effect (127 per unit change of its discount factor); the 1-year pillar has the largest (191,964), because the first exercise date is there.
+Worked example (`aadladder_g-0001`, from `bermudan_g-0002` on `nx = 101`, 50 steps a year). Price 22,697.81 per 1,000,000. `dV/dsigma = 2,269,595`: a 1 bp rise in `sigma` adds about 227. `dV/da = -52,528`: more mean reversion damps rate moves and cheapens the option. Per unit change of each discount factor: the 6-month pillar 127, the 1- to 3-year pillars +191,964, +173,816, +147,510, the 5- and 7-year pillars -233,482 and -343,473 (a higher long discount factor lowers the forward swap rate of a payer), and 0 beyond the last payment.
 
 ## Performance acceptance (G-9)
 
