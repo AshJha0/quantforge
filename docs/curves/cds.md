@@ -40,4 +40,4 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 |---|---|
 | credit.cds.bootstrap: independent-replay, quantlib-1.44-isda-cds-engine | 5 |
 
-Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.

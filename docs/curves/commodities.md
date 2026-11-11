@@ -59,4 +59,4 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 | cmdty.curve.forward: analytic | 2 |
 | cmdty.storage.carry: analytic | 2 |
 
-Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.

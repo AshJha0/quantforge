@@ -2,7 +2,7 @@
 
 <p class="note">Status: Implemented, not Validated. Validation is self-assessment until the human review at the end of the project. Data: synthetic. These are constructed inputs, not market data, and nothing is traded.</p>
 
-Generated on 2026-11-11 from commit `e150116`, by Java 0.6.0 (JDK 25.0.5+8-LTS), C++ 0.6.0 (GCC 16.2.0), Python 0.6.0 (CPython 3.15.2), Rust 0.6.0 (rustc 1.99.1), on one Windows machine.
+Generated on 2026-11-11 from commit `dbf0843`, by Java 0.7.0 (JDK 25.0.5+8-LTS), C++ 0.7.0 (GCC 16.2.0), Python 0.7.0 (CPython 3.15.2), Rust 0.7.0 (rustc 1.99.1), on one Windows machine.
 
 ## What it is
 
@@ -44,4 +44,4 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 |---|---|
 | credit.curve.composite: independent-replay, quantlib-1.44-isda-cds-engine | 2 |
 
-Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.
