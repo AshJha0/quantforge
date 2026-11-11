@@ -12,6 +12,7 @@ import org.quantforge.cli.Operations.Out;
 import org.quantforge.core.QfError;
 import org.quantforge.risk.FrtbGirr;
 import org.quantforge.risk.FrtbSbm;
+import org.quantforge.risk.FrtbVegaCurvature;
 import org.quantforge.risk.RiskToolsB;
 
 /** Stage F carry-over wave 2b: FRTB FX, equity, CSR and commodity delta; F3 sensitivities; F4 tools. */
@@ -29,13 +30,17 @@ final class OpsWave2b {
     }
 
     private static Out frtbOut(FrtbGirr.Result r) {
+        return frtbOut(r, "delta");
+    }
+
+    private static Out frtbOut(FrtbGirr.Result r, String key) {
         Map<String, Object> sc = new LinkedHashMap<>();
         for (FrtbGirr.Scenario s : r.scenarios()) {
             List<Map<String, Object>> bl = new ArrayList<>();
             for (FrtbGirr.Bucket b : s.buckets()) {
                 bl.add(Operations.out("bucket", b.currency(), "k", b.k(), "s", b.s(), "s_used", b.sUsed()).outputs());
             }
-            sc.put(s.name(), Operations.out("buckets", bl, "delta", s.delta(), "alternative_used",
+            sc.put(s.name(), Operations.out("buckets", bl, key, s.delta(), "alternative_used",
                     s.alternativeUsed()).outputs());
         }
         return Operations.out("scenarios", sc, "capital", r.capital(), "binding_scenario", r.binding());
@@ -95,6 +100,9 @@ final class OpsWave2b {
             in.gate();
             return frtbOut(FrtbSbm.commodity(col(r, 0), r.bucket(), col(r, 1), col(r, 2), r.s()));
         });
+
+        table.put("risk.frtb.vega", OpsWave2b::vega);
+        table.put("risk.frtb.curvature", OpsWave2b::curvature);
 
         table.put("risk.sens.inflation01", in -> {
             double n = in.real("notional");
@@ -301,5 +309,83 @@ final class OpsWave2b {
             double sq = sigma * Math.sqrt((double) h);
             return Operations.out("vol", sigma * Math.sqrt(h * ratio), "sqrt_rule_vol", sq, "variance_ratio", ratio);
         });
+    }
+
+    private static FrtbVegaCurvature.RiskClass riskClass(In in) {
+        String s = in.string("risk_class");
+        for (FrtbVegaCurvature.RiskClass c : FrtbVegaCurvature.RiskClass.values()) {
+            if (c.name().equals(s)) {
+                return c;
+            }
+        }
+        throw input("risk_class");
+    }
+
+    /** A bucket label: a string for GIRR and FX, an integer otherwise. */
+    private static String bucket(In x, FrtbVegaCurvature.RiskClass rc) {
+        return named(rc) ? Long.toString(x.integer("bucket")) : x.string("bucket");
+    }
+
+    private static boolean named(FrtbVegaCurvature.RiskClass rc) {
+        return rc != FrtbVegaCurvature.RiskClass.GIRR && rc != FrtbVegaCurvature.RiskClass.FX;
+    }
+
+    private static Out vega(In in) {
+        FrtbVegaCurvature.RiskClass rc = riskClass(in);
+        List<In> list = in.objects("sensitivities");
+        in.limit(list.size() > MAX, "sensitivities");
+        List<FrtbVegaCurvature.Vega> vs = new ArrayList<>();
+        boolean missingU = false;
+        for (In x : list) {
+            String b = bucket(x, rc);
+            String name = named(rc) ? x.string("name") : "";
+            double t = x.real("option_maturity");
+            boolean hasU = x.has("underlying_maturity");
+            double u = hasU ? x.real("underlying_maturity") : Double.NaN;
+            missingU |= rc == FrtbVegaCurvature.RiskClass.GIRR && !hasU;
+            vs.add(new FrtbVegaCurvature.Vega(b, name, t, u, x.real("vega")));
+        }
+        in.gate();
+        if (missingU) {
+            throw input("underlying_maturity");
+        }
+        for (FrtbVegaCurvature.Vega v : vs) {
+            FrtbVegaCurvature.bucketNumber(rc, v.bucket());
+            if (!(v.optionMaturity() > 0.0)) {
+                throw domain("option_maturity");
+            }
+            if (rc == FrtbVegaCurvature.RiskClass.GIRR && !(v.underlyingMaturity() > 0.0)) {
+                throw domain("underlying_maturity");
+            }
+        }
+        return frtbOut(FrtbVegaCurvature.vega(rc, vs), "vega");
+    }
+
+    private static Out curvature(In in) {
+        FrtbVegaCurvature.RiskClass rc = riskClass(in);
+        List<In> list = in.objects("factors");
+        in.limit(list.size() > MAX, "factors");
+        boolean scalar = in.bool("fx_scalar", false);
+        List<FrtbVegaCurvature.Cvr> fs = new ArrayList<>();
+        for (In x : list) {
+            String b = bucket(x, rc);
+            String name = named(rc) ? x.string("name") : "";
+            fs.add(new FrtbVegaCurvature.Cvr(b, name, x.real("cvr_up"), x.real("cvr_down")));
+        }
+        in.gate();
+        for (FrtbVegaCurvature.Cvr f : fs) {
+            FrtbVegaCurvature.bucketNumber(rc, f.bucket());
+        }
+        FrtbVegaCurvature.CurvResult r = FrtbVegaCurvature.curvature(rc, fs, scalar);
+        Map<String, Object> sc = new LinkedHashMap<>();
+        for (FrtbVegaCurvature.CurvScenario s : r.scenarios()) {
+            List<Map<String, Object>> bl = new ArrayList<>();
+            for (FrtbVegaCurvature.CurvBucket b : s.buckets()) {
+                bl.add(Operations.out("bucket", b.bucket(), "k", b.k(), "s", b.s(), "selected", b.up() ? "UP" : "DOWN")
+                        .outputs());
+            }
+            sc.put(s.name(), Operations.out("buckets", bl, "curvature", s.curvature()).outputs());
+        }
+        return Operations.out("scenarios", sc, "capital", r.capital(), "binding_scenario", r.binding());
     }
 }

@@ -161,7 +161,7 @@ public final class FrtbSbm {
 
     private static final double[] EQ_RW = {0, 0.55, 0.60, 0.45, 0.55, 0.30, 0.35, 0.40, 0.50, 0.70, 0.50, 0.70, 0.15,
         0.25};
-    private static final double[] EQ_RHO = {0, 0.15, 0.15, 0.15, 0.15, 0.25, 0.25, 0.25, 0.25, 0.075, 0.125, 0, 0.80,
+    static final double[] EQ_RHO = {0, 0.15, 0.15, 0.15, 0.15, 0.25, 0.25, 0.25, 0.25, 0.075, 0.125, 0, 0.80,
         0.80};
     private static final double[] CSR_RW = {0, 0.005, 0.01, 0.05, 0.03, 0.03, 0.02, 0.015, 0.025, 0.02, 0.04, 0.12,
         0.07, 0.085, 0.055, 0.05, 0.12, 0.015, 0.05};
@@ -172,7 +172,7 @@ public final class FrtbSbm {
         {10, 10, 20, 5, 15, 20, 5, -1, 0, 45, 45}, {0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0},
         {45, 45, 45, 45, 45, 45, 45, 45, 0, -1, 75}, {45, 45, 45, 45, 45, 45, 45, 45, 0, 75, -1}};
     private static final double[] CM_RW = {0, 0.30, 0.35, 0.60, 0.80, 0.40, 0.45, 0.20, 0.35, 0.25, 0.35, 0.50};
-    private static final double[] CM_RHO = {0, 0.55, 0.95, 0.40, 0.80, 0.60, 0.65, 0.55, 0.45, 0.15, 0.40, 0.15};
+    static final double[] CM_RHO = {0, 0.55, 0.95, 0.40, 0.80, 0.60, 0.65, 0.55, 0.45, 0.15, 0.40, 0.15};
     private static final Set<String> CSR_TENORS = Set.of("0.5Y", "1Y", "3Y", "5Y", "10Y");
 
     private static QfError input(String why) {
@@ -243,15 +243,7 @@ public final class FrtbSbm {
             }
             double r = EQ_RHO[b];
             return x.get(1).equals(y.get(1)) ? r : r * 0.999;
-        }, (b, c) -> {
-            if (b == 11 || c == 11) {
-                return 0.0;
-            }
-            if (b <= 10 && c <= 10) {
-                return 0.15;
-            }
-            return (b == 12 && c == 13) || (b == 13 && c == 12) ? 0.75 : 0.45;
-        }, Set.of(11));
+        }, FrtbSbm::eqGamma, Set.of(11));
     }
 
     private static int sector(int b) {
@@ -292,13 +284,7 @@ public final class FrtbSbm {
             double ten = x.get(1).equals(y.get(1)) ? 1.0 : 0.65;
             double basis = x.get(2).equals(y.get(2)) ? 1.0 : 0.999;
             return name * ten * basis;
-        }, (b, c) -> {
-            int sb = sector(b);
-            int scc = sector(c);
-            double sec = sb == scc ? 1.0 : T5[sb][scc] / 100.0;
-            double rating = b <= 15 && c <= 15 && (b <= 8) != (c <= 8) ? 0.5 : 1.0;
-            return rating * sec;
-        }, Set.of(16));
+        }, FrtbSbm::csrGamma, Set.of(16));
     }
 
     /**
@@ -327,5 +313,25 @@ public final class FrtbSbm {
             double loc = x.get(2).equals(y.get(2)) ? 1.0 : 0.999;
             return name * ten * loc;
         }, (b, c) -> b == 11 || c == 11 ? 0.0 : 0.20, Set.of());
+    }
+
+    /** Equity cross-bucket correlation (MAR21.80). */
+    static double eqGamma(int b, int c) {
+        if (b == 11 || c == 11) {
+            return 0.0;
+        }
+        if (b <= 10 && c <= 10) {
+            return 0.15;
+        }
+        return (b == 12 && c == 13) || (b == 13 && c == 12) ? 0.75 : 0.45;
+    }
+
+    /** CSR cross-bucket correlation, rating times sector (MAR21.57). */
+    static double csrGamma(int b, int c) {
+        int sb = sector(b);
+        int scc = sector(c);
+        double sec = sb == scc ? 1.0 : T5[sb][scc] / 100.0;
+        double rating = b <= 15 && c <= 15 && (b <= 8) != (c <= 8) ? 0.5 : 1.0;
+        return rating * sec;
     }
 }

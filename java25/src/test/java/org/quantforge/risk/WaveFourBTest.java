@@ -111,4 +111,27 @@ class WaveFourBTest {
                 new double[] {1e6, -1e6});
         assertEquals(1_400_000.0, r.capital(), 1e-6);
     }
+
+    /** frtb-sa-vega-curvature.md: one vega factor gives RW x VR; long gamma alone gives no curvature charge. */
+    @Test
+    void vegaAndCurvatureLimits() {
+        FrtbVegaCurvature.RiskClass fx = FrtbVegaCurvature.RiskClass.FX;
+        assertEquals(1e6, FrtbVegaCurvature.vega(fx, List.of(new FrtbVegaCurvature.Vega("EURUSD", "", 1, 0, 1e6)))
+                .capital(), 1e-9);
+        FrtbVegaCurvature.RiskClass eq = FrtbVegaCurvature.RiskClass.EQUITY;
+        assertEquals(0.7778e6, FrtbVegaCurvature.vega(eq, List.of(new FrtbVegaCurvature.Vega("5", "A", 1, 0, 1e6)))
+                .capital(), 1e-9);
+        assertEquals(0.0, FrtbVegaCurvature.curvature(eq, List.of(new FrtbVegaCurvature.Cvr("5", "A", -3, 0)), false)
+                .capital(), 0.0);
+        // one factor: curvature = max(CVR+, CVR-) when positive; the FX scalar divides by 1.5
+        assertEquals(3e5, FrtbVegaCurvature.curvature(fx, List.of(new FrtbVegaCurvature.Cvr("EURJPY", "", 3e5, 1e5)),
+                false).capital(), 1e-9);
+        assertEquals(2e5, FrtbVegaCurvature.curvature(fx, List.of(new FrtbVegaCurvature.Cvr("EURJPY", "", 3e5, 1e5)),
+                true).capital(), 1e-9);
+        // two buckets that both lose nothing under the selected shock do not offset (psi)
+        FrtbVegaCurvature.CurvResult r = FrtbVegaCurvature.curvature(FrtbVegaCurvature.RiskClass.GIRR, List.of(
+                new FrtbVegaCurvature.Cvr("EUR", "", -1e5, -2e5), new FrtbVegaCurvature.Cvr("USD", "", -1e5, -3e5)),
+                false);
+        assertEquals(0.0, r.capital(), 0.0);
+    }
 }
