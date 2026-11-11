@@ -2097,6 +2097,60 @@
     "synthetic"
    ],
    "description": "zero quantity: the hedged item never changes"
+  },
+  {
+   "case_id": "hedgebt_i-0016",
+   "operation": "hedge.backtest.delta",
+   "inputs": {
+    "rate": 0.0,
+    "dividend_yield": 0.0,
+    "hedge_volatility": 0.2,
+    "quantity": -100.0,
+    "option": {
+     "type": "CALL",
+     "strike": 100.0,
+     "expiry_years": 0.1726027397260274
+    },
+    "times": [
+     0.0,
+     0.019178082191780823,
+     0.038356164383561646,
+     0.057534246575342465,
+     0.07671232876712329,
+     0.0958904109589041,
+     0.11506849315068493,
+     0.13424657534246576,
+     0.15342465753424658,
+     0.1726027397260274
+    ],
+    "spots": [
+     100.0,
+     100.0,
+     100.0,
+     100.0,
+     100.0,
+     100.0,
+     100.0,
+     100.0,
+     100.0,
+     100.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "backtest",
+    "synthetic"
+   ],
+   "description": "constant spot, zero rates and dividends: the hedge leg is zero, so it has no variance (I-43, after the builds)"
   }
  ]
 }

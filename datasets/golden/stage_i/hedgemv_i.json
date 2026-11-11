@@ -703,6 +703,43 @@
     "synthetic"
    ],
    "description": "correlation above 1 (variance after below 0)"
+  },
+  {
+   "case_id": "hedgemv_i-0018",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.06000000000000001
+     ],
+     [
+      0.06000000000000001,
+      0.09
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -0.6666666666666669
+     ],
+     "variance_before": 0.04,
+     "variance_after": 0.0,
+     "effectiveness": 1.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "perfect hedge whose exact hedged variance is a rounding step below 0: reads as 0 (I-44, after the builds)"
   }
  ]
 }
