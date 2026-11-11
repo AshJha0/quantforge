@@ -22,7 +22,7 @@ Input file: [`examples/fx_forward_outright.json`](../../examples/fx_forward_outr
 rust/target/release/quantforge run < examples/fx_forward_outright.json
 ```
 
-The gallery sends this case once per quarterly value date, changing only `value_date`, and sends [`examples/fx_curve_implied.json`](../../examples/fx_curve_implied.json) for the basis. To rebuild every page, with all four CLIs built:
+The gallery sends this case once per quarterly value date, changing only `value_date`, and sends [`examples/fx_curve_implied.json`](../../examples/fx_curve_implied.json) to `fx.curve.implied` for the basis. To rebuild every page, with all four CLIs built:
 
 ```bash
 python tools/build_gallery.py

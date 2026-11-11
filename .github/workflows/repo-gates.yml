@@ -4,7 +4,8 @@ name: Repo gates
 #     placeholder packages;
 #   - model register (plan 12.2 A2) and convergence rule (Q5b) ratchets over
 #     conformance/quality/governance_baseline.json;
-#   - build and test leftovers stay ignored (plan 12.2 G9).
+#   - build and test leftovers stay ignored (plan 12.2 G9);
+#   - docs status (tools/check_docs_status.py): curve table rows against the name map, release wording against tags.
 on:
   pull_request:
   push:
@@ -23,8 +24,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-tags: true  # the docs check reads release tags
       - run: python3 tools/check_hygiene.py
-      - run: python3 tools/quality_gate.py --check-register --check-specs
+      - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |
           for p in python/quantforge.egg-info/PKG-INFO python/.hypothesis/examples python/.benchmarks/x; do

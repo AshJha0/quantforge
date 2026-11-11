@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-General collateral repo rates by term, and specials against them. Stage D, target v0.4.
+General collateral repo rates by term, and specials against them. Stage D.
 
 ## Runs
 
