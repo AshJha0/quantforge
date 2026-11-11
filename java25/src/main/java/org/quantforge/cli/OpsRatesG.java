@@ -133,6 +133,7 @@ final class OpsRatesG {
     }
 
     static void register(Map<String, Function<In, Out>> table) {
+        table.put("xva.exposure.portfolio_hw", OpsRatesG::portfolio);
         table.put("risk.model_reserve.dispersion", OpsRatesG::reserve);
 
         table.put("rates.shortrate.hw_calibrate", in -> {
@@ -376,5 +377,113 @@ final class OpsRatesG {
                 payer, notional, ex, g);
         return Operations.out("price", l.price(), "d_price_d_discount_factors", l.dDiscountFactors(),
                 "d_price_d_mean_reversion", l.dMeanReversion(), "d_price_d_sigma", l.dSigma());
+    }
+
+    /** The output key of a PFE quantile: {@code pfe_} and the percentage, as {@code pfe_95}. */
+    static String pfeKey(double q) {
+        return "pfe_" + new java.math.BigDecimal(Double.toString(q)).movePointRight(2).stripTrailingZeros()
+                .toPlainString();
+    }
+
+    /** Swap portfolio exposure under Hull-White (xva-exposure-portfolio.md, ruling G-42). */
+    private static Out portfolio(In in) {
+        OpsShortRate.Raw raw = OpsShortRate.read(in, true);
+        List<In> list = in.objects("trades");
+        in.limit(list.size() > MAX, "trades");
+        int n = list.size();
+        double[] notional = new double[n];
+        double[] rate = new double[n];
+        String[] side = new String[n];
+        double[] start = new double[n];
+        double[][] pay = new double[n][];
+        for (int i = 0; i < n; i++) {
+            In t = list.get(i);
+            notional[i] = t.real("notional");
+            rate[i] = t.real("fixed_rate");
+            side[i] = t.string("side");
+            start[i] = t.real("start_years");
+            pay[i] = t.reals("payment_times");
+            in.limit(pay[i].length > MAX, "payment_times");
+        }
+        double[] ex = in.reals("exposure_times");
+        double[] q = in.reals("pfe_quantiles");
+        double hz = in.real("hazard_rate");
+        double rec = in.real("recovery");
+        in.limit(ex.length > MAX, "exposure_times");
+        in.gate();
+        ShortRate.Params p = OpsShortRate.params(raw, 0.0);
+        if (n == 0) {
+            throw input("trades");
+        }
+        java.util.TreeSet<Double> grid = new java.util.TreeSet<>();
+        List<org.quantforge.risk.PortfolioExposure.Swap> swaps = new java.util.ArrayList<>();
+        double lastPay = 0.0;
+        for (int i = 0; i < n; i++) {
+            boolean payer = listed(side[i], "side", "PAY", "RECEIVE");
+            if (!(start[i] >= 0.0)) {
+                throw domain("start_years");
+            }
+            OpsShortRate.checkPayments(pay[i], start[i]);
+            grid.add(start[i]);
+            for (double x : pay[i]) {
+                grid.add(x);
+            }
+            lastPay = Math.max(lastPay, pay[i][pay[i].length - 1]);
+            swaps.add(new org.quantforge.risk.PortfolioExposure.Swap(notional[i], rate[i], payer, start[i], pay[i]));
+        }
+        // common resets: each trade's dates are a contiguous run of the set's grid
+        List<Double> g = new java.util.ArrayList<>(grid);
+        for (int i = 0; i < n; i++) {
+            int at = g.indexOf(start[i]);
+            for (int j = 0; j < pay[i].length; j++) {
+                if (at + 1 + j >= g.size() || g.get(at + 1 + j) != pay[i][j]) {
+                    throw input("trades");
+                }
+            }
+        }
+        if (ex.length == 0 || !increasing(ex)) {
+            throw input("exposure_times");
+        }
+        for (double t : ex) {
+            if (!(t > 0.0) || !grid.contains(t) || !(t < lastPay)) {
+                throw input("exposure_times");
+            }
+        }
+        for (double x : q) {
+            if (!(x > 0.0 && x < 1.0)) {
+                throw domain("pfe_quantiles");
+            }
+        }
+        if (!(hz >= 0.0)) {
+            throw domain("hazard_rate");
+        }
+        if (!(rec >= 0.0 && rec < 1.0)) {
+            throw domain("recovery");
+        }
+        double[] ee = new double[ex.length];
+        double[] ene = new double[ex.length];
+        double[][] pfe = new double[q.length][ex.length];
+        double epe = 0.0;
+        double cva = 0.0;
+        double prev = 0.0;
+        for (int i = 0; i < ex.length; i++) {
+            org.quantforge.risk.PortfolioExposure.Point pt = org.quantforge.risk.PortfolioExposure.point(p.curve(),
+                    p.a(), p.sigma(), swaps, ex[i], q);
+            ee[i] = pt.ee();
+            ene[i] = pt.ene();
+            for (int j = 0; j < q.length; j++) {
+                pfe[j][i] = pt.pfe()[j];
+            }
+            epe += ee[i] * (ex[i] - prev);
+            cva += ee[i] * (Math.exp(-hz * prev) - Math.exp(-hz * ex[i]));
+            prev = ex[i];
+        }
+        Out o = Operations.out("discounted_ee", ee, "discounted_ene", ene);
+        for (int j = 0; j < q.length; j++) {
+            o.outputs().put(pfeKey(q[j]), pfe[j]);
+        }
+        o.outputs().put("epe", epe / ex[ex.length - 1]);
+        o.outputs().put("cva", (1.0 - rec) * cva);
+        return o;
     }
 }
