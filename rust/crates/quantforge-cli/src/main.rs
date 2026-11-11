@@ -312,7 +312,14 @@ mod tests {
     fn operations_are_sorted_and_all_dispatch() {
         assert!(operations().windows(2).all(|w| w[0] < w[1]));
         for op in operations() {
-            assert_eq!(code(&case(op, "{}")), Some("E_SCHEMA"), "{op}");
+            // Every key of `hedge.minvar.ratio` is optional, and its spec makes "neither input
+            // form" an `E_INPUT` (hedge-solvers.md, check 1).
+            let want = if *op == "hedge.minvar.ratio" {
+                "E_INPUT"
+            } else {
+                "E_SCHEMA"
+            };
+            assert_eq!(code(&case(op, "{}")), Some(want), "{op}");
         }
     }
 
