@@ -1,0 +1,11 @@
+<Simulation><Parameters><Discretization>Exact</Discretization><Grid>91D,182D,274D,365D,456D,548D,639D,730D,821D,912D,1004D,1095D,1186D,1278D,1369D,1460D,1551D,1642D,1734D,1825D</Grid><Calendar>NullCalendar</Calendar>
+<Sequence>MersenneTwister</Sequence><Scenario>Simple</Scenario><Seed>7</Seed><Samples>8000</Samples></Parameters>
+<CrossAssetModel><DomesticCcy>EUR</DomesticCcy><Currencies><Currency>EUR</Currency></Currencies><BootstrapTolerance>0.0001</BootstrapTolerance><Measure>LGM</Measure>
+<InterestRateModels><LGM ccy="default"><CalibrationType>Bootstrap</CalibrationType>
+<Volatility><Calibrate>N</Calibrate><VolatilityType>HullWhite</VolatilityType><ParamType>Constant</ParamType><TimeGrid/><InitialValue>0.01</InitialValue></Volatility>
+<Reversion><Calibrate>N</Calibrate><ReversionType>HullWhite</ReversionType><ParamType>Constant</ParamType><TimeGrid/><InitialValue>0.05</InitialValue></Reversion>
+<CalibrationSwaptions><Expiries>1Y</Expiries><Terms>1Y</Terms><Strikes/></CalibrationSwaptions><ParameterTransformation><ShiftHorizon>0.0</ShiftHorizon><Scaling>1.0</Scaling></ParameterTransformation></LGM></InterestRateModels>
+<ForeignExchangeModels/><InstantaneousCorrelations/></CrossAssetModel>
+<Market><BaseCurrency>EUR</BaseCurrency><Currencies><Currency>EUR</Currency></Currencies>
+<YieldCurves><Configuration><Tenors>30D,60D,90D,120D,150D,180D,182D,210D,240D,270D,300D,330D,360D,365D,390D,420D,450D,480D,510D,540D,570D,600D,630D,660D,690D,720D,730D,750D,780D,810D,840D,870D,900D,930D,960D,990D,1020D,1050D,1080D,1095D,1110D,1140D,1170D,1200D,1230D,1260D,1290D,1320D,1350D,1380D,1410D,1440D,1470D,1500D,1530D,1560D,1590D,1620D,1650D,1680D,1710D,1740D,1770D,1800D,1826D,1830D,1860D,1890D,1920D,1950D,1980D,2010D,2040D,2070D,2100D,2130D,2160D,2190D,2557D,3652D,5479D,7305D,10957D</Tenors><Interpolation>LogLinear</Interpolation><Extrapolation>Y</Extrapolation></Configuration></YieldCurves>
+<Indices><Index>EUR-QFPAR-1Y</Index></Indices><SwapIndices/><DefaultCurves><Names/><Tenors>1Y</Tenors></DefaultCurves></Market></Simulation>

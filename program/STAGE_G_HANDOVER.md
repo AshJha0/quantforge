@@ -318,3 +318,17 @@ Ruling G-49. `frtb_f2b` now 25 cases (17 values, 8 errors); **ids from `frtb_f2b
 Read: `specifications/06-risk/frtb-sa-vega-curvature.md`; ruling G-51 (closes the owner item of G-49). New operations `risk.frtb.vega`, `risk.frtb.curvature`; suite `stage_f/frtb_f2c` (19 cases: 13 values, 6 errors). Table 5 checked against the PDF: unchanged. Wave 2b is complete except CSR securitisations (out of scope). Wave 4c waits for WSL.
 
 MAR21.57 Table 5 is now printed in `frtb-sa-fx-equity.md` (checked against PDF p. 599). No value changed, so no rebuild is needed.
+
+## WAVE 4c READY (2026-11-11): portfolio exposure under Hull-White, checked against ORE
+
+Read: `specifications/06-risk/xva-exposure-portfolio.md`; rulings G-42 and its result row, G-12, G-16, G-23. New operation `xva.exposure.portfolio_hw` (suite `expsim_g`, 102 cases: 96 values, 6 errors): discounted EE, ENE, PFE 95/99 (quantile of the discounted exposure under the LGM measure), EPE and CVA at the common reset dates of a netting set. Build notes: write Hull-White in LGM form; the deflated set value is a function of one Gaussian; integrate split at its zeros (Gauss-Legendre per piece is enough to 1e-10); find PFE by bisection on the CDF over the level sets of `f` (it is not monotone for payers). Property test: a single swap reproduces your `xva.exposure.swap_ee_hw` (wave 4a).
+
+ORE: 1.8.17.0 Python wheel under WSL; inputs `oracle/ore/build_case.py`, runner `oracle/ore/run_ore.py`, six runs `oracle/ore/run0..5` (5,000 samples, outputs git-ignored, summaries in `oracle/ore/ORE_CHECK_4C.json`), demo `oracle/ore/ORE_DEMO.json` (ORE NPV equals the closed form to 1e-6; EE within 1 SE at 8,000 paths). **80 of 102 count. Stage G: 338 of 589 = 57.4%, below the 60% floor.** The 16 uncounted value cases fail only the registered 99% PFE CDF check on the flat top of a payer's deflated value, or a zero-SE artefact; an amendment is the owner's call (G-42 result row). CSA and collateral are not part of the ORE-checked slice (they are specified on given paths in wave 4b).
+
+## G-42b status (2026-11-11 15:00): registered, runs blocked by WSL
+
+G-42 stands as registered: 80 of 102 `expsim_g` cases, stage G 338 of 589 = 57.4%. G-42b (rulings) was registered and committed (`c158c5c`, counting script `5ab5edb`) before any of its runs. Its six ORE runs (`oracle/ore/runb0..5`, seeds 20261211 to 20261216) have not completed: WSL stopped answering during `runb0` twice (once before the machine rebooted, once after a fresh `wsl --shutdown`, when even `ps` timed out after 60 s). Per the coordinator's rule the work stops here. To resume: restart WSL, then run `oracle/ore/run_ore.py runb<i>` for i = 0..5 one at a time, then `uv run python -W ignore gen_stage_g_w4c.py countb` and record the count beside G-42.
+
+## expsim_g golden fix (G-Q4) and owner decision G-52 (2026-11-11)
+
+18 `pfe_99` values in cases 0039, 0045, 0055, 0061, 0071, 0077, 0087, 0093 changed (list: `oracle/ore/W4C_GOLDEN_FIX_DIFF.json`; for 0039 at 17 years 291,322.04 -> 291,331.93, matching the four lanes). All other `expsim_g` values unchanged. Builds: rerun `expsim_g`. G-42 recount on the existing ORE outputs: 80 of 102, unchanged; stage G 338 of 589 = 57.4%. G-42b carried over to stage I; C++ sanitizers for wave 4c in CI (G-52).

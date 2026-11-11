@@ -1,0 +1,8 @@
+<CurveConfiguration><YieldCurves><YieldCurve><CurveId>EUR1D</CurveId><CurveDescription>QF</CurveDescription>
+<Currency>EUR</Currency><DiscountCurve>EUR1D</DiscountCurve><Segments><Direct><Type>Zero</Type><Quotes><Quote>ZERO/RATE/EUR/EUR1D/A365/2027-05-11</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2027-11-10</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2028-11-09</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2029-11-09</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2031-11-10</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2033-11-10</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2036-11-09</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2041-11-10</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2046-11-10</Quote><Quote>ZERO/RATE/EUR/EUR1D/A365/2056-11-09</Quote></Quotes>
+<Conventions>EUR-ZERO-CONVENTIONS</Conventions></Direct></Segments><InterpolationVariable>Discount</InterpolationVariable>
+<InterpolationMethod>LogLinear</InterpolationMethod><YieldCurveDayCounter>A365</YieldCurveDayCounter><Extrapolation>true</Extrapolation></YieldCurve></YieldCurves>
+<SwaptionVolatilities><SwaptionVolatility><CurveId>EUR</CurveId><CurveDescription>flat</CurveDescription><Dimension>ATM</Dimension><VolatilityType>Normal</VolatilityType>
+<Extrapolation>Flat</Extrapolation><DayCounter>A365</DayCounter><Calendar>TARGET</Calendar><BusinessDayConvention>Following</BusinessDayConvention>
+<OptionTenors>1Y,5Y</OptionTenors><SwapTenors>1Y,5Y</SwapTenors><ShortSwapIndexBase>EUR-CMS-1Y</ShortSwapIndexBase><SwapIndexBase>EUR-CMS-30Y</SwapIndexBase></SwaptionVolatility></SwaptionVolatilities>
+</CurveConfiguration>

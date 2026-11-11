@@ -7306,6 +7306,47 @@
     "total_ee"
    ]
   },
+  "xva.exposure.portfolio_hw": {
+   "spec": "specifications/06-risk/xva-exposure-portfolio.md",
+   "rust": "quantforge::xva::exposure_portfolio_hw",
+   "python": "quantforge.xva.exposure_portfolio_hw",
+   "java": "Xva.exposurePortfolioHw",
+   "cpp": "qf::xva::exposure_portfolio_hw",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "exposure_times": {
+     "java": "exposureTimes"
+    },
+    "hazard_rate": {
+     "java": "hazardRate"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "pfe_quantiles": {
+     "java": "pfeQuantiles"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "trades": {
+     "java": "trades"
+    }
+   },
+   "outputs": [
+    "cva",
+    "discounted_ee",
+    "discounted_ene",
+    "epe",
+    "pfe_95",
+    "pfe_99"
+   ]
+  },
   "xva.exposure.swap_ee_hw": {
    "spec": "specifications/06-risk/xva-exposure.md",
    "rust": "quantforge::xva::exposure_swap_ee_hw",
