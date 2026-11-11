@@ -415,7 +415,7 @@ Use case 4 regresses a portfolio's returns on factor returns, and each factor's 
 
 ## Stage G: rates models and xVA
 
-Stage G (v0.7.0, not yet tagged) is at Implemented, not Validated. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,492 of 14,492 golden cases, of which 589 are stage G value and error cases and 1,026 are E1 cases for the first 20 stage G operations.
+Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,492 of 14,492 golden cases, of which 589 are stage G value and error cases and 1,026 are E1 cases for the first 20 stage G operations.
 
 ### Short-rate models
 

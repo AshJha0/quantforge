@@ -104,7 +104,7 @@ Implemented in all four languages, each passing 12,462 of 12,462 golden cases on
 - **Inputs:** a Real input may be the string `"NaN"`, `"Infinity"` or `"-Infinity"`, and every operation refuses a non-finite input first (rulings F-1 to F-4).
 - Public names across the four languages follow one generated name map, with units in names, enums for closed choices, validated constructors and a thread-safety line per type ([ADR-0011](architecture/decisions/ADR-0011-api-style.md)). What must be bit-exact and what is within tolerance is in [docs/determinism.md](docs/determinism.md).
 
-### Stage G: rates models and xVA (v0.7.0, pending)
+### Stage G: rates models and xVA (v0.7.0)
 
 Implemented in all four languages; on the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each build passed 14,492 of 14,492 golden cases. What changes in the structure:
 - **Pricing (domain 04)** gains term-structure models. Short-rate models (Vasicek, CIR, Hull-White, G2++) share one curve rule: log-linear discount factors with `(0, 1)` first (ruling G-3). Bermudan swaptions and callable bonds run on one lattice scheme (ruling G-18). The LMM prices caplets and swaptions by Rebonato's formula (`04-pricing/lmm.md`).
