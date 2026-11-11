@@ -50,6 +50,15 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-27 | Outputs with costs | `risk`, `cost` and (with margin inputs) `margin` are output only when a new input is present, so every wave 1 result keeps its exact output set; `objective = risk + cost_weight cost` |
 | I-28 | Several outside solvers | An outside check may try several library solvers on the same problem and count the case if one agrees with every compared output within the case tolerance; `verified_by` names it. Goldens never depend on which solver agreed |
 
+## Wave 4b, dynamic hedge backtest and effectiveness
+
+| # | Point | Ruling |
+|---|---|---|
+| I-29 | Backtest cash account | Self-financing from zero wealth. Each step credits interest `cash (e^{r dt} - 1)` and dividends `h_i S_i (e^{q dt} - 1)` on the shares held at the step's start, then rebalances, except on the last date. Options are marked and hedged at `hedge_volatility`; at expiry the mark is the payoff |
+| I-30 | Dollar offset | Cumulative: `-sum(hedge changes) / sum(item changes)`. No period-by-period ratio |
+| I-31 | Effectiveness domain | `sum(item changes) = 0`, or a series with zero sample variance, is `E_DOMAIN`; a backtest with `quantity = 0` therefore fails there. Sample (co)variances use `n - 1` |
+| I-32 | `E_LIMIT` sizes, wave 4b | Path and series length 100,000 |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).

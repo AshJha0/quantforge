@@ -706,6 +706,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a need for square-root impact or portfolio margin.
 - **Validation report:** `specifications/08-hedging/hedge-costs-and-frontier.md`.
 
+### MI-5 Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b)
+- **Purpose:** replay a delta hedge of one European option on a given path with a self-financing cash account; dollar-offset, regression and variance-reduction effectiveness.
+- **Inputs:** option, quantity, rate, dividend yield, hedge volatility, a dated spot path; or two series of value changes.
+- **Limitations:** flat hedge volatility, no transaction costs in the replay, continuous dividend yield; the dollar offset is unstable for small item changes.
+- **Validation:** QuantLib AnalyticEuropeanEngine on every date and numpy statistics outside checks on every value case (12 of 25). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** QuantLib 1.44 values on each date with the same cash arithmetic; numpy regression.
+- **Monitoring thresholds:** a live hedge's regression R² below 0.8 or dollar offset outside [0.8, 1.25] over a quarter.
+- **Data lineage hash:** sha256 6369d73df9b153ef8621b0bcf4978eb3dede5889b93baa4da4361888aad3735f (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`)
+- **Retirement trigger:** a need for cost-aware rebalancing or stochastic-volatility hedging.
+- **Validation report:** `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

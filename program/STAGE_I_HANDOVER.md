@@ -126,3 +126,27 @@ Read: `specifications/08-hedging/hedge-costs-and-frontier.md`; rulings I-24 to I
 
 ### Outside-oracle status
 `hedgecost_i` 12 of 22, `hedgefrontier_i` 2 of 10 (scipy BVLS or lstsq where exact, else trust-constr or SLSQP on the split form; I-28). Stage I so far: 86 of 209 = 41.1% (`oracle/outside_register_i.json`).
+
+## WAVE 4b READY (2026-11-11): dynamic delta-hedge backtest and hedge effectiveness
+
+Read: `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`; rulings I-29 to I-32; cli-contract block "Stage I operations"; edge-case rows I11, I12; `specifications/name-map.json` (272 operations).
+
+### Suites (25 cases)
+
+| Suite | Operation | Cases |
+|---|---|---|
+| `hedgebt_i` | `hedge.backtest.delta` | 15 (7 value, 8 error) |
+| `hedgeeff_i` | `hedge.effectiveness` | 10 (5, 5) |
+
+### Build notes
+- Follow the replay order of I-29 exactly: interest on cash, then dividends on the shares held at the step's start, then the mark, then the rebalance (none on the last date). Another order changes `final_pnl` by about `q dt` per step, far above the tolerance.
+- The value at `tau = 0` is the payoff; a path may stop before expiry, and then the last mark is a model value.
+- Reuse one statistics routine for both operations; `quantity = 0` reaches `E_DOMAIN` through it (I-31).
+- Paths are inputs with up to 64 dates; tolerance `1e-9` absolute and relative (case limit).
+
+### Property tests
+- A perfect offset gives dollar offset 1, slope -1, R² 1, variance reduction 1.
+- On a path with constant spot and zero rates and dividends, the hedge leg is zero and `final_pnl` equals the option's time decay times the quantity.
+
+### Outside-oracle status
+`hedgebt_i` 7 of 15 (QuantLib `AnalyticEuropeanEngine` on each date), `hedgeeff_i` 5 of 10 (numpy). Every value case counts. Stage I so far: 98 of 234 = 41.9% (`oracle/outside_register_i.json`).
