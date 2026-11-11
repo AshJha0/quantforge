@@ -309,8 +309,15 @@ BAR = "exotic.barrier.price"
 PATHS = 40000
 
 
-def bgk_barrier(btype, H, v, m, beta=BGK):
-    return H * math.exp((-1 if btype.startswith("DOWN") else 1) * beta * v * math.sqrt(1.0 / m))
+def bgk_barrier(btype, H, v, dt, beta=BGK):
+    return H * math.exp((-1 if btype.startswith("DOWN") else 1) * beta * v * math.sqrt(dt))
+
+
+def r9_dt(inp):
+    """R5 M3 (ruling G-30): n = floor(m T + 0.5) observation dates, n >= 1, step dt = T / n."""
+    n = math.floor(inp["monitoring_per_year"] * inp["expiry_years"] + 0.5)
+    assert n >= 1
+    return inp["expiry_years"] / n
 
 
 def r9_price(inp, mut=None):
@@ -318,9 +325,9 @@ def r9_price(inp, mut=None):
     H = inp["barrier"]
     if inp.get("monitoring", "CONTINUOUS") == "DISCRETE":
         if mut == "sign":
-            H = bgk_barrier("UP" if inp["barrier_type"].startswith("DOWN") else "DOWN", H, inp["vol"], inp["monitoring_per_year"])
+            H = bgk_barrier("UP" if inp["barrier_type"].startswith("DOWN") else "DOWN", H, inp["vol"], r9_dt(inp))
         else:
-            H = bgk_barrier(inp["barrier_type"], H, inp["vol"], inp["monitoring_per_year"])
+            H = bgk_barrier(inp["barrier_type"], H, inp["vol"], r9_dt(inp))
     return barrier(inp["barrier_type"], inp["option_type"], inp["spot"], inp["strike"], H, inp["rebate"],
                    inp["expiry_years"], inp["rate"], inp["dividend_yield"], inp["vol"])
 
@@ -388,6 +395,17 @@ def r9():
             (dict(base, barrier=101.0, barrier_type="DOWN_OUT", option_type="CALL", monitoring="DISCRETE", monitoring_per_year=252), "E_DOMAIN", "spot below the unshifted down barrier")]
     for inp, code, d in errs:
         s.add(BAR, inp, error=code, cls="date_and_convention", tags=["invalid", "r9"], description=d)
+    # R5 M3 (ruling G-30), appended to keep ids: non-unit T, non-integer and tie m T, UP_* with rebate, n = 0
+    m3 = [dict(base, expiry_years=0.3, barrier=90.0, barrier_type="DOWN_OUT", option_type="CALL", monitoring="DISCRETE", monitoring_per_year=252),
+          dict(base, expiry_years=0.5, barrier=90.0, barrier_type="DOWN_OUT", option_type="PUT", monitoring="DISCRETE", monitoring_per_year=3),
+          dict(base, expiry_years=0.75, barrier=115.0, barrier_type="UP_OUT", option_type="CALL", rebate=2.0, monitoring="DISCRETE", monitoring_per_year=10),
+          dict(base, expiry_years=1.5, barrier=120.0, barrier_type="UP_IN", option_type="PUT", rebate=1.5, monitoring="DISCRETE", monitoring_per_year=52)]
+    for inp in m3:
+        n = math.floor(inp["monitoring_per_year"] * inp["expiry_years"] + 0.5)
+        s.add(BAR, inp, {"price": r9_price(inp)}, verified=["closed-form-bgk"], tags=["barrier", "r9", "discrete", "m3"],
+              description=f"{inp['barrier_type']} {inp['option_type']} T={inp['expiry_years']} m={inp['monitoring_per_year']}: n={n}, dt=T/n")
+    s.add(BAR, dict(base, expiry_years=0.3, barrier=90.0, barrier_type="DOWN_OUT", option_type="CALL", monitoring="DISCRETE", monitoring_per_year=1),
+          error="E_DOMAIN", cls="date_and_convention", tags=["invalid", "r9"], description="n = floor(m T + 0.5) = 0")
     a = rows[0]
     caught("BGK shift with the wrong sign", abs(r9_price(a) - r9_price(a, "sign")), 1e-6)
     caught("continuous price for a daily barrier", abs(r9_price(a) - r9_price(dict(a, monitoring="CONTINUOUS"))), 1e-6)

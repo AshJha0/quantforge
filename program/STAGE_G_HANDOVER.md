@@ -246,3 +246,6 @@ Both tests restated against the scheme's own bounding value on the same grid (`s
 
 ### M2, negative-strike Jamshidian (ruling G-29)
 `1 + K tau_n <= 0` is `E_DOMAIN`; root bracket `[-1, 1]`. `swaption_g` gains 3 cases (0041, 0042 values at K = -0.2%, both QuantLib-engine counted; 0043 error): 43 cases, 28 counted. Stage G: 252 of 408 = 61.8%.
+
+### M3, discrete barrier (ruling G-30)
+`n = floor(m T + 0.5)`, `n >= 1` else `E_DOMAIN`, BGK step `dt = T/n`; rebates not BGK-corrected. `barrier_g` gains 5 cases (0033 to 0037: T = 0.3 with m = 252, the tie T = 0.5 with m = 3, UP_OUT and UP_IN with rebates, n = 0 error); original 32 unchanged byte for byte. Stage G: 252 of 413 = 61.0%.
