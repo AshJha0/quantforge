@@ -85,7 +85,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -176,7 +177,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -277,7 +279,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -369,7 +372,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -420,7 +424,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -477,7 +482,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -528,7 +534,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -579,7 +586,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -635,7 +643,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -697,7 +706,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -796,7 +806,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
@@ -887,7 +898,8 @@
    "tolerance_class": "root_finding",
    "verified_by": [
     "exact-rational-enumeration",
-    "ellipsoid-bound"
+    "ellipsoid-bound",
+    "wide-box-brute-force"
    ],
    "tags": [
     "hedge",
