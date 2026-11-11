@@ -33,6 +33,8 @@ endfunction()
 add_library(quantforge_core
   src/core/calendar.cpp
   src/core/shortrate.cpp
+  src/core/lmm.cpp
+  src/core/aad_ladder.cpp
   src/core/calibration.cpp
   src/core/compounding.cpp
   src/core/cos.cpp

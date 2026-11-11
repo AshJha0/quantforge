@@ -2,6 +2,9 @@
 
 #include <algorithm>
 #include <charconv>
+#include <cstdio>
+#include <functional>
+#include <set>
 #include <cmath>
 #include <initializer_list>
 #include <limits>
@@ -59,6 +62,7 @@
 #include "quantforge/core/risk_f4.hpp"
 #include "quantforge/core/book.hpp"
 #include "quantforge/core/shortrate.hpp"
+#include "quantforge/core/lmm.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -306,6 +310,9 @@ struct Entry {
 #include "ops_risk_f4.inc"
 #include "ops_book.inc"
 #include "ops_shortrate.inc"
+#include "ops_xva.inc"
+#include "ops_risk_gb.inc"
+#include "ops_frtb_gb.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -330,6 +337,11 @@ constexpr std::span<const Entry> registry[] = {
     risk_f4_ops,
     book_ops,
     shortrate_ops,
+    lmm_ops,
+    xva_ops,
+    reserve_ops,
+    risk_gb_ops,
+    frtb_gb_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.

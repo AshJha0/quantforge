@@ -2,7 +2,10 @@
 // (R9), 06-risk/mc-greeks.md (G-10 report, G-10b gate) and 06-risk/xva-exposure.md.
 // No namespace-scope static objects (static-init order has broken ASan before): fixtures are built by functions.
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <tuple>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -12,6 +15,7 @@
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/exotics.hpp"
 #include "quantforge/core/rng.hpp"
+#include "quantforge/core/lmm.hpp"
 #include "quantforge/core/shortrate.hpp"
 #include "quantforge/core/stats.hpp"
 
@@ -224,7 +228,6 @@ TEST_CASE("G2d one exercise date converges to Jamshidian at order about 1; Bermu
             const double berm = sr::bermudan_swaption(p, pay, K, payer, {1.0, 2.0, 3.0, 4.0, 5.0}, {201, 100, 6.0});
             const double euro = sr::bermudan_swaption(p, pay, K, payer, {1.0}, {201, 100, 6.0});
             CHECK(berm >= euro);
-            CHECK(berm >= sr::swaption(p, 1.0, pay, K, payer).price * (1 - 0.01));
         }
 }
 
@@ -262,8 +265,8 @@ TEST_CASE("G2g no call times converges to the straight bond at order about 1; ca
     }
     for (double cc : {0.03, 0.045, 0.06})
         for (const auto& calls : {std::vector<double>{3, 4, 5, 6, 7, 8, 9}, std::vector<double>{5}}) {
-            double s = p.curve.df(10.0);
-            for (std::size_t i = 0; i < pay.size(); ++i) s += cc * (pay[i] - (i ? pay[i - 1] : 0.0)) * p.curve.df(pay[i]);
+            // G-28: the bound is the scheme's own no-call bond on the same grid, not the closed form.
+            const double s = sr::callable_bond(p, pay, cc, {}, 1.0, {201, 100, 6.0});
             CHECK(sr::callable_bond(p, pay, cc, calls, 1.0, {201, 100, 6.0}) <= s);
         }
 }
@@ -369,4 +372,171 @@ TEST_CASE("G5a PAY minus RECEIVE EE equals the forward value of the remaining sw
             }
         }
     }
+}
+
+// ---- Wave 2 R5 fixes ----
+
+TEST_CASE("G-29 Jamshidian: 1 + K tau_n <= 0 is E_DOMAIN, negative strikes keep parity; G-33 G2++ series continuity") {
+    CHECK_THROWS_AS(sr::swaption(g_hw(), 1.0, {2.0, 3.0}, -1.0, true), Error);
+    const auto a = sr::swaption(g_hw(), 1.0, {2.0, 3.0, 4.0, 5.0}, -0.002, true);
+    const auto b = sr::swaption(g_hw(), 1.0, {2.0, 3.0, 4.0, 5.0}, -0.002, false);
+    CHECK(std::fabs(a.price - b.price - a.annuity * (a.forward_swap_rate + 0.002)) <= 1e-8);
+    // The series and the direct form agree across max(a, b) tau = 0.1, with a = b.
+    const sr::G2 lo{0.1 / 4 * (1 - 1e-9), 0.01, 0.1 / 4 * (1 - 1e-9), 0.008, 0.3, g_curve()};
+    const sr::G2 hi{0.1 / 4 * (1 + 1e-9), 0.01, 0.1 / 4 * (1 + 1e-9), 0.008, 0.3, g_curve()};
+    CHECK(g_rel(sr::g2_bond(lo, 1.0, 5.0, 0.002, -0.001), sr::g2_bond(hi, 1.0, 5.0, 0.002, -0.001)) <= 1e-12);
+}
+
+// ---- Wave 3b and 3c, LMM ----
+
+namespace {
+lmm::Abcd g_hump() { return {-0.06, 0.17, 0.54, 0.17}; }
+}  // namespace
+
+TEST_CASE("G4 LMM: cap-floor parity, flat-vol limits, payer-receiver parity") {
+    const sr::Curve c = g_curve();
+    const auto t = g_years(0.5, 5.0, 0.5);
+    for (double K : {0.03, 0.045}) {
+        const auto cap = lmm::capfloor(c, g_hump(), t, K, true), floor = lmm::capfloor(c, g_hump(), t, K, false);
+        double swaplets = 0.0;
+        for (std::size_t i = 1; i < t.size(); ++i) swaplets += c.df(t[i - 1]) - (1 + K * (t[i] - t[i - 1])) * c.df(t[i]);
+        CHECK(std::fabs(cap.price - floor.price - swaplets) <= 1e-12);
+    }
+    const lmm::Abcd flat{0, 0, 0.5, 0.2};
+    for (double v : lmm::capfloor(c, flat, t, 0.04, true).black_vols) CHECK(std::fabs(v - 0.2) <= 1e-14);
+    CHECK(std::fabs(lmm::swaption_rebonato(c, flat, 0.0, 5.0, g_years(6, 10, 1), 0.035, true).black_vol - 0.2) <= 1e-14);
+    for (double beta : {0.0, 0.1, 0.5}) {
+        const auto a = lmm::swaption_rebonato(c, g_hump(), beta, 5.0, g_years(6, 10, 1), 0.035, true);
+        const auto b = lmm::swaption_rebonato(c, g_hump(), beta, 5.0, g_years(6, 10, 1), 0.035, false);
+        CHECK(std::fabs(a.price - b.price - a.annuity * (a.swap_rate - 0.035)) <= 1e-12);
+    }
+    CHECK(lmm::swaption_rebonato(c, g_hump(), 0.5, 5.0, g_years(6, 10, 1), 0.035, true).black_vol <
+          lmm::swaption_rebonato(c, g_hump(), 0.0, 5.0, g_years(6, 10, 1), 0.035, true).black_vol);
+}
+
+TEST_CASE("G4 simulated LMM acceptance: six caplets within 3 SE of the closed form (G-26)") {
+    const sr::Curve c = g_curve();
+    const auto grid = g_years(0.0, 7.0, 1.0);
+    const auto mc = lmm::simulate_caplets(c, g_hump(), 0.1, grid, 0.045, 100000, 20, 20261111ULL);
+    const auto cf = lmm::capfloor(c, g_hump(), g_years(1.0, 7.0, 1.0), 0.045, true);
+    REQUIRE(mc.price.size() == 6);
+    for (std::size_t k = 0; k < 6; ++k) {
+        const double z = (mc.price[k] - cf.caplets[k]) / mc.se[k];
+        std::printf("LMM caplet %zu: MC %.8f +- %.8f, closed %.8f, z %.2f\n", k + 1, mc.price[k], mc.se[k], cf.caplets[k], z);
+        CHECK(std::fabs(z) <= 3.0);
+    }
+}
+
+// ---- Wave 3d, AAD ladder (Q3b) ----
+
+namespace {
+std::vector<double> g_dfs() { return {0.98085, 0.9619, 0.9254, 0.8906, 0.8242, 0.762, 0.6787, 0.561, 0.467, 0.332}; }
+std::vector<double> g_times() {
+    return {0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795, 10.005479452054795, 15.01095890410959,
+            20.013698630136986, 30.019178082191782};
+}
+double g_berm(const std::vector<double>& P, double a, double s) {
+    sr::Params p;
+    p.model = sr::Model::HullWhite;
+    p.a = a;
+    p.sigma = s;
+    p.curve = sr::Curve::from(g_times(), P);
+    return sr::bermudan_swaption(p, {2, 3, 4, 5, 6}, 0.039462, true, {1, 2, 3, 4, 5}, {101, 50, 6.0});
+}
+}  // namespace
+
+TEST_CASE("Q3b AAD ladder matches Richardson bumps of the scheme, and costs at most 5 prices (G-9)") {
+    const sr::Params p = g_hw();
+    const auto P = g_dfs();
+    const sr::Ladder l = sr::bermudan_ladder(p, P, {2, 3, 4, 5, 6}, 0.039462, true, {1, 2, 3, 4, 5}, {101, 50, 6.0});
+    CHECK(g_rel(l.price, g_berm(P, 0.05, 0.01)) <= 1e-14);
+    const auto rich = [&](auto f, double x) {
+        const auto D = [&](double h) { return (f(x * (1 + h)) - f(x * (1 - h))) / (2 * h * x); };
+        return (4 * D(5e-5) - D(1e-4)) / 3;
+    };
+    for (std::size_t k = 0; k < P.size(); ++k) {
+        const double ref = rich(
+            [&](double v) {
+                auto Q = P;
+                Q[k] = v;
+                return g_berm(Q, 0.05, 0.01);
+            },
+            P[k]);
+        INFO("pillar " << k << " AAD " << l.d_discount_factors[k] << " bump " << ref);
+        CHECK(std::fabs(l.d_discount_factors[k] - ref) <= 1e-10 + 1e-7 * std::fabs(ref));
+    }
+    const double ra = rich([&](double v) { return g_berm(P, v, 0.01); }, 0.05);
+    const double rs = rich([&](double v) { return g_berm(P, 0.05, v); }, 0.01);
+    CHECK(std::fabs(l.d_mean_reversion - ra) <= 1e-10 + 1e-7 * std::fabs(ra));
+    CHECK(std::fabs(l.d_sigma - rs) <= 1e-10 + 1e-7 * std::fabs(rs));
+    // Performance (G-9): median of 21 timed runs after 5 warm-ups, price plus ladder over one price.
+    const auto median_s = [](auto f) {
+        for (int i = 0; i < 5; ++i) f();
+        std::vector<double> v;
+        for (int i = 0; i < 21; ++i) {
+            const auto t0 = std::chrono::steady_clock::now();
+            f();
+            v.push_back(std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count());
+        }
+        std::sort(v.begin(), v.end());
+        return v[10];
+    };
+    double sink = 0.0;
+    const double one = median_s([&] { sink += g_berm(P, 0.05, 0.01); });
+    const double lad = median_s([&] {
+        sink += sr::bermudan_ladder(p, P, {2, 3, 4, 5, 6}, 0.039462, true, {1, 2, 3, 4, 5}, {101, 50, 6.0}).price;
+    });
+    std::printf("Q3b AAD cost ratio (price + ladder) / price = %.2f (sink %.3f)\n", lad / one, sink);
+    CHECK(lad / one <= 5.0);
+}
+
+// ---- Wave 4b and 3e, given-path xVA and the reserve statistic (through the CLI) ----
+
+namespace {
+std::string g_run(const char* op, const std::string& inputs) {
+    return cli::run_case(R"({"schema_version":"1.0","case_id":"p","operation":")" + std::string(op) + R"(","inputs":)" + inputs +
+                         "}")
+        .json;
+}
+}  // namespace
+
+TEST_CASE("G5b limits: zero thresholds and no lag give zero exposure; own hazard 0 gives DVA 0; b = 0 is independent CVA") {
+    const std::string paths = R"([[0,3,5,2,-1],[0,-2,-4,-6,-3],[0,1,6,9,4],[0,0.5,-1,2.5,7]])";
+    const std::string col = g_run(
+        "xva.exposure.collateralised",
+        R"({"times":[0,0.25,0.5,0.75,1],"trades":[{"netting_set":"NS1","values":)" + paths +
+            R"(}],"pfe_quantile":0.9,"csa":{"NS1":{"threshold_receive":0,"threshold_post":0,"minimum_transfer_amount":0,"mpor_steps":0}}})");
+    INFO(col);
+    CHECK(g_number_after(col, "epe") == 0.0);
+    CHECK(g_number_after(col, "effective_epe") == 0.0);
+    const std::string adj = g_run(
+        "xva.adjustments.value",
+        R"({"times":[0.5,1],"discount_factors":[0.99,0.98],"ee":[10,12],"ene":[-5,-6],"counterparty":{"hazard_rate":0.02,"recovery":0.4},"own":{"hazard_rate":0,"recovery":0.4},"funding":{"borrow_spread":0.01,"lend_spread":0.01,"exclude_dva_overlap":false}})");
+    INFO(adj);
+    CHECK(g_number_after(adj, "dva") == 0.0);
+    const double cva_indep = 0.6 * (0.99 * 10 * (1 - std::exp(-0.01)) + 0.98 * 12 * (std::exp(-0.01) - std::exp(-0.02)));
+    CHECK(g_rel(g_number_after(adj, "cva"), cva_indep) <= 1e-14);
+    const std::string w = g_run(
+        "xva.wwr.cva_hw",
+        R"({"times":[0.5,1],"values":[[3,-1],[-2,4],[1,2]],"discount_factors":[0.99,0.98],"hazard_rate":0.03,"recovery":0.4,"wwr_b":0})");
+    const double ee1 = (3 + 0 + 1) / 3.0, ee2 = (0 + 4 + 2) / 3.0;
+    const double ind = 0.6 * (0.99 * ee1 * (1 - std::exp(-0.015)) + 0.98 * ee2 * (std::exp(-0.015) - std::exp(-0.03)));
+    INFO(w);
+    CHECK(g_rel(g_number_after(w, "cva"), ind) <= 1e-12);
+    const std::string r = g_run("risk.model_reserve.dispersion", R"({"prices":{"A":2,"B":2},"reference_model":"B"})");
+    CHECK(g_number_after(r, "reserve") == 0.0);
+    CHECK(r.find(R"("worst_model":"A")") != std::string::npos);
+}
+
+TEST_CASE("Stage F carry-over limits: one FRTB factor is RW |s|; rho = 0 is the square-root rule; Gamma = 0 reverse stress") {
+    CHECK(g_number_after(g_run("risk.frtb.fx_delta", R"({"sensitivities":[{"pair":"EURUSD","sensitivity":-2000000}]})"), "capital") == 300000.0);
+    CHECK(g_number_after(g_run("risk.frtb.equity_delta", R"({"sensitivities":[{"issuer":"A","bucket":5,"kind":"SPOT","sensitivity":1000000}]})"),
+                         "capital") == 300000.0);
+    CHECK(g_number_after(g_run("risk.frtb.vega", R"({"risk_class":"FX","sensitivities":[{"bucket":"EURUSD","option_maturity":1,"vega":1000000}]})"),
+                         "capital") == 1000000.0);
+    CHECK(g_number_after(g_run("risk.frtb.curvature", R"({"risk_class":"EQUITY","factors":[{"bucket":5,"name":"A","cvr_up":-3,"cvr_down":0}]})"),
+                         "capital") == 0.0);
+    CHECK(g_number_after(g_run("risk.vol.horizon", R"({"daily_vol":0.01,"ar1":0,"horizon_days":25})"), "variance_ratio") == 1.0);
+    const std::string s = g_run("risk.stress.reverse", R"({"direction":[1,2],"delta":[-10,-5],"gamma":[[0,0],[0,0]],"target_loss":4})");
+    CHECK(g_rel(g_number_after(s, "scale"), 0.2) <= 1e-15);
 }

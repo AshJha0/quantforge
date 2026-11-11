@@ -15,11 +15,19 @@ T sr_enum(const In& in, string_view k, std::initializer_list<std::pair<const cha
     throw Error("E_INPUT", "unknown value", string(k));
 }
 
+// F-2 for arrays whose order is checked before ready(): a non-finite element is E_DOMAIN first.
+Vec sr_finite(Vec v, string_view key) {
+    for (double x : v)
+        if (!std::isfinite(x)) throw Error("E_DOMAIN", string(key) + " must be finite", string(key));
+    return v;
+}
+Vec sr_reals(const In& in, string_view key) { return sr_finite(in.reals(key), key); }
+
 sr::Curve sr_curve(const In& in) {
     const Value& cv = in.need("curve");
     if (cv.kind != Kind::Object) schema("curve", "expected an object");
     const In c(cv);
-    const Vec times = c.reals("times"), dfs = c.reals("discount_factors");
+    const Vec times = sr_reals(c, "times"), dfs = sr_reals(c, "discount_factors");
     c.ready();
     limit_if(times.size() > 10000, "curve");
     if (times.empty() || times.size() != dfs.size()) throw Error("E_INPUT", "curve needs matching times and discount factors", "curve");
@@ -74,7 +82,8 @@ sr::Params sr_hw(const In& in, bool with_sigma = true) {
 
 // Payment times: at least one, strictly increasing, the first after `after`.
 Vec sr_payments(const In& in, const char* key, double after) {
-    const Vec t = in.reals(key);
+    if (!std::isfinite(after)) throw Error("E_DOMAIN", "the start or expiry must be finite", key);  // F-2 first
+    const Vec t = sr_reals(in, key);
     limit_if(t.size() > 10000, key);
     if (t.empty()) throw Error("E_INPUT", string(key) + " is empty", key);
     for (std::size_t i = 0; i < t.size(); ++i)
@@ -128,7 +137,7 @@ void op_sr_swaption(const In& in, Out& out) {
 
 void op_sr_capfloor(const In& in, Out& out) {
     const sr::Params p = sr_params(in, true);
-    const Vec t = in.reals("period_times");
+    const Vec t = sr_reals(in, "period_times");
     limit_if(t.size() > 10000, "period_times");
     if (t.size() < 2) throw Error("E_INPUT", "period_times needs at least two times", "period_times");
     for (std::size_t i = 1; i < t.size(); ++i)
@@ -187,6 +196,16 @@ sr::Grid sr_grid(const In& in) {
     return r;
 }
 
+// G-31: combined grid work nx x total steps over the knot intervals at most 5e8.
+void sr_grid_work(const sr::Grid& g, const Vec& knots) {
+    double steps = 0.0, prev = 0.0;
+    for (double t : knots) {
+        steps += std::max(1.0, std::ceil(static_cast<double>(g.steps_per_year) * (t - prev)));
+        prev = t;
+    }
+    limit_if(static_cast<double>(g.nx) * steps > 5e8, "grid");
+}
+
 bool sr_contains(const Vec& v, double x) { return std::find(v.begin(), v.end(), x) != v.end(); }
 
 void op_sr_bermudan(const In& in, Out& out) {
@@ -196,7 +215,7 @@ void op_sr_bermudan(const In& in, Out& out) {
     const Vec pay = sr_payments(in, "payment_times", T0);
     const double K = in.real("fixed_rate"), notional = in.real("notional");
     const bool payer = sr_enum<bool>(in, "swaption_type", {{"PAYER", true}, {"RECEIVER", false}});
-    const Vec ex = in.reals("exercise_times");
+    const Vec ex = sr_reals(in, "exercise_times");
     limit_if(ex.size() > 10000, "exercise_times");
     Vec resets{T0};
     resets.insert(resets.end(), pay.begin(), pay.end() - 1);
@@ -206,15 +225,44 @@ void op_sr_bermudan(const In& in, Out& out) {
         if (!sr_contains(resets, ex[i])) throw Error("E_INPUT", "an exercise time is not a reset date", "exercise_times");
     }
     const sr::Grid g = sr_grid(in);
+    sr_grid_work(g, ex);
     in.ready();
     out.key_real("price", notional * sr::bermudan_swaption(p, pay, K, payer, ex, g));
+}
+
+void op_sr_bermudan_ladder(const In& in, Out& out) {
+    const sr::Params p = sr_hw(in);
+    const Vec P = In(in.need("curve")).reals("discount_factors");
+    const double T0 = in.real("start_years");
+    if (!(T0 > 0)) throw Error("E_DOMAIN", "start_years is not positive", "start_years");
+    const Vec pay = sr_payments(in, "payment_times", T0);
+    const double K = in.real("fixed_rate"), notional = in.real("notional");
+    const bool payer = sr_enum<bool>(in, "swaption_type", {{"PAYER", true}, {"RECEIVER", false}});
+    const Vec ex = sr_reals(in, "exercise_times");
+    limit_if(ex.size() > 10000, "exercise_times");
+    Vec resets{T0};
+    resets.insert(resets.end(), pay.begin(), pay.end() - 1);
+    if (ex.empty()) throw Error("E_INPUT", "exercise_times is empty", "exercise_times");
+    for (std::size_t i = 0; i < ex.size(); ++i) {
+        if (i && !(ex[i] > ex[i - 1])) throw Error("E_INPUT", "exercise_times must increase", "exercise_times");
+        if (!sr_contains(resets, ex[i])) throw Error("E_INPUT", "an exercise time is not a reset date", "exercise_times");
+    }
+    const sr::Grid g = sr_grid(in);
+    sr_grid_work(g, ex);
+    in.ready();
+    sr::Ladder l = sr::bermudan_ladder(p, P, pay, K, payer, ex, g);
+    for (double& v : l.d_discount_factors) v *= notional;
+    out.key_real("price", notional * l.price);
+    out.key_reals("d_price_d_discount_factors", l.d_discount_factors);
+    out.key_real("d_price_d_mean_reversion", notional * l.d_mean_reversion);
+    out.key_real("d_price_d_sigma", notional * l.d_sigma);
 }
 
 void op_sr_callable(const In& in, Out& out) {
     const sr::Params p = sr_hw(in);
     const Vec pay = sr_payments(in, "payment_times", 0.0);
     const double c = in.real("coupon_rate"), notional = in.real("notional");
-    const Vec calls = in.reals("call_times");
+    const Vec calls = sr_reals(in, "call_times");
     limit_if(calls.size() > 10000, "call_times");
     for (std::size_t i = 0; i < calls.size(); ++i) {
         if (i && !(calls[i] > calls[i - 1])) throw Error("E_INPUT", "call_times must increase", "call_times");
@@ -224,6 +272,7 @@ void op_sr_callable(const In& in, Out& out) {
     const double cp = in.real("call_price");
     sr_positive(cp, "call_price");
     const sr::Grid g = sr_grid(in);
+    sr_grid_work(g, pay);
     in.ready();
     out.key_real("price", notional * sr::callable_bond(p, pay, c, calls, cp, g));
 }
@@ -275,7 +324,7 @@ void op_xva_swap_ee_hw(const In& in, Out& out) {
     if (!(T0 >= 0)) throw Error("E_DOMAIN", "start_years is negative", "start_years");
     const Vec pay = sr_payments(in, "payment_times", T0);
     const double K = in.real("fixed_rate"), notional = in.real("notional");
-    const Vec et = in.reals("exposure_times");
+    const Vec et = sr_reals(in, "exposure_times");
     limit_if(et.size() > 10000, "exposure_times");
     if (et.empty()) throw Error("E_INPUT", "exposure_times is empty", "exposure_times");
     for (double t : et)
@@ -351,8 +400,68 @@ constexpr Entry shortrate_ops[] = {
     {"rates.shortrate.hw_calibrate", op_sr_hw_calibrate},
     {"rates.shortrate.bermudan_swaption", op_sr_bermudan},
     {"rates.shortrate.callable_bond", op_sr_callable},
+    {"rates.shortrate.bermudan_ladder", op_sr_bermudan_ladder},
     {"rates.g2pp.zcb", op_g2_zcb},
     {"rates.g2pp.zcb_option", op_g2_zcb_option},
     {"xva.exposure.swap_ee_hw", op_xva_swap_ee_hw},
     {"risk.mc.greeks", op_mc_greeks},
+};
+
+namespace lmmns = quantforge::lmm;
+
+lmmns::Abcd lmm_abcd(const In& in) {
+    const Value& av = in.need("abcd");
+    if (av.kind != Kind::Object) schema("abcd", "expected an object");
+    const In a(av);
+    lmmns::Abcd v{a.real("a"), a.real("b"), a.real("c"), a.real("d")};
+    a.ready();
+    if (!(v.c > 0)) throw Error("E_DOMAIN", "c is not positive", "abcd");
+    if (!(v.d >= 0)) throw Error("E_DOMAIN", "d is negative", "abcd");
+    if (!(v.a + v.d > 0)) throw Error("E_DOMAIN", "a + d is not positive", "abcd");
+    return v;
+}
+
+void op_lmm_capfloor(const In& in, Out& out) {
+    const sr::Curve c = sr_curve(in);
+    const lmmns::Abcd v = lmm_abcd(in);
+    const Vec t = sr_reals(in, "period_times");
+    limit_if(t.size() > 10000, "period_times");
+    if (t.size() < 2) throw Error("E_INPUT", "period_times needs at least two times", "period_times");
+    for (std::size_t i = 1; i < t.size(); ++i)
+        if (!(t[i] > t[i - 1])) throw Error("E_INPUT", "period_times must increase", "period_times");
+    if (!(t[0] > 0)) throw Error("E_DOMAIN", "the first fixing is not after 0", "period_times");
+    const double K = in.real("strike"), notional = in.real("notional");
+    if (!(K > 0)) throw Error("E_DOMAIN", "strike is not positive (lognormal)", "strike");
+    const bool cap = sr_enum<bool>(in, "cap_floor", {{"CAP", true}, {"FLOOR", false}});
+    in.ready();
+    lmmns::CapFloor r = lmmns::capfloor(c, v, t, K, cap);
+    for (double& x : r.caplets) x *= notional;
+    out.key_real("price", notional * r.price);
+    out.key_reals("caplet_prices", r.caplets);
+    out.key_reals("forward_rates", r.forwards);
+    out.key_reals("black_vols", r.black_vols);
+}
+
+void op_lmm_swaption(const In& in, Out& out) {
+    const sr::Curve c = sr_curve(in);
+    const lmmns::Abcd v = lmm_abcd(in);
+    const double beta = in.real("correlation_beta");
+    if (!(beta >= 0)) throw Error("E_DOMAIN", "correlation_beta is negative", "correlation_beta");
+    const double T0 = in.real("expiry_years");
+    if (!(T0 > 0)) throw Error("E_DOMAIN", "expiry_years is not positive", "expiry_years");
+    const Vec pay = sr_payments(in, "payment_times", T0);
+    const double K = in.real("fixed_rate"), notional = in.real("notional");
+    if (!(K > 0)) throw Error("E_DOMAIN", "fixed_rate is not positive (lognormal)", "fixed_rate");
+    const bool payer = sr_enum<bool>(in, "side", {{"PAY", true}, {"RECEIVE", false}});
+    in.ready();
+    const lmmns::Swaption s = lmmns::swaption_rebonato(c, v, beta, T0, pay, K, payer);
+    out.key_real("price", notional * s.price);
+    out.key_real("swap_rate", s.swap_rate);
+    out.key_real("annuity", s.annuity);
+    out.key_real("black_vol", s.black_vol);
+}
+
+constexpr Entry lmm_ops[] = {
+    {"rates.lmm.capfloor", op_lmm_capfloor},
+    {"rates.lmm.swaption_rebonato", op_lmm_swaption},
 };

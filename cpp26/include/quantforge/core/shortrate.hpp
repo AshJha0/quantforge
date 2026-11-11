@@ -42,6 +42,9 @@ double bond0(const Params& p, double T);
 double bond_option(const Params& p, double T, double S, double K, bool call);
 
 double gamma_p(double s, double x);
+double gamma_pq(double s, double x, bool upper);
+double ncx2_tail(double x, double k, double lambda, bool upper);
+double ncx2_sf(double x, double k, double lambda);
 double ncx2_cdf(double x, double k, double lambda);
 
 /// Per unit notional. Throws E_DOMAIN for CIR with no non-negative critical rate (ruling G-20).
@@ -81,6 +84,15 @@ struct Grid {
 /// Pinned scheme of ruling G-18, per unit notional.
 double bermudan_swaption(const Params& p, const std::vector<double>& payment_times, double fixed_rate, bool payer,
                          const std::vector<double>& exercise_times, const Grid& g);
+/// Q3b ladder (G-9, G-35): price and its reverse-mode derivatives with respect to the curve pillar discount factors
+/// `P` (the curve's input values, in order), the mean reversion and sigma, per unit notional.
+struct Ladder {
+    double price;
+    std::vector<double> d_discount_factors;
+    double d_mean_reversion, d_sigma;
+};
+Ladder bermudan_ladder(const Params& p, const std::vector<double>& P, const std::vector<double>& payment_times,
+                       double fixed_rate, bool payer, const std::vector<double>& exercise_times, const Grid& g);
 /// Callable bond on the G-18 scheme (ruling G-21), per unit notional.
 double callable_bond(const Params& p, const std::vector<double>& payment_times, double coupon,
                      const std::vector<double>& call_times, double call_price, const Grid& g);

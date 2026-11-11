@@ -92,8 +92,11 @@ double bond0(const Params& p, double T) {
     return bond(p, 0.0, T, p.r0);
 }
 
-double gamma_p(double s, double x) {
-    if (x <= 0) return 0.0;
+double gamma_p(double s, double x) { return gamma_pq(s, x, false); }
+
+// Regularised lower (or, with upper, upper) incomplete gamma; each branch returns its own side directly.
+double gamma_pq(double s, double x, bool upper) {
+    if (x <= 0) return upper ? 1.0 : 0.0;
     const double lead = s * std::log(x) - x - std::lgamma(s);
     if (x < s + 1) {
         double term = 1.0 / s, sum = term;
@@ -102,7 +105,8 @@ double gamma_p(double s, double x) {
             sum += term;
             if (term < sum * 1e-17) break;
         }
-        return sum * std::exp(lead);
+        const double P = sum * std::exp(lead);
+        return upper ? 1.0 - P : P;
     }
     const double tiny = 1e-300;
     double bb = x + 1 - s, c = 1 / tiny, d = 1 / bb, h = d;
@@ -118,13 +122,18 @@ double gamma_p(double s, double x) {
         h *= del;
         if (std::fabs(del - 1) < 1e-17) break;
     }
-    return 1.0 - std::exp(lead) * h;
+    const double Q = std::exp(lead) * h;
+    return upper ? Q : 1.0 - Q;
 }
 
 // The CDF is 0 for x <= 0 (the support is x >= 0). Each Poisson weight is formed in log space, so
 // exp(-lambda/2) never appears alone and cannot underflow at a large noncentrality (low CIR sigma, about 0.005).
-double ncx2_cdf(double x, double k, double lambda) {
-    if (!(x > 0)) return 0.0;
+double ncx2_cdf(double x, double k, double lambda) { return ncx2_tail(x, k, lambda, false); }
+double ncx2_sf(double x, double k, double lambda) { return ncx2_tail(x, k, lambda, true); }
+
+// Poisson-weighted sum of central chi-square CDFs (upper: survival functions), started at the mode (G-32).
+double ncx2_tail(double x, double k, double lambda, bool upper) {
+    if (!(x > 0)) return upper ? 1.0 : 0.0;
     const double mu = lambda / 2;
     const long long mode = static_cast<long long>(std::floor(mu));
     const auto weight = [&](long long j) {
@@ -132,7 +141,7 @@ double ncx2_cdf(double x, double k, double lambda) {
         return std::exp(-mu + dj * std::log(std::max(mu, 1e-300)) - std::lgamma(dj + 1.0));
     };
     const auto term = [&](long long j) {
-        return (mu == 0 && j > 0) ? 0.0 : weight(j) * gamma_p(k / 2 + static_cast<double>(j), x / 2);
+        return (mu == 0 && j > 0) ? 0.0 : weight(j) * gamma_pq(k / 2 + static_cast<double>(j), x / 2, upper);
     };
     double sum = term(mode);
     for (long long j = mode + 1; j < mode + 100000; ++j) {
@@ -168,8 +177,11 @@ double bond_option(const Params& p, double T, double S, double K, bool call) {
         const auto [lnA, B] = ln_a_b(p, T, S);
         const double rbar = (lnA - std::log(K)) / B, k = 4 * a * p.b / s2;
         const double ee = 2 * rho * rho * p.r0 * std::exp(g * T);
-        c = ps * ncx2_cdf(2 * rbar * (rho + psi + B), k, ee / (rho + psi + B)) -
-            K * pt * ncx2_cdf(2 * rbar * (rho + psi), k, ee / (rho + psi));
+        const double x1 = 2 * rbar * (rho + psi + B), l1 = ee / (rho + psi + B);
+        const double x2 = 2 * rbar * (rho + psi), l2 = ee / (rho + psi);
+        // The put directly from the upper tails, so it does not lose digits to parity when the call is deep in the money.
+        if (!call) return K * pt * ncx2_sf(x2, k, l2) - ps * ncx2_sf(x1, k, l1);
+        return ps * ncx2_cdf(x1, k, l1) - K * pt * ncx2_cdf(x2, k, l2);
     } else {
         c = gauss_call(ps, pt, K, gauss_sigma_p(p, T, S));
     }
@@ -208,13 +220,12 @@ double critical_rate(const Coupons& cs, bool cir) {
         d = ds;
         return s - 1.0;
     };
-    double lo = -std::numeric_limits<double>::infinity(), hi = std::numeric_limits<double>::infinity();
-    double r = 0.0, d = 0.0;
-    if (cir) {
-        const double v0 = g(0.0, d);
-        if (v0 < 0) throw Error("E_DOMAIN", "no non-negative critical rate for CIR", "fixed_rate");
-        lo = 0.0;
-    }
+    // G-29: bracket [-1, 1] (CIR: [0, 1], G-20); no sign change there is E_DOMAIN.
+    double lo = cir ? 0.0 : -1.0, hi = 1.0, d = 0.0;
+    const double glo = g(lo, d);
+    if (cir && glo < 0) throw Error("E_DOMAIN", "no non-negative critical rate for CIR", "fixed_rate");
+    if (glo < 0 || g(hi, d) > 0) throw Error("E_DOMAIN", "no critical rate in [-1, 1]", "fixed_rate");
+    double r = 0.0;
     for (int it = 0; it < 500; ++it) {
         const double v = g(r, d);
         if (std::fabs(v) <= 1e-15) break;
@@ -224,12 +235,7 @@ double critical_rate(const Coupons& cs, bool cir) {
             hi = r;
         double rn = r - v / d;
         if (!std::isfinite(rn) || !(rn > lo && rn < hi)) {
-            if (std::isfinite(lo) && std::isfinite(hi))
-                rn = 0.5 * (lo + hi);
-            else if (v > 0)
-                rn = r + 0.5;
-            else
-                rn = r - 0.5;
+            rn = 0.5 * (lo + hi);
         }
         if (rn == r) break;
         r = rn;
@@ -239,6 +245,8 @@ double critical_rate(const Coupons& cs, bool cir) {
 }  // namespace
 
 Swaption swaption(const Params& p, double expiry, const std::vector<double>& pay, double K, bool payer) {
+    const double tau_n = pay.back() - (pay.size() > 1 ? pay[pay.size() - 2] : expiry);
+    if (!(1 + K * tau_n > 0)) throw Error("E_DOMAIN", "1 + fixed_rate x last accrual is not positive", "fixed_rate");
     const Coupons cs = coupons_of(p, expiry, pay, K);
     const double rs = critical_rate(cs, p.model == Model::Cir);
     double price = 0.0, ann = 0.0, prev = expiry;
@@ -286,7 +294,12 @@ Calibration hw_calibrate(const Curve& curve, double a, const std::vector<CalSwap
         p.sigma = s;
         double f = 0.0;
         for (const auto& q : strip) {
-            const double e = swaption(p, q.expiry, q.payment_times, q.fixed_rate, q.payer).price - q.target;
+            double e;
+            try {
+                e = swaption(p, q.expiry, q.payment_times, q.fixed_rate, q.payer).price - q.target;
+            } catch (const Error&) {
+                return std::numeric_limits<double>::infinity();  // no critical rate in [-1, 1] at an extreme sigma
+            }
             f += e * e;
         }
         return f;
@@ -451,11 +464,13 @@ namespace {
 // (tau - 2 B_a + B_2a) / a^2, the bracket of one G2++ variance term, with a series for small a tau.
 double g2_var_term(double a, double tau) {
     const double x = a * tau;
-    if (x < 1e-2) {
+    if (x < 0.1) {  // G-33
         // sum_{k>=3} (-1)^{k+1} tau^k / k! a^{k-3} (2^{k-1} - 2)
         double sum = 0.0, pw = tau * tau * tau / 6.0, two = 4.0;  // pw = tau^k a^{k-3} / k!, two = 2^{k-1}
-        for (int k = 3; k < 40; ++k) {
-            sum += ((k % 2) ? 1.0 : -1.0) * pw * (two - 2.0);
+        for (int k = 3; k < 80; ++k) {
+            const double term = ((k % 2) ? 1.0 : -1.0) * pw * (two - 2.0);
+            sum += term;
+            if (std::fabs(term) < 1e-17 * std::fabs(sum)) break;
             pw *= x / (k + 1);
             two *= 2.0;
         }
@@ -463,10 +478,30 @@ double g2_var_term(double a, double tau) {
     }
     return (tau - 2 * b_factor(a, tau) + b_factor(2 * a, tau)) / (a * a);
 }
+// (tau - B_a - B_b + B_(a+b)) / (a b): series below max(a, b) tau = 0.1 (G-33), where the bracket is a b tau^3/3 + ...
+double g2_cross_term(double a, double b, double tau) {
+    if (std::max(a, b) * tau < 0.1) {
+        // sum_{k>=3} (-1)^(k+1) tau^k / k! x [((a+b)^(k-1) - a^(k-1) - b^(k-1)) / (a b)],
+        // the bracket being sum_{j=1}^{k-2} C(k-1, j) a^(j-1) b^(k-2-j).
+        double sum = 0.0, tk = tau * tau * tau / 6.0;
+        for (int k = 3; k < 80; ++k) {
+            double inner = 0.0, binom = static_cast<double>(k - 1);  // C(k-1, 1)
+            for (int j = 1; j <= k - 2; ++j) {
+                inner += binom * std::pow(a, j - 1) * std::pow(b, k - 2 - j);
+                binom = binom * (k - 1 - j) / (j + 1);
+            }
+            const double term = ((k % 2) ? 1.0 : -1.0) * tk * inner;
+            sum += term;
+            if (std::fabs(term) < 1e-17 * std::fabs(sum)) break;
+            tk *= tau / (k + 1);
+        }
+        return sum;
+    }
+    return (tau - b_factor(a, tau) - b_factor(b, tau) + b_factor(a + b, tau)) / (a * b);
+}
 double g2_v(const G2& m, double tau) {
-    const double cross = tau - b_factor(m.a, tau) - b_factor(m.b, tau) + b_factor(m.a + m.b, tau);
     return m.sigma * m.sigma * g2_var_term(m.a, tau) + m.eta * m.eta * g2_var_term(m.b, tau) +
-           2 * m.rho * m.sigma * m.eta / (m.a * m.b) * cross;
+           2 * m.rho * m.sigma * m.eta * g2_cross_term(m.a, m.b, tau);
 }
 }  // namespace
 
