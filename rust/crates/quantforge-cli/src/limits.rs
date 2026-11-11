@@ -301,6 +301,13 @@ fn stage_i_above(op: &str, i: &Json) -> bool {
         // Ruling I-19.
         "hedge.credit.cds" => over("book", 1_000) || over("hedges", 50),
         "hedge.correlation.neutralise" => over("book", 1_000) || over("hedges", 5),
+        // Ruling I-23.
+        "hedge.crossasset.solve" => {
+            over("book", 1_000)
+                || over("hedges", 200)
+                || i.get("curve")
+                    .is_some_and(|c| len(c, "times").is_some_and(|n| n > 100))
+        }
         _ => false,
     }
 }

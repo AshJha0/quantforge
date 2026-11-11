@@ -11,6 +11,7 @@ use quantforge_core::hedge;
 use quantforge_core::hedge_cross::{
     self as hx, CorrKind, CorrLeg, CorrMarket, CorrTarget, CreditMarket, CreditRisk,
 };
+use quantforge_core::hedge_crossasset::{self as xa, XaKind, XaLeg, XaMarket, ZeroCurve};
 use quantforge_core::hedge_solvers::{
     self as hs, Greek, IntegerProblem, Leg, LegKind, MinVarInput, QpProblem, Singular,
 };
@@ -97,21 +98,24 @@ fn leg(i: &Inputs, k: &str, v: &Json, with_quantity: bool) -> Result<(Leg, f64)>
     ))
 }
 
-/// A `hedge.correlation.neutralise` instrument: its kind and every other key as a number. The
-/// key set is checked by the library (`E_INPUT`); a non-number is `E_SCHEMA`.
-fn corr_leg(i: &Inputs, k: &str, v: &Json, in_book: bool) -> Result<(CorrLeg, f64)> {
+/// An instrument with a fixed key set (waves 2 and 3): its kind, every other key as a number,
+/// and the book `quantity`. The key set is checked by the library (`E_INPUT`); a non-number or
+/// an unknown kind is `E_SCHEMA`. A book position without `quantity` gets a placeholder key so
+/// that it fails the key-set check like any other missing key.
+type Keyed<K> = (K, Vec<(String, f64)>, f64);
+
+fn keyed<K>(
+    i: &Inputs,
+    k: &str,
+    v: &Json,
+    in_book: bool,
+    kind_of: impl Fn(&str) -> Option<K>,
+) -> Result<Keyed<K>> {
     let Json::Obj(keys) = v else {
         return i.fail(k, "expected objects");
     };
-    let kind = match v.get("instrument").and_then(Json::as_str) {
-        Some("EXCHANGE") => CorrKind::Exchange,
-        Some("CALL_1") => CorrKind::Call1,
-        Some("PUT_1") => CorrKind::Put1,
-        Some("CALL_2") => CorrKind::Call2,
-        Some("PUT_2") => CorrKind::Put2,
-        Some("UNDERLYING_1") => CorrKind::Underlying1,
-        Some("UNDERLYING_2") => CorrKind::Underlying2,
-        _ => return i.fail(k, "unknown instrument"),
+    let Some(kind) = v.get("instrument").and_then(Json::as_str).and_then(kind_of) else {
+        return i.fail(k, "unknown instrument");
     };
     let mut fields = Vec::new();
     let mut quantity = None;
@@ -128,11 +132,44 @@ fn corr_leg(i: &Inputs, k: &str, v: &Json, in_book: bool) -> Result<(CorrLeg, f6
             fields.push((name.clone(), n));
         }
     }
-    // A book position without `quantity` breaks the key set, like any missing key.
     if in_book && quantity.is_none() {
         fields.push(("quantity".to_string(), 1.0));
     }
-    Ok((CorrLeg { kind, fields }, quantity.unwrap_or(0.0)))
+    Ok((kind, fields, quantity.unwrap_or(0.0)))
+}
+
+fn corr_kind(s: &str) -> Option<CorrKind> {
+    Some(match s {
+        "EXCHANGE" => CorrKind::Exchange,
+        "CALL_1" => CorrKind::Call1,
+        "PUT_1" => CorrKind::Put1,
+        "CALL_2" => CorrKind::Call2,
+        "PUT_2" => CorrKind::Put2,
+        "UNDERLYING_1" => CorrKind::Underlying1,
+        "UNDERLYING_2" => CorrKind::Underlying2,
+        _ => return None,
+    })
+}
+
+fn corr_leg(i: &Inputs, k: &str, v: &Json, in_book: bool) -> Result<(CorrLeg, f64)> {
+    let (kind, fields, q) = keyed(i, k, v, in_book, corr_kind)?;
+    Ok((CorrLeg { kind, fields }, q))
+}
+
+fn xa_kind(s: &str) -> Option<XaKind> {
+    Some(match s {
+        "CALL" => XaKind::Call,
+        "PUT" => XaKind::Put,
+        "FORWARD" => XaKind::Forward,
+        "ZCB" => XaKind::Zcb,
+        "UNDERLYING" => XaKind::Underlying,
+        _ => return None,
+    })
+}
+
+fn xa_leg(i: &Inputs, k: &str, v: &Json, in_book: bool) -> Result<(XaLeg, f64)> {
+    let (kind, fields, q) = keyed(i, k, v, in_book, xa_kind)?;
+    Ok((XaLeg { kind, fields }, q))
 }
 
 fn corr_greeks(g: [f64; 5]) -> Json {
@@ -391,6 +428,39 @@ super::registry! {
                 ("quantities", r.quantities.into()),
                 ("greeks_before", corr_greeks(r.before)),
                 ("greeks_after", corr_greeks(r.after)),
+            ]))
+        },
+        "hedge.crossasset.solve" => {
+            let (spot, q, vol) = (i.f64("spot")?, i.f64("dividend_yield")?, i.f64("volatility")?);
+            let c = super::rates::sub(i, "curve")?;
+            let curve = ZeroCurve {
+                times: c.reals("times")?,
+                zero_rates: c.reals("zero_rates")?,
+            };
+            let book = i
+                .array("book")?
+                .iter()
+                .map(|v| xa_leg(i, "book", v, true))
+                .collect::<Result<Vec<_>>>()?;
+            let hedges = i
+                .array("hedges")?
+                .iter()
+                .map(|v| xa_leg(i, "hedges", v, false).map(|l| l.0))
+                .collect::<Result<Vec<_>>>()?;
+            let (w, ridge) = (i.reals("weights")?, ridge(i)?);
+            i.gate()?;
+            let market = XaMarket {
+                spot,
+                dividend_yield: q,
+                volatility: vol,
+                curve,
+            };
+            let r = xa::crossasset_solve(&market, &book, &hedges, &w, ridge)?;
+            plain(obj([
+                ("positions", r.positions.into()),
+                ("book_risk", r.book_risk.into()),
+                ("residual_risk", r.residual_risk.into()),
+                ("objective", r.objective.into()),
             ]))
         },
         "hedge.residual.report" => {
