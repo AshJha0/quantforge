@@ -1,11 +1,35 @@
 # Changelog
 
-## Unreleased: stage G (target 0.7.0)
+## 0.7.0: stage G, rates models and xVA (unreleased)
 
-### Known issues (stage G, in progress)
+Not yet tagged. Stage G is at Implemented, not Validated. No golden value of an earlier stage changed.
+
+### Verified on the integration tree (`stage-g-int`, 2026-11-11)
+- Each of the four builds passed 14,390 of 14,390 golden cases through the neutral runner (observed, one Windows machine): Java (JDK 25), Python (CPython 3.15.2), Rust (1.99.1) and C++ (WinLibs GCC 16.2, `-DQF_WERROR=ON`). Of these, 487 are stage G cases in 19 suites and 1,026 are E1 cases for the 20 stage G operations (`datasets/golden/stage_g/`, `stage_g_e1/`).
+- Unit tests (observed, same machine): Java `mvn verify` 395 tests, 0 failures; Rust `cargo test --release` 269 passed, clippy `-D warnings` and `fmt --check` clean; C++ ctest 258 test cases, 7,397 assertions, all passed; Python `ruff` and `mypy --strict` (102 files) clean. Fuzz, 60 s per language, seed 71: 0 findings for C++, Java and Rust.
+- Gates: `quality_gate.py --check-specs --check-register` (0 new gaps, 10 baseline), `check_hygiene.py` (0 problems), `test_tools.py`, `build_gallery.py --check` (25 entries, 0 differences), the site build (290 pages, 0 broken links) and the banned-word check (no hits).
+
+### Added
+- G1: Vasicek, CIR and Hull-White bond prices and bond options (`rates.shortrate.zcb`, `zcb_option`; `04-pricing/short-rate-models.md`, rulings G-1 to G-5).
+- G2 and G3: Jamshidian and affine swaptions, Hull-White calibration to a swaption strip, G2++, Bermudan swaptions and callable bonds on one lattice scheme, caps and floors (G-12 to G-18).
+- G4: LMM caplets and Rebonato swaptions (`04-pricing/lmm.md`).
+- Q3b and Q9: the AAD core and a Bermudan AAD ladder; Monte Carlo Greeks by pathwise, likelihood ratio and smoothed digitals; the model-reserve dispersion report (`06-risk/aad-core.md`, `mc-greeks.md`, `model-reserve.md`; G-9, G-10, G-10b).
+- G5 and G6: closed-form swap EE under Hull-White, collateralised exposure, CVA, DVA, FVA with the overlap defined, a SIMM-style IR delta and wrong-way CVA (`06-risk/xva-exposure.md`, `xva-framework.md`; G-40 to G-44).
+- R9: discretely monitored barriers by the BGK shift (`04-pricing/exotics.md`, G-7, G-8). A5: Heston and SABR calibration surrogate, Python research module only, challenger tier (`11-research/a5-surrogate.md`, G-11).
+- Stage F carry-overs: E1 cases for every stage G operation (G-45); F4 portfolio-risk tools (G-46); F3 inflation01, dividend and borrow, and correlation sensitivities (G-47); FRTB-SA FX, equity, CSR non-securitisation and commodity delta (G-48, G-49); FRTB vega and curvature (G-51).
+- Model inventory rows MG-1 onward in `docs/model-inventory.md`.
+
+### Fixed
+- Recorder: `fetch` retries HTTP 429, 5xx and timeouts up to four attempts (15, 30, 45 s waits); other 4xx errors still fail at once. The ECB API returned 504 for `ecb-estr` twice on 2026-11-10 and left a gap day (`tools/recorder/record.py`, tests in `tools/test_tools.py`).
+- C++: `NodeLogCurve` guards an empty node vector, so Windows GCC 16.2 builds with `-Werror` (it raised `-Walloc-size-larger-than` at `-O3`). No output changes.
+
+### Known issues (0.7.0)
+- **Outside-oracle share is 53.0% (258 of 487): the 60% floor is not met.** Wave 4c, simulated exposure checked against ORE (about 96 counted cases), would lift it; it needs WSL, which is down until a reboot (`program/STAGE_G_HANDOVER.md`, "Wave 4c plan"). The stage demo, exposure checked against ORE, waits on the same wave.
+- **CSR securitisations are out of scope** for FRTB-SA in this release.
+- **The C++ sanitizer run (address, undefined, float-cast-overflow) for stage G is pending**; it runs under Linux and WSL is down.
 - **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, was registered in `specifications/stage-g-rulings.md` with its power calculation before it ran, and passed (variance ratio 0.102, 95% interval 0.089 to 0.116, Z = 33.4; `oracle/G10B_RESULT.json`). G-10's own outcome stays inconclusive.
 - R9 acceptance has modest power (ruling G-34, R5 L6): the continuous price is 3.7 SE from the daily call MC at 40,000 paths, just outside the 3 SE band, and the put (z = -1.72) cannot discriminate; parameters were fixed before the run (plan 12.10).
-- Outside share counted strictly against library pricing engines (ruling G-27, R5 H1): the Jamshidian suites now count only against QuantLib's `JamshidianSwaptionEngine`; the share is 61.0%, or 52.8%-equivalent if the Rebonato suite were excluded (owner reading open).
+- Outside share counted strictly against library pricing engines (ruling G-27, R5 H1): the Jamshidian suites now count only against QuantLib's `JamshidianSwaptionEngine`; after later waves the share stands at 53.0% (258 of 487, first known issue above).
 - FRTB vega and curvature: specified from the owner-supplied Basel Framework PDF (ruling G-51), closing the G-49 item; CSR securitisations remain out of scope.
 - F-33 (FRTB-SA GIRR `low` scenario) closed: confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma).
 

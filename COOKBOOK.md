@@ -507,3 +507,23 @@ Copy the inputs of the named case from `datasets/golden/stage_f/` and send them 
 | A CDS index option on the adjusted forward; GARCH with standard errors | `credit.cdsindex.option_price`, `vol.garch.estimate` | `cdsidx_f-0001`, `garch_f` |
 
 To check a whole suite against a build: `python conformance/runner/runner.py --impl python --suite risk_f4` (any language name from `conformance/runner/implementations.json`).
+
+## Stage G recipes
+
+Copy the inputs of the named case from `datasets/golden/stage_g/` and send them to any build. Its `expected.outputs` are the oracle's answer; all four builds reproduce every stage G case on the integration tree (2026-11-11, observed).
+
+| Task | Operation | Case |
+|---|---|---|
+| Vasicek, CIR or Hull-White bond price and bond option | `rates.shortrate.zcb`, `rates.shortrate.zcb_option` | `shortrate_g-0001` |
+| European swaption on Hull-White (Jamshidian) | `rates.shortrate.swaption` | `swaption_g-0001` |
+| G2++ bond and bond option | `rates.g2pp.zcb`, `rates.g2pp.zcb_option` | `g2pp_g` |
+| Calibrate Hull-White sigma to a swaption strip | `rates.shortrate.hw_calibrate` | `hwcal_g` |
+| Bermudan swaption, callable bond, cap or floor | `rates.shortrate.bermudan_swaption`, `rates.shortrate.callable_bond`, `rates.shortrate.capfloor` | `bermudan_g`, `callable_g`, `capfloor_g` |
+| LMM caplets and Rebonato swaptions | `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `lmmcap_g`, `lmmswn_g` |
+| Monte Carlo Greeks; model-reserve dispersion | `risk.mc.greeks`, `risk.model_reserve.dispersion` | `mcgreeks_g`, `reserve_g` |
+| Expected exposure of a swap under Hull-White | `xva.exposure.swap_ee_hw` | `exposure_g-0001` |
+| Collateralised exposure; CVA, DVA, FVA; SIMM-style IR delta; wrong-way CVA | `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `collexp_g`, `xvaadj_g-0001`, `simm_g`, `wwr_g` |
+| Discretely monitored barrier (BGK shift) | `exotic.barrier.price` with `monitoring: DISCRETE` | `barrier_g` |
+
+To check a whole suite: `python conformance/runner/runner.py --impl rust --suite xvaadj_g`.
+
