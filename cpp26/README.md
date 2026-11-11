@@ -1,6 +1,6 @@
 # C++26 implementation
 
-Stages A and B of QuantForge: the specs in `specifications/` that `stage-b-followups.md` names, behind the CLI in
+Stages A to G of QuantForge (stage G in progress): the specs in `specifications/` that `stage-b-followups.md` names, behind the CLI in
 `specifications/cli-contract.md`. It is written from the specs alone.
 
 ## Layout
@@ -14,6 +14,19 @@ Stages A and B of QuantForge: the specs in `specifications/` that `stage-b-follo
 
 The other folders in `include/quantforge/` are empty placeholders for later stages. There are no dependencies beyond the standard library, apart from Catch2 for tests. The Sobol table is compiled in
 with `#embed`, so no command reads a file.
+
+## Stage G modules
+
+| File | Holds | Spec |
+|---|---|---|
+| `core/shortrate.{hpp,cpp}` | Vasicek, CIR and Hull-White bonds and bond options (noncentral chi-square started at the Poisson mode, upper tails for CIR puts), Jamshidian swaptions (bracket `[-1, 1]`, G-29), caps and floors, Hull-White sigma calibration, the pinned G-18 scheme for Bermudan swaptions and callable bonds, G2++ (series below `max(a, b) tau = 0.1`, G-33), closed-form swap EE and CVA, and the MC Greeks of Q9 part 1 | `04-pricing/short-rate-models.md`, `06-risk/mc-greeks.md`, `06-risk/xva-exposure.md` |
+| `core/aad_ladder.cpp` | Q3b: reverse-mode ladder of the G-18 Bermudan scheme with respect to every curve discount factor, `a` and `sigma`. Hand-written adjoint: the forward pass stores each step; the reverse pass solves the transposed tridiagonal system per step and maps coefficient adjoints to the parameters through forward-mode gradients of `h`, `alpha(t)` and the exercise values. The unit test prints the G-9 cost ratio (price plus ladder over one price; pass at 5 or less) | `06-risk/aad-core.md` |
+| `core/lmm.{hpp,cpp}` | LMM caplets and Rebonato swaptions on the abcd volatility (covariance by composite 20-point Gauss-Legendre), and the simulated terminal-measure LMM used by the G-26 caplet acceptance test | `04-pricing/lmm.md` |
+| `cli/ops_shortrate.inc` | CLI side of the short-rate, G2++, LMM, MC Greeks and exposure operations, including the G-31 limits (combined grid work `nx x steps <= 5e8`) | `cli-contract.md`, "Stage G operations" |
+| `cli/ops_xva.inc` | xVA on given paths: collateralised exposure (CSA, MTA, MPoR), CVA, DVA, FVA with the overlap rule, MVA, KVA, SIMM-style IR delta, Hull-White wrong-way risk; the model-reserve dispersion statistic | `06-risk/xva-framework.md`, `06-risk/model-reserve.md` |
+| `cli/ops_risk_gb.inc`, `cli/ops_frtb_gb.inc` | Stage F carry-overs landed in stage G: inflation01, dividend and borrow, correlation sensitivities; reverse stress, limits, concentration, liquidity-adjusted VaR, horizon volatility; FRTB FX, equity, CSR and commodity delta, vega and curvature (one sensitivities-based engine with the MAR21.6 scenarios) | `06-risk/f3-sensitivities.md`, `portfolio-risk-tools.md`, `frtb-sa-fx-equity.md`, `frtb-sa-vega-curvature.md` |
+
+Property tests for these waves are in `tests/test_stage_g.cpp`: the acceptance checks of each spec (R9 barrier MC, G-10 report and G-10b gate, LMM caplets against simulation, Q3b ladder against Richardson bumps and its cost ratio), plus parity and limit cases. Bounds on the G-18 scheme compare with the scheme's own value of the bounding product (G-28).
 
 ## Build
 
