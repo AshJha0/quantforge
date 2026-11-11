@@ -11,6 +11,7 @@ pub struct HwCurve {
 }
 
 impl HwCurve {
+    /// Builds the curve from pillar times and discount factors (`(0, 1)` is prepended).
     pub fn new(times: &[f64], dfs: &[f64]) -> Result<HwCurve> {
         crate::error::finite("times", &times)?;
         crate::error::finite("discount_factors", &dfs)?;
@@ -49,12 +50,14 @@ impl HwCurve {
         -(self.logs[i + 1] - self.logs[i]) / (self.times[i + 1] - self.times[i])
     }
 
+    /// `ln P(0, t)`, log-linear between pillars and flat-forward past the last.
     pub fn ln_discount(&self, t: f64) -> f64 {
         let i = self.seg(t);
         self.logs[i] - self.forward(t) * (t - self.times[i])
     }
 }
 
+/// A one-factor short-rate model with its parameters.
 pub enum Model<'a> {
     Vasicek {
         a: f64,
@@ -89,6 +92,16 @@ fn b_terms(a: f64, tau: f64) -> (f64, f64) {
         (b - tau) / a
     };
     (b, s)
+}
+
+/// CIR `(ln A, B)` at time to maturity `tau` [BM 3.25].
+fn cir_factors(a: f64, b: f64, sigma: f64, tau: f64) -> (f64, f64) {
+    let g = (a * a + 2.0 * sigma * sigma).sqrt();
+    let em1 = (g * tau).exp_m1();
+    let den = (g + a) * em1 + 2.0 * g;
+    let bb = 2.0 * em1 / den;
+    let ln_a = 2.0 * a * b / (sigma * sigma) * ((2.0 * g).ln() + (a + g) * tau / 2.0 - den.ln());
+    (ln_a, bb)
 }
 
 /// `rates.shortrate.zcb`: `(discount_factor, zero_rate)` for `P(t, T)` given `r(t)`.
@@ -126,12 +139,7 @@ pub fn zcb(m: &Model, r: f64, t: f64, maturity: f64) -> Result<(f64, f64)> {
             if r < 0.0 {
                 return fail("E_DOMAIN", "CIR short_rate must not be negative");
             }
-            let g = (a * a + 2.0 * sigma * sigma).sqrt();
-            let em1 = (g * tau).exp_m1();
-            let den = (g + a) * em1 + 2.0 * g;
-            let bb = 2.0 * em1 / den;
-            let ln_a =
-                2.0 * a * b / (sigma * sigma) * ((2.0 * g).ln() + (a + g) * tau / 2.0 - den.ln());
+            let (ln_a, bb) = cir_factors(a, *b, sigma, tau);
             ln_a - bb * r
         }
         Model::HullWhite { curve, .. } => {
@@ -145,8 +153,9 @@ pub fn zcb(m: &Model, r: f64, t: f64, maturity: f64) -> Result<(f64, f64)> {
     Ok((ln_p.exp(), -ln_p / tau))
 }
 
-/// `rates.shortrate.zcb_option` for Vasicek and Hull-White (Jamshidian):
-/// `(price, P(0, T), P(0, S))`. `r` is `r(0)` for Vasicek and ignored for Hull-White.
+/// `rates.shortrate.zcb_option` (Jamshidian for Vasicek and Hull-White, the noncentral
+/// chi-square formula [BM 3.26] for CIR):
+/// `(price, P(0, T), P(0, S))`. `r` is `r(0)` for Vasicek and CIR, ignored for Hull-White.
 pub fn zcb_option(
     m: &Model,
     r: f64,
@@ -178,11 +187,23 @@ pub fn zcb_option(
                 curve.ln_discount(maturity).exp(),
             )
         }
-        Model::Cir { .. } => {
-            return fail(
-                "E_UNSUPPORTED_OPERATION",
-                "CIR bond options are not in this build",
-            );
+        Model::Cir { a, b, sigma } => {
+            let pt = zcb(m, r, 0.0, expiry)?.0;
+            let ps = zcb(m, r, 0.0, maturity)?.0;
+            let (a, b, sigma) = (*a, *b, *sigma);
+            let s2 = sigma * sigma;
+            let g = (a * a + 2.0 * s2).sqrt();
+            let rho = 2.0 * g / (s2 * (g * expiry).exp_m1());
+            let psi = (a + g) / s2;
+            let (ln_a, bb) = cir_factors(a, b, sigma, maturity - expiry);
+            let rbar = (ln_a - strike.ln()) / bb;
+            let k = 4.0 * a * b / s2;
+            let num = 2.0 * rho * rho * r * (g * expiry).exp();
+            let chi = crate::stats::noncentral_chi2_cdf;
+            let c = ps * chi(2.0 * rbar * (rho + psi + bb), k, num / (rho + psi + bb))
+                - strike * pt * chi(2.0 * rbar * (rho + psi), k, num / (rho + psi));
+            let v = if call { c } else { c - ps + strike * pt };
+            return Ok((notional * v, pt, ps));
         }
     };
     let sp = sigma / a
@@ -193,4 +214,26 @@ pub fn zcb_option(
     let c = ps * n(h) - strike * pt * n(h - sp);
     let v = if call { c } else { c - ps + strike * pt };
     Ok((notional * v, pt, ps))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cir_put_call_parity_and_bounds() {
+        let m = Model::Cir {
+            a: 0.3,
+            b: 0.05,
+            sigma: 0.1,
+        };
+        for (k, te, ts) in [(0.9, 1.0, 3.0), (0.95, 0.5, 2.0), (0.7, 2.0, 10.0)] {
+            let (c, pt, ps) = zcb_option(&m, 0.04, true, k, te, ts, 1.0).unwrap();
+            let (p, _, _) = zcb_option(&m, 0.04, false, k, te, ts, 1.0).unwrap();
+            assert!((c - p - (ps - k * pt)).abs() < 1e-12);
+            assert!(c >= 0.0 && c <= ps);
+        }
+        // r = 0 gives zero noncentrality and must still price.
+        assert!(zcb_option(&m, 0.0, true, 0.9, 1.0, 3.0, 1.0).unwrap().0 > 0.0);
+    }
 }
