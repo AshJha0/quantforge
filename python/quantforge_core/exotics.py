@@ -70,7 +70,10 @@ def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_t
         raise _domain("spot is on or beyond the barrier", "barrier")
     if discrete:
         assert monitoring_per_year is not None
-        shift = math.exp(BGK_BETA * v * math.sqrt(1.0 / monitoring_per_year))
+        n = math.floor(monitoring_per_year * t + 0.5)  # G-30: ties round up
+        if n < 1:
+            raise _domain("the barrier is never observed (n = 0)", "monitoring_per_year")
+        shift = math.exp(BGK_BETA * v * math.sqrt(t / n))
         h = h / shift if down else h * shift
     phi, eta = _phi(option_type), 1.0 if down else -1.0
     b, sd = r - q, v * math.sqrt(t)

@@ -153,8 +153,7 @@ def test_bermudan_is_at_least_the_first_european() -> None:
     for kind in ("PAYER", "RECEIVER"):
         berm = shortrate.bermudan_swaption(m, 1.0, pay, 0.04, kind, 1.0, [1.0, 2.0, 3.0, 4.0, 5.0],
                                            grid)["price"]
-        euro = shortrate.swaption(m, 1.0, pay, 0.04, kind, 1.0)["price"]
-        assert berm >= euro * (1 - 2e-2)  # within the scheme's first-order bias
+        # G-28: bounded by the scheme's own single-date price on the same grid, never Jamshidian
         one = shortrate.bermudan_swaption(m, 1.0, pay, 0.04, kind, 1.0, [1.0], grid)["price"]
         assert berm >= one
 
@@ -172,7 +171,10 @@ def test_callable_bond_limits() -> None:
     assert 0.8 < math.log2(errors[1] / errors[2]) < 1.2
     grid = shortrate.make_grid(101, 50, 6.0)
     called = shortrate.callable_bond(m, pay, c, 1.0, pay[2:9], 1.0, grid)["price"]
-    assert called <= straight
+    no_call = shortrate.callable_bond(m, pay, c, 1.0, [], 1.0, grid)["price"]
+    assert called <= no_call  # G-28: the scheme's own no-call bond, not the exact straight bond
+    deep = shortrate.callable_bond(m, pay, c, 1.0, [5.0], 10.0, grid)["price"]
+    assert deep <= no_call
 
 
 def test_exposure_pay_minus_receive_is_the_forward_value() -> None:

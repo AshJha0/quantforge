@@ -1,4 +1,5 @@
 """Input limits (specifications/01-core/limits.md). Runs after every E_SCHEMA check has passed."""
+import math
 from collections.abc import Callable, Mapping
 from typing import Any
 
@@ -117,9 +118,22 @@ def _fd_grid(raw: Raw) -> None:
 def _scheme_grid(raw: Raw) -> None:
     """The G-18 scheme grid: nx at most 10,001, steps_per_year at most 100,000."""
     grid = raw.get("grid")
-    if isinstance(grid, dict):
-        _cap(grid, "nx", 10_001)
-        _cap(grid, "steps_per_year", 100_000)
+    if not isinstance(grid, dict):
+        return
+    _cap(grid, "nx", 10_001)
+    _cap(grid, "steps_per_year", 100_000)
+    # G-31: combined grid work nx x total steps <= 5e8, total steps summed over the knot
+    # intervals exactly as the scheme counts them.
+    knots = raw.get("exercise_times") or raw.get("payment_times") or []
+    nx, spy = grid.get("nx"), grid.get("steps_per_year")
+    if isinstance(nx, int) and isinstance(spy, int) and nx > 0 and spy > 0:
+        total, prev = 0, 0.0
+        for t in knots:
+            if isinstance(t, (int, float)) and not isinstance(t, bool) and t > prev:
+                total += max(1, math.ceil(spy * (t - prev)))
+                prev = t
+        if nx * total > 500_000_000:
+            raise _over("nx x total time steps", 500_000_000)
 
 
 def _slv_grid(raw: Raw) -> None:
@@ -175,6 +189,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "risk.mc.greeks": _caps(paths=10_000_000),
     "rates.shortrate.bermudan_swaption": _scheme_grid,
     "rates.shortrate.callable_bond": _scheme_grid,
+    "rates.shortrate.bermudan_ladder": _scheme_grid,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -206,11 +221,13 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
 
 # Stage G sizes (ruling G-6 and the operation specs): curve pillars, payment, exposure and
 # period times 10,000 each, wherever the key appears.
-_G_TIMES = {"times": 10_000, "discount_factors": 10_000, "payment_times": 10_000}
+_G_TIMES = {"times": 10_000, "discount_factors": 10_000, "payment_times": 10_000,
+            "period_times": 10_000, "swaptions": 10_000}
 for _name in ("rates.shortrate.zcb", "rates.shortrate.zcb_option", "rates.shortrate.swaption",
               "rates.shortrate.capfloor", "rates.shortrate.hw_calibrate",
               "rates.shortrate.bermudan_swaption", "rates.shortrate.callable_bond",
-              "rates.g2pp.zcb", "rates.g2pp.zcb_option"):
+              "rates.shortrate.bermudan_ladder", "rates.lmm.capfloor",
+              "rates.lmm.swaption_rebonato", "rates.g2pp.zcb", "rates.g2pp.zcb_option"):
     STAGE_F_ARRAYS[_name] = dict(_G_TIMES)
 STAGE_F_ARRAYS["xva.exposure.swap_ee_hw"] = {**_G_TIMES, "exposure_times": 10_000}
 

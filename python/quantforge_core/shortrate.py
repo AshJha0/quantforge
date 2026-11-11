@@ -266,12 +266,50 @@ def curve_model(times: Floats, discount_factors: Floats, a: float, sigma: float,
 # --- noncentral chi-square --------------------------------------------------------------------
 
 
+def _log1pmx(d: float) -> float:
+    """`ln(1 + d) - d` without cancellation for small `d`."""
+    if abs(d) > 0.25:
+        return math.log1p(d) - d
+    total, power = 0.0, d * d
+    for n in range(2, 60):
+        term = power / n
+        total += -term if n % 2 == 0 else term
+        if abs(term) < 1e-18 * abs(total):
+            break
+        power *= d
+    return total
+
+
+def _stirling_tail(s: float) -> float:
+    """`lnGamma(s) - ((s - 1/2) ln s - s + ln(2 pi)/2)` for `s >= 10`."""
+    inv = 1.0 / s
+    inv2 = inv * inv
+    return inv * (1 / 12 - inv2 * (1 / 360 - inv2 * (1 / 1260 - inv2 * (1 / 1680
+                                                                           - inv2 / 1188))))
+
+
+def _log_front(s: float, x: float) -> float:
+    """`s ln x - x - lnGamma(s)`, the log prefactor of the incomplete gamma. For large `s` the
+    three terms are each of order `s` and cancel, so the form `s (ln(1 + d) - d) + ln(s)/2 -
+    ln(2 pi)/2 - stirling_tail(s)`, `d = (x - s)/s`, keeps its digits (G-32)."""
+    if s < 10:
+        return s * math.log(x) - x - math.lgamma(s)
+    return (s * _log1pmx((x - s) / s) + 0.5 * math.log(s / (2 * math.pi)) - _stirling_tail(s))
+
+
+def _log_poisson(j: int, mu: float) -> float:
+    """`j ln mu - mu - lnGamma(j + 1)`."""
+    if j == 0:
+        return -mu
+    return _log_front(j, mu) - math.log(j)
+
+
 def _gamma_p(s: float, x: float) -> float:
     """Regularised lower incomplete gamma `P(s, x)`: series below `s + 1`, continued fraction
     (modified Lentz) above."""
     if x <= 0:
         return 0.0
-    log_front = s * math.log(x) - x - math.lgamma(s)
+    log_front = _log_front(s, x)
     if x < s + 1:
         term = total = 1.0 / s
         k = s
@@ -302,21 +340,35 @@ def _gamma_p(s: float, x: float) -> float:
 
 
 def ncx2_cdf(x: float, k: float, lam: float) -> float:
-    """Noncentral chi-square CDF by the Poisson-weighted series of central CDFs; stops past the
-    Poisson mode once a term is below 1e-17 of the sum."""
+    """Noncentral chi-square CDF by the Poisson-weighted series of central CDFs, summed from the
+    Poisson mode outward with log weights (G-32), so `exp(-lambda/2)` never underflows alone. A
+    non-positive argument gives 0."""
     if x <= 0:
         return 0.0
     half = lam / 2
-    total = 0.0
-    j = 0
-    while True:
-        log_w = -half + (j * math.log(half) if half > 0 else (0.0 if j == 0 else -math.inf))
-        weight = math.exp(log_w - math.lgamma(j + 1)) if log_w > -math.inf else 0.0
-        term = weight * _gamma_p(k / 2 + j, x / 2) if weight > 0 else 0.0
-        total += term
-        if j > half + 10 and term <= 1e-17 * total:
-            return total
+    if half <= 0:
+        return _gamma_p(k / 2, x / 2)
+    j0 = math.floor(half)
+
+    def term(j: int) -> float:
+        return math.exp(_log_poisson(j, half)) * _gamma_p(k / 2 + j, x / 2)
+
+    total = term(j0)
+    j = j0 + 1
+    while True:  # upward: weights fall past the mode
+        t = term(j)
+        total += t
+        if t <= 1e-17 * total and (total > 0 or j > half + 10):
+            break
         j += 1
+    j = j0 - 1
+    while j >= 0:  # downward
+        t = term(j)
+        total += t
+        if t <= 1e-17 * total and total > 0:
+            break
+        j -= 1
+    return total
 
 
 # --- bonds and bond options ---------------------------------------------------------------------
@@ -375,8 +427,9 @@ def _swaption_type(kind: str) -> bool:
 
 
 def _critical_rate(model: Model, t0: float, times: Floats, coupons: Floats) -> float:
-    """`r*` with `sum c_i P(T0, Ti; r*) = 1`; Newton from 0, kept inside a bracket (the sum is
-    strictly decreasing in `r`), solved until the sum is within 1e-15 relative of 1."""
+    """`r*` with `sum c_i P(T0, Ti; r*) = 1` (G-13, G-29): Newton from 0 kept inside the bracket
+    `[-1, 1]`, solved until the sum is within 1e-15 relative of 1. With a negative strike the
+    sum need not be monotone, so a bracket without a sign change is E_DOMAIN."""
     factors = [model.ab(t0, t) for t in times]
 
     def g(r: float) -> tuple[float, float]:
@@ -384,24 +437,21 @@ def _critical_rate(model: Model, t0: float, times: Floats, coupons: Floats) -> f
         return (ordered_sum(terms) - 1.0,
                 -ordered_sum(term * bb for term, (_, bb) in zip(terms, factors, strict=True)))
 
-    lo, hi = -math.inf, math.inf
+    lo, hi = -1.0, 1.0
+    if not (g(lo)[0] > 0 > g(hi)[0]):
+        raise _domain("no critical rate in [-1, 1]", "fixed_rate")
     r = 0.0
     for _ in range(500):
         f, df = g(r)
-        if abs(f) <= 1e-15 * (1.0 + abs(f)):
+        if abs(f) <= 1e-15:
             return r
         if f > 0:
             lo = r
         else:
             hi = r
-        step = r - f / df if df < 0 else math.nan
-        if not (lo < step < hi) or not math.isfinite(step):
-            if math.isfinite(lo) and math.isfinite(hi):
-                step = (lo + hi) / 2
-            elif math.isfinite(lo):
-                step = lo + max(1.0, abs(lo))
-            else:
-                step = hi - max(1.0, abs(hi))
+        step = r - f / df if df != 0 else math.nan
+        if not lo < step < hi:
+            step = (lo + hi) / 2
         if step == r:
             return r
         r = step
@@ -424,6 +474,9 @@ def swaption(model: Model, expiry: float, payment_times: Floats, fixed_rate: flo
     """`rates.shortrate.swaption`: European swaption by Jamshidian's decomposition."""
     _swap_times(expiry, payment_times)
     payer = _swaption_type(swaption_type)
+    if not 1 + fixed_rate * (payment_times[-1] - (payment_times[-2] if len(payment_times) > 1
+                                                  else expiry)) > 0:
+        raise _domain("1 + K tau_n must be above 0", "fixed_rate")
     if model.kind == "CIR":
         taus = [payment_times[0] - expiry,
                 *(b - a for a, b in itertools.pairwise(payment_times))]
@@ -526,7 +579,7 @@ def hw_calibrate(times: Floats, discount_factors: Floats, a: float,
         # simply not the minimum.
         try:
             return objective(sigma)
-        except (OverflowError, ZeroDivisionError, ValueError):
+        except (OverflowError, ZeroDivisionError, ValueError, QfError):
             return math.inf
 
     values = [scanned(s) for s in grid]
@@ -665,10 +718,9 @@ def _exercise_values(model: Model, t: float, xs: Floats, times: Floats, k: float
     return out
 
 
-def bermudan_swaption(model: Model, start: float, payment_times: Floats, fixed_rate: float,
-                      swaption_type: str, notional: float, exercise_times: Floats,
-                      grid: Grid) -> dict[str, float]:
-    """`rates.shortrate.bermudan_swaption` on the pinned reference scheme (G-18)."""
+def check_bermudan(start: float, payment_times: Floats, swaption_type: str,
+                   exercise_times: Floats) -> bool:
+    """The swap and exercise checks of the Bermudan operations; True for a payer."""
     _swap_times(start, payment_times)
     payer = _swaption_type(swaption_type)
     resets = {start, *payment_times[:-1]}
@@ -676,6 +728,14 @@ def bermudan_swaption(model: Model, start: float, payment_times: Floats, fixed_r
             or any(t not in resets for t in exercise_times)):
         raise _input("exercise_times must be strictly increasing reset dates before the last "
                      "payment", "exercise_times")
+    return payer
+
+
+def bermudan_swaption(model: Model, start: float, payment_times: Floats, fixed_rate: float,
+                      swaption_type: str, notional: float, exercise_times: Floats,
+                      grid: Grid) -> dict[str, float]:
+    """`rates.shortrate.bermudan_swaption` on the pinned reference scheme (G-18)."""
+    payer = check_bermudan(start, payment_times, swaption_type, exercise_times)
     phi = 1.0 if payer else -1.0
     knots = list(exercise_times)
     nx = grid.nx
@@ -730,8 +790,9 @@ def swap_ee_hw(model: Model, start: float, payment_times: Floats, fixed_rate: fl
     """`xva.exposure.swap_ee_hw`: discounted EE at reset dates and an optional bucketed CVA."""
     if side not in ("PAY", "RECEIVE"):
         raise _input(f"{side} is not PAY or RECEIVE", "side")
-    if (not payment_times or not _increasing(payment_times) or not payment_times[0] > start
-            or start < 0):
+    if start < 0:
+        raise _domain("start_years must be >= 0", "start_years")
+    if not payment_times or not _increasing(payment_times) or not payment_times[0] > start:
         raise _input("payment_times must be strictly increasing and start after start_years",
                      "payment_times")
     if not exposure_times:

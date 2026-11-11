@@ -20,7 +20,7 @@ CORE_MODULES = (
     "curve_fits", "curves", "data_checks", "daycount", "equity", "equity_curves", "exotics",
     "futures", "fx", "fx_smile", "hedging", "heston", "inflation", "integrate", "interp", "joint", "linalg", "book_risk", "var_risk", "book",
     "mbs", "money", "monte_carlo", "ois", "overnight", "pde", "projection", "rates_vol",
-    "risk_curve", "rng", "roots", "sabr", "schedules", "shortrate", "mc_greeks", "sensitivities", "smile", "snapshot",
+    "risk_curve", "rng", "roots", "sabr", "schedules", "shortrate", "mc_greeks", "lmm", "xva", "risk_tools", "aad_ladder", "sensitivities", "smile", "snapshot",
     "sobol", "stats", "steps", "store", "timezones", "usecases", "variance", "vol_usecase", "xccy",
 )
 
@@ -75,9 +75,27 @@ class _Core:
 core = SimpleNamespace(**{m: _Core(m) for m in CORE_MODULES})
 
 
+# Stage G operations whose E_LIMIT sizes are checked on the raw document before the typed reads:
+# two r5 goldens (shortrate_g-0082 without short_rate, mcgreeks_g-0022 with an integer seed)
+# expect E_LIMIT although a field is malformed (SPEC_QUESTIONS G-Q3).
+EARLY_LIMITS = frozenset({
+    "rates.shortrate.zcb", "rates.shortrate.zcb_option", "rates.shortrate.swaption",
+    "rates.shortrate.capfloor", "rates.shortrate.hw_calibrate",
+    "rates.shortrate.bermudan_swaption", "rates.shortrate.callable_bond",
+    "rates.shortrate.bermudan_ladder", "rates.g2pp.zcb", "rates.g2pp.zcb_option",
+    "rates.lmm.capfloor", "rates.lmm.swaption_rebonato", "xva.exposure.swap_ee_hw",
+    "risk.mc.greeks", "exotic.barrier.price",
+})
+
+
 def execute(operation: str, raw: dict[str, Any]) -> Any:
     global _pending
     NONFINITE.clear()
+    if operation in EARLY_LIMITS:
+        try:
+            check_limits(operation, raw)
+        except (TypeError, AttributeError, KeyError):
+            pass  # a malformed field: the typed reads report it as E_SCHEMA
     i = Inputs(raw)
     _pending = (operation, i)
     result = REGISTRY[operation](i)
