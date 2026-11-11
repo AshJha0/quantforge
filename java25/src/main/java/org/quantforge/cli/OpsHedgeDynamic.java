@@ -43,11 +43,18 @@ final class OpsHedgeDynamic {
         double vol = in.real("hedge_volatility");
         double[] times = in.reals("times");
         double[] spots = in.reals("spots");
+        in.notNull("half_spread");
+        in.notNull("impact");
+        Double halfSpread = in.realOrNull("half_spread");
+        Double impact = in.realOrNull("impact");
         in.gate();
         DynamicHedge.Backtest b = DynamicHedge.backtest(type == OptionType.CALL, strike, expiry, quantity, rate, q,
-                vol, times, spots);
+                vol, times, spots, halfSpread, impact);
         Out out = Operations.out("option_values", b.optionValues(), "shares", b.shares(), "portfolio_values",
                 b.portfolioValues(), "final_pnl", b.finalPnl());
+        if (b.tradingCost() != null) {
+            out.outputs().put("trading_cost", b.tradingCost()); // ruling I-40
+        }
         out.outputs().putAll(Operations.out(stats(b.effectiveness())).outputs());
         return out;
     }

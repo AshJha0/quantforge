@@ -50,3 +50,10 @@ solved by `LeastSquaresHedge`): `hedgeselect_i` 17 of 17. No spec question.
 ## Wave 4d: hedge slippage
 
 Built (`hedging.Slippage`, `cli.OpsHedgeSlippage`): `hedgeslip_i` 12 of 12. No spec question.
+
+## Wave 4e: costs in the backtest; tutorial examples
+
+Built (`DynamicHedge.backtest` with `half_spread` and `impact`, I-39, I-40): `hedgebtcost_i` 8 of 8, `hedgebt_i` still
+15 of 15. `HedgeExamplesSmokeTest` runs the 16 `examples/hedge_*_i.json` inputs through the CLI request handler
+and judges each against its golden case; the same 16 return `status: ok` through `java -jar quantforge-cli.jar run`.
+No spec question.

@@ -30,9 +30,10 @@ public final class DynamicHedge {
      * @param portfolioValues the hedged portfolio's value on each date, 0 at the start
      * @param finalPnl the last portfolio value
      * @param effectiveness statistics of the item and hedge changes
+     * @param tradingCost the undiscounted sum of trading costs paid, null without a cost input (ruling I-40)
      */
     public record Backtest(double[] optionValues, double[] shares, double[] portfolioValues, double finalPnl,
-            Effectiveness effectiveness) {}
+            Effectiveness effectiveness, Double tradingCost) {}
 
     private static boolean constant(double[] v) {
         for (double x : v) {
@@ -129,6 +130,30 @@ public final class DynamicHedge {
      */
     public static Backtest backtest(boolean call, double strike, double expiry, double quantity, double rate,
             double dividendYield, double vol, double[] times, double[] spots) {
+        return backtest(call, strike, expiry, quantity, rate, dividendYield, vol, times, spots, null, null);
+    }
+
+    /**
+     * {@code hedge.backtest.delta} with the optional wave 4e trading costs (ruling I-39): every share trade of
+     * {@code dq} costs {@code half_spread |dq| + impact dq^2}, paid from cash. The initial purchase is a trade, so
+     * {@code Pi_0 = -cost(h_0)}; each rebalance is paid after that date's value is recorded; there is no unwind.
+     *
+     * @param call true for a call, false for a put
+     * @param strike option strike
+     * @param expiry option expiry in years
+     * @param quantity options held, negative short
+     * @param rate continuously compounded rate
+     * @param dividendYield continuous dividend yield
+     * @param vol hedge volatility, for marks and deltas
+     * @param times dates in years, from 0, strictly increasing, the last at or before expiry
+     * @param spots the spot path, one per date
+     * @param halfSpread cost per share traded, or null
+     * @param impact cost per share traded squared, or null
+     * @return the backtest, with {@code tradingCost} when a cost input is given
+     * @throws QfError {@code E_INPUT}, then {@code E_DOMAIN}, in the specification's order
+     */
+    public static Backtest backtest(boolean call, double strike, double expiry, double quantity, double rate,
+            double dividendYield, double vol, double[] times, double[] spots, Double halfSpread, Double impact) {
         int m = times.length;
         if (spots.length != m) {
             throw new QfError("E_INPUT", "times and spots differ in length", "spots");
@@ -161,6 +186,15 @@ public final class DynamicHedge {
         if (!(vol > 0.0)) {
             throw new QfError("E_DOMAIN", "hedge volatility at or below 0", "hedge_volatility");
         }
+        if (halfSpread != null && !(halfSpread >= 0.0)) {
+            throw new QfError("E_DOMAIN", "half_spread below 0", "half_spread");
+        }
+        if (impact != null && !(impact >= 0.0)) {
+            throw new QfError("E_DOMAIN", "impact below 0", "impact");
+        }
+        boolean costed = halfSpread != null || impact != null;
+        double hs = halfSpread == null ? 0.0 : halfSpread;
+        double im = impact == null ? 0.0 : impact;
         double[] v = new double[m];
         double[] delta = new double[m];
         for (int i = 0; i < m; i++) {
@@ -173,7 +207,9 @@ public final class DynamicHedge {
             h[i] = -quantity * delta[i] + 0.0;
         }
         double[] pi = new double[m];
-        double cash = -quantity * v[0] - h[0] * spots[0];
+        double paid = hs * Math.abs(h[0]) + im * h[0] * h[0];
+        double cash = -quantity * v[0] - h[0] * spots[0] - paid;
+        pi[0] = -paid + 0.0;
         double[] item = new double[m - 1];
         double[] hedge = new double[m - 1];
         for (int i = 0; i < m - 1; i++) {
@@ -181,11 +217,14 @@ public final class DynamicHedge {
             cash = cash * Math.exp(rate * dt) + h[i] * spots[i] * Math.expm1(dividendYield * dt);
             pi[i + 1] = quantity * v[i + 1] + h[i] * spots[i + 1] + cash;
             if (i + 1 < m - 1) {
-                cash -= (h[i + 1] - h[i]) * spots[i + 1];
+                double dq = h[i + 1] - h[i];
+                double cost = hs * Math.abs(dq) + im * dq * dq;
+                cash -= dq * spots[i + 1] + cost;
+                paid += cost;
             }
             item[i] = quantity * (v[i + 1] - v[i]);
             hedge[i] = (pi[i + 1] - pi[i]) - item[i];
         }
-        return new Backtest(v, h, pi, pi[m - 1], effectiveness(item, hedge));
+        return new Backtest(v, h, pi, pi[m - 1], effectiveness(item, hedge), costed ? paid : null);
     }
 }

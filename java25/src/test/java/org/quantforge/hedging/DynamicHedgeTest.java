@@ -85,6 +85,32 @@ class DynamicHedgeTest {
     }
 
     @Example
+    void tradingCostsFollowRulingI39() {
+        double[] times = {0, 0.1, 0.2, 0.3};
+        double[] spots = {100, 102, 99, 101};
+        DynamicHedge.Backtest free = DynamicHedge.backtest(true, 100, 0.5, -10, 0.03, 0.02, 0.2, times, spots);
+        assertEquals(null, free.tradingCost());
+        DynamicHedge.Backtest zero = DynamicHedge.backtest(true, 100, 0.5, -10, 0.03, 0.02, 0.2, times, spots, 0.0,
+                0.0);
+        assertEquals(0.0, zero.tradingCost(), 0.0);
+        assertEquals(free.finalPnl(), zero.finalPnl(), 0.0);
+        DynamicHedge.Backtest c = DynamicHedge.backtest(true, 100, 0.5, -10, 0.03, 0.02, 0.2, times, spots, 0.02,
+                0.001);
+        double[] h = c.shares();
+        double c0 = 0.02 * Math.abs(h[0]) + 0.001 * h[0] * h[0];
+        assertEquals(-c0, c.portfolioValues()[0], 1e-15);
+        double c1 = 0.02 * Math.abs(h[1] - h[0]) + 0.001 * (h[1] - h[0]) * (h[1] - h[0]);
+        double c2 = 0.02 * Math.abs(h[2] - h[1]) + 0.001 * (h[2] - h[1]) * (h[2] - h[1]);
+        assertEquals(c0 + c1 + c2, c.tradingCost(), 1e-14);
+        // The date-1 value is recorded before its rebalance cost, so only the initial cost shows there.
+        assertEquals(free.portfolioValues()[1] - c0 * Math.exp(0.003), c.portfolioValues()[1], 1e-12);
+        assertEquals("E_DOMAIN", code(() -> DynamicHedge.backtest(true, 100, 0.5, -10, 0, 0, 0.2, times, spots, -0.01,
+                null)));
+        assertEquals("E_DOMAIN", code(() -> DynamicHedge.backtest(true, 100, 0.5, -10, 0, 0, 0.2, times, spots, null,
+                -1.0)));
+    }
+
+    @Example
     void putValuesAndPayoffAtExpiry() {
         double[] vd = DynamicHedge.valueDelta(false, 90, 100, 0.0, 0.03, 0.01, 0.2);
         assertEquals(10.0, vd[0], 0.0);
