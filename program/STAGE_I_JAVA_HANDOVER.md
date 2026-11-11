@@ -57,3 +57,17 @@ Built (`DynamicHedge.backtest` with `half_spread` and `impact`, I-39, I-40): `he
 15 of 15. `HedgeExamplesSmokeTest` runs the 16 `examples/hedge_*_i.json` inputs through the CLI request handler
 and judges each against its golden case; the same 16 return `status: ok` through `java -jar quantforge-cli.jar run`.
 No spec question.
+
+## Rulings I-41 to I-52 applied (2026-11-11)
+
+| Ruling | Java |
+|---|---|
+| I-41 | Changed: `hedge.greeks.neutralise` refuses keys outside an instrument's set, a `quantity` on a hedge and a missing `quantity` on a position (`E_INPUT`); `hedgegreeks_i-0020` passes |
+| I-42 | Checked: an unknown Greek or correlation target is `E_SCHEMA`; `hedgegreeks_i-0021` passes |
+| I-43 | Changed: relative zero tests in `hedge.effectiveness` and the backtest; `hedgebt_i-0016` passes. Closes J-I5 |
+| I-44 | Changed (the Java build also refused any negative hedged variance): `E_NOT_POSITIVE_DEFINITE` only below `-1e-12 S_00`, else 0; `hedgemv_i-0018` passes |
+| I-45, I-46, I-47 | No change: Java already reads the limits, feasibility tolerance and `null` this way. Closes J-I1 to J-I3 |
+| I-48 | Open, see below |
+| I-49 | Added: `E_LIMIT` (key `lot_sizes`) when a relaxed lot count exceeds `2^52` |
+| I-50 | Checked: one order's `fills` above 100,000 is `E_LIMIT` (unit test) |
+| I-51 | Not applied in this lane: `conformance/runner/runner.py` still requires `contract_version` 1.0.0, so a lone move to 1.11.0 stops every conformance run. The change is one constant (`cli.Main.CONTRACT`), to land with the runner in the integration PR, as I-51 says |

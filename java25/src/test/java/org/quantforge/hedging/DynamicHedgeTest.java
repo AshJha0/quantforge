@@ -39,8 +39,8 @@ class DynamicHedgeTest {
         // ends at quantity (V_last - V_0).
         Random rnd = new Random(seed);
         boolean call = rnd.nextBoolean();
-        double k = 80 + 40 * rnd.nextDouble();
         double s = 80 + 40 * rnd.nextDouble();
+        double k = s * (0.95 + 0.1 * rnd.nextDouble()); // near the money, so the final step moves the hedge leg
         double t = 0.2 + rnd.nextDouble();
         double q = 100 * rnd.nextGaussian();
         int m = 4 + rnd.nextInt(20);
@@ -51,8 +51,8 @@ class DynamicHedgeTest {
             spots[i] = s;
         }
         times[m - 1] = t; // exactly at expiry, whatever the rounding of t (m-1)/(m-1)
-        // The hedge leg is zero only in exact arithmetic; in doubles it carries rounding noise, so whether the I-31
-        // zero-variance rule fires here is open (spec question J-I5) and is not asserted.
+        // Ruling I-43: the hedge leg is zero only up to rounding, and the relative test treats it as no variance.
+        assertEquals("E_DOMAIN", code(() -> DynamicHedge.backtest(call, k, t, q, 0, 0, 0.2, times, spots)));
         // Replay by hand with the same marks: cash never earns, shares never pay, rebalances are at the same spot.
         double v0 = DynamicHedge.valueDelta(call, s, k, t, 0, 0, 0.2)[0];
         double vLast = DynamicHedge.valueDelta(call, s, k, 0.0, 0, 0, 0.2)[0];
@@ -82,6 +82,19 @@ class DynamicHedgeTest {
         assertEquals(0.0, b.portfolioValues()[0], 1e-12);
         assertEquals(b.portfolioValues()[3], b.finalPnl(), 0.0);
         assertEquals(3, h.length);
+    }
+
+    @Example
+    void zeroTestsAreRelativeUnderRulingI43() {
+        // A sum that is zero up to rounding, and a series whose variance is rounding noise next to the other's.
+        assertEquals("E_DOMAIN", code(() -> DynamicHedge.effectiveness(new double[] {0.1, 0.2, -0.30000000000000004},
+                new double[] {1, 2, 3})));
+        assertEquals("E_DOMAIN", code(() -> DynamicHedge.effectiveness(new double[] {1, 2, 4},
+                new double[] {1e-15, 2e-15, 0})));
+        assertEquals("E_DOMAIN", code(() -> DynamicHedge.effectiveness(new double[] {1e-15, 2e-15, 1e-15},
+                new double[] {1, 2, 4})));
+        assertEquals(1.0, DynamicHedge.effectiveness(new double[] {1, 2, 4}, new double[] {-1, -2, -4})
+                .regressionR2(), 1e-15);
     }
 
     @Example

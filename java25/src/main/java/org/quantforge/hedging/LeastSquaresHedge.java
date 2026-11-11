@@ -626,6 +626,9 @@ public final class LeastSquaresHedge {
         double[] nc = boundedReduced(hl, cl, identity, new double[n], lo, hi, actLo, actHi, null, 0.0);
         for (int j = 0; j < n; j++) {
             nc[j] = actLo[j] ? lo[j] : actHi[j] ? hi[j] : nc[j];
+            if (Math.abs(nc[j]) > 0x1p52) { // ruling I-49: integers beyond 2^52 are not all representable
+                throw new QfError("E_LIMIT", "a relaxed lot count is above 2^52", "lot_sizes");
+            }
         }
         double contObj = objective(residual(al, b, nc), weights, 0.0, nc) + ridgeTerm(ridge, lotSizes, nc);
         Search s = new Search(al, b, weights, ridge, lotSizes, hl, cl, lo, hi);

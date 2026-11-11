@@ -35,23 +35,15 @@ public final class DynamicHedge {
     public record Backtest(double[] optionValues, double[] shares, double[] portfolioValues, double finalPnl,
             Effectiveness effectiveness, Double tradingCost) {}
 
-    private static boolean constant(double[] v) {
-        for (double x : v) {
-            if (x != v[0]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * {@code hedge.effectiveness} with sample (co)variances over {@code n - 1}.
      *
      * @param item the hedged item's changes {@code x}
      * @param hedge the hedge leg's changes {@code y}
      * @return the four statistics
-     * @throws QfError {@code E_INPUT} for unequal or short series; {@code E_DOMAIN} when {@code sum(x) = 0} or a
-     *     series has zero variance (I-31)
+     * @throws QfError {@code E_INPUT} for unequal or short series; {@code E_DOMAIN} when
+     *     {@code |sum(x)| <= 1e-12 sum|x|}, {@code var(x) <= 1e-20 var(y)} or {@code var(y) <= 1e-20 var(x)}
+     *     (rulings I-31, I-43)
      */
     public static Effectiveness effectiveness(double[] item, double[] hedge) {
         int n = item.length;
@@ -63,18 +55,14 @@ public final class DynamicHedge {
         }
         double sx = 0.0;
         double sy = 0.0;
+        double ax = 0.0;
         for (int i = 0; i < n; i++) {
             sx += item[i];
             sy += hedge[i];
+            ax += Math.abs(item[i]);
         }
-        if (sx == 0.0) {
+        if (Math.abs(sx) <= 1e-12 * ax) { // ruling I-43: relative, so rounding noise counts as zero
             throw new QfError("E_DOMAIN", "the hedged item's changes sum to zero", "item_changes");
-        }
-        if (constant(item)) {
-            throw new QfError("E_DOMAIN", "the hedged item has no variance", "item_changes");
-        }
-        if (constant(hedge)) {
-            throw new QfError("E_DOMAIN", "the hedge has no variance", "hedge_changes");
         }
         double mx = sx / n;
         double my = sy / n;
@@ -94,6 +82,12 @@ public final class DynamicHedge {
         vy /= n - 1;
         cxy /= n - 1;
         vs /= n - 1;
+        if (vx <= 1e-20 * vy) {
+            throw new QfError("E_DOMAIN", "the hedged item has no variance", "item_changes");
+        }
+        if (vy <= 1e-20 * vx) {
+            throw new QfError("E_DOMAIN", "the hedge has no variance", "hedge_changes");
+        }
         return new Effectiveness(-sy / sx, cxy / vx, cxy * cxy / (vx * vy), 1.0 - vs / vx);
     }
 

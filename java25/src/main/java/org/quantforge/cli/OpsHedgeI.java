@@ -208,12 +208,30 @@ final class OpsHedgeI {
                 r.varianceAfter(), "effectiveness", r.effectiveness());
     }
 
-    private static HedgeRatios.Position position(In p, boolean withQuantity) {
-        optional(p, "strike", "expiry_years");
+    /**
+     * Reads a position or hedge instrument. Ruling I-41 fixes the key sets: {@code instrument}, {@code quantity} on a
+     * portfolio position only, and {@code strike} and {@code expiry_years} on options (checked in the core). Any other
+     * key, a {@code quantity} on a hedge or a missing one on a position sets {@code badKeys[0]}, raised as
+     * {@code E_INPUT} after the gate.
+     */
+    private static HedgeRatios.Position position(In p, boolean withQuantity, boolean[] badKeys) {
+        optional(p, "strike", "expiry_years", "quantity");
         HedgeRatios.Instrument kind = p.choice("instrument", HedgeRatios.Instrument.class);
+        for (String k : p.keys()) {
+            boolean known = k.equals("instrument") || k.equals("strike") || k.equals("expiry_years")
+                    || (withQuantity && k.equals("quantity"));
+            badKeys[0] |= !known;
+        }
         Double strike = p.has("strike") ? p.real("strike") : null;
         Double expiry = p.has("expiry_years") ? p.real("expiry_years") : null;
-        double qty = withQuantity ? p.real("quantity") : 0.0;
+        double qty = 0.0;
+        if (withQuantity) {
+            if (p.has("quantity")) {
+                qty = p.real("quantity");
+            } else {
+                badKeys[0] = true;
+            }
+        }
         return new HedgeRatios.Position(kind, strike, expiry, qty);
     }
 
@@ -226,13 +244,14 @@ final class OpsHedgeI {
                 in.real("volatility"));
         List<In> book = in.objects("portfolio");
         List<In> hedgeIn = in.objects("hedges");
+        boolean[] badKeys = new boolean[1];
         List<HedgeRatios.Position> positions = new ArrayList<>();
         for (In p : book) {
-            positions.add(position(p, true));
+            positions.add(position(p, true, badKeys));
         }
         List<HedgeRatios.Position> hedges = new ArrayList<>();
         for (In p : hedgeIn) {
-            hedges.add(position(p, false));
+            hedges.add(position(p, false, badKeys));
         }
         List<HedgeRatios.Greek> targets = new ArrayList<>();
         for (String t : in.strings("targets")) {
@@ -241,6 +260,9 @@ final class OpsHedgeI {
         in.limit(book.size() > MAX_POSITIONS, "portfolio");
         in.limit(hedgeIn.size() > MAX_GREEK_HEDGES, "hedges");
         in.gate();
+        if (badKeys[0]) {
+            throw new QfError("E_INPUT", "an instrument has a key outside its kind's set (ruling I-41)", "portfolio");
+        }
         HedgeRatios.GreekHedge g = HedgeRatios.neutralise(mk, positions, hedges, targets);
         return Operations.out("quantities", g.quantities(), "greeks_before", greekObject(g.before()),
                 "greeks_after", greekObject(g.after()));

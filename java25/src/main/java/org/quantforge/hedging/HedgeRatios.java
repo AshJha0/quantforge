@@ -175,9 +175,10 @@ public final class HedgeRatios {
             hedge[i] = -hedge[i] + 0.0;
         }
         double after = s[0][0] + Dense.dot(she, hedge);
-        if (after < 0.0) {
+        if (after < -1e-12 * s[0][0]) {
             throw new QfError("E_NOT_POSITIVE_DEFINITE", "the hedged variance is negative", "covariance");
         }
+        after = Math.max(after, 0.0); // ruling I-44: a value in [-1e-12 S_00, 0) is rounding
         return new MinVariance(hedge, s[0][0], after, 1.0 - after / s[0][0]);
     }
 

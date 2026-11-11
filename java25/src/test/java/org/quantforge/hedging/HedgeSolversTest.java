@@ -194,6 +194,23 @@ class HedgeSolversTest {
     }
 
     @Test
+    void roundingBelowZeroInTheHedgedVarianceIsZeroUnderRulingI44() {
+        double[][] s = {{1.0, 1.0}, {1.0, 1.0 + 1e-13}};
+        HedgeRatios.MinVariance mv = HedgeRatios.minimumVariance(s);
+        assertEquals(0.0, Math.min(mv.varianceAfter(), 0.0), 0.0);
+        assertEquals("E_NOT_POSITIVE_DEFINITE", code(() -> HedgeRatios.minimumVariance(
+                new double[][] {{1.0, 1.0 + 1e-6}, {1.0 + 1e-6, 1.0}})));
+    }
+
+    @Test
+    void lotCountsAbove2To52AreRefusedUnderRulingI49() {
+        assertEquals("E_LIMIT", code(() -> lots(new double[][] {{1}}, new double[] {-0x1p53}, new double[] {1},
+                null, null)));
+        assertEquals("E_LIMIT", code(() -> lots(new double[][] {{1e-3}}, new double[] {-0x1p50}, new double[] {1},
+                null, null)));
+    }
+
+    @Test
     void minimumVarianceChecks() {
         assertEquals("E_INPUT", code(() -> HedgeRatios.minimumVariance(new double[][] {{1}})));
         assertEquals("E_INPUT", code(() -> HedgeRatios.minimumVariance(new double[][] {{1, 0}, {0}})));
