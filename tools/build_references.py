@@ -56,7 +56,7 @@ def e_rows(text):
     for line in text.splitlines():
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if line.startswith("|") and len(cells) == 4 and cells[0] not in ("Model", "") and not set(cells[0]) <= set("-"):
-            rows.append(f"{cells[1]}. Use: {cells[0]}; {cells[2]}. Status: {cells[3]}")
+            rows.append(f"{cells[1]}. Use: {cells[0]}. {cells[2]}. Status: {cells[3]}")
     return rows
 
 
@@ -107,7 +107,7 @@ def render(found):
            "- **Paywalled** marks an entry the spec calls licensed: a person with access must confirm section or equation numbers.",
            "- DOI and arXiv links are formed from the identifiers the specs give. `tools/check_links.py` checks their HTTP status; "
            "run it by hand, as it needs the network (see `tools/README.md`).", "",
-           f"{n} entries: {unopened} marked not opened, {paid} paywalled or licensed. "
+           f"{n} entries: {unopened} marked Not opened, {paid} marked Paywalled (the spec calls them licensed or paywalled). "
            "Built by `python tools/build_references.py` from `specifications/`; CI fails if this page is out of date.", ""]
     for topic in sorted(by_topic, key=lambda t: (t == "", t)):
         out += [f"## {TOPICS.get(topic, topic)}", ""]
@@ -117,8 +117,10 @@ def render(found):
                 marks.append("**Not opened.**")
             if PAYWALL.search(entry):
                 marks.append("**Paywalled.**")
+            if marks and entry.endswith(" (not opened)"):  # the bold mark already says it
+                entry = entry.removesuffix(" (not opened)")
             refs = ", ".join(f"[`{u.removeprefix('specifications/')}`](../{u})" for u in used)
-            out.append(f"- {' '.join(marks) + ' ' if marks else ''}{linkify(entry)} Cited by {refs}.")
+            out.append(f"- {' '.join(marks) + ' ' if marks else ''}{linkify(entry).rstrip('.')}. Cited by {refs}.")
         out.append("")
     return "\n".join(out)
 
