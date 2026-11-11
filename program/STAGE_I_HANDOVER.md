@@ -260,3 +260,5 @@ What each language must change (run the four suites above again afterwards):
 | I-52 tutorials import `quantforge_core` modules | none | none | none | none |
 
 "check" means the lane's notes did not state its reading, so it runs the new case or confirms the rule. **Correction to the follow-up note's item 2 (Python API):** the tutorials import `quantforge_core` modules, as tutorial 1 does (I-52); `quantforge.hedge.*` in `name-map.json` is a logical name.
+
+MAIN eb251b9 MERGED (2026-11-11, 22:33): origin/main with PR #32 (tutorials 2-16, references, curve status check) merged into stage-i without conflicts; name map, quality gate, hygiene, docs status and the G-50 error-case check all exit 0 on the merged tree.
