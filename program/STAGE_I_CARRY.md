@@ -45,7 +45,7 @@ gh workflow run mutation-stage.yml -R AshJha0/quantforge --ref ci-rust-mutation-
 
 Run 43095428122 ended `startup_failure` with no jobs after about 15 minutes queued; the workflow file parses and the same file started normally on the next dispatch, so the failure is taken as transient on GitHub's side. Re-dispatch (same command): run 43100924809. Its plan job succeeded and all four Rust jobs (bonds, credit, credit_options, exotics) started.
 
-At the deadline (2026-11-11 22:30): run 43100924809 still in progress, all four Rust jobs running (bonds past 70 minutes; before the fix it died at 6). Unverified: no result yet. Open: one green run of the four Rust jobs, then a PR for the branch.
+At the final check (2026-11-11 23:33): run 43100924809 still in progress. All four Rust jobs (bonds, credit, credit_options, exotics; jobs 130792006349, 130792006286, 130792006258, 130792006345) started at 21:11 and are inside `golden_mutants.py` after 140 minutes; none was killed, so the memory cap holds. **Unverified: no result, so no per-module caught, missed or timeout counts and no survivors yet.** Before the fix bonds died at 6 minutes; in stage F it finished in about an hour, so the cap may be turning runaway mutants into slow timeouts. The job limit of 180 minutes falls at 00:11. If a job hits it, `golden_mutants.py` writes its JSON only at the end and the artifact will be empty: then the next adjustment on `ci-rust-mutation-fix` is to pass `--timeout` (cargo-mutants per-mutant limit) and to write partial results as they come. Open: read the run's result, record each module, write kill tests for any survivor (new files under `rust/crates/quantforge-core/tests/`); the branch reaches main through the stage I PR.
 
 ## 3. expsim_g PFE regeneration
 
