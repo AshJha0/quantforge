@@ -53,4 +53,25 @@ class PortfolioExposureTest {
         assertTrue(m.pfe()[2] >= m.pfe()[1] && m.pfe()[1] >= m.pfe()[0] && m.pfe()[0] >= 0.0);
         assertTrue(m.ee() >= 0.0 && m.ene() <= 0.0);
     }
+
+    /** The returned PFE inverts the distribution: P(f <= PFE) = q, including on the narrow top of a long payer. */
+    @Test
+    void pfeInvertsTheDistribution() {
+        double[] pay = new double[20];
+        for (int i = 0; i < 20; i++) {
+            pay[i] = i + 1.0;
+        }
+        List<PortfolioExposure.Swap> s20 = List.of(new PortfolioExposure.Swap(1e7, 0.039, true, 0.0, pay));
+        for (double[] as : new double[][] {{0.03, 0.005}, {0.10, 0.015}}) {
+            for (double t : new double[] {5.0, 17.0, 19.0}) {
+                PortfolioExposure.Point pt = PortfolioExposure.point(CURVE, as[0], as[1], s20, t, Q);
+                for (int j = 0; j < Q.length; j++) {
+                    if (pt.pfe()[j] > 0.0) {
+                        double pr = PortfolioExposure.probabilityAtMost(CURVE, as[0], as[1], s20, t, pt.pfe()[j]);
+                        assertEquals(Q[j], pr, 1e-9, "t=" + t + " q=" + Q[j]);
+                    }
+                }
+            }
+        }
+    }
 }

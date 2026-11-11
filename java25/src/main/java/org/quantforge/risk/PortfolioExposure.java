@@ -32,7 +32,7 @@ public final class PortfolioExposure {
      */
     public record Point(double ee, double ene, double[] pfe) {}
 
-    private static final int GRID = 600;
+    private static final int GRID = 600; // breakpoint scan uses 10 x GRID steps
     private static final double SPAN = 12.0;
     private static final int GL_N = 20;
     private static final double[] GL_X = new double[GL_N];
@@ -103,6 +103,18 @@ public final class PortfolioExposure {
             }
         }
 
+        /** {@code f'(x)}, analytic. */
+        double slope(double x) {
+            double g = constant;
+            double dg = 0.0;
+            for (double[] c : coef) {
+                double e = c[0] * Math.exp(-c[1] * x - c[2]);
+                g += e;
+                dg -= c[1] * e;
+            }
+            return pt * Math.exp(-ht * x - ht * ht * zt / 2.0) * (dg - ht * g);
+        }
+
         double value(double x) {
             double v = constant;
             for (double[] c : coef) {
@@ -137,16 +149,61 @@ public final class PortfolioExposure {
         return 0.5 * (x0 + x1);
     }
 
-    /** Roots of {@code f - y} on the scan grid, as the specification's reference does. */
-    private static List<Double> crossings(Deflated f, double[] xs, double[] vs, double y, boolean exactZero) {
+    /**
+     * The breakpoints of {@code f} on {@code [-12 sd, 12 sd]}: the ends and every critical point, found as sign
+     * changes of the analytic {@code f'} on a 6,000-point scan refined by bisection. Between two consecutive
+     * breakpoints {@code f} is monotone, so {@code f - y} has at most one root there and no level set can be
+     * missed, however narrow (the scan only has to separate critical points, which are spaced on the scale of sd).
+     */
+    private static double[] breakpoints(Deflated f, double sd) {
+        int n = 10 * GRID;
+        List<Double> b = new ArrayList<>();
+        double x0 = -SPAN * sd;
+        b.add(x0);
+        double d0 = f.slope(x0);
+        for (int i = 1; i <= n; i++) {
+            double x1 = sd * (-SPAN + 2.0 * SPAN * i / n);
+            double d1 = f.slope(x1);
+            if (d0 * d1 < 0.0) {
+                double lo = x0;
+                double hi = x1;
+                double dl = d0;
+                for (int it = 0; it < 200; it++) {
+                    double m = 0.5 * (lo + hi);
+                    if (m == lo || m == hi) {
+                        break;
+                    }
+                    double dm = f.slope(m);
+                    if ((dm < 0.0) == (dl < 0.0)) {
+                        lo = m;
+                        dl = dm;
+                    } else {
+                        hi = m;
+                    }
+                }
+                b.add(0.5 * (lo + hi));
+            }
+            x0 = x1;
+            d0 = d1;
+        }
+        b.add(SPAN * sd);
+        double[] out = new double[b.size()];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = b.get(i);
+        }
+        return out;
+    }
+
+    /** Roots of {@code f - y}: at most one per monotone piece between breakpoints. */
+    private static List<Double> crossings(Deflated f, double[] bp, double[] bv, double y) {
         List<Double> z = new ArrayList<>();
-        for (int i = 0; i < GRID; i++) {
-            double v0 = vs[i] - y;
-            double v1 = vs[i + 1] - y;
-            if (exactZero && v0 == 0.0) {
-                z.add(xs[i]);
+        for (int i = 0; i + 1 < bp.length; i++) {
+            double v0 = bv[i] - y;
+            double v1 = bv[i + 1] - y;
+            if (v0 == 0.0) {
+                z.add(bp[i]);
             } else if (v0 * v1 < 0.0) {
-                z.add(root(f, y, xs[i], xs[i + 1]));
+                z.add(root(f, y, bp[i], bp[i + 1]));
             }
         }
         return z;
@@ -169,20 +226,43 @@ public final class PortfolioExposure {
         return sum * norm;
     }
 
-    private static double cdf(Deflated f, double[] xs, double[] vs, double y, double sd) {
+    private static double cdf(Deflated f, double[] bp, double[] bv, double y, double sd) {
         List<Double> pts = new ArrayList<>();
-        pts.add(xs[0]);
-        pts.addAll(crossings(f, xs, vs, y, false));
-        pts.add(xs[GRID]);
+        pts.add(bp[0]);
+        pts.addAll(crossings(f, bp, bv, y));
+        pts.add(bp[bp.length - 1]);
         double p = 0.0;
         for (int i = 0; i + 1 < pts.size(); i++) {
             double a = pts.get(i);
             double b = pts.get(i + 1);
-            if (f.value(0.5 * (a + b)) - y <= 0.0) {
+            if (b > a && f.value(0.5 * (a + b)) - y <= 0.0) {
                 p += Normal.cdf(b / sd) - Normal.cdf(a / sd);
             }
         }
         return p;
+    }
+
+    /**
+     * {@code P(f(x) <= y)} under the LGM measure at reset date {@code t}: the distribution the PFE inverts.
+     *
+     * @param curve the curve
+     * @param a mean reversion
+     * @param sigma volatility
+     * @param trades the netting set
+     * @param t the reset date
+     * @param y the level
+     * @return the probability
+     */
+    public static double probabilityAtMost(ShortRate.Curve curve, double a, double sigma, List<Swap> trades, double t,
+                                           double y) {
+        Deflated f = new Deflated(curve, a, sigma, trades, t);
+        double sd = Math.sqrt(f.zt);
+        double[] bp = breakpoints(f, sd);
+        double[] bv = new double[bp.length];
+        for (int i = 0; i < bp.length; i++) {
+            bv[i] = f.value(bp[i]);
+        }
+        return cdf(f, bp, bv, y, sd);
     }
 
     /**
@@ -199,18 +279,23 @@ public final class PortfolioExposure {
     public static Point point(ShortRate.Curve curve, double a, double sigma, List<Swap> trades, double t, double[] q) {
         Deflated f = new Deflated(curve, a, sigma, trades, t);
         double sd = Math.sqrt(f.zt);
-        double[] xs = new double[GRID + 1];
-        double[] vs = new double[GRID + 1];
+        double[] bp = breakpoints(f, sd);
+        double[] bv = new double[bp.length];
         double vmax = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i <= GRID; i++) {
-            xs[i] = sd * (-SPAN + 2.0 * SPAN * i / GRID);
-            vs[i] = f.value(xs[i]);
-            vmax = Math.max(vmax, vs[i]);
+        for (int i = 0; i < bp.length; i++) {
+            bv[i] = f.value(bp[i]);
+            vmax = Math.max(vmax, bv[i]);
         }
         List<Double> pts = new ArrayList<>();
-        pts.add(xs[0]);
-        pts.addAll(crossings(f, xs, vs, 0.0, true));
-        pts.add(xs[GRID]);
+        pts.add(bp[0]);
+        for (int i = 0; i + 1 < bp.length; i++) {
+            if (bv[i] == 0.0 && i > 0) {
+                pts.add(bp[i]);
+            } else if (bv[i] * bv[i + 1] < 0.0) {
+                pts.add(root(f, 0.0, bp[i], bp[i + 1]));
+            }
+        }
+        pts.add(bp[bp.length - 1]);
         double ee = 0.0;
         double ene = 0.0;
         for (int i = 0; i + 1 < pts.size(); i++) {
@@ -227,7 +312,7 @@ public final class PortfolioExposure {
             }
         }
         double[] pfe = new double[q.length];
-        double c0 = cdf(f, xs, vs, 0.0, sd);
+        double c0 = cdf(f, bp, bv, 0.0, sd);
         for (int j = 0; j < q.length; j++) {
             if (c0 >= q[j]) {
                 continue;
@@ -236,7 +321,7 @@ public final class PortfolioExposure {
             double hi = vmax;
             for (int it = 0; it < 200; it++) {
                 double mid = 0.5 * (lo + hi);
-                if (cdf(f, xs, vs, mid, sd) >= q[j]) {
+                if (cdf(f, bp, bv, mid, sd) >= q[j]) {
                     hi = mid;
                 } else {
                     lo = mid;
