@@ -103,3 +103,4 @@ Each prints the four lines shown in step 1, digit for digit. That is the project
 - Change `"LOG_LINEAR_DF"` to `"LINEAR_ZERO"`. The curve still reprices every quote, but discount factors between pillars change.
 - Print `key_rates`: the DV01 split by quote.
 - Read [LEARN](../../LEARN.md#curves-and-fixed-income) for why bootstrapping works, and the [Cookbook](../../COOKBOOK.md) for the other operations.
+- Go on to [Tutorial 2: bonds and repo](tutorial-2-bonds-repo.md), which prices a bond off this curve, or pick any tutorial from the [series](README.md).

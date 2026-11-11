@@ -8,7 +8,7 @@ QuantForge has four equal implementations of the same maths, in Java, C++, Pytho
 
 Two ways in:
 
-- **New to quantitative finance, or to this project.** Do [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md) first: quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Then read the topics below in order.
+- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 7 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models and counterparty risk, with every number checked in all four languages. Then read the topics below in order.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
 Each result below is real output from the CLIs, on the date each section gives. Unless a section says otherwise, Java, C++, Python and Rust printed the same value.

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Tutorials 2 to 7 (`docs/getting-started/`): bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, with a [Tutorials](docs/getting-started/README.md) index and site navigation entry. Each runs one script in `examples/tutorials/` against all four builds; every printed number is checked in CI in Python, Rust, Java and C++.
+- `tools/check_tutorial.py` checks every `tutorial-*.md` page by default, and checks that a script listed on a page equals the file (`tutorial:source`). `tutorial.yml` runs all pages and watches the new paths.
+- GLOSSARY: a section of tutorial terms.
+
 ## 0.7.0: stage G, rates models and xVA (unreleased)
 
 Not yet tagged. Stage G is at Implemented, not Validated. No golden value of an earlier stage changed.

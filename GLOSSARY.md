@@ -171,3 +171,28 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at mer
 | SIMM | ISDA's standard initial-margin model; here a SIMM-style IR delta only (`xva.simm.ir_delta`) |
 | Wrong-way risk | Exposure that grows when the counterparty is more likely to default |
 | BGK correction | Broadie, Glasserman and Kou's barrier shift `exp(0.5826 sigma sqrt(dt))`, which turns a continuous barrier formula into a discrete one (ruling G-7) |
+
+## Tutorial terms
+
+Terms the [tutorials](docs/getting-started/README.md) use that the stage sections above do not define.
+
+| Term | Meaning |
+|---|---|
+| Accrued interest | The share of the current coupon earned by the seller of a bond since the last coupon date; here ACT/ACT ICMA (`04-pricing/bonds.md`) |
+| Clean price, dirty price | The quoted bond price without accrued interest, and the price actually paid, with it |
+| Yield to maturity | The single rate that, used to discount every cash flow of a bond, gives back its price; here compounded at the coupon frequency |
+| Macaulay duration | The present-value-weighted average time to a bond's cash flows, in years |
+| Modified duration | Macaulay duration times `1/(1 + y/f)`: the fall in price, as a fraction of price, per unit rise in yield |
+| Convexity | The second derivative of price with respect to yield, divided by price |
+| Carry | What holding a position earns or costs over time, such as a bond's coupon less its repo financing |
+| Implied repo rate | The repo rate that links a bond's spot and forward prices |
+| Black-Scholes model | Lognormal stock with constant volatility, rate and dividend yield; gives closed-form European option prices |
+| Survival probability | The probability that a borrower has not defaulted by a date |
+| Recovery rate | The fraction of the notional recovered after a default |
+| Risky annuity (RPV01) | The value of 1 a year paid until maturity or default, whichever is first |
+| Upfront | The amount paid at the start of a standard CDS because its fixed coupon differs from the par spread |
+| Bump and revalue | A sensitivity found by repricing with one input moved up and down |
+| AAD | Adjoint (reverse-mode) algorithmic differentiation: every sensitivity of a price from one backward pass through the pricing code |
+| Backtest | Counting how often realised losses exceeded VaR, and testing that count (Kupiec, Christoffersen, traffic light) |
+| Mean reversion | In a short-rate model, the speed `a` at which the rate is pulled back toward its drift; shocks halve in about `ln 2 / a` years |
+| CSA, threshold, minimum transfer amount | A collateral agreement; the exposure left uncollateralised; the smallest collateral call that is made |

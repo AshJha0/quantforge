@@ -62,7 +62,7 @@ It cannot show tradable profitability. That needs instrument-level prices, bid a
 | `.github/` | CI and issue templates |
 
 ### Start here
-1. [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md), about 10 minutes from clone to a priced swap and its DV01. Then `LEARN.md` for the maths by topic, `COOKBOOK.md` for commands.
+1. [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md), about 10 minutes from clone to a priced swap and its DV01; then the [tutorial series](docs/getting-started/README.md) on bonds, options, credit, risk, rates models and counterparty risk. Then `LEARN.md` for the maths by topic, `COOKBOOK.md` for commands.
 2. `ARCHITECTURE.md`, then the ADRs in `architecture/decisions/`, and [determinism](docs/determinism.md) for what is bit-exact and what is within tolerance.
 3. `ROADMAP.md` for the stages, `GLOSSARY.md` for terms.
 4. [Curves gallery](docs/curves/README.md): every implemented curve, with charts from real CLI runs on synthetic inputs.

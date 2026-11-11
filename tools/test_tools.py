@@ -847,10 +847,18 @@ class DoctorAndQuickstart(unittest.TestCase):
     def test_tutorial_has_a_block_per_language_and_one_expected_output(self):
         sys.path.insert(0, str(ROOT / "tools"))
         import check_tutorial
-        runs, expected = check_tutorial.blocks(check_tutorial.PAGE.read_text(encoding="utf-8"))
-        self.assertEqual(set(runs), {"python", "rust", "java", "cpp"})
-        self.assertEqual(runs["python"][0], "python")
-        self.assertEqual(len(expected), 4)
+        self.assertGreaterEqual(len(check_tutorial.PAGES), 7)
+        for page in check_tutorial.PAGES:
+            text = page.read_text(encoding="utf-8")
+            runs, expected = check_tutorial.blocks(text)
+            self.assertEqual(set(runs), {"python", "rust", "java", "cpp"}, page.name)
+            self.assertGreaterEqual(len(expected), 4, page.name)
+            self.assertEqual(check_tutorial.sources(text), [], page.name)  # listings equal their scripts
+        first = check_tutorial.PAGES[0]
+        self.assertEqual(first.name, "tutorial-1-swap.md")
+        self.assertEqual(check_tutorial.blocks(first.read_text(encoding="utf-8"))[0]["python"][0], "python")
+        stale = "<!-- tutorial:source examples/tutorial_swap.py -->\n```python\nprint(1)\n```"
+        self.assertEqual(check_tutorial.sources(stale), ["examples/tutorial_swap.py"])
         with self.assertRaises(ValueError):
             check_tutorial.blocks("no markers")
 

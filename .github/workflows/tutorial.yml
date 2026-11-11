@@ -1,11 +1,13 @@
 name: Tutorial
-# Runs every code block of docs/getting-started/tutorial-1-swap.md on a fresh runner, one job per language,
-# and fails if a block prints anything other than the lines the page shows (plan 13.2 E2). The acceptance
-# test is under 10 minutes per language from a cold start, so the jobs use no build cache.
+# Runs every code block of the tutorials (docs/getting-started/tutorial-*.md) on a fresh runner, one job per
+# language, and fails if a block prints anything other than the lines a page shows (plan 13.2 E2). Page 1 builds
+# each CLI and pages 2 to 7 reuse it. Tutorial 1's acceptance test is under 10 minutes per language from a cold
+# start, so the jobs use no build cache; the timeout allows for the six later pages.
 on:
   push:
     branches: [main]
-    paths: ['docs/getting-started/tutorial-1-swap.md', 'examples/tutorial_swap.py', 'tools/check_tutorial.py',
+    paths: ['docs/getting-started/tutorial-*.md', 'examples/tutorial_swap.py', 'examples/tutorials/**',
+            'datasets/golden/stage_f/risk_f4.json', 'tools/check_tutorial.py',
             'python/**', 'rust/**', 'java25/**', 'cpp26/**', '.github/workflows/tutorial.yml']
   pull_request:
   workflow_dispatch:
@@ -17,7 +19,7 @@ concurrency:
 jobs:
   python:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -26,7 +28,7 @@ jobs:
       - run: python3 tools/check_tutorial.py --lang python
   rust:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -34,7 +36,7 @@ jobs:
       - run: python3 tools/check_tutorial.py --lang rust
   java:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -47,7 +49,7 @@ jobs:
   cpp:
     runs-on: ubuntu-24.04
     container: gcc:16.2@sha256:9af8c7003ad451f09496c7182f320c58554e10ec080e7038e0aa5e41146c916b
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

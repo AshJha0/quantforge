@@ -2,7 +2,19 @@
 
 Short recipes. Commands run from the repository root, in Git Bash or a Unix shell. `python` means any Python 3.12 or later, because the neutral tools use only the standard library.
 
-New here? [Tutorial 1](docs/getting-started/tutorial-1-swap.md) builds a curve, prices a swap and takes its DV01 in each language. `python tools/check_tutorial.py --lang rust` runs its blocks and checks the output.
+New here? [Tutorial 1](docs/getting-started/tutorial-1-swap.md) builds a curve, prices a swap and takes its DV01 in each language; the [tutorial series](docs/getting-started/README.md) goes on to bonds and repo, options, credit, risk, rates models and counterparty risk. `python tools/check_tutorial.py --lang rust` runs the blocks of every tutorial and checks the output.
+
+## Run a tutorial script
+
+Tutorials 2 to 7 each have a script in `examples/tutorials/` that sends its operations to any build: Python in process with no argument, or another build's CLI.
+
+```bash
+uv run --project python python examples/tutorials/t2_bonds.py                  # Python
+python examples/tutorials/t5_risk.py rust/target/release/quantforge            # Rust
+python examples/tutorials/t6_hull_white.py java -jar java25/target/quantforge-cli.jar
+python examples/tutorials/t7_counterparty.py cpp26/build/quantforge
+python tools/check_tutorial.py --lang cpp --page docs/getting-started/tutorial-4-credit.md
+```
 
 ## Build each CLI
 
