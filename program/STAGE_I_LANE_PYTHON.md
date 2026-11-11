@@ -51,3 +51,15 @@ size of 20 instruments with K = 20 that is about a million small solves, correct
 `python/quantforge_core/slippage.py`, plain arithmetic in correctly rounded sums; `average_price`
 is `null` with no fills (I-37); I-38 sizes in `cli/limits.py`. Conformance `hedgeslip_i` 12 of 12;
 stage I total 263 of 263. Tests in `python/tests/test_slippage.py`. SPEC_QUESTIONS: none.
+
+## Wave 4e (costs in the backtest) and the follow-up note on tutorial inputs
+
+`dynamic_hedge.backtest_delta` takes `half_spread` and `impact` (I-39); `trading_cost` only with a
+cost input (I-40). Conformance `hedgebtcost_i` 8 of 8 with `hedgebt_i` unchanged; stage I total
+271 of 271. Follow-up note: `python/tests/test_examples_stage_i.py` runs all sixteen
+`examples/hedge_*_i.json` through `quantforge batch` and checks status ok, inputs equal to the
+named golden case, and the golden outputs. Every stage I operation answers through `run` and
+`batch`. Python API names: the functions carry the name-map names (`qp_solve`,
+`greeks_neutralise`, `credit_cds`, ...) inside `quantforge_core` modules, as every earlier stage
+does; there is no `quantforge.hedge` package path. Open item for the tutorial owner: whether the
+Python step imports `quantforge_core.hedge_solvers` etc., or a `quantforge.hedge` facade is wanted.

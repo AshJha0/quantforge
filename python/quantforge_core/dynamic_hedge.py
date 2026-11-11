@@ -64,12 +64,15 @@ def _value_delta(kind: str, spot: float, strike: float, tau: float, rate: float,
 
 def backtest_delta(option_type: str, strike: float, expiry_years: float, quantity: float,
                    rate: float, dividend_yield: float, hedge_volatility: float,
-                   times: Floats, spots: Floats) -> dict[str, Any]:
+                   times: Floats, spots: Floats, half_spread: float | None = None,
+                   impact: float | None = None) -> dict[str, Any]:
     """`hedge.backtest.delta`: replays a self-financing delta hedge of `quantity` European
-    options along a given path (I-29) and reports the effectiveness of the hedge leg.
+    options along a given path (I-29) and reports the effectiveness of the hedge leg. With
+    `half_spread` or `impact`, every share trade costs `half_spread |dq| + impact dq^2`, paid
+    from cash: the initial purchase at t_0 and each rebalance after that date's mark (I-39).
 
-    Returns {option_values, shares, portfolio_values, final_pnl} and the `hedge.effectiveness`
-    outputs."""
+    Returns {option_values, shares, portfolio_values, final_pnl}, the `hedge.effectiveness`
+    outputs, and `trading_cost` (the undiscounted sum of costs) when a cost input is given."""
     m = len(times)
     if len(spots) != m:
         raise QfError("E_INPUT", "times and spots differ in length", "spots")
@@ -87,25 +90,40 @@ def backtest_delta(option_type: str, strike: float, expiry_years: float, quantit
                     ("hedge_volatility", hedge_volatility)):
         if v <= 0:
             raise QfError("E_DOMAIN", f"{name} must be positive", name)
+    for name, amount in (("half_spread", half_spread), ("impact", impact)):
+        if amount is not None and amount < 0:
+            raise QfError("E_DOMAIN", f"{name} must not be negative", name)
+    spread, linear = half_spread or 0.0, impact or 0.0
+    paid: list[float] = []
+
+    def cost(dq: float) -> float:
+        c = spread * abs(dq) + linear * dq * dq
+        paid.append(c)
+        return c
 
     marks = [_value_delta(option_type, s, strike, expiry_years - t, rate, dividend_yield,
                           hedge_volatility) for t, s in zip(times, spots)]
     values = [v for v, _ in marks]
     shares = [-quantity * marks[i][1] for i in range(m - 1)]
     cash = -quantity * values[0] - shares[0] * spots[0]
-    portfolio = [0.0]
+    cash -= cost(shares[0])
+    portfolio = [quantity * values[0] + shares[0] * spots[0] + cash]
     for i in range(m - 1):
         dt = times[i + 1] - times[i]
         cash = cash * math.exp(rate * dt) + shares[i] * spots[i] * math.expm1(dividend_yield * dt)
         portfolio.append(quantity * values[i + 1] + shares[i] * spots[i + 1] + cash)
         if i + 1 < m - 1:
             cash -= (shares[i + 1] - shares[i]) * spots[i + 1]
+            cash -= cost(shares[i + 1] - shares[i])
     item = [quantity * (values[i + 1] - values[i]) for i in range(m - 1)]
     hedge = [(portfolio[i + 1] - portfolio[i]) - item[i] for i in range(m - 1)]
     stats = effectiveness(item, hedge)
-    return {"option_values": values, "shares": [v + 0.0 for v in shares],
-            "portfolio_values": [v + 0.0 for v in portfolio], "final_pnl": portfolio[-1] + 0.0,
-            **stats}
+    out: dict[str, Any] = {"option_values": values, "shares": [v + 0.0 for v in shares],
+           "portfolio_values": [v + 0.0 for v in portfolio], "final_pnl": portfolio[-1] + 0.0,
+           **stats}
+    if half_spread is not None or impact is not None:
+        out["trading_cost"] = math.fsum(paid) + 0.0
+    return out
 
 
 guard(globals())

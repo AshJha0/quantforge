@@ -185,7 +185,7 @@ def hedge_backtest_delta(i: Inputs) -> Any:
     args = (option.enum("type", ("CALL", "PUT")), option.real("strike"),
             option.real("expiry_years"), i.real("quantity"), i.real("rate"),
             i.real("dividend_yield"), i.real("hedge_volatility"), i.reals("times"),
-            i.reals("spots"))
+            i.reals("spots"), i.opt_real("half_spread"), i.opt_real("impact"))
     return core.dynamic_hedge.backtest_delta(*args)
 
 

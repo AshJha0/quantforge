@@ -222,3 +222,39 @@ def test_selection_cli_and_limit() -> None:
         with pytest.raises(QfError) as caught:
             execute("hedge.select.solve", {**inputs, **extra})
         assert caught.value.code == expected
+
+
+# ----- wave 4e: costs in the backtest (rulings I-39, I-40) -----
+
+def test_zero_costs_equal_the_cost_free_replay() -> None:
+    plain = run()
+    costed = run(half_spread=0.0, impact=0.0)
+    assert costed.pop("trading_cost") == 0.0
+    assert costed == plain
+    assert "trading_cost" not in plain
+
+
+def test_costs_are_paid_on_every_trade_including_the_first() -> None:
+    out = run(half_spread=0.02, impact=0.001)
+    shares = out["shares"]
+    trades = [shares[0], *(b - a for a, b in itertools.pairwise(shares))]
+    expected = math.fsum(0.02 * abs(dq) + 0.001 * dq * dq for dq in trades)
+    assert out["trading_cost"] == pytest.approx(expected, rel=1e-13)
+    assert out["portfolio_values"][0] == pytest.approx(-(0.02 * abs(shares[0])
+                                                         + 0.001 * shares[0] ** 2), rel=1e-13)
+    plain = run()
+    # Costs leave the cash account and earn interest, so the P&L falls by a bit more than the sum.
+    assert plain["final_pnl"] - out["final_pnl"] >= out["trading_cost"]
+
+
+def test_weekly_rebalancing_pays_less_than_daily() -> None:
+    weekly = list(range(0, 31, 7)) + [30]
+    daily = run(half_spread=0.02)
+    week = run(half_spread=0.02, times=[TIMES[k] for k in weekly],
+               spots=[SPOTS[k] for k in weekly])
+    assert week["trading_cost"] < daily["trading_cost"]
+
+
+@pytest.mark.parametrize("change", [{"half_spread": -0.01}, {"impact": -1.0}])
+def test_negative_costs_are_refused(change: dict[str, float]) -> None:
+    assert code(run, **change) == "E_DOMAIN"
