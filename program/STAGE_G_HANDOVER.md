@@ -235,3 +235,8 @@ Read: `specifications/04-pricing/lmm.md`; ruling G-22; cli-contract block "Stage
 ## WAVE 3c READY (2026-11-11): simulated LMM, acceptance only
 
 Read: `specifications/04-pricing/lmm.md`, section "Simulated LMM"; rulings G-25, G-26. No new operation and no goldens: each language implements the terminal-measure simulation as a library function and adds the caplet acceptance (6 caplets within 3 SE of `lmmcap_g`) as a property test. Python reference run passes (`oracle/LMM_ACCEPTANCE.json`). Rebonato error versus simulation 0.4-0.5% (evidence only). Outside share unchanged: 258 of 405 = 63.7%.
+
+## R5 audit fixes (2026-11-11)
+
+### H1, outside count (ruling G-27)
+Recounted against QuantLib's own `JamshidianSwaptionEngine` at 3e-7 relative: `swaption_g` 26/40 (was 33), `swaption_affine_g` 36/39, `exposure_g` 6/15 (was 7); the semi-annual cases cannot be written as whole-day QuantLib dates. **Honest stage G share: 250 of 405 = 61.7%.** Under the strictest reading (Rebonato `lmmswn_g` not counted): 214 of 405 = 52.8%; that reading is open for the owner (G-27).
