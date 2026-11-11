@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 import pytest
-from hypothesis import given, settings
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from quantforge_core import dynamic_hedge as dh
@@ -35,6 +35,7 @@ def test_property_perfect_offset() -> None:
 @settings(max_examples=50, deadline=None)
 @given(st.lists(st.tuples(st.integers(-100, 100), st.integers(-100, 100)), min_size=3,
                 max_size=30))
+@example(pairs=[(0, 1), (0, 1), (1, 1)])  # a constant hedge leg: I-43 E_DOMAIN
 def test_effectiveness_matches_numpy(pairs: list[tuple[int, int]]) -> None:
     x = [p / 10 for p, _ in pairs]
     y = [q / 10 for _, q in pairs]
@@ -42,7 +43,9 @@ def test_effectiveness_matches_numpy(pairs: list[tuple[int, int]]) -> None:
         out = dh.effectiveness(x, y)
     except QfError as err:
         assert err.code == "E_DOMAIN"
-        assert math.fsum(x) == 0 or np.var(x) == 0 or np.var(y) == 0
+        vx, vy = float(np.var(x, ddof=1)), float(np.var(y, ddof=1))  # ruling I-43
+        assert (abs(math.fsum(x)) <= 1e-12 * math.fsum(map(abs, x))
+                or vx <= 1e-20 * vy or vy <= 1e-20 * vx)
         return
     cov = np.cov(x, y, ddof=1)
     assert out["regression_slope"] == pytest.approx(cov[0, 1] / cov[0, 0], rel=1e-9, abs=1e-12)
