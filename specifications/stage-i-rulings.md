@@ -59,6 +59,29 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-31 | Effectiveness domain | `sum(item changes) = 0`, or a series with zero sample variance, is `E_DOMAIN`; a backtest with `quantity = 0` therefore fails there. Sample (co)variances use `n - 1` |
 | I-32 | `E_LIMIT` sizes, wave 4b | Path and series length 100,000 |
 
+## Wave 4c, instrument selection
+
+| # | Point | Ruling |
+|---|---|---|
+| I-33 | Selection inputs | `hedge.select.solve` takes the `hedge.qp.solve` inputs without equalities or a singular policy (`E_INPUT` if present), and every bound must admit 0 (`E_DOMAIN`). The full problem must be regular (I-3) |
+| I-34 | Selection rule | The least objective over all subsets of at most `K` instruments. Ties within `1e-12` relative go to the smaller subset, then to the lexicographically smaller index list. Indices are 0-based |
+| I-35 | `E_LIMIT` size, wave 4c | 20 instruments |
+
+## Wave 4d, hedge slippage
+
+| # | Point | Ruling |
+|---|---|---|
+| I-36 | Slippage definition | `execution_cost = sum q (p - d)` against the decision price; `opportunity_cost = (Q - q_f)(final_price - d)`; `model_cost` is the wave 4a model on the filled size; `slippage = execution_cost - model_cost` |
+| I-37 | `null` average price | `average_price` is `null` for an order with no fills; this extends I-12's list of places where `null` is legal |
+| I-38 | `E_LIMIT` sizes, wave 4d | 10,000 orders; 1,000,000 fills in total |
+
+## Wave 4e, costs in the backtest
+
+| # | Point | Ruling |
+|---|---|---|
+| I-39 | Backtest costs | Optional `half_spread` and `impact` charge `half_spread |dq| + impact dq^2` on every share trade: the initial `h_0` at `t_0` (so `Pi_0 = -cost(h_0)`), and each rebalance after that date's `Pi` is recorded. No unwind at the end. Without the inputs the wave 4b result is unchanged (I-13 pattern) |
+| I-40 | `trading_cost` output | The undiscounted sum of the costs paid, present only when a cost input is given |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).

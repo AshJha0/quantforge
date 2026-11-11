@@ -666,7 +666,8 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** scipy 1.18 `lsq_linear` (BVLS) and `minimize` (SLSQP) on the same problems.
 - **Monitoring thresholds:** a KKT residual above 1e-8 of the gradient scale, or a hedge effectiveness below the desk's floor on the dynamic backtest (later wave).
-- **Data lineage hash:** sha256 0a45713450573d2bbf6f9f363269f572b86cd577033258c3fd82ad123c512f8e (`hedgeqp_i`); 9bc649595e8d405bcc674db12af9ecd75294ccf5f1d624aaaf54e8a3a9936c4f (`hedgeint_i`); dc2e13e50a06fe8ff698d6bc1f0172f0b33374c5d07280568564c88bb333e61c (`hedgemv_i`); 93217e152d7a649c2e2b95622ed852c1ec24e9a14cfbc47780b8aa52a2cb30e3 (`hedgegreeks_i`); 03f02bc3a95fcc215d27d652df70d66ed2642abe33439e7bef198fcd31b7e87e (`hedgebeta_i`); 2531eeb9dc4eddd57cf4d9dfb6c577ffb62bb583487d1b40845b0731762d1794 (`hedgeres_i`)
+- **Data lineage hash:** sha256 0a45713450573d2bbf6f9f363269f572b86cd577033258c3fd82ad123c512f8e (`hedgeqp_i`); 614a31e2a14f99f71332d712e50a883a2fce4dd00ade9edd232009c28aae93cc (`hedgeint_i`); dc2e13e50a06fe8ff698d6bc1f0172f0b33374c5d07280568564c88bb333e61c (`hedgemv_i`); 93217e152d7a649c2e2b95622ed852c1ec24e9a14cfbc47780b8aa52a2cb30e3 (`hedgegreeks_i`); 03f02bc3a95fcc215d27d652df70d66ed2642abe33439e7bef198fcd31b7e87e (`hedgebeta_i`); 2531eeb9dc4eddd57cf4d9dfb6c577ffb62bb583487d1b40845b0731762d1794 (`hedgeres_i`)
+- **Lineage regenerated 2026-11-11:** `hedgeint_i` hash refreshed after a second check (a wide-box float search with the I-7 tie rule) was added to its `verified_by` lists; no value or error code changed.
 - **Retirement trigger:** a hedge that needs costs or non-convex constraints the solver cannot express.
 - **Validation report:** `specifications/08-hedging/hedge-solvers.md`.
 
@@ -714,9 +715,33 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** QuantLib 1.44 values on each date with the same cash arithmetic; numpy regression.
 - **Monitoring thresholds:** a live hedge's regression R² below 0.8 or dollar offset outside [0.8, 1.25] over a quarter.
-- **Data lineage hash:** sha256 6369d73df9b153ef8621b0bcf4978eb3dede5889b93baa4da4361888aad3735f (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`)
+- **Data lineage hash:** sha256 6369d73df9b153ef8621b0bcf4978eb3dede5889b93baa4da4361888aad3735f (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`); 4d8d4cf5d70a3dbd497fe4678a656409b137d1be9303d054ecc3750ff1dbbbb8 (`hedgebtcost_i`, wave 4e: costs in the backtest)
 - **Retirement trigger:** a need for cost-aware rebalancing or stochastic-volatility hedging.
 - **Validation report:** `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`.
+
+### MI-6 Instrument selection (stage I wave 4c)
+- **Purpose:** the best weighted least-squares hedge using at most K of n instruments.
+- **Inputs:** the `hedge.qp.solve` inputs without equalities, and K.
+- **Limitations:** exhaustive search, at most 20 instruments; no fixed cost per instrument; bounds must admit zero.
+- **Validation:** 50-digit solve of every subset; scipy per-subset outside check (10 of 17); greedy counterexample pinned. **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** the same enumeration with scipy solvers.
+- **Monitoring thresholds:** a selected hedge whose residual risk exceeds the full hedge's by more than the desk's tolerance.
+- **Data lineage hash:** sha256 00bfcdd41645756679f850673b867f1c04871e3e7e76b08fc05ca5c76b59731d (`hedgeselect_i`)
+- **Retirement trigger:** universes above 20 instruments or fixed costs per instrument.
+- **Validation report:** `specifications/08-hedging/instrument-selection.md`.
+
+### MI-7 Hedge slippage report (stage I wave 4d)
+- **Purpose:** implementation shortfall of executed hedge orders (execution and opportunity cost) and slippage against the wave 4a cost model.
+- **Inputs:** orders with decision and final prices, cost-model parameters and fills.
+- **Limitations:** one decision-price benchmark; fees not separated; no estimation across many hedges.
+- **Validation:** exact rational arithmetic with the shortfall and slippage identities asserted; no outside library (0 of 12). **Review:** 2026-11-11.
+- **Tier:** 3.
+- **Challenger:** none; the identities are the check.
+- **Monitoring thresholds:** mean slippage over a month above zero by more than two standard errors (the cost model is optimistic).
+- **Data lineage hash:** sha256 b296e48d8f4919622a433d1a14fa05ed96d54222c2a2e125fbde831e9c66347e (`hedgeslip_i`)
+- **Retirement trigger:** a benchmark other than the decision price becomes the desk standard.
+- **Validation report:** `specifications/08-hedging/hedge-slippage.md`.
 
 ## Review cycle
 

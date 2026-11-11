@@ -688,6 +688,36 @@ def qp_suite(reg):
     return s, n_out, "scipy 1.18 optimisers on the same problem (lsq_linear BVLS for bounds, linalg.lstsq gelsd for unconstrained and MIN_NORM, minimize SLSQP for equalities); every output within root_finding"
 
 
+def wide_box_check(inp):
+    A = np.array(inp["a"]) * np.array(inp["lot_sizes"])[None, :]
+    b, w = np.array(inp["b"]), np.array(inp["weights"])
+    n = A.shape[1]
+    L = np.array(inp["lot_sizes"])
+    rv = inp.get("ridge", 0.0) * L ** 2
+    xc = np.linalg.solve(A.T @ (w[:, None] * A) + np.diag(rv), -A.T @ (w * b))
+    lo = inp.get("lower_lots") or [None] * n
+    up = inp.get("upper_lots") or [None] * n
+    rngs = []
+    for j in range(n):
+        c = int(round(xc[j]))
+        c = max(c, lo[j]) if lo[j] is not None else c
+        c = min(c, up[j]) if up[j] is not None else c
+        a0, a1 = c - 6, c + 6  # centred on the relaxed solution clipped to the bounds
+        if lo[j] is not None:
+            a0 = max(a0, lo[j])
+        if up[j] is not None:
+            a1 = min(a1, up[j])
+        rngs.append(range(a0, a1 + 1))
+    pts = []
+    for nv in itertools.product(*rngs):
+        v = np.array(nv, dtype=float)
+        r = A @ v + b
+        pts.append((float(np.sum(w * r * r) + np.sum(rv * v * v)), list(nv)))
+    fb = min(f for f, _ in pts)
+    tied = [nv for f, nv in pts if f - fb <= 1e-12 * max(fb, 1e-300)]  # I-7 tie rule, applied in floats
+    return min(tied, key=lambda nv: (sum(abs(x) for x in nv), nv))
+
+
 def int_suite(reg):
     s = Suite("hedgeint_i", SPEC, G)
     A3 = [[1.0, 0.5, 0.2], [0.3, 1.2, 0.4], [0.1, 0.6, 1.5], [0.8, 0.2, 0.9], [0.4, 0.9, 0.3]]
@@ -716,7 +746,9 @@ def int_suite(reg):
             tie_cases += 1
         else:
             assert ntied == 1, desc
-        s.add(INT, inp, out, cls=RF, verified=["exact-rational-enumeration", "ellipsoid-bound"],
+        # second method: float brute force over a wide box (+-6 lots around the clipped relaxed solution), independent of the bound
+        assert wide_box_check(inp) == out["lots"], desc
+        s.add(INT, inp, out, cls=RF, verified=["exact-rational-enumeration", "ellipsoid-bound", "wide-box-brute-force"],
               output_classes={"lots": EX}, tags=["hedge", "integer"], description=f"{desc} (searched {size} points)")
     c10 = cases[9][1]
     naive = [half_away(v) for v in qp_ref({k: c10[k] for k in ("a", "b", "weights")})["x"]]

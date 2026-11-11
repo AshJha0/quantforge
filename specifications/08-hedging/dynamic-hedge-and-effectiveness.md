@@ -87,3 +87,18 @@ Mutant caught: dividends on the hedge shares left out of the cash account (`fina
 | Q-I14 | Interest and dividends: on which value, and in which order? | Cash earns `e^{r dt}`; shares earn `h_i S_i (e^{q dt} - 1)`, on the value at the start of the step; both are credited before the rebalance (I-29). Other conventions (dividends on the end value, or reinvested in shares) change the result at about `q dt` relative per step |
 | Q-I15 | Dollar offset period by period, or cumulative? | Cumulative over the whole series (I-30). A period-by-period ratio divides by single changes, which can be zero |
 | Q-I16 | Population or sample variance? | Sample (`n - 1`), as `hedge.minvar.ratio` (I-8). The ratios do not depend on the choice; only a future variance output would |
+
+## Costs in the backtest (wave 4e)
+
+Added in wave 4e (rulings I-39, I-40) for the stage I tutorials' "dynamic hedge backtest with costs". It changes nothing above: without the new inputs `hedge.backtest.delta` returns exactly the wave 4b result. The generator re-derives every `hedgebt_i` golden and asserts they are equal.
+
+New optional inputs: `half_spread` and `impact` (each `>= 0`, else `E_DOMAIN`, checked after the wave 4b domain checks). They are the wave 4a cost model per share traded: a trade of `dq` shares costs `half_spread |dq| + impact dq^2`.
+
+Replay with costs (I-39):
+- The initial purchase of `h_0` shares is a trade. Its cost is paid from cash at `t_0`, so `Pi_0 = -cost(h_0)`.
+- Each rebalance at `t_{i+1}` (not on the last date) pays `cost(h_{i+1} - h_i)` from cash after `Pi_{i+1}` is recorded, so it shows in the next step's change.
+- No unwind at the end: the final shares are marked at the last spot, and the option at its value or payoff.
+
+New output, present only with a cost input (I-40): `trading_cost`, the undiscounted sum of every cost paid. `final_pnl` and the effectiveness statistics include the costs through the cash account.
+
+Suite `hedgebtcost_i` (5 value, 3 error), written by `oracle/python/gen_stage_i_w4e.py`. The value cases are daily and weekly rebalancing with a 2 cent half-spread, spread plus impact, zero cost parameters (equal to the cost-free replay, with `trading_cost = 0`) and impact only. Weekly rebalancing pays less than daily (2.35 against 6.75 on the same option), which is asserted. Outside: 5 of 8, the QuantLib check of wave 4b with the same cost arithmetic. Mutant caught: costs ignored.
