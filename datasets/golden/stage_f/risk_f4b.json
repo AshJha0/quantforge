@@ -1,0 +1,1076 @@
+{
+ "schema_version": "1.0",
+ "suite": "risk_f4b",
+ "spec": "specifications/06-risk/portfolio-risk-tools.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_w2b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "risk_f4b-0001",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     1.0,
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     -1000.0,
+     -400.0,
+     300.0
+    ],
+    "gamma": [
+     [
+      -2000.0,
+      0,
+      0
+     ],
+     [
+      0,
+      -800.0,
+      100.0
+     ],
+     [
+      0,
+      100.0,
+      -500.0
+     ]
+    ],
+    "target_loss": 50.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scale": 0.03794193126594032,
+     "shocks": [
+      0.03794193126594032,
+      0.01897096563297016,
+      -0.00948548281648508
+     ],
+     "pnl": -50.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "reverse_stress",
+    "synthetic"
+   ],
+   "description": "delta-gamma, loss 50",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0002",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     1.0,
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     -1000.0,
+     -400.0,
+     300.0
+    ],
+    "gamma": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "target_loss": 50.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scale": 0.0392156862745098,
+     "shocks": [
+      0.0392156862745098,
+      0.0196078431372549,
+      -0.00980392156862745
+     ],
+     "pnl": -50.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "reverse_stress",
+    "synthetic"
+   ],
+   "description": "linear only",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0003",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     1.0,
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     -1000.0,
+     -400.0,
+     300.0
+    ],
+    "gamma": [
+     [
+      -2000.0,
+      0,
+      0
+     ],
+     [
+      0,
+      -800.0,
+      100.0
+     ],
+     [
+      0,
+      100.0,
+      -500.0
+     ]
+    ],
+    "target_loss": 500.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scale": 0.30814291252671344,
+     "shocks": [
+      0.30814291252671344,
+      0.15407145626335672,
+      -0.07703572813167836
+     ],
+     "pnl": -500.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "reverse_stress",
+    "synthetic"
+   ],
+   "description": "larger loss",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0004",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     1.0,
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     -1000.0,
+     -400.0,
+     300.0
+    ],
+    "gamma": [
+     [
+      4000.0,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0
+     ]
+    ],
+    "target_loss": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scale": 0.0079420810210911,
+     "shocks": [
+      0.0079420810210911,
+      0.00397104051054555,
+      -0.001985520255272775
+     ],
+     "pnl": -10.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "reverse_stress",
+    "synthetic"
+   ],
+   "description": "convex: smaller root",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0005",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     1.0,
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     1000.0,
+     400.0,
+     -300.0
+    ],
+    "gamma": [
+     [
+      2000.0,
+      0,
+      0
+     ],
+     [
+      0,
+      800.0,
+      0
+     ],
+     [
+      0,
+      0,
+      500.0
+     ]
+    ],
+    "target_loss": 50.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "no positive scale reaches the loss"
+  },
+  {
+   "case_id": "risk_f4b-0006",
+   "operation": "risk.stress.reverse",
+   "inputs": {
+    "direction": [
+     1.0,
+     0.5,
+     -0.25
+    ],
+    "delta": [
+     -1000.0,
+     -400.0,
+     300.0
+    ],
+    "gamma": [
+     [
+      -2000.0,
+      0,
+      0
+     ],
+     [
+      0,
+      -800.0,
+      100.0
+     ],
+     [
+      0,
+      100.0,
+      -500.0
+     ]
+    ],
+    "target_loss": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "target_loss 0"
+  },
+  {
+   "case_id": "risk_f4b-0007",
+   "operation": "risk.limits.check",
+   "inputs": {
+    "measures": {
+     "VAR99": 9500000.0,
+     "DV01": -48000.0,
+     "VEGA": 120000.0
+    },
+    "limits": {
+     "VAR99": {
+      "soft": 8000000.0,
+      "hard": 10000000.0
+     },
+     "DV01": {
+      "soft": 40000.0,
+      "hard": 50000.0
+     },
+     "VEGA": {
+      "soft": 150000.0,
+      "hard": 200000.0
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "measures": {
+      "DV01": {
+       "utilisation": 0.96,
+       "status": "WARN"
+      },
+      "VAR99": {
+       "utilisation": 0.95,
+       "status": "WARN"
+      },
+      "VEGA": {
+       "utilisation": 0.6,
+       "status": "OK"
+      }
+     },
+     "overall": "WARN"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "limits",
+    "synthetic"
+   ],
+   "description": "two warnings",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0008",
+   "operation": "risk.limits.check",
+   "inputs": {
+    "measures": {
+     "VAR99": 10500000.0,
+     "DV01": -48000.0,
+     "VEGA": 120000.0
+    },
+    "limits": {
+     "VAR99": {
+      "soft": 8000000.0,
+      "hard": 10000000.0
+     },
+     "DV01": {
+      "soft": 40000.0,
+      "hard": 50000.0
+     },
+     "VEGA": {
+      "soft": 150000.0,
+      "hard": 200000.0
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "measures": {
+      "DV01": {
+       "utilisation": 0.96,
+       "status": "WARN"
+      },
+      "VAR99": {
+       "utilisation": 1.05,
+       "status": "BREACH"
+      },
+      "VEGA": {
+       "utilisation": 0.6,
+       "status": "OK"
+      }
+     },
+     "overall": "BREACH"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "limits",
+    "synthetic"
+   ],
+   "description": "one breach",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0009",
+   "operation": "risk.limits.check",
+   "inputs": {
+    "measures": {
+     "VAR99": 8000000.0,
+     "DV01": -48000.0,
+     "VEGA": 120000.0
+    },
+    "limits": {
+     "VAR99": {
+      "soft": 8000000.0,
+      "hard": 10000000.0
+     },
+     "DV01": {
+      "soft": 40000.0,
+      "hard": 50000.0
+     },
+     "VEGA": {
+      "soft": 150000.0,
+      "hard": 200000.0
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "measures": {
+      "DV01": {
+       "utilisation": 0.96,
+       "status": "WARN"
+      },
+      "VAR99": {
+       "utilisation": 0.8,
+       "status": "WARN"
+      },
+      "VEGA": {
+       "utilisation": 0.6,
+       "status": "OK"
+      }
+     },
+     "overall": "WARN"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "limits",
+    "synthetic"
+   ],
+   "description": "exactly at soft: WARN",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0010",
+   "operation": "risk.limits.check",
+   "inputs": {
+    "measures": {
+     "VAR99": 9500000.0,
+     "DV01": -48000.0,
+     "VEGA": 120000.0
+    },
+    "limits": {
+     "VAR99": {
+      "soft": 20000000.0,
+      "hard": 10000000.0
+     },
+     "DV01": {
+      "soft": 40000.0,
+      "hard": 50000.0
+     },
+     "VEGA": {
+      "soft": 150000.0,
+      "hard": 200000.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "soft above hard"
+  },
+  {
+   "case_id": "risk_f4b-0011",
+   "operation": "risk.limits.check",
+   "inputs": {
+    "measures": {
+     "VAR99": 9500000.0,
+     "DV01": -48000.0,
+     "VEGA": 120000.0
+    },
+    "limits": {
+     "VAR99": {
+      "soft": 8000000.0,
+      "hard": 10000000.0
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "measure without a limit"
+  },
+  {
+   "case_id": "risk_f4b-0012",
+   "operation": "risk.concentration.measures",
+   "inputs": {
+    "exposures": [
+     10.0,
+     10.0,
+     10.0,
+     10.0
+    ],
+    "top_n": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hhi": 0.25,
+     "effective_number": 4.0,
+     "top_n_share": 0.5,
+     "weights": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "concentration",
+    "synthetic"
+   ],
+   "description": "equal: HHI 1/4",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0013",
+   "operation": "risk.concentration.measures",
+   "inputs": {
+    "exposures": [
+     50.0,
+     -30.0,
+     10.0,
+     5.0,
+     5.0
+    ],
+    "top_n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hhi": 0.355,
+     "effective_number": 2.816901408450704,
+     "top_n_share": 0.5,
+     "weights": [
+      0.5,
+      0.3,
+      0.1,
+      0.05,
+      0.05
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "concentration",
+    "synthetic"
+   ],
+   "description": "signed exposures by absolute size",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0014",
+   "operation": "risk.concentration.measures",
+   "inputs": {
+    "exposures": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "top_n": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hhi": 1.0,
+     "effective_number": 1.0,
+     "top_n_share": 1.0,
+     "weights": [
+      1.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "concentration",
+    "synthetic"
+   ],
+   "description": "single name: HHI 1",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0015",
+   "operation": "risk.concentration.measures",
+   "inputs": {
+    "exposures": [
+     0.0,
+     0.0
+    ],
+    "top_n": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "all zero"
+  },
+  {
+   "case_id": "risk_f4b-0016",
+   "operation": "risk.concentration.measures",
+   "inputs": {
+    "exposures": [
+     1.0
+    ],
+    "top_n": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "top_n above count"
+  },
+  {
+   "case_id": "risk_f4b-0017",
+   "operation": "risk.var.liquidity_adjusted",
+   "inputs": {
+    "var": 1200000.0,
+    "z": 2.326,
+    "position_values": [
+     5000000.0,
+     -3000000.0,
+     2000000.0
+    ],
+    "spread_mean": [
+     0.001,
+     0.002,
+     0.004
+    ],
+    "spread_vol": [
+     0.0005,
+     0.001,
+     0.003
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "liquidity_cost": 22874.5,
+     "lvar": 1222874.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "lvar",
+    "synthetic"
+   ],
+   "description": "three positions",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0018",
+   "operation": "risk.var.liquidity_adjusted",
+   "inputs": {
+    "var": 1200000.0,
+    "z": 2.326,
+    "position_values": [
+     5000000.0,
+     -3000000.0,
+     2000000.0
+    ],
+    "spread_mean": [
+     0.001,
+     0.002,
+     0.004
+    ],
+    "spread_vol": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "liquidity_cost": 9500.0,
+     "lvar": 1209500.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "lvar",
+    "synthetic"
+   ],
+   "description": "constant spreads: half spread cost",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0019",
+   "operation": "risk.var.liquidity_adjusted",
+   "inputs": {
+    "var": 1200000.0,
+    "z": 2.326,
+    "position_values": [
+     5000000.0,
+     -3000000.0,
+     2000000.0
+    ],
+    "spread_mean": [
+     -0.001,
+     0.002,
+     0.004
+    ],
+    "spread_vol": [
+     0.0005,
+     0.001,
+     0.003
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "negative spread"
+  },
+  {
+   "case_id": "risk_f4b-0020",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": 0.01,
+    "ar1": 0.0,
+    "horizon_days": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.03162277660168379,
+     "sqrt_rule_vol": 0.03162277660168379,
+     "variance_ratio": 1.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "horizon",
+    "synthetic"
+   ],
+   "description": "iid: sqrt rule",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0021",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": 0.01,
+    "ar1": 0.2,
+    "horizon_days": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.03791437730465846,
+     "sqrt_rule_vol": 0.03162277660168379,
+     "variance_ratio": 1.4375000064
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "horizon",
+    "synthetic"
+   ],
+   "description": "momentum: ratio above 1",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0022",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": 0.01,
+    "ar1": -0.3,
+    "horizon_days": 10
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.0239575517822669,
+     "sqrt_rule_vol": 0.03162277660168379,
+     "variance_ratio": 0.5739642874
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "horizon",
+    "synthetic"
+   ],
+   "description": "mean reversion: ratio below 1",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0023",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": 0.012,
+    "ar1": 0.1,
+    "horizon_days": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.012,
+     "sqrt_rule_vol": 0.012,
+     "variance_ratio": 1.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "f4",
+    "horizon",
+    "synthetic"
+   ],
+   "description": "one day: ratio 1",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "closed forms"
+   }
+  },
+  {
+   "case_id": "risk_f4b-0024",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": 0.01,
+    "ar1": 1.0,
+    "horizon_days": 10
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "|ar1| = 1"
+  },
+  {
+   "case_id": "risk_f4b-0025",
+   "operation": "risk.vol.horizon",
+   "inputs": {
+    "daily_vol": 0.01,
+    "ar1": 0.1,
+    "horizon_days": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f4",
+    "synthetic"
+   ],
+   "description": "horizon 0"
+  }
+ ]
+}

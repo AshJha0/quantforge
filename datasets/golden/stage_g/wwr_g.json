@@ -1,0 +1,407 @@
+{
+ "schema_version": "1.0",
+ "suite": "wwr_g",
+ "spec": "specifications/06-risk/xva-framework.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w4b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "wwr_g-0001",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.04362773322524341,
+     "a": [
+      -3.506557897319982,
+      -3.506557897319982,
+      -3.506557897319982,
+      -3.506557897319982
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "synthetic"
+   ],
+   "description": "b = 0: independent CVA",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0002",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.061148353888627834,
+     "a": [
+      -3.5845686606981486,
+      -3.7379138467370954,
+      -3.8251759206680735,
+      -3.758146947929861
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "synthetic"
+   ],
+   "description": "wrong-way b = 0.1",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0003",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.0864873047142507,
+     "a": [
+      -3.827722486823666,
+      -4.564278963159875,
+      -5.051548623240317,
+      -4.653971603884738
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "synthetic"
+   ],
+   "description": "wrong-way b = 0.3",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0004",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": -0.2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.015569211034720727,
+     "a": [
+      -3.4452987689759222,
+      -3.531046008370255,
+      -3.6688725868166703,
+      -3.4299222979922965
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "wwr",
+    "synthetic"
+   ],
+   "description": "right-way b = -0.2",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "wwr_g-0005",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      1.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "path length differs"
+  },
+  {
+   "case_id": "wwr_g-0006",
+   "operation": "xva.wwr.cva_hw",
+   "inputs": {
+    "times": [
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "values": [
+     [
+      3.0,
+      5.0,
+      2.0,
+      -1.0
+     ],
+     [
+      -2.0,
+      -4.0,
+      -6.0,
+      -3.0
+     ],
+     [
+      1.0,
+      6.0,
+      9.0,
+      4.0
+     ],
+     [
+      0.5,
+      -1.0,
+      2.5,
+      7.0
+     ]
+    ],
+    "discount_factors": [
+     0.995,
+     0.99,
+     0.985,
+     0.98
+    ],
+    "hazard_rate": 0.0,
+    "recovery": 0.4,
+    "wwr_b": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "hazard 0 (a(t) undefined)"
+  }
+ ]
+}

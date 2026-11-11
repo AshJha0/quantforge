@@ -46,7 +46,7 @@ The smoothed digital replaces the payoff by the call spread `(max(S_T - K + eps,
 
 ### Error checks, in order (after F-2)
 
-`payoff`, `method` `E_INPUT`; `paths < 2` `E_INPUT`; `seed` `E_SCHEMA` (a schema check, so it comes before F-2 in practice); `S`, `K`, `T`, `v` `E_DOMAIN`; `smoothing_width` and `bump_relative` presence `E_INPUT`, then value `E_DOMAIN`. `E_LIMIT`: paths 10,000,000 (as F-42).
+`seed` `E_SCHEMA` first (a schema check, before F-2 and before every other check below; R5 L5); then `payoff`, `method` `E_INPUT`; `paths < 2` `E_INPUT`; `S`, `K`, `T`, `v` `E_DOMAIN`; `smoothing_width` and `bump_relative` presence `E_INPUT`, then value `E_DOMAIN`. `E_LIMIT`: paths 10,000,000 (as F-42).
 
 ## Validation cases and oracle
 

@@ -1,0 +1,1611 @@
+{
+ "schema_version": "1.0",
+ "suite": "collexp_g",
+ "spec": "specifications/06-risk/xva-framework.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w4b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "collexp_g-0001",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        1.125,
+        2.75,
+        3.375,
+        2.75
+       ],
+       "ene": [
+        0.0,
+        -0.5,
+        -1.25,
+        -1.5,
+        -1.0
+       ],
+       "pfe": [
+        0.0,
+        1.0,
+        5.0,
+        2.5,
+        4.0
+       ],
+       "epe": 2.5,
+       "effective_epe": 2.65625
+      }
+     },
+     "total_ee": [
+      0.0,
+      1.125,
+      2.75,
+      3.375,
+      2.75
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "one set, no CSA",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0002",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     },
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        -1.0,
+        2.0,
+        1.0,
+        0.5
+       ],
+       [
+        0.0,
+        2.0,
+        1.0,
+        -3.0,
+        -2.0
+       ],
+       [
+        0.0,
+        -0.5,
+        -2.0,
+        -1.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.5,
+        0.0,
+        2.0,
+        -4.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        1.125,
+        2.75,
+        3.875,
+        2.0
+       ],
+       "ene": [
+        0.0,
+        0.0,
+        -1.0,
+        -2.25,
+        -1.375
+       ],
+       "pfe": [
+        0.0,
+        2.0,
+        4.0,
+        4.5,
+        3.0
+       ],
+       "epe": 2.4375,
+       "effective_epe": 2.90625
+      }
+     },
+     "total_ee": [
+      0.0,
+      1.125,
+      2.75,
+      3.875,
+      2.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "two trades netted",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0003",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     },
+     {
+      "netting_set": "NS2",
+      "values": [
+       [
+        0.0,
+        -1.0,
+        2.0,
+        1.0,
+        0.5
+       ],
+       [
+        0.0,
+        2.0,
+        1.0,
+        -3.0,
+        -2.0
+       ],
+       [
+        0.0,
+        -0.5,
+        -2.0,
+        -1.0,
+        1.0
+       ],
+       [
+        0.0,
+        1.5,
+        0.0,
+        2.0,
+        -4.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        1.125,
+        2.75,
+        3.375,
+        2.75
+       ],
+       "ene": [
+        0.0,
+        -0.5,
+        -1.25,
+        -1.5,
+        -1.0
+       ],
+       "pfe": [
+        0.0,
+        1.0,
+        5.0,
+        2.5,
+        4.0
+       ],
+       "epe": 2.5,
+       "effective_epe": 2.65625
+      },
+      "NS2": {
+       "ee": [
+        0.0,
+        0.875,
+        0.75,
+        0.75,
+        0.375
+       ],
+       "ene": [
+        0.0,
+        -0.375,
+        -0.5,
+        -1.0,
+        -1.5
+       ],
+       "pfe": [
+        0.0,
+        1.5,
+        1.0,
+        1.0,
+        0.5
+       ],
+       "epe": 0.6875,
+       "effective_epe": 0.875
+      }
+     },
+     "total_ee": [
+      0.0,
+      2.0,
+      3.5,
+      4.125,
+      3.125
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "two sets: no netting across",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0004",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        1.125,
+        2.25,
+        1.625,
+        1.875
+       ],
+       "ene": [
+        0.0,
+        -0.5,
+        -1.0,
+        -1.25,
+        -1.5
+       ],
+       "pfe": [
+        0.0,
+        1.0,
+        3.0,
+        2.5,
+        2.0
+       ],
+       "epe": 1.71875,
+       "effective_epe": 1.96875
+      }
+     },
+     "total_ee": [
+      0.0,
+      1.125,
+      2.25,
+      1.625,
+      1.875
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "CSA, MPoR 1 step",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0005",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 0
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        0.625,
+        0.5,
+        0.75,
+        0.5
+       ],
+       "ene": [
+        0.0,
+        -0.25,
+        -0.5,
+        -0.25,
+        -0.5
+       ],
+       "pfe": [
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ],
+       "epe": 0.59375,
+       "effective_epe": 0.6875
+      }
+     },
+     "total_ee": [
+      0.0,
+      0.625,
+      0.5,
+      0.75,
+      0.5
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "CSA, MPoR 0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0006",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 3.0,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        1.125,
+        2.75,
+        1.625,
+        1.75
+       ],
+       "ene": [
+        0.0,
+        -0.5,
+        -1.25,
+        -1.25,
+        -1.5
+       ],
+       "pfe": [
+        0.0,
+        1.0,
+        5.0,
+        2.5,
+        0.0
+       ],
+       "epe": 1.8125,
+       "effective_epe": 2.34375
+      }
+     },
+     "total_ee": [
+      0.0,
+      1.125,
+      2.75,
+      1.625,
+      1.75
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "large MTA",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0007",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 0.0,
+      "threshold_post": 0.0,
+      "minimum_transfer_amount": 0.0,
+      "mpor_steps": 0
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "ene": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pfe": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+       ],
+       "epe": 0.0,
+       "effective_epe": 0.0
+      }
+     },
+     "total_ee": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "zero thresholds, no lag: exposure 0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0008",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1,
+      "independent_amount": 2.0
+     }
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        0.25,
+        1.25,
+        0.625,
+        0.875
+       ],
+       "ene": [
+        -2.0,
+        -1.625,
+        -2.0,
+        -2.25,
+        -2.5
+       ],
+       "pfe": [
+        0.0,
+        0.0,
+        1.0,
+        0.5,
+        0.0
+       ],
+       "epe": 0.75,
+       "effective_epe": 1.0
+      }
+     },
+     "total_ee": [
+      0.0,
+      0.25,
+      1.25,
+      0.625,
+      0.875
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "independent amount 2",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0009",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        1.125,
+        2.75,
+        3.375,
+        2.75
+       ],
+       "ene": [
+        0.0,
+        -0.5,
+        -1.25,
+        -1.5,
+        -1.0
+       ],
+       "pfe": [
+        0.0,
+        3.0,
+        6.0,
+        9.0,
+        7.0
+       ],
+       "epe": 2.5,
+       "effective_epe": 2.65625
+      }
+     },
+     "total_ee": [
+      0.0,
+      1.125,
+      2.75,
+      3.375,
+      2.75
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "PFE at quantile 1: the path maximum",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0010",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "NS1": {
+       "ee": [
+        0.0,
+        1.125,
+        2.75,
+        3.375,
+        2.75
+       ],
+       "ene": [
+        0.0,
+        -0.5,
+        -1.25,
+        -1.5,
+        -1.0
+       ],
+       "pfe": [
+        0.0,
+        0.5,
+        0.0,
+        2.0,
+        0.0
+       ],
+       "epe": 2.5,
+       "effective_epe": 1.9375
+      }
+     },
+     "total_ee": [
+      0.0,
+      1.125,
+      2.75,
+      3.375,
+      2.75
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "collateral",
+    "synthetic"
+   ],
+   "description": "two-year grid: effective EPE over the first year",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "collexp_g-0011",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.5,
+     0.25,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "times not increasing"
+  },
+  {
+   "case_id": "collexp_g-0012",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        1.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "path length differs from times"
+  },
+  {
+   "case_id": "collexp_g-0013",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.0,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "pfe_quantile 0"
+  },
+  {
+   "case_id": "collexp_g-0014",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": -1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "negative threshold"
+  },
+  {
+   "case_id": "collexp_g-0015",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": -1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "negative MPoR"
+  },
+  {
+   "case_id": "collexp_g-0016",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [
+     {
+      "netting_set": "NS1",
+      "values": [
+       [
+        0.0,
+        3.0,
+        5.0,
+        2.0,
+        -1.0
+       ],
+       [
+        0.0,
+        -2.0,
+        -4.0,
+        -6.0,
+        -3.0
+       ],
+       [
+        0.0,
+        1.0,
+        6.0,
+        9.0,
+        4.0
+       ],
+       [
+        0.0,
+        0.5,
+        -1.0,
+        2.5,
+        7.0
+       ]
+      ]
+     }
+    ],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS9": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "CSA for an unknown netting set"
+  },
+  {
+   "case_id": "collexp_g-0017",
+   "operation": "xva.exposure.collateralised",
+   "inputs": {
+    "times": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "trades": [],
+    "pfe_quantile": 0.75,
+    "csa": {
+     "NS1": {
+      "threshold_receive": 1.0,
+      "threshold_post": 1.0,
+      "minimum_transfer_amount": 0.5,
+      "mpor_steps": 1
+     }
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "no trades"
+  }
+ ]
+}

@@ -49,9 +49,9 @@ Outputs: `price`, `bond_price_expiry` `P(0,T)`, `bond_price_maturity` `P(0,S)`.
 
 ## `rates.shortrate.swaption` (stage G wave 2a)
 
-European swaption on Hull-White by Jamshidian's decomposition [J89; BM 3.11]. Suite `stage_g/swaption_g` (40 cases), generator slice `G2A`. Rulings G-12, G-13.
+European swaption on Hull-White by Jamshidian's decomposition [J89; BM section 3.11, unverified pointer: the source was not opened, R5 citation note]. Suite `stage_g/swaption_g` (40 cases), generator slice `G2A`. Rulings G-12, G-13.
 
-Inputs: `curve`, `mean_reversion`, `sigma` (Hull-White, as above; no `short_rate`, `E_INPUT` if present), `expiry_years` `T0` (> 0, else `E_DOMAIN`), `payment_times` `T1 < ... < Tn` (at least one, strictly increasing, `T1 > T0`; else `E_INPUT`), `fixed_rate` `K` (any sign), `swaption_type` (`PAYER`, `RECEIVER`; else `E_INPUT`), `notional`.
+Inputs: `curve`, `mean_reversion`, `sigma` (Hull-White, as above; no `short_rate`, `E_INPUT` if present), `expiry_years` `T0` (> 0, else `E_DOMAIN`), `payment_times` `T1 < ... < Tn` (at least one, strictly increasing, `T1 > T0`; else `E_INPUT`), `fixed_rate` `K` (any sign, but `1 + K tau_n > 0`, else `E_DOMAIN`; ruling G-29), `swaption_type` (`PAYER`, `RECEIVER`; else `E_INPUT`), `notional`.
 
 Conventions (ruling G-12): single curve; the fixed accruals are the time differences `tau_1 = T1 - T0`, `tau_i = Ti - T(i-1)` (ACT/365F year fractions, so a caller's dates fix them); the floating leg is worth `P(T0, T0) - P(T0, Tn)` at expiry (a par floater on the same curve). A payer swaption pays fixed.
 
@@ -94,7 +94,7 @@ Inputs: `curve`, `mean_reversion`, `sigma` (Hull-White); the underlying swap `st
 **Reference scheme.**
 1. State `x = r - alpha(t)`, `alpha(t) = f(0,t) + sigma^2/(2a^2) (1 - e^{-at})^2`, `f` the curve's right-hand forward (G-3); `dx = -a x dt + sigma dW`, `x(0) = 0`.
 2. Space grid: `sx = sigma sqrt((1 - e^{-2a t_m}) / (2a))` with `t_m` the last exercise time; `h = width sx`; `x_i = -h + i dx`, `dx = 2h/(nx - 1)`, `i = 0..nx-1` (the centre node is `x = 0`).
-3. Time grid: knots `0, t_1, ..., t_m` (the exercise times). Interval `[t_(k-1), t_k]` gets `n = max(1, ceil(steps_per_year (t_k - t_(k-1))))` equal steps.
+3. Time grid: knots `0, t_1, ..., t_m` (the exercise times). Interval `[t_(k-1), t_k]` gets `n = max(1, ceil(steps_per_year (t_k - t_(k-1))))` equal steps, evaluated in binary64 exactly as written (R5 L9: at a near-tie such as `100 x (1.1 - 1.0) = 10.000000000000009` the count is 11, and every build must reproduce that).
 4. Exercise value at `t` and node `i` (per unit notional): `phi (1 - P(t, Tn) - K sum tau_j P(t, Tj))` over the payments after `t`, `tau` the time differences starting at `t`, `P(t, T)` the Hull-White bond of `rates.shortrate.zcb` with `r = x_i + alpha(t)`, `phi = +1` payer, `-1` receiver.
 5. Start at `t_m` with `V = max(exercise, 0)`. Step backward fully implicitly: from `t + dt` to `t`, solve `(I - dt L(t)) V(t) = V(t + dt)` on interior nodes `1..nx-2`, where `(L V)_i = (sigma^2/2)(V_(i+1) - 2V_i + V_(i-1))/dx^2 - a x_i (V_(i+1) - V_(i-1))/(2 dx) - (x_i + alpha(t)) V_i`, coefficients at the earlier time `t`. Boundaries: `V_0 = 2V_1 - V_2` and `V_(nx-1) = 2V_(nx-2) - V_(nx-3)`, substituted into the first and last interior rows (the system stays tridiagonal), then set after the solve.
 6. On arriving at an exercise time `t_k` (`k < m`), `V = max(V, exercise(t_k))`. Do not apply exercise at `t = 0`.
@@ -124,6 +124,20 @@ Outputs: `price` (the sum) and `caplet_prices` (per period, in order; floorlets 
 
 Validation: three models x two schedules (semi-annual to 5 years, annual to 7 years) x cap and floor x strikes 3%, 4%, 5% (36 cases), 5 error cases. Values: 50-digit mpmath (CIR through the noncentral chi-square). Asserted: cap minus floor equals `notional sum (P(t_(i-1)) - (1 + K tau_i) P(t_i))` on all 18 pairs. Outside: QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` `discountBondOption` per period, scaled and summed: 36 of 41 count. Wrong convention caught: a cap priced with bond calls.
 
+## Negative strikes in Jamshidian (R5 M2, ruling G-29)
+
+With `K < 0` the coupons `c_i = K tau_i` for `i < n` are negative, so `sum c_i P(T0, Ti; r)` is no longer a sum of decreasing terms. Each `P(T0, Ti; r)` is still strictly decreasing in `r`, and the payer/receiver mapping (payer = sum of `c_i` puts) still follows from the decomposition, since a negative coupon simply enters with a negative weight. Rule: `1 + K tau_n <= 0` is `E_DOMAIN` (the bond sum can then never reach 1). Otherwise the build solves by Newton from 0 with a bracket on `[-1, 1]`; if no sign change exists on that bracket, `E_DOMAIN`. Goldens: `swaption_g-0041`/`0042` at `K = -0.2%` (value) and `swaption_g-0043` (`1 + K tau_n = 0`, `E_DOMAIN`).
+
+## Numerical guards (R5 M4 to M6, rulings G-31 to G-33)
+
+- **Limits (G-31).** The full `E_LIMIT` table is ruling G-31, including the combined bound `nx x total time steps <= 5e8` for the reference scheme; a request inside every single limit can still exceed it (golden: `nx = 10,001` with `steps_per_year = 100,000` over five years).
+- **Noncentral chi-square (G-32).** Sum the Poisson series from its mode with log weights [Johnson, Kotz, Balakrishnan, *Continuous Univariate Distributions* vol. 2, 2nd ed., Wiley, 1995, ch. 29; Abramowitz and Stegun 26.4.25] (not opened); a CDF argument `<= 0`, which happens when the strike exceeds `A(T,S)` so that `rbar < 0`, gives 0. Goldens at CIR `sigma = 0.005`, where `lambda/2` is in the thousands and a naive `exp(-lambda/2)` returns 0.
+- **G2++ cancellation (G-33).** Use `expm1` for every `(1 - e^(-x u))/x`, and the series for the `V(tau)` cross term when `max(a, b) tau < 0.1`. Goldens at `a = 1e-4` and at `a = b`.
+
+## Property tests on the pinned scheme (R5 M1, ruling G-28)
+
+Bounds that compare the scheme with a closed form must use the scheme's own value of the bounding product on the same grid, never the closed form, because the scheme's first-order bias (convergence tables) is larger than the optionality in edge cases. A Bermudan swaption is at least the scheme's single-date swaption with the same first exercise date and grid; it is **not** asserted against Jamshidian. `bermudan_g-0007` (one exercise date) is 23.9 (0.17%) below the Jamshidian value at its grid: that is the scheme bias, which shrinks at order about 1 as the grid is refined. A callable bond is at most the scheme's no-call bond on the same grid.
+
 ## `rates.shortrate.callable_bond` (stage G wave 2g)
 
 Issuer-callable fixed-rate bond on Hull-White, on the G-18 scheme (ruling G-21). Suite `stage_g/callable_g` (12 cases), generator `gen_stage_g_berm.py` slice `CALL`.
@@ -132,7 +146,7 @@ Inputs: `curve`, `mean_reversion`, `sigma`; `payment_times` (at least one, stric
 
 Scheme: the G-18 grid and step with `t_m` the last payment time and knots `0, T1, ..., Tn`. Start at `Tn` with `V = 1 + c tau_n`. After stepping back to each knot `Tk > 0`: first, if `Tk` is a call time, `V = min(V, call_price)` (the issuer calls the ex-coupon bond); then add the coupon, `V = V + c tau_k`. `price = notional x V` at the centre node at 0.
 
-Validation: three coupons x (seven annual calls from year 3, one call at year 5) on a 10-year bond; the straight-bond limit (no calls); a 2% call premium with high mean reversion and volatility; 4 error cases. Asserted: every price at most the straight bond (curve-discounted cash flows). Not counted as outside (G-18).
+Validation: three coupons x (seven annual calls from year 3, one call at year 5) on a 10-year bond; the straight-bond limit (no calls); a 2% call premium with high mean reversion and volatility; 4 error cases. Asserted: every price at most the scheme's own no-call price on the same grid (`callable_g-0007` family; the cap `min(V, call_price)` makes this monotone by construction). It is **not** asserted against the exact curve-discounted straight bond: the first-order scheme bias puts the no-call golden `callable_g-0007` at 104.48531 against the exact 104.47600 (+0.0093, inside the convergence table's errors), and a deep out-of-the-money call inherits the same bias (R5 M1). Not counted as outside (G-18).
 
 ## Convergence and limit cases (callable bond)
 

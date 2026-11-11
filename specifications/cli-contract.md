@@ -321,8 +321,15 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `rates.shortrate.callable_bond` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.callable_bond`" | G3 (wave 2g) |
 | `risk.mc.greeks` | `06-risk/mc-greeks.md` | Q9 part 1 (wave 3a) |
 | `xva.exposure.swap_ee_hw` | `06-risk/xva-exposure.md` | G5a (wave 4a) |
+| `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `04-pricing/lmm.md` | G4a (wave 3b, LMM) |
+| `rates.shortrate.bermudan_ladder` | `06-risk/aad-core.md` | Q3b (wave 3d) |
+| `risk.model_reserve.dispersion` (`null` legal for `relative_reserve`) | `06-risk/model-reserve.md` | Q9 part 2 (wave 3e) |
+| `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `06-risk/xva-framework.md` | G5b (wave 4b) |
+| `risk.stress.reverse`, `risk.limits.check`, `risk.concentration.measures`, `risk.var.liquidity_adjusted`, `risk.vol.horizon` | `06-risk/portfolio-risk-tools.md` | F4 carry-over (wave 2b) |
+| `risk.sens.inflation01`, `risk.sens.dividend_borrow`, `risk.sens.correlation` | `06-risk/f3-sensitivities.md` | F3 carry-over (wave 2b) |
+| `risk.frtb.fx_delta`, `risk.frtb.equity_delta` | `06-risk/frtb-sa-fx-equity.md` | FRTB carry-over (wave 2b) |
 
-`E_LIMIT` sizes for the stage G operations: ruling G-6. `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
+`E_LIMIT` sizes for the stage G operations: ruling G-6 as amended by G-31 (full table and the combined grid-work bound). `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
 
 ## Versioning
 
