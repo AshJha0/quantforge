@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Runs the code blocks of a tutorial and checks they print what the page shows (plan 13.2 E2).
 
-  python tools/check_tutorial.py --lang python [--page docs/getting-started/tutorial-1-swap.md]
+  python tools/check_tutorial.py --lang python [--page docs/getting-started/tutorial-1-swap.md ...] [--all]
+
+--page may be given more than once; --all checks every docs/getting-started/tutorial-*.md in number order.
 
 A block marked <!-- tutorial:run LANG --> is run: a python block through `uv run --project python python -`,
 a bash block through bash, both from the repository root. The last lines of its stdout must equal, line for line, the text
@@ -64,9 +66,17 @@ def check(lang, page):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--lang", required=True, choices=("python", "rust", "java", "cpp"))
-    ap.add_argument("--page", default=str(PAGE))
+    ap.add_argument("--page", action="append", help="a tutorial page; may be repeated")
+    ap.add_argument("--all", action="store_true", help="every docs/getting-started/tutorial-*.md")
     a = ap.parse_args()
-    return check(a.lang, Path(a.page))
+    pages = [Path(p) for p in a.page or []]
+    if a.all:
+        pages += sorted(PAGE.parent.glob("tutorial-*.md"), key=lambda p: int(re.match(r"tutorial-(\d+)", p.name)[1]))
+    failures = 0
+    for page in pages or [PAGE]:
+        print(f"{page.name}:", flush=True)
+        failures += check(a.lang, page)
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
