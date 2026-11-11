@@ -67,6 +67,14 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-34 | Selection rule | The least objective over all subsets of at most `K` instruments. Ties within `1e-12` relative go to the smaller subset, then to the lexicographically smaller index list. Indices are 0-based |
 | I-35 | `E_LIMIT` size, wave 4c | 20 instruments |
 
+## Wave 4d, hedge slippage
+
+| # | Point | Ruling |
+|---|---|---|
+| I-36 | Slippage definition | `execution_cost = sum q (p - d)` against the decision price; `opportunity_cost = (Q - q_f)(final_price - d)`; `model_cost` is the wave 4a model on the filled size; `slippage = execution_cost - model_cost` |
+| I-37 | `null` average price | `average_price` is `null` for an order with no fills; this extends I-12's list of places where `null` is legal |
+| I-38 | `E_LIMIT` sizes, wave 4d | 10,000 orders; 1,000,000 fills in total |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).

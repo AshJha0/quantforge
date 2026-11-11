@@ -171,3 +171,15 @@ Read: `specifications/08-hedging/instrument-selection.md`; rulings I-33 to I-35;
 
 ### Outside-oracle status
 `hedgeselect_i` 10 of 17 (scipy per subset); every value case counts. Stage I so far: 108 of 251 = 43.0% (`oracle/outside_register_i.json`).
+
+## WAVE 4d READY (2026-11-11): hedge slippage
+
+Read: `specifications/08-hedging/hedge-slippage.md`; rulings I-36 to I-38; cli-contract block "Stage I operations"; edge-case row I14; `specifications/name-map.json` (274 operations).
+
+`hedgeslip_i`, operation `hedge.slippage.report`: 12 cases (6 value, 6 error). Plain arithmetic. Signs follow I-36, so a positive cost is a cost for buys and for sells alike. `average_price` is `null` when nothing was filled (I-37). Property tests: `shortfall = execution_cost + opportunity_cost`; `slippage = execution_cost - model_cost`; totals are the sums over orders.
+
+## Stage I spec status after session 1 (2026-11-11)
+
+Domain 08 rows for stage I are all specified: multi-instrument, delta, gamma, vega, equity beta, credit, correlation, cross-asset, dynamic hedge and effectiveness, minimum variance, constrained least squares, integer contracts, instrument selection, transaction cost, liquidity, impact, margin, position constraints, residual risk, slippage, frontier, singular handling. 14 suites, 263 cases, rulings I-1 to I-38.
+
+**Open: the outside share is 108 of 263 = 41.1%, below the 60% floor (I-2).** Error cases are 89 of the 263 and never count. Uncounted value suites are `hedgeint_i` (12; no free integer least-squares library), `hedgebeta_i` (8) and `hedgeres_i` (7) and `hedgeslip_i` (6), which are all arithmetic, plus a few cases where scipy's general solvers stop near 1e-8. Even if every value case counted, the share would be 174 of 263 = 66%. Reaching 60% honestly needs an owner decision: an outside reference for integer lots (for example a free MIQP solver), or a ruling on how arithmetic-only suites are treated. The G-42 precedent was to report the gap, not to add cases to pad the share.

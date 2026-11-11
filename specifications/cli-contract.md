@@ -346,6 +346,7 @@ Stage I adds operations and one error code, `E_INFEASIBLE` (ruling I-1). `stage-
 | `hedge.qp.solve`: new optional inputs `half_spreads`, `impact`, `cost_weight`, `margin_rates`, `margin_limit` (outputs `risk`, `cost`, `margin` only with them); `hedge.frontier.solve` | `08-hedging/hedge-costs-and-frontier.md` | wave 4a |
 | `hedge.backtest.delta`, `hedge.effectiveness` | `08-hedging/dynamic-hedge-and-effectiveness.md` | wave 4b |
 | `hedge.select.solve` | `08-hedging/instrument-selection.md` | wave 4c |
+| `hedge.slippage.report` (`null` legal for `average_price`) | `08-hedging/hedge-slippage.md` | wave 4d |
 
 `null` is legal inside `lower`, `upper`, `lower_lots`, `upper_lots` (ruling I-12). `E_LIMIT` sizes: ruling I-4. Every rank or singularity decision uses the relative threshold `1e-12` (ruling I-3).
 

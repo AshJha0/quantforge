@@ -119,3 +119,4 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | I11 | Backtest path that ends at expiry, or stops before it; zero position | Pinned | `stage_i/hedgebt_i` (payoff at expiry; value mark at day 30; `quantity = 0` is `E_DOMAIN`) | Rulings I-29, I-31 |
 | I12 | Effectiveness when the hedged item's total change is zero or small | Pinned | `stage_i/hedgeeff_i` `E_DOMAIN` (sum zero); `hedgebt_i-0001` (offset 1.31 at R² 0.996) | Ruling I-30; dollar-offset instability (Finnerty and Grant 2002) |
 | I13 | Instrument selection with ties, and a best pair that leaves out the best single instrument | Pinned | `stage_i/hedgeselect_i-0008` to `-0010` | Ruling I-34 |
+| I14 | Hedge order with no fills, or filled better than the decision price | Pinned | `stage_i/hedgeslip_i-0004` (`average_price` null), `-0005` (negative cost) | Rulings I-36, I-37 |
