@@ -4999,6 +4999,27 @@
     "pv"
    ]
   },
+  "risk.concentration.measures": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::concentration_measures",
+   "python": "quantforge.risk.concentration_measures",
+   "java": "Risk.concentrationMeasures",
+   "cpp": "qf::risk::concentration_measures",
+   "inputs": {
+    "exposures": {
+     "java": "exposures"
+    },
+    "top_n": {
+     "java": "topN"
+    }
+   },
+   "outputs": [
+    "effective_number",
+    "hhi",
+    "top_n_share",
+    "weights"
+   ]
+  },
   "risk.corr.dispersion": {
    "spec": "specifications/05-volatility/stage-e-targets-b.md",
    "rust": "quantforge::risk::corr_dispersion",
@@ -5244,6 +5265,77 @@
     "loadings"
    ]
   },
+  "risk.frtb.commodity_delta": {
+   "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
+   "rust": "quantforge::risk::frtb_commodity_delta",
+   "python": "quantforge.risk.frtb_commodity_delta",
+   "java": "Risk.frtbCommodityDelta",
+   "cpp": "qf::risk::frtb_commodity_delta",
+   "inputs": {
+    "sensitivities": {
+     "java": "sensitivities"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
+  "risk.frtb.csr_delta": {
+   "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
+   "rust": "quantforge::risk::frtb_csr_delta",
+   "python": "quantforge.risk.frtb_csr_delta",
+   "java": "Risk.frtbCsrDelta",
+   "cpp": "qf::risk::frtb_csr_delta",
+   "inputs": {
+    "sensitivities": {
+     "java": "sensitivities"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
+  "risk.frtb.equity_delta": {
+   "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
+   "rust": "quantforge::risk::frtb_equity_delta",
+   "python": "quantforge.risk.frtb_equity_delta",
+   "java": "Risk.frtbEquityDelta",
+   "cpp": "qf::risk::frtb_equity_delta",
+   "inputs": {
+    "sensitivities": {
+     "java": "sensitivities"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
+  "risk.frtb.fx_delta": {
+   "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
+   "rust": "quantforge::risk::frtb_fx_delta",
+   "python": "quantforge.risk.frtb_fx_delta",
+   "java": "Risk.frtbFxDelta",
+   "cpp": "qf::risk::frtb_fx_delta",
+   "inputs": {
+    "sensitivities": {
+     "java": "sensitivities"
+    },
+    "specified_pairs": {
+     "java": "specifiedPairs"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
   "risk.frtb.girr_delta": {
    "spec": "specifications/06-risk/frtb-sa-girr.md",
    "rust": "quantforge::risk::frtb_girr_delta",
@@ -5262,6 +5354,25 @@
     "binding_scenario",
     "capital",
     "scenarios"
+   ]
+  },
+  "risk.limits.check": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::limits_check",
+   "python": "quantforge.risk.limits_check",
+   "java": "Risk.limitsCheck",
+   "cpp": "qf::risk::limits_check",
+   "inputs": {
+    "limits": {
+     "java": "limits"
+    },
+    "measures": {
+     "java": "measures"
+    }
+   },
+   "outputs": [
+    "measures",
+    "overall"
    ]
   },
   "risk.mc.greeks": {
@@ -5406,6 +5517,143 @@
     "value_start"
    ]
   },
+  "risk.sens.correlation": {
+   "spec": "specifications/06-risk/f3-sensitivities.md",
+   "rust": "quantforge::risk::sens_correlation",
+   "python": "quantforge.risk.sens_correlation",
+   "java": "Risk.sensCorrelation",
+   "cpp": "qf::risk::sens_correlation",
+   "inputs": {
+    "correlation": {
+     "java": "correlation"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "quantity1": {
+     "java": "quantity1"
+    },
+    "quantity2": {
+     "java": "quantity2"
+    },
+    "spot1": {
+     "java": "spot1"
+    },
+    "spot2": {
+     "java": "spot2"
+    },
+    "vol1": {
+     "java": "vol1"
+    },
+    "vol2": {
+     "java": "vol2"
+    },
+    "yield1": {
+     "java": "yield1"
+    },
+    "yield2": {
+     "java": "yield2"
+    }
+   },
+   "outputs": [
+    "correlation01",
+    "price",
+    "spread_vol"
+   ]
+  },
+  "risk.sens.dividend_borrow": {
+   "spec": "specifications/06-risk/f3-sensitivities.md",
+   "rust": "quantforge::risk::sens_dividend_borrow",
+   "python": "quantforge.risk.sens_dividend_borrow",
+   "java": "Risk.sensDividendBorrow",
+   "cpp": "qf::risk::sens_dividend_borrow",
+   "inputs": {
+    "borrow_rate": {
+     "java": "borrowRate"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "borrow01",
+    "dividend01",
+    "price"
+   ]
+  },
+  "risk.sens.inflation01": {
+   "spec": "specifications/06-risk/f3-sensitivities.md",
+   "rust": "quantforge::risk::sens_inflation01",
+   "python": "quantforge.risk.sens_inflation01",
+   "java": "Risk.sensInflation01",
+   "cpp": "qf::risk::sens_inflation01",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "market_rate": {
+     "java": "marketRate"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "years": {
+     "java": "years"
+    }
+   },
+   "outputs": [
+    "inflation01",
+    "inflation01_bump",
+    "pv"
+   ]
+  },
+  "risk.stress.reverse": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::stress_reverse",
+   "python": "quantforge.risk.stress_reverse",
+   "java": "Risk.stressReverse",
+   "cpp": "qf::risk::stress_reverse",
+   "inputs": {
+    "delta": {
+     "java": "delta"
+    },
+    "direction": {
+     "java": "direction"
+    },
+    "gamma": {
+     "java": "gamma"
+    },
+    "target_loss": {
+     "java": "targetLoss"
+    }
+   },
+   "outputs": [
+    "pnl",
+    "scale",
+    "shocks"
+   ]
+  },
   "risk.var.filtered_historical": {
    "spec": "specifications/06-risk/var-es-and-backtests.md",
    "rust": "quantforge::risk::var_filtered_historical",
@@ -5451,6 +5699,34 @@
     "es",
     "tail_count",
     "var"
+   ]
+  },
+  "risk.var.liquidity_adjusted": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::var_liquidity_adjusted",
+   "python": "quantforge.risk.var_liquidity_adjusted",
+   "java": "Risk.varLiquidityAdjusted",
+   "cpp": "qf::risk::var_liquidity_adjusted",
+   "inputs": {
+    "position_values": {
+     "java": "positionValues"
+    },
+    "spread_mean": {
+     "java": "spreadMean"
+    },
+    "spread_vol": {
+     "java": "spreadVol"
+    },
+    "var": {
+     "java": "var"
+    },
+    "z": {
+     "java": "z"
+    }
+   },
+   "outputs": [
+    "liquidity_cost",
+    "lvar"
    ]
   },
   "risk.var.monte_carlo": {
@@ -5605,6 +5881,29 @@
     "volga"
    ]
   },
+  "risk.vol.horizon": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::vol_horizon",
+   "python": "quantforge.risk.vol_horizon",
+   "java": "Risk.volHorizon",
+   "cpp": "qf::risk::vol_horizon",
+   "inputs": {
+    "ar1": {
+     "java": "ar1"
+    },
+    "daily_vol": {
+     "java": "dailyVol"
+    },
+    "horizon_days": {
+     "java": "horizonDays"
+    }
+   },
+   "outputs": [
+    "sqrt_rule_vol",
+    "variance_ratio",
+    "vol"
+   ]
+  },
   "risk.vol.surface_vega": {
    "spec": "specifications/06-risk/vol-greeks.md",
    "rust": "quantforge::risk::vol_surface_vega",
@@ -5627,7 +5926,7 @@
    ]
   },
   "usecase.factor_attribution": {
-   "spec": "specifications/04-pricing/use-cases.md",
+   "spec": "specifications/stage-f-rulings.md",
    "rust": "quantforge::usecase::factor_attribution_",
    "python": "quantforge.usecase.factor_attribution_",
    "java": "Usecase.factorAttribution",
@@ -6888,6 +7187,82 @@
     "vol_of_vol"
    ]
   },
+  "xva.adjustments.value": {
+   "spec": "specifications/06-risk/xva-framework.md",
+   "rust": "quantforge::xva::adjustments_value",
+   "python": "quantforge.xva.adjustments_value",
+   "java": "Xva.adjustmentsValue",
+   "cpp": "qf::xva::adjustments_value",
+   "inputs": {
+    "capital": {
+     "java": "capital"
+    },
+    "counterparty": {
+     "java": "counterparty"
+    },
+    "discount_factors": {
+     "java": "discountFactors"
+    },
+    "ee": {
+     "java": "ee"
+    },
+    "ene": {
+     "java": "ene"
+    },
+    "funding": {
+     "java": "funding"
+    },
+    "hurdle_rate": {
+     "java": "hurdleRate"
+    },
+    "im": {
+     "java": "im"
+    },
+    "im_spread": {
+     "java": "imSpread"
+    },
+    "own": {
+     "java": "own"
+    },
+    "times": {
+     "java": "times"
+    }
+   },
+   "outputs": [
+    "cva",
+    "dva",
+    "fba",
+    "fca",
+    "fva",
+    "kva",
+    "mva"
+   ]
+  },
+  "xva.exposure.collateralised": {
+   "spec": "specifications/06-risk/xva-framework.md",
+   "rust": "quantforge::xva::exposure_collateralised",
+   "python": "quantforge.xva.exposure_collateralised",
+   "java": "Xva.exposureCollateralised",
+   "cpp": "qf::xva::exposure_collateralised",
+   "inputs": {
+    "csa": {
+     "java": "csa"
+    },
+    "pfe_quantile": {
+     "java": "pfeQuantile"
+    },
+    "times": {
+     "java": "times"
+    },
+    "trades": {
+     "java": "trades"
+    }
+   },
+   "outputs": [
+    "netting_sets",
+    "total_ee"
+   ]
+  },
   "xva.exposure.swap_ee_hw": {
    "spec": "specifications/06-risk/xva-exposure.md",
    "rust": "quantforge::xva::exposure_swap_ee_hw",
@@ -6933,6 +7308,63 @@
     "cva",
     "discounted_ee"
    ]
+  },
+  "xva.simm.ir_delta": {
+   "spec": "specifications/06-risk/xva-framework.md",
+   "rust": "quantforge::xva::simm_ir_delta",
+   "python": "quantforge.xva.simm_ir_delta",
+   "java": "Xva.simmIrDelta",
+   "cpp": "qf::xva::simm_ir_delta",
+   "inputs": {
+    "concentration_threshold": {
+     "java": "concentrationThreshold"
+    },
+    "correlations": {
+     "java": "correlations"
+    },
+    "risk_weights": {
+     "java": "riskWeights"
+    },
+    "sensitivities": {
+     "java": "sensitivities"
+    }
+   },
+   "outputs": [
+    "concentration_factor",
+    "margin",
+    "weighted_sensitivities"
+   ]
+  },
+  "xva.wwr.cva_hw": {
+   "spec": "specifications/06-risk/xva-framework.md",
+   "rust": "quantforge::xva::wwr_cva_hw",
+   "python": "quantforge.xva.wwr_cva_hw",
+   "java": "Xva.wwrCvaHw",
+   "cpp": "qf::xva::wwr_cva_hw",
+   "inputs": {
+    "discount_factors": {
+     "java": "discountFactors"
+    },
+    "hazard_rate": {
+     "java": "hazardRate"
+    },
+    "recovery": {
+     "java": "recovery"
+    },
+    "times": {
+     "java": "times"
+    },
+    "values": {
+     "java": "values"
+    },
+    "wwr_b": {
+     "java": "wwrB"
+    }
+   },
+   "outputs": [
+    "a",
+    "cva"
+   ]
   }
  },
  "unit_warnings": [
@@ -6952,6 +7384,8 @@
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
   "risk.mc.greeks: bump_relative",
+  "risk.var.liquidity_adjusted: spread_mean",
+  "risk.var.liquidity_adjusted: spread_vol",
   "risk.vol.greeks: shift",
   "usecase.fx_hedge: half_spread",
   "vol.equity.price: expiry",
@@ -6962,7 +7396,8 @@
   "vol.sabr.hagan: shift",
   "vol.smile.dynamics: spot_shifted",
   "vol.varswap.fair_strike: maturity",
-  "vol.vix.term_variance: minutes_to_expiry"
+  "vol.vix.term_variance: minutes_to_expiry",
+  "xva.adjustments.value: im_spread"
  ],
  "spec_only": []
 }

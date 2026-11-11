@@ -69,7 +69,7 @@ def main():
         add(d, "rates.shortrate.zcb_option", inp, out, cls="root_finding", verified=["mpmath-50", "put-call-parity"] + (["quantlib-1.44"] if ok else []),
             tags=["shortrate", "cir", "m5"], limit=LIM,
             description=f"CIR {inp['option_type']} sigma={inp['sigma']} K={inp['strike']}: " + ("large noncentrality (log-weight start at the mode)" if inp["sigma"] < 0.01 else "strike above A(T,S): rbar < 0, CDF 0"))
-    lim(d, "rates.shortrate.zcb", dict(hw, model="HULL_WHITE", curve=longcurve, t_years=0.0, maturity_years=1.0), "10,001 curve pillars")
+    lim(d, "rates.shortrate.zcb", dict(hw, model="HULL_WHITE", curve=longcurve, short_rate=0.01, t_years=0.0, maturity_years=1.0), "10,001 curve pillars")
     save(d)
     reg["shortrate_r5"] = {"counted": n_out, "total": len(m5) + 1, "rule": "QuantLib CoxIngersollRoss discountBondOption and discountBond (R5 M5)"}
 
@@ -118,7 +118,7 @@ def main():
     save(d)
     d = load("mcgreeks_g")
     lim(d, "risk.mc.greeks", dict(payoff="CALL", method="PATHWISE", spot=100.0, strike=100.0, expiry_years=1.0, rate=0.03, dividend_yield=0.0,
-                                  vol=0.2, paths=10_000_001, seed=1), "paths 10,000,001")
+                                  vol=0.2, paths=10_000_001, seed="1"), "paths 10,000,001")
     save(d)
     d = load("barrier_g")
     lim(d, "exotic.barrier.price", dict(spot=100.0, strike=100.0, expiry_years=1.0, rate=0.05, dividend_yield=0.02, vol=0.25, rebate=0.0,

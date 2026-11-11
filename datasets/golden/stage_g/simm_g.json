@@ -1,0 +1,769 @@
+{
+ "schema_version": "1.0",
+ "suite": "simm_g",
+ "spec": "specifications/06-risk/xva-framework.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w4b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "simm_g-0001",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     109.0,
+     105.0,
+     90.0,
+     71.0,
+     66.0,
+     66.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.659754,
+      0.535887,
+      0.407091,
+      0.33066,
+      0.237818
+     ],
+     [
+      0.659754,
+      1.0,
+      0.812252,
+      0.617034,
+      0.501187,
+      0.360465
+     ],
+     [
+      0.535887,
+      0.812252,
+      1.0,
+      0.759658,
+      0.617034,
+      0.443785
+     ],
+     [
+      0.407091,
+      0.617034,
+      0.759658,
+      1.0,
+      0.812252,
+      0.584191
+     ],
+     [
+      0.33066,
+      0.501187,
+      0.617034,
+      0.812252,
+      1.0,
+      0.719223
+     ],
+     [
+      0.237818,
+      0.360465,
+      0.443785,
+      0.584191,
+      0.719223,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "weighted_sensitivities": [
+      109000.0,
+      -52500.0,
+      225000.0,
+      284000.0,
+      -79200.0,
+      19800.0
+     ],
+     "concentration_factor": 1.0,
+     "margin": 452205.33578236337
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "simm",
+    "synthetic"
+   ],
+   "description": "mixed signs, below concentration",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "simm_g-0002",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     0.0,
+     0.0,
+     10000.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "risk_weights": [
+     109.0,
+     105.0,
+     90.0,
+     71.0,
+     66.0,
+     66.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.659754,
+      0.535887,
+      0.407091,
+      0.33066,
+      0.237818
+     ],
+     [
+      0.659754,
+      1.0,
+      0.812252,
+      0.617034,
+      0.501187,
+      0.360465
+     ],
+     [
+      0.535887,
+      0.812252,
+      1.0,
+      0.759658,
+      0.617034,
+      0.443785
+     ],
+     [
+      0.407091,
+      0.617034,
+      0.759658,
+      1.0,
+      0.812252,
+      0.584191
+     ],
+     [
+      0.33066,
+      0.501187,
+      0.617034,
+      0.812252,
+      1.0,
+      0.719223
+     ],
+     [
+      0.237818,
+      0.360465,
+      0.443785,
+      0.584191,
+      0.719223,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "weighted_sensitivities": [
+      0.0,
+      0.0,
+      900000.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "concentration_factor": 1.0,
+     "margin": 900000.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "simm",
+    "synthetic"
+   ],
+   "description": "one bucket: margin = RW x s",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "simm_g-0003",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0,
+     1000000.0
+    ],
+    "risk_weights": [
+     109.0,
+     105.0,
+     90.0,
+     71.0,
+     66.0,
+     66.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.659754,
+      0.535887,
+      0.407091,
+      0.33066,
+      0.237818
+     ],
+     [
+      0.659754,
+      1.0,
+      0.812252,
+      0.617034,
+      0.501187,
+      0.360465
+     ],
+     [
+      0.535887,
+      0.812252,
+      1.0,
+      0.759658,
+      0.617034,
+      0.443785
+     ],
+     [
+      0.407091,
+      0.617034,
+      0.759658,
+      1.0,
+      0.812252,
+      0.584191
+     ],
+     [
+      0.33066,
+      0.501187,
+      0.617034,
+      0.812252,
+      1.0,
+      0.719223
+     ],
+     [
+      0.237818,
+      0.360465,
+      0.443785,
+      0.584191,
+      0.719223,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "weighted_sensitivities": [
+      266994381.96336642,
+      257196422.9922337,
+      220454076.85048604,
+      173913771.73760563,
+      161666323.02368975,
+      161666323.02368975
+     ],
+     "concentration_factor": 2.449489742783178,
+     "margin": 988979528.4655795
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "simm",
+    "synthetic"
+   ],
+   "description": "concentration factor sqrt(6)",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "simm_g-0004",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -1000.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "risk_weights": [
+     100.0,
+     100.0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "correlations": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "weighted_sensitivities": [
+      100000.0,
+      -100000.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "concentration_factor": 1.0,
+     "margin": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "simm",
+    "synthetic"
+   ],
+   "description": "perfect correlation hedge: margin 0",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "simm_g-0005",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     109.0,
+     105.0,
+     90.0,
+     71.0,
+     66.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.659754,
+      0.535887,
+      0.407091,
+      0.33066,
+      0.237818
+     ],
+     [
+      0.659754,
+      1.0,
+      0.812252,
+      0.617034,
+      0.501187,
+      0.360465
+     ],
+     [
+      0.535887,
+      0.812252,
+      1.0,
+      0.759658,
+      0.617034,
+      0.443785
+     ],
+     [
+      0.407091,
+      0.617034,
+      0.759658,
+      1.0,
+      0.812252,
+      0.584191
+     ],
+     [
+      0.33066,
+      0.501187,
+      0.617034,
+      0.812252,
+      1.0,
+      0.719223
+     ],
+     [
+      0.237818,
+      0.360465,
+      0.443785,
+      0.584191,
+      0.719223,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "length mismatch"
+  },
+  {
+   "case_id": "simm_g-0006",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     109.0,
+     105.0,
+     90.0,
+     71.0,
+     66.0,
+     66.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.659754,
+      0.535887,
+      0.407091,
+      0.33066,
+      0.237818
+     ],
+     [
+      0.659754,
+      1.0,
+      0.812252,
+      0.617034,
+      0.501187,
+      0.360465
+     ],
+     [
+      0.535887,
+      0.812252,
+      1.0,
+      0.759658,
+      0.617034,
+      0.443785
+     ],
+     [
+      0.407091,
+      0.617034,
+      0.759658,
+      1.0,
+      0.812252,
+      0.584191
+     ],
+     [
+      0.33066,
+      0.501187,
+      0.617034,
+      0.812252,
+      1.0,
+      0.719223
+     ],
+     [
+      0.237818,
+      0.360465,
+      0.443785,
+      0.584191,
+      0.719223,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "threshold 0"
+  },
+  {
+   "case_id": "simm_g-0007",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     109.0,
+     105.0,
+     90.0,
+     71.0,
+     66.0,
+     66.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      1.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.659754,
+      1.0,
+      0.812252,
+      0.617034,
+      0.501187,
+      0.360465
+     ],
+     [
+      0.535887,
+      0.812252,
+      1.0,
+      0.759658,
+      0.617034,
+      0.443785
+     ],
+     [
+      0.407091,
+      0.617034,
+      0.759658,
+      1.0,
+      0.812252,
+      0.584191
+     ],
+     [
+      0.33066,
+      0.501187,
+      0.617034,
+      0.812252,
+      1.0,
+      0.719223
+     ],
+     [
+      0.237818,
+      0.360465,
+      0.443785,
+      0.584191,
+      0.719223,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "correlation above 1"
+  },
+  {
+   "case_id": "simm_g-0008",
+   "operation": "xva.simm.ir_delta",
+   "inputs": {
+    "sensitivities": [
+     1000.0,
+     -500.0,
+     2500.0,
+     4000.0,
+     -1200.0,
+     300.0
+    ],
+    "risk_weights": [
+     -1.0,
+     105.0,
+     90.0,
+     71.0,
+     66.0,
+     66.0
+    ],
+    "correlations": [
+     [
+      1.0,
+      0.659754,
+      0.535887,
+      0.407091,
+      0.33066,
+      0.237818
+     ],
+     [
+      0.659754,
+      1.0,
+      0.812252,
+      0.617034,
+      0.501187,
+      0.360465
+     ],
+     [
+      0.535887,
+      0.812252,
+      1.0,
+      0.759658,
+      0.617034,
+      0.443785
+     ],
+     [
+      0.407091,
+      0.617034,
+      0.759658,
+      1.0,
+      0.812252,
+      0.584191
+     ],
+     [
+      0.33066,
+      0.501187,
+      0.617034,
+      0.812252,
+      1.0,
+      0.719223
+     ],
+     [
+      0.237818,
+      0.360465,
+      0.443785,
+      0.584191,
+      0.719223,
+      1.0
+     ]
+    ],
+    "concentration_threshold": 1000000000.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "negative risk weight"
+  }
+ ]
+}

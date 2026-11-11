@@ -277,3 +277,38 @@ Read (research lane only; language sessions have nothing to build): `specificati
 ## Stage F carry-over wave 2b, part 1 READY (2026-11-11): E1 for the stage F operations
 
 `gen_stage_f_e1.py` now skips only the `e1_*` files (and `stage_g`, whose operations get E1 in a later pass). E1 grows from 5,247 to 5,535 cases (+288) over 226 operations in 24 files; new file `e1_book.json`; **case ids in the `e1_*` files renumber**, so every build reruns the whole E1 set. Not done: F3 (inflation01, dividend and borrow, correlation sensitivities), F4 (reverse stress, limits, concentration, liquidity-adjusted risk, vol by horizon, model-risk reserve), FRTB vega, curvature and the other risk classes; E1 for the stage G operations.
+
+## WAVE 4b READY (2026-11-11): deterministic xVA layer
+
+Read: `specifications/06-risk/xva-framework.md`; rulings G-40, G-41, G-43, G-44. New operations `xva.exposure.collateralised` (`collexp_g`, 17), `xva.adjustments.value` (`xvaadj_g`, 12), `xva.simm.ir_delta` (`simm_g`, 8), `xva.wwr.cva_hw` (`wwr_g`, 6). Build notes: everything is exact arithmetic on the inputs except the WWR root (monotone in `a`; Newton from `ln h`). Property tests: total EE equals the sum over sets; zero thresholds with no lag give zero exposure; `b = 0` WWR equals the independent CVA. Outside: none. **Stage G share: 258 of 487 = 53.0%** (below 60%; ORE-checked wave 4c is the planned recovery, G-39).
+
+## Stage F carry-over wave 2b, part 2 READY (2026-11-11): E1 for the stage G operations
+
+Ruling G-45. 1,026 cases over all 20 stage G operations in `datasets/golden/stage_g_e1/` (`e1g_exotic`, `e1g_rates`, `e1g_risk`, `e1g_xva`); the runner finds them by suite name. Builds: F-2 says NaN or infinity in any Real input is `E_DOMAIN`, and negative zero behaves as the base case (or as its +0 anchor). Stage F E1 unchanged (5,535). Outside share unchanged (E1 outside the denominator, G-45).
+
+## Stage F carry-over wave 2b, part 3 READY (2026-11-11): F4 portfolio-risk tools
+
+Read: `specifications/06-risk/portfolio-risk-tools.md`; ruling G-46. Five operations, suite `stage_f/risk_f4b` (25 cases: 16 values, 9 errors). Outside: none. Stage G share unchanged (stage F suite). Still not done in wave 2b: F3 (inflation01, dividend and borrow, correlation sensitivities) and the FRTB vega, curvature and other risk classes (these need the MAR21 weight tables read from the BIS text, not available in this session).
+
+## Stage F carry-over wave 2b, part 4 READY (2026-11-11): F3 sensitivities
+
+Read: `specifications/06-risk/f3-sensitivities.md`; ruling G-47. Three operations, suite `stage_f/risk_f3b` (18 cases, 12 values, 6 errors); 9 count against QuantLib. G-45 confirmed by the coordinator (E1 outside the floor denominator).
+
+## Stage F carry-over wave 2b, part 5 READY (2026-11-11): FRTB FX and equity delta
+
+Read: `specifications/06-risk/frtb-sa-fx-equity.md` with `frtb-sa-girr.md`; ruling G-48. Suite `stage_f/frtb_f2b` (15 cases: 9 values, 6 errors). Not specified: bucket 11, vega, curvature, CSR, commodity (formulas are images on the BIS page; owner confirmation from the PDF needed).
+
+## Wave 4c plan (ORE-checked simulated exposure), for when WSL is back
+
+Target: at least 50 ORE-counted cases, so stage G (258 of 487 now) reaches 60% (needs 293 of 488+x; with x = 60 cases of which 55 count: 313 of 547 = 57.2%, so **about 90 counted cases** are needed if every new case counts; plan below gives 96).
+- New operation `xva.exposure.swap_sim_hw`: Hull-White simulated EE, PFE (95%, 99%), EPE and CVA of vanilla swaps and swap portfolios, `core.rng` paths; goldens are the closed form where one exists (EE at resets, the `exposure_g` anchor) and ORE's own run otherwise.
+- Counted check: ORE 1.8.17 under WSL, on the same model (LGM equals Hull-White), curve and trades, at a tolerance of 3 Monte Carlo SE on its own paths (both sides report SE).
+- Grid: 4 swaps (2y, 5y, 10y, 20y; payer and receiver) x 3 volatilities x 2 mean reversions = 48 single-trade cases; 24 netting-set cases (mixed portfolios, with and without CSA, MPoR 10 days, threshold 0 and 1 million); 24 CVA cases (3 hazard rates); about 96 counted cases, plus 6 error cases.
+- ORE scripts go under `oracle/ore/` and run through `wsl.exe -e bash -lc '~/ore-oracle/.venv/bin/python ...'`.
+
+## Stage F carry-over wave 2b, part 6 READY (2026-11-11): FRTB CSR and commodity delta, equity bucket 11
+
+Ruling G-49. `frtb_f2b` now 25 cases (17 values, 8 errors); **ids from `frtb_f2b-0012` on renumber** (equity bucket 11 became a value case). New operations `risk.frtb.csr_delta`, `risk.frtb.commodity_delta`. Owner item: vega and curvature (formulas are images), and a spot check of MAR21.57 Table 5. Wave 4c waits for WSL.
+
+## G-J4, G-J5 fixed; error-case self-check (ruling G-50)
+`shortrate_g-0082` (now with `short_rate`) and `mcgreeks_g-0022` (seed `"1"`) fixed; builds rerun those two. `oracle/python/check_error_cases.py` checks the schema step of every hand-set error case in `stage_g` and `stage_f`: 0 mismatches now, and it flags both old cases. It does not re-derive the later validation steps.

@@ -6,6 +6,7 @@
 - **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, was registered in `specifications/stage-g-rulings.md` with its power calculation before it ran, and passed (variance ratio 0.102, 95% interval 0.089 to 0.116, Z = 33.4; `oracle/G10B_RESULT.json`). G-10's own outcome stays inconclusive.
 - R9 acceptance has modest power (ruling G-34, R5 L6): the continuous price is 3.7 SE from the daily call MC at 40,000 paths, just outside the 3 SE band, and the put (z = -1.72) cannot discriminate; parameters were fixed before the run (plan 12.10).
 - Outside share counted strictly against library pricing engines (ruling G-27, R5 H1): the Jamshidian suites now count only against QuantLib's `JamshidianSwaptionEngine`; the share is 61.0%, or 52.8%-equivalent if the Rebonato suite were excluded (owner reading open).
+- FRTB vega and curvature are not specified (ruling G-49): their formulas appear only as images on the BIS MAR21 page and wait for the owner to confirm them from the PDF.
 - F-33 (FRTB-SA GIRR `low` scenario) closed: confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma).
 
 ## 0.6.0: stage F, curve layer, portfolio risk and book (2026-11-10)
