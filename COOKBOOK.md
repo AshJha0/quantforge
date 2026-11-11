@@ -542,3 +542,34 @@ Copy the inputs of the named case from `datasets/golden/stage_g/` and send them 
 
 To check a whole suite: `python conformance/runner/runner.py --impl rust --suite xvaadj_g`.
 
+
+## Stage I recipes (draft)
+
+Each file below is one case document copied verbatim from the named golden case, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_i/` (`program/STAGE_I_HANDOVER.md`, follow-up note). Send it to a build's CLI, for example:
+
+```bash
+rust/target/release/quantforge run < examples/hedge_greeks_i.json
+```
+
+Stage I is a draft: the operations answer in a build only once that build's lane has passed the wave, and the release records which builds pass. Each lane adds a smoke test that runs every file through its CLI and checks `status: ok` and the golden values.
+
+| Task | File | Operation | From golden |
+|---|---|---|---|
+| Neutralise delta, gamma and vega with the underlying and two options | `hedge_greeks_i.json` | `hedge.greeks.neutralise` | `hedgegreeks_i-0003` |
+| Minimum-variance hedge ratio from two return series | `hedge_minvar_i.json` | `hedge.minvar.ratio` | `hedgemv_i-0006` |
+| Equity-beta hedge with index futures (Hull's 30 contracts) | `hedge_beta_i.json` | `hedge.beta.futures` | `hedgebeta_i-0001` |
+| Key-rate hedge with long-only bounds that bind | `hedge_qp_keyrate_i.json` | `hedge.qp.solve` | `hedgeqp_i-0009` |
+| Duplicate instruments: `MIN_NORM` splits the position evenly | `hedge_qp_minnorm_i.json` | `hedge.qp.solve` | `hedgeqp_i-0018` |
+| Whole lots where rounding the continuous answer is wrong | `hedge_integer_i.json` | `hedge.integer.solve` | `hedgeint_i-0010` |
+| Residual risk and per-factor contributions of a partial hedge | `hedge_residual_i.json` | `hedge.residual.report` | `hedgeres_i-0002` |
+| CS01 and jump-to-default hedge with a 3Y and a 10Y CDS | `hedge_credit_i.json` | `hedge.credit.cds` | `hedgecredit_i-0004` |
+| Correlation and vega hedge of exchange options with vanillas | `hedge_correlation_i.json` | `hedge.correlation.neutralise` | `hedgecorr_i-0003` |
+| Equity with the underlying, rates with two bonds, in one solve | `hedge_crossasset_i.json` | `hedge.crossasset.solve` | `hedgexa_i-0002` |
+| A costly instrument is left out (`x = 0` exactly) | `hedge_cost_i.json` | `hedge.qp.solve` with costs | `hedgecost_i-0002` |
+| Risk against cost, seven points of a spread-cost frontier | `hedge_frontier_i.json` | `hedge.frontier.solve` | `hedgefrontier_i-0001` |
+| Short call, delta-hedged daily to expiry | `hedge_backtest_i.json` | `hedge.backtest.delta` | `hedgebt_i-0001` |
+| Dollar offset, regression and variance reduction of a hedge | `hedge_effectiveness_i.json` | `hedge.effectiveness` | `hedgeeff_i-0001` |
+| Best pair of instruments where greedy selection fails | `hedge_select_i.json` | `hedge.select.solve` | `hedgeselect_i-0009` |
+| Implementation shortfall and slippage of a buy and a sell | `hedge_slippage_i.json` | `hedge.slippage.report` | `hedgeslip_i-0003` |
+
+The same backtest with costs: add `"half_spread"` to the inputs of `hedge_backtest_i.json` as in golden `hedgebtcost_i-0001`. To check a whole suite: `python conformance/runner/runner.py --impl python --suite hedgeqp_i`.

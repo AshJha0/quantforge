@@ -450,6 +450,36 @@ Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On 
 - **G-10 is inconclusive**; the powered test G-10b passed (`specifications/stage-g-rulings.md`). R9 acceptance has modest power (ruling G-34).
 - **All inputs are synthetic.** No market swaption, cap or CDS quotes are used.
 
+## Stage I: hedging
+
+Stage I is in progress (draft, 2026-11-11). Everything below is specified in `specifications/08-hedging/` and pinned by 276 golden cases in `datasets/golden/stage_i/`; the four builds' conformance results are recorded at release, and none is claimed here. Every input is synthetic.
+
+### A hedge is a small least-squares problem
+
+**Plain idea.** A book has risks: delta, vega, key-rate DV01s, a CS01. Each hedge instrument has its own risks per unit. Choose how many units of each to hold so that the book's risks, plus the hedges' risks, come as close to zero as you can, perhaps with limits on positions, costs for trading or a whole number of contracts. With as many independent instruments as risks the answer is exact; with fewer it is the best fit, and what is left is the residual risk.
+
+**Formal statement.** With the instruments' risks as the columns of `A` (`m` risks by `n` instruments) and the book's risks `b`, `hedge.qp.solve` minimises `f(x) = sum_i w_i (A x + b)_i^2 + ridge sum_j x_j^2` subject to optional equalities `E x = e` and bounds `lower <= x <= upper` (`hedge-solvers.md`). The checks run in a fixed order, and a problem without a unique minimiser is `E_SINGULAR` unless `singular: MIN_NORM` asks for the least-norm minimiser (rulings I-3, I-5). Integer lots minimise the same `f` over whole numbers by exact search, with a fixed tie rule (I-7); costs, impact, liquidity bounds and margin extend the objective and the constraints (`hedge-costs-and-frontier.md`, I-24 to I-28). Greek, beta, credit, correlation and cross-asset hedges build `A` and `b` from their own pricing and then solve this problem.
+
+**Worked example 1: equity beta.** `hedgebeta_i-0001` is Hull's example (*Options, Futures, and Other Derivatives*, ch. 3): a portfolio of 5,050,000 with beta 1.5, hedged to beta 0 with index futures at 1,010 and a multiplier of 250. `contracts = (beta* - beta) V / (F m) = (0 - 1.5) x 5,050,000 / 252,500 = -30`, thirty contracts short, and `beta_after` is 0 (computed: mpmath at 50 digits; arithmetic only, so no outside library counts for this suite).
+
+**Worked example 2: delta, gamma and vega together.** `hedgegreeks_i-0003` (the input of `examples/hedge_greeks_i.json`): spot 100, rate 3%, dividend yield 1%, volatility 25%, a book short 1,000 six-month 100 calls and long 500 one-year 90 puts. Its Greeks are delta -686.21, gamma -15.760 and vega -11,508.4 (per unit volatility). Three targets need three instruments: hold 504.83 of the underlying, 502.76 three-month 105 calls and 38.27 two-year 95 puts, and all three Greeks are zero after the hedge (computed at 50 digits; outside check QuantLib 1.44 `AnalyticEuropeanEngine` Greeks with a numpy solve). The underlying alone could fix the delta, but only an option can fix gamma, and two options with different expiries are needed to fix gamma and vega at once.
+
+**Worked example 3: rounding is not enough.** `hedgeint_i-0010` (`examples/hedge_integer_i.json`): two strongly correlated instruments, `A = [[1, 0.95], [0.95, 1]]`, `b = (-1.265, -1.27)`, lots of 1. The continuous answer is `(0.6, 0.7)`, objective 0. Rounding it gives `(1, 1)` and an objective of 0.9317; the best whole-number answer is `(0, 1)` with 0.172125, found by searching 756 points (computed: exact rational enumeration, an ellipsoid bound and a wide-box float search agree; no free integer least-squares library exists, so no outside check).
+
+### Judging a hedge after the fact
+
+**Plain idea.** A hedge chosen today drifts as prices move, so a delta hedge is rebalanced on dates. Replaying a path shows what the hedged position actually earned, and comparing the changes of the book with the changes of the hedge says how well it worked.
+
+**Formal statement.** `hedge.backtest.delta` replays a given path in a fixed order at each date: interest on cash, dividends on the shares held, the mark, then the rebalance (ruling I-29); optional spread and impact costs are paid on every trade, the first purchase included (I-39, I-40). `hedge.effectiveness` reports the dollar offset, the regression slope and `R^2` of hedge changes on book changes, and the variance reduction; a hedge leg with zero variance is `E_DOMAIN` (I-31, I-43).
+
+**Worked example.** `hedgeeff_i-0001`: a close hedge gives a dollar offset of 0.9712, a slope of -0.9924, `R^2` 0.9964 and a variance reduction of 0.9964 (computed at 50 digits; outside check numpy 2.5 `polyfit`, `corrcoef` and `var`). A perfect offset would give 1, -1, 1 and 1.
+
+### What stage I's evidence does and does not show
+- **Outside oracle: 113 of 276 cases (40.9%), below the 60% floor (I-2).** Error cases are in the denominator and never count. Integer lots, beta futures, residual reports and slippage have no outside library that solves a different way, so the floor needs an owner decision, not more cases (`program/STAGE_I_HANDOVER.md`).
+- **Q6 (calibration on real noisy quotes) is blocked** by the data terms of the candidate sources; only its preregistration exists (`research/preregs/Q6-01-churn-bound.md`).
+- **The hedges are calculations.** Nothing is traded, and costs, impact and margin are inputs, not estimates from a market.
+- **I-48 is open at this draft:** two builds limit one cost form to 20 instruments, which the ruling does not allow.
+
 ## Appendix: stage history
 
 The order things were built, with each stage's own summary. The topics above reuse these stages' worked examples.

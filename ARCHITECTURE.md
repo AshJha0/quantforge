@@ -113,3 +113,11 @@ Implemented in all four languages; on the integration tree `stage-g-int` (2026-1
 - **Risk (domain 06)** gains Monte Carlo Greeks (pathwise, likelihood ratio, smoothed digitals), a model-reserve dispersion report and an AAD ladder on a Bermudan (`mc-greeks.md`, `model-reserve.md`, `aad-core.md`).
 - **xVA (new, under domain 06)**: exposure is computed first (`xva-exposure.md`), and the adjustments are pure arithmetic on exposure profiles, discount factors and hazard rates (`xva-framework.md`). That split keeps CVA, DVA and FVA testable without a simulation. Portfolio exposure (`xva.exposure.portfolio_hw`, wave 4c) is exact one-factor integration, and ORE's Monte Carlo is the outside check, kept under `oracle/ore/` and never read by a build.
 - **CLI**: the 21 stage G operations are listed in `specifications/cli-contract.md` ("Stage G operations") and the generated name map.
+
+### Stage I: hedging (draft for v0.8.0)
+
+Specified, with 276 golden cases; the four builds' results are recorded at release (`program/STAGE_I_HANDOVER.md`). What changes in the structure:
+- **Hedging (domain 08)** gets its first operations, all built around one solver. `hedge.qp.solve` (weighted least squares with ridge, equalities and bounds, and optional spread, impact, liquidity and margin terms) is the kernel; the Greek, credit, correlation and cross-asset hedges each build a risk matrix from their own pricing and pass it to that solve, and `hedge.frontier.solve` and `hedge.select.solve` call it repeatedly (`specifications/08-hedging/`). The fixed check order (shapes, then domain, then rank, then feasibility) makes the error code of a bad problem the same in every build (rulings I-3, I-14).
+- **Reuse of earlier domains:** credit hedges reuse the `credit.cds.price` legs (domain 04), and cross-asset hedges reprice rather than use Greeks, so the risk is a half-difference of prices on a rebuilt curve (I-15, I-21).
+- **Errors:** a new code, `E_INFEASIBLE`, for constraints no point satisfies (`specifications/cli-contract.md`, contract 1.11.0 at release, I-51).
+- **Tutorials** for stage I import `quantforge_core` modules, as tutorial 1 does; `quantforge.hedge.*` in the name map is a logical name (I-52).
