@@ -59,6 +59,14 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-31 | Effectiveness domain | `sum(item changes) = 0`, or a series with zero sample variance, is `E_DOMAIN`; a backtest with `quantity = 0` therefore fails there. Sample (co)variances use `n - 1` |
 | I-32 | `E_LIMIT` sizes, wave 4b | Path and series length 100,000 |
 
+## Wave 4c, instrument selection
+
+| # | Point | Ruling |
+|---|---|---|
+| I-33 | Selection inputs | `hedge.select.solve` takes the `hedge.qp.solve` inputs without equalities or a singular policy (`E_INPUT` if present), and every bound must admit 0 (`E_DOMAIN`). The full problem must be regular (I-3) |
+| I-34 | Selection rule | The least objective over all subsets of at most `K` instruments. Ties within `1e-12` relative go to the smaller subset, then to the lexicographically smaller index list. Indices are 0-based |
+| I-35 | `E_LIMIT` size, wave 4c | 20 instruments |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).

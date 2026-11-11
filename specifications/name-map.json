@@ -3774,6 +3774,45 @@
     "volatility_after"
    ]
   },
+  "hedge.select.solve": {
+   "spec": "specifications/08-hedging/instrument-selection.md",
+   "rust": "quantforge::hedge::select_solve",
+   "python": "quantforge.hedge.select_solve",
+   "java": "Hedge.selectSolve",
+   "cpp": "qf::hedge::select_solve",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "eq_matrix": {
+     "java": "eqMatrix"
+    },
+    "eq_rhs": {
+     "java": "eqRhs"
+    },
+    "lower": {
+     "java": "lower"
+    },
+    "max_instruments": {
+     "java": "maxInstruments"
+    },
+    "ridge": {
+     "java": "ridge"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "objective",
+    "residual",
+    "selected",
+    "x"
+   ]
+  },
   "hedge.solve": {
    "spec": "specifications/08-hedging/stage-b-hedges.md",
    "rust": "quantforge::hedge::solve_",

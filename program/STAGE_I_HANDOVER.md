@@ -152,3 +152,22 @@ Read: `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`; rulings I-
 `hedgebt_i` 7 of 15 (QuantLib `AnalyticEuropeanEngine` on each date), `hedgeeff_i` 5 of 10 (numpy). Every value case counts. Stage I so far: 98 of 234 = 41.9% (`oracle/outside_register_i.json`).
 
 **Correction to the wave 4b property tests (2026-11-11):** on a constant-spot path the hedge leg has zero variance, so `hedge.backtest.delta` returns `E_DOMAIN` (I-31). Test the replay itself instead: on such a path, with zero rates and dividends, `portfolio_values` end at `quantity (V_last - V_0)`.
+
+## WAVE 4c READY (2026-11-11): instrument selection
+
+Read: `specifications/08-hedging/instrument-selection.md`; rulings I-33 to I-35; cli-contract block "Stage I operations"; edge-case row I13; `specifications/name-map.json` (273 operations).
+
+### Suite (17 cases)
+
+`hedgeselect_i`, operation `hedge.select.solve`: 10 value cases, 7 error cases.
+
+### Build notes
+- Enumerate subsets of size 1 to `K` and solve each with your `hedge.qp.solve` on those columns. Keep the best by the I-34 tie rule: within 1e-12 relative, the smaller subset wins, then the lexicographically smaller index list. Indices are 0-based.
+- Do not select greedily: `hedgeselect_i-0009` defeats forward selection by 0.5.
+- `selected` is compared exactly; `x` has zeros for instruments left out.
+
+### Property test
+- `K = n` gives the `hedge.qp.solve` answer, and the best objective never rises as `K` grows.
+
+### Outside-oracle status
+`hedgeselect_i` 10 of 17 (scipy per subset); every value case counts. Stage I so far: 108 of 251 = 43.0% (`oracle/outside_register_i.json`).

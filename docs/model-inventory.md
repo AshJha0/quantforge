@@ -718,6 +718,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a need for cost-aware rebalancing or stochastic-volatility hedging.
 - **Validation report:** `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`.
 
+### MI-6 Instrument selection (stage I wave 4c)
+- **Purpose:** the best weighted least-squares hedge using at most K of n instruments.
+- **Inputs:** the `hedge.qp.solve` inputs without equalities, and K.
+- **Limitations:** exhaustive search, at most 20 instruments; no fixed cost per instrument; bounds must admit zero.
+- **Validation:** 50-digit solve of every subset; scipy per-subset outside check (10 of 17); greedy counterexample pinned. **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** the same enumeration with scipy solvers.
+- **Monitoring thresholds:** a selected hedge whose residual risk exceeds the full hedge's by more than the desk's tolerance.
+- **Data lineage hash:** sha256 00bfcdd41645756679f850673b867f1c04871e3e7e76b08fc05ca5c76b59731d (`hedgeselect_i`)
+- **Retirement trigger:** universes above 20 instruments or fixed costs per instrument.
+- **Validation report:** `specifications/08-hedging/instrument-selection.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.
