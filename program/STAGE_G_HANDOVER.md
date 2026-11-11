@@ -231,3 +231,7 @@ Read: `specifications/04-pricing/lmm.md`; ruling G-22; cli-contract block "Stage
 `lmmcap_g` 17 of 26 and `lmmswn_g` 36 of 42 count (QuantLib 1.44 `AbcdFunction`, `DiscountCurve`, `blackFormula`; every value case). **Stage G: 258 of 405 = 63.7%** (error cases and the 21 `mcgreeks_g` cases in the denominator). Generator `oracle/python/gen_stage_g_lmm.py`; a rerun reproduces the goldens byte for byte. `quality_gate --check-specs --check-register`: no new gaps. Rulings G-1 to G-22 plus G-10b.
 
 **Not done in this session, still left for stage G:** simulated LMM; Q3b AAD core (G-9); Q9 part 2 reserve dispersion; wave 4 rest (CSA, netting, MPoR, collateral, simulated EE/PFE/EPE, DVA/FVA/MVA, SIMM-style IM, WWR, KVA, ORE demo); A5 surrogate (G-11, challenger only, so no goldens by ruling); stage F carry-over wave 2b. Most wave 4 items have no free outside library short of ORE; each such suite lowers the share, so the 5.0-point margin above 60% buys about 85 uncounted cases at the current total.
+
+## WAVE 3c READY (2026-11-11): simulated LMM, acceptance only
+
+Read: `specifications/04-pricing/lmm.md`, section "Simulated LMM"; rulings G-25, G-26. No new operation and no goldens: each language implements the terminal-measure simulation as a library function and adds the caplet acceptance (6 caplets within 3 SE of `lmmcap_g`) as a property test. Python reference run passes (`oracle/LMM_ACCEPTANCE.json`). Rebonato error versus simulation 0.4-0.5% (evidence only). Outside share unchanged: 258 of 405 = 63.7%.

@@ -64,3 +64,19 @@ Prices: `simple_analytic` with limit 1e-6 absolute plus 1e-9 relative (1e-12 per
 |---|---|---|---|---|
 | Variance integral `C(T_i, T_j; u)` | exact (closed form) or quadrature to 1e-14 relative | every golden: 50-digit `mp.quad` agrees with QuantLib's closed-form `AbcdFunction.covariance` within the 1e-10 relative output tolerance on all 53 value cases | `a = b = 0`: `C = d^2 u`, so `black_vols = d` to 1e-14 (asserted) | QuantLib 1.44 `AbcdFunction` |
 | Rebonato frozen-weight approximation | none (an approximation, not a limit) | the golden is the formula itself; its error against a simulated LMM is reported by the later simulation slice, not judged here | `beta = 0` with flat volatility: `black_vol = d` exactly (asserted) | [BM 6.13] |
+
+## Simulated LMM (stage G wave 3c): acceptance only
+
+**Plain idea.** The closed forms above price one caplet or approximate one swaption. Path-dependent and Bermudan LMM products need the forwards simulated jointly. The simulation has no golden of its own (its numbers depend on the random stream); it is judged by reproducing the wave 3b caplets, which are exact under the model.
+
+Formal statement [BM 6.3, eq. 6.12; Glasserman, *Monte Carlo Methods in Financial Engineering*, Springer, 2003, section 3.7 (not opened)]. Under the measure of the last grid date `T_N`, for `t` before the fixing of `F_k`:
+
+`d ln F_k = (mu_k - sigma_k^2/2) dt + sigma_k dW_k`, `mu_k = -sigma_k sum_(j > k) rho_kj tau_j sigma_j F_j / (1 + tau_j F_j)`, `dW_i dW_j = rho_ij dt`.
+
+Scheme (ruling G-26): log-Euler with a predictor-corrector drift (the drift averaged at the start and at the predicted end of the step), `sigma` frozen at the step midpoint, every fixing date a step boundary, correlated normals by Cholesky of `rho`. A forward stops at its fixing. A caplet on `F_k` paid at `T_(k+1)` is `P(0, T_N) E^N[tau_k max(F_k(T_k) - K, 0) prod_(j > k) (1 + tau_j F_j(T_(k+1)))]`.
+
+Acceptance (`oracle/python/run_lmm_mc.py`, `oracle/LMM_ACCEPTANCE.json`): humped abcd, `beta = 0.1`, annual grid to 7 years, `K = 4.5%`, 100,000 paths, 20 steps a year, numpy PCG64 seed 20261111. All six caplets must lie within 3 standard errors of `lmmcap_g` closed forms. **Pass:** `z` from -1.49 to 0.61. Each language adds this as a property test with its own stream, same parameters.
+
+Disclosure: the first run froze `sigma` at the step start (`oracle/LMM_ACCEPTANCE_LEFTPOINT.json`); it also passed but the 1-year caplet sat at `z = 2.97`, a discretisation bias of the left-point rule on the steep part of the hump. The midpoint rule was adopted after that run was seen, so it is recorded here, not hidden.
+
+Rebonato error, evidence only (G-25): 5 years into 5, payer at 3.5%: Rebonato exceeds the simulation by 0.41% at `beta = 0` and 0.47% at `beta = 0.5` (simulation SE about 0.6% and 0.5%), consistent with the sub-percent accuracy reported for the formula [BM 6.13].

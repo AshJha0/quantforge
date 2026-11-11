@@ -85,6 +85,7 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 | G-23 | Wave 4 outside oracle | ORE (open-source build or binary, no spend, no account) is the outside oracle for wave 4 exposure, PFE and CVA. If it cannot be installed, that is documented and the lower share is accepted as a known issue. **Status 2026-11-11:** the install (`uv pip install open-source-risk-engine`) was refused by this session's permission classifier ("code from external"); not installed. It needs the owner to approve the install or to add a permission rule |
 | G-24 | LMM scope in stage G | G-22 stays lognormal only for stage G. A shifted or normal LMM is recorded as a later item |
 | G-25 | Rebonato golden | The frozen-weight approximation is the golden (G-22). Its error against a simulated LMM is reported as evidence only, never judged |
+| G-26 | Simulated LMM scheme and acceptance | Terminal measure, log-Euler, predictor-corrector drift, volatility at step midpoint, fixings as step boundaries, Cholesky correlation. Judged only by the caplet acceptance (6 caplets within 3 SE at 100,000 paths, 20 steps a year); no goldens (stream-dependent). The midpoint rule replaced a left-point rule after the left-point run was seen (both runs kept in `oracle/`) |
 
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
