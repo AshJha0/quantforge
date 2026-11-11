@@ -1,9 +1,12 @@
 #pragma once
 // Stage I wave 1, hedge solvers (specifications/08-hedging/hedge-solvers.md; rulings I-1 to I-14).
 // Every rank or singularity decision compares with 1e-12 times the largest value of the stated matrix (I-3).
+#include <array>
 #include <optional>
+#include <string>
 #include <vector>
 
+#include "quantforge/core/credit.hpp"
 #include "quantforge/core/linalg.hpp"
 
 namespace quantforge::hedging {
@@ -102,5 +105,59 @@ struct ResidualReport {
     Vec contributions;
 };
 ResidualReport residual_report(const Matrix& a, const Vec& b, const Vec& x, const Matrix& covariance);
+
+// ---- wave 2: credit and correlation hedges (08-hedging/credit-and-correlation-hedges.md, I-15 to I-19) ----
+
+struct CdsContract {
+    Date maturity;
+    double coupon = 0.0;
+    double notional = 1.0;
+    bool buy = true;  // side: BUY_PROTECTION
+};
+/// One target: CS01, JTD, or BUCKET_k (bucket = k - 1).
+struct CreditTarget {
+    enum class Kind { Cs01, Jtd, Bucket } kind = Kind::Cs01;
+    std::size_t bucket = 0;
+    bool operator==(const CreditTarget&) const = default;
+};
+struct CreditRisk {
+    double pv = 0.0, cs01 = 0.0, jtd = 0.0;
+    Vec buckets;
+};
+/// pv, CS01, JTD and bucket CS01s of one unit of bought protection (I-15, I-16).
+CreditRisk unit_credit_risk(Date trade_date, const Curve& discount, const HazardCurve& hazard, double recovery,
+                            Date maturity, double coupon);
+struct CreditHedge {
+    Vec notionals;
+    CreditRisk book, after;
+    double hedge_upfront = 0.0;
+};
+/// Checks 2 to 4 of hedge.credit.cds; the discount interpolation check (1) is the caller's.
+/// targets: CS01, JTD or BUCKET_1 to BUCKET_P; any other name is E_INPUT.
+CreditHedge credit_hedge(Date trade_date, const Curve& discount, const HazardCurve& hazard, double recovery,
+                         const std::vector<CdsContract>& book, const std::vector<CdsContract>& hedges,
+                         const std::vector<std::string>& targets);
+
+enum class TwoAssetKind { Exchange, Call1, Put1, Call2, Put2, Underlying1, Underlying2 };
+struct TwoAssetPosition {
+    TwoAssetKind kind = TwoAssetKind::Underlying1;
+    double quantity1 = 0.0, quantity2 = 0.0, strike = 0.0, expiry_years = 0.0;
+    double quantity = 0.0;
+};
+struct TwoAssetMarket {
+    double spot1 = 0.0, spot2 = 0.0, rate = 0.0, yield1 = 0.0, yield2 = 0.0, vol1 = 0.0, vol2 = 0.0, correlation = 0.0;
+};
+/// delta_1, delta_2, vega_1, vega_2 (per unit volatility), correlation01 (per 0.01; I-18).
+using TwoAssetGreeks = std::array<double, 5>;
+enum class TwoAssetTarget { Delta1, Delta2, Vega1, Vega2, Correlation };
+TwoAssetGreeks unit_two_asset_greeks(const TwoAssetMarket& m, const TwoAssetPosition& p);
+struct CorrelationHedge {
+    Vec quantities;
+    TwoAssetGreeks before{}, after{};
+};
+/// Checks 2 and 3 of hedge.correlation.neutralise; key sets (check 1) are the caller's.
+CorrelationHedge correlation_hedge(const TwoAssetMarket& m, const std::vector<TwoAssetPosition>& book,
+                                   const std::vector<TwoAssetPosition>& hedges,
+                                   const std::vector<TwoAssetTarget>& targets);
 
 }  // namespace quantforge::hedging

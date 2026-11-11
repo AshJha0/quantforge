@@ -15,6 +15,13 @@ Built: `hedge.qp.solve`, `hedge.integer.solve`, `hedge.minvar.ratio`, `hedge.gre
 - Line coverage of the new code (gcov, unit tests plus the wave 1 conformance run): `hedging.cpp` 99.3% of 668 lines, `ops_hedge.inc` 90.8% of 174.
 - `tests/test_cli.cpp` now expects 266 operations (the wave 1 name map).
 
+## Wave 2, credit and correlation hedges
+
+Built: `hedge.credit.cds`, `hedge.correlation.neutralise` (`cpp26/src/core/hedging_w2.cpp`). The CDS risks reuse the stage D `cds_price` legs on hazard curves rebuilt from the bumped piecewise-flat hazards (I-15).
+
+- Conformance: `hedgecredit_i` 19 of 19, `hedgecorr_i` 20 of 20, on the first build. Full run on the wave 2 tree: 14,653 passed, 0 failures in the suites built so far (the 21 `hedgecost_i` failures and 52 not-implemented cases are waves 4a and 4b, not built at that point).
+- ctest: 277 of 278 test cases passed; the one failure was the load-sensitive Q3b timing test (see Open), which passed when rerun. 4 new test cases (own contract hedges itself, targets zero after, bucket sum against the parallel CS01, zero risk past maturity, Margrabe delta against a price difference, the I-17 proportional rows, key sets). `tests/test_cli.cpp` expects 268 operations.
+
 ## SPEC_QUESTIONS
 
 | # | Where | Question | What the C++ build does |
@@ -24,5 +31,6 @@ Built: `hedge.qp.solve`, `hedge.integer.solve`, `hedge.minvar.ratio`, `hedge.gre
 
 ## Open
 
+- `Q3b AAD ladder ... costs at most 5 prices (G-9)` (stage G, `tests/test_stage_g.cpp:515`) is a wall-clock ratio. It failed once tonight at 5.09 against 5.0 while other lanes were compiling, and passed when rerun alone (2.80 earlier in the evening). Not touched by stage I.
 - ASan and UBSan need WSL; not run tonight (no WSL by the coordinator's rule).
 - `cpp26/tests/gen_cli_cases.py` fails on main: it reads `expected.error_code` for every non-ok case, and the stage F `e1_*` cases with `"status": "any"` have none (first: `e1_bond-0004`). `tests/cli_cases.inc` was not regenerated, so the in-process golden test has no stage I cases; conformance covers them.

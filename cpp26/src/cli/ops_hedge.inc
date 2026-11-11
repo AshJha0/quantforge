@@ -205,6 +205,152 @@ void op_hedge_residual_report(const In& in, Out& out) {
     out.key_reals("contributions", r.contributions);
 }
 
+// ---- stage I wave 2: credit and correlation hedges (08-hedging/credit-and-correlation-hedges.md) ----
+
+constexpr std::size_t max_credit_book = 1000, max_credit_hedges = 50, max_correlation_book = 1000,
+                      max_correlation_hedges = 5;  // ruling I-19
+
+hedging::CdsContract cds_contract_of(const In& r, bool trade) {
+    hedging::CdsContract c;
+    c.maturity = r.date("maturity");
+    c.coupon = r.real("coupon");
+    if (trade) {
+        c.notional = r.real("notional");
+        c.buy = r.choice<bool>("side", {{"BUY_PROTECTION", true}, {"SELL_PROTECTION", false}});
+    }
+    return c;
+}
+
+void write_credit_risk(Out& out, string_view key, const hedging::CreditRisk& r, bool with_pv) {
+    out.values.key(key);
+    out.values.begin_object();
+    if (with_pv) out.key_real("pv", r.pv);
+    out.key_real("cs01", r.cs01);
+    out.key_real("jtd", r.jtd);
+    out.key_reals("buckets", r.buckets);
+    out.values.end_object();
+}
+
+void op_hedge_credit_cds(const In& in, Out& out) {
+    const Date t = in.date("trade_date");
+    const CurveInput d = curve_of(in, "discount");
+    const HazardCurve h = hazard_of(in.need("hazard"), "hazard");
+    const double recovery = in.real("recovery");
+    const auto book = rows_of<hedging::CdsContract>(in, "book", [](const In& r) { return cds_contract_of(r, true); });
+    const auto hedges =
+        rows_of<hedging::CdsContract>(in, "hedges", [](const In& r) { return cds_contract_of(r, false); });
+    const Value& tv = in.need("targets");
+    if (tv.kind != Kind::Array) schema("targets", "expected an array");
+    std::vector<string> targets;
+    for (const Value& item : tv.items) targets.push_back(to_string(item, "targets"));
+    limit_if(book.size() > max_credit_book, "book");
+    limit_if(hedges.size() > max_credit_hedges, "hedges");
+    in.ready();
+    d.limit();
+    limit_if(h.dates.size() > max_quotes, "hazard");
+    require_flat_forwards(d);  // check 1 (R1-4)
+    const hedging::CreditHedge r = hedging::credit_hedge(t, d.build(), h, recovery, book, hedges, targets);
+    out.key_reals("notionals", r.notionals);
+    write_credit_risk(out, "book", r.book, true);
+    write_credit_risk(out, "after", r.after, false);
+    out.key_real("hedge_upfront", r.hedge_upfront);
+}
+
+// One two-asset position. Its keys are recorded so that a key set other than its kind's is E_INPUT (check 1),
+// raised by the caller after E_LIMIT and the finite rule.
+struct KeyedPosition {
+    hedging::TwoAssetPosition p;
+    bool keys_ok = true;
+};
+
+KeyedPosition two_asset_position_of(const In& r, bool with_quantity) {
+    using K = hedging::TwoAssetKind;
+    KeyedPosition k;
+    k.p.kind = r.choice<K>("instrument", {{"EXCHANGE", K::Exchange},
+                                          {"CALL_1", K::Call1},
+                                          {"PUT_1", K::Put1},
+                                          {"CALL_2", K::Call2},
+                                          {"PUT_2", K::Put2},
+                                          {"UNDERLYING_1", K::Underlying1},
+                                          {"UNDERLYING_2", K::Underlying2}});
+    std::vector<string_view> wanted{"instrument"};
+    if (with_quantity) wanted.push_back("quantity");
+    if (k.p.kind == K::Exchange) wanted.insert(wanted.end(), {"quantity1", "quantity2", "expiry_years"});
+    else if (k.p.kind != K::Underlying1 && k.p.kind != K::Underlying2) wanted.insert(wanted.end(), {"strike", "expiry_years"});
+    for (const auto& [key, value] : r.raw().members)
+        if (std::ranges::find(wanted, string_view(key)) == wanted.end()) k.keys_ok = false;
+    const auto read = [&](string_view key, double& into) {
+        if (r.raw().find(key)) into = to_real(*r.raw().find(key), key);
+        else k.keys_ok = false;
+    };
+    for (const string_view key : wanted) {
+        if (key == "instrument") continue;
+        double* slot = key == "quantity"    ? &k.p.quantity
+                       : key == "quantity1" ? &k.p.quantity1
+                       : key == "quantity2" ? &k.p.quantity2
+                       : key == "strike"    ? &k.p.strike
+                                            : &k.p.expiry_years;
+        read(key, *slot);
+    }
+    return k;
+}
+
+std::vector<KeyedPosition> two_asset_positions_of(const In& in, string_view key, bool with_quantity) {
+    const Value& a = in.need(key);
+    if (a.kind != Kind::Array) schema(key, "expected an array");
+    std::vector<KeyedPosition> out;
+    for (const Value& item : a.items) {
+        if (item.kind != Kind::Object) schema(key, "expected an object");
+        out.push_back(two_asset_position_of(In(item), with_quantity));
+    }
+    return out;
+}
+
+void op_hedge_correlation_neutralise(const In& in, Out& out) {
+    using T = hedging::TwoAssetTarget;
+    const hedging::TwoAssetMarket m{in.real("spot1"),  in.real("spot2"), in.real("rate"),
+                                    in.real("yield1"), in.real("yield2"), in.real("vol1"),
+                                    in.real("vol2"),   in.real("correlation")};
+    const auto book = two_asset_positions_of(in, "book", true);
+    const auto hedges = two_asset_positions_of(in, "hedges", false);
+    const Value& tv = in.need("targets");
+    if (tv.kind != Kind::Array) schema("targets", "expected an array");
+    std::vector<T> targets;
+    for (const Value& item : tv.items)
+        targets.push_back(to_enum<T>(item, "targets",
+                                     {{"DELTA_1", T::Delta1},
+                                      {"DELTA_2", T::Delta2},
+                                      {"VEGA_1", T::Vega1},
+                                      {"VEGA_2", T::Vega2},
+                                      {"CORRELATION", T::Correlation}}));
+    limit_if(book.size() > max_correlation_book, "book");
+    limit_if(hedges.size() > max_correlation_hedges, "hedges");
+    in.ready();
+    std::vector<hedging::TwoAssetPosition> b, h;
+    for (const KeyedPosition& k : book) {
+        if (!k.keys_ok) throw Error("E_INPUT", "book: keys other than those of the instrument kind", "book");
+        b.push_back(k.p);
+    }
+    for (const KeyedPosition& k : hedges) {
+        if (!k.keys_ok) throw Error("E_INPUT", "hedges: keys other than those of the instrument kind", "hedges");
+        h.push_back(k.p);
+    }
+    const hedging::CorrelationHedge r = hedging::correlation_hedge(m, b, h, targets);
+    out.key_reals("quantities", r.quantities);
+    const auto write = [&](string_view key, const hedging::TwoAssetGreeks& g) {
+        out.values.key(key);
+        out.values.begin_object();
+        out.key_real("delta_1", g[0]);
+        out.key_real("delta_2", g[1]);
+        out.key_real("vega_1", g[2]);
+        out.key_real("vega_2", g[3]);
+        out.key_real("correlation01", g[4]);
+        out.values.end_object();
+    };
+    write("greeks_before", r.before);
+    write("greeks_after", r.after);
+}
+
 constexpr Entry hedge_ops[] = {
     {"hedge.solve", op_hedge_solve},
     {"hedge.spread_cost", op_spread_cost},
@@ -214,4 +360,6 @@ constexpr Entry hedge_ops[] = {
     {"hedge.greeks.neutralise", op_hedge_greeks_neutralise},
     {"hedge.beta.futures", op_hedge_beta_futures},
     {"hedge.residual.report", op_hedge_residual_report},
+    {"hedge.credit.cds", op_hedge_credit_cds},
+    {"hedge.correlation.neutralise", op_hedge_correlation_neutralise},
 };

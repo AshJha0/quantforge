@@ -11,7 +11,9 @@
 #include "dispatch.hpp"
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/hedging.hpp"
+#include "quantforge/core/json.hpp"
 #include "quantforge/core/linalg.hpp"
+#include "quantforge/core/stats.hpp"
 
 using namespace quantforge;
 namespace hg = quantforge::hedging;
@@ -448,4 +450,112 @@ TEST_CASE("I1 CLI: null only inside bounds (I-12), limits (I-4) before the finit
           "ok");
     CHECK(i_code(i_case("hedge.residual.report",
                         R"({"a":[[1.0]],"b":[1.0],"x":[-0.5],"covariance":[[1.0,0.0]]})")) == "E_INPUT");
+}
+
+// ---- wave 2: credit and correlation hedges ----
+
+namespace {
+
+json::Value i_outputs(const std::string& op, const std::string& inputs) {
+    const auto r = cli::run_case(i_case(op, inputs));
+    REQUIRE(r.ok);
+    return *json::parse(r.json).value.find("outputs");
+}
+
+double i_num(const json::Value& v, std::initializer_list<std::string_view> path) {
+    const json::Value* p = &v;
+    for (const std::string_view k : path) p = p->find(k);
+    return p->number;
+}
+
+// A five-pillar hazard curve and flat discounting, own data in the shape of credit.cds.price inputs.
+std::string i_credit(const std::string& book, const std::string& hedges, const std::string& targets) {
+    return R"({"trade_date":"2026-11-06","discount":{"as_of":"2026-11-06","interpolation":"LOG_LINEAR_DF","pillars":[{"date":"2046-11-06","discount_factor":0.5}]},)"
+           R"("hazard":{"as_of":"2026-11-06","pillars":[{"date":"2027-12-20","survival":0.985},{"date":"2029-12-20","survival":0.95},{"date":"2031-12-20","survival":0.9},{"date":"2033-12-20","survival":0.84},{"date":"2036-12-20","survival":0.76}]},)"
+           R"("recovery":0.4,"book":)" +
+           book + R"(,"hedges":)" + hedges + R"(,"targets":)" + targets + "}";
+}
+
+}  // namespace
+
+TEST_CASE("I2 credit: the book's own contract hedges it with the opposite notional; targets are zero after") {
+    const json::Value o = i_outputs(
+        "hedge.credit.cds",
+        i_credit(R"([{"maturity":"2033-12-20","coupon":0.01,"notional":7.5e6,"side":"SELL_PROTECTION"}])",
+                 R"([{"maturity":"2033-12-20","coupon":0.01}])", R"(["CS01"])"));
+    CHECK(std::fabs(o.find("notionals")->items[0].number - 7.5e6) < 1e-6);
+    const json::Value both = i_outputs(
+        "hedge.credit.cds",
+        i_credit(R"([{"maturity":"2033-12-20","coupon":0.01,"notional":1e7,"side":"BUY_PROTECTION"},{"maturity":"2029-12-20","coupon":0.05,"notional":4e6,"side":"SELL_PROTECTION"}])",
+                 R"([{"maturity":"2028-12-20","coupon":0.01},{"maturity":"2036-12-20","coupon":0.01}])",
+                 R"(["CS01","JTD"])"));
+    CHECK(std::fabs(i_num(both, {"after", "cs01"})) < 1e-6);
+    CHECK(std::fabs(i_num(both, {"after", "jtd"})) < 1e-6);
+    // Sum of bucket CS01s against the parallel CS01: equal to first order only.
+    double sum = 0.0;
+    for (const json::Value& b : both.find("book")->find("buckets")->items) sum += b.number;
+    const double parallel = i_num(both, {"book", "cs01"});
+    CHECK(std::fabs(sum - parallel) < 1e-3 * std::fabs(parallel));
+    CHECK(sum != parallel);
+}
+
+TEST_CASE("I2 credit: a section after every maturity has zero risk exactly; the check ladder") {
+    const json::Value o = i_outputs(
+        "hedge.credit.cds", i_credit(R"([{"maturity":"2028-12-20","coupon":0.01,"notional":1e6,"side":"BUY_PROTECTION"}])",
+                                     R"([{"maturity":"2028-06-20","coupon":0.01}])", R"(["BUCKET_2"])"));
+    for (std::size_t k = 2; k < 5; ++k) CHECK(o.find("book")->find("buckets")->items[k].number == 0.0);
+    const std::string book = R"([{"maturity":"2028-12-20","coupon":0.01,"notional":1e6,"side":"BUY_PROTECTION"}])";
+    const std::string hedge = R"([{"maturity":"2028-06-20","coupon":0.01}])";
+    CHECK(i_code(i_case("hedge.credit.cds", i_credit(book, hedge, R"(["BUCKET_0"])"))) == "E_INPUT");
+    CHECK(i_code(i_case("hedge.credit.cds", i_credit(book, hedge, R"(["BUCKET_01"])"))) == "E_INPUT");
+    CHECK(i_code(i_case("hedge.credit.cds", i_credit(book, hedge, R"(["VEGA"])"))) == "E_INPUT");
+    CHECK(i_code(i_case("hedge.credit.cds", i_credit(book, hedge, R"(["BUCKET_4"])"))) == "E_SINGULAR");
+    CHECK(i_code(i_case("hedge.credit.cds", i_credit("[]", hedge, R"(["CS01"])"))) == "E_INPUT");
+    CHECK(i_code(i_case("hedge.credit.cds",
+                        i_credit(book, R"([{"maturity":"2028-06-20","coupon":-0.01}])", R"(["CS01"])"))) == "E_DOMAIN");
+}
+
+TEST_CASE("I2 correlation: a long exchange option has negative correlation01; a vanilla has none") {
+    const hg::TwoAssetMarket m{100.0, 95.0, 0.03, 0.01, 0.02, 0.25, 0.3, 0.4};
+    const hg::TwoAssetPosition exchange{hg::TwoAssetKind::Exchange, 1.0, 1.0, 0.0, 1.0, 1.0};
+    const hg::TwoAssetGreeks g = hg::unit_two_asset_greeks(m, exchange);
+    CHECK(g[4] < 0.0);
+    // I-17: the vega and correlation rows are dV/ds times common factors.
+    CHECK(std::fabs(g[2] / g[4] - (0.25 - 0.4 * 0.3) / (-0.01 * 0.25 * 0.3)) < 1e-12 * std::fabs(g[2] / g[4]));
+    CHECK(std::fabs(g[3] / g[2] - (0.3 - 0.4 * 0.25) / (0.25 - 0.4 * 0.3)) < 1e-12);
+    for (const hg::TwoAssetKind kind : {hg::TwoAssetKind::Call1, hg::TwoAssetKind::Put2}) {
+        const hg::TwoAssetGreeks v = hg::unit_two_asset_greeks(m, {kind, 0.0, 0.0, 100.0, 0.5, 1.0});
+        CHECK(v[4] == 0.0);
+    }
+    // Margrabe delta against a central difference of the price F1 N(d1) - F2 N(d2) in spot1.
+    const auto price = [&](double s1) {
+        hg::TwoAssetMarket b = m;
+        b.spot1 = s1;
+        const double sp = std::sqrt(b.vol1 * b.vol1 + b.vol2 * b.vol2 - 2.0 * b.correlation * b.vol1 * b.vol2);
+        const double f1 = s1 * std::exp(-b.yield1), f2 = b.spot2 * std::exp(-b.yield2);
+        const double d1 = (std::log(f1 / f2) + 0.5 * sp * sp) / sp;
+        return f1 * normal_cdf(d1) - f2 * normal_cdf(d1 - sp);
+    };
+    CHECK(std::fabs((price(100.01) - price(99.99)) / 0.02 - g[0]) < 1e-8);
+    hg::TwoAssetMarket flat = m;
+    flat.correlation = 1.0;
+    flat.vol2 = 0.25;
+    CHECK(i_error([&] { hg::correlation_hedge(flat, {exchange}, {exchange}, {hg::TwoAssetTarget::Delta1}); }) ==
+          "E_DOMAIN");
+    CHECK(i_error([&] {
+              hg::correlation_hedge(m, {exchange}, {exchange, exchange},
+                                    {hg::TwoAssetTarget::Correlation, hg::TwoAssetTarget::Vega1});
+          }) == "E_SINGULAR");
+}
+
+TEST_CASE("I2 correlation CLI: a key set other than the kind's is E_INPUT, after the finite rule") {
+    const std::string head =
+        R"({"spot1":100,"spot2":95,"rate":0.03,"yield1":0.01,"yield2":0.02,"vol1":0.25,"vol2":0.3,"correlation":0.4,"targets":["DELTA_1"],"book":[{"instrument":"CALL_1","strike":100,"expiry_years":0.5,"quantity":10}],"hedges":[)";
+    CHECK(i_code(i_case("hedge.correlation.neutralise", head + R"({"instrument":"UNDERLYING_1"}]})")) == "ok");
+    CHECK(i_code(i_case("hedge.correlation.neutralise", head + R"({"instrument":"UNDERLYING_1","quantity":1}]})")) ==
+          "E_INPUT");
+    CHECK(i_code(i_case("hedge.correlation.neutralise", head + R"({"instrument":"UNDERLYING_1","note":"x"}]})")) ==
+          "E_INPUT");
+    CHECK(i_code(i_case("hedge.correlation.neutralise",
+                        head + R"({"instrument":"CALL_1","strike":"NaN"}]})")) == "E_DOMAIN");
 }

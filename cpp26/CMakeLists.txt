@@ -38,6 +38,7 @@ add_library(quantforge_core
   src/core/exposure_lgm.cpp
   src/core/calibration.cpp
   src/core/hedging.cpp
+  src/core/hedging_w2.cpp
   src/core/compounding.cpp
   src/core/cos.cpp
   src/core/data_checks.cpp
