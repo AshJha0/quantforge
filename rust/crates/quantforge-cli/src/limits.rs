@@ -282,10 +282,31 @@ fn stage_f_above(op: &str, i: &Json) -> bool {
     }
 }
 
+/// Ruling I-4: stated sizes of the stage I wave 1 operations.
+fn stage_i_above(op: &str, i: &Json) -> bool {
+    let over = |k: &str, n: i128| len(i, k).is_some_and(|m| m > n);
+    let columns_over = |n: i128| {
+        i.get("a")
+            .and_then(Json::as_array)
+            .and_then(|a| a.first())
+            .and_then(Json::as_array)
+            .is_some_and(|r| r.len() as i128 > n)
+    };
+    match op {
+        "hedge.qp.solve" => over("a", 1_000) || columns_over(200) || over("eq_matrix", 200),
+        "hedge.integer.solve" => over("a", 1_000) || columns_over(12),
+        "hedge.residual.report" => over("a", 1_000) || columns_over(200),
+        "hedge.minvar.ratio" => over("covariance", 201) || over("hedge_changes", 200),
+        "hedge.greeks.neutralise" => over("portfolio", 1_000) || over("hedges", 3),
+        _ => false,
+    }
+}
+
 /// The `E_LIMIT` this case breaks, if any.
 pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
     (too_long_stage_f(op, inputs)
         || stage_f_above(op, inputs)
+        || stage_i_above(op, inputs)
         || matrix_above(op, inputs)
         || curve_points_above(inputs)
         || value_too_deep(op, inputs)

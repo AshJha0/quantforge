@@ -45,6 +45,7 @@ pub mod garch;
 pub mod garch_estimate;
 pub mod greeks;
 pub mod hedge;
+pub mod hedge_solvers;
 pub mod heston;
 pub mod inflation;
 pub mod integrate;
