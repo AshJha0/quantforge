@@ -271,5 +271,44 @@ super::registry! {
             ("fitted_prices", px.into()),
             ("rmse", rmse.into()),
         ]))
+    },
+    "rates.shortrate.bermudan_swaption" | "rates.shortrate.callable_bond" => {
+        let (a, sigma) = (i.f64("mean_reversion")?, i.f64("sigma")?);
+        if i.opt("short_rate").is_some() {
+            return fail("E_INPUT", "HULL_WHITE takes no short_rate");
+        }
+        let c = super::rates::sub(i, "curve")?;
+        let (ts, ds) = (c.reals("times")?, c.reals("discount_factors")?);
+        let g = super::rates::sub(i, "grid")?;
+        let grid = sr::FdGrid {
+            nx: g.int("nx")?,
+            steps_per_year: g.int("steps_per_year")?,
+            width: g.f64("width")?,
+        };
+        let pay = i.reals("payment_times")?;
+        let notional = i.f64("notional")?;
+        if op == "rates.shortrate.callable_bond" {
+            let coupon = i.f64("coupon_rate")?;
+            let calls = i.reals("call_times")?;
+            let call_price = i.f64("call_price")?;
+            i.gate()?;
+            let curve = HwCurve::new(&ts, &ds)?;
+            let bond = sr::CallableBond { pay: &pay, coupon, notional, calls: &calls, call_price };
+            return plain(obj([("price", sr::callable_bond(&curve, a, sigma, &bond, grid)?.into())]));
+        }
+        let start = i.f64("start_years")?;
+        let k = i.f64("fixed_rate")?;
+        let st = i.str("swaption_type")?;
+        let ex = i.reals("exercise_times")?;
+        i.gate()?;
+        let curve = HwCurve::new(&ts, &ds)?;
+        let payer = match st {
+            "PAYER" => true,
+            "RECEIVER" => false,
+            _ => return fail("E_INPUT", "swaption_type must be PAYER or RECEIVER"),
+        };
+        let swap = sr::SwapLeg { start, pay: &pay, fixed_rate: k, payer, notional };
+        let p = sr::bermudan_swaption(&curve, a, sigma, &swap, &ex, grid)?;
+        plain(obj([("price", p.into())]))
     }
 }

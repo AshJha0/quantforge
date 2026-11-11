@@ -677,6 +677,270 @@ impl G2pp<'_> {
     }
 }
 
+/// Grid of the pinned Hull-White finite-difference scheme (ruling G-18).
+#[derive(Debug, Clone, Copy)]
+pub struct FdGrid {
+    /// Space nodes, odd, 5 to 10,001.
+    pub nx: i64,
+    /// Time steps per year, 1 to 100,000.
+    pub steps_per_year: i64,
+    /// Half-width of the space grid in standard deviations of `x(t_m)`.
+    pub width: f64,
+}
+
+impl FdGrid {
+    fn check(&self) -> Result<()> {
+        crate::error::finite("width", &self.width)?;
+        if self.nx < 5 || self.nx % 2 == 0 {
+            return fail("E_INPUT", "grid.nx must be odd and at least 5");
+        }
+        if self.nx > 10_001 {
+            return fail("E_LIMIT", "grid.nx is at most 10,001");
+        }
+        if self.steps_per_year < 1 {
+            return fail("E_INPUT", "grid.steps_per_year must be at least 1");
+        }
+        if self.steps_per_year > 100_000 {
+            return fail("E_LIMIT", "grid.steps_per_year is at most 100,000");
+        }
+        if self.width <= 0.0 {
+            return fail("E_DOMAIN", "grid.width must be positive");
+        }
+        Ok(())
+    }
+}
+
+/// `alpha(t) = f(0,t) + sigma^2/(2a^2) (1 - e^{-at})^2`, so that `r = x + alpha`.
+fn hw_alpha(curve: &HwCurve, a: f64, sigma: f64, t: f64) -> f64 {
+    let e = -(-a * t).exp_m1();
+    curve.forward(t) + sigma * sigma / (2.0 * a * a) * e * e
+}
+
+/// Terminal values of the FD scheme from `(x nodes, t_m)`.
+type Terminal<'a> = dyn Fn(&[f64], f64) -> Result<Vec<f64>> + 'a;
+/// Knot update of the FD scheme: `(knot index, V, x nodes, t_k)`.
+type AtKnot<'a> = dyn FnMut(usize, &mut [f64], &[f64], f64) -> Result<()> + 'a;
+
+/// The G-18 reference scheme: fully implicit backward induction on `x = r - alpha(t)` over
+/// the knots `0 < t_1 < ... < t_m`. `terminal` gives `V` at `t_m` from `(x, t_m)`; `at_knot`
+/// is called on arrival at each knot `t_k`, `k < m` (0-based into `knots`, backward order),
+/// with `(k, V, x, t_k)`. Returns `V` at the centre node at time 0.
+fn hw_fd(
+    curve: &HwCurve,
+    a: f64,
+    sigma: f64,
+    knots: &[f64],
+    grid: FdGrid,
+    terminal: &Terminal,
+    at_knot: &mut AtKnot,
+) -> Result<f64> {
+    let nx = usize::try_from(grid.nx).unwrap_or(5);
+    let tm = knots[knots.len() - 1];
+    let sx = sigma * (-(-2.0 * a * tm).exp_m1() / (2.0 * a)).sqrt();
+    let h = grid.width * sx;
+    #[allow(clippy::cast_precision_loss)]
+    let dx = 2.0 * h / (nx - 1) as f64;
+    #[allow(clippy::cast_precision_loss)]
+    let x: Vec<f64> = (0..nx).map(|i| -h + i as f64 * dx).collect();
+    let mut v = terminal(&x, tm)?;
+    let (mut lo, mut di, mut up, mut cp, mut dp) = (
+        vec![0.0; nx],
+        vec![0.0; nx],
+        vec![0.0; nx],
+        vec![0.0; nx],
+        vec![0.0; nx],
+    );
+    let diff = sigma * sigma / (2.0 * dx * dx);
+    #[allow(clippy::cast_precision_loss)]
+    let spy = grid.steps_per_year as f64;
+    let mut all = vec![0.0];
+    all.extend_from_slice(knots);
+    for k in (1..all.len()).rev() {
+        let (ta, tb) = (all[k - 1], all[k]);
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let n = ((spy * (tb - ta)).ceil() as usize).max(1);
+        #[allow(clippy::cast_precision_loss)]
+        let dt = (tb - ta) / n as f64;
+        for j in 1..=n {
+            #[allow(clippy::cast_precision_loss)]
+            let t = if j == n { ta } else { tb - j as f64 * dt };
+            let al = hw_alpha(curve, a, sigma, t);
+            for i in 1..nx - 1 {
+                let adv = a * x[i] / (2.0 * dx);
+                lo[i] = -dt * (diff + adv);
+                di[i] = 1.0 + dt * (2.0 * diff + x[i] + al);
+                up[i] = -dt * (diff - adv);
+            }
+            // V_0 = 2 V_1 - V_2 and V_(nx-1) = 2 V_(nx-2) - V_(nx-3).
+            di[1] += 2.0 * lo[1];
+            up[1] -= lo[1];
+            di[nx - 2] += 2.0 * up[nx - 2];
+            lo[nx - 2] -= up[nx - 2];
+            // Thomas algorithm on rows 1..nx-2.
+            cp[1] = up[1] / di[1];
+            dp[1] = v[1] / di[1];
+            for i in 2..nx - 1 {
+                let m = di[i] - lo[i] * cp[i - 1];
+                cp[i] = up[i] / m;
+                dp[i] = (v[i] - lo[i] * dp[i - 1]) / m;
+            }
+            v[nx - 2] = dp[nx - 2];
+            for i in (1..nx - 2).rev() {
+                v[i] = dp[i] - cp[i] * v[i + 1];
+            }
+            v[0] = 2.0 * v[1] - v[2];
+            v[nx - 1] = 2.0 * v[nx - 2] - v[nx - 3];
+        }
+        if k >= 2 {
+            at_knot(k - 2, &mut v, &x, ta)?;
+        }
+    }
+    Ok(v[(nx - 1) / 2])
+}
+
+/// Value of entering at `t` the swap paying from `t` to `Tn` (per unit notional, payer sign
+/// `phi`), at short rate `r`: `phi (1 - P(t,Tn) - K sum tau_j P(t,Tj))`, payments after `t`.
+fn swap_exercise(m: &Model, r: f64, t: f64, pay: &[f64], k: f64, phi: f64) -> Result<f64> {
+    let mut prev = t;
+    let mut fixed = 0.0;
+    let mut last = 1.0;
+    for tj in pay.iter().filter(|tj| **tj > t) {
+        let p = zcb(m, r, t, *tj)?.0;
+        fixed += (tj - prev) * p;
+        prev = *tj;
+        last = p;
+    }
+    Ok(phi * (1.0 - last - k * fixed))
+}
+
+/// The underlying swap of a Bermudan swaption.
+#[derive(Debug, Clone)]
+pub struct SwapLeg<'a> {
+    /// `T0`, the start of the swap.
+    pub start: f64,
+    /// `T1 < ... < Tn`.
+    pub pay: &'a [f64],
+    /// Fixed rate `K`.
+    pub fixed_rate: f64,
+    /// Payer (pays fixed) or receiver.
+    pub payer: bool,
+    /// Notional.
+    pub notional: f64,
+}
+
+/// `rates.shortrate.bermudan_swaption` on the pinned G-18 scheme. `exercise` must be reset
+/// dates `T0, ..., T(n-1)`; exercising at `t` enters the swap paying from `t` to `Tn`.
+pub fn bermudan_swaption(
+    curve: &HwCurve,
+    a: f64,
+    sigma: f64,
+    swap: &SwapLeg,
+    exercise: &[f64],
+    grid: FdGrid,
+) -> Result<f64> {
+    let (start, pay) = (swap.start, swap.pay);
+    crate::error::finite("start_years", &start)?;
+    crate::error::finite("exercise_times", &exercise)?;
+    crate::error::finite("fixed_rate", &swap.fixed_rate)?;
+    crate::error::finite("notional", &swap.notional)?;
+    let m = Model::HullWhite { a, sigma, curve };
+    zcb(&m, 0.0, 0.0, 1.0)?;
+    if start <= 0.0 {
+        return fail("E_DOMAIN", "start_years must be positive");
+    }
+    check_payments(start, pay)?;
+    let mut resets = vec![start];
+    resets.extend_from_slice(&pay[..pay.len() - 1]);
+    if exercise.is_empty()
+        || exercise.windows(2).any(|w| w[1] <= w[0])
+        || exercise.iter().any(|e| !resets.contains(e))
+    {
+        return fail(
+            "E_INPUT",
+            "exercise_times must be strictly increasing reset dates before the last payment",
+        );
+    }
+    grid.check()?;
+    let phi = if swap.payer { 1.0 } else { -1.0 };
+    let ex = |x: &[f64], t: f64| -> Result<Vec<f64>> {
+        let al = hw_alpha(curve, a, sigma, t);
+        x.iter()
+            .map(|xi| swap_exercise(&m, xi + al, t, pay, swap.fixed_rate, phi))
+            .collect()
+    };
+    let terminal = |x: &[f64], t: f64| -> Result<Vec<f64>> {
+        Ok(ex(x, t)?.into_iter().map(|e| e.max(0.0)).collect())
+    };
+    let mut knot = |_k: usize, v: &mut [f64], x: &[f64], t: f64| -> Result<()> {
+        for (vi, e) in v.iter_mut().zip(ex(x, t)?) {
+            *vi = vi.max(e);
+        }
+        Ok(())
+    };
+    Ok(swap.notional * hw_fd(curve, a, sigma, exercise, grid, &terminal, &mut knot)?)
+}
+
+/// A fixed-rate bond with an issuer call schedule.
+#[derive(Debug, Clone)]
+pub struct CallableBond<'a> {
+    /// Coupon dates `T1 < ... < Tn`, the last also the maturity.
+    pub pay: &'a [f64],
+    /// Coupon rate `c`; accruals are time differences from 0.
+    pub coupon: f64,
+    /// Face amount.
+    pub notional: f64,
+    /// Call dates: payment times before the last (possibly none).
+    pub calls: &'a [f64],
+    /// Call price as a fraction of face.
+    pub call_price: f64,
+}
+
+/// `rates.shortrate.callable_bond` (G-21) on the G-18 scheme. At each coupon date the
+/// ex-coupon value is capped by `call_price` (if callable), then the coupon is added.
+pub fn callable_bond(
+    curve: &HwCurve,
+    a: f64,
+    sigma: f64,
+    bond: &CallableBond,
+    grid: FdGrid,
+) -> Result<f64> {
+    let (pay, calls, coupon) = (bond.pay, bond.calls, bond.coupon);
+    crate::error::finite("coupon_rate", &coupon)?;
+    crate::error::finite("notional", &bond.notional)?;
+    crate::error::finite("call_times", &calls)?;
+    crate::error::finite("call_price", &bond.call_price)?;
+    let m = Model::HullWhite { a, sigma, curve };
+    zcb(&m, 0.0, 0.0, 1.0)?;
+    check_payments(0.0, pay)?;
+    let before_last = &pay[..pay.len() - 1];
+    if calls.windows(2).any(|w| w[1] <= w[0]) || calls.iter().any(|c| !before_last.contains(c)) {
+        return fail(
+            "E_INPUT",
+            "call_times must be strictly increasing payment times before the last",
+        );
+    }
+    if bond.call_price <= 0.0 {
+        return fail("E_DOMAIN", "call_price must be positive");
+    }
+    grid.check()?;
+    let n = pay.len();
+    let tau = |k: usize| pay[k] - if k == 0 { 0.0 } else { pay[k - 1] };
+    let last = 1.0 + coupon * tau(n - 1);
+    let terminal = |x: &[f64], _t: f64| -> Result<Vec<f64>> { Ok(vec![last; x.len()]) };
+    let mut knot = |k: usize, v: &mut [f64], _x: &[f64], t: f64| -> Result<()> {
+        let callable = calls.contains(&t);
+        let cpn = coupon * tau(k);
+        for vi in v.iter_mut() {
+            if callable {
+                *vi = vi.min(bond.call_price);
+            }
+            *vi += cpn;
+        }
+        Ok(())
+    };
+    Ok(bond.notional * hw_fd(curve, a, sigma, pay, grid, &terminal, &mut knot)?)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -826,5 +1090,58 @@ mod tests {
         let (sigma, _, rmse) = hw_calibrate(&c, 0.05, &strip).unwrap();
         assert!((sigma - 0.007).abs() < 1e-11 && rmse < 1e-12);
         assert_eq!(hw_calibrate(&c, 0.05, &[]).unwrap_err().code, "E_INPUT");
+    }
+
+    #[test]
+    fn bermudan_european_limit_and_callable_bound() {
+        let c = curve();
+        let pay = [2.0, 3.0, 4.0, 5.0, 6.0];
+        let grid = FdGrid {
+            nx: 201,
+            steps_per_year: 100,
+            width: 6.0,
+        };
+        let swap = SwapLeg {
+            start: 1.0,
+            pay: &pay,
+            fixed_rate: 0.04,
+            payer: true,
+            notional: 1.0,
+        };
+        let berm1 = bermudan_swaption(&c, 0.05, 0.01, &swap, &[1.0], grid).unwrap();
+        let m = Model::HullWhite {
+            a: 0.05,
+            sigma: 0.01,
+            curve: &c,
+        };
+        let euro = swaption(&m, 0.0, 1.0, &pay, 0.04, true, 1.0).unwrap().price;
+        // The pinned scheme is first order in time: about 0.2% below Jamshidian at this grid.
+        assert!((berm1 - euro).abs() < 5e-3 * euro, "{berm1} {euro}");
+        let berm = bermudan_swaption(&c, 0.05, 0.01, &swap, &[1.0, 2.0, 3.0], grid).unwrap();
+        assert!(berm >= berm1);
+        let coupons: Vec<f64> = (1..=10).map(f64::from).collect();
+        let straight: f64 = coupons
+            .iter()
+            .map(|t| 0.05 * c.ln_discount(*t).exp())
+            .sum::<f64>()
+            + c.ln_discount(10.0).exp();
+        let bond = |calls: &'static [f64]| CallableBond {
+            pay: Box::leak(coupons.clone().into_boxed_slice()),
+            coupon: 0.05,
+            notional: 1.0,
+            calls,
+            call_price: 1.0,
+        };
+        let plain = callable_bond(&c, 0.05, 0.01, &bond(&[]), grid).unwrap();
+        let called = callable_bond(&c, 0.05, 0.01, &bond(&[3.0, 4.0, 5.0]), grid).unwrap();
+        assert!((plain - straight).abs() < 1e-3 * straight);
+        assert!(called < plain);
+        let bad = FdGrid { nx: 50, ..grid };
+        assert_eq!(
+            callable_bond(&c, 0.05, 0.01, &bond(&[]), bad)
+                .unwrap_err()
+                .code,
+            "E_INPUT"
+        );
     }
 }
