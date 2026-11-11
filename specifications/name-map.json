@@ -4999,6 +4999,27 @@
     "pv"
    ]
   },
+  "risk.concentration.measures": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::concentration_measures",
+   "python": "quantforge.risk.concentration_measures",
+   "java": "Risk.concentrationMeasures",
+   "cpp": "qf::risk::concentration_measures",
+   "inputs": {
+    "exposures": {
+     "java": "exposures"
+    },
+    "top_n": {
+     "java": "topN"
+    }
+   },
+   "outputs": [
+    "effective_number",
+    "hhi",
+    "top_n_share",
+    "weights"
+   ]
+  },
   "risk.corr.dispersion": {
    "spec": "specifications/05-volatility/stage-e-targets-b.md",
    "rust": "quantforge::risk::corr_dispersion",
@@ -5264,6 +5285,25 @@
     "scenarios"
    ]
   },
+  "risk.limits.check": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::limits_check",
+   "python": "quantforge.risk.limits_check",
+   "java": "Risk.limitsCheck",
+   "cpp": "qf::risk::limits_check",
+   "inputs": {
+    "limits": {
+     "java": "limits"
+    },
+    "measures": {
+     "java": "measures"
+    }
+   },
+   "outputs": [
+    "measures",
+    "overall"
+   ]
+  },
   "risk.mc.greeks": {
    "spec": "specifications/06-risk/mc-greeks.md",
    "rust": "quantforge::risk::mc_greeks",
@@ -5406,6 +5446,32 @@
     "value_start"
    ]
   },
+  "risk.stress.reverse": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::stress_reverse",
+   "python": "quantforge.risk.stress_reverse",
+   "java": "Risk.stressReverse",
+   "cpp": "qf::risk::stress_reverse",
+   "inputs": {
+    "delta": {
+     "java": "delta"
+    },
+    "direction": {
+     "java": "direction"
+    },
+    "gamma": {
+     "java": "gamma"
+    },
+    "target_loss": {
+     "java": "targetLoss"
+    }
+   },
+   "outputs": [
+    "pnl",
+    "scale",
+    "shocks"
+   ]
+  },
   "risk.var.filtered_historical": {
    "spec": "specifications/06-risk/var-es-and-backtests.md",
    "rust": "quantforge::risk::var_filtered_historical",
@@ -5451,6 +5517,34 @@
     "es",
     "tail_count",
     "var"
+   ]
+  },
+  "risk.var.liquidity_adjusted": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::var_liquidity_adjusted",
+   "python": "quantforge.risk.var_liquidity_adjusted",
+   "java": "Risk.varLiquidityAdjusted",
+   "cpp": "qf::risk::var_liquidity_adjusted",
+   "inputs": {
+    "position_values": {
+     "java": "positionValues"
+    },
+    "spread_mean": {
+     "java": "spreadMean"
+    },
+    "spread_vol": {
+     "java": "spreadVol"
+    },
+    "var": {
+     "java": "var"
+    },
+    "z": {
+     "java": "z"
+    }
+   },
+   "outputs": [
+    "liquidity_cost",
+    "lvar"
    ]
   },
   "risk.var.monte_carlo": {
@@ -5603,6 +5697,29 @@
     "vanna",
     "vega",
     "volga"
+   ]
+  },
+  "risk.vol.horizon": {
+   "spec": "specifications/06-risk/portfolio-risk-tools.md",
+   "rust": "quantforge::risk::vol_horizon",
+   "python": "quantforge.risk.vol_horizon",
+   "java": "Risk.volHorizon",
+   "cpp": "qf::risk::vol_horizon",
+   "inputs": {
+    "ar1": {
+     "java": "ar1"
+    },
+    "daily_vol": {
+     "java": "dailyVol"
+    },
+    "horizon_days": {
+     "java": "horizonDays"
+    }
+   },
+   "outputs": [
+    "sqrt_rule_vol",
+    "variance_ratio",
+    "vol"
    ]
   },
   "risk.vol.surface_vega": {
@@ -7085,6 +7202,8 @@
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
   "risk.mc.greeks: bump_relative",
+  "risk.var.liquidity_adjusted: spread_mean",
+  "risk.var.liquidity_adjusted: spread_vol",
   "risk.vol.greeks: shift",
   "usecase.fx_hedge: half_spread",
   "vol.equity.price: expiry",

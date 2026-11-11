@@ -285,3 +285,7 @@ Read: `specifications/06-risk/xva-framework.md`; rulings G-40, G-41, G-43, G-44.
 ## Stage F carry-over wave 2b, part 2 READY (2026-11-11): E1 for the stage G operations
 
 Ruling G-45. 1,026 cases over all 20 stage G operations in `datasets/golden/stage_g_e1/` (`e1g_exotic`, `e1g_rates`, `e1g_risk`, `e1g_xva`); the runner finds them by suite name. Builds: F-2 says NaN or infinity in any Real input is `E_DOMAIN`, and negative zero behaves as the base case (or as its +0 anchor). Stage F E1 unchanged (5,535). Outside share unchanged (E1 outside the denominator, G-45).
+
+## Stage F carry-over wave 2b, part 3 READY (2026-11-11): F4 portfolio-risk tools
+
+Read: `specifications/06-risk/portfolio-risk-tools.md`; ruling G-46. Five operations, suite `stage_f/risk_f4b` (25 cases: 16 values, 9 errors). Outside: none. Stage G share unchanged (stage F suite). Still not done in wave 2b: F3 (inflation01, dividend and borrow, correlation sensitivities) and the FRTB vega, curvature and other risk classes (these need the MAR21 weight tables read from the BIS text, not available in this session).
