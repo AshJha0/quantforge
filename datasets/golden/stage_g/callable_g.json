@@ -929,6 +929,94 @@
     "synthetic"
    ],
    "description": "no payments"
+  },
+  {
+   "case_id": "callable_g-0013",
+   "operation": "rates.shortrate.callable_bond",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 100.0,
+    "payment_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0
+    ],
+    "coupon_rate": 0.045,
+    "call_times": [],
+    "call_price": 1.0,
+    "grid": {
+     "nx": 5001,
+     "steps_per_year": 5000,
+     "width": 6.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [],
+   "tags": [
+    "invalid",
+    "limit",
+    "r5",
+    "synthetic"
+   ],
+   "description": "combined work 5,001 x 150,000 > 5e8"
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "operations": 206,
+ "operations": 226,
  "no_real_input": [
   "core.calendar.add_business_days",
   "core.calendar.add_tenor",
@@ -26,12 +26,16 @@
   "fx.spot_date",
   "rates.schedule.generate"
  ],
- "leaves": 1052,
- "cases": 5207,
+ "leaves": 1118,
+ "cases": 5535,
  "files": [
   [
    "e1_bond",
    182
+  ],
+  [
+   "e1_book",
+   40
   ],
   [
    "e1_calib",
@@ -47,7 +51,7 @@
   ],
   [
    "e1_credit",
-   274
+   309
   ],
   [
    "e1_eq",
@@ -79,11 +83,11 @@
   ],
   [
    "e1_rates_1",
-   401
+   406
   ],
   [
    "e1_rates_2",
-   163
+   208
   ],
   [
    "e1_repo",
@@ -91,35 +95,35 @@
   ],
   [
    "e1_risk",
-   378
+   541
   ],
   [
    "e1_usecase_1",
-   151
+   172
   ],
   [
    "e1_usecase_2",
-   54
+   63
   ],
   [
    "e1_vol_1",
-   970
+   538
   ],
   [
    "e1_vol_2",
-   294
+   494
   ],
   [
    "e1_vol_3",
-   45
+   264
   ],
   [
    "e1_vol_4",
-   45
+   46
   ],
   [
    "e1_vol_5",
-   71
+   93
   ]
  ]
 }

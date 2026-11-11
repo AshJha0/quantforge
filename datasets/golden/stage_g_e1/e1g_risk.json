@@ -1,0 +1,1333 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1g_risk",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1g_risk-0001",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": "NaN",
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mcgreeks_g-0010",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0002",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": "Infinity",
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0003",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": "-Infinity",
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0004",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 0.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mcgreeks_g-0010",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0005",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": -0.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0004"
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mcgreeks_g-0010",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0006",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": "NaN",
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mcgreeks_g-0010",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0007",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": "Infinity",
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0008",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": "-Infinity",
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0009",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 0.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mcgreeks_g-0010",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0010",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": -0.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0009"
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mcgreeks_g-0010",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0011",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": "NaN",
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mcgreeks_g-0010",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0012",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": "Infinity",
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0013",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": "-Infinity",
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0014",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mcgreeks_g-0010",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0015",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": -0.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0014"
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mcgreeks_g-0010",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0016",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": "NaN",
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mcgreeks_g-0010",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0017",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": "Infinity",
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0018",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": "-Infinity",
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0019",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.0,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mcgreeks_g-0010",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0020",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": -0.0,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0019"
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mcgreeks_g-0010",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0021",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": "NaN",
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mcgreeks_g-0010",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0022",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": "Infinity",
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0023",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": "-Infinity",
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0024",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mcgreeks_g-0010",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0025",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": -0.0,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0024"
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mcgreeks_g-0010",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0026",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": "NaN",
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:mcgreeks_g-0010",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0027",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": "Infinity",
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0028",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": "-Infinity",
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:mcgreeks_g-0010",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0029",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.0,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:mcgreeks_g-0010",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0030",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": -0.0,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0029"
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:mcgreeks_g-0010",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0031",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": "NaN",
+     "B": 3.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:reserve_g-0005",
+    "input:/prices/A"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0032",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": "Infinity",
+     "B": 3.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:reserve_g-0005",
+    "input:/prices/A"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0033",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": "-Infinity",
+     "B": 3.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:reserve_g-0005",
+    "input:/prices/A"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0034",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 0.0,
+     "B": 3.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:reserve_g-0005",
+    "input:/prices/A"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0035",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": -0.0,
+     "B": 3.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0034"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:reserve_g-0005",
+    "input:/prices/A"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0036",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": "NaN",
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:reserve_g-0005",
+    "input:/prices/B"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0037",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": "Infinity",
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:reserve_g-0005",
+    "input:/prices/B"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0038",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": "-Infinity",
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:reserve_g-0005",
+    "input:/prices/B"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0039",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": 0.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:reserve_g-0005",
+    "input:/prices/B"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0040",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": -0.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0039"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:reserve_g-0005",
+    "input:/prices/B"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0041",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": 3.0,
+     "C": "NaN"
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:reserve_g-0005",
+    "input:/prices/C"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0042",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": 3.0,
+     "C": "Infinity"
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:reserve_g-0005",
+    "input:/prices/C"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0043",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": 3.0,
+     "C": "-Infinity"
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:reserve_g-0005",
+    "input:/prices/C"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0044",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": 3.0,
+     "C": 0.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:reserve_g-0005",
+    "input:/prices/C"
+   ]
+  },
+  {
+   "case_id": "e1g_risk-0045",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": 3.0,
+     "C": -0.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_risk-0044"
+   },
+   "tolerance_class": "simple_analytic",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   },
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:reserve_g-0005",
+    "input:/prices/C"
+   ]
+  }
+ ]
+}

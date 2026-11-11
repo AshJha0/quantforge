@@ -45,7 +45,7 @@ Class `simple_analytic`; `binding_scenario` and `alternative_used` exact.
 
 - Every case of `frtb_f` passes in all four languages.
 - No outside oracle: MAR21 and MAR23 contain no numeric worked example (checked on the BIS pages, 2026-11-10), and no free library implements the SBM with these parameters. The suite does not count toward the 60% floor (known issue).
-- Known issue: the `low` scenario formula is an image on the BIS page and is not in its text; it is transcribed as the widely published `max(2 rho - 1, 0.75 rho)`. A human with the PDF should confirm it (no Table reproduces it, unlike the tenor correlation).
+- The `low` scenario formula is an image on the BIS page and is not in its text. It was confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma) (ruling F-33).
 - Vega, curvature, the other risk classes (CSR, equity, commodity, FX), the default risk charge and the residual risk add-on are not in stage F. The equity risk weights and correlations (MAR21.77 to MAR21.80) were read only in summary and need checking against the PDF before an equity slice uses them.
 
 ## Sources

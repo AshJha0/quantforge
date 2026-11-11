@@ -1,0 +1,779 @@
+{
+ "schema_version": "1.0",
+ "suite": "xvaadj_g",
+ "spec": "specifications/06-risk/xva-framework.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w4b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "xvaadj_g-0001",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2.7098617740030235,
+     "dva": 0.8997960006816191,
+     "fca": 1.815622443344568,
+     "fba": 1.2027298203433914,
+     "fva": 0.6128926230011765
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "adjustments",
+    "synthetic"
+   ],
+   "description": "CVA, DVA, FCA, FBA",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "xvaadj_g-0002",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": true
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2.7098617740030235,
+     "dva": 0.8997960006816191,
+     "fca": 1.815622443344568,
+     "fba": 0.3006824550858479,
+     "fva": 1.5149399882587202
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "adjustments",
+    "synthetic"
+   ],
+   "description": "FBA without the DVA overlap",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "xvaadj_g-0003",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    },
+    "im": [
+     200.0,
+     210.0,
+     190.0,
+     150.0
+    ],
+    "im_spread": 0.006
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2.7098617740030235,
+     "dva": 0.8997960006816191,
+     "fca": 1.815622443344568,
+     "fba": 1.2027298203433914,
+     "fva": 0.6128926230011765,
+     "mva": 2.125650867293963
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "adjustments",
+    "synthetic"
+   ],
+   "description": "with MVA",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "xvaadj_g-0004",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    },
+    "capital": [
+     40.0,
+     42.0,
+     38.0,
+     30.0
+    ],
+    "hurdle_rate": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2.7098617740030235,
+     "dva": 0.8997960006816191,
+     "fca": 1.815622443344568,
+     "fba": 1.2027298203433914,
+     "fva": 0.6128926230011765,
+     "kva": 7.085502890979877
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "adjustments",
+    "synthetic"
+   ],
+   "description": "with KVA",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "xvaadj_g-0005",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.0,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2.7278664568793287,
+     "dva": 0.0,
+     "fca": 1.8276856808975417,
+     "fba": 1.2119825595783573,
+     "fva": 0.6157031213191844
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "adjustments",
+    "synthetic"
+   ],
+   "description": "own hazard 0: DVA 0, unilateral CVA",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "xvaadj_g-0006",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.05,
+     "recovery": 0.0
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 10.988262348973302,
+     "dva": 0.879484696081558,
+     "fca": 1.7801900684327552,
+     "fba": 1.1755803201077093,
+     "fva": 0.6046097483250458
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "adjustments",
+    "synthetic"
+   ],
+   "description": "zero recovery",
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "sums of products of the inputs"
+   }
+  },
+  {
+   "case_id": "xvaadj_g-0007",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     1.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "ee length differs"
+  },
+  {
+   "case_id": "xvaadj_g-0008",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": -0.01,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "negative hazard"
+  },
+  {
+   "case_id": "xvaadj_g-0009",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 1.0
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "recovery 1"
+  },
+  {
+   "case_id": "xvaadj_g-0010",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     -1.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "negative EE"
+  },
+  {
+   "case_id": "xvaadj_g-0011",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     1.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "positive ENE"
+  },
+  {
+   "case_id": "xvaadj_g-0012",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    },
+    "im": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "synthetic"
+   ],
+   "description": "im without im_spread"
+  }
+ ]
+}

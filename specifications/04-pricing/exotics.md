@@ -111,9 +111,9 @@ Rulings `stage-g-rulings.md` G-7, G-8. Suite `stage_g/barrier_g` (32 cases), wri
 
 `exotic.barrier.price` gains two optional inputs:
 - `monitoring`: `CONTINUOUS` (the default when absent; stage E behaviour unchanged) or `DISCRETE`; another value is `E_INPUT`.
-- `monitoring_per_year` `m`: an Integer, required with `DISCRETE` and not allowed with `CONTINUOUS` (both `E_INPUT`); `m >= 1`, else `E_DOMAIN`. The barrier is observed at `T/n, 2T/n, ..., T` with `n = round(m T)`; the correction uses `dt = 1/m`.
+- `monitoring_per_year` `m`: an Integer, required with `DISCRETE` and not allowed with `CONTINUOUS` (both `E_INPUT`); `m >= 1`, else `E_DOMAIN`. The barrier is observed at `T/n, 2T/n, ..., T` with `n = floor(m T + 0.5)` (ties round up, the same in every language; ruling G-30); `n = 0` is `E_DOMAIN`. The correction uses `dt = T/n`, the actual observation spacing (amended by R5 M3; for integer `m T` this equals `1/m`, so the original goldens are unchanged).
 
-With `DISCRETE`, the price is the continuous-monitoring price of this page with the barrier replaced by `H' = H exp(-beta v sqrt(dt))` for `DOWN_*` and `H' = H exp(+beta v sqrt(dt))` for `UP_*`, `beta = 0.5826` exactly (ruling G-7). The rebate is unchanged and is paid as in the continuous case. The domain check (ruling E-A19) uses the **unshifted** `H`, then the shifted price is computed (ruling G-8).
+With `DISCRETE`, the price is the continuous-monitoring price of this page with the barrier replaced by `H' = H exp(-beta v sqrt(dt))` for `DOWN_*` and `H' = H exp(+beta v sqrt(dt))` for `UP_*`, `beta = 0.5826` exactly (ruling G-7). The rebate is unchanged and is paid as in the continuous case. The rebate leg is a convention, not a BGK approximation: BGK corrects the barrier-crossing probability of the option leg only [BGK97], so rebate rows are not expected to match a discretely monitored Monte Carlo. The domain check (ruling E-A19) uses the **unshifted** `H`, then the shifted price is computed (ruling G-8).
 
 Wrong conventions caught: the shift with the opposite sign; the continuous price for a daily barrier.
 

@@ -102,6 +102,8 @@ def sigma_p(a, s, T, S, ho_lee=False):
 
 def ncx2_cdf(x, k, lam):
     x, k, lam = mp.mpf(x), mp.mpf(k), mp.mpf(lam)
+    if x <= 0:  # R5 M5: rbar < 0 (strike above A(T, S)) gives a non-positive argument; the CDF is 0
+        return mp.mpf(0)
     tot, j, w = mp.mpf(0), 0, mp.exp(-lam / 2)
     while True:
         term = w * mp.gammainc(k / 2 + j, 0, x / 2, regularized=True)
@@ -309,8 +311,15 @@ BAR = "exotic.barrier.price"
 PATHS = 40000
 
 
-def bgk_barrier(btype, H, v, m, beta=BGK):
-    return H * math.exp((-1 if btype.startswith("DOWN") else 1) * beta * v * math.sqrt(1.0 / m))
+def bgk_barrier(btype, H, v, dt, beta=BGK):
+    return H * math.exp((-1 if btype.startswith("DOWN") else 1) * beta * v * math.sqrt(dt))
+
+
+def r9_dt(inp):
+    """R5 M3 (ruling G-30): n = floor(m T + 0.5) observation dates, n >= 1, step dt = T / n."""
+    n = math.floor(inp["monitoring_per_year"] * inp["expiry_years"] + 0.5)
+    assert n >= 1
+    return inp["expiry_years"] / n
 
 
 def r9_price(inp, mut=None):
@@ -318,9 +327,9 @@ def r9_price(inp, mut=None):
     H = inp["barrier"]
     if inp.get("monitoring", "CONTINUOUS") == "DISCRETE":
         if mut == "sign":
-            H = bgk_barrier("UP" if inp["barrier_type"].startswith("DOWN") else "DOWN", H, inp["vol"], inp["monitoring_per_year"])
+            H = bgk_barrier("UP" if inp["barrier_type"].startswith("DOWN") else "DOWN", H, inp["vol"], r9_dt(inp))
         else:
-            H = bgk_barrier(inp["barrier_type"], H, inp["vol"], inp["monitoring_per_year"])
+            H = bgk_barrier(inp["barrier_type"], H, inp["vol"], r9_dt(inp))
     return barrier(inp["barrier_type"], inp["option_type"], inp["spot"], inp["strike"], H, inp["rebate"],
                    inp["expiry_years"], inp["rate"], inp["dividend_yield"], inp["vol"])
 
@@ -388,6 +397,17 @@ def r9():
             (dict(base, barrier=101.0, barrier_type="DOWN_OUT", option_type="CALL", monitoring="DISCRETE", monitoring_per_year=252), "E_DOMAIN", "spot below the unshifted down barrier")]
     for inp, code, d in errs:
         s.add(BAR, inp, error=code, cls="date_and_convention", tags=["invalid", "r9"], description=d)
+    # R5 M3 (ruling G-30), appended to keep ids: non-unit T, non-integer and tie m T, UP_* with rebate, n = 0
+    m3 = [dict(base, expiry_years=0.3, barrier=90.0, barrier_type="DOWN_OUT", option_type="CALL", monitoring="DISCRETE", monitoring_per_year=252),
+          dict(base, expiry_years=0.5, barrier=90.0, barrier_type="DOWN_OUT", option_type="PUT", monitoring="DISCRETE", monitoring_per_year=3),
+          dict(base, expiry_years=0.75, barrier=115.0, barrier_type="UP_OUT", option_type="CALL", rebate=2.0, monitoring="DISCRETE", monitoring_per_year=10),
+          dict(base, expiry_years=1.5, barrier=120.0, barrier_type="UP_IN", option_type="PUT", rebate=1.5, monitoring="DISCRETE", monitoring_per_year=52)]
+    for inp in m3:
+        n = math.floor(inp["monitoring_per_year"] * inp["expiry_years"] + 0.5)
+        s.add(BAR, inp, {"price": r9_price(inp)}, verified=["closed-form-bgk"], tags=["barrier", "r9", "discrete", "m3"],
+              description=f"{inp['barrier_type']} {inp['option_type']} T={inp['expiry_years']} m={inp['monitoring_per_year']}: n={n}, dt=T/n")
+    s.add(BAR, dict(base, expiry_years=0.3, barrier=90.0, barrier_type="DOWN_OUT", option_type="CALL", monitoring="DISCRETE", monitoring_per_year=1),
+          error="E_DOMAIN", cls="date_and_convention", tags=["invalid", "r9"], description="n = floor(m T + 0.5) = 0")
     a = rows[0]
     caught("BGK shift with the wrong sign", abs(r9_price(a) - r9_price(a, "sign")), 1e-6)
     caught("continuous price for a daily barrier", abs(r9_price(a) - r9_price(dict(a, monitoring="CONTINUOUS"))), 1e-6)
@@ -501,6 +521,16 @@ def g2a():
             (dict(e, short_rate=0.01), "E_INPUT", "short_rate given")]
     for inp, code, d in errs:
         s.add(SWO, inp, error=code, cls="date_and_convention", tags=["invalid", "jamshidian"], description=d)
+    # R5 M2 (ruling G-29): small negative strike (value), and the limit 1 + K tau_n <= 0 (E_DOMAIN); appended to keep ids
+    for st in ("PAYER", "RECEIVER"):
+        inp = dict(hw, expiry_years=1.0, payment_times=[2.0, 3.0, 4.0, 5.0], fixed_rate=-0.002, swaption_type=st)
+        out = jam_price(inp)
+        q = ql_jam(inp)
+        ok = all(abs(q[k] - out[k]) <= 1e-6 + 1e-10 * abs(out[k]) for k in ("price", "annuity"))
+        n_out += ok
+        s.add(SWO, inp, out, cls=R, verified=["mpmath-50"] + (["quantlib-1.44"] if ok else []), tags=["shortrate", "jamshidian", "negative-strike", st.lower()],
+              limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-9 relative"}, description=f"HW {st} K=-0.2%: negative coupons, root still unique")
+    s.add(SWO, dict(e, fixed_rate=-1.0), error="E_DOMAIN", cls="date_and_convention", tags=["invalid", "jamshidian"], description="1 + K tau_n = 0")
     for c in s.cases:
         c["tags"].append("synthetic")
     keep = common.GOLDEN
@@ -855,7 +885,7 @@ def g2e():
     caught("cap priced with bond calls", abs(cap_value(b)["price"] - cap_value(b, "type")["price"]), 1e-6)
     e = dict(models[2], period_times=[1.0, 2.0, 3.0], strike=0.04, cap_floor="CAP", notional=1.0)
     errs = [(dict(e, period_times=[1.0]), "E_INPUT", "one period time"), (dict(e, period_times=[0.0, 1.0]), "E_DOMAIN", "first fixing at 0"),
-            (dict(e, period_times=[2.0, 1.0]), "E_INPUT", "period times not increasing"), (dict(e, strike=-0.5), "E_DOMAIN", "1 + K tau <= 0"),
+            (dict(e, period_times=[2.0, 1.0]), "E_INPUT", "period times not increasing"), (dict(e, strike=-1.0), "E_DOMAIN", "1 + K tau <= 0 (K = -1, tau = 1: exactly 0)"),
             (dict(e, cap_floor="COLLAR"), "E_INPUT", "unknown cap_floor")]
     for inp, code, d in errs:
         s.add(CAPOP, inp, error=code, cls="date_and_convention", tags=["invalid", "capfloor"], description=d)

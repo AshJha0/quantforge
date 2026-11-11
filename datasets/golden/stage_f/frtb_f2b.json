@@ -1,0 +1,1807 @@
+{
+ "schema_version": "1.0",
+ "suite": "frtb_f2b",
+ "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_frtb2.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "frtb_f2b-0001",
+   "operation": "risk.frtb.fx_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "pair": "EURUSD",
+      "sensitivity": 1000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 150000.0,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 150000.0,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 150000.0,
+       "alternative_used": false
+      }
+     },
+     "capital": 150000.0,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "fx",
+    "synthetic"
+   ],
+   "description": "one pair"
+  },
+  {
+   "case_id": "frtb_f2b-0002",
+   "operation": "risk.frtb.fx_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "pair": "EURUSD",
+      "sensitivity": 1000000.0
+     },
+     {
+      "pair": "USDJPY",
+      "sensitivity": -400000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        },
+        {
+         "bucket": "USDJPY",
+         "k": 60000.0,
+         "s": -60000.0,
+         "s_used": -60000.0
+        }
+       ],
+       "delta": 123693.16876852981,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        },
+        {
+         "bucket": "USDJPY",
+         "k": 60000.0,
+         "s": -60000.0,
+         "s_used": -60000.0
+        }
+       ],
+       "delta": 112249.72160321825,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        },
+        {
+         "bucket": "USDJPY",
+         "k": 60000.0,
+         "s": -60000.0,
+         "s_used": -60000.0
+        }
+       ],
+       "delta": 134164.07864998738,
+       "alternative_used": false
+      }
+     },
+     "capital": 134164.07864998738,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "fx",
+    "synthetic"
+   ],
+   "description": "two pairs, offsetting"
+  },
+  {
+   "case_id": "frtb_f2b-0003",
+   "operation": "risk.frtb.fx_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "pair": "EURUSD",
+      "sensitivity": 1000000.0
+     },
+     {
+      "pair": "USDJPY",
+      "sensitivity": -400000.0
+     }
+    ],
+    "specified_pairs": [
+     "EURUSD",
+     "USDJPY",
+     "GBPUSD"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 106066.01717798212,
+         "s": 106066.01717798212,
+         "s_used": 106066.01717798212
+        },
+        {
+         "bucket": "USDJPY",
+         "k": 42426.40687119285,
+         "s": -42426.40687119285,
+         "s_used": -42426.40687119285
+        }
+       ],
+       "delta": 87464.2784226795,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 106066.01717798212,
+         "s": 106066.01717798212,
+         "s_used": 106066.01717798212
+        },
+        {
+         "bucket": "USDJPY",
+         "k": 42426.40687119285,
+         "s": -42426.40687119285,
+         "s_used": -42426.40687119285
+        }
+       ],
+       "delta": 79372.53933193772,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 106066.01717798212,
+         "s": 106066.01717798212,
+         "s_used": 106066.01717798212
+        },
+        {
+         "bucket": "USDJPY",
+         "k": 42426.40687119285,
+         "s": -42426.40687119285,
+         "s_used": -42426.40687119285
+        }
+       ],
+       "delta": 94868.32980505138,
+       "alternative_used": false
+      }
+     },
+     "capital": 94868.32980505138,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "fx",
+    "synthetic"
+   ],
+   "description": "specified pairs: RW / sqrt 2"
+  },
+  {
+   "case_id": "frtb_f2b-0004",
+   "operation": "risk.frtb.fx_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "pair": "EURUSD",
+      "sensitivity": 1000000.0
+     },
+     {
+      "pair": "USDBRL",
+      "sensitivity": 2000000.0
+     },
+     {
+      "pair": "USDTRY",
+      "sensitivity": -3000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        },
+        {
+         "bucket": "USDBRL",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        },
+        {
+         "bucket": "USDTRY",
+         "k": 450000.0,
+         "s": -450000.0,
+         "s_used": -450000.0
+        }
+       ],
+       "delta": 354964.78698597697,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        },
+        {
+         "bucket": "USDBRL",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        },
+        {
+         "bucket": "USDTRY",
+         "k": 450000.0,
+         "s": -450000.0,
+         "s_used": -450000.0
+        }
+       ],
+       "delta": 280624.3040080456,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "EURUSD",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        },
+        {
+         "bucket": "USDBRL",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        },
+        {
+         "bucket": "USDTRY",
+         "k": 450000.0,
+         "s": -450000.0,
+         "s_used": -450000.0
+        }
+       ],
+       "delta": 416233.1077653482,
+       "alternative_used": false
+      }
+     },
+     "capital": 416233.1077653482,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "fx",
+    "synthetic"
+   ],
+   "description": "three pairs, low scenario binds?"
+  },
+  {
+   "case_id": "frtb_f2b-0005",
+   "operation": "risk.frtb.fx_delta",
+   "inputs": {
+    "sensitivities": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "no sensitivities"
+  },
+  {
+   "case_id": "frtb_f2b-0006",
+   "operation": "risk.frtb.fx_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "pair": "EURUSD",
+      "sensitivity": 1.0
+     },
+     {
+      "pair": "EURUSD",
+      "sensitivity": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "pair twice"
+  },
+  {
+   "case_id": "frtb_f2b-0007",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": 1000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        }
+       ],
+       "delta": 300000.0,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        }
+       ],
+       "delta": 300000.0,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        }
+       ],
+       "delta": 300000.0,
+       "alternative_used": false
+      }
+     },
+     "capital": 300000.0,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "equity",
+    "synthetic"
+   ],
+   "description": "one name: K = 30% x s"
+  },
+  {
+   "case_id": "frtb_f2b-0008",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": 1000000.0
+     },
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "REPO",
+      "sensitivity": 50000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 449899.98888641904,
+         "s": 450000.0,
+         "s_used": 450000.0
+        }
+       ],
+       "delta": 449899.98888641904,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 450000.0,
+         "s": 450000.0,
+         "s_used": 450000.0
+        }
+       ],
+       "delta": 450000.0,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 449799.95553579147,
+         "s": 450000.0,
+         "s_used": 450000.0
+        }
+       ],
+       "delta": 449799.95553579147,
+       "alternative_used": false
+      }
+     },
+     "capital": 450000.0,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "equity",
+    "synthetic"
+   ],
+   "description": "spot and repo, same issuer (99.9%)"
+  },
+  {
+   "case_id": "frtb_f2b-0009",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": 1000000.0
+     },
+     {
+      "issuer": "B",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": -800000.0
+     },
+     {
+      "issuer": "B",
+      "bucket": 5,
+      "kind": "REPO",
+      "sensitivity": 30000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 300049.4959169237,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 300049.4959169237,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 290444.7021379457,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 290444.7021379457,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 309356.2267031326,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 309356.2267031326,
+       "alternative_used": false
+      }
+     },
+     "capital": 309356.2267031326,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "equity",
+    "synthetic"
+   ],
+   "description": "two issuers in bucket 5"
+  },
+  {
+   "case_id": "frtb_f2b-0010",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 1,
+      "kind": "SPOT",
+      "sensitivity": 1000000.0
+     },
+     {
+      "issuer": "C",
+      "bucket": 9,
+      "kind": "SPOT",
+      "sensitivity": 500000.0
+     },
+     {
+      "issuer": "IDX1",
+      "bucket": 12,
+      "kind": "SPOT",
+      "sensitivity": -2000000.0
+     },
+     {
+      "issuer": "IDX2",
+      "bucket": 13,
+      "kind": "SPOT",
+      "sensitivity": 1000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k": 550000.0,
+         "s": 550000.0,
+         "s_used": 550000.0
+        },
+        {
+         "bucket": "9",
+         "k": 350000.0,
+         "s": 350000.0,
+         "s_used": 350000.0
+        },
+        {
+         "bucket": "12",
+         "k": 300000.0,
+         "s": -300000.0,
+         "s_used": -300000.0
+        },
+        {
+         "bucket": "13",
+         "k": 250000.0,
+         "s": 250000.0,
+         "s_used": 250000.0
+        }
+       ],
+       "delta": 694442.2222186667,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k": 550000.0,
+         "s": 550000.0,
+         "s_used": 550000.0
+        },
+        {
+         "bucket": "9",
+         "k": 350000.0,
+         "s": 350000.0,
+         "s_used": 350000.0
+        },
+        {
+         "bucket": "12",
+         "k": 300000.0,
+         "s": -300000.0,
+         "s_used": -300000.0
+        },
+        {
+         "bucket": "13",
+         "k": 250000.0,
+         "s": 250000.0,
+         "s_used": 250000.0
+        }
+       ],
+       "delta": 677080.128197542,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k": 550000.0,
+         "s": 550000.0,
+         "s_used": 550000.0
+        },
+        {
+         "bucket": "9",
+         "k": 350000.0,
+         "s": 350000.0,
+         "s_used": 350000.0
+        },
+        {
+         "bucket": "12",
+         "k": 300000.0,
+         "s": -300000.0,
+         "s_used": -300000.0
+        },
+        {
+         "bucket": "13",
+         "k": 250000.0,
+         "s": 250000.0,
+         "s_used": 250000.0
+        }
+       ],
+       "delta": 711380.6997663066,
+       "alternative_used": false
+      }
+     },
+     "capital": 711380.6997663066,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "equity",
+    "synthetic"
+   ],
+   "description": "four buckets: 15%, 45%, 75% gammas"
+  },
+  {
+   "case_id": "frtb_f2b-0011",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 12,
+      "kind": "SPOT",
+      "sensitivity": 3000000.0
+     },
+     {
+      "issuer": "B",
+      "bucket": 13,
+      "kind": "SPOT",
+      "sensitivity": -3000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "12",
+         "k": 450000.0,
+         "s": 450000.0,
+         "s_used": 450000.0
+        },
+        {
+         "bucket": "13",
+         "k": 750000.0,
+         "s": -750000.0,
+         "s_used": -750000.0
+        }
+       ],
+       "delta": 508674.74873439514,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "12",
+         "k": 450000.0,
+         "s": 450000.0,
+         "s_used": 450000.0
+        },
+        {
+         "bucket": "13",
+         "k": 750000.0,
+         "s": -750000.0,
+         "s_used": -750000.0
+        }
+       ],
+       "delta": 363575.9893062247,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "12",
+         "k": 450000.0,
+         "s": 450000.0,
+         "s_used": 450000.0
+        },
+        {
+         "bucket": "13",
+         "k": 750000.0,
+         "s": -750000.0,
+         "s_used": -750000.0
+        }
+       ],
+       "delta": 620735.4508967568,
+       "alternative_used": false
+      }
+     },
+     "capital": 620735.4508967568,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "equity",
+    "synthetic"
+   ],
+   "description": "index hedge: 12 against 13"
+  },
+  {
+   "case_id": "frtb_f2b-0012",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "X",
+      "bucket": 11,
+      "kind": "SPOT",
+      "sensitivity": 1000000.0
+     },
+     {
+      "issuer": "Y",
+      "bucket": 11,
+      "kind": "SPOT",
+      "sensitivity": -1000000.0
+     },
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": 1000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        },
+        {
+         "bucket": "11",
+         "k": 1400000.0,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 1431782.1063276352,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        },
+        {
+         "bucket": "11",
+         "k": 1400000.0,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 1431782.1063276352,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "5",
+         "k": 300000.0,
+         "s": 300000.0,
+         "s_used": 300000.0
+        },
+        {
+         "bucket": "11",
+         "k": 1400000.0,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 1431782.1063276352,
+       "alternative_used": false
+      }
+     },
+     "capital": 1431782.1063276352,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "equity",
+    "synthetic"
+   ],
+   "description": "bucket 11: simple sum of absolutes, no offset, gamma 0 (MAR21.79, 21.80)"
+  },
+  {
+   "case_id": "frtb_f2b-0013",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 14,
+      "kind": "SPOT",
+      "sensitivity": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "unknown bucket"
+  },
+  {
+   "case_id": "frtb_f2b-0014",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": 1.0
+     },
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "SPOT",
+      "sensitivity": 2.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "same factor twice"
+  },
+  {
+   "case_id": "frtb_f2b-0015",
+   "operation": "risk.frtb.equity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 5,
+      "kind": "DIVIDEND",
+      "sensitivity": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "unknown kind"
+  },
+  {
+   "case_id": "frtb_f2b-0016",
+   "operation": "risk.frtb.csr_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 3,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": 1000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 50000.0,
+         "s": 50000.0,
+         "s_used": 50000.0
+        }
+       ],
+       "delta": 50000.0,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 50000.0,
+         "s": 50000.0,
+         "s_used": 50000.0
+        }
+       ],
+       "delta": 50000.0,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 50000.0,
+         "s": 50000.0,
+         "s_used": 50000.0
+        }
+       ],
+       "delta": 50000.0,
+       "alternative_used": false
+      }
+     },
+     "capital": 50000.0,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "csr",
+    "synthetic"
+   ],
+   "description": "one CSR factor: 5%"
+  },
+  {
+   "case_id": "frtb_f2b-0017",
+   "operation": "risk.frtb.csr_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 3,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": 1000000.0
+     },
+     {
+      "issuer": "A",
+      "bucket": 3,
+      "tenor": "5Y",
+      "curve": "CDS",
+      "sensitivity": -900000.0
+     },
+     {
+      "issuer": "B",
+      "bucket": 3,
+      "tenor": "1Y",
+      "curve": "BOND",
+      "sensitivity": 500000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 26681.208274738983,
+         "s": 30000.0,
+         "s_used": 30000.0
+        }
+       ],
+       "delta": 26681.208274738983,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 26865.09992071498,
+         "s": 30000.0,
+         "s_used": 30000.0
+        }
+       ],
+       "delta": 26865.09992071498,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 26496.040388141017,
+         "s": 30000.0,
+         "s_used": 30000.0
+        }
+       ],
+       "delta": 26496.040388141017,
+       "alternative_used": false
+      }
+     },
+     "capital": 26865.09992071498,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "csr",
+    "synthetic"
+   ],
+   "description": "bond-CDS basis and a second name"
+  },
+  {
+   "case_id": "frtb_f2b-0018",
+   "operation": "risk.frtb.csr_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 3,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": 1000000.0
+     },
+     {
+      "issuer": "H",
+      "bucket": 11,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": 400000.0
+     },
+     {
+      "issuer": "I",
+      "bucket": 17,
+      "tenor": "3Y",
+      "curve": "CDS",
+      "sensitivity": -2000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 50000.0,
+         "s": 50000.0,
+         "s_used": 50000.0
+        },
+        {
+         "bucket": "11",
+         "k": 48000.0,
+         "s": 48000.0,
+         "s_used": 48000.0
+        },
+        {
+         "bucket": "17",
+         "k": 30000.0,
+         "s": -30000.0,
+         "s_used": -30000.0
+        }
+       ],
+       "delta": 73878.27826905552,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 50000.0,
+         "s": 50000.0,
+         "s_used": 50000.0
+        },
+        {
+         "bucket": "11",
+         "k": 48000.0,
+         "s": 48000.0,
+         "s_used": 48000.0
+        },
+        {
+         "bucket": "17",
+         "k": 30000.0,
+         "s": -30000.0,
+         "s_used": -30000.0
+        }
+       ],
+       "delta": 73460.87393980553,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "3",
+         "k": 50000.0,
+         "s": 50000.0,
+         "s_used": 50000.0
+        },
+        {
+         "bucket": "11",
+         "k": 48000.0,
+         "s": 48000.0,
+         "s_used": 48000.0
+        },
+        {
+         "bucket": "17",
+         "k": 30000.0,
+         "s": -30000.0,
+         "s_used": -30000.0
+        }
+       ],
+       "delta": 74293.3375209379,
+       "alternative_used": false
+      }
+     },
+     "capital": 74293.3375209379,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "csr",
+    "synthetic"
+   ],
+   "description": "IG and HY same sector (rating 50%), index bucket"
+  },
+  {
+   "case_id": "frtb_f2b-0019",
+   "operation": "risk.frtb.csr_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "O1",
+      "bucket": 16,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": 1000000.0
+     },
+     {
+      "issuer": "O2",
+      "bucket": 16,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": -1000000.0
+     },
+     {
+      "issuer": "A",
+      "bucket": 1,
+      "tenor": "10Y",
+      "curve": "BOND",
+      "sensitivity": 20000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k": 100000.0,
+         "s": 100000.0,
+         "s_used": 100000.0
+        },
+        {
+         "bucket": "16",
+         "k": 240000.0,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 260000.0,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k": 100000.0,
+         "s": 100000.0,
+         "s_used": 100000.0
+        },
+        {
+         "bucket": "16",
+         "k": 240000.0,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 260000.0,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "1",
+         "k": 100000.0,
+         "s": 100000.0,
+         "s_used": 100000.0
+        },
+        {
+         "bucket": "16",
+         "k": 240000.0,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 260000.0,
+       "alternative_used": false
+      }
+     },
+     "capital": 260000.0,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "csr",
+    "synthetic"
+   ],
+   "description": "other sector 16: simple sum, gamma 0"
+  },
+  {
+   "case_id": "frtb_f2b-0020",
+   "operation": "risk.frtb.csr_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 19,
+      "tenor": "5Y",
+      "curve": "BOND",
+      "sensitivity": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "unknown bucket"
+  },
+  {
+   "case_id": "frtb_f2b-0021",
+   "operation": "risk.frtb.csr_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "issuer": "A",
+      "bucket": 3,
+      "tenor": "7Y",
+      "curve": "BOND",
+      "sensitivity": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "tenor not in 0.5Y, 1Y, 3Y, 5Y, 10Y"
+  },
+  {
+   "case_id": "frtb_f2b-0022",
+   "operation": "risk.frtb.commodity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "commodity": "BRENT",
+      "bucket": 2,
+      "tenor": "1Y",
+      "location": "ICE",
+      "sensitivity": 1000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 350000.0,
+         "s": 350000.0,
+         "s_used": 350000.0
+        }
+       ],
+       "delta": 350000.0,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 350000.0,
+         "s": 350000.0,
+         "s_used": 350000.0
+        }
+       ],
+       "delta": 350000.0,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 350000.0,
+         "s": 350000.0,
+         "s_used": 350000.0
+        }
+       ],
+       "delta": 350000.0,
+       "alternative_used": false
+      }
+     },
+     "capital": 350000.0,
+     "binding_scenario": "high"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "commodity",
+    "synthetic"
+   ],
+   "description": "one commodity factor: 35%"
+  },
+  {
+   "case_id": "frtb_f2b-0023",
+   "operation": "risk.frtb.commodity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "commodity": "BRENT",
+      "bucket": 2,
+      "tenor": "1Y",
+      "location": "ICE",
+      "sensitivity": 1000000.0
+     },
+     {
+      "commodity": "WTI",
+      "bucket": 2,
+      "tenor": "1Y",
+      "location": "NYMEX",
+      "sensitivity": -1000000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 111726.22789658657,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 111726.22789658657,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 0.0,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 0.0,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 158004.74676413997,
+         "s": 0.0,
+         "s_used": 0.0
+        }
+       ],
+       "delta": 158004.74676413997,
+       "alternative_used": false
+      }
+     },
+     "capital": 158004.74676413997,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "commodity",
+    "synthetic"
+   ],
+   "description": "Brent-WTI spread in bucket 2 (95%)"
+  },
+  {
+   "case_id": "frtb_f2b-0024",
+   "operation": "risk.frtb.commodity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "commodity": "BRENT",
+      "bucket": 2,
+      "tenor": "1Y",
+      "location": "ICE",
+      "sensitivity": 1000000.0
+     },
+     {
+      "commodity": "BRENT",
+      "bucket": 2,
+      "tenor": "2Y",
+      "location": "ICE",
+      "sensitivity": -1000000.0
+     },
+     {
+      "commodity": "GOLD",
+      "bucket": 7,
+      "tenor": "1Y",
+      "location": "LBMA",
+      "sensitivity": 500000.0
+     },
+     {
+      "commodity": "OTHER1",
+      "bucket": 11,
+      "tenor": "1Y",
+      "location": "X",
+      "sensitivity": 300000.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "scenarios": {
+      "medium": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 49497.474683058324,
+         "s": 0.0,
+         "s_used": 0.0
+        },
+        {
+         "bucket": "7",
+         "k": 100000.0,
+         "s": 100000.0,
+         "s_used": 100000.0
+        },
+        {
+         "bucket": "11",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 186949.19095839918,
+       "alternative_used": false
+      },
+      "high": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 0.0,
+         "s": 0.0,
+         "s_used": 0.0
+        },
+        {
+         "bucket": "7",
+         "k": 100000.0,
+         "s": 100000.0,
+         "s_used": 100000.0
+        },
+        {
+         "bucket": "11",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 180277.56377319945,
+       "alternative_used": false
+      },
+      "low": {
+       "buckets": [
+        {
+         "bucket": "2",
+         "k": 70000.0,
+         "s": 0.0,
+         "s_used": 0.0
+        },
+        {
+         "bucket": "7",
+         "k": 100000.0,
+         "s": 100000.0,
+         "s_used": 100000.0
+        },
+        {
+         "bucket": "11",
+         "k": 150000.0,
+         "s": 150000.0,
+         "s_used": 150000.0
+        }
+       ],
+       "delta": 193390.79605813717,
+       "alternative_used": false
+      }
+     },
+     "capital": 193390.79605813717,
+     "binding_scenario": "low"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "frtb",
+    "commodity",
+    "synthetic"
+   ],
+   "description": "calendar spread, gold, other commodity"
+  },
+  {
+   "case_id": "frtb_f2b-0025",
+   "operation": "risk.frtb.commodity_delta",
+   "inputs": {
+    "sensitivities": [
+     {
+      "commodity": "X",
+      "bucket": 12,
+      "tenor": "1Y",
+      "location": "X",
+      "sensitivity": 1.0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "frtb",
+    "synthetic"
+   ],
+   "description": "unknown bucket"
+  }
+ ]
+}

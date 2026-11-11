@@ -1,7 +1,7 @@
 """Stage F wave 0, plan item E1: non-finite and negative-zero inputs for every operation (rules F-1 to F-3).
 
 For each operation, the base case is its smallest ok golden case (by input JSON length, then case id) from
-every golden suite outside stage_f. Each Real leaf (a JSON float; arrays: element 0 and the last element)
+every golden suite except the e1_* files themselves and stage_g (stage F operations included since wave 2b). Each Real leaf (a JSON float; arrays: element 0 and the last element)
 gets NaN, +inf and -inf cases expecting E_DOMAIN, and one negative-zero case: a copy of the base expected
 result when the base leaf is exactly zero, else a pair (+0.0 anchor expecting "any", -0.0 expecting
 "same_as" the anchor). Files are split by operation domain and kept under 1 MB (plan item E11).
@@ -12,7 +12,10 @@ from pathlib import Path
 from qf_oracle.common import ROOT
 
 GOLD = ROOT / "datasets" / "golden"
-OUT = GOLD / "stage_f"
+import sys
+STAGE_G = "G" in sys.argv[1:]  # ruling G-45: E1 for the stage G operations, written to stage_g_e1/ as e1g_* suites
+OUT = GOLD / ("stage_g_e1" if STAGE_G else "stage_f")
+PREFIX = "e1g_" if STAGE_G else "e1_"
 SPEC = "specifications/stage-f-rulings.md"
 TOKENS = ("NaN", "Infinity", "-Infinity")
 MAX_BYTES = 900_000
@@ -46,8 +49,8 @@ def base_cases():
     """Also fills REAL_PATHS: per operation, every input path that holds a float in any golden case (spec type Real)."""
     best = {}
     for p in sorted(GOLD.rglob("*.json")):
-        if p.parent.name == "stage_f":
-            continue
+        if p.name.startswith("e1") or p.parent.name == "stage_g_e1" or (p.parent.name == "stage_g") != STAGE_G:
+            continue  # stage F mode: every suite but E1 and stage G; stage G mode (G-45): stage G suites only
         doc = json.loads(p.read_text(encoding="utf-8"))
         if not isinstance(doc, dict) or "cases" not in doc:
             continue
@@ -138,7 +141,7 @@ def main():
                               "verified_by": ["rule-F-3"],
                               "tags": ["e1", "negative_zero", f"base:{b['case_id']}", f"input:{where}"]})
     OUT.mkdir(parents=True, exist_ok=True)
-    for old in OUT.glob("e1_*.json"):
+    for old in OUT.glob(f"{PREFIX}*.json"):
         old.unlink()
     total = 0
     written = []
@@ -156,7 +159,7 @@ def main():
             size += n
         chunks.append(cur)
         for j, chunk in enumerate(chunks, 1):
-            suite = f"e1_{dom}" + (f"_{j}" if len(chunks) > 1 else "")
+            suite = f"{PREFIX}{dom}" + (f"_{j}" if len(chunks) > 1 else "")
             for i, c in enumerate(chunk, 1):
                 c["case_id"] = f"{suite}-{i:04d}"
             for i, c in enumerate(chunk):
@@ -176,7 +179,7 @@ def main():
             written.append((suite, len(chunk)))
     stats["cases"] = total
     stats["files"] = written
-    (ROOT / "oracle" / "E1_SUMMARY.json").write_text(json.dumps(stats, indent=1) + "\n", encoding="utf-8", newline="\n")
+    (ROOT / "oracle" / ("E1G_SUMMARY.json" if STAGE_G else "E1_SUMMARY.json")).write_text(json.dumps(stats, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(f"E1: {stats['operations']} operations, {stats['leaves']} real leaves, {total} cases in {len(written)} files; "
           f"{len(stats['no_real_input'])} operations with no real input")
 

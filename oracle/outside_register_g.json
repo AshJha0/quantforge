@@ -6,13 +6,13 @@
  "rule": "11.2.5 and G-4: every output is a QuantLib value (discountBond, discountBondOption, the curve discount) or plain arithmetic on one (zero_rate)",
  "barrier_g": {
   "counted": 2,
-  "total": 32,
+  "total": 38,
   "rule": "continuous-monitoring rows only; the BGK rows have MC evidence, not an outside library value"
  },
  "swaption_g": {
-  "counted": 33,
-  "total": 40,
-  "rule": "QuantLib HullWhite discountBond and discountBondOption, r* by QuantLib Brent to 1e-15, combined by arithmetic; DiscountCurve discounts for the annuity and forward"
+  "counted": 28,
+  "total": 44,
+  "rule": "QuantLib 1.44 JamshidianSwaptionEngine on a VanillaSwap (par floater on the same curve, NullCalendar, ACT/365F), relative 3e-7 (R5 H1); CVA as G-16 bucket arithmetic on the engine EEs"
  },
  "g2pp_g": {
   "counted": 30,
@@ -20,9 +20,9 @@
   "rule": "QuantLib G2 discountBond and discountBondOption on a DiscountCurve; zero_rate and the curve discounts as arithmetic or curve values"
  },
  "exposure_g": {
-  "counted": 7,
-  "total": 15,
-  "rule": "each EE point is the swaption_g QuantLib check; cva is arithmetic on those values"
+  "counted": 6,
+  "total": 16,
+  "rule": "QuantLib 1.44 JamshidianSwaptionEngine on a VanillaSwap (par floater on the same curve, NullCalendar, ACT/365F), relative 3e-7 (R5 H1); CVA as G-16 bucket arithmetic on the engine EEs"
  },
  "hwcal_g": {
   "counted": 0,
@@ -37,16 +37,71 @@
  "swaption_affine_g": {
   "counted": 36,
   "total": 39,
-  "rule": "G-13 method on QuantLib Vasicek and CoxIngersollRoss objects"
+  "rule": "QuantLib 1.44 JamshidianSwaptionEngine on a VanillaSwap (par floater on the same curve, NullCalendar, ACT/365F), relative 3e-7 (R5 H1); CVA as G-16 bucket arithmetic on the engine EEs"
  },
  "bermudan_g": {
   "counted": 0,
-  "total": 15,
+  "total": 17,
   "rule": "not counted: the golden is the pinned scheme; QuantLib FD and tree values are convergence evidence (oracle/BERMUDAN_EVIDENCE_G.json)"
  },
  "callable_g": {
   "counted": 0,
-  "total": 12,
+  "total": 13,
   "rule": "not counted: pinned scheme (G-18)"
+ },
+ "lmmcap_g": {
+  "counted": 17,
+  "total": 26,
+  "rule": "QuantLib AbcdFunction.covariance(0, T_fix, T_fix, T_fix), DiscountCurve.discount and blackFormula per caplet, summed"
+ },
+ "lmmswn_g": {
+  "counted": 36,
+  "total": 42,
+  "rule": "QuantLib AbcdFunction.covariance(0, T0, T_i, T_j) per pair, DiscountCurve.discount for weights and annuity, blackFormula; exp correlation by arithmetic"
+ },
+ "shortrate_r5": {
+  "counted": 1,
+  "total": 4,
+  "rule": "QuantLib CoxIngersollRoss discountBondOption and discountBond (R5 M5)"
+ },
+ "g2pp_r5": {
+  "counted": 5,
+  "total": 6,
+  "rule": "QuantLib G2 discountBond and discountBondOption (R5 M6)"
+ },
+ "mcgreeks_g": {
+  "counted": 0,
+  "total": 22,
+  "rule": "core.rng stream: no outside library"
+ },
+ "aadladder_g": {
+  "counted": 0,
+  "total": 5,
+  "rule": "differentiates the G-18 scheme: no outside library"
+ },
+ "reserve_g": {
+  "counted": 0,
+  "total": 9,
+  "rule": "arithmetic on inputs: not counted"
+ },
+ "collexp_g": {
+  "counted": 0,
+  "total": 17,
+  "rule": "own formulas on given inputs: not counted (G-40)"
+ },
+ "xvaadj_g": {
+  "counted": 0,
+  "total": 12,
+  "rule": "own formulas on given inputs: not counted (G-40)"
+ },
+ "simm_g": {
+  "counted": 0,
+  "total": 8,
+  "rule": "own formulas on given inputs: not counted (G-40)"
+ },
+ "wwr_g": {
+  "counted": 0,
+  "total": 6,
+  "rule": "own formulas on given inputs: not counted (G-40)"
  }
 }
