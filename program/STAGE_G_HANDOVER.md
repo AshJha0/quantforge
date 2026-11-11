@@ -258,3 +258,7 @@ Both tests restated against the scheme's own bounding value on the same grid (`s
 - Language sessions: new property and error cases only; no existing golden value changed (the appended cases keep every earlier case id).
 
 **Honest stage G outside share after the R5 fixes: 258 of 435 = 59.3%, below the 60% floor.** The drop comes from the H1 strict recount (-8), the new error and limit cases, and the 5 `aadladder_g` cases. ORE under WSL (G-23) is the route back above the floor in wave 4.
+
+## WAVE 3d READY (2026-11-11): Q3b AAD core
+
+Read: `specifications/06-risk/aad-core.md`; rulings G-9, G-35. New operation `rates.shortrate.bermudan_ladder` (suite `aadladder_g`, 5 cases: 3 values, 2 errors). Build notes: tape your wave 2d scheme (or hand-write its adjoint: Thomas solve backwards, `max` through its active branch); report the G-9 cost ratio. Property test: AAD equals your own Richardson bump within G-9. Outside: none (G-18).
