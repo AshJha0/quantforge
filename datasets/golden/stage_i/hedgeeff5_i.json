@@ -1,0 +1,1292 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeeff5_i",
+ "spec": "specifications/08-hedging/dynamic-hedge-and-effectiveness.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w5.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeeff5_i-0001",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     818.48,
+     532.11,
+     1726.67,
+     -1405.09,
+     -925.23,
+     -145.45
+    ],
+    "hedge_changes": [
+     -543.35,
+     -118.15,
+     -1243.78,
+     785.99,
+     371.12,
+     59.2
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.1454388269131652,
+     "regression_slope": -0.6010575555389028,
+     "regression_r2": 0.9580805612368153,
+     "variance_reduction": 0.8250380679907122
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 1 (n = 6)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0002",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -292.85,
+     1246.03,
+     534.53,
+     -236.42,
+     123.51,
+     -93.94,
+     1371.78,
+     302.99,
+     1906.7,
+     -283.56,
+     -53.82,
+     820.9,
+     286.1,
+     789.59,
+     254.4,
+     349.46,
+     -1223.24,
+     328.21,
+     1082.57,
+     -723.13,
+     88.21,
+     -468.46
+    ],
+    "hedge_changes": [
+     198.47,
+     -1207.94,
+     -497.81,
+     311.01,
+     90.24,
+     -184.84,
+     -1414.11,
+     -303.27,
+     -2019.5,
+     159.3,
+     129.77,
+     -784.85,
+     -1070.63,
+     -647.35,
+     -103.39,
+     -215.53,
+     1211.64,
+     -238.43,
+     -1168.47,
+     571.66,
+     -357.61,
+     318.73
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.1822307989446048,
+     "regression_slope": -0.9724094174598157,
+     "regression_r2": 0.9191243761872178,
+     "variance_reduction": 0.9160352451653634
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 2 (n = 22)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0003",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     553.56,
+     1548.49,
+     302.72,
+     -1402.1,
+     -1271.08,
+     -45.24,
+     -2045.64,
+     1345.23,
+     1988.77,
+     1819.28,
+     -670.51,
+     1560.28
+    ],
+    "hedge_changes": [
+     -676.47,
+     -1745.0,
+     -287.55,
+     2284.4,
+     1777.72,
+     138.29,
+     3162.66,
+     -1596.59,
+     -3458.96,
+     -2677.96,
+     891.89,
+     -2139.26
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.1745689187134885,
+     "regression_slope": -1.4775911366979049,
+     "regression_r2": 0.983617958682412,
+     "variance_reduction": 0.735544508574217
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 3 (n = 12)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0004",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -384.76,
+     1752.21,
+     445.2,
+     254.25,
+     -1002.55
+    ],
+    "hedge_changes": [
+     337.65,
+     -1002.62,
+     -1182.55,
+     -205.48,
+     514.87
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.4451355287264527,
+     "regression_slope": -0.6230985329579997,
+     "regression_r2": 0.7032086067216068,
+     "variance_reduction": 0.69408240454338
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 4 (n = 5)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0005",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -301.74,
+     -393.93,
+     1988.98,
+     1126.3,
+     1039.02,
+     708.24,
+     38.45,
+     -534.93,
+     -1163.38,
+     350.33
+    ],
+    "hedge_changes": [
+     526.66,
+     215.69,
+     -805.09,
+     -425.12,
+     10.62,
+     -233.33,
+     -96.56,
+     780.8,
+     885.74,
+     -675.39
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": -0.06440255622362054,
+     "regression_slope": -0.5274483090611183,
+     "regression_r2": 0.7264076239766978,
+     "variance_reduction": 0.6719136901507133
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 5 (n = 10)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0006",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1154.71,
+     -1296.76,
+     854.4,
+     -1063.21,
+     561.3,
+     304.8,
+     -1095.52,
+     527.13,
+     -384.14,
+     -1222.72,
+     -1165.23,
+     738.83,
+     -88.56,
+     287.07,
+     -43.95,
+     -60.92,
+     507.66,
+     -360.19,
+     -78.99,
+     -337.97,
+     -1148.01,
+     -834.89,
+     1159.71,
+     848.73,
+     817.54
+    ],
+    "hedge_changes": [
+     -1702.55,
+     1827.07,
+     -1153.73,
+     1660.16,
+     -506.03,
+     -148.18,
+     1404.9,
+     -730.02,
+     581.71,
+     1556.84,
+     1729.17,
+     -940.62,
+     98.78,
+     -9.02,
+     211.0,
+     -317.9,
+     -627.17,
+     133.86,
+     -117.45,
+     368.24,
+     543.24,
+     1049.84,
+     -1396.7,
+     -1226.33,
+     -1014.31
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 0.8982651953945238,
+     "regression_slope": -1.256571583111309,
+     "regression_r2": 0.9361420865486557,
+     "variance_reduction": 0.8264631566696081
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 6 (n = 25)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0007",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     144.32,
+     -582.82,
+     -125.48,
+     -229.85,
+     444.65,
+     -744.25,
+     947.28,
+     -1001.25,
+     -264.25,
+     79.07,
+     819.42,
+     1932.26,
+     1521.65,
+     785.68,
+     -1333.2,
+     632.57,
+     817.77,
+     320.9,
+     1072.04,
+     -982.36,
+     -575.52,
+     263.06,
+     548.93,
+     277.42,
+     391.21,
+     513.36,
+     -533.48,
+     -318.5,
+     -722.4,
+     -1900.62,
+     334.21,
+     679.91,
+     -1019.38
+    ],
+    "hedge_changes": [
+     -690.58,
+     674.39,
+     724.24,
+     226.47,
+     242.51,
+     675.0,
+     -1231.0,
+     982.7,
+     875.1,
+     181.37,
+     -941.68,
+     -1539.75,
+     -1579.72,
+     -586.61,
+     1717.55,
+     -508.93,
+     -810.61,
+     -690.94,
+     -1175.59,
+     1804.57,
+     601.12,
+     -540.07,
+     -1068.82,
+     -480.72,
+     -435.61,
+     -958.86,
+     825.28,
+     1444.8,
+     564.17,
+     3065.6,
+     -227.11,
+     -675.83,
+     1196.64
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": -0.7567587292175063,
+     "regression_slope": -1.2052562308630206,
+     "regression_r2": 0.8725888616799131,
+     "variance_reduction": 0.7457621470847349
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 7 (n = 33)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0008",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     16.4,
+     30.06,
+     823.08,
+     572.52,
+     146.63,
+     1261.86,
+     2150.74,
+     916.5,
+     -167.15,
+     31.08,
+     -85.86,
+     -936.75,
+     382.19,
+     555.07,
+     -803.06,
+     -111.94,
+     -1206.67,
+     -438.29,
+     157.89,
+     300.71,
+     -1298.12,
+     -786.56,
+     -2563.29
+    ],
+    "hedge_changes": [
+     -1431.65,
+     -191.24,
+     -518.83,
+     -377.33,
+     631.42,
+     -959.71,
+     -1273.76,
+     -307.27,
+     -89.72,
+     55.03,
+     -654.12,
+     1005.29,
+     -279.31,
+     -363.24,
+     448.47,
+     112.64,
+     655.11,
+     318.44,
+     171.49,
+     14.52,
+     766.47,
+     471.7,
+     1478.81
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": -0.3008566327305882,
+     "regression_slope": -0.6005362081615665,
+     "regression_r2": 0.6811449132245632,
+     "variance_reduction": 0.6716054404842141
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 8 (n = 23)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0009",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -171.48,
+     -36.24,
+     15.83,
+     -694.02,
+     1295.45,
+     -1808.75,
+     913.7,
+     82.14,
+     -773.29,
+     231.7,
+     -720.02,
+     1138.98,
+     -1354.5,
+     1447.43,
+     -1606.1,
+     1234.21
+    ],
+    "hedge_changes": [
+     126.98,
+     346.62,
+     314.55,
+     657.87,
+     -939.02,
+     1779.38,
+     -1077.09,
+     662.73,
+     1109.21,
+     -216.9,
+     644.4,
+     -965.81,
+     1255.72,
+     -1172.61,
+     1705.0,
+     -1067.73
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 3.9297604849930456,
+     "regression_slope": -0.9316569746649567,
+     "regression_r2": 0.9501218641151751,
+     "variance_reduction": 0.9497630131558549
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 9 (n = 16)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0010",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     367.32,
+     752.41,
+     -798.5,
+     1446.89,
+     -45.56,
+     -568.73,
+     -633.71,
+     -529.21,
+     2580.66,
+     -143.68
+    ],
+    "hedge_changes": [
+     -280.15,
+     -417.97,
+     614.32,
+     -1213.39,
+     -449.05,
+     353.8,
+     1097.97,
+     22.95,
+     -1866.38,
+     -331.12
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.016940635696016,
+     "regression_slope": -0.7332865130337716,
+     "regression_r2": 0.8554291061526282,
+     "variance_reduction": 0.837988954833839
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 10 (n = 10)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0011",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -1248.14,
+     -333.6,
+     1645.98,
+     -1441.82,
+     -1338.14,
+     -501.91,
+     978.8
+    ],
+    "hedge_changes": [
+     1431.61,
+     438.14,
+     -2469.96,
+     2154.15,
+     2331.41,
+     786.91,
+     -944.59
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.6650080622467982,
+     "regression_slope": -1.4129246010376284,
+     "regression_r2": 0.9725411027730272,
+     "variance_reduction": 0.7731278080641563
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 11 (n = 7)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0012",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -348.3,
+     -1653.68,
+     626.55,
+     45.15,
+     -75.22,
+     -159.83,
+     481.54,
+     -848.36,
+     -147.98,
+     -1694.41,
+     606.26,
+     10.88
+    ],
+    "hedge_changes": [
+     502.65,
+     697.98,
+     -503.81,
+     99.84,
+     371.39,
+     -78.36,
+     -247.02,
+     584.13,
+     95.98,
+     1225.89,
+     -876.35,
+     -938.99
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 0.295600810793691,
+     "regression_slope": -0.6990150542766962,
+     "regression_r2": 0.7018232812826329,
+     "variance_reduction": 0.7018120446378433
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 12 (n = 12)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0013",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1312.75,
+     29.65,
+     1709.31,
+     -36.66,
+     1026.93,
+     1570.01,
+     1993.31,
+     979.02,
+     -193.04,
+     171.99,
+     20.91,
+     -656.38,
+     719.99,
+     915.03,
+     432.7,
+     -1544.19,
+     -1562.64,
+     -1287.79,
+     1437.5,
+     1798.87,
+     1873.91,
+     802.82,
+     216.03,
+     1150.24,
+     -892.0,
+     607.1,
+     481.87,
+     -1284.93
+    ],
+    "hedge_changes": [
+     -1103.28,
+     29.59,
+     -1475.58,
+     1273.83,
+     -1463.23,
+     -1373.92,
+     -1499.35,
+     -737.96,
+     -29.77,
+     -33.26,
+     58.04,
+     522.88,
+     -1347.8,
+     -716.19,
+     -214.77,
+     677.24,
+     1326.24,
+     1507.16,
+     -1180.34,
+     -1427.19,
+     -1571.79,
+     -653.38,
+     -154.35,
+     -416.25,
+     687.1,
+     -326.78,
+     -406.27,
+     1006.94
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 0.7668081995809133,
+     "regression_slope": -0.826820387424736,
+     "regression_r2": 0.8574072985793152,
+     "variance_reduction": 0.8563161495588574
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 13 (n = 28)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0014",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1849.22,
+     27.17,
+     52.31,
+     448.76,
+     -620.51,
+     -1094.95,
+     1307.29,
+     1091.62,
+     1101.82,
+     1174.12,
+     245.57,
+     1553.38,
+     739.6,
+     -348.24,
+     765.05,
+     -1930.59,
+     512.54,
+     997.1,
+     -1098.04,
+     1445.59,
+     -731.4,
+     1569.67,
+     -310.28,
+     176.9,
+     -103.07,
+     -879.11,
+     -537.89,
+     450.91,
+     -1618.54,
+     -251.48,
+     190.49,
+     86.57,
+     -1164.23,
+     -908.07,
+     -1660.82,
+     1003.25,
+     2207.57
+    ],
+    "hedge_changes": [
+     -1878.77,
+     136.98,
+     -173.24,
+     -506.45,
+     634.78,
+     1585.24,
+     -993.27,
+     -477.99,
+     -1146.54,
+     -1120.49,
+     -269.83,
+     -1583.15,
+     -774.49,
+     419.01,
+     -1297.03,
+     2169.9,
+     -530.51,
+     -1016.09,
+     1261.13,
+     112.49,
+     859.92,
+     -1539.74,
+     305.34,
+     -285.95,
+     621.91,
+     886.69,
+     1322.63,
+     -666.59,
+     1337.14,
+     173.43,
+     -330.26,
+     286.24,
+     1371.45,
+     1018.46,
+     3186.09,
+     -746.62,
+     -2552.23
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 0.034919014231750235,
+     "regression_slope": -1.0719565354757112,
+     "regression_r2": 0.8787448419243936,
+     "variance_reduction": 0.8362629327922543
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 14 (n = 37)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0015",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -844.04,
+     -99.72,
+     -1048.41,
+     -730.36,
+     174.86
+    ],
+    "hedge_changes": [
+     1200.03,
+     157.35,
+     1273.61,
+     1242.41,
+     106.93
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.562341276538955,
+     "regression_slope": -1.1260236493498372,
+     "regression_r2": 0.9357961290559819,
+     "variance_reduction": 0.8971269057566148
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 15 (n = 5)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0016",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     755.5,
+     878.17,
+     201.28,
+     305.45,
+     -10.66,
+     2650.79,
+     730.94
+    ],
+    "hedge_changes": [
+     -1111.92,
+     -1325.57,
+     -352.02,
+     -456.04,
+     20.27,
+     -3895.08,
+     -1088.56
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.489424781410404,
+     "regression_slope": -1.4629209067648474,
+     "regression_r2": 0.999726217663119,
+     "variance_reduction": 0.7851181417505353
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 16 (n = 7)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0017",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -1458.4,
+     -189.45,
+     -516.8,
+     -1257.46,
+     -1583.48,
+     895.12,
+     -261.86,
+     -567.83,
+     753.22,
+     -1357.97,
+     -262.03,
+     647.18,
+     361.8,
+     1882.91
+    ],
+    "hedge_changes": [
+     814.13,
+     595.35,
+     163.92,
+     1128.49,
+     990.71,
+     -696.35,
+     311.13,
+     521.45,
+     -392.66,
+     881.68,
+     631.79,
+     -464.52,
+     -544.06,
+     -925.35
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.0345311401176651,
+     "regression_slope": -0.6319198887645825,
+     "regression_r2": 0.8807534440458815,
+     "variance_reduction": 0.8104521143689853
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 17 (n = 14)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0018",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1667.28,
+     354.07,
+     957.29,
+     38.59,
+     886.86,
+     -1634.1,
+     -150.9,
+     -95.64,
+     781.9,
+     2088.71,
+     159.82,
+     -671.55,
+     1098.39,
+     -443.24,
+     -439.44,
+     -295.52,
+     -402.19,
+     -1310.58,
+     -1370.06,
+     823.61,
+     531.69,
+     -255.31,
+     1314.55,
+     348.75,
+     -367.5,
+     -3500.08,
+     248.1,
+     824.02
+    ],
+    "hedge_changes": [
+     -645.69,
+     -445.16,
+     -18.14,
+     3.85,
+     -507.66,
+     697.85,
+     -83.49,
+     500.05,
+     -581.1,
+     -1050.66,
+     -400.87,
+     242.52,
+     -1053.34,
+     288.83,
+     -162.86,
+     165.73,
+     498.92,
+     615.13,
+     765.86,
+     -431.13,
+     740.82,
+     53.26,
+     -1315.97,
+     159.04,
+     180.03,
+     2140.11,
+     51.86,
+     -1795.38
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.1684771624898946,
+     "regression_slope": -0.576367353995904,
+     "regression_r2": 0.7089676379240869,
+     "variance_reduction": 0.6841670202974225
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 18 (n = 28)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0019",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     685.96,
+     -1264.31,
+     1263.28,
+     -771.02,
+     -1537.14,
+     -333.01,
+     -356.16,
+     -895.44,
+     920.28,
+     81.55,
+     318.42,
+     -484.24,
+     -1180.02,
+     936.12,
+     2076.35,
+     1610.97,
+     -1280.25,
+     -707.32
+    ],
+    "hedge_changes": [
+     -584.16,
+     531.85,
+     -1035.6,
+     553.9,
+     996.22,
+     147.93,
+     236.0,
+     752.29,
+     -362.47,
+     -88.67,
+     -507.14,
+     602.19,
+     981.17,
+     -591.96,
+     -2405.95,
+     -1344.73,
+     1085.72,
+     832.93
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": -0.21886940762898724,
+     "regression_slope": -0.8352166305231262,
+     "regression_r2": 0.9246366510561735,
+     "variance_reduction": 0.9159889946356788
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 19 (n = 18)"
+  },
+  {
+   "case_id": "hedgeeff5_i-0020",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -1264.02,
+     1696.15,
+     -469.57,
+     -398.87,
+     170.0,
+     -675.91,
+     279.71,
+     -159.61,
+     55.22,
+     -385.2,
+     -555.22,
+     410.57,
+     -1277.5
+    ],
+    "hedge_changes": [
+     1884.91,
+     -2685.12,
+     1033.03,
+     559.01,
+     -591.95,
+     792.25,
+     -433.28,
+     286.94,
+     -83.4,
+     63.06,
+     2367.09,
+     -359.28,
+     2379.65
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 2.025020879867923,
+     "regression_slope": -1.660562047473397,
+     "regression_r2": 0.8736837679279827,
+     "variance_reduction": 0.16498635411567797
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 20 (n = 13)"
+  }
+ ]
+}

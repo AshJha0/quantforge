@@ -47,9 +47,9 @@
   "rule": "QuantLib 1.44 AnalyticEuropeanMargrabeEngine delta1 and delta2, and BlackCalculator.vega (the Margrabe price as a Black price in the spread volatility, asserted equal to the engine NPV) for the vegas and correlation, then numpy solve; quantities and before-Greeks within root_finding"
  },
  "_stage": {
-  "counted": 113,
-  "total": 276,
-  "share": 0.4094,
+  "counted": 278,
+  "total": 443,
+  "share": 0.6275,
   "floor": 0.6,
   "note": "Stage I so far, error cases in the denominator (ruling I-2); the floor applies at release"
  },
@@ -59,8 +59,8 @@
   "rule": "QuantLib 1.44 ZeroCurve (linear zero, continuous, ACT/365F) and AnalyticEuropeanEngine values, the spec's half-differences of them, numpy lstsq on the weighted system; positions and book risk within the case limit"
  },
  "hedgecost_i": {
-  "counted": 12,
-  "total": 22,
+  "counted": 13,
+  "total": 23,
   "rule": "scipy 1.18 solvers on the same problem, first that agrees: lsq_linear BVLS or lstsq (no spread, margin or equality: exact), minimize trust-constr, minimize SLSQP (both on the split form x = p - n, p, n >= 0); x within root_finding; verified_by names the solver"
  },
  "hedgefrontier_i": {
@@ -80,7 +80,7 @@
  },
  "hedgeselect_i": {
   "counted": 10,
-  "total": 17,
+  "total": 18,
   "rule": "the same subset enumeration with every subset solved by scipy 1.18 (lstsq, or lsq_linear BVLS with bounds); same selected set and every output within root_finding"
  },
  "hedgeslip_i": {
@@ -92,5 +92,30 @@
   "counted": 5,
   "total": 8,
   "rule": "as hedgebt_i: QuantLib 1.44 AnalyticEuropeanEngine value and delta on each date, then the spec's cash-account arithmetic with costs; every output within the case limit"
+ },
+ "hedgegreeks5_i": {
+  "counted": 50,
+  "total": 50,
+  "rule": "QuantLib 1.44 AnalyticEuropeanEngine Greeks and numpy solve, as hedgegreeks_i; seeded draws (seed 202611115), 0 draws rejected before any outside check"
+ },
+ "hedgecorr5_i": {
+  "counted": 35,
+  "total": 35,
+  "rule": "QuantLib 1.44 Margrabe engine, BlackCalculator.vega and AnalyticEuropeanEngine, numpy solve, as hedgecorr_i; seeded draws (seed 202611116), 1 draws rejected before any outside check"
+ },
+ "hedgemv5_i": {
+  "counted": 30,
+  "total": 30,
+  "rule": "numpy 2.5 solve (covariance) or lstsq OLS with intercept (series); hedge within root_finding, as hedgemv_i; seeded draws (seed 202611117), 0 draws rejected before any outside check"
+ },
+ "hedgeeff5_i": {
+  "counted": 20,
+  "total": 20,
+  "rule": "numpy 2.5 polyfit, corrcoef, var(ddof=1), as hedgeeff_i; seeded draws (seed 202611118), 0 draws rejected before any outside check"
+ },
+ "hedgeqp5_i": {
+  "counted": 29,
+  "total": 30,
+  "rule": "scipy 1.18 BVLS, lstsq (gelsd) or SLSQP on the same problem, as hedgeqp_i; seeded draws (seed 202611119), 2 draws rejected before any outside check"
  }
 }

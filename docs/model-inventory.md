@@ -666,7 +666,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** scipy 1.18 `lsq_linear` (BVLS) and `minimize` (SLSQP) on the same problems.
 - **Monitoring thresholds:** a KKT residual above 1e-8 of the gradient scale, or a hedge effectiveness below the desk's floor on the dynamic backtest (later wave).
-- **Data lineage hash:** sha256 0a45713450573d2bbf6f9f363269f572b86cd577033258c3fd82ad123c512f8e (`hedgeqp_i`); 8659c72326be4654ac75059b61319efd96ffb472f8adb99ef7117b55a10a071c (`hedgeint_i`); 2cd58f846b05db9a4f43ea70f78fe842cd240c25559411e96eff3a301c5a1cbc (`hedgemv_i`); e013dbe82448fecfe4c1c9bbcea8ca0f7ce06a50978c09499db1e40ecd1e06d8 (`hedgegreeks_i`); 03f02bc3a95fcc215d27d652df70d66ed2642abe33439e7bef198fcd31b7e87e (`hedgebeta_i`); 2531eeb9dc4eddd57cf4d9dfb6c577ffb62bb583487d1b40845b0731762d1794 (`hedgeres_i`)
+- **Data lineage hash:** sha256 0a45713450573d2bbf6f9f363269f572b86cd577033258c3fd82ad123c512f8e (`hedgeqp_i`); 8659c72326be4654ac75059b61319efd96ffb472f8adb99ef7117b55a10a071c (`hedgeint_i`); 2cd58f846b05db9a4f43ea70f78fe842cd240c25559411e96eff3a301c5a1cbc (`hedgemv_i`); e013dbe82448fecfe4c1c9bbcea8ca0f7ce06a50978c09499db1e40ecd1e06d8 (`hedgegreeks_i`); 03f02bc3a95fcc215d27d652df70d66ed2642abe33439e7bef198fcd31b7e87e (`hedgebeta_i`); 2531eeb9dc4eddd57cf4d9dfb6c577ffb62bb583487d1b40845b0731762d1794 (`hedgeres_i`); d7ddbc7b28ad0cf16ead1e02e50be1e013e0f158c38c3ee8b7c9cc94b723aac5 (`hedgegreeks5_i`, wave 5); 8e6030343dabc17948b78be0e8960faee5dbcdf55193cad0e707575921038d5d (`hedgemv5_i`, wave 5); ae1842ca8734960cd4ffb90e990c9976c23c8dfac249cfbd7715781dc2418e2b (`hedgeqp5_i`, wave 5)
 - **Lineage regenerated 2026-11-11:** `hedgeint_i` hash refreshed after a second check (a wide-box float search with the I-7 tie rule) was added to its `verified_by` lists; no value or error code changed.
 - **Lineage regenerated 2026-11-11 (after the builds):** `hedgegreeks_i`, `hedgeint_i`, `hedgemv_i` gained computed cases for rulings I-41, I-42, I-44, I-45; earlier cases unchanged.
 - **Retirement trigger:** a hedge that needs costs or non-convex constraints the solver cannot express.
@@ -680,7 +680,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** QuantLib 1.44 `IsdaCdsEngine` and `AnalyticEuropeanMargrabeEngine` on the same trades.
 - **Monitoring thresholds:** targeted risk after the hedge above 1e-6 of the book's, or a hedge notional above 10 times the book's on a regular matrix.
-- **Data lineage hash:** sha256 c73a9d5138891138da19b7fda4d48768e610baebfa059a755e8d1be3a3e25931 (`hedgecredit_i`); 0d673c90931655b80d5797f28ddfa7b152969aa017efc6e8af643810f9c726d3 (`hedgecorr_i`)
+- **Data lineage hash:** sha256 c73a9d5138891138da19b7fda4d48768e610baebfa059a755e8d1be3a3e25931 (`hedgecredit_i`); 0d673c90931655b80d5797f28ddfa7b152969aa017efc6e8af643810f9c726d3 (`hedgecorr_i`); 42d960e1b6ca1ad8d6751341a3ff937e0e49dbbf45c5d378d8552a85db555863 (`hedgecorr5_i`, wave 5)
 - **Retirement trigger:** a desk need for index, tranche or recovery hedges.
 - **Validation report:** `specifications/08-hedging/credit-and-correlation-hedges.md`.
 
@@ -716,7 +716,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** QuantLib 1.44 values on each date with the same cash arithmetic; numpy regression.
 - **Monitoring thresholds:** a live hedge's regression R² below 0.8 or dollar offset outside [0.8, 1.25] over a quarter.
-- **Data lineage hash:** sha256 2de452d8b296754bb2626f530d4cebd982863e5fb34afe2e025c080f72ae566a (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`); 4d8d4cf5d70a3dbd497fe4678a656409b137d1be9303d054ecc3750ff1dbbbb8 (`hedgebtcost_i`, wave 4e: costs in the backtest)
+- **Data lineage hash:** sha256 2de452d8b296754bb2626f530d4cebd982863e5fb34afe2e025c080f72ae566a (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`); 4d8d4cf5d70a3dbd497fe4678a656409b137d1be9303d054ecc3750ff1dbbbb8 (`hedgebtcost_i`, wave 4e: costs in the backtest); cff4f2c54880a5bbed20a1656092ad86ce2fc5d4fcd258c1fb38506035bc1c2c (`hedgeeff5_i`, wave 5)
 - **Lineage regenerated 2026-11-11 (after the builds):** `hedgebt_i` gained case 0016 for ruling I-43; earlier cases unchanged.
 - **Retirement trigger:** a need for cost-aware rebalancing or stochastic-volatility hedging.
 - **Validation report:** `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`.

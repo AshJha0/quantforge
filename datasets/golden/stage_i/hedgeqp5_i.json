@@ -1,0 +1,2563 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeqp5_i",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w5.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeqp5_i-0001",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.9165,
+      1.4925,
+      0.5121,
+      1.3447
+     ],
+     [
+      0.0942,
+      0.1216,
+      0.7015,
+      -0.6375
+     ],
+     [
+      0.7218,
+      -0.6466,
+      -0.7107,
+      0.6811
+     ],
+     [
+      0.1732,
+      -0.5201,
+      0.1618,
+      -0.9089
+     ]
+    ],
+    "b": [
+     0.1406,
+     -2.8892,
+     2.7533,
+     0.7408
+    ],
+    "weights": [
+     0.2323,
+     1.9889,
+     1.0815,
+     0.7755
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -4.097964802539608,
+      -6.353269105271629,
+      10.862334259230327,
+      5.603359490587942
+     ],
+     "residual": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 4
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 1 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0002",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.1585,
+      0.582
+     ],
+     [
+      0.4686,
+      -0.824
+     ],
+     [
+      -0.3262,
+      1.4469
+     ],
+     [
+      -0.9794,
+      -0.4527
+     ],
+     [
+      1.0934,
+      -0.1924
+     ]
+    ],
+    "b": [
+     2.2021,
+     -0.448,
+     -1.8542,
+     -2.6984,
+     1.7688
+    ],
+    "weights": [
+     0.3967,
+     2.9308,
+     1.8197,
+     2.1136,
+     1.0999
+    ],
+    "ridge": 0.7282
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -1.681819966109348,
+      -0.1595128914812561
+     ],
+     "residual": [
+      2.3758319617862407,
+      -1.1046622135382855,
+      -1.5363895297393602,
+      -0.9790140392189398,
+      -0.039411670622967306
+     ],
+     "objective": 14.216768294948741,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 2 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0003",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.1308,
+      0.9172,
+      -0.1605
+     ],
+     [
+      0.706,
+      0.7332,
+      0.8189
+     ],
+     [
+      0.27,
+      0.3725,
+      0.6194
+     ]
+    ],
+    "b": [
+     1.1029,
+     -2.4071,
+     -2.9327
+    ],
+    "weights": [
+     1.8399,
+     2.0151,
+     1.1617
+    ],
+    "lower": [
+     null,
+     -0.258,
+     -1.1834
+    ],
+    "upper": [
+     null,
+     1.0717,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -3.9439992421619294,
+      -0.258,
+      6.632408692722478
+     ],
+     "residual": [
+      0.3176359056928226,
+      0.0505504135041154,
+      0.014429148888581626
+     ],
+     "objective": 0.19102337758222573,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 3 (bounds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0004",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.3875,
+      -0.1113,
+      0.0187
+     ],
+     [
+      -0.8452,
+      0.9758,
+      -0.1694
+     ],
+     [
+      0.9166,
+      -0.6141,
+      -0.7466
+     ],
+     [
+      0.5698,
+      0.9687,
+      -0.029
+     ],
+     [
+      -0.6925,
+      -0.0505,
+      0.847
+     ]
+    ],
+    "b": [
+     -0.6721,
+     -2.9481,
+     -2.1666,
+     0.0118,
+     0.8116
+    ],
+    "weights": [
+     2.979,
+     0.6156,
+     2.1777,
+     2.7639,
+     2.2961
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.9274
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.9662856195794399,
+      0.23230279071678597,
+      -0.2711884102962259
+     ],
+     "residual": [
+      -1.0774622014663506,
+      -3.4921842257829225,
+      -1.2210904777455012,
+      0.795285723302306,
+      -0.09898066601086321
+     ],
+     "objective": 15.983543505839997,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 4 (equality)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0005",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.8517,
+      -0.6264,
+      1.0062
+     ],
+     [
+      0.1311,
+      0.4158,
+      1.3264
+     ],
+     [
+      0.3362,
+      0.1491,
+      1.0512
+     ],
+     [
+      0.8999,
+      -0.0722,
+      1.4104
+     ]
+    ],
+    "b": [
+     2.8153,
+     1.447,
+     1.8854,
+     -2.4504
+    ],
+    "weights": [
+     2.311,
+     1.2281,
+     1.2586,
+     1.694
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      3.916419713749542,
+      -2.6859726967186495,
+      -1.1675551992941633
+     ],
+     "residual": [
+      -0.012615414505710293,
+      -0.7050300391668276,
+      1.574287753183821,
+      -0.3788065239781886
+     ],
+     "objective": 3.97318719368293,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 5 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0006",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.4159,
+      -0.5947,
+      0.1706
+     ],
+     [
+      -0.2741,
+      0.4675,
+      1.1907
+     ],
+     [
+      -0.4001,
+      -0.519,
+      -0.7638
+     ],
+     [
+      -0.0868,
+      -0.3297,
+      0.3963
+     ],
+     [
+      0.8176,
+      0.6499,
+      0.7325
+     ],
+     [
+      -0.93,
+      1.3807,
+      0.8112
+     ]
+    ],
+    "b": [
+     0.8491,
+     -2.7863,
+     2.4667,
+     -1.8327,
+     -0.0904,
+     -0.8828
+    ],
+    "weights": [
+     0.4724,
+     1.3778,
+     1.368,
+     0.9174,
+     1.7928,
+     1.1882
+    ],
+    "ridge": 0.9383
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.3430085498963956,
+      -0.21281177497295822,
+      1.6944394094623954
+     ],
+     "residual": [
+      1.1220732699287919,
+      -0.7742018564263818,
+      1.4201742110771354,
+      -1.0612564776904614,
+      0.7320267044809861,
+      0.5168979826543797
+     ],
+     "objective": 9.337989256714456,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 6 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0007",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.7658,
+      1.2577,
+      0.9577,
+      0.1637
+     ],
+     [
+      0.4393,
+      -0.0811,
+      -0.0748,
+      -0.2384
+     ],
+     [
+      -0.5905,
+      -0.4637,
+      1.042,
+      -0.7747
+     ],
+     [
+      0.4452,
+      0.0613,
+      0.4628,
+      -0.8899
+     ],
+     [
+      1.4873,
+      -0.4133,
+      1.4968,
+      -0.277
+     ],
+     [
+      1.3354,
+      0.8481,
+      1.4346,
+      0.9023
+     ]
+    ],
+    "b": [
+     1.7746,
+     0.2509,
+     0.3839,
+     -2.5102,
+     0.6446,
+     0.452
+    ],
+    "weights": [
+     2.9774,
+     0.8467,
+     2.269,
+     2.8976,
+     0.2168,
+     2.7607
+    ],
+    "lower": [
+     -1.1513,
+     null,
+     -1.1257,
+     -1.2503
+    ],
+    "upper": [
+     null,
+     0.4464,
+     0.1822,
+     0.9061
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2343878599848954,
+      -0.040835158465192284,
+      -0.5489339503293759,
+      -1.2503
+     ],
+     "residual": [
+      0.04755924379145136,
+      1.135610097727529,
+      0.07054746541601926,
+      -1.104558382161076,
+      2.0220709982961895,
+      0.15012291518697723
+     ],
+     "objective": 5.593818039688484,
+     "rank": 4
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 7 (bounds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0008",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.0718,
+      1.3057,
+      0.4318,
+      1.3371
+     ],
+     [
+      0.3876,
+      -0.6257,
+      0.0714,
+      0.4147
+     ],
+     [
+      -0.86,
+      1.3116,
+      1.1832,
+      0.9518
+     ],
+     [
+      1.1494,
+      0.6484,
+      -0.5786,
+      0.812
+     ]
+    ],
+    "b": [
+     0.0028,
+     0.9904,
+     2.6441,
+     1.5225
+    ],
+    "weights": [
+     1.4649,
+     1.6603,
+     0.9029,
+     2.1743
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     -0.9933
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.003859129515948304,
+      0.3274952750976352,
+      -0.0024274656984044555,
+      -1.322226938915179
+     ],
+     "residual": [
+      -1.3383101535178294,
+      0.2384811723528003,
+      1.8089561735605233,
+      0.667039877092909
+     ],
+     "objective": 6.640188839680848,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 8 (equality)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0009",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.1332,
+      1.269,
+      0.274
+     ],
+     [
+      1.3682,
+      -0.005,
+      1.414
+     ],
+     [
+      0.1484,
+      0.3224,
+      0.7145
+     ],
+     [
+      0.6524,
+      0.5402,
+      -0.0243
+     ],
+     [
+      -0.6547,
+      1.4223,
+      -0.3995
+     ]
+    ],
+    "b": [
+     -2.9791,
+     2.6201,
+     2.3385,
+     -0.9435,
+     1.758
+    ],
+    "weights": [
+     1.0154,
+     0.2893,
+     0.6541,
+     1.5644,
+     2.3856
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.4333816297185193,
+      -0.018060789409242512,
+      -1.0358976779867985
+     ],
+     "residual": [
+      -3.4767815386072183,
+      3.1165837330545916,
+      1.8052421444231208,
+      0.007054050364568376,
+      1.2077183086022458
+     ],
+     "objective": 20.695484000263807,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 9 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0010",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.4098,
+      1.2803,
+      0.4092
+     ],
+     [
+      -0.3957,
+      0.9566,
+      0.8855
+     ],
+     [
+      0.4587,
+      1.0683,
+      0.2569
+     ],
+     [
+      -0.8748,
+      0.7315,
+      0.456
+     ],
+     [
+      0.4538,
+      -0.2249,
+      0.1277
+     ]
+    ],
+    "b": [
+     0.0123,
+     -0.0249,
+     2.3013,
+     1.7432,
+     -0.9049
+    ],
+    "weights": [
+     0.6897,
+     2.7957,
+     2.7076,
+     1.1867,
+     0.4685
+    ],
+    "ridge": 0.3201
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.3948026099322118,
+      -1.6862461295495308,
+      1.1716011265747923
+     ],
+     "residual": [
+      -1.505391629117639,
+      -0.4442868571949266,
+      0.6197716320433946,
+      1.3893343931213222,
+      -0.5552112059879473
+     ],
+     "objective": 6.9893878968377825,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 10 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0011",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.8592,
+      -0.585,
+      -0.7905,
+      -0.6915
+     ],
+     [
+      -0.5677,
+      -0.1675,
+      -0.698,
+      0.1918
+     ],
+     [
+      0.7916,
+      -0.7979,
+      1.103,
+      0.8195
+     ],
+     [
+      -0.8816,
+      0.2835,
+      1.1231,
+      0.2399
+     ],
+     [
+      1.0409,
+      -0.1759,
+      -0.2861,
+      -0.7787
+     ]
+    ],
+    "b": [
+     -2.0896,
+     2.7153,
+     0.5168,
+     2.8204,
+     0.9871
+    ],
+    "weights": [
+     1.2302,
+     1.6041,
+     0.9351,
+     2.0267,
+     0.3036
+    ],
+    "lower": [
+     -0.2022,
+     null,
+     null,
+     -1.1437
+    ],
+    "upper": [
+     1.6825,
+     0.7647,
+     1.6242,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2661019765023942,
+      -0.8710696844472072,
+      -0.6434877730573122,
+      -1.1437
+     ],
+     "residual": [
+      -1.3683134182074355,
+      2.372230885678502,
+      0.5670436621375066,
+      0.4601814940540385,
+      3.5329077467073025
+     ],
+     "objective": 15.849543679508287,
+     "rank": 4
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 11 (bounds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0012",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.147,
+      0.5075,
+      -0.5551,
+      0.5401
+     ],
+     [
+      -0.9498,
+      0.7033,
+      1.4092,
+      0.5278
+     ],
+     [
+      -0.3218,
+      -0.9785,
+      0.0736,
+      -0.307
+     ]
+    ],
+    "b": [
+     1.3229,
+     -0.4366,
+     1.3404
+    ],
+    "weights": [
+     2.8047,
+     2.2816,
+     2.2493
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.0744
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.153132592344826,
+      2.954460342600347,
+      1.7956575996396122,
+      -5.8288505345847845
+     ],
+     "residual": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 12 (equality)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0013",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0586,
+      0.3413,
+      -0.7802,
+      0.4708
+     ],
+     [
+      -0.0163,
+      0.9551,
+      0.4814,
+      1.0822
+     ],
+     [
+      -0.5992,
+      -0.9317,
+      1.0862,
+      -0.8209
+     ],
+     [
+      1.2451,
+      1.0899,
+      0.9221,
+      1.2316
+     ],
+     [
+      -0.9835,
+      -0.5578,
+      0.1635,
+      -0.4923
+     ]
+    ],
+    "b": [
+     -1.9454,
+     -0.1784,
+     2.2832,
+     1.1184,
+     -2.8657
+    ],
+    "weights": [
+     1.353,
+     2.0516,
+     1.4399,
+     0.6981,
+     0.4416
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -1.171901299312407,
+      -7.017357995046165,
+      -2.6021376060786676,
+      7.752024127746584
+     ],
+     "residual": [
+      0.09884172044429823,
+      0.27499483759128324,
+      0.33339722834268626,
+      -0.8409909574071404,
+      -2.0406237591730028
+     ],
+     "objective": 2.6610438638548177,
+     "rank": 4
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 13 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0014",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.4928,
+      0.9061,
+      -0.3416,
+      0.2785
+     ],
+     [
+      -0.2153,
+      0.9159,
+      -0.3405,
+      -0.1457
+     ],
+     [
+      0.4092,
+      1.1467,
+      -0.7814,
+      0.0163
+     ],
+     [
+      0.1298,
+      0.0425,
+      -0.5997,
+      0.9214
+     ],
+     [
+      -0.2007,
+      -0.4675,
+      0.0329,
+      0.1777
+     ],
+     [
+      -0.0902,
+      -0.994,
+      0.6576,
+      -0.9003
+     ]
+    ],
+    "b": [
+     -0.3294,
+     1.581,
+     0.1386,
+     -2.5356,
+     -0.2067,
+     -2.5827
+    ],
+    "weights": [
+     2.4484,
+     1.6762,
+     1.204,
+     0.6839,
+     0.9441,
+     0.4026
+    ],
+    "ridge": 1.4263
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.034470241341696725,
+      -0.5582032335795949,
+      -0.19849348239758474,
+      0.5981461191574093
+     ],
+     "residual": [
+      -0.5838119472409293,
+      1.0576002425204594,
+      -0.3507442818150053,
+      -1.8936294991678166,
+      0.16093831893913024,
+      -2.693777035154929
+     ],
+     "objective": 9.268339316260358,
+     "rank": 4
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 14 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0015",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.9122,
+      1.3301
+     ],
+     [
+      0.9266,
+      0.4137
+     ],
+     [
+      -0.1617,
+      0.7564
+     ]
+    ],
+    "b": [
+     2.5809,
+     0.3201,
+     -2.6088
+    ],
+    "weights": [
+     2.4408,
+     0.7316,
+     2.1432
+    ],
+    "lower": [
+     null,
+     null
+    ],
+    "upper": [
+     0.1973,
+     0.3625
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.1973,
+      -0.6465958177927208
+     ],
+     "residual": [
+      1.540885842753902,
+      0.23542149017915137,
+      -3.129788486578414
+     ],
+     "objective": 26.82968875417612,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 15 (bounds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0016",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.4975,
+      0.8701
+     ],
+     [
+      1.1987,
+      0.7431
+     ],
+     [
+      -0.7136,
+      -0.5007
+     ],
+     [
+      0.9242,
+      -0.4085
+     ],
+     [
+      0.7355,
+      -0.9479
+     ]
+    ],
+    "b": [
+     -1.463,
+     1.4969,
+     -2.4113,
+     1.3359,
+     -2.5843
+    ],
+    "weights": [
+     2.2985,
+     0.7936,
+     1.7653,
+     1.4902,
+     1.118
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     -0.8223
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.44850184523612535,
+      -0.3737981547638747
+     ],
+     "residual": [
+      -2.0113714424650198,
+      0.6815114293104211,
+      -1.9040883471492291,
+      1.0740911408538159,
+      -2.559849836270493
+     ],
+     "objective": 25.112894653053175,
+     "rank": 1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 16 (equality)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0017",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.8011,
+      -0.1985
+     ],
+     [
+      0.0356,
+      -0.283
+     ],
+     [
+      1.008,
+      -0.7177
+     ],
+     [
+      -0.3814,
+      -0.9331
+     ],
+     [
+      1.3482,
+      1.4642
+     ],
+     [
+      0.0099,
+      0.476
+     ]
+    ],
+    "b": [
+     -2.261,
+     -0.7757,
+     -2.7292,
+     -0.2201,
+     2.9453,
+     -2.4439
+    ],
+    "weights": [
+     1.9981,
+     2.2344,
+     1.9966,
+     2.8343,
+     1.9116,
+     2.8326
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.20867854174121256,
+      -1.1853084022170177
+     ],
+     "residual": [
+      -1.8585439023710366,
+      -0.4476866782585711,
+      -2.0888521298039886,
+      0.9655012659287978,
+      0.92843102749834,
+      -3.0101727170185386
+     ],
+     "objective": 46.017872348423275,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 17 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0018",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.6938,
+      -0.5208,
+      -0.818
+     ],
+     [
+      1.4423,
+      0.3634,
+      -0.8124
+     ],
+     [
+      0.1485,
+      -0.9427,
+      -0.0984
+     ],
+     [
+      1.429,
+      -0.7225,
+      0.3393
+     ],
+     [
+      -0.4231,
+      0.3753,
+      1.3908
+     ],
+     [
+      -0.7021,
+      0.592,
+      0.3275
+     ]
+    ],
+    "b": [
+     2.4948,
+     0.9068,
+     -1.1609,
+     2.626,
+     2.6609,
+     -2.3458
+    ],
+    "weights": [
+     1.8759,
+     1.7906,
+     0.7228,
+     2.1231,
+     2.3789,
+     1.1551
+    ],
+    "ridge": 0.2753
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.5588260458666436,
+      1.3354731273733236,
+      -0.9617767955940094
+     ],
+     "residual": [
+      2.97373252468215,
+      1.367463597274579,
+      -2.408197348299578,
+      0.5362273791842924,
+      2.060903197397237,
+      -1.4778300423490602
+     ],
+     "objective": 38.197675222750505,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 18 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0019",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.4241,
+      -0.3207
+     ],
+     [
+      0.0644,
+      0.5826
+     ],
+     [
+      1.0214,
+      -0.4264
+     ],
+     [
+      -0.8293,
+      0.8636
+     ]
+    ],
+    "b": [
+     2.3318,
+     2.3923,
+     1.0172,
+     -0.9837
+    ],
+    "weights": [
+     2.013,
+     1.3581,
+     2.9237,
+     1.7899
+    ],
+    "lower": [
+     -1.0609,
+     -1.5094
+    ],
+    "upper": [
+     0.143,
+     1.4479
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -1.0609,
+      -0.4856936216022281
+     ],
+     "residual": [
+      0.9767342544478346,
+      2.041012936054542,
+      0.14069650025119013,
+      -0.5233406416156843
+     ],
+     "objective": 8.12600846042546,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 19 (bounds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0020",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.8704,
+      -0.5085,
+      0.4761,
+      -0.1937
+     ],
+     [
+      0.7504,
+      0.0709,
+      -0.9112,
+      1.0707
+     ],
+     [
+      -0.3436,
+      0.9609,
+      -0.8049,
+      0.9635
+     ],
+     [
+      1.1537,
+      -0.9723,
+      1.4677,
+      1.0442
+     ],
+     [
+      0.2669,
+      -0.5411,
+      0.3959,
+      -0.8263
+     ],
+     [
+      0.1327,
+      -0.3338,
+      1.2573,
+      -0.0967
+     ]
+    ],
+    "b": [
+     -0.2937,
+     0.5884,
+     -2.3797,
+     2.4225,
+     -2.8827,
+     -1.7019
+    ],
+    "weights": [
+     0.2926,
+     2.2476,
+     2.724,
+     1.1838,
+     1.1806,
+     0.6793
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.7588
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.4040112648465979,
+      1.6285585266871412,
+      0.06957633402825969,
+      -0.535323595868803
+     ],
+     "residual": [
+      -0.6333531327472909,
+      -0.23587418326204623,
+      -1.247786116983973,
+      -0.08392296510435483,
+      -3.401860467469789,
+      -2.1598810145590672
+     ],
+     "objective": 21.32361471267559,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 20 (equality)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0021",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.6586,
+      1.4514
+     ],
+     [
+      -0.4612,
+      -0.6014
+     ],
+     [
+      -0.5963,
+      -0.1474
+     ]
+    ],
+    "b": [
+     2.1561,
+     -0.4602,
+     -2.5667
+    ],
+    "weights": [
+     1.9992,
+     2.3529,
+     1.7094
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -3.6416526586023132,
+      0.4566781205686893
+     ],
+     "residual": [
+      0.42053018323791225,
+      0.9446839844373771,
+      -0.46249687464726524
+     ],
+     "objective": 2.818989637766429,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 21 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0022",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.1586,
+      -0.0424,
+      0.5287
+     ],
+     [
+      -0.3169,
+      1.3622,
+      -0.512
+     ],
+     [
+      0.8459,
+      1.3735,
+      -0.6557
+     ]
+    ],
+    "b": [
+     2.0832,
+     1.795,
+     2.9165
+    ],
+    "weights": [
+     0.7631,
+     0.4709,
+     1.9706
+    ],
+    "ridge": 0.7526
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.9783277969408533,
+      -1.4162540296722628,
+      -0.2964068761158377
+     ],
+     "residual": [
+      1.8313760668608414,
+      0.32757116020230864,
+      0.3380615954820342
+     ],
+     "objective": 5.131130834867849,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 22 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0023",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.0398,
+      0.5819,
+      1.1115
+     ],
+     [
+      0.2893,
+      0.7599,
+      -0.9133
+     ],
+     [
+      -0.8094,
+      -0.3967,
+      0.8085
+     ],
+     [
+      -0.4175,
+      -0.7712,
+      1.0911
+     ],
+     [
+      1.157,
+      -0.7224,
+      0.9586
+     ],
+     [
+      -0.2893,
+      -0.6389,
+      -0.2169
+     ]
+    ],
+    "b": [
+     -1.5501,
+     1.0076,
+     -0.0113,
+     -0.7661,
+     0.6121,
+     2.0103
+    ],
+    "weights": [
+     1.5598,
+     2.2188,
+     0.8673,
+     1.8551,
+     1.1665,
+     2.7049
+    ],
+    "lower": [
+     -0.8064,
+     -1.3449,
+     null
+    ],
+    "upper": [
+     null,
+     0.2522,
+     1.4507
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.06601347946453583,
+      0.2522,
+      0.9621580905359511
+     ],
+     "residual": [
+      -0.33653343885197895,
+      0.30141009630442567,
+      0.7199883864769118,
+      0.11677468026021996,
+      1.2758578698472949,
+      1.6595750297718423
+     ],
+     "objective": 10.201769777639479,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 23 (bounds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0024",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.9755,
+      0.2503,
+      1.4807,
+      1.1684
+     ],
+     [
+      0.5226,
+      1.4967,
+      0.2562,
+      1.2155
+     ],
+     [
+      -0.233,
+      1.3414,
+      -0.3491,
+      -0.1445
+     ],
+     [
+      1.3166,
+      -0.2629,
+      1.1443,
+      1.366
+     ],
+     [
+      1.4663,
+      -0.0699,
+      0.6189,
+      0.1783
+     ],
+     [
+      0.0289,
+      0.4395,
+      1.2562,
+      0.4405
+     ]
+    ],
+    "b": [
+     -2.4012,
+     -0.264,
+     -1.3312,
+     -1.4932,
+     2.8906,
+     0.1877
+    ],
+    "weights": [
+     0.6874,
+     0.2703,
+     2.3869,
+     0.859,
+     2.6175,
+     0.8963
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.3903
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -1.9633226696913038,
+      0.18445197438503183,
+      -0.758758373732319,
+      2.927929069038591
+     ],
+     "residual": [
+      -1.972754134816048,
+      2.350540730947589,
+      -0.7845251417279682,
+      -0.9952991497365727,
+      0.051340971928776236,
+      0.548627103417103
+     ],
+     "objective": 6.76532355894881,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 24 (equality)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0025",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.5432,
+      -0.4274,
+      0.2429,
+      -0.0891
+     ],
+     [
+      1.0323,
+      -0.916,
+      0.7882,
+      -0.5137
+     ],
+     [
+      1.4429,
+      -0.9405,
+      -0.1786,
+      -0.6258
+     ],
+     [
+      -0.1878,
+      -0.9585,
+      -0.4516,
+      -0.296
+     ],
+     [
+      0.3036,
+      -0.0547,
+      0.717,
+      -0.6977
+     ]
+    ],
+    "b": [
+     -1.4371,
+     -0.4602,
+     -2.6888,
+     2.3743,
+     -1.5471
+    ],
+    "weights": [
+     1.681,
+     0.915,
+     1.8403,
+     0.4926,
+     0.8334
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      3.1312157935901093,
+      2.423965673087009,
+      -0.24466158523170117,
+      -0.7108282836316423
+     ],
+     "residual": [
+      -0.7683200085804414,
+      0.724111734997317,
+      0.03802445205190012,
+      -0.21621907984451882,
+      -0.40853127050523513
+     ],
+     "objective": 1.6368725048126258,
+     "rank": 4
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 25 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0026",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.4723,
+      -0.2186,
+      0.1573
+     ],
+     [
+      0.5545,
+      1.2686,
+      -0.6421
+     ],
+     [
+      0.1699,
+      0.6763,
+      -0.127
+     ],
+     [
+      -0.8003,
+      -0.7732,
+      0.8317
+     ],
+     [
+      0.9406,
+      1.332,
+      0.0426
+     ]
+    ],
+    "b": [
+     -1.9221,
+     2.0225,
+     0.8499,
+     0.914,
+     -0.7735
+    ],
+    "weights": [
+     2.0707,
+     2.0329,
+     2.0615,
+     1.5904,
+     1.6147
+    ],
+    "ridge": 0.2322
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.7237564650840079,
+      -0.6978090485569155,
+      0.7710935664672972
+     ],
+     "residual": [
+      -1.9900961024393293,
+      1.0434632218611277,
+      0.4030090809373842,
+      1.5156421765683268,
+      -0.9893677356882867
+     ],
+     "objective": 16.35597453930687,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 26 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0027",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.3519,
+      -0.9311,
+      1.0091
+     ],
+     [
+      1.2114,
+      -0.2978,
+      0.3341
+     ],
+     [
+      1.1606,
+      -0.8787,
+      1.2378
+     ],
+     [
+      -0.9021,
+      0.7419,
+      0.885
+     ],
+     [
+      -0.4642,
+      0.6765,
+      -0.912
+     ]
+    ],
+    "b": [
+     -1.4922,
+     -2.49,
+     -1.1235,
+     -0.1203,
+     -2.8501
+    ],
+    "weights": [
+     0.3455,
+     2.9771,
+     2.8461,
+     1.5671,
+     0.209
+    ],
+    "lower": [
+     -1.6757,
+     -1.0665,
+     -1.3827
+    ],
+    "upper": [
+     0.9162,
+     0.3931,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.9162,
+      0.35193202099962345,
+      0.6046061253783472
+     ],
+     "residual": [
+      -1.532186643633459,
+      -1.2829217693647823,
+      0.3789805151409492,
+      -0.15062923266054207,
+      -3.588718814138807
+     ],
+     "objective": 8.847089822050082,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 27 (bounds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0028",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.8348,
+      -0.789,
+      0.2255,
+      -0.0908
+     ],
+     [
+      -0.8082,
+      1.3755,
+      -0.3953,
+      0.1271
+     ],
+     [
+      -0.6467,
+      0.2119,
+      1.3574,
+      0.3455
+     ]
+    ],
+    "b": [
+     1.3984,
+     -2.4931,
+     -1.1904
+    ],
+    "weights": [
+     2.8337,
+     0.2782,
+     2.1953
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     -0.1315
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.03601531095684481,
+      2.713140225910715,
+      1.61482673753637,
+      -4.49548227440393
+     ],
+     "residual": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 28 (equality)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0029",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      -0.3222,
+      -0.1847
+     ],
+     [
+      1.2931,
+      0.0258
+     ],
+     [
+      -0.5701,
+      1.4092
+     ]
+    ],
+    "b": [
+     -2.1351,
+     -0.9923,
+     1.3695
+    ],
+    "weights": [
+     2.6276,
+     1.9216,
+     0.2679
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.24627608449020863,
+      -2.4165339680273212
+     ],
+     "residual": [
+      -1.768116330528099,
+      -0.736186971520816,
+      -2.1762816635119693
+     ],
+     "objective": 10.524776478306807,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 29 (plain)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp5_i-0030",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.3915,
+      0.6439
+     ],
+     [
+      -0.0399,
+      -0.2939
+     ],
+     [
+      -0.4722,
+      0.3584
+     ],
+     [
+      1.4195,
+      1.3912
+     ],
+     [
+      -0.6482,
+      -0.2126
+     ]
+    ],
+    "b": [
+     0.608,
+     -1.8435,
+     -0.4906,
+     0.8106,
+     -1.1732
+    ],
+    "weights": [
+     2.6322,
+     2.6793,
+     1.7729,
+     2.0843,
+     0.4846
+    ],
+    "ridge": 0.5567
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.23419816988598663,
+      -0.5791942926013576
+     ],
+     "residual": [
+      0.14336821148362203,
+      -1.66393029042601,
+      -0.5875948586481636,
+      -0.32761940202016676,
+      -0.8982560396728548
+     ],
+     "objective": 8.916321779313781,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 30 (ridge)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  }
+ ]
+}
