@@ -544,6 +544,19 @@ mod tests {
         );
     }
 
+    /// The last period runs to the unadjusted maturity plus one day; earlier periods end on
+    /// the adjusted next coupon date. Maturity on a Monday (2027-09-20) separates the two:
+    /// 2027-06-21 to 2027-09-20 is 91 days, so the last accrual is 92/360, the one before
+    /// (2027-03-22 to 2027-06-21) 91/360 with no extra day.
+    #[test]
+    fn last_period_accrues_to_maturity_plus_one_day() {
+        let p = periods(d("2026-11-06"), d("2027-09-20")).unwrap();
+        let n = p.len();
+        assert_eq!(p[n - 1].start, d("2027-06-21"));
+        assert!((p[n - 1].alpha - 92.0 / 360.0).abs() < 1e-15);
+        assert!((p[n - 2].alpha - 91.0 / 360.0).abs() < 1e-15);
+    }
+
     #[test]
     fn bootstrap_reprices_and_price_agrees() {
         let (c, pil) = flat();

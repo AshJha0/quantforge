@@ -5,10 +5,15 @@ use crate::input::Inputs;
 use quantforge_core::error::{Result, fail};
 use quantforge_core::frtb::GirrDelta;
 use quantforge_core::frtb2 as f2;
+use quantforge_core::frtb3 as f3;
 use quantforge_core::json::{Json, obj};
 use quantforge_core::risk_carry as rc;
 
 fn sbm_out(r: &GirrDelta) -> Result<Outcome> {
+    sbm_named(r, "delta")
+}
+
+fn sbm_named(r: &GirrDelta, measure: &str) -> Result<Outcome> {
     let scen: Vec<(String, Json)> = r
         .scenarios
         .iter()
@@ -29,7 +34,7 @@ fn sbm_out(r: &GirrDelta) -> Result<Outcome> {
                 s.name.to_string(),
                 obj([
                     ("buckets", Json::Arr(b)),
-                    ("delta", s.delta.into()),
+                    (measure, s.delta.into()),
                     ("alternative_used", Json::Bool(s.alternative_used)),
                 ]),
             )
@@ -60,6 +65,31 @@ fn named<'a>(i: &Inputs<'a>, k: &str) -> Result<Vec<(String, &'a Json)>> {
         Json::Obj(m) => Ok(m.iter().map(|(n, v)| (n.clone(), v)).collect()),
         _ => i.fail(k, "expected an object"),
     }
+}
+
+/// A bucket label given as a string or an integer.
+fn label(r: &Inputs) -> Result<String> {
+    match r.req("bucket")? {
+        Json::Str(s) => Ok(s.clone()),
+        Json::Int(n) => Ok(n.to_string()),
+        _ => r.fail("bucket", "expected a string or an integer"),
+    }
+}
+
+fn class(i: &Inputs) -> Result<f3::Class> {
+    match f3::Class::parse(i.str("risk_class")?) {
+        Some(c) => Ok(c),
+        None => fail(
+            "E_INPUT",
+            "risk_class must be GIRR, CSR_NONSEC, EQUITY, COMMODITY or FX",
+        ),
+    }
+}
+
+fn opt_name(r: &Inputs) -> Result<Option<String>> {
+    r.opt("name")
+        .map(|_| r.str("name").map(str::to_string))
+        .transpose()
 }
 
 super::registry! {
@@ -221,5 +251,61 @@ super::registry! {
         }
         i.gate()?;
         sbm_out(&f2::commodity_delta(&sens)?)
+    },
+    "risk.frtb.vega" => {
+        let c = class(i)?;
+        let mut sens = Vec::new();
+        for r in rows(i, "sensitivities")? {
+            sens.push(f3::VegaSens {
+                bucket: label(&r)?,
+                name: opt_name(&r)?,
+                option_maturity: r.f64("option_maturity")?,
+                underlying_maturity: r.opt_f64("underlying_maturity")?,
+                vega: r.f64("vega")?,
+            });
+        }
+        i.gate()?;
+        sbm_named(&f3::vega(c, &sens)?, "vega")
+    },
+    "risk.frtb.curvature" => {
+        let c = class(i)?;
+        let mut fs = Vec::new();
+        for r in rows(i, "factors")? {
+            fs.push(f3::CurvFactor {
+                bucket: label(&r)?,
+                name: opt_name(&r)?,
+                cvr_up: r.f64("cvr_up")?,
+                cvr_down: r.f64("cvr_down")?,
+            });
+        }
+        let fx = i.bool_or("fx_scalar", false)?;
+        if i.opt("fx_scalar").is_some() && c != f3::Class::Fx {
+            return fail("E_INPUT", "fx_scalar applies to FX only");
+        }
+        i.gate()?;
+        let r = f3::curvature(c, &fs, fx)?;
+        let scen: Vec<(String, Json)> = r
+            .scenarios
+            .iter()
+            .map(|(n, b, k)| {
+                let bs: Vec<Json> = b
+                    .iter()
+                    .map(|x| {
+                        obj([
+                            ("bucket", x.bucket.as_str().into()),
+                            ("k", x.k.into()),
+                            ("s", x.s.into()),
+                            ("selected", if x.up { "UP" } else { "DOWN" }.into()),
+                        ])
+                    })
+                    .collect();
+                ((*n).to_string(), obj([("buckets", Json::Arr(bs)), ("curvature", (*k).into())]))
+            })
+            .collect();
+        plain(obj([
+            ("scenarios", Json::Obj(scen)),
+            ("capital", r.capital.into()),
+            ("binding_scenario", r.binding_scenario.into()),
+        ]))
     }
 }

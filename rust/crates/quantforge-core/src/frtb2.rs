@@ -149,6 +149,55 @@ fn ws(key: String, name: &str, a: &str, b: &str, ws: f64) -> Ws {
     }
 }
 
+/// Equity cross-bucket delta correlation (MAR21.80).
+#[allow(clippy::unnecessary_wraps)]
+pub(crate) fn equity_gamma(b: i64, c: i64) -> Result<f64> {
+    Ok(if b == 11 || c == 11 {
+        0.0
+    } else if b <= 10 && c <= 10 {
+        0.15
+    } else if (b, c) == (12, 13) || (b, c) == (13, 12) {
+        0.75
+    } else {
+        0.45
+    })
+}
+
+/// CSR cross-bucket delta correlation, rating x sector (MAR21.57, Table 5 per G-51).
+pub(crate) fn csr_gamma(b: i64, c: i64) -> Result<f64> {
+    let rating = if b <= 15 && c <= 15 && ((b <= 8) != (c <= 8)) {
+        0.5
+    } else {
+        1.0
+    };
+    let (sb, sc) = (csr_sector(b), csr_sector(c));
+    let sector = if sb == 16 || sc == 16 {
+        0.0
+    } else if sb == sc {
+        1.0
+    } else if (sb, sc) == (17, 18) || (sb, sc) == (18, 17) {
+        0.75
+    } else if sb >= 17 || sc >= 17 {
+        0.45
+    } else {
+        // MAR21.57 Table 5 body, sectors 1 to 8 (G-51), percent.
+        const T5: [[f64; 8]; 8] = [
+            [100.0, 75.0, 10.0, 20.0, 25.0, 20.0, 15.0, 10.0],
+            [75.0, 100.0, 5.0, 15.0, 20.0, 15.0, 10.0, 10.0],
+            [10.0, 5.0, 100.0, 5.0, 15.0, 20.0, 5.0, 20.0],
+            [20.0, 15.0, 5.0, 100.0, 20.0, 25.0, 5.0, 5.0],
+            [25.0, 20.0, 15.0, 20.0, 100.0, 25.0, 5.0, 15.0],
+            [20.0, 15.0, 20.0, 25.0, 25.0, 100.0, 5.0, 20.0],
+            [15.0, 10.0, 5.0, 5.0, 5.0, 5.0, 100.0, 5.0],
+            [10.0, 10.0, 20.0, 5.0, 15.0, 20.0, 5.0, 100.0],
+        ];
+        #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+        let v = T5[(sb - 1) as usize][(sc - 1) as usize];
+        v / 100.0
+    };
+    Ok(rating * sector)
+}
+
 /// `risk.frtb.fx_delta`: `(pair, sensitivity)`; pairs in `specified` get `RW / sqrt 2`.
 pub fn fx_delta(sens: &[(String, f64)], specified: &[String]) -> Result<GirrDelta> {
     let items = sens
@@ -226,17 +275,7 @@ pub fn equity_delta(sens: &[EquitySens]) -> Result<GirrDelta> {
         };
         if x.a == y.a { base } else { base * 0.999 }
     };
-    let gamma = |b: i64, c: i64| -> Result<f64> {
-        Ok(if b == 11 || c == 11 {
-            0.0
-        } else if b <= 10 && c <= 10 {
-            0.15
-        } else if (b, c) == (12, 13) || (b, c) == (13, 12) {
-            0.75
-        } else {
-            0.45
-        })
-    };
+    let gamma = equity_gamma;
     sbm(
         &g,
         &Class {
@@ -273,9 +312,7 @@ fn csr_sector(b: i64) -> i64 {
     }
 }
 
-/// `risk.frtb.csr_delta` (MAR21.51 to 21.57). Cross-sector correlations between two of the
-/// sectors 1 to 8 (MAR21.57 Table 5 body) are not in the spec text: such a pair is `E_INPUT`
-/// until the owner confirms the table (G-49 owner item).
+/// `risk.frtb.csr_delta` (MAR21.51 to 21.57, Table 5 per G-51).
 pub fn csr_delta(sens: &[CsrSens]) -> Result<GirrDelta> {
     const RW: [f64; 18] = [
         0.005, 0.01, 0.05, 0.03, 0.03, 0.02, 0.015, 0.025, 0.02, 0.04, 0.12, 0.07, 0.085, 0.055,
@@ -315,29 +352,7 @@ pub fn csr_delta(sens: &[CsrSens]) -> Result<GirrDelta> {
         let basis = if x.b == y.b { 1.0 } else { 0.999 };
         name * tenor * basis
     };
-    let gamma = |b: i64, c: i64| -> Result<f64> {
-        let rating = if b <= 15 && c <= 15 && ((b <= 8) != (c <= 8)) {
-            0.5
-        } else {
-            1.0
-        };
-        let (sb, sc) = (csr_sector(b), csr_sector(c));
-        let sector = if sb == 16 || sc == 16 {
-            0.0
-        } else if sb == sc {
-            1.0
-        } else if (sb, sc) == (17, 18) || (sb, sc) == (18, 17) {
-            0.75
-        } else if sb >= 17 || sc >= 17 {
-            0.45
-        } else {
-            return fail(
-                "E_INPUT",
-                "CSR sector pair correlation (MAR21.57 Table 5) is not specified yet",
-            );
-        };
-        Ok(rating * sector)
-    };
+    let gamma = csr_gamma;
     sbm(
         &g,
         &Class {
@@ -346,6 +361,32 @@ pub fn csr_delta(sens: &[CsrSens]) -> Result<GirrDelta> {
             simple: Some(16),
         },
     )
+}
+
+/// Commodity cross-bucket delta correlation (MAR21.85).
+#[allow(clippy::unnecessary_wraps)]
+pub(crate) fn commodity_gamma(b: i64, c: i64) -> Result<f64> {
+    Ok(if b == 11 || c == 11 { 0.0 } else { 0.20 })
+}
+
+/// Commodity intra-bucket name correlation (MAR21.83 Table 12).
+pub(crate) fn commodity_name_rho(b: i64) -> f64 {
+    const CTY: [f64; 11] = [
+        0.55, 0.95, 0.40, 0.80, 0.60, 0.65, 0.55, 0.45, 0.15, 0.40, 0.15,
+    ];
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+    CTY[(b - 1) as usize]
+}
+
+/// Equity intra-bucket correlation between different issuers, same kind (MAR21.78).
+pub(crate) fn equity_name_rho(b: i64) -> f64 {
+    match b {
+        1..=4 => 0.15,
+        5..=8 => 0.25,
+        9 => 0.075,
+        10 => 0.125,
+        _ => 0.80,
+    }
 }
 
 /// A commodity sensitivity.
@@ -398,7 +439,7 @@ pub fn commodity_delta(sens: &[CommoditySens]) -> Result<GirrDelta> {
         let loc = if x.b == y.b { 1.0 } else { 0.999 };
         cty * tenor * loc
     };
-    let gamma = |b: i64, c: i64| -> Result<f64> { Ok(if b == 11 || c == 11 { 0.0 } else { 0.20 }) };
+    let gamma = commodity_gamma;
     sbm(
         &g,
         &Class {

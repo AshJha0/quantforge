@@ -37,6 +37,7 @@ pub mod error;
 pub mod exotics;
 pub mod frtb;
 pub mod frtb2;
+pub mod frtb3;
 pub mod funding;
 pub mod fx;
 pub mod fx_smile;
