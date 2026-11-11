@@ -453,7 +453,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MF-9 FRTB-SA GIRR delta (Q2)
 - **Purpose:** standardised capital for interest rate delta under MAR21.
 - **Inputs:** delta sensitivities per currency, curve and tenor.
-- **Limitations:** GIRR delta only; the `low` scenario formula is transcribed from an image (ruling F-33, known issue).
+- **Limitations:** GIRR delta only; the `low` scenario formula is confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma) (ruling F-33).
 - **Validation:** 40-digit replica; tenor correlation reproduces MAR21.46 Table 2. **Review:** 2026-11-10.
 - **Tier:** 1.
 - **Challenger:** none free.
@@ -485,6 +485,54 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Data lineage hash:** sha256 64021394cb4fe8252e1724f76054935cdee1a23eb8006db0925c767673efc6f5
 - **Retirement trigger:** a holdings-based factor model.
 - **Validation report:** `specifications/04-pricing/use-cases.md`.
+
+### MG-1 One-factor short-rate models (G1)
+- **Purpose:** zero-coupon bond prices and European bond options under Vasicek, CIR and Hull-White, and European swaptions on Hull-White by Jamshidian, sigma calibration, Bermudan swaptions by a pinned FD scheme, caps and floors under all three models, and issuer-callable bonds; the base of the stage G Bermudan, callable-bond and exposure models.
+- **Inputs:** model parameters (`a`, `sigma`, `b`), short rate, and for Hull-White a log-linear discount curve.
+- **Limitations:** one factor (perfectly correlated rates); constant parameters (no time-dependent `sigma`); Vasicek and Hull-White allow negative rates without bound; no market price of risk; calibration of `sigma` only with `a` fixed (wave 2c).
+- **Validation:** 50-digit mpmath replicas; QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` outside check (61 of 78 bond cases, 33 of 40 swaption cases). **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** G2++ (`rates.g2pp.*`, wave 2b; QuantLib `G2` outside check, 30 of 38).
+- **Monitoring thresholds:** calibration error once calibration lands.
+- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`); b0630a25f4a701810eb1596c3fcdf7ab70736a6759973bc6771345576b7f1188 (`g2pp_g`); f2f683d408b844b83fa054864b36bf089491c6c6a277f701a1045c69d75c0a49 (`hwcal_g`); 3455c11ece1804fc729463fcad1ec8020f444233cfc7ab1a4c9e355125a22287 (`bermudan_g`); 0fda39dc4e71a228d3029a2879cebbdc3e314e915ac5560260e70cd03886728c (`capfloor_g`); f0f6e80f5740683fc4da985dd249517ea3184118b9829202369badf520fc1352 (`swaption_affine_g`); 235aa37b21ca8e23a2eb3bbc5da2b76501c82524ccd5e778ded7c6628eb1fddf (`callable_g`)
+- **Retirement trigger:** a multi-factor or market model for the desk's products.
+- **Validation report:** `specifications/04-pricing/short-rate-models.md`.
+
+### MG-2 Discrete barrier correction (R9)
+- **Purpose:** price discretely monitored barriers by the Broadie-Glasserman-Kou shift of the continuous formula.
+- **Inputs:** as `exotic.barrier.price`, plus monitoring frequency.
+- **Limitations:** an approximation; error grows when spot is near the barrier or monitoring is sparse (monthly); flat vol only.
+- **Validation:** exact-date Monte Carlo within 3 SE at daily monitoring (`oracle/R9_ACCEPTANCE.json`). **Review:** 2026-11-10.
+- **Tier:** 2.
+- **Challenger:** exact-date Monte Carlo.
+- **Monitoring thresholds:** BGK against MC beyond 3 SE on a desk sample.
+- **Data lineage hash:** sha256 51ed99b349c200ddbf85d89f49a20623683d1a9ce81437163d54944b1a4d95d3
+- **Retirement trigger:** a PDE or MC barrier engine in the library.
+- **Validation report:** `specifications/04-pricing/exotics.md`, section "Stage G addition".
+
+### MG-3 Monte Carlo Greeks (Q9 part 1)
+- **Purpose:** delta and vega of GBM payoffs by pathwise, likelihood-ratio, smoothed-digital and common-draw bump estimators, with standard errors.
+- **Inputs:** Black-Scholes inputs, payoff, method, paths and seed; smoothing width or bump size.
+- **Limitations:** one-step GBM only (no path-dependent payoffs yet); three payoffs; the smoothed digital is biased by `O(eps^2)`.
+- **Validation:** float64 replica on the `core.rng` stream; Black-Scholes closed forms (`oracle/Q9_ACCEPTANCE.json`). **Review:** 2026-11-10.
+- **Tier:** 2.
+- **Challenger:** closed-form Greeks where they exist.
+- **Monitoring thresholds:** MC Greek beyond 3 SE of a closed form on a desk sample.
+- **Data lineage hash:** sha256 8c17b12b1f1ded1c73f2b1850ec8605c564c2f5c449c0a7d00f5ca466ee2ddda
+- **Retirement trigger:** AAD through the MC engine (Q3b) for smooth payoffs.
+- **Validation report:** `specifications/06-risk/mc-greeks.md`.
+
+### MG-4 Closed-form swap exposure and CVA (G5a)
+- **Purpose:** discounted expected exposure of a vanilla swap under Hull-White at its reset dates, and a bucketed unilateral CVA; the exact anchor for the simulated exposure engine.
+- **Inputs:** Hull-White model and curve; swap times, rate, side, notional; exposure dates; flat hazard and recovery.
+- **Limitations:** single swap, no netting or collateral; reset dates only; independence of default and rates (no wrong-way risk); flat hazard; single curve.
+- **Validation:** 50-digit Jamshidian; QuantLib 1.44 `HullWhite` objects (7 of 15). **Review:** 2026-11-10.
+- **Tier:** 1.
+- **Challenger:** the simulated exposure engine (next xVA wave) and ORE.
+- **Monitoring thresholds:** simulated EE beyond 3 SE of these values.
+- **Data lineage hash:** sha256 cf24a7e0571b5adb0c854b0dfce6b8f2a5848472e812afbc6d1f911e02227660
+- **Retirement trigger:** the netting-set simulation engine.
+- **Validation report:** `specifications/06-risk/xva-exposure.md`.
 
 ## Review cycle
 

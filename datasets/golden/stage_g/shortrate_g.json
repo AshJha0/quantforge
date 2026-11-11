@@ -1,0 +1,3184 @@
+{
+ "schema_version": "1.0",
+ "suite": "shortrate_g",
+ "spec": "specifications/04-pricing/short-rate-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "shortrate_g-0001",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "t_years": 0.0,
+    "maturity_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9649370761916807,
+     "zero_rate": 0.03569238578813971
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=1.0 | r=0.035)"
+  },
+  {
+   "case_id": "shortrate_g-0002",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "t_years": 0.0,
+    "maturity_years": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.6775855106308146,
+     "zero_rate": 0.03892195192394862
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=10.0 | r=0.035)"
+  },
+  {
+   "case_id": "shortrate_g-0003",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "t_years": 2.1,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8155921653043147,
+     "zero_rate": 0.03774830488510664
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=2.1, T=7.5 | r=0.035)"
+  },
+  {
+   "case_id": "shortrate_g-0004",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "t_years": 0.0,
+    "maturity_years": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.29534790881344825,
+     "zero_rate": 0.04065337552071649
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=30.0 | r=0.035)"
+  },
+  {
+   "case_id": "shortrate_g-0005",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "t_years": 0.25,
+    "maturity_years": 0.26
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9996499863305405,
+     "zero_rate": 0.03500749385410394
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.25, T=0.26 | r=0.035)"
+  },
+  {
+   "case_id": "shortrate_g-0006",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": -0.01,
+    "t_years": 0.0,
+    "maturity_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 1.0061138349445045,
+     "zero_rate": -0.006095221284342947
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=1.0 | r=-0.01)"
+  },
+  {
+   "case_id": "shortrate_g-0007",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": -0.01,
+    "t_years": 0.0,
+    "maturity_years": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8554235374292307,
+     "zero_rate": 0.015615856728401514
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=10.0 | r=-0.01)"
+  },
+  {
+   "case_id": "shortrate_g-0008",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": -0.01,
+    "t_years": 2.1,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9633887461467415,
+     "zero_rate": 0.006907086341936695
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=2.1, T=7.5 | r=-0.01)"
+  },
+  {
+   "case_id": "shortrate_g-0009",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": -0.01,
+    "t_years": 0.0,
+    "maturity_years": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.3973515139115421,
+     "zero_rate": 0.030764465486098912
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=30.0 | r=-0.01)"
+  },
+  {
+   "case_id": "shortrate_g-0010",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": -0.01,
+    "t_years": 0.25,
+    "maturity_years": 0.26
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 1.0000995926891683,
+     "zero_rate": -0.009958773014569834
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.25, T=0.26 | r=-0.01)"
+  },
+  {
+   "case_id": "shortrate_g-0011",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.0,
+    "t_years": 0.0,
+    "maturity_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9968141719335879,
+     "zero_rate": 0.0031909136206531995
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=1.0 | r=0.0)"
+  },
+  {
+   "case_id": "shortrate_g-0012",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.0,
+    "t_years": 0.0,
+    "maturity_years": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8122477374743926,
+     "zero_rate": 0.020794988994078646
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=10.0 | r=0.0)"
+  },
+  {
+   "case_id": "shortrate_g-0013",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.0,
+    "t_years": 2.1,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.928385959062185,
+     "zero_rate": 0.013760690462641126
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=2.1, T=7.5 | r=0.0)"
+  },
+  {
+   "case_id": "shortrate_g-0014",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.0,
+    "t_years": 0.0,
+    "maturity_years": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.37200051828139,
+     "zero_rate": 0.03296200104934726
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=30.0 | r=0.0)"
+  },
+  {
+   "case_id": "shortrate_g-0015",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.0,
+    "t_years": 0.25,
+    "maturity_years": 0.26
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9999996626927167,
+     "zero_rate": 3.3730734024338074e-05
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.25, T=0.26 | r=0.0)"
+  },
+  {
+   "case_id": "shortrate_g-0016",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9693545196994152,
+     "zero_rate": 0.031124872599428994
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.0, T=1.0 | r=0.03)"
+  },
+  {
+   "case_id": "shortrate_g-0017",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.7009698265327415,
+     "zero_rate": 0.03552904363365089
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.0, T=10.0 | r=0.03)"
+  },
+  {
+   "case_id": "shortrate_g-0018",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "t_years": 2.1,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8318144363085634,
+     "zero_rate": 0.03410109191102343
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=2.1, T=7.5 | r=0.03)"
+  },
+  {
+   "case_id": "shortrate_g-0019",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.3274568489734748,
+     "zero_rate": 0.03721329971491368
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.0, T=30.0 | r=0.03)"
+  },
+  {
+   "case_id": "shortrate_g-0020",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "t_years": 0.25,
+    "maturity_years": 0.26
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.99969992016901,
+     "zero_rate": 0.030012486395168576
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.25, T=0.26 | r=0.03)"
+  },
+  {
+   "case_id": "shortrate_g-0021",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.0005,
+    "t_years": 0.0,
+    "maturity_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9949647997239557,
+     "zero_rate": 0.0050479196111844395
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.0, T=1.0 | r=0.0005)"
+  },
+  {
+   "case_id": "shortrate_g-0022",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.0005,
+    "t_years": 0.0,
+    "maturity_years": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.7785423238331745,
+     "zero_rate": 0.025033192331151356
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.0, T=10.0 | r=0.0005)"
+  },
+  {
+   "case_id": "shortrate_g-0023",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.0005,
+    "t_years": 2.1,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9065465719949296,
+     "zero_rate": 0.018169050831849616
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=2.1, T=7.5 | r=0.0005)"
+  },
+  {
+   "case_id": "shortrate_g-0024",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.0005,
+    "t_years": 0.0,
+    "maturity_years": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.3664392301335463,
+     "zero_rate": 0.03346408609239595
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.0, T=30.0 | r=0.0005)"
+  },
+  {
+   "case_id": "shortrate_g-0025",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.0005,
+    "t_years": 0.25,
+    "maturity_years": 0.26
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9999945066768483,
+     "zero_rate": 0.0005493338240084443
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "synthetic"
+   ],
+   "description": "CIR P(t=0.25, T=0.26 | r=0.0005)"
+  },
+  {
+   "case_id": "shortrate_g-0026",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": 0.04,
+    "t_years": 0.0,
+    "maturity_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9607538745493023,
+     "zero_rate": 0.04003701670711388
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.0, T=1.0 | r=0.04)"
+  },
+  {
+   "case_id": "shortrate_g-0027",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": 0.04,
+    "t_years": 0.0,
+    "maturity_years": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.6723452685958345,
+     "zero_rate": 0.03969832778518628
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.0, T=10.0 | r=0.04)"
+  },
+  {
+   "case_id": "shortrate_g-0028",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": 0.04,
+    "t_years": 2.1,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8028796084582484,
+     "zero_rate": 0.040657500643661186
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=2.1, T=7.5 | r=0.04)"
+  },
+  {
+   "case_id": "shortrate_g-0029",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": 0.04,
+    "t_years": 0.0,
+    "maturity_years": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.3259675369373317,
+     "zero_rate": 0.03736524941735589
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.0, T=30.0 | r=0.04)"
+  },
+  {
+   "case_id": "shortrate_g-0030",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": 0.04,
+    "t_years": 0.25,
+    "maturity_years": 0.26
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9996000818099272,
+     "zero_rate": 0.03999981786788562
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.25, T=0.26 | r=0.04)"
+  },
+  {
+   "case_id": "shortrate_g-0031",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": -0.005,
+    "t_years": 0.0,
+    "maturity_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 1.0038639471117508,
+     "zero_rate": -0.0038565012422435096
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.0, T=1.0 | r=-0.005)"
+  },
+  {
+   "case_id": "shortrate_g-0032",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": -0.005,
+    "t_years": 0.0,
+    "maturity_years": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9580446720239929,
+     "zero_rate": 0.004286087159323287
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.0, T=10.0 | r=-0.005)"
+  },
+  {
+   "case_id": "shortrate_g-0033",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": -0.005,
+    "t_years": 2.1,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.993429631507532,
+     "zero_rate": 0.001220749699803385
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=2.1, T=7.5 | r=-0.005)"
+  },
+  {
+   "case_id": "shortrate_g-0034",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": -0.005,
+    "t_years": 0.0,
+    "maturity_years": 30.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.6558818410224613,
+     "zero_rate": 0.014059154221808786
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.0, T=30.0 | r=-0.005)"
+  },
+  {
+   "case_id": "shortrate_g-0035",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": -0.005,
+    "t_years": 0.25,
+    "maturity_years": 0.26
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 1.0000498905845627,
+     "zero_rate": -0.0049889340068800326
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=0.25, T=0.26 | r=-0.005)"
+  },
+  {
+   "case_id": "shortrate_g-0036",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.0001,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8632768225429971,
+     "zero_rate": 0.02940397432258749
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "synthetic"
+   ],
+   "description": "VASICEK P(t=0.0, T=5.0 | r=0.03)"
+  },
+  {
+   "case_id": "shortrate_g-0037",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": 0.04,
+    "t_years": 2.0,
+    "maturity_years": 7.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.7997266393943927,
+     "zero_rate": 0.040633692811677245
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=2.0, T=7.5 | r=0.04)"
+  },
+  {
+   "case_id": "shortrate_g-0038",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      1.0,
+      5.002739726027397,
+      10.005479452054795
+     ],
+     "discount_factors": [
+      1.0045,
+      1.008,
+      0.995
+     ]
+    },
+    "short_rate": -0.004,
+    "t_years": 1.5,
+    "maturity_years": 6.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 1.0120138605760454,
+     "zero_rate": -0.0026538371095267033
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE P(t=1.5, T=6.0 | r=-0.004)"
+  },
+  {
+   "case_id": "shortrate_g-0039",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10473.198094324578,
+     "bond_price_expiry": 0.9649370761916807,
+     "bond_price_maturity": 0.8285731237161603
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "call",
+    "synthetic"
+   ],
+   "description": "VASICEK CALL on ZCB, T=1.0, S=5.0, K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0040",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "CALL",
+    "strike": 0.97,
+    "expiry_years": 2.0,
+    "maturity_years": 3.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 2289.9337451958213,
+     "bond_price_expiry": 0.9300034702272026,
+     "bond_price_maturity": 0.895499915350074
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "call",
+    "synthetic"
+   ],
+   "description": "VASICEK CALL on ZCB, T=2.0, S=3.0, K=0.97",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0041",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "CALL",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26463.622581327392,
+     "bond_price_expiry": 0.8285731237161603,
+     "bond_price_maturity": 0.6775855106308146
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "call",
+    "synthetic"
+   ],
+   "description": "VASICEK CALL on ZCB, T=5.0, S=10.0, K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0042",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "CALL",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 364.9431361590785,
+     "bond_price_expiry": 0.9824753131816335,
+     "bond_price_maturity": 0.44818254501965415
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "call",
+    "synthetic"
+   ],
+   "description": "VASICEK CALL on ZCB, T=0.5, S=20.0, K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0043",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11745.959903009609,
+     "bond_price_expiry": 0.9649370761916807,
+     "bond_price_maturity": 0.8285731237161603
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "put",
+    "synthetic"
+   ],
+   "description": "VASICEK PUT on ZCB, T=1.0, S=5.0, K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0044",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "PUT",
+    "strike": 0.97,
+    "expiry_years": 2.0,
+    "maturity_years": 3.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8893.384515508413,
+     "bond_price_expiry": 0.9300034702272026,
+     "bond_price_maturity": 0.895499915350074
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "put",
+    "synthetic"
+   ],
+   "description": "VASICEK PUT on ZCB, T=2.0, S=3.0, K=0.97",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0045",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "PUT",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11736.610923441085,
+     "bond_price_expiry": 0.8285731237161603,
+     "bond_price_maturity": 0.6775855106308146
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "put",
+    "synthetic"
+   ],
+   "description": "VASICEK PUT on ZCB, T=5.0, S=10.0, K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0046",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "option_type": "PUT",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 43420.0547073217,
+     "bond_price_expiry": 0.9824753131816335,
+     "bond_price_maturity": 0.44818254501965415
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "vasicek",
+    "put",
+    "synthetic"
+   ],
+   "description": "VASICEK PUT on ZCB, T=0.5, S=20.0, K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0047",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 16757.326283792805,
+     "bond_price_expiry": 0.9693545196994152,
+     "bond_price_maturity": 0.8440061745442642
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "call",
+    "synthetic"
+   ],
+   "description": "CIR CALL on ZCB, T=1.0, S=5.0, K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0048",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.97,
+    "expiry_years": 2.0,
+    "maturity_years": 3.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3337.541753441302,
+     "bond_price_expiry": 0.9379338972934257,
+     "bond_price_maturity": 0.9063248369072314
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "call",
+    "synthetic"
+   ],
+   "description": "CIR CALL on ZCB, T=2.0, S=3.0, K=0.97",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0049",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 32539.08902700973,
+     "bond_price_expiry": 0.8440061745442642,
+     "bond_price_maturity": 0.7009698265327415
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "call",
+    "synthetic"
+   ],
+   "description": "CIR CALL on ZCB, T=5.0, S=10.0, K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0050",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1873.2416950593108,
+     "bond_price_expiry": 0.9848201990137253,
+     "bond_price_maturity": 0.4794496395022208
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "call",
+    "synthetic"
+   ],
+   "description": "CIR CALL on ZCB, T=0.5, S=20.0, K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0051",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6396.0386810257,
+     "bond_price_expiry": 0.9693545196994152,
+     "bond_price_maturity": 0.8440061745442642
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "put",
+    "synthetic"
+   ],
+   "description": "CIR PUT on ZCB, T=1.0, S=5.0, K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0052",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "PUT",
+    "strike": 0.97,
+    "expiry_years": 2.0,
+    "maturity_years": 3.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6808.585220832787,
+     "bond_price_expiry": 0.9379338972934257,
+     "bond_price_maturity": 0.9063248369072314
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "put",
+    "synthetic"
+   ],
+   "description": "CIR PUT on ZCB, T=2.0, S=3.0, K=0.97",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0053",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "PUT",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6774.20212967958,
+     "bond_price_expiry": 0.8440061745442642,
+     "bond_price_maturity": 0.7009698265327415
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "put",
+    "synthetic"
+   ],
+   "description": "CIR PUT on ZCB, T=5.0, S=10.0, K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0054",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "option_type": "PUT",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14833.701699701152,
+     "bond_price_expiry": 0.9848201990137253,
+     "bond_price_maturity": 0.4794496395022208
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "cir",
+    "put",
+    "synthetic"
+   ],
+   "description": "CIR PUT on ZCB, T=0.5, S=20.0, K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0055",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10236.007208359895,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "call",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CALL on ZCB, T=1.0, S=5.0, K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0056",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.97,
+    "expiry_years": 2.0,
+    "maturity_years": 3.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1982.5109838664278,
+     "bond_price_expiry": 0.9254,
+     "bond_price_maturity": 0.8906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "call",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CALL on ZCB, T=2.0, S=3.0, K=0.97",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0057",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 34392.67854101142,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "call",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CALL on ZCB, T=5.0, S=10.0, K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0058",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7532.67606236416,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "call",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CALL on ZCB, T=0.5, S=20.0, K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0059",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13182.641692119096,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "put",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE PUT on ZCB, T=1.0, S=5.0, K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0060",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.97,
+    "expiry_years": 2.0,
+    "maturity_years": 3.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9020.510983866456,
+     "bond_price_expiry": 0.9254,
+     "bond_price_maturity": 0.8906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "put",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE PUT on ZCB, T=2.0, S=3.0, K=0.97",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0061",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14979.046553613482,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "put",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE PUT on ZCB, T=5.0, S=10.0, K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0062",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 30696.96422204919,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "put",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE PUT on ZCB, T=0.5, S=20.0, K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0063",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      1.0,
+      5.002739726027397,
+      10.005479452054795
+     ],
+     "discount_factors": [
+      1.0045,
+      1.008,
+      0.995
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 1.0,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 16013.762648579845,
+     "bond_price_expiry": 1.0045,
+     "bond_price_maturity": 1.0079976002147037
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "hull_white",
+    "call",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CALL on ZCB, T=1.0, S=5.0, K=1.0",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "shortrate_g-0064",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.0,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "a = 0"
+  },
+  {
+   "case_id": "shortrate_g-0065",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": -0.01,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "sigma < 0"
+  },
+  {
+   "case_id": "shortrate_g-0066",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "T = t"
+  },
+  {
+   "case_id": "shortrate_g-0067",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "t_years": -1.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "t < 0"
+  },
+  {
+   "case_id": "shortrate_g-0068",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "G2PP",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "unknown model"
+  },
+  {
+   "case_id": "shortrate_g-0069",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": -0.01,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "CIR r < 0"
+  },
+  {
+   "case_id": "shortrate_g-0070",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.0,
+    "sigma": 0.08,
+    "short_rate": 0.01,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "CIR b = 0"
+  },
+  {
+   "case_id": "shortrate_g-0071",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      1.0,
+      0.5
+     ],
+     "discount_factors": [
+      0.99,
+      0.98
+     ]
+    },
+    "short_rate": 0.01,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "pillar times not increasing"
+  },
+  {
+   "case_id": "shortrate_g-0072",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      1.0
+     ],
+     "discount_factors": [
+      0.0
+     ]
+    },
+    "short_rate": 0.01,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "df <= 0"
+  },
+  {
+   "case_id": "shortrate_g-0073",
+   "operation": "rates.shortrate.zcb",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "t_years": 0.0,
+    "maturity_years": 5.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "short_rate missing"
+  },
+  {
+   "case_id": "shortrate_g-0074",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.9,
+    "expiry_years": 5.0,
+    "maturity_years": 5.0,
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "expiry = maturity"
+  },
+  {
+   "case_id": "shortrate_g-0075",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.0,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "strike = 0"
+  },
+  {
+   "case_id": "shortrate_g-0076",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.9,
+    "expiry_years": 0.0,
+    "maturity_years": 5.0,
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "expiry = 0"
+  },
+  {
+   "case_id": "shortrate_g-0077",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "short_rate": 0.03,
+    "option_type": "CALL",
+    "strike": 0.9,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "short_rate given for HULL_WHITE"
+  },
+  {
+   "case_id": "shortrate_g-0078",
+   "operation": "rates.shortrate.zcb_option",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.03,
+    "option_type": "STRADDLE",
+    "strike": 0.9,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "shortrate",
+    "synthetic"
+   ],
+   "description": "unknown option_type"
+  }
+ ]
+}

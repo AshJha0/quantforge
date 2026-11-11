@@ -104,3 +104,19 @@ Reference scheme (ruling E-A23): `x = ln S`; `x_i = ln S - h + i dx`, `h = width
 ## Wrong conventions the goldens catch
 
 Cash digital on `N(d1)`; barrier `mu` with `r` for `b`; knock-in rebate dropped; continuous geometric vol `v/2`; lookback without the reflection term; quanto adjustment sign; chooser as call plus put; Kirk without the `F2/(F2+K)` weight; basket vol from weighted vols; tree probability without `q`; BAW put with the call root; FD without the exercise projection.
+
+## Stage G addition: discrete barrier monitoring (plan 13.3 R9)
+
+Rulings `stage-g-rulings.md` G-7, G-8. Suite `stage_g/barrier_g` (32 cases), written by `oracle/python/gen_stage_g_w1.py` (slice `R9`). Source: [BGK97] M. Broadie, P. Glasserman, S. Kou, "A continuity correction for discrete barrier options", *Mathematical Finance* 7(4), 1997 (not opened; the constant is `-zeta(1/2)/sqrt(2 pi) = 0.5825971579...`).
+
+`exotic.barrier.price` gains two optional inputs:
+- `monitoring`: `CONTINUOUS` (the default when absent; stage E behaviour unchanged) or `DISCRETE`; another value is `E_INPUT`.
+- `monitoring_per_year` `m`: an Integer, required with `DISCRETE` and not allowed with `CONTINUOUS` (both `E_INPUT`); `m >= 1`, else `E_DOMAIN`. The barrier is observed at `T/n, 2T/n, ..., T` with `n = round(m T)`; the correction uses `dt = 1/m`.
+
+With `DISCRETE`, the price is the continuous-monitoring price of this page with the barrier replaced by `H' = H exp(-beta v sqrt(dt))` for `DOWN_*` and `H' = H exp(+beta v sqrt(dt))` for `UP_*`, `beta = 0.5826` exactly (ruling G-7). The rebate is unchanged and is paid as in the continuous case. The domain check (ruling E-A19) uses the **unshifted** `H`, then the shifted price is computed (ruling G-8).
+
+Wrong conventions caught: the shift with the opposite sign; the continuous price for a daily barrier.
+
+**Acceptance (R9).** A daily-monitored (`m = 252`, `T = 1`) down-and-out call and put (`S = K = 100`, `H = 90`, `r = 0.05`, `q = 0.02`, `v = 0.25`) match an exact-date Monte Carlo (GBM sampled exactly at the 252 dates, knocked out if `S <= H` at any date, 40,000 paths, `core.rng` seed 20261109, inverse normal) within 3 SE. Oracle run 2026-11-10: call BGK 8.51904 against MC 8.45109 +- 0.08496 (z = +0.80); put 0.118543 against 0.125394 +- 0.003990 (z = -1.72). The continuous price (8.13881) is 3.7 SE from the MC call value, so the check discriminates. Stored in `oracle/R9_ACCEPTANCE.json`. Each language adds the same check as a property test (its own MC, same seed and path count; pass at 3 SE).
+
+Outside: none counted. QuantLib's `AnalyticBarrierEngine` at the shifted barrier would only check the stage E formula, which is already counted; the shift is the point under test, and its evidence is the MC acceptance.
