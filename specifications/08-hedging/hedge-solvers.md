@@ -200,3 +200,7 @@ Mutants caught by the goldens (generator log): bounds ignored (the free solution
 | Q-I2 | A bound active with a zero multiplier (degenerate) makes the active set ambiguous | `x` is still unique and is the only QP output; no active-set flag or multiplier is output. The goldens avoid degenerate points so an inexact method cannot land on the wrong face |
 | Q-I3 | Threshold for `MIN_NORM` relative to `H` or to `Z^T H Z`? | The largest eigenvalue of `H`, so the decision does not depend on the chosen basis `Z` (I-3) |
 | Q-I4 | Integer lots with equalities (for example a zero-cost budget)? | Refused by schema in wave 1 (no such input). An integer equality can make a box problem infeasible or need lattice reduction; it waits for an owner need |
+
+## Amendments after the builds
+
+Rulings I-41 (fixed key sets on `hedge.greeks.neutralise` instruments), I-42 (an unknown target is `E_SCHEMA`), I-44 (`hedge.minvar.ratio` check 4 has a tolerance of `1e-12 S_00`; a hedged variance inside it is returned as 0), I-45 (what the size limits count), I-46 (feasibility tolerance up to 1e-9, amending I-14), I-48 (no method-dependent `E_LIMIT`) and I-49 (`E_LIMIT` for lot counts above `2^52`) amend this page; `stage-i-rulings.md` is normative. Cases `hedgegreeks_i-0020`, `-0021`, `hedgemv_i-0018` and `hedgeint_i-0019` pin them.

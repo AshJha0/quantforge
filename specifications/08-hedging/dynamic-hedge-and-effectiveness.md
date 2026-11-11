@@ -102,3 +102,7 @@ Replay with costs (I-39):
 New output, present only with a cost input (I-40): `trading_cost`, the undiscounted sum of every cost paid. `final_pnl` and the effectiveness statistics include the costs through the cash account.
 
 Suite `hedgebtcost_i` (5 value, 3 error), written by `oracle/python/gen_stage_i_w4e.py`. The value cases are daily and weekly rebalancing with a 2 cent half-spread, spread plus impact, zero cost parameters (equal to the cost-free replay, with `trading_cost = 0`) and impact only. Weekly rebalancing pays less than daily (2.35 against 6.75 on the same option), which is asserted. Outside: 5 of 8, the QuantLib check of wave 4b with the same cost arithmetic. Mutant caught: costs ignored.
+
+## Amendment after the builds
+
+Ruling I-43 replaces the exact tests of I-31 with relative ones: `E_DOMAIN` when `|sum(x)| <= 1e-12 sum|x|`, `var(x) <= 1e-20 var(y)` or `var(y) <= 1e-20 var(x)`. A constant-spot backtest with zero rates and dividends is therefore `E_DOMAIN` in every build (`hedgebt_i-0016`).
