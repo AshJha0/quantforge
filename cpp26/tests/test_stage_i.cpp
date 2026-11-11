@@ -894,3 +894,76 @@ TEST_CASE("I4e backtest costs: zero costs equal the replay; without carry the P&
     CHECK(i_error([&] { hg::backtest_delta(call, -100.0, 0.0, 0.0, 0.2, times, spots, {-0.01, std::nullopt}); }) ==
           "E_DOMAIN");
 }
+
+// ---- the stage I example inputs (examples/hedge_*_i.json; follow-up note to waves 1 to 4d) ----
+
+#ifdef QF_REPO_DIR
+#include <fstream>
+#include <sstream>
+
+namespace {
+
+std::string i_read(const std::string& path) {
+    std::ifstream f(path, std::ios::binary);
+    REQUIRE(f.good());
+    std::stringstream s;
+    s << f.rdbuf();
+    return s.str();
+}
+
+// Every number in `expected` within 1e-9 relative (1e-9 absolute below 1) of `actual`; same shape otherwise.
+void i_same(const json::Value& actual, const json::Value& expected, const std::string& where) {
+    INFO(where);
+    REQUIRE(actual.kind == expected.kind);
+    switch (expected.kind) {
+        case json::Kind::Number:
+            CHECK(std::fabs(actual.number - expected.number) <= 1e-9 * std::max(1.0, std::fabs(expected.number)));
+            break;
+        case json::Kind::Array:
+            REQUIRE(actual.items.size() == expected.items.size());
+            for (std::size_t i = 0; i < expected.items.size(); ++i) i_same(actual.items[i], expected.items[i], where);
+            break;
+        case json::Kind::Object:
+            REQUIRE(actual.members.size() == expected.members.size());
+            for (const json::Member& m : expected.members) {
+                REQUIRE(actual.find(m.first) != nullptr);
+                i_same(*actual.find(m.first), m.second, where + "." + m.first);
+            }
+            break;
+        default: CHECK(actual.text == expected.text); break;
+    }
+}
+
+}  // namespace
+
+TEST_CASE("Stage I examples run through the CLI and give the outputs of their golden cases") {
+    struct Example {
+        const char* file;
+        const char* suite;
+        const char* case_id;
+    };
+    const Example examples[] = {
+        {"hedge_greeks_i", "hedgegreeks_i", "hedgegreeks_i-0003"}, {"hedge_minvar_i", "hedgemv_i", "hedgemv_i-0006"},
+        {"hedge_beta_i", "hedgebeta_i", "hedgebeta_i-0001"},       {"hedge_qp_keyrate_i", "hedgeqp_i", "hedgeqp_i-0009"},
+        {"hedge_qp_minnorm_i", "hedgeqp_i", "hedgeqp_i-0018"},     {"hedge_integer_i", "hedgeint_i", "hedgeint_i-0010"},
+        {"hedge_residual_i", "hedgeres_i", "hedgeres_i-0002"},     {"hedge_credit_i", "hedgecredit_i", "hedgecredit_i-0004"},
+        {"hedge_correlation_i", "hedgecorr_i", "hedgecorr_i-0003"}, {"hedge_crossasset_i", "hedgexa_i", "hedgexa_i-0002"},
+        {"hedge_cost_i", "hedgecost_i", "hedgecost_i-0002"},       {"hedge_frontier_i", "hedgefrontier_i", "hedgefrontier_i-0001"},
+        {"hedge_backtest_i", "hedgebt_i", "hedgebt_i-0001"},       {"hedge_effectiveness_i", "hedgeeff_i", "hedgeeff_i-0001"},
+        {"hedge_select_i", "hedgeselect_i", "hedgeselect_i-0009"}, {"hedge_slippage_i", "hedgeslip_i", "hedgeslip_i-0003"},
+    };
+    const std::string root = QF_REPO_DIR;
+    for (const Example& e : examples) {
+        INFO(e.file);
+        const auto r = cli::run_case(i_read(root + "/examples/" + e.file + ".json"));
+        REQUIRE(r.ok);
+        const json::Parsed got = json::parse(r.json);
+        const json::Parsed golden = json::parse(i_read(root + "/datasets/golden/stage_i/" + e.suite + ".json"));
+        const json::Value* expected = nullptr;
+        for (const json::Value& c : golden.value.find("cases")->items)
+            if (c.find("case_id")->text == e.case_id) expected = c.find("expected")->find("outputs");
+        REQUIRE(expected != nullptr);
+        i_same(*got.value.find("outputs"), *expected, e.file);
+    }
+}
+#endif

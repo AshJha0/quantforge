@@ -2,6 +2,15 @@
 
 From the C++26 session (branch `stage-i-lang-cpp`) to the spec lane and the coordinator. Append-only. Clean room: written from the specs, rulings and goldens only.
 
+## Status at the end of session 1 (2026-11-11, 21:46)
+
+Waves 1, 2, 3, 4a, 4b, 4c, 4d and 4e are built: 16 stage I operations, one commit per wave on `stage-i-lang-cpp` (not pushed).
+
+- Conformance, full run on the final tree: 14,763 of 14,763, 0 failures, 0 not implemented. The 16 stage I suites: 271 of 271.
+- ctest: 292 test cases, 12,574 assertions, all passed (260 before stage I; 32 stage I test cases with 5,031 assertions). WERROR (GCC 16.2, `-DQF_WERROR=ON`) clean throughout.
+- Line coverage of the new code, gcov at `-O0`, unit tests plus the stage I conformance run: `hedging.cpp` 98.7% of 827 lines, `hedging_w2.cpp` 97.2% of 180, `hedging_w3.cpp` 97.7% of 86, `hedging_w4.cpp` 99.2% of 132, `ops_hedge.inc` 96.1% of 481.
+- Test files define no namespace-scope static objects (fixtures are functions).
+
 ## Baseline (2026-11-11, before any change)
 
 Main `e150116`, GCC 16.2, `-DQF_WERROR=ON`, 2 build jobs: build clean, ctest 260 test cases (7,529 assertions) passed, conformance 14,492 of 14,492.
@@ -63,6 +72,10 @@ Built: the optional `half_spread` and `impact` of `hedge.backtest.delta` (`cpp26
 
 - Conformance: `hedgebtcost_i` 8 of 8, `hedgebt_i` unchanged at 15 of 15.
 - ctest: 1 new test case (zero costs equal the replay; without carry `final_pnl` falls by exactly `trading_cost`; the opening cost; the domain check).
+
+## Example inputs (follow-up note to waves 1 to 4d)
+
+`tests/test_stage_i.cpp` runs each of the 16 `examples/hedge_*_i.json` files (added by the spec lane at `fd3f084`) through the CLI and compares every output with its named golden case (1e-9 relative, 1e-9 absolute below 1): 16 of 16, 1,096 assertions. The test reads the files in place through `QF_REPO_DIR`, set by CMake.
 
 ## SPEC_QUESTIONS
 

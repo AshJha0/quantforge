@@ -123,6 +123,8 @@ if(BUILD_TESTING)
   add_executable(quantforge_core_tests
     tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp tests/test_f_cdsindex.cpp tests/test_f_garch_vix_lv.cpp tests/test_f_curve_interp.cpp tests/test_f_joint.cpp tests/test_f_risk_f3.cpp tests/test_f_risk_f4.cpp tests/test_f_book.cpp tests/test_mut_kill_f.cpp tests/test_mut_kill_g.cpp tests/test_stage_g.cpp tests/test_stage_i.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
+  # The stage I example inputs and their goldens, read in place by tests/test_stage_i.cpp.
+  target_compile_definitions(quantforge_core_tests PRIVATE QF_REPO_DIR="${CMAKE_CURRENT_SOURCE_DIR}/..")
   qf_strict(quantforge_core_tests)
   if(MINGW)
     target_link_options(quantforge_core_tests PRIVATE -static)
