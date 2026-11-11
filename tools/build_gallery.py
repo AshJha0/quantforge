@@ -705,7 +705,7 @@ Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
 ## Status of every curve in the plan
 
-An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown.
+An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown. The papers and standards behind each curve are cited in its spec and collected in [References](../references.md).
 
 {table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
 {real}

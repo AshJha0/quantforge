@@ -11,6 +11,8 @@ Two ways in:
 - **New to quantitative finance, or to this project.** Do [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md) first: quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Then read the topics below in order.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
+Sources: every model and convention cites its papers, books and standards in the `## Sources` section of its spec. [References](docs/references.md) collects them all by topic, with each one's status (read, not opened, or paywalled) and the specs that rely on it.
+
 Each result below is real output from the CLIs, on the date each section gives. Unless a section says otherwise, Java, C++, Python and Rust printed the same value.
 
 | Topic | What it covers |

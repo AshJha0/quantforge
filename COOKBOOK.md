@@ -4,6 +4,8 @@ Short recipes. Commands run from the repository root, in Git Bash or a Unix shel
 
 New here? [Tutorial 1](docs/getting-started/tutorial-1-swap.md) builds a curve, prices a swap and takes its DV01 in each language. `python tools/check_tutorial.py --lang rust` runs its blocks and checks the output.
 
+Each recipe names its spec; the sources behind the spec are in its `## Sources` section and in [References](docs/references.md).
+
 ## Build each CLI
 
 ```bash

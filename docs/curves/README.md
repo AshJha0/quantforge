@@ -8,7 +8,7 @@ Generated on 2026-11-07 from commit `8dddd58`.
 
 ## Status of every curve in the plan
 
-An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown.
+An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown. The papers and standards behind each curve are cited in its spec and collected in [References](../references.md).
 
 | Curve | Status | Stage | Evidence |
 |---|---|---|---|
