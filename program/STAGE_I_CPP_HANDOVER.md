@@ -43,6 +43,13 @@ Built: `hedge.backtest.delta`, `hedge.effectiveness` (`cpp26/src/core/hedging_w4
 - Conformance: `hedgebt_i` 15 of 15, `hedgeeff_i` 10 of 10. Full run: 14,726 of 14,726, 0 failures. ctest passed.
 - ctest: 3 new test cases (perfect offset gives 1, -1, 1, 1; an exactly-zero sum that naive summation misses; the constant-path replay of the corrected property test; self-financing and the check ladder). `tests/test_cli.cpp` expects 272 operations.
 
+## Wave 4c, instrument selection
+
+Built: `hedge.select.solve` (`cpp26/src/core/hedging.cpp`): every subset of 1 to `K` instruments in size-then-lexicographic order, each through the wave 1 QP, and the first subset tied with the best wins (I-34). No greedy step.
+
+- Conformance: `hedgeselect_i` 17 of 17 on the first build. Full run on the 4c and 4d tree: 14,756 passed, 0 failures outside wave 4e (`hedgebtcost_i`, not built at that point). ctest passed.
+- ctest: 1 new test case (`K = n` equals the QP, the best objective never rises with `K`, the I-34 tie, the I-33 checks). `tests/test_cli.cpp` expects 273 operations at 4c.
+
 ## SPEC_QUESTIONS
 
 | # | Where | Question | What the C++ build does |

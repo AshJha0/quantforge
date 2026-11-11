@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <random>
 #include <string>
 #include <vector>
@@ -809,4 +810,37 @@ TEST_CASE("I4b backtest: self-financing and the check ladder") {
           "ok");
     CHECK(i_error([&] { hg::backtest_delta(put, 50.0, 0.03, 0.01, 0.25, {0.0, 0.1, 0.2, 0.3, 0.4}, Vec(5, 100.0)); }) ==
           "E_INPUT");  // the path ends after expiry
+}
+
+// ---- wave 4c: instrument selection; wave 4d: slippage ----
+
+TEST_CASE("I4c selection: K = n gives the QP answer; the best objective never rises with K; ties (I-34)") {
+    std::mt19937_64 rng(4040);
+    for (int trial = 0; trial < 10; ++trial) {
+        const std::size_t n = 3 + std::size_t(trial % 3);
+        hg::QpProblem p = i_qp(rng, n + 2, n, 0, false);
+        const hg::QpResult full = hg::solve_qp(p);
+        double previous = std::numeric_limits<double>::infinity();
+        for (long long k = 1; k <= (long long)n; ++k) {
+            const hg::SelectResult r = hg::select_instruments(p, k, false);
+            CHECK(r.objective <= previous * (1.0 + 1e-12));
+            CHECK((long long)r.selected.size() <= k);
+            CHECK(std::ranges::is_sorted(r.selected));
+            previous = r.objective;
+            if (k == (long long)n) {
+                CHECK(std::fabs(r.objective - full.objective) <= 1e-12 * full.objective);
+                for (std::size_t j = 0; j < n; ++j) CHECK(std::fabs(r.x[j] - full.x[j]) < 1e-10);
+            }
+        }
+    }
+    // Two symmetric instruments: an exact tie, index 0 wins.
+    hg::QpProblem s;
+    s.a = {{1.0, 0.0}, {0.0, 1.0}};
+    s.b = {-1.0, -1.0};
+    s.weights = {1.0, 1.0};
+    CHECK(hg::select_instruments(s, 1, false).selected == std::vector<long long>{0});
+    CHECK(i_error([&] { hg::select_instruments(s, 3, false); }) == "E_INPUT");
+    CHECK(i_error([&] { hg::select_instruments(s, 1, true); }) == "E_INPUT");
+    s.lower = std::vector<hg::Bound>{0.5, std::nullopt};
+    CHECK(i_error([&] { hg::select_instruments(s, 1, false); }) == "E_DOMAIN");
 }

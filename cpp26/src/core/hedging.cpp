@@ -1034,3 +1034,77 @@ ResidualReport residual_report(const Matrix& a, const Vec& b, const Vec& x, cons
 }
 
 }  // namespace quantforge::hedging
+
+namespace quantforge::hedging {
+
+// ---- wave 4c: hedge.select.solve (08-hedging/instrument-selection.md, I-33 to I-35) ----
+
+SelectResult select_instruments(const QpProblem& p, long long max_instruments, bool forbidden_keys) {
+    // hedge.qp.solve checks 1 to 3.
+    const std::size_t n = check_ls_shapes(p.a, p.b, p.weights);
+    input_if(p.lower && p.lower->size() != n, "lower", "length differs from the instruments");
+    input_if(p.upper && p.upper->size() != n, "upper", "length differs from the instruments");
+    const std::vector<Bound> none;
+    const std::vector<Bound>& lower = p.lower ? *p.lower : none;
+    const std::vector<Bound>& upper = p.upper ? *p.upper : none;
+    check_ls_domain(p.weights, p.ridge);
+    for (std::size_t j = 0; j < lower.size() && j < upper.size(); ++j)
+        domain_if(lower[j] && upper[j] && *lower[j] > *upper[j], "lower", "a lower bound is above its upper bound");
+    // Check 3, 4 and 5.
+    input_if(max_instruments < 1 || max_instruments > (long long)n, "max_instruments", "must be in 1..n");
+    input_if(forbidden_keys, "eq_matrix", "selection takes no eq_matrix, eq_rhs or singular (I-33)");
+    for (std::size_t j = 0; j < n; ++j) {
+        domain_if(!lower.empty() && lower[j] && *lower[j] > 0.0, "lower", "a bound excludes 0 (I-33)");
+        domain_if(!upper.empty() && upper[j] && *upper[j] < 0.0, "upper", "a bound excludes 0 (I-33)");
+    }
+    const Vec eig = jacobi_eigen(normal_equations(p.a, p.b, p.weights, p.ridge).h).values;
+    if (eig.front() <= singular_threshold * largest_abs(eig))
+        throw Error("E_SINGULAR", "the full hedge has no unique minimiser", "a");
+    // Every subset of 1..K instruments, by size and then lexicographically, so the first one tied with the best
+    // is the I-34 winner.
+    std::vector<std::vector<std::size_t>> subsets;
+    Vec objective;
+    std::vector<QpResult> results;
+    for (std::size_t size = 1; size <= std::size_t(max_instruments); ++size) {
+        std::vector<std::size_t> s(size);
+        std::iota(s.begin(), s.end(), std::size_t{0});
+        for (;;) {
+            QpProblem sub;
+            sub.a.assign(p.a.size(), Vec(size));
+            for (std::size_t r = 0; r < p.a.size(); ++r)
+                for (std::size_t c = 0; c < size; ++c) sub.a[r][c] = p.a[r][s[c]];
+            sub.b = p.b;
+            sub.weights = p.weights;
+            sub.ridge = p.ridge;
+            if (!lower.empty()) {
+                sub.lower = std::vector<Bound>(size);
+                for (std::size_t c = 0; c < size; ++c) (*sub.lower)[c] = lower[s[c]];
+            }
+            if (!upper.empty()) {
+                sub.upper = std::vector<Bound>(size);
+                for (std::size_t c = 0; c < size; ++c) (*sub.upper)[c] = upper[s[c]];
+            }
+            results.push_back(solve_qp(sub));
+            objective.push_back(results.back().objective);
+            subsets.push_back(s);
+            // Next combination in lexicographic order.
+            std::size_t i = size;
+            while (i > 0 && s[i - 1] == n - size + i - 1) --i;
+            if (i == 0) break;
+            ++s[i - 1];
+            for (std::size_t j = i; j < size; ++j) s[j] = s[j - 1] + 1;
+        }
+    }
+    const double best = *std::ranges::min_element(objective);
+    std::size_t pick = 0;
+    while (objective[pick] - best > 1e-12 * std::fabs(best)) ++pick;
+    SelectResult out;
+    out.selected.assign(subsets[pick].begin(), subsets[pick].end());
+    out.x.assign(n, 0.0);
+    for (std::size_t c = 0; c < subsets[pick].size(); ++c) out.x[subsets[pick][c]] = results[pick].x[c];
+    out.residual = results[pick].residual;
+    out.objective = results[pick].objective;
+    return out;
+}
+
+}  // namespace quantforge::hedging

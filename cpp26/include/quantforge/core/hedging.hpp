@@ -220,4 +220,15 @@ struct DeltaBacktest {
 DeltaBacktest backtest_delta(const BacktestOption& option, double quantity, double rate, double dividend_yield,
                              double hedge_volatility, const Vec& times, const Vec& spots);
 
+// ---- wave 4c: instrument selection (08-hedging/instrument-selection.md, I-33 to I-35) ----
+
+struct SelectResult {
+    std::vector<long long> selected;  // 0-based, ascending
+    Vec x, residual;
+    double objective = 0.0;
+};
+/// hedge.select.solve: the best subset of at most max_instruments columns (I-34). forbidden_keys: eq_matrix,
+/// eq_rhs or singular was given (E_INPUT, I-33).
+SelectResult select_instruments(const QpProblem& p, long long max_instruments, bool forbidden_keys);
+
 }  // namespace quantforge::hedging

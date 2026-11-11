@@ -511,6 +511,29 @@ void op_hedge_backtest_delta(const In& in, Out& out) {
     write_effectiveness(out, r.stats);
 }
 
+// ---- stage I wave 4c: instrument selection (08-hedging/instrument-selection.md) ----
+
+void op_hedge_select_solve(const In& in, Out& out) {
+    hedging::QpProblem p;
+    p.a = in.matrix("a");
+    p.b = in.reals("b");
+    p.weights = in.reals("weights");
+    p.ridge = optional_real(in, "ridge", 0.0);
+    p.lower = bounds_of(in, "lower");
+    p.upper = bounds_of(in, "upper");
+    const long long k = in.integer("max_instruments");
+    const bool forbidden = in.raw().find("eq_matrix") || in.raw().find("eq_rhs") || in.raw().find("singular");
+    limit_if(p.a.size() > max_factors, "a");
+    limit_if(widest_row(p.a) > 20, "a");  // ruling I-35
+    in.ready();
+    const hedging::SelectResult r = hedging::select_instruments(p, k, forbidden);
+    out.values.key("selected");
+    out.values.begin_array();
+    for (const long long i : r.selected) out.values.integer(i);
+    out.values.end_array();
+    write_ls(out, r.x, r.residual, r.objective);
+}
+
 constexpr Entry hedge_ops[] = {
     {"hedge.solve", op_hedge_solve},
     {"hedge.spread_cost", op_spread_cost},
@@ -526,4 +549,5 @@ constexpr Entry hedge_ops[] = {
     {"hedge.frontier.solve", op_hedge_frontier_solve},
     {"hedge.backtest.delta", op_hedge_backtest_delta},
     {"hedge.effectiveness", op_hedge_effectiveness},
+    {"hedge.select.solve", op_hedge_select_solve},
 };
