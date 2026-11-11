@@ -712,6 +712,16 @@ mod stage_d_rulings2_tests {
         assert_eq!(greeks(leg, r#""RHO""#).as_deref(), Some("E_SCHEMA"));
         let four = [leg; 4].join(",");
         assert_eq!(greeks(&four, r#""DELTA""#).as_deref(), Some("E_LIMIT"));
+        // I-53: n = 20 allows K = 6 (60,459 subsets) but not K = 7 (137,979).
+        let row = format!("[{}]", vec!["0.0"; 20].join(","));
+        let select = |k: i64| {
+            code(
+                "hedge.select.solve",
+                &format!(r#"{{"a":[{row}],"b":[1.0],"weights":[1.0],"max_instruments":{k}}}"#),
+            )
+        };
+        assert_eq!(select(7).as_deref(), Some("E_LIMIT"));
+        assert_ne!(select(6).as_deref(), Some("E_LIMIT"));
         let res = code(
             "hedge.residual.report",
             r#"{"a":[[1.0]],"b":[1.0],"x":[0.5],"covariance":[[2.0]]}"#,

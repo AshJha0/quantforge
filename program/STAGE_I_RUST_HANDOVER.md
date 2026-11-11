@@ -37,7 +37,7 @@ None of these blocked a golden. In each case the code follows the reading stated
 
 ## Open items
 
-- Selection enumerates every subset (`2^20` QPs in the worst case at the I-35 limit). That is correct but slow at the limit; branch and bound on the objective, which the spec allows, would cut it.
+- Selection enumerates every subset; I-53 caps that at 100,000 solves.
 - Closed in the extension: the 4a solve was exact only away from switch points between holding and not holding an instrument. A sign-state correction loop now checks the subgradient condition at every zero coordinate with the multipliers of the exact orthant solve, and re-solves until it holds. Unit tests sit exactly on a switch point, 1e-9 past it and 1e-9 short of it, and on a binding margin; a property test checks the KKT residual of random cost problems.
 - Coverage: see the lane report. Line coverage of the new core modules was measured with `-C instrument-coverage` and `llvm-cov`, because `cargo llvm-cov` is not installed.
 
@@ -57,4 +57,5 @@ None of these blocked a golden. In each case the code follows the reading stated
 - Wave 4a is now exact at and next to switch points (see Open items).
 - New property tests: KKT residuals of random cost problems, invariance of `hedge.qp.solve` (with costs and bounds) under a reordering of the instruments, and of the integer objective, with the integer optimum never below the relaxation.
 - Fuzz (`conformance/fuzz/fuzz_cli.py`, 90% of seeds from `datasets/golden/stage_i`): the only finding was `unknown error code 'E_INFEASIBLE'` on the `E_INFEASIBLE` goldens. The harness's known-code list predates contract 1.11.0 (I-1), so this is a harness gap, outside this lane. **Spec lane / tooling:** add `E_INFEASIBLE` to `CODES` in `fuzz_cli.py`. A second run with the code added in memory (file unchanged): 2200 inputs, 0 findings. One `quantforge.exe` from 22:47 was found still running at 23:18 and was stopped; the fuzzer recorded no timeout for it, so its input is unknown. Worth a longer fuzz run on the integration tree.
-- Wave 5: the five new suites pass (165 of 165). Conformance 14933 of 14933.
+- Wave 5: the five new suites pass (165 of 165).
+- I-53 applied: `E_LIMIT` for `hedge.select.solve` above 100,000 candidate subsets, checked with the size limits (`hedgeselect_i-0018`, CLI test). I-54: already met by the correction loop (`hedgecost_i-0023` passes). Conformance 14935 of 14935.
