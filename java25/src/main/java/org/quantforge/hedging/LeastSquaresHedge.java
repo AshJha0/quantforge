@@ -57,8 +57,8 @@ public final class LeastSquaresHedge {
     public record Costs(double[] halfSpreads, double[] impact, double costWeight, double[] marginRates,
             Double marginLimit) {}
 
-    /** Above this many instruments with an {@code |x|} term the sign-orthant search is refused (spec question J-I4). */
-    static final int MAX_COSTLY = 20;
+    /** Relative slack in the subgradient test at a kink before a sign is flipped. */
+    private static final double KINK_TOL = 1e-9;
 
     /**
      * A {@code hedge.integer.solve} answer.
@@ -178,11 +178,22 @@ public final class LeastSquaresHedge {
      * @param minNorm true for {@code singular = MIN_NORM}
      * @param costs the cost inputs, or null when none is given
      * @return the unique minimiser, with {@code risk}, {@code cost} and {@code margin} when costs are given
-     * @throws QfError {@code E_INPUT}, {@code E_DOMAIN}, {@code E_LIMIT}, {@code E_SINGULAR} or {@code E_INFEASIBLE},
+     * @throws QfError {@code E_INPUT}, {@code E_DOMAIN}, {@code E_SINGULAR} or {@code E_INFEASIBLE},
      *     in the specification's order
      */
     public static Solution solve(double[][] a, double[] b, double[] weights, double ridge, double[][] eqMatrix,
             double[] eqRhs, double[] lower, double[] upper, boolean minNorm, Costs costs) {
+        return solve(a, b, weights, ridge, eqMatrix, eqRhs, lower, upper, minNorm, costs, false);
+    }
+
+    /** Test oracle only: {@link #solve} with the {@code 2^k} sign-orthant enumeration in place of the sign search. */
+    static Solution solveByEnumeration(double[][] a, double[] b, double[] weights, double ridge, double[][] eqMatrix,
+            double[] eqRhs, double[] lower, double[] upper, Costs costs) {
+        return solve(a, b, weights, ridge, eqMatrix, eqRhs, lower, upper, false, costs, true);
+    }
+
+    private static Solution solve(double[][] a, double[] b, double[] weights, double ridge, double[][] eqMatrix,
+            double[] eqRhs, double[] lower, double[] upper, boolean minNorm, Costs costs, boolean enumerate) {
         int n = checkShapes(a, b, weights);
         if ((eqMatrix == null) != (eqRhs == null)) {
             throw input(eqMatrix == null ? "eq_matrix" : "eq_rhs");
@@ -315,8 +326,10 @@ public final class LeastSquaresHedge {
         }
         double[] hxp = Dense.mul(h, xp);
         if (costs != null) {
-            double[] x = costSearch(new Reduced(hr, z, xp, hxp, c, k), lo, hi, cw, spreads, rates,
-                    costs.marginLimit(), a, b, weights, ridge, impact);
+            Reduced rd = new Reduced(hr, z, xp, hxp, c, k);
+            CostTerms ct = new CostTerms(cw, spreads, impact, rates, costs.marginLimit());
+            double[] x = enumerate ? costSearchByEnumeration(rd, lo, hi, ct, a, b, weights, ridge)
+                    : costSearch(rd, lo, hi, ct, a, b, weights, ridge);
             double[] res = residual(a, b, x);
             double risk = objective(res, weights, ridge, x);
             double cost = 0.0;
@@ -380,90 +393,223 @@ public final class LeastSquaresHedge {
     /** The reduced problem's fixed parts: {@code Z'HZ}, {@code Z}, {@code x_p}, {@code H x_p}, {@code c}, {@code k}. */
     private record Reduced(double[][] hr, double[][] z, double[] xp, double[] hxp, double[] c, int k) {}
 
+    /** The cost inputs as the solver sees them; {@code rates} and {@code marginLimit} are null without a margin. */
+    private record CostTerms(double cw, double[] spreads, double[] impact, double[] rates, Double marginLimit) {
+        /** True when instrument {@code j} has an {@code |x_j|} term, in the objective or in the margin. */
+        boolean costly(int j) {
+            return (cw > 0.0 && spreads[j] > 0.0) || (rates != null && rates[j] > 0.0);
+        }
+    }
+
     /**
-     * The best solution over the closed sign orthants of the instruments with an {@code |x|} term. On an orthant
-     * with signs {@code s}, {@code |x_j| = s_j x_j}, so the spread cost adds {@code cw h_j s_j / 2} to {@code c_j} and
-     * the margin is one linear row; the orthant is the bound {@code s_j x_j >= 0}.
+     * One orthant's solution: {@code x}, the true objective, and the multipliers (in the solver's half-scaled units)
+     * of each instrument's lower and upper bound and of the margin row.
      */
-    private static double[] costSearch(Reduced rd, double[] lo, double[] hi, double cw, double[] spreads,
-            double[] rates, Double marginLimit, double[][] a, double[] b, double[] w, double ridge, double[] impact) {
+    private record OrthantSolution(double[] x, double f, double[] muLo, double[] muHi, double muRow) {}
+
+    /**
+     * Solves the strictly convex problem on the closed orthant {@code signs} ({@code +1}, {@code -1}, or 0 for an
+     * instrument without an {@code |x|} term), where {@code |x_j| = s_j x_j}: the spread cost adds
+     * {@code cw h_j s_j / 2} to {@code c_j}, the margin is one linear row, and the orthant is the bound
+     * {@code s_j x_j >= 0}. Returns null when the orthant is empty or infeasible.
+     */
+    private static OrthantSolution orthant(Reduced rd, double[] lo, double[] hi, int[] signs, CostTerms ct,
+            double[][] a, double[] b, double[] w, double ridge) {
         int n = lo.length;
         int r = rd.hr().length;
+        double[] l2 = lo.clone();
+        double[] h2 = hi.clone();
+        double[] grad = new double[n];
+        double[] row = ct.rates() == null ? null : new double[n];
+        for (int j = 0; j < n; j++) {
+            grad[j] = rd.hxp()[j] + rd.c()[j];
+            if (signs[j] > 0) {
+                l2[j] = Math.max(l2[j], 0.0);
+            } else if (signs[j] < 0) {
+                h2[j] = Math.min(h2[j], 0.0);
+            }
+            if (l2[j] > h2[j]) {
+                return null;
+            }
+            grad[j] += 0.5 * ct.cw() * ct.spreads()[j] * signs[j];
+            if (row != null) {
+                row[j] = ct.rates()[j] * signs[j];
+            }
+        }
+        double[] gr = Dense.mulT(rd.z(), grad, r);
+        boolean[] actLo = new boolean[n];
+        boolean[] actHi = new boolean[n];
+        double[] muLo = new double[n];
+        double[] muHi = new double[n];
+        double[] muRow = new double[1];
+        double[] y;
+        try {
+            y = boundedReduced(rd.hr(), gr, rd.z(), rd.xp(), l2, h2, actLo, actHi, row,
+                    ct.marginLimit() == null ? 0.0 : ct.marginLimit(), muLo, muHi, muRow);
+        } catch (QfError e) {
+            if (e.code().equals("E_INFEASIBLE")) {
+                return null;
+            }
+            throw e;
+        }
+        double[] x = new double[n];
+        for (int j = 0; j < n; j++) {
+            double v = rd.xp()[j];
+            for (int t = 0; t < r; t++) {
+                v += rd.z()[j][t] * y[t];
+            }
+            if ((actLo[j] && (rd.k() == 0 || l2[j] == 0.0)) || (actHi[j] && (rd.k() == 0 || h2[j] == 0.0))) {
+                v = actLo[j] ? l2[j] : h2[j]; // the exact bound, so an exact 0 at an orthant's kink
+            }
+            x[j] = v + 0.0;
+        }
+        return new OrthantSolution(x, trueObjective(x, ct, a, b, w, ridge), muLo, muHi, muRow[0]);
+    }
+
+    private static double trueObjective(double[] x, CostTerms ct, double[][] a, double[] b, double[] w,
+            double ridge) {
+        double f = objective(residual(a, b, x), w, ridge, x);
+        for (int j = 0; j < x.length; j++) {
+            f += ct.cw() * (ct.spreads()[j] * Math.abs(x[j]) + ct.impact()[j] * x[j] * x[j]);
+        }
+        return f;
+    }
+
+    /**
+     * Test oracle only: the best solution over every closed sign orthant of the instruments with an {@code |x|} term,
+     * {@code 2^k} problems. {@link #costSearch} must return the same minimiser.
+     */
+    private static double[] costSearchByEnumeration(Reduced rd, double[] lo, double[] hi, CostTerms ct, double[][] a,
+            double[] b, double[] w, double ridge) {
+        int n = lo.length;
         List<Integer> costly = new ArrayList<>();
         for (int j = 0; j < n; j++) {
-            if ((cw > 0.0 && spreads[j] > 0.0) || (rates != null && rates[j] > 0.0)) {
+            if (ct.costly(j)) {
                 costly.add(j);
             }
         }
-        if (costly.size() > MAX_COSTLY) {
-            throw new QfError("E_LIMIT", "more than " + MAX_COSTLY + " instruments carry an |x| term", "half_spreads");
-        }
-        double[] best = null;
-        double bestF = Double.POSITIVE_INFINITY;
+        OrthantSolution best = null;
         for (long mask = 0; mask < (1L << costly.size()); mask++) {
-            double[] l2 = lo.clone();
-            double[] h2 = hi.clone();
-            double[] shift = new double[n];
-            double[] row = rates == null ? null : new double[n];
-            boolean empty = false;
+            int[] signs = new int[n];
             for (int i = 0; i < costly.size(); i++) {
-                int j = costly.get(i);
-                double sign = ((mask >> i) & 1L) == 0 ? 1.0 : -1.0;
-                if (sign > 0) {
-                    l2[j] = Math.max(l2[j], 0.0);
-                } else {
-                    h2[j] = Math.min(h2[j], 0.0);
-                }
-                empty |= l2[j] > h2[j];
-                shift[j] = 0.5 * cw * spreads[j] * sign;
-                if (row != null) {
-                    row[j] = rates[j] * sign;
-                }
+                signs[costly.get(i)] = ((mask >> i) & 1L) == 0 ? 1 : -1;
             }
-            if (empty) {
-                continue;
-            }
-            double[] grad = new double[n];
-            for (int j = 0; j < n; j++) {
-                grad[j] = rd.hxp()[j] + rd.c()[j] + shift[j];
-            }
-            double[] gr = Dense.mulT(rd.z(), grad, r);
-            boolean[] actLo = new boolean[n];
-            boolean[] actHi = new boolean[n];
-            double[] y;
-            try {
-                y = boundedReduced(rd.hr(), gr, rd.z(), rd.xp(), l2, h2, actLo, actHi, row,
-                        marginLimit == null ? 0.0 : marginLimit);
-            } catch (QfError e) {
-                if (e.code().equals("E_INFEASIBLE")) {
-                    continue;
-                }
-                throw e;
-            }
-            double[] x = new double[n];
-            for (int j = 0; j < n; j++) {
-                double v = rd.xp()[j];
-                for (int t = 0; t < r; t++) {
-                    v += rd.z()[j][t] * y[t];
-                }
-                if ((actLo[j] && (rd.k() == 0 || l2[j] == 0.0)) || (actHi[j] && (rd.k() == 0 || h2[j] == 0.0))) {
-                    v = actLo[j] ? l2[j] : h2[j]; // the exact bound, so an exact 0 at an orthant's kink
-                }
-                x[j] = v + 0.0;
-            }
-            double f = objective(residual(a, b, x), w, ridge, x);
-            for (int j = 0; j < n; j++) {
-                f += cw * (spreads[j] * Math.abs(x[j]) + impact[j] * x[j] * x[j]);
-            }
-            if (f < bestF) {
-                bestF = f;
-                best = x;
+            OrthantSolution o = orthant(rd, lo, hi, signs, ct, a, b, w, ridge);
+            if (o != null && (best == null || o.f() < best.f())) {
+                best = o;
             }
         }
         if (best == null) {
             throw new QfError("E_INFEASIBLE", "no point satisfies the bounds, equalities and margin limit");
         }
-        return best;
+        return best.x();
+    }
+
+    /** The sign of a starting point, choosing a non-empty orthant for a coordinate at 0. */
+    private static int[] signsOf(double[] x, double[] lo, double[] hi, CostTerms ct) {
+        int[] signs = new int[x.length];
+        for (int j = 0; j < x.length; j++) {
+            if (ct.costly(j)) {
+                signs[j] = x[j] > 0.0 || (x[j] == 0.0 && hi[j] > 0.0) ? 1 : -1;
+            }
+        }
+        return signs;
+    }
+
+    /**
+     * The exact minimiser by a sign-state active-set method (ruling I-48: no size limit below the I-4 one). Each step
+     * solves the strictly convex problem on one closed sign orthant. At the orthant's optimum, an instrument at 0 whose
+     * orthant-bound multiplier {@code nu_j} exceeds {@code 2 (cw h_j / 2 + mu m_j)} breaks the subgradient condition
+     * {@code |g_j| <= cw h_j + mu m_j}; its sign is flipped, which keeps the current point feasible and lets the
+     * objective fall. When no instrument breaks the condition, the KKT conditions of the whole problem hold, so the
+     * point is the unique minimiser. A step that flips several signs and does not lower the objective is retried
+     * with the single worst one; the objective falls at every accepted step, so no orthant is visited twice.
+     *
+     * <p>With a margin limit, the start must be a feasible orthant: a phase 1 minimises the smooth part plus a
+     * heavily weighted margin, and refuses ({@code E_INFEASIBLE}) when even that point is above the limit.
+     */
+    private static double[] costSearch(Reduced rd, double[] lo, double[] hi, CostTerms ct, double[][] a, double[] b,
+            double[] w, double ridge) {
+        int n = lo.length;
+        CostTerms smooth = new CostTerms(0.0, new double[n], ct.impact(), null, null);
+        OrthantSolution free = orthant(rd, lo, hi, new int[n], smooth, a, b, w, ridge);
+        if (free == null) {
+            throw new QfError("E_INFEASIBLE", "no point satisfies the bounds and equalities");
+        }
+        int[] signs = signsOf(free.x(), lo, hi, ct);
+        if (ct.rates() != null) {
+            OrthantSolution start = orthant(rd, lo, hi, signs, ct, a, b, w, ridge);
+            if (start == null) {
+                // Phase 1: the least-margin point, as the minimiser of the smooth part plus a dominant margin cost.
+                double weight = 1e12 * Math.max(1.0, free.f());
+                double[] mr = ct.rates();
+                CostTerms phase1 = new CostTerms(weight, mr, ct.impact(), null, null);
+                double[] x1 = signSearch(rd, lo, hi, signsOf(free.x(), lo, hi, phase1), phase1, a, b, w, ridge).x();
+                double margin = 0.0;
+                for (int j = 0; j < n; j++) {
+                    margin += mr[j] * Math.abs(x1[j]);
+                }
+                if (margin > ct.marginLimit() + 1e-9 * Math.max(1.0, ct.marginLimit())) {
+                    throw new QfError("E_INFEASIBLE", "no point meets the margin limit");
+                }
+                signs = signsOf(x1, lo, hi, ct);
+            }
+        }
+        return signSearch(rd, lo, hi, signs, ct, a, b, w, ridge).x();
+    }
+
+    private static OrthantSolution signSearch(Reduced rd, double[] lo, double[] hi, int[] start, CostTerms ct,
+            double[][] a, double[] b, double[] w, double ridge) {
+        int n = lo.length;
+        int[] signs = start.clone();
+        OrthantSolution cur = orthant(rd, lo, hi, signs, ct, a, b, w, ridge);
+        if (cur == null) {
+            throw new QfError("E_INFEASIBLE", "no point satisfies the bounds, equalities and margin limit");
+        }
+        for (int iter = 0; iter < 4 * n + 100; iter++) {
+            List<Integer> broken = new ArrayList<>();
+            int worst = -1;
+            double worstExcess = 0.0;
+            for (int j = 0; j < n; j++) {
+                if (signs[j] == 0 || cur.x()[j] != 0.0) {
+                    continue;
+                }
+                boolean otherSideOpen = signs[j] > 0 ? lo[j] < 0.0 : hi[j] > 0.0;
+                if (!otherSideOpen) {
+                    continue;
+                }
+                double nu = signs[j] > 0 ? cur.muLo()[j] : cur.muHi()[j];
+                double rate = ct.rates() == null ? 0.0 : ct.rates()[j];
+                double allowed = 2.0 * (0.5 * ct.cw() * ct.spreads()[j] + cur.muRow() * rate);
+                double excess = nu - allowed * (1.0 + KINK_TOL);
+                if (excess > 1e-14 * Math.max(1.0, nu)) {
+                    broken.add(j);
+                    if (excess > worstExcess) {
+                        worstExcess = excess;
+                        worst = j;
+                    }
+                }
+            }
+            if (broken.isEmpty()) {
+                return cur;
+            }
+            int[] next = signs.clone();
+            for (int j : broken) {
+                next[j] = -next[j];
+            }
+            OrthantSolution cand = orthant(rd, lo, hi, next, ct, a, b, w, ridge);
+            if ((cand == null || !(cand.f() < cur.f())) && broken.size() > 1) {
+                next = signs.clone();
+                next[worst] = -next[worst];
+                cand = orthant(rd, lo, hi, next, ct, a, b, w, ridge);
+            }
+            if (cand == null || !(cand.f() < cur.f())) {
+                return cur; // degenerate: the flip cannot lower the objective, so the point is already optimal
+            }
+            signs = next;
+            cur = cand;
+        }
+        throw new QfError("E_NO_CONVERGENCE", "sign-state iterations exhausted");
     }
 
     /**
@@ -472,6 +618,14 @@ public final class LeastSquaresHedge {
      */
     private static double[] boundedReduced(double[][] hr, double[] gr, double[][] z, double[] xp, double[] lo,
             double[] hi, boolean[] activeLo, boolean[] activeHi, double[] row, double limit) {
+        return boundedReduced(hr, gr, z, xp, lo, hi, activeLo, activeHi, row, limit, new double[xp.length],
+                new double[xp.length], new double[1]);
+    }
+
+    /** As above, and writes each bound's and the row's multiplier (0 when inactive). */
+    private static double[] boundedReduced(double[][] hr, double[] gr, double[][] z, double[] xp, double[] lo,
+            double[] hi, boolean[] activeLo, boolean[] activeHi, double[] row, double limit, double[] muLo,
+            double[] muHi, double[] muRow) {
         int n = xp.length;
         int r = hr.length;
         int count = row == null ? 0 : 1;
@@ -521,6 +675,13 @@ public final class LeastSquaresHedge {
         }
         DualActiveSet.Result res = DualActiveSet.solve(hr, gr, cons, rhs);
         for (int i = 0; i < count; i++) {
+            if (which[i] > 0) {
+                muLo[which[i] - 1] = res.multipliers()[i];
+            } else if (which[i] < 0) {
+                muHi[-which[i] - 1] = res.multipliers()[i];
+            } else {
+                muRow[0] = res.multipliers()[i];
+            }
             if (res.active()[i] && which[i] != 0) {
                 if (which[i] > 0) {
                     activeLo[which[i] - 1] = true;

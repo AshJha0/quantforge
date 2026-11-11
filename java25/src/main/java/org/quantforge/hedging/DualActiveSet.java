@@ -16,8 +16,11 @@ final class DualActiveSet {
     /** Relative slack before a constraint counts as violated. */
     private static final double VIOLATION = 1e-12;
 
-    /** The minimiser and, for each constraint, whether it is in the final active set. */
-    record Result(double[] y, boolean[] active) {}
+    /**
+     * The minimiser; for each constraint, whether it is in the final active set and its multiplier (0 when inactive),
+     * with {@code G y + a = sum_i multiplier_i C_i}.
+     */
+    record Result(double[] y, boolean[] active, double[] multipliers) {}
 
     /**
      * Solves the programme. {@code g} must be symmetric positive definite.
@@ -51,7 +54,11 @@ final class DualActiveSet {
         for (int iter = 0; iter < 20 * (p + n) + 100; iter++) {
             int pick = mostViolated(c, d, y, isActive);
             if (pick < 0) {
-                return new Result(y, isActive);
+                double[] lambda = new double[p];
+                for (int k = 0; k < q; k++) {
+                    lambda[act[k]] = u[k];
+                }
+                return new Result(y, isActive, lambda);
             }
             double[] np = c[pick];
             double uplus = 0.0;

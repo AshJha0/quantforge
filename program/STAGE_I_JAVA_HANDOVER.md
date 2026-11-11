@@ -81,3 +81,14 @@ starts from the orthant of the cost-free solution and flips one instrument's sig
 bound's multiplier shows the subgradient condition `|g_j| <= cost_weight half_spreads_j + mu margin_rates_j` broken.
 Each flip strictly lowers the convex objective, so the search ends. Test it against the current enumeration on random
 problems of up to 12 such instruments, then drop `MAX_COSTLY`. No golden reaches 20, so every golden passes either way.
+
+### I-48 done (2026-11-11, extended session)
+
+`hedge.qp.solve` no longer enumerates the `2^k` sign orthants. `LeastSquaresHedge.costSearch` is a sign-state
+active-set method: it solves one strictly convex orthant QP, flips every instrument at 0 whose orthant-bound
+multiplier breaks the subgradient condition `|g_j| <= cost_weight half_spreads_j + mu margin_rates_j`, and accepts a
+step only when the objective falls (else it retries with the single worst flip). With a margin limit, a phase 1
+(smooth part plus a dominant margin cost) finds a feasible starting orthant, or returns `E_INFEASIBLE`. The size cap
+and its `E_LIMIT` are gone. The enumeration stays only as a test oracle (`solveByEnumeration`). `SignSearchTest`
+checks the KKT conditions at 21, 50 and 200 instruments (tolerance `1e-8` of the gradient scale) and agreement with
+the oracle on 150 random problems with up to 12 such instruments; all 276 stage I goldens pass.

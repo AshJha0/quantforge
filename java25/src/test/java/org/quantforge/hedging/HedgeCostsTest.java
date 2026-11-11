@@ -177,7 +177,8 @@ class HedgeCostsTest {
                 -1.0))));
         double[] many = new double[21];
         java.util.Arrays.fill(many, 0.1);
-        assertEquals("E_LIMIT", code(() -> LeastSquaresHedge.solve(new double[][] {many}, new double[] {1},
-                new double[] {1}, 1.0, null, null, null, null, false, new Costs(many, null, 1, null, null))));
+        // Ruling I-48: no size limit below the I-4 one (the 20-instrument orthant cap is gone).
+        assertEquals(21, LeastSquaresHedge.solve(new double[][] {many}, new double[] {1}, new double[] {1}, 1.0, null,
+                null, null, null, false, new Costs(many, null, 1, null, null)).x().length);
     }
 }
