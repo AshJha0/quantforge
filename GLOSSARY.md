@@ -23,7 +23,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Honest ceiling | What free public data can show (correct pricing and risk, curve quality, honest statistics) and what it cannot (tradable profitability) |
 | Golden case | A stored case with an independently obtained expected result |
 | Golden suite | A file of golden cases on one topic, such as `daycount` |
-| Jacobian | How each bootstrapped zero rate moves per basis point of each par quote; lower triangular for a bootstrap (`risk.curve.jacobian`) |
+| Jacobian | Dimensionless sensitivity of each bootstrapped zero rate to each par quote (bp of zero per bp of quote); lower triangular for a bootstrap (`risk.curve.jacobian`) |
 | Key-rate risk | Value change per 1 bp shift of the zero curve around one maturity: a triangular tent around a key date, or a bump of one curve pillar |
 | Knowledge time | The instant the store learned a value |
 | Locked quote | Bid equal to ask |
@@ -91,6 +91,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | NDF | Non-deliverable forward: settled in USD on the fixing, without delivering the other currency |
 | CDS | Credit default swap: protection against a named borrower's default, paid for with a running premium |
 | Hazard rate | The default rate per year, given survival so far |
+| Sector or rating curve | A credit curve for a group of names: a weighted average of the constituents' CDS spreads, times a rating multiplier, bootstrapped like one name (`credit.curve.composite`, `04-pricing/credit.md`) |
 | Index ratio | Reference CPI over base CPI, scaling an inflation-linked bond |
 | Seasonality | A repeating monthly pattern in CPI or commodity prices |
 | Convenience yield | The benefit of holding a commodity, implied by its forward curve |
@@ -155,6 +156,7 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at mer
 | Name map | `specifications/name-map.json`: each operation's public name in each language, generated from the specs ([ADR-0011](architecture/decisions/ADR-0011-api-style.md)) |
 | Value at risk (VaR), expected shortfall (ES) | A loss quantile, and the mean loss beyond it, over a horizon |
 | FRTB-SA | The Basel standardised approach to market-risk capital |
+| Funding curve | The curve for unsecured borrowing: the OIS curve times a spread factor, used to discount uncollateralised cash flows and in FVA (`rates.funding.curve`, `02-curves/joint-solve-and-funding.md`) |
 
 ## Stage G terms
 
@@ -171,3 +173,54 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at mer
 | SIMM | ISDA's standard initial-margin model; here a SIMM-style IR delta only (`xva.simm.ir_delta`) |
 | Wrong-way risk | Exposure that grows when the counterparty is more likely to default |
 | BGK correction | Broadie, Glasserman and Kou's barrier shift `exp(0.5826 sigma sqrt(dt))`, which turns a continuous barrier formula into a discrete one (ruling G-7) |
+
+## Tutorial terms
+
+Terms the [tutorials](docs/getting-started/README.md) use that the stage sections above do not define.
+
+| Term | Meaning |
+|---|---|
+| Accrued interest | The share of the current coupon earned by the seller of a bond since the last coupon date; here ACT/ACT ICMA (`04-pricing/bonds.md`) |
+| Clean price, dirty price | The quoted bond price without accrued interest, and the price actually paid, with it |
+| Yield to maturity | The single rate that, used to discount every cash flow of a bond, gives back its price; here compounded at the coupon frequency |
+| Macaulay duration | The present-value-weighted average time to a bond's cash flows, in years |
+| Modified duration | Macaulay duration times `1/(1 + y/f)`: the fall in price, as a fraction of price, per unit rise in yield |
+| Convexity | The second derivative of price with respect to yield, divided by price |
+| Carry | What holding a position earns or costs over time, such as a bond's coupon less its repo financing |
+| Implied repo rate | The repo rate that links a bond's spot and forward prices |
+| Black-Scholes model | Lognormal stock with constant volatility, rate and dividend yield; gives closed-form European option prices |
+| Survival probability | The probability that a borrower has not defaulted by a date |
+| Recovery rate | The fraction of the notional recovered after a default |
+| Risky annuity (RPV01) | The value of 1 a year paid until maturity or default, whichever is first |
+| Upfront | The amount paid at the start of a standard CDS because its fixed coupon differs from the par spread |
+| Bump and revalue | A sensitivity found by repricing with one input moved up and down |
+| AAD | Adjoint (reverse-mode) algorithmic differentiation: every sensitivity of a price from one backward pass through the pricing code |
+| Backtest | Counting how often realised losses exceeded VaR, and testing that count (Kupiec, Christoffersen, traffic light) |
+| Mean reversion | In a short-rate model, the speed `a` at which the rate is pulled back toward its drift; shocks halve in about `ln 2 / a` years |
+| Collateral agreement (CSA), threshold, minimum transfer amount | A collateral agreement; the exposure left uncollateralised; the smallest collateral call that is made |
+| Implied volatility | The volatility that makes the Black-Scholes price equal a given price (`vol.option.implied`, `05-volatility/black-models.md`) |
+| Smile | Implied volatility plotted against strike for one expiry; flat in Black-Scholes, curved in the market |
+| At the money (ATM) | A strike at the spot or the forward; FX also uses the delta-neutral straddle (DNS) strike |
+| Gamma | The change in delta per 1.00 move in the underlying (`06-risk/vol-greeks.md`) |
+| Vega | The change in price per 1.00 of volatility (100 percentage points); divide by 100 for one vol point |
+| Theta | `−dV/dT`: the change in price as time to expiry shortens, per year |
+| Rho | The change in price per 1.00 of interest rate; divide by 100 for a 1% move |
+| Forward price | The price agreed today for delivery on a later date; for a bond on repo, the dirty price grown at the repo rate less coupons paid in the term (`repo.forward`) |
+| Floor | A strip of floorlets, each a put on one period's forward rate; the mirror of a cap |
+| OIS curve | The discount curve bootstrapped from overnight indexed swap quotes, one pillar per quote at that swap's last payment date (`02-curves/ois-curves.md`) |
+| Joint solve | Solving several curves (OIS discount, term projection, cross-currency) as one system with one unknown per instrument, which also gives the Jacobian (`rates.curve.joint_solve`, `02-curves/joint-solve-and-funding.md`) |
+| Sector curve, rating curve | A CDS curve built from the weighted average of constituent spread curves, times a rating multiplier (1 for the sector itself), then bootstrapped (`credit.curve.composite`, `04-pricing/credit.md`) |
+| Protection leg | The value of the CDS default payment, `(1 − R)` per unit notional paid at default, summed over the hazard buckets (`04-pricing/credit.md`) |
+| Par spread | The running CDS spread that makes the contract worth zero: protection leg over the clean risky annuity (`04-pricing/credit.md`) |
+| Down-and-out call | A call that is cancelled if the underlying touches or falls through a barrier below spot; on a daily-monitored contract the check is at each date (`04-pricing/exotics.md`) |
+| CRR tree | The Cox-Ross-Rubinstein binomial tree: up factor `e^{v√dt}`, down factor its inverse, risk-neutral probability `(e^{(r−q)dt} − d)/(u − d)` (`exotic.american.crr`) |
+| Early-exercise premium | An American option's price less the European option's with the same terms: the value of being able to exercise early |
+| AAD ladder | A price and its full sensitivity ladder (here to every curve node, sigma and mean reversion) from one reverse sweep (`rates.shortrate.bermudan_ladder`) |
+| Model reserve | A valuation reserve for model risk: the largest distance between the booked model's price and the other calibrated models' prices (`risk.model_reserve.dispersion`, `06-risk/model-reserve.md`) |
+| Basel traffic light | The backtest zones for a VaR model: green, yellow or red by the binomial probability of the exception count; at 250 days and 99%, green for 0 to 4 exceptions, yellow for 5 to 9, red from 10 (`risk.backtest.traffic_light`) |
+| Exposure profile | Expected exposure (and PFE) at each date of a time grid; CVA integrates it against default probabilities (`06-risk/xva-framework.md`) |
+| Expected negative exposure (ENE) | The mean over paths of the negative part of the portfolio value at a date: what the counterparty is exposed to |
+| Potential future exposure (PFE) | A high quantile of exposure at a date, by the inverted-CDF rule (`06-risk/xva-framework.md`) |
+| Effective EPE | The time average over the first year of effective EE, where effective EE is EE made non-decreasing in time (Basel CRE53; `06-risk/xva-framework.md`) |
+| abcd volatility | The LMM instantaneous volatility of a forward fixing at `T`: `σ(t) = (a + b(T − t)) e^{−c(T − t)} + d` (`04-pricing/lmm.md`) |
+| Humped volatility | An abcd shape with `b > 0` whose volatility rises then falls with time to fixing; it peaks at `T − t = 1/c − a/b` |

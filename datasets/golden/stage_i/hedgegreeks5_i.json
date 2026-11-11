@@ -1,0 +1,3936 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgegreeks5_i",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w5.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgegreeks5_i-0001",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 186.4793,
+    "rate": 0.0317,
+    "dividend_yield": 0.0052,
+    "volatility": 0.5965,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 227.5486,
+      "expiry_years": 0.863013698630137,
+      "quantity": 584.5566
+     },
+     {
+      "instrument": "CALL",
+      "strike": 226.0185,
+      "expiry_years": 0.9452054794520548,
+      "quantity": 776.3642
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 131.8657,
+      "expiry_years": 1.7671232876712328
+     }
+    ],
+    "targets": [
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -2838.358078087747
+     ],
+     "greeks_before": {
+      "delta": 668.2497969316232,
+      "gamma": 5.094731487983188,
+      "vega": 96062.21247829346
+     },
+     "greeks_after": {
+      "delta": -1620.9048246737802,
+      "gamma": 0.0,
+      "vega": -90687.46424104169
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 1 (GAMMA)",
+   "tolerance_limit": {
+    "absolute": 9.606221247829345e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0002",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 138.8055,
+    "rate": 0.0335,
+    "dividend_yield": 0.0082,
+    "volatility": 0.5645,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 110.6146,
+      "expiry_years": 1.0273972602739727,
+      "quantity": 130.6592
+     },
+     {
+      "instrument": "PUT",
+      "strike": 122.4399,
+      "expiry_years": 0.23013698630136986,
+      "quantity": 203.1389
+     },
+     {
+      "instrument": "CALL",
+      "strike": 136.2138,
+      "expiry_years": 1.2986301369863014,
+      "quantity": -680.9491
+     },
+     {
+      "instrument": "PUT",
+      "strike": 173.1644,
+      "expiry_years": 1.5013698630136987,
+      "quantity": -247.8336
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 174.3983,
+      "expiry_years": 0.8356164383561644
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      435.6343076757262,
+      276.83261394353826
+     ],
+     "greeks_before": {
+      "delta": -282.4899087557635,
+      "gamma": -1.515699833463442,
+      "vega": -45748.83691753279
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": -31973.650850625636
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 2 (DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 4.574883691753279e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0003",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 148.4127,
+    "rate": 0.0152,
+    "dividend_yield": 0.0047,
+    "volatility": 0.2934,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 107.2109,
+      "expiry_years": 1.536986301369863,
+      "quantity": 110.1858
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 123.0021,
+      "expiry_years": 0.8273972602739726
+     }
+    ],
+    "targets": [
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -62.79248348295615
+     ],
+     "greeks_before": {
+      "delta": -14.36311776851173,
+      "gamma": 0.4316282394451908,
+      "vega": 4287.282381867301
+     },
+     "greeks_after": {
+      "delta": -2.3385685386382606,
+      "gamma": 0.0,
+      "vega": 1979.3335773683264
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 3 (GAMMA)",
+   "tolerance_limit": {
+    "absolute": 4.287282381867302e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0004",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 179.1014,
+    "rate": 0.0484,
+    "dividend_yield": 0.0249,
+    "volatility": 0.5855,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 140.084,
+      "expiry_years": 1.484931506849315,
+      "quantity": 665.5833
+     },
+     {
+      "instrument": "PUT",
+      "strike": 178.7106,
+      "expiry_years": 1.3917808219178083,
+      "quantity": 502.9768
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 231.9964,
+      "expiry_years": 1.1945205479452055
+     },
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 178.3986,
+      "expiry_years": 0.4410958904109589
+     }
+    ],
+    "targets": [
+     "GAMMA",
+     "DELTA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -1161.733910157965,
+      -839.5303640603278,
+      174.37952350174766
+     ],
+     "greeks_before": {
+      "delta": 327.9160870573556,
+      "gamma": 2.9601932477469792,
+      "vega": 80022.11346593338
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 4 (GAMMA+DELTA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 8.002211346593339e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0005",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 161.7702,
+    "rate": 0.0305,
+    "dividend_yield": 0.0106,
+    "volatility": 0.3257,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 184.1908,
+      "expiry_years": 0.2054794520547945,
+      "quantity": -189.9206
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 185.8464,
+      "expiry_years": 0.547945205479452
+     },
+     {
+      "instrument": "PUT",
+      "strike": 189.359,
+      "expiry_years": 0.5589041095890411
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      8068.7024973588905,
+      -8145.279818137162
+     ],
+     "greeks_before": {
+      "delta": -41.38761332522143,
+      "gamma": -2.339523853196291,
+      "vega": -4097.421857684424
+     },
+     "greeks_after": {
+      "delta": 8233.72303292547,
+      "gamma": -1.176016472440566e-49,
+      "vega": 8.758115402030107e-47
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 5 (VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 4.097421857684424e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0006",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 175.0203,
+    "rate": 0.042,
+    "dividend_yield": 0.0353,
+    "volatility": 0.12,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 212.5954,
+      "expiry_years": 1.673972602739726,
+      "quantity": -69.6279
+     },
+     {
+      "instrument": "PUT",
+      "strike": 157.7067,
+      "expiry_years": 1.4,
+      "quantity": 415.0514
+     },
+     {
+      "instrument": "CALL",
+      "strike": 198.513,
+      "expiry_years": 1.547945205479452,
+      "quantity": -782.6279
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 200.4341,
+      "expiry_years": 1.9863013698630136
+     }
+    ],
+    "targets": [
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      418.15879078610163
+     ],
+     "greeks_before": {
+      "delta": -264.1085290151002,
+      "gamma": -5.041459513603375,
+      "vega": -31289.790952381416
+     },
+     "greeks_after": {
+      "delta": -551.9703695555347,
+      "gamma": -0.7559799774705599,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 6 (VEGA)",
+   "tolerance_limit": {
+    "absolute": 3.1289790952381417e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0007",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 82.3713,
+    "rate": 0.0172,
+    "dividend_yield": 0.027,
+    "volatility": 0.2438,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 75.8709,
+      "expiry_years": 0.8356164383561644,
+      "quantity": 812.8032
+     },
+     {
+      "instrument": "CALL",
+      "strike": 60.9243,
+      "expiry_years": 0.7589041095890411,
+      "quantity": 684.2451
+     },
+     {
+      "instrument": "PUT",
+      "strike": 77.0494,
+      "expiry_years": 1.3232876712328767,
+      "quantity": -486.6592
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 97.4256,
+      "expiry_years": 1.5534246575342465
+     },
+     {
+      "instrument": "CALL",
+      "strike": 71.7357,
+      "expiry_years": 0.5616438356164384
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -777.238526910193,
+      41.2450927904135,
+      -726.4927451844128
+     ],
+     "greeks_before": {
+      "delta": 1331.9832592888781,
+      "gamma": 13.006036875894363,
+      "vega": 11149.068493358965
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 7 (DELTA+VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 1.1149068493358965e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0008",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 66.7771,
+    "rate": 0.0204,
+    "dividend_yield": 0.0173,
+    "volatility": 0.2173,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 72.3467,
+      "expiry_years": 1.2904109589041095,
+      "quantity": 319.9708
+     },
+     {
+      "instrument": "CALL",
+      "strike": 49.6784,
+      "expiry_years": 0.7424657534246575,
+      "quantity": -427.2269
+     },
+     {
+      "instrument": "CALL",
+      "strike": 71.8731,
+      "expiry_years": 0.3726027397260274,
+      "quantity": -346.9217
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 73.3876,
+      "expiry_years": 1.3178082191780822
+     },
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "GAMMA",
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      423.7946077544265,
+      522.3998723558415
+     ],
+     "greeks_before": {
+      "delta": -690.6688901607241,
+      "gamma": -9.64544892042678,
+      "vega": 1973.4846823633295
+     },
+     "greeks_after": {
+      "delta": -1.3684555315672042e-48,
+      "gamma": 0.0,
+      "vega": 14290.04655350761
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 8 (GAMMA+DELTA)",
+   "tolerance_limit": {
+    "absolute": 1.9734846823633297e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0009",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 102.0984,
+    "rate": 0.0596,
+    "dividend_yield": 0.0391,
+    "volatility": 0.5913,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 114.3658,
+      "expiry_years": 0.7232876712328767,
+      "quantity": -237.5712
+     },
+     {
+      "instrument": "CALL",
+      "strike": 131.2298,
+      "expiry_years": 1.7232876712328766,
+      "quantity": 853.5503
+     },
+     {
+      "instrument": "CALL",
+      "strike": 79.0526,
+      "expiry_years": 1.3068493150684932,
+      "quantity": -650.7914
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 101.1571,
+      "expiry_years": 1.7178082191780821
+     }
+    ],
+    "targets": [
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -282.73960360576376
+     ],
+     "greeks_before": {
+      "delta": -165.93608893116613,
+      "gamma": -0.4852656374097302,
+      "vega": 12783.642812647493
+     },
+     "greeks_after": {
+      "delta": -79.16859484271502,
+      "gamma": -1.6926184542014528,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 9 (VEGA)",
+   "tolerance_limit": {
+    "absolute": 1.2783642812647493e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0010",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 182.0065,
+    "rate": 0.0532,
+    "dividend_yield": 0.0192,
+    "volatility": 0.4345,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 210.3842,
+      "expiry_years": 1.4575342465753425,
+      "quantity": 227.8531
+     },
+     {
+      "instrument": "CALL",
+      "strike": 225.5969,
+      "expiry_years": 1.6082191780821917,
+      "quantity": -700.919
+     },
+     {
+      "instrument": "CALL",
+      "strike": 153.0203,
+      "expiry_years": 1.0876712328767124,
+      "quantity": -958.7326
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 161.7748,
+      "expiry_years": 0.20273972602739726
+     },
+     {
+      "instrument": "CALL",
+      "strike": 175.0034,
+      "expiry_years": 1.726027397260274
+     },
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "GAMMA",
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      181.46896962208987,
+      1139.139770519441,
+      264.3979312180137
+     ],
+     "greeks_before": {
+      "delta": -1148.51753177989,
+      "gamma": -5.357416515909064,
+      "vega": -99212.45743457126
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 10 (VEGA+GAMMA+DELTA)",
+   "tolerance_limit": {
+    "absolute": 9.921245743457127e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0011",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 58.4316,
+    "rate": 0.0358,
+    "dividend_yield": 0.0107,
+    "volatility": 0.4567,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 43.3481,
+      "expiry_years": 1.6,
+      "quantity": 320.3249
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 47.0571,
+      "expiry_years": 0.5397260273972603
+     },
+     {
+      "instrument": "CALL",
+      "strike": 71.0611,
+      "expiry_years": 1.106849315068493
+     },
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "GAMMA",
+     "VEGA",
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      156.9603676018674,
+      -339.83520602351854,
+      244.07043514511975
+     ],
+     "greeks_before": {
+      "delta": -60.055747898024315,
+      "gamma": 2.537357485163704,
+      "vega": 6330.357106861287
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 11 (GAMMA+VEGA+DELTA)",
+   "tolerance_limit": {
+    "absolute": 6.330357106861287e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0012",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 55.7902,
+    "rate": 0.0478,
+    "dividend_yield": 0.0368,
+    "volatility": 0.5826,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 50.1307,
+      "expiry_years": 1.5890410958904109,
+      "quantity": -430.779
+     },
+     {
+      "instrument": "PUT",
+      "strike": 51.6017,
+      "expiry_years": 0.5452054794520548,
+      "quantity": -786.7504
+     },
+     {
+      "instrument": "PUT",
+      "strike": 58.282,
+      "expiry_years": 0.958904109589041,
+      "quantity": 817.1589
+     },
+     {
+      "instrument": "PUT",
+      "strike": 39.7759,
+      "expiry_years": 0.7013698630136986,
+      "quantity": 251.6328
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 63.8137,
+      "expiry_years": 1.536986301369863
+     },
+     {
+      "instrument": "CALL",
+      "strike": 56.608,
+      "expiry_years": 1.643835616438356
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      4502.652568363177,
+      4471.080983082149,
+      -4496.684717547078
+     ],
+     "greeks_before": {
+      "delta": 17.63107618914787,
+      "gamma": -3.2910386838223062,
+      "vega": -1863.3287630390184
+     },
+     "greeks_after": {
+      "delta": -1.967154826627856e-48,
+      "gamma": -1.0691058840368783e-50,
+      "vega": 1.4231937528298923e-46
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 12 (DELTA+GAMMA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 1.8633287630390185e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0013",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 81.7085,
+    "rate": -0.0094,
+    "dividend_yield": 0.0002,
+    "volatility": 0.1843,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 65.0536,
+      "expiry_years": 1.7452054794520548,
+      "quantity": -636.878
+     },
+     {
+      "instrument": "PUT",
+      "strike": 69.3687,
+      "expiry_years": 1.356164383561644,
+      "quantity": 722.7976
+     },
+     {
+      "instrument": "CALL",
+      "strike": 68.0152,
+      "expiry_years": 1.4767123287671233,
+      "quantity": 174.7142
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      544.0866353684196
+     ],
+     "greeks_before": {
+      "delta": -544.0866353684196,
+      "gamma": 6.631560000716586,
+      "vega": 7706.4846878536355
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 6.631560000716586,
+      "vega": 7706.4846878536355
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 13 (DELTA)",
+   "tolerance_limit": {
+    "absolute": 7.706484687853636e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0014",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 134.367,
+    "rate": 0.0059,
+    "dividend_yield": 0.0201,
+    "volatility": 0.2518,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 100.8494,
+      "expiry_years": 1.7780821917808218,
+      "quantity": -218.2094
+     },
+     {
+      "instrument": "CALL",
+      "strike": 145.3883,
+      "expiry_years": 1.8164383561643835,
+      "quantity": -674.1295
+     },
+     {
+      "instrument": "CALL",
+      "strike": 99.755,
+      "expiry_years": 1.1506849315068493,
+      "quantity": -257.3368
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 133.0072,
+      "expiry_years": 0.09315068493150686
+     },
+     {
+      "instrument": "CALL",
+      "strike": 161.0997,
+      "expiry_years": 1.263013698630137
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -80.16325556914657,
+      1289.6626519650208
+     ],
+     "greeks_before": {
+      "delta": -684.9346031624631,
+      "gamma": -8.202935680596719,
+      "vega": -63347.19371053758
+     },
+     "greeks_after": {
+      "delta": -369.36147289769514,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 14 (VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 6.3347193710537575e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0015",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 161.1141,
+    "rate": 0.0213,
+    "dividend_yield": 0.0206,
+    "volatility": 0.3162,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 183.2688,
+      "expiry_years": 0.8054794520547945,
+      "quantity": -360.2442
+     },
+     {
+      "instrument": "PUT",
+      "strike": 113.2688,
+      "expiry_years": 1.5780821917808219,
+      "quantity": -189.502
+     },
+     {
+      "instrument": "PUT",
+      "strike": 124.8367,
+      "expiry_years": 0.16986301369863013,
+      "quantity": -797.8698
+     },
+     {
+      "instrument": "CALL",
+      "strike": 193.936,
+      "expiry_years": 1.0657534246575342,
+      "quantity": 593.7992
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -462.38361512784115
+     ],
+     "greeks_before": {
+      "delta": 462.38361512784115,
+      "gamma": -1.464882505922137,
+      "vega": 5157.492588671562
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": -1.464882505922137,
+      "vega": 5157.492588671562
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 15 (DELTA)",
+   "tolerance_limit": {
+    "absolute": 5.157492588671562e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0016",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 151.3516,
+    "rate": 0.0439,
+    "dividend_yield": 0.0085,
+    "volatility": 0.3887,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 125.1704,
+      "expiry_years": 1.4931506849315068,
+      "quantity": -524.0936
+     },
+     {
+      "instrument": "CALL",
+      "strike": 174.4298,
+      "expiry_years": 0.3863013698630137,
+      "quantity": -215.5848
+     },
+     {
+      "instrument": "CALL",
+      "strike": 175.0559,
+      "expiry_years": 0.2356164383561644,
+      "quantity": -267.3557
+     },
+     {
+      "instrument": "PUT",
+      "strike": 177.5428,
+      "expiry_years": 1.83013698630137,
+      "quantity": 287.7621
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 166.1735,
+      "expiry_years": 0.1643835616438356
+     },
+     {
+      "instrument": "PUT",
+      "strike": 169.2027,
+      "expiry_years": 1.5890410958904109
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      122.05089932227474,
+      342.4411781250018,
+      162.95953171246924
+     ],
+     "greeks_before": {
+      "delta": -158.40281971466774,
+      "gamma": -5.961569208015652,
+      "vega": -19601.506755852613
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 16 (DELTA+VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 1.9601506755852614e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0017",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 95.5199,
+    "rate": 0.0236,
+    "dividend_yield": 0.0108,
+    "volatility": 0.431,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 123.163,
+      "expiry_years": 1.4684931506849315,
+      "quantity": 931.9674
+     },
+     {
+      "instrument": "PUT",
+      "strike": 66.9521,
+      "expiry_years": 0.4246575342465753,
+      "quantity": -155.2095
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 89.4652,
+      "expiry_years": 0.09041095890410959
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -1569.0522823140623,
+      -4154.42878467249
+     ],
+     "greeks_before": {
+      "delta": 401.619060752708,
+      "gamma": 6.372386867071592,
+      "vega": 40215.83176660921
+     },
+     "greeks_after": {
+      "delta": 6.842277657836021e-49,
+      "gamma": -106.7402148155037,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 17 (DELTA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 4.021583176660922e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0018",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 99.5527,
+    "rate": 0.0052,
+    "dividend_yield": 0.0119,
+    "volatility": 0.3405,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 84.6895,
+      "expiry_years": 1.6876712328767123,
+      "quantity": 655.903
+     },
+     {
+      "instrument": "CALL",
+      "strike": 80.0252,
+      "expiry_years": 1.4602739726027398,
+      "quantity": 530.1797
+     },
+     {
+      "instrument": "PUT",
+      "strike": 80.6567,
+      "expiry_years": 1.336986301369863,
+      "quantity": -703.3469
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 118.2223,
+      "expiry_years": 0.6657534246575343
+     },
+     {
+      "instrument": "CALL",
+      "strike": 69.706,
+      "expiry_years": 0.34794520547945207
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -1398.2633261614237,
+      4073.318514616399
+     ],
+     "greeks_before": {
+      "delta": 377.90880073091023,
+      "gamma": 3.4310754684775016,
+      "vega": 23006.293230021547
+     },
+     "greeks_after": {
+      "delta": 5264.950435841067,
+      "gamma": 2.1382117680737565e-50,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 18 (VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 2.3006293230021546e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0019",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 122.5828,
+    "rate": 0.0334,
+    "dividend_yield": 0.0023,
+    "volatility": 0.5791,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 91.9708,
+      "expiry_years": 1.3123287671232877,
+      "quantity": 835.4026
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 119.9818,
+      "expiry_years": 0.5397260273972603
+     },
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 137.6063,
+      "expiry_years": 0.9671232876712329
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      321.40211766800695,
+      -348.25525322145285,
+      -929.092102884211
+     ],
+     "greeks_before": {
+      "delta": 662.7164496963533,
+      "gamma": 2.904172373467555,
+      "vega": 33164.822555069026
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 5.345529420184391e-51,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 19 (VEGA+DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 3.3164822555069027e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0020",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 131.8704,
+    "rate": 0.0158,
+    "dividend_yield": 0.0224,
+    "volatility": 0.1492,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 107.5979,
+      "expiry_years": 1.6931506849315068,
+      "quantity": -494.8748
+     },
+     {
+      "instrument": "CALL",
+      "strike": 107.3474,
+      "expiry_years": 0.16712328767123288,
+      "quantity": -173.4694
+     },
+     {
+      "instrument": "CALL",
+      "strike": 167.073,
+      "expiry_years": 1.6356164383561644,
+      "quantity": -105.9408
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 137.7507,
+      "expiry_years": 1.6602739726027398
+     },
+     {
+      "instrument": "PUT",
+      "strike": 155.1695,
+      "expiry_years": 0.6794520547945205
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -25.579943794722713,
+      335.74972772454595,
+      -7.254428666249706
+     ],
+     "greeks_before": {
+      "delta": -118.52188899253217,
+      "gamma": -4.9259030824981105,
+      "vega": -21411.85446565404
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 20 (DELTA+GAMMA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 2.141185446565404e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0021",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 64.0885,
+    "rate": 0.0239,
+    "dividend_yield": 0.0215,
+    "volatility": 0.1354,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 75.2753,
+      "expiry_years": 0.2356164383561644,
+      "quantity": 851.5219
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 67.1386,
+      "expiry_years": 1.7452054794520548
+     },
+     {
+      "instrument": "CALL",
+      "strike": 51.5928,
+      "expiry_years": 1.3917808219178083
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      1960.637779230023,
+      437.53430559655436,
+      -1450.9670097213746
+     ],
+     "greeks_before": {
+      "delta": -840.3958842864942,
+      "gamma": 4.434906746252939,
+      "vega": 581.1241946959464
+     },
+     "greeks_after": {
+      "delta": -1.3684555315672042e-48,
+      "gamma": 1.0691058840368783e-50,
+      "vega": -2.7369110631344083e-48
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 21 (DELTA+GAMMA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 8.403958842864942e-08,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0022",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 154.6286,
+    "rate": 0.0489,
+    "dividend_yield": 0.0052,
+    "volatility": 0.5055,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 130.6827,
+      "expiry_years": 1.178082191780822,
+      "quantity": -825.4905
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 109.641,
+      "expiry_years": 0.6575342465753424
+     }
+    ],
+    "targets": [
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      910.7838321581002
+     ],
+     "greeks_before": {
+      "delta": 205.02505390479968,
+      "gamma": -3.0723923811932248,
+      "vega": -43747.48371810743
+     },
+     "greeks_after": {
+      "delta": 84.597090837634,
+      "gamma": 0.0,
+      "vega": -19330.283503349798
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 22 (GAMMA)",
+   "tolerance_limit": {
+    "absolute": 4.3747483718107436e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0023",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 153.8109,
+    "rate": 0.0154,
+    "dividend_yield": 0.0387,
+    "volatility": 0.341,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 122.2139,
+      "expiry_years": 1.6356164383561644,
+      "quantity": -627.9266
+     },
+     {
+      "instrument": "CALL",
+      "strike": 120.4509,
+      "expiry_years": 0.5835616438356165,
+      "quantity": 218.3788
+     },
+     {
+      "instrument": "CALL",
+      "strike": 122.8696,
+      "expiry_years": 1.893150684931507,
+      "quantity": 193.4855
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 141.514,
+      "expiry_years": 0.25753424657534246
+     },
+     {
+      "instrument": "PUT",
+      "strike": 191.5549,
+      "expiry_years": 1.9424657534246574
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -281.02496729061284,
+      -41.36985658007051,
+      263.40660545996775
+     ],
+     "greeks_before": {
+      "delta": 462.59688120134564,
+      "gamma": -0.7346247724199182,
+      "vega": -18750.35736680432
+     },
+     "greeks_after": {
+      "delta": 6.842277657836021e-49,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 23 (DELTA+VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 1.8750357366804322e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0024",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 59.9519,
+    "rate": 0.0511,
+    "dividend_yield": 0.0117,
+    "volatility": 0.384,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 57.2324,
+      "expiry_years": 1.1506849315068493,
+      "quantity": -585.1811
+     },
+     {
+      "instrument": "CALL",
+      "strike": 55.8275,
+      "expiry_years": 1.4109589041095891,
+      "quantity": 775.9697
+     },
+     {
+      "instrument": "PUT",
+      "strike": 70.9483,
+      "expiry_years": 0.27123287671232876,
+      "quantity": 405.6296
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 50.8392,
+      "expiry_years": 1.8520547945205479
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      504.7427645393672,
+      -1234.6101799745643
+     ],
+     "greeks_before": {
+      "delta": 417.2357872034244,
+      "gamma": 11.901836438074277,
+      "vega": 9537.88973643067
+     },
+     "greeks_after": {
+      "delta": 6.842277657836021e-49,
+      "gamma": 0.0,
+      "vega": -20885.31332627029
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 24 (DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 9.53788973643067e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0025",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 132.5616,
+    "rate": 0.035,
+    "dividend_yield": 0.0384,
+    "volatility": 0.1612,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 114.9256,
+      "expiry_years": 0.8273972602739726,
+      "quantity": -946.3164
+     },
+     {
+      "instrument": "PUT",
+      "strike": 151.8711,
+      "expiry_years": 0.8712328767123287,
+      "quantity": -23.9491
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 158.3374,
+      "expiry_years": 1.5232876712328767
+     },
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 95.3455,
+      "expiry_years": 0.8136986301369863
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      23.577122972319355,
+      -7107.790059848775,
+      8218.05332553197
+     ],
+     "greeks_before": {
+      "delta": -758.7793533964997,
+      "gamma": -11.418603508982109,
+      "vega": -26802.698981738184
+     },
+     "greeks_after": {
+      "delta": 9.579188720970429e-48,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 25 (VEGA+DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 2.6802698981738186e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0026",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 182.1417,
+    "rate": 0.0425,
+    "dividend_yield": 0.0202,
+    "volatility": 0.3957,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 201.3826,
+      "expiry_years": 0.5643835616438356,
+      "quantity": -555.996
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 142.1948,
+      "expiry_years": 0.2684931506849315
+     }
+    ],
+    "targets": [
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      924.5751549567666
+     ],
+     "greeks_before": {
+      "delta": -242.7610659028835,
+      "gamma": -4.0066917712581125,
+      "vega": -29685.550815854458
+     },
+     "greeks_after": {
+      "delta": 593.8253964435992,
+      "gamma": 0.0,
+      "vega": -15563.298485981948
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 26 (GAMMA)",
+   "tolerance_limit": {
+    "absolute": 2.9685550815854457e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0027",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 80.4132,
+    "rate": 0.0444,
+    "dividend_yield": 0.0212,
+    "volatility": 0.5911,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 68.9156,
+      "expiry_years": 1.7698630136986302,
+      "quantity": -526.0676
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 99.7114,
+      "expiry_years": 1.1452054794520548
+     },
+     {
+      "instrument": "CALL",
+      "strike": 88.7848,
+      "expiry_years": 1.8876712328767122
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      53.94369480019931,
+      394.9171955637409
+     ],
+     "greeks_before": {
+      "delta": 132.0252374473949,
+      "gamma": -2.6019888174841688,
+      "vega": -17601.94779537675
+     },
+     "greeks_after": {
+      "delta": 346.00669168886225,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 27 (VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 1.760194779537675e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0028",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 102.4533,
+    "rate": 0.0377,
+    "dividend_yield": 0.0127,
+    "volatility": 0.4144,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 119.0191,
+      "expiry_years": 0.3315068493150685,
+      "quantity": 740.7129
+     },
+     {
+      "instrument": "PUT",
+      "strike": 132.7079,
+      "expiry_years": 0.8712328767123287,
+      "quantity": -700.0691
+     },
+     {
+      "instrument": "PUT",
+      "strike": 122.2071,
+      "expiry_years": 0.7342465753424657,
+      "quantity": -150.3945
+     },
+     {
+      "instrument": "PUT",
+      "strike": 94.4966,
+      "expiry_years": 1.0657534246575342,
+      "quantity": 504.9992
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 117.381,
+      "expiry_years": 0.7068493150684931
+     },
+     {
+      "instrument": "CALL",
+      "strike": 110.1708,
+      "expiry_years": 0.8794520547945206
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -2574.527512896833,
+      2150.1944069000606
+     ],
+     "greeks_before": {
+      "delta": -114.26818285405852,
+      "gamma": 6.867360396666167,
+      "vega": 5151.845971546493
+     },
+     "greeks_after": {
+      "delta": -104.93463999445981,
+      "gamma": 2.1382117680737565e-50,
+      "vega": 8.758115402030107e-47
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 28 (VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 5.151845971546494e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0029",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 115.2941,
+    "rate": 0.0542,
+    "dividend_yield": 0.0261,
+    "volatility": 0.44,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 146.3011,
+      "expiry_years": 1.2986301369863014,
+      "quantity": 667.8793
+     },
+     {
+      "instrument": "PUT",
+      "strike": 94.3396,
+      "expiry_years": 0.6684931506849315,
+      "quantity": 674.4075
+     },
+     {
+      "instrument": "CALL",
+      "strike": 83.3737,
+      "expiry_years": 1.3452054794520547,
+      "quantity": -79.6635
+     },
+     {
+      "instrument": "CALL",
+      "strike": 115.3673,
+      "expiry_years": 1.3945205479452054,
+      "quantity": -686.9516
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 119.5313,
+      "expiry_years": 0.28493150684931506
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      184.91819165281981,
+      -312.6562762470753
+     ],
+     "greeks_before": {
+      "delta": -340.3537844241841,
+      "gamma": 4.572108165193083,
+      "vega": 15097.49008017585
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 7478.036728099493
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 29 (DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 1.509749008017585e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0030",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 54.6898,
+    "rate": 0.0212,
+    "dividend_yield": 0.0115,
+    "volatility": 0.1342,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 56.2172,
+      "expiry_years": 0.9616438356164384,
+      "quantity": -227.983
+     },
+     {
+      "instrument": "CALL",
+      "strike": 59.2605,
+      "expiry_years": 1.4986301369863013,
+      "quantity": -263.3045
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 54.6879,
+      "expiry_years": 1.1945205479452055
+     },
+     {
+      "instrument": "PUT",
+      "strike": 61.5453,
+      "expiry_years": 0.4301369863013699
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      404.3487702865335,
+      493.7146093224292,
+      -14.544498503036928
+     ],
+     "greeks_before": {
+      "delta": -203.33040516068587,
+      "gamma": -23.390287195981195,
+      "vega": -11383.289528867304
+     },
+     "greeks_after": {
+      "delta": -3.4211388289180104e-49,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 30 (DELTA+GAMMA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 1.1383289528867304e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0031",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 102.8608,
+    "rate": -0.0046,
+    "dividend_yield": 0.0089,
+    "volatility": 0.1382,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 74.5333,
+      "expiry_years": 0.25753424657534246,
+      "quantity": -432.5853
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 79.317,
+      "expiry_years": 0.12054794520547946
+     },
+     {
+      "instrument": "CALL",
+      "strike": 82.6433,
+      "expiry_years": 0.9561643835616438
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -0.013323220127938148,
+      15465.881853261124,
+      0.013680099434025303
+     ],
+     "greeks_before": {
+      "delta": 0.0010101448869710957,
+      "gamma": -0.0006693111298701363,
+      "vega": -0.2520408145512418
+     },
+     "greeks_after": {
+      "delta": -7.83036536159823e-54,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 31 (DELTA+GAMMA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0032",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 102.4528,
+    "rate": 0.0515,
+    "dividend_yield": 0.0351,
+    "volatility": 0.4356,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 72.0367,
+      "expiry_years": 1.6712328767123288,
+      "quantity": 627.893
+     },
+     {
+      "instrument": "CALL",
+      "strike": 105.7929,
+      "expiry_years": 0.3506849315068493,
+      "quantity": 416.8038
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 72.6883,
+      "expiry_years": 1.1506849315068493
+     },
+     {
+      "instrument": "PUT",
+      "strike": 82.4682,
+      "expiry_years": 0.989041095890411
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      2823.6299863955996,
+      -3430.0927763891827
+     ],
+     "greeks_before": {
+      "delta": 109.843317423385,
+      "gamma": 8.805801834361185,
+      "vega": 29777.623349467278
+     },
+     "greeks_after": {
+      "delta": 3142.9504650384815,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 32 (VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 2.977762334946728e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0033",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 139.9689,
+    "rate": 0.0439,
+    "dividend_yield": 0.008,
+    "volatility": 0.1703,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 133.84,
+      "expiry_years": 0.08767123287671233,
+      "quantity": 253.7376
+     },
+     {
+      "instrument": "CALL",
+      "strike": 100.0102,
+      "expiry_years": 0.9095890410958904,
+      "quantity": 621.4184
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 155.7142,
+      "expiry_years": 0.28493150684931506
+     }
+    ],
+    "targets": [
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -262.90329570913406
+     ],
+     "greeks_before": {
+      "delta": 569.4071361070942,
+      "gamma": 9.586407162797885,
+      "vega": 4672.370664293486
+     },
+     "greeks_after": {
+      "delta": 528.7176025822868,
+      "gamma": 4.67145758671109,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 33 (VEGA)",
+   "tolerance_limit": {
+    "absolute": 4.672370664293486e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0034",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 127.324,
+    "rate": -0.0031,
+    "dividend_yield": 0.0397,
+    "volatility": 0.5062,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 124.2876,
+      "expiry_years": 0.16164383561643836,
+      "quantity": 511.7145
+     },
+     {
+      "instrument": "CALL",
+      "strike": 165.0301,
+      "expiry_years": 1.8383561643835618,
+      "quantity": -766.6724
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 162.7026,
+      "expiry_years": 1.3123287671232877
+     },
+     {
+      "instrument": "CALL",
+      "strike": 93.1157,
+      "expiry_years": 0.37534246575342467
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      1796.1100011065446,
+      1356.95026791397,
+      -2098.5245030984597
+     ],
+     "greeks_before": {
+      "delta": -530.6680409427961,
+      "gamma": 4.475444665650522,
+      "vega": -38335.52713657883
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": -1.0691058840368783e-50,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 34 (DELTA+VEGA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 3.833552713657883e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0035",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 64.8342,
+    "rate": 0.019,
+    "dividend_yield": 0.034,
+    "volatility": 0.3104,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 47.0726,
+      "expiry_years": 0.2136986301369863,
+      "quantity": 389.3942
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 72.3273,
+      "expiry_years": 1.4054794520547946
+     },
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "PUT",
+      "strike": 52.7216,
+      "expiry_years": 0.8767123287671232
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      98.22997642767277,
+      19.549259943405726,
+      -187.65553439515196
+     ],
+     "greeks_before": {
+      "delta": -4.363917828430022,
+      "gamma": 1.2308124823287108,
+      "vega": 343.1813320386003
+     },
+     "greeks_after": {
+      "delta": -3.207317652110635e-50,
+      "gamma": -2.6727647100921956e-51,
+      "vega": 1.3684555315672042e-48
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 35 (VEGA+DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 3.4318133203860034e-08,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0036",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 60.3608,
+    "rate": -0.0076,
+    "dividend_yield": 0.0376,
+    "volatility": 0.5926,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 53.773,
+      "expiry_years": 0.9616438356164384,
+      "quantity": 873.7446
+     },
+     {
+      "instrument": "CALL",
+      "strike": 74.4579,
+      "expiry_years": 1.4575342465753425,
+      "quantity": 947.1827
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 65.427,
+      "expiry_years": 1.9616438356164383
+     },
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "GAMMA",
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -2360.4365934070483,
+      284.2843819220399
+     ],
+     "greeks_before": {
+      "delta": 995.2748490885425,
+      "gamma": 17.07535864758989,
+      "vega": 44318.803012034674
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": -28001.7292073765
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 36 (GAMMA+DELTA)",
+   "tolerance_limit": {
+    "absolute": 4.431880301203468e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0037",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 136.5944,
+    "rate": -0.0076,
+    "dividend_yield": 0.0389,
+    "volatility": 0.4289,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 176.0581,
+      "expiry_years": 1.0136986301369864,
+      "quantity": 381.7916
+     },
+     {
+      "instrument": "CALL",
+      "strike": 169.5589,
+      "expiry_years": 1.5972602739726027,
+      "quantity": -465.0923
+     },
+     {
+      "instrument": "CALL",
+      "strike": 153.6266,
+      "expiry_years": 1.3287671232876712,
+      "quantity": 499.9321
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 175.6496,
+      "expiry_years": 1.8986301369863015
+     },
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "GAMMA",
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -616.9086969884336,
+      65.07145414339092
+     ],
+     "greeks_before": {
+      "delta": 158.37266324880022,
+      "gamma": 2.723284328894044,
+      "vega": 18496.90273022498
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": -22879.734618578066
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 37 (GAMMA+DELTA)",
+   "tolerance_limit": {
+    "absolute": 1.8496902730224983e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0038",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 89.1468,
+    "rate": 0.0392,
+    "dividend_yield": 0.0181,
+    "volatility": 0.5311,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 82.6901,
+      "expiry_years": 1.6191780821917807,
+      "quantity": -454.4706
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 110.7601,
+      "expiry_years": 1.0575342465753426
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      79.38125050226577,
+      493.0401556244927
+     ],
+     "greeks_before": {
+      "delta": -305.12808478991224,
+      "gamma": -2.579496074370235,
+      "vega": -17628.57898993715
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 1.369939624989373,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 38 (DELTA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 1.762857898993715e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0039",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 171.9679,
+    "rate": 0.0183,
+    "dividend_yield": 0.0363,
+    "volatility": 0.5004,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 170.5444,
+      "expiry_years": 0.736986301369863,
+      "quantity": 889.2452
+     },
+     {
+      "instrument": "PUT",
+      "strike": 215.0841,
+      "expiry_years": 1.0684931506849316,
+      "quantity": -862.4517
+     },
+     {
+      "instrument": "CALL",
+      "strike": 165.8113,
+      "expiry_years": 0.4876712328767123,
+      "quantity": -452.9825
+     },
+     {
+      "instrument": "PUT",
+      "strike": 155.5139,
+      "expiry_years": 0.3232876712328767,
+      "quantity": -602.9466
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -42.96080453967084
+     ],
+     "greeks_before": {
+      "delta": 42.96080453967084,
+      "gamma": -6.259736449432284,
+      "vega": -48997.91127115707
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": -6.259736449432284,
+      "vega": -48997.91127115707
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 39 (DELTA)",
+   "tolerance_limit": {
+    "absolute": 4.899791127115707e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0040",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 131.8541,
+    "rate": 0.0404,
+    "dividend_yield": 0.0134,
+    "volatility": 0.4612,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 168.6841,
+      "expiry_years": 1.378082191780822,
+      "quantity": -892.6225
+     },
+     {
+      "instrument": "CALL",
+      "strike": 108.2775,
+      "expiry_years": 0.6273972602739726,
+      "quantity": 50.537
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 158.3298,
+      "expiry_years": 1.5095890410958903
+     },
+     {
+      "instrument": "CALL",
+      "strike": 145.93,
+      "expiry_years": 0.4520547945205479
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -937.991651746852,
+      804.6870836609074,
+      36.111776104885344
+     ],
+     "greeks_before": {
+      "delta": 517.4818045394015,
+      "gamma": -4.555514350806379,
+      "vega": -52197.03458822074
+     },
+     "greeks_after": {
+      "delta": 1.3684555315672042e-48,
+      "gamma": 0.0,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 40 (DELTA+GAMMA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 5.219703458822074e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0041",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 156.8303,
+    "rate": 0.0273,
+    "dividend_yield": 0.0395,
+    "volatility": 0.2602,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 164.7362,
+      "expiry_years": 0.28493150684931506,
+      "quantity": -876.6808
+     },
+     {
+      "instrument": "PUT",
+      "strike": 120.1143,
+      "expiry_years": 0.2547945205479452,
+      "quantity": 717.6387
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 165.1964,
+      "expiry_years": 1.7452054794520548
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -1409.9240632282929,
+      1960.080827677087
+     ],
+     "greeks_before": {
+      "delta": 525.274880338279,
+      "gamma": -13.527434180408141,
+      "vega": -24977.09894339423
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 126110.64489916984
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 41 (DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 2.497709894339423e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0042",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 110.3877,
+    "rate": 0.0215,
+    "dividend_yield": 0.034,
+    "volatility": 0.2253,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 129.222,
+      "expiry_years": 0.5452054794520548,
+      "quantity": -817.2944
+     },
+     {
+      "instrument": "CALL",
+      "strike": 84.979,
+      "expiry_years": 1.082191780821918,
+      "quantity": -852.7279
+     },
+     {
+      "instrument": "CALL",
+      "strike": 116.2039,
+      "expiry_years": 1.547945205479452,
+      "quantity": 766.9907
+     },
+     {
+      "instrument": "PUT",
+      "strike": 136.8578,
+      "expiry_years": 1.4164383561643836,
+      "quantity": 651.7527
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 123.6261,
+      "expiry_years": 1.0657534246575342
+     },
+     {
+      "instrument": "CALL",
+      "strike": 136.8284,
+      "expiry_years": 0.6575342465753424
+     }
+    ],
+    "targets": [
+     "GAMMA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -2106.627721269339,
+      3032.178210771949
+     ],
+     "greeks_before": {
+      "delta": -1015.9353489287914,
+      "gamma": -2.206006172027787,
+      "vega": 28301.098593035127
+     },
+     "greeks_after": {
+      "delta": -1311.3755885992034,
+      "gamma": -1.0691058840368783e-50,
+      "vega": -4.3790577010150533e-47
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 42 (GAMMA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 2.8301098593035128e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0043",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 65.4582,
+    "rate": -0.0021,
+    "dividend_yield": 0.0091,
+    "volatility": 0.1149,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 73.6443,
+      "expiry_years": 0.7041095890410959,
+      "quantity": 161.8619
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 69.3694,
+      "expiry_years": 0.34794520547945207
+     }
+    ],
+    "targets": [
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -153.63280811282667
+     ],
+     "greeks_before": {
+      "delta": -144.00533577340087,
+      "gamma": 4.621035802382258,
+      "vega": 1601.8717348283892
+     },
+     "greeks_after": {
+      "delta": -19.8740406476663,
+      "gamma": -4.7301941284227835,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 43 (VEGA)",
+   "tolerance_limit": {
+    "absolute": 1.6018717348283892e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0044",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 109.4536,
+    "rate": 0.0179,
+    "dividend_yield": 0.0042,
+    "volatility": 0.5655,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 108.5985,
+      "expiry_years": 0.4602739726027397,
+      "quantity": 920.1219
+     },
+     {
+      "instrument": "CALL",
+      "strike": 77.6034,
+      "expiry_years": 1.021917808219178,
+      "quantity": 766.0095
+     },
+     {
+      "instrument": "CALL",
+      "strike": 123.8656,
+      "expiry_years": 1.2082191780821918,
+      "quantity": -225.4069
+     },
+     {
+      "instrument": "CALL",
+      "strike": 77.2905,
+      "expiry_years": 0.9397260273972603,
+      "quantity": -142.9836
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     }
+    ],
+    "targets": [
+     "DELTA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -925.0875561027717
+     ],
+     "greeks_before": {
+      "delta": 925.0875561027717,
+      "gamma": 9.792509185274506,
+      "vega": 34153.247584963705
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 9.792509185274506,
+      "vega": 34153.247584963705
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 44 (DELTA)",
+   "tolerance_limit": {
+    "absolute": 3.4153247584963706e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0045",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 59.8009,
+    "rate": -0.007,
+    "dividend_yield": 0.0369,
+    "volatility": 0.579,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 69.3238,
+      "expiry_years": 1.2821917808219179,
+      "quantity": 762.0136
+     },
+     {
+      "instrument": "CALL",
+      "strike": 69.6193,
+      "expiry_years": 1.8712328767123287,
+      "quantity": -145.0964
+     },
+     {
+      "instrument": "CALL",
+      "strike": 56.6869,
+      "expiry_years": 0.13150684931506848,
+      "quantity": 831.8654
+     },
+     {
+      "instrument": "PUT",
+      "strike": 47.1729,
+      "expiry_years": 1.5945205479452054,
+      "quantity": -555.5384
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 71.301,
+      "expiry_years": 0.2876712328767123
+     }
+    ],
+    "targets": [
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -768.5559373810659
+     ],
+     "greeks_before": {
+      "delta": 234.5826785246383,
+      "gamma": 27.14428027002009,
+      "vega": 8786.390514758272
+     },
+     "greeks_after": {
+      "delta": 747.3375301895122,
+      "gamma": 12.393327817551528,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 45 (VEGA)",
+   "tolerance_limit": {
+    "absolute": 8.786390514758273e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0046",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 103.8913,
+    "rate": 0.0288,
+    "dividend_yield": 0.0385,
+    "volatility": 0.1163,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 93.6555,
+      "expiry_years": 1.515068493150685,
+      "quantity": 355.8617
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 127.9897,
+      "expiry_years": 1.1506849315068493
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      125.41115386125833,
+      -1018.5726111772855
+     ],
+     "greeks_before": {
+      "delta": -81.91222256687385,
+      "gamma": 7.08037067261486,
+      "vega": 13465.619470759553
+     },
+     "greeks_after": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "vega": 3238.566708157362
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 46 (DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 1.3465619470759554e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0047",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 198.7301,
+    "rate": 0.0436,
+    "dividend_yield": 0.008,
+    "volatility": 0.4993,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 226.7173,
+      "expiry_years": 0.9945205479452055,
+      "quantity": 957.007
+     },
+     {
+      "instrument": "CALL",
+      "strike": 201.3611,
+      "expiry_years": 1.0054794520547945,
+      "quantity": 319.8514
+     },
+     {
+      "instrument": "CALL",
+      "strike": 200.3644,
+      "expiry_years": 0.726027397260274,
+      "quantity": -318.3149
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 257.0014,
+      "expiry_years": 1.4684931506849315
+     }
+    ],
+    "targets": [
+     "DELTA",
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -104.70915212601433,
+      -826.1799732397778
+     ],
+     "greeks_before": {
+      "delta": 501.2364848656211,
+      "gamma": 3.593837382751782,
+      "vega": 78397.13564268689
+     },
+     "greeks_after": {
+      "delta": -6.842277657836021e-49,
+      "gamma": 0.88651856495887,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 47 (DELTA+VEGA)",
+   "tolerance_limit": {
+    "absolute": 7.839713564268688e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0048",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 82.8953,
+    "rate": 0.0175,
+    "dividend_yield": 0.0367,
+    "volatility": 0.5138,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 105.4542,
+      "expiry_years": 1.0082191780821919,
+      "quantity": -158.2382
+     },
+     {
+      "instrument": "CALL",
+      "strike": 78.6463,
+      "expiry_years": 1.9616438356164383,
+      "quantity": -685.8853
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "PUT",
+      "strike": 68.5307,
+      "expiry_years": 0.24383561643835616
+     }
+    ],
+    "targets": [
+     "VEGA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      2894.620496700477
+     ],
+     "greeks_before": {
+      "delta": -475.1606580174034,
+      "gamma": -5.350213593817717,
+      "vega": -32409.316234190515
+     },
+     "greeks_after": {
+      "delta": -1035.5064231102635,
+      "gamma": 32.29578408546703,
+      "vega": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 48 (VEGA)",
+   "tolerance_limit": {
+    "absolute": 3.2409316234190516e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0049",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 165.8556,
+    "rate": 0.0111,
+    "dividend_yield": 0.0355,
+    "volatility": 0.347,
+    "portfolio": [
+     {
+      "instrument": "PUT",
+      "strike": 126.4632,
+      "expiry_years": 0.1726027397260274,
+      "quantity": 836.6042
+     },
+     {
+      "instrument": "CALL",
+      "strike": 187.3024,
+      "expiry_years": 0.8301369863013699,
+      "quantity": -247.7122
+     },
+     {
+      "instrument": "CALL",
+      "strike": 160.8923,
+      "expiry_years": 1.8027397260273972,
+      "quantity": 570.7647
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 208.1636,
+      "expiry_years": 1.5424657534246575
+     }
+    ],
+    "targets": [
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      -642.111553725987
+     ],
+     "greeks_before": {
+      "delta": 195.5435932536573,
+      "gamma": 3.13322509387191,
+      "vega": 36277.66395141747
+     },
+     "greeks_after": {
+      "delta": -14.134486597790655,
+      "gamma": 0.0,
+      "vega": -9853.762180486687
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 49 (GAMMA)",
+   "tolerance_limit": {
+    "absolute": 3.6277663951417467e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgegreeks5_i-0050",
+   "operation": "hedge.greeks.neutralise",
+   "inputs": {
+    "spot": 194.8189,
+    "rate": 0.002,
+    "dividend_yield": 0.0208,
+    "volatility": 0.4229,
+    "portfolio": [
+     {
+      "instrument": "CALL",
+      "strike": 223.7064,
+      "expiry_years": 0.4794520547945205,
+      "quantity": -132.2172
+     },
+     {
+      "instrument": "CALL",
+      "strike": 239.1928,
+      "expiry_years": 1.5123287671232877,
+      "quantity": -479.5921
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "CALL",
+      "strike": 217.5439,
+      "expiry_years": 0.8794520547945206
+     },
+     {
+      "instrument": "UNDERLYING"
+     },
+     {
+      "instrument": "CALL",
+      "strike": 250.2879,
+      "expiry_years": 0.7917808219178082
+     }
+    ],
+    "targets": [
+     "VEGA",
+     "DELTA",
+     "GAMMA"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      2327.364332784986,
+      -211.8332971117949,
+      -1933.8787667856052
+     ],
+     "greeks_before": {
+      "delta": -244.7203593516424,
+      "gamma": -2.656503040988741,
+      "vega": -50242.683522581705
+     },
+     "greeks_after": {
+      "delta": 6.842277657836021e-49,
+      "gamma": 1.6036588260553174e-50,
+      "vega": -1.7516230804060213e-46
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-analytic-european",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "greeks",
+    "wave5",
+    "synthetic"
+   ],
+   "description": "seeded draw 50 (VEGA+DELTA+GAMMA)",
+   "tolerance_limit": {
+    "absolute": 5.0242683522581704e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  }
+ ]
+}
