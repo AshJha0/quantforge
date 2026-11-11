@@ -28,7 +28,12 @@ Recorded runs (seed **20261111**, sample **90**, 3 workers):
 | Date | Tests | Killed | Score |
 |---|---|---|---|
 | 2026-11-11, first run | unit tests only, before `test_credit_kills.py` | 52 of 90 | 57.8% |
-| 2026-11-11, rerun | with `test_credit_kills.py` | see the commit that updates this table | |
+| 2026-11-11, rerun | with `test_credit_kills.py` (goldens in process plus targeted checks) | 77 of 90 | 85.6% |
+
+Of the 13 survivors of the rerun: 8 are iteration caps or bracket factors (equivalent: the solves
+converge well inside them), 4 change only message text or the code string of an unreachable
+`E_NO_CONVERGENCE` branch, and 1 (`credit._series` fourth-order term) is killed by
+`test_credit_series_branch_matches_the_closed_form`, added after the rerun.
 
 Reproduce:
 

@@ -10,6 +10,7 @@ reasons are listed in conformance/mutation/README_python.md.
 """
 import importlib.util
 import json
+import math
 from pathlib import Path
 
 import pytest
@@ -133,3 +134,14 @@ def test_incomplete_beta_at_zero() -> None:
     from quantforge_core import credit_options
 
     assert credit_options._incomplete_beta(2.0, 3.0, 0.0) == 0.0
+
+
+def test_credit_series_branch_matches_the_closed_form() -> None:
+    from quantforge_core import credit
+
+    x = 9e-5  # inside the series branch; the closed form is accurate to ~1e-12 here, so compare
+    # with a long Taylor sum instead
+    first = sum((-x) ** k / math.factorial(k + 1) for k in range(12))
+    second = sum((-x) ** k * (k + 1) / math.factorial(k + 2) for k in range(12))
+    a, b = credit._series(x)
+    assert abs(a - first) <= 1e-16 and abs(b - second) <= 1e-16
