@@ -45,6 +45,40 @@ public final class Exotics {
 
     public enum BarrierType { DOWN_IN, DOWN_OUT, UP_IN, UP_OUT }
 
+    /** Broadie-Glasserman-Kou shift, beta exactly 0.5826 (ruling G-7). */
+    private static final double BGK_BETA = 0.5826;
+
+    /**
+     * Discrete monitoring m times a year: the continuous price at the barrier shifted away from spot by
+     * {@code exp(beta v sqrt(T/n))}, {@code n = floor(m T + 0.5)} (rulings G-7, G-8, G-30). The domain check uses the unshifted barrier.
+     *
+     * @param phi 1 for a call, -1 for a put
+     * @param type the barrier type
+     * @param s spot
+     * @param k strike
+     * @param t expiry in years
+     * @param r risk-free rate
+     * @param q dividend yield
+     * @param v volatility
+     * @param h barrier level
+     * @param rebate rebate
+     * @param perYear monitoring dates per year
+     * @return the option price
+     */
+    public static double barrierDiscrete(double phi, BarrierType type, double s, double k, double t, double r,
+                                         double q, double v, double h, double rebate, long perYear) {
+        boolean down = type == BarrierType.DOWN_IN || type == BarrierType.DOWN_OUT;
+        if (down ? s <= h : s >= h) {
+            throw new QfError("E_DOMAIN", "spot is on or beyond the barrier (ruling E-A19)", "barrier");
+        }
+        long n = (long) Math.floor(perYear * t + 0.5); // ruling G-30, ties round up
+        if (n < 1) {
+            throw new QfError("E_DOMAIN", "no monitoring date before expiry (ruling G-30)", "monitoring_per_year");
+        }
+        double shift = Math.exp(BGK_BETA * v * Math.sqrt(t / n));
+        return barrier(phi, type, s, k, t, r, q, v, down ? h / shift : h * shift, rebate);
+    }
+
     /** Reiner-Rubinstein, continuous monitoring [RR91]. */
     public static double barrier(double phi, BarrierType type, double s, double k, double t, double r, double q,
                                  double v, double h, double rebate) {

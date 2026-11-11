@@ -1,0 +1,2703 @@
+{
+ "schema_version": "1.0",
+ "suite": "capfloor_g",
+ "spec": "specifications/04-pricing/short-rate-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "capfloor_g-0001",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 43483.948603076075,
+     "caplet_prices": [
+      3534.3499474580176,
+      4115.377938725958,
+      4527.661416500974,
+      4829.91566444921,
+      5053.175613162083,
+      5216.580429305503,
+      5333.161041918158,
+      5412.369431816733,
+      5461.357119739436
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "cap",
+    "synthetic"
+   ],
+   "description": "VASICEK CAP K=0.03, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0002",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 20071.705196575,
+     "caplet_prices": [
+      821.8888105112907,
+      1427.3004543785764,
+      1862.709034260497,
+      2191.233607235318,
+      2443.888735399062,
+      2639.2836844006647,
+      2789.9188104803306,
+      2904.793878439477,
+      2990.6881814697836
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "cap",
+    "synthetic"
+   ],
+   "description": "VASICEK CAP K=0.04, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0003",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7588.358026334704,
+     "caplet_prices": [
+      71.70233257133708,
+      298.71787209232235,
+      538.4024690659079,
+      751.9917320369995,
+      933.531721880606,
+      1084.6729406903667,
+      1208.86589020301,
+      1309.757160535516,
+      1390.7159072586383
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "cap",
+    "synthetic"
+   ],
+   "description": "VASICEK CAP K=0.05, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0004",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10545.490712902692,
+     "caplet_prices": [
+      470.16910038040334,
+      822.7653903768341,
+      1048.214590381041,
+      1199.517298518602,
+      1302.7602735146586,
+      1372.8007003658117,
+      1418.9654529849731,
+      1447.5030786700177,
+      1462.794827710351
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "floor",
+    "synthetic"
+   ],
+   "description": "VASICEK FLOOR K=0.03, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0005",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 27454.49116483543,
+     "caplet_prices": [
+      2582.3933443921396,
+      2871.852751563164,
+      3033.279559276635,
+      3124.2493884046285,
+      3170.9729725020625,
+      3187.898712215385,
+      3183.9239888473867,
+      3164.928939612473,
+      3134.9915080215515
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "floor",
+    "synthetic"
+   ],
+   "description": "VASICEK FLOOR K=0.04, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0006",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 55292.387853028275,
+     "caplet_prices": [
+      6656.892247410569,
+      6480.435014810544,
+      6358.9903452180415,
+      6248.421660306154,
+      6138.1155357339585,
+      6025.682725259425,
+      5911.071835870236,
+      5794.893636028154,
+      5677.884852391192
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "floor",
+    "synthetic"
+   ],
+   "description": "VASICEK FLOOR K=0.05, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0007",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 61340.274716075124,
+     "caplet_prices": [
+      8441.102029131562,
+      9761.263320030017,
+      10471.04252662633,
+      10821.380406024255,
+      10940.427429374846,
+      10905.059004888117
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "cap",
+    "synthetic"
+   ],
+   "description": "VASICEK CAP K=0.03, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0008",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 30813.324970841855,
+     "caplet_prices": [
+      2960.5600760020693,
+      4442.731602589166,
+      5303.201087460513,
+      5808.466395397495,
+      6086.389374942609,
+      6211.976434450003
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "cap",
+    "synthetic"
+   ],
+   "description": "VASICEK CAP K=0.04, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0009",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12903.275314510547,
+     "caplet_prices": [
+      623.8591388662676,
+      1525.9871476064986,
+      2178.216259083706,
+      2616.0592246663227,
+      2896.1917586627933,
+      3062.9617856249592
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "cap",
+    "synthetic"
+   ],
+   "description": "VASICEK CAP K=0.05, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0010",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13906.923980525045,
+     "caplet_prices": [
+      1407.6001714696088,
+      2122.7059034035274,
+      2460.4852403909704,
+      2611.544373631903,
+      2658.9046280942953,
+      2645.6836635347413
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "floor",
+    "synthetic"
+   ],
+   "description": "VASICEK FLOOR K=0.03, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0011",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 34152.983951294846,
+     "caplet_prices": [
+      5227.092920612129,
+      5759.173339463404,
+      5909.045335825515,
+      5884.361600166737,
+      5768.862699049229,
+      5604.44805617783
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "floor",
+    "synthetic"
+   ],
+   "description": "VASICEK FLOOR K=0.04, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0012",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "VASICEK",
+    "mean_reversion": 0.15,
+    "long_term_mean": 0.045,
+    "sigma": 0.012,
+    "short_rate": 0.035,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 67015.94401096711,
+     "caplet_prices": [
+      12190.426685748434,
+      11797.428037981554,
+      11400.462042049157,
+      10977.68566659724,
+      10542.661208156665,
+      10107.280370434066
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "vasicek",
+    "floor",
+    "synthetic"
+   ],
+   "description": "VASICEK FLOOR K=0.05, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0013",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 33738.91712375339,
+     "caplet_prices": [
+      2184.374538869467,
+      2938.294636692734,
+      3433.2657578177627,
+      3779.243545438026,
+      4025.4250855486234,
+      4200.159503157706,
+      4321.821940029127,
+      4403.121232927405,
+      4453.210883272539
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "cap",
+    "synthetic"
+   ],
+   "description": "CIR CAP K=0.03, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0014",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 16433.56348372304,
+     "caplet_prices": [
+      500.6772157679027,
+      1069.320630343987,
+      1493.5388747523382,
+      1809.0203716077237,
+      2044.2399764984953,
+      2219.190501791962,
+      2348.1882665432636,
+      2441.730532183925,
+      2507.657114233441
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "cap",
+    "synthetic"
+   ],
+   "description": "CIR CAP K=0.04, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0015",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7594.937203812807,
+     "caplet_prices": [
+      73.26987572086765,
+      316.1273319309112,
+      567.2139321689835,
+      781.615488381085,
+      954.7905303916227,
+      1091.1417469740372,
+      1196.6694687434087,
+      1277.0335951980398,
+      1337.0752343038507
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "cap",
+    "synthetic"
+   ],
+   "description": "CIR CAP K=0.05, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0016",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15300.029840259518,
+     "caplet_prices": [
+      1259.0130200505744,
+      1588.4692952719001,
+      1736.965246610933,
+      1801.579592335729,
+      1820.7667234097587,
+      1813.9198963305566,
+      1791.948334190985,
+      1761.3341872887745,
+      1726.0335447703071
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "floor",
+    "synthetic"
+   ],
+   "description": "CIR FLOOR K=0.03, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0017",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 38786.38859555214,
+     "caplet_prices": [
+      4422.088295446146,
+      4487.991320243382,
+      4486.907850012694,
+      4441.978257620377,
+      4371.205798895843,
+      4285.8503890555285,
+      4192.945326775589,
+      4096.910709049999,
+      4000.5106484525822
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "floor",
+    "synthetic"
+   ],
+   "description": "CIR FLOOR K=0.04, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0018",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 70739.47471096422,
+     "caplet_prices": [
+      8841.453553896168,
+      8503.294053150457,
+      8250.25239389645,
+      8025.195213508613,
+      7813.38053732511,
+      7610.701128328247,
+      7416.057195046132,
+      7229.180994568749,
+      7049.959641244296
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "floor",
+    "synthetic"
+   ],
+   "description": "CIR FLOOR K=0.05, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0019",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 47823.77451973211,
+     "caplet_prices": [
+      5941.748826542514,
+      7493.561582801264,
+      8263.795835045541,
+      8628.616146460687,
+      8756.826919228924,
+      8739.225209653181
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "cap",
+    "synthetic"
+   ],
+   "description": "CIR CAP K=0.03, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0020",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 24397.3176470119,
+     "caplet_prices": [
+      2099.499419825701,
+      3499.051445133532,
+      4268.563941930932,
+      4683.42493094594,
+      4886.899717814332,
+      4959.878191361465
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "cap",
+    "synthetic"
+   ],
+   "description": "CIR CAP K=0.04, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0021",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11754.042141853206,
+     "caplet_prices": [
+      593.8566712479286,
+      1465.418843238437,
+      2043.6086354195074,
+      2390.258159820814,
+      2583.409409230338,
+      2677.4904228961805
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "cap",
+    "synthetic"
+   ],
+   "description": "CIR CAP K=0.05, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0022",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17555.809507850845,
+     "caplet_prices": [
+      2659.143339355749,
+      3074.246303823913,
+      3112.8761383195283,
+      3028.842712969852,
+      2905.7709228959925,
+      2774.9300904858114
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "floor",
+    "synthetic"
+   ],
+   "description": "CIR FLOOR K=0.03, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0023",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 45741.20147190939,
+     "caplet_prices": [
+      8196.232905573183,
+      8142.984535228484,
+      7866.905577345738,
+      7523.713242897737,
+      7173.272056898196,
+      6838.093153966059
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "floor",
+    "synthetic"
+   ],
+   "description": "CIR FLOOR K=0.04, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0024",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "CIR",
+    "mean_reversion": 0.25,
+    "long_term_mean": 0.04,
+    "sigma": 0.08,
+    "short_rate": 0.03,
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 84709.77480352996,
+     "caplet_prices": [
+      16069.929129929746,
+      15172.600302405779,
+      14391.211602975216,
+      13670.608217215324,
+      13007.210083731079,
+      12398.215467272817
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "cir",
+    "floor",
+    "synthetic"
+   ],
+   "description": "CIR FLOOR K=0.05, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0025",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 45381.44548250802,
+     "caplet_prices": [
+      4615.062884355106,
+      4718.194404598923,
+      4894.661267517409,
+      4913.791332678056,
+      5029.04630772812,
+      5229.218613539277,
+      5289.922799360554,
+      5332.320753797594,
+      5359.227118932975
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "cap",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CAP K=0.03, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0026",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 20582.38595096289,
+     "caplet_prices": [
+      1186.2536820948176,
+      1635.900693106295,
+      1983.6896785181168,
+      2171.5333405249344,
+      2381.3571094265008,
+      2625.625188369665,
+      2761.875301188921,
+      2872.910678013775,
+      2963.240279719865
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "cap",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CAP K=0.04, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0027",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7483.544518770885,
+     "caplet_prices": [
+      95.24779570953346,
+      312.1115307784245,
+      535.6119251735672,
+      701.4733092347604,
+      873.0089033553078,
+      1061.8562666317289,
+      1193.0329671730665,
+      1306.5498326228915,
+      1404.6519880916042
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "cap",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CAP K=0.05, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0028",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9234.420978917236,
+     "caplet_prices": [
+      145.84413920097865,
+      443.8048643965092,
+      702.1534253522876,
+      964.5569620739697,
+      1154.77967778132,
+      1270.0370799426073,
+      1406.591856911593,
+      1523.3872455424007,
+      1623.2657277155706
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "floor",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE FLOOR K=0.03, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0029",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 24556.471022480175,
+     "caplet_prices": [
+      1526.53493694075,
+      2078.8786921147653,
+      2418.1818363530524,
+      2761.465303070638,
+      2960.090479479755,
+      3034.132415691293,
+      3162.5562860365626,
+      3265.9153567096423,
+      3348.715716083715
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "floor",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE FLOOR K=0.04, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0030",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     3.5,
+     4.0,
+     4.5,
+     5.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 51578.739165395564,
+     "caplet_prices": [
+      5245.029050555446,
+      5472.457068997701,
+      5597.104083008484,
+      5830.571604930179,
+      5904.742273408543,
+      5838.052254871582,
+      5877.7258793172405,
+      5901.492698269751,
+      5911.564252036641
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "floor",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE FLOOR K=0.05, 9 periods to 5.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0031",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 62730.61771462851,
+     "caplet_prices": [
+      9558.15490187316,
+      9906.568549746984,
+      10513.673196320517,
+      10702.67659853434,
+      11044.443031906701,
+      11005.10143624681
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "cap",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CAP K=0.03, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0032",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 31906.661859535034,
+     "caplet_prices": [
+      3400.1782706044523,
+      4449.55876050653,
+      5346.738724466234,
+      5829.789672656232,
+      6345.138123142493,
+      6535.258308159091
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "cap",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CAP K=0.04, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0033",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "CAP",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13701.812190898214,
+     "caplet_prices": [
+      680.049993855659,
+      1477.7083921628916,
+      2208.2480182041004,
+      2698.497664220251,
+      3185.6479364643533,
+      3451.6601859909583
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "cap",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE CAP K=0.05, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0034",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.03,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14550.352814125143,
+     "caplet_prices": [
+      820.1549018731705,
+      1824.5685497469158,
+      2420.1302194098275,
+      2916.277620952348,
+      3153.216692748459,
+      3416.0048293944214
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "floor",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE FLOOR K=0.03, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0035",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 34245.10663793046,
+     "caplet_prices": [
+      3916.17827060445,
+      5273.558760506451,
+      5821.219602148633,
+      6286.2643502366345,
+      6380.087892499604,
+      6567.797761934692
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "floor",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE FLOOR K=0.04, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0036",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0
+    ],
+    "strike": 0.05,
+    "cap_floor": "FLOOR",
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 66558.96664819295,
+     "caplet_prices": [
+      10450.049993855735,
+      11207.708392162887,
+      11250.752750479673,
+      11397.845996963131,
+      11146.773814336897,
+      11105.835700394624
+     ]
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "cap-floor-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "capfloor",
+    "hull_white",
+    "floor",
+    "synthetic"
+   ],
+   "description": "HULL_WHITE FLOOR K=0.05, 6 periods to 7.0y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "capfloor_g-0037",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "capfloor",
+    "synthetic"
+   ],
+   "description": "one period time"
+  },
+  {
+   "case_id": "capfloor_g-0038",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     0.0,
+     1.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "capfloor",
+    "synthetic"
+   ],
+   "description": "first fixing at 0"
+  },
+  {
+   "case_id": "capfloor_g-0039",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     2.0,
+     1.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "CAP",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "capfloor",
+    "synthetic"
+   ],
+   "description": "period times not increasing"
+  },
+  {
+   "case_id": "capfloor_g-0040",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "strike": -1.0,
+    "cap_floor": "CAP",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "capfloor",
+    "synthetic"
+   ],
+   "description": "1 + K tau <= 0 (K = -1, tau = 1: exactly 0)"
+  },
+  {
+   "case_id": "capfloor_g-0041",
+   "operation": "rates.shortrate.capfloor",
+   "inputs": {
+    "model": "HULL_WHITE",
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "period_times": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "strike": 0.04,
+    "cap_floor": "COLLAR",
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "capfloor",
+    "synthetic"
+   ],
+   "description": "unknown cap_floor"
+  }
+ ]
+}

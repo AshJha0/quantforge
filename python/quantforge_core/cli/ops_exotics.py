@@ -21,7 +21,8 @@ def _digital(i: Inputs) -> Any:
 @op("exotic.barrier.price")
 def _barrier(i: Inputs) -> Any:
     kinds = ("DOWN_IN", "DOWN_OUT", "UP_IN", "UP_OUT")
-    args = (*_option_common(i), i.real("barrier"), i.real("rebate"), i.enum("barrier_type", kinds))
+    args = (*_option_common(i), i.real("barrier"), i.real("rebate"), i.enum("barrier_type", kinds),
+            i.opt_string("monitoring"), i.opt_integer("monitoring_per_year"))
     return {"price": core.exotics.barrier(*args)}
 
 

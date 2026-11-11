@@ -1,0 +1,785 @@
+{
+ "schema_version": "1.0",
+ "suite": "mcgreeks_g",
+ "spec": "specifications/06-risk/mc-greeks.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_q9.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "mcgreeks_g-0001",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.76305694289261,
+     "price_se": 0.13618926484687136,
+     "delta": 0.567127707555244,
+     "delta_se": 0.005831227913584769,
+     "vega": 38.471689678724346,
+     "vega_se": 0.7348899409892465
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "pathwise",
+    "call",
+    "synthetic"
+   ],
+   "description": "CALL PATHWISE 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0002",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "LIKELIHOOD_RATIO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.76305694289261,
+     "price_se": 0.13618926484687136,
+     "delta": 0.5688568484486752,
+     "delta_se": 0.013621493482389275,
+     "vega": 38.18009236479447,
+     "vega_se": 2.4982430218607012
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "likelihood_ratio",
+    "call",
+    "synthetic"
+   ],
+   "description": "CALL LIKELIHOOD_RATIO 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0003",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "BUMP",
+    "bump_relative": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.76305694289261,
+     "price_se": 0.13618926484687136,
+     "delta": 0.5680444006446544,
+     "delta_se": 0.005775612103278826,
+     "vega": 38.47259102461865,
+     "vega_se": 0.734879134847386
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "bump",
+    "call",
+    "synthetic"
+   ],
+   "description": "CALL BUMP 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0004",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "PUT",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.9062915553096245,
+     "price_se": 0.09598355392000141,
+     "delta": -0.4218854798690941,
+     "delta_se": 0.004223827315503705,
+     "vega": 39.007029655046466,
+     "vega_se": 0.46413312679290175
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "pathwise",
+    "put",
+    "synthetic"
+   ],
+   "description": "PUT PATHWISE 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0005",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "PUT",
+    "method": "LIKELIHOOD_RATIO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.9062915553096245,
+     "price_se": 0.09598355392000141,
+     "delta": -0.4177288011019636,
+     "delta_se": 0.008779626695274668,
+     "vega": 38.53331245479822,
+     "vega_se": 1.8270053837947158
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "likelihood_ratio",
+    "put",
+    "synthetic"
+   ],
+   "description": "PUT LIKELIHOOD_RATIO 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0006",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "PUT",
+    "method": "BUMP",
+    "bump_relative": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6.9062915553096245,
+     "price_se": 0.09598355392000141,
+     "delta": -0.42096878677968363,
+     "delta_se": 0.004147892652544484,
+     "vega": 39.00793064795848,
+     "vega_se": 0.4641192788808609
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "bump",
+    "put",
+    "synthetic"
+   ],
+   "description": "PUT BUMP 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0007",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "DIGITAL_CALL",
+    "method": "PATHWISE",
+    "smoothing_width": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.4794971381263179,
+     "price_se": 0.004852132456580552,
+     "delta": 0.01988297807565492,
+     "delta_se": 0.00096167510030208,
+     "vega": -0.4030634549202299,
+     "vega_se": 0.019690913791322363
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "pathwise",
+    "digital_call",
+    "synthetic"
+   ],
+   "description": "DIGITAL_CALL PATHWISE 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0008",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "DIGITAL_CALL",
+    "method": "LIKELIHOOD_RATIO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.4794971381263179,
+     "price_se": 0.004852132456580552,
+     "delta": 0.019218553430427863,
+     "delta_se": 0.0002826203995340338,
+     "vega": -0.374682356108406,
+     "vega_se": 0.04441273854530064
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "likelihood_ratio",
+    "digital_call",
+    "synthetic"
+   ],
+   "description": "DIGITAL_CALL LIKELIHOOD_RATIO 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0009",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "DIGITAL_CALL",
+    "method": "BUMP",
+    "bump_relative": 0.01
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.4794971381263179,
+     "price_se": 0.004852132456580552,
+     "delta": 0.01989413343774442,
+     "delta_se": 0.0009621972639523833,
+     "vega": -0.3153947984032651,
+     "vega_se": 0.0874222724073066
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "bump",
+    "digital_call",
+    "synthetic"
+   ],
+   "description": "DIGITAL_CALL BUMP 10000 paths seed 20261109"
+  },
+  {
+   "case_id": "mcgreeks_g-0010",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 0.25,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.35,
+    "paths": 10000,
+    "seed": "7",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.6133504135653807,
+     "price_se": 0.056275513035769005,
+     "delta": 0.1781140826821372,
+     "delta_se": 0.0045064176834546145,
+     "vega": 13.235445806532502,
+     "vega_se": 0.364290522158094
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "pathwise",
+    "call",
+    "synthetic"
+   ],
+   "description": "CALL PATHWISE 10000 paths seed 7"
+  },
+  {
+   "case_id": "mcgreeks_g-0011",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 90.0,
+    "expiry_years": 2.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "42",
+    "payoff": "DIGITAL_CALL",
+    "method": "LIKELIHOOD_RATIO"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.6058371244547472,
+     "price_se": 0.004511514705035154,
+     "delta": 0.012236451164007659,
+     "delta_se": 0.00019942947952345248,
+     "vega": -1.1935948122226998,
+     "vega_se": 0.043405438966009395
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "likelihood_ratio",
+    "digital_call",
+    "synthetic"
+   ],
+   "description": "DIGITAL_CALL LIKELIHOOD_RATIO 10000 paths seed 42"
+  },
+  {
+   "case_id": "mcgreeks_g-0012",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": -0.005,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 2,
+    "seed": "1",
+    "payoff": "PUT",
+    "method": "BUMP",
+    "bump_relative": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.2284439018373747,
+     "price_se": 1.2284439018373747,
+     "delta": -0.4902218214112908,
+     "delta_se": 0.4902218214112908,
+     "vega": 7.2920771452816835,
+     "vega_se": 7.2920771452816835
+    }
+   },
+   "tolerance_class": "common_rng",
+   "verified_by": [
+    "python-float64-replica",
+    "core.rng"
+   ],
+   "tags": [
+    "q9",
+    "bump",
+    "put",
+    "synthetic"
+   ],
+   "description": "PUT BUMP 2 paths seed 1"
+  },
+  {
+   "case_id": "mcgreeks_g-0013",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 1,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "paths = 1 (no standard error)"
+  },
+  {
+   "case_id": "mcgreeks_g-0014",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "DIGITAL_CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "pathwise digital without smoothing_width"
+  },
+  {
+   "case_id": "mcgreeks_g-0015",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "PATHWISE",
+    "smoothing_width": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "smoothing_width on a call"
+  },
+  {
+   "case_id": "mcgreeks_g-0016",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "DIGITAL_CALL",
+    "method": "PATHWISE",
+    "smoothing_width": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "smoothing_width = 0"
+  },
+  {
+   "case_id": "mcgreeks_g-0017",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "BUMP"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "bump without bump_relative"
+  },
+  {
+   "case_id": "mcgreeks_g-0018",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "BUMP",
+    "bump_relative": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "bump_relative = 1"
+  },
+  {
+   "case_id": "mcgreeks_g-0019",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "ADJOINT"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "unknown method"
+  },
+  {
+   "case_id": "mcgreeks_g-0020",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.2,
+    "paths": 10000,
+    "seed": "-1",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "seed not a u64 string"
+  },
+  {
+   "case_id": "mcgreeks_g-0021",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.01,
+    "vol": 0.0,
+    "paths": 10000,
+    "seed": "20261109",
+    "payoff": "CALL",
+    "method": "PATHWISE"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "vol = 0"
+  },
+  {
+   "case_id": "mcgreeks_g-0022",
+   "operation": "risk.mc.greeks",
+   "inputs": {
+    "payoff": "CALL",
+    "method": "PATHWISE",
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.0,
+    "vol": 0.2,
+    "paths": 10000001,
+    "seed": "1"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [],
+   "tags": [
+    "invalid",
+    "limit",
+    "r5",
+    "synthetic"
+   ],
+   "description": "paths 10,000,001"
+  }
+ ]
+}

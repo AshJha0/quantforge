@@ -147,11 +147,27 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 
 Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at merge `597abf2`), not Validated. All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, and no SLV or American FD reference, so those goldens rest on hand cases and high-precision replicas; 557 of 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28.
 
-## Stage F terms (planned)
+## Stage F terms
 
 | Term | Meaning |
 |---|---|
 | Bit-exact | Identical binary64 bits in every language and on every platform; see [determinism](docs/determinism.md) |
 | Name map | `specifications/name-map.json`: each operation's public name in each language, generated from the specs ([ADR-0011](architecture/decisions/ADR-0011-api-style.md)) |
-| Value at risk (VaR), expected shortfall (ES) | *Planned for stage F.* A loss quantile, and the mean loss beyond it, over a horizon |
-| FRTB-SA | *Planned for stage F.* The Basel standardised approach to market-risk capital |
+| Value at risk (VaR), expected shortfall (ES) | A loss quantile, and the mean loss beyond it, over a horizon |
+| FRTB-SA | The Basel standardised approach to market-risk capital |
+
+## Stage G terms
+
+| Term | Meaning |
+|---|---|
+| Short-rate model | A model of the instantaneous rate `r(t)` from which bond prices follow; here Vasicek, CIR, Hull-White and two-factor G2++ (`04-pricing/short-rate-models.md`) |
+| Jamshidian decomposition | Writing a swaption on a one-factor model as a sum of bond options struck at one critical rate |
+| Bermudan swaption | A swaption exercisable on several dates, priced by rolling back a lattice (ruling G-18) |
+| LIBOR market model (LMM) | A model of the quoted forward rates themselves, each lognormal under its own measure (`04-pricing/lmm.md`) |
+| Pathwise and likelihood-ratio Greeks | Monte Carlo derivatives taken through the payoff, or through the density of the paths (`06-risk/mc-greeks.md`) |
+| EE, ENE, PFE, EPE | Expected positive and negative exposure at a date, a high quantile of exposure, and EE averaged over time (`06-risk/xva-exposure.md`) |
+| Margin period of risk (MPoR) | The time between the last collateral call met and the close-out after a default |
+| CVA, DVA, FVA (FCA, FBA) | Prices of counterparty default, own default, and funding of uncollateralised exposure (`06-risk/xva-framework.md`) |
+| SIMM | ISDA's standard initial-margin model; here a SIMM-style IR delta only (`xva.simm.ir_delta`) |
+| Wrong-way risk | Exposure that grows when the counterparty is more likely to default |
+| BGK correction | Broadie, Glasserman and Kou's barrier shift `exp(0.5826 sigma sqrt(dt))`, which turns a continuous barrier formula into a discrete one (ruling G-7) |

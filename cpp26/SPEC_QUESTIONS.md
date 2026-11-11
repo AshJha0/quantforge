@@ -137,3 +137,16 @@ E1 (`arb-free-surfaces.md`, `local-and-forward-vol.md`) and E7 (`garch.md`, `var
 - F4 `risk.var.monte_carlo`: settled by ruling F-39 (`seed` a decimal u64 string; `E_NOT_POSITIVE_DEFINITE`).
 - F4 FHS with all returns 0 and traffic light with exceptions above observations: `E_DOMAIN`, accepted by F-39.
 - F5 book and UC4 choices (duplicate opening position, zero quantity, optional `ipv`, later quotes, shape checks first): accepted by F-39.
+
+## Stage G
+
+- `capfloor_g-0040` (golden defect, reported 2026-11-11): HULL_WHITE cap with `period_times` [1, 2, 3] and `strike` -0.5
+  expects `E_DOMAIN` with description "1 + K tau <= 0", but `1 + K tau = 0.5 > 0` for every period, so the spec rule
+  does not apply and this build prices it. The other 40 `capfloor_g` cases pass.
+- `expsim_g` wave 4c, 8 cases (`-0039`, `-0045`, `-0055`, `-0061`, `-0071`, `-0077`, `-0087`, `-0093`), reported
+  2026-11-11: each fails one `pfe_99` point at a late date of a long payer, by 3e-5 to 1e-4 relative, where the 99%
+  quantile sits on the flat top of the deflated value `f(x)`. An independent 40-digit mpmath check of `-0039` at
+  t = 17 (critical point of `f` by `findroot`, both crossings of `f = y` by bisection) gives `P(f > y) = 0.01000000000008`
+  at this build's 291,331.928, and `0.01234` at the golden 291,322.038 (fmax 291,350.886). So this build looks right
+  and the golden quantile root looks like it misses part of the region above `y` near the top. Everything else in
+  these cases, and the other 94 cases, pass.

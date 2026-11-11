@@ -1,0 +1,6 @@
+{
+ "suite": "risk_f3b",
+ "counted": 9,
+ "total": 18,
+ "rule": "dividendRho of AnalyticEuropeanEngine; Margrabe price and central correlation bump h = 1e-4 at 1e-6 relative"
+}

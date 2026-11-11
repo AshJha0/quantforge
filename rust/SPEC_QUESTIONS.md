@@ -222,3 +222,30 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - Traffic light: `P(X <= x)` is summed in log space from `n ln(1 - p)`.
 - FRTB GIRR: inflation against a tenor is 40% whatever the curve; with `reporting_currency`
   absent only the seven listed currencies are reduced.
+
+## Stage G, choices and findings
+
+- Noncentral chi-square (CIR bond options): Poisson-weighted series of regularised lower
+  incomplete gammas (`stats::gamma_p`: series below `s + 1`, Lentz continued fraction above),
+  summed from `j = 0` until past the mode and the term is below 1e-17 of the sum.
+- `capfloor_g-0040` ("1 + K tau <= 0") has `strike = -0.5` on annual periods, so
+  `1 + K tau = 0.5 > 0` and the spec's own rule does not reject it. Rust follows the spec text
+  and prices the case, so this one case fails. Question for the spec session: should the golden
+  use for example `strike = -1.5`, or is a different rule meant?
+- `hw_calibrate`: scan points where the critical-rate solve has no binary64 root (sigma near 1
+  with long expiries) are scored as `+inf`, since they cannot be the minimum.
+- Bermudan / callable FD: one stepper shared by both operations, exactly the G-18 scheme.
+- `risk.frtb.csr_delta`: cross-bucket sector correlations between two of the sectors 1 to 8
+  (the body of MAR21.57 Table 5) are not in the spec text. Rust returns `E_INPUT` for such a
+  pair rather than guess the table; no golden uses one. Owner item with G-49.
+- AAD ladder (Q3b): hand-written adjoint of the G-18 scheme; G-9 ratio measured by
+  `cargo bench -p quantforge-bench --bench aad_ladder` (4.21 on 2026-11-11, loaded laptop).
+- `expsim_g` (wave 4c), eight `pfe_99` goldens on the flat top of a long payer
+  (`expsim_g-0039`, `-0045`, `-0055`, `-0061`, `-0071`, `-0077`, `-0087`, `-0093`; gaps 3e-5 to
+  1e-4 relative, all with Rust above the golden) do not meet the spec's own definition. For
+  `-0039` at 17 years the golden 291,322.04 leaves 1.234% of the Gaussian mass above it, so
+  `P(exposure <= y) = 98.77% < 99%`; Rust's 291,331.93 leaves 1.0000% (roots bracketed by
+  bisection; checked independently in Python). The same cases fail the ORE PFE99 check
+  (G-42). Only `-0039` was rechecked independently; the other seven show the same pattern.
+  Rust follows the definition; the generator's quantile search near the maximum of
+  `f` looks too coarse.

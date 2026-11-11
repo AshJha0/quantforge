@@ -1,0 +1,1200 @@
+{
+ "schema_version": "1.0",
+ "suite": "e1g_exotic",
+ "spec": "specifications/stage-f-rulings.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_e1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "e1g_exotic-0001",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": "NaN",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0002",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": "Infinity",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0003",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": "-Infinity",
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0004",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 0.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:barrier_g-0027",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0005",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": -0.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_exotic-0004"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/spot"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0006",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": "NaN",
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0007",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": "Infinity",
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0008",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": "-Infinity",
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0009",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 0.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:barrier_g-0027",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0010",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": -0.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_exotic-0009"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/strike"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0011",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": "NaN",
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0012",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": "Infinity",
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0013",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": "-Infinity",
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0014",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 0.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:barrier_g-0027",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0015",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": -0.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_exotic-0014"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/expiry_years"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0016",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": "NaN",
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0017",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": "Infinity",
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0018",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": "-Infinity",
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0019",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.0,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:barrier_g-0027",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0020",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": -0.0,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_exotic-0019"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/rate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0021",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": "NaN",
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0022",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": "Infinity",
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0023",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": "-Infinity",
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0024",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.0,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:barrier_g-0027",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0025",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": -0.0,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_exotic-0024"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/dividend_yield"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0026",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": "NaN",
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0027",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": "Infinity",
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0028",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": "-Infinity",
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0029",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.0,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:barrier_g-0027",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0030",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": -0.0,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_exotic-0029"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/vol"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0031",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": "NaN",
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/rebate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0032",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": "Infinity",
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/rebate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0033",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": "-Infinity",
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/rebate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0034",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": -0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8.138810547624576
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "copied:barrier_g-0027",
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/rebate"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0035",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": "NaN",
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "nan",
+    "base:barrier_g-0027",
+    "input:/barrier"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0036",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": "Infinity",
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/barrier"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0037",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": "-Infinity",
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-2"
+   ],
+   "tags": [
+    "e1",
+    "non_finite",
+    "infinity",
+    "base:barrier_g-0027",
+    "input:/barrier"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0038",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 0.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "any"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "rule-F-3-anchor"
+   ],
+   "tags": [
+    "e1",
+    "zero_anchor",
+    "base:barrier_g-0027",
+    "input:/barrier"
+   ]
+  },
+  {
+   "case_id": "e1g_exotic-0039",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": -0.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "same_as",
+    "case_id": "e1g_exotic-0038"
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "rule-F-3"
+   ],
+   "tags": [
+    "e1",
+    "negative_zero",
+    "base:barrier_g-0027",
+    "input:/barrier"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+{
+ "operations": 20,
+ "no_real_input": [],
+ "leaves": 208,
+ "cases": 1026,
+ "files": [
+  [
+   "e1g_exotic",
+   39
+  ],
+  [
+   "e1g_rates",
+   678
+  ],
+  [
+   "e1g_risk",
+   45
+  ],
+  [
+   "e1g_xva",
+   264
+  ]
+ ]
+}

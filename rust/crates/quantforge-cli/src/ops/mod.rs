@@ -12,12 +12,17 @@ mod exotic;
 mod fx;
 mod hedge;
 mod infl;
+mod lmm;
 mod mbs;
+mod mcgreeks;
 mod rates;
 mod repo;
 mod risk;
+mod riskcarry;
+mod shortrate;
 mod usecase;
 mod vol;
+mod xva;
 
 use crate::input::Inputs;
 use quantforge_core::error::{Result, fail};
@@ -73,10 +78,15 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("infl", infl::NAMES, infl::dispatch),
     ("mbs", mbs::NAMES, mbs::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
+    ("rates", shortrate::NAMES, shortrate::dispatch),
+    ("rates", lmm::NAMES, lmm::dispatch),
     ("repo", repo::NAMES, repo::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
+    ("risk", mcgreeks::NAMES, mcgreeks::dispatch),
+    ("risk", riskcarry::NAMES, riskcarry::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
     ("vol", vol::NAMES, vol::dispatch),
+    ("xva", xva::NAMES, xva::dispatch),
 ];
 
 /// Every operation, sorted: the verb table printed by the bare CLI.
@@ -93,8 +103,8 @@ pub fn dispatch(op: &str, i: &Inputs) -> Result<Outcome> {
     let domain = op.split('.').next().unwrap_or_default();
     DOMAINS
         .iter()
-        .find(|d| d.0 == domain)
-        .and_then(|d| (d.2)(op, i))
+        .filter(|d| d.0 == domain)
+        .find_map(|d| (d.2)(op, i))
         .unwrap_or_else(|| {
             fail(
                 "E_UNSUPPORTED_OPERATION",
@@ -116,6 +126,6 @@ mod tests {
                 assert_eq!(n.split('.').next(), Some(*domain), "{n} is in {domain}");
             }
         }
-        assert!(DOMAINS.windows(2).all(|w| w[0].0 < w[1].0));
+        assert!(DOMAINS.windows(2).all(|w| w[0].0 <= w[1].0));
     }
 }

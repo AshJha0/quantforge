@@ -22,6 +22,7 @@ Each result below is real output from the CLIs, on the date each section gives. 
 | [Risk, hedging and use cases](#risk-hedging-and-use-cases) | Bump and rebuild, par and key-rate risk, the Jacobian, P&L explain, hedges, use cases 1 to 3 |
 | [Validation and evidence](#validation-and-evidence) | What a pass means, tolerances in money, what an outside library does not check |
 | [Stage F: curves, portfolio risk and the book](#stage-f-curves-portfolio-risk-and-the-book) | Interpolation, joint solve, AAD, VaR and backtests, FRTB GIRR, book |
+| [Stage G: rates models and xVA](#stage-g-rates-models-and-xva) | Short-rate models, swaptions and Bermudans, LMM, MC Greeks, exposure, CVA, DVA and FVA |
 
 ## Foundations
 
@@ -411,6 +412,41 @@ Use case 4 regresses a portfolio's returns on factor returns, and each factor's 
 - **Outside oracle: 225 of 438 cases (51.4%); the 60% floor is not met.** The checks use QuantLib 1.44, SciPy, NumPy and `arch`. Every case without a free outside source is listed with the reason in `oracle/OUTSIDE_GAPS_F.md`. 79 of the cases without one are error cases, which no library can check; the CDS index option (R7) is the largest value-case gap, because its reference paper is not freely available.
 - **All inputs are synthetic.** The 500-swap book, the VaR series and the factor returns are drawn from `core.rng` with fixed seeds.
 - [Determinism](docs/determinism.md): what is bit-exact across languages and platforms, and what is within tolerance.
+
+## Stage G: rates models and xVA
+
+Stage G (v0.7.0, not yet tagged) is at Implemented, not Validated. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,492 of 14,492 golden cases, of which 589 are stage G value and error cases and 1,026 are E1 cases for the first 20 stage G operations.
+
+### Short-rate models
+
+**Plain idea.** Instead of a fixed curve, let the overnight rate itself move at random, pulled back towards a long-run level. A bond price is then the expected discount over every rate path, and options on bonds and swaps get a value.
+
+**Formal statement.** Under Vasicek, `dr = a (theta - r) dt + sigma dW`, and the zero-coupon bond is `P(t, T) = A(tau) exp(-B(tau) r)` with `B = (1 - exp(-a tau)) / a` and `ln A = (theta - sigma^2 / (2 a^2)) (B - tau) - sigma^2 B^2 / (4 a)` (`04-pricing/short-rate-models.md`). CIR and Hull-White have the same affine form; Hull-White fits today's curve exactly. Below `a tau = 1e-2` the spec uses a series to avoid cancellation (ruling G-2).
+
+**Worked example.** `shortrate_g-0001`: `a = 0.15`, `theta = 0.045`, `sigma = 0.012`, `r = 0.035`, one year. `B = 0.928613`, so `P = 0.964937076`, a zero rate of 3.5692%. The golden is checked by mpmath at 50 digits and by QuantLib 1.44's `Vasicek`; the formula above, in double precision, gives the same digits.
+
+### Swaptions, Bermudans and the LMM
+
+**Plain idea.** On a one-factor model a European swaption splits into a portfolio of bond options, one per coupon, all struck at the same short rate (Jamshidian). A Bermudan can be exercised on several dates, so its value is rolled back on a lattice. The LMM models the quoted forward rates directly.
+
+**Formal statement.** Find `r*` with `sum c_i P(T0, T_i; r*) = 1`; the payer swaption is then `sum c_i ZBP(T0, T_i, K_i)` with `K_i = P(T0, T_i; r*)` (`short-rate-models.md`, rulings G-12, G-13). Bermudans and callable bonds share one lattice scheme (G-18). LMM swaption vols use Rebonato's frozen-weights formula (`04-pricing/lmm.md`).
+
+**Worked example.** `swaption_g-0001`: Hull-White with `a = 0.05`, `sigma = 0.01`; a 1y into 5y payer on 1 million at 2.9462%, 100 bp below the forward swap rate of 3.9462%. Price 45,445.78, annuity 4,289,707 (QuantLib's `JamshidianSwaptionEngine` is the outside check). Intrinsic value is `annuity x 1%` = 42,897, so 2,549 is time value.
+
+### Exposure and xVA
+
+**Plain idea.** If a counterparty defaults while it owes you money, you lose what it owed less what is recovered. CVA prices that loss today: expected positive exposure at each date, times the chance of default in that period, times the loss given default, discounted. DVA is the same loss seen from the other side; FVA prices funding the uncollateralised exposure.
+
+**Formal statement.** In outline, `CVA = (1 - R) sum_i DF(t_i) EE(t_i) PD(t_{i-1}, t_i)` with a flat hazard rate; DVA uses `ENE` and the own hazard rate; FVA is FCA less FBA on the borrowing and lending spreads, with the DVA overlap optional. The exact discretisation is in `06-risk/xva-framework.md` (rulings G-40 to G-44). Exposure comes from `xva-exposure.md`: in closed form for a swap under Hull-White, or with collateral, threshold and a margin period of risk. For a portfolio of swaps, `xva-exposure-portfolio.md` integrates the netting-set value exactly over the one Gaussian factor, splitting the integral at the zeros of the value; PFE is the level at which the probability of a lower exposure reaches 95% or 99%.
+
+**Worked example.** `xvaadj_g-0001`: four half-yearly dates, `EE` 120, 150, 130, 80, counterparty hazard 2% and recovery 40%. CVA is 2.7099, DVA 0.8998 and FVA 0.6129 (FCA 1.8156 less FBA 1.2027); checked by mpmath at 50 digits.
+
+### What stage G's evidence does and does not show
+- **Outside oracle: 338 of 589 cases (57.4%); the 60% floor is not met.** Wave 4c compared portfolio exposure with ORE 1.8.17; 80 of 102 `expsim_g` cases count under ruling G-42. The re-test G-42b needs WSL and is carried to stage I (G-52).
+- **The stage demo ran.** ORE's NPV of the demo swap equals the closed form to 1e-6, and its EE is within 1 SE at 8,000 paths (`oracle/ore/ORE_DEMO.json`). ORE is a Monte Carlo check: it confirms the profiles to a few standard errors, not to the goldens' digits.
+- **18 PFE goldens were wrong and are fixed** (G-Q4): a grid scan missed level crossings near a flat peak. The four builds found it, because they solve for the crossings exactly.
+- **G-10 is inconclusive**; the powered test G-10b passed (`specifications/stage-g-rulings.md`). R9 acceptance has modest power (ruling G-34).
+- **All inputs are synthetic.** No market swaption, cap or CDS quotes are used.
 
 ## Appendix: stage history
 

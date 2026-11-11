@@ -32,6 +32,10 @@ endfunction()
 
 add_library(quantforge_core
   src/core/calendar.cpp
+  src/core/shortrate.cpp
+  src/core/lmm.cpp
+  src/core/aad_ladder.cpp
+  src/core/exposure_lgm.cpp
   src/core/calibration.cpp
   src/core/compounding.cpp
   src/core/cos.cpp
@@ -93,6 +97,11 @@ target_compile_definitions(quantforge_cli_lib PRIVATE QF_VERSION="${PROJECT_VERS
 
 add_executable(quantforge src/cli/main.cpp)
 qf_strict(quantforge_core)
+# Test builds (the mutation job builds with BUILD_TESTING=ON) check standard-library bounds, so an out-of-range
+# write such as the multicurve.cpp solve_split loop mutant (equivalents-cpp.md) aborts the unit tests. No value changes.
+if(BUILD_TESTING)
+  target_compile_definitions(quantforge_core PUBLIC _GLIBCXX_ASSERTIONS)
+endif()
 qf_strict(quantforge_cli_lib)
 qf_strict(quantforge)
 target_link_libraries(quantforge PRIVATE quantforge_cli_lib)
@@ -108,7 +117,7 @@ if(BUILD_TESTING)
     GIT_TAG 08092139210881f01a34e60c5f2fd6afa0ea4024) # v3.16.1
   FetchContent_MakeAvailable(Catch2)
   add_executable(quantforge_core_tests
-    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp tests/test_f_cdsindex.cpp tests/test_f_garch_vix_lv.cpp tests/test_f_curve_interp.cpp tests/test_f_joint.cpp tests/test_f_risk_f3.cpp tests/test_f_risk_f4.cpp tests/test_f_book.cpp tests/test_mut_kill_f.cpp)
+    tests/test_dates.cpp tests/test_data.cpp tests/test_numerics.cpp tests/test_models.cpp tests/test_cli.cpp tests/test_curves_money_fx.cpp tests/test_equity_vol.cpp tests/test_multicurve.cpp tests/test_bonds.cpp tests/test_xccy_credit_carry.cpp tests/test_rates_vol_commodity_mbs.cpp tests/test_cli_golden.cpp tests/test_risk.cpp tests/test_boundaries_pricing.cpp tests/test_boundaries_vol_credit.cpp tests/test_coverage.cpp tests/test_credit_options.cpp tests/test_limits.cpp tests/test_finite_rates.cpp tests/test_finite_vol.cpp tests/test_finite_numerics.cpp tests/test_f_cdsindex.cpp tests/test_f_garch_vix_lv.cpp tests/test_f_curve_interp.cpp tests/test_f_joint.cpp tests/test_f_risk_f3.cpp tests/test_f_risk_f4.cpp tests/test_f_book.cpp tests/test_mut_kill_f.cpp tests/test_mut_kill_g.cpp tests/test_stage_g.cpp)
   target_link_libraries(quantforge_core_tests PRIVATE quantforge_cli_lib Catch2::Catch2WithMain)
   qf_strict(quantforge_core_tests)
   if(MINGW)

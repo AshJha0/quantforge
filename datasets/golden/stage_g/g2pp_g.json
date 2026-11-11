@@ -1,0 +1,2757 @@
+{
+ "schema_version": "1.0",
+ "suite": "g2pp_g",
+ "spec": "specifications/04-pricing/short-rate-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "g2pp_g-0001",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 5.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8242873655162408,
+     "zero_rate": 0.038647213062273915
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=0.0, T=5.0 | x=0.0, y=0.0)"
+  },
+  {
+   "case_id": "g2pp_g-0002",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 1.5,
+    "maturity_years": 7.5,
+    "x": 0.004,
+    "y": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.7939101871326544,
+     "zero_rate": 0.03846415642923718
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=1.5, T=7.5 | x=0.004, y=-0.002)"
+  },
+  {
+   "case_id": "g2pp_g-0003",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 2.5,
+    "maturity_years": 30.0,
+    "x": -0.01,
+    "y": 0.006
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.33642279075791726,
+     "zero_rate": 0.03961405833436711
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=2.5, T=30.0 | x=-0.01, y=0.006)"
+  },
+  {
+   "case_id": "g2pp_g-0004",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.3,
+    "maturity_years": 0.31,
+    "x": 0.002,
+    "y": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9995823445810004,
+     "zero_rate": 0.04177426613164897
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=0.3, T=0.31 | x=0.002, y=0.001)"
+  },
+  {
+   "case_id": "g2pp_g-0005",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5307.092634453496,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=1.0 S=5.0 K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0006",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 27566.4067643337,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=5.0 S=10.0 K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0007",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 3519.5975997778387,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=0.5 S=20.0 K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0008",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8253.727118212697,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=1.0 S=5.0 K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0009",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 8152.774776935766,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=5.0 S=10.0 K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0010",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 26683.88575946287,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=0.5 S=20.0 K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0011",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 5.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8242873655162408,
+     "zero_rate": 0.038647213062273915
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=0.0, T=5.0 | x=0.0, y=0.0)"
+  },
+  {
+   "case_id": "g2pp_g-0012",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 1.5,
+    "maturity_years": 7.5,
+    "x": 0.004,
+    "y": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.777868660444248,
+     "zero_rate": 0.04186626432743848
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=1.5, T=7.5 | x=0.004, y=-0.002)"
+  },
+  {
+   "case_id": "g2pp_g-0013",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 2.5,
+    "maturity_years": 30.0,
+    "x": -0.01,
+    "y": 0.006
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.3922069075826902,
+     "zero_rate": 0.034035118290054234
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=2.5, T=30.0 | x=-0.01, y=0.006)"
+  },
+  {
+   "case_id": "g2pp_g-0014",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.3,
+    "maturity_years": 0.31,
+    "x": 0.002,
+    "y": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9995822292328388,
+     "zero_rate": 0.04178580576806137
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=0.3, T=0.31 | x=0.002, y=0.001)"
+  },
+  {
+   "case_id": "g2pp_g-0015",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12071.196402156238,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=1.0 S=5.0 K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0016",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 34134.41150575937,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=5.0 S=10.0 K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0017",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 5392.426813812283,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=0.5 S=20.0 K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0018",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15017.830885915439,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=1.0 S=5.0 K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0019",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14720.779518361436,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=5.0 S=10.0 K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0020",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.012,
+    "b": 0.8,
+    "eta": 0.01,
+    "rho": 0.3,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 28556.714973497314,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=0.5 S=20.0 K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0021",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 5.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.8242873655162408,
+     "zero_rate": 0.038647213062273915
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=0.0, T=5.0 | x=0.0, y=0.0)"
+  },
+  {
+   "case_id": "g2pp_g-0022",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 1.5,
+    "maturity_years": 7.5,
+    "x": 0.004,
+    "y": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.787494069940706,
+     "zero_rate": 0.039816573090787566
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=1.5, T=7.5 | x=0.004, y=-0.002)"
+  },
+  {
+   "case_id": "g2pp_g-0023",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 2.5,
+    "maturity_years": 30.0,
+    "x": -0.01,
+    "y": 0.006
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.3358758766309758,
+     "zero_rate": 0.039673221893023546
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=2.5, T=30.0 | x=-0.01, y=0.006)"
+  },
+  {
+   "case_id": "g2pp_g-0024",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.3,
+    "maturity_years": 0.31,
+    "x": 0.002,
+    "y": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.9995822166045699,
+     "zero_rate": 0.041787069122754344
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "G2++ P(t=0.3, T=0.31 | x=0.002, y=0.001)"
+  },
+  {
+   "case_id": "g2pp_g-0025",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 12941.800161589006,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=1.0 S=5.0 K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0026",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 35116.113990954465,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=5.0 S=10.0 K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0027",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 6317.863716813853,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "call",
+    "synthetic"
+   ],
+   "description": "G2++ CALL on ZCB T=0.5 S=20.0 K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0028",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15888.434645348209,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=1.0 S=5.0 K=0.86",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0029",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.8,
+    "expiry_years": 5.0,
+    "maturity_years": 10.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 15702.482003556532,
+     "bond_price_expiry": 0.8242873655162408,
+     "bond_price_maturity": 0.6788435244003906
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=5.0 S=10.0 K=0.8",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0030",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.2,
+    "sigma": 0.015,
+    "b": 0.03,
+    "eta": 0.006,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.5,
+    "expiry_years": 0.5,
+    "maturity_years": 20.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 29482.151876498883,
+     "bond_price_expiry": 0.9807977187451541,
+     "bond_price_maturity": 0.467234571212892
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "put-call-parity",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "put",
+    "synthetic"
+   ],
+   "description": "G2++ PUT on ZCB T=0.5 S=20.0 K=0.5",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0031",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.05,
+    "sigma": 0.01,
+    "b": 0.3,
+    "eta": 1e-12,
+    "rho": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10236.007208359895,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "hull-white-limit"
+   ],
+   "tags": [
+    "g2pp",
+    "limit",
+    "synthetic"
+   ],
+   "description": "eta near 0: the Hull-White price",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-12 per unit notional"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0032",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": 1.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 5.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "rho = 1"
+  },
+  {
+   "case_id": "g2pp_g-0033",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -1.2,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 5.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "rho < -1"
+  },
+  {
+   "case_id": "g2pp_g-0034",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.0,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 5.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "a = 0"
+  },
+  {
+   "case_id": "g2pp_g-0035",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.0,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 5.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "eta = 0"
+  },
+  {
+   "case_id": "g2pp_g-0036",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 0.0,
+    "maturity_years": 0.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "T = t"
+  },
+  {
+   "case_id": "g2pp_g-0037",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.9,
+    "expiry_years": 5.0,
+    "maturity_years": 5.0,
+    "notional": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "expiry = maturity"
+  },
+  {
+   "case_id": "g2pp_g-0038",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.5,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.9,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1.0,
+    "x": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "g2pp",
+    "synthetic"
+   ],
+   "description": "state given to the option"
+  },
+  {
+   "case_id": "g2pp_g-0039",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.0001,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 1.5,
+    "maturity_years": 7.5,
+    "x": 0.004,
+    "y": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.7804975952997741,
+     "zero_rate": 0.04130393666757012
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "g2pp",
+    "m6",
+    "r5",
+    "synthetic"
+   ],
+   "description": "G2++ zcb a=0.0001 b=0.05 (small a: series / expm1)"
+  },
+  {
+   "case_id": "g2pp_g-0040",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.0001,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7338.227746409832,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "m6",
+    "call",
+    "r5",
+    "synthetic"
+   ],
+   "description": "G2++ CALL a=0.0001 b=0.05",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-9 relative"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0041",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.0001,
+    "sigma": 0.01,
+    "b": 0.05,
+    "eta": 0.008,
+    "rho": -0.75,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10284.862230169034,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "m6",
+    "put",
+    "r5",
+    "synthetic"
+   ],
+   "description": "G2++ PUT a=0.0001 b=0.05",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-9 relative"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0042",
+   "operation": "rates.g2pp.zcb",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.01,
+    "b": 0.1,
+    "eta": 0.008,
+    "rho": 0.4,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "t_years": 1.5,
+    "maturity_years": 7.5,
+    "x": 0.004,
+    "y": -0.002
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "discount_factor": 0.782130243314599,
+     "zero_rate": 0.04095566679196673
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "m6",
+    "r5",
+    "synthetic"
+   ],
+   "description": "G2++ zcb a=0.1 b=0.1 (a = b)"
+  },
+  {
+   "case_id": "g2pp_g-0043",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.01,
+    "b": 0.1,
+    "eta": 0.008,
+    "rho": 0.4,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "CALL",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14181.902993819145,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "m6",
+    "call",
+    "r5",
+    "synthetic"
+   ],
+   "description": "G2++ CALL a=0.1 b=0.1",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-9 relative"
+   }
+  },
+  {
+   "case_id": "g2pp_g-0044",
+   "operation": "rates.g2pp.zcb_option",
+   "inputs": {
+    "a": 0.1,
+    "sigma": 0.01,
+    "b": 0.1,
+    "eta": 0.008,
+    "rho": 0.4,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "option_type": "PUT",
+    "strike": 0.86,
+    "expiry_years": 1.0,
+    "maturity_years": 5.0,
+    "notional": 1000000.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 17128.537477578346,
+     "bond_price_expiry": 0.9619,
+     "bond_price_maturity": 0.8242873655162408
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "g2pp",
+    "m6",
+    "put",
+    "r5",
+    "synthetic"
+   ],
+   "description": "G2++ PUT a=0.1 b=0.1",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-9 relative"
+   }
+  }
+ ]
+}

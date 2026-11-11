@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.7.0: stage G, rates models and xVA (unreleased)
+
+Not yet tagged. Stage G is at Implemented, not Validated. No golden value of an earlier stage changed.
+
+### Verified on the integration tree (`stage-g-int`, 2026-11-11)
+- Each of the four builds passed 14,492 of 14,492 golden cases through the neutral runner, `expsim_g` 102 of 102 included (observed, one Windows machine): Java (JDK 25), Python (CPython 3.15.2), Rust (1.99.1) and C++ (WinLibs GCC 16.2, `-DQF_WERROR=ON`). Of these, 589 are stage G cases in 20 suites over 21 operations and 1,026 are E1 cases for the first 20 stage G operations (`datasets/golden/stage_g/`, `stage_g_e1/`).
+- Unit tests (observed, same machine): Java `mvn -Pcoverage verify` 399 tests, 0 failures, JaCoCo line coverage 98.2% and branch 91.5%; Rust `cargo test --release` 271 passed, clippy `-D warnings` and `fmt --check` clean; C++ ctest passed, 260 test cases and 7,529 assertions; Python `pytest` 1,566 passed and 2 skipped (two opt-in tests), `ruff` and `mypy --strict` (103 files) clean. Fuzz, 45 s per language, seed 72: 0 findings for C++, Java and Rust.
+- Gates: `quality_gate.py --check-specs --check-register` (0 new gaps, 10 baseline), `check_hygiene.py` (0 problems), `gen_name_map.py --check`, `governance_gate.py`, `build_gallery.py --check` (25 entries, 0 differences), the site build (291 pages, 0 broken links) and the banned-word check (no hits).
+
+### Added
+- G1: Vasicek, CIR and Hull-White bond prices and bond options (`rates.shortrate.zcb`, `zcb_option`; `04-pricing/short-rate-models.md`, rulings G-1 to G-5).
+- G2 and G3: Jamshidian and affine swaptions, Hull-White calibration to a swaption strip, G2++, Bermudan swaptions and callable bonds on one lattice scheme, caps and floors (G-12 to G-18).
+- G4: LMM caplets and Rebonato swaptions (`04-pricing/lmm.md`).
+- Q3b and Q9: the AAD core and a Bermudan AAD ladder; Monte Carlo Greeks by pathwise, likelihood ratio and smoothed digitals; the model-reserve dispersion report (`06-risk/aad-core.md`, `mc-greeks.md`, `model-reserve.md`; G-9, G-10, G-10b).
+- Wave 4c: `xva.exposure.portfolio_hw`, EE, ENE, PFE, EPE and CVA of swap portfolios under Hull-White by exact one-factor integration, checked against ORE 1.8.17 (`06-risk/xva-exposure-portfolio.md`, G-42, suite `expsim_g`, 102 cases). The stage demo, exposure checked against ORE, ran: ORE's NPV equals the closed form to 1e-6 and its EE is within 1 SE at 8,000 paths (`oracle/ore/ORE_DEMO.json`).
+- G5 and G6: closed-form swap EE under Hull-White, collateralised exposure, CVA, DVA, FVA with the overlap defined, a SIMM-style IR delta and wrong-way CVA (`06-risk/xva-exposure.md`, `xva-framework.md`; G-40 to G-44).
+- R9: discretely monitored barriers by the BGK shift (`04-pricing/exotics.md`, G-7, G-8). A5: Heston and SABR calibration surrogate, Python research module only, challenger tier (`11-research/a5-surrogate.md`, G-11).
+- Stage F carry-overs: E1 cases for every stage G operation (G-45); F4 portfolio-risk tools (G-46); F3 inflation01, dividend and borrow, and correlation sensitivities (G-47); FRTB-SA FX, equity, CSR non-securitisation and commodity delta (G-48, G-49); FRTB vega and curvature (G-51).
+- Model inventory rows MG-1 onward in `docs/model-inventory.md`.
+
+### Fixed
+- Recorder: `fetch` retries HTTP 429, 5xx and timeouts up to four attempts (15, 30, 45 s waits); other 4xx errors still fail at once. The ECB API returned 504 for `ecb-estr` twice on 2026-11-10 and left a gap day (`tools/recorder/record.py`, tests in `tools/test_tools.py`).
+- C++: `NodeLogCurve` guards an empty node vector, so Windows GCC 16.2 builds with `-Werror` (it raised `-Walloc-size-larger-than` at `-O3`). No output changes.
+
+### Known issues (0.7.0)
+- **Outside-oracle share is 57.4% (338 of 589): the 60% floor is not met.** Wave 4c checked simulated exposure against ORE 1.8.17 (`oracle/ore/ORE_CHECK_4C.json`); 80 of 102 `expsim_g` cases count under ruling G-42 as registered. The re-test G-42b was registered (`c158c5c`) before any of its runs, but its ORE runs need WSL; owner decision G-52 (2026-11-11) ships v0.7.0 without WSL and carries G-42b to stage I.
+- **18 `expsim_g` `pfe_99` goldens in 8 cases were wrong and are fixed (G-Q4, the G-42 golden-fix row).** The generator's grid scan missed level crossings near the flat peak of a payer's deflated value. The fixed values were regenerated in double precision by `oracle/python/fix_w4c_pfe.py` and checked against the 50-digit generator on case 0039 to 1e-12; a full 50-digit regeneration is a follow-up. The G-42 recount on the existing ORE outputs is unchanged.
+- **CSR securitisations are out of scope** for FRTB-SA in this release.
+- **The C++ sanitizer builds (address, undefined, float-cast-overflow) for wave 4c run in CI on the PR, not locally** (G-52).
+- **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, was registered in `specifications/stage-g-rulings.md` with its power calculation before it ran, and passed (variance ratio 0.102, 95% interval 0.089 to 0.116, Z = 33.4; `oracle/G10B_RESULT.json`). G-10's own outcome stays inconclusive.
+- R9 acceptance has modest power (ruling G-34, R5 L6): the continuous price is 3.7 SE from the daily call MC at 40,000 paths, just outside the 3 SE band, and the put (z = -1.72) cannot discriminate; parameters were fixed before the run (plan 12.10).
+- Outside share counted strictly against library pricing engines (ruling G-27, R5 H1): the Jamshidian suites now count only against QuantLib's `JamshidianSwaptionEngine`; the final share is in the first known issue above.
+- FRTB vega and curvature: specified from the owner-supplied Basel Framework PDF (ruling G-51), closing the G-49 item; CSR securitisations remain out of scope.
+- F-33 (FRTB-SA GIRR `low` scenario) closed: confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma).
+
 ## 0.6.0: stage F, curve layer, portfolio risk and book (2026-11-10)
 
 Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
@@ -37,7 +72,7 @@ Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part
 ### Known issues (0.6.0)
 - **Outside-oracle share is 51.4% (225 of 438): the 60% floor is not met.** Error cases stay in the denominator (coordinator ruling). `oracle/OUTSIDE_GAPS_F.md` lists every case without a free outside source, with its reason; 79 of the 213 are error cases. The R5 second review of the outside register is still owed.
 - **R7 has no outside case.** Pedersen (2003), the CDS index option's reference example, is not freely available.
-- **FRTB-SA GIRR `low` scenario formula is unconfirmed:** it is an image in MAR21.6 (ruling F-33). The equity FRTB parameters were read only in summary.
+- **Equity FRTB parameters were read only in summary.**
 - **Deferred to wave 2b:**
   - F3: Inflation01, dividend and borrow sensitivity, correlation sensitivity;
   - F4: reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves;
