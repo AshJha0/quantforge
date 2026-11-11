@@ -78,3 +78,23 @@ run on this branch; it is a one-line change in `python/quantforge_core/cli/main.
 Merged `stage-i` with main `eb251b9`; one conflict, `python/README.md`, resolved to keep both the
 v0.7.0 release note and the stage I wave list. `contract_version` is 1.11.0 (I-51) in
 `cli/main.py`, with `tests/test_cli.py` following it.
+
+## Wave 5, I-53, fuzz and the tutorial-command check (23:35)
+
+- Wave 5: `hedgegreeks5_i` 50, `hedgecorr5_i` 35, `hedgemv5_i` 30, `hedgeeff5_i` 20, `hedgeqp5_i` 30, all
+  passing with no code change. I-54's `hedgecost_i-0023` (a switch point) passes unchanged.
+- I-53: `hedge.select.solve` is `E_LIMIT` above 100,000 candidate subsets, in `cli/limits.py`.
+- Fuzz (`conformance/fuzz/fuzz_cli.py`, 95% of draws from the stage I goldens, seeds 11 and 12,
+  600 inputs): no crash, no contract-shape error. The four "timeouts" were all trivial inputs
+  (unmutated goldens, `"inputs": "NaN"`). Each answered correctly when replayed (an ok, an
+  E_INPUT, an E_SCHEMA); the stalls were the machine under memory pressure, not the CLI.
+- Property tests added in `python/tests/test_hedge_invariants.py`: weight and exposure scaling,
+  instrument units, permutations of instruments and factors, the costed QP's subgradient
+  conditions, integer lots never beating the bounded relaxation.
+- Tutorial commands: driving the sixteen `examples/hedge_*_i.json` as `examples/tutorial_swap.py`
+  does (one `quantforge batch` call in text mode, so Windows line ends) through
+  `python/.venv/Scripts/quantforge.exe` and through `uv run --project python quantforge` gives 16
+  of 16 matching their goldens. For tutorial authors: the Python step imports
+  `quantforge_core.hedge_solvers` and the other modules (I-52). The core functions take decoded
+  Python values (lists, tuples for instruments), not the JSON documents. The CLI is the shortest
+  path for the JSON examples.

@@ -201,6 +201,18 @@ def _slippage_sizes(raw: Raw) -> None:
             raise _over("fills", 1_000_000)
 
 
+
+def _select_subsets(raw: Raw) -> None:
+    """Ruling I-53: at most 100,000 candidate subsets, sum over k = 1..min(K, n) of C(n, k),
+    with n the columns of `a` and K = max_instruments."""
+    rows, k = raw.get("a"), raw.get("max_instruments")
+    if not isinstance(rows, list) or not isinstance(k, int) or isinstance(k, bool):
+        return
+    n = max((len(r) for r in rows if isinstance(r, list)), default=0)
+    if sum(math.comb(n, j) for j in range(1, min(k, n) + 1)) > 100_000:
+        raise _over("max_instruments", 100_000)
+
+
 _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.integrate.trapezoid": _POINTS,
     "core.integrate.simpson": _POINTS,
@@ -260,7 +272,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "hedge.frontier.solve": _all(_HEDGE_QP, _caps_list("cost_weights", 50)),
     # Ruling I-35: selection over at most 20 instruments. I-32 (paths and series of 100,000)
     # is the generic array cap.
-    "hedge.select.solve": _rows_cols("a", _I_FACTORS, 20),
+    "hedge.select.solve": _all(_rows_cols("a", _I_FACTORS, 20), _select_subsets),
     "hedge.slippage.report": _slippage_sizes,
 }
 OPTION_ARRAY = 100

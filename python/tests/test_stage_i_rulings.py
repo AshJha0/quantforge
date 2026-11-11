@@ -110,3 +110,16 @@ def test_i50_one_order_keeps_the_general_array_limit() -> None:
     assert cli_code("hedge.slippage.report", {"orders": [order]}) == "E_LIMIT"
     assert math.isfinite(execute("hedge.slippage.report", {
         "orders": [{**order, "fills": [fill] * 10}]})["total"]["shortfall"])
+
+
+def test_i53_selection_limits_the_number_of_subsets() -> None:
+    a = [[1.0 if i == j else 0.1 for j in range(20)] for i in range(20)]
+    base = {"a": a, "b": [-1.0] * 20, "weights": [1.0] * 20}
+    assert cli_code("hedge.select.solve", {**base, "max_instruments": 7}) == "E_LIMIT"
+    # 21 instruments is the I-35 limit, also before the rule checks.
+    wide = {"a": [[1.0] * 21], "b": [1.0], "weights": [1.0], "max_instruments": 1}
+    assert cli_code("hedge.select.solve", wide) == "E_LIMIT"
+    small = execute("hedge.select.solve", {"a": [r[:6] for r in a[:6]], "b": [-1.0] * 6,
+                                           "weights": [1.0] * 6, "max_instruments": 6})
+    assert len(small["selected"]) <= 6
+
