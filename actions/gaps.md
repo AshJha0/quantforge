@@ -1,6 +1,6 @@
 # Recorder gaps
 
-Business days Monday to Friday up to 2026-11-10, holidays from code/tools/recorder/holidays.txt. A gap is a day with no successful recording in any log given.
+Business days Monday to Friday up to 2026-11-11, holidays from code/tools/recorder/holidays.txt. A gap is a day with no successful recording in any log given.
 
 | Series | From | Expected | Missing | Longest run of unchanged bytes |
 |---|---|---:|---|---:|
