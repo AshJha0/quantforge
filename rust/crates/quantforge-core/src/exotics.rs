@@ -84,6 +84,51 @@ pub enum BarrierType {
 }
 
 /// Reiner-Rubinstein, continuous monitoring; a touched barrier is `E_DOMAIN` (ruling E-A19).
+/// BGK constant for discrete monitoring, pinned to four digits (ruling G-7).
+pub const BGK_BETA: f64 = 0.5826;
+
+/// Discretely monitored barrier by the Broadie-Glasserman-Kou continuity correction:
+/// `n = floor(m T + 0.5)` dates (`n >= 1`, else `E_DOMAIN`), the barrier moved away from spot
+/// by `exp(beta v sqrt(T/n))`; the rebate is kept and paid as in the continuous formula at the
+/// shifted barrier, a convention (G-30). The domain check uses the
+/// unshifted barrier (G-8).
+pub fn barrier_discrete(
+    x: &Vanilla,
+    h: f64,
+    rebate: f64,
+    kind: BarrierType,
+    monitoring_per_year: i64,
+) -> Result<f64> {
+    if monitoring_per_year > 1_000_000 {
+        return fail("E_LIMIT", "monitoring_per_year is at most 1,000,000 (G-31)");
+    }
+    if monitoring_per_year < 1 {
+        return fail("E_DOMAIN", "monitoring_per_year must be at least 1");
+    }
+    crate::error::finite("x", &x)?;
+    crate::error::finite("h", &h)?;
+    crate::error::finite("rebate", &rebate)?;
+    x.check()?;
+    let down = matches!(kind, BarrierType::DownIn | BarrierType::DownOut);
+    if h <= 0.0 || (down && x.spot <= h) || (!down && x.spot >= h) || rebate < 0.0 {
+        // Delegate so the error text and code match the continuous rule.
+        return barrier(x, h, rebate, kind);
+    }
+    #[allow(clippy::cast_precision_loss)]
+    let n = (monitoring_per_year as f64 * x.expiry_years + 0.5).floor();
+    if n < 1.0 {
+        return fail(
+            "E_DOMAIN",
+            "fewer than one monitoring date (n = floor(m T + 0.5))",
+        );
+    }
+    let dt = x.expiry_years / n;
+    let shift = (BGK_BETA * x.vol * dt.sqrt()).exp();
+    let hs = if down { h / shift } else { h * shift };
+    barrier(x, hs, rebate, kind)
+}
+
+/// Continuously monitored single-barrier option (Reiner-Rubinstein, stage E).
 pub fn barrier(x: &Vanilla, h: f64, rebate: f64, kind: BarrierType) -> Result<f64> {
     use BarrierType::{DownIn, DownOut, UpIn, UpOut};
     crate::error::finite("x", &x)?;
@@ -928,5 +973,69 @@ mod tests {
             .code,
             "E_DOMAIN"
         );
+    }
+}
+
+#[cfg(test)]
+mod bgk_acceptance {
+    use super::*;
+
+    /// R9 acceptance: daily down-and-out call and put against an exact-date Monte Carlo
+    /// (40,000 paths, `core.rng` seed 20261109, stream 0), within 3 standard errors.
+    #[test]
+    fn daily_down_and_out_matches_exact_date_mc() {
+        let (s0, k, h, r, q, v, t, m) = (100.0, 100.0, 90.0, 0.05, 0.02, 0.25, 1.0, 252);
+        let paths = 40_000;
+        let dt = t / f64::from(m);
+        let drift = (r - q - v * v / 2.0) * dt;
+        let vol = v * dt.sqrt();
+        let mut g = crate::rng::Xoshiro::seeded(20_261_109, 0);
+        let (mut sc, mut sc2, mut sp, mut sp2) = (0.0, 0.0, 0.0, 0.0);
+        for _ in 0..paths {
+            let mut x = s0;
+            let mut alive = true;
+            for _ in 0..m {
+                x *= (drift + vol * g.next_normal()).exp();
+                if x <= h {
+                    alive = false;
+                }
+            }
+            let df = (-r * t).exp();
+            let (c, p) = if alive {
+                (df * (x - k).max(0.0), df * (k - x).max(0.0))
+            } else {
+                (0.0, 0.0)
+            };
+            sc += c;
+            sc2 += c * c;
+            sp += p;
+            sp2 += p * p;
+        }
+        let nf = f64::from(paths);
+        let stat = |s: f64, s2: f64| {
+            let mean = s / nf;
+            (mean, ((s2 - nf * mean * mean) / (nf - 1.0) / nf).sqrt())
+        };
+        for (call, (mean, se)) in [(true, stat(sc, sc2)), (false, stat(sp, sp2))] {
+            let x = Vanilla {
+                spot: s0,
+                strike: k,
+                expiry_years: t,
+                rate: r,
+                dividend_yield: q,
+                vol: v,
+                call,
+            };
+            let bgk = barrier_discrete(&x, h, 0.0, BarrierType::DownOut, m.into()).unwrap();
+            assert!(
+                (bgk - mean).abs() < 3.0 * se,
+                "call={call} bgk={bgk} mc={mean} se={se}"
+            );
+            if call {
+                // The continuous price is outside 3 SE of the call: the check discriminates.
+                let cont = barrier(&x, h, 0.0, BarrierType::DownOut).unwrap();
+                assert!((cont - mean).abs() > 3.0 * se);
+            }
+        }
     }
 }

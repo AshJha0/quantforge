@@ -30,7 +30,18 @@ super::registry! {
                 ("UP_OUT", UpOut),
             ];
             let kind = pick(i, "barrier_type", &table)?;
-            price_out(exotics::barrier(&x, h, r, kind)?)
+            let discrete = match i.opt("monitoring").map(|_| i.str("monitoring")).transpose()? {
+                None | Some("CONTINUOUS") => false,
+                Some("DISCRETE") => true,
+                Some(_) => return fail("E_INPUT", "monitoring must be CONTINUOUS or DISCRETE"),
+            };
+            let m = i.opt_int("monitoring_per_year")?;
+            match (discrete, m) {
+                (false, None) => price_out(exotics::barrier(&x, h, r, kind)?),
+                (true, Some(m)) => price_out(exotics::barrier_discrete(&x, h, r, kind, m)?),
+                (true, None) => fail("E_INPUT", "DISCRETE monitoring needs monitoring_per_year"),
+                (false, Some(_)) => fail("E_INPUT", "monitoring_per_year needs DISCRETE monitoring"),
+            }
         },
         "exotic.asian.geometric" => {
             let x = vanilla(i, true, true)?;

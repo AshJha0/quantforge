@@ -645,4 +645,170 @@ mod tests {
         assert_eq!(tranche_loss(&flat, 0.0, 0.1).unwrap_err().code, "E_DOMAIN");
         assert_eq!(loss_cdf(&pool, &[0.6]).unwrap_err().code, "E_DOMAIN");
     }
+
+    // ---- Stage G: closed-form identities and domain edges (no stage F tests yet). ----
+
+    #[test]
+    fn student_t_closed_forms() {
+        for x in [-3.0_f64, -0.4, 0.0, 0.7, 2.5] {
+            let cauchy = 0.5 + f64::atan(x) / PI;
+            assert!((student_cdf(x, 1.0) - cauchy).abs() < 1e-9, "nu 1, x {x}");
+            let two = 0.5 + x / (2.0 * (2.0 + x * x).sqrt());
+            assert!((student_cdf(x, 2.0) - two).abs() < 1e-9, "nu 2, x {x}");
+        }
+        for p in [0.01_f64, 0.3, 0.5, 0.9, 0.999] {
+            let q = (2.0 * p - 1.0) / (2.0 * p * (1.0 - p)).sqrt();
+            assert!((student_inv(p, 2.0) - q).abs() < 1e-8, "p {p}");
+        }
+        // orthant probability is 1/4 + asin(rho)/(2 pi) for every elliptical law
+        for rho in [-0.6, 0.0, 0.45] {
+            let orth = 0.25 + f64::asin(rho) / (2.0 * PI);
+            assert!((bivariate_normal(0.0, 0.0, rho) - orth).abs() < 1e-13);
+            assert!((bivariate_student(0.0, 0.0, rho, 3.0) - orth).abs() < 1e-9);
+        }
+        assert!(
+            (bivariate_normal(0.3, -1.1, 0.0) - normal_cdf(0.3) * normal_cdf(-1.1)).abs() < 1e-15
+        );
+        assert!((normal_inv(0.975) - 1.959_963_984_540_054).abs() < 1e-13);
+        assert!((normal_inv(0.025) + 1.959_963_984_540_054).abs() < 1e-13);
+    }
+
+    #[test]
+    fn copula_and_pool_domains() {
+        assert!(joint_default(0.02, 0.03, -0.99, None).is_ok());
+        assert!(joint_default(0.02, 0.03, 0.3, Some(0.5)).is_ok());
+        for (p1, p2, rho) in [
+            (1.0, 0.03, 0.3),
+            (0.02, 0.0, 0.3),
+            (0.02, 1.0, 0.3),
+            (0.02, 0.03, -1.0),
+        ] {
+            assert_eq!(
+                joint_default(p1, p2, rho, None).unwrap_err().code,
+                "E_DOMAIN"
+            );
+        }
+        assert_eq!(
+            joint_default(0.02, 0.03, 0.3, Some(-1.0)).unwrap_err().code,
+            "E_DOMAIN"
+        );
+        // the default correlation of the Gaussian copula grows with rho
+        let lo = joint_default(0.02, 0.03, 0.2, None).unwrap().1;
+        let hi = joint_default(0.02, 0.03, 0.5, None).unwrap().1;
+        assert!(0.0 < lo && lo < hi && hi < 1.0);
+        let pool = Pool {
+            default_probability: 0.05,
+            correlation: 0.3,
+            recovery: 0.0,
+        };
+        // zero recovery is allowed; then the whole pool loses p on average
+        assert!((tranche_loss(&pool, 0.0, 1.0).unwrap() - 0.05).abs() < 1e-14);
+        for bad in [
+            Pool {
+                recovery: 1.0,
+                ..pool
+            },
+            Pool {
+                recovery: -0.1,
+                ..pool
+            },
+            Pool {
+                correlation: 1.0,
+                ..pool
+            },
+            Pool {
+                default_probability: 0.0,
+                ..pool
+            },
+            Pool {
+                default_probability: 1.0,
+                ..pool
+            },
+        ] {
+            assert_eq!(tranche_loss(&bad, 0.0, 0.1).unwrap_err().code, "E_DOMAIN");
+        }
+        assert_eq!(tranche_loss(&pool, -0.1, 0.1).unwrap_err().code, "E_INPUT");
+        assert_eq!(tranche_loss(&pool, 0.2, 0.1).unwrap_err().code, "E_INPUT");
+        assert!(tranche_loss(&pool, 0.9, 1.0).is_ok());
+        assert_eq!(loss_cdf(&pool, &[0.0]).unwrap_err().code, "E_DOMAIN");
+        assert_eq!(loss_cdf(&pool, &[1.0]).unwrap_err().code, "E_DOMAIN");
+    }
+
+    #[test]
+    fn finite_checks_see_every_field() {
+        use crate::error::Finite;
+        let o = opt(true, 0.01, false);
+        assert!(o.is_all_finite());
+        let bad = [
+            CdsOption {
+                rate: f64::NAN,
+                ..o
+            },
+            CdsOption {
+                hazard_rate: f64::NAN,
+                ..o
+            },
+            CdsOption {
+                recovery: f64::NAN,
+                ..o
+            },
+            CdsOption {
+                strike: f64::NAN,
+                ..o
+            },
+            CdsOption {
+                notional: f64::NAN,
+                ..o
+            },
+        ];
+        assert!(bad.iter().all(|b| !b.is_all_finite()));
+        let p = cds_option_price(&o, 0.4).unwrap();
+        assert!(p.is_all_finite());
+        let bad = [
+            CdsOptionPrice {
+                price: f64::NAN,
+                ..p
+            },
+            CdsOptionPrice {
+                forward_spread: f64::NAN,
+                ..p
+            },
+            CdsOptionPrice {
+                risky_annuity: f64::NAN,
+                ..p
+            },
+            CdsOptionPrice {
+                front_end_protection: f64::NAN,
+                ..p
+            },
+        ];
+        assert!(bad.iter().all(|b| !b.is_all_finite()));
+        let pool = Pool {
+            default_probability: 0.05,
+            correlation: 0.3,
+            recovery: 0.4,
+        };
+        assert!(pool.is_all_finite());
+        assert!(
+            !Pool {
+                default_probability: f64::NAN,
+                ..pool
+            }
+            .is_all_finite()
+        );
+        assert!(
+            !Pool {
+                correlation: f64::NAN,
+                ..pool
+            }
+            .is_all_finite()
+        );
+        assert!(
+            !Pool {
+                recovery: f64::NAN,
+                ..pool
+            }
+            .is_all_finite()
+        );
+    }
 }

@@ -288,3 +288,142 @@ impl crate::error::Finite for Summary {
             && self.max.is_all_finite()
     }
 }
+
+/// Regularised lower incomplete gamma `P(s, x)` for `s > 0`, `x >= 0`.
+///
+/// Series `x^s e^{-x} / Gamma(s+1) * sum x^n / ((s+1)...(s+n))` for `x < s + 1`, otherwise
+/// `1 - Q(s, x)` with `Q` by the modified Lentz continued fraction. Both stop at a relative
+/// step of `1e-17`; accuracy is limited by the Lanczos `ln Gamma` (about 1e-15 relative in
+/// the prefactor). unchecked: caller guarantees finite inputs with `s > 0` (F-4).
+pub fn gamma_p(s: f64, x: f64) -> f64 {
+    if x <= 0.0 {
+        return 0.0;
+    }
+    let ln_pre = s * x.ln() - x - crate::garch_estimate::lgamma(s);
+    if x < s + 1.0 {
+        let (mut term, mut sum, mut d) = (1.0 / s, 1.0 / s, s);
+        for _ in 0..10_000 {
+            d += 1.0;
+            term *= x / d;
+            sum += term;
+            if term.abs() < sum.abs() * 1e-17 {
+                break;
+            }
+        }
+        (ln_pre.exp() * sum).min(1.0)
+    } else {
+        let tiny = 1e-300;
+        let mut b = x + 1.0 - s;
+        let mut c = 1.0 / tiny;
+        let mut d = 1.0 / b;
+        let mut h = d;
+        for i in 1..10_000 {
+            let an = -f64::from(i) * (f64::from(i) - s);
+            b += 2.0;
+            d = an * d + b;
+            if d.abs() < tiny {
+                d = tiny;
+            }
+            c = b + an / c;
+            if c.abs() < tiny {
+                c = tiny;
+            }
+            d = 1.0 / d;
+            let del = d * c;
+            h *= del;
+            if (del - 1.0).abs() < 1e-17 {
+                break;
+            }
+        }
+        (1.0 - ln_pre.exp() * h).max(0.0)
+    }
+}
+
+/// Noncentral chi-square CDF `P(X <= x)` with `k > 0` degrees of freedom and noncentrality
+/// `lambda >= 0`, as the Poisson-weighted sum `sum_j e^{-lambda/2} (lambda/2)^j / j!
+/// P(k/2 + j, x/2)` (Johnson, Kotz and Balakrishnan, *Continuous Univariate Distributions*
+/// vol. 2, eq. 29.2).
+///
+/// The sum starts at the Poisson mode with a log weight and recurs up and down until both the
+/// weight and the term fall below `1e-17` of the mode weight and the sum (ruling G-32), so the
+/// truncation error is far below the rounding of the terms and nothing underflows. Checked against 50-digit values in the `shortrate_g` CIR option goldens to
+/// better than 1e-12 relative. unchecked: caller guarantees finite inputs (F-4).
+pub fn noncentral_chi2_cdf(x: f64, k: f64, lambda: f64) -> f64 {
+    if x <= 0.0 {
+        return 0.0;
+    }
+    let (h, y, s0) = (lambda / 2.0, x / 2.0, k / 2.0);
+    if h == 0.0 {
+        return gamma_p(s0, y);
+    }
+    // G-32: start at the Poisson mode with a log weight (exp(-lambda/2) alone underflows for
+    // lambda/2 > 745), then recur the weights up and down.
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let j0 = h.floor().min(1e9) as u32;
+    let jf0 = f64::from(j0);
+    let w0 = (-h + jf0 * h.ln() - crate::garch_estimate::lgamma(jf0 + 1.0)).exp();
+    let mut sum = w0 * gamma_p(s0 + jf0, y);
+    let (mut w, mut j) = (w0, j0);
+    loop {
+        w *= h / f64::from(j + 1);
+        j += 1;
+        let term = w * gamma_p(s0 + f64::from(j), y);
+        sum += term;
+        if (term <= sum * 1e-17 && w <= w0 * 1e-17) || j - j0 > 1_000_000 {
+            break;
+        }
+    }
+    let (mut w, mut j) = (w0, j0);
+    while j > 0 {
+        w *= f64::from(j) / h;
+        j -= 1;
+        let term = w * gamma_p(s0 + f64::from(j), y);
+        sum += term;
+        if term <= sum * 1e-17 && w <= w0 * 1e-17 {
+            break;
+        }
+    }
+    sum.min(1.0)
+}
+
+#[cfg(test)]
+mod chi2_tests {
+    use super::*;
+
+    #[test]
+    fn gamma_p_known_values() {
+        // P(1, x) = 1 - e^{-x}
+        for x in [0.1, 1.0, 2.5, 10.0] {
+            assert!((gamma_p(1.0, x) - (1.0 - f64::exp(-x))).abs() < 1e-14);
+        }
+        // P(1/2, x) = erf(sqrt x) = 2 N(sqrt(2x)) - 1
+        for x in [0.2_f64, 1.7, 6.0] {
+            let e = 2.0 * normal_cdf((2.0 * x).sqrt()) - 1.0;
+            assert!((gamma_p(0.5, x) - e).abs() < 1e-14);
+        }
+        assert_eq!(gamma_p(2.0, 0.0), 0.0);
+    }
+
+    #[test]
+    fn central_limit_and_monotone() {
+        // lambda = 0 is the central chi-square: k = 2 gives 1 - e^{-x/2}.
+        assert!((noncentral_chi2_cdf(3.0, 2.0, 0.0) - (1.0 - f64::exp(-1.5))).abs() < 1e-14);
+        let mut prev = 0.0;
+        for i in 1..50 {
+            let v = noncentral_chi2_cdf(f64::from(i), 3.0, 7.5);
+            assert!(v >= prev && v <= 1.0);
+            prev = v;
+        }
+        assert_eq!(noncentral_chi2_cdf(-1.0, 3.0, 1.0), 0.0);
+        // Mean k + lambda: the CDF there is a little above one half.
+        let m = noncentral_chi2_cdf(10.0, 4.0, 6.0);
+        assert!(m > 0.5 && m < 0.6);
+    }
+
+    #[test]
+    fn small_lambda_continuity() {
+        let a = noncentral_chi2_cdf(5.0, 3.0, 1e-12);
+        let b = noncentral_chi2_cdf(5.0, 3.0, 0.0);
+        assert!((a - b).abs() < 1e-12);
+    }
+}

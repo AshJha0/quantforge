@@ -14,7 +14,7 @@ pub fn ln_gamma(x: f64) -> Result<f64> {
     Ok(lgamma(x))
 }
 
-fn lgamma(x: f64) -> f64 {
+pub(crate) fn lgamma(x: f64) -> f64 {
     const G: [f64; 9] = [
         0.999_999_999_999_809_9,
         676.520_368_121_885_1,
