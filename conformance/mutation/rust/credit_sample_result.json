@@ -13,6 +13,19 @@
  "unviable": 4,
  "score": 0.9821428571428571,
  "score_rule": "(caught + timeout) / (caught + timeout + missed); unviable excluded",
- "wilson95": [0.9055436275572404, 0.9968407896929579],
- "missed_mutants": ["crates/quantforge-core/src/credit.rs:163:24: replace + with * in periods"]
+ "wilson95": [
+  0.9055436275572404,
+  0.9968407896929579
+ ],
+ "missed_mutants": [
+  "crates/quantforge-core/src/credit.rs:163:24: replace + with * in periods"
+ ],
+ "follow_up": {
+  "date": "2026-11-11",
+  "test": "credit::tests::last_period_accrues_to_maturity_plus_one_day (Monday and Saturday maturities)",
+  "mutant": "crates/quantforge-core/src/credit.rs:163:24: replace + with * in periods",
+  "result": "caught: mutant applied by hand in a scratch clone, the new test fails (alpha 92/360 against 90/360); scratch restored, no diff",
+  "note": "cargo-mutants itself reported the mutant unviable twice on retest because the Windows linker could not open the fresh test executable (LNK1104), an environment fault",
+  "score_with_follow_up": "56 of 56 viable sampled mutants now caught"
+ }
 }
