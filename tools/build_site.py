@@ -64,7 +64,7 @@ PAGE = """<!doctype html>
 </body></html>
 """
 NAV = (("index.html", "QuantForge"), ("LEARN.html", "Learn"), ("COOKBOOK.html", "Cookbook"),
-       ("docs/curves/README.html", "Curves"), ("ARCHITECTURE.html", "Architecture"),
+       ("docs/getting-started/README.html", "Tutorials"), ("docs/curves/README.html", "Curves"), ("ARCHITECTURE.html", "Architecture"),
        ("docs/diagrams/README.html", "Diagrams"), ("all-pages.html", "All pages"))
 SEARCH_FORM = ('<form class="search" role="search" onsubmit="return false"><label class="sr-only" for="q">Search the site</label>'
                '<input id="q" type="search" placeholder="Search" autocomplete="off" aria-controls="hits">'
