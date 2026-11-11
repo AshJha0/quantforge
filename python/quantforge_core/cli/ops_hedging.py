@@ -201,3 +201,15 @@ def hedge_select_solve(i: Inputs) -> Any:
     extra = [k for k in ("eq_matrix", "eq_rhs", "singular") if i.has(k)]
     return core.hedge_solvers.select_solve(a, b, weights, i.integer("max_instruments"), ridge,
                                            lower, upper, extra)
+
+
+# Stage I wave 4d (hedge-slippage.md).
+
+@op("hedge.slippage.report")
+def hedge_slippage_report(i: Inputs) -> Any:
+    orders = []
+    for o in _objects(i, "orders"):
+        fills = [(f.real("quantity"), f.real("price")) for f in _objects(o, "fills")]
+        orders.append((o.real("quantity"), o.real("decision_price"), o.real("final_price"),
+                       o.real("half_spread"), o.real("impact"), fills))
+    return core.slippage.slippage_report(orders)

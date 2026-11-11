@@ -188,6 +188,19 @@ _HEDGE_CROSSASSET = _all(_caps_list("book", 1000), _caps_list("hedges", 200), _c
 _HEDGE_RESIDUAL = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
                        _rows_cols("covariance", _I_FACTORS, _I_FACTORS))
 
+
+def _slippage_sizes(raw: Raw) -> None:
+    """Ruling I-38: 10,000 orders and 1,000,000 fills in total."""
+    orders = raw.get("orders")
+    if isinstance(orders, list):
+        if len(orders) > 10_000:
+            raise _over("orders", 10_000)
+        fills = sum(len(o["fills"]) for o in orders
+                    if isinstance(o, dict) and isinstance(o.get("fills"), list))
+        if fills > 1_000_000:
+            raise _over("fills", 1_000_000)
+
+
 _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.integrate.trapezoid": _POINTS,
     "core.integrate.simpson": _POINTS,
@@ -248,6 +261,7 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     # Ruling I-35: selection over at most 20 instruments. I-32 (paths and series of 100,000)
     # is the generic array cap.
     "hedge.select.solve": _rows_cols("a", _I_FACTORS, 20),
+    "hedge.slippage.report": _slippage_sizes,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")

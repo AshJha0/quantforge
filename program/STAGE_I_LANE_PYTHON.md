@@ -45,3 +45,9 @@ through the wave 1 solve, I-34 tie rule. Conformance: `hedgebt_i` 15 of 15, `hed
 (a constant-spot backtest is `E_DOMAIN` only if rounding happens to cancel exactly; asks for a
 threshold or for the property note to go). Selection is exhaustive with no pruning: at the I-35
 size of 20 instruments with K = 20 that is about a million small solves, correct but slow.
+
+## Wave 4d (hedge slippage)
+
+`python/quantforge_core/slippage.py`, plain arithmetic in correctly rounded sums; `average_price`
+is `null` with no fills (I-37); I-38 sizes in `cli/limits.py`. Conformance `hedgeslip_i` 12 of 12;
+stage I total 263 of 263. Tests in `python/tests/test_slippage.py`. SPEC_QUESTIONS: none.
