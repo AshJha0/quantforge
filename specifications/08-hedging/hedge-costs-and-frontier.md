@@ -94,3 +94,7 @@ Mutants caught: costs ignored; the margin constraint ignored.
 | Q-I11 | Should cost apply to the trade from an existing position? | Not in wave 4a (I-24). Every stage I hedge so far starts from no hedge position. An `initial_positions` input can come later and changes no current meaning |
 | Q-I12 | Should the new outputs always be present? | No (I-27). Adding outputs to wave 1 results would change goldens the language lanes already pass |
 | Q-I13 | May the outside check try several library solvers? | Yes, if each is a library solving the same problem and the solver used is recorded per case (I-28). Picking the one that agrees does not change any golden, which comes from the 50-digit reference alone |
+
+## Amendment after the builds
+
+Ruling I-54: answers are exact to `root_finding` at a hold/not-hold switch point too (`hedgecost_i-0023`).

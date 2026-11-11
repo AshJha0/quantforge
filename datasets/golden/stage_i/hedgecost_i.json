@@ -1789,6 +1789,66 @@
     "synthetic"
    ],
    "description": "an equality needs more margin than the limit"
+  },
+  {
+   "case_id": "hedgecost_i-0023",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -2.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "half_spreads": [
+     2.0,
+     0.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.0,
+      1.75
+     ],
+     "residual": [
+      -1.0,
+      -0.25
+     ],
+     "objective": 1.9375,
+     "rank": 2,
+     "risk": 1.0625,
+     "cost": 0.875
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "scipy-1.18-slsqp-split"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "cost",
+    "synthetic"
+   ],
+   "description": "instrument 1 exactly at its switch point: x_1 = 0 exactly (I-54, after the builds)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
   }
  ]
 }

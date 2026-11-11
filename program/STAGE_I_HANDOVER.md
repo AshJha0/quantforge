@@ -264,3 +264,23 @@ What each language must change (run the four suites above again afterwards):
 MAIN eb251b9 MERGED (2026-11-11, 22:33): origin/main with PR #32 (tutorials 2-16, references, curve status check) merged into stage-i without conflicts; name map, quality gate, hygiene, docs status and the G-50 error-case check all exit 0 on the merged tree.
 
 I-51 RUNNER READY (2026-11-11): `conformance/runner/runner.py` `CONTRACT = "1.11.0"`, the stub CLI and `specifications/cli-contract.md` (header and the `version` row) move to contract 1.11.0. Each language changes its one `contract_version` constant to `1.11.0` after merging; until then the runner stops on the mismatch.
+
+## WAVE 5 READY (2026-11-11): outside-checked value cases (I-2 floor)
+
+Read: ruling I-55. Five new suites of existing operations, built in nothing new; rerun conformance on them:
+
+| Suite | Operation | Cases | Outside |
+|---|---|---|---|
+| `hedgegreeks5_i` | `hedge.greeks.neutralise` | 50 | 50 (QuantLib `AnalyticEuropeanEngine`, numpy) |
+| `hedgecorr5_i` | `hedge.correlation.neutralise` | 35 | 35 (QuantLib Margrabe engine and `BlackCalculator`, numpy) |
+| `hedgemv5_i` | `hedge.minvar.ratio` | 30 | 30 (numpy) |
+| `hedgeeff5_i` | `hedge.effectiveness` | 20 | 20 (numpy) |
+| `hedgeqp5_i` | `hedge.qp.solve` | 30 | 29 (scipy BVLS, gelsd, SLSQP) |
+
+All 165 are value cases from seeded draws. Draws are rejected only by rules fixed before any outside check (3 rejected); every accepted draw is kept whether or not it counts. **Stage I outside share: 278 of 443 = 62.8%, above the 60% floor** (I-2 unchanged, error cases in the denominator; this total includes the two after-build cases of the next commit). Earlier suites are byte-identical. The uncounted cases still cannot have a free outside reference: integer lots (no free integer least-squares solver), beta futures, the residual report and slippage (arithmetic only), and every error case.
+
+## Rulings after the builds, part 2 (2026-11-11)
+
+I-53: `hedge.select.solve` returns `E_LIMIT` above 100,000 candidate subsets (`hedgeselect_i-0018`, `n = 20`, `K = 7`); all four lanes add the check. I-54: costs in `hedge.qp.solve` must be exact at a switch point (`hedgecost_i-0023`); Rust changes its final step, and the others run the case. Both cases are appended; earlier cases are byte-identical.
+
+Verification (2026-11-11, 23:32): the full stub replay test (`conformance/runner/test_runner.py::StubTests::test_replay_passes_every_case`, every golden at contract 1.11.0, wave 5 and the after-build cases included) passes in 855 s; the other 21 runner tests pass.

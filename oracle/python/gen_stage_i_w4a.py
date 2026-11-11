@@ -389,6 +389,14 @@ def qp_cost_suite():
         if code == "E_INFEASIBLE":
             assert infeasible_by_highs(inp), desc
         run_error(s, QP, qp4_ref, inp, code, desc, ["hedge", "qp", "cost"])
+    # I-54 (after the builds): an instrument exactly at its hold/not-hold switch (|g_1| = cost_weight h_1 at x_1 = 0)
+    sw = dict(a=[[1.0, 0.0], [0.0, 1.0]], b=[-1.0, -2.0], weights=[1.0, 1.0], half_spreads=[2.0, 0.5])
+    so_ = qp4_ref(sw)
+    assert so_["x"] == [0.0, 1.75], so_
+    lib = outside(sw, so_)
+    n_out += lib is not None
+    s.add(QP, sw, so_, cls=RF, output_classes={"rank": EX}, verified=["mpmath-50-state-enumeration"] + ([lib] if lib else []),
+          tags=["hedge", "qp", "cost"], description="instrument 1 exactly at its switch point: x_1 = 0 exactly (I-54, after the builds)")
     return s, n_out, "scipy 1.18 solvers on the same problem, first that agrees: lsq_linear BVLS or lstsq (no spread, margin or equality: exact), minimize trust-constr, minimize SLSQP (both on the split form x = p - n, p, n >= 0); x within root_finding; verified_by names the solver"
 
 
