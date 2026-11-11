@@ -70,6 +70,13 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-21 | Callable bond on the G-18 scheme | Issuer call on coupon dates only, at a fixed fraction of face, applied to the ex-coupon value before the coupon is added; no notice period, no accrued interest between dates, no credit spread. The golden is the scheme (G-18); QuantLib's `CallableFixedRateBond` was not compared tonight (its date and accrual setup differs), so the evidence is the straight-bond limit only |
 
+
+## Wave 3b, LIBOR market model (closed-form layer)
+
+| # | Point | Ruling |
+|---|---|---|
+| G-22 | LMM conventions | Lognormal forwards only (forward or strike `<= 0` is `E_DOMAIN`; a shifted or normal LMM is a future new input). Single curve, accruals from the time grid, caplet variance integrated to the fixing date (not payment). Volatility is the abcd form only [BM 6.3.2]; correlation `exp(-beta |T_i - T_j|)` on fixing times [BM 6.9]. Swaptions by Rebonato's frozen-weight formula [BM 6.13]: the golden is the formula, not the exact LMM price. Outside check: QuantLib 1.44 `AbcdFunction.covariance`, `DiscountCurve.discount` and `blackFormula`, combined by arithmetic (as G-13) |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |

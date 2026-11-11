@@ -48,5 +48,15 @@
   "counted": 0,
   "total": 12,
   "rule": "not counted: pinned scheme (G-18)"
+ },
+ "lmmcap_g": {
+  "counted": 17,
+  "total": 26,
+  "rule": "QuantLib AbcdFunction.covariance(0, T_fix, T_fix, T_fix), DiscountCurve.discount and blackFormula per caplet, summed"
+ },
+ "lmmswn_g": {
+  "counted": 36,
+  "total": 42,
+  "rule": "QuantLib AbcdFunction.covariance(0, T0, T_i, T_j) per pair, DiscountCurve.discount for weights and annuity, blackFormula; exp correlation by arithmetic"
  }
 }

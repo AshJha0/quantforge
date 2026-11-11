@@ -216,3 +216,18 @@ All work committed locally on `stage-g`, not pushed. Waves READY: 1, 2a to 2g, 3
 G-10 is kept as registered and recorded as **inconclusive, low power** (rulings, CHANGELOG known issues). G-10b was registered with a closed-form power calculation (33,541 paths per estimator for 80% power at a variance ratio of 0.8; 60,000 registered) and committed (`ea11299`) before it ran. It then **passed**: ratio 0.1015 [0.0888, 0.1161], `Z = 33.35`. Language sessions: the Q9 property test now has two parts, G-10 as in the spec (report only, not gating) and G-10b (gating, same seed, streams and path count). F-33 stays open for the owner.
 
 Final status otherwise unchanged from "Final status, 2026-11-10" above: 12 suites, 337 cases, outside 205 of 337 = 60.8%, rulings G-1 to G-21 plus G-10b; nothing pushed.
+
+## WAVE 3b READY (2026-11-11): LIBOR market model, closed-form layer
+
+Read: `specifications/04-pricing/lmm.md`; ruling G-22; cli-contract block "Stage G operations"; `specifications/name-map.json` (239 operations).
+
+### G4a (suites `lmmcap_g`, 26 cases; `lmmswn_g`, 42 cases)
+- New operation `rates.lmm.capfloor`: Black caplets on the integrated abcd variance to each fixing date. Outputs `price`, `caplet_prices`, `forward_rates`, `black_vols`.
+- New operation `rates.lmm.swaption_rebonato`: Rebonato's frozen-weight swaption volatility with exponential correlation. Outputs `price`, `swap_rate`, `annuity`, `black_vol`.
+- Build notes: integrate `sigma_i sigma_j` in closed form (the abcd product integrates to exponentials times polynomials) or by Gauss-Legendre to 1e-14 relative. Reuse the wave 1 Hull-White curve code for `P(t)`. Check `E_DOMAIN` on every forward before pricing.
+- Property tests: cap minus floor equals the swap value; payer minus receiver equals `notional A (S - K)`; flat abcd gives `black_vols = d`.
+
+### Status update (after wave 3b)
+`lmmcap_g` 17 of 26 and `lmmswn_g` 36 of 42 count (QuantLib 1.44 `AbcdFunction`, `DiscountCurve`, `blackFormula`; every value case). **Stage G: 258 of 405 = 63.7%** (error cases and the 21 `mcgreeks_g` cases in the denominator). Generator `oracle/python/gen_stage_g_lmm.py`; a rerun reproduces the goldens byte for byte. `quality_gate --check-specs --check-register`: no new gaps. Rulings G-1 to G-22 plus G-10b.
+
+**Not done in this session, still left for stage G:** simulated LMM; Q3b AAD core (G-9); Q9 part 2 reserve dispersion; wave 4 rest (CSA, netting, MPoR, collateral, simulated EE/PFE/EPE, DVA/FVA/MVA, SIMM-style IM, WWR, KVA, ORE demo); A5 surrogate (G-11, challenger only, so no goldens by ruling); stage F carry-over wave 2b. Most wave 4 items have no free outside library short of ORE; each such suite lowers the share, so the 5.0-point margin above 60% buys about 85 uncounted cases at the current total.
