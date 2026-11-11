@@ -277,3 +277,7 @@ Read (research lane only; language sessions have nothing to build): `specificati
 ## Stage F carry-over wave 2b, part 1 READY (2026-11-11): E1 for the stage F operations
 
 `gen_stage_f_e1.py` now skips only the `e1_*` files (and `stage_g`, whose operations get E1 in a later pass). E1 grows from 5,247 to 5,535 cases (+288) over 226 operations in 24 files; new file `e1_book.json`; **case ids in the `e1_*` files renumber**, so every build reruns the whole E1 set. Not done: F3 (inflation01, dividend and borrow, correlation sensitivities), F4 (reverse stress, limits, concentration, liquidity-adjusted risk, vol by horizon, model-risk reserve), FRTB vega, curvature and the other risk classes; E1 for the stage G operations.
+
+## WAVE 4b READY (2026-11-11): deterministic xVA layer
+
+Read: `specifications/06-risk/xva-framework.md`; rulings G-40, G-41, G-43, G-44. New operations `xva.exposure.collateralised` (`collexp_g`, 17), `xva.adjustments.value` (`xvaadj_g`, 12), `xva.simm.ir_delta` (`simm_g`, 8), `xva.wwr.cva_hw` (`wwr_g`, 6). Build notes: everything is exact arithmetic on the inputs except the WWR root (monotone in `a`; Newton from `ln h`). Property tests: total EE equals the sum over sets; zero thresholds with no lag give zero exposure; `b = 0` WWR equals the independent CVA. Outside: none. **Stage G share: 258 of 487 = 53.0%** (below 60%; ORE-checked wave 4c is the planned recovery, G-39).

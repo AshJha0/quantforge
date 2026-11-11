@@ -83,5 +83,25 @@
   "counted": 0,
   "total": 9,
   "rule": "arithmetic on inputs: not counted"
+ },
+ "collexp_g": {
+  "counted": 0,
+  "total": 17,
+  "rule": "own formulas on given inputs: not counted (G-40)"
+ },
+ "xvaadj_g": {
+  "counted": 0,
+  "total": 12,
+  "rule": "own formulas on given inputs: not counted (G-40)"
+ },
+ "simm_g": {
+  "counted": 0,
+  "total": 8,
+  "rule": "own formulas on given inputs: not counted (G-40)"
+ },
+ "wwr_g": {
+  "counted": 0,
+  "total": 6,
+  "rule": "own formulas on given inputs: not counted (G-40)"
  }
 }
