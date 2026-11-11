@@ -415,7 +415,7 @@ Use case 4 regresses a portfolio's returns on factor returns, and each factor's 
 
 ## Stage G: rates models and xVA
 
-Stage G (v0.7.0, not yet tagged) is at Implemented, not Validated. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,390 of 14,390 golden cases, of which 487 are stage G value and error cases and 1,026 are E1 cases for the 20 stage G operations.
+Stage G (v0.7.0, not yet tagged) is at Implemented, not Validated. On the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each of the four builds passed 14,492 of 14,492 golden cases, of which 589 are stage G value and error cases and 1,026 are E1 cases for the first 20 stage G operations.
 
 ### Short-rate models
 
@@ -437,13 +437,14 @@ Stage G (v0.7.0, not yet tagged) is at Implemented, not Validated. On the integr
 
 **Plain idea.** If a counterparty defaults while it owes you money, you lose what it owed less what is recovered. CVA prices that loss today: expected positive exposure at each date, times the chance of default in that period, times the loss given default, discounted. DVA is the same loss seen from the other side; FVA prices funding the uncollateralised exposure.
 
-**Formal statement.** In outline, `CVA = (1 - R) sum_i DF(t_i) EE(t_i) PD(t_{i-1}, t_i)` with a flat hazard rate; DVA uses `ENE` and the own hazard rate; FVA is FCA less FBA on the borrowing and lending spreads, with the DVA overlap optional. The exact discretisation is in `06-risk/xva-framework.md` (rulings G-40 to G-44). Exposure comes from `xva-exposure.md`: in closed form for a swap under Hull-White, or with collateral, threshold and a margin period of risk.
+**Formal statement.** In outline, `CVA = (1 - R) sum_i DF(t_i) EE(t_i) PD(t_{i-1}, t_i)` with a flat hazard rate; DVA uses `ENE` and the own hazard rate; FVA is FCA less FBA on the borrowing and lending spreads, with the DVA overlap optional. The exact discretisation is in `06-risk/xva-framework.md` (rulings G-40 to G-44). Exposure comes from `xva-exposure.md`: in closed form for a swap under Hull-White, or with collateral, threshold and a margin period of risk. For a portfolio of swaps, `xva-exposure-portfolio.md` integrates the netting-set value exactly over the one Gaussian factor, splitting the integral at the zeros of the value; PFE is the level at which the probability of a lower exposure reaches 95% or 99%.
 
 **Worked example.** `xvaadj_g-0001`: four half-yearly dates, `EE` 120, 150, 130, 80, counterparty hazard 2% and recovery 40%. CVA is 2.7099, DVA 0.8998 and FVA 0.6129 (FCA 1.8156 less FBA 1.2027); checked by mpmath at 50 digits.
 
 ### What stage G's evidence does and does not show
-- **Outside oracle: 258 of 487 cases (53.0%); the 60% floor is not met.** Wave 4c, simulated exposure checked against ORE, would add about 96 counted cases; it needs WSL, which is down (`program/STAGE_G_HANDOVER.md`, "Wave 4c plan").
-- **The stage demo, exposure checked against ORE, is not done** for the same reason. Today's exposure check is the closed-form Hull-White EE (`exposure_g`).
+- **Outside oracle: 338 of 589 cases (57.4%); the 60% floor is not met.** Wave 4c compared portfolio exposure with ORE 1.8.17; 80 of 102 `expsim_g` cases count under ruling G-42. The re-test G-42b needs WSL and is carried to stage I (G-52).
+- **The stage demo ran.** ORE's NPV of the demo swap equals the closed form to 1e-6, and its EE is within 1 SE at 8,000 paths (`oracle/ore/ORE_DEMO.json`). ORE is a Monte Carlo check: it confirms the profiles to a few standard errors, not to the goldens' digits.
+- **18 PFE goldens were wrong and are fixed** (G-Q4): a grid scan missed level crossings near a flat peak. The four builds found it, because they solve for the crossings exactly.
 - **G-10 is inconclusive**; the powered test G-10b passed (`specifications/stage-g-rulings.md`). R9 acceptance has modest power (ruling G-34).
 - **All inputs are synthetic.** No market swaption, cap or CDS quotes are used.
 

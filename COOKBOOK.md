@@ -523,6 +523,7 @@ Copy the inputs of the named case from `datasets/golden/stage_g/` and send them 
 | Monte Carlo Greeks; model-reserve dispersion | `risk.mc.greeks`, `risk.model_reserve.dispersion` | `mcgreeks_g`, `reserve_g` |
 | Expected exposure of a swap under Hull-White | `xva.exposure.swap_ee_hw` | `exposure_g-0001` |
 | Collateralised exposure; CVA, DVA, FVA; SIMM-style IR delta; wrong-way CVA | `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `collexp_g`, `xvaadj_g-0001`, `simm_g`, `wwr_g` |
+| EE, ENE, PFE, EPE and CVA of a swap portfolio under Hull-White (checked against ORE) | `xva.exposure.portfolio_hw` | `expsim_g-0001` |
 | Discretely monitored barrier (BGK shift) | `exotic.barrier.price` with `monitoring: DISCRETE` | `barrier_g` |
 
 To check a whole suite: `python conformance/runner/runner.py --impl rust --suite xvaadj_g`.

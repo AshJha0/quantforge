@@ -106,8 +106,8 @@ Implemented in all four languages, each passing 12,462 of 12,462 golden cases on
 
 ### Stage G: rates models and xVA (v0.7.0, pending)
 
-Implemented in all four languages; on the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each build passed 14,390 of 14,390 golden cases. What changes in the structure:
+Implemented in all four languages; on the integration tree `stage-g-int` (2026-11-11, observed on one Windows machine through the neutral runner) each build passed 14,492 of 14,492 golden cases. What changes in the structure:
 - **Pricing (domain 04)** gains term-structure models. Short-rate models (Vasicek, CIR, Hull-White, G2++) share one curve rule: log-linear discount factors with `(0, 1)` first (ruling G-3). Bermudan swaptions and callable bonds run on one lattice scheme (ruling G-18). The LMM prices caplets and swaptions by Rebonato's formula (`04-pricing/lmm.md`).
 - **Risk (domain 06)** gains Monte Carlo Greeks (pathwise, likelihood ratio, smoothed digitals), a model-reserve dispersion report and an AAD ladder on a Bermudan (`mc-greeks.md`, `model-reserve.md`, `aad-core.md`).
-- **xVA (new, under domain 06)**: exposure is computed first (`xva-exposure.md`), and the adjustments are pure arithmetic on exposure profiles, discount factors and hazard rates (`xva-framework.md`). That split keeps CVA, DVA and FVA testable without a simulation.
-- **CLI**: the 20 stage G operations are listed in `specifications/cli-contract.md` ("Stage G operations") and the generated name map.
+- **xVA (new, under domain 06)**: exposure is computed first (`xva-exposure.md`), and the adjustments are pure arithmetic on exposure profiles, discount factors and hazard rates (`xva-framework.md`). That split keeps CVA, DVA and FVA testable without a simulation. Portfolio exposure (`xva.exposure.portfolio_hw`, wave 4c) is exact one-factor integration, and ORE's Monte Carlo is the outside check, kept under `oracle/ore/` and never read by a build.
+- **CLI**: the 21 stage G operations are listed in `specifications/cli-contract.md` ("Stage G operations") and the generated name map.
