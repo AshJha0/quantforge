@@ -293,6 +293,22 @@ final class In {
         return out;
     }
 
+    /** An array of integers in which null is allowed. */
+    List<Long> nullableIntegers(String key) {
+        List<Long> out = new ArrayList<>();
+        for (Object v : list(key)) {
+            out.add(v == null ? null : Long.valueOf(integerOf(key, v)));
+        }
+        return out;
+    }
+
+    /** Refuses an optional key that is present with a null value (ruling I-12: null only where a rule allows it). */
+    void notNull(String key) {
+        if (hasKey(key) && values.get(key) == null) {
+            throw schema(key, "null is not allowed here");
+        }
+    }
+
     double[][] matrix(String key) {
         List<?> rows = list(key);
         limit(rows.size() > MAX_MATRIX_ROWS, key);
