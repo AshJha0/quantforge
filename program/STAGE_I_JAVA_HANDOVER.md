@@ -71,3 +71,13 @@ No spec question.
 | I-49 | Added: `E_LIMIT` (key `lot_sizes`) when a relaxed lot count exceeds `2^52` |
 | I-50 | Checked: one order's `fills` above 100,000 is `E_LIMIT` (unit test) |
 | I-51 | Not applied in this lane: `conformance/runner/runner.py` still requires `contract_version` 1.0.0, so a lone move to 1.11.0 stops every conformance run. The change is one constant (`cli.Main.CONTRACT`), to land with the runner in the integration PR, as I-51 says |
+
+### I-48, open in the Java lane
+
+`hedge.qp.solve` still solves one strictly convex QP per closed sign orthant of the instruments with an `|x|` term
+and returns `E_LIMIT` above 20 of them (`LeastSquaresHedge.MAX_COSTLY`), which I-48 forbids below 200 instruments.
+Planned replacement, not started tonight so as not to ship a half-finished solver: a sign-state active-set method that
+starts from the orthant of the cost-free solution and flips one instrument's sign when it sits at 0 and its orthant
+bound's multiplier shows the subgradient condition `|g_j| <= cost_weight half_spreads_j + mu margin_rates_j` broken.
+Each flip strictly lowers the convex objective, so the search ends. Test it against the current enumeration on random
+problems of up to 12 such instruments, then drop `MAX_COSTLY`. No golden reaches 20, so every golden passes either way.
