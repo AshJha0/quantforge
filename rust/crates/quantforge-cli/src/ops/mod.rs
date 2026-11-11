@@ -12,6 +12,7 @@ mod exotic;
 mod fx;
 mod hedge;
 mod infl;
+mod lmm;
 mod mbs;
 mod mcgreeks;
 mod rates;
@@ -77,6 +78,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("mbs", mbs::NAMES, mbs::dispatch),
     ("rates", rates::NAMES, rates::dispatch),
     ("rates", shortrate::NAMES, shortrate::dispatch),
+    ("rates", lmm::NAMES, lmm::dispatch),
     ("repo", repo::NAMES, repo::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
     ("risk", mcgreeks::NAMES, mcgreeks::dispatch),

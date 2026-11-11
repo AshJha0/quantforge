@@ -88,8 +88,10 @@ pub enum BarrierType {
 pub const BGK_BETA: f64 = 0.5826;
 
 /// Discretely monitored barrier by the Broadie-Glasserman-Kou continuity correction:
-/// the continuous price with the barrier moved away from spot by `exp(beta v sqrt(1/m))`.
-/// The domain check uses the unshifted barrier (ruling G-8).
+/// `n = floor(m T + 0.5)` dates (`n >= 1`, else `E_DOMAIN`), the barrier moved away from spot
+/// by `exp(beta v sqrt(T/n))`; the rebate is kept and paid as in the continuous formula at the
+/// shifted barrier, a convention (G-30). The domain check uses the
+/// unshifted barrier (G-8).
 pub fn barrier_discrete(
     x: &Vanilla,
     h: f64,
@@ -97,19 +99,30 @@ pub fn barrier_discrete(
     kind: BarrierType,
     monitoring_per_year: i64,
 ) -> Result<f64> {
+    if monitoring_per_year > 1_000_000 {
+        return fail("E_LIMIT", "monitoring_per_year is at most 1,000,000 (G-31)");
+    }
     if monitoring_per_year < 1 {
         return fail("E_DOMAIN", "monitoring_per_year must be at least 1");
     }
     crate::error::finite("x", &x)?;
     crate::error::finite("h", &h)?;
+    crate::error::finite("rebate", &rebate)?;
     x.check()?;
     let down = matches!(kind, BarrierType::DownIn | BarrierType::DownOut);
-    if h <= 0.0 || (down && x.spot <= h) || (!down && x.spot >= h) {
+    if h <= 0.0 || (down && x.spot <= h) || (!down && x.spot >= h) || rebate < 0.0 {
         // Delegate so the error text and code match the continuous rule.
         return barrier(x, h, rebate, kind);
     }
     #[allow(clippy::cast_precision_loss)]
-    let dt = 1.0 / monitoring_per_year as f64;
+    let n = (monitoring_per_year as f64 * x.expiry_years + 0.5).floor();
+    if n < 1.0 {
+        return fail(
+            "E_DOMAIN",
+            "fewer than one monitoring date (n = floor(m T + 0.5))",
+        );
+    }
+    let dt = x.expiry_years / n;
     let shift = (BGK_BETA * x.vol * dt.sqrt()).exp();
     let hs = if down { h / shift } else { h * shift };
     barrier(x, hs, rebate, kind)

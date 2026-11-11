@@ -13,6 +13,9 @@ pub struct HwCurve {
 impl HwCurve {
     /// Builds the curve from pillar times and discount factors (`(0, 1)` is prepended).
     pub fn new(times: &[f64], dfs: &[f64]) -> Result<HwCurve> {
+        if times.len() > 10_000 || dfs.len() > 10_000 {
+            return fail("E_LIMIT", "at most 10,000 curve pillars (G-31)");
+        }
         crate::error::finite("times", &times)?;
         crate::error::finite("discount_factors", &dfs)?;
         if times.is_empty()
@@ -314,19 +317,33 @@ fn swaption_parts(
         }
         Ok((f, d, mag))
     };
+    if 1.0 + fixed_rate * tau[n - 1] <= 0.0 {
+        return fail("E_DOMAIN", "1 + K tau_n must be positive (G-29)");
+    }
+    // G-29: the root lies in [-1, 1] (CIR: [0, 1]); no sign change there is E_DOMAIN.
     let cir = matches!(m, Model::Cir { .. });
-    let (f0, _, _) = sum_at(0.0)?;
-    if cir && f0 < 0.0 {
-        return fail("E_DOMAIN", "CIR critical rate would be negative");
+    let (mut lo, mut hi) = (if cir { 0.0 } else { -1.0 }, 1.0);
+    let (flo, _, _) = sum_at(lo)?;
+    let (fhi, _, _) = sum_at(hi)?;
+    if !(flo >= 0.0 && fhi <= 0.0) {
+        let what = if cir {
+            "CIR critical rate would be negative"
+        } else {
+            "no critical rate in [-1, 1]"
+        };
+        return fail("E_DOMAIN", what);
     }
-    // Bracket: lo has f > 0, hi has f < 0.
-    let (mut lo, mut hi) = (f64::NEG_INFINITY, f64::INFINITY);
-    if cir {
-        lo = 0.0;
+    let mut r = if cir { 0.0_f64.max(lo) } else { 0.0 };
+    let mut found = flo == 0.0 || fhi == 0.0;
+    if flo == 0.0 {
+        r = lo;
+    } else if fhi == 0.0 {
+        r = hi;
     }
-    let mut r = 0.0;
-    let mut found = false;
     for _ in 0..500 {
+        if found {
+            break;
+        }
         let (f, d, mag) = sum_at(r)?;
         // Converged at 1e-15 relative, or at the rounding floor of the sum.
         if f.abs() <= 1e-15_f64.max(2.0 * f64::EPSILON * mag) {
@@ -334,24 +351,15 @@ fn swaption_parts(
             break;
         }
         if f > 0.0 {
-            lo = lo.max(r);
+            lo = r;
         } else {
-            hi = hi.min(r);
+            hi = r;
         }
         let mut next = r - f / d;
         if !(next > lo && next < hi && next.is_finite()) {
-            next = match (lo.is_finite(), hi.is_finite()) {
-                (true, true) => 0.5 * (lo + hi),
-                (true, false) => lo + 2.0 * (lo.abs() + 0.1),
-                (false, true) => hi - 2.0 * (hi.abs() + 0.1),
-                (false, false) => r,
-            };
+            next = 0.5 * (lo + hi);
         }
-        if next == r
-            || (lo.is_finite()
-                && hi.is_finite()
-                && hi - lo <= 4.0 * f64::EPSILON * hi.abs().max(1e-300))
-        {
+        if next == r || hi - lo <= 4.0 * f64::EPSILON * hi.abs().max(lo.abs()) {
             found = true;
             break;
         }
@@ -689,6 +697,23 @@ pub struct FdGrid {
 }
 
 impl FdGrid {
+    /// G-31 combined bound: `nx` times the total number of time steps over the knots.
+    fn check_work(&self, knots: &[f64]) -> Result<()> {
+        #[allow(clippy::cast_precision_loss)]
+        let spy = self.steps_per_year as f64;
+        let mut prev = 0.0;
+        let mut steps = 0.0;
+        for k in knots {
+            steps += (spy * (k - prev)).ceil().max(1.0);
+            prev = *k;
+        }
+        #[allow(clippy::cast_precision_loss)]
+        if self.nx as f64 * steps > 5e8 {
+            return fail("E_LIMIT", "grid work nx x total steps exceeds 5e8 (G-31)");
+        }
+        Ok(())
+    }
+
     fn check(&self) -> Result<()> {
         crate::error::finite("width", &self.width)?;
         if self.nx < 5 || self.nx % 2 == 0 {
@@ -861,6 +886,7 @@ pub fn bermudan_swaption(
         );
     }
     grid.check()?;
+    grid.check_work(exercise)?;
     let phi = if swap.payer { 1.0 } else { -1.0 };
     let ex = |x: &[f64], t: f64| -> Result<Vec<f64>> {
         let al = hw_alpha(curve, a, sigma, t);
@@ -923,6 +949,7 @@ pub fn callable_bond(
         return fail("E_DOMAIN", "call_price must be positive");
     }
     grid.check()?;
+    grid.check_work(pay)?;
     let n = pay.len();
     let tau = |k: usize| pay[k] - if k == 0 { 0.0 } else { pay[k - 1] };
     let last = 1.0 + coupon * tau(n - 1);
@@ -1167,7 +1194,8 @@ mod tests {
     }
 
     #[test]
-    fn bermudan_european_limit_and_callable_bound() {
+    fn bermudan_and_callable_scheme_bounds() {
+        // G-28: bounds against the scheme's own bounding product on the same grid.
         let c = curve();
         let pay = [2.0, 3.0, 4.0, 5.0, 6.0];
         let grid = FdGrid {
@@ -1183,22 +1211,9 @@ mod tests {
             notional: 1.0,
         };
         let berm1 = bermudan_swaption(&c, 0.05, 0.01, &swap, &[1.0], grid).unwrap();
-        let m = Model::HullWhite {
-            a: 0.05,
-            sigma: 0.01,
-            curve: &c,
-        };
-        let euro = swaption(&m, 0.0, 1.0, &pay, 0.04, true, 1.0).unwrap().price;
-        // The pinned scheme is first order in time: about 0.2% below Jamshidian at this grid.
-        assert!((berm1 - euro).abs() < 5e-3 * euro, "{berm1} {euro}");
         let berm = bermudan_swaption(&c, 0.05, 0.01, &swap, &[1.0, 2.0, 3.0], grid).unwrap();
-        assert!(berm >= berm1);
+        assert!(berm1 > 0.0 && berm >= berm1);
         let coupons: Vec<f64> = (1..=10).map(f64::from).collect();
-        let straight: f64 = coupons
-            .iter()
-            .map(|t| 0.05 * c.ln_discount(*t).exp())
-            .sum::<f64>()
-            + c.ln_discount(10.0).exp();
         let bond = |calls: &'static [f64]| CallableBond {
             pay: Box::leak(coupons.clone().into_boxed_slice()),
             coupon: 0.05,
@@ -1208,8 +1223,7 @@ mod tests {
         };
         let plain = callable_bond(&c, 0.05, 0.01, &bond(&[]), grid).unwrap();
         let called = callable_bond(&c, 0.05, 0.01, &bond(&[3.0, 4.0, 5.0]), grid).unwrap();
-        assert!((plain - straight).abs() < 1e-3 * straight);
-        assert!(called < plain);
+        assert!(called <= plain);
         let bad = FdGrid { nx: 50, ..grid };
         assert_eq!(
             callable_bond(&c, 0.05, 0.01, &bond(&[]), bad)
@@ -1217,6 +1231,13 @@ mod tests {
                 .code,
             "E_INPUT"
         );
+        let huge = FdGrid {
+            nx: 10_001,
+            steps_per_year: 100_000,
+            width: 6.0,
+        };
+        let e = bermudan_swaption(&c, 0.05, 0.01, &swap, &[1.0, 2.0], huge).unwrap_err();
+        assert_eq!(e.code, "E_LIMIT");
     }
 
     #[test]

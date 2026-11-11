@@ -344,9 +344,9 @@ pub fn gamma_p(s: f64, x: f64) -> f64 {
 /// P(k/2 + j, x/2)` (Johnson, Kotz and Balakrishnan, *Continuous Univariate Distributions*
 /// vol. 2, eq. 29.2).
 ///
-/// The sum starts at `j = 0` and stops once `j > lambda/2 + 10` (past the Poisson mode) and the
-/// term is below `1e-17` of the running sum, so the truncation error is far below the rounding
-/// of the terms. Checked against 50-digit values in the `shortrate_g` CIR option goldens to
+/// The sum starts at the Poisson mode with a log weight and recurs up and down until both the
+/// weight and the term fall below `1e-17` of the mode weight and the sum (ruling G-32), so the
+/// truncation error is far below the rounding of the terms and nothing underflows. Checked against 50-digit values in the `shortrate_g` CIR option goldens to
 /// better than 1e-12 relative. unchecked: caller guarantees finite inputs (F-4).
 pub fn noncentral_chi2_cdf(x: f64, k: f64, lambda: f64) -> f64 {
     if x <= 0.0 {
@@ -356,18 +356,32 @@ pub fn noncentral_chi2_cdf(x: f64, k: f64, lambda: f64) -> f64 {
     if h == 0.0 {
         return gamma_p(s0, y);
     }
-    let ln_h = h.ln();
-    let mut sum = 0.0;
-    let mut j = 0u32;
+    // G-32: start at the Poisson mode with a log weight (exp(-lambda/2) alone underflows for
+    // lambda/2 > 745), then recur the weights up and down.
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let j0 = h.floor().min(1e9) as u32;
+    let jf0 = f64::from(j0);
+    let w0 = (-h + jf0 * h.ln() - crate::garch_estimate::lgamma(jf0 + 1.0)).exp();
+    let mut sum = w0 * gamma_p(s0 + jf0, y);
+    let (mut w, mut j) = (w0, j0);
     loop {
-        let jf = f64::from(j);
-        let w = (-h + jf * ln_h - crate::garch_estimate::lgamma(jf + 1.0)).exp();
-        let term = w * gamma_p(s0 + jf, y);
+        w *= h / f64::from(j + 1);
+        j += 1;
+        let term = w * gamma_p(s0 + f64::from(j), y);
         sum += term;
-        if (jf > h + 10.0 && term <= sum * 1e-17) || j >= 100_000 {
+        if (term <= sum * 1e-17 && w <= w0 * 1e-17) || j - j0 > 1_000_000 {
             break;
         }
-        j += 1;
+    }
+    let (mut w, mut j) = (w0, j0);
+    while j > 0 {
+        w *= f64::from(j) / h;
+        j -= 1;
+        let term = w * gamma_p(s0 + f64::from(j), y);
+        sum += term;
+        if term <= sum * 1e-17 && w <= w0 * 1e-17 {
+            break;
+        }
     }
     sum.min(1.0)
 }
