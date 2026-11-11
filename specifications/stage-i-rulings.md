@@ -31,6 +31,15 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-18 | Correlation sensitivity units | `CORRELATION` and `correlation01` are per 0.01 of correlation, as `risk.sens.correlation`; vegas are per unit volatility, as I-9 |
 | I-19 | `E_LIMIT` sizes, wave 2 | Credit: book 1,000 trades, 50 hedges. Correlation: book 1,000 positions, 5 hedges (the number of Greeks) |
 
+## Wave 3, cross-asset hedge (equity and rates)
+
+| # | Point | Ruling |
+|---|---|---|
+| I-20 | Curve for the cross-asset hedge | Continuously compounded zero rates on ACT/365F pillar times, linear in time between pillars, flat before the first pillar, and no extrapolation after the last: a maturity there is `E_INPUT` (spec question Q-I9) |
+| I-21 | Equity and key-rate risk factors | `EQ01` is half the value change between spot times 1.01 and spot times 0.99. `KR01_k` is half the change between pillar `k`'s zero rate plus and minus 1bp, other pillars fixed. Both are definitions, not derivative approximations |
+| I-22 | Units of hedge instruments | The wave 1 singularity test (I-3) is relative to the largest eigenvalue, so it is not invariant to instrument units. A unit zero-coupon bond's 1bp risk (about 5e-4) next to a forward's 1% equity risk (about 40) made a regular problem look singular (ratio 6e-12, found while generating `hedgexa_i`). `ZCB` therefore takes a `notional`, and hedge instruments are expected to carry comparable risk per unit. I-3 is not changed (Q-I10) |
+| I-23 | `E_LIMIT` sizes, wave 3 | Book 1,000 positions, hedges 200, curve pillars 100 |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).

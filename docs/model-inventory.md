@@ -682,6 +682,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a desk need for index, tranche or recovery hedges.
 - **Validation report:** `specifications/08-hedging/credit-and-correlation-hedges.md`.
 
+### MI-3 Cross-asset hedge, equity and rates (stage I wave 3)
+- **Purpose:** one weighted least-squares hedge of a book's equity move and key-rate risks with forwards, options, bonds and the underlying.
+- **Inputs:** spot, dividend yield, flat volatility, a linear-in-zero discount curve; book and hedge instruments; factor weights.
+- **Limitations:** one equity, one curve, no extrapolation beyond the last pillar; the singularity test depends on instrument units (I-22).
+- **Validation:** QuantLib ZeroCurve and AnalyticEuropeanEngine outside check on every value case (9 of 17). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** QuantLib 1.44 values with numpy least squares on the same risk definitions.
+- **Monitoring thresholds:** residual equity or key-rate risk above the desk's limit after the hedge.
+- **Data lineage hash:** sha256 ac4424db9b094def5344ca102b4da3e08252472ffce4ec85440423ac9b2b6dc2 (`hedgexa_i`)
+- **Retirement trigger:** a multi-curve or dividend-term-structure need.
+- **Validation report:** `specifications/08-hedging/cross-asset-hedge.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

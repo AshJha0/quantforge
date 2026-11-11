@@ -3446,6 +3446,45 @@
     "notionals"
    ]
   },
+  "hedge.crossasset.solve": {
+   "spec": "specifications/08-hedging/cross-asset-hedge.md",
+   "rust": "quantforge::hedge::crossasset_solve",
+   "python": "quantforge.hedge.crossasset_solve",
+   "java": "Hedge.crossassetSolve",
+   "cpp": "qf::hedge::crossasset_solve",
+   "inputs": {
+    "book": {
+     "java": "book"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "hedges": {
+     "java": "hedges"
+    },
+    "ridge": {
+     "java": "ridge"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "volatility": {
+     "java": "volatility"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "book_risk",
+    "objective",
+    "positions",
+    "residual_risk"
+   ]
+  },
   "hedge.greeks.neutralise": {
    "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
    "rust": "quantforge::hedge::greeks_neutralise",
@@ -3482,7 +3521,7 @@
    ]
   },
   "hedge.integer.solve": {
-   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "spec": "specifications/08-hedging/cross-asset-hedge.md",
    "rust": "quantforge::hedge::integer_solve",
    "python": "quantforge.hedge.integer_solve",
    "java": "Hedge.integerSolve",

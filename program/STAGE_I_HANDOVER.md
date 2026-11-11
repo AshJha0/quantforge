@@ -80,3 +80,24 @@ Read: `specifications/08-hedging/credit-and-correlation-hedges.md`; rulings I-15
 
 ### Outside-oracle status
 `hedgecredit_i` 10 of 19 (QuantLib `IsdaCdsEngine` on bumped hazard curves), `hedgecorr_i` 9 of 20 (QuantLib Margrabe engine and `BlackCalculator.vega`). Every value case counts; no error case does. Stage I so far: 63 of 160 = 39.4% (`oracle/outside_register_i.json`). The floor (60%, I-2) is measured at release. Error cases are 61 of the 160, so the value suites still to come must count nearly all their cases, or the stage reports a gap as G-42 did.
+
+## WAVE 3 READY (2026-11-11): cross-asset hedge, equity and rates
+
+Read: `specifications/08-hedging/cross-asset-hedge.md`; rulings I-20 to I-23 (and I-1 to I-5); `specifications/08-hedging/hedge-solvers.md` (the solve it reuses); cli-contract block "Stage I operations"; edge-case rows I8, I9; `specifications/name-map.json` (269 operations).
+
+### Suite (17 cases)
+
+`hedgexa_i`, operation `hedge.crossasset.solve`: 9 value cases, 8 error cases.
+
+### Build notes
+- Build the risk matrix by repricing, not by Greeks. `EQ01` is half of `V(1.01 S) - V(0.99 S)`, and `KR01_k` is half of `V(z_k + 1bp) - V(z_k - 1bp)` with the curve rebuilt (I-21). Then call your wave 1 `hedge.qp.solve` with the given weights and ridge.
+- Curve: linear in zero rate between pillars, flat before the first, refused after the last (I-20). A maturity between pillars shares its key-rate risk between the two neighbours; before pillar 1 it all goes to pillar 1.
+- `ZCB` has a `notional` (I-22). Every instrument kind has a fixed key set (`E_INPUT` otherwise).
+- `residual_risk` and `objective` come from the risks and positions, as in `hedge.qp.solve`.
+
+### Property tests
+- A square, regular hedge leaves `residual_risk` at 0. A book of bonds alone has `EQ01 = 0` exactly.
+- Scaling every weight by the same factor leaves `positions` unchanged when `ridge = 0`.
+
+### Outside-oracle status
+`hedgexa_i` 9 of 17 (QuantLib `ZeroCurve` and `AnalyticEuropeanEngine`, the same half-differences, numpy `lstsq`). Every value case counts; no error case does. Stage I so far: 72 of 177 = 40.7% (`oracle/outside_register_i.json`).

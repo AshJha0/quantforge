@@ -113,3 +113,5 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | I5 | Book already hedged, or nothing to hedge | Pinned | `hedgeqp_i-0026` (`b = 0` gives `x = 0`); `hedgeres_i` `E_DOMAIN` for `b^T S b = 0`; `hedgemv_i` zero exposure variance | Ruling I-11 |
 | I6 | Credit hedge instrument with no risk in the targeted hazard sections | Pinned | `stage_i/hedgecredit_i` `E_SINGULAR` (1Y and 3Y contracts against buckets 4 and 5) | Ruling I-15 |
 | I7 | Correlation 1 with unequal vols; exchange options that cannot separate vega from correlation | Pinned | `stage_i/hedgecorr_i` (`rho = 1`, `s = 0.05`; exchange-only `E_SINGULAR`; `s = 0` `E_DOMAIN`) | Ruling I-17 |
+| I8 | Cross-asset maturity outside the curve: before the first pillar, or after the last | Pinned | `stage_i/hedgexa_i-0008` (flat short end, pillar 1 only); `E_INPUT` case beyond the last pillar | Ruling I-20 |
+| I9 | Hedge instruments of very different unit sizes | Rule | `stage_i/hedgexa_i` uses `ZCB` notionals of 1e6 | Ruling I-22: the relative singularity test is not scale-invariant |
