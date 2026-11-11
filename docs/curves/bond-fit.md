@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-A fitted yield curve against bond yields, with residuals per bond. Stage D, target v0.4.
+A fitted yield curve against bond yields, with residuals per bond. Stage D.
 
 ## Runs
 

@@ -247,9 +247,13 @@ CURVES = {
 
 # Curves named in the plan's stage rows that have no page. Stage from the plan.
 # Stage D curves are in STAGE_D below, each with a planned page.
+# Each row: name, status, stage, evidence. A Planned row must not name an operation that exists in
+# specifications/name-map.json; tools/test_tools.py and quality_gate check this against the README table.
 PLANNED = [
-    ("Financing curves", "D"), ("Sector and rating curves", "D"),
-    ("Funding curve", "F"), ("Liquidity curves", "H"),
+    ("Financing term structures", "Partly done", "D",
+     "Repo financing is done (`repo.forward`, `repo.implied_rate` and the implied financing spread; see the repo row). "
+     "Ruling D22 keeps borrow and financing as flat rates over the funding curve; financing term structures are not yet scheduled"),
+    ("Liquidity curves", "Planned", "H", "None yet"),
 ]
 
 # Stage D curves. Each gets a page: a planned page until `cli` names a CLI operation and a renderer
@@ -274,6 +278,10 @@ STAGE_D = {
                        "shows": "Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike. The conventions are stylised: a synthetic term index, no fixing lag and an annual 30/360 fixed leg (ruling R1-5)."},
     "commodities": {"kind": "stage-d", "title": "Commodity forward curves, with seasonality and storage carry", "short": "Commodity forwards", "cli": "cmdty.curve.forward", "examples": {"cmdty.curve.forward": "commodity_forward_d.json", "cmdty.storage.carry": "commodity_carry_d.json"},
                     "shows": "Forward prices by delivery month, with seasonality and carry shown apart."},
+    "sector-rating": {"kind": "stage-d", "title": "Sector and rating curves", "short": "Sector and rating curves", "golden": "stage_d", "cli": "credit.curve.composite", "examples": {"credit.curve.composite": "credit_composite_d.json"},
+                      "shows": "A sector or rating curve built as the weighted average of constituent CDS spread curves, then bootstrapped to survival probabilities with the ISDA rules (`specifications/04-pricing/credit.md`). The constituents and weights are synthetic."},
+    "funding": {"kind": "stage-d", "stage": "F", "golden": "stage_f", "title": "Funding curve", "short": "Funding curve", "cli": "rates.funding.curve", "examples": {"rates.funding.curve": "funding_curve_f.json"},
+                "shows": "A funding curve solved from term funding quotes over an OIS discount curve, with the funding spread it implies by date (`specifications/02-curves/joint-solve-and-funding.md`)."},
     "mbs": {"kind": "stage-d", "title": "MBS prepayment and valuation curves", "short": "MBS", "cli": "mbs.cashflows", "examples": {"mbs.cashflows": "mbs_cashflows_d.json"},
             "shows": "Prepayment speeds by month and the resulting cash flows."},
 }
@@ -482,7 +490,7 @@ def how_block(spec, slug):
     ex = spec["example"]
     more = {"rates": "The charts then send the pillars to `rates.curve.discount` and `rates.curve.forward` on a grid of quarterly dates plus every pillar.",
             "fx": "The gallery sends this case once per quarterly value date, changing only `value_date`, and sends "
-                  f"[`examples/{spec.get('implied')}`](../../examples/{spec.get('implied')}) for the basis."}[spec["kind"]]
+                  f"[`examples/{spec.get('implied')}`](../../examples/{spec.get('implied')}) to `fx.curve.implied` for the basis."}[spec["kind"]]
     return (f"Input file: [`examples/{ex}`](../../examples/{ex}). Build a CLI as in the [Cookbook](../../COOKBOOK.md), then from the repository root:\n\n"
             f"```bash\nrust/target/release/quantforge run < examples/{ex}\n```\n\n{more} To rebuild every page, with all four CLIs built:\n\n"
             f"```bash\npython tools/build_gallery.py\n```\n\nRaw numbers: [`docs/curves/data/{slug}.json`](data/{slug}.json).")
@@ -659,8 +667,14 @@ def index_page(all_data):
                      f"{e['cases']} golden cases for {', '.join('`' + o + '`' for o in e['operations'])}, {outside} with an outside library in `verified_by`"])
     for slug, spec in STAGE_D.items():
         live = is_live(spec) and slug in all_data
-        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", "D",
-                     f"{all_data[slug]['evidence']['cases']} golden case{'s' if all_data[slug]['evidence']['cases'] != 1 else ''}" if live and slug in all_data else "None yet"])
+        ev = "None yet"
+        if live:
+            e = all_data[slug]["evidence"]
+            ev = f"{e['cases']} golden case{'s' if e['cases'] != 1 else ''}"
+            if spec.get("golden"):  # newer pages name the operation and the outside-library share, like stages B, C and F
+                outside = sum(v for k, v in e["by_source"].items() if "quantlib" in k or "strata" in k)
+                ev += f" for {', '.join('`' + o + '`' for o in e['operations'])}, {outside} with an outside library in `verified_by`"
+        rows.append([f"[{spec['short']}]({slug}.md)", "Implemented, not Validated" if live else "Planned", spec.get("stage", "D"), ev])
     for slug, spec in gallery_e.STAGE_E.items():
         live = gallery_e.is_live(spec) and slug in all_data
         n = all_data[slug]["evidence"]["cases"] if live else 0
@@ -670,7 +684,7 @@ def index_page(all_data):
         e = all_data[gallery_f.SLUG]["evidence"]
         rows.append([f"[Five interpolation methods]({gallery_f.SLUG}.md)", "Implemented, not Validated", "F",
                      f"{e['cases']} golden cases for `{e['operation']}`, {e['outside']} reproduced by an outside library"])
-    rows += [[name, "Planned", stage, "None yet"] for name, stage in PLANNED]
+    rows += [[name, status, stage, ev] for name, status, stage, ev in PLANNED]
     real = ""
     if gallery_real.SLUG in all_data:
         real = ("\n## Real data\n\n"
@@ -685,7 +699,7 @@ def index_page(all_data):
 
 A curve says what one unit paid on a future date is worth today, or what a rate or price is expected to be on that date. Pricing, risk and hedging all read from curves, so a mistake here reaches everything else. Formally, a discount curve is a function `D(t)` with `D(0) = 1`, stored as dated pillars plus a rule for the dates in between (`specifications/02-curves/curve-framework.md`).
 
-<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Stages B, C and D are at Implemented, not Validated, and stage E pages are Planned until their CLI operations land: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
+<p class="note">Every number and chart here comes from a real run of the four command-line builds. All inputs are synthetic, so these pages show the method, not a market, except the one Real data page below. Every page in the table is at Implemented, not Validated, unless its row says otherwise: validation is self-assessment until the human review at the end of the project. Nothing is traded, and trading in this project is simulated only.</p>
 
 Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
@@ -964,9 +978,9 @@ Limits:
 STAGE_D_GOLDEN = ROOT / "datasets" / "golden" / "stage_d"
 
 
-def golden_d(ops):
+def golden_d(ops, folder="stage_d"):
     counts, total = {}, 0
-    for path in sorted(STAGE_D_GOLDEN.glob("*.json")):
+    for path in sorted((ROOT / "datasets" / "golden" / folder).glob("*.json")):
         for c in json.loads(path.read_text(encoding="utf-8"))["cases"]:
             if c["operation"] not in ops or c["expected"].get("status") != "ok":
                 continue
@@ -1029,7 +1043,7 @@ Input: [`examples/{ex}`](../../examples/{ex}). Command: `quantforge batch < exam
 
 ## What it is
 
-{spec['shows']} Stage D, target v0.4.
+{spec['shows']} Stage {spec.get('stage', 'D')}.
 
 ## Runs
 
@@ -1044,7 +1058,7 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 
 ## Oracle evidence and limits
 
-{ev['cases']} golden cases with status ok in `datasets/golden/stage_d` for {', '.join('`' + o + '`' for o in ev['operations'])}, by `verified_by`:
+{ev['cases']} golden cases with status ok in `datasets/golden/{spec.get('golden', 'stage_d')}` for {', '.join('`' + o + '`' for o in ev['operations'])}, by `verified_by`:
 
 {table(['Operation: sources', 'Cases'], ev_rows)}
 
@@ -1097,7 +1111,7 @@ def refresh_evidence():
         elif slug in VOLS:
             new = golden_c(VOLS[slug]["golden"])
         elif slug in STAGE_D:
-            new = golden_d(STAGE_D[slug]["examples"])
+            new = golden_d(STAGE_D[slug]["examples"], STAGE_D[slug].get("golden", "stage_d"))
         elif slug in gallery_e.STAGE_E:
             new = gallery_e.golden(gallery_e.STAGE_E[slug]["examples"])
         else:
@@ -1200,7 +1214,7 @@ def generate(refresh_real=False, real_only=False, stage_e_only=False, stage_f_on
         results = {lang: d_run(lang, spec) for lang in LANGS}
         d = {"meta": {**meta, "example_hashes": {v: example_hash(v) for v in spec["examples"].values()}},
              "inputs": {op: read_example(f)["inputs"] for op, f in spec["examples"].items()},
-             "reference": results["python"], "agreement": vol_agreement(results), "evidence": golden_d(spec["examples"])}
+             "reference": results["python"], "agreement": vol_agreement(results), "evidence": golden_d(spec["examples"], spec.get("golden", "stage_d"))}
         all_data[slug] = d
         (DATA / f"{slug}.json").write_text(json.dumps(d, indent=1) + "\n", encoding="utf-8", newline="\n")
     generate_e(meta, all_data)
@@ -1258,7 +1272,7 @@ def check():
             if d["meta"]["example_hashes"].get(v) != example_hash(v):
                 bad.append(f"{slug}: {v} changed")
         compare(d["reference"], d_run("python", spec), slug, bad)
-        if d["evidence"] != golden_d(spec["examples"]):
+        if d["evidence"] != golden_d(spec["examples"], spec.get("golden", "stage_d")):
             bad.append(f"{slug}: golden evidence changed")
     for slug, spec in gallery_e.STAGE_E.items():
         if not gallery_e.is_live(spec):
