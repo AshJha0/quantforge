@@ -264,3 +264,19 @@ F-Q1, F-Q2 and F-Q4 have no ruling yet.
   a root scan coarser than that misses it and overstates `P(f <= y)`, which is what a too-low
   quantile needs. Python's scan has 0.01-standard-deviation steps plus Brent refinement. Asked:
   regenerate the eight `pfe_99` values (or confirm the definition).
+
+## Stage I (2026-11-11)
+
+Wave 1 (hedge solvers) passes 121 of 121 with no open question. Choices made where the spec is silent:
+
+- I-Q1 (I-4, `hedge.minvar.ratio`). "Instruments 200" is read as at most 200 hedge instruments, so the
+  covariance may be 201 x 201 (the position plus 200) and `hedge_changes` at most 200 series; the
+  series length uses the generic 100,000. `hedge.residual.report` caps `covariance` at 1,000 x 1,000
+  (factors) and `a` at 1,000 x 200. `hedge.integer.solve` counts instruments by the row length of
+  `a` and the length of `lot_sizes`. No golden tests these readings beyond the integer case.
+- I-Q2 (`hedge.greeks.neutralise`). A `quantity` on a hedge instrument is ignored, not refused; check
+  1 is applied to the portfolio and the hedges together, so an underlying hedge with a strike is
+  `E_INPUT` too.
+- I-Q3 (`hedge.qp.solve`). `E_INFEASIBLE` is decided by a phase-1 simplex with a relative tolerance
+  of 1e-9 on the artificial sum; I-14 asks for an exact decision and the goldens keep feasible cases
+  clear of the boundary, so the tolerance never decides a golden.

@@ -1,6 +1,7 @@
 """Handlers for the hedging verbs. A handler reads every input first; the first call through `core`, the gated core modules, ends the E_SCHEMA stage."""
 from typing import Any
 
+from ..errors import QfError
 from .inputs import Inputs
 from .registry import core, op
 
@@ -15,3 +16,91 @@ def hedge_solve(i: Inputs) -> Any:
 @op("hedge.spread_cost")
 def spread_cost(i: Inputs) -> Any:
     return {"cost": core.hedging.spread_cost(i.reals("quantities"), i.reals("half_spreads"))}
+
+
+# Stage I wave 1 (08-hedging/hedge-solvers.md). `null` is legal only inside the bound lists (I-12).
+
+def _opt_matrix(i: Inputs, key: str) -> list[list[float]] | None:
+    return i.matrix(key) if i.has(key) else None
+
+
+def _opt_reals(i: Inputs, key: str) -> list[float] | None:
+    return i.reals(key) if i.has(key) else None
+
+
+def _opt_bounds(i: Inputs, key: str) -> list[float | None] | None:
+    return i.nullable_reals(key) if i.has(key) else None
+
+
+def _opt_lot_bounds(i: Inputs, key: str) -> list[int | None] | None:
+    if not i.has(key):
+        return None
+    values = i.array(key)
+    if not all(v is None or (not isinstance(v, bool) and isinstance(v, int)) for v in values):
+        raise QfError("E_SCHEMA", f"{key}: not an array of integers and nulls", key)
+    return values
+
+
+def _least_squares(i: Inputs) -> tuple[list[list[float]], list[float], list[float], float]:
+    return i.matrix("a"), i.reals("b"), i.reals("weights"), i.opt_real("ridge", 0.0)
+
+
+@op("hedge.qp.solve")
+def hedge_qp_solve(i: Inputs) -> Any:
+    a, b, weights, ridge = _least_squares(i)
+    args = (_opt_matrix(i, "eq_matrix"), _opt_reals(i, "eq_rhs"), _opt_bounds(i, "lower"),
+            _opt_bounds(i, "upper"))
+    singular = i.enum("singular", ("ERROR", "MIN_NORM")) if i.has("singular") else "ERROR"
+    return core.hedge_solvers.qp_solve(a, b, weights, ridge, *args, singular)
+
+
+@op("hedge.integer.solve")
+def hedge_integer_solve(i: Inputs) -> Any:
+    a, b, weights, ridge = _least_squares(i)
+    lots = i.reals("lot_sizes")
+    lower, upper = _opt_lot_bounds(i, "lower_lots"), _opt_lot_bounds(i, "upper_lots")
+    return core.hedge_solvers.integer_solve(a, b, weights, lots, ridge, lower, upper)
+
+
+@op("hedge.minvar.ratio")
+def hedge_minvar_ratio(i: Inputs) -> Any:
+    return core.hedge_solvers.minvar_ratio(
+        _opt_matrix(i, "covariance"), _opt_reals(i, "exposure_changes"),
+        _opt_matrix(i, "hedge_changes"))
+
+
+def _instruments(i: Inputs, key: str, held: bool) -> list[tuple[Any, ...]]:
+    out: list[tuple[Any, ...]] = []
+    for k, item in enumerate(i.array(key)):
+        if not isinstance(item, dict):
+            raise QfError("E_SCHEMA", f"{key}/{k}: not an object", key)
+        p = Inputs(item, f"{key}/{k}.")
+        entry = (p.enum("instrument", ("CALL", "PUT", "UNDERLYING")), p.opt_real("strike"),
+                 p.opt_real("expiry_years"))
+        out.append((*entry, p.real("quantity")) if held else entry)
+    return out
+
+
+@op("hedge.greeks.neutralise")
+def hedge_greeks_neutralise(i: Inputs) -> Any:
+    market = (i.real("spot"), i.real("rate"), i.real("dividend_yield"), i.real("volatility"))
+    portfolio = _instruments(i, "portfolio", True)
+    hedges = _instruments(i, "hedges", False)
+    targets = i.array("targets")
+    if not all(isinstance(t, str) and t in ("DELTA", "GAMMA", "VEGA") for t in targets):
+        raise QfError("E_SCHEMA", "targets: each must be DELTA, GAMMA or VEGA", "targets")
+    return core.hedge_solvers.greeks_neutralise(*market, portfolio, hedges, targets)
+
+
+@op("hedge.beta.futures")
+def hedge_beta_futures(i: Inputs) -> Any:
+    args = (i.real("portfolio_value"), i.real("portfolio_beta"), i.real("target_beta"),
+            i.real("futures_price"), i.real("multiplier"))
+    rounding = i.enum("rounding", ("NEAREST", "NONE")) if i.has("rounding") else "NEAREST"
+    return core.hedge_solvers.beta_futures(*args, rounding)
+
+
+@op("hedge.residual.report")
+def hedge_residual_report(i: Inputs) -> Any:
+    return core.hedge_solvers.residual_report(
+        i.matrix("a"), i.reals("b"), i.reals("x"), i.matrix("covariance"))

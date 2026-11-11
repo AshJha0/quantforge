@@ -94,6 +94,27 @@ def _hedge(raw: Raw) -> None:
         raise _over("a", 20)
 
 
+def _rows_cols(key: str, rows: int, cols: int) -> Callable[[Raw], None]:
+    """A matrix input of at most `rows` rows of at most `cols` entries."""
+    def check(raw: Raw) -> None:
+        value = raw.get(key)
+        if isinstance(value, list):
+            if len(value) > rows:
+                raise _over(key, rows)
+            if any(isinstance(r, list) and len(r) > cols for r in value):
+                raise _over(key, cols)
+
+    return check
+
+
+def _all(*checks: Callable[[Raw], None]) -> Callable[[Raw], None]:
+    def check(raw: Raw) -> None:
+        for c in checks:
+            c(raw)
+
+    return check
+
+
 _RNG = _caps(count=MAX_ARRAY, skip=MAX_SKIP)
 _ROOT = _caps(max_iter=100_000)
 _POINTS = _caps(n=10_000_000)
@@ -143,6 +164,18 @@ def _slv_grid(raw: Raw) -> None:
             _cap(grid, key, limit)
 
 
+# Ruling I-4: factors 1,000, instruments 200, equality rows 200, integer instruments 12, series
+# 100,000 (the generic array cap), portfolio positions 1,000, Greek hedge instruments 3.
+_I_FACTORS, _I_INSTRUMENTS = 1000, 200
+_HEDGE_QP = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
+                 _rows_cols("eq_matrix", _I_INSTRUMENTS, _I_INSTRUMENTS))
+_HEDGE_INTEGER = _all(_rows_cols("a", _I_FACTORS, 12), _caps_list("lot_sizes", 12))
+_HEDGE_MINVAR = _all(_rows_cols("covariance", _I_INSTRUMENTS + 1, _I_INSTRUMENTS + 1),
+                     _rows_cols("hedge_changes", _I_INSTRUMENTS, MAX_ARRAY))
+_HEDGE_GREEKS = _all(_caps_list("portfolio", 1000), _caps_list("hedges", 3))
+_HEDGE_RESIDUAL = _all(_rows_cols("a", _I_FACTORS, _I_INSTRUMENTS),
+                       _rows_cols("covariance", _I_FACTORS, _I_FACTORS))
+
 _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "core.integrate.trapezoid": _POINTS,
     "core.integrate.simpson": _POINTS,
@@ -190,6 +223,12 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "rates.shortrate.bermudan_swaption": _scheme_grid,
     "rates.shortrate.callable_bond": _scheme_grid,
     "rates.shortrate.bermudan_ladder": _scheme_grid,
+    # Stage I wave 1 (ruling I-4).
+    "hedge.qp.solve": _HEDGE_QP,
+    "hedge.integer.solve": _HEDGE_INTEGER,
+    "hedge.minvar.ratio": _HEDGE_MINVAR,
+    "hedge.greeks.neutralise": _HEDGE_GREEKS,
+    "hedge.residual.report": _HEDGE_RESIDUAL,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")

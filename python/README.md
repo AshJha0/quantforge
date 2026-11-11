@@ -2,7 +2,7 @@
 
 One of four equal implementations; it is not a reference for the others.
 
-Stages A to G (stage G pending release as v0.7.0), on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
+Stages A to G, and stage I wave 1 (hedge solvers), on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
 
 Install: `uv sync`
 
@@ -10,8 +10,8 @@ Test: `uv run ruff check .` and `uv run pytest`
 
 Conformance, from the repository root: `python conformance/runner/runner.py --impl python`
 
-The interpreter is pinned in `.python-version` and dependencies in `uv.lock`. NumPy is used only for
-symmetric eigenvalues and condition numbers. SciPy is a dev dependency, for second checks in the tests.
+The interpreter is pinned in `.python-version` and dependencies in `uv.lock`. NumPy is used for symmetric
+eigenvalues and condition numbers, and in `hedge_solvers` for the SVD, QR and least-squares steps. SciPy is a dev dependency, for second checks in the tests.
 
 `quantforge_core` holds one module per domain spec (curves, bonds, credit, caps_swaptions, variance and
 so on), never named by stage. `quantforge_core/cli` holds the `quantforge` command and the input
