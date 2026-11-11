@@ -12,11 +12,23 @@ use quantforge_core::hedge_cross::{
     self as hx, CorrKind, CorrLeg, CorrMarket, CorrTarget, CreditMarket, CreditRisk,
 };
 use quantforge_core::hedge_crossasset::{self as xa, XaKind, XaLeg, XaMarket, ZeroCurve};
-use quantforge_core::hedge_dynamic::{self as hd, BacktestOption, BacktestSetup, Effectiveness};
+use quantforge_core::hedge_dynamic::{
+    self as hd, BacktestOption, BacktestSetup, Effectiveness, Order, SlippageCosts,
+};
 use quantforge_core::hedge_solvers::{
     self as hs, Costs, Greek, IntegerProblem, Leg, LegKind, MinVarInput, QpProblem, Singular,
 };
 use quantforge_core::json::{Json, obj};
+
+fn slippage_fields(c: &SlippageCosts) -> [(&'static str, Json); 5] {
+    [
+        ("execution_cost", c.execution_cost.into()),
+        ("opportunity_cost", c.opportunity_cost.into()),
+        ("shortfall", c.shortfall.into()),
+        ("model_cost", c.model_cost.into()),
+        ("slippage", c.slippage.into()),
+    ]
+}
 
 fn effectiveness_fields(e: &Effectiveness) -> [(&'static str, Json); 4] {
     [
@@ -578,20 +590,91 @@ super::registry! {
                 rate: i.f64("rate")?,
                 dividend_yield: i.f64("dividend_yield")?,
                 hedge_volatility: i.f64("hedge_volatility")?,
+                half_spread: opt_f64(i, "half_spread")?,
+                impact: opt_f64(i, "impact")?,
             };
             let (times, spots) = (i.reals("times")?, i.reals("spots")?);
             i.gate()?;
             let r = hd::backtest_delta(&option, &setup, &times, &spots)?;
-            let [d, s, r2, v] = effectiveness_fields(&r.effectiveness);
-            plain(obj([
+            let mut out = vec![
                 ("option_values", r.option_values.into()),
                 ("shares", r.shares.into()),
                 ("portfolio_values", r.portfolio_values.into()),
                 ("final_pnl", r.final_pnl.into()),
-                d,
-                s,
-                r2,
-                v,
+            ];
+            out.extend(effectiveness_fields(&r.effectiveness));
+            if let Some(c) = r.trading_cost {
+                out.push(("trading_cost", c.into()));
+            }
+            plain(Json::Obj(out.into_iter().map(|(k, v)| (k.to_string(), v)).collect()))
+        },
+        "hedge.select.solve" => {
+            let (a, b, w) = (i.matrix("a")?, i.reals("b")?, i.reals("weights")?);
+            let ridge = ridge(i)?;
+            let (lo, hi) = (opt_bounds(i, "lower")?, opt_bounds(i, "upper")?);
+            let k = i.int("max_instruments")?;
+            let extra = ["eq_matrix", "eq_rhs", "singular"].iter().any(|k| i.0.get(k).is_some());
+            i.gate()?;
+            let s = hs::select_solve(
+                &QpProblem {
+                    a: &a,
+                    b: &b,
+                    weights: &w,
+                    ridge,
+                    eq_matrix: None,
+                    eq_rhs: None,
+                    lower: lo.as_deref(),
+                    upper: hi.as_deref(),
+                    singular: Singular::Error,
+                    costs: Costs::default(),
+                },
+                k,
+                extra,
+            )?;
+            let selected = s
+                .selected
+                .iter()
+                .map(|j| Json::Int(i64::try_from(*j).unwrap_or(i64::MAX)))
+                .collect();
+            plain(obj([
+                ("selected", Json::Arr(selected)),
+                ("x", s.x.into()),
+                ("residual", s.residual.into()),
+                ("objective", s.objective.into()),
+            ]))
+        },
+        "hedge.slippage.report" => {
+            let mut orders = Vec::new();
+            for o in items(i, "orders")? {
+                let mut fills = Vec::new();
+                for f in items(&o, "fills")? {
+                    fills.push((f.f64("quantity")?, f.f64("price")?));
+                }
+                orders.push(Order {
+                    quantity: o.f64("quantity")?,
+                    decision_price: o.f64("decision_price")?,
+                    final_price: o.f64("final_price")?,
+                    half_spread: o.f64("half_spread")?,
+                    impact: o.f64("impact")?,
+                    fills,
+                });
+            }
+            i.gate()?;
+            let (reports, total) = hd::slippage_report(&orders)?;
+            let rows: Vec<Json> = reports
+                .iter()
+                .map(|r| {
+                    let mut v = vec![
+                        ("filled_quantity", r.filled_quantity.into()),
+                        ("average_price", r.average_price.map_or(Json::Null, Into::into)),
+                    ];
+                    v.extend(slippage_fields(&r.costs));
+                    Json::Obj(v.into_iter().map(|(k, v)| (k.to_string(), v)).collect())
+                })
+                .collect();
+            plain(obj([
+                ("orders", Json::Arr(rows)),
+                ("total", obj(slippage_fields(&total))),
             ]))
         },
         "hedge.residual.report" => {

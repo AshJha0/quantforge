@@ -307,6 +307,17 @@ fn stage_i_above(op: &str, i: &Json) -> bool {
         // Ruling I-19.
         "hedge.credit.cds" => over("book", 1_000) || over("hedges", 50),
         "hedge.correlation.neutralise" => over("book", 1_000) || over("hedges", 5),
+        // Rulings I-35 and I-38.
+        "hedge.select.solve" => over("a", 1_000) || columns_over(20),
+        "hedge.slippage.report" => {
+            over("orders", 10_000)
+                || i.get("orders").and_then(Json::as_array).is_some_and(|os| {
+                    os.iter()
+                        .map(|o| len(o, "fills").unwrap_or(0))
+                        .sum::<i128>()
+                        > 1_000_000
+                })
+        }
         // Ruling I-23.
         "hedge.crossasset.solve" => {
             over("book", 1_000)

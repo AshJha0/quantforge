@@ -64,6 +64,19 @@ pub struct BacktestSetup {
     pub rate: f64,
     pub dividend_yield: f64,
     pub hedge_volatility: f64,
+    /// Wave 4e cost per share traded, `half_spread |dq| + impact dq^2` (I-39); absent is 0.
+    pub half_spread: Option<f64>,
+    pub impact: Option<f64>,
+}
+
+impl BacktestSetup {
+    fn trade_cost(&self, dq: f64) -> f64 {
+        self.half_spread.unwrap_or(0.0) * dq.abs() + self.impact.unwrap_or(0.0) * dq * dq
+    }
+
+    fn costed(&self) -> bool {
+        self.half_spread.is_some() || self.impact.is_some()
+    }
 }
 
 /// Outputs of `hedge.backtest.delta`.
@@ -74,6 +87,8 @@ pub struct Backtest {
     pub portfolio_values: Vec<f64>,
     pub final_pnl: f64,
     pub effectiveness: Effectiveness,
+    /// Sum of the costs paid, present only with a cost input (I-40).
+    pub trading_cost: Option<f64>,
 }
 
 /// `(value, delta)` at spot `s` with `tau` to expiry; at `tau = 0` the payoff and no delta.
@@ -110,6 +125,8 @@ pub struct Replay {
     pub portfolio_values: Vec<f64>,
     pub item: Vec<f64>,
     pub hedge: Vec<f64>,
+    /// Undiscounted sum of the trading costs paid (0 without cost inputs).
+    pub trading_cost: f64,
 }
 
 /// Replays a self-financing delta hedge of an option position along a given path (I-29).
@@ -128,6 +145,7 @@ pub fn replay(
         "setup",
         &[b.quantity, b.rate, b.dividend_yield, b.hedge_volatility],
     )?;
+    finite("costs", &[b.half_spread, b.impact])?;
     finite("times", &times)?;
     finite("spots", &spots)?;
     let m = times.len();
@@ -152,6 +170,9 @@ pub fn replay(
             "spots, strike, expiry and hedge volatility must be positive",
         );
     }
+    if b.half_spread.is_some_and(|v| v < 0.0) || b.impact.is_some_and(|v| v < 0.0) {
+        return fail("E_DOMAIN", "half_spread and impact must be non-negative");
+    }
     let marks: Vec<(f64, f64)> = times
         .iter()
         .zip(spots)
@@ -159,16 +180,21 @@ pub fn replay(
         .collect();
     let q = b.quantity;
     let shares: Vec<f64> = marks[..m - 1].iter().map(|(_, d)| -q * d).collect();
-    let mut cash = -q * marks[0].0 - shares[0] * spots[0];
-    // Pi_0 = 0: the hedge starts from zero wealth.
+    // The initial purchase is a trade (I-39): Pi_0 = -cost(h_0), 0 without costs.
+    let mut paid = b.trade_cost(shares[0]);
+    let mut cash = -q * marks[0].0 - shares[0] * spots[0] - paid;
     let mut portfolio = vec![0.0; m];
+    portfolio[0] = 0.0 - paid;
     for i in 0..m - 1 {
         let dt = times[i + 1] - times[i];
         cash = cash * (b.rate * dt).exp()
             + shares[i] * spots[i] * ((b.dividend_yield * dt).exp() - 1.0);
         portfolio[i + 1] = q * marks[i + 1].0 + shares[i] * spots[i + 1] + cash;
         if i + 2 < m {
-            cash -= (shares[i + 1] - shares[i]) * spots[i + 1];
+            let dq = shares[i + 1] - shares[i];
+            let cost = b.trade_cost(dq);
+            paid += cost;
+            cash -= dq * spots[i + 1] + cost;
         }
     }
     let item: Vec<f64> = (0..m - 1)
@@ -183,6 +209,7 @@ pub fn replay(
         portfolio_values: portfolio,
         item,
         hedge,
+        trading_cost: paid,
     })
 }
 
@@ -205,5 +232,116 @@ pub fn backtest_delta(
         shares: r.shares,
         portfolio_values: r.portfolio_values,
         effectiveness,
+        trading_cost: b.costed().then_some(r.trading_cost),
     })
+}
+
+/// An order of `hedge.slippage.report`: signed `quantity` (positive buys) and its fills
+/// `(quantity, price)`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Order {
+    pub quantity: f64,
+    pub decision_price: f64,
+    pub final_price: f64,
+    pub half_spread: f64,
+    pub impact: f64,
+    pub fills: Vec<(f64, f64)>,
+}
+
+/// Costs of one order or of all orders (rulings I-36, I-37).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SlippageCosts {
+    pub execution_cost: f64,
+    pub opportunity_cost: f64,
+    pub shortfall: f64,
+    pub model_cost: f64,
+    pub slippage: f64,
+}
+
+/// One order's report: `average_price` is `None` when nothing was filled.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct OrderSlippage {
+    pub filled_quantity: f64,
+    pub average_price: Option<f64>,
+    pub costs: SlippageCosts,
+}
+
+/// `hedge.slippage.report`: implementation shortfall of each order against its decision
+/// price, and its slippage against the wave 4a cost model; `total` sums the orders.
+///
+/// # Errors
+/// `E_DOMAIN` for a non-finite input; `E_INPUT` (no orders, a zero order, a fill of zero or of
+/// the other sign, overfilled); `E_DOMAIN` (a price at or below 0, a negative cost parameter).
+pub fn slippage_report(orders: &[Order]) -> Result<(Vec<OrderSlippage>, SlippageCosts)> {
+    for o in orders {
+        finite(
+            "orders",
+            &[
+                o.quantity,
+                o.decision_price,
+                o.final_price,
+                o.half_spread,
+                o.impact,
+            ],
+        )?;
+        finite("fills", &o.fills)?;
+    }
+    if orders.is_empty()
+        || orders.iter().any(|o| {
+            let filled: f64 = o.fills.iter().map(|f| f.0).sum();
+            o.quantity == 0.0
+                || o.fills.iter().any(|f| f.0 * o.quantity <= 0.0)
+                || filled.abs() > o.quantity.abs()
+        })
+    {
+        return fail(
+            "E_INPUT",
+            "orders non-zero, fills of the order's sign and not above it",
+        );
+    }
+    if orders.iter().any(|o| {
+        o.decision_price <= 0.0
+            || o.final_price <= 0.0
+            || o.fills.iter().any(|f| f.1 <= 0.0)
+            || o.half_spread < 0.0
+            || o.impact < 0.0
+    }) {
+        return fail("E_DOMAIN", "prices positive, cost parameters non-negative");
+    }
+    let mut total = SlippageCosts {
+        execution_cost: 0.0,
+        opportunity_cost: 0.0,
+        shortfall: 0.0,
+        model_cost: 0.0,
+        slippage: 0.0,
+    };
+    let reports = orders
+        .iter()
+        .map(|o| {
+            let d = o.decision_price;
+            let filled: f64 = o.fills.iter().map(|f| f.0).sum();
+            let notional: f64 = o.fills.iter().map(|f| f.0 * f.1).sum();
+            let execution_cost: f64 = o.fills.iter().map(|f| f.0 * (f.1 - d)).sum();
+            let opportunity_cost = (o.quantity - filled) * (o.final_price - d);
+            let model_cost = o.half_spread * filled.abs() + o.impact * filled * filled;
+            let c = SlippageCosts {
+                execution_cost,
+                opportunity_cost,
+                shortfall: execution_cost + opportunity_cost,
+                model_cost,
+                slippage: execution_cost - model_cost,
+            };
+            total.execution_cost += c.execution_cost;
+            total.opportunity_cost += c.opportunity_cost;
+            total.shortfall += c.shortfall;
+            total.model_cost += c.model_cost;
+            total.slippage += c.slippage;
+            OrderSlippage {
+                filled_quantity: filled,
+                average_price: (!o.fills.is_empty()).then(|| notional / filled),
+                costs: c,
+            }
+        })
+        .collect();
+    Ok((reports, total))
 }

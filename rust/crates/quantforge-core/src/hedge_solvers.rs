@@ -1483,3 +1483,121 @@ pub fn residual_report(a: &Matrix, b: &[f64], x: &[f64], s: &Matrix) -> Result<R
         residual,
     })
 }
+
+/// Outputs of `hedge.select.solve`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Selection {
+    /// Chosen 0-based indices, ascending.
+    pub selected: Vec<usize>,
+    pub x: Vec<f64>,
+    pub residual: Vec<f64>,
+    pub objective: f64,
+}
+
+/// The next `k`-subset of `0..n` in lexicographic order, in place; `false` after the last.
+fn next_subset(s: &mut [usize], n: usize) -> bool {
+    let k = s.len();
+    for i in (0..k).rev() {
+        if s[i] < n - k + i {
+            s[i] += 1;
+            for j in i + 1..k {
+                s[j] = s[j - 1] + 1;
+            }
+            return true;
+        }
+    }
+    false
+}
+
+/// `hedge.select.solve`: the best hedge with at most `max_instruments` of the instruments
+/// (ruling I-34), by `hedge.qp.solve` on every subset of size 1 to `K`. `p` carries no
+/// equalities, singular policy or costs; `extra_keys` says that the input named one of
+/// `eq_matrix`, `eq_rhs` or `singular` (I-33).
+///
+/// # Errors
+/// `E_DOMAIN` for a non-finite input; `hedge.qp.solve` checks 1 to 3; `E_INPUT` (`K` outside
+/// `1..n`, an extra key); `E_DOMAIN` (a bound that excludes 0); `E_SINGULAR` (the full
+/// problem).
+pub fn select_solve(p: &QpProblem, max_instruments: i64, extra_keys: bool) -> Result<Selection> {
+    check_finite(p)?;
+    let (_, n) = check_system(p.a, p.b, p.weights)?;
+    let none = vec![None; n];
+    let lower = p.lower.unwrap_or(&none);
+    let upper = p.upper.unwrap_or(&none);
+    if lower.len() != n || upper.len() != n {
+        return fail("E_INPUT", "lower and upper need one entry per instrument");
+    }
+    if p.weights.iter().any(|w| *w <= 0.0)
+        || p.ridge < 0.0
+        || lower
+            .iter()
+            .zip(upper)
+            .any(|(l, u)| matches!((l, u), (Some(l), Some(u)) if l > u))
+    {
+        return fail(
+            "E_DOMAIN",
+            "weights positive, ridge non-negative, bounds ordered",
+        );
+    }
+    let k = usize::try_from(max_instruments).unwrap_or(0);
+    if k < 1 || k > n || extra_keys {
+        return fail(
+            "E_INPUT",
+            "max_instruments in 1..n; no equalities or singular policy (ruling I-33)",
+        );
+    }
+    if lower.iter().any(|l| l.is_some_and(|l| l > 0.0))
+        || upper.iter().any(|u| u.is_some_and(|u| u < 0.0))
+    {
+        return fail("E_DOMAIN", "every bound must admit 0 (ruling I-33)");
+    }
+    let (h, _) = normal_equations(p.a, p.b, p.weights, p.ridge);
+    let eig = eigen_symmetric(&h)?;
+    if eig[0] <= THRESHOLD * spectral_scale(&eig) {
+        return fail("E_SINGULAR", "the full problem is singular");
+    }
+    let mut best: Option<(f64, Vec<usize>, Vec<f64>)> = None;
+    for size in 1..=k {
+        let mut s: Vec<usize> = (0..size).collect();
+        loop {
+            let a: Matrix =
+                p.a.iter()
+                    .map(|r| s.iter().map(|&j| r[j]).collect())
+                    .collect();
+            let lo: Vec<Option<f64>> = s.iter().map(|&j| lower[j]).collect();
+            let hi: Vec<Option<f64>> = s.iter().map(|&j| upper[j]).collect();
+            let sol = qp_solve(&QpProblem {
+                a: &a,
+                lower: Some(&lo),
+                upper: Some(&hi),
+                costs: Costs::default(),
+                ..p.clone()
+            })?;
+            // Earlier subsets are smaller or lexicographically smaller, so a later one wins
+            // only if it is better beyond the tie margin.
+            if best
+                .as_ref()
+                .is_none_or(|b| sol.objective < b.0 - THRESHOLD * b.0.abs())
+            {
+                best = Some((sol.objective, s.clone(), sol.x));
+            }
+            if !next_subset(&mut s, n) {
+                break;
+            }
+        }
+    }
+    let Some((objective, selected, xs)) = best else {
+        return fail("E_NO_CONVERGENCE", "no subset was solved");
+    };
+    let mut x = vec![0.0; n];
+    for (j, v) in selected.iter().zip(xs) {
+        x[*j] = v;
+    }
+    let residual = residual_of(p.a, p.b, &x);
+    Ok(Selection {
+        selected,
+        x,
+        residual,
+        objective,
+    })
+}

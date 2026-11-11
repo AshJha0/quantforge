@@ -254,3 +254,53 @@ proptest! {
         }
     }
 }
+
+mod selection {
+    use super::{base, code, problem};
+    use proptest::prelude::*;
+    use quantforge_core::hedge_solvers::{Costs, qp_solve, select_solve};
+
+    #[test]
+    fn selection_checks_and_ties() {
+        let (a, b, w) = base();
+        let p = problem(&a, &b, &w, Costs::default());
+        assert_eq!(code(select_solve(&p, 0, false)), "E_INPUT");
+        assert_eq!(code(select_solve(&p, 4, false)), "E_INPUT");
+        assert_eq!(code(select_solve(&p, 2, true)), "E_INPUT");
+        let lower = [Some(0.5), None, None];
+        let mut q = p.clone();
+        q.lower = Some(&lower);
+        assert_eq!(code(select_solve(&q, 2, false)), "E_DOMAIN");
+        let dup = vec![vec![1.0, 1.0, 0.0], vec![0.5, 0.5, 1.0]];
+        let q = problem(&dup, &[-1.0, 0.5], &[1.0, 1.0], Costs::default());
+        assert_eq!(code(select_solve(&q, 1, false)), "E_SINGULAR");
+        // Two identical instruments plus ridge: an exact tie goes to index 0.
+        let mut q = problem(&dup, &[-1.0, 0.5], &[1.0, 1.0], Costs::default());
+        q.ridge = 0.01;
+        assert_eq!(select_solve(&q, 1, false).unwrap().selected, vec![0]);
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(48))]
+
+        #[test]
+        fn all_instruments_give_the_qp_answer_and_more_never_hurts(
+            b in prop::collection::vec(-3.0..3.0_f64, 5),
+        ) {
+            let (a, _, w) = base();
+            let p = problem(&a, &b, &w, Costs::default());
+            let full = qp_solve(&p).unwrap();
+            let mut last = f64::INFINITY;
+            for k in 1..=3 {
+                let s = select_solve(&p, k, false).unwrap();
+                prop_assert!(s.objective <= last * (1.0 + 1e-12));
+                last = s.objective;
+                if k == 3 {
+                    for (u, v) in s.x.iter().zip(&full.x) {
+                        prop_assert!((u - v).abs() < 1e-12 * u.abs().max(1.0));
+                    }
+                }
+            }
+        }
+    }
+}
