@@ -49,11 +49,12 @@ None of these blocked a golden. In each case the code follows the reading stated
 - I-44 changed: `E_NOT_POSITIVE_DEFINITE` only below `-1e-12 S_00`; a hedged variance between that and 0 is returned as 0 (`hedgemv_i-0018` passes).
 - I-45: no change (`hedgeint_i-0019` passes). I-46: the feasibility tolerance is 1e-12 relative, inside the allowed 1e-9. I-47: already `E_SCHEMA` for a `null` optional key (CLI test `stage_i_null_keys_and_limits`). I-48, I-50: no change.
 - I-49 added: `E_LIMIT` (field `lot_sizes`) when a relaxed lot count exceeds `2^52`.
-- I-51 **not applied in this branch**: `conformance/runner/runner.py` on `stage-i` still has `CONTRACT = "1.0.0"` and stops on a mismatch, so a CLI at 1.11.0 alone fails every suite. The Rust change is one line (`CONTRACT` in `rust/crates/quantforge-cli/src/main.rs`), to land with the runner in the integration PR as I-51 says.
+- I-51 applied after `I-51 RUNNER READY`: `CONTRACT` is 1.11.0 in `rust/crates/quantforge-cli/src/main.rs`, and conformance passes against the 1.11.0 runner.
 - Each changed behaviour has a unit test (`stray_keys_are_input_errors`, `minvar_perfect_hedge_rounding_is_zero`, `huge_lot_counts_are_a_limit`, and the I-43 cases in `effectiveness_checks`).
 
 ## Extension to 23:45
 
 - Wave 4a is now exact at and next to switch points (see Open items).
 - New property tests: KKT residuals of random cost problems, invariance of `hedge.qp.solve` (with costs and bounds) under a reordering of the instruments, and of the integer objective, with the integer optimum never below the relaxation.
-- Fuzz (`conformance/fuzz/fuzz_cli.py`, 90% of seeds from `datasets/golden/stage_i`): the only finding was `unknown error code 'E_INFEASIBLE'` on the `E_INFEASIBLE` goldens. The harness's known-code list predates contract 1.11.0 (I-1), so this is a harness gap, outside this lane. **Spec lane / tooling:** add `E_INFEASIBLE` to `CODES` in `fuzz_cli.py`. A second run with the code added in memory (file unchanged) is reported in the lane report.
+- Fuzz (`conformance/fuzz/fuzz_cli.py`, 90% of seeds from `datasets/golden/stage_i`): the only finding was `unknown error code 'E_INFEASIBLE'` on the `E_INFEASIBLE` goldens. The harness's known-code list predates contract 1.11.0 (I-1), so this is a harness gap, outside this lane. **Spec lane / tooling:** add `E_INFEASIBLE` to `CODES` in `fuzz_cli.py`. A second run with the code added in memory (file unchanged): 2200 inputs, 0 findings. One `quantforge.exe` from 22:47 was found still running at 23:18 and was stopped; the fuzzer recorded no timeout for it, so its input is unknown. Worth a longer fuzz run on the integration tree.
+- Wave 5: the five new suites pass (165 of 165). Conformance 14933 of 14933.
