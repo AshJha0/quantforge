@@ -1,0 +1,708 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgemv_i",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgemv_i-0001",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.00069169,
+      0.0007639203200000001
+     ],
+     [
+      0.0007639203200000001,
+      0.00097969
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -0.7797571884984026
+     ],
+     "variance_before": 0.00069169,
+     "variance_after": 9.601763903999991e-05,
+     "effectiveness": 0.8611840000000002
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "Hull-style single hedge from a covariance: rho sigma_S / sigma_F"
+  },
+  {
+   "case_id": "hedgemv_i-0002",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.018,
+      0.006
+     ],
+     [
+      0.018,
+      0.0225,
+      0.003
+     ],
+     [
+      0.006,
+      0.003,
+      0.01
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -0.75,
+      -0.375
+     ],
+     "variance_before": 0.04,
+     "variance_after": 0.02425,
+     "effectiveness": 0.39374999999999993
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "two hedge instruments from a covariance"
+  },
+  {
+   "case_id": "hedgemv_i-0003",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.0
+     ],
+     [
+      0.0,
+      0.09
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      0.0
+     ],
+     "variance_before": 0.04,
+     "variance_after": 0.04,
+     "effectiveness": 0.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "uncorrelated hedge: ratio 0, no reduction"
+  },
+  {
+   "case_id": "hedgemv_i-0004",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.06
+     ],
+     [
+      0.06,
+      0.09
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -0.6666666666666666
+     ],
+     "variance_before": 0.04,
+     "variance_after": 2.3129646346357427e-18,
+     "effectiveness": 0.9999999999999999
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "perfectly correlated hedge: effectiveness 1"
+  },
+  {
+   "case_id": "hedgemv_i-0005",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.05,
+      0.02,
+      0.01,
+      -0.005
+     ],
+     [
+      0.02,
+      0.03,
+      0.004,
+      0.0
+     ],
+     [
+      0.01,
+      0.004,
+      0.02,
+      0.002
+     ],
+     [
+      -0.005,
+      0.0,
+      0.002,
+      0.015
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -0.6111111111111112,
+      -0.4166666666666667,
+      0.3888888888888889
+     ],
+     "variance_before": 0.05,
+     "variance_after": 0.03166666666666667,
+     "effectiveness": 0.3666666666666667
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "three hedge instruments"
+  },
+  {
+   "case_id": "hedgemv_i-0006",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.012,
+     -0.008,
+     0.015,
+     0.003,
+     -0.011,
+     0.007,
+     -0.002,
+     0.009,
+     -0.013,
+     0.004,
+     0.006,
+     -0.005
+    ],
+    "hedge_changes": [
+     [
+      0.01,
+      -0.006,
+      0.013,
+      0.001,
+      -0.01,
+      0.008,
+      -0.001,
+      0.007,
+      -0.012,
+      0.005,
+      0.004,
+      -0.006
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -1.1123466697237188
+     ],
+     "variance_before": 8.353787878787878e-05,
+     "variance_after": 1.7719716944754203e-06,
+     "effectiveness": 0.9787884044916336
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-lstsq-ols"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "single hedge from return series"
+  },
+  {
+   "case_id": "hedgemv_i-0007",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.012,
+     -0.008,
+     0.015,
+     0.003,
+     -0.011,
+     0.007,
+     -0.002,
+     0.009,
+     -0.013,
+     0.004,
+     0.006,
+     -0.005
+    ],
+    "hedge_changes": [
+     [
+      0.01,
+      -0.006,
+      0.013,
+      0.001,
+      -0.01,
+      0.008,
+      -0.001,
+      0.007,
+      -0.012,
+      0.005,
+      0.004,
+      -0.006
+     ],
+     [
+      0.002,
+      0.001,
+      -0.003,
+      0.004,
+      0.0,
+      -0.002,
+      0.003,
+      0.001,
+      -0.001,
+      0.002,
+      -0.004,
+      0.001
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -1.112232855039261,
+      0.0022160836886740984
+     ],
+     "variance_before": 8.353787878787878e-05,
+     "variance_after": 1.7719436796190389e-06,
+     "effectiveness": 0.9787887398467658
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-lstsq-ols"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "two hedges from return series"
+  },
+  {
+   "case_id": "hedgemv_i-0008",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.012,
+     -0.008,
+     0.015
+    ],
+    "hedge_changes": [
+     [
+      0.01,
+      -0.006,
+      0.013
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      -1.2236421725239617
+     ],
+     "variance_before": 0.00015633333333333333,
+     "variance_after": 1.1501597444089452e-07,
+     "effectiveness": 0.9992642901421691
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-lstsq-ols"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "series with the minimum length k + 2"
+  },
+  {
+   "case_id": "hedgemv_i-0009",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      -0.018
+     ],
+     [
+      -0.018,
+      0.0225
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "hedge": [
+      0.7999999999999999
+     ],
+     "variance_before": 0.04,
+     "variance_after": 0.0256,
+     "effectiveness": 0.35999999999999993
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "short position in the exposure (negative covariance)"
+  },
+  {
+   "case_id": "hedgemv_i-0010",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.018
+     ],
+     [
+      0.018,
+      0.0225
+     ]
+    ],
+    "exposure_changes": [
+     0.012,
+     -0.008,
+     0.015,
+     0.003,
+     -0.011,
+     0.007,
+     -0.002,
+     0.009,
+     -0.013,
+     0.004,
+     0.006,
+     -0.005
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "covariance and a series together"
+  },
+  {
+   "case_id": "hedgemv_i-0011",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.012,
+     -0.008,
+     0.015,
+     0.003,
+     -0.011,
+     0.007,
+     -0.002,
+     0.009,
+     -0.013,
+     0.004,
+     0.006,
+     -0.005
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "exposure series without hedge series"
+  },
+  {
+   "case_id": "hedgemv_i-0012",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.018
+     ],
+     [
+      0.0185,
+      0.0225
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "covariance not symmetric"
+  },
+  {
+   "case_id": "hedgemv_i-0013",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "exposure_changes": [
+     0.012,
+     -0.008
+    ],
+    "hedge_changes": [
+     [
+      0.01,
+      -0.006
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "fewer than k + 2 observations"
+  },
+  {
+   "case_id": "hedgemv_i-0014",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0225
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "zero exposure variance"
+  },
+  {
+   "case_id": "hedgemv_i-0015",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.01,
+      0.01
+     ],
+     [
+      0.01,
+      0.0225,
+      0.0225
+     ],
+     [
+      0.01,
+      0.0225,
+      0.0225
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "two identical hedge instruments"
+  },
+  {
+   "case_id": "hedgemv_i-0016",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.0
+     ],
+     [
+      0.0,
+      0.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "hedge with zero variance"
+  },
+  {
+   "case_id": "hedgemv_i-0017",
+   "operation": "hedge.minvar.ratio",
+   "inputs": {
+    "covariance": [
+     [
+      0.04,
+      0.05
+     ],
+     [
+      0.05,
+      0.0225
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NOT_POSITIVE_DEFINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "minvar",
+    "synthetic"
+   ],
+   "description": "correlation above 1 (variance after below 0)"
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "hedgeqp_i": {
+  "counted": 25,
+  "total": 44,
+  "rule": "scipy 1.18 optimisers on the same problem (lsq_linear BVLS for bounds, linalg.lstsq gelsd for unconstrained and MIN_NORM, minimize SLSQP for equalities); every output within root_finding"
+ },
+ "hedgeint_i": {
+  "counted": 0,
+  "total": 18,
+  "rule": "no outside library solves integer least squares; uncounted (exact rational enumeration is the oracle)"
+ },
+ "hedgemv_i": {
+  "counted": 9,
+  "total": 17,
+  "rule": "numpy 2.5 linalg.solve on the hedge block (covariance input) and linalg.lstsq OLS with intercept (series input); hedge within root_finding; variances are arithmetic"
+ },
+ "hedgegreeks_i": {
+  "counted": 10,
+  "total": 19,
+  "rule": "QuantLib 1.44 AnalyticEuropeanEngine delta, gamma and vega per instrument, then numpy 2.5 linalg.solve; quantities and before-Greeks within root_finding"
+ },
+ "hedgebeta_i": {
+  "counted": 0,
+  "total": 12,
+  "rule": "no outside library; Hull's worked example (30 contracts) is a textbook check, not counted"
+ },
+ "hedgeres_i": {
+  "counted": 0,
+  "total": 11,
+  "rule": "arithmetic only; no library model value, uncounted"
+ },
+ "_wave1": {
+  "counted": 44,
+  "total": 121,
+  "share": 0.3636,
+  "floor": 0.6,
+  "note": "Floor is measured over the stage at release, error cases in the denominator (ruling I-2)"
+ }
+}

@@ -3331,6 +3331,206 @@
     "pv"
    ]
   },
+  "hedge.beta.futures": {
+   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "rust": "quantforge::hedge::beta_futures",
+   "python": "quantforge.hedge.beta_futures",
+   "java": "Hedge.betaFutures",
+   "cpp": "qf::hedge::beta_futures",
+   "inputs": {
+    "futures_price": {
+     "java": "futuresPrice"
+    },
+    "multiplier": {
+     "java": "multiplier"
+    },
+    "portfolio_beta": {
+     "java": "portfolioBeta"
+    },
+    "portfolio_value": {
+     "java": "portfolioValue"
+    },
+    "rounding": {
+     "java": "rounding"
+    },
+    "target_beta": {
+     "java": "targetBeta"
+    }
+   },
+   "outputs": [
+    "beta_after",
+    "contracts",
+    "contracts_held"
+   ]
+  },
+  "hedge.greeks.neutralise": {
+   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "rust": "quantforge::hedge::greeks_neutralise",
+   "python": "quantforge.hedge.greeks_neutralise",
+   "java": "Hedge.greeksNeutralise",
+   "cpp": "qf::hedge::greeks_neutralise",
+   "inputs": {
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "hedges": {
+     "java": "hedges"
+    },
+    "portfolio": {
+     "java": "portfolio"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "targets": {
+     "java": "targets"
+    },
+    "volatility": {
+     "java": "volatility"
+    }
+   },
+   "outputs": [
+    "greeks_after",
+    "greeks_before",
+    "quantities"
+   ]
+  },
+  "hedge.integer.solve": {
+   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "rust": "quantforge::hedge::integer_solve",
+   "python": "quantforge.hedge.integer_solve",
+   "java": "Hedge.integerSolve",
+   "cpp": "qf::hedge::integer_solve",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "lot_sizes": {
+     "java": "lotSizes"
+    },
+    "lower_lots": {
+     "java": "lowerLots"
+    },
+    "ridge": {
+     "java": "ridge"
+    },
+    "upper_lots": {
+     "java": "upperLots"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "continuous_objective",
+    "lots",
+    "objective",
+    "residual",
+    "rounding_cost",
+    "x"
+   ]
+  },
+  "hedge.minvar.ratio": {
+   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "rust": "quantforge::hedge::minvar_ratio",
+   "python": "quantforge.hedge.minvar_ratio",
+   "java": "Hedge.minvarRatio",
+   "cpp": "qf::hedge::minvar_ratio",
+   "inputs": {
+    "covariance": {
+     "java": "covariance"
+    },
+    "exposure_changes": {
+     "java": "exposureChanges"
+    },
+    "hedge_changes": {
+     "java": "hedgeChanges"
+    }
+   },
+   "outputs": [
+    "effectiveness",
+    "hedge",
+    "variance_after",
+    "variance_before"
+   ]
+  },
+  "hedge.qp.solve": {
+   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "rust": "quantforge::hedge::qp_solve",
+   "python": "quantforge.hedge.qp_solve",
+   "java": "Hedge.qpSolve",
+   "cpp": "qf::hedge::qp_solve",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "eq_matrix": {
+     "java": "eqMatrix"
+    },
+    "eq_rhs": {
+     "java": "eqRhs"
+    },
+    "lower": {
+     "java": "lower"
+    },
+    "ridge": {
+     "java": "ridge"
+    },
+    "singular": {
+     "java": "singular"
+    },
+    "upper": {
+     "java": "upper"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "objective",
+    "rank",
+    "residual",
+    "x"
+   ]
+  },
+  "hedge.residual.report": {
+   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "rust": "quantforge::hedge::residual_report",
+   "python": "quantforge.hedge.residual_report",
+   "java": "Hedge.residualReport",
+   "cpp": "qf::hedge::residual_report",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "covariance": {
+     "java": "covariance"
+    },
+    "x": {
+     "java": "x"
+    }
+   },
+   "outputs": [
+    "contributions",
+    "effectiveness",
+    "residual",
+    "variance_after",
+    "variance_before",
+    "volatility_after"
+   ]
+  },
   "hedge.solve": {
    "spec": "specifications/08-hedging/stage-b-hedges.md",
    "rust": "quantforge::hedge::solve_",

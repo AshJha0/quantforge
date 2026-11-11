@@ -658,6 +658,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a surrogate that fails the acceptance after a model or domain change.
 - **Validation report:** `specifications/11-research/a5-surrogate.md`.
 
+### MI-1 Hedge solvers (stage I wave 1)
+- **Purpose:** hedge positions by constrained weighted least squares (bounds, equalities, ridge, minimum-norm), integer lots, minimum-variance ratios, Black-Scholes-Merton delta, gamma and vega neutralisation, beta futures; residual risk report.
+- **Inputs:** instrument sensitivities by risk factor, the book's existing risk, weights, constraints; covariances or return series; flat Black-Scholes-Merton market.
+- **Limitations:** no costs, liquidity, margin or instrument selection yet (later stage I waves); `MIN_NORM` refuses bounds; integer lots need a strictly convex problem; Greek hedges use one flat volatility.
+- **Validation:** active-set enumeration at 50 digits with KKT re-check; exact rational enumeration for integer lots; HiGHS confirms infeasibility; scipy, numpy and QuantLib outside checks (44 of 121 cases). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** scipy 1.18 `lsq_linear` (BVLS) and `minimize` (SLSQP) on the same problems.
+- **Monitoring thresholds:** a KKT residual above 1e-8 of the gradient scale, or a hedge effectiveness below the desk's floor on the dynamic backtest (later wave).
+- **Data lineage hash:** sha256 0a45713450573d2bbf6f9f363269f572b86cd577033258c3fd82ad123c512f8e (`hedgeqp_i`); 9bc649595e8d405bcc674db12af9ecd75294ccf5f1d624aaaf54e8a3a9936c4f (`hedgeint_i`); dc2e13e50a06fe8ff698d6bc1f0172f0b33374c5d07280568564c88bb333e61c (`hedgemv_i`); 93217e152d7a649c2e2b95622ed852c1ec24e9a14cfbc47780b8aa52a2cb30e3 (`hedgegreeks_i`); 03f02bc3a95fcc215d27d652df70d66ed2642abe33439e7bef198fcd31b7e87e (`hedgebeta_i`); 2531eeb9dc4eddd57cf4d9dfb6c577ffb62bb583487d1b40845b0731762d1794 (`hedgeres_i`)
+- **Retirement trigger:** a hedge that needs costs or non-convex constraints the solver cannot express.
+- **Validation report:** `specifications/08-hedging/hedge-solvers.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

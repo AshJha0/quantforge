@@ -145,6 +145,7 @@ These are the same in all four languages. A case that expects an error passes on
 | `E_CURRENCY_MISMATCH` | Two amounts in different currencies were combined |
 | `E_ARBITRAGE` | A model result breaks no-arbitrage and the case asked to reject it (`vol.sabr.density`) |
 | `E_LIMIT` | A size-like input is above its limit in `01-core/limits.md`. No work is started |
+| `E_INFEASIBLE` | No point satisfies the operation's constraints (bounds and equalities). Added in contract 1.11.0 (stage I, ruling I-1) |
 
 Order of checks: `E_PARSE`, then `E_SCHEMA`, then `E_LIMIT` (with the text-size and depth exceptions in `01-core/limits.md` B1 and B2), then the rule checks in the order the operation's spec
 lists them. When one case breaks two rules, the first listed wins.
@@ -332,6 +333,16 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `risk.frtb.vega`, `risk.frtb.curvature` | `06-risk/frtb-sa-vega-curvature.md` | FRTB carry-over (wave 2b) |
 
 `E_LIMIT` sizes for the stage G operations: ruling G-6 as amended by G-31 (full table and the combined grid-work bound). `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
+
+## Stage I operations (target contract 1.11.0)
+
+Stage I adds operations and one error code, `E_INFEASIBLE` (ruling I-1). `stage-i-rulings.md` is normative. Operations are added to the table as each wave lands.
+
+| Prefix | Spec | Slice |
+|---|---|---|
+| `hedge.qp.solve`, `hedge.integer.solve`, `hedge.minvar.ratio`, `hedge.greeks.neutralise`, `hedge.beta.futures`, `hedge.residual.report` | `08-hedging/hedge-solvers.md` | wave 1 |
+
+`null` is legal inside `lower`, `upper`, `lower_lots`, `upper_lots` (ruling I-12). `E_LIMIT` sizes: ruling I-4. Every rank or singularity decision uses the relative threshold `1e-12` (ruling I-3).
 
 ## Versioning
 

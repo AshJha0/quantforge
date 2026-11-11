@@ -106,3 +106,8 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | G3 | Hull-White bond priced at a curve pillar time | Pinned | `stage_g/shortrate_g` `t = 2.0` case | Ruling G-3: right-hand forward |
 | G4 | Negative-rate Hull-White curve (discount factors above 1) | Pinned | `stage_g/shortrate_g` `NEG` curve cases | Spec rule: no positivity check on rates |
 | G5 | Discrete barrier: absent monitoring, monthly monitoring, spot near the barrier | Pinned | `stage_g/barrier_g` | Rulings G-7, G-8 |
+| I1 | Hedge instruments that duplicate each other (or a zero column) | Pinned | `stage_i/hedgeqp_i` `E_SINGULAR` under `ERROR`; `MIN_NORM` cases `-0018` to `-0022`; ridge `-0023`; `stage_i/hedgeint_i` `E_SINGULAR` | Rulings I-3, I-5, I-6 |
+| I2 | Constraints that no position can meet | Pinned | `stage_i/hedgeqp_i` `E_INFEASIBLE` cases (budget above the bounds, equality outside the box, fixed variable against an equality) | Ruling I-14; HiGHS confirms each |
+| I3 | Integer lots: exact ties and rounding that is not optimal | Pinned | `stage_i/hedgeint_i-0007` to `-0010` | Ruling I-7 |
+| I4 | Beta futures exactly half a contract | Pinned | `stage_i/hedgebeta_i-0006` (`-2.5 -> -3`) | Ruling I-10 |
+| I5 | Book already hedged, or nothing to hedge | Pinned | `hedgeqp_i-0026` (`b = 0` gives `x = 0`); `hedgeres_i` `E_DOMAIN` for `b^T S b = 0`; `hedgemv_i` zero exposure variance | Ruling I-11 |

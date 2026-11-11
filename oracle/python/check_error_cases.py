@@ -15,7 +15,9 @@ from pathlib import Path
 GOLD = Path(__file__).resolve().parents[2] / "datasets" / "golden"
 OPTIONAL = {"monitoring", "monitoring_per_year", "model", "independent_amount", "csa", "specified_pairs", "im", "im_spread",
             "capital", "hurdle_rate", "hazard_rate", "recovery", "reporting_currency", "specified_currency_reduction",
-            "smoothing_width", "bump_relative", "grid"}
+            "smoothing_width", "bump_relative", "grid",
+            "ridge", "eq_matrix", "eq_rhs", "lower", "upper", "singular", "lower_lots", "upper_lots",  # stage I hedge solvers
+            "covariance", "exposure_changes", "hedge_changes", "rounding"}
 
 
 UNION = {"initial_variance": {"str", "real", "int"}}  # spec: "SAMPLE" or a number (05-volatility/garch.md)
@@ -27,6 +29,8 @@ def jtype(v):
     if isinstance(v, int):
         return "int"
     if isinstance(v, float):
+        return "real"
+    if v in ("NaN", "Infinity", "-Infinity"):  # F-1: the non-finite tokens are Real values on the wire
         return "real"
     return type(v).__name__
 

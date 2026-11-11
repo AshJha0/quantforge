@@ -1,0 +1,371 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgebeta_i",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgebeta_i-0001",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 0.0,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": -30.0,
+     "contracts_held": -30.0,
+     "beta_after": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "Hull's example: beta 1.5 to 0, 30 contracts short",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0002",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 0.75,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": -15.0,
+     "contracts_held": -15.0,
+     "beta_after": 0.75
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "halve the beta",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0003",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 2.0,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": 10.0,
+     "contracts_held": 10.0,
+     "beta_after": 2.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "raise the beta (long futures)",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0004",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 0.43,
+    "futures_price": 1010.0,
+    "multiplier": 250.0,
+    "rounding": "NONE"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": -21.4,
+     "contracts_held": -21.4,
+     "beta_after": 0.43
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "no rounding",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0005",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 0.47,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": -20.6,
+     "contracts_held": -21.0,
+     "beta_after": 0.45
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "rounding to nearest, fraction above a half",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0006",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 1000000.0,
+    "portfolio_beta": 1.0,
+    "target_beta": 0.0,
+    "futures_price": 4000.0,
+    "multiplier": 100.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": -2.5,
+     "contracts_held": -3.0,
+     "beta_after": -0.2
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "exact half rounds away from zero",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0007",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": -0.3,
+    "target_beta": 0.0,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": 6.0,
+     "contracts_held": 6.0,
+     "beta_after": 1.1102230246251566e-17
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "negative beta portfolio",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0008",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 1.5,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "contracts": 0.0,
+     "contracts_held": 0.0,
+     "beta_after": 1.5
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "target equals beta: no contracts",
+   "output_classes": {
+    "contracts_held": "simple_analytic"
+   }
+  },
+  {
+   "case_id": "hedgebeta_i-0009",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 0.0,
+    "futures_price": 0.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "zero futures price"
+  },
+  {
+   "case_id": "hedgebeta_i-0010",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 0.0,
+    "futures_price": 1010.0,
+    "multiplier": -250.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "negative multiplier"
+  },
+  {
+   "case_id": "hedgebeta_i-0011",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 0.0,
+    "portfolio_beta": 1.5,
+    "target_beta": 0.0,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "zero portfolio value"
+  },
+  {
+   "case_id": "hedgebeta_i-0012",
+   "operation": "hedge.beta.futures",
+   "inputs": {
+    "portfolio_value": 5050000.0,
+    "portfolio_beta": "Infinity",
+    "target_beta": 0.0,
+    "futures_price": 1010.0,
+    "multiplier": 250.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "beta",
+    "synthetic"
+   ],
+   "description": "infinite beta (F-2)"
+  }
+ ]
+}
