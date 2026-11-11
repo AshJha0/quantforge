@@ -77,6 +77,15 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-22 | LMM conventions | Lognormal forwards only (forward or strike `<= 0` is `E_DOMAIN`; a shifted or normal LMM is a future new input). Single curve, accruals from the time grid, caplet variance integrated to the fixing date (not payment). Volatility is the abcd form only [BM 6.3.2]; correlation `exp(-beta |T_i - T_j|)` on fixing times [BM 6.9]. Swaptions by Rebonato's frozen-weight formula [BM 6.13]: the golden is the formula, not the exact LMM price. Outside check: QuantLib 1.44 `AbcdFunction.covariance`, `DiscountCurve.discount` and `blackFormula`, combined by arithmetic (as G-13) |
 
+
+## Coordinator decisions, 2026-11-11 (owner standing authorisation)
+
+| # | Point | Ruling |
+|---|---|---|
+| G-23 | Wave 4 outside oracle | ORE (open-source build or binary, no spend, no account) is the outside oracle for wave 4 exposure, PFE and CVA. If it cannot be installed, that is documented and the lower share is accepted as a known issue. **Status 2026-11-11:** the install (`uv pip install open-source-risk-engine`) was refused by this session's permission classifier ("code from external"); not installed. It needs the owner to approve the install or to add a permission rule |
+| G-24 | LMM scope in stage G | G-22 stays lognormal only for stage G. A shifted or normal LMM is recorded as a later item |
+| G-25 | Rebonato golden | The frozen-weight approximation is the golden (G-22). Its error against a simulated LMM is reported as evidence only, never judged |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |
