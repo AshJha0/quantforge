@@ -41,3 +41,8 @@ Built (`hedging.DynamicHedge`, `cli.OpsHedgeDynamic`): `hedgebt_i` 15 of 15, `he
 | # | Point | Java choice, open for a ruling |
 |---|---|---|
 | J-I5 | The handover correction (e6605a2) says a constant-spot path with zero rates and dividends gives `E_DOMAIN`, because the hedge leg has zero variance. That holds in exact arithmetic only: in doubles each `hedge_i = (Pi_{i+1} - Pi_i) - item_i` carries rounding noise of about 1e-14, so the series is not constant and the statistics are returned (of noise). No golden has such a path | Java applies I-31 exactly as written: zero variance means every value is equal. A ruling could give the zero-variance test a relative tolerance (for example `var(y) <= 1e-24 var(x)`), or state that the rule holds only for inputs given exactly, as in `hedge.effectiveness` |
+
+## Wave 4c: instrument selection
+
+Built (`hedging.InstrumentSelection`, `cli.OpsHedgeSelect`; exhaustive over subsets in size then index order, each
+solved by `LeastSquaresHedge`): `hedgeselect_i` 17 of 17. No spec question.

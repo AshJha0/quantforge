@@ -78,7 +78,8 @@ final class Operations {
             new Registry.Module("hedge_solvers", OpsHedgeI::register),
             new Registry.Module("hedge_credit_correlation", OpsHedgeCreditCorr::register),
             new Registry.Module("hedge_cross_asset", OpsHedgeCrossAsset::register),
-            new Registry.Module("hedge_dynamic", OpsHedgeDynamic::register)
+            new Registry.Module("hedge_dynamic", OpsHedgeDynamic::register),
+            new Registry.Module("hedge_selection", OpsHedgeSelect::register)
     );
 
     static final Registry REGISTRY = Registry.of(MODULES);
