@@ -417,7 +417,8 @@ def int_ref(inp):
 # ================================================================================================ hedge.minvar.ratio
 def mv_ref(inp):
     cov, ex, hs = inp.get("covariance"), inp.get("exposure_changes"), inp.get("hedge_changes")
-    if cov is not None and len(cov) > LIMITS["instruments"] + 1 or ex is not None and len(ex) > LIMITS["series"]:
+    if (cov is not None and len(cov) > LIMITS["instruments"] + 1 or ex is not None and len(ex) > LIMITS["series"]
+            or hs is not None and len(hs) > LIMITS["instruments"]):  # I-45: 200 hedge instruments
         fail("E_LIMIT")
     finite_rule(inp)
     if (cov is None) == (ex is None and hs is None) or (ex is None) != (hs is None):
@@ -460,9 +461,12 @@ def mv_ref(inp):
             Lc[i, j] = (Shh[i, j] - sum(Lc[i, p] * Lc[j, p] for p in range(j))) / Lc[j, j]
     h = -(Shh ** -1) * she
     after = S[0, 0] + (she.T * h)[0]
-    if after < 0:
+    if after < -THRESH * S[0, 0]:  # I-44: a tolerance of 1e-12 S_00; a value inside it is rounding and reads as 0
         assert after < -THRESH * MARGIN * S[0, 0]
         fail("E_NOT_POSITIVE_DEFINITE", "covariance not positive semi-definite")
+    if after < 0:
+        assert after > -THRESH / MARGIN * S[0, 0]
+        after = mp.mpf(0)
     return {"hedge": [fl(v) for v in h], "variance_before": fl(S[0, 0]), "variance_after": fl(after),
             "effectiveness": fl(1 - after / S[0, 0])}
 
@@ -484,16 +488,16 @@ def bs_greeks(S, r, q, v, ins):
 
 
 def instr_check(ins, with_qty):
-    keys = set(ins)
-    if ins.get("instrument") == "UNDERLYING":
-        if keys & {"strike", "expiry_years"}:
-            fail("E_INPUT", "underlying takes no strike or expiry")
-    elif not {"strike", "expiry_years"} <= keys:
-        fail("E_INPUT", "option needs strike and expiry")
+    """Fixed key set per kind (I-41): portfolio positions carry `quantity`, hedge instruments do not."""
+    want = {"instrument"} | (set() if ins.get("instrument") == "UNDERLYING" else {"strike", "expiry_years"}) | ({"quantity"} if with_qty else set())
+    if set(ins) != want:
+        fail("E_INPUT", "instrument keys")
 
 
 def gr_ref(inp):
     port, hed, tg = inp["portfolio"], inp["hedges"], inp["targets"]
+    if any(t not in GREEKS for t in tg):
+        fail("E_SCHEMA", "unknown target (an enumeration value not listed, I-42)")
     if len(port) > LIMITS["positions"] or len(hed) > 3:
         fail("E_LIMIT")
     finite_rule(inp)
@@ -763,6 +767,7 @@ def int_suite(reg):
         (dict(a=[[1.0, 1.0]], b=[-1.0], weights=[1.0], lot_sizes=[1.0, 1.0]), "E_SINGULAR", "duplicate instruments without ridge"),
         (dict(a=[[1.0] * 13], b=[-1.0], weights=[1.0], lot_sizes=[1.0] * 13), "E_LIMIT", "13 instruments (limit 12)"),
         (dict(e, weights=[1.0, -1.0, 1.0, 1.0, 1.0]), "E_DOMAIN", "negative weight"),
+        (dict(e, lot_sizes=[1.0] * 13), "E_INPUT", "13 lot sizes for 3 columns: instruments are the columns of a (I-45, after the builds)"),
     ]
     for inp, code, desc in errs:
         run_error(s, INT, lambda i: int_ref(i)[0], inp, code, desc, ["hedge", "integer"])
@@ -817,6 +822,13 @@ def mv_suite(reg):
     ]
     for inp, code, desc in errs:
         run_error(s, MV, mv_ref, inp, code, desc, ["hedge", "minvar"])
+    # I-44 (after the builds): a hedged variance a rounding step below 0 reads as 0, not E_NOT_POSITIVE_DEFINITE
+    tb = dict(covariance=[[0.04, 0.06000000000000001], [0.06000000000000001, 0.09]])
+    S_ = M(tb["covariance"])
+    raw = S_[0, 0] - S_[0, 1] ** 2 / S_[1, 1]
+    assert -THRESH / MARGIN * S_[0, 0] < raw < 0, raw
+    s.add(MV, tb, mv_ref(tb), cls=RF, verified=["mpmath-50"], tags=["hedge", "minvar"],
+          description="perfect hedge whose exact hedged variance is a rounding step below 0: reads as 0 (I-44, after the builds)")
     return s, n_out, "numpy 2.5 linalg.solve on the hedge block (covariance input) and linalg.lstsq OLS with intercept (series input); hedge within root_finding; variances are arithmetic"
 
 
@@ -869,6 +881,8 @@ def gr_suite(reg):
         (dict(e, hedges=[U, {"instrument": "UNDERLYING"}]), "E_SINGULAR", "underlying twice: no gamma"),
         (dict(e, hedges=[c1, dict(c1)]), "E_SINGULAR", "the same call twice"),
         (dict(e, hedges=[U, U, U, U], targets=["DELTA", "GAMMA", "VEGA", "DELTA"]), "E_LIMIT", "four hedges (limit 3)"),
+        (dict(e, hedges=[U, dict(c1, quantity=10.0)]), "E_INPUT", "a hedge instrument with a quantity (I-41, after the builds)"),
+        (dict(e, targets=["DELTA", "THETA"]), "E_SCHEMA", "unknown target THETA (I-42, after the builds)"),
     ]
     for inp, code, desc in errs:
         run_error(s, GR, gr_ref, inp, code, desc, ["hedge", "greeks"])
