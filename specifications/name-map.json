@@ -4118,6 +4118,78 @@
     "price"
    ]
   },
+  "rates.lmm.capfloor": {
+   "spec": "specifications/04-pricing/lmm.md",
+   "rust": "quantforge::rates::lmm_capfloor",
+   "python": "quantforge.rates.lmm_capfloor",
+   "java": "Rates.lmmCapfloor",
+   "cpp": "qf::rates::lmm_capfloor",
+   "inputs": {
+    "abcd": {
+     "java": "abcd"
+    },
+    "cap_floor": {
+     "java": "capFloor"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "period_times": {
+     "java": "periodTimes"
+    },
+    "strike": {
+     "java": "strike"
+    }
+   },
+   "outputs": [
+    "black_vols",
+    "caplet_prices",
+    "forward_rates",
+    "price"
+   ]
+  },
+  "rates.lmm.swaption_rebonato": {
+   "spec": "specifications/04-pricing/lmm.md",
+   "rust": "quantforge::rates::lmm_swaption_rebonato",
+   "python": "quantforge.rates.lmm_swaption_rebonato",
+   "java": "Rates.lmmSwaptionRebonato",
+   "cpp": "qf::rates::lmm_swaption_rebonato",
+   "inputs": {
+    "abcd": {
+     "java": "abcd"
+    },
+    "correlation_beta": {
+     "java": "correlationBeta"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "side": {
+     "java": "side"
+    }
+   },
+   "outputs": [
+    "annuity",
+    "black_vol",
+    "price",
+    "swap_rate"
+   ]
+  },
   "rates.ois.bootstrap": {
    "spec": "specifications/02-curves/csa-and-basis.md",
    "rust": "quantforge::rates::ois_bootstrap",
@@ -4343,6 +4415,153 @@
     "periods"
    ]
   },
+  "rates.shortrate.bermudan_swaption": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_bermudan_swaption",
+   "python": "quantforge.rates.shortrate_bermudan_swaption",
+   "java": "Rates.shortrateBermudanSwaption",
+   "cpp": "qf::rates::shortrate_bermudan_swaption",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "exercise_times": {
+     "java": "exerciseTimes"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "grid": {
+     "java": "grid"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "start_years": {
+     "java": "startYears"
+    },
+    "swaption_type": {
+     "java": "swaptionType"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "rates.shortrate.callable_bond": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_callable_bond",
+   "python": "quantforge.rates.shortrate_callable_bond",
+   "java": "Rates.shortrateCallableBond",
+   "cpp": "qf::rates::shortrate_callable_bond",
+   "inputs": {
+    "call_price": {
+     "java": "callPrice"
+    },
+    "call_times": {
+     "java": "callTimes"
+    },
+    "coupon_rate": {
+     "java": "couponRate"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "grid": {
+     "java": "grid"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "sigma": {
+     "java": "sigma"
+    }
+   },
+   "outputs": [
+    "price"
+   ]
+  },
+  "rates.shortrate.capfloor": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_capfloor",
+   "python": "quantforge.rates.shortrate_capfloor",
+   "java": "Rates.shortrateCapfloor",
+   "cpp": "qf::rates::shortrate_capfloor",
+   "inputs": {
+    "cap_floor": {
+     "java": "capFloor"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "long_term_mean": {
+     "java": "longTermMean"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "model": {
+     "java": "model"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "period_times": {
+     "java": "periodTimes"
+    },
+    "short_rate": {
+     "java": "shortRate"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "strike": {
+     "java": "strike"
+    }
+   },
+   "outputs": [
+    "caplet_prices",
+    "price"
+   ]
+  },
+  "rates.shortrate.hw_calibrate": {
+   "spec": "specifications/04-pricing/short-rate-models.md",
+   "rust": "quantforge::rates::shortrate_hw_calibrate",
+   "python": "quantforge.rates.shortrate_hw_calibrate",
+   "java": "Rates.shortrateHwCalibrate",
+   "cpp": "qf::rates::shortrate_hw_calibrate",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "swaptions": {
+     "java": "swaptions"
+    }
+   },
+   "outputs": [
+    "fitted_prices",
+    "rmse",
+    "sigma"
+   ]
+  },
   "rates.shortrate.swaption": {
    "spec": "specifications/04-pricing/short-rate-models.md",
    "rust": "quantforge::rates::shortrate_swaption",
@@ -4359,8 +4578,14 @@
     "fixed_rate": {
      "java": "fixedRate"
     },
+    "long_term_mean": {
+     "java": "longTermMean"
+    },
     "mean_reversion": {
      "java": "meanReversion"
+    },
+    "model": {
+     "java": "model"
     },
     "notional": {
      "java": "notional"
@@ -4385,7 +4610,7 @@
    ]
   },
   "rates.shortrate.zcb": {
-   "spec": "specifications/04-pricing/short-rate-models.md",
+   "spec": "specifications/04-pricing/lmm.md",
    "rust": "quantforge::rates::shortrate_zcb",
    "python": "quantforge.rates.shortrate_zcb",
    "java": "Rates.shortrateZcb",

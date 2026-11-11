@@ -23,5 +23,40 @@
   "counted": 7,
   "total": 15,
   "rule": "each EE point is the swaption_g QuantLib check; cva is arithmetic on those values"
+ },
+ "hwcal_g": {
+  "counted": 0,
+  "total": 6,
+  "rule": "not counted: the fitted sigma is this platform's least-squares optimum; QuantLib reprices the fitted prices (evidence only)"
+ },
+ "capfloor_g": {
+  "counted": 36,
+  "total": 41,
+  "rule": "QuantLib Vasicek, CoxIngersollRoss, HullWhite discountBondOption per caplet, scaled by (1 + K tau) and summed"
+ },
+ "swaption_affine_g": {
+  "counted": 36,
+  "total": 39,
+  "rule": "G-13 method on QuantLib Vasicek and CoxIngersollRoss objects"
+ },
+ "bermudan_g": {
+  "counted": 0,
+  "total": 15,
+  "rule": "not counted: the golden is the pinned scheme; QuantLib FD and tree values are convergence evidence (oracle/BERMUDAN_EVIDENCE_G.json)"
+ },
+ "callable_g": {
+  "counted": 0,
+  "total": 12,
+  "rule": "not counted: pinned scheme (G-18)"
+ },
+ "lmmcap_g": {
+  "counted": 17,
+  "total": 26,
+  "rule": "QuantLib AbcdFunction.covariance(0, T_fix, T_fix, T_fix), DiscountCurve.discount and blackFormula per caplet, summed"
+ },
+ "lmmswn_g": {
+  "counted": 36,
+  "total": 42,
+  "rule": "QuantLib AbcdFunction.covariance(0, T0, T_i, T_j) per pair, DiscountCurve.discount for weights and annuity, blackFormula; exp correlation by arithmetic"
  }
 }

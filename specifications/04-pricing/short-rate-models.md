@@ -63,6 +63,83 @@ Errors in order (after F-2): `short_rate` present `E_INPUT`; `a`, `sigma`, curve
 
 Validation: 33 value cases (expiries 0.5 to 10 years, 2 to 20 annual periods, strikes at the forward and 100 bp either side, both types, a semi-annual swap, high mean reversion `a = 0.5`, a zero strike on the negative-rate curve) and 7 error cases. Values: 50-digit mpmath, `r*` to 1e-45. Payer minus receiver equals `annuity (F - K)` to 1e-8 on every pair (asserted). Outside: QuantLib 1.44 `HullWhite` `discountBond` and `discountBondOption`, `r*` by QuantLib's `Brent` to 1e-15, combined by arithmetic, and `DiscountCurve` discounts: 33 of 40 count. `JamshidianSwaptionEngine` itself agrees only to about 3e-7 relative (its internal root accuracy), so the engine is not the counted check. Wrong conventions caught: Ho-Lee `sigma_p`; strike 1 on every bond option.
 
+### Stage G wave 2f: `model` on `rates.shortrate.swaption` (Vasicek and CIR)
+
+Suite `stage_g/swaption_affine_g` (39 cases), generator slice `G2F`. Ruling G-20.
+
+New optional input `model` (`VASICEK`, `CIR`, `HULL_WHITE`; absent means `HULL_WHITE`, so wave 2a cases keep their meaning; another value `E_INPUT`). With `VASICEK` or `CIR` the inputs are those of `rates.shortrate.zcb_option` for that model (`mean_reversion`, `long_term_mean`, `sigma`, `short_rate` required, else `E_SCHEMA`), and no `curve`. The method is unchanged: `r*` solves `sum c_i P(T0, Ti; r*) = 1` with the model's bond formula at `tau = Ti - T0`, then the sum of the model's bond options at strikes `X_i = P(T0, Ti; r*)`. `forward_swap_rate` and `annuity` use the model's bond prices `P(0, t)` at `short_rate`.
+
+CIR needs `r* >= 0` (the bond formula is for `r >= 0`): if `sum c_i P(T0, Ti; 0) < 1` there is no such root, and the case is `E_DOMAIN`.
+
+Validation: two models x three expiry and tenor pairs x strikes at the forward and 100 bp either side x payer and receiver (36 cases); 3 error cases. Asserted: payer minus receiver equals `annuity (F - K)`. Outside: QuantLib 1.44 `Vasicek` and `CoxIngersollRoss` objects by the G-13 method: 36 of 39 count.
+
+## `rates.shortrate.hw_calibrate` (stage G wave 2c)
+
+Hull-White `sigma` fitted to a strip of European swaption prices with `a` fixed. Suite `stage_g/hwcal_g` (6 cases), generator slice `G2C`. Ruling G-17.
+
+Inputs: `curve`, `mean_reversion` (> 0), `swaptions`: at least one (else `E_INPUT`), each `{expiry_years, payment_times, fixed_rate, swaption_type, target_price}` with the rules of `rates.shortrate.swaption` and `target_price` >= 0 per unit notional (else `E_DOMAIN`).
+
+Objective: `F(sigma) = sum_i (model_i(sigma) - target_i)^2`, unweighted, `model_i` the Jamshidian price per unit notional. Output `sigma` = the minimiser of `F` on `[1e-4, 1]`, `fitted_prices` (model prices at `sigma`, in input order), `rmse` = `sqrt(F(sigma) / n)`. If the minimum on that interval is at an end, `E_NO_CONVERGENCE`.
+
+Method: any solver that reaches `F'(sigma) = 0` to a relative step below 1e-12 (for example a bracketing scan, then Newton or Brent on `F'` with `model'` analytic or by central differences of the closed form). The goldens assert a unique interior minimum by a scan on `[0.001, 0.04]`, so the answer does not depend on the solver.
+
+Validation: three ten-year co-terminal strips (expiries 1, 2, 3, 5, 7 years, strikes at the forward), targets from a known `sigma` with stated percentage perturbations (`a = 0.05`, payers; `a = 0.2`, receivers; `a = 0.01`, unperturbed, an exact fit recovering `sigma = 0.007`); 3 error cases. Values: 30-digit mpmath, `F'` root. Outside: none counted (ruling G-17); QuantLib 1.44 `HullWhite` objects reprice every fitted price at the golden `sigma` to 1e-10 relative (evidence).
+
+## `rates.shortrate.bermudan_swaption` (stage G wave 2d)
+
+Bermudan swaption on Hull-White by a pinned reference scheme (ruling G-18), as `exotic.american.fd` pins its scheme (E-A23). Suite `stage_g/bermudan_g` (15 cases), generator `oracle/python/gen_stage_g_berm.py`.
+
+Inputs: `curve`, `mean_reversion`, `sigma` (Hull-White); the underlying swap `start_years` `T0` (> 0), `payment_times` (the `rates.shortrate.swaption` rules, first payment after `T0`), `fixed_rate`, `swaption_type` (`PAYER`, `RECEIVER`), `notional`; `exercise_times`: at least one, strictly increasing, each one of `T0, T1, ..., T(n-1)` (a reset date before the last payment), else `E_INPUT`; `grid` `{nx, steps_per_year, width}`: `nx` odd and at least 5 (else `E_INPUT`), at most 10,001 (`E_LIMIT`); `steps_per_year` at least 1 (else `E_INPUT`), at most 100,000 (`E_LIMIT`); `width` > 0 (else `E_DOMAIN`). Exercising at `t` enters the swap paying from `t` to `Tn` (fixed periods after `t`).
+
+**Reference scheme.**
+1. State `x = r - alpha(t)`, `alpha(t) = f(0,t) + sigma^2/(2a^2) (1 - e^{-at})^2`, `f` the curve's right-hand forward (G-3); `dx = -a x dt + sigma dW`, `x(0) = 0`.
+2. Space grid: `sx = sigma sqrt((1 - e^{-2a t_m}) / (2a))` with `t_m` the last exercise time; `h = width sx`; `x_i = -h + i dx`, `dx = 2h/(nx - 1)`, `i = 0..nx-1` (the centre node is `x = 0`).
+3. Time grid: knots `0, t_1, ..., t_m` (the exercise times). Interval `[t_(k-1), t_k]` gets `n = max(1, ceil(steps_per_year (t_k - t_(k-1))))` equal steps.
+4. Exercise value at `t` and node `i` (per unit notional): `phi (1 - P(t, Tn) - K sum tau_j P(t, Tj))` over the payments after `t`, `tau` the time differences starting at `t`, `P(t, T)` the Hull-White bond of `rates.shortrate.zcb` with `r = x_i + alpha(t)`, `phi = +1` payer, `-1` receiver.
+5. Start at `t_m` with `V = max(exercise, 0)`. Step backward fully implicitly: from `t + dt` to `t`, solve `(I - dt L(t)) V(t) = V(t + dt)` on interior nodes `1..nx-2`, where `(L V)_i = (sigma^2/2)(V_(i+1) - 2V_i + V_(i-1))/dx^2 - a x_i (V_(i+1) - V_(i-1))/(2 dx) - (x_i + alpha(t)) V_i`, coefficients at the earlier time `t`. Boundaries: `V_0 = 2V_1 - V_2` and `V_(nx-1) = 2V_(nx-2) - V_(nx-3)`, substituted into the first and last interior rows (the system stays tridiagonal), then set after the solve.
+6. On arriving at an exercise time `t_k` (`k < m`), `V = max(V, exercise(t_k))`. Do not apply exercise at `t = 0`.
+7. `price = notional x V` at the centre node at `t = 0`.
+
+Output: `price`. Class `root_finding` with a limit of 1e-9 relative: the scheme is deterministic, so builds differ only by rounding in the tridiagonal solve.
+
+## Convergence and limit cases (Bermudan scheme)
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Fully implicit FD on the Hull-White state | 1 in time (space second order, refined together) | `nx = 51, 101, 201, 401` with `steps_per_year = 25, 50, 100, 200`, width 6, one exercise date at 1y into a 5y payer at 4%: errors against Jamshidian -149.7, -52.2, -23.9, -12.9 on 1e6 notional; observed orders 1.52, 1.13, 0.89 (the last two within 0.2 of 1) | one exercise date: the European swaption (`swaption_g`, Jamshidian) | Jamshidian closed form; QuantLib 1.44 `FdHullWhiteSwaptionEngine` (400 x 400) and `TreeSwaptionEngine` (400 steps) |
+
+At the default grid (201 nodes, 100 steps a year) the scheme sits about 0.1% to 0.2% below QuantLib's FD and tree engines on the ten value cases (`oracle/BERMUDAN_EVIDENCE_G.json`). That is the first-order time bias of the reference scheme; it is a pinned reference, not the most accurate engine. On the coarse pinned grid (51 nodes, 12 steps a year) it is about 1.2% below. No case counts as outside (G-18).
+
+Validation: payer and receiver at the forward and 50 bp either side, annual exercise into a 1-into-5-year swap (6 cases); the European limit; two exercise dates; high mean reversion; a coarse pinned grid; 5 error cases.
+
+## `rates.shortrate.capfloor` (stage G wave 2e)
+
+Caps and floors under Vasicek, CIR and Hull-White as portfolios of bond options [BM 2.6 and 3.3.2]. Suite `stage_g/capfloor_g` (41 cases), generator slice `G2E`. Ruling G-19.
+
+Inputs: `model` and its parameters as `rates.shortrate.zcb_option` (including the `short_rate` rule G-5); `period_times` `t_0 < t_1 < ... < t_m` (at least two, strictly increasing, else `E_INPUT`; `t_0 > 0`, else `E_DOMAIN`); `strike` `K` (simple rate; `1 + K tau_i > 0` for every period, else `E_DOMAIN`); `cap_floor` (`CAP`, `FLOOR`; else `E_INPUT`); `notional`.
+
+Each period `[t_(i-1), t_i]`, `tau_i = t_i - t_(i-1)`, pays `notional tau_i max(L_i - K, 0)` (cap) or `max(K - L_i, 0)` (floor) at `t_i`, where `L_i` is the simple model rate fixed at `t_(i-1)`: `1 + tau_i L_i = 1 / P(t_(i-1), t_i)` (single curve, ruling G-19). Then caplet `= notional (1 + K tau_i) ZBP(0, t_(i-1), t_i, 1/(1 + K tau_i))` and floorlet `= notional (1 + K tau_i) ZBC(...)` with the bond options of `zcb_option`.
+
+Outputs: `price` (the sum) and `caplet_prices` (per period, in order; floorlets for a floor).
+
+Validation: three models x two schedules (semi-annual to 5 years, annual to 7 years) x cap and floor x strikes 3%, 4%, 5% (36 cases), 5 error cases. Values: 50-digit mpmath (CIR through the noncentral chi-square). Asserted: cap minus floor equals `notional sum (P(t_(i-1)) - (1 + K tau_i) P(t_i))` on all 18 pairs. Outside: QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` `discountBondOption` per period, scaled and summed: 36 of 41 count. Wrong convention caught: a cap priced with bond calls.
+
+## `rates.shortrate.callable_bond` (stage G wave 2g)
+
+Issuer-callable fixed-rate bond on Hull-White, on the G-18 scheme (ruling G-21). Suite `stage_g/callable_g` (12 cases), generator `gen_stage_g_berm.py` slice `CALL`.
+
+Inputs: `curve`, `mean_reversion`, `sigma`; `payment_times` (at least one, strictly increasing, first > 0; else `E_INPUT`), `coupon_rate` `c` (accrual `tau_i` = time differences from 0), `notional`; `call_times`: a possibly empty, strictly increasing list of payment times before the last (else `E_INPUT`); `call_price` (fraction of face, > 0, else `E_DOMAIN`); `grid` as `bermudan_swaption`.
+
+Scheme: the G-18 grid and step with `t_m` the last payment time and knots `0, T1, ..., Tn`. Start at `Tn` with `V = 1 + c tau_n`. After stepping back to each knot `Tk > 0`: first, if `Tk` is a call time, `V = min(V, call_price)` (the issuer calls the ex-coupon bond); then add the coupon, `V = V + c tau_k`. `price = notional x V` at the centre node at 0.
+
+Validation: three coupons x (seven annual calls from year 3, one call at year 5) on a 10-year bond; the straight-bond limit (no calls); a 2% call premium with high mean reversion and volatility; 4 error cases. Asserted: every price at most the straight bond (curve-discounted cash flows). Not counted as outside (G-18).
+
+## Convergence and limit cases (callable bond)
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| G-18 scheme with coupons and a call cap | 1 in time | `nx = 51 ... 401`, `steps_per_year = 25 ... 200`, width 6, no calls, 4.5% coupon on 100 face: errors 3.71e-2, 1.85e-2, 9.32e-3, 4.51e-3; orders 1.01, 0.99, 1.05 | no call times: the straight bond | curve-discounted cash flows |
+
 ## G2++: `rates.g2pp.zcb`, `rates.g2pp.zcb_option` (stage G wave 2b)
 
 Two-factor Gaussian model [BM 4.2, eqs. 4.10, 4.14 and 4.31] (not opened; checked against QuantLib 1.44 `G2`). Suite `stage_g/g2pp_g` (38 cases), generator slice `G2B`. Ruling G-14.

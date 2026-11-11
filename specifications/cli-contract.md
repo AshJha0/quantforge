@@ -314,10 +314,16 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `exotic.barrier.price`: new optional inputs `monitoring`, `monitoring_per_year` | `04-pricing/exotics.md`, section "Stage G addition" | R9 (wave 1) |
 | `rates.shortrate.swaption` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.swaption`" | G2a (wave 2a) |
 | `rates.g2pp.zcb`, `rates.g2pp.zcb_option` | `04-pricing/short-rate-models.md`, section "G2++" | G2b (wave 2b) |
+| `rates.shortrate.hw_calibrate` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.hw_calibrate`" | G2c (wave 2c) |
+| `rates.shortrate.bermudan_swaption` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.bermudan_swaption`" | G2d (wave 2d) |
+| `rates.shortrate.capfloor` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.capfloor`" | G2e (wave 2e) |
+| `rates.shortrate.swaption`: new optional input `model` (`VASICEK`, `CIR`; default `HULL_WHITE`) | `04-pricing/short-rate-models.md`, "Stage G wave 2f" | G2f (wave 2f) |
+| `rates.shortrate.callable_bond` | `04-pricing/short-rate-models.md`, section "`rates.shortrate.callable_bond`" | G3 (wave 2g) |
 | `risk.mc.greeks` | `06-risk/mc-greeks.md` | Q9 part 1 (wave 3a) |
 | `xva.exposure.swap_ee_hw` | `06-risk/xva-exposure.md` | G5a (wave 4a) |
+| `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `04-pricing/lmm.md` | G4a (wave 3b, LMM) |
 
-`E_LIMIT` sizes for the stage G operations: ruling G-6.
+`E_LIMIT` sizes for the stage G operations: ruling G-6. `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
 
 ## Versioning
 

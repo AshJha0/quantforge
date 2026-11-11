@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased: stage G (target 0.7.0)
+
+### Known issues (stage G, in progress)
+- **G-10 (plan 12.3 Q9 variance test) is inconclusive, low power, not a pass.** As registered (smoothed pathwise against a central bump with `h S = eps`) the two estimators are nearly the same, and the variance ratio was 0.9985 at 100,000 paths. Owner decision 2026-11-10: G-10 is kept unchanged; a powered test, G-10b, was registered in `specifications/stage-g-rulings.md` with its power calculation before it ran, and passed (variance ratio 0.102, 95% interval 0.089 to 0.116, Z = 33.4; `oracle/G10B_RESULT.json`). G-10's own outcome stays inconclusive.
+- F-33 (FRTB-SA GIRR `low` scenario) closed: confirmed by the owner on 2026-11-10 against the MAR21.6 formula images (BIS page of 2026-03-23): rho_low = max(2 x rho - 100%; 75% x rho) and gamma_low = max(2 x gamma - 100%; 75% x gamma).
+
 ## 0.6.0: stage F, curve layer, portfolio risk and book (2026-11-10)
 
 Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part 1 (PR #25, merged at `5c8fa9d`) holds wave 0 and the parallel lanes. Part 2 holds waves 1 to 3, listed first below. No golden value of an earlier stage changed. Stage F is at Implemented, not Validated.
@@ -37,7 +43,7 @@ Tagged `v0.6.0` on `e1ddfbb` (PR #29). Stage F landed in two pull requests. Part
 ### Known issues (0.6.0)
 - **Outside-oracle share is 51.4% (225 of 438): the 60% floor is not met.** Error cases stay in the denominator (coordinator ruling). `oracle/OUTSIDE_GAPS_F.md` lists every case without a free outside source, with its reason; 79 of the 213 are error cases. The R5 second review of the outside register is still owed.
 - **R7 has no outside case.** Pedersen (2003), the CDS index option's reference example, is not freely available.
-- **FRTB-SA GIRR `low` scenario formula is unconfirmed:** it is an image in MAR21.6 (ruling F-33). The equity FRTB parameters were read only in summary.
+- **Equity FRTB parameters were read only in summary.**
 - **Deferred to wave 2b:**
   - F3: Inflation01, dividend and borrow sensitivity, correlation sensitivity;
   - F4: reverse stress, limits, concentration, liquidity-adjusted risk, portfolio vol by horizon, model-risk reserves;

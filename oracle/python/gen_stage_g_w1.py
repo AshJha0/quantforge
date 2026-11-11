@@ -705,6 +705,259 @@ def g5a():
     reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
 
 
+# ================================================================================================ G2c Hull-White sigma calibration
+CAL = "rates.shortrate.hw_calibrate"
+
+
+def cal_obj(inp, sg):
+    tot = mp.mpf(0)
+    for q in inp["swaptions"]:
+        w = dict(mean_reversion=inp["mean_reversion"], sigma=sg, curve=inp["curve"], notional=1.0, **q)
+        w.pop("target_price")
+        m = jam_mp(w)
+        tot += (m - mp.mpf(q["target_price"])) ** 2
+    return tot
+
+
+def jam_mp(inp):
+    cv, a, sg = Curve(**inp["curve"]), inp["mean_reversion"], inp["sigma"]
+    T0 = mp.mpf(inp["expiry_years"])
+    Ts = [mp.mpf(x) for x in inp["payment_times"]]
+    K = mp.mpf(inp["fixed_rate"])
+    acc = [Ts[0] - T0] + [Ts[i] - Ts[i - 1] for i in range(1, len(Ts))]
+    c = [K * x for x in acc]
+    c[-1] += 1
+    a_, = (mp.mpf(a),)
+    f = lambda r: sum(ci * hw_bond(cv, a_, sg, T0, Ti, r)[0] for ci, Ti in zip(c, Ts)) - 1  # noqa: E731
+    rs = mp.findroot(f, 0.0, tol=mp.mpf(10) ** -45)
+    typ = "CALL" if inp["swaption_type"] == "RECEIVER" else "PUT"
+    return sum(ci * gauss_opt(typ, cv.P(T0), cv.P(Ti), hw_bond(cv, a_, sg, T0, Ti, rs)[0], sigma_p(a_, sg, T0, Ti))
+               for ci, Ti in zip(c, Ts))
+
+
+def calibrate(inp):
+    g = lambda x: mp.diff(lambda y: cal_obj(inp, y), x)  # noqa: E731
+    grid = [mp.mpf(k) / 2000 for k in range(2, 81)]
+    vals = [cal_obj(inp, x) for x in grid]
+    i = min(range(len(vals)), key=lambda k: vals[k])
+    assert 0 < i < len(vals) - 1, "optimum at the scan edge"
+    sg = mp.findroot(g, (grid[i - 1], grid[i + 1]), solver="anderson")
+    return sg
+
+
+def g2c():
+    mp.mp.dps = 30
+    s = Suite("hwcal_g", "specifications/04-pricing/short-rate-models.md", G)
+    strips = []
+    # co-terminal 10y strip, ATM-ish strikes, targets from sigma 0.0115 with stated perturbations (so the fit is not exact)
+    for a, true_s, pert, typ in ((0.05, 0.0115, (1.02, 0.99, 1.01, 0.985, 1.0), "PAYER"), (0.2, 0.009, (0.97, 1.03, 1.0, 1.01, 0.99), "RECEIVER"),
+                                 (0.01, 0.007, (1.0, 1.0, 1.0, 1.0, 1.0), "PAYER")):
+        sw = []
+        for T0, p in zip((1.0, 2.0, 3.0, 5.0, 7.0), pert):
+            Ts = [T0 + k for k in range(1, int(10 - T0) + 1)]
+            base = dict(mean_reversion=a, sigma=true_s, curve=CURVE, notional=1.0, expiry_years=T0, payment_times=Ts, fixed_rate=0.03, swaption_type=typ)
+            K = round(jam_price(base)["forward_swap_rate"], 6)
+            px = float(jam_mp(dict(base, fixed_rate=K)) * p)
+            sw.append(dict(expiry_years=T0, payment_times=Ts, fixed_rate=K, swaption_type=typ, target_price=px))
+        strips.append(dict(mean_reversion=a, curve=CURVE, swaptions=sw))
+    n_out = 0
+    for inp in strips:
+        sg = calibrate(inp)
+        fitted = [float(jam_mp(dict(mean_reversion=inp["mean_reversion"], sigma=sg, curve=CURVE, notional=1.0, **{k: v for k, v in q.items() if k != "target_price"}))) for q in inp["swaptions"]]
+        rmse = float(mp.sqrt(cal_obj(inp, sg) / len(fitted)))
+        out = {"sigma": float(sg), "fitted_prices": fitted, "rmse": rmse}
+        # outside: fitted prices by QuantLib HullWhite objects at the golden sigma (G-13 method), and QL's own gradient sign change
+        q = [ql_jam(dict(mean_reversion=inp["mean_reversion"], sigma=float(sg), curve=CURVE, notional=1.0, **{k: v for k, v in x.items() if k != "target_price"}))["price"] for x in inp["swaptions"]]
+        ok = all(abs(a - b) <= 1e-12 + 1e-10 * abs(a) for a, b in zip(fitted, q))
+        note(f"  hwcal sigma {float(sg):.12f} rmse {rmse:.3e} QL fitted match {ok}")
+        s.add(CAL, inp, out, cls=R, verified=["mpmath-30", "grid-scan-unique"], tags=["shortrate", "calibration"],
+              output_classes={"sigma": R, "fitted_prices": R, "rmse": R},
+              limit={"absolute": 1e-12, "relative": 1e-9, "reason": "1-D optimum; sigma judged at 1e-9 relative"},
+              description=f"HW sigma to a 10y co-terminal strip, a = {inp['mean_reversion']}")
+    e = strips[0]
+    errs = [(dict(e, swaptions=[]), "E_INPUT", "empty strip"),
+            (dict(e, swaptions=[dict(e["swaptions"][0], target_price=-0.01)]), "E_DOMAIN", "negative target"),
+            (dict(e, mean_reversion=0.0), "E_DOMAIN", "a = 0")]
+    for inp, code, d in errs:
+        s.add(CAL, inp, error=code, cls="date_and_convention", tags=["invalid", "calibration"], description=d)
+    for c in s.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    mp.mp.dps = 50
+    note(f"hwcal_g outside: {n_out} of {len(s.cases)} (sigma is not a library value)")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["hwcal_g"] = {"counted": n_out, "total": len(s.cases), "rule": "not counted: the fitted sigma is this platform's least-squares optimum; QuantLib reprices the fitted prices (evidence only)"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
+# ================================================================================================ G2e caps and floors
+CAPOP = "rates.shortrate.capfloor"
+
+
+def cap_value(inp, mut=None):
+    Ts, K, n = inp["period_times"], mp.mpf(inp["strike"]), inp["notional"]
+    typ = "PUT" if inp["cap_floor"] == "CAP" else "CALL"
+    if mut == "type":
+        typ = "CALL" if typ == "PUT" else "PUT"
+    lets = []
+    for t0, t1 in zip(Ts, Ts[1:]):
+        tau = mp.mpf(t1) - mp.mpf(t0)
+        q = {k: v for k, v in inp.items() if k not in ("period_times", "strike", "cap_floor", "notional")}
+        o = opt_value(dict(q, option_type=typ, strike=float(1 / (1 + K * tau)), expiry_years=t0, maturity_years=t1, notional=1.0))
+        lets.append((1 + K * tau) * mp.mpf(o["price"]) * n)
+    return {"price": float(sum(lets)), "caplet_prices": [float(x) for x in lets]}
+
+
+def ql_cap(inp):
+    m = ql_model(inp)
+    Ts, K, n = inp["period_times"], inp["strike"], inp["notional"]
+    t = ql.Option.Put if inp["cap_floor"] == "CAP" else ql.Option.Call
+    lets = [(1 + K * (t1 - t0)) * m.discountBondOption(t, 1 / (1 + K * (t1 - t0)), t0, t1) * n for t0, t1 in zip(Ts, Ts[1:])]
+    return {"price": sum(lets), "caplet_prices": lets}
+
+
+def g2e():
+    s = Suite("capfloor_g", "specifications/04-pricing/short-rate-models.md", G)
+    models = [dict(model="VASICEK", mean_reversion=0.15, long_term_mean=0.045, sigma=0.012, short_rate=0.035),
+              dict(model="CIR", mean_reversion=0.25, long_term_mean=0.04, sigma=0.08, short_rate=0.03),
+              dict(model="HULL_WHITE", mean_reversion=0.05, sigma=0.01, curve=CURVE)]
+    n_out = 0
+    for m in models:
+        for Ts in ([0.5 * k for k in range(1, 11)], [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]):
+            for cf in ("CAP", "FLOOR"):
+                for K in (0.03, 0.04, 0.05):
+                    inp = dict(m, period_times=Ts, strike=K, cap_floor=cf, notional=1e6)
+                    out = cap_value(inp)
+                    q = ql_cap(inp)
+                    ok = all(abs(a - b) <= 1e-6 + 1e-9 * abs(a) for a, b in zip(out["caplet_prices"] + [out["price"]], q["caplet_prices"] + [q["price"]]))
+                    n_out += ok
+                    if not ok:
+                        note(f"  QL cap differs {m['model']} {cf} {K}: {q['price']} {out['price']}")
+                    s.add(CAPOP, inp, out, cls=R if m["model"] == "CIR" else A,
+                          verified=["mpmath-50", "cap-floor-parity"] + (["quantlib-1.44"] if ok else []),
+                          tags=["shortrate", "capfloor", m["model"].lower(), cf.lower()],
+                          limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-12 per unit notional"},
+                          description=f"{m['model']} {cf} K={K}, {len(Ts) - 1} periods to {Ts[-1]}y")
+    # parity: cap - floor = sum notional (P(t0) - (1 + K tau) P(t1)), asserted on every pair
+    for i in range(0, 36, 6):
+        for j in range(3):
+            cap, flo = s.cases[i + j], s.cases[i + 3 + j]
+            inp = cap["inputs"]
+            Pm = (lambda t: Curve(**inp["curve"]).P(t)) if inp["model"] == "HULL_WHITE" else                 (lambda t: mp.mpf(zcb_value(dict(inp, t_years=0.0, maturity_years=t))["discount_factor"]))
+            Ts, K = inp["period_times"], inp["strike"]
+            sw = sum(Pm(t0) - (1 + K * (t1 - t0)) * Pm(t1) for t0, t1 in zip(Ts, Ts[1:])) * inp["notional"]
+            assert abs(cap["expected"]["outputs"]["price"] - flo["expected"]["outputs"]["price"] - float(sw)) < 1e-6
+    b = dict(models[2], period_times=[1.0, 2.0, 3.0], strike=0.04, cap_floor="CAP", notional=1e6)
+    caught("cap priced with bond calls", abs(cap_value(b)["price"] - cap_value(b, "type")["price"]), 1e-6)
+    e = dict(models[2], period_times=[1.0, 2.0, 3.0], strike=0.04, cap_floor="CAP", notional=1.0)
+    errs = [(dict(e, period_times=[1.0]), "E_INPUT", "one period time"), (dict(e, period_times=[0.0, 1.0]), "E_DOMAIN", "first fixing at 0"),
+            (dict(e, period_times=[2.0, 1.0]), "E_INPUT", "period times not increasing"), (dict(e, strike=-0.5), "E_DOMAIN", "1 + K tau <= 0"),
+            (dict(e, cap_floor="COLLAR"), "E_INPUT", "unknown cap_floor")]
+    for inp, code, d in errs:
+        s.add(CAPOP, inp, error=code, cls="date_and_convention", tags=["invalid", "capfloor"], description=d)
+    for c in s.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    note(f"capfloor_g outside (QuantLib 1.44 model objects): {n_out} of {len(s.cases)}")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["capfloor_g"] = {"counted": n_out, "total": len(s.cases), "rule": "QuantLib Vasicek, CoxIngersollRoss, HullWhite discountBondOption per caplet, scaled by (1 + K tau) and summed"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
+# ================================================================================================ G2f Jamshidian for Vasicek and CIR
+def jam_affine(inp):
+    T0 = mp.mpf(inp["expiry_years"])
+    Ts = [mp.mpf(x) for x in inp["payment_times"]]
+    K = mp.mpf(inp["fixed_rate"])
+    acc = [Ts[0] - T0] + [Ts[i] - Ts[i - 1] for i in range(1, len(Ts))]
+    c = [K * x for x in acc]
+    c[-1] += 1
+    AB = vas_AB if inp["model"] == "VASICEK" else cir_AB
+    pr = (inp["mean_reversion"], inp["long_term_mean"], inp["sigma"])
+    bond = lambda tau, r: mp.exp(AB(*pr, tau)[0] - AB(*pr, tau)[1] * r)  # noqa: E731
+    f = lambda r: sum(ci * bond(Ti - T0, r) for ci, Ti in zip(c, Ts)) - 1  # noqa: E731
+    rs = mp.findroot(f, 0.03, tol=mp.mpf(10) ** -40)
+    if inp["model"] == "CIR":
+        assert rs > 0.001, "CIR critical rate must be positive with a margin"
+    typ = "CALL" if inp["swaption_type"] == "RECEIVER" else "PUT"
+    base = {k: inp[k] for k in ("model", "mean_reversion", "long_term_mean", "sigma", "short_rate")}
+    v = mp.mpf(0)
+    for ci, Ti in zip(c, Ts):
+        X = bond(Ti - T0, rs)
+        v += ci * mp.mpf(opt_value(dict(base, option_type=typ, strike=float(X), expiry_years=float(T0), maturity_years=float(Ti), notional=1.0))["price"])
+    P0 = lambda t: bond(t, inp["short_rate"])  # noqa: E731
+    ann = sum(x * P0(Ti) for x, Ti in zip(acc, Ts))
+    return {"price": float(inp["notional"] * v), "forward_swap_rate": float((P0(T0) - P0(Ts[-1])) / ann), "annuity": float(inp["notional"] * ann)}
+
+
+def ql_jam_affine(inp):
+    m = ql_model(inp)
+    T0, Ts, K = inp["expiry_years"], inp["payment_times"], inp["fixed_rate"]
+    acc = [Ts[0] - T0] + [Ts[i] - Ts[i - 1] for i in range(1, len(Ts))]
+    c = [K * x for x in acc]
+    c[-1] += 1
+    f = lambda r: sum(ci * m.discountBond(T0, Ti, r) for ci, Ti in zip(c, Ts)) - 1  # noqa: E731
+    rs = ql.Brent().solve(f, 1e-15, 0.03, 0.0001, 0.5)
+    t = ql.Option.Call if inp["swaption_type"] == "RECEIVER" else ql.Option.Put
+    v = sum(ci * m.discountBondOption(t, m.discountBond(T0, Ti, rs), T0, Ti) for ci, Ti in zip(c, Ts))
+    P0 = lambda t: m.discountBond(0.0, t, inp["short_rate"])  # noqa: E731
+    ann = sum(x * P0(Ti) for x, Ti in zip(acc, Ts))
+    return {"price": inp["notional"] * v, "forward_swap_rate": (P0(T0) - P0(Ts[-1])) / ann, "annuity": inp["notional"] * ann}
+
+
+def g2f():
+    s = Suite("swaption_affine_g", "specifications/04-pricing/short-rate-models.md", G)
+    models = [dict(model="VASICEK", mean_reversion=0.15, long_term_mean=0.045, sigma=0.012, short_rate=0.035),
+              dict(model="CIR", mean_reversion=0.25, long_term_mean=0.04, sigma=0.08, short_rate=0.03)]
+    n_out = 0
+    for m in models:
+        for T0, n in ((1.0, 5), (2.0, 10), (5.0, 5)):
+            Ts = [T0 + k for k in range(1, n + 1)]
+            base = dict(m, notional=1e6, expiry_years=T0, payment_times=Ts)
+            fwd = jam_affine(dict(base, fixed_rate=0.04, swaption_type="PAYER"))["forward_swap_rate"]
+            for K in (round(fwd - 0.01, 6), round(fwd, 6), round(fwd + 0.01, 6)):
+                for st in ("PAYER", "RECEIVER"):
+                    inp = dict(base, fixed_rate=K, swaption_type=st)
+                    out = jam_affine(inp)
+                    q = ql_jam_affine(inp)
+                    ok = all(abs(q[k] - out[k]) <= 1e-6 + 1e-9 * abs(out[k]) for k in ("price", "annuity")) and close(q["forward_swap_rate"], out["forward_swap_rate"])
+                    n_out += ok
+                    if not ok:
+                        note(f"  QL affine swaption differs {m['model']}: {q} {out}")
+                    s.add(SWO, inp, out, cls=R, verified=["mpmath-50", "payer-receiver-parity"] + (["quantlib-1.44"] if ok else []),
+                          tags=["shortrate", "jamshidian", m["model"].lower(), st.lower()],
+                          limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-12 per unit notional"},
+                          description=f"{m['model']} {st} {T0}y into {n}y, K={K}")
+    for i in range(0, len(s.cases), 2):
+        p_, r_ = s.cases[i]["expected"]["outputs"], s.cases[i + 1]["expected"]["outputs"]
+        assert abs(p_["price"] - r_["price"] - p_["annuity"] * (p_["forward_swap_rate"] - s.cases[i]["inputs"]["fixed_rate"])) < 1e-6
+    e = dict(models[0], notional=1.0, expiry_years=1.0, payment_times=[2.0, 3.0], fixed_rate=0.04, swaption_type="PAYER")
+    errs = [(dict(e, model="G2PP"), "E_INPUT", "unknown model"),
+            ({k: v for k, v in e.items() if k != "short_rate"}, "E_SCHEMA", "VASICEK without short_rate"),
+            (dict(models[1], notional=1.0, expiry_years=1.0, payment_times=[2.0, 3.0], fixed_rate=0.0, swaption_type="PAYER"), "E_DOMAIN", "CIR critical rate below 0 (bond sum at r = 0 below 1)")]
+    for inp, code, d in errs:
+        s.add(SWO, inp, error=code, cls="date_and_convention", tags=["invalid", "jamshidian"], description=d)
+    for c in s.cases:
+        c["tags"].append("synthetic")
+    keep = common.GOLDEN
+    common.GOLDEN = keep.parent / FOLDER
+    s.write()
+    common.GOLDEN = keep
+    note(f"swaption_affine_g outside (QuantLib 1.44 model objects): {n_out} of {len(s.cases)}")
+    reg = HERE.parent / "outside_register_g.json"
+    d = json.loads(reg.read_text(encoding="utf-8"))
+    d["swaption_affine_g"] = {"counted": n_out, "total": len(s.cases), "rule": "G-13 method on QuantLib Vasicek and CoxIngersollRoss objects"}
+    reg.write_text(json.dumps(d, indent=1) + chr(10), encoding="utf-8")
+
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2 or "G1" in sys.argv:
@@ -717,3 +970,9 @@ if __name__ == "__main__":
         g2b()
     if len(sys.argv) < 2 or "G5A" in sys.argv:
         g5a()
+    if len(sys.argv) < 2 or "G2C" in sys.argv:
+        g2c()
+    if len(sys.argv) < 2 or "G2E" in sys.argv:
+        g2e()
+    if len(sys.argv) < 2 or "G2F" in sys.argv:
+        g2f()

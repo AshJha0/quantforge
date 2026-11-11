@@ -40,6 +40,52 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 |---|---|---|
 | G-16 | Exposure dates and CVA buckets | Exposure is defined only at reset dates before the last payment, where the remaining swap is a swaption and the EE is exact; between resets the floating coupon already fixed makes the exposure path-dependent, which the simulation wave covers. CVA uses default buckets `(t_(k-1), t_k]` with the exposure at the bucket end, `t_0 = 0`, independence of default and rates. Both are stylised and stated as such; the simulation wave must reproduce these numbers on the same grid |
 
+## Wave 2c, Hull-White calibration
+
+| # | Point | Ruling |
+|---|---|---|
+| G-17 | Calibration objective and outside status | One parameter (`sigma`, `a` fixed), unweighted squared price errors per unit notional, search interval `[1e-4, 1]`, `E_NO_CONVERGENCE` at an end. Judged on `sigma` (1e-9 relative) as well as on repricing, since the optimum is unique. Not counted as outside: QuantLib's `HullWhite.calibrate` needs date-based `SwaptionHelper`s with Black or normal vols and stops at its optimiser's accuracy, so it cannot reproduce this objective to 1e-9; QuantLib's repricing of the fitted prices is recorded as evidence only. A two-parameter (`a`, `sigma`) or piecewise `sigma(t)` fit waits for a later wave |
+
+## Wave 2d, Bermudan swaption reference scheme
+
+| # | Point | Ruling |
+|---|---|---|
+| G-18 | Pinned Bermudan scheme | The golden is the reference scheme of `short-rate-models.md` in binary64 (fully implicit, linear-extrapolation boundaries, exercise at the knots), as E-A23 for American options; any build implements exactly that scheme. Accuracy is shown by convergence to Jamshidian with one exercise date and by QuantLib's FD and tree engines (evidence file), not by golden tolerance. Not counted as outside: no library implements this scheme. A higher-order engine (Crank-Nicolson with Rannacher steps) may be added later as a separate `method` value; this one keeps its meaning |
+
+## Wave 2e, caps and floors
+
+| # | Point | Ruling |
+|---|---|---|
+| G-19 | Cap rate and accrual | Single curve: the fixing is the model's simple rate over its own period, `1/P(t_(i-1), t_i) - 1` over `tau_i`, accruals are time differences, payment at period end. A projection curve, fixing lag or a day count other than the time grid waits for a multi-curve wave and will be a new input |
+
+## Wave 2f, Jamshidian for Vasicek and CIR
+
+| # | Point | Ruling |
+|---|---|---|
+| G-20 | `model` on the swaption | `rates.shortrate.swaption` gains optional `model` (default `HULL_WHITE`, a minor contract change: no existing case changes meaning). The G-5 `short_rate` rule is per model as in `zcb_option`. CIR with no non-negative critical rate is `E_DOMAIN` (checked as `sum c_i P(T0, Ti; 0) < 1`) |
+
+## Wave 2g, callable bonds
+
+| # | Point | Ruling |
+|---|---|---|
+| G-21 | Callable bond on the G-18 scheme | Issuer call on coupon dates only, at a fixed fraction of face, applied to the ex-coupon value before the coupon is added; no notice period, no accrued interest between dates, no credit spread. The golden is the scheme (G-18); QuantLib's `CallableFixedRateBond` was not compared tonight (its date and accrual setup differs), so the evidence is the straight-bond limit only |
+
+
+## Wave 3b, LIBOR market model (closed-form layer)
+
+| # | Point | Ruling |
+|---|---|---|
+| G-22 | LMM conventions | Lognormal forwards only (forward or strike `<= 0` is `E_DOMAIN`; a shifted or normal LMM is a future new input). Single curve, accruals from the time grid, caplet variance integrated to the fixing date (not payment). Volatility is the abcd form only [BM 6.3.2]; correlation `exp(-beta |T_i - T_j|)` on fixing times [BM 6.9]. Swaptions by Rebonato's frozen-weight formula [BM 6.13]: the golden is the formula, not the exact LMM price. Outside check: QuantLib 1.44 `AbcdFunction.covariance`, `DiscountCurve.discount` and `blackFormula`, combined by arithmetic (as G-13) |
+
+
+## Coordinator decisions, 2026-11-11 (owner standing authorisation)
+
+| # | Point | Ruling |
+|---|---|---|
+| G-23 | Wave 4 outside oracle | ORE (open-source build or binary, no spend, no account) is the outside oracle for wave 4 exposure, PFE and CVA. If it cannot be installed, that is documented and the lower share is accepted as a known issue. **Status 2026-11-11:** the install (`uv pip install open-source-risk-engine`) was refused by this session's permission classifier ("code from external"); not installed. It needs the owner to approve the install or to add a permission rule |
+| G-24 | LMM scope in stage G | G-22 stays lognormal only for stage G. A shifted or normal LMM is recorded as a later item |
+| G-25 | Rebonato golden | The frozen-weight approximation is the golden (G-22). Its error against a simulated LMM is reported as evidence only, never judged |
+
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 
 | # | Point | Ruling |
@@ -47,3 +93,12 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 | G-9 | Q3b ladder cost | "Full ladder at most 5x one pricing" is measured as the median of 21 timed runs, after 5 warm-up runs, of (a) one Hull-White Bermudan swaption PV and (b) the same PV with its full ladder (every curve pillar plus `a` and `sigma`) by reverse-mode AAD, same process, same thread. Pass when `median(b) / median(a) <= 5`. "AAD equals bump to 1e-8" uses the Q3a reference (Richardson central differences, `h = 1e-4` and `5e-5`): `abs(AAD - ref) <= 1e-10 + 1e-8 abs(ref)` per unit notional |
 | G-10 | Q9 variance test | "Smoothed pathwise variance below bump at equal paths": a digital call under GBM (`S = K = 100`, `T = 1`, `r = 0.03`, `v = 0.2`), delta by (i) bump-and-reprice with common draws, `h = 0.01 S`, and (ii) the pathwise estimator with the payoff smoothed by a call spread of width `2 eps`, `eps = 0.01 S`; 100,000 paths, `core.rng` seed 20261109. Pass when the sample variance of (ii) is below that of (i), and the likelihood-ratio delta is within 3 SE of the closed form |
 | G-11 | A5 parameters | As the T row in plan 12.10 (domain, 110,000 Sobol points, 1 bp max, 0.5 bp at the 99.9th percentile, `E_DOMAIN` on each of the 14 faces plus NaN and infinity). Challenger only: never in goldens, never in the four-language conformance (12.8), Python research module only |
+
+## Owner decisions, 2026-11-10 (relayed by the coordinator: "agree and go ahead")
+
+| # | Point | Ruling |
+|---|---|---|
+| G-10 outcome | Q9 variance test as registered | Kept exactly as registered; parameters unchanged. **Outcome: inconclusive, low power (not a pass).** The run of 2026-11-10 gave a per-path variance ratio of 0.9985 (smoothed pathwise 0.0087549, bump 0.0087677), because at `h S = eps` the two estimators are nearly the same call spread, and a comparison of two sample variances cannot separate a 0.15% difference at 100,000 paths. Recorded in CHANGELOG known issues |
+| G-10b | Q9 variance test, powered (registered 2026-11-10 before any run of it) | **Question:** does the smoothed pathwise delta of a digital have lower per-path variance than a central bump with a standard finite-difference step, at equal paths? **Setup:** digital call, `S = K = 100`, `T = 1`, `r = 0.03`, `q = 0`, `v = 0.2`; pathwise smoothing `eps = 1.0`; bump `h = 0.001` (relative, central, on `S`). **Independent draws:** `core.rng` seed 20261110, stream 0 for the pathwise estimator, stream 1 for the bump, `n = 60,000` paths each. **Statistic:** `Z = (ln s_b^2 - ln s_pw^2) / sqrt((k_pw - 1)/n + (k_b - 1)/n)`, `s^2` the sample variances (divisor `n - 1`), `k` the sample kurtoses (fourth central moment over `s^4`). **Decision:** one-sided at 5%: pass if `Z > 1.6449`; fail otherwise. Report the variance ratio `s_pw^2 / s_b^2` with its 95% interval `exp(-(ln ratio) +- 1.96 se)` inverted accordingly. **Effect that matters:** a ratio of at most 0.8 (at least a 20% variance reduction). **Power calculation (closed form, no simulation):** each per-path estimator is close to a scaled Bernoulli: pathwise nonzero when `abs(S_T - K) < eps`, `p_pw = 0.039829`; bump nonzero when `K/(1+h) < S_T < K/(1-h)`, `p_b = 0.0039844` (lognormal probabilities). A scaled Bernoulli has kurtosis `k = (1 - 3p + 3p^2)/(p(1 - p))`: `k_pw = 23.149`, `k_b = 248.98`. With `Var(ln s^2) ~ (k - 1)/n`, 80% power at ratio 0.8 and one-sided 5% needs `n = ((1.6449 + 0.8416) / ln(1.25))^2 (k_pw + k_b - 2) = 124.2 x 270.13 = 33,541` per estimator; `n = 60,000` adds a factor of about 1.8 for the Bernoulli approximation (the `S_T/S` factor and discounting are ignored). The same model implies a true ratio near 0.096, so the test is expected to pass; it is registered as a falsifiable check, not assumed |
+| F-33 | (stage F, unchanged) | Stays open: only the owner can confirm the `low` scenario formula against MAR21.6 |
+| G-10b outcome | Run 2026-11-10 after registration (`oracle/python/run_g10b.py`, `oracle/G10B_RESULT.json`) | **Pass.** Per-path variance: smoothed pathwise 0.0090503, bump 0.0891291; ratio 0.1015, 95% interval [0.0888, 0.1161]; `Z = 33.35 > 1.6449`. Sample kurtoses 23.02 and 261.15 (registered predictions 23.15 and 248.98), so the power calculation's assumptions held. G-10 itself stays "inconclusive, low power" |
