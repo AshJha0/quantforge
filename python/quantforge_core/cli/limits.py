@@ -230,6 +230,7 @@ for _name in ("rates.shortrate.zcb", "rates.shortrate.zcb_option", "rates.shortr
               "rates.lmm.swaption_rebonato", "rates.g2pp.zcb", "rates.g2pp.zcb_option"):
     STAGE_F_ARRAYS[_name] = dict(_G_TIMES)
 STAGE_F_ARRAYS["xva.exposure.swap_ee_hw"] = {**_G_TIMES, "exposure_times": 10_000}
+STAGE_F_ARRAYS["xva.exposure.portfolio_hw"] = {**_G_TIMES, "exposure_times": 10_000}
 
 
 def _check_stage_f(raw: Raw, limits: Mapping[str, int]) -> None:

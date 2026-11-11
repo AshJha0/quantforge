@@ -253,3 +253,14 @@ F-Q1, F-Q2 and F-Q4 have no ruling yet.
   either fix the two inputs, or amend G-31 to say the stage G sizes come first.
 - G-Q3 answered by G-50 (both goldens fixed); the `registry.EARLY_LIMITS` workaround is removed, so
   `E_LIMIT` again comes after `E_SCHEMA` exactly as G-31 orders it.
+- G-Q4 (wave 4c, `expsim_g` `pfe_99`). Eight cases fail, all on `pfe_99` at late dates of long payer
+  exposure: 0039, 0045, 0055, 0061, 0071, 0077, 0087, 0093. In every one the Python value is a few
+  units above the golden (for example 0039 at 17 years: 291,331.928 against 291,322.038, where the
+  deflated value peaks at 291,347.4). By the spec's own definition (the smallest `y` with
+  `P(max(f, 0) <= y) >= 0.99`), the golden `y` gives `P = 0.98766`, not 0.99: an independent
+  brute-force check (2.4 million points, normal weights) gives 0.98766 at the golden and 0.98999
+  at Python's value, and reproduces the golden EE to 4e-12 relative at the same date. The set
+  `{f > y}` there is an interval only 0.037 standard deviations wide around the flat maximum, so
+  a root scan coarser than that misses it and overstates `P(f <= y)`, which is what a too-low
+  quantile needs. Python's scan has 0.01-standard-deviation steps plus Brent refinement. Asked:
+  regenerate the eight `pfe_99` values (or confirm the definition).

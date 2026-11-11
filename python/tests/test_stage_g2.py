@@ -220,3 +220,34 @@ def test_frtb_vega_one_factor_and_curvature_long_gamma() -> None:
     assert c["capital"] == 0.0
     with pytest.raises(QfError):
         frtb.curvature("GIRR", [("EUR", None, 1.0, 1.0)], True)
+
+
+# --- wave 4c portfolio exposure --------------------------------------------------------------------
+
+
+def test_portfolio_single_swap_reproduces_wave_4a_and_pfe_order() -> None:
+    from quantforge_core import portfolio_exposure
+
+    pay = [1.0, 2.0, 3.0, 4.0, 5.0]
+    out = portfolio_exposure.portfolio_hw(TIMES, DFS, 0.05, 0.01, [(1e7, 0.03, "PAY", 0.0, pay)],
+                                          [1.0, 2.0, 3.0, 4.0], [0.95, 0.99], 0.02, 0.4)
+    m = shortrate.curve_model(TIMES, DFS, 0.05, 0.01)
+    wave4a = shortrate.swap_ee_hw(m, 0.0, pay, 0.03, "PAY", 1e7, [1.0, 2.0, 3.0, 4.0], 0.02, 0.4)
+    ee, ref = out["discounted_ee"], wave4a["discounted_ee"]
+    assert isinstance(ee, list) and isinstance(ref, list)
+    for x, y in zip(ee, ref, strict=True):
+        assert x == pytest.approx(y, rel=1e-10)
+    assert out["cva"] == pytest.approx(wave4a["cva"], rel=1e-10)
+    p95, p99 = out["pfe_95"], out["pfe_99"]
+    assert isinstance(p95, list) and isinstance(p99, list)
+    assert all(b >= a >= 0 for a, b in zip(p95, p99, strict=True))
+
+
+def test_portfolio_offsetting_swaps_have_no_exposure() -> None:
+    from quantforge_core import portfolio_exposure
+
+    pay = [1.0, 2.0, 3.0]
+    out = portfolio_exposure.portfolio_hw(
+        TIMES, DFS, 0.05, 0.01, [(1e6, 0.03, "PAY", 0.0, pay), (1e6, 0.03, "RECEIVE", 0.0, pay)],
+        [1.0, 2.0], [0.95], 0.02, 0.4)
+    assert out["discounted_ee"] == [0.0, 0.0] and out["pfe_95"] == [0.0, 0.0]

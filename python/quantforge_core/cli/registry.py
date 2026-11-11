@@ -20,7 +20,7 @@ CORE_MODULES = (
     "curve_fits", "curves", "data_checks", "daycount", "equity", "equity_curves", "exotics",
     "futures", "fx", "fx_smile", "hedging", "heston", "inflation", "integrate", "interp", "joint", "linalg", "book_risk", "var_risk", "book",
     "mbs", "money", "monte_carlo", "ois", "overnight", "pde", "projection", "rates_vol",
-    "risk_curve", "rng", "roots", "sabr", "schedules", "shortrate", "mc_greeks", "lmm", "xva", "risk_tools", "aad_ladder", "frtb", "sensitivities", "smile", "snapshot",
+    "risk_curve", "rng", "roots", "sabr", "schedules", "shortrate", "mc_greeks", "lmm", "xva", "risk_tools", "aad_ladder", "frtb", "portfolio_exposure", "sensitivities", "smile", "snapshot",
     "sobol", "stats", "steps", "store", "timezones", "usecases", "variance", "vol_usecase", "xccy",
 )
 
