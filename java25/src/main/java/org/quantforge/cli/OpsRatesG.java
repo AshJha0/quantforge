@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
 import org.quantforge.core.QfError;
+import org.quantforge.pricing.BermudanLadder;
 import org.quantforge.pricing.Lmm;
 import org.quantforge.pricing.ShortRate;
 import org.quantforge.pricing.ShortRateFd;
@@ -45,14 +46,27 @@ final class OpsRatesG {
     /** The raw grid; checked after the gate. */
     private record RawGrid(long nx, long steps, double width) {}
 
-    private static RawGrid grid(In in) {
+    private static RawGrid grid(In in, double[] knots) {
         In g = in.object("grid");
         long nx = g.integer("nx");
         long steps = g.integer("steps_per_year");
         double width = g.real("width");
         in.limit(nx > 10_001, "grid");
         in.limit(steps > 100_000, "grid");
+        double total = 0.0;
+        for (int k = 1; k < knots.length; k++) {
+            total += Math.max(1.0, Math.ceil(steps * (knots[k] - knots[k - 1])));
+        }
+        in.limit(nx * total > 5e8, "grid"); // ruling G-31, combined grid work
         return new RawGrid(nx, steps, width);
+    }
+
+    /** {@code 0} followed by the given times: the knots of the G-18 scheme. */
+    private static double[] knots(double first, double[] times) {
+        double[] k = new double[times.length + 1];
+        k[0] = first;
+        System.arraycopy(times, 0, k, 1, times.length);
+        return k;
     }
 
     private static ShortRateFd.Grid checkGrid(RawGrid g) {
@@ -116,6 +130,8 @@ final class OpsRatesG {
     }
 
     static void register(Map<String, Function<In, Out>> table) {
+        table.put("risk.model_reserve.dispersion", OpsRatesG::reserve);
+
         table.put("rates.shortrate.hw_calibrate", in -> {
             In c = in.object("curve");
             double[] ct = c.reals("times");
@@ -161,30 +177,8 @@ final class OpsRatesG {
             return Operations.out("sigma", fit.sigma(), "fitted_prices", fit.fitted(), "rmse", fit.rmse());
         });
 
-        table.put("rates.shortrate.bermudan_swaption", in -> {
-            OpsShortRate.Raw raw = OpsShortRate.read(in, true);
-            double t0 = in.real("start_years");
-            double[] pay = in.reals("payment_times");
-            double rate = in.real("fixed_rate");
-            String type = in.string("swaption_type");
-            double notional = in.real("notional");
-            double[] ex = in.reals("exercise_times");
-            RawGrid rg = grid(in);
-            in.limit(pay.length > MAX, "payment_times");
-            in.limit(ex.length > MAX, "exercise_times");
-            in.gate();
-            ShortRate.Params p = OpsShortRate.params(raw, 0.0);
-            if (!(t0 > 0.0)) {
-                throw domain("start_years");
-            }
-            OpsShortRate.checkPayments(pay, t0);
-            boolean payer = listed(type, "swaption_type", "PAYER", "RECEIVER");
-            if (ex.length == 0 || !increasing(ex) || !resets(ex, t0, pay)) {
-                throw input("exercise_times");
-            }
-            ShortRateFd.Grid g = checkGrid(rg);
-            return Operations.out("price", ShortRateFd.bermudan(p, pay, rate, payer, notional, ex, g));
-        });
+        table.put("rates.shortrate.bermudan_swaption", in -> bermudan(in, false));
+        table.put("rates.shortrate.bermudan_ladder", in -> bermudan(in, true));
 
         table.put("rates.shortrate.callable_bond", in -> {
             OpsShortRate.Raw raw = OpsShortRate.read(in, true);
@@ -193,7 +187,7 @@ final class OpsRatesG {
             double notional = in.real("notional");
             double[] calls = in.reals("call_times");
             double callPrice = in.real("call_price");
-            RawGrid rg = grid(in);
+            RawGrid rg = grid(in, knots(0.0, pay));
             in.limit(pay.length > MAX, "payment_times");
             in.limit(calls.length > MAX, "call_times");
             in.gate();
@@ -308,5 +302,76 @@ final class OpsRatesG {
             return Operations.out("price", s.price(), "swap_rate", s.swapRate(), "annuity", s.annuity(), "black_vol",
                     s.blackVol());
         });
+    }
+
+    /** Model-reserve dispersion (model-reserve.md, ruling G-36). */
+    private static Out reserve(In in) {
+        In pr = in.object("prices");
+        java.util.TreeMap<String, Double> prices = new java.util.TreeMap<>();
+        for (String k : pr.keys()) {
+            prices.put(k, pr.real(k));
+        }
+        String ref = in.string("reference_model");
+        in.limit(prices.size() > MAX, "prices");
+        in.gate();
+        if (prices.size() < 2) {
+            throw input("prices");
+        }
+        if (!prices.containsKey(ref)) {
+            throw input("reference_model");
+        }
+        double pRef = prices.get(ref);
+        double sum = 0.0;
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        double reserve = -1.0;
+        String worst = null;
+        for (Map.Entry<String, Double> e : prices.entrySet()) {
+            double p = e.getValue();
+            sum += p;
+            max = Math.max(max, p);
+            min = Math.min(min, p);
+            double dev = Math.abs(p - pRef);
+            if (dev > reserve) {
+                reserve = dev;
+                worst = e.getKey();
+            }
+        }
+        double range = max - min;
+        Double rel = pRef == 0.0 ? null : reserve / Math.abs(pRef);
+        return Operations.out("mean", sum / prices.size(), "range", range, "half_range", range / 2.0, "reserve",
+                reserve, "worst_model", worst, "relative_reserve", rel);
+    }
+
+    /** The Bermudan swaption (wave 2d) and its AAD ladder (wave 3d), with the same inputs and checks. */
+    private static Out bermudan(In in, boolean ladder) {
+        OpsShortRate.Raw raw = OpsShortRate.read(in, true);
+        double t0 = in.real("start_years");
+        double[] pay = in.reals("payment_times");
+        double rate = in.real("fixed_rate");
+        String type = in.string("swaption_type");
+        double notional = in.real("notional");
+        double[] ex = in.reals("exercise_times");
+        RawGrid rg = grid(in, knots(0.0, ex));
+        in.limit(pay.length > MAX, "payment_times");
+        in.limit(ex.length > MAX, "exercise_times");
+        in.gate();
+        ShortRate.Params p = OpsShortRate.params(raw, 0.0);
+        if (!(t0 > 0.0)) {
+            throw domain("start_years");
+        }
+        OpsShortRate.checkPayments(pay, t0);
+        boolean payer = listed(type, "swaption_type", "PAYER", "RECEIVER");
+        if (ex.length == 0 || !increasing(ex) || !resets(ex, t0, pay)) {
+            throw input("exercise_times");
+        }
+        ShortRateFd.Grid g = checkGrid(rg);
+        if (!ladder) {
+            return Operations.out("price", ShortRateFd.bermudan(p, pay, rate, payer, notional, ex, g));
+        }
+        BermudanLadder.Ladder l = BermudanLadder.ladder(raw.times(), raw.dfs(), p.a(), p.sigma(), pay, rate,
+                payer, notional, ex, g);
+        return Operations.out("price", l.price(), "d_price_d_discount_factors", l.dDiscountFactors(),
+                "d_price_d_mean_reversion", l.dMeanReversion(), "d_price_d_sigma", l.dSigma());
     }
 }

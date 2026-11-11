@@ -348,27 +348,59 @@ public final class ShortRate {
         return 1.0 - Math.exp(lead) * h;
     }
 
-    /** Noncentral chi-square CDF with k degrees of freedom and noncentrality lambda, by the Poisson series. */
+    /**
+     * ln of the Poisson weight {@code e^-mu mu^j / j!}. For {@code j >= 10} by Stirling's series written without
+     * the large cancelling terms, so the weight at the mode keeps full relative accuracy when mu is in the thousands.
+     */
+    static double logPoisson(int j, double mu) {
+        if (j < 10) {
+            double lf = 0.0;
+            for (int i = 2; i <= j; i++) {
+                lf += Math.log(i);
+            }
+            return -mu + j * Math.log(mu) - lf;
+        }
+        double n = j;
+        double d = mu - n;
+        double inv = 1.0 / n;
+        double inv2 = inv * inv;
+        double corr = inv * (1.0 / 12.0 - inv2 * (1.0 / 360.0 - inv2 * (1.0 / 1260.0 - inv2 / 1680.0)));
+        return -d + n * Math.log1p(d / n) - 0.5 * Math.log(2.0 * Math.PI * n) - corr;
+    }
+
+    /**
+     * Noncentral chi-square CDF with k degrees of freedom and noncentrality lambda: the Poisson series summed from
+     * its mode with log weights, up then down, until terms fall below 1e-17 of the sum (ruling G-32). A
+     * non-positive argument gives 0.
+     */
     static double chi2Cdf(double x, double k, double lambda) {
         if (x <= 0.0) {
             return 0.0;
         }
         double mu = lambda / 2.0;
         double s0 = k / 2.0;
-        double sum = 0.0;
         if (mu == 0.0) {
             return gammaP(s0, x / 2.0);
         }
-        double logMu = Math.log(mu);
-        double lnFact = 0.0;
-        for (int j = 0; j < 100000; j++) {
-            if (j > 0) {
-                lnFact += Math.log(j);
-            }
-            double w = Math.exp(-mu + j * logMu - lnFact);
-            double term = w * gammaP(s0 + j, x / 2.0);
+        int j0 = (int) Math.floor(mu);
+        double w0 = Math.exp(logPoisson(j0, mu));
+        double half = x / 2.0;
+        double sum = 0.0;
+        double w = w0;
+        for (int j = j0; j < j0 + 1_000_000; j++) {
+            double term = w * gammaP(s0 + j, half);
             sum += term;
             if (j > mu + 10.0 && term < 1e-17 * sum) {
+                break;
+            }
+            w *= mu / (j + 1);
+        }
+        w = w0;
+        for (int j = j0 - 1; j >= 0; j--) {
+            w *= (j + 1) / mu;
+            double term = w * gammaP(s0 + j, half);
+            sum += term;
+            if (term < 1e-17 * sum) {
                 break;
             }
         }

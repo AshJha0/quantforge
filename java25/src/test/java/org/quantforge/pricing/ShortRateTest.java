@@ -194,4 +194,66 @@ class ShortRateTest {
         }
         return s;
     }
+
+    /**
+     * aad-core.md: the AAD ladder equals this build's own Richardson bump of the scheme within G-9, and the
+     * G-9 cost ratio (median of 21 timed runs after 5 warm-ups) is printed for the benchmark record.
+     */
+    @Test
+    void aadLadderMatchesBumpAndReportsCost() {
+        double[] times = {1, 2, 5, 10};
+        double[] dfs = {0.97, 0.935, 0.81, 0.62};
+        double[] pay = {2.0, 3.0, 4.0, 5.0, 6.0};
+        double[] ex = {1.0, 2.0, 3.0, 4.0, 5.0};
+        ShortRateFd.Grid g = new ShortRateFd.Grid(101, 50, 6.0);
+        double a = 0.05;
+        double sig = 0.01;
+        BermudanLadder.Ladder l = BermudanLadder.ladder(times, dfs, a, sig, pay, 0.035, true, 1.0, ex, g);
+        java.util.function.DoubleUnaryOperator bumpA = h -> price(times, dfs, a * (1 + h), sig, pay, ex, g);
+        assertEquals(richardson(bumpA, a), l.dMeanReversion(), 1e-10 + 1e-6 * Math.abs(l.dMeanReversion()));
+        java.util.function.DoubleUnaryOperator bumpS = h -> price(times, dfs, a, sig * (1 + h), pay, ex, g);
+        assertEquals(richardson(bumpS, sig), l.dSigma(), 1e-10 + 1e-6 * Math.abs(l.dSigma()));
+        for (int i = 0; i < dfs.length; i++) {
+            int k = i;
+            java.util.function.DoubleUnaryOperator bump = h -> {
+                double[] d = dfs.clone();
+                d[k] *= 1 + h;
+                return price(times, d, a, sig, pay, ex, g);
+            };
+            double ref = richardson(bump, dfs[i]);
+            assertEquals(ref, l.dDiscountFactors()[i], 1e-10 + 1e-6 * Math.abs(ref), "pillar " + i);
+        }
+        assertEquals(price(times, dfs, a, sig, pay, ex, g), l.price(), 1e-12);
+        double[] tp = new double[21];
+        double[] tl = new double[21];
+        for (int r = -5; r < 21; r++) {
+            long t0 = System.nanoTime();
+            price(times, dfs, a, sig, pay, ex, g);
+            long t1 = System.nanoTime();
+            BermudanLadder.ladder(times, dfs, a, sig, pay, 0.035, true, 1.0, ex, g);
+            long t2 = System.nanoTime();
+            if (r >= 0) {
+                tp[r] = t1 - t0;
+                tl[r] = t2 - t1;
+            }
+        }
+        java.util.Arrays.sort(tp);
+        java.util.Arrays.sort(tl);
+        System.out.println("G-9 AAD cost ratio (median ladder / median price): " + tl[10] / tp[10]);
+    }
+
+    private static double price(double[] times, double[] dfs, double a, double sig, double[] pay, double[] ex,
+                                ShortRateFd.Grid g) {
+        ShortRate.Params p = new ShortRate.Params(ShortRate.Model.HULL_WHITE, a, sig, 0.0,
+                new ShortRate.Curve(times, dfs));
+        return ShortRateFd.bermudan(p, pay, 0.035, true, 1.0, ex, g);
+    }
+
+    /** Q3a rule: relative bumps 1e-4 and 5e-5, Richardson-extrapolated central differences. */
+    private static double richardson(java.util.function.DoubleUnaryOperator v, double x) {
+        double h = 1e-4;
+        double d1 = (v.applyAsDouble(h) - v.applyAsDouble(-h)) / (2 * h * x);
+        double d2 = (v.applyAsDouble(h / 2) - v.applyAsDouble(-h / 2)) / (h * x);
+        return (4 * d2 - d1) / 3;
+    }
 }
