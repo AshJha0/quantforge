@@ -279,9 +279,9 @@ STAGE_D = {
     "commodities": {"kind": "stage-d", "title": "Commodity forward curves, with seasonality and storage carry", "short": "Commodity forwards", "cli": "cmdty.curve.forward", "examples": {"cmdty.curve.forward": "commodity_forward_d.json", "cmdty.storage.carry": "commodity_carry_d.json"},
                     "shows": "Forward prices by delivery month, with seasonality and carry shown apart."},
     "sector-rating": {"kind": "stage-d", "title": "Sector and rating curves", "short": "Sector and rating curves", "golden": "stage_d", "cli": "credit.curve.composite", "examples": {"credit.curve.composite": "credit_composite_d.json"},
-                      "shows": "A sector or rating curve built as the weighted average of constituent CDS spread curves, then bootstrapped to survival probabilities with the ISDA rules (`specifications/04-pricing/credit.md`). The constituents and weights are synthetic."},
+                      "shows": "A sector or rating curve built as the weighted average of constituent CDS spread curves, times a rating multiplier (`scale`, 1 for the sector itself), then bootstrapped to survival probabilities with the ISDA rules (`specifications/04-pricing/credit.md`). The constituents and weights are synthetic."},
     "funding": {"kind": "stage-d", "stage": "F", "golden": "stage_f", "title": "Funding curve", "short": "Funding curve", "cli": "rates.funding.curve", "examples": {"rates.funding.curve": "funding_curve_f.json"},
-                "shows": "A funding curve solved from term funding quotes over an OIS discount curve, with the funding spread it implies by date (`specifications/02-curves/joint-solve-and-funding.md`)."},
+                "shows": "Unsecured funding: the OIS curve times a spread factor, `D_f(t) = D_ois(t) exp(-integral of s)`, with the spread `s` piecewise flat between the dates of simple ACT/360 funding quotes. It discounts uncollateralised cash flows and feeds FVA (`specifications/02-curves/joint-solve-and-funding.md`)."},
     "mbs": {"kind": "stage-d", "title": "MBS prepayment and valuation curves", "short": "MBS", "cli": "mbs.cashflows", "examples": {"mbs.cashflows": "mbs_cashflows_d.json"},
             "shows": "Prepayment speeds by month and the resulting cash flows."},
 }
@@ -705,7 +705,7 @@ Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 
 ## Status of every curve in the plan
 
-An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown.
+An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown. The papers and standards behind each curve are cited in its spec and collected in [References](../references.md).
 
 {table(['Curve', 'Status', 'Stage', 'Evidence'], rows)}
 {real}

@@ -11,6 +11,8 @@ Two ways in:
 - **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 7 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models and counterparty risk, with every number checked in all four languages. Then read the topics below in order.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
+Sources: every model and convention cites its papers, books and standards in the `## Sources` section of its spec. [References](docs/references.md) collects them all by topic, with each one's status (read, not opened, or paywalled) and the specs that rely on it.
+
 Each result below is real output from the CLIs, on the date each section gives. Unless a section says otherwise, Java, C++, Python and Rust printed the same value.
 
 | Topic | What it covers |
@@ -401,7 +403,7 @@ Stage F (v0.6.0) is at Implemented, not Validated. On the merged part 2 tree (`s
 - In the Basel traffic light, 4 exceptions in 250 days is green, 5 is yellow (plus factor 0.40), and 10 is red (`risk_f4-0086`, `0087`, `0092`).
 
 ### FRTB standardised capital for rates
-**Plain idea.** Regulators fix the recipe: weight each sensitivity, add them within a currency with set correlations, then across currencies, under three correlation scenarios, and keep the worst. Spec: `06-risk/frtb-sa-girr.md`, from the Basel Framework MAR21. **Worked number:** a 2Y long and a 10Y short on one curve (`frtb_f-0002`) need 8,812.37 of capital, with the `low` scenario binding. **Open:** the `low` formula is transcribed from an image and still needs checking against the PDF (F-33).
+**Plain idea.** Regulators fix the recipe: weight each sensitivity, add them within a currency with set correlations, then across currencies, under three correlation scenarios, and keep the worst. Spec: `06-risk/frtb-sa-girr.md`, from the Basel Framework MAR21. **Worked number:** a 2Y long and a 10Y short on one curve (`frtb_f-0002`) need 8,812.37 of capital, with the `low` scenario binding. **Checked:** the `low` formula, first transcribed from an image, was confirmed by the owner against MAR21.6 on 2026-11-10 (F-33): `rho_low = max(2 rho - 100%, 75% rho)`, and the same for `gamma`.
 
 ### The book, and where returns came from
 **Plain idea.** Positions carry an average cost, and selling realises the difference. Expiry, default and rolls are trades at their settlement, recovery or roll prices. At the end of the day each position gets a mark from the best available source, and an independent price flags marks that look wrong. Spec: `07-portfolio/book-lifecycle.md`. **Worked number:** buy 100 at 99.50 and 50 at 100.25 (average 99.75), sell 120 at 100.50: realised P&L 90.00, with 30 left at 99.75 (`book_f-0001`).

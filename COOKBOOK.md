@@ -16,6 +16,8 @@ python examples/tutorials/t7_counterparty.py cpp26/build/quantforge
 python tools/check_tutorial.py --lang cpp --page docs/getting-started/tutorial-4-credit.md
 ```
 
+Each recipe names its spec; the sources behind the spec are in its `## Sources` section and in [References](docs/references.md).
+
 ## Build each CLI
 
 ```bash

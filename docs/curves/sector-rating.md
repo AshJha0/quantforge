@@ -6,7 +6,7 @@ Generated on 2026-11-11 from commit `e150116`, by Java 0.6.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-A sector or rating curve built as the weighted average of constituent CDS spread curves, then bootstrapped to survival probabilities with the ISDA rules (`specifications/04-pricing/credit.md`). The constituents and weights are synthetic. Stage D.
+A sector or rating curve built as the weighted average of constituent CDS spread curves, times a rating multiplier (`scale`, 1 for the sector itself), then bootstrapped to survival probabilities with the ISDA rules (`specifications/04-pricing/credit.md`). The constituents and weights are synthetic. Stage D.
 
 ## Runs
 

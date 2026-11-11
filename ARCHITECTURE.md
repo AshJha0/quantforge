@@ -2,6 +2,8 @@
 
 QuantForge is one repository holding four isolated implementations and the neutral parts around them. The plain idea: a spec says what must be true, the oracle says what the answer is, and a runner that knows no finance compares each language's answer with it. Detail is in `architecture/`; decisions are in `architecture/decisions/`; diagrams are in `docs/diagrams/`.
 
+Sources: each spec ends with a `## Sources` section naming the papers, books and standards (ISDA, BIS MAR21, ARRC and others) it follows; [References](docs/references.md) lists them all by topic with their status.
+
 | Part | Role | May depend on |
 |---|---|---|
 | `specifications/` | What must be true | Nothing |

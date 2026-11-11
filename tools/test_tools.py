@@ -944,6 +944,32 @@ class DocsStatus(unittest.TestCase):
         self.assertEqual(sorted(b.split(":")[0] for b in bad), ["CHANGELOG.md", "README.md", "ROADMAP.md"])
         self.assertTrue(all(":2:" not in b for b in bad if b.startswith("README")))  # stage H is not released
 
+    def test_unknown_operation_name_fails(self):
+        files = {"LEARN.md": "Use `credit.curve.composite` or `credit.curve.nope`; `core.x` and `foo.bar.baz` are not checked.\n",
+                 "CHANGELOG.md": "Renamed `credit.curve.old`.\n"}
+        bad = self.c.unknown_operations(files, self.ops)
+        self.assertEqual(len(bad), 1)
+        self.assertIn("credit.curve.nope", bad[0])
+
+    def test_references_page_is_current_and_marks_status(self):
+        r = load("build_references", "tools/build_references.py")
+        found = r.collect()
+        self.assertEqual((ROOT / "docs/references.md").read_text(encoding="utf-8"), r.render(found))
+        page = r.render({("05-volatility", "Merton, R.C. (1976), doi:10.1016/0304-405X(76)90022-2. Status: licensed (not opened)"):
+                         {"specifications/05-volatility/x.md"}})
+        self.assertIn("**Not opened.** **Paywalled.**", page)
+        self.assertIn("(https://doi.org/10.1016/0304-405X%2876%2990022-2)", page)
+        self.assertIn("[`05-volatility/x.md`](../specifications/05-volatility/x.md)", page)
+
+    def test_link_check_fails_only_on_gone_and_tolerates_offline(self):
+        lc = load("check_links", "tools/check_links.py")
+        self.assertEqual(lc.links("see <https://a.org/x>, [d](https://doi.org/10.1/a(76)b)."),
+                         ["https://a.org/x", "https://doi.org/10.1/a(76)b"])
+        self.assertEqual([lc.classify(c) for c in (200, 403, 404, None, 500)], ["ok", "refused", "gone", "unreachable", "error"])
+        self.assertEqual(lc.run(["docs/references.md"], check=lambda u: None)[0], 0)  # offline
+        self.assertEqual(lc.run(["docs/references.md"], check=lambda u: 403)[0], 0)
+        self.assertEqual(lc.run(["docs/references.md"], check=lambda u: 404)[0], 1)
+
     def test_shipped_docs_pass(self):
         self.assertEqual(self.c.main(), 0)
 

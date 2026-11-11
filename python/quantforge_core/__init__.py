@@ -4,4 +4,4 @@ try:  # the installed package's version (python/pyproject.toml), so the CLI cann
     from importlib.metadata import version as _version
     __version__ = _version("quantforge-core")
 except Exception:  # noqa: BLE001 (not installed: running from a source tree)
-    __version__ = "0.6.0"
+    __version__ = "0.7.0"
