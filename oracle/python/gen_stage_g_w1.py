@@ -501,6 +501,16 @@ def g2a():
             (dict(e, short_rate=0.01), "E_INPUT", "short_rate given")]
     for inp, code, d in errs:
         s.add(SWO, inp, error=code, cls="date_and_convention", tags=["invalid", "jamshidian"], description=d)
+    # R5 M2 (ruling G-29): small negative strike (value), and the limit 1 + K tau_n <= 0 (E_DOMAIN); appended to keep ids
+    for st in ("PAYER", "RECEIVER"):
+        inp = dict(hw, expiry_years=1.0, payment_times=[2.0, 3.0, 4.0, 5.0], fixed_rate=-0.002, swaption_type=st)
+        out = jam_price(inp)
+        q = ql_jam(inp)
+        ok = all(abs(q[k] - out[k]) <= 1e-6 + 1e-10 * abs(out[k]) for k in ("price", "annuity"))
+        n_out += ok
+        s.add(SWO, inp, out, cls=R, verified=["mpmath-50"] + (["quantlib-1.44"] if ok else []), tags=["shortrate", "jamshidian", "negative-strike", st.lower()],
+              limit={"absolute": 1e-6, "relative": 1e-9, "reason": "1e-9 relative"}, description=f"HW {st} K=-0.2%: negative coupons, root still unique")
+    s.add(SWO, dict(e, fixed_rate=-1.0), error="E_DOMAIN", cls="date_and_convention", tags=["invalid", "jamshidian"], description="1 + K tau_n = 0")
     for c in s.cases:
         c["tags"].append("synthetic")
     keep = common.GOLDEN

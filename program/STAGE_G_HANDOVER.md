@@ -243,3 +243,6 @@ Recounted against QuantLib's own `JamshidianSwaptionEngine` at 3e-7 relative: `s
 
 ### M1, property tests (ruling G-28)
 Both tests restated against the scheme's own bounding value on the same grid (`short-rate-models.md`, "Property tests on the pinned scheme"). The failures were the first-order scheme bias: `callable_g-0007` +0.0093 over the exact straight bond, `bermudan_g-0007` 0.17% under Jamshidian. Language sessions: change these two property tests.
+
+### M2, negative-strike Jamshidian (ruling G-29)
+`1 + K tau_n <= 0` is `E_DOMAIN`; root bracket `[-1, 1]`. `swaption_g` gains 3 cases (0041, 0042 values at K = -0.2%, both QuantLib-engine counted; 0043 error): 43 cases, 28 counted. Stage G: 252 of 408 = 61.8%.
