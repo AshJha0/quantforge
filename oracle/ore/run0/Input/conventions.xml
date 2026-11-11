@@ -1,0 +1,7 @@
+<Conventions>
+<Zero><Id>EUR-ZERO-CONVENTIONS</Id><TenorBased>false</TenorBased><DayCounter>A365</DayCounter><Compounding>Continuous</Compounding></Zero>
+<IborIndex><Id>EUR-QFPAR-1Y</Id><FixingCalendar>NullCalendar</FixingCalendar><DayCounter>A365</DayCounter><SettlementDays>0</SettlementDays><BusinessDayConvention>Unadjusted</BusinessDayConvention><EndOfMonth>false</EndOfMonth></IborIndex>
+<Swap><Id>EUR-SWAP-CONVENTIONS</Id><FixedCalendar>TARGET</FixedCalendar><FixedFrequency>Annual</FixedFrequency><FixedConvention>MF</FixedConvention><FixedDayCounter>30/360</FixedDayCounter><Index>EUR-QFPAR-1Y</Index></Swap>
+<SwapIndex><Id>EUR-CMS-1Y</Id><Conventions>EUR-SWAP-CONVENTIONS</Conventions></SwapIndex>
+<SwapIndex><Id>EUR-CMS-30Y</Id><Conventions>EUR-SWAP-CONVENTIONS</Conventions></SwapIndex>
+</Conventions>
