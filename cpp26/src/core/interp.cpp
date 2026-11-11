@@ -404,7 +404,7 @@ constexpr double small_z = 1e-3;
 
 NodeLogCurve::NodeLogCurve(NodeCurveMethod method, Vec t, Vec ln_s, double tension)
     : method_(method), t_(std::move(t)), y_(std::move(ln_s)), sigma_(tension) {
-    const std::size_t n = t_.size() - 1;
+    const std::size_t n = t_.empty() ? 0 : t_.size() - 1;  // empty guard: GCC 16 -Walloc-size-larger-than on Windows
     Vec h(n), s(n);
     for (std::size_t i = 0; i < n; ++i) {
         h[i] = t_[i + 1] - t_[i];
