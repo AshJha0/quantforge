@@ -3446,6 +3446,87 @@
     "notionals"
    ]
   },
+  "hedge.crossasset.solve": {
+   "spec": "specifications/08-hedging/cross-asset-hedge.md",
+   "rust": "quantforge::hedge::crossasset_solve",
+   "python": "quantforge.hedge.crossasset_solve",
+   "java": "Hedge.crossassetSolve",
+   "cpp": "qf::hedge::crossasset_solve",
+   "inputs": {
+    "book": {
+     "java": "book"
+    },
+    "curve": {
+     "java": "curve"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "hedges": {
+     "java": "hedges"
+    },
+    "ridge": {
+     "java": "ridge"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "volatility": {
+     "java": "volatility"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "book_risk",
+    "objective",
+    "positions",
+    "residual_risk"
+   ]
+  },
+  "hedge.frontier.solve": {
+   "spec": "specifications/08-hedging/hedge-costs-and-frontier.md",
+   "rust": "quantforge::hedge::frontier_solve",
+   "python": "quantforge.hedge.frontier_solve",
+   "java": "Hedge.frontierSolve",
+   "cpp": "qf::hedge::frontier_solve",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "cost_weight": {
+     "java": "costWeight"
+    },
+    "cost_weights": {
+     "java": "costWeights"
+    },
+    "half_spreads": {
+     "java": "halfSpreads"
+    },
+    "impact": {
+     "java": "impact"
+    },
+    "lower": {
+     "java": "lower"
+    },
+    "margin_limit": {
+     "java": "marginLimit"
+    },
+    "margin_rates": {
+     "java": "marginRates"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "points"
+   ]
+  },
   "hedge.greeks.neutralise": {
    "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
    "rust": "quantforge::hedge::greeks_neutralise",
@@ -3482,7 +3563,7 @@
    ]
   },
   "hedge.integer.solve": {
-   "spec": "specifications/08-hedging/hedge-solvers.md",
+   "spec": "specifications/08-hedging/cross-asset-hedge.md",
    "rust": "quantforge::hedge::integer_solve",
    "python": "quantforge.hedge.integer_solve",
    "java": "Hedge.integerSolve",
@@ -3556,14 +3637,29 @@
     "b": {
      "java": "b"
     },
+    "cost_weight": {
+     "java": "costWeight"
+    },
     "eq_matrix": {
      "java": "eqMatrix"
     },
     "eq_rhs": {
      "java": "eqRhs"
     },
+    "half_spreads": {
+     "java": "halfSpreads"
+    },
+    "impact": {
+     "java": "impact"
+    },
     "lower": {
      "java": "lower"
+    },
+    "margin_limit": {
+     "java": "marginLimit"
+    },
+    "margin_rates": {
+     "java": "marginRates"
     },
     "ridge": {
      "java": "ridge"
@@ -3579,9 +3675,12 @@
     }
    },
    "outputs": [
+    "cost",
+    "margin",
     "objective",
     "rank",
     "residual",
+    "risk",
     "x"
    ]
   },

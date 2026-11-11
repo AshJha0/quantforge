@@ -31,6 +31,25 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-18 | Correlation sensitivity units | `CORRELATION` and `correlation01` are per 0.01 of correlation, as `risk.sens.correlation`; vegas are per unit volatility, as I-9 |
 | I-19 | `E_LIMIT` sizes, wave 2 | Credit: book 1,000 trades, 50 hedges. Correlation: book 1,000 positions, 5 hedges (the number of Greeks) |
 
+## Wave 3, cross-asset hedge (equity and rates)
+
+| # | Point | Ruling |
+|---|---|---|
+| I-20 | Curve for the cross-asset hedge | Continuously compounded zero rates on ACT/365F pillar times, linear in time between pillars, flat before the first pillar, and no extrapolation after the last: a maturity there is `E_INPUT` (spec question Q-I9) |
+| I-21 | Equity and key-rate risk factors | `EQ01` is half the value change between spot times 1.01 and spot times 0.99. `KR01_k` is half the change between pillar `k`'s zero rate plus and minus 1bp, other pillars fixed. Both are definitions, not derivative approximations |
+| I-22 | Units of hedge instruments | The wave 1 singularity test (I-3) is relative to the largest eigenvalue, so it is not invariant to instrument units. A unit zero-coupon bond's 1bp risk (about 5e-4) next to a forward's 1% equity risk (about 40) made a regular problem look singular (ratio 6e-12, found while generating `hedgexa_i`). `ZCB` therefore takes a `notional`, and hedge instruments are expected to carry comparable risk per unit. I-3 is not changed (Q-I10) |
+| I-23 | `E_LIMIT` sizes, wave 3 | Book 1,000 positions, hedges 200, curve pillars 100 |
+
+## Wave 4a, costs, impact, liquidity and margin; frontier
+
+| # | Point | Ruling |
+|---|---|---|
+| I-24 | Traded size | Costs and margin apply to `x`, the new hedge, which starts from no position. Rebalancing from existing positions is a later input (Q-I11) |
+| I-25 | Order of the new checks in `hedge.qp.solve` | After wave 1 checks 1 to 3: lengths and the `margin_rates`/`margin_limit` pair (`E_INPUT`), `MIN_NORM` with any new input (`E_INPUT`), negative values (`E_DOMAIN`); then wave 1 checks 4 to 6, with the margin constraint part of feasibility |
+| I-26 | Regularity with costs | The singularity test (I-3) uses `A^T W A + ridge I + cost_weight diag(impact)`. Impact counts like a ridge; a spread cost does not, because `|x|` has no curvature away from 0 |
+| I-27 | Outputs with costs | `risk`, `cost` and (with margin inputs) `margin` are output only when a new input is present, so every wave 1 result keeps its exact output set; `objective = risk + cost_weight cost` |
+| I-28 | Several outside solvers | An outside check may try several library solvers on the same problem and count the case if one agrees with every compared output within the case tolerance; `verified_by` names it. Goldens never depend on which solver agreed |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).
