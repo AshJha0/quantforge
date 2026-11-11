@@ -19,3 +19,8 @@ Built in `java25/` (`hedging.LeastSquaresHedge`, `hedging.HedgeRatios`, `cli.Ops
 
 Built (`hedging.CreditHedge`, `hedging.CorrelationHedge`, `cli.OpsHedgeCreditCorr`; `pricing.Credit.Hazard.shifted`
 for the I-15 hazard bumps): `hedgecredit_i` 19 of 19, `hedgecorr_i` 20 of 20. No spec question.
+
+## Wave 3: cross-asset hedge
+
+Built (`hedging.CrossAssetHedge`, `cli.OpsHedgeCrossAsset`, solving through the wave 1 `LeastSquaresHedge`):
+`hedgexa_i` 17 of 17. No spec question.
