@@ -272,7 +272,7 @@ super::registry! {
             ("rmse", rmse.into()),
         ]))
     },
-    "rates.shortrate.bermudan_swaption" | "rates.shortrate.callable_bond" => {
+    "rates.shortrate.bermudan_swaption" | "rates.shortrate.callable_bond" | "rates.shortrate.bermudan_ladder" => {
         let (a, sigma) = (i.f64("mean_reversion")?, i.f64("sigma")?);
         if i.opt("short_rate").is_some() {
             return fail("E_INPUT", "HULL_WHITE takes no short_rate");
@@ -308,6 +308,15 @@ super::registry! {
             _ => return fail("E_INPUT", "swaption_type must be PAYER or RECEIVER"),
         };
         let swap = sr::SwapLeg { start, pay: &pay, fixed_rate: k, payer, notional };
+        if op == "rates.shortrate.bermudan_ladder" {
+            let l = quantforge_core::bermudan_aad::bermudan_ladder(&curve, a, sigma, &swap, &ex, grid)?;
+            return plain(obj([
+                ("price", l.price.into()),
+                ("d_price_d_discount_factors", l.d_discount_factors.into()),
+                ("d_price_d_mean_reversion", l.d_mean_reversion.into()),
+                ("d_price_d_sigma", l.d_sigma.into()),
+            ]));
+        }
         let p = sr::bermudan_swaption(&curve, a, sigma, &swap, &ex, grid)?;
         plain(obj([("price", p.into())]))
     }

@@ -18,6 +18,7 @@ mod mcgreeks;
 mod rates;
 mod repo;
 mod risk;
+mod riskcarry;
 mod shortrate;
 mod usecase;
 mod vol;
@@ -82,6 +83,7 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("repo", repo::NAMES, repo::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
     ("risk", mcgreeks::NAMES, mcgreeks::dispatch),
+    ("risk", riskcarry::NAMES, riskcarry::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
     ("vol", vol::NAMES, vol::dispatch),
     ("xva", xva::NAMES, xva::dispatch),

@@ -47,6 +47,22 @@ impl HwCurve {
             .min(n - 1)
     }
 
+    /// Segment index of `t` with its end times (adjoint helpers).
+    pub(crate) fn segment(&self, t: f64) -> (usize, f64, f64) {
+        let i = self.seg(t);
+        (i, self.times[i], self.times[i + 1])
+    }
+
+    /// Number of input pillars (the `(0, 1)` node excluded).
+    pub(crate) fn pillars(&self) -> usize {
+        self.times.len() - 1
+    }
+
+    /// Discount factor of input pillar `k` (1-based).
+    pub(crate) fn pillar_df(&self, k: usize) -> f64 {
+        self.logs[k].exp()
+    }
+
     /// Right-hand instantaneous forward `f(0, t)`.
     pub fn forward(&self, t: f64) -> f64 {
         let i = self.seg(t);
@@ -853,23 +869,21 @@ pub struct SwapLeg<'a> {
     pub notional: f64,
 }
 
-/// `rates.shortrate.bermudan_swaption` on the pinned G-18 scheme. `exercise` must be reset
-/// dates `T0, ..., T(n-1)`; exercising at `t` enters the swap paying from `t` to `Tn`.
-pub fn bermudan_swaption(
+/// Validation of the Bermudan inputs shared by the price and the AAD ladder.
+pub(crate) fn check_bermudan(
     curve: &HwCurve,
     a: f64,
     sigma: f64,
     swap: &SwapLeg,
     exercise: &[f64],
     grid: FdGrid,
-) -> Result<f64> {
+) -> Result<()> {
     let (start, pay) = (swap.start, swap.pay);
     crate::error::finite("start_years", &start)?;
     crate::error::finite("exercise_times", &exercise)?;
     crate::error::finite("fixed_rate", &swap.fixed_rate)?;
     crate::error::finite("notional", &swap.notional)?;
-    let m = Model::HullWhite { a, sigma, curve };
-    zcb(&m, 0.0, 0.0, 1.0)?;
+    zcb(&Model::HullWhite { a, sigma, curve }, 0.0, 0.0, 1.0)?;
     if start <= 0.0 {
         return fail("E_DOMAIN", "start_years must be positive");
     }
@@ -886,7 +900,22 @@ pub fn bermudan_swaption(
         );
     }
     grid.check()?;
-    grid.check_work(exercise)?;
+    grid.check_work(exercise)
+}
+
+/// `rates.shortrate.bermudan_swaption` on the pinned G-18 scheme. `exercise` must be reset
+/// dates `T0, ..., T(n-1)`; exercising at `t` enters the swap paying from `t` to `Tn`.
+pub fn bermudan_swaption(
+    curve: &HwCurve,
+    a: f64,
+    sigma: f64,
+    swap: &SwapLeg,
+    exercise: &[f64],
+    grid: FdGrid,
+) -> Result<f64> {
+    check_bermudan(curve, a, sigma, swap, exercise, grid)?;
+    let pay = swap.pay;
+    let m = Model::HullWhite { a, sigma, curve };
     let phi = if swap.payer { 1.0 } else { -1.0 };
     let ex = |x: &[f64], t: f64| -> Result<Vec<f64>> {
         let al = hw_alpha(curve, a, sigma, t);

@@ -235,3 +235,8 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - `hw_calibrate`: scan points where the critical-rate solve has no binary64 root (sigma near 1
   with long expiries) are scored as `+inf`, since they cannot be the minimum.
 - Bermudan / callable FD: one stepper shared by both operations, exactly the G-18 scheme.
+- `risk.frtb.csr_delta`: cross-bucket sector correlations between two of the sectors 1 to 8
+  (the body of MAR21.57 Table 5) are not in the spec text. Rust returns `E_INPUT` for such a
+  pair rather than guess the table; no golden uses one. Owner item with G-49.
+- AAD ladder (Q3b): hand-written adjoint of the G-18 scheme; G-9 ratio measured by
+  `cargo bench -p quantforge-bench --bench aad_ladder` (4.21 on 2026-11-11, loaded laptop).

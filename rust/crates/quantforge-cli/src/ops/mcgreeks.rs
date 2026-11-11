@@ -51,5 +51,30 @@ super::registry! {
             ("vega", g.vega.into()),
             ("vega_se", g.vega_se.into()),
         ]))
+    },
+    "risk.model_reserve.dispersion" => {
+        let mut prices = Vec::new();
+        match i.req("prices")? {
+            quantforge_core::json::Json::Obj(m) => {
+                for (k, v) in m {
+                    let Some(x) = v.as_f64() else {
+                        return i.fail("prices", "expected numbers");
+                    };
+                    prices.push((k.clone(), x));
+                }
+            }
+            _ => return i.fail("prices", "expected an object"),
+        }
+        let r = i.str("reference_model")?;
+        i.gate()?;
+        let o = quantforge_core::xva::model_reserve(&prices, r)?;
+        plain(obj([
+            ("mean", o.mean.into()),
+            ("range", o.range.into()),
+            ("half_range", o.half_range.into()),
+            ("reserve", o.reserve.into()),
+            ("worst_model", o.worst_model.as_str().into()),
+            ("relative_reserve", o.relative_reserve.map_or(quantforge_core::json::Json::Null, Into::into)),
+        ]))
     }
 }

@@ -18,3 +18,8 @@ harness = false
 
 [lints]
 workspace = true
+
+# G-9 AAD cost ratio: median of 21 runs after 5 warm-ups, ladder over one pricing (<= 5).
+[[bench]]
+name = "aad_ladder"
+harness = false

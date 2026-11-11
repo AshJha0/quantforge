@@ -457,3 +457,54 @@ mod tests {
         assert!((m - 900_000.0).abs() < 1e-9);
     }
 }
+
+/// Output of [`model_reserve`].
+#[derive(Debug, Clone, PartialEq)]
+pub struct Reserve {
+    /// Mean of the model prices.
+    pub mean: f64,
+    /// `max - min`.
+    pub range: f64,
+    /// `range / 2`.
+    pub half_range: f64,
+    /// `max_m |p_m - p_ref|`.
+    pub reserve: f64,
+    /// The model attaining `reserve` (first in code-point order on a tie).
+    pub worst_model: String,
+    /// `reserve / |p_ref|`, `None` when `p_ref = 0`.
+    pub relative_reserve: Option<f64>,
+}
+
+/// `risk.model_reserve.dispersion` (Q9 part 2, ruling G-36).
+pub fn model_reserve(prices: &[(String, f64)], reference: &str) -> Result<Reserve> {
+    if prices.len() < 2 {
+        return fail("E_INPUT", "prices needs at least two models");
+    }
+    for (_, p) in prices {
+        crate::error::finite("prices", p)?;
+    }
+    let Some(pref) = prices.iter().find(|p| p.0 == reference).map(|p| p.1) else {
+        return fail("E_INPUT", "reference_model must be a key of prices");
+    };
+    let mut sorted: Vec<&(String, f64)> = prices.iter().collect();
+    sorted.sort_by(|a, b| a.0.cmp(&b.0));
+    #[allow(clippy::cast_precision_loss)]
+    let mean = prices.iter().map(|p| p.1).sum::<f64>() / prices.len() as f64;
+    let hi = prices.iter().map(|p| p.1).fold(f64::NEG_INFINITY, f64::max);
+    let lo = prices.iter().map(|p| p.1).fold(f64::INFINITY, f64::min);
+    let mut worst = (sorted[0].0.clone(), -1.0);
+    for (name, p) in sorted {
+        let d = (p - pref).abs();
+        if d > worst.1 {
+            worst = (name.clone(), d);
+        }
+    }
+    Ok(Reserve {
+        mean,
+        range: hi - lo,
+        half_range: (hi - lo) / 2.0,
+        reserve: worst.1,
+        worst_model: worst.0,
+        relative_reserve: (pref != 0.0).then(|| worst.1 / pref.abs()),
+    })
+}

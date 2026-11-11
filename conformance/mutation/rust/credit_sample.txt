@@ -1,0 +1,61 @@
+# population 404, sample 60, seed 20261111
+crates/quantforge-core/src/credit.rs:131:31: replace + with * in last_imm_on_or_before
+crates/quantforge-core/src/credit.rs:141:17: replace <= with > in periods
+crates/quantforge-core/src/credit.rs:163:24: replace + with * in periods
+crates/quantforge-core/src/credit.rs:163:24: replace + with - in periods
+crates/quantforge-core/src/credit.rs:166:39: replace + with - in periods
+crates/quantforge-core/src/credit.rs:169:26: replace + with * in periods
+crates/quantforge-core/src/credit.rs:17:38: replace / with * in years
+crates/quantforge-core/src/credit.rs:17:5: replace years -> f64 with 1.0
+crates/quantforge-core/src/credit.rs:195:5: replace e_terms -> (f64, f64) with (0.0, 0.0)
+crates/quantforge-core/src/credit.rs:196:21: replace - with + in e_terms
+crates/quantforge-core/src/credit.rs:196:39: replace / with % in e_terms
+crates/quantforge-core/src/credit.rs:196:49: replace * with / in e_terms
+crates/quantforge-core/src/credit.rs:196:68: replace * with + in e_terms
+crates/quantforge-core/src/credit.rs:196:72: replace * with / in e_terms
+crates/quantforge-core/src/credit.rs:196:76: replace * with / in e_terms
+crates/quantforge-core/src/credit.rs:197:21: replace - with + in e_terms
+crates/quantforge-core/src/credit.rs:197:21: replace - with / in e_terms
+crates/quantforge-core/src/credit.rs:197:25: replace / with * in e_terms
+crates/quantforge-core/src/credit.rs:197:68: replace * with / in e_terms
+crates/quantforge-core/src/credit.rs:200:18: delete - in e_terms
+crates/quantforge-core/src/credit.rs:201:46: replace + with * in e_terms
+crates/quantforge-core/src/credit.rs:201:52: replace / with % in e_terms
+crates/quantforge-core/src/credit.rs:207:9: replace Engine<'_>::qp -> Result<(f64, f64)> with Ok((0.0, 0.0))
+crates/quantforge-core/src/credit.rs:213:62: replace > with == in Engine<'_>::pieces
+crates/quantforge-core/src/credit.rs:213:72: replace < with > in Engine<'_>::pieces
+crates/quantforge-core/src/credit.rs:220:25: replace - with + in Engine<'_>::pieces
+crates/quantforge-core/src/credit.rs:232:9: replace Engine<'_>::protection -> Result<f64> with Ok(-1.0)
+crates/quantforge-core/src/credit.rs:234:20: replace * with + in Engine<'_>::protection
+crates/quantforge-core/src/credit.rs:234:31: replace * with + in Engine<'_>::protection
+crates/quantforge-core/src/credit.rs:250:47: replace * with + in Engine<'_>::rpv01
+crates/quantforge-core/src/credit.rs:250:52: replace * with + in Engine<'_>::rpv01
+crates/quantforge-core/src/credit.rs:250:61: replace * with / in Engine<'_>::rpv01
+crates/quantforge-core/src/credit.rs:277:8: delete ! in check_recovery
+crates/quantforge-core/src/credit.rs:309:5: replace price -> Result<CdsPrice> with Ok(Default::default())
+crates/quantforge-core/src/credit.rs:321:30: replace * with / in price
+crates/quantforge-core/src/credit.rs:323:48: replace - with + in price
+crates/quantforge-core/src/credit.rs:323:79: replace / with % in price
+crates/quantforge-core/src/credit.rs:323:79: replace / with * in price
+crates/quantforge-core/src/credit.rs:324:32: replace * with / in price
+crates/quantforge-core/src/credit.rs:326:46: replace - with / in price
+crates/quantforge-core/src/credit.rs:327:35: replace - with + in price
+crates/quantforge-core/src/credit.rs:384:19: replace / with * in bootstrap
+crates/quantforge-core/src/credit.rs:398:50: replace - with + in bootstrap
+crates/quantforge-core/src/credit.rs:425:5: replace index_intrinsic -> Result<(Vec<f64>, f64)> with Ok((vec![-1.0], 0.0))
+crates/quantforge-core/src/credit.rs:425:5: replace index_intrinsic -> Result<(Vec<f64>, f64)> with Ok((vec![1.0], 1.0))
+crates/quantforge-core/src/credit.rs:429:33: replace < with <= in index_intrinsic
+crates/quantforge-core/src/credit.rs:429:33: replace < with == in index_intrinsic
+crates/quantforge-core/src/credit.rs:447:14: replace += with *= in index_intrinsic
+crates/quantforge-core/src/credit.rs:460:5: replace composite_spreads -> Result<Vec<((i64, char), f64)>> with Ok(vec![((0, Default::default()), 0.0)])
+crates/quantforge-core/src/credit.rs:460:5: replace composite_spreads -> Result<Vec<((i64, char), f64)>> with Ok(vec![])
+crates/quantforge-core/src/credit.rs:467:62: replace != with == in composite_spreads
+crates/quantforge-core/src/credit.rs:471:56: replace < with <= in composite_spreads
+crates/quantforge-core/src/credit.rs:485:58: replace * with / in composite_spreads
+crates/quantforge-core/src/credit.rs:486:28: replace / with % in composite_spreads
+crates/quantforge-core/src/credit.rs:497:13: replace && with || in <impl crate::error::Finite for CdsPrice>::is_all_finite
+crates/quantforge-core/src/credit.rs:504:9: replace <impl crate::error::Finite for CdsTrade>::is_all_finite -> bool with true
+crates/quantforge-core/src/credit.rs:60:14: replace < with <= in Hazard::survival
+crates/quantforge-core/src/credit.rs:68:20: replace - with / in Hazard::survival
+crates/quantforge-core/src/credit.rs:71:44: replace + with * in Hazard::survival
+crates/quantforge-core/src/credit.rs:75:50: replace - with + in Hazard::survival
