@@ -92,10 +92,10 @@ def _d1(f: float, k: float, v: float, t: float) -> float:
 def _value(o: Option, v: float) -> float:
     t, phi, d = o.expiry_years, o.phi, o.discount
     f, k = o.forward + o.shift, o.strike + o.shift
-    if t == 0 or v == 0:
+    root = v * math.sqrt(t)
+    if root == 0:  # t or v zero, or a subnormal vol whose total deviation underflows
         return d * max(phi * (f - k), 0.0)
     if o.model == BACHELIER:
-        root = v * math.sqrt(t)
         x = (f - k) / root
         return d * (phi * (f - k) * big_n(phi * x) + root * small_n(x))
     d1 = _d1(f, k, v, t)
