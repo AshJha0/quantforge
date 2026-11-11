@@ -316,3 +316,5 @@ Ruling G-49. `frtb_f2b` now 25 cases (17 values, 8 errors); **ids from `frtb_f2b
 ## Stage F carry-over wave 2b, part 7 READY (2026-11-11): FRTB vega and curvature
 
 Read: `specifications/06-risk/frtb-sa-vega-curvature.md`; ruling G-51 (closes the owner item of G-49). New operations `risk.frtb.vega`, `risk.frtb.curvature`; suite `stage_f/frtb_f2c` (19 cases: 13 values, 6 errors). Table 5 checked against the PDF: unchanged. Wave 2b is complete except CSR securitisations (out of scope). Wave 4c waits for WSL.
+
+MAR21.57 Table 5 is now printed in `frtb-sa-fx-equity.md` (checked against PDF p. 599). No value changed, so no rebuild is needed.
