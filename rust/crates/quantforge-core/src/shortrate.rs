@@ -273,6 +273,19 @@ pub fn swaption(
     payer: bool,
     notional: f64,
 ) -> Result<SwaptionValue> {
+    Ok(swaption_parts(m, r0, expiry, pay, fixed_rate, payer, notional)?.0)
+}
+
+/// [`swaption`] plus the critical rate `r*` and the coupons `c_i`.
+fn swaption_parts(
+    m: &Model,
+    r0: f64,
+    expiry: f64,
+    pay: &[f64],
+    fixed_rate: f64,
+    payer: bool,
+    notional: f64,
+) -> Result<(SwaptionValue, f64, Vec<f64>)> {
     crate::error::finite("expiry_years", &expiry)?;
     crate::error::finite("fixed_rate", &fixed_rate)?;
     crate::error::finite("notional", &notional)?;
@@ -291,17 +304,18 @@ pub fn swaption(
         prev = *t;
     }
     let bs: Vec<f64> = pay.iter().map(|t| b_factor(m, t - expiry)).collect();
-    let sum_at = |r: f64| -> Result<(f64, f64)> {
-        let (mut f, mut d) = (-1.0, 0.0);
+    let sum_at = |r: f64| -> Result<(f64, f64, f64)> {
+        let (mut f, mut d, mut mag) = (-1.0, 0.0, 1.0);
         for i in 0..n {
             let p = zcb(m, r, expiry, pay[i])?.0;
             f += c[i] * p;
             d -= c[i] * bs[i] * p;
+            mag += (c[i] * p).abs();
         }
-        Ok((f, d))
+        Ok((f, d, mag))
     };
     let cir = matches!(m, Model::Cir { .. });
-    let (f0, _) = sum_at(0.0)?;
+    let (f0, _, _) = sum_at(0.0)?;
     if cir && f0 < 0.0 {
         return fail("E_DOMAIN", "CIR critical rate would be negative");
     }
@@ -313,8 +327,9 @@ pub fn swaption(
     let mut r = 0.0;
     let mut found = false;
     for _ in 0..500 {
-        let (f, d) = sum_at(r)?;
-        if f.abs() <= 1e-15 {
+        let (f, d, mag) = sum_at(r)?;
+        // Converged at 1e-15 relative, or at the rounding floor of the sum.
+        if f.abs() <= 1e-15_f64.max(2.0 * f64::EPSILON * mag) {
             found = true;
             break;
         }
@@ -355,11 +370,138 @@ pub fn swaption(
         ann += tau[i] * discount0(m, r0, pay[i])?;
     }
     let fwd = (discount0(m, r0, expiry)? - discount0(m, r0, pay[n - 1])?) / ann;
-    Ok(SwaptionValue {
+    let out = SwaptionValue {
         price: notional * v,
         forward_swap_rate: fwd,
         annuity: notional * ann,
-    })
+    };
+    Ok((out, r, c))
+}
+
+/// Hull-White Jamshidian price and its derivative in `sigma`, per unit notional.
+///
+/// The strikes `X_i` move with `sigma`, but `sum c_i X_i = 1` and every bond option is
+/// exercised on the same event `r(T0) > r*`, so their contribution cancels and
+/// `d price / d sigma = sum c_i P(0, Ti) n(h_i) sigma_p,i / sigma`.
+pub fn hw_swaption_vega(
+    curve: &HwCurve,
+    a: f64,
+    sigma: f64,
+    expiry: f64,
+    pay: &[f64],
+    fixed_rate: f64,
+    payer: bool,
+) -> Result<(f64, f64)> {
+    let m = Model::HullWhite { a, sigma, curve };
+    let (v, r, c) = swaption_parts(&m, 0.0, expiry, pay, fixed_rate, payer, 1.0)?;
+    let pt = curve.ln_discount(expiry).exp();
+    let mut vega = 0.0;
+    for (ci, ti) in c.iter().zip(pay) {
+        let x = zcb(&m, r, expiry, *ti)?.0;
+        let ps = curve.ln_discount(*ti).exp();
+        let sp = sigma / a
+            * -(-a * (ti - expiry)).exp_m1()
+            * (-(-2.0 * a * expiry).exp_m1() / (2.0 * a)).sqrt();
+        let h = (ps / (x * pt)).ln() / sp + sp / 2.0;
+        vega += ci * ps * crate::stats::normal_pdf(h) * sp / sigma;
+    }
+    Ok((v.price, vega))
+}
+
+/// One swaption in a calibration strip (per unit notional).
+#[derive(Debug, Clone)]
+pub struct CalibSwaption {
+    /// `T0`.
+    pub expiry: f64,
+    /// `T1 < ... < Tn`.
+    pub pay: Vec<f64>,
+    /// Fixed rate `K`.
+    pub fixed_rate: f64,
+    /// Payer (else receiver).
+    pub payer: bool,
+    /// Target price per unit notional.
+    pub target: f64,
+}
+
+/// `rates.shortrate.hw_calibrate` (G-17): Hull-White `sigma` minimising the unweighted squared
+/// price error on `[1e-4, 1]`, with `a` fixed. Returns `(sigma, fitted prices, rmse)`.
+///
+/// A log-spaced scan of `F` brackets the minimum; bisection on the sign of the analytic `F'`
+/// then runs until the bracket is below 1e-15 relative. A minimum at an end of the interval
+/// is `E_NO_CONVERGENCE`.
+pub fn hw_calibrate(
+    curve: &HwCurve,
+    a: f64,
+    strip: &[CalibSwaption],
+) -> Result<(f64, Vec<f64>, f64)> {
+    crate::error::finite("mean_reversion", &a)?;
+    if a <= 0.0 {
+        return fail("E_DOMAIN", "mean_reversion must be positive");
+    }
+    if strip.is_empty() {
+        return fail("E_INPUT", "swaptions needs at least one entry");
+    }
+    if strip.len() > 10_000 {
+        return fail("E_LIMIT", "at most 10,000 swaptions");
+    }
+    for q in strip {
+        crate::error::finite("swaption", &[q.expiry, q.fixed_rate, q.target])?;
+        if q.expiry <= 0.0 {
+            return fail("E_DOMAIN", "expiry_years must be positive");
+        }
+        check_payments(q.expiry, &q.pay)?;
+        if q.target < 0.0 {
+            return fail("E_DOMAIN", "target_price must not be negative");
+        }
+    }
+    let eval = |s: f64| -> Result<(f64, f64, Vec<f64>)> {
+        let (mut f, mut d, mut px) = (0.0, 0.0, Vec::with_capacity(strip.len()));
+        for q in strip {
+            let (p, v) = hw_swaption_vega(curve, a, s, q.expiry, &q.pay, q.fixed_rate, q.payer)?;
+            f += (p - q.target) * (p - q.target);
+            d += 2.0 * (p - q.target) * v;
+            px.push(p);
+        }
+        Ok((f, d, px))
+    };
+    let (lo_s, hi_s) = (1e-4_f64, 1.0_f64);
+    let n = 400;
+    let grid: Vec<f64> = (0..=n)
+        .map(|j| lo_s * (hi_s / lo_s).powf(f64::from(j) / f64::from(n)))
+        .collect();
+    let mut best = (f64::INFINITY, 0usize);
+    for (j, s) in grid.iter().enumerate() {
+        // Far from any sensible sigma (sigma near 1 with long expiries) the bond formula
+        // leaves binary64 and the critical rate has no root; such points cannot be the
+        // minimum, so the scan scores them as +inf.
+        let f = eval(*s).map_or(f64::INFINITY, |e| {
+            if e.0.is_finite() { e.0 } else { f64::INFINITY }
+        });
+        if f < best.0 {
+            best = (f, j);
+        }
+    }
+    let j = best.1;
+    if j == 0 || j == n as usize {
+        return fail("E_NO_CONVERGENCE", "the minimum is at an end of [1e-4, 1]");
+    }
+    let (mut lo, mut hi) = (grid[j - 1], grid[j + 1]);
+    for _ in 0..200 {
+        let mid = 0.5 * (lo + hi);
+        if hi - lo <= 1e-15 * hi || mid <= lo || mid >= hi {
+            break;
+        }
+        if eval(mid)?.1 > 0.0 {
+            hi = mid;
+        } else {
+            lo = mid;
+        }
+    }
+    let sigma = 0.5 * (lo + hi);
+    let (f, _, px) = eval(sigma)?;
+    #[allow(clippy::cast_precision_loss)]
+    let rmse = (f / strip.len() as f64).sqrt();
+    Ok((sigma, px, rmse))
 }
 
 /// Cap or floor as a portfolio of bond options (`rates.shortrate.capfloor`, G-19):
@@ -650,5 +792,39 @@ mod tests {
         let bk = |k: f64| -(-k).exp_m1() / k;
         let direct = (1.0 - bk(0.9) - bk(0.95) + bk(1.85)) / (0.9 * 0.95);
         assert!((g2_cross(0.9, 0.95, 1.0) - direct).abs() < 1e-11 * direct);
+    }
+
+    #[test]
+    fn hw_vega_and_exact_calibration() {
+        let c = curve();
+        let pay = [2.0, 3.0, 4.0, 5.0];
+        let (p, v) = hw_swaption_vega(&c, 0.05, 0.01, 1.0, &pay, 0.04, true).unwrap();
+        let h = 1e-6;
+        let up = hw_swaption_vega(&c, 0.05, 0.01 + h, 1.0, &pay, 0.04, true)
+            .unwrap()
+            .0;
+        let dn = hw_swaption_vega(&c, 0.05, 0.01 - h, 1.0, &pay, 0.04, true)
+            .unwrap()
+            .0;
+        assert!(p > 0.0 && (v - (up - dn) / (2.0 * h)).abs() < 1e-7 * v.abs());
+        let strip: Vec<CalibSwaption> = [1.0, 2.0, 3.0]
+            .iter()
+            .map(|t0| {
+                let pay: Vec<f64> = (1..=4).map(|k| t0 + f64::from(k)).collect();
+                let target = hw_swaption_vega(&c, 0.05, 0.007, *t0, &pay, 0.04, false)
+                    .unwrap()
+                    .0;
+                CalibSwaption {
+                    expiry: *t0,
+                    pay,
+                    fixed_rate: 0.04,
+                    payer: false,
+                    target,
+                }
+            })
+            .collect();
+        let (sigma, _, rmse) = hw_calibrate(&c, 0.05, &strip).unwrap();
+        assert!((sigma - 0.007).abs() < 1e-11 && rmse < 1e-12);
+        assert_eq!(hw_calibrate(&c, 0.05, &[]).unwrap_err().code, "E_INPUT");
     }
 }

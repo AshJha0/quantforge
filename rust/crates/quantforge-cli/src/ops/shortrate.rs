@@ -236,5 +236,40 @@ super::registry! {
             ("bond_price_expiry", pt.into()),
             ("bond_price_maturity", ps.into()),
         ]))
+    },
+    "rates.shortrate.hw_calibrate" => {
+        let a = i.f64("mean_reversion")?;
+        let c = super::rates::sub(i, "curve")?;
+        let (ts, ds) = (c.reals("times")?, c.reals("discount_factors")?);
+        let mut strip = Vec::new();
+        for (j, v) in i.array("swaptions")?.iter().enumerate() {
+            if !matches!(v, quantforge_core::json::Json::Obj(_)) {
+                return i.fail("swaptions", "entries must be objects");
+            }
+            let q = Inputs::new(v);
+            let payer = match q.str("swaption_type")? {
+                "PAYER" => true,
+                "RECEIVER" => false,
+                _ => return fail("E_INPUT", format!("swaptions[{j}].swaption_type must be PAYER or RECEIVER")),
+            };
+            strip.push(sr::CalibSwaption {
+                expiry: q.f64("expiry_years")?,
+                pay: q.reals("payment_times")?,
+                fixed_rate: q.f64("fixed_rate")?,
+                payer,
+                target: q.f64("target_price")?,
+            });
+        }
+        i.gate()?;
+        if ts.len() > 10_000 {
+            return fail("E_LIMIT", "at most 10,000 curve pillars");
+        }
+        let curve = HwCurve::new(&ts, &ds)?;
+        let (sigma, px, rmse) = sr::hw_calibrate(&curve, a, &strip)?;
+        plain(obj([
+            ("sigma", sigma.into()),
+            ("fitted_prices", px.into()),
+            ("rmse", rmse.into()),
+        ]))
     }
 }
