@@ -262,3 +262,7 @@ Both tests restated against the scheme's own bounding value on the same grid (`s
 ## WAVE 3d READY (2026-11-11): Q3b AAD core
 
 Read: `specifications/06-risk/aad-core.md`; rulings G-9, G-35. New operation `rates.shortrate.bermudan_ladder` (suite `aadladder_g`, 5 cases: 3 values, 2 errors). Build notes: tape your wave 2d scheme (or hand-write its adjoint: Thomas solve backwards, `max` through its active branch); report the G-9 cost ratio. Property test: AAD equals your own Richardson bump within G-9. Outside: none (G-18).
+
+## WAVE 3e READY (2026-11-11): Q9 part 2, model-reserve dispersion
+
+Read: `specifications/06-risk/model-reserve.md`; ruling G-36. New operation `risk.model_reserve.dispersion` (suite `reserve_g`, 9 cases: 6 values, 3 errors; outside none). The report over every single-asset exotic is registered with fixed parameters and belongs to the Python research lane; it has not been run. Stage G share: 258 of 444 = 58.1%.

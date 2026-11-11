@@ -5317,6 +5317,29 @@
     "vega_se"
    ]
   },
+  "risk.model_reserve.dispersion": {
+   "spec": "specifications/06-risk/model-reserve.md",
+   "rust": "quantforge::risk::model_reserve_dispersion",
+   "python": "quantforge.risk.model_reserve_dispersion",
+   "java": "Risk.modelReserveDispersion",
+   "cpp": "qf::risk::model_reserve_dispersion",
+   "inputs": {
+    "prices": {
+     "java": "prices"
+    },
+    "reference_model": {
+     "java": "referenceModel"
+    }
+   },
+   "outputs": [
+    "half_range",
+    "mean",
+    "range",
+    "relative_reserve",
+    "reserve",
+    "worst_model"
+   ]
+  },
   "risk.ois.dv01": {
    "spec": "specifications/01-core/limits.md",
    "rust": "quantforge::risk::ois_dv01",
