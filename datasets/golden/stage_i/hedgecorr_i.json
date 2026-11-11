@@ -1,0 +1,1473 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgecorr_i",
+ "spec": "specifications/08-hedging/credit-and-correlation-hedges.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w2.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgecorr_i-0001",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     }
+    ],
+    "targets": [
+     "CORRELATION"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      632.6016163490964
+     ],
+     "greeks_before": {
+      "delta_1": -393.4685097352428,
+      "delta_2": 358.3047589610073,
+      "vega_1": -10062.040445739667,
+      "vega_2": -3870.015556053719,
+      "correlation01": 38.70015556053718
+     },
+     "greeks_after": {
+      "delta_1": 32.687450744422534,
+      "delta_2": -32.00192931207621,
+      "vega_1": 2.1895288505075267e-47,
+      "vega_2": 1.0947644252537633e-47,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "correlation hedge with one exchange option",
+   "tolerance_limit": {
+    "absolute": 1.0062040445739667e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0002",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_2"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1",
+     "DELTA_2"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      632.6016163490964,
+      -32.687450744422534,
+      32.00192931207621
+     ],
+     "greeks_before": {
+      "delta_1": -393.4685097352428,
+      "delta_2": 358.3047589610073,
+      "vega_1": -10062.040445739667,
+      "vega_2": -3870.015556053719,
+      "correlation01": 38.70015556053718
+     },
+     "greeks_after": {
+      "delta_1": 0.0,
+      "delta_2": 0.0,
+      "vega_1": 2.1895288505075267e-47,
+      "vega_2": 1.0947644252537633e-47,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "correlation and both deltas",
+   "tolerance_limit": {
+    "absolute": 1.0062040445739667e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0003",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "CALL_1",
+      "strike": 100.0,
+      "expiry_years": 1.0
+     },
+     {
+      "instrument": "PUT_2",
+      "strike": 90.0,
+      "expiry_years": 1.4986301369863013
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_2"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "VEGA_1",
+     "VEGA_2",
+     "DELTA_1",
+     "DELTA_2"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      632.6016163490964,
+      -5.053071028894271e-49,
+      -3.178469681864974e-49,
+      -32.687450744422534,
+      32.00192931207621
+     ],
+     "greeks_before": {
+      "delta_1": -393.4685097352428,
+      "delta_2": 358.3047589610073,
+      "vega_1": -10062.040445739667,
+      "vega_2": -3870.015556053719,
+      "correlation01": 38.70015556053718
+     },
+     "greeks_after": {
+      "delta_1": 0.0,
+      "delta_2": 0.0,
+      "vega_1": 0.0,
+      "vega_2": 0.0,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "all five Greeks",
+   "tolerance_limit": {
+    "absolute": 1.0062040445739667e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0004",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "CALL_1",
+      "strike": 100.0,
+      "expiry_years": 1.0
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "VEGA_1"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      632.6016163490964,
+      -5.053071028894271e-49
+     ],
+     "greeks_before": {
+      "delta_1": -393.4685097352428,
+      "delta_2": 358.3047589610073,
+      "vega_1": -10062.040445739667,
+      "vega_2": -3870.015556053719,
+      "correlation01": 38.70015556053718
+     },
+     "greeks_after": {
+      "delta_1": 32.687450744422534,
+      "delta_2": -32.00192931207621,
+      "vega_1": 0.0,
+      "vega_2": 1.0947644252537633e-47,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "correlation and vega of asset 1: exchange option and a call on asset 1",
+   "tolerance_limit": {
+    "absolute": 1.0062040445739667e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0005",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_2"
+     }
+    ],
+    "targets": [
+     "DELTA_1",
+     "DELTA_2"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      393.4685097352428,
+      -358.3047589610073
+     ],
+     "greeks_before": {
+      "delta_1": -393.4685097352428,
+      "delta_2": 358.3047589610073,
+      "vega_1": -10062.040445739667,
+      "vega_2": -3870.015556053719,
+      "correlation01": 38.70015556053718
+     },
+     "greeks_after": {
+      "delta_1": 0.0,
+      "delta_2": 0.0,
+      "vega_1": -10062.040445739667,
+      "vega_2": -3870.015556053719,
+      "correlation01": 38.70015556053718
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "delta hedge only with the two underlyings",
+   "tolerance_limit": {
+    "absolute": 1.0062040445739667e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0006",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": -0.4,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_2"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1",
+     "DELTA_2"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      632.9368371946923,
+      -25.88400434231489,
+      24.753109390116197
+     ],
+     "greeks_before": {
+      "delta_1": -373.86302584128157,
+      "delta_2": 308.01820441364094,
+      "vega_1": -14616.475601826778,
+      "vega_2": -13287.705092569799,
+      "correlation01": 22.146175154282997
+     },
+     "greeks_after": {
+      "delta_1": 0.0,
+      "delta_2": 0.0,
+      "vega_1": 4.3790577010150533e-47,
+      "vega_2": 1.0947644252537633e-46,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "negative correlation",
+   "tolerance_limit": {
+    "absolute": 1.461647560182678e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0007",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.0,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 2.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.4986301369863013
+     }
+    ],
+    "targets": [
+     "CORRELATION"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      1678.272762413744
+     ],
+     "greeks_before": {
+      "delta_1": -376.42357590360274,
+      "delta_2": 320.76550569617194,
+      "vega_1": -12947.655771339867,
+      "vega_2": -10358.124617071895,
+      "correlation01": 25.895311542679735
+     },
+     "greeks_after": {
+      "delta_1": 2875.8442869132086,
+      "delta_2": -1241.5302861160048,
+      "vega_1": 4.3790577010150533e-47,
+      "vega_2": 4.3790577010150533e-47,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "zero correlation",
+   "tolerance_limit": {
+    "absolute": 1.2947655771339867e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0008",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 1.0,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     }
+    ],
+    "targets": [
+     "CORRELATION"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      683.9184972359506
+     ],
+     "greeks_before": {
+      "delta_1": -551.6879974034689,
+      "delta_2": 546.785981689549,
+      "vega_1": -5231.248993389473,
+      "vega_2": 5231.248993389473,
+      "correlation01": 52.312489933894746
+     },
+     "greeks_after": {
+      "delta_1": 92.40932086931231,
+      "delta_2": -91.43014380750638,
+      "vega_1": -3.28429327576129e-47,
+      "vega_2": 3.28429327576129e-47,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "correlation 1 with unequal vols (spread vol 0.05)",
+   "tolerance_limit": {
+    "absolute": 5.231248993389474e-07,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0009",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     },
+     {
+      "instrument": "UNDERLYING_1",
+      "quantity": 250.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_2"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1",
+     "DELTA_2"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "quantities": [
+      632.6016163490964,
+      -282.68745074442256,
+      32.00192931207621
+     ],
+     "greeks_before": {
+      "delta_1": -143.46850973524278,
+      "delta_2": 358.3047589610073,
+      "vega_1": -10062.040445739667,
+      "vega_2": -3870.015556053719,
+      "correlation01": 38.70015556053718
+     },
+     "greeks_after": {
+      "delta_1": 0.0,
+      "delta_2": 0.0,
+      "vega_1": 2.1895288505075267e-47,
+      "vega_2": 1.0947644252537633e-47,
+      "correlation01": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-margrabe",
+    "numpy-2.5-solve"
+   ],
+   "tags": [
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "book holding an underlying",
+   "tolerance_limit": {
+    "absolute": 1.0062040445739667e-06,
+    "relative": 1e-10,
+    "reason": "targeted Greeks after hedging are zero up to rounding of the before value"
+   }
+  },
+  {
+   "case_id": "hedgecorr_i-0010",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     }
+    ],
+    "targets": [
+     "CORRELATION"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "two hedges, one target"
+  },
+  {
+   "case_id": "hedgecorr_i-0011",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "exchange option without expiry"
+  },
+  {
+   "case_id": "hedgecorr_i-0012",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1",
+      "expiry_years": 1.0
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "underlying with an expiry"
+  },
+  {
+   "case_id": "hedgecorr_i-0013",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 1.2,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "correlation above 1"
+  },
+  {
+   "case_id": "hedgecorr_i-0014",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.0,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "zero volatility"
+  },
+  {
+   "case_id": "hedgecorr_i-0015",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.2,
+    "vol2": 0.2,
+    "correlation": 1.0,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "zero spread volatility"
+  },
+  {
+   "case_id": "hedgecorr_i-0016",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "the same option twice"
+  },
+  {
+   "case_id": "hedgecorr_i-0017",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 2.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.4986301369863013
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "VEGA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "exchange options alone: vega and correlation rows proportional (I-17)"
+  },
+  {
+   "case_id": "hedgecorr_i-0018",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 0.4986301369863014
+     },
+     {
+      "instrument": "CALL_1",
+      "strike": 100.0
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "vanilla without expiry"
+  },
+  {
+   "case_id": "hedgecorr_i-0019",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_2"
+     }
+    ],
+    "targets": [
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "underlyings carry no correlation risk"
+  },
+  {
+   "case_id": "hedgecorr_i-0020",
+   "operation": "hedge.correlation.neutralise",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "rate": 0.03,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.2,
+    "correlation": 0.6,
+    "book": [
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 1.0,
+      "quantity": -1000.0
+     },
+     {
+      "instrument": "EXCHANGE",
+      "quantity1": 1.0,
+      "quantity2": 1.0,
+      "expiry_years": 2.0,
+      "quantity": 400.0
+     }
+    ],
+    "hedges": [
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     },
+     {
+      "instrument": "UNDERLYING_1"
+     }
+    ],
+    "targets": [
+     "DELTA_1",
+     "DELTA_2",
+     "VEGA_1",
+     "VEGA_2",
+     "CORRELATION",
+     "DELTA_1"
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "six hedges (limit 5)"
+  }
+ ]
+}

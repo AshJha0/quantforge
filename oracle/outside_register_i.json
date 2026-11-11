@@ -1,0 +1,96 @@
+{
+ "hedgeqp_i": {
+  "counted": 25,
+  "total": 44,
+  "rule": "scipy 1.18 optimisers on the same problem (lsq_linear BVLS for bounds, linalg.lstsq gelsd for unconstrained and MIN_NORM, minimize SLSQP for equalities); every output within root_finding"
+ },
+ "hedgeint_i": {
+  "counted": 0,
+  "total": 19,
+  "rule": "no outside library solves integer least squares; uncounted (exact rational enumeration is the oracle)"
+ },
+ "hedgemv_i": {
+  "counted": 9,
+  "total": 18,
+  "rule": "numpy 2.5 linalg.solve on the hedge block (covariance input) and linalg.lstsq OLS with intercept (series input); hedge within root_finding; variances are arithmetic"
+ },
+ "hedgegreeks_i": {
+  "counted": 10,
+  "total": 21,
+  "rule": "QuantLib 1.44 AnalyticEuropeanEngine delta, gamma and vega per instrument, then numpy 2.5 linalg.solve; quantities and before-Greeks within root_finding"
+ },
+ "hedgebeta_i": {
+  "counted": 0,
+  "total": 12,
+  "rule": "no outside library; Hull's worked example (30 contracts) is a textbook check, not counted"
+ },
+ "hedgeres_i": {
+  "counted": 0,
+  "total": 11,
+  "rule": "arithmetic only; no library model value, uncounted"
+ },
+ "_wave1": {
+  "counted": 44,
+  "total": 125,
+  "share": 0.352,
+  "floor": 0.6,
+  "note": "Floor is measured over the stage at release, error cases in the denominator (ruling I-2)"
+ },
+ "hedgecredit_i": {
+  "counted": 10,
+  "total": 19,
+  "rule": "QuantLib 1.44 IsdaCdsEngine NPVs on bumped HazardRateCurves (CS01, buckets, JTD by the spec's own central difference), then numpy solve; notionals, book pv, CS01, JTD and hedge upfront within the case limit"
+ },
+ "hedgecorr_i": {
+  "counted": 9,
+  "total": 20,
+  "rule": "QuantLib 1.44 AnalyticEuropeanMargrabeEngine delta1 and delta2, and BlackCalculator.vega (the Margrabe price as a Black price in the spread volatility, asserted equal to the engine NPV) for the vegas and correlation, then numpy solve; quantities and before-Greeks within root_finding"
+ },
+ "_stage": {
+  "counted": 113,
+  "total": 276,
+  "share": 0.4094,
+  "floor": 0.6,
+  "note": "Stage I so far, error cases in the denominator (ruling I-2); the floor applies at release"
+ },
+ "hedgexa_i": {
+  "counted": 9,
+  "total": 17,
+  "rule": "QuantLib 1.44 ZeroCurve (linear zero, continuous, ACT/365F) and AnalyticEuropeanEngine values, the spec's half-differences of them, numpy lstsq on the weighted system; positions and book risk within the case limit"
+ },
+ "hedgecost_i": {
+  "counted": 12,
+  "total": 22,
+  "rule": "scipy 1.18 solvers on the same problem, first that agrees: lsq_linear BVLS or lstsq (no spread, margin or equality: exact), minimize trust-constr, minimize SLSQP (both on the split form x = p - n, p, n >= 0); x within root_finding; verified_by names the solver"
+ },
+ "hedgefrontier_i": {
+  "counted": 2,
+  "total": 10,
+  "rule": "the hedgecost_i solver list at every frontier point; a case counts if every point's x agrees within root_finding"
+ },
+ "hedgebt_i": {
+  "counted": 7,
+  "total": 16,
+  "rule": "QuantLib 1.44 AnalyticEuropeanEngine NPV and delta on each date (evaluation date moved, exercise fixed), then the spec's cash-account arithmetic; every output within the case limit"
+ },
+ "hedgeeff_i": {
+  "counted": 5,
+  "total": 10,
+  "rule": "numpy 2.5 polyfit (slope), corrcoef (R2), var ddof=1 (variance reduction) and sums (dollar offset); every output within root_finding"
+ },
+ "hedgeselect_i": {
+  "counted": 10,
+  "total": 17,
+  "rule": "the same subset enumeration with every subset solved by scipy 1.18 (lstsq, or lsq_linear BVLS with bounds); same selected set and every output within root_finding"
+ },
+ "hedgeslip_i": {
+  "counted": 0,
+  "total": 12,
+  "rule": "no outside library computes implementation shortfall; exact rational arithmetic, uncounted"
+ },
+ "hedgebtcost_i": {
+  "counted": 5,
+  "total": 8,
+  "rule": "as hedgebt_i: QuantLib 1.44 AnalyticEuropeanEngine value and delta on each date, then the spec's cash-account arithmetic with costs; every output within the case limit"
+ }
+}

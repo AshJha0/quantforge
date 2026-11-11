@@ -658,6 +658,93 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** a surrogate that fails the acceptance after a model or domain change.
 - **Validation report:** `specifications/11-research/a5-surrogate.md`.
 
+### MI-1 Hedge solvers (stage I wave 1)
+- **Purpose:** hedge positions by constrained weighted least squares (bounds, equalities, ridge, minimum-norm), integer lots, minimum-variance ratios, Black-Scholes-Merton delta, gamma and vega neutralisation, beta futures; residual risk report.
+- **Inputs:** instrument sensitivities by risk factor, the book's existing risk, weights, constraints; covariances or return series; flat Black-Scholes-Merton market.
+- **Limitations:** no costs, liquidity, margin or instrument selection yet (later stage I waves); `MIN_NORM` refuses bounds; integer lots need a strictly convex problem; Greek hedges use one flat volatility.
+- **Validation:** active-set enumeration at 50 digits with KKT re-check; exact rational enumeration for integer lots; HiGHS confirms infeasibility; scipy, numpy and QuantLib outside checks (44 of 121 cases). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** scipy 1.18 `lsq_linear` (BVLS) and `minimize` (SLSQP) on the same problems.
+- **Monitoring thresholds:** a KKT residual above 1e-8 of the gradient scale, or a hedge effectiveness below the desk's floor on the dynamic backtest (later wave).
+- **Data lineage hash:** sha256 0a45713450573d2bbf6f9f363269f572b86cd577033258c3fd82ad123c512f8e (`hedgeqp_i`); 8659c72326be4654ac75059b61319efd96ffb472f8adb99ef7117b55a10a071c (`hedgeint_i`); 2cd58f846b05db9a4f43ea70f78fe842cd240c25559411e96eff3a301c5a1cbc (`hedgemv_i`); e013dbe82448fecfe4c1c9bbcea8ca0f7ce06a50978c09499db1e40ecd1e06d8 (`hedgegreeks_i`); 03f02bc3a95fcc215d27d652df70d66ed2642abe33439e7bef198fcd31b7e87e (`hedgebeta_i`); 2531eeb9dc4eddd57cf4d9dfb6c577ffb62bb583487d1b40845b0731762d1794 (`hedgeres_i`)
+- **Lineage regenerated 2026-11-11:** `hedgeint_i` hash refreshed after a second check (a wide-box float search with the I-7 tie rule) was added to its `verified_by` lists; no value or error code changed.
+- **Lineage regenerated 2026-11-11 (after the builds):** `hedgegreeks_i`, `hedgeint_i`, `hedgemv_i` gained computed cases for rulings I-41, I-42, I-44, I-45; earlier cases unchanged.
+- **Retirement trigger:** a hedge that needs costs or non-convex constraints the solver cannot express.
+- **Validation report:** `specifications/08-hedging/hedge-solvers.md`.
+
+### MI-2 Credit and correlation hedges (stage I wave 2)
+- **Purpose:** CDS hedges against CS01 (parallel and bucketed hazard bumps) and jump to default; correlation, vega and delta hedges of two-asset exchange-option books.
+- **Inputs:** ISDA CDS market (discount, hazard, recovery) and trades; two-asset Black-Scholes-Merton market with correlation; exchange options, vanillas, underlyings.
+- **Limitations:** single-name CDS only; CS01 is a hazard bump, not a quote re-bootstrap; recovery not hedged; two assets, flat volatilities.
+- **Validation:** QuantLib IsdaCdsEngine and Margrabe engine outside checks (19 of 39 cases); same-contract hedge returns its notional. **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** QuantLib 1.44 `IsdaCdsEngine` and `AnalyticEuropeanMargrabeEngine` on the same trades.
+- **Monitoring thresholds:** targeted risk after the hedge above 1e-6 of the book's, or a hedge notional above 10 times the book's on a regular matrix.
+- **Data lineage hash:** sha256 c73a9d5138891138da19b7fda4d48768e610baebfa059a755e8d1be3a3e25931 (`hedgecredit_i`); 0d673c90931655b80d5797f28ddfa7b152969aa017efc6e8af643810f9c726d3 (`hedgecorr_i`)
+- **Retirement trigger:** a desk need for index, tranche or recovery hedges.
+- **Validation report:** `specifications/08-hedging/credit-and-correlation-hedges.md`.
+
+### MI-3 Cross-asset hedge, equity and rates (stage I wave 3)
+- **Purpose:** one weighted least-squares hedge of a book's equity move and key-rate risks with forwards, options, bonds and the underlying.
+- **Inputs:** spot, dividend yield, flat volatility, a linear-in-zero discount curve; book and hedge instruments; factor weights.
+- **Limitations:** one equity, one curve, no extrapolation beyond the last pillar; the singularity test depends on instrument units (I-22).
+- **Validation:** QuantLib ZeroCurve and AnalyticEuropeanEngine outside check on every value case (9 of 17). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** QuantLib 1.44 values with numpy least squares on the same risk definitions.
+- **Monitoring thresholds:** residual equity or key-rate risk above the desk's limit after the hedge.
+- **Data lineage hash:** sha256 ac4424db9b094def5344ca102b4da3e08252472ffce4ec85440423ac9b2b6dc2 (`hedgexa_i`)
+- **Retirement trigger:** a multi-curve or dividend-term-structure need.
+- **Validation report:** `specifications/08-hedging/cross-asset-hedge.md`.
+
+### MI-4 Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a)
+- **Purpose:** weighted least-squares hedge with spread cost, linear market impact, liquidity bounds and a margin limit; frontier of risk against cost.
+- **Inputs:** the `hedge.qp.solve` inputs plus half-spreads, impact coefficients, cost weight(s), margin rates and limit.
+- **Limitations:** linear impact only (no square-root impact); the hedge starts from no position; margin is per instrument with no netting.
+- **Validation:** 50-digit state enumeration with subgradient checks; wave 1 goldens reproduced exactly; HiGHS infeasibility; scipy BVLS, trust-constr and SLSQP outside checks (14 of 32). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** scipy 1.18 trust-constr and SLSQP on the split-variable QP.
+- **Monitoring thresholds:** a frontier that is not monotone, or a realised cost above the modelled cost by more than the desk's tolerance.
+- **Data lineage hash:** sha256 e1e2ea2afa1f9fbd695f553f26257ff8bdd0b78fadcdf4b8e7f1261856d8d54a (`hedgecost_i`); 7e4a0069d2d7eb68d4c4f2153ef2fdaff4a4e75b98f4e0ef368c4dfbb37246b7 (`hedgefrontier_i`)
+- **Retirement trigger:** a need for square-root impact or portfolio margin.
+- **Validation report:** `specifications/08-hedging/hedge-costs-and-frontier.md`.
+
+### MI-5 Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b)
+- **Purpose:** replay a delta hedge of one European option on a given path with a self-financing cash account; dollar-offset, regression and variance-reduction effectiveness.
+- **Inputs:** option, quantity, rate, dividend yield, hedge volatility, a dated spot path; or two series of value changes.
+- **Limitations:** flat hedge volatility, no transaction costs in the replay, continuous dividend yield; the dollar offset is unstable for small item changes.
+- **Validation:** QuantLib AnalyticEuropeanEngine on every date and numpy statistics outside checks on every value case (12 of 25). **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** QuantLib 1.44 values on each date with the same cash arithmetic; numpy regression.
+- **Monitoring thresholds:** a live hedge's regression R² below 0.8 or dollar offset outside [0.8, 1.25] over a quarter.
+- **Data lineage hash:** sha256 2de452d8b296754bb2626f530d4cebd982863e5fb34afe2e025c080f72ae566a (`hedgebt_i`); 785a5ae423b3f45dc831f7557e048dfd1014e6759313796547fa055389a6dd20 (`hedgeeff_i`); 4d8d4cf5d70a3dbd497fe4678a656409b137d1be9303d054ecc3750ff1dbbbb8 (`hedgebtcost_i`, wave 4e: costs in the backtest)
+- **Lineage regenerated 2026-11-11 (after the builds):** `hedgebt_i` gained case 0016 for ruling I-43; earlier cases unchanged.
+- **Retirement trigger:** a need for cost-aware rebalancing or stochastic-volatility hedging.
+- **Validation report:** `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`.
+
+### MI-6 Instrument selection (stage I wave 4c)
+- **Purpose:** the best weighted least-squares hedge using at most K of n instruments.
+- **Inputs:** the `hedge.qp.solve` inputs without equalities, and K.
+- **Limitations:** exhaustive search, at most 20 instruments; no fixed cost per instrument; bounds must admit zero.
+- **Validation:** 50-digit solve of every subset; scipy per-subset outside check (10 of 17); greedy counterexample pinned. **Review:** 2026-11-11.
+- **Tier:** 2.
+- **Challenger:** the same enumeration with scipy solvers.
+- **Monitoring thresholds:** a selected hedge whose residual risk exceeds the full hedge's by more than the desk's tolerance.
+- **Data lineage hash:** sha256 00bfcdd41645756679f850673b867f1c04871e3e7e76b08fc05ca5c76b59731d (`hedgeselect_i`)
+- **Retirement trigger:** universes above 20 instruments or fixed costs per instrument.
+- **Validation report:** `specifications/08-hedging/instrument-selection.md`.
+
+### MI-7 Hedge slippage report (stage I wave 4d)
+- **Purpose:** implementation shortfall of executed hedge orders (execution and opportunity cost) and slippage against the wave 4a cost model.
+- **Inputs:** orders with decision and final prices, cost-model parameters and fills.
+- **Limitations:** one decision-price benchmark; fees not separated; no estimation across many hedges.
+- **Validation:** exact rational arithmetic with the shortfall and slippage identities asserted; no outside library (0 of 12). **Review:** 2026-11-11.
+- **Tier:** 3.
+- **Challenger:** none; the identities are the check.
+- **Monitoring thresholds:** mean slippage over a month above zero by more than two standard errors (the cost model is optimistic).
+- **Data lineage hash:** sha256 b296e48d8f4919622a433d1a14fa05ed96d54222c2a2e125fbde831e9c66347e (`hedgeslip_i`)
+- **Retirement trigger:** a benchmark other than the decision price becomes the desk standard.
+- **Validation report:** `specifications/08-hedging/hedge-slippage.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

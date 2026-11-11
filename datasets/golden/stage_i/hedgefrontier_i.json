@@ -1,0 +1,983 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgefrontier_i",
+ "spec": "specifications/08-hedging/hedge-costs-and-frontier.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w4a.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgefrontier_i-0001",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": [
+     0.0,
+     0.5,
+     1.0,
+     2.0,
+     5.0,
+     10.0,
+     50.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "points": [
+      {
+       "cost_weight": 0.0,
+       "x": [
+        1.2389484039547414,
+        -0.579151887583752,
+        -0.7518047108371649
+       ],
+       "risk": 8.717443423206426,
+       "cost": 0.13489870317285557
+      },
+      {
+       "cost_weight": 0.5,
+       "x": [
+        1.2208533278595104,
+        -0.5671835816889136,
+        -0.7476835536977733
+       ],
+       "risk": 8.717989425090684,
+       "cost": 0.13271469563582233
+      },
+      {
+       "cost_weight": 1.0,
+       "x": [
+        1.2027582517642792,
+        -0.555215275794075,
+        -0.7435623965583817
+       ],
+       "risk": 8.71962743074346,
+       "cost": 0.13053068809878912
+      },
+      {
+       "cost_weight": 2.0,
+       "x": [
+        1.166568099573817,
+        -0.5312786640043982,
+        -0.7353200822795986
+       ],
+       "risk": 8.72617945335456,
+       "cost": 0.12616267302472264
+      },
+      {
+       "cost_weight": 5.0,
+       "x": [
+        1.0579976430024303,
+        -0.4594688286353672,
+        -0.7105931394432492
+       ],
+       "risk": 8.772043611632258,
+       "cost": 0.11305862780252322
+      },
+      {
+       "cost_weight": 10.0,
+       "x": [
+        0.8770468820501189,
+        -0.3397857696869824,
+        -0.6693815680493335
+       ],
+       "risk": 8.93584417690975,
+       "cost": 0.09121855243219086
+      },
+      {
+       "cost_weight": 50.0,
+       "x": [
+        0.0,
+        0.0,
+        -0.23655913978494628
+       ],
+       "risk": 10.77731182795699,
+       "cost": 0.004731182795698926
+      }
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "monotone-frontier"
+   ],
+   "tags": [
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "spread-cost frontier, seven points"
+  },
+  {
+   "case_id": "hedgefrontier_i-0002",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "impact": [
+     0.5,
+     0.5,
+     2.0
+    ],
+    "cost_weights": [
+     0.0,
+     0.1,
+     1.0,
+     10.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "points": [
+      {
+       "cost_weight": 0.0,
+       "x": [
+        1.2389484039547414,
+        -0.579151887583752,
+        -0.7518047108371649
+       ],
+       "risk": 8.717443423206426,
+       "cost": 2.065625674750818
+      },
+      {
+       "cost_weight": 0.1,
+       "x": [
+        1.1311353770839387,
+        -0.5796649145499158,
+        -0.639325784906899
+       ],
+       "risk": 8.737908245981174,
+       "cost": 1.6252142457191376
+      },
+      {
+       "cost_weight": 1.0,
+       "x": [
+        0.6733517569287463,
+        -0.5062323373210563,
+        -0.2666016642222619
+       ],
+       "risk": 9.18503516780984,
+       "cost": 0.49698977868644395
+      },
+      {
+       "cost_weight": 10.0,
+       "x": [
+        0.12797450715797262,
+        -0.19817096854441626,
+        -0.04270407170951601
+       ],
+       "risk": 10.41145158721237,
+       "cost": 0.03147187910922198
+      }
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "monotone-frontier",
+    "scipy-1.18-bvls-or-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "impact-only frontier"
+  },
+  {
+   "case_id": "hedgefrontier_i-0003",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02
+     ],
+     [
+      0.3,
+      0.85,
+      0.15
+     ],
+     [
+      0.05,
+      0.7,
+      0.6
+     ],
+     [
+      0.0,
+      0.2,
+      1.1
+     ],
+     [
+      0.0,
+      0.02,
+      0.55
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "lower": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "half_spreads": [
+     0.02,
+     0.03,
+     0.05
+    ],
+    "impact": [
+     0.001,
+     0.001,
+     0.002
+    ],
+    "cost_weights": [
+     0.0,
+     1.0,
+     10.0,
+     100.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "points": [
+      {
+       "cost_weight": 0.0,
+       "x": [
+        16.45903073409697,
+        25.280170248709787,
+        13.401534525281136
+       ],
+       "risk": 38.12447253564799,
+       "cost": 3.0268514041815946
+      },
+      {
+       "cost_weight": 1.0,
+       "x": [
+        16.366834134258898,
+        25.289428751521932,
+        13.374505529756185
+       ],
+       "risk": 38.12792917210262,
+       "cost": 3.019928084206249
+      },
+      {
+       "cost_weight": 10.0,
+       "x": [
+        15.580493172358068,
+        25.35612681547047,
+        13.138655943430729
+       ],
+       "risk": 38.453350718537784,
+       "cost": 2.9601599596586246
+      },
+      {
+       "cost_weight": 100.0,
+       "x": [
+        10.425623188013082,
+        25.032050936900063,
+        11.263592581825142
+       ],
+       "risk": 61.6023921977067,
+       "cost": 2.511687849623209
+      }
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "monotone-frontier",
+    "scipy-1.18-slsqp-split",
+    "scipy-1.18-trust-constr-split"
+   ],
+   "tags": [
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "key-rate hedge frontier with long-only bounds"
+  },
+  {
+   "case_id": "hedgefrontier_i-0004",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "margin_rates": [
+     0.1,
+     0.2,
+     0.15
+    ],
+    "margin_limit": 0.2,
+    "cost_weights": [
+     0.0,
+     1.0,
+     10.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "points": [
+      {
+       "cost_weight": 0.0,
+       "x": [
+        0.6753530358866267,
+        -0.3547739004652618,
+        -0.41006610878856653
+       ],
+       "risk": 9.171738457835492,
+       "cost": 0.07744636401662884
+      },
+      {
+       "cost_weight": 1.0,
+       "x": [
+        0.6748003766962432,
+        -0.3450252493976832,
+        -0.4234327496722604
+       ],
+       "risk": 9.172106040459793,
+       "cost": 0.07671119876802568
+      },
+      {
+       "cost_weight": 10.0,
+       "x": [
+        0.6698264439827917,
+        -0.2572873897894753,
+        -0.5437325176255052
+       ],
+       "risk": 9.20849672026565,
+       "cost": 0.07009471153059722
+      }
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-state-enumeration",
+    "monotone-frontier"
+   ],
+   "tags": [
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "frontier with a binding margin"
+  },
+  {
+   "case_id": "hedgefrontier_i-0005",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "cost weights not increasing"
+  },
+  {
+   "case_id": "hedgefrontier_i-0006",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "no cost weights"
+  },
+  {
+   "case_id": "hedgefrontier_i-0007",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "cost_weights": [
+     0.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "a frontier without costs"
+  },
+  {
+   "case_id": "hedgefrontier_i-0008",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": [
+     0.0,
+     1.0
+    ],
+    "cost_weight": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "cost_weight with cost_weights"
+  },
+  {
+   "case_id": "hedgefrontier_i-0009",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": [
+     -1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "negative cost weight"
+  },
+  {
+   "case_id": "hedgefrontier_i-0010",
+   "operation": "hedge.frontier.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "half_spreads": [
+     0.05,
+     0.1,
+     0.02
+    ],
+    "cost_weights": [
+     0.0,
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0,
+     11.0,
+     12.0,
+     13.0,
+     14.0,
+     15.0,
+     16.0,
+     17.0,
+     18.0,
+     19.0,
+     20.0,
+     21.0,
+     22.0,
+     23.0,
+     24.0,
+     25.0,
+     26.0,
+     27.0,
+     28.0,
+     29.0,
+     30.0,
+     31.0,
+     32.0,
+     33.0,
+     34.0,
+     35.0,
+     36.0,
+     37.0,
+     38.0,
+     39.0,
+     40.0,
+     41.0,
+     42.0,
+     43.0,
+     44.0,
+     45.0,
+     46.0,
+     47.0,
+     48.0,
+     49.0,
+     50.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "frontier",
+    "synthetic"
+   ],
+   "description": "51 points (limit 50)"
+  }
+ ]
+}

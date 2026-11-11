@@ -1,0 +1,1365 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeint_i",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeint_i-0001",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      12,
+      -6,
+      -7
+     ],
+     "x": [
+      12.0,
+      -6.0,
+      -7.0
+     ],
+     "residual": [
+      -12.4,
+      8.6,
+      -19.9,
+      11.1,
+      -13.7
+     ],
+     "objective": 872.19,
+     "continuous_objective": 871.7443423206425,
+     "rounding_cost": 0.4456576793574203
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "three instruments, unit lots (searched 12 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0002",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     0.5,
+     2.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      24,
+      -3,
+      -7
+     ],
+     "x": [
+      12.0,
+      -6.0,
+      -7.0
+     ],
+     "residual": [
+      -12.4,
+      8.6,
+      -19.9,
+      11.1,
+      -13.7
+     ],
+     "objective": 872.19,
+     "continuous_objective": 871.7443423206425,
+     "rounding_cost": 0.4456576793574203
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "three instruments, mixed lots (searched 8 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0003",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "lower_lots": [
+     -3,
+     null,
+     -1
+    ],
+    "upper_lots": [
+     3,
+     2,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      3,
+      -5,
+      -1
+     ],
+     "x": [
+      3.0,
+      -5.0,
+      -1.0
+     ],
+     "residual": [
+      -19.7,
+      9.5,
+      -11.2,
+      9.5,
+      -14.6
+     ],
+     "objective": 979.845,
+     "continuous_objective": 979.7277751196173,
+     "rounding_cost": 0.11722488038277529
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "lot bounds bind (searched 39 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0004",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "ridge": 0.5,
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      8,
+      -5,
+      -5
+     ],
+     "x": [
+      8.0,
+      -5.0,
+      -5.0
+     ],
+     "residual": [
+      -15.5,
+      9.4,
+      -16.7,
+      9.9,
+      -13.8
+     ],
+     "objective": 950.87,
+     "continuous_objective": 949.5344705283237,
+     "rounding_cost": 1.33552947167628
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "ridge with integer lots (searched 8 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0005",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      250.0
+     ]
+    ],
+    "b": [
+     -3100.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "lot_sizes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      12
+     ],
+     "x": [
+      12.0
+     ],
+     "residual": [
+      -100.0
+     ],
+     "objective": 10000.0,
+     "continuous_objective": 0.0,
+     "rounding_cost": 10000.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "single futures contract hedge (size 250) (searched 1 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0006",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ],
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     -2.6,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     3.0
+    ],
+    "lot_sizes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      1
+     ],
+     "x": [
+      1.0
+     ],
+     "residual": [
+      -1.6,
+      0.0
+     ],
+     "objective": 2.5600000000000005,
+     "continuous_objective": 1.9200000000000002,
+     "rounding_cost": 0.6400000000000001
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "single instrument, two weighted factors (searched 1 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0007",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     0.5
+    ],
+    "weights": [
+     1.0
+    ],
+    "lot_sizes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      0
+     ],
+     "x": [
+      0.0
+     ],
+     "residual": [
+      0.5
+     ],
+     "objective": 0.25,
+     "continuous_objective": 0.0,
+     "rounding_cost": 0.25
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "exact tie between 0 and -1 lots: smaller sum |n| wins (searched 2 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0008",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ]
+    ],
+    "b": [
+     -1.5
+    ],
+    "weights": [
+     1.0
+    ],
+    "lot_sizes": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      1
+     ],
+     "x": [
+      1.0
+     ],
+     "residual": [
+      -0.5
+     ],
+     "objective": 0.25,
+     "continuous_objective": 0.0,
+     "rounding_cost": 0.25
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "exact tie between 1 and 2 lots: smaller sum |n| wins (searched 2 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0009",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "ridge": 0.25,
+    "lot_sizes": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      0,
+      1
+     ],
+     "x": [
+      0.0,
+      1.0
+     ],
+     "residual": [
+      0.0
+     ],
+     "objective": 0.25,
+     "continuous_objective": 0.1111111111111111,
+     "rounding_cost": 0.1388888888888889
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "exact tie with equal sum |n|: lexicographically smaller (searched 4 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0010",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.95
+     ],
+     [
+      0.95,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.265,
+     -1.27
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      0,
+      1
+     ],
+     "x": [
+      0.0,
+      1.0
+     ],
+     "residual": [
+      -0.31499999999999995,
+      -0.27
+     ],
+     "objective": 0.17212499999999997,
+     "continuous_objective": 0.0,
+     "rounding_cost": 0.17212499999999997
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "rounding the relaxed solution is not optimal (searched 756 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0011",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      16,
+      25,
+      15,
+      -2
+     ],
+     "x": [
+      16.0,
+      25.0,
+      15.0,
+      -2.0
+     ],
+     "residual": [
+      -1.9999999999999998,
+      3.1999999999999993,
+      -4.100000000000001,
+      2.100000000000002,
+      -1.1499999999999992
+     ],
+     "objective": 36.78250000000001,
+     "continuous_objective": 36.44288642200292,
+     "rounding_cost": 0.3396135779970898
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "four instruments, key-rate style (searched 12 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0012",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "lots": [
+      0,
+      0,
+      0
+     ],
+     "x": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "continuous_objective": 0.0,
+     "rounding_cost": 0.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational-enumeration",
+    "ellipsoid-bound",
+    "wide-box-brute-force"
+   ],
+   "tags": [
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "zero exposure gives zero lots (searched 1 points)",
+   "output_classes": {
+    "lots": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeint_i-0013",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "lot_sizes of the wrong length"
+  },
+  {
+   "case_id": "hedgeint_i-0014",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     0.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "zero lot size"
+  },
+  {
+   "case_id": "hedgeint_i-0015",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "lower_lots": [
+     2,
+     null,
+     null
+    ],
+    "upper_lots": [
+     1,
+     null,
+     null
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "lower lots above upper lots"
+  },
+  {
+   "case_id": "hedgeint_i-0016",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "duplicate instruments without ridge"
+  },
+  {
+   "case_id": "hedgeint_i-0017",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "13 instruments (limit 12)"
+  },
+  {
+   "case_id": "hedgeint_i-0018",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     -1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "negative weight"
+  },
+  {
+   "case_id": "hedgeint_i-0019",
+   "operation": "hedge.integer.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -20.0,
+     15.0,
+     -7.0,
+     9.0,
+     -11.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lot_sizes": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "integer",
+    "synthetic"
+   ],
+   "description": "13 lot sizes for 3 columns: instruments are the columns of a (I-45, after the builds)"
+  }
+ ]
+}

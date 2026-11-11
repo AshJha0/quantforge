@@ -1,0 +1,1 @@
+{"schema_version":"1.0","case_id":"example-hedge-beta-i","operation":"hedge.beta.futures","inputs":{"portfolio_value":5050000.0,"portfolio_beta":1.5,"target_beta":0.0,"futures_price":1010.0,"multiplier":250.0}}

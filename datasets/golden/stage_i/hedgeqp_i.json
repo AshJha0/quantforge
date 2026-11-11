@@ -1,0 +1,3180 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeqp_i",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeqp_i-0001",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2389484039547414,
+      -0.579151887583752,
+      -0.7518047108371649
+     ],
+     "residual": [
+      -1.2009884820045675,
+      0.875980371751054,
+      -2.0513033584105242,
+      1.0987041058935945,
+      -1.35119875049463
+     ],
+     "objective": 8.717443423206426,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "weighted least squares, 5 factors and 3 instruments",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0002",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.9885469780593176,
+      -0.2575929112253176,
+      -0.12771409629637115
+     ],
+     "residual": [
+      -1.1657922968126153,
+      1.4363669614288657,
+      -0.9472721933738154,
+      1.5243763135356565,
+      -0.9747290577679701
+     ],
+     "objective": 7.593366216857058,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "unit weights",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0003",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "ridge": 0.1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.102803267798756,
+      -0.5470088386401573,
+      -0.6677991297794272
+     ],
+     "residual": [
+      -1.304260977477208,
+      0.9073107220596672,
+      -1.9196236710733594,
+      1.0718216297094891,
+      -1.3515263865904672
+     ],
+     "objective": 8.935960631366418,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "ridge 0.1",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0004",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "ridge": 10.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.06887276801126029,
+      -0.11497419314981254,
+      -0.0815027131495071
+     ],
+     "residual": [
+      -2.0049148711935474,
+      1.3500917133638002,
+      -0.8843513088130222,
+      0.8587509339444893,
+      -1.2003784805751794
+     ],
+     "objective": 10.849357930020812,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "ridge 10, strong shrinkage",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0005",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5
+     ],
+     [
+      0.2,
+      1.0
+     ]
+    ],
+    "b": [
+     3.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -3.888888888888889,
+      1.777777777777778
+     ],
+     "residual": [
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "square exact hedge, zero residual",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0006",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.8
+     ]
+    ],
+    "b": [
+     -4.0
+    ],
+    "weights": [
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      5.0
+     ],
+     "residual": [
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "single instrument, single factor (stage B form)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0007",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ],
+     [
+      0.9
+     ],
+     [
+      1.2
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1.1,
+     -0.8
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.8336886993603412
+     ],
+     "residual": [
+      -0.1663113006396588,
+      -0.349680170575693,
+      0.20042643923240938
+     ],
+     "objective": 0.23027718550106607,
+     "rank": 1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "single instrument, three factors",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0008",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02
+     ],
+     [
+      0.3,
+      0.85,
+      0.15
+     ],
+     [
+      0.05,
+      0.7,
+      0.6
+     ],
+     [
+      0.0,
+      0.2,
+      1.1
+     ],
+     [
+      0.0,
+      0.02,
+      0.55
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      16.45903073409697,
+      25.280170248709787,
+      13.401534525281136
+     ],
+     "residual": [
+      -1.7973884542797616,
+      3.4360841104245794,
+      -4.440008574029621,
+      1.797722027551208,
+      0.376447393878821
+     ],
+     "objective": 38.12447253564799,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "key-rate hedge with three bonds",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0009",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02
+     ],
+     [
+      0.3,
+      0.85,
+      0.15
+     ],
+     [
+      0.05,
+      0.7,
+      0.6
+     ],
+     [
+      0.0,
+      0.2,
+      1.1
+     ],
+     [
+      0.0,
+      0.02,
+      0.55
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "lower": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "upper": [
+     null,
+     20.0,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      21.904754142010226,
+      20.0,
+      15.334494382225989
+     ],
+     "residual": [
+      0.16382925154912248,
+      0.8716003999369658,
+      -6.704065663563896,
+      2.8679438204485894,
+      1.3339719102242946
+     ],
+     "objective": 55.735606516726556,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "key-rate hedge, long-only bounds bind",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0010",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "upper": [
+     0.5,
+     null,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.5,
+      -0.4161259836186441,
+      -0.4173626285239354
+     ],
+     "residual": [
+      -1.7915355175141092,
+      0.983703768248053,
+      -1.5257195329570894,
+      0.8411484376047293,
+      -1.3997221738139605
+     ],
+     "objective": 9.32937396946258,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "upper bound binds on one instrument",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0011",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.21475054229934923,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      -1.7852494577006508,
+      1.5644251626898047,
+      -0.6785249457700651,
+      1.0718004338394793,
+      -1.0140997830802605
+     ],
+     "objective": 11.063698481561822,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "lower bounds bind on two instruments",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0012",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     -10.0,
+     -10.0,
+     -10.0
+    ],
+    "upper": [
+     10.0,
+     10.0,
+     10.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2389484039547414,
+      -0.579151887583752,
+      -0.7518047108371649
+     ],
+     "residual": [
+      -1.2009884820045675,
+      0.875980371751054,
+      -2.0513033584105242,
+      1.0987041058935945,
+      -1.35119875049463
+     ],
+     "objective": 8.717443423206426,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-bvls"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "box bounds, none binding",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0013",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     null,
+     0.25,
+     null
+    ],
+    "upper": [
+     null,
+     0.25,
+     null
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.8479213978178797,
+      0.25,
+      -1.120675697941815
+     ],
+     "residual": [
+      -1.2512137417704834,
+      1.6061061401686378,
+      -2.1462214071309345,
+      0.6197289901066703,
+      -0.8720341502553927
+     ],
+     "objective": 10.364362449763233,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "fixed variable (lower = upper)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0014",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2948410448737517,
+      -0.5724689596740531,
+      -0.7223720851996986
+     ],
+     "residual": [
+      -1.1358678520032146,
+      0.9125407277733824,
+      -1.9975553991166046,
+      1.171244167284462,
+      -1.3139972713170567
+     ],
+     "objective": 8.735078901300174,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "budget equality: positions sum to zero",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0015",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     1.0
+    ],
+    "lower": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      -1.0,
+      1.8,
+      -0.6,
+      1.7000000000000002,
+      -0.7000000000000001
+     ],
+     "objective": 12.485000000000001,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "equality and bounds together",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0016",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      0.0,
+      -1.0
+     ],
+     [
+      0.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.5,
+     0.2
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.49510703363914366,
+      0.20489296636085638,
+      -0.0048929663608563625
+     ],
+     "residual": [
+      -1.4034250764525995,
+      1.8924464831804282,
+      -0.5348929663608563,
+      1.3326605504587155,
+      -0.7190214067278288
+     ],
+     "objective": 12.45633256880734,
+     "rank": 1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "two equalities leave one free direction",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0017",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.1,
+     -0.2,
+     0.3
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.1,
+      -0.2,
+      0.3
+     ],
+     "residual": [
+      -1.94,
+      1.41,
+      -0.36,
+      1.21,
+      -1.1500000000000001
+     ],
+     "objective": 11.32325,
+     "rank": 0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "equalities fix every position (k = n)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0018",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "singular": "MIN_NORM"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.0,
+      1.0,
+      -6.681911775230489e-52
+     ],
+     "residual": [
+      -2.6727647100921956e-51,
+      -2.6727647100921956e-51
+     ],
+     "objective": 1.4287342391028437e-101,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "duplicate instruments, MIN_NORM splits evenly",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0019",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.0
+     ]
+    ],
+    "b": [
+     1.0,
+     -1.0,
+     2.0
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "singular": "MIN_NORM"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.0,
+      0.0
+     ],
+     "residual": [
+      1.0,
+      -1.0,
+      2.0
+     ],
+     "objective": 6.0,
+     "rank": 1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "zero column, MIN_NORM leaves it at zero",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0020",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.4,
+      0.2,
+      0.7
+     ]
+    ],
+    "b": [
+     -3.0
+    ],
+    "weights": [
+     2.0
+    ],
+    "singular": "MIN_NORM"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.7751479289940828,
+      0.7100591715976332,
+      0.3550295857988166,
+      1.242603550295858
+     ],
+     "residual": [
+      1.6036588260553174e-50
+     ],
+     "objective": 5.143443260770237e-100,
+     "rank": 1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "more instruments than factors, MIN_NORM",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0021",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "singular": "MIN_NORM"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.2389484039547414,
+      -0.579151887583752,
+      -0.7518047108371649
+     ],
+     "residual": [
+      -1.2009884820045675,
+      0.875980371751054,
+      -2.0513033584105242,
+      1.0987041058935945,
+      -1.35119875049463
+     ],
+     "objective": 8.717443423206426,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "MIN_NORM on a regular problem equals the unique solution",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0022",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.3
+     ],
+     [
+      0.2,
+      0.2,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     0.5
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.1
+    ],
+    "singular": "MIN_NORM"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.40865384615384615,
+      0.40865384615384615,
+      0.1
+     ],
+     "residual": [
+      -0.1526923076923077,
+      0.7634615384615385
+     ],
+     "objective": 0.6061884615384615,
+     "rank": 1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "MIN_NORM with an equality on duplicate instruments",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0023",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "ridge": 0.001
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.9995003745942728,
+      0.9995003745942728,
+      0.0004991262794478266
+     ],
+     "residual": [
+      -0.0009992508114545489,
+      -4.991262794478266e-07
+     ],
+     "objective": 0.0019990007491885453,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "singular A made regular by ridge",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0024",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      -1.0,
+      0.0
+     ]
+    ],
+    "eq_rhs": [
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.0,
+      1.0,
+      0.0
+     ],
+     "residual": [
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-slsqp"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "duplicate instruments made regular by an equality",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0025",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     0.001,
+     1.0,
+     1000.0,
+     1.0,
+     10.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -0.5332872283988221,
+      1.0590531433243013,
+      0.07827500711561815
+     ],
+     "residual": [
+      -1.9881056553135479,
+      2.6421876063157623,
+      -0.0004843261718741324,
+      0.7556283523498589,
+      -0.3366845602329722
+     ],
+     "objective": 8.68988162077373,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "weights spanning six decades",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0026",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "already hedged: b = 0 gives x = 0",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0027",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5
+     ],
+     [
+      0.2,
+      1.0
+     ]
+    ],
+    "b": [
+     -0.0,
+     2.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.1111111111111112,
+      -2.2222222222222223
+     ],
+     "residual": [
+      0.0,
+      0.0
+     ],
+     "objective": 0.0,
+     "rank": 2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-active-set",
+    "kkt-check",
+    "scipy-1.18-lstsq"
+   ],
+   "tags": [
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "negative zero in b is zero (F-3)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeqp_i-0028",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "b shorter than a"
+  },
+  {
+   "case_id": "hedgeqp_i-0029",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "ragged a"
+  },
+  {
+   "case_id": "hedgeqp_i-0030",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "eq_matrix without eq_rhs"
+  },
+  {
+   "case_id": "hedgeqp_i-0031",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "lower of the wrong length"
+  },
+  {
+   "case_id": "hedgeqp_i-0032",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     0.0,
+     null,
+     null
+    ],
+    "singular": "MIN_NORM"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "MIN_NORM with a bound"
+  },
+  {
+   "case_id": "hedgeqp_i-0033",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     0.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "zero weight"
+  },
+  {
+   "case_id": "hedgeqp_i-0034",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "ridge": -0.1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "negative ridge"
+  },
+  {
+   "case_id": "hedgeqp_i-0035",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     1.0,
+     null,
+     null
+    ],
+    "upper": [
+     0.5,
+     null,
+     null
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "lower above upper"
+  },
+  {
+   "case_id": "hedgeqp_i-0036",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     "NaN",
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "NaN in b (F-2)"
+  },
+  {
+   "case_id": "hedgeqp_i-0037",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "duplicate instruments, policy ERROR"
+  },
+  {
+   "case_id": "hedgeqp_i-0038",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0
+     ]
+    ],
+    "b": [
+     1.0,
+     1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "zero column"
+  },
+  {
+   "case_id": "hedgeqp_i-0039",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0
+     ],
+     [
+      2.0,
+      2.0,
+      2.0
+     ]
+    ],
+    "eq_rhs": [
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "dependent equality rows"
+  },
+  {
+   "case_id": "hedgeqp_i-0040",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ],
+     [
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "more equalities than instruments"
+  },
+  {
+   "case_id": "hedgeqp_i-0041",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     5.0
+    ],
+    "upper": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INFEASIBLE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "budget above the sum of upper bounds"
+  },
+  {
+   "case_id": "hedgeqp_i-0042",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "eq_matrix": [
+     [
+      1.0,
+      -1.0,
+      0.0
+     ]
+    ],
+    "eq_rhs": [
+     2.0
+    ],
+    "lower": [
+     0.0,
+     0.0,
+     null
+    ],
+    "upper": [
+     1.0,
+     null,
+     null
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INFEASIBLE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "equality outside the box"
+  },
+  {
+   "case_id": "hedgeqp_i-0043",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ],
+     [
+      0.8,
+      0.2,
+      0.9
+     ],
+     [
+      0.4,
+      0.9,
+      0.3
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9,
+     -1.1
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5,
+     1.0
+    ],
+    "lower": [
+     null,
+     1.0,
+     null
+    ],
+    "upper": [
+     null,
+     1.0,
+     null
+    ],
+    "eq_matrix": [
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "eq_rhs": [
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INFEASIBLE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "fixed variable against an equality"
+  },
+  {
+   "case_id": "hedgeqp_i-0044",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     0.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "qp",
+    "synthetic"
+   ],
+   "description": "zero weight before the singular test"
+  }
+ ]
+}

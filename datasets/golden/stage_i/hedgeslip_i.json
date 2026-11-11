@@ -1,0 +1,564 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeslip_i",
+ "spec": "specifications/08-hedging/hedge-slippage.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w4d.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeslip_i-0001",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": 400.0,
+        "price": 100.05
+       },
+       {
+        "quantity": 600.0,
+        "price": 100.12
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "orders": [
+      {
+       "filled_quantity": 1000.0,
+       "average_price": 100.092,
+       "execution_cost": 92.00000000000159,
+       "opportunity_cost": 0.0,
+       "shortfall": 92.00000000000159,
+       "model_cost": 120.0,
+       "slippage": -27.999999999998412
+      }
+     ],
+     "total": {
+      "execution_cost": 92.00000000000159,
+      "opportunity_cost": 0.0,
+      "shortfall": 92.00000000000159,
+      "model_cost": 120.0,
+      "slippage": -27.999999999998412
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "one buy, fully filled in two fills"
+  },
+  {
+   "case_id": "hedgeslip_i-0002",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": -500.0,
+      "decision_price": 50.0,
+      "final_price": 49.2,
+      "half_spread": 0.01,
+      "impact": 0.0002,
+      "fills": [
+       {
+        "quantity": -300.0,
+        "price": 49.97
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "orders": [
+      {
+       "filled_quantity": -300.0,
+       "average_price": 49.97,
+       "execution_cost": 9.000000000000341,
+       "opportunity_cost": 159.99999999999943,
+       "shortfall": 168.99999999999977,
+       "model_cost": 21.0,
+       "slippage": -11.99999999999966
+      }
+     ],
+     "total": {
+      "execution_cost": 9.000000000000341,
+      "opportunity_cost": 159.99999999999943,
+      "shortfall": 168.99999999999977,
+      "model_cost": 21.0,
+      "slippage": -11.99999999999966
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "one sell, partly filled: opportunity cost on the rest"
+  },
+  {
+   "case_id": "hedgeslip_i-0003",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": 400.0,
+        "price": 100.05
+       },
+       {
+        "quantity": 600.0,
+        "price": 100.12
+       }
+      ]
+     },
+     {
+      "quantity": -500.0,
+      "decision_price": 50.0,
+      "final_price": 49.2,
+      "half_spread": 0.01,
+      "impact": 0.0002,
+      "fills": [
+       {
+        "quantity": -300.0,
+        "price": 49.97
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "orders": [
+      {
+       "filled_quantity": 1000.0,
+       "average_price": 100.092,
+       "execution_cost": 92.00000000000159,
+       "opportunity_cost": 0.0,
+       "shortfall": 92.00000000000159,
+       "model_cost": 120.0,
+       "slippage": -27.999999999998412
+      },
+      {
+       "filled_quantity": -300.0,
+       "average_price": 49.97,
+       "execution_cost": 9.000000000000341,
+       "opportunity_cost": 159.99999999999943,
+       "shortfall": 168.99999999999977,
+       "model_cost": 21.0,
+       "slippage": -11.99999999999966
+      }
+     ],
+     "total": {
+      "execution_cost": 101.00000000000193,
+      "opportunity_cost": 159.99999999999943,
+      "shortfall": 261.00000000000136,
+      "model_cost": 141.0,
+      "slippage": -39.999999999998074
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "buy and sell together: totals add"
+  },
+  {
+   "case_id": "hedgeslip_i-0004",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": -500.0,
+      "decision_price": 50.0,
+      "final_price": 49.2,
+      "half_spread": 0.01,
+      "impact": 0.0002,
+      "fills": []
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "orders": [
+      {
+       "filled_quantity": 0.0,
+       "average_price": null,
+       "execution_cost": 0.0,
+       "opportunity_cost": 399.9999999999986,
+       "shortfall": 399.9999999999986,
+       "model_cost": 0.0,
+       "slippage": 0.0
+      }
+     ],
+     "total": {
+      "execution_cost": 0.0,
+      "opportunity_cost": 399.9999999999986,
+      "shortfall": 399.9999999999986,
+      "model_cost": 0.0,
+      "slippage": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "nothing filled: average price null, all opportunity cost"
+  },
+  {
+   "case_id": "hedgeslip_i-0005",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": 1000.0,
+        "price": 99.98
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "orders": [
+      {
+       "filled_quantity": 1000.0,
+       "average_price": 99.98,
+       "execution_cost": -19.99999999999602,
+       "opportunity_cost": 0.0,
+       "shortfall": -19.99999999999602,
+       "model_cost": 120.0,
+       "slippage": -139.99999999999602
+      }
+     ],
+     "total": {
+      "execution_cost": -19.99999999999602,
+      "opportunity_cost": 0.0,
+      "shortfall": -19.99999999999602,
+      "model_cost": 120.0,
+      "slippage": -139.99999999999602
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "filled better than the decision price: negative cost"
+  },
+  {
+   "case_id": "hedgeslip_i-0006",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 100.0,
+      "decision_price": 10.0,
+      "final_price": 10.0,
+      "half_spread": 0.25,
+      "impact": 0.0,
+      "fills": [
+       {
+        "quantity": 100.0,
+        "price": 10.25
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "orders": [
+      {
+       "filled_quantity": 100.0,
+       "average_price": 10.25,
+       "execution_cost": 25.0,
+       "opportunity_cost": 0.0,
+       "shortfall": 25.0,
+       "model_cost": 25.0,
+       "slippage": 0.0
+      }
+     ],
+     "total": {
+      "execution_cost": 25.0,
+      "opportunity_cost": 0.0,
+      "shortfall": 25.0,
+      "model_cost": 25.0,
+      "slippage": 0.0
+     }
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "fills exactly at the model cost: zero slippage"
+  },
+  {
+   "case_id": "hedgeslip_i-0007",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "no orders"
+  },
+  {
+   "case_id": "hedgeslip_i-0008",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": -10.0,
+        "price": 100.0
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "a sell fill on a buy order"
+  },
+  {
+   "case_id": "hedgeslip_i-0009",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": 1200.0,
+        "price": 100.0
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "overfilled"
+  },
+  {
+   "case_id": "hedgeslip_i-0010",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 0.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": []
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "zero order"
+  },
+  {
+   "case_id": "hedgeslip_i-0011",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 0.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": 0.0001,
+      "fills": [
+       {
+        "quantity": 400.0,
+        "price": 100.05
+       },
+       {
+        "quantity": 600.0,
+        "price": 100.12
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "zero decision price"
+  },
+  {
+   "case_id": "hedgeslip_i-0012",
+   "operation": "hedge.slippage.report",
+   "inputs": {
+    "orders": [
+     {
+      "quantity": 1000.0,
+      "decision_price": 100.0,
+      "final_price": 101.5,
+      "half_spread": 0.02,
+      "impact": -0.1,
+      "fills": [
+       {
+        "quantity": 400.0,
+        "price": 100.05
+       },
+       {
+        "quantity": 600.0,
+        "price": 100.12
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "slippage",
+    "synthetic"
+   ],
+   "description": "negative impact"
+  }
+ ]
+}

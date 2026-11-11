@@ -1,0 +1,813 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeres_i",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w1.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeres_i-0001",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     2.9531821506949525,
+     -2.3979517190929043,
+     1.228968544257498
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "residual": [
+      -3.076462924125891e-17,
+      -7.664356022960938e-17,
+      -1.746103871099382e-16
+     ],
+     "variance_before": 0.0004059,
+     "variance_after": 6.600568423152965e-36,
+     "volatility_after": 2.5691571425572563e-18,
+     "effectiveness": 1.0,
+     "contributions": [
+      2.426809080140729e-37,
+      1.0244804594233184e-36,
+      5.333407055715574e-36
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "euler-sum"
+   ],
+   "tags": [
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "exact hedge from the QP: residual near zero",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "residual of an exact hedge is rounding noise"
+   }
+  },
+  {
+   "case_id": "hedgeres_i-0002",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     1.0,
+     -0.5,
+     0.2
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "residual": [
+      -1.21,
+      1.28,
+      -0.5999999999999999
+     ],
+     "variance_before": 0.0004059,
+     "variance_after": 0.000196002,
+     "volatility_after": 0.014000071428389214,
+     "effectiveness": 0.5171175166297117,
+     "contributions": [
+      9.1718e-05,
+      6.2464e-05,
+      4.181999999999999e-05
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "euler-sum"
+   ],
+   "tags": [
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "partial hedge"
+  },
+  {
+   "case_id": "hedgeres_i-0003",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "residual": [
+      -2.0,
+      1.5,
+      -0.7
+     ],
+     "variance_before": 0.0004059,
+     "variance_after": 0.0004059,
+     "volatility_after": 0.020146960068456978,
+     "effectiveness": 0.0,
+     "contributions": [
+      0.000294,
+      5.1000000000000006e-05,
+      6.0899999999999996e-05
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "euler-sum"
+   ],
+   "tags": [
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "no hedge: effectiveness 0"
+  },
+  {
+   "case_id": "hedgeres_i-0004",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     6.0,
+     -4.0,
+     2.0
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "residual": [
+      2.4,
+      -0.6999999999999998,
+      0.5000000000000002
+     ],
+     "variance_before": 0.0004059,
+     "variance_after": 0.0005287000000000001,
+     "volatility_after": 0.02299347733597509,
+     "effectiveness": -0.3025375708302539,
+     "contributions": [
+      0.0005208000000000001,
+      -3.360000000000001e-05,
+      4.150000000000003e-05
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "euler-sum"
+   ],
+   "tags": [
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "over-hedge: effectiveness below 0"
+  },
+  {
+   "case_id": "hedgeres_i-0005",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     1.0,
+     -0.5,
+     0.2
+    ],
+    "covariance": [
+     [
+      0.0001,
+      0,
+      0
+     ],
+     [
+      0,
+      9e-05,
+      0
+     ],
+     [
+      0,
+      0,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "residual": [
+      -1.21,
+      1.28,
+      -0.5999999999999999
+     ],
+     "variance_before": 0.0006809,
+     "variance_after": 0.000351466,
+     "volatility_after": 0.018747426490054574,
+     "effectiveness": 0.4838214128359524,
+     "contributions": [
+      0.00014641,
+      0.00014745600000000002,
+      5.759999999999999e-05
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "euler-sum"
+   ],
+   "tags": [
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "diagonal covariance"
+  },
+  {
+   "case_id": "hedgeres_i-0006",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     1.0,
+     -0.5,
+     0.2
+    ],
+    "covariance": [
+     [
+      1.0,
+      2.0,
+      3.0
+     ],
+     [
+      2.0,
+      4.0,
+      6.0
+     ],
+     [
+      3.0,
+      6.0,
+      9.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "residual": [
+      -1.21,
+      1.28,
+      -0.5999999999999999
+     ],
+     "variance_before": 1.2099999999999997,
+     "variance_after": 0.20249999999999976,
+     "volatility_after": 0.44999999999999973,
+     "effectiveness": 0.8326446280991737,
+     "contributions": [
+      0.5444999999999997,
+      -1.1519999999999992,
+      0.8099999999999994
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "euler-sum"
+   ],
+   "tags": [
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "singular PSD covariance (one factor)"
+  },
+  {
+   "case_id": "hedgeres_i-0007",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0
+     ],
+     [
+      0.8
+     ]
+    ],
+    "b": [
+     -1.0,
+     -0.5
+    ],
+    "x": [
+     0.7
+    ],
+    "covariance": [
+     [
+      1.0,
+      0.5
+     ],
+     [
+      0.5,
+      1.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "residual": [
+      -0.30000000000000004,
+      0.06
+     ],
+     "variance_before": 1.75,
+     "variance_after": 0.07560000000000003,
+     "volatility_after": 0.27495454169735045,
+     "effectiveness": 0.9568,
+     "contributions": [
+      0.08100000000000003,
+      -0.005400000000000001
+     ]
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "euler-sum"
+   ],
+   "tags": [
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "one instrument, two factors"
+  },
+  {
+   "case_id": "hedgeres_i-0008",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     1.0,
+     0.0
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "x of the wrong length"
+  },
+  {
+   "case_id": "hedgeres_i-0009",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     1.0,
+     -0.5,
+     0.2
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      2e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "covariance not symmetric"
+  },
+  {
+   "case_id": "hedgeres_i-0010",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7
+    ],
+    "x": [
+     1.0,
+     -0.5,
+     0.2
+    ],
+    "covariance": [
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NOT_POSITIVE_DEFINITE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "covariance with eigenvalue -1"
+  },
+  {
+   "case_id": "hedgeres_i-0011",
+   "operation": "hedge.residual.report",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      0.2
+     ],
+     [
+      0.3,
+      1.2,
+      0.4
+     ],
+     [
+      0.1,
+      0.6,
+      1.5
+     ]
+    ],
+    "b": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "x": [
+     1.0,
+     -0.5,
+     0.2
+    ],
+    "covariance": [
+     [
+      0.0001,
+      4e-05,
+      1e-05
+     ],
+     [
+      4e-05,
+      9e-05,
+      3e-05
+     ],
+     [
+      1e-05,
+      3e-05,
+      0.00016
+     ]
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "residual",
+    "synthetic"
+   ],
+   "description": "zero unhedged variance"
+  }
+ ]
+}
