@@ -6,7 +6,7 @@ cases, and each key present in every ok case of that operation must be present (
 OPTIONAL below). A failure means the case would stop at E_SCHEMA before its intended code. For E_LIMIT cases it also checks
 that the case is otherwise schema-valid. Exit code 1 on any mismatch.
 
-    uv run python check_error_cases.py [folder ...]    (default: stage_g stage_f)
+    uv run python check_error_cases.py [folder ...]    (default: stage_i stage_g stage_f)
 """
 import json
 import sys
@@ -18,7 +18,7 @@ OPTIONAL = {"monitoring", "monitoring_per_year", "model", "independent_amount", 
             "smoothing_width", "bump_relative", "grid",
             "ridge", "eq_matrix", "eq_rhs", "lower", "upper", "singular", "lower_lots", "upper_lots",  # stage I hedge solvers
             "covariance", "exposure_changes", "hedge_changes", "rounding",
-            "half_spreads", "impact", "cost_weight", "margin_rates", "margin_limit", "max_instruments"}
+            "half_spreads", "impact", "cost_weight", "margin_rates", "margin_limit", "max_instruments", "half_spread"}
 
 
 UNION = {"initial_variance": {"str", "real", "int"}}  # spec: "SAMPLE" or a number (05-volatility/garch.md)
@@ -72,4 +72,4 @@ def main(folders):
 
 
 if __name__ == "__main__":
-    sys.exit(1 if main(sys.argv[1:] or ["stage_g", "stage_f"]) else 0)
+    sys.exit(1 if main(sys.argv[1:] or ["stage_i", "stage_g", "stage_f"]) else 0)

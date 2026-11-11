@@ -347,6 +347,7 @@ Stage I adds operations and one error code, `E_INFEASIBLE` (ruling I-1). `stage-
 | `hedge.backtest.delta`, `hedge.effectiveness` | `08-hedging/dynamic-hedge-and-effectiveness.md` | wave 4b |
 | `hedge.select.solve` | `08-hedging/instrument-selection.md` | wave 4c |
 | `hedge.slippage.report` (`null` legal for `average_price`) | `08-hedging/hedge-slippage.md` | wave 4d |
+| `hedge.backtest.delta`: new optional inputs `half_spread`, `impact` (output `trading_cost` only with them) | `08-hedging/dynamic-hedge-and-effectiveness.md`, section "Costs in the backtest (wave 4e)" | wave 4e |
 
 `null` is legal inside `lower`, `upper`, `lower_lots`, `upper_lots` (ruling I-12). `E_LIMIT` sizes: ruling I-4. Every rank or singularity decision uses the relative threshold `1e-12` (ruling I-3).
 
