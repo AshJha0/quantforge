@@ -164,6 +164,22 @@ impl Exercise<'_> {
     }
 }
 
+/// One recorded implicit step: its time, size, solution and LU factors.
+struct Step {
+    t: f64,
+    dt: f64,
+    u: Vec<f64>,
+    cp: Vec<f64>,
+    m: Vec<f64>,
+}
+
+/// One exercise knot: the continuation value before the `max` and the exercise values.
+struct Knot {
+    t: f64,
+    before: Vec<f64>,
+    exv: Vec<f64>,
+}
+
 /// `rates.shortrate.bermudan_ladder`: price and `dV/d(P_k, a, sigma)` of the G-18 scheme.
 pub fn bermudan_ladder(
     curve: &HwCurve,
@@ -207,18 +223,6 @@ pub fn bermudan_ladder(
     let mut v: Vec<f64> = ex_m.iter().map(|e| e.max(0.0)).collect();
     let diff = sigma * sigma / (2.0 * dx * dx);
     let adv: Vec<f64> = (0..nx).map(|i| a * x[i] / (2.0 * dx)).collect();
-    struct Step {
-        t: f64,
-        dt: f64,
-        u: Vec<f64>,
-        cp: Vec<f64>,
-        m: Vec<f64>,
-    }
-    struct Knot {
-        t: f64,
-        before: Vec<f64>,
-        exv: Vec<f64>,
-    }
     let mut steps: Vec<Step> = Vec::new();
     let mut knot_log: Vec<Knot> = Vec::new();
     let (mut lo, mut di, mut up) = (vec![0.0; nx], vec![0.0; nx], vec![0.0; nx]);

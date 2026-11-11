@@ -14,7 +14,7 @@ struct Ws {
     /// Kind, tenor, curve, location (class-specific).
     a: String,
     b: String,
-    ws: f64,
+    value: f64,
 }
 
 fn scale(x: f64, scenario: &str) -> f64 {
@@ -49,23 +49,23 @@ fn sbm(buckets: &[(String, i64, Vec<Ws>)], class: &Class) -> Result<GirrDelta> {
     for name in ["high", "medium", "low"] {
         let mut out = Vec::new();
         for (label, b, items) in buckets {
-            let s: f64 = items.iter().map(|x| x.ws).sum();
+            let s: f64 = items.iter().map(|x| x.value).sum();
             let k = if class.simple == Some(*b) {
                 let mut net: Vec<(&str, f64)> = Vec::new();
                 for w in items {
                     match net.iter_mut().find(|n| n.0 == w.key) {
-                        Some(n) => n.1 += w.ws,
-                        None => net.push((&w.key, w.ws)),
+                        Some(n) => n.1 += w.value,
+                        None => net.push((&w.key, w.value)),
                     }
                 }
                 net.iter().map(|n| n.1.abs()).sum()
             } else {
                 let mut sum = 0.0;
                 for (i, x) in items.iter().enumerate() {
-                    sum += x.ws * x.ws;
+                    sum += x.value * x.value;
                     for (j, y) in items.iter().enumerate() {
                         if i != j {
-                            sum += scale((class.rho)(*b, x, y), name) * x.ws * y.ws;
+                            sum += scale((class.rho)(*b, x, y), name) * x.value * y.value;
                         }
                     }
                 }
@@ -124,7 +124,7 @@ fn group(items: Vec<(i64, String, Ws)>) -> Result<Vec<(String, i64, Vec<Ws>)>> {
     }
     let mut seen = std::collections::HashSet::new();
     for (b, _, w) in &items {
-        crate::error::finite("sensitivity", &w.ws)?;
+        crate::error::finite("sensitivity", &w.value)?;
         if !seen.insert((*b, w.key.clone())) {
             return fail("E_INPUT", "the same risk factor twice");
         }
@@ -145,7 +145,7 @@ fn ws(key: String, name: &str, a: &str, b: &str, ws: f64) -> Ws {
         name: name.into(),
         a: a.into(),
         b: b.into(),
-        ws,
+        value: ws,
     }
 }
 

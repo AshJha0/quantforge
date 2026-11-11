@@ -439,7 +439,7 @@ mod tests {
         let (cva, a) = wwr_cva_hw(&t, &v, &d, 0.03, 0.4, 0.0).unwrap();
         assert!(a.iter().all(|x| (x - 0.03_f64.ln()).abs() < 1e-14));
         let mut indep = 0.0;
-        let mut prev = 0.0;
+        let mut prev = 0.0_f64;
         for i in 0..4 {
             let ee = (v[0][i].max(0.0) + v[1][i].max(0.0)) / 2.0;
             indep += d[i] * ee * ((-0.03 * prev).exp() - (-0.03 * t[i]).exp());
