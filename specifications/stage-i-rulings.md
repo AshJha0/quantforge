@@ -101,6 +101,12 @@ Questions read from the lanes' notes only: Java J-I1 to J-I5, Python I-Q1 to I-Q
 | I-51 | Rust 5: contract version | All four CLIs report `contract_version` 1.11.0 from the stage I release; the runner's contract check (`StubTests::test_contract_mismatch_stops` covers the mechanism) stops a mismatch. The lanes move together in the integration PR |
 | I-52 | Coordinator: Python import path for the tutorials | As tutorial 1: a tutorial's Python step imports the `quantforge_core` modules directly (for example `from quantforge_core import hedge_solvers`). No `quantforge.hedge` facade is added. The `python` column of `name-map.json` is a logical name, as for every earlier stage, not an import path. This amends the wave 1 to 4d follow-up note's item 2 |
 
+## Wave 5, outside-checked value cases (2026-11-11)
+
+| # | Point | Ruling |
+|---|---|---|
+| I-55 | How wave 5 adds outside-checked cases | New suites `hedgegreeks5_i`, `hedgecorr5_i`, `hedgemv5_i`, `hedgeeff5_i`, `hedgeqp5_i` of existing operations, written by `oracle/python/gen_stage_i_w5.py` from seeded draws (one seed per suite, in the generator). A draw is rejected only for reasons fixed before any outside check: a domain rule, an I-3 decision inside the factor-1e3 margin, or an infeasible QP (3 draws in all). It is never rejected because the outside check disagrees: every accepted draw is a golden, and the register counts it only if the library agrees within the case tolerance (I-2 unchanged). Earlier suites are untouched |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).
