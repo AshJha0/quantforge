@@ -33,7 +33,9 @@ pub fn effectiveness(x: &[f64], y: &[f64]) -> Result<Effectiveness> {
     let vy = moment(&|i| (y[i] - my) * (y[i] - my));
     let cxy = moment(&|i| (x[i] - mx) * (y[i] - my));
     let sx: f64 = x.iter().sum();
-    if sx == 0.0 || vx == 0.0 || vy == 0.0 {
+    // I-43: relative tests, as rounding leaves a zero hedge leg at about 1e-28 of the item.
+    let abs_sum: f64 = x.iter().map(|v| v.abs()).sum();
+    if sx.abs() <= 1e-12 * abs_sum || vx <= 1e-20 * vy || vy <= 1e-20 * vx {
         return fail(
             "E_DOMAIN",
             "the item sums to zero or a series has no variance (I-31)",

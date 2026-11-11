@@ -129,33 +129,26 @@ fn ridge(i: &Inputs) -> Result<f64> {
     present(i, "ridge")?.map_or(Ok(0.0), |_| i.f64("ridge"))
 }
 
-/// A position (`with_quantity`) or a hedge instrument. Key presence is checked by the library.
+/// A position (`with_quantity`) or a hedge instrument of `hedge.greeks.neutralise`, with the
+/// fixed key sets of ruling I-41 checked by the library.
 fn leg(i: &Inputs, k: &str, v: &Json, with_quantity: bool) -> Result<(Leg, f64)> {
-    let kind = match v.get("instrument").and_then(Json::as_str) {
-        Some("CALL") => LegKind::Call,
-        Some("PUT") => LegKind::Put,
-        Some("UNDERLYING") => LegKind::Underlying,
-        _ => return i.fail(k, "instrument must be CALL, PUT or UNDERLYING"),
+    let kind_of = |s: &str| match s {
+        "CALL" => Some(LegKind::Call),
+        "PUT" => Some(LegKind::Put),
+        "UNDERLYING" => Some(LegKind::Underlying),
+        _ => None,
     };
-    let number = |name: &str| -> Result<Option<f64>> {
-        match v.get(name) {
-            None => Ok(None),
-            Some(x) => x
-                .as_f64()
-                .map_or_else(|| i.fail(k, "expected a number"), |n| Ok(Some(n))),
-        }
-    };
-    let quantity = if with_quantity {
-        number("quantity")?.map_or_else(|| i.fail(k, "quantity is required"), Ok)?
-    } else {
-        0.0
-    };
-    let (strike, expiry) = (number("strike")?, number("expiry_years")?);
+    let (kind, fields, quantity) = keyed(i, k, v, with_quantity, kind_of)?;
+    let get = |name: &str| fields.iter().find(|f| f.0 == name).map(|f| f.1);
+    let stray_keys = fields
+        .iter()
+        .any(|f| f.0 != "strike" && f.0 != "expiry_years");
     Ok((
         Leg {
             kind,
-            strike,
-            expiry,
+            strike: get("strike"),
+            expiry: get("expiry_years"),
+            stray_keys,
         },
         quantity,
     ))

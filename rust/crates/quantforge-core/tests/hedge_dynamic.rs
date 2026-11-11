@@ -34,6 +34,10 @@ fn effectiveness_checks() {
     assert_eq!(code(effectiveness(&[1.0, 1.0, 1.0], &x)), "E_DOMAIN");
     assert_eq!(code(effectiveness(&x, &[2.0, 2.0, 2.0])), "E_DOMAIN");
     assert_eq!(code(effectiveness(&x, &[1.0, f64::NAN, 2.0])), "E_DOMAIN");
+    // I-43: a hedge leg of rounding size against a real item is a zero-variance leg.
+    let tiny = [1e-15, -2e-15, 1.5e-15];
+    assert_eq!(code(effectiveness(&x, &tiny)), "E_DOMAIN");
+    assert_eq!(code(effectiveness(&[1.0, -1.0, 1e-13], &x)), "E_DOMAIN");
     // Hedging half of the item: offset 0.5, slope -0.5, R^2 1, variance reduction 0.75.
     let y: Vec<f64> = x.iter().map(|v| -0.5 * v).collect();
     let e = effectiveness(&x, &y).unwrap();

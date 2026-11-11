@@ -1035,6 +1035,12 @@ pub fn integer_solve(p: &IntegerProblem) -> Result<IntegerSolution> {
     else {
         return fail("E_NO_CONVERGENCE", "a box of integers cannot be empty");
     };
+    // I-49: integers beyond 2^52 are not all representable, so the search is not defined.
+    if relaxed.iter().any(|v| v.abs() > 4_503_599_627_370_496.0) {
+        let mut e = crate::error::err("E_LIMIT", "a relaxed lot count is above 2^52 (I-49)");
+        e.field = Some("lot_sizes".to_string());
+        return Err(e);
+    }
     let continuous_objective = search.value(&relaxed);
     search.branch(&mut lo, &mut hi)?;
     let Some((objective, lots)) = search.best else {
@@ -1174,9 +1180,12 @@ pub fn minvar_ratio(input: MinVarInput) -> Result<MinVar> {
     }
     let variance_before = s[0][0];
     let variance_after = variance_before + (0..k).map(|i| s[i + 1][0] * hedge[i]).sum::<f64>();
-    if variance_after < 0.0 {
+    // I-44: below -1e-12 S_00 the matrix is not positive semi-definite; between that and 0 the
+    // value is rounding of a perfect hedge, returned as 0.
+    if variance_after < -1e-12 * variance_before {
         return fail("E_NOT_POSITIVE_DEFINITE", "the hedged variance is negative");
     }
+    let variance_after = variance_after.max(0.0);
     Ok(MinVar {
         hedge,
         variance_before,
@@ -1289,11 +1298,19 @@ pub struct Leg {
     pub kind: LegKind,
     pub strike: Option<f64>,
     pub expiry: Option<f64>,
+    /// A key outside the fixed set was given, or a position's `quantity` is missing (I-41).
+    pub stray_keys: bool,
 }
 
 impl Leg {
     /// Check 1: an underlying has neither key, an option has both.
     fn instrument(&self) -> Result<GreekInstrument> {
+        if self.stray_keys {
+            return fail(
+                "E_INPUT",
+                "an instrument has keys outside its fixed set (I-41)",
+            );
+        }
         match (self.kind, self.strike, self.expiry) {
             (LegKind::Underlying, None, None) => Ok(GreekInstrument::Underlying),
             (LegKind::Call | LegKind::Put, Some(strike), Some(expiry)) => {

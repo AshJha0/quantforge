@@ -40,3 +40,14 @@ None of these blocked a golden. In each case the code follows the reading stated
 - Selection enumerates every subset (`2^20` QPs in the worst case at the I-35 limit). That is correct but slow at the limit; branch and bound on the objective, which the spec allows, would cut it.
 - The 4a orthant step is exact only away from degenerate sign states (Q-I2). On a degenerate input the answer comes from the regularised split problem, within about 1e-6 relative.
 - Coverage: see the lane report. Line coverage of the new core modules was measured with `-C instrument-coverage` and `llvm-cov`, because `cargo llvm-cov` is not installed.
+
+## After the rulings (I-41 to I-52, `stage-i` aa2297e)
+
+- I-41 changed: `hedge.greeks.neutralise` instruments now use the fixed key sets of waves 2 and 3; a hedge with `quantity`, any other key, or a position without `quantity` is `E_INPUT` (`hedgegreeks_i-0020` passes).
+- I-42: no change (already `E_SCHEMA`; `hedgegreeks_i-0021` passes).
+- I-43 changed: relative zero-variance tests in `hedge.effectiveness` and `hedge.backtest.delta` (`hedgebt_i-0016` passes).
+- I-44 changed: `E_NOT_POSITIVE_DEFINITE` only below `-1e-12 S_00`; a hedged variance between that and 0 is returned as 0 (`hedgemv_i-0018` passes).
+- I-45: no change (`hedgeint_i-0019` passes). I-46: the feasibility tolerance is 1e-12 relative, inside the allowed 1e-9. I-47: already `E_SCHEMA` for a `null` optional key (CLI test `stage_i_null_keys_and_limits`). I-48, I-50: no change.
+- I-49 added: `E_LIMIT` (field `lot_sizes`) when a relaxed lot count exceeds `2^52`.
+- I-51 **not applied in this branch**: `conformance/runner/runner.py` on `stage-i` still has `CONTRACT = "1.0.0"` and stops on a mismatch, so a CLI at 1.11.0 alone fails every suite. The Rust change is one line (`CONTRACT` in `rust/crates/quantforge-cli/src/main.rs`), to land with the runner in the integration PR as I-51 says.
+- Each changed behaviour has a unit test (`stray_keys_are_input_errors`, `minvar_perfect_hedge_rounding_is_zero`, `huge_lot_counts_are_a_limit`, and the I-43 cases in `effectiveness_checks`).

@@ -345,6 +345,7 @@ fn option(kind: LegKind, strike: f64, expiry: f64) -> Leg {
         kind,
         strike: Some(strike),
         expiry: Some(expiry),
+        stray_keys: false,
     }
 }
 
@@ -352,6 +353,7 @@ const UNDERLYING: Leg = Leg {
     kind: LegKind::Underlying,
     strike: None,
     expiry: None,
+    stray_keys: false,
 };
 
 #[test]
@@ -446,6 +448,42 @@ fn greek_checks() {
         g(&MARKET, &book, &[call, call], &[Greek::Delta, Greek::Gamma]),
         "E_SINGULAR"
     );
+}
+
+#[test]
+fn stray_keys_are_input_errors() {
+    // I-41: a hedge with a `quantity`, or any key outside the fixed set.
+    let book = [(option(LegKind::Call, 100.0, 0.5), -1000.0)];
+    let stray = Leg {
+        stray_keys: true,
+        ..UNDERLYING
+    };
+    let r = greeks_neutralise(&MARKET, &book, &[stray], &[Greek::Delta]);
+    assert_eq!(code(r), "E_INPUT");
+    let r = greeks_neutralise(&MARKET, &[(stray, 1.0)], &[UNDERLYING], &[Greek::Delta]);
+    assert_eq!(code(r), "E_INPUT");
+}
+
+#[test]
+fn minvar_perfect_hedge_rounding_is_zero() {
+    // I-44: a hedged variance a hair below 0 is rounding; well below it is not PSD.
+    let cov = vec![vec![1.0, 1.0], vec![1.0, 1.0 + 1e-15]];
+    let r = minvar_ratio(MinVarInput::Covariance(&cov)).unwrap();
+    assert!(r.variance_after >= 0.0 && r.variance_after < 1e-14);
+    let bad = vec![vec![1.0, 1.0], vec![1.0, 0.999_999]];
+    assert_eq!(
+        code(minvar_ratio(MinVarInput::Covariance(&bad))),
+        "E_NOT_POSITIVE_DEFINITE"
+    );
+}
+
+#[test]
+fn huge_lot_counts_are_a_limit() {
+    // I-49: a relaxed lot count above 2^52.
+    let a = vec![vec![1.0]];
+    let r = integer_solve(&lots_problem(&a, &[-1e17], &[1.0], &[1.0]));
+    assert_eq!(code(r), "E_LIMIT");
+    assert!(integer_solve(&lots_problem(&a, &[-4e15], &[1.0], &[1.0])).is_ok());
 }
 
 #[test]
