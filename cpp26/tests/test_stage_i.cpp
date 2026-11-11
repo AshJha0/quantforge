@@ -770,7 +770,12 @@ TEST_CASE("I4b effectiveness: a perfect offset gives 1, -1, 1, 1; the I-31 domai
     CHECK(e.variance_reduction == 1.0);
     // Sums to 0 exactly, while left-to-right binary64 summation gives -1 (1 + 1e16 rounds to 1e16).
     CHECK(i_error([] { hg::effectiveness({1.0, 1e16, -1e16, -1.0}, {1.0, 2.0, 0.5, 3.0}); }) == "E_DOMAIN");
-    CHECK(i_error([] { hg::effectiveness({0.1, 0.2, -0.3}, {1.0, 2.0, 0.5}); }) == "ok");  // binary sum is 2^-55
+    // I-43: a sum within 1e-12 of sum |x| is zero (the binary sum here is 2^-55).
+    CHECK(i_error([] { hg::effectiveness({0.1, 0.2, -0.3}, {1.0, 2.0, 0.5}); }) == "E_DOMAIN");
+    CHECK(i_error([] { hg::effectiveness({0.1, 0.2, -0.29}, {1.0, 2.0, 0.5}); }) == "ok");
+    // I-43: a variance below 1e-20 times the other's is zero.
+    CHECK(i_error([] { hg::effectiveness({1.0, 2.0, 4.0}, {1.0, 1.0 + 1e-12, 1.0}); }) == "E_DOMAIN");
+    CHECK(i_error([] { hg::effectiveness({1.0, 2.0, 4.0}, {1.0, 1.0 + 1e-6, 1.0}); }) == "ok");
     CHECK(i_error([] { hg::effectiveness({0.1, 0.1, 0.1}, {1.0, 2.0, 0.5}); }) == "E_DOMAIN");
     CHECK(i_error([] { hg::effectiveness({0.1, 0.2, 0.4}, {1.0, 1.0, 1.0}); }) == "E_DOMAIN");
     CHECK(i_error([] { hg::effectiveness({0.1, 0.2}, {1.0, 2.0}); }) == "E_INPUT");
@@ -967,3 +972,38 @@ TEST_CASE("Stage I examples run through the CLI and give the outputs of their go
     }
 }
 #endif
+
+// ---- rulings after the builds (I-41 to I-52) ----
+
+TEST_CASE("I-44 minimum variance: a hedged variance a rounding step below 0 reads as 0; below -1e-12 S_00 it is an error") {
+    // S_00 - S_he^2 / S_hh = 1 - 1 / (1 - 1e-15), about -1e-15 S_00: rounding by I-44.
+    const hg::MinVarResult r = hg::min_variance({{1.0, 1.0}, {1.0, 1.0 - 1e-15}});
+    CHECK(r.variance_after == 0.0);
+    CHECK(r.effectiveness == 1.0);
+    CHECK(i_error([] { hg::min_variance({{1.0, 1.0}, {1.0, 1.0 - 1e-9}}); }) == "E_NOT_POSITIVE_DEFINITE");
+}
+
+TEST_CASE("I-41 Greek instruments have fixed key sets; I-49 lot counts above 2^52") {
+    const std::string head =
+        R"({"spot":100,"rate":0.03,"dividend_yield":0.01,"volatility":0.25,"targets":["DELTA"],"portfolio":[)";
+    const std::string book = R"({"instrument":"CALL","strike":100,"expiry_years":0.5,"quantity":-10}],"hedges":[)";
+    CHECK(i_code(i_case("hedge.greeks.neutralise", head + book + R"({"instrument":"UNDERLYING"}]})")) == "ok");
+    CHECK(i_code(i_case("hedge.greeks.neutralise", head + book + R"({"instrument":"UNDERLYING","quantity":1}]})")) ==
+          "E_INPUT");
+    CHECK(i_code(i_case("hedge.greeks.neutralise", head + book + R"({"instrument":"UNDERLYING","note":1}]})")) ==
+          "E_INPUT");
+    CHECK(i_code(i_case("hedge.greeks.neutralise",
+                        head + R"({"instrument":"CALL","strike":100,"expiry_years":0.5}],"hedges":[{"instrument":"UNDERLYING"}]})")) ==
+          "E_INPUT");  // a portfolio position without quantity
+    CHECK(i_code(i_case("hedge.greeks.neutralise",
+                        R"({"spot":100,"rate":0.03,"dividend_yield":0.01,"volatility":0.25,"targets":["THETA"],"portfolio":[)" + book +
+                            R"({"instrument":"UNDERLYING"}]})")) == "E_SCHEMA");  // I-42
+    hg::IntegerProblem p;
+    p.a = {{1.0}};
+    p.b = {-1e16};
+    p.weights = {1.0};
+    p.lot_sizes = {1.0};
+    CHECK(i_error([&] { hg::solve_integer(p); }) == "E_LIMIT");
+    p.b = {-1e15};
+    CHECK(i_error([&] { hg::solve_integer(p); }) == "ok");
+}

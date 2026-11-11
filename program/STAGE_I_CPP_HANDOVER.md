@@ -2,14 +2,31 @@
 
 From the C++26 session (branch `stage-i-lang-cpp`) to the spec lane and the coordinator. Append-only. Clean room: written from the specs, rulings and goldens only.
 
-## Status at the end of session 1 (2026-11-11, 21:46)
+## Status at the end of session 1 (2026-11-11, 22:15)
 
-Waves 1, 2, 3, 4a, 4b, 4c, 4d and 4e are built: 16 stage I operations, one commit per wave on `stage-i-lang-cpp` (not pushed).
+Waves 1, 2, 3, 4a, 4b, 4c, 4d and 4e are built (16 stage I operations), with one commit per wave on `stage-i-lang-cpp` (not pushed), plus the examples smoke test and the rulings I-41 to I-52 (below).
 
-- Conformance, full run on the final tree: 14,763 of 14,763, 0 failures, 0 not implemented. The 16 stage I suites: 271 of 271.
-- ctest: 292 test cases, 12,574 assertions, all passed (260 before stage I; 32 stage I test cases with 5,031 assertions). WERROR (GCC 16.2, `-DQF_WERROR=ON`) clean throughout.
-- Line coverage of the new code, gcov at `-O0`, unit tests plus the stage I conformance run: `hedging.cpp` 98.7% of 827 lines, `hedging_w2.cpp` 97.2% of 180, `hedging_w3.cpp` 97.7% of 86, `hedging_w4.cpp` 99.2% of 132, `ops_hedge.inc` 96.1% of 481.
+- Conformance, full run on the final tree (`stage-i` at `aa2297e` merged): 14,768 of 14,768, 0 failures, 0 not implemented. The 16 stage I suites: 276 of 276.
+- ctest: 294 test cases, 12,587 assertions, all passed (260 before stage I). WERROR (GCC 16.2, `-DQF_WERROR=ON`) clean throughout.
+- Line coverage of the new code before the rulings commit (gcov at `-O0`, unit tests plus the stage I conformance run): `hedging.cpp` 98.7% of 827 lines, `hedging_w2.cpp` 97.2% of 180, `hedging_w3.cpp` 97.7% of 86, `hedging_w4.cpp` 99.2% of 132, `ops_hedge.inc` 96.1% of 481. Not remeasured after the rulings commit, which removes more lines than it adds and has a unit test for each change.
 - Test files define no namespace-scope static objects (fixtures are functions).
+
+## Rulings after the builds (I-41 to I-52), C++ column
+
+| Ruling | C++ | Done |
+|---|---|---|
+| I-41 fixed key sets on Greek instruments | change: a hedge with `quantity`, any other key, or a portfolio position without `quantity` is `E_INPUT` | `hedgegreeks_i-0020` passes; unit test |
+| I-42 unknown Greek or correlation target | already `E_SCHEMA` | `hedgegreeks_i-0021` passes; unit test |
+| I-43 relative zero-variance and zero-sum tests | change: the compensated sum and the exact tests are replaced by the I-43 ratios | `hedgebt_i-0016` passes; unit tests on both sides of each ratio |
+| I-44 hedged-variance tolerance | change: the long-double workaround is gone; `E_NOT_POSITIVE_DEFINITE` only below `-1e-12 S_00`, otherwise clamped to 0 | `hedgemv_i-0018` passes; unit test on both sides |
+| I-45 instruments are columns of `a` | already so (`lot_sizes` length is `E_INPUT`) | `hedgeint_i-0019` passes |
+| I-46 feasibility tolerance up to 1e-9 | already within it (relative 1e-12 slack tests) | goldens pass |
+| I-47 `null` optional key is `E_SCHEMA` | already so; `hedge.select.solve` now also treats `null` for `eq_matrix`, `eq_rhs` or `singular` as `E_SCHEMA` | |
+| I-48 no `E_LIMIT` below 200 instruments | **open**, see below | |
+| I-49 `E_LIMIT` for lot counts above `2^52` | change: tested on the relaxed solution (was a `2^53` test inside the search) | unit test |
+| I-50 per-order `fills` keep the 100,000 array limit | already so (the general array limit applies to every array) | |
+| I-51 `contract_version` 1.11.0 | **not changed tonight**: the runner on `stage-i` still requires `1.0.0` (`runner.py` `CONTRACT`) and stops on a mismatch, so the change would stop the conformance gate. To move with the runner in the integration PR (`version_json` in `cpp26/src/cli/dispatch.cpp`) | |
+| I-52 tutorial imports | none | |
 
 ## Baseline (2026-11-11, before any change)
 
@@ -47,7 +64,7 @@ Built: the new optional inputs of `hedge.qp.solve` and `hedge.frontier.solve` (`
 
 ## Wave 4b, dynamic delta-hedge backtest and effectiveness
 
-Built: `hedge.backtest.delta`, `hedge.effectiveness` (`cpp26/src/core/hedging_w4.cpp`), the I-29 replay and one statistics routine for both. The hedge leg of each step is summed from its terms (`h dS`, interest, dividends), which equals `(Pi_{i+1} - Pi_i) - item_i` and is exactly 0 on a constant path without carry, so the I-31 test sees a zero variance there. The item sum for I-31 is compensated in extended precision.
+Built: `hedge.backtest.delta`, `hedge.effectiveness` (`cpp26/src/core/hedging_w4.cpp`), the I-29 replay and one statistics routine for both. The hedge leg of each step is summed from its terms (`h dS`, interest, dividends), which equals `(Pi_{i+1} - Pi_i) - item_i` and is exactly 0 on a constant path without carry, so the I-31 test sees a zero variance there. The item sum for I-31 is compensated in extended precision (both replaced by the I-43 relative tests after the rulings).
 
 - Conformance: `hedgebt_i` 15 of 15, `hedgeeff_i` 10 of 10. Full run: 14,726 of 14,726, 0 failures. ctest passed.
 - ctest: 3 new test cases (perfect offset gives 1, -1, 1, 1; an exactly-zero sum that naive summation misses; the constant-path replay of the corrected property test; self-financing and the check ladder). `tests/test_cli.cpp` expects 272 operations.
@@ -79,15 +96,12 @@ Built: the optional `half_spread` and `impact` of `hedge.backtest.delta` (`cpp26
 
 ## SPEC_QUESTIONS
 
-| # | Where | Question | What the C++ build does |
-|---|---|---|---|
-| C-I1 | `hedge.minvar.ratio`, check 4; `hedgemv_i-0004` | A perfect hedge has a hedged variance at rounding level (golden `2.31e-18`). In binary64 the difference `S_00 - S_he' S_hh^-1 S_he` can come out a few 1e-18 below zero, which check 4 turns into `E_NOT_POSITIVE_DEFINITE`, so the case depends on the rounding of each build. Should check 4 carry a tolerance (for example `-1e-12 S_00`), as the residual report's eigenvalue check does? | Computes the Cholesky and the difference in `long double` (x87, 64-bit mantissa) and keeps the exact rule. Passes the golden; not bent to it |
-| C-I2 | `hedge.integer.solve` | The spec does not say what happens when the search would need lot counts beyond `2^53` (huge `b` with small lot sizes). | `E_LIMIT` on `lot_sizes`. No golden reaches it |
+C-I1 (minimum-variance sign at rounding level) was answered by I-44, and C-I2 (lot counts beyond `2^53`) by I-49; both are applied. No question is open from this lane.
 
 ## Open
 
-- Wave 4a enumerates signs, `2^k` orthants for `k` instruments with a spread or margin term whose sign the bounds leave open. Above `k = 20` this build returns `E_LIMIT` (`max_sign_free_instruments`), while the spec allows 200 instruments. No golden reaches it. A sign-state active-set method (start from the smooth solution, flip a sign when a zero coordinate's subgradient test fails) would remove the cap.
-
+- **I-48 (release blocker for C++):** wave 4a still enumerates sign orthants, `2^k` QPs for `k` instruments with a spread or margin term whose sign the bounds leave open, and returns `E_LIMIT` above `k = 20`. I-48 forbids that limit below 200 instruments. Not replaced tonight: a sign-state active-set method (start from the smooth solution; at each zero coordinate apply the subgradient test with the active-set multipliers; flip a sign when it fails; the margin as one more linear row) needs its own property tests against the enumeration on small problems, and could not be finished and checked well in the time left. No golden reaches 20 such instruments.
+- I-51: `contract_version` stays `1.0.0` until the runner moves (see the rulings table).
 - `Q3b AAD ladder ... costs at most 5 prices (G-9)` (stage G, `tests/test_stage_g.cpp:515`) is a wall-clock ratio. It failed once tonight at 5.09 against 5.0 while other lanes were compiling, and passed when rerun alone (2.80 earlier in the evening). Not touched by stage I.
 - ASan and UBSan need WSL; not run tonight (no WSL by the coordinator's rule).
 - `cpp26/tests/gen_cli_cases.py` fails on main: it reads `expected.error_code` for every non-ok case, and the stage F `e1_*` cases with `"status": "any"` have none (first: `e1_bond-0004`). `tests/cli_cases.inc` was not regenerated, so the in-process golden test has no stage I cases; conformance covers them.

@@ -18,22 +18,6 @@ void domain_if(bool bad, const char* field, const std::string& why) {
     if (bad) throw Error("E_DOMAIN", std::string(field) + ": " + why, field);
 }
 
-// Sum with Neumaier compensation in extended precision, so a series that sums to zero in exact arithmetic is
-// seen as zero by the I-31 test.
-double exact_sum(const Vec& v) {
-    long double s = 0.0L, c = 0.0L;
-    for (const double x : v) {
-        const long double t = s + x;
-        c += std::fabs(s) >= std::fabs((long double)x) ? (s - t) + x : (x - t) + s;
-        s = t;
-    }
-    return double(s + c);
-}
-
-bool constant(const Vec& v) {
-    return std::ranges::all_of(v, [&](double x) { return x == v.front(); });
-}
-
 // Black-Scholes-Merton value and delta at time to expiry tau; at tau = 0 the payoff and no delta.
 struct Mark {
     double value, delta;
@@ -53,10 +37,13 @@ Mark mark(const BacktestOption& o, double s, double tau, double r, double q, dou
 Effectiveness effectiveness(const Vec& x, const Vec& y) {
     input_if(x.size() != y.size(), "hedge_changes", "length differs from item_changes");
     input_if(x.size() < 3, "item_changes", "needs at least 3 values");
-    const double sx = exact_sum(x), sy = exact_sum(y);
-    domain_if(sx == 0.0, "item_changes", "sum to zero (I-31)");
-    domain_if(constant(x), "item_changes", "zero sample variance (I-31)");
-    domain_if(constant(y), "hedge_changes", "zero sample variance (I-31)");
+    double sx = 0.0, sy = 0.0, ax = 0.0;
+    for (std::size_t i = 0; i < x.size(); ++i) {
+        sx += x[i];
+        sy += y[i];
+        ax += std::fabs(x[i]);
+    }
+    domain_if(std::fabs(sx) <= 1e-12 * ax, "item_changes", "sum to zero (I-31, I-43)");
     const double n = double(x.size()), mx = sx / n, my = sy / n;
     double vx = 0.0, vy = 0.0, cxy = 0.0, vs = 0.0;
     const double ms = (sx + sy) / n;
@@ -67,6 +54,9 @@ Effectiveness effectiveness(const Vec& x, const Vec& y) {
         cxy += dx * dy;
         vs += ds * ds;
     }
+    // I-43: relative zero-variance tests (the ratio of the sums of squares equals that of the variances).
+    domain_if(vx <= 1e-20 * vy, "item_changes", "zero sample variance (I-31, I-43)");
+    domain_if(vy <= 1e-20 * vx, "hedge_changes", "zero sample variance (I-31, I-43)");
     vx /= n - 1.0;
     vy /= n - 1.0;
     cxy /= n - 1.0;
@@ -120,8 +110,7 @@ DeltaBacktest backtest_delta(const BacktestOption& o, double quantity, double r,
         cash += interest + dividends;
         const double pi = quantity * out.option_values[i + 1] + out.shares[i] * spots[i + 1] + cash;
         item.push_back(quantity * (out.option_values[i + 1] - out.option_values[i]));
-        // hedge_i = (Pi_{i+1} - Pi_i) - item_i, summed from its terms: exactly 0 on a constant path without carry,
-        // where the difference of portfolio values would leave rounding noise in front of the I-31 test.
+        // hedge_i = (Pi_{i+1} - Pi_i) - item_i, summed from its terms (less rounding than the difference).
         hedge.push_back(out.shares[i] * (spots[i + 1] - spots[i]) + interest + dividends - paid);
         out.portfolio_values.push_back(pi);
         paid = 0.0;

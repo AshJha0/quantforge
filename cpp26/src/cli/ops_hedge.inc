@@ -171,24 +171,33 @@ void op_hedge_minvar_ratio(const In& in, Out& out) {
     out.key_real("effectiveness", r.effectiveness);
 }
 
-hedging::Position position_of(const In& r, bool with_quantity) {
+// A Greek-hedge instrument. Fixed key sets (I-41): instrument, quantity on the portfolio only, strike and
+// expiry_years; any other key, or a missing quantity, is E_INPUT, raised by the caller after the finite rule.
+// A missing or extra strike or expiry is the library's check 1, also E_INPUT.
+hedging::Position position_of(const In& r, bool with_quantity, bool& keys_ok) {
     hedging::Position p;
     p.instrument = r.choice<hedging::Instrument>("instrument", {{"CALL", hedging::Instrument::Call},
                                                                 {"PUT", hedging::Instrument::Put},
                                                                 {"UNDERLYING", hedging::Instrument::Underlying}});
+    for (const auto& [key, value] : r.raw().members)
+        if (key != "instrument" && key != "strike" && key != "expiry_years" && !(with_quantity && key == "quantity"))
+            keys_ok = false;
     if (present(r, "strike")) p.strike = r.real("strike");
     if (present(r, "expiry_years")) p.expiry_years = r.real("expiry_years");
-    if (with_quantity) p.quantity = r.real("quantity");
+    if (with_quantity) {
+        if (present(r, "quantity")) p.quantity = r.real("quantity");
+        else keys_ok = false;
+    }
     return p;
 }
 
-std::vector<hedging::Position> positions_of(const In& in, string_view key, bool with_quantity) {
+std::vector<hedging::Position> positions_of(const In& in, string_view key, bool with_quantity, bool& keys_ok) {
     const Value& a = in.need(key);
     if (a.kind != Kind::Array) schema(key, "expected an array");
     std::vector<hedging::Position> out;
     for (const Value& item : a.items) {
         if (item.kind != Kind::Object) schema(key, "expected an object");
-        out.push_back(position_of(In(item), with_quantity));
+        out.push_back(position_of(In(item), with_quantity, keys_ok));
     }
     return out;
 }
@@ -204,8 +213,9 @@ void write_greeks(Out& out, string_view key, const hedging::Greeks& g) {
 
 void op_hedge_greeks_neutralise(const In& in, Out& out) {
     const hedging::Market m{in.real("spot"), in.real("rate"), in.real("dividend_yield"), in.real("volatility")};
-    const std::vector<hedging::Position> book = positions_of(in, "portfolio", true);
-    const std::vector<hedging::Position> hedges = positions_of(in, "hedges", false);
+    bool book_keys = true, hedge_keys = true;
+    const std::vector<hedging::Position> book = positions_of(in, "portfolio", true, book_keys);
+    const std::vector<hedging::Position> hedges = positions_of(in, "hedges", false, hedge_keys);
     const Value& t = in.need("targets");
     if (t.kind != Kind::Array) schema("targets", "expected an array");
     std::vector<hedging::Greek> targets;
@@ -216,6 +226,8 @@ void op_hedge_greeks_neutralise(const In& in, Out& out) {
     limit_if(book.size() > max_positions, "portfolio");
     limit_if(hedges.size() > max_greek_hedges, "hedges");
     in.ready();
+    if (!book_keys) throw Error("E_INPUT", "portfolio: keys other than those of the instrument (I-41)", "portfolio");
+    if (!hedge_keys) throw Error("E_INPUT", "hedges: keys other than those of the instrument (I-41)", "hedges");
     const hedging::GreekHedge r = hedging::neutralise(m, book, hedges, targets);
     out.key_reals("quantities", r.quantities);
     write_greeks(out, "greeks_before", r.before);
@@ -526,7 +538,7 @@ void op_hedge_select_solve(const In& in, Out& out) {
     p.lower = bounds_of(in, "lower");
     p.upper = bounds_of(in, "upper");
     const long long k = in.integer("max_instruments");
-    const bool forbidden = in.raw().find("eq_matrix") || in.raw().find("eq_rhs") || in.raw().find("singular");
+    const bool forbidden = present(in, "eq_matrix") || present(in, "eq_rhs") || present(in, "singular");  // I-47
     limit_if(p.a.size() > max_factors, "a");
     limit_if(widest_row(p.a) > 20, "a");  // ruling I-35
     in.ready();

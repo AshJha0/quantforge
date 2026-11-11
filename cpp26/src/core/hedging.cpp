@@ -719,8 +719,6 @@ private:
         const double half = std::sqrt(room) / std::fabs(r_[i][i]);
         const double from = std::max(std::ceil(c - half), lo_[i]), to = std::min(std::floor(c + half), hi_[i]);
         if (!(from <= to)) return;
-        if (std::fabs(from) > 9.0e15 || std::fabs(to) > 9.0e15)
-            throw Error("E_LIMIT", "lot counts above 2^53 are not representable", "lot_sizes");
         for (double v = from; v <= to; v += 1.0) {
             lots_[i] = (long long)v;
             const double term = r_[i][i] * (v - c);
@@ -777,6 +775,8 @@ IntegerResult solve_integer(const IntegerProblem& p) {
     const Vec r_rel = residual_of(al, p.b, relaxed);
     IntegerResult out;
     out.continuous_objective = objective_of(r_rel, p.weights, p.ridge, relaxed);
+    for (const double v : relaxed)  // I-49: beyond 2^52 the integers are not all representable
+        if (std::fabs(v) > 4503599627370496.0) throw Error("E_LIMIT", "a lot count above 2^52", "lot_sizes");
     // Ellipsoid centre (the free minimiser) and Cholesky factor R = L^T.
     const Matrix l = cholesky_lower(q.h);
     Vec centre = cholesky_solve(l, q.c);
@@ -857,47 +857,47 @@ MinVarResult min_variance(const Matrix& cov) {
         for (std::size_t j = 0; j < i; ++j)
             input_if(std::fabs(cov[i][j] - cov[j][i]) > singular_threshold * biggest, "covariance", "not symmetric");
     domain_if(cov[0][0] <= 0.0, "covariance", "the position must have a positive variance");
-    // Cholesky of the hedge block in extended precision: the hedged variance is a difference of near-equal
-    // terms when the hedge is close to perfect, and its sign decides E_NOT_POSITIVE_DEFINITE.
-    using Real = long double;
     const std::size_t k = size - 1;
     double diag_max = 0.0;
     for (std::size_t i = 1; i <= k; ++i) diag_max = std::max(diag_max, cov[i][i]);
-    std::vector<std::vector<Real>> l(k, std::vector<Real>(k, 0.0L));
+    Matrix l(k, Vec(k, 0.0));
     for (std::size_t j = 0; j < k; ++j) {
-        Real d = cov[j + 1][j + 1];
+        double d = cov[j + 1][j + 1];
         for (std::size_t m = 0; m < j; ++m) d -= l[j][m] * l[j][m];
-        if (d <= Real(singular_threshold) * Real(diag_max))
+        if (d <= singular_threshold * diag_max)
             throw Error("E_SINGULAR", "the hedge instruments are linearly dependent", "covariance");
         l[j][j] = std::sqrt(d);
         for (std::size_t i = j + 1; i < k; ++i) {
-            Real s = cov[i + 1][j + 1];
+            double s = cov[i + 1][j + 1];
             for (std::size_t m = 0; m < j; ++m) s -= l[i][m] * l[j][m];
             l[i][j] = s / l[j][j];
         }
     }
     // w = L^{-1} S_he; hedge = -L^{-T} w; variance after = S_00 - |w|^2.
-    std::vector<Real> w(k);
-    Real explained = 0.0L;
+    Vec w(k);
+    double explained = 0.0;
     for (std::size_t i = 0; i < k; ++i) {
-        Real s = cov[i + 1][0];
+        double s = cov[i + 1][0];
         for (std::size_t m = 0; m < i; ++m) s -= l[i][m] * w[m];
         w[i] = s / l[i][i];
         explained += w[i] * w[i];
     }
-    std::vector<Real> h(k);
+    Vec h(k);
     for (std::size_t i = k; i-- > 0;) {
-        Real s = w[i];
+        double s = w[i];
         for (std::size_t m = i + 1; m < k; ++m) s -= l[m][i] * h[m];
         h[i] = s / l[i][i];
     }
-    const Real after = Real(cov[0][0]) - explained;
-    if (after < 0.0L)
+    // I-44: below -1e-12 S_00 the covariance is not positive semi-definite; between that and 0 the hedged
+    // variance is rounding and is returned as 0.
+    double after = cov[0][0] - explained;
+    if (after < -singular_threshold * cov[0][0])
         throw Error("E_NOT_POSITIVE_DEFINITE", "the hedged variance is below zero", "covariance");
+    after = std::max(after, 0.0);
     MinVarResult out;
-    for (const Real v : h) out.hedge.push_back(double(-v) + 0.0);
+    for (const double v : h) out.hedge.push_back(-v + 0.0);
     out.variance_before = cov[0][0];
-    out.variance_after = double(after);
+    out.variance_after = after;
     out.effectiveness = 1.0 - out.variance_after / out.variance_before;
     return out;
 }
