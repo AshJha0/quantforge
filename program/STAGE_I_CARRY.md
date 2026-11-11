@@ -37,7 +37,15 @@ Each survivor was applied in a scratch copy of `rust/` and the tests were run (`
 | `bonds.rs:554:31` `+` to `-` in `fit_nelson_siegel` | `fit_raises_the_damping_until_a_step_is_accepted` (new) |
 | `bonds.rs:567:50` `*` to `/` in `fit_nelson_siegel` | same |
 
-Open: a fresh CI mutation run of the four Rust modules once the runners hold (the jobs need more than 60 minutes; the shutdowns look like the hosted runner's limits, not the code).
+Why CI gave nothing: mutants such as `bonds.rs:58` `k += 1` to `k *= 1` or `-=` in `periods` (and `credit.rs:157` alike) make the schedule loop push to a `Vec` forever; the test eats the runner's memory and the runner agent dies (exit 143) before any result is written. Exotics, separately, needed 89 of its 90 minutes in stage F and has more mutants now. Fix on branch `ci-rust-mutation-fix` (commit 5a02b9a, cut from main, pushed on the owner's instruction, no PR): an 8 GiB address-space cap on every test binary (cargo target runner with `ulimit -v`) and on the golden check (`prlimit`, `QF_MUTANT_AS`), `timeout-minutes` 180, and a `paths` dispatch input that plans the run as a pull request touching those files. Verification run, dispatched 2026-11-11 20:20:
+
+```bash
+gh workflow run mutation-stage.yml -R AshJha0/quantforge --ref ci-rust-mutation-fix -f max=12 -f paths="rust/crates/quantforge-core/src/bonds.rs rust/crates/quantforge-core/src/credit.rs rust/crates/quantforge-core/src/credit_options.rs rust/crates/quantforge-core/src/exotics.rs"
+```
+
+Run 43095428122 ended `startup_failure` with no jobs after about 15 minutes queued; the workflow file parses and the same file started normally on the next dispatch, so the failure is taken as transient on GitHub's side. Re-dispatch (same command): run 43100924809. Its plan job succeeded and all four Rust jobs (bonds, credit, credit_options, exotics) started.
+
+At the deadline (2026-11-11 22:30): run 43100924809 still in progress, all four Rust jobs running (bonds past 70 minutes; before the fix it died at 6). Unverified: no result yet. Open: one green run of the four Rust jobs, then a PR for the branch.
 
 ## 3. expsim_g PFE regeneration
 
@@ -46,7 +54,7 @@ The generator `oracle/python/gen_stage_g_w4c.py` (function `golden`, unchanged) 
 - Started 2026-11-11 19:24 local, Windows process 18468 (`cmd.exe` running `run_regen.cmd`).
 - Folder: `C:\Users\ashis\AppData\Local\Temp\claude\615d9a8404c697b8\68854005-fd86-4dbf-8f7c-4acb00304417\scratchpad\pfe\`. Log `regen.log` (one line per case, `DONE` and `EXIT 0` at the end); partial results `regen_partial.jsonl`; full result `W4C_GOLDEN_RAW.regen.json`.
 - Check: `python compare.py` in that folder (it reads the partial file until the full one exists) prints the largest absolute difference and the largest difference over the runner limit `1e-4 + 1e-8 max(|a|, |b|)`.
-- At the deadline: see the closing line of this section.
+- At the deadline (22:26): 94 of 96 cases done (the forward job, 2 workers, process 18468, log `regen.log`; a reverse job from case 96 down, process 21784, log `regen_rev.log`, partials `regen_partial_rev.jsonl`; `compare.py` merges both). Cases 63 and 64 still running. Over the 94 cases (3988 values): largest |diff| 8.6e-5, largest |diff|/limit 9.2e-4, so far every value is well inside the limit. Both jobs left running; goldens not changed.
 - To finish: when `regen.log` ends in `EXIT 0`, run `compare.py`. If every difference is well inside the limit, copy `W4C_GOLDEN_RAW.regen.json` over `oracle/ore/W4C_GOLDEN_RAW.json`, run `cd oracle/python && uv run python -W ignore gen_stage_g_w4c.py suite` (needs the ORE outputs under `oracle/ore/run*/Output`, which are not in git) or, without them, patch only the values in `datasets/golden/stage_g/expsim_g.json`, then run the four language lanes on `expsim_g` before committing.
 
 ## 4. G-9 AAD timing (deferred)
