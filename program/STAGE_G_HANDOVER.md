@@ -138,7 +138,7 @@ Read: `specifications/04-pricing/short-rate-models.md`, sections "`rates.shortra
 
 ### G2d (suite `bermudan_g`, 15 cases)
 - New operation `rates.shortrate.bermudan_swaption`. Implement the seven-step scheme exactly: fully implicit, coefficients at the earlier time, linear-extrapolation boundaries substituted into the tridiagonal rows, exercise applied on arrival at each exercise time except at 0. Golden generator runs in about 11 seconds.
-- Property tests: one exercise date converges to your `rates.shortrate.swaption` price as the grid is refined (order about 1); a Bermudan price is at least the European price for its first exercise date.
+- Property tests: one exercise date converges to your `rates.shortrate.swaption` price as the grid is refined (order about 1); a Bermudan price is at least the scheme's own single-date price for its first exercise date on the same grid (amended by R5 M1 / G-28: not the Jamshidian price).
 
 ### Outside-oracle status after waves 2c and 2d
 Neither suite counts (G-17, G-18): the calibration objective and the pinned scheme are this platform's own, and QuantLib values are recorded as evidence only (`oracle/BERMUDAN_EVIDENCE_G.json`: QuantLib FD and tree within about 0.2% of the scheme at the default grid). **Stage G now stands at 133 of 245 = 54.3%, below the 60% floor.** The expectation that wave 2 would lift the share was wrong for these two slices. Candidates that would count: QuantLib-checkable closed forms still to be specified (Hull-White caps and floors as bond-option portfolios, G2++ European swaptions by `G2SwaptionEngine` if its integration can be set tight enough, CIR swaptions by Jamshidian), and ORE exposure profiles in wave 4.
@@ -186,7 +186,7 @@ Read: `specifications/04-pricing/short-rate-models.md`, sections "`rates.shortra
 
 ### G3 (suite `callable_g`, 12 cases)
 - New operation `rates.shortrate.callable_bond`: reuse your wave 2d stepper; at each coupon date cap by the call price (if callable) and then add the coupon.
-- Property tests: no call times converges to the straight bond at order about 1; a callable bond is never above the straight bond.
+- Property tests: no call times converges to the straight bond at order about 1; a callable bond is never above the scheme's own no-call bond on the same grid (amended by R5 M1 / G-28: not the exact straight bond).
 
 ## Final status, 2026-11-10 (supersedes the earlier status counts)
 
@@ -240,3 +240,6 @@ Read: `specifications/04-pricing/lmm.md`, section "Simulated LMM"; rulings G-25,
 
 ### H1, outside count (ruling G-27)
 Recounted against QuantLib's own `JamshidianSwaptionEngine` at 3e-7 relative: `swaption_g` 26/40 (was 33), `swaption_affine_g` 36/39, `exposure_g` 6/15 (was 7); the semi-annual cases cannot be written as whole-day QuantLib dates. **Honest stage G share: 250 of 405 = 61.7%.** Under the strictest reading (Rebonato `lmmswn_g` not counted): 214 of 405 = 52.8%; that reading is open for the owner (G-27).
+
+### M1, property tests (ruling G-28)
+Both tests restated against the scheme's own bounding value on the same grid (`short-rate-models.md`, "Property tests on the pinned scheme"). The failures were the first-order scheme bias: `callable_g-0007` +0.0093 over the exact straight bond, `bermudan_g-0007` 0.17% under Jamshidian. Language sessions: change these two property tests.

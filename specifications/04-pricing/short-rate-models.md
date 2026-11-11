@@ -124,6 +124,10 @@ Outputs: `price` (the sum) and `caplet_prices` (per period, in order; floorlets 
 
 Validation: three models x two schedules (semi-annual to 5 years, annual to 7 years) x cap and floor x strikes 3%, 4%, 5% (36 cases), 5 error cases. Values: 50-digit mpmath (CIR through the noncentral chi-square). Asserted: cap minus floor equals `notional sum (P(t_(i-1)) - (1 + K tau_i) P(t_i))` on all 18 pairs. Outside: QuantLib 1.44 `Vasicek`, `CoxIngersollRoss`, `HullWhite` `discountBondOption` per period, scaled and summed: 36 of 41 count. Wrong convention caught: a cap priced with bond calls.
 
+## Property tests on the pinned scheme (R5 M1, ruling G-28)
+
+Bounds that compare the scheme with a closed form must use the scheme's own value of the bounding product on the same grid, never the closed form, because the scheme's first-order bias (convergence tables) is larger than the optionality in edge cases. A Bermudan swaption is at least the scheme's single-date swaption with the same first exercise date and grid; it is **not** asserted against Jamshidian. `bermudan_g-0007` (one exercise date) is 23.9 (0.17%) below the Jamshidian value at its grid: that is the scheme bias, which shrinks at order about 1 as the grid is refined. A callable bond is at most the scheme's no-call bond on the same grid.
+
 ## `rates.shortrate.callable_bond` (stage G wave 2g)
 
 Issuer-callable fixed-rate bond on Hull-White, on the G-18 scheme (ruling G-21). Suite `stage_g/callable_g` (12 cases), generator `gen_stage_g_berm.py` slice `CALL`.
@@ -132,7 +136,7 @@ Inputs: `curve`, `mean_reversion`, `sigma`; `payment_times` (at least one, stric
 
 Scheme: the G-18 grid and step with `t_m` the last payment time and knots `0, T1, ..., Tn`. Start at `Tn` with `V = 1 + c tau_n`. After stepping back to each knot `Tk > 0`: first, if `Tk` is a call time, `V = min(V, call_price)` (the issuer calls the ex-coupon bond); then add the coupon, `V = V + c tau_k`. `price = notional x V` at the centre node at 0.
 
-Validation: three coupons x (seven annual calls from year 3, one call at year 5) on a 10-year bond; the straight-bond limit (no calls); a 2% call premium with high mean reversion and volatility; 4 error cases. Asserted: every price at most the straight bond (curve-discounted cash flows). Not counted as outside (G-18).
+Validation: three coupons x (seven annual calls from year 3, one call at year 5) on a 10-year bond; the straight-bond limit (no calls); a 2% call premium with high mean reversion and volatility; 4 error cases. Asserted: every price at most the scheme's own no-call price on the same grid (`callable_g-0007` family; the cap `min(V, call_price)` makes this monotone by construction). It is **not** asserted against the exact curve-discounted straight bond: the first-order scheme bias puts the no-call golden `callable_g-0007` at 104.48531 against the exact 104.47600 (+0.0093, inside the convergence table's errors), and a deep out-of-the-money call inherits the same bias (R5 M1). Not counted as outside (G-18).
 
 ## Convergence and limit cases (callable bond)
 
