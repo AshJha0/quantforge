@@ -494,7 +494,8 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** G2++ (`rates.g2pp.*`, wave 2b; QuantLib `G2` outside check, 30 of 38).
 - **Monitoring thresholds:** calibration error once calibration lands.
-- **Data lineage hash:** sha256 fbe20b94430ed2000f69313417c65374c6c1e6520ecc9c9b39d801e0df0020b2 (`shortrate_g`); daacb08fc52f87e3f32db1905b85e8bd2a50aa213d4d576e184620d20d5e8266 (`swaption_g`); b0630a25f4a701810eb1596c3fcdf7ab70736a6759973bc6771345576b7f1188 (`g2pp_g`); f2f683d408b844b83fa054864b36bf089491c6c6a277f701a1045c69d75c0a49 (`hwcal_g`); 3455c11ece1804fc729463fcad1ec8020f444233cfc7ab1a4c9e355125a22287 (`bermudan_g`); 0fda39dc4e71a228d3029a2879cebbdc3e314e915ac5560260e70cd03886728c (`capfloor_g`); f0f6e80f5740683fc4da985dd249517ea3184118b9829202369badf520fc1352 (`swaption_affine_g`); 235aa37b21ca8e23a2eb3bbc5da2b76501c82524ccd5e778ded7c6628eb1fddf (`callable_g`)
+- **Data lineage hash:** sha256 3defdc4d6df794b7deac5e9caaa70aa91845410365a9ff1342d88e014df2ea39 (`shortrate_g`); aee7b1b9e7f78a730de81a1578af139895ed1bf13f7462e347353b5064fce1ba (`swaption_g`); 71c1f5c30547898916e4d9271ecb602a8008c03cde1cf5279d73014a90753b2d (`g2pp_g`); f2f683d408b844b83fa054864b36bf089491c6c6a277f701a1045c69d75c0a49 (`hwcal_g`); bfb7a473ab04fac0d7c67e1ec50d08736c14d3b2be63a2a64492ee52c6e624af (`bermudan_g`); f444c1dddfe9d2faa43e4eff2b9870df184761531264a389d6f3e3c2b125a1bf (`capfloor_g`); f0f6e80f5740683fc4da985dd249517ea3184118b9829202369badf520fc1352 (`swaption_affine_g`); db24a20790d13d0e3bfe0b00e76f86c0d6f634a4b024d221ea63e7196ce5f923 (`callable_g`)
+- **Lineage regenerated 2026-11-11:** the hashes of shortrate_g, swaption_g, g2pp_g, bermudan_g, capfloor_g and callable_g were refreshed after later stage G commits (among them the R5 fixes 21237dc and the G-50 corrections f2243bd) appended or corrected cases; values are the SHA-256 of the committed files at `stage-g-int`.
 - **Retirement trigger:** a multi-factor or market model for the desk's products.
 - **Validation report:** `specifications/04-pricing/short-rate-models.md`.
 
@@ -506,7 +507,8 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** exact-date Monte Carlo.
 - **Monitoring thresholds:** BGK against MC beyond 3 SE on a desk sample.
-- **Data lineage hash:** sha256 51ed99b349c200ddbf85d89f49a20623683d1a9ce81437163d54944b1a4d95d3
+- **Data lineage hash:** sha256 482a63c90c04c1a63cf1841be39f194bcd11597df670d8927fac522d71e34f08
+- **Lineage regenerated 2026-11-11:** the hashes of barrier_g were refreshed after later stage G commits (among them the R5 fixes 21237dc and the G-50 corrections f2243bd) appended or corrected cases; values are the SHA-256 of the committed files at `stage-g-int`.
 - **Retirement trigger:** a PDE or MC barrier engine in the library.
 - **Validation report:** `specifications/04-pricing/exotics.md`, section "Stage G addition".
 
@@ -518,7 +520,8 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** closed-form Greeks where they exist.
 - **Monitoring thresholds:** MC Greek beyond 3 SE of a closed form on a desk sample.
-- **Data lineage hash:** sha256 8c17b12b1f1ded1c73f2b1850ec8605c564c2f5c449c0a7d00f5ca466ee2ddda
+- **Data lineage hash:** sha256 f166dba11c41869d3fce6bf2b1ccb1db29c49c024ae95c2a3e458e83d4a75be4
+- **Lineage regenerated 2026-11-11:** the hashes of mcgreeks_g were refreshed after later stage G commits (among them the R5 fixes 21237dc and the G-50 corrections f2243bd) appended or corrected cases; values are the SHA-256 of the committed files at `stage-g-int`.
 - **Retirement trigger:** AAD through the MC engine (Q3b) for smooth payoffs.
 - **Validation report:** `specifications/06-risk/mc-greeks.md`.
 
@@ -530,7 +533,8 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 1.
 - **Challenger:** the simulated exposure engine (next xVA wave) and ORE.
 - **Monitoring thresholds:** simulated EE beyond 3 SE of these values.
-- **Data lineage hash:** sha256 cf24a7e0571b5adb0c854b0dfce6b8f2a5848472e812afbc6d1f911e02227660
+- **Data lineage hash:** sha256 f3ddc91403fa738130721d6c29116a7e4fbfdc9ba43a0779d515949cdbdd36f2
+- **Lineage regenerated 2026-11-11:** the hashes of exposure_g were refreshed after later stage G commits (among them the R5 fixes 21237dc and the G-50 corrections f2243bd) appended or corrected cases; values are the SHA-256 of the committed files at `stage-g-int`.
 - **Retirement trigger:** the netting-set simulation engine.
 - **Validation report:** `specifications/06-risk/xva-exposure.md`.
 
