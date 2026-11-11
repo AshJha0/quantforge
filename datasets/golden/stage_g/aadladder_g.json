@@ -1,0 +1,428 @@
+{
+ "schema_version": "1.0",
+ "suite": "aadladder_g",
+ "spec": "specifications/06-risk/aad-core.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_q3b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "aadladder_g-0001",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.039462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 22697.809654563578,
+     "d_price_d_discount_factors": [
+      127.29305716006148,
+      191964.24101976422,
+      173815.83322504009,
+      147510.2115088347,
+      -233481.50369345793,
+      -343472.6318262545,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -52528.10050842526,
+     "d_price_d_sigma": 2269594.6079778266
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "reference-scheme-float64",
+    "richardson-two-pairs"
+   ],
+   "tags": [
+    "aad",
+    "bermudan",
+    "q3b",
+    "synthetic"
+   ],
+   "description": "ladder of bermudan_g-0002 on nx=101, 50 steps a year",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9); price at 1e-9 relative"
+   }
+  },
+  {
+   "case_id": "aadladder_g-0002",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.044462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14530.6397544942,
+     "d_price_d_discount_factors": [
+      81.57482088869519,
+      87159.13738192833,
+      142000.07656277038,
+      155222.40724830705,
+      -153708.52716090213,
+      -278537.8743307765,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -51414.55607905905,
+     "d_price_d_sigma": 2132091.2093621395
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "reference-scheme-float64",
+    "richardson-two-pairs"
+   ],
+   "tags": [
+    "aad",
+    "bermudan",
+    "q3b",
+    "synthetic"
+   ],
+   "description": "ladder of bermudan_g-0003 on nx=101, 50 steps a year",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9); price at 1e-9 relative"
+   }
+  },
+  {
+   "case_id": "aadladder_g-0003",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.034462,
+    "swaption_type": "RECEIVER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 14012.653089249206,
+     "d_price_d_discount_factors": [
+      78.76602360886467,
+      -88799.57739265116,
+      -146742.28622846652,
+      -124678.88720156101,
+      158329.92284774798,
+      283212.4412177211,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "d_price_d_mean_reversion": -51282.950747554416,
+     "d_price_d_sigma": 2085099.9585081805
+    }
+   },
+   "tolerance_class": "aad_sensitivity",
+   "verified_by": [
+    "reference-scheme-float64",
+    "richardson-two-pairs"
+   ],
+   "tags": [
+    "aad",
+    "bermudan",
+    "q3b",
+    "synthetic"
+   ],
+   "description": "ladder of bermudan_g-0004 on nx=101, 50 steps a year",
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-08,
+    "reason": "Q3a rule per unit notional (G-9); price at 1e-9 relative"
+   }
+  },
+  {
+   "case_id": "aadladder_g-0004",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.0,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.034462,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "aad",
+    "synthetic"
+   ],
+   "description": "sigma = 0"
+  },
+  {
+   "case_id": "aadladder_g-0005",
+   "operation": "rates.shortrate.bermudan_ladder",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "grid": {
+     "nx": 101,
+     "steps_per_year": 50,
+     "width": 6.0
+    },
+    "fixed_rate": 0.034462,
+    "swaption_type": "PAYER",
+    "exercise_times": []
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "aad",
+    "synthetic"
+   ],
+   "description": "no exercise dates"
+  }
+ ]
+}
