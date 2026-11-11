@@ -298,6 +298,9 @@ fn stage_i_above(op: &str, i: &Json) -> bool {
         "hedge.residual.report" => over("a", 1_000) || columns_over(200),
         "hedge.minvar.ratio" => over("covariance", 201) || over("hedge_changes", 200),
         "hedge.greeks.neutralise" => over("portfolio", 1_000) || over("hedges", 3),
+        // Ruling I-19.
+        "hedge.credit.cds" => over("book", 1_000) || over("hedges", 50),
+        "hedge.correlation.neutralise" => over("book", 1_000) || over("hedges", 5),
         _ => false,
     }
 }

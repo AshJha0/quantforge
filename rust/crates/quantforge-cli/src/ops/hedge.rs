@@ -1,9 +1,16 @@
 //! `hedge.*` operations: read the inputs, call the library, shape the outputs.
+use super::credit::{credit_discount, hazard_input};
+use super::eq::items;
+use super::rates::curve_input;
 use super::{Outcome, plain};
 use crate::input::Inputs;
+use quantforge_core::credit::{CdsTrade, Hazard};
 use quantforge_core::error::Result;
 use quantforge_core::error::err;
 use quantforge_core::hedge;
+use quantforge_core::hedge_cross::{
+    self as hx, CorrKind, CorrLeg, CorrMarket, CorrTarget, CreditMarket, CreditRisk,
+};
 use quantforge_core::hedge_solvers::{
     self as hs, Greek, IntegerProblem, Leg, LegKind, MinVarInput, QpProblem, Singular,
 };
@@ -88,6 +95,68 @@ fn leg(i: &Inputs, k: &str, v: &Json, with_quantity: bool) -> Result<(Leg, f64)>
         },
         quantity,
     ))
+}
+
+/// A `hedge.correlation.neutralise` instrument: its kind and every other key as a number. The
+/// key set is checked by the library (`E_INPUT`); a non-number is `E_SCHEMA`.
+fn corr_leg(i: &Inputs, k: &str, v: &Json, in_book: bool) -> Result<(CorrLeg, f64)> {
+    let Json::Obj(keys) = v else {
+        return i.fail(k, "expected objects");
+    };
+    let kind = match v.get("instrument").and_then(Json::as_str) {
+        Some("EXCHANGE") => CorrKind::Exchange,
+        Some("CALL_1") => CorrKind::Call1,
+        Some("PUT_1") => CorrKind::Put1,
+        Some("CALL_2") => CorrKind::Call2,
+        Some("PUT_2") => CorrKind::Put2,
+        Some("UNDERLYING_1") => CorrKind::Underlying1,
+        Some("UNDERLYING_2") => CorrKind::Underlying2,
+        _ => return i.fail(k, "unknown instrument"),
+    };
+    let mut fields = Vec::new();
+    let mut quantity = None;
+    for (name, x) in keys {
+        if name == "instrument" {
+            continue;
+        }
+        let Some(n) = x.as_f64() else {
+            return i.fail(k, "expected a number");
+        };
+        if in_book && name == "quantity" {
+            quantity = Some(n);
+        } else {
+            fields.push((name.clone(), n));
+        }
+    }
+    // A book position without `quantity` breaks the key set, like any missing key.
+    if in_book && quantity.is_none() {
+        fields.push(("quantity".to_string(), 1.0));
+    }
+    Ok((CorrLeg { kind, fields }, quantity.unwrap_or(0.0)))
+}
+
+fn corr_greeks(g: [f64; 5]) -> Json {
+    obj([
+        ("delta_1", g[0].into()),
+        ("delta_2", g[1].into()),
+        ("vega_1", g[2].into()),
+        ("vega_2", g[3].into()),
+        ("correlation01", g[4].into()),
+    ])
+}
+
+fn credit_risk(r: &CreditRisk, with_pv: bool) -> Json {
+    let (cs01, jtd, buckets) = (r.cs01.into(), r.jtd.into(), r.buckets.clone().into());
+    if with_pv {
+        obj([
+            ("pv", r.pv.into()),
+            ("cs01", cs01),
+            ("jtd", jtd),
+            ("buckets", buckets),
+        ])
+    } else {
+        obj([("cs01", cs01), ("jtd", jtd), ("buckets", buckets)])
+    }
 }
 
 fn greeks_obj(g: [f64; 3]) -> Json {
@@ -237,6 +306,91 @@ super::registry! {
                 ("contracts", r.contracts.into()),
                 ("contracts_held", r.contracts_held.into()),
                 ("beta_after", r.beta_after.into()),
+            ]))
+        },
+        "hedge.credit.cds" => {
+            let (t, d) = (i.date("trade_date")?, curve_input(i, "discount")?);
+            let h = hazard_input(i, "hazard")?;
+            let r = i.f64("recovery")?;
+            let mut book = Vec::new();
+            for x in items(i, "book")? {
+                book.push(CdsTrade {
+                    maturity: x.date("maturity")?,
+                    coupon: x.f64("coupon")?,
+                    notional: x.f64("notional")?,
+                    buy: match x.str("side")? {
+                        "BUY_PROTECTION" => true,
+                        "SELL_PROTECTION" => false,
+                        _ => return x.fail("side", "unknown side"),
+                    },
+                });
+            }
+            let mut hedges = Vec::new();
+            for x in items(i, "hedges")? {
+                hedges.push((x.date("maturity")?, x.f64("coupon")?));
+            }
+            let targets = i
+                .array("targets")?
+                .iter()
+                .map(|v| v.as_str().map_or_else(|| i.fail("targets", "expected strings"), Ok))
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let (curve, pillars) = credit_discount(&d)?;
+            let hazard = Hazard::new(h.0, &h.1)?;
+            let market = CreditMarket {
+                trade_date: t,
+                discount: &curve,
+                discount_pillars: &pillars,
+                hazard: &hazard,
+                recovery: r,
+            };
+            let s = hx::credit_hedge(&market, &book, &hedges, &targets)?;
+            plain(obj([
+                ("notionals", s.notionals.into()),
+                ("book", credit_risk(&s.book, true)),
+                ("after", credit_risk(&s.after, false)),
+                ("hedge_upfront", s.hedge_upfront.into()),
+            ]))
+        },
+        "hedge.correlation.neutralise" => {
+            let market = CorrMarket {
+                spot1: i.f64("spot1")?,
+                spot2: i.f64("spot2")?,
+                rate: i.f64("rate")?,
+                yield1: i.f64("yield1")?,
+                yield2: i.f64("yield2")?,
+                vol1: i.f64("vol1")?,
+                vol2: i.f64("vol2")?,
+                correlation: i.f64("correlation")?,
+            };
+            let book = i
+                .array("book")?
+                .iter()
+                .map(|v| corr_leg(i, "book", v, true))
+                .collect::<Result<Vec<_>>>()?;
+            let hedges = i
+                .array("hedges")?
+                .iter()
+                .map(|v| corr_leg(i, "hedges", v, false).map(|l| l.0))
+                .collect::<Result<Vec<_>>>()?;
+            let targets = i
+                .array("targets")?
+                .iter()
+                .map(|t| match t.as_str() {
+                    Some("DELTA_1") => Ok(CorrTarget::Delta1),
+                    Some("DELTA_2") => Ok(CorrTarget::Delta2),
+                    Some("VEGA_1") => Ok(CorrTarget::Vega1),
+                    Some("VEGA_2") => Ok(CorrTarget::Vega2),
+                    Some("CORRELATION") => Ok(CorrTarget::Correlation),
+                    _ => i.fail("targets", "unknown target"),
+                })
+                .collect::<Result<Vec<_>>>()?;
+            i.gate()?;
+            let r = hx::correlation_hedge(&market, &book, &hedges, &targets)?;
+            plain(obj([
+                ("quantities", r.quantities.into()),
+                ("greeks_before", corr_greeks(r.before)),
+                ("greeks_after", corr_greeks(r.after)),
             ]))
         },
         "hedge.residual.report" => {
