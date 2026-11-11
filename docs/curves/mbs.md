@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-Prepayment speeds by month and the resulting cash flows. Stage D, target v0.4.
+Prepayment speeds by month and the resulting cash flows. Stage D.
 
 ## Runs
 
@@ -52,4 +52,4 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 |---|---|
 | mbs.cashflows: analytic, psa-standard | 3 |
 
-Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.

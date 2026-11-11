@@ -6,7 +6,7 @@ Generated on 2026-11-07 from commit `8dddd58`, by Java 0.4.0 (JDK 25.0.5+8-LTS),
 
 ## What it is
 
-Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike. The conventions are stylised: a synthetic term index, no fixing lag and an annual 30/360 fixed leg (ruling R1-5). Stage D, target v0.4.
+Cap volatilities by strike and expiry, and swaption volatilities by expiry, tenor and strike. The conventions are stylised: a synthetic term index, no fixing lag and an annual 30/360 fixed leg (ruling R1-5). Stage D.
 
 ## Runs
 
@@ -59,4 +59,4 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 | rates.cap.price: independent-replay, quantlib-1.44 | 12 |
 | rates.swaption.price: independent-replay, quantlib-1.44 | 10 |
 
-Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the stage D specs are in `specifications/`.
+Limits: one input per operation, synthetic unless labelled real; charts plot output index, not calendar time; the specs are in `specifications/`.

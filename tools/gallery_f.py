@@ -109,7 +109,7 @@ def page(d, table, lines, status_block, langs):
 
 ## What it is
 
-Between quoted dates a curve has to be filled in, and the method decides what forward rate a trader sees on any day in between. This page takes one set of 12 SOFR pillar discount factors and asks each method for the instantaneous forward rate along the curve. The discount factors at the pillars are the same in every method; only the space between them changes. Stage F, target v0.6.0 (`specifications/02-curves/curve-framework.md`, section "Stage F: pluggable interpolation").
+Between quoted dates a curve has to be filled in, and the method decides what forward rate a trader sees on any day in between. This page takes one set of 12 SOFR pillar discount factors and asks each method for the instantaneous forward rate along the curve. The discount factors at the pillars are the same in every method; only the space between them changes. Stage F, released in v0.6.0 (`specifications/02-curves/curve-framework.md`, section "Stage F: pluggable interpolation").
 
 What to look for: log-linear in `D` gives flat forwards that jump at every pillar. Monotone convex (Hagan and West) and the monotonic log cubic give continuous forwards. The tension spline sits between a cubic spline and log-linear as its tension moves from 0 to infinity. The hybrid is stepwise up to its `step_end` and smooth behind it.
 
