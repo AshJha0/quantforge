@@ -9,6 +9,7 @@ From the C++26 session (branch `stage-i-lang-cpp`) to the spec lane and the coor
 - I-51: `contract_version` is 1.11.0, with the runner at `CONTRACT = "1.11.0"`.
 - I-53: `hedge.select.solve` returns `E_LIMIT` (`max_instruments`) above 100,000 candidate subsets, with the other size limits.
 - `tests/gen_cli_cases.py` skips cases with `"status": "any"` (they carry no error code), and `tests/cli_cases.inc` is regenerated: 976 cases over 274 operations, so the in-process golden test now covers stage I.
+- Coverage remeasured on the final code (gcov at `-O0`, the 36 stage I test cases plus the 443 stage I conformance cases): `hedging.cpp` 98.2% of 931 lines, `hedging_w2.cpp` 97.2% of 180, `hedging_w3.cpp` 97.7% of 86, `hedging_w4.cpp` 99.2% of 127, `ops_hedge.inc` 96.2% of 495.
 - Wave 5 (outside-checked value cases of existing operations) and I-54 (`hedgecost_i-0023`): run as part of the full gate; no code change was needed for them.
 
 ## Status at the end of session 1 (2026-11-11, 22:15)
