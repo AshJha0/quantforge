@@ -106,6 +106,7 @@ Normative for stage G (v0.7): rates models and xVA, plus plan items Q3b, Q9, A5 
 | G-44 | Wrong-way risk | Hull-White (2012) hazard `exp(a(t) + b V(t))`, `a(t)` fitted bucket by bucket to the survival curve on the given paths |
 | G-45 | E1 for the stage G operations | `gen_stage_f_e1.py G` writes `datasets/golden/stage_g_e1/e1g_*.json` (NaN, +inf, -inf and negative zero on every Real leaf of each operation's smallest ok case; rules F-1 to F-3). E1 suites are robustness checks and stay outside the G-4 denominator, as the stage F E1 suites stayed outside the stage F share. **Confirmed by the coordinator 2026-11-11** |
 | G-46 | Stage F carry-over F4 tools | `risk.stress.reverse`, `risk.limits.check`, `risk.concentration.measures`, `risk.var.liquidity_adjusted`, `risk.vol.horizon` as `06-risk/portfolio-risk-tools.md`; suite in `stage_f/` (counts toward stage F, not stage G); F4 model-risk reserve is Q9 part 2 |
+| G-47 | Stage F carry-over F3 sensitivities | `risk.sens.inflation01` (ZCIS, analytic and one-sided bump), `risk.sens.dividend_borrow` (equal sensitivities to dividend yield and borrow cost), `risk.sens.correlation` (Margrabe); per 1 bp, 1 bp and 1 point. Suite in `stage_f/`; 9 of 18 count against QuantLib (`oracle/OUTSIDE_F3B.json`), raising stage F |
 
 ## Fixed before later waves (plan 12.10 rule: no parameter changes after results are seen)
 

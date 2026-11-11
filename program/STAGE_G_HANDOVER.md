@@ -289,3 +289,7 @@ Ruling G-45. 1,026 cases over all 20 stage G operations in `datasets/golden/stag
 ## Stage F carry-over wave 2b, part 3 READY (2026-11-11): F4 portfolio-risk tools
 
 Read: `specifications/06-risk/portfolio-risk-tools.md`; ruling G-46. Five operations, suite `stage_f/risk_f4b` (25 cases: 16 values, 9 errors). Outside: none. Stage G share unchanged (stage F suite). Still not done in wave 2b: F3 (inflation01, dividend and borrow, correlation sensitivities) and the FRTB vega, curvature and other risk classes (these need the MAR21 weight tables read from the BIS text, not available in this session).
+
+## Stage F carry-over wave 2b, part 4 READY (2026-11-11): F3 sensitivities
+
+Read: `specifications/06-risk/f3-sensitivities.md`; ruling G-47. Three operations, suite `stage_f/risk_f3b` (18 cases, 12 values, 6 errors); 9 count against QuantLib. G-45 confirmed by the coordinator (E1 outside the floor denominator).

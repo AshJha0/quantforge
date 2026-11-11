@@ -5446,6 +5446,117 @@
     "value_start"
    ]
   },
+  "risk.sens.correlation": {
+   "spec": "specifications/06-risk/f3-sensitivities.md",
+   "rust": "quantforge::risk::sens_correlation",
+   "python": "quantforge.risk.sens_correlation",
+   "java": "Risk.sensCorrelation",
+   "cpp": "qf::risk::sens_correlation",
+   "inputs": {
+    "correlation": {
+     "java": "correlation"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "quantity1": {
+     "java": "quantity1"
+    },
+    "quantity2": {
+     "java": "quantity2"
+    },
+    "spot1": {
+     "java": "spot1"
+    },
+    "spot2": {
+     "java": "spot2"
+    },
+    "vol1": {
+     "java": "vol1"
+    },
+    "vol2": {
+     "java": "vol2"
+    },
+    "yield1": {
+     "java": "yield1"
+    },
+    "yield2": {
+     "java": "yield2"
+    }
+   },
+   "outputs": [
+    "correlation01",
+    "price",
+    "spread_vol"
+   ]
+  },
+  "risk.sens.dividend_borrow": {
+   "spec": "specifications/06-risk/f3-sensitivities.md",
+   "rust": "quantforge::risk::sens_dividend_borrow",
+   "python": "quantforge.risk.sens_dividend_borrow",
+   "java": "Risk.sensDividendBorrow",
+   "cpp": "qf::risk::sens_dividend_borrow",
+   "inputs": {
+    "borrow_rate": {
+     "java": "borrowRate"
+    },
+    "dividend_yield": {
+     "java": "dividendYield"
+    },
+    "expiry_years": {
+     "java": "expiryYears"
+    },
+    "option_type": {
+     "java": "optionType"
+    },
+    "rate": {
+     "java": "rate"
+    },
+    "spot": {
+     "java": "spot"
+    },
+    "strike": {
+     "java": "strike"
+    },
+    "vol": {
+     "java": "vol"
+    }
+   },
+   "outputs": [
+    "borrow01",
+    "dividend01",
+    "price"
+   ]
+  },
+  "risk.sens.inflation01": {
+   "spec": "specifications/06-risk/f3-sensitivities.md",
+   "rust": "quantforge::risk::sens_inflation01",
+   "python": "quantforge.risk.sens_inflation01",
+   "java": "Risk.sensInflation01",
+   "cpp": "qf::risk::sens_inflation01",
+   "inputs": {
+    "discount_factor": {
+     "java": "discountFactor"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "market_rate": {
+     "java": "marketRate"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "years": {
+     "java": "years"
+    }
+   },
+   "outputs": [
+    "inflation01",
+    "inflation01_bump",
+    "pv"
+   ]
+  },
   "risk.stress.reverse": {
    "spec": "specifications/06-risk/portfolio-risk-tools.md",
    "rust": "quantforge::risk::stress_reverse",

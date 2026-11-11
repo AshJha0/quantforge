@@ -1,0 +1,631 @@
+{
+ "schema_version": "1.0",
+ "suite": "risk_f3b",
+ "spec": "specifications/06-risk/f3-sensitivities.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_f_f3b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "risk_f3b-0001",
+   "operation": "risk.sens.inflation01",
+   "inputs": {
+    "notional": 10000000.0,
+    "years": 10,
+    "fixed_rate": 0.025,
+    "market_rate": 0.027,
+    "discount_factor": 0.75
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 188982.87723402766,
+     "inflation01": 9532.24630838044,
+     "inflation01_bump": 9536.424131969165
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "bump-1bp"
+   ],
+   "tags": [
+    "f3",
+    "inflation01",
+    "synthetic"
+   ],
+   "description": "10y ZCIS, receive inflation",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-12,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0002",
+   "operation": "risk.sens.inflation01",
+   "inputs": {
+    "notional": 10000000.0,
+    "years": 1,
+    "fixed_rate": 0.025,
+    "market_rate": 0.025,
+    "discount_factor": 0.75
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 0.0,
+     "inflation01": 750.0,
+     "inflation01_bump": 750.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "bump-1bp"
+   ],
+   "tags": [
+    "f3",
+    "inflation01",
+    "synthetic"
+   ],
+   "description": "1y at the money: pv 0",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-12,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0003",
+   "operation": "risk.sens.inflation01",
+   "inputs": {
+    "notional": 10000000.0,
+    "years": 30,
+    "fixed_rate": 0.025,
+    "market_rate": 0.03,
+    "discount_factor": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "pv": 1318779.568431475,
+     "inflation01": 28278.786072112547,
+     "inflation01_bump": 28318.632111056322
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "bump-1bp"
+   ],
+   "tags": [
+    "f3",
+    "inflation01",
+    "synthetic"
+   ],
+   "description": "30y",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-12,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0004",
+   "operation": "risk.sens.inflation01",
+   "inputs": {
+    "notional": 10000000.0,
+    "years": 10,
+    "fixed_rate": 0.025,
+    "market_rate": 0.027,
+    "discount_factor": 0.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f3",
+    "synthetic"
+   ],
+   "description": "discount factor 0"
+  },
+  {
+   "case_id": "risk_f3b-0005",
+   "operation": "risk.sens.inflation01",
+   "inputs": {
+    "notional": 10000000.0,
+    "years": 10,
+    "fixed_rate": 0.025,
+    "market_rate": -1.0,
+    "discount_factor": 0.75
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f3",
+    "synthetic"
+   ],
+   "description": "1 + z <= 0"
+  },
+  {
+   "case_id": "risk_f3b-0006",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": 0.25,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.92298654478512,
+     "dividend01": -0.0054387627076025085,
+     "borrow01": -0.0054387627076025085
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "f3",
+    "dividend_borrow",
+    "synthetic"
+   ],
+   "description": "ATM call",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0007",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": 0.25,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 9.43654869680267,
+     "dividend01": 0.004314336412680818,
+     "borrow01": 0.004314336412680818
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "f3",
+    "dividend_borrow",
+    "synthetic"
+   ],
+   "description": "ATM put",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0008",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 120.0,
+    "expiry_years": 2.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": 0.25,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 7.336022521624448,
+     "dividend01": -0.00719212958136574,
+     "borrow01": -0.00719212958136574
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "f3",
+    "dividend_borrow",
+    "synthetic"
+   ],
+   "description": "OTM 2y call",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0009",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.0,
+    "vol": 0.25,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10.197535275462172,
+     "dividend01": -0.005543298041121017,
+     "borrow01": -0.005543298041121017
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "f3",
+    "dividend_borrow",
+    "synthetic"
+   ],
+   "description": "no borrow",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0010",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 80.0,
+    "expiry_years": 0.6,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": 0.25,
+    "option_type": "PUT"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 1.017494515101777,
+     "dividend01": 0.0006088164280364978,
+     "borrow01": 0.0006088164280364978
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "f3",
+    "dividend_borrow",
+    "synthetic"
+   ],
+   "description": "OTM put 0.6y (219 days)",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0011",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": 0.0,
+    "option_type": "CALL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f3",
+    "synthetic"
+   ],
+   "description": "vol 0"
+  },
+  {
+   "case_id": "risk_f3b-0012",
+   "operation": "risk.sens.dividend_borrow",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.03,
+    "dividend_yield": 0.02,
+    "borrow_rate": 0.005,
+    "vol": 0.25,
+    "option_type": "DIGITAL"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f3",
+    "synthetic"
+   ],
+   "description": "unknown option_type"
+  },
+  {
+   "case_id": "risk_f3b-0013",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "quantity1": 1.0,
+    "quantity2": 1.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.3,
+    "vol2": 0.25,
+    "correlation": 0.5,
+    "expiry_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 13.832385744105824,
+     "correlation01": -0.09975490692513424,
+     "spread_vol": 0.2783882181415011
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-bump"
+   ],
+   "tags": [
+    "f3",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "rho 0.5",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0014",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "quantity1": 1.0,
+    "quantity2": 1.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.3,
+    "vol2": 0.25,
+    "correlation": -0.3,
+    "expiry_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 19.992843992828085,
+     "correlation01": -0.0624716417884482,
+     "spread_vol": 0.44440972086577946
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-bump"
+   ],
+   "tags": [
+    "f3",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "rho -0.3",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0015",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "quantity1": 1.0,
+    "quantity2": 1.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.3,
+    "vol2": 0.25,
+    "correlation": 0.9,
+    "expiry_years": 2.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 10.930509156804767,
+     "correlation01": -0.2801340501765232,
+     "spread_vol": 0.1322875655532295
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-bump"
+   ],
+   "tags": [
+    "f3",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "rho 0.9, 2y",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0016",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 50.0,
+    "quantity1": 1.0,
+    "quantity2": 2.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.3,
+    "vol2": 0.25,
+    "correlation": 0.5,
+    "expiry_years": 1.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 11.405192099415254,
+     "correlation01": -0.10478971108031414,
+     "spread_vol": 0.2783882181415011
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44-bump"
+   ],
+   "tags": [
+    "f3",
+    "correlation",
+    "synthetic"
+   ],
+   "description": "quantities 1 and 2",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-09,
+    "reason": "closed form"
+   }
+  },
+  {
+   "case_id": "risk_f3b-0017",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "quantity1": 1.0,
+    "quantity2": 1.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.25,
+    "vol2": 0.25,
+    "correlation": 1.0,
+    "expiry_years": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f3",
+    "synthetic"
+   ],
+   "description": "rho 1 with equal vols: spread vol 0"
+  },
+  {
+   "case_id": "risk_f3b-0018",
+   "operation": "risk.sens.correlation",
+   "inputs": {
+    "spot1": 100.0,
+    "spot2": 95.0,
+    "quantity1": 1.0,
+    "quantity2": 1.0,
+    "yield1": 0.01,
+    "yield2": 0.02,
+    "vol1": 0.3,
+    "vol2": 0.25,
+    "correlation": 1.2,
+    "expiry_years": 1.0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "f3",
+    "synthetic"
+   ],
+   "description": "rho above 1"
+  }
+ ]
+}
