@@ -269,3 +269,7 @@ Read: `specifications/06-risk/model-reserve.md`; ruling G-36. New operation `ris
 
 ## Answers to G-J1 to G-J3 and a golden fix (ruling G-38)
 `capfloor_g-0040` fixed (strike -1.0, so `1 + K tau = 0`, `E_DOMAIN`): all builds rerun that case. G-J1: negative `start_years` is `E_DOMAIN` after `side`, before `payment_times`. G-J2: the Java method is acceptable. `aadladder_g` (wave 3d) is READY (section above).
+
+## A5 READY (2026-11-11): surrogate spec and acceptance harness
+
+Read (research lane only; language sessions have nothing to build): `specifications/11-research/a5-surrogate.md`; rulings G-11, G-37. Harness `oracle/python/a5_acceptance.py`; self-test passes and is non-vacuous (`oracle/A5_HARNESS_SELFTEST.json`). No surrogate trained yet; never in goldens.

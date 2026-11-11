@@ -163,7 +163,7 @@ def run(heston_iv, sabr_iv, limit=None):
     for name, box, ref, sur in (("heston", HESTON, heston_ref, heston_iv), ("sabr", SABR, sabr_ref, sabr_iv)):
         X = test_set(box)
         if limit:
-            X = np.vstack([X[: limit // 2], X[N_MAIN: N_MAIN + limit // 2]])
+            X = np.vstack([X[: limit - limit // 10], X[N_MAIN: N_MAIN + limit // 10]])  # the full set has 10/110 extra points
         errs, excl = [], 0
         for p in X:
             r, _ = ref(p)
