@@ -66,6 +66,16 @@ class InstrumentSelectionTest {
     }
 
     @Example
+    void candidateSubsetCountsFollowRulingI53() {
+        assertEquals(60_459, InstrumentSelection.candidateSubsets(20, 6));
+        assertEquals(137_979, InstrumentSelection.candidateSubsets(20, 7));
+        assertEquals((1L << 20) - 1, InstrumentSelection.candidateSubsets(20, 20));
+        assertEquals(31, InstrumentSelection.candidateSubsets(5, 99));
+        assertEquals(0, InstrumentSelection.candidateSubsets(5, 0));
+        assertTrue(InstrumentSelection.candidateSubsets(20, 7) > InstrumentSelection.MAX_SUBSETS);
+    }
+
+    @Example
     void combinationsAreLexicographic() {
         assertEquals(10, InstrumentSelection.combinations(5, 2).size());
         assertArrayEquals(new int[] {0, 1}, InstrumentSelection.combinations(5, 2).get(0));

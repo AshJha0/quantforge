@@ -17,6 +17,29 @@ public final class InstrumentSelection {
     /** Ruling I-35: at most 20 instruments. */
     public static final int MAX_INSTRUMENTS = 20;
 
+    /** Ruling I-53: at most 100,000 candidate subsets. */
+    public static final long MAX_SUBSETS = 100_000;
+
+    /**
+     * The number of candidate subsets, {@code sum_{k=1..min(K,n)} C(n, k)} (ruling I-53); 0 when {@code K < 1}.
+     *
+     * @param n the number of instruments
+     * @param maxInstruments {@code K}
+     * @return the subset count, saturating at {@link Long#MAX_VALUE}
+     */
+    public static long candidateSubsets(int n, long maxInstruments) {
+        long total = 0;
+        long c = 1;
+        for (int k = 1; k <= Math.min(maxInstruments, n); k++) {
+            c = c * (n - k + 1) / k; // C(n, k) from C(n, k-1), exact for n <= 62
+            total += c;
+            if (total < 0 || n > 62) {
+                return Long.MAX_VALUE;
+            }
+        }
+        return total;
+    }
+
     /**
      * The answer.
      *

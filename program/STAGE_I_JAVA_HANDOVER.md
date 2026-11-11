@@ -92,3 +92,13 @@ step only when the objective falls (else it retries with the single worst flip).
 and its `E_LIMIT` are gone. The enumeration stays only as a test oracle (`solveByEnumeration`). `SignSearchTest`
 checks the KKT conditions at 21, 50 and 200 instruments (tolerance `1e-8` of the gradient scale) and agreement with
 the oracle on 150 random problems with up to 12 such instruments; all 276 stage I goldens pass.
+
+## I-51, wave 5, I-53, I-54 and the fuzz pass (2026-11-11)
+
+- I-51: `cli.Main.CONTRACT` is 1.11.0, merged with the runner's change.
+- Wave 5: `hedgegreeks5_i`, `hedgecorr5_i`, `hedgemv5_i`, `hedgeeff5_i`, `hedgeqp5_i` pass with no code change.
+- I-53: `hedge.select.solve` returns `E_LIMIT` above 100,000 candidate subsets, with the size limits;
+  `hedgeselect_i-0018` passes. I-54: `hedgecost_i-0023` (a switch point) passes with the exact orthant solves.
+- Fuzz: `conformance/fuzz/fuzz_cli.py`, 240 s, seed 20261112, 90% of draws from the stage I goldens: 11,000 inputs,
+  0 findings. The shared harness's `CODES` set lacks `E_INFEASIBLE` (contract 1.11.0), so an unpatched run reports
+  that legal code as unknown; this run added it in memory only. The harness needs the code added (not a Java file).

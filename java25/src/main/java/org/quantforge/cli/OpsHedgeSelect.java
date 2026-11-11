@@ -45,6 +45,7 @@ final class OpsHedgeSelect {
         }
         in.limit(width > InstrumentSelection.MAX_INSTRUMENTS, "a");
         in.limit(a.length > 1_000, "a");
+        in.limit(InstrumentSelection.candidateSubsets(width, k) > InstrumentSelection.MAX_SUBSETS, "max_instruments");
         in.gate();
         InstrumentSelection.Selection s = InstrumentSelection.select(a, b, w, ridge, lower, upper, k, extra);
         List<Long> selected = new ArrayList<>();
