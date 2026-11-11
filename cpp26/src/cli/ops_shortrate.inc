@@ -351,6 +351,71 @@ void op_xva_swap_ee_hw(const In& in, Out& out) {
     if (e.cva) out.key_real("cva", notional * *e.cva);
 }
 
+void op_xva_portfolio_hw(const In& in, Out& out) {
+    const sr::Params p = sr_hw(in);
+    const Value& tv = in.need("trades");
+    if (tv.kind != Kind::Array) schema("trades", "expected an array");
+    limit_if(tv.items.size() > 10000, "trades");
+    if (tv.items.empty()) throw Error("E_INPUT", "no trades", "trades");
+    std::vector<sr::SwapTrade> trades;
+    for (const Value& v : tv.items) {
+        if (v.kind != Kind::Object) schema("trades", "expected an object");
+        const In q(v);
+        sr::SwapTrade t{};
+        t.notional = q.real("notional");
+        t.fixed_rate = q.real("fixed_rate");
+        t.pay = sr_enum<bool>(q, "side", {{"PAY", true}, {"RECEIVE", false}});
+        t.start = q.real("start_years");
+        if (!std::isfinite(t.start) || !(t.start >= 0)) throw Error("E_DOMAIN", "start_years must be finite and >= 0", "start_years");
+        t.payment_times = sr_payments(q, "payment_times", t.start);
+        q.ready();
+        trades.push_back(std::move(t));
+    }
+    // Common reset dates (G-42): every reset date of the set inside a trade's life is a reset date of that trade.
+    std::set<double> all;
+    double last = 0.0;
+    for (const auto& t : trades) {
+        all.insert(t.start);
+        for (std::size_t i = 0; i + 1 < t.payment_times.size(); ++i) all.insert(t.payment_times[i]);
+        last = std::max(last, t.payment_times.back());
+    }
+    for (const auto& t : trades) {
+        Vec own{t.start};
+        own.insert(own.end(), t.payment_times.begin(), t.payment_times.end() - 1);
+        for (double r : all)
+            if (r >= t.start && r < t.payment_times.back() && !sr_contains(own, r))
+                throw Error("E_INPUT", "the trades do not share their reset dates", "trades");
+    }
+    const Vec et = sr_reals(in, "exposure_times");
+    limit_if(et.size() > 10000, "exposure_times");
+    if (et.empty()) throw Error("E_INPUT", "exposure_times is empty", "exposure_times");
+    for (std::size_t i = 0; i < et.size(); ++i) {
+        if (!(et[i] > 0)) throw Error("E_DOMAIN", "an exposure time is not positive", "exposure_times");
+        if (i && !(et[i] > et[i - 1])) throw Error("E_INPUT", "exposure_times must increase", "exposure_times");
+        if (!all.count(et[i]) || !(et[i] < last)) throw Error("E_INPUT", "an exposure time is not a reset date", "exposure_times");
+    }
+    const Vec qs = sr_reals(in, "pfe_quantiles");
+    limit_if(qs.size() > 100, "pfe_quantiles");
+    for (double q : qs)
+        if (!(q > 0 && q < 1)) throw Error("E_DOMAIN", "a PFE quantile is outside (0, 1)", "pfe_quantiles");
+    const double h = in.real("hazard_rate"), R = in.real("recovery");
+    in.ready();
+    if (!(h >= 0)) throw Error("E_DOMAIN", "hazard_rate is negative", "hazard_rate");
+    if (!(R >= 0 && R < 1)) throw Error("E_DOMAIN", "recovery must lie in [0, 1)", "recovery");
+    const sr::PortfolioExposure e = sr::portfolio_exposure_hw(p, trades, et, qs, h, R);
+    out.key_reals("discounted_ee", e.discounted_ee);
+    out.key_reals("discounted_ene", e.discounted_ene);
+    for (std::size_t i = 0; i < qs.size(); ++i) {
+        const double pct = qs[i] * 100;
+        char name[32];
+        if (std::fabs(pct - std::round(pct)) < 1e-9) std::snprintf(name, sizeof name, "pfe_%d", static_cast<int>(std::lround(pct)));
+        else std::snprintf(name, sizeof name, "pfe_%g", pct);
+        out.key_reals(name, e.pfe[i]);
+    }
+    out.key_real("epe", e.epe);
+    out.key_real("cva", e.cva);
+}
+
 void op_mc_greeks(const In& in, Out& out) {
     mcg::Inputs q{};
     q.payoff = sr_enum<mcg::Payoff>(in, "payoff", {{"CALL", mcg::Payoff::Call}, {"PUT", mcg::Payoff::Put}, {"DIGITAL_CALL", mcg::Payoff::DigitalCall}});
@@ -405,6 +470,7 @@ constexpr Entry shortrate_ops[] = {
     {"rates.g2pp.zcb_option", op_g2_zcb_option},
     {"xva.exposure.swap_ee_hw", op_xva_swap_ee_hw},
     {"risk.mc.greeks", op_mc_greeks},
+    {"xva.exposure.portfolio_hw", op_xva_portfolio_hw},
 };
 
 namespace lmmns = quantforge::lmm;
