@@ -730,6 +730,18 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Retirement trigger:** universes above 20 instruments or fixed costs per instrument.
 - **Validation report:** `specifications/08-hedging/instrument-selection.md`.
 
+### MI-7 Hedge slippage report (stage I wave 4d)
+- **Purpose:** implementation shortfall of executed hedge orders (execution and opportunity cost) and slippage against the wave 4a cost model.
+- **Inputs:** orders with decision and final prices, cost-model parameters and fills.
+- **Limitations:** one decision-price benchmark; fees not separated; no estimation across many hedges.
+- **Validation:** exact rational arithmetic with the shortfall and slippage identities asserted; no outside library (0 of 12). **Review:** 2026-11-11.
+- **Tier:** 3.
+- **Challenger:** none; the identities are the check.
+- **Monitoring thresholds:** mean slippage over a month above zero by more than two standard errors (the cost model is optimistic).
+- **Data lineage hash:** sha256 b296e48d8f4919622a433d1a14fa05ed96d54222c2a2e125fbde831e9c66347e (`hedgeslip_i`)
+- **Retirement trigger:** a benchmark other than the decision price becomes the desk standard.
+- **Validation report:** `specifications/08-hedging/hedge-slippage.md`.
+
 ## Review cycle
 
 Each stage's definition of done adds entries for its new models and re-dates every entry it touched. An entry moves to *Validated* only with a dated report on real data against an independent benchmark. The R5 audit uses a different model from the spec session and reads this register.

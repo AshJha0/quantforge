@@ -48,8 +48,8 @@
  },
  "_stage": {
   "counted": 108,
-  "total": 251,
-  "share": 0.4303,
+  "total": 263,
+  "share": 0.4106,
   "floor": 0.6,
   "note": "Stage I so far, error cases in the denominator (ruling I-2); the floor applies at release"
  },
@@ -82,5 +82,10 @@
   "counted": 10,
   "total": 17,
   "rule": "the same subset enumeration with every subset solved by scipy 1.18 (lstsq, or lsq_linear BVLS with bounds); same selected set and every output within root_finding"
+ },
+ "hedgeslip_i": {
+  "counted": 0,
+  "total": 12,
+  "rule": "no outside library computes implementation shortfall; exact rational arithmetic, uncounted"
  }
 }

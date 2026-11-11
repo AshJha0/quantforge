@@ -3813,6 +3813,22 @@
     "x"
    ]
   },
+  "hedge.slippage.report": {
+   "spec": "specifications/08-hedging/hedge-slippage.md",
+   "rust": "quantforge::hedge::slippage_report",
+   "python": "quantforge.hedge.slippage_report",
+   "java": "Hedge.slippageReport",
+   "cpp": "qf::hedge::slippage_report",
+   "inputs": {
+    "orders": {
+     "java": "orders"
+    }
+   },
+   "outputs": [
+    "orders",
+    "total"
+   ]
+  },
   "hedge.solve": {
    "spec": "specifications/08-hedging/stage-b-hedges.md",
    "rust": "quantforge::hedge::solve_",
