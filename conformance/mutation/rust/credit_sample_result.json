@@ -1,0 +1,18 @@
+{
+ "file": "rust/crates/quantforge-core/src/credit.rs",
+ "date": "2026-11-11",
+ "tool": "cargo-mutants 27.1.0 via tools/rust_mutants.sh (scratch clone of HEAD fef88a4, --in-place)",
+ "population": 404,
+ "sample": 60,
+ "seed": 20261111,
+ "sampling": "random.Random(seed).sample over the sorted mutant names from `cargo mutants --list` (tools/rust_mutants_sample.py list); names in credit_sample.txt, filter regex in credit_sample_regex.txt",
+ "tests": "cargo test --lib, skipping three long Monte Carlo acceptance tests unrelated to credit (simulated_caplets, g10*, daily_down_and_out)",
+ "caught": 55,
+ "missed": 1,
+ "timeout": 0,
+ "unviable": 4,
+ "score": 0.9821428571428571,
+ "score_rule": "(caught + timeout) / (caught + timeout + missed); unviable excluded",
+ "wilson95": [0.9055436275572404, 0.9968407896929579],
+ "missed_mutants": ["crates/quantforge-core/src/credit.rs:163:24: replace + with * in periods"]
+}
