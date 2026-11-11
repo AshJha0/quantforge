@@ -2,8 +2,9 @@
 
 One of four equal implementations; it is not a reference for the others.
 
-Stages A to G, and stage I waves 1 to 4a (hedge solvers; credit and correlation hedges; the
-cross-asset hedge; costs, margin and the risk-against-cost frontier), on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
+Stages A to G, and stage I waves 1 to 4c (hedge solvers; credit and correlation hedges; the
+cross-asset hedge; costs, margin and the frontier; the delta-hedge backtest and effectiveness;
+instrument selection), on Python 3.15.2, written from the specs in `specifications/` and `specifications/cli-contract.md`.
 
 Install: `uv sync`
 

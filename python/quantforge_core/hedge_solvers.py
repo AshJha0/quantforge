@@ -1053,4 +1053,52 @@ def residual_report(a: Matrix, b: Floats, x: Floats, covariance: Matrix) -> dict
             "contributions": _zs(r * v for r, v in zip(residual, s_r))}
 
 
+def select_solve(a: Matrix, b: Floats, weights: Floats, max_instruments: int,
+                 ridge: float = 0.0, lower: Bounds | None = None, upper: Bounds | None = None,
+                 extra_inputs: Sequence[str] = ()) -> dict[str, Any]:
+    """`hedge.select.solve`: the subset of at most `max_instruments` hedge instruments with the
+    least `hedge.qp.solve` objective, the others held at 0 (rulings I-33, I-34). Every subset is
+    solved; ties within 1e-12 relative go to the smaller subset, then the lexicographically
+    smaller index list. `extra_inputs` names given inputs that selection refuses.
+
+    Returns {selected (0-based, ascending), x, residual, objective}."""
+    _, n = _shape(a, b, weights)
+    for key, bound in (("lower", lower), ("upper", upper)):
+        if bound is not None and len(bound) != n:
+            raise QfError("E_INPUT", f"{key} must have one entry per instrument", key)
+    lo: Bounds = lower if lower is not None else [None] * n
+    hi: Bounds = upper if upper is not None else [None] * n
+    _check_weights_ridge(weights, ridge)
+    if any(p is not None and q is not None and p > q for p, q in zip(lo, hi)):
+        raise QfError("E_DOMAIN", "a lower bound is above its upper bound", "lower")
+    if not 1 <= max_instruments <= n:
+        raise QfError("E_INPUT", "max_instruments must be between 1 and n", "max_instruments")
+    if extra_inputs:
+        raise QfError("E_INPUT", f"selection takes no {extra_inputs[0]} (ruling I-33)",
+                      extra_inputs[0])
+    if any((p is not None and p > 0) or (q is not None and q < 0) for p, q in zip(lo, hi)):
+        raise QfError("E_DOMAIN", "every bound must admit 0 (ruling I-33)", "lower")
+    big_b, _ = _root_form(a, b, weights, ridge)
+    sv = np.linalg.svd(big_b, compute_uv=False)
+    if int((sv * sv > THRESHOLD * sv[0] ** 2).sum()) < n:
+        raise QfError("E_SINGULAR", "the full hedge has no unique solution", "a")
+
+    scored: list[tuple[float, tuple[int, ...], list[float]]] = []
+    for size in range(1, max_instruments + 1):
+        for subset in itertools.combinations(range(n), size):
+            cols = [[row[j] for j in subset] for row in a]
+            out = _qp_core(cols, b, weights, ridge, None, None, [lo[j] for j in subset],
+                           [hi[j] for j in subset], "ERROR")
+            scored.append((out["objective"], subset, out["x"]))
+    best = min(v for v, _, _ in scored)
+    tied = [t for t in scored if t[0] - best <= THRESHOLD * abs(best)]
+    _, chosen, part = min(tied, key=lambda t: (len(t[1]), t[1]))
+    x = [0.0] * n
+    for j, v in zip(chosen, part):
+        x[j] = v
+    residual, objective = _objective(a, b, weights, ridge, x)
+    return {"selected": list(chosen), "x": x, "residual": _zs(residual),
+            "objective": _z(objective)}
+
+
 guard(globals())

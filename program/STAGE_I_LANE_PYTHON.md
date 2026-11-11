@@ -34,3 +34,14 @@ feasible start with a margin is the least-margin point from a two-phase simplex.
 Tests in `python/tests/test_hedge_costs_cross_asset.py`, including SciPy SLSQP on the split form
 as a second check. One commit for both waves: they were released together and share the handler
 and limits files. SPEC_QUESTIONS: none.
+
+## Waves 4b and 4c (backtest and effectiveness; instrument selection)
+
+Wave 4b in `python/quantforge_core/dynamic_hedge.py` (the I-29 replay order; one statistics routine
+for both operations). Wave 4c is `hedge_solvers.select_solve`, every subset of 1 to K instruments
+through the wave 1 solve, I-34 tie rule. Conformance: `hedgebt_i` 15 of 15, `hedgeeff_i` 10 of 10,
+`hedgeselect_i` 17 of 17; stage I total 251 of 251. Tests in
+`python/tests/test_dynamic_hedge_selection.py`. SPEC_QUESTIONS: I-Q4 in `python/SPEC_QUESTIONS.md`
+(a constant-spot backtest is `E_DOMAIN` only if rounding happens to cancel exactly; asks for a
+threshold or for the property note to go). Selection is exhaustive with no pruning: at the I-35
+size of 20 instruments with K = 20 that is about a million small solves, correct but slow.

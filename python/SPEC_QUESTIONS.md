@@ -280,3 +280,10 @@ Wave 1 (hedge solvers) passes 121 of 121 with no open question. Choices made whe
 - I-Q3 (`hedge.qp.solve`). `E_INFEASIBLE` is decided by a phase-1 simplex with a relative tolerance
   of 1e-9 on the artificial sum; I-14 asks for an exact decision and the goldens keep feasible cases
   clear of the boundary, so the tolerance never decides a golden.
+- I-Q4 (I-31, wave 4b property note). The handover's corrected property says a constant-spot path
+  makes `hedge.backtest.delta` return `E_DOMAIN` because the hedge leg has zero variance. In
+  double arithmetic that leg is zero only up to rounding (the cash account and the rebalances
+  cancel to about 1e-16 per step), so Python's exact `var == 0` test does not fire and the
+  statistics are computed on noise. No golden is affected. Asked: either pin the zero-variance
+  test with a relative threshold (for example `var(y) <= 1e-24 var(x)`, in the spirit of I-3), or
+  drop the claim from the property notes. Python's test checks the replay itself instead.

@@ -245,6 +245,9 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "hedge.correlation.neutralise": _HEDGE_CORRELATION,
     "hedge.crossasset.solve": _HEDGE_CROSSASSET,
     "hedge.frontier.solve": _all(_HEDGE_QP, _caps_list("cost_weights", 50)),
+    # Ruling I-35: selection over at most 20 instruments. I-32 (paths and series of 100,000)
+    # is the generic array cap.
+    "hedge.select.solve": _rows_cols("a", _I_FACTORS, 20),
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")

@@ -175,3 +175,29 @@ def hedge_crossasset_solve(i: Inputs) -> Any:
             curve.reals("zero_rates"), _positions(i, "book", kinds),
             _positions(i, "hedges", kinds), i.reals("weights"), i.opt_real("ridge", 0.0))
     return core.cross_asset_hedge.crossasset_solve(*args)
+
+
+# Stage I waves 4b and 4c (dynamic-hedge-and-effectiveness.md, instrument-selection.md).
+
+@op("hedge.backtest.delta")
+def hedge_backtest_delta(i: Inputs) -> Any:
+    option = i.object("option")
+    args = (option.enum("type", ("CALL", "PUT")), option.real("strike"),
+            option.real("expiry_years"), i.real("quantity"), i.real("rate"),
+            i.real("dividend_yield"), i.real("hedge_volatility"), i.reals("times"),
+            i.reals("spots"))
+    return core.dynamic_hedge.backtest_delta(*args)
+
+
+@op("hedge.effectiveness")
+def hedge_effectiveness(i: Inputs) -> Any:
+    return core.dynamic_hedge.effectiveness(i.reals("item_changes"), i.reals("hedge_changes"))
+
+
+@op("hedge.select.solve")
+def hedge_select_solve(i: Inputs) -> Any:
+    a, b, weights, ridge = _least_squares(i)
+    lower, upper = _opt_bounds(i, "lower"), _opt_bounds(i, "upper")
+    extra = [k for k in ("eq_matrix", "eq_rhs", "singular") if i.has(k)]
+    return core.hedge_solvers.select_solve(a, b, weights, i.integer("max_instruments"), ridge,
+                                           lower, upper, extra)
