@@ -566,3 +566,54 @@ TEST_CASE("Stage F carry-over limits: one FRTB factor is RW |s|; rho = 0 is the 
     const std::string s = g_run("risk.stress.reverse", R"({"direction":[1,2],"delta":[-10,-5],"gamma":[[0,0],[0,0]],"target_loss":4})");
     CHECK(g_rel(g_number_after(s, "scale"), 0.2) <= 1e-15);
 }
+
+// ---- Wave 4c, portfolio exposure (G-42) ----
+
+TEST_CASE("G5c a single swap reproduces the wave 4a EE; EE + ENE is the forward value; PFE99 >= PFE95 >= 0") {
+    const sr::Params p = g_hw();
+    for (const auto& [K, pay] : {std::pair{0.03, true}, std::pair{0.045, false}}) {
+        const std::vector<double> pt = g_years(1, 5, 1), times{1, 2, 3, 4};
+        const sr::SwapTrade tr{1.0, K, 0.0, pay, pt};
+        const auto e = sr::portfolio_exposure_hw(p, {tr}, times, {0.95, 0.99}, 0.02, 0.4);
+        const auto w = sr::swap_ee_hw(p, 0.0, pt, K, pay, times, std::pair{0.02, 0.4});
+        for (std::size_t k = 0; k < times.size(); ++k) {
+            CHECK(std::fabs(e.discounted_ee[k] - w.discounted_ee[k]) <= 1e-12);
+            double fwd = p.curve.df(times[k]) - p.curve.df(pt.back()), prev = times[k];
+            for (double T : pt)
+                if (T > times[k]) fwd -= K * (T - prev) * p.curve.df(T), prev = T;
+            CHECK(std::fabs(e.discounted_ee[k] + e.discounted_ene[k] - (pay ? fwd : -fwd)) <= 1e-12);
+            CHECK(e.discounted_ene[k] <= 0.0);
+            CHECK(e.pfe[1][k] >= e.pfe[0][k]);
+            CHECK(e.pfe[0][k] >= 0.0);
+        }
+        CHECK(std::fabs(*w.cva - e.cva) <= 1e-12);
+    }
+    // A portfolio of offsetting identical swaps has zero exposure; netting lowers EE below the sum of the parts.
+    const sr::SwapTrade a{1.0, 0.04, 0.0, true, g_years(1, 10, 1)}, b{1.0, 0.04, 0.0, false, g_years(1, 10, 1)};
+    const auto zero = sr::portfolio_exposure_hw(p, {a, b}, g_years(1, 9, 1), {0.95}, 0.0, 0.4);
+    for (double v : zero.discounted_ee) CHECK(std::fabs(v) <= 1e-15);
+    const sr::SwapTrade c{1.0, 0.03, 0.0, false, g_years(1, 5, 1)};
+    const auto both = sr::portfolio_exposure_hw(p, {a, c}, {1, 2, 3, 4}, {0.95}, 0.0, 0.4);
+    const auto ea = sr::portfolio_exposure_hw(p, {a}, {1, 2, 3, 4}, {0.95}, 0.0, 0.4);
+    const auto ec = sr::portfolio_exposure_hw(p, {c}, {1, 2, 3, 4}, {0.95}, 0.0, 0.4);
+    for (std::size_t k = 0; k < 4; ++k) CHECK(both.discounted_ee[k] <= ea.discounted_ee[k] + ec.discounted_ee[k] + 1e-15);
+}
+
+TEST_CASE("G5c PFE is the q-quantile: P(max(f, 0) <= PFE_q) = q, including the flat top of a long payer") {
+    for (const auto& [a, sg] : {std::pair{0.03, 0.01}, std::pair{0.10, 0.015}}) {
+        const sr::Params p = g_hw(a, sg);
+        const sr::SwapTrade tr{1e7, 0.039, 0.0, true, g_years(1, 20, 1)};
+        const std::vector<double> times = g_years(1, 19, 1);
+        const auto e = sr::portfolio_exposure_hw(p, {tr}, times, {0.95, 0.99}, 0.0, 0.4);
+        for (std::size_t k = 0; k < times.size(); ++k)
+            for (std::size_t qi = 0; qi < 2; ++qi) {
+                const double q = qi ? 0.99 : 0.95, y = e.pfe[qi][k];
+                if (y == 0.0) {
+                    CHECK(1 - sr::portfolio_prob_above_hw(p, {tr}, times[k], 0.0) >= q);
+                    continue;
+                }
+                INFO("t " << times[k] << " q " << q << " pfe " << y);
+                CHECK(std::fabs(1 - sr::portfolio_prob_above_hw(p, {tr}, times[k], y) - q) <= 1e-9);
+            }
+    }
+}

@@ -112,6 +112,22 @@ struct Exposure {
 Exposure swap_ee_hw(const Params& p, double start, const std::vector<double>& payment_times, double fixed_rate, bool pay,
                     const std::vector<double>& exposure_times, std::optional<std::pair<double, double>> hazard_recovery);
 
+/// Wave 4c (G-42): exposure of a swap netting set at common reset dates, exact one-factor (LGM) integration.
+struct SwapTrade {
+    double notional, fixed_rate, start;
+    bool pay;
+    std::vector<double> payment_times;
+};
+struct PortfolioExposure {
+    std::vector<double> discounted_ee, discounted_ene;
+    std::vector<std::vector<double>> pfe;  // per quantile, per time
+    double epe = 0.0, cva = 0.0;
+};
+PortfolioExposure portfolio_exposure_hw(const Params& p, const std::vector<SwapTrade>& trades, const std::vector<double>& times,
+                                        const std::vector<double>& quantiles, double hazard, double recovery);
+/// P(f(t) > y) for the deflated set value f at an exposure time t (the PFE property test: at y = PFE_q it is 1 - q).
+double portfolio_prob_above_hw(const Params& p, const std::vector<SwapTrade>& trades, double t, double y);
+
 }  // namespace quantforge::shortrate
 
 namespace quantforge::mcgreeks {
