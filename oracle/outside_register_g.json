@@ -103,5 +103,10 @@
   "counted": 0,
   "total": 6,
   "rule": "own formulas on given inputs: not counted (G-40)"
+ },
+ "expsim_g": {
+  "counted": 80,
+  "total": 102,
+  "rule": "ORE 1.8.17 simulation (LGM = Hull-White), every output within 3 MC SE (G-42)"
  }
 }
