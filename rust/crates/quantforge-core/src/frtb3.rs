@@ -104,6 +104,18 @@ fn order(a: &str, b: &str) -> std::cmp::Ordering {
     a.len().cmp(&b.len()).then_with(|| a.cmp(b))
 }
 
+/// A weighted vega sensitivity inside a bucket.
+struct W {
+    key: String,
+    name: String,
+    t: f64,
+    u: f64,
+    ws: f64,
+}
+
+/// Curvature rows of one bucket: `(name, CVR+, CVR-)`.
+type CurvRows = Vec<(String, f64, f64)>;
+
 /// A vega sensitivity `VR_k` (MAR21.25).
 #[derive(Debug, Clone)]
 pub struct VegaSens {
@@ -127,13 +139,6 @@ fn mat_rho(a: f64, b: f64) -> f64 {
 pub fn vega(class: Class, sens: &[VegaSens]) -> Result<GirrDelta> {
     if sens.is_empty() {
         return fail("E_INPUT", "no sensitivities");
-    }
-    struct W {
-        key: String,
-        name: String,
-        t: f64,
-        u: f64,
-        ws: f64,
     }
     let mut buckets: Vec<(String, i64, Vec<W>)> = Vec::new();
     for s in sens {
@@ -313,7 +318,7 @@ pub fn curvature(class: Class, factors: &[CurvFactor], fx_scalar: bool) -> Resul
         return fail("E_INPUT", "no factors");
     }
     let div = if fx_scalar { 1.5 } else { 1.0 };
-    let mut buckets: Vec<(String, i64, Vec<(String, f64, f64)>)> = Vec::new();
+    let mut buckets: Vec<(String, i64, CurvRows)> = Vec::new();
     for f in factors {
         crate::error::finite("cvr", &[f.cvr_up, f.cvr_down])?;
         if class.named() != f.name.is_some() {

@@ -164,6 +164,7 @@ pub(crate) fn equity_gamma(b: i64, c: i64) -> Result<f64> {
 }
 
 /// CSR cross-bucket delta correlation, rating x sector (MAR21.57, Table 5 per G-51).
+#[allow(clippy::unnecessary_wraps)]
 pub(crate) fn csr_gamma(b: i64, c: i64) -> Result<f64> {
     let rating = if b <= 15 && c <= 15 && ((b <= 8) != (c <= 8)) {
         0.5
