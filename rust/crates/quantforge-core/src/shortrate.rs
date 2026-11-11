@@ -216,6 +216,325 @@ pub fn zcb_option(
     Ok((notional * v, pt, ps))
 }
 
+/// `B(tau)`, minus the sensitivity of `ln P` to the short rate, for the model.
+fn b_factor(m: &Model, tau: f64) -> f64 {
+    match m {
+        Model::Vasicek { a, .. } | Model::HullWhite { a, .. } => b_terms(*a, tau).0,
+        Model::Cir { a, b, sigma } => cir_factors(*a, *b, *sigma, tau).1,
+    }
+}
+
+/// `P(0, t)` under the model: the curve for Hull-White, the bond formula at `r0` otherwise.
+pub fn discount0(m: &Model, r0: f64, t: f64) -> Result<f64> {
+    match m {
+        Model::HullWhite { curve, .. } => Ok(curve.ln_discount(t).exp()),
+        _ => Ok(zcb(m, r0, 0.0, t)?.0),
+    }
+}
+
+/// Checks a swap payment schedule after `start`: non-empty, strictly increasing, first
+/// payment after `start`, at most 10,000 entries (G-6).
+pub fn check_payments(start: f64, pay: &[f64]) -> Result<()> {
+    crate::error::finite("payment_times", &pay)?;
+    if pay.len() > 10_000 {
+        return fail("E_LIMIT", "at most 10,000 payment times");
+    }
+    if pay.is_empty() || pay[0] <= start || pay.windows(2).any(|w| w[1] <= w[0]) {
+        return fail(
+            "E_INPUT",
+            "payment_times must be non-empty, strictly increasing and after the start",
+        );
+    }
+    Ok(())
+}
+
+/// Output of [`swaption`].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SwaptionValue {
+    /// Present value.
+    pub price: f64,
+    /// `(P(0,T0) - P(0,Tn)) / sum tau_i P(0,Ti)`.
+    pub forward_swap_rate: f64,
+    /// `notional sum tau_i P(0,Ti)`.
+    pub annuity: f64,
+}
+
+/// European swaption by Jamshidian's decomposition (`rates.shortrate.swaption`, G-12, G-13).
+///
+/// Accruals are time differences starting at `expiry`. The critical rate solves
+/// `sum c_i P(T0, Ti; r*) = 1` by Newton from 0 inside a maintained bracket, to 1e-15
+/// relative in the sum. `r0` is `r(0)` for Vasicek and CIR and ignored for Hull-White.
+pub fn swaption(
+    m: &Model,
+    r0: f64,
+    expiry: f64,
+    pay: &[f64],
+    fixed_rate: f64,
+    payer: bool,
+    notional: f64,
+) -> Result<SwaptionValue> {
+    crate::error::finite("expiry_years", &expiry)?;
+    crate::error::finite("fixed_rate", &fixed_rate)?;
+    crate::error::finite("notional", &notional)?;
+    discount0(m, r0, 1.0)?; // parameter checks of zcb
+    if expiry <= 0.0 {
+        return fail("E_DOMAIN", "expiry_years must be positive");
+    }
+    check_payments(expiry, pay)?;
+    let n = pay.len();
+    let mut prev = expiry;
+    let mut c = Vec::with_capacity(n);
+    let mut tau = Vec::with_capacity(n);
+    for (i, t) in pay.iter().enumerate() {
+        tau.push(t - prev);
+        c.push(fixed_rate * (t - prev) + if i + 1 == n { 1.0 } else { 0.0 });
+        prev = *t;
+    }
+    let bs: Vec<f64> = pay.iter().map(|t| b_factor(m, t - expiry)).collect();
+    let sum_at = |r: f64| -> Result<(f64, f64)> {
+        let (mut f, mut d) = (-1.0, 0.0);
+        for i in 0..n {
+            let p = zcb(m, r, expiry, pay[i])?.0;
+            f += c[i] * p;
+            d -= c[i] * bs[i] * p;
+        }
+        Ok((f, d))
+    };
+    let cir = matches!(m, Model::Cir { .. });
+    let (f0, _) = sum_at(0.0)?;
+    if cir && f0 < 0.0 {
+        return fail("E_DOMAIN", "CIR critical rate would be negative");
+    }
+    // Bracket: lo has f > 0, hi has f < 0.
+    let (mut lo, mut hi) = (f64::NEG_INFINITY, f64::INFINITY);
+    if cir {
+        lo = 0.0;
+    }
+    let mut r = 0.0;
+    let mut found = false;
+    for _ in 0..500 {
+        let (f, d) = sum_at(r)?;
+        if f.abs() <= 1e-15 {
+            found = true;
+            break;
+        }
+        if f > 0.0 {
+            lo = lo.max(r);
+        } else {
+            hi = hi.min(r);
+        }
+        let mut next = r - f / d;
+        if !(next > lo && next < hi && next.is_finite()) {
+            next = match (lo.is_finite(), hi.is_finite()) {
+                (true, true) => 0.5 * (lo + hi),
+                (true, false) => lo + 2.0 * (lo.abs() + 0.1),
+                (false, true) => hi - 2.0 * (hi.abs() + 0.1),
+                (false, false) => r,
+            };
+        }
+        if next == r
+            || (lo.is_finite()
+                && hi.is_finite()
+                && hi - lo <= 4.0 * f64::EPSILON * hi.abs().max(1e-300))
+        {
+            found = true;
+            break;
+        }
+        r = next;
+    }
+    if !found {
+        return fail("E_NO_CONVERGENCE", "critical rate solve did not converge");
+    }
+    let mut v = 0.0;
+    for i in 0..n {
+        let x = zcb(m, r, expiry, pay[i])?.0;
+        v += c[i] * zcb_option(m, r0, !payer, x, expiry, pay[i], 1.0)?.0;
+    }
+    let mut ann = 0.0;
+    for i in 0..n {
+        ann += tau[i] * discount0(m, r0, pay[i])?;
+    }
+    let fwd = (discount0(m, r0, expiry)? - discount0(m, r0, pay[n - 1])?) / ann;
+    Ok(SwaptionValue {
+        price: notional * v,
+        forward_swap_rate: fwd,
+        annuity: notional * ann,
+    })
+}
+
+/// Cap or floor as a portfolio of bond options (`rates.shortrate.capfloor`, G-19):
+/// `(price, caplet or floorlet prices)`. A caplet is `(1 + K tau) ZBP(0, t_(i-1), t_i,
+/// 1/(1 + K tau))`, a floorlet the same with `ZBC`.
+pub fn capfloor(
+    m: &Model,
+    r0: f64,
+    times: &[f64],
+    strike: f64,
+    cap: bool,
+    notional: f64,
+) -> Result<(f64, Vec<f64>)> {
+    crate::error::finite("period_times", &times)?;
+    crate::error::finite("strike", &strike)?;
+    crate::error::finite("notional", &notional)?;
+    discount0(m, r0, 1.0)?;
+    if times.len() > 10_001 {
+        return fail("E_LIMIT", "at most 10,000 periods");
+    }
+    if times.len() < 2 || times.windows(2).any(|w| w[1] <= w[0]) {
+        return fail(
+            "E_INPUT",
+            "period_times needs at least two strictly increasing times",
+        );
+    }
+    if times[0] <= 0.0 {
+        return fail("E_DOMAIN", "the first period time must be positive");
+    }
+    if times
+        .windows(2)
+        .any(|w| 1.0 + strike * (w[1] - w[0]) <= 0.0)
+    {
+        return fail("E_DOMAIN", "1 + K tau must be positive");
+    }
+    let mut lets = Vec::with_capacity(times.len() - 1);
+    for w in times.windows(2) {
+        let g = 1.0 + strike * (w[1] - w[0]);
+        lets.push(notional * g * zcb_option(m, r0, !cap, 1.0 / g, w[0], w[1], 1.0)?.0);
+    }
+    Ok((lets.iter().sum(), lets))
+}
+
+/// G2++ two-factor Gaussian model parameters (`rates.g2pp.*`, ruling G-14).
+#[derive(Debug, Clone, Copy)]
+pub struct G2pp<'a> {
+    /// Mean reversion of `x`.
+    pub a: f64,
+    /// Volatility of `x`.
+    pub sigma: f64,
+    /// Mean reversion of `y`.
+    pub b: f64,
+    /// Volatility of `y`.
+    pub eta: f64,
+    /// Correlation of the two drivers, strictly inside `(-1, 1)`.
+    pub rho: f64,
+    /// The fitted discount curve.
+    pub curve: &'a HwCurve,
+}
+
+/// `(k tau + 2 expm1(-k tau) - expm1(-2 k tau)/2) / k^3`, by series below `k tau = 1`.
+fn g2_vterm(k: f64, tau: f64) -> f64 {
+    let x = k * tau;
+    if x < 1.0 {
+        // sum_{n>=3} (-1)^n (2 - 2^{n-1}) x^{n-3} / n!, times tau^3
+        let (mut sum, mut fact, mut xp, mut p2) = (0.0_f64, 6.0_f64, 1.0_f64, 4.0_f64);
+        for n in 3..60 {
+            let sign = if n % 2 == 0 { 1.0 } else { -1.0 };
+            let t = sign * (2.0 - p2) * xp / fact;
+            sum += t;
+            if t.abs() < 1e-18 * sum.abs() {
+                break;
+            }
+            xp *= x;
+            p2 *= 2.0;
+            fact *= f64::from(n + 1);
+        }
+        sum * tau * tau * tau
+    } else {
+        (x + 2.0 * (-x).exp_m1() - (-2.0 * x).exp_m1() / 2.0) / (k * k * k)
+    }
+}
+
+/// `(tau - B_a - B_b + B_(a+b)) / (a b)`, the integral of `B_a(s) B_b(s)`, by double series
+/// when both `a tau` and `b tau` are below 1.
+fn g2_cross(a: f64, b: f64, tau: f64) -> f64 {
+    if a * tau < 1.0 && b * tau < 1.0 {
+        // sum_{m,n>=1} (-1)^{m+n} a^{m-1} b^{n-1} tau^{m+n+1} / (m! n! (m+n+1))
+        let mut sum = 0.0;
+        let mut am = 1.0; // (a tau)^{m-1} / m!
+        for m in 1..40 {
+            let mut bn = 1.0; // (b tau)^{n-1} / n!
+            for n in 1..40 {
+                let sign = if (m + n) % 2 == 0 { 1.0 } else { -1.0 };
+                sum += sign * am * bn / f64::from(m + n + 1);
+                bn *= b * tau / f64::from(n + 1);
+            }
+            am *= a * tau / f64::from(m + 1);
+        }
+        sum * tau * tau * tau
+    } else {
+        let bk = |k: f64| -(-k * tau).exp_m1() / k;
+        (tau - bk(a) - bk(b) + bk(a + b)) / (a * b)
+    }
+}
+
+impl G2pp<'_> {
+    fn check(&self) -> Result<()> {
+        crate::error::finite("g2pp", &[self.a, self.sigma, self.b, self.eta, self.rho])?;
+        if self.a <= 0.0 || self.sigma <= 0.0 || self.b <= 0.0 || self.eta <= 0.0 {
+            return fail("E_DOMAIN", "a, sigma, b and eta must be positive");
+        }
+        if !(self.rho > -1.0 && self.rho < 1.0) {
+            return fail("E_DOMAIN", "rho must be strictly inside (-1, 1)");
+        }
+        Ok(())
+    }
+
+    /// `V(tau)`, the variance of the integrated factors [BM 4.10].
+    fn v(&self, tau: f64) -> f64 {
+        let (a, b, s, e, r) = (self.a, self.b, self.sigma, self.eta, self.rho);
+        s * s * g2_vterm(a, tau) + e * e * g2_vterm(b, tau) + 2.0 * r * s * e * g2_cross(a, b, tau)
+    }
+
+    /// `rates.g2pp.zcb`: `(discount_factor, zero_rate)` of `P(t, T)` at states `x`, `y`.
+    pub fn zcb(&self, x: f64, y: f64, t: f64, maturity: f64) -> Result<(f64, f64)> {
+        crate::error::finite("state", &[x, y, t, maturity])?;
+        self.check()?;
+        if t < 0.0 || maturity <= t {
+            return fail("E_DOMAIN", "need 0 <= t_years < maturity_years");
+        }
+        let tau = maturity - t;
+        let c = self.curve;
+        let ln_p = c.ln_discount(maturity) - c.ln_discount(t)
+            + 0.5 * (self.v(tau) - self.v(maturity) + self.v(t))
+            - b_terms(self.a, tau).0 * x
+            - b_terms(self.b, tau).0 * y;
+        Ok((ln_p.exp(), -ln_p / tau))
+    }
+
+    /// `rates.g2pp.zcb_option`: `(price, P(0, T), P(0, S))` [BM 4.31].
+    pub fn zcb_option(
+        &self,
+        call: bool,
+        strike: f64,
+        expiry: f64,
+        maturity: f64,
+        notional: f64,
+    ) -> Result<(f64, f64, f64)> {
+        crate::error::finite("option", &[strike, expiry, maturity, notional])?;
+        self.check()?;
+        if !(0.0 < expiry && expiry < maturity) || strike <= 0.0 {
+            return fail("E_DOMAIN", "need 0 < expiry < maturity and strike > 0");
+        }
+        let (a, b, s, e, r) = (self.a, self.b, self.sigma, self.eta, self.rho);
+        let u = maturity - expiry;
+        let om = |k: f64, t: f64| -(-k * t).exp_m1();
+        let ba = b_terms(a, u).0;
+        let bb = b_terms(b, u).0;
+        // 1 - e^{-2kT} over 2k, written with expm1 so small k loses nothing.
+        let var = |k: f64| om(2.0 * k, expiry) / (2.0 * k);
+        let cross = om(a + b, expiry) / (a + b);
+        let sig2 =
+            s * s * ba * ba * var(a) + e * e * bb * bb * var(b) + 2.0 * r * s * e * ba * bb * cross;
+        let sp = sig2.sqrt();
+        let pt = self.curve.ln_discount(expiry).exp();
+        let ps = self.curve.ln_discount(maturity).exp();
+        let h = (ps / (strike * pt)).ln() / sp + sp / 2.0;
+        let n = crate::stats::normal_cdf;
+        let c = ps * n(h) - strike * pt * n(h - sp);
+        let v = if call { c } else { c - ps + strike * pt };
+        Ok((notional * v, pt, ps))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -235,5 +554,101 @@ mod tests {
         }
         // r = 0 gives zero noncentrality and must still price.
         assert!(zcb_option(&m, 0.0, true, 0.9, 1.0, 3.0, 1.0).unwrap().0 > 0.0);
+    }
+
+    fn curve() -> HwCurve {
+        HwCurve::new(
+            &[0.5, 1.0, 2.0, 5.0, 10.0, 30.0],
+            &[0.985, 0.97, 0.94, 0.85, 0.70, 0.33],
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn swaption_payer_minus_receiver_is_forward_swap() {
+        let c = curve();
+        let models = [
+            Model::HullWhite {
+                a: 0.05,
+                sigma: 0.01,
+                curve: &c,
+            },
+            Model::Vasicek {
+                a: 0.15,
+                b: 0.045,
+                sigma: 0.012,
+            },
+            Model::Cir {
+                a: 0.2,
+                b: 0.05,
+                sigma: 0.08,
+            },
+        ];
+        let pay = [2.0, 3.0, 4.0, 5.0, 6.0];
+        for m in &models {
+            for k in [0.02, 0.04, 0.06] {
+                let p = swaption(m, 0.04, 1.0, &pay, k, true, 1.0).unwrap();
+                let r = swaption(m, 0.04, 1.0, &pay, k, false, 1.0).unwrap();
+                let fwd = p.annuity * (p.forward_swap_rate - k);
+                assert!((p.price - r.price - fwd).abs() < 1e-8);
+            }
+        }
+    }
+
+    #[test]
+    fn capfloor_parity() {
+        let c = curve();
+        let m = Model::HullWhite {
+            a: 0.05,
+            sigma: 0.01,
+            curve: &c,
+        };
+        let t = [0.5, 1.0, 1.5, 2.0, 2.5];
+        let k = 0.03;
+        let cap = capfloor(&m, 0.0, &t, k, true, 1.0).unwrap().0;
+        let floor = capfloor(&m, 0.0, &t, k, false, 1.0).unwrap().0;
+        let swap: f64 = t
+            .windows(2)
+            .map(|w| {
+                discount0(&m, 0.0, w[0]).unwrap()
+                    - (1.0 + k * (w[1] - w[0])) * discount0(&m, 0.0, w[1]).unwrap()
+            })
+            .sum();
+        assert!((cap - floor - swap).abs() < 1e-12);
+    }
+
+    #[test]
+    fn g2pp_limits() {
+        let c = curve();
+        let g = G2pp {
+            a: 0.1,
+            sigma: 0.01,
+            b: 0.3,
+            eta: 1e-12,
+            rho: 0.2,
+            curve: &c,
+        };
+        let hw = Model::HullWhite {
+            a: 0.1,
+            sigma: 0.01,
+            curve: &c,
+        };
+        let (pg, _, _) = g.zcb_option(true, 0.9, 1.0, 4.0, 1.0).unwrap();
+        let (ph, _, _) = zcb_option(&hw, 0.0, true, 0.9, 1.0, 4.0, 1.0).unwrap();
+        assert!((pg - ph).abs() < 1e-12);
+        let g = G2pp { eta: 0.008, ..g };
+        let (p, _) = g.zcb(0.0, 0.0, 0.0, 5.0).unwrap();
+        assert!((p - c.ln_discount(5.0).exp()).abs() < 1e-15);
+        let (c1, pt, ps) = g.zcb_option(true, 0.9, 1.0, 4.0, 1.0).unwrap();
+        let (p1, _, _) = g.zcb_option(false, 0.9, 1.0, 4.0, 1.0).unwrap();
+        assert!((c1 - p1 - (ps - 0.9 * pt)).abs() < 1e-12);
+        // Series and direct forms of the variance terms agree where they meet.
+        for k in [0.999_f64, 1.001] {
+            let d = (k + 2.0 * (-k).exp_m1() - (-2.0 * k).exp_m1() / 2.0) / (k * k * k);
+            assert!((g2_vterm(k, 1.0) - d).abs() < 1e-12 * d);
+        }
+        let bk = |k: f64| -(-k).exp_m1() / k;
+        let direct = (1.0 - bk(0.9) - bk(0.95) + bk(1.85)) / (0.9 * 0.95);
+        assert!((g2_cross(0.9, 0.95, 1.0) - direct).abs() < 1e-11 * direct);
     }
 }
