@@ -327,7 +327,7 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `xva.exposure.collateralised`, `xva.adjustments.value`, `xva.simm.ir_delta`, `xva.wwr.cva_hw` | `06-risk/xva-framework.md` | G5b (wave 4b) |
 | `risk.stress.reverse`, `risk.limits.check`, `risk.concentration.measures`, `risk.var.liquidity_adjusted`, `risk.vol.horizon` | `06-risk/portfolio-risk-tools.md` | F4 carry-over (wave 2b) |
 | `risk.sens.inflation01`, `risk.sens.dividend_borrow`, `risk.sens.correlation` | `06-risk/f3-sensitivities.md` | F3 carry-over (wave 2b) |
-| `risk.frtb.fx_delta`, `risk.frtb.equity_delta` | `06-risk/frtb-sa-fx-equity.md` | FRTB carry-over (wave 2b) |
+| `risk.frtb.fx_delta`, `risk.frtb.equity_delta`, `risk.frtb.csr_delta`, `risk.frtb.commodity_delta` | `06-risk/frtb-sa-fx-equity.md` | FRTB carry-over (wave 2b) |
 
 `E_LIMIT` sizes for the stage G operations: ruling G-6 as amended by G-31 (full table and the combined grid-work bound). `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
 
