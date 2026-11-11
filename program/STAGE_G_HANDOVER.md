@@ -328,3 +328,7 @@ ORE: 1.8.17.0 Python wheel under WSL; inputs `oracle/ore/build_case.py`, runner 
 ## G-42b status (2026-11-11 15:00): registered, runs blocked by WSL
 
 G-42 stands as registered: 80 of 102 `expsim_g` cases, stage G 338 of 589 = 57.4%. G-42b (rulings) was registered and committed (`c158c5c`, counting script `5ab5edb`) before any of its runs. Its six ORE runs (`oracle/ore/runb0..5`, seeds 20261211 to 20261216) have not completed: WSL stopped answering during `runb0` twice (once before the machine rebooted, once after a fresh `wsl --shutdown`, when even `ps` timed out after 60 s). Per the coordinator's rule the work stops here. To resume: restart WSL, then run `oracle/ore/run_ore.py runb<i>` for i = 0..5 one at a time, then `uv run python -W ignore gen_stage_g_w4c.py countb` and record the count beside G-42.
+
+## expsim_g golden fix (G-Q4) and owner decision G-52 (2026-11-11)
+
+18 `pfe_99` values in cases 0039, 0045, 0055, 0061, 0071, 0077, 0087, 0093 changed (list: `oracle/ore/W4C_GOLDEN_FIX_DIFF.json`; for 0039 at 17 years 291,322.04 -> 291,331.93, matching the four lanes). All other `expsim_g` values unchanged. Builds: rerun `expsim_g`. G-42 recount on the existing ORE outputs: 80 of 102, unchanged; stage G 338 of 589 = 57.4%. G-42b carried over to stage I; C++ sanitizers for wave 4c in CI (G-52).

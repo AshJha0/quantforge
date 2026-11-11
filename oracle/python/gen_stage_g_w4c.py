@@ -61,16 +61,59 @@ def deflated_value(inp, t):
     return f, mp.sqrt(Zt)
 
 
-def zeros(f, sd):
+def _root(g, a, b):
+    """Root of g on [a, b] with g(a) g(b) < 0: Anderson-Bjorck (bracketing), checked to stay in the bracket, else bisection."""
+    try:
+        r = mp.findroot(g, (a, b), solver="anderson")
+        if min(a, b) <= r <= max(a, b):
+            return r
+    except (ValueError, ZeroDivisionError):
+        pass
+    ga = g(a)
+    for _ in range(200):
+        m = (a + b) / 2
+        gm = g(m)
+        if gm == 0 or (b - a) < mp.mpf(10) ** -22 * (1 + abs(m)):
+            return m
+        if ga * gm < 0:
+            b = m
+        else:
+            a, ga = m, gm
+    return (a + b) / 2
+
+
+def segments(f, sd):
+    """Knots splitting [-12 sd, 12 sd] into pieces on which f is monotone: every local extremum seen on a 601-point grid
+    is refined to a zero of f' inside its bracket (R-G-Q4 fix: the old code only scanned the grid, which missed level
+    crossings near a flat maximum and capped the maximum at the best grid value)."""
     xs = [sd * (-12 + 24 * mp.mpf(i) / 600) for i in range(601)]
     vs = [f(x) for x in xs]
-    z = []
-    for x0, x1, v0, v1 in zip(xs, xs[1:], vs, vs[1:]):
-        if v0 == 0:
-            z.append(x0)
-        elif v0 * v1 < 0:
-            z.append(mp.findroot(f, (x0, x1), solver="bisect" if False else "anderson"))
-    return z, xs, vs
+    df = lambda x: mp.diff(f, x)  # noqa: E731
+    knots = [xs[0]]
+    for i in range(1, 600):
+        if (vs[i] - vs[i - 1]) * (vs[i + 1] - vs[i]) <= 0:
+            a, b = xs[i - 1], xs[i + 1]
+            da, db = df(a), df(b)
+            knots.append(_root(df, a, b) if da * db < 0 else xs[i])
+    knots.append(xs[-1])
+    return sorted(set(knots)), xs, vs
+
+
+def crossings(f, sd, y, knots):
+    g = lambda x: f(x) - y  # noqa: E731
+    out = []
+    for a, b in zip(knots, knots[1:]):
+        ga, gb = g(a), g(b)
+        if ga == 0:
+            out.append(a)
+        elif ga * gb < 0:
+            out.append(_root(g, a, b))
+    return out
+
+
+def zeros(f, sd):
+    knots, xs, vs = segments(f, sd)
+    return crossings(f, sd, 0, knots), xs, vs
 
 
 def profile_point(inp, t):
@@ -86,30 +129,29 @@ def profile_point(inp, t):
             ee += val
         else:
             ene += val
-    # PFE: smallest y >= 0 with P(max(f, 0) <= y) >= q; the CDF is computed on the sorted level sets of f
+    # PFE: smallest y >= 0 with P(max(f, 0) <= y) >= q, on the monotone pieces of f (R-G-Q4 fix)
+    knots, _, _ = segments(f, sd)
+    fmax = max(f(k) for k in knots)
+
     def cdf(y):
-        g = lambda x: f(x) - y  # noqa: E731
-        zz = []
-        gv = [v - y for v in vs]
-        for x0, x1, v0, v1 in zip(xs, xs[1:], gv, gv[1:]):
-            if v0 * v1 < 0:
-                zz.append(mp.findroot(g, (x0, x1), solver="anderson"))
-        pp = [-12 * sd] + zz + [12 * sd]
-        return sum(mp.ncdf(b / sd) - mp.ncdf(a / sd) for a, b in zip(pp, pp[1:]) if g((a + b) / 2) <= 0)
+        pp = [-12 * sd] + crossings(f, sd, y, knots) + [12 * sd]
+        return sum(mp.ncdf(b / sd) - mp.ncdf(a / sd) for a, b in zip(pp, pp[1:]) if f((a + b) / 2) <= y)
     pfe = []
     for q in Q:
         if cdf(mp.mpf(0)) >= q:
             pfe.append(mp.mpf(0))
             continue
-        lo, hi = mp.mpf(0), max(vs)
+        lo, hi = mp.mpf(0), fmax
         for _ in range(200):
             mid = (lo + hi) / 2
             if cdf(mid) >= q:
                 hi = mid
             else:
                 lo = mid
-            if hi - lo <= mp.mpf(10) ** -11 * max(1, hi):
+            if hi - lo <= mp.mpf(10) ** -12 * max(1, hi):
                 break
+        # self-check: the CDF at the golden quantile equals q (it is continuous here, f has no flat pieces)
+        assert abs(cdf(hi) - q) < 1e-9, (t, q, float(cdf(hi)))
         pfe.append(hi)
     return ee, ene, pfe
 
@@ -188,7 +230,7 @@ def _gold(args):
 def build_goldens():
     from multiprocessing import Pool
     jobs = [(a, s, name, trades) for a, s, sets in cases() for name, trades in sets.items()]
-    with Pool(6) as p:
+    with Pool(11) as p:
         res = p.map(_gold, jobs, chunksize=1)
     (HERE.parent / "ore" / "W4C_GOLDEN_RAW.json").write_text(json.dumps(res, indent=1) + "\n")
     print("goldens", len(res))
