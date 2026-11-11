@@ -13,10 +13,12 @@ Inputs: `risk_class` (`GIRR`, `CSR_NONSEC`, `EQUITY`, `COMMODITY`, `FX`; others 
 Recipe:
 - Risk weights (MAR21.92 Table 13): 100% for every class, except equity large cap and indices (buckets 1 to 8, 12, 13, per the Table 13 FAQ): 77.78%. Footnote 295's formula `min(55% x sqrt(LH/10), 100%)` gives these values with the Table 13 liquidity horizons; the table values are used. `WS_k = RW x VR_k`.
 - Within a bucket, GIRR (MAR21.93): `rho = min(exp(-a |T_k - T_l| / min(T_k, T_l)) x exp(-a |U_k - U_l| / min(U_k, U_l)), 1)`, `a = 1%`, `T` the option maturities, `U` the underlying residual maturities. Other classes (MAR21.94): `rho = min(rho_delta x exp(-a |T_k - T_l| / min(T_k, T_l)), 1)`, `rho_delta` the delta correlation along the name dimension only (MAR21.94 FAQ1): CSR 35% (80% in buckets 17, 18); equity as MAR21.78 spot against spot; commodity Table 12; FX 1.
-- Other-sector buckets (equity 11, CSR 16): simple sum of absolute net weighted sensitivities (MAR21.56(1), 21.79(1)).
+- Other-sector buckets (equity 11, CSR 16): simple sum of absolute net weighted sensitivities (MAR21.56(1), 21.79(1)); sensitivities are first netted per risk factor, the key being (`name`, `option_maturity`, `underlying_maturity`), with `underlying_maturity` absent outside GIRR.
 - Across buckets: the delta `gamma` of each class (MAR21.95). Aggregation MAR21.4; scenarios MAR21.6.
 
 Outputs as `risk.frtb.girr_delta`, with `vega` in place of `delta`.
+
+Bucket order (both operations): bucket labels are compared as strings, first by length, then by text (so `5` < `9` < `11` < `16`, and `EUR` < `USD`); `buckets` outputs follow this order.
 
 Worked example (`frtb_f2c-0006`): one FX vega of 1,000,000 gives capital 1,000,000 (100% weight). (`-0001`) GIRR, EUR 1y-into-5y +1,000,000 and 5y-into-10y -600,000: correlation `exp(-0.01 x 4) x exp(-0.01 x 1) = 0.951`, `K_EUR = 467,466` in the medium scenario.
 
