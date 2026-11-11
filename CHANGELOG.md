@@ -28,7 +28,7 @@ Known issues (stage I, at this draft):
 - **Outside-oracle share 113 of 276 (40.9%), below the 60% floor of ruling I-2.** Error cases count in the denominator and never in the numerator. Integer lots have no free outside solver, and the beta, residual and slippage suites are arithmetic only, so even counting every value case would not close the gap without an owner decision (handover, "Stage I spec status after session 1").
 - **I-48:** Java and C++ return `E_LIMIT` above 20 instruments with a sign-open cost or margin term in `hedge.qp.solve`; the ruling allows no limit below 200 instruments, and both builds must replace the orthant enumeration before release. No golden reaches 20 such instruments. Open at this draft.
 - Tutorials 17 to 21 (hedging) are planned, not written: they need the integrated four-language tree (handover, "Tutorials").
-- Stage G carry-overs: G-42b (needs WSL) and the C++ sanitizer run on wave 4c are still open; the full regeneration of the `expsim_g` PFE goldens is recorded in `program/STAGE_I_CARRY.md`.
+- Stage G carry-overs: G-42b (needs WSL) and the C++ sanitizer run on wave 4c are still open; the follow-up of the 0.7.0 PFE fix is done: all 96 `expsim_g` value cases were regenerated with the mpmath generator, 1,683 values moved by at most 8.6e-5 (9.2e-4 of the runner limit), and all four builds pass 102 of 102 on the new goldens (observed, `program/STAGE_I_CARRY.md`).
 
 ## 0.7.0: stage G, rates models and xVA (2026-11-11)
 

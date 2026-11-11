@@ -6,7 +6,7 @@ Lane `stage-i-carry`. Items as numbered in `STAGE_I_START.md` ("Carry-overs from
 |---|---|---|
 | 1 | Rust mutation kill tests | Done. All 8 sampled survivors are now killed (below). |
 | 2 | G-42b (six ORE runs) | Not attempted: needs WSL with about 6 GB free. |
-| 3 | 50-digit regeneration of the `expsim_g` PFE goldens | Running at the deadline; goldens not changed tonight (below). |
+| 3 | 50-digit regeneration of the `expsim_g` PFE goldens | Done: all 96 value cases regenerated, every value within 9.2e-4 of the runner limit of the old one, all four builds pass 102/102 on the new goldens; committed (below). |
 | 4 | Formal G-9 AAD timing | Deferred: the machine was not quiet (below). |
 | 5 | C++ ASan/UBSan on wave 4c | Not attempted: needs WSL. |
 | 6 | FRTB CSR securitisations | Decided: out of scope with the documented limit, a candidate for a later "FRTB completion" item together with DRC. Note: `STAGE_I_CSR_SEC_DECISION.md` in the plan folder. |
@@ -54,8 +54,12 @@ The generator `oracle/python/gen_stage_g_w4c.py` (function `golden`, unchanged) 
 - Started 2026-11-11 19:24 local, Windows process 18468 (`cmd.exe` running `run_regen.cmd`).
 - Folder: `C:\Users\ashis\AppData\Local\Temp\claude\615d9a8404c697b8\68854005-fd86-4dbf-8f7c-4acb00304417\scratchpad\pfe\`. Log `regen.log` (one line per case, `DONE` and `EXIT 0` at the end); partial results `regen_partial.jsonl`; full result `W4C_GOLDEN_RAW.regen.json`.
 - Check: `python compare.py` in that folder (it reads the partial file until the full one exists) prints the largest absolute difference and the largest difference over the runner limit `1e-4 + 1e-8 max(|a|, |b|)`.
-- At the deadline (22:26): 94 of 96 cases done (the forward job, 2 workers, process 18468, log `regen.log`; a reverse job from case 96 down, process 21784, log `regen_rev.log`, partials `regen_partial_rev.jsonl`; `compare.py` merges both). Cases 63 and 64 still running. Over the 94 cases (3988 values): largest |diff| 8.6e-5, largest |diff|/limit 9.2e-4, so far every value is well inside the limit. Both jobs left running; goldens not changed.
-- To finish: when `regen.log` ends in `EXIT 0`, run `compare.py`. If every difference is well inside the limit, copy `W4C_GOLDEN_RAW.regen.json` over `oracle/ore/W4C_GOLDEN_RAW.json`, run `cd oracle/python && uv run python -W ignore gen_stage_g_w4c.py suite` (needs the ORE outputs under `oracle/ore/run*/Output`, which are not in git) or, without them, patch only the values in `datasets/golden/stage_g/expsim_g.json`, then run the four language lanes on `expsim_g` before committing.
+- Finished 2026-11-11 22:48 (forward job 70 cases, reverse job 26, merged by `compare.py`). Both jobs then stopped.
+- Result over all 96 value cases (4,104 values): 1,683 values changed; largest |diff| 8.6e-5 (`expsim_g-0075`, set P3, `pfe_99` at date index 5, on a value of 10,756,015); largest |diff|/limit 9.2e-4 (`expsim_g-0040`, S20R, `pfe_95` index 8). Every value is far inside the runner limit `1e-4 + 1e-8 max(|a|, |b|)`.
+- Four builds on the new `expsim_g.json` through the neutral runner (observed, this machine, 2026-11-11 22:55 to 23:07, Rust, C++ and Java CLIs built by their lanes from `stage-i` that evening, Python from this branch's source): Rust, C++, Java and Python each 102 of 102.
+- Committed: `oracle/ore/W4C_GOLDEN_RAW.json` (the regenerated raw file), `datasets/golden/stage_g/expsim_g.json` (expected outputs of the 96 value cases replaced, inputs, tolerances, tags and the 6 error cases unchanged; compact form as the generator writes it), and the `expsim_g` lineage hash in `docs/model-inventory.md` (now `49b806c2...65ba`). `governance_gate.py` and `check_hygiene.py` exit 0.
+- Not redone: `ORE_CHECK_4C.json` and the G-42 count, which need the ORE outputs (not in git). The changes are at most 8.6e-5 absolute, far below ORE's Monte Carlo standard errors, so the count is not expected to move; the G-42b re-test will recount on the new goldens.
+- A copy of every result file is in the plan folder, `stage_i_pfe_regen/`.
 
 ## 4. G-9 AAD timing (deferred)
 
