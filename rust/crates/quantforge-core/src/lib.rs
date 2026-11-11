@@ -51,6 +51,7 @@ pub mod json;
 pub mod linalg;
 pub mod mbs;
 pub mod mc;
+pub mod mc_greeks;
 pub mod ois;
 pub mod pde;
 pub mod projection;

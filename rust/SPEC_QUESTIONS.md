@@ -222,3 +222,16 @@ E1 and E7 pass every golden (surf_e 28, lv_e 39, garch_e 27, varswap_e 31, vix_e
 - Traffic light: `P(X <= x)` is summed in log space from `n ln(1 - p)`.
 - FRTB GIRR: inflation against a tenor is 40% whatever the curve; with `reporting_currency`
   absent only the seven listed currencies are reduced.
+
+## Stage G, choices and findings
+
+- Noncentral chi-square (CIR bond options): Poisson-weighted series of regularised lower
+  incomplete gammas (`stats::gamma_p`: series below `s + 1`, Lentz continued fraction above),
+  summed from `j = 0` until past the mode and the term is below 1e-17 of the sum.
+- `capfloor_g-0040` ("1 + K tau <= 0") has `strike = -0.5` on annual periods, so
+  `1 + K tau = 0.5 > 0` and the spec's own rule does not reject it. Rust follows the spec text
+  and prices the case, so this one case fails. Question for the spec session: should the golden
+  use for example `strike = -1.5`, or is a different rule meant?
+- `hw_calibrate`: scan points where the critical-rate solve has no binary64 root (sigma near 1
+  with long expiries) are scored as `+inf`, since they cannot be the minimum.
+- Bermudan / callable FD: one stepper shared by both operations, exactly the G-18 scheme.

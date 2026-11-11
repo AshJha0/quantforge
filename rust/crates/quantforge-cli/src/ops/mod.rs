@@ -13,12 +13,14 @@ mod fx;
 mod hedge;
 mod infl;
 mod mbs;
+mod mcgreeks;
 mod rates;
 mod repo;
 mod risk;
 mod shortrate;
 mod usecase;
 mod vol;
+mod xva;
 
 use crate::input::Inputs;
 use quantforge_core::error::{Result, fail};
@@ -77,8 +79,10 @@ const DOMAINS: &[(&str, &[&str], Handler)] = &[
     ("rates", shortrate::NAMES, shortrate::dispatch),
     ("repo", repo::NAMES, repo::dispatch),
     ("risk", risk::NAMES, risk::dispatch),
+    ("risk", mcgreeks::NAMES, mcgreeks::dispatch),
     ("usecase", usecase::NAMES, usecase::dispatch),
     ("vol", vol::NAMES, vol::dispatch),
+    ("xva", xva::NAMES, xva::dispatch),
 ];
 
 /// Every operation, sorted: the verb table printed by the bare CLI.

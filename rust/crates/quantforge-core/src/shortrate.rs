@@ -941,6 +941,80 @@ pub fn callable_bond(
     Ok(bond.notional * hw_fd(curve, a, sigma, pay, grid, &terminal, &mut knot)?)
 }
 
+/// `xva.exposure.swap_ee_hw` (G-16): discounted EE of a swap under Hull-White at reset dates,
+/// each point the European swaption on the remaining swap, and the bucketed CVA when both
+/// `credit = (hazard_rate, recovery)` are given (one alone is `E_INPUT`).
+pub fn swap_ee_hw(
+    curve: &HwCurve,
+    a: f64,
+    sigma: f64,
+    swap: &SwapLeg,
+    exposure: &[f64],
+    credit: (Option<f64>, Option<f64>),
+) -> Result<(Vec<f64>, Option<f64>)> {
+    let (start, pay) = (swap.start, swap.pay);
+    crate::error::finite("start_years", &start)?;
+    crate::error::finite("exposure_times", &exposure)?;
+    let m = Model::HullWhite { a, sigma, curve };
+    zcb(&m, 0.0, 0.0, 1.0)?;
+    if start < 0.0 {
+        return fail("E_DOMAIN", "start_years must not be negative");
+    }
+    check_payments(start, pay)?;
+    if exposure.len() > 10_000 {
+        return fail("E_LIMIT", "at most 10,000 exposure times");
+    }
+    if exposure.iter().any(|t| *t <= 0.0) {
+        return fail("E_DOMAIN", "exposure_times must be positive");
+    }
+    let mut resets = vec![start];
+    resets.extend_from_slice(&pay[..pay.len() - 1]);
+    if exposure.is_empty()
+        || exposure.windows(2).any(|w| w[1] <= w[0])
+        || exposure.iter().any(|e| !resets.contains(e))
+    {
+        return fail(
+            "E_INPUT",
+            "exposure_times must be strictly increasing reset dates before the last payment",
+        );
+    }
+    let credit = match credit {
+        (Some(h), Some(r)) => Some((h, r)),
+        (None, None) => None,
+        _ => return fail("E_INPUT", "hazard_rate and recovery go together"),
+    };
+    if let Some((h, r)) = credit {
+        crate::error::finite("credit", &[h, r])?;
+        if h < 0.0 || !(0.0..1.0).contains(&r) {
+            return fail("E_DOMAIN", "need hazard_rate >= 0 and 0 <= recovery < 1");
+        }
+    }
+    let mut ee = Vec::with_capacity(exposure.len());
+    for t in exposure {
+        let rest: Vec<f64> = pay.iter().copied().filter(|p| p > t).collect();
+        let v = swaption(
+            &m,
+            0.0,
+            *t,
+            &rest,
+            swap.fixed_rate,
+            swap.payer,
+            swap.notional,
+        )?;
+        ee.push(v.price);
+    }
+    let cva = credit.map(|(h, r)| {
+        let mut prev = 0.0;
+        let mut sum = 0.0;
+        for (t, e) in exposure.iter().zip(&ee) {
+            sum += e * ((-h * prev).exp() - (-h * t).exp());
+            prev = *t;
+        }
+        (1.0 - r) * sum
+    });
+    Ok((ee, cva))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1143,5 +1217,35 @@ mod tests {
                 .code,
             "E_INPUT"
         );
+    }
+
+    #[test]
+    fn exposure_pay_minus_receive_is_forward_value() {
+        let c = curve();
+        let pay = [1.0, 2.0, 3.0, 4.0, 5.0];
+        let ex = [1.0, 2.0, 3.0, 4.0];
+        let leg = |payer| SwapLeg {
+            start: 0.0,
+            pay: &pay,
+            fixed_rate: 0.035,
+            payer,
+            notional: 1e7,
+        };
+        let (p, cva) =
+            swap_ee_hw(&c, 0.05, 0.01, &leg(true), &ex, (Some(0.02), Some(0.4))).unwrap();
+        let (r, none) = swap_ee_hw(&c, 0.05, 0.01, &leg(false), &ex, (None, None)).unwrap();
+        assert!(cva.unwrap() > 0.0 && none.is_none());
+        let df = |t: f64| c.ln_discount(t).exp();
+        for (k, t) in ex.iter().enumerate() {
+            let mut fwd = df(*t) - df(5.0);
+            let mut prev = *t;
+            for tj in &pay[k + 1..] {
+                fwd -= 0.035 * (tj - prev) * df(*tj);
+                prev = *tj;
+            }
+            assert!((p[k] - r[k] - 1e7 * fwd).abs() < 1e-6);
+        }
+        let err = swap_ee_hw(&c, 0.05, 0.01, &leg(true), &ex, (Some(0.02), None));
+        assert_eq!(err.unwrap_err().code, "E_INPUT");
     }
 }
