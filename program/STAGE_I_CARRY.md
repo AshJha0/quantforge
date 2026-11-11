@@ -1,0 +1,72 @@
+# Stage I carry-overs from stage G: status (2026-11-11)
+
+Lane `stage-i-carry`. Items as numbered in `STAGE_I_START.md` ("Carry-overs from stage G").
+
+| # | Item | State |
+|---|---|---|
+| 1 | Rust mutation kill tests | Done. All 8 sampled survivors are now killed (below). |
+| 2 | G-42b (six ORE runs) | Not attempted: needs WSL with about 6 GB free. |
+| 3 | 50-digit regeneration of the `expsim_g` PFE goldens | Running at the deadline; goldens not changed tonight (below). |
+| 4 | Formal G-9 AAD timing | Deferred: the machine was not quiet (below). |
+| 5 | C++ ASan/UBSan on wave 4c | Not attempted: needs WSL. |
+| 6 | FRTB CSR securitisations | Decided: out of scope with the documented limit, a candidate for a later "FRTB completion" item together with DRC. Note: `STAGE_I_CSR_SEC_DECISION.md` in the plan folder. |
+
+## 1. Rust mutation
+
+PR #31 (`Mutation by stage`, run 43073386336) gave no Rust result: bonds, credit_options and credit ended with exit 143 after a runner shutdown signal (at 6, 33 and 60 minutes), and exotics was cancelled. The earlier attempt (run 43069561885) was cancelled the same way. No mutation run on `main` covers these modules after the merge.
+
+The latest complete runs are the stage F ones on the same source positions (stage G only added code; `cargo mutants --list` shows the same mutants at the same line and column):
+
+| Module | Run (job) | Sample of 12: either killed | Survivors (unit and golden) |
+|---|---|---|---|
+| credit | 42888111129 (130081816617) | 8 | 4 |
+| credit_options | 42888111129 (130081816625) | 12 | 0 |
+| bonds | 42705795220 (129462885516) | 8 | 4 |
+| exotics | 42705795220 (129462896160) | 12 | 0 |
+
+Each survivor was applied in a scratch copy of `rust/` and the tests were run (`cargo test -j 2 -p quantforge-core --lib -- bonds:: credit::` and `--test bonds_mutants`):
+
+| Mutant | Killed by |
+|---|---|
+| `credit.rs:197:64` `+` to `*` in `e_terms` | `credit::tests::e_terms_series_and_closed_form` (stage G) |
+| `credit.rs:197:31` `+` to `-` in `e_terms` | same |
+| `credit.rs:197:53` `*` to `+` in `e_terms` | same |
+| `credit.rs:497:13` `&&` to `\|\|` in `CdsPrice::is_all_finite` | `credit::tests::finite_checks_see_every_field` (stage G) |
+| `bonds.rs:405:16` `-=` to `/=` in `conversion_factor` | `tests/bonds_mutants.rs` `conversion_factor_counts_a_part_month_down` (new) |
+| `bonds.rs:460:64` `-` to `/` in `futures_basis` | `net_basis_vanishes_at_the_implied_repo` (new) |
+| `bonds.rs:554:31` `+` to `-` in `fit_nelson_siegel` | `fit_raises_the_damping_until_a_step_is_accepted` (new) |
+| `bonds.rs:567:50` `*` to `/` in `fit_nelson_siegel` | same |
+
+Open: a fresh CI mutation run of the four Rust modules once the runners hold (the jobs need more than 60 minutes; the shutdowns look like the hosted runner's limits, not the code).
+
+## 3. expsim_g PFE regeneration
+
+The generator `oracle/python/gen_stage_g_w4c.py` (function `golden`, unchanged) runs on all 96 cases with 2 worker processes, writing to a scratch folder, never over the committed `oracle/ore/W4C_GOLDEN_RAW.json`. Note: the generator works at `mp.mp.dps = 25` (the suite tags it `mpmath-25-quadrature`); "50-digit" in the carry-over list and in `fix_w4c_pfe.py` refers to this generator. It was run as committed.
+
+- Started 2026-11-11 19:24 local, Windows process 18468 (`cmd.exe` running `run_regen.cmd`).
+- Folder: `C:\Users\ashis\AppData\Local\Temp\claude\615d9a8404c697b8\68854005-fd86-4dbf-8f7c-4acb00304417\scratchpad\pfe\`. Log `regen.log` (one line per case, `DONE` and `EXIT 0` at the end); partial results `regen_partial.jsonl`; full result `W4C_GOLDEN_RAW.regen.json`.
+- Check: `python compare.py` in that folder (it reads the partial file until the full one exists) prints the largest absolute difference and the largest difference over the runner limit `1e-4 + 1e-8 max(|a|, |b|)`.
+- At the deadline: see the closing line of this section.
+- To finish: when `regen.log` ends in `EXIT 0`, run `compare.py`. If every difference is well inside the limit, copy `W4C_GOLDEN_RAW.regen.json` over `oracle/ore/W4C_GOLDEN_RAW.json`, run `cd oracle/python && uv run python -W ignore gen_stage_g_w4c.py suite` (needs the ORE outputs under `oracle/ore/run*/Output`, which are not in git) or, without them, patch only the values in `datasets/golden/stage_g/expsim_g.json`, then run the four language lanes on `expsim_g` before committing.
+
+## 4. G-9 AAD timing (deferred)
+
+Not run: five other lanes were building, and the PFE regeneration held two cores. A timing taken under that load would not be the formal record. Next time, on a quiet machine (no builds, llama-server paused by the owner), one language at a time, each from the repo root:
+
+```bash
+cd rust && cargo bench -p quantforge-bench --bench aad_ladder
+```
+
+```bash
+cd python && uv run pytest tests/test_stage_g2.py::test_ladder_cost_ratio_report -s -q
+```
+
+```bash
+cd java25 && mvn -B -q test -Dtest=ShortRateTest#aadCostRatioG9
+```
+
+```bash
+cmake -S cpp26 -B cpp26/build-rel -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build cpp26/build-rel -j 2 --target quantforge_core_tests && cpp26/build-rel/quantforge_core_tests "Q3b AAD ladder*" -s
+```
+
+Each prints the median-of-21 (after 5 warm-ups) ratio of price plus ladder over one price; G-9 passes at `<= 5`. Record the four ratios, the two medians and the machine state in the model inventory (MG entry of the Q3b ladder).
