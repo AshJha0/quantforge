@@ -152,3 +152,88 @@ Read: `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`; rulings I-
 `hedgebt_i` 7 of 15 (QuantLib `AnalyticEuropeanEngine` on each date), `hedgeeff_i` 5 of 10 (numpy). Every value case counts. Stage I so far: 98 of 234 = 41.9% (`oracle/outside_register_i.json`).
 
 **Correction to the wave 4b property tests (2026-11-11):** on a constant-spot path the hedge leg has zero variance, so `hedge.backtest.delta` returns `E_DOMAIN` (I-31). Test the replay itself instead: on such a path, with zero rates and dividends, `portfolio_values` end at `quantity (V_last - V_0)`.
+
+## WAVE 4c READY (2026-11-11): instrument selection
+
+Read: `specifications/08-hedging/instrument-selection.md`; rulings I-33 to I-35; cli-contract block "Stage I operations"; edge-case row I13; `specifications/name-map.json` (273 operations).
+
+### Suite (17 cases)
+
+`hedgeselect_i`, operation `hedge.select.solve`: 10 value cases, 7 error cases.
+
+### Build notes
+- Enumerate subsets of size 1 to `K` and solve each with your `hedge.qp.solve` on those columns. Keep the best by the I-34 tie rule: within 1e-12 relative, the smaller subset wins, then the lexicographically smaller index list. Indices are 0-based.
+- Do not select greedily: `hedgeselect_i-0009` defeats forward selection by 0.5.
+- `selected` is compared exactly; `x` has zeros for instruments left out.
+
+### Property test
+- `K = n` gives the `hedge.qp.solve` answer, and the best objective never rises as `K` grows.
+
+### Outside-oracle status
+`hedgeselect_i` 10 of 17 (scipy per subset); every value case counts. Stage I so far: 108 of 251 = 43.0% (`oracle/outside_register_i.json`).
+
+## WAVE 4d READY (2026-11-11): hedge slippage
+
+Read: `specifications/08-hedging/hedge-slippage.md`; rulings I-36 to I-38; cli-contract block "Stage I operations"; edge-case row I14; `specifications/name-map.json` (274 operations).
+
+`hedgeslip_i`, operation `hedge.slippage.report`: 12 cases (6 value, 6 error). Plain arithmetic. Signs follow I-36, so a positive cost is a cost for buys and for sells alike. `average_price` is `null` when nothing was filled (I-37). Property tests: `shortfall = execution_cost + opportunity_cost`; `slippage = execution_cost - model_cost`; totals are the sums over orders.
+
+## Stage I spec status after session 1 (2026-11-11)
+
+Domain 08 rows for stage I are all specified: multi-instrument, delta, gamma, vega, equity beta, credit, correlation, cross-asset, dynamic hedge and effectiveness, minimum variance, constrained least squares, integer contracts, instrument selection, transaction cost, liquidity, impact, margin, position constraints, residual risk, slippage, frontier, singular handling. 14 suites, 263 cases, rulings I-1 to I-38.
+
+**Open: the outside share is 108 of 263 = 41.1%, below the 60% floor (I-2).** Error cases are 89 of the 263 and never count. Uncounted value suites are `hedgeint_i` (12; no free integer least-squares library), `hedgebeta_i` (8) and `hedgeres_i` (7) and `hedgeslip_i` (6), which are all arithmetic, plus a few cases where scipy's general solvers stop near 1e-8. Even if every value case counted, the share would be 174 of 263 = 66%. Reaching 60% honestly needs an owner decision: an outside reference for integer lots (for example a free MIQP solver), or a ruling on how arithmetic-only suites are treated. The G-42 precedent was to report the gap, not to add cases to pad the share.
+
+**Note (2026-11-11, metadata only):** `hedgeint_i` gained a second oracle method (a wide-box float search with the I-7 tie rule) in each value case's `verified_by`. No input, value or error code changed; the file hash in `docs/model-inventory.md` MI-1 was refreshed.
+
+**Correction to the session 1 status above:** the suites number 15, not 14 (`hedgeqp_i`, `hedgeint_i`, `hedgemv_i`, `hedgegreeks_i`, `hedgebeta_i`, `hedgeres_i`, `hedgecredit_i`, `hedgecorr_i`, `hedgexa_i`, `hedgecost_i`, `hedgefrontier_i`, `hedgebt_i`, `hedgeeff_i`, `hedgeselect_i`, `hedgeslip_i`); the 263-case total stands.
+
+## WAVE 4e READY (2026-11-11): costs in the dynamic hedge backtest
+
+Read: `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`, section "Costs in the backtest (wave 4e)"; rulings I-39, I-40; cli-contract block "Stage I operations".
+
+`hedgebtcost_i`, operation `hedge.backtest.delta` with the new optional inputs `half_spread` and `impact`: 8 cases (5 value, 3 error). Your `hedgebt_i` results must not change; the generator re-derived every one with the extended reference. Build notes: the initial share purchase is a trade, so `Pi_0 = -cost(h_0)`. A rebalance cost is paid after that date's `Pi` is recorded. There is no unwind at the end. `trading_cost` appears only with a cost input. Outside: 5 of 8. Stage I so far: 113 of 271 = 41.7%. This wave exists for tutorial 21 (below).
+
+## FOLLOW-UP NOTE to waves 1 to 4d (2026-11-11): CLI entry points and example inputs for the tutorials
+
+This note adds a build requirement for the tutorials (stage I done criterion, owner 2026-11-11). It changes no spec, golden or ruling of a READY wave. Each language lane builds the following as part of the wave, not after it:
+
+1. **CLI.** Every stage I operation answers through `quantforge run` and `quantforge batch` (`specifications/cli-contract.md`). The contract already requires this; it is listed here because the tutorials' Rust, Java and C++ steps drive the CLI through `examples/tutorial_hedge_*.py`, as tutorial 1 drives `examples/tutorial_swap.py`.
+2. **Python API.** The tutorial's Python step calls the Python package directly. Each operation needs a public function under the name in `specifications/name-map.json` (`quantforge.hedge.qp_solve`, `quantforge.hedge.greeks_neutralise`, and so on), with the same inputs and outputs as the CLI.
+3. **Example inputs.** These files are committed under `examples/`. Each is one case document copied verbatim from the named golden case, so its expected outputs are in the golden. Each lane adds a smoke test that runs every file through its CLI and checks `status: ok` and the golden values:
+
+| File | Operation | From golden | Wave |
+|---|---|---|---|
+| `hedge_greeks_i.json` | `hedge.greeks.neutralise` | `hedgegreeks_i-0003` | 1 |
+| `hedge_minvar_i.json` | `hedge.minvar.ratio` | `hedgemv_i-0006` | 1 |
+| `hedge_beta_i.json` | `hedge.beta.futures` | `hedgebeta_i-0001` | 1 |
+| `hedge_qp_keyrate_i.json` | `hedge.qp.solve` | `hedgeqp_i-0009` | 1 |
+| `hedge_qp_minnorm_i.json` | `hedge.qp.solve` | `hedgeqp_i-0018` | 1 |
+| `hedge_integer_i.json` | `hedge.integer.solve` | `hedgeint_i-0010` | 1 |
+| `hedge_residual_i.json` | `hedge.residual.report` | `hedgeres_i-0002` | 1 |
+| `hedge_credit_i.json` | `hedge.credit.cds` | `hedgecredit_i-0004` | 2 |
+| `hedge_correlation_i.json` | `hedge.correlation.neutralise` | `hedgecorr_i-0003` | 2 |
+| `hedge_crossasset_i.json` | `hedge.crossasset.solve` | `hedgexa_i-0002` | 3 |
+| `hedge_cost_i.json` | `hedge.qp.solve` (costs) | `hedgecost_i-0002` | 4a |
+| `hedge_frontier_i.json` | `hedge.frontier.solve` | `hedgefrontier_i-0001` | 4a |
+| `hedge_backtest_i.json` | `hedge.backtest.delta` | `hedgebt_i-0001` | 4b |
+| `hedge_effectiveness_i.json` | `hedge.effectiveness` | `hedgeeff_i-0001` | 4b |
+| `hedge_select_i.json` | `hedge.select.solve` | `hedgeselect_i-0009` | 4c |
+| `hedge_slippage_i.json` | `hedge.slippage.report` | `hedgeslip_i-0003` | 4d |
+
+Wave 4e needs no new file: tutorial 21's driver adds `half_spread` to the `hedge_backtest_i.json` inputs (golden `hedgebtcost_i-0001`). The driver scripts (`examples/tutorial_hedge_17.py` onwards) and the tutorial pages are written with the tutorials, after `docs-curve-status` is merged or rebased in.
+
+## Tutorials (planned 2026-11-11; not written yet)
+
+Numbered from 17, after tutorials 2 to 16 on branch `docs-curve-status`. Each page follows tutorial 1 (`docs/getting-started/tutorial-1-swap.md`): about 10 to 15 minutes, real outputs, Python first and then Rust, Java and C++ through a driver script, one `tutorial:expect` block checked by `tools/check_tutorial.py`, linked from LEARN and the tutorials index. Each ends with "References and further reading". Every link there is opened and checked, with its access date, when the page is written. The candidates below are **not yet verified**; most are the spec pages' sources, which are marked "not opened" there too.
+
+| # | Title | Items covered | Operations | Waves | Candidate references |
+|---|---|---|---|---|---|
+| 17 | Delta-hedge an option and watch the P&L | delta, gamma and vega hedges; a dynamic delta hedge on a path; hedge effectiveness (dollar offset, regression) | `hedge.greeks.neutralise`, `hedge.backtest.delta`, `hedge.effectiveness` | 1, 4b | Hull, *Options, Futures, and Other Derivatives*, 10th ed., ch. 19; IFRS 9 hedge accounting (ifrs.org); Finnerty and Grant (2002) on the dollar offset; QuantLib `AnalyticEuropeanEngine` documentation |
+| 18 | A minimum-variance hedge with the QP solver | minimum-variance ratio from returns; equity-beta futures (the Hull 30-contract example); multi-instrument key-rate hedge with bounds; singular matrix handling (`MIN_NORM`); integer contracts; residual risk | `hedge.minvar.ratio`, `hedge.beta.futures`, `hedge.qp.solve`, `hedge.integer.solve`, `hedge.residual.report` | 1 | Hull ch. 3; Nocedal and Wright, *Numerical Optimization*, 2nd ed., ch. 16; Golub and Van Loan, *Matrix Computations*, 4th ed., 5.5; scipy `lsq_linear` documentation (BVLS) |
+| 19 | Hedging credit and correlation | CS01 (parallel and bucketed) and jump-to-default hedges with CDS; correlation hedge with exchange options and vanillas, and why exchange options alone cannot do it (I-17) | `hedge.credit.cds`, `hedge.correlation.neutralise` | 2 | O'Kane, *Modelling Single-name and Multi-name Credit Derivatives* (2008); Margrabe (1978), *Journal of Finance* 33(1); QuantLib `IsdaCdsEngine` and Margrabe engine documentation |
+| 20 | One hedge for equity and rates | cross-asset (equity/rates) hedge on key rates; choosing the best two instruments (instrument selection, greedy pitfall) | `hedge.crossasset.solve`, `hedge.select.solve` | 3, 4c | Tuckman and Serrat, *Fixed Income Securities*, 3rd ed., ch. 5; Miller, *Subset Selection in Regression*, 2nd ed., ch. 3 |
+| 21 | What a hedge costs: spread, impact, margin, and a backtest with costs | transaction cost and bid/offer; market impact; liquidity bounds; margin; the risk-against-cost frontier; a dynamic hedge backtest with costs; slippage against the model | `hedge.qp.solve` (costs), `hedge.frontier.solve`, `hedge.backtest.delta` (costs), `hedge.slippage.report` | 4a, 4d, 4e | Almgren and Chriss (2001), *Journal of Risk* 3(2); Perold (1988), *Journal of Portfolio Management* 14(3); Boyd and Vandenberghe, *Convex Optimization*, 4.7 |
+| (22) | Calibration on real noisy quotes | Q6: parameter time series, churn penalty, arbitrage repair | not specified | Q6 | **Blocked:** the Cboe and Deribit terms forbid automated download or publishing derived data without consent (`STAGE_I_DATA_TERMS.md` in the plan folder). It waits for the owner's decision on the data source, then for the preregistered fit (`research/preregs/Q6-01-churn-bound.md`) |
+
+Every Domain 08 stage I row appears in at least one of tutorials 17 to 21. Each tutorial needs only READY waves, so all five can be written once the language lanes pass the waves they depend on.

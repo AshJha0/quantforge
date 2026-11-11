@@ -3341,8 +3341,14 @@
     "dividend_yield": {
      "java": "dividendYield"
     },
+    "half_spread": {
+     "java": "halfSpread"
+    },
     "hedge_volatility": {
      "java": "hedgeVolatility"
+    },
+    "impact": {
+     "java": "impact"
     },
     "option": {
      "java": "option"
@@ -3368,6 +3374,7 @@
     "regression_r2",
     "regression_slope",
     "shares",
+    "trading_cost",
     "variance_reduction"
    ]
   },
@@ -3772,6 +3779,61 @@
     "variance_after",
     "variance_before",
     "volatility_after"
+   ]
+  },
+  "hedge.select.solve": {
+   "spec": "specifications/08-hedging/instrument-selection.md",
+   "rust": "quantforge::hedge::select_solve",
+   "python": "quantforge.hedge.select_solve",
+   "java": "Hedge.selectSolve",
+   "cpp": "qf::hedge::select_solve",
+   "inputs": {
+    "a": {
+     "java": "a"
+    },
+    "b": {
+     "java": "b"
+    },
+    "eq_matrix": {
+     "java": "eqMatrix"
+    },
+    "eq_rhs": {
+     "java": "eqRhs"
+    },
+    "lower": {
+     "java": "lower"
+    },
+    "max_instruments": {
+     "java": "maxInstruments"
+    },
+    "ridge": {
+     "java": "ridge"
+    },
+    "weights": {
+     "java": "weights"
+    }
+   },
+   "outputs": [
+    "objective",
+    "residual",
+    "selected",
+    "x"
+   ]
+  },
+  "hedge.slippage.report": {
+   "spec": "specifications/08-hedging/hedge-slippage.md",
+   "rust": "quantforge::hedge::slippage_report",
+   "python": "quantforge.hedge.slippage_report",
+   "java": "Hedge.slippageReport",
+   "cpp": "qf::hedge::slippage_report",
+   "inputs": {
+    "orders": {
+     "java": "orders"
+    }
+   },
+   "outputs": [
+    "orders",
+    "total"
    ]
   },
   "hedge.solve": {
@@ -7908,6 +7970,7 @@
   "eq.forward.outright: expiry",
   "eq.futures.basis: expiry",
   "eq.futures.basis: financing_spread",
+  "hedge.backtest.delta: half_spread",
   "rates.basis.ois_spread: tenor",
   "rates.csa.discount: collateral_spread",
   "risk.mc.greeks: bump_relative",

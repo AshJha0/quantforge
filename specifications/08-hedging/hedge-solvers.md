@@ -168,7 +168,7 @@ Generator `oracle/python/gen_stage_i_w1.py`. Every golden, including every error
 | Suite | Cases (value + error) | Oracle and self-checks | Outside (I-2) |
 |---|---|---|---|
 | `hedgeqp_i` | 27 + 17 | Active-set enumeration at 50 digits: each active set's KKT system is solved and kept only if primal-feasible with non-negative multipliers; exactly one KKT point must be found. KKT re-checked from the double outputs. Infeasible cases confirmed by HiGHS (`scipy.optimize.linprog`) | 25 of 44: scipy 1.18 `lsq_linear` BVLS (bounds), `linalg.lstsq` gelsd (unconstrained, `MIN_NORM`), `minimize` SLSQP (equalities); every output within `root_finding` |
-| `hedgeint_i` | 12 + 6 | Exhaustive search in exact rational arithmetic over a box that contains every minimiser (ellipsoid bound from the rounded relaxed solution); tie margin asserted | 0 of 18 |
+| `hedgeint_i` | 12 + 6 | Exhaustive search in exact rational arithmetic over a box that contains every minimiser (ellipsoid bound from the rounded relaxed solution); tie margin asserted; second method: a float search over a box of 6 lots either side of the clipped relaxed solution, with the I-7 tie rule, returns the same lots | 0 of 18 |
 | `hedgemv_i` | 9 + 8 | 50-digit Cholesky and solve; Hull's `rho sigma_S / sigma_F` asserted | 9 of 17: numpy 2.5 `linalg.solve` (covariance) and `linalg.lstsq` OLS with intercept (series) |
 | `hedgegreeks_i` | 10 + 9 | 50-digit Greeks and solve | 10 of 19: QuantLib 1.44 `AnalyticEuropeanEngine` Greeks, then numpy `linalg.solve` |
 | `hedgebeta_i` | 8 + 4 | 50-digit arithmetic; Hull's 30-contract example | 0 of 12 |
