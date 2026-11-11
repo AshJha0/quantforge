@@ -902,7 +902,8 @@ def res_suite(reg):
 def main():
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / FOLDER
-    reg = {}
+    reg_p = HERE.parent / "outside_register_i.json"
+    reg = json.loads(reg_p.read_text(encoding="utf-8")) if reg_p.exists() else {}  # later waves keep their rows
     tot = cnt = 0
     for fn in (qp_suite, int_suite, mv_suite, gr_suite, beta_suite, res_suite):
         s, n_out, rule = fn(reg)
@@ -916,7 +917,7 @@ def main():
     common.GOLDEN = keep
     reg["_wave1"] = {"counted": cnt, "total": tot, "share": round(cnt / tot, 4), "floor": 0.60,
                      "note": "Floor is measured over the stage at release, error cases in the denominator (ruling I-2)"}
-    (HERE.parent / "outside_register_i.json").write_text(json.dumps(reg, indent=1) + "\n", encoding="utf-8", newline="\n")
+    reg_p.write_text(json.dumps(reg, indent=1) + "\n", encoding="utf-8", newline="\n")
     note(f"wave 1 outside: {cnt} of {tot} = {100 * cnt / tot:.1f}%")
     for m_, g in MUTANTS:
         note(f"  mutant caught: {m_} (gap {g:.3e})")

@@ -21,6 +21,16 @@ Normative for stage I (v0.8): hedging (plan section 4, row I; TRACEABILITY Domai
 | I-13 | Costs in the QP | Not in wave 1 (spec question Q-I1). The cost wave adds new optional inputs; with them absent, `hedge.qp.solve` keeps the meaning fixed here |
 | I-14 | Order of `E_SINGULAR` and `E_INFEASIBLE` | The equality-rank and reduced-Hessian checks come before feasibility, so a problem that is both singular and infeasible returns `E_SINGULAR`. Feasibility is decided exactly (no tolerance): the generator confirms each `E_INFEASIBLE` golden by HiGHS and keeps feasible cases clear of the boundary |
 
+## Wave 2, credit and correlation hedges
+
+| # | Point | Ruling |
+|---|---|---|
+| I-15 | CS01 definition | A central difference of the piecewise-flat hazard rates with `eps = 1e-4 / (1 - R)` (about one basis point of spread by the credit triangle), with all sections shifted (`CS01`) or one (`BUCKET_k`). It is a definition, not an approximation, so builds agree to rounding. Sections are those of the `hazard` input; the last also covers the time after the last pillar. Quote bumps with a re-bootstrap are not used (spec question Q-I5) |
+| I-16 | Jump to default in the hedge | `JTD = (1 - R) - pv` per unit of bought protection, with `pv` the `credit.cds.price` value including `accrued Pcs`. This is `risk.credit.jtd` with the computed value in place of the clean market value input |
+| I-17 | One spread-volatility factor | Margrabe Greeks in `vol1`, `vol2` and `rho` are all proportional to `dV/ds` with factors common to every exchange option. A correlation hedge needs single-asset vanillas, so `CALL_k` and `PUT_k` are hedge instruments. Exchange options alone against two of `VEGA_1`, `VEGA_2`, `CORRELATION` are `E_SINGULAR` |
+| I-18 | Correlation sensitivity units | `CORRELATION` and `correlation01` are per 0.01 of correlation, as `risk.sens.correlation`; vegas are per unit volatility, as I-9 |
+| I-19 | `E_LIMIT` sizes, wave 2 | Credit: book 1,000 trades, 50 hedges. Correlation: book 1,000 positions, 5 hedges (the number of Greeks) |
+
 ## Sources
 
 - [GV13] G. H. Golub, C. F. Van Loan, *Matrix Computations*, 4th ed., 2013, section 5.5 (not opened).
