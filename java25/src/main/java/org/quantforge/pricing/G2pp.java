@@ -4,6 +4,16 @@ package org.quantforge.pricing;
 public final class G2pp {
     private G2pp() {}
 
+    /**
+     * G2++ parameters.
+     *
+     * @param curve the initial discount curve
+     * @param a mean reversion of the first factor
+     * @param sigma volatility of the first factor
+     * @param b mean reversion of the second factor
+     * @param eta volatility of the second factor
+     * @param rho correlation of the two factors
+     */
     public record Params(ShortRate.Curve curve, double a, double sigma, double b, double eta, double rho) {}
 
     private static final int TERMS = 30;
@@ -68,14 +78,32 @@ public final class G2pp {
                 + 2.0 * p.rho() * p.sigma() * p.eta() * cross(p.a(), p.b(), tau);
     }
 
-    /** P(t, T) with factor states x and y at t. */
+    /**
+     * P(t, T) with factor states x and y at t.
+     *
+     * @param p the model
+     * @param x first factor state at t
+     * @param y second factor state at t
+     * @param t valuation time in years
+     * @param maturity bond maturity in years
+     * @return the zero-coupon bond price
+     */
     public static double zcb(Params p, double x, double y, double t, double maturity) {
         double tau = maturity - t;
         double ln = 0.5 * (v(p, tau) - v(p, maturity) + v(p, t)) - bf(p.a(), tau) * x - bf(p.b(), tau) * y;
         return p.curve().df(maturity) / p.curve().df(t) * Math.exp(ln);
     }
 
-    /** Bond call at expiry t on the bond to s, states starting at zero; the put by parity. */
+    /**
+     * Bond call at expiry t on the bond to s, states starting at zero; the put by parity.
+     *
+     * @param p the model
+     * @param call true for a call, false for a put
+     * @param k strike per unit face
+     * @param t option expiry in years
+     * @param s bond maturity in years
+     * @return the option price per unit face
+     */
     public static double bondOption(Params p, boolean call, double k, double t, double s) {
         double u = s - t;
         double ba = bf(p.a(), u);

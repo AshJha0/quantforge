@@ -6,10 +6,36 @@ import org.quantforge.core.Rng;
 public final class McGreeks {
     private McGreeks() {}
 
-    public enum Payoff { CALL, PUT, DIGITAL_CALL }
+    /** The payoffs. */
+    public enum Payoff {
+        /** European call. */
+        CALL,
+        /** European put. */
+        PUT,
+        /** Cash-or-nothing digital call paying 1. */
+        DIGITAL_CALL
+    }
 
-    public enum Method { PATHWISE, LIKELIHOOD_RATIO, BUMP }
+    /** The Greek estimators. */
+    public enum Method {
+        /** Pathwise derivative of the payoff. */
+        PATHWISE,
+        /** Likelihood-ratio score weights. */
+        LIKELIHOOD_RATIO,
+        /** Central bump and reprice with common draws. */
+        BUMP
+    }
 
+    /**
+     * Estimates and their standard errors.
+     *
+     * @param price price estimate
+     * @param priceSe standard error of the price
+     * @param delta delta estimate
+     * @param deltaSe standard error of delta
+     * @param vega vega estimate
+     * @param vegaSe standard error of vega
+     */
     public record Result(double price, double priceSe, double delta, double deltaSe, double vega, double vegaSe) {}
 
     /** Running mean and standard deviation (divisor n - 1) of one per-path term. */
@@ -45,7 +71,24 @@ public final class McGreeks {
         return s * Math.exp((r - q - v * v / 2.0) * t + v * Math.sqrt(t) * z);
     }
 
-    /** {@code width} applies to the smoothed pathwise digital; {@code bump} to BUMP; the other is ignored. */
+    /**
+     * Runs one estimator. {@code width} applies to the smoothed pathwise digital; {@code bump} to BUMP; the other
+     * is ignored.
+     *
+     * @param pay the payoff
+     * @param method the estimator
+     * @param s spot
+     * @param k strike
+     * @param t expiry in years
+     * @param r risk-free rate
+     * @param q dividend yield
+     * @param v volatility
+     * @param n number of paths
+     * @param seed core.rng seed
+     * @param width smoothing width of the pathwise digital
+     * @param bump relative bump size
+     * @return the estimates
+     */
     public static Result run(Payoff pay, Method method, double s, double k, double t, double r, double q, double v,
                              long n, long seed, double width, double bump) {
         Rng rng = Rng.seeded(seed, 0);

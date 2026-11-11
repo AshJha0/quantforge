@@ -51,6 +51,19 @@ public final class Exotics {
     /**
      * Discrete monitoring m times a year: the continuous price at the barrier shifted away from spot by
      * {@code exp(beta v sqrt(1/m))} (rulings G-7, G-8). The domain check uses the unshifted barrier.
+     *
+     * @param phi 1 for a call, -1 for a put
+     * @param type the barrier type
+     * @param s spot
+     * @param k strike
+     * @param t expiry in years
+     * @param r risk-free rate
+     * @param q dividend yield
+     * @param v volatility
+     * @param h barrier level
+     * @param rebate rebate
+     * @param perYear monitoring dates per year
+     * @return the option price
      */
     public static double barrierDiscrete(double phi, BarrierType type, double s, double k, double t, double r,
                                          double q, double v, double h, double rebate, long perYear) {

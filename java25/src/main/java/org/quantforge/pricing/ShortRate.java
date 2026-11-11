@@ -10,13 +10,27 @@ import org.quantforge.core.QfError;
 public final class ShortRate {
     private ShortRate() {}
 
-    public enum Model { VASICEK, CIR, HULL_WHITE }
+    /** The one-factor short-rate models of short-rate-models.md. */
+    public enum Model {
+        /** Vasicek, Gaussian with a constant long-term mean. */
+        VASICEK,
+        /** Cox-Ingersoll-Ross, square-root diffusion. */
+        CIR,
+        /** Hull-White, Vasicek fitted to the initial curve. */
+        HULL_WHITE
+    }
 
     /** Log-linear discount curve with (0, 1) as the first node and a flat forward beyond the last pillar. */
     public static final class Curve {
         private final double[] t;
         private final double[] lnP;
 
+        /**
+         * A curve from its pillars.
+         *
+         * @param times pillar times in years, increasing
+         * @param discountFactors discount factors at the pillars
+         */
         public Curve(double[] times, double[] discountFactors) {
             if (times.length == 0 || times.length != discountFactors.length) {
                 throw new QfError("E_INPUT", "curve needs matching, non-empty times and discount_factors", "curve");
@@ -45,21 +59,39 @@ public final class ShortRate {
             return i;
         }
 
-        /** P(0, x). */
+        /**
+         * P(0, x).
+         *
+         * @param x time in years
+         * @return the discount factor
+         */
         public double df(double x) {
             int i = section(x);
             double slope = (lnP[i + 1] - lnP[i]) / (t[i + 1] - t[i]);
             return Math.exp(lnP[i] + slope * (x - t[i]));
         }
 
-        /** Instantaneous forward f(0, x), right-hand at a pillar (ruling G-3). */
+        /**
+         * Instantaneous forward f(0, x), right-hand at a pillar (ruling G-3).
+         *
+         * @param x time in years
+         * @return the forward rate
+         */
         public double forward(double x) {
             int i = section(x);
             return -(lnP[i + 1] - lnP[i]) / (t[i + 1] - t[i]);
         }
     }
 
-    /** Parameters of one model; {@code b} is unused by Hull-White, {@code curve} only by Hull-White. */
+    /**
+     * Parameters of one model; {@code b} is unused by Hull-White, {@code curve} only by Hull-White.
+     *
+     * @param model the model
+     * @param a mean reversion
+     * @param sigma volatility
+     * @param b long-term mean (Vasicek and CIR)
+     * @param curve initial discount curve (Hull-White)
+     */
     public record Params(Model model, double a, double sigma, double b, Curve curve) {}
 
     // ---- factors ----
@@ -146,7 +178,15 @@ public final class ShortRate {
         return 2.0 * p.a() * p.b() / (p.sigma() * p.sigma()) * ln;
     }
 
-    /** P(t, T) given the short rate r at t. */
+    /**
+     * P(t, T) given the short rate r at t.
+     *
+     * @param p the model
+     * @param r short rate at t
+     * @param t valuation time in years
+     * @param maturity bond maturity in years
+     * @return the zero-coupon bond price
+     */
     public static double zcb(Params p, double r, double t, double maturity) {
         double tau = maturity - t;
         return switch (p.model()) {
@@ -163,7 +203,17 @@ public final class ShortRate {
 
     // ---- bond options ----
 
-    /** Call on a bond (maturity s) struck at k at expiry t; the put follows by parity. */
+    /**
+     * Call on a bond (maturity s) struck at k at expiry t; the put follows by parity.
+     *
+     * @param p the model
+     * @param r short rate today
+     * @param call true for a call, false for a put
+     * @param k strike per unit face
+     * @param t option expiry in years
+     * @param s bond maturity in years
+     * @return the option price per unit face
+     */
     public static double bondOption(Params p, double r, boolean call, double k, double t, double s) {
         double pt;
         double ps;
@@ -188,13 +238,32 @@ public final class ShortRate {
         return call ? callValue : callValue - ps + k * pt;
     }
 
-    /** Vasicek and Hull-White bond call [J89]. */
+    /**
+     * Vasicek and Hull-White bond call [J89].
+     *
+     * @param a mean reversion
+     * @param sigma volatility
+     * @param k strike per unit face
+     * @param t option expiry in years
+     * @param s bond maturity in years
+     * @param pt P(0, t)
+     * @param ps P(0, s)
+     * @return the call price per unit face
+     */
     public static double gaussianCall(double a, double sigma, double k, double t, double s, double pt, double ps) {
         double sp = sigma * bFactor(a, s - t) * Math.sqrt(-Math.expm1(-2.0 * a * t) / (2.0 * a));
         return gaussianCallSp(sp, k, pt, ps);
     }
 
-    /** The Gaussian bond call for a given total volatility sp. */
+    /**
+     * The Gaussian bond call for a given total volatility sp.
+     *
+     * @param sp total volatility of the bond price ratio
+     * @param k strike per unit face
+     * @param pt P(0, t)
+     * @param ps P(0, s)
+     * @return the call price per unit face
+     */
     public static double gaussianCallSp(double sp, double k, double pt, double ps) {
         double h = Math.log(ps / (k * pt)) / sp + sp / 2.0;
         return ps * Normal.cdf(h) - k * pt * Normal.cdf(h - sp);
@@ -308,9 +377,26 @@ public final class ShortRate {
 
     // ---- Jamshidian swaption ----
 
+    /**
+     * A Jamshidian swaption result.
+     *
+     * @param price swaption price
+     * @param forwardSwapRate forward par rate of the underlying swap
+     * @param annuity annuity of the underlying swap
+     */
     public record Swaption(double price, double forwardSwapRate, double annuity) {}
 
-    /** European swaption on Hull-White; coupons are fixed-rate times accruals, plus 1 on the last. */
+    /**
+     * European swaption on Hull-White; coupons are fixed-rate times accruals, plus 1 on the last.
+     *
+     * @param p the Hull-White model
+     * @param t0 expiry and swap start in years
+     * @param pay payment times in years, increasing, after t0
+     * @param rate fixed rate
+     * @param payer true for a payer swaption, false for a receiver
+     * @param notional notional
+     * @return price, forward swap rate and annuity
+     */
     public static Swaption swaption(Params p, double t0, double[] pay, double rate, boolean payer, double notional) {
         int n = pay.length;
         double[] tau = new double[n];
