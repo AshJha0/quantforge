@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 from scipy import integrate as sp_integrate
 from scipy import interpolate as sp_interpolate
@@ -134,6 +134,11 @@ def test_rng_reference_vector():
     assert rng.set_state_next_u64([1, 2, 3, 4], 3) == [11520, 0, 1509978240]
 
 
+# deadline=None: both properties take well under a millisecond per example, but under a loaded
+# machine (the full suite next to a mutation run) one example was descheduled for 273 ms and
+# Hypothesis reported DeadlineExceeded / FlakyFailure (reproduced 2026-11-11 with 12 busy
+# processes; the same seed passes unloaded). The property itself never failed.
+@settings(deadline=None)
 @given(st.floats(min_value=1e-12, max_value=1 - 1e-12))
 def test_ppnd16_inverts_the_normal_cdf(p):
     z = rng.ppnd16(p)
@@ -235,6 +240,7 @@ def test_tension_zero_is_natural_cubic():
     )
 
 
+@settings(deadline=None)  # see test_ppnd16_inverts_the_normal_cdf
 @given(
     st.lists(st.floats(min_value=-0.02, max_value=0.1), min_size=2, max_size=8),
     st.booleans(),

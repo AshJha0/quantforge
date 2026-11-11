@@ -235,3 +235,21 @@ readers, and `core.store.*` record `value`). F-Q5 by the amended `dR/dq` line of
 spline small-`z` series with its `z^2` terms), F-36 (`side` is `PAY` / `RECEIVE` in `risk_f3`), F-39
 (Monte Carlo `seed` a u64 string; `E_NOT_POSITIVE_DEFINITE`; duplicate opening position `E_INPUT`).
 F-Q1, F-Q2 and F-Q4 have no ruling yet.
+
+## Stage G (2026-11-11)
+
+- G-Q1 (G2e, `capfloor_g-0040`). The case is described as "1 + K tau <= 0" and expects `E_DOMAIN`, but its
+  inputs (`period_times` [1, 2, 3], `strike` -0.5) give `1 + K tau = 0.5 > 0` in both periods. The spec rule
+  (`1 + K tau_i > 0`, else `E_DOMAIN`) therefore prices it (0.9793 on unit notional). Python follows the
+  spec and fails this one case; asked: regenerate the case (for example `strike` -1.5) or amend the rule.
+- G-Q2 (G2c). `E_NO_CONVERGENCE` also covers an objective that is flat at the low end in rounding noise
+  (an in-the-money strip with zero targets): an interior minimum must lie below both ends by more than
+  1e-12 relative and bracket a sign change of `F'`. Not exercised by the goldens.
+- G-Q1 answered by G-38 (golden fixed to `strike = -1.0`); Python unchanged and passes it.
+- G-Q3 (G-31 `E_LIMIT` goldens). `shortrate_g-0082` has no `short_rate` (required by `zcb` for
+  every model) and `mcgreeks_g-0022` has an integer `seed` (a u64 string is required, E_SCHEMA),
+  yet both expect `E_LIMIT`, which G-31 checks *after* `E_SCHEMA`. Python passes them by checking
+  the stage G sizes on the raw document before the typed reads (`registry.EARLY_LIMITS`). Asked:
+  either fix the two inputs, or amend G-31 to say the stage G sizes come first.
+- G-Q3 answered by G-50 (both goldens fixed); the `registry.EARLY_LIMITS` workaround is removed, so
+  `E_LIMIT` again comes after `E_SCHEMA` exactly as G-31 orders it.
