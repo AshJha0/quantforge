@@ -1127,6 +1127,146 @@
     "synthetic"
    ],
    "description": "width 0"
+  },
+  {
+   "case_id": "bermudan_g-0016",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "grid": {
+     "nx": 10001,
+     "steps_per_year": 100000,
+     "width": 6.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [],
+   "tags": [
+    "invalid",
+    "limit",
+    "r5",
+    "synthetic"
+   ],
+   "description": "combined work nx x total steps = 10,001 x 500,000 > 5e8 (each value within its own limit)"
+  },
+  {
+   "case_id": "bermudan_g-0017",
+   "operation": "rates.shortrate.bermudan_swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1.0,
+    "start_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0
+    ],
+    "fixed_rate": 0.03,
+    "swaption_type": "PAYER",
+    "exercise_times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "grid": {
+     "nx": 10003,
+     "steps_per_year": 10,
+     "width": 6.0
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [],
+   "tags": [
+    "invalid",
+    "limit",
+    "r5",
+    "synthetic"
+   ],
+   "description": "nx = 10,003 > 10,001"
   }
  ]
 }

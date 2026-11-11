@@ -249,3 +249,31 @@ Both tests restated against the scheme's own bounding value on the same grid (`s
 
 ### M3, discrete barrier (ruling G-30)
 `n = floor(m T + 0.5)`, `n >= 1` else `E_DOMAIN`, BGK step `dt = T/n`; rebates not BGK-corrected. `barrier_g` gains 5 cases (0033 to 0037: T = 0.3 with m = 252, the tie T = 0.5 with m = 3, UP_OUT and UP_IN with rebates, n = 0 error); original 32 unchanged byte for byte. Stage G: 252 of 413 = 61.0%.
+
+### M4 to M6 and LOW items (rulings G-31 to G-34)
+- M4 (G-31): full `E_LIMIT` table with the combined bound `nx x total steps <= 5e8`; 9 `E_LIMIT` goldens appended (tag `r5`) to shortrate, swaption, exposure, bermudan (2), callable, mcgreeks, barrier.
+- M5 (G-32): Poisson sum from the mode with log weights; CDF 0 for a non-positive argument. 3 CIR goldens appended to `shortrate_g` (0079 to 0081). QuantLib 1.44 itself underflows at `sigma = 0.005` (returns 0 for a call worth 16,898.80 per 1,000,000), so those two do not count; this is the bug the guard prevents.
+- M6 (G-33): `expm1` factors and the cross-term series; 6 G2++ goldens appended (a = 1e-4, a = b = 0.1), 5 count (QuantLib's small-a bond loses digits).
+- LOW (G-34): L1 to L10 and the citation note recorded; R9 power and the strict-count reading added to CHANGELOG known issues; `mc-greeks.md` check order fixed (seed first); Bermudan step count in binary64 as written.
+- Language sessions: new property and error cases only; no existing golden value changed (the appended cases keep every earlier case id).
+
+**Honest stage G outside share after the R5 fixes: 258 of 435 = 59.3%, below the 60% floor.** The drop comes from the H1 strict recount (-8), the new error and limit cases, and the 5 `aadladder_g` cases. ORE under WSL (G-23) is the route back above the floor in wave 4.
+
+## WAVE 3d READY (2026-11-11): Q3b AAD core
+
+Read: `specifications/06-risk/aad-core.md`; rulings G-9, G-35. New operation `rates.shortrate.bermudan_ladder` (suite `aadladder_g`, 5 cases: 3 values, 2 errors). Build notes: tape your wave 2d scheme (or hand-write its adjoint: Thomas solve backwards, `max` through its active branch); report the G-9 cost ratio. Property test: AAD equals your own Richardson bump within G-9. Outside: none (G-18).
+
+## WAVE 3e READY (2026-11-11): Q9 part 2, model-reserve dispersion
+
+Read: `specifications/06-risk/model-reserve.md`; ruling G-36. New operation `risk.model_reserve.dispersion` (suite `reserve_g`, 9 cases: 6 values, 3 errors; outside none). The report over every single-asset exotic is registered with fixed parameters and belongs to the Python research lane; it has not been run. Stage G share: 258 of 444 = 58.1%.
+
+## Answers to G-J1 to G-J3 and a golden fix (ruling G-38)
+`capfloor_g-0040` fixed (strike -1.0, so `1 + K tau = 0`, `E_DOMAIN`): all builds rerun that case. G-J1: negative `start_years` is `E_DOMAIN` after `side`, before `payment_times`. G-J2: the Java method is acceptable. `aadladder_g` (wave 3d) is READY (section above).
+
+## A5 READY (2026-11-11): surrogate spec and acceptance harness
+
+Read (research lane only; language sessions have nothing to build): `specifications/11-research/a5-surrogate.md`; rulings G-11, G-37. Harness `oracle/python/a5_acceptance.py`; self-test passes and is non-vacuous (`oracle/A5_HARNESS_SELFTEST.json`). No surrogate trained yet; never in goldens.
+
+## Stage F carry-over wave 2b, part 1 READY (2026-11-11): E1 for the stage F operations
+
+`gen_stage_f_e1.py` now skips only the `e1_*` files (and `stage_g`, whose operations get E1 in a later pass). E1 grows from 5,247 to 5,535 cases (+288) over 226 operations in 24 files; new file `e1_book.json`; **case ids in the `e1_*` files renumber**, so every build reruns the whole E1 set. Not done: F3 (inflation01, dividend and borrow, correlation sensitivities), F4 (reverse stress, limits, concentration, liquidity-adjusted risk, vol by horizon, model-risk reserve), FRTB vega, curvature and the other risk classes; E1 for the stage G operations.

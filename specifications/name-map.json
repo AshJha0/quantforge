@@ -4415,6 +4415,51 @@
     "periods"
    ]
   },
+  "rates.shortrate.bermudan_ladder": {
+   "spec": "specifications/06-risk/aad-core.md",
+   "rust": "quantforge::rates::shortrate_bermudan_ladder",
+   "python": "quantforge.rates.shortrate_bermudan_ladder",
+   "java": "Rates.shortrateBermudanLadder",
+   "cpp": "qf::rates::shortrate_bermudan_ladder",
+   "inputs": {
+    "curve": {
+     "java": "curve"
+    },
+    "exercise_times": {
+     "java": "exerciseTimes"
+    },
+    "fixed_rate": {
+     "java": "fixedRate"
+    },
+    "grid": {
+     "java": "grid"
+    },
+    "mean_reversion": {
+     "java": "meanReversion"
+    },
+    "notional": {
+     "java": "notional"
+    },
+    "payment_times": {
+     "java": "paymentTimes"
+    },
+    "sigma": {
+     "java": "sigma"
+    },
+    "start_years": {
+     "java": "startYears"
+    },
+    "swaption_type": {
+     "java": "swaptionType"
+    }
+   },
+   "outputs": [
+    "d_price_d_discount_factors",
+    "d_price_d_mean_reversion",
+    "d_price_d_sigma",
+    "price"
+   ]
+  },
   "rates.shortrate.bermudan_swaption": {
    "spec": "specifications/04-pricing/short-rate-models.md",
    "rust": "quantforge::rates::shortrate_bermudan_swaption",
@@ -5270,6 +5315,29 @@
     "price_se",
     "vega",
     "vega_se"
+   ]
+  },
+  "risk.model_reserve.dispersion": {
+   "spec": "specifications/06-risk/model-reserve.md",
+   "rust": "quantforge::risk::model_reserve_dispersion",
+   "python": "quantforge.risk.model_reserve_dispersion",
+   "java": "Risk.modelReserveDispersion",
+   "cpp": "qf::risk::model_reserve_dispersion",
+   "inputs": {
+    "prices": {
+     "java": "prices"
+    },
+    "reference_model": {
+     "java": "referenceModel"
+    }
+   },
+   "outputs": [
+    "half_range",
+    "mean",
+    "range",
+    "relative_reserve",
+    "reserve",
+    "worst_model"
    ]
   },
   "risk.ois.dv01": {

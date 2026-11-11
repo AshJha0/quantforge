@@ -102,6 +102,8 @@ def sigma_p(a, s, T, S, ho_lee=False):
 
 def ncx2_cdf(x, k, lam):
     x, k, lam = mp.mpf(x), mp.mpf(k), mp.mpf(lam)
+    if x <= 0:  # R5 M5: rbar < 0 (strike above A(T, S)) gives a non-positive argument; the CDF is 0
+        return mp.mpf(0)
     tot, j, w = mp.mpf(0), 0, mp.exp(-lam / 2)
     while True:
         term = w * mp.gammainc(k / 2 + j, 0, x / 2, regularized=True)
@@ -883,7 +885,7 @@ def g2e():
     caught("cap priced with bond calls", abs(cap_value(b)["price"] - cap_value(b, "type")["price"]), 1e-6)
     e = dict(models[2], period_times=[1.0, 2.0, 3.0], strike=0.04, cap_floor="CAP", notional=1.0)
     errs = [(dict(e, period_times=[1.0]), "E_INPUT", "one period time"), (dict(e, period_times=[0.0, 1.0]), "E_DOMAIN", "first fixing at 0"),
-            (dict(e, period_times=[2.0, 1.0]), "E_INPUT", "period times not increasing"), (dict(e, strike=-0.5), "E_DOMAIN", "1 + K tau <= 0"),
+            (dict(e, period_times=[2.0, 1.0]), "E_INPUT", "period times not increasing"), (dict(e, strike=-1.0), "E_DOMAIN", "1 + K tau <= 0 (K = -1, tau = 1: exactly 0)"),
             (dict(e, cap_floor="COLLAR"), "E_INPUT", "unknown cap_floor")]
     for inp, code, d in errs:
         s.add(CAPOP, inp, error=code, cls="date_and_convention", tags=["invalid", "capfloor"], description=d)

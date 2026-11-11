@@ -1,0 +1,308 @@
+{
+ "schema_version": "1.0",
+ "suite": "reserve_g",
+ "spec": "specifications/06-risk/model-reserve.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_g_q9b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "reserve_g-0001",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "HESTON": 4.1832,
+     "LOCAL_VOL": 4.6021,
+     "SLV": 4.3907
+    },
+    "reference_model": "SLV"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mean": 4.392,
+     "range": 0.41889999999999983,
+     "half_range": 0.20944999999999991,
+     "reserve": 0.21140000000000025,
+     "worst_model": "LOCAL_VOL",
+     "relative_reserve": 0.04814722026100628
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "q9",
+    "reserve",
+    "synthetic"
+   ],
+   "description": "down-and-out call, three models",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   }
+  },
+  {
+   "case_id": "reserve_g-0002",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "HESTON": 0.5123,
+     "LOCAL_VOL": 0.4987,
+     "SLV": 0.505
+    },
+    "reference_model": "HESTON"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mean": 0.5053333333333333,
+     "range": 0.013600000000000001,
+     "half_range": 0.0068000000000000005,
+     "reserve": 0.013600000000000001,
+     "worst_model": "LOCAL_VOL",
+     "relative_reserve": 0.02654694514932657
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "q9",
+    "reserve",
+    "synthetic"
+   ],
+   "description": "digital, reference at the top",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   }
+  },
+  {
+   "case_id": "reserve_g-0003",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "HESTON": 2.0,
+     "LOCAL_VOL": 2.0
+    },
+    "reference_model": "LOCAL_VOL"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mean": 2.0,
+     "range": 0.0,
+     "half_range": 0.0,
+     "reserve": 0.0,
+     "worst_model": "HESTON",
+     "relative_reserve": 0.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "q9",
+    "reserve",
+    "synthetic"
+   ],
+   "description": "two models agree: reserve 0",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   }
+  },
+  {
+   "case_id": "reserve_g-0004",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "HESTON": 0.0,
+     "LOCAL_VOL": 0.012,
+     "SLV": 0.004
+    },
+    "reference_model": "HESTON"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mean": 0.005333333333333333,
+     "range": 0.012,
+     "half_range": 0.006,
+     "reserve": 0.012,
+     "worst_model": "LOCAL_VOL",
+     "relative_reserve": null
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "q9",
+    "reserve",
+    "synthetic"
+   ],
+   "description": "reference price 0: relative_reserve null",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   }
+  },
+  {
+   "case_id": "reserve_g-0005",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "A": 1.0,
+     "B": 3.0,
+     "C": -1.0
+    },
+    "reference_model": "A"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mean": 1.0,
+     "range": 4.0,
+     "half_range": 2.0,
+     "reserve": 2.0,
+     "worst_model": "B",
+     "relative_reserve": 2.0
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "q9",
+    "reserve",
+    "synthetic"
+   ],
+   "description": "tie in deviation: worst_model is the first in code-point order",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   }
+  },
+  {
+   "case_id": "reserve_g-0006",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "HESTON": 1000000.1,
+     "LOCAL_VOL": 1000000.3,
+     "SLV": 1000000.2
+    },
+    "reference_model": "SLV"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mean": 1000000.2,
+     "range": 0.2000000000698492,
+     "half_range": 0.1000000000349246,
+     "reserve": 0.10000000009313226,
+     "worst_model": "LOCAL_VOL",
+     "relative_reserve": 9.999998009313624e-08
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "exact-rational"
+   ],
+   "tags": [
+    "q9",
+    "reserve",
+    "synthetic"
+   ],
+   "description": "large level: exact differences",
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-15,
+    "reason": "one rounding of exact arithmetic"
+   }
+  },
+  {
+   "case_id": "reserve_g-0007",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "HESTON": 1.0
+    },
+    "reference_model": "HESTON"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "one model"
+  },
+  {
+   "case_id": "reserve_g-0008",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {
+     "HESTON": 1.0,
+     "LOCAL_VOL": 1.1
+    },
+    "reference_model": "SLV"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "reference model not in prices"
+  },
+  {
+   "case_id": "reserve_g-0009",
+   "operation": "risk.model_reserve.dispersion",
+   "inputs": {
+    "prices": {},
+    "reference_model": "SLV"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "q9",
+    "synthetic"
+   ],
+   "description": "no prices"
+  }
+ ]
+}
