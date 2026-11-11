@@ -1,7 +1,7 @@
 """Stage F wave 0, plan item E1: non-finite and negative-zero inputs for every operation (rules F-1 to F-3).
 
 For each operation, the base case is its smallest ok golden case (by input JSON length, then case id) from
-every golden suite outside stage_f. Each Real leaf (a JSON float; arrays: element 0 and the last element)
+every golden suite except the e1_* files themselves and stage_g (stage F operations included since wave 2b). Each Real leaf (a JSON float; arrays: element 0 and the last element)
 gets NaN, +inf and -inf cases expecting E_DOMAIN, and one negative-zero case: a copy of the base expected
 result when the base leaf is exactly zero, else a pair (+0.0 anchor expecting "any", -0.0 expecting
 "same_as" the anchor). Files are split by operation domain and kept under 1 MB (plan item E11).
@@ -46,7 +46,7 @@ def base_cases():
     """Also fills REAL_PATHS: per operation, every input path that holds a float in any golden case (spec type Real)."""
     best = {}
     for p in sorted(GOLD.rglob("*.json")):
-        if p.parent.name == "stage_f":
+        if p.name.startswith("e1_") or p.parent.name == "stage_g":  # stage F ops now included (wave 2b); stage G later
             continue
         doc = json.loads(p.read_text(encoding="utf-8"))
         if not isinstance(doc, dict) or "cases" not in doc:

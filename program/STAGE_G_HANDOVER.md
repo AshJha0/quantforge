@@ -273,3 +273,7 @@ Read: `specifications/06-risk/model-reserve.md`; ruling G-36. New operation `ris
 ## A5 READY (2026-11-11): surrogate spec and acceptance harness
 
 Read (research lane only; language sessions have nothing to build): `specifications/11-research/a5-surrogate.md`; rulings G-11, G-37. Harness `oracle/python/a5_acceptance.py`; self-test passes and is non-vacuous (`oracle/A5_HARNESS_SELFTEST.json`). No surrogate trained yet; never in goldens.
+
+## Stage F carry-over wave 2b, part 1 READY (2026-11-11): E1 for the stage F operations
+
+`gen_stage_f_e1.py` now skips only the `e1_*` files (and `stage_g`, whose operations get E1 in a later pass). E1 grows from 5,247 to 5,535 cases (+288) over 226 operations in 24 files; new file `e1_book.json`; **case ids in the `e1_*` files renumber**, so every build reruns the whole E1 set. Not done: F3 (inflation01, dividend and borrow, correlation sensitivities), F4 (reverse stress, limits, concentration, liquidity-adjusted risk, vol by horizon, model-risk reserve), FRTB vega, curvature and the other risk classes; E1 for the stage G operations.
