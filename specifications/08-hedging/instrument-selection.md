@@ -57,3 +57,7 @@ Mutant caught: greedy forward selection. It takes the best single instrument, th
 |---|---|---|
 | Q-I17 | Exactly `K` instruments, or at most `K`? | At most `K` (I-34). Adding an instrument never raises the least objective, so "exactly `K`" would only add ties with zero positions |
 | Q-I18 | Equalities in selection? | Refused (I-33). A budget equality can make a small subset infeasible, which would need a rule for which infeasible subsets to skip |
+
+## Amendment after the builds
+
+Ruling I-53 adds a size limit: `E_LIMIT` when `sum_{k=1..min(K,n)} C(n, k)` exceeds 100,000 candidate subsets (`hedgeselect_i-0018`).
