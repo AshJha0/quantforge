@@ -33,3 +33,4 @@ To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rus
 - [COOKBOOK](../../COOKBOOK.md): commands for every operation.
 - [GLOSSARY](../../GLOSSARY.md): terms, including a [section for the tutorials](../../GLOSSARY.md#tutorial-terms).
 - `specifications/`: the rules each operation follows. Each tutorial names the spec pages it uses.
+- [References](../references.md): every source the specs cite, with its status as the spec records it.
