@@ -150,3 +150,5 @@ Read: `specifications/08-hedging/dynamic-hedge-and-effectiveness.md`; rulings I-
 
 ### Outside-oracle status
 `hedgebt_i` 7 of 15 (QuantLib `AnalyticEuropeanEngine` on each date), `hedgeeff_i` 5 of 10 (numpy). Every value case counts. Stage I so far: 98 of 234 = 41.9% (`oracle/outside_register_i.json`).
+
+**Correction to the wave 4b property tests (2026-11-11):** on a constant-spot path the hedge leg has zero variance, so `hedge.backtest.delta` returns `E_DOMAIN` (I-31). Test the replay itself instead: on such a path, with zero rates and dividends, `portfolio_values` end at `quantity (V_last - V_0)`.
