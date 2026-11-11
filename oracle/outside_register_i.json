@@ -35,5 +35,27 @@
   "share": 0.3636,
   "floor": 0.6,
   "note": "Floor is measured over the stage at release, error cases in the denominator (ruling I-2)"
+ },
+ "hedgecredit_i": {
+  "counted": 10,
+  "total": 19,
+  "rule": "QuantLib 1.44 IsdaCdsEngine NPVs on bumped HazardRateCurves (CS01, buckets, JTD by the spec's own central difference), then numpy solve; notionals, book pv, CS01, JTD and hedge upfront within the case limit"
+ },
+ "hedgecorr_i": {
+  "counted": 9,
+  "total": 20,
+  "rule": "QuantLib 1.44 AnalyticEuropeanMargrabeEngine delta1 and delta2, and BlackCalculator.vega (the Margrabe price as a Black price in the spread volatility, asserted equal to the engine NPV) for the vegas and correlation, then numpy solve; quantities and before-Greeks within root_finding"
+ },
+ "_stage": {
+  "counted": 72,
+  "total": 177,
+  "share": 0.4068,
+  "floor": 0.6,
+  "note": "Stage I so far, error cases in the denominator (ruling I-2); the floor applies at release"
+ },
+ "hedgexa_i": {
+  "counted": 9,
+  "total": 17,
+  "rule": "QuantLib 1.44 ZeroCurve (linear zero, continuous, ACT/365F) and AnalyticEuropeanEngine values, the spec's half-differences of them, numpy lstsq on the weighted system; positions and book risk within the case limit"
  }
 }

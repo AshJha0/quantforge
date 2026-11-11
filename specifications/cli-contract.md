@@ -341,6 +341,8 @@ Stage I adds operations and one error code, `E_INFEASIBLE` (ruling I-1). `stage-
 | Prefix | Spec | Slice |
 |---|---|---|
 | `hedge.qp.solve`, `hedge.integer.solve`, `hedge.minvar.ratio`, `hedge.greeks.neutralise`, `hedge.beta.futures`, `hedge.residual.report` | `08-hedging/hedge-solvers.md` | wave 1 |
+| `hedge.credit.cds`, `hedge.correlation.neutralise` | `08-hedging/credit-and-correlation-hedges.md` | wave 2 |
+| `hedge.crossasset.solve` | `08-hedging/cross-asset-hedge.md` | wave 3 |
 
 `null` is legal inside `lower`, `upper`, `lower_lots`, `upper_lots` (ruling I-12). `E_LIMIT` sizes: ruling I-4. Every rank or singularity decision uses the relative threshold `1e-12` (ruling I-3).
 
