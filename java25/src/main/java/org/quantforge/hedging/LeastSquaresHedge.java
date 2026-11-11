@@ -1,5 +1,7 @@
 package org.quantforge.hedging;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.quantforge.core.QfError;
 
 /**
@@ -22,8 +24,41 @@ public final class LeastSquaresHedge {
      * @param residual {@code A x + b}, one per factor
      * @param objective {@code f(x)}
      * @param rank the number of eigenvalues of the reduced Hessian above the threshold
+     * @param risk weighted squared residual plus the ridge term, null without cost inputs (ruling I-27)
+     * @param cost {@code C(x)}, null without cost inputs
+     * @param margin {@code sum_j margin_rates_j |x_j|}, null without margin inputs
      */
-    public record Solution(double[] x, double[] residual, double objective, int rank) {}
+    public record Solution(double[] x, double[] residual, double objective, int rank, Double risk, Double cost,
+            Double margin) {
+        /**
+         * A wave 1 answer, without the cost outputs.
+         *
+         * @param x positions
+         * @param residual {@code A x + b}
+         * @param objective {@code f(x)}
+         * @param rank reduced-Hessian rank
+         */
+        public Solution(double[] x, double[] residual, double objective, int rank) {
+            this(x, residual, objective, rank, null, null, null);
+        }
+    }
+
+    /**
+     * The wave 4a cost inputs of {@code hedge.qp.solve} ({@code hedge-costs-and-frontier.md}); each array may be null
+     * when not given. The cost is {@code C(x) = sum_j (half_spreads_j |x_j| + impact_j x_j^2)}, weighted by
+     * {@code costWeight}, and {@code sum_j margin_rates_j |x_j| <= marginLimit} is a constraint.
+     *
+     * @param halfSpreads cost per unit traded, each {@code >= 0}, or null
+     * @param impact linear-impact coefficients, each {@code >= 0}, or null
+     * @param costWeight weight of the cost against the risk, {@code >= 0}
+     * @param marginRates margin per unit held, each {@code >= 0}, or null
+     * @param marginLimit the margin cap, {@code >= 0}, or null
+     */
+    public record Costs(double[] halfSpreads, double[] impact, double costWeight, double[] marginRates,
+            Double marginLimit) {}
+
+    /** Above this many instruments with an {@code |x|} term the sign-orthant search is refused (spec question J-I4). */
+    static final int MAX_COSTLY = 20;
 
     /**
      * A {@code hedge.integer.solve} answer.
@@ -107,6 +142,47 @@ public final class LeastSquaresHedge {
      */
     public static Solution solve(double[][] a, double[] b, double[] weights, double ridge, double[][] eqMatrix,
             double[] eqRhs, double[] lower, double[] upper, boolean minNorm) {
+        return solve(a, b, weights, ridge, eqMatrix, eqRhs, lower, upper, minNorm, null);
+    }
+
+    private static void costLength(double[] v, int n, String key) {
+        if (v != null && v.length != n) {
+            throw input(key);
+        }
+    }
+
+    private static void nonNegative(double[] v, String key) {
+        if (v != null) {
+            for (double x : v) {
+                if (!(x >= 0.0)) {
+                    throw domain(key);
+                }
+            }
+        }
+    }
+
+    /**
+     * Solves {@code hedge.qp.solve} with the optional wave 4a costs. The {@code |x|} terms are handled exactly by
+     * solving the strictly convex problem on each closed sign orthant of the instruments that carry them, where the
+     * spread cost and the margin are linear, and keeping the best; an instrument whose cost exceeds its benefit lands
+     * on its orthant's bound and is returned as exactly 0.
+     *
+     * @param a factor-by-instrument sensitivities, {@code m x n}
+     * @param b the book's factor exposures, length {@code m}
+     * @param weights factor weights, each {@code > 0}
+     * @param ridge Tikhonov weight, {@code >= 0}
+     * @param eqMatrix equality rows ({@code k x n}), or null for none
+     * @param eqRhs equality right-hand side, or null for none
+     * @param lower lower bounds (infinite for none), or null
+     * @param upper upper bounds (infinite for none), or null
+     * @param minNorm true for {@code singular = MIN_NORM}
+     * @param costs the cost inputs, or null when none is given
+     * @return the unique minimiser, with {@code risk}, {@code cost} and {@code margin} when costs are given
+     * @throws QfError {@code E_INPUT}, {@code E_DOMAIN}, {@code E_LIMIT}, {@code E_SINGULAR} or {@code E_INFEASIBLE},
+     *     in the specification's order
+     */
+    public static Solution solve(double[][] a, double[] b, double[] weights, double ridge, double[][] eqMatrix,
+            double[] eqRhs, double[] lower, double[] upper, boolean minNorm, Costs costs) {
         int n = checkShapes(a, b, weights);
         if ((eqMatrix == null) != (eqRhs == null)) {
             throw input(eqMatrix == null ? "eq_matrix" : "eq_rhs");
@@ -143,6 +219,38 @@ public final class LeastSquaresHedge {
                 throw domain("lower");
             }
         }
+        double[] spreads = new double[n];
+        double[] impact = new double[n];
+        double[] rates = null;
+        double cw = 0.0;
+        if (costs != null) { // ruling I-25
+            costLength(costs.halfSpreads(), n, "half_spreads");
+            costLength(costs.impact(), n, "impact");
+            costLength(costs.marginRates(), n, "margin_rates");
+            if ((costs.marginRates() == null) != (costs.marginLimit() == null)) {
+                throw input(costs.marginRates() == null ? "margin_limit" : "margin_rates");
+            }
+            if (minNorm) {
+                throw new QfError("E_INPUT", "MIN_NORM does not take cost inputs", "singular");
+            }
+            nonNegative(costs.halfSpreads(), "half_spreads");
+            nonNegative(costs.impact(), "impact");
+            nonNegative(costs.marginRates(), "margin_rates");
+            if (!(costs.costWeight() >= 0.0)) {
+                throw domain("cost_weight");
+            }
+            if (costs.marginLimit() != null && !(costs.marginLimit() >= 0.0)) {
+                throw domain("margin_limit");
+            }
+            cw = costs.costWeight();
+            if (costs.halfSpreads() != null) {
+                spreads = costs.halfSpreads();
+            }
+            if (costs.impact() != null) {
+                impact = costs.impact();
+            }
+            rates = costs.marginRates();
+        }
         // Check 4: equality rank.
         double[][] q = null;
         double[] xp = new double[n];
@@ -178,6 +286,9 @@ public final class LeastSquaresHedge {
         }
         // Check 5: reduced Hessian.
         double[][] h = Dense.gram(a, weights, ridge, n);
+        for (int j = 0; j < n; j++) {
+            h[j][j] += cw * impact[j]; // ruling I-26: impact counts like a ridge
+        }
         double[] wb = new double[b.length];
         for (int i = 0; i < b.length; i++) {
             wb[i] = weights[i] * b[i];
@@ -203,6 +314,25 @@ public final class LeastSquaresHedge {
             throw new QfError("E_SINGULAR", "the reduced Hessian is singular", "a");
         }
         double[] hxp = Dense.mul(h, xp);
+        if (costs != null) {
+            double[] x = costSearch(new Reduced(hr, z, xp, hxp, c, k), lo, hi, cw, spreads, rates,
+                    costs.marginLimit(), a, b, weights, ridge, impact);
+            double[] res = residual(a, b, x);
+            double risk = objective(res, weights, ridge, x);
+            double cost = 0.0;
+            for (int j = 0; j < n; j++) {
+                cost += spreads[j] * Math.abs(x[j]) + impact[j] * x[j] * x[j];
+            }
+            Double margin = null;
+            if (rates != null) {
+                double mg = 0.0;
+                for (int j = 0; j < n; j++) {
+                    mg += rates[j] * Math.abs(x[j]);
+                }
+                margin = mg;
+            }
+            return new Solution(x, res, risk + cw * cost, rank, risk, cost, margin);
+        }
         double[] grad = new double[n];
         for (int j = 0; j < n; j++) {
             grad[j] = hxp[j] + c[j];
@@ -228,7 +358,7 @@ public final class LeastSquaresHedge {
                 }
             }
         } else {
-            y = boundedReduced(hr, gr, z, xp, lo, hi, activeLo, activeHi);
+            y = boundedReduced(hr, gr, z, xp, lo, hi, activeLo, activeHi, null, 0.0);
         }
         double[] x = new double[n];
         for (int j = 0; j < n; j++) {
@@ -247,12 +377,104 @@ public final class LeastSquaresHedge {
         return new Solution(x, res, objective(res, weights, ridge, x), rank);
     }
 
-    /** The bounded reduced problem in {@code y}, with {@code x = x_p + Z y}; marks the active bounds. */
+    /** The reduced problem's fixed parts: {@code Z'HZ}, {@code Z}, {@code x_p}, {@code H x_p}, {@code c}, {@code k}. */
+    private record Reduced(double[][] hr, double[][] z, double[] xp, double[] hxp, double[] c, int k) {}
+
+    /**
+     * The best solution over the closed sign orthants of the instruments with an {@code |x|} term. On an orthant
+     * with signs {@code s}, {@code |x_j| = s_j x_j}, so the spread cost adds {@code cw h_j s_j / 2} to {@code c_j} and
+     * the margin is one linear row; the orthant is the bound {@code s_j x_j >= 0}.
+     */
+    private static double[] costSearch(Reduced rd, double[] lo, double[] hi, double cw, double[] spreads,
+            double[] rates, Double marginLimit, double[][] a, double[] b, double[] w, double ridge, double[] impact) {
+        int n = lo.length;
+        int r = rd.hr().length;
+        List<Integer> costly = new ArrayList<>();
+        for (int j = 0; j < n; j++) {
+            if ((cw > 0.0 && spreads[j] > 0.0) || (rates != null && rates[j] > 0.0)) {
+                costly.add(j);
+            }
+        }
+        if (costly.size() > MAX_COSTLY) {
+            throw new QfError("E_LIMIT", "more than " + MAX_COSTLY + " instruments carry an |x| term", "half_spreads");
+        }
+        double[] best = null;
+        double bestF = Double.POSITIVE_INFINITY;
+        for (long mask = 0; mask < (1L << costly.size()); mask++) {
+            double[] l2 = lo.clone();
+            double[] h2 = hi.clone();
+            double[] shift = new double[n];
+            double[] row = rates == null ? null : new double[n];
+            boolean empty = false;
+            for (int i = 0; i < costly.size(); i++) {
+                int j = costly.get(i);
+                double sign = ((mask >> i) & 1L) == 0 ? 1.0 : -1.0;
+                if (sign > 0) {
+                    l2[j] = Math.max(l2[j], 0.0);
+                } else {
+                    h2[j] = Math.min(h2[j], 0.0);
+                }
+                empty |= l2[j] > h2[j];
+                shift[j] = 0.5 * cw * spreads[j] * sign;
+                if (row != null) {
+                    row[j] = rates[j] * sign;
+                }
+            }
+            if (empty) {
+                continue;
+            }
+            double[] grad = new double[n];
+            for (int j = 0; j < n; j++) {
+                grad[j] = rd.hxp()[j] + rd.c()[j] + shift[j];
+            }
+            double[] gr = Dense.mulT(rd.z(), grad, r);
+            boolean[] actLo = new boolean[n];
+            boolean[] actHi = new boolean[n];
+            double[] y;
+            try {
+                y = boundedReduced(rd.hr(), gr, rd.z(), rd.xp(), l2, h2, actLo, actHi, row,
+                        marginLimit == null ? 0.0 : marginLimit);
+            } catch (QfError e) {
+                if (e.code().equals("E_INFEASIBLE")) {
+                    continue;
+                }
+                throw e;
+            }
+            double[] x = new double[n];
+            for (int j = 0; j < n; j++) {
+                double v = rd.xp()[j];
+                for (int t = 0; t < r; t++) {
+                    v += rd.z()[j][t] * y[t];
+                }
+                if ((actLo[j] && (rd.k() == 0 || l2[j] == 0.0)) || (actHi[j] && (rd.k() == 0 || h2[j] == 0.0))) {
+                    v = actLo[j] ? l2[j] : h2[j]; // the exact bound, so an exact 0 at an orthant's kink
+                }
+                x[j] = v + 0.0;
+            }
+            double f = objective(residual(a, b, x), w, ridge, x);
+            for (int j = 0; j < n; j++) {
+                f += cw * (spreads[j] * Math.abs(x[j]) + impact[j] * x[j] * x[j]);
+            }
+            if (f < bestF) {
+                bestF = f;
+                best = x;
+            }
+        }
+        if (best == null) {
+            throw new QfError("E_INFEASIBLE", "no point satisfies the bounds, equalities and margin limit");
+        }
+        return best;
+    }
+
+    /**
+     * The bounded reduced problem in {@code y}, with {@code x = x_p + Z y}, and an optional general row
+     * {@code row . x <= limit}; marks the active bounds.
+     */
     private static double[] boundedReduced(double[][] hr, double[] gr, double[][] z, double[] xp, double[] lo,
-            double[] hi, boolean[] activeLo, boolean[] activeHi) {
+            double[] hi, boolean[] activeLo, boolean[] activeHi, double[] row, double limit) {
         int n = xp.length;
         int r = hr.length;
-        int count = 0;
+        int count = row == null ? 0 : 1;
         for (int j = 0; j < n; j++) {
             count += (lo[j] > Double.NEGATIVE_INFINITY ? 1 : 0) + (hi[j] < Double.POSITIVE_INFINITY ? 1 : 0);
         }
@@ -262,6 +484,9 @@ public final class LeastSquaresHedge {
                 if (xp[j] < lo[j] - tol || xp[j] > hi[j] + tol) {
                     throw new QfError("E_INFEASIBLE", "the equalities fix a point outside the bounds");
                 }
+            }
+            if (row != null && Dense.dot(row, xp) > limit + 1e-10 * Math.max(1.0, limit)) {
+                throw new QfError("E_INFEASIBLE", "the equalities fix a point above the margin limit");
             }
             return new double[0];
         }
@@ -284,9 +509,19 @@ public final class LeastSquaresHedge {
                 which[at++] = -(j + 1);
             }
         }
+        if (row != null) {
+            cons[at] = new double[r];
+            for (int t = 0; t < r; t++) {
+                for (int j = 0; j < n; j++) {
+                    cons[at][t] -= row[j] * z[j][t];
+                }
+            }
+            rhs[at] = Dense.dot(row, xp) - limit;
+            which[at++] = 0;
+        }
         DualActiveSet.Result res = DualActiveSet.solve(hr, gr, cons, rhs);
         for (int i = 0; i < count; i++) {
-            if (res.active()[i]) {
+            if (res.active()[i] && which[i] != 0) {
                 if (which[i] > 0) {
                     activeLo[which[i] - 1] = true;
                 } else {
@@ -388,7 +623,7 @@ public final class LeastSquaresHedge {
         }
         boolean[] actLo = new boolean[n];
         boolean[] actHi = new boolean[n];
-        double[] nc = boundedReduced(hl, cl, identity, new double[n], lo, hi, actLo, actHi);
+        double[] nc = boundedReduced(hl, cl, identity, new double[n], lo, hi, actLo, actHi, null, 0.0);
         for (int j = 0; j < n; j++) {
             nc[j] = actLo[j] ? lo[j] : actHi[j] ? hi[j] : nc[j];
         }

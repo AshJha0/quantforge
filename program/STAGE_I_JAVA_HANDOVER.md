@@ -24,3 +24,12 @@ for the I-15 hazard bumps): `hedgecredit_i` 19 of 19, `hedgecorr_i` 20 of 20. No
 
 Built (`hedging.CrossAssetHedge`, `cli.OpsHedgeCrossAsset`, solving through the wave 1 `LeastSquaresHedge`):
 `hedgexa_i` 17 of 17. No spec question.
+
+## Wave 4a: costs, impact, margin and the frontier
+
+Built (`LeastSquaresHedge.Costs`, the sign-orthant search in `LeastSquaresHedge`, `hedge.frontier.solve` in
+`cli.OpsHedgeI`): `hedgecost_i` 22 of 22, `hedgefrontier_i` 10 of 10, `hedgeqp_i` still 44 of 44.
+
+| # | Point | Java choice, open for a ruling |
+|---|---|---|
+| J-I4 | The spec allows any exact method for the `|x|` terms but names no size limit for them. Java solves one strictly convex QP per closed sign orthant of the instruments that carry a spread (with `cost_weight > 0`) or a margin rate, so the work doubles per such instrument | Above 20 such instruments `hedge.qp.solve` returns `E_LIMIT` (key `half_spreads`). No golden comes near it. A ruling could set a limit for every build, or a build could switch to a split-variable method that needs no limit |

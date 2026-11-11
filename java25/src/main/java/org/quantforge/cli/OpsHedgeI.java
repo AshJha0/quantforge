@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
+import org.quantforge.core.QfError;
 import org.quantforge.hedging.HedgeRatios;
 import org.quantforge.hedging.LeastSquaresHedge;
 
@@ -21,6 +22,7 @@ final class OpsHedgeI {
     private static final int MAX_INTEGER_INSTRUMENTS = 12;
     private static final int MAX_POSITIONS = 1_000;
     private static final int MAX_GREEK_HEDGES = 3;
+    private static final int MAX_FRONTIER_POINTS = 50;
 
     private enum Singular { ERROR, MIN_NORM }
 
@@ -33,6 +35,7 @@ final class OpsHedgeI {
         table.put("hedge.greeks.neutralise", OpsHedgeI::greeks);
         table.put("hedge.beta.futures", OpsHedgeI::beta);
         table.put("hedge.residual.report", OpsHedgeI::residual);
+        table.put("hedge.frontier.solve", OpsHedgeI::frontier);
     }
 
     private static int width(double[][] m) {
@@ -74,8 +77,16 @@ final class OpsHedgeI {
         return out;
     }
 
-    private static Out qp(In in) {
+    /** The wave 1 inputs of {@code hedge.qp.solve}, shared with {@code hedge.frontier.solve}. */
+    private record QpInputs(double[][] a, double[] b, double[] w, double ridge, double[][] eq, double[] eqRhs,
+            double[] lower, double[] upper, boolean minNorm) {}
+
+    private static final String[] COST_KEYS = {"half_spreads", "impact", "cost_weight", "margin_rates",
+        "margin_limit"};
+
+    private static QpInputs qpInputs(In in) {
         optional(in, "ridge", "eq_matrix", "eq_rhs", "lower", "upper", "singular");
+        optional(in, COST_KEYS);
         double[][] a = in.anyMatrix("a");
         double[] b = in.reals("b");
         double[] w = in.reals("weights");
@@ -88,11 +99,72 @@ final class OpsHedgeI {
         in.limit(a.length > MAX_FACTORS, "a");
         in.limit(width(a) > MAX_INSTRUMENTS, "a");
         in.limit(eq != null && eq.length > MAX_EQUALITIES, "eq_matrix");
+        return new QpInputs(a, b, w, ridge, eq, eqRhs, lower, upper, policy == Singular.MIN_NORM);
+    }
+
+    /** The wave 4a cost inputs, or null when none is present (ruling I-27). */
+    private static LeastSquaresHedge.Costs costs(In in) {
+        boolean any = false;
+        for (String k : COST_KEYS) {
+            any |= in.has(k);
+        }
+        if (!any) {
+            return null;
+        }
+        return new LeastSquaresHedge.Costs(in.has("half_spreads") ? in.reals("half_spreads") : null,
+                in.has("impact") ? in.reals("impact") : null, in.real("cost_weight", 1.0),
+                in.has("margin_rates") ? in.reals("margin_rates") : null, in.realOrNull("margin_limit"));
+    }
+
+    private static LeastSquaresHedge.Solution solveQp(QpInputs q, LeastSquaresHedge.Costs c) {
+        return LeastSquaresHedge.solve(q.a(), q.b(), q.w(), q.ridge(), q.eq(), q.eqRhs(), q.lower(), q.upper(),
+                q.minNorm(), c);
+    }
+
+    private static Out qp(In in) {
+        QpInputs q = qpInputs(in);
+        LeastSquaresHedge.Costs c = costs(in);
         in.gate();
-        LeastSquaresHedge.Solution s = LeastSquaresHedge.solve(a, b, w, ridge, eq, eqRhs, lower, upper,
-                policy == Singular.MIN_NORM);
-        return Operations.out("x", s.x(), "residual", s.residual(), "objective", s.objective(), "rank",
+        LeastSquaresHedge.Solution s = solveQp(q, c);
+        Out out = Operations.out("x", s.x(), "residual", s.residual(), "objective", s.objective(), "rank",
                 (long) s.rank());
+        if (s.risk() != null) {
+            out.outputs().put("risk", s.risk());
+            out.outputs().put("cost", s.cost());
+            if (s.margin() != null) {
+                out.outputs().put("margin", s.margin());
+            }
+        }
+        return out;
+    }
+
+    private static Out frontier(In in) {
+        QpInputs q = qpInputs(in);
+        double[] weights = in.reals("cost_weights");
+        LeastSquaresHedge.Costs base = costs(in);
+        in.limit(weights.length > MAX_FRONTIER_POINTS, "cost_weights");
+        in.gate();
+        if (in.has("cost_weight")) {
+            throw new QfError("E_INPUT", "cost_weight is set by cost_weights", "cost_weight");
+        }
+        if (weights.length == 0) {
+            throw new QfError("E_INPUT", "cost_weights is empty", "cost_weights");
+        }
+        for (int i = 1; i < weights.length; i++) {
+            if (!(weights[i] > weights[i - 1])) {
+                throw new QfError("E_INPUT", "cost_weights must increase strictly", "cost_weights");
+            }
+        }
+        if (base == null || (base.halfSpreads() == null && base.impact() == null)) {
+            throw new QfError("E_INPUT", "a frontier needs half_spreads or impact", "half_spreads");
+        }
+        List<Object> points = new ArrayList<>();
+        for (double cw : weights) {
+            LeastSquaresHedge.Solution s = solveQp(q, new LeastSquaresHedge.Costs(base.halfSpreads(), base.impact(),
+                    cw, base.marginRates(), base.marginLimit()));
+            points.add(Operations.out("cost_weight", cw, "x", s.x(), "risk", s.risk(), "cost", s.cost()).outputs());
+        }
+        return Operations.out("points", points);
     }
 
     private static Out integer(In in) {
