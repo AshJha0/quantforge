@@ -312,3 +312,7 @@ Ruling G-49. `frtb_f2b` now 25 cases (17 values, 8 errors); **ids from `frtb_f2b
 
 ## G-J4, G-J5 fixed; error-case self-check (ruling G-50)
 `shortrate_g-0082` (now with `short_rate`) and `mcgreeks_g-0022` (seed `"1"`) fixed; builds rerun those two. `oracle/python/check_error_cases.py` checks the schema step of every hand-set error case in `stage_g` and `stage_f`: 0 mismatches now, and it flags both old cases. It does not re-derive the later validation steps.
+
+## Stage F carry-over wave 2b, part 7 READY (2026-11-11): FRTB vega and curvature
+
+Read: `specifications/06-risk/frtb-sa-vega-curvature.md`; ruling G-51 (closes the owner item of G-49). New operations `risk.frtb.vega`, `risk.frtb.curvature`; suite `stage_f/frtb_f2c` (19 cases: 13 values, 6 errors). Table 5 checked against the PDF: unchanged. Wave 2b is complete except CSR securitisations (out of scope). Wave 4c waits for WSL.

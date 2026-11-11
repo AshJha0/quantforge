@@ -34,7 +34,7 @@ Recipe: risk weights (MAR21.53 Table 4, %): 1: 0.5; 2: 1.0; 3: 5.0; 4: 3.0; 5: 3
 
 Worked example (`frtb_f2b-0019`): other-sector names O1 and O2 at +1 and -1 million give `K_16 = 12% x 2,000,000 = 240,000` (no offset), and a bucket-1 position of 20 million gives 100,000; with `gamma = 0`, capital `sqrt(240,000^2 + 100,000^2) = 260,000`.
 
-Caution: Table 5 was read from the BIS page through an automated page reader, which printed one triangle; the matrix is taken as symmetric. A spot check of Table 5 against the PDF is part of the owner item below.
+Table 5 was checked against the owner-supplied PDF (p. 599, G-51): the PDF prints the upper triangle and every value matches the symmetric matrix used here.
 
 ## `risk.frtb.commodity_delta` (ruling G-49)
 
@@ -44,9 +44,9 @@ Recipe: risk weights (MAR21.82 Table 11, %): 1: 30; 2: 35; 3: 60; 4: 80; 5: 40; 
 
 Worked example (`frtb_f2b-0023`): Brent +1 million and WTI -1 million in bucket 2 (35%), correlation `0.95 x 0.999`; the low scenario (`max(2 rho - 1, 0.75 rho)`) binds at 158,004.75.
 
-## Owner item: vega and curvature (G-49, as F-33)
+## Owner item: vega and curvature (G-49, as F-33), closed by G-51
 
-Vega and curvature for every class are not specified. The vega weights are readable (MAR21.92 Table 13: liquidity horizons 60, 120, 120, 120, 20, 60, 120, 40 days; weights 100% except 77.78% for large-cap equity and indices), but the vega risk-weight formula, the vega correlations (MAR21.93 to 21.95), the curvature charge `CVR_k` and its bucket aggregation (MAR21.5), the other-sector curvature formulas (MAR21.56(2), 21.69(2), 21.79(2)) and the curvature correlations (MAR21.100, 21.101) appear only as images on the BIS page. The owner confirms them from the PDF (and spot-checks Table 5), then the goldens are written.
+Vega and curvature for every class are not specified. The vega weights are readable (MAR21.92 Table 13: liquidity horizons 60, 120, 120, 120, 20, 60, 120, 40 days; weights 100% except 77.78% for large-cap equity and indices), but the vega risk-weight formula, the vega correlations (MAR21.93 to 21.95), the curvature charge `CVR_k` and its bucket aggregation (MAR21.5), the other-sector curvature formulas (MAR21.56(2), 21.69(2), 21.79(2)) and the curvature correlations (MAR21.100, 21.101) appear only as images on the BIS page. Closed: specified from the owner-supplied PDF in `frtb-sa-vega-curvature.md` (G-51).
 
 ## Outside share
 

@@ -5299,6 +5299,29 @@
     "scenarios"
    ]
   },
+  "risk.frtb.curvature": {
+   "spec": "specifications/06-risk/frtb-sa-vega-curvature.md",
+   "rust": "quantforge::risk::frtb_curvature",
+   "python": "quantforge.risk.frtb_curvature",
+   "java": "Risk.frtbCurvature",
+   "cpp": "qf::risk::frtb_curvature",
+   "inputs": {
+    "factors": {
+     "java": "factors"
+    },
+    "fx_scalar": {
+     "java": "fxScalar"
+    },
+    "risk_class": {
+     "java": "riskClass"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
   "risk.frtb.equity_delta": {
    "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
    "rust": "quantforge::risk::frtb_equity_delta",
@@ -5348,6 +5371,26 @@
     },
     "specified_currency_reduction": {
      "java": "specifiedCurrencyReduction"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
+  "risk.frtb.vega": {
+   "spec": "specifications/06-risk/frtb-sa-vega-curvature.md",
+   "rust": "quantforge::risk::frtb_vega",
+   "python": "quantforge.risk.frtb_vega",
+   "java": "Risk.frtbVega",
+   "cpp": "qf::risk::frtb_vega",
+   "inputs": {
+    "risk_class": {
+     "java": "riskClass"
+    },
+    "sensitivities": {
+     "java": "sensitivities"
     }
    },
    "outputs": [
