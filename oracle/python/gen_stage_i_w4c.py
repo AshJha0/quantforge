@@ -12,6 +12,7 @@ with bounds); a case counts if the library's best subset is the same and every o
 """
 import itertools
 import json
+import math
 from fractions import Fraction as Fr
 from pathlib import Path
 
@@ -44,7 +45,8 @@ def sub(inp, S):
 
 def sel_ref(inp, solver=None):
     n = len(inp["a"][0]) if inp["a"] else 0
-    if n > 20:
+    K0 = inp["max_instruments"]
+    if n > 20 or sum(math.comb(n, k) for k in range(1, min(max(K0, 0), n) + 1)) > 100000:  # I-53: subset count limit
         fail("E_LIMIT")
     W.finite_rule(inp)
     base = {k: v for k, v in inp.items() if k != "max_instruments"}
@@ -168,6 +170,8 @@ def suite():
         (dict(e, weights=[1.0, 1.0, -1.0, 1.0, 1.0]), "E_DOMAIN", "negative weight"),
         (dict(a=[[1.0, 1.0, 0.0], [0.5, 0.5, 1.0]], b=[-2.0, -1.0], weights=[1.0, 1.0], max_instruments=1), "E_SINGULAR", "duplicate instruments"),
         (dict(a=[[1.0] * 21], b=[-1.0], weights=[1.0], max_instruments=1), "E_LIMIT", "21 instruments (limit 20)"),
+        (dict(a=[[1.0 if i == j else 0.1 for j in range(20)] for i in range(20)], b=[-1.0] * 20, weights=[1.0] * 20, max_instruments=7), "E_LIMIT",
+         "20 instruments, K = 7: 137,979 subsets, above 100,000 (I-53, after the builds)"),
     ]
     for inp, code, desc in errs:
         run_error(s, SEL, sel_api, inp, code, desc, ["hedge", "selection"])

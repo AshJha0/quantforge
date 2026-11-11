@@ -65,7 +65,7 @@ def main():
     cmd = a[-1]
     if cmd == "version":
         print(json.dumps({"language": "stub", "implementation_version": "0", "toolchain": "python",
-                          "contract_version": "0.0.0" if mode == "bad_contract" else "1.0.0"}))
+                          "contract_version": "0.0.0" if mode == "bad_contract" else "1.11.0"}))
         return 0
     if cmd != "batch":
         return 64
