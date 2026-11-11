@@ -138,7 +138,7 @@ Read: `specifications/04-pricing/short-rate-models.md`, sections "`rates.shortra
 
 ### G2d (suite `bermudan_g`, 15 cases)
 - New operation `rates.shortrate.bermudan_swaption`. Implement the seven-step scheme exactly: fully implicit, coefficients at the earlier time, linear-extrapolation boundaries substituted into the tridiagonal rows, exercise applied on arrival at each exercise time except at 0. Golden generator runs in about 11 seconds.
-- Property tests: one exercise date converges to your `rates.shortrate.swaption` price as the grid is refined (order about 1); a Bermudan price is at least the European price for its first exercise date.
+- Property tests: one exercise date converges to your `rates.shortrate.swaption` price as the grid is refined (order about 1); a Bermudan price is at least the scheme's own single-date price for its first exercise date on the same grid (amended by R5 M1 / G-28: not the Jamshidian price).
 
 ### Outside-oracle status after waves 2c and 2d
 Neither suite counts (G-17, G-18): the calibration objective and the pinned scheme are this platform's own, and QuantLib values are recorded as evidence only (`oracle/BERMUDAN_EVIDENCE_G.json`: QuantLib FD and tree within about 0.2% of the scheme at the default grid). **Stage G now stands at 133 of 245 = 54.3%, below the 60% floor.** The expectation that wave 2 would lift the share was wrong for these two slices. Candidates that would count: QuantLib-checkable closed forms still to be specified (Hull-White caps and floors as bond-option portfolios, G2++ European swaptions by `G2SwaptionEngine` if its integration can be set tight enough, CIR swaptions by Jamshidian), and ORE exposure profiles in wave 4.
@@ -186,7 +186,7 @@ Read: `specifications/04-pricing/short-rate-models.md`, sections "`rates.shortra
 
 ### G3 (suite `callable_g`, 12 cases)
 - New operation `rates.shortrate.callable_bond`: reuse your wave 2d stepper; at each coupon date cap by the call price (if callable) and then add the coupon.
-- Property tests: no call times converges to the straight bond at order about 1; a callable bond is never above the straight bond.
+- Property tests: no call times converges to the straight bond at order about 1; a callable bond is never above the scheme's own no-call bond on the same grid (amended by R5 M1 / G-28: not the exact straight bond).
 
 ## Final status, 2026-11-10 (supersedes the earlier status counts)
 
@@ -230,4 +230,22 @@ Read: `specifications/04-pricing/lmm.md`; ruling G-22; cli-contract block "Stage
 ### Status update (after wave 3b)
 `lmmcap_g` 17 of 26 and `lmmswn_g` 36 of 42 count (QuantLib 1.44 `AbcdFunction`, `DiscountCurve`, `blackFormula`; every value case). **Stage G: 258 of 405 = 63.7%** (error cases and the 21 `mcgreeks_g` cases in the denominator). Generator `oracle/python/gen_stage_g_lmm.py`; a rerun reproduces the goldens byte for byte. `quality_gate --check-specs --check-register`: no new gaps. Rulings G-1 to G-22 plus G-10b.
 
-**Not done in this session, still left for stage G:** simulated LMM; Q3b AAD core (G-9); Q9 part 2 reserve dispersion; wave 4 rest (CSA, netting, MPoR, collateral, simulated EE/PFE/EPE, DVA/FVA/MVA, SIMM-style IM, WWR, KVA, ORE demo); A5 surrogate (G-11, challenger only, so no goldens by ruling); stage F carry-over wave 2b. Most wave 4 items have no free outside library short of ORE; each such suite lowers the share, so the 5.0-point margin above 60% buys about 85 uncounted cases at the current total.
+**Not done in this session, still left for stage G:** simulated LMM; Q3b AAD core (G-9); Q9 part 2 reserve dispersion; wave 4 rest (CSA, netting, MPoR, collateral, simulated EE/PFE/EPE, DVA/FVA/MVA, SIMM-style IM, WWR, KVA, ORE demo); A5 surrogate (G-11, challenger only, so no goldens by ruling); stage F carry-over wave 2b. Most wave 4 items have no free outside library short of ORE; each such suite lowers the share, so the 3.7-point margin above 60% buys about 25 uncounted cases at the current total.
+
+## WAVE 3c READY (2026-11-11): simulated LMM, acceptance only
+
+Read: `specifications/04-pricing/lmm.md`, section "Simulated LMM"; rulings G-25, G-26. No new operation and no goldens: each language implements the terminal-measure simulation as a library function and adds the caplet acceptance (6 caplets within 3 SE of `lmmcap_g`) as a property test. Python reference run passes (`oracle/LMM_ACCEPTANCE.json`). Rebonato error versus simulation 0.4-0.5% (evidence only). Outside share unchanged: 258 of 405 = 63.7%.
+
+## R5 audit fixes (2026-11-11)
+
+### H1, outside count (ruling G-27)
+Recounted against QuantLib's own `JamshidianSwaptionEngine` at 3e-7 relative: `swaption_g` 26/40 (was 33), `swaption_affine_g` 36/39, `exposure_g` 6/15 (was 7); the semi-annual cases cannot be written as whole-day QuantLib dates. **Honest stage G share: 250 of 405 = 61.7%.** Under the strictest reading (Rebonato `lmmswn_g` not counted): 214 of 405 = 52.8%; that reading is open for the owner (G-27).
+
+### M1, property tests (ruling G-28)
+Both tests restated against the scheme's own bounding value on the same grid (`short-rate-models.md`, "Property tests on the pinned scheme"). The failures were the first-order scheme bias: `callable_g-0007` +0.0093 over the exact straight bond, `bermudan_g-0007` 0.17% under Jamshidian. Language sessions: change these two property tests.
+
+### M2, negative-strike Jamshidian (ruling G-29)
+`1 + K tau_n <= 0` is `E_DOMAIN`; root bracket `[-1, 1]`. `swaption_g` gains 3 cases (0041, 0042 values at K = -0.2%, both QuantLib-engine counted; 0043 error): 43 cases, 28 counted. Stage G: 252 of 408 = 61.8%.
+
+### M3, discrete barrier (ruling G-30)
+`n = floor(m T + 0.5)`, `n >= 1` else `E_DOMAIN`, BGK step `dt = T/n`; rebates not BGK-corrected. `barrier_g` gains 5 cases (0033 to 0037: T = 0.3 with m = 252, the tie T = 0.5 with m = 3, UP_OUT and UP_IN with rebates, n = 0 error); original 32 unchanged byte for byte. Stage G: 252 of 413 = 61.0%.

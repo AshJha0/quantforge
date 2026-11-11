@@ -1,0 +1,530 @@
+{
+ "swaption_g": {
+  "counted": 28,
+  "total": 43,
+  "rows": [
+   {
+    "case": "swaption_g-0001",
+    "golden": 45445.78442596593,
+    "quantlib_engine": 45445.78442613558,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0002",
+    "golden": 2546.7535716520356,
+    "quantlib_engine": 2546.7535716273464,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0003",
+    "golden": 15409.247099177188,
+    "quantlib_engine": 15409.248625683373,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0004",
+    "golden": 15407.289863134154,
+    "quantlib_engine": 15407.288386851396,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0005",
+    "golden": 2643.172437079846,
+    "quantlib_engine": 2643.171813775263,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0006",
+    "golden": 45538.28881930769,
+    "quantlib_engine": 45538.292670218914,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0007",
+    "golden": 83625.28624570725,
+    "quantlib_engine": 83625.28634440199,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0008",
+    "golden": 8354.917750868088,
+    "quantlib_engine": 8354.917730569714,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0009",
+    "golden": 33590.74492725808,
+    "quantlib_engine": 33590.7449273019,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0010",
+    "golden": 33588.09218351176,
+    "quantlib_engine": 33588.09218347136,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0011",
+    "golden": 8745.477695948352,
+    "quantlib_engine": 8745.477517407662,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0012",
+    "golden": 84010.54070329492,
+    "quantlib_engine": 84010.5414117142,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0013",
+    "golden": 48967.96602999763,
+    "quantlib_engine": 48967.96603016625,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0014",
+    "golden": 12244.415314635524,
+    "quantlib_engine": 12244.415314570835,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0015",
+    "golden": 26836.379333311528,
+    "quantlib_engine": 26836.3793333117,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0016",
+    "golden": 26837.693636355074,
+    "quantlib_engine": 26837.6936363548,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0017",
+    "golden": 12510.187047070149,
+    "quantlib_engine": 12510.187046962445,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0018",
+    "golden": 49236.366368519346,
+    "quantlib_engine": 49236.366368760704,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0019",
+    "golden": 122614.74374210593,
+    "quantlib_engine": 122614.74373382979,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0020",
+    "golden": 28198.63642983118,
+    "quantlib_engine": 28198.63643236278,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0021",
+    "golden": 66020.5323010728,
+    "quantlib_engine": 66020.5323198215,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0022",
+    "golden": 66019.21270876047,
+    "quantlib_engine": 66019.21269379639,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0023",
+    "golden": 30337.81471716658,
+    "quantlib_engine": 30337.814716420664,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0024",
+    "golden": 124751.2828448166,
+    "quantlib_engine": 124751.28284628411,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0025",
+    "golden": 18927.766286513594,
+    "quantlib_engine": null,
+    "counted": false
+   },
+   {
+    "case": "swaption_g-0026",
+    "golden": 413.9490220799929,
+    "quantlib_engine": null,
+    "counted": false
+   },
+   {
+    "case": "swaption_g-0027",
+    "golden": 5104.9480460539135,
+    "quantlib_engine": null,
+    "counted": false
+   },
+   {
+    "case": "swaption_g-0028",
+    "golden": 5104.198526341434,
+    "quantlib_engine": null,
+    "counted": false
+   },
+   {
+    "case": "swaption_g-0029",
+    "golden": 431.7319885501667,
+    "quantlib_engine": null,
+    "counted": false
+   },
+   {
+    "case": "swaption_g-0030",
+    "golden": 18944.050213558796,
+    "quantlib_engine": null,
+    "counted": false
+   },
+   {
+    "case": "swaption_g-0031",
+    "golden": 13358.72053731616,
+    "quantlib_engine": null,
+    "counted": false
+   },
+   {
+    "case": "swaption_g-0032",
+    "golden": 11302.382679026094,
+    "quantlib_engine": 11302.38271139174,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0033",
+    "golden": 12516.162433876014,
+    "quantlib_engine": 12516.162525893049,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0041",
+    "golden": 144606.82781098215,
+    "quantlib_engine": 144606.82824382433,
+    "counted": true
+   },
+   {
+    "case": "swaption_g-0042",
+    "golden": 0.013825271853764027,
+    "quantlib_engine": 0.01382527098555865,
+    "counted": true
+   }
+  ]
+ },
+ "swaption_affine_g": {
+  "counted": 36,
+  "total": 39,
+  "rows": [
+   {
+    "case": "swaption_affine_g-0001",
+    "golden": 45002.553644675114,
+    "quantlib_engine": 45002.55364482137,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0002",
+    "golden": 1882.991858586133,
+    "quantlib_engine": 1882.9918585685814,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0003",
+    "golden": 14165.633299669533,
+    "quantlib_engine": 14165.634048529822,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0004",
+    "golden": 14167.234266502448,
+    "quantlib_engine": 14167.233539989898,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0005",
+    "golden": 1986.032217872197,
+    "quantlib_engine": 1986.0321287907957,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0006",
+    "golden": 45108.79593762702,
+    "quantlib_engine": 45108.796604988434,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0007",
+    "golden": 78672.73737114885,
+    "quantlib_engine": 78672.73739079069,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0008",
+    "golden": 3267.906947983208,
+    "quantlib_engine": 3267.9069457176934,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0009",
+    "golden": 24922.573735781105,
+    "quantlib_engine": 24922.573735782527,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0010",
+    "golden": 24920.68465611318,
+    "quantlib_engine": 24920.68465611191,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0011",
+    "golden": 3643.3140243555445,
+    "quantlib_engine": 3643.3148680980753,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0012",
+    "golden": 79044.3662881854,
+    "quantlib_engine": 79044.36035291955,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0013",
+    "golden": 44203.62251527044,
+    "quantlib_engine": 44203.62251530833,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0014",
+    "golden": 7403.385377948714,
+    "quantlib_engine": 7403.385377937317,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0015",
+    "golden": 20995.48584160011,
+    "quantlib_engine": 20995.483651555773,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0016",
+    "golden": 20994.274146761178,
+    "quantlib_engine": 20994.276224714136,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0017",
+    "golden": 7654.195892993206,
+    "quantlib_engine": 7654.195894279396,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0018",
+    "golden": 44452.00964063707,
+    "quantlib_engine": 44452.009636864525,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0019",
+    "golden": 44271.16192448604,
+    "quantlib_engine": 44271.16192462147,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0020",
+    "golden": 503.2670874206994,
+    "quantlib_engine": 503.2670873427595,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0021",
+    "golden": 12789.546773437045,
+    "quantlib_engine": 12789.546773323891,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0022",
+    "golden": 12790.990691378493,
+    "quantlib_engine": 12790.990691264284,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0023",
+    "golden": 2064.5811670754133,
+    "quantlib_engine": 2064.581295364808,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0024",
+    "golden": 45835.3638400238,
+    "quantlib_engine": 45835.362718020624,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0025",
+    "golden": 77399.53730771021,
+    "quantlib_engine": 77399.53732082515,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0026",
+    "golden": 73.56984840340249,
+    "quantlib_engine": 73.56984817094113,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0027",
+    "golden": 19156.84677463123,
+    "quantlib_engine": 19156.84677526591,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0028",
+    "golden": 19157.035175803132,
+    "quantlib_engine": 19157.035176436333,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0029",
+    "golden": 2532.544165138247,
+    "quantlib_engine": 2532.544165486458,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0030",
+    "golden": 79858.88842678888,
+    "quantlib_engine": 79858.88842848773,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0031",
+    "golden": 40323.82810672821,
+    "quantlib_engine": 40323.828107473346,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0032",
+    "golden": 2498.7280313213255,
+    "quantlib_engine": 2498.7280320121154,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0033",
+    "golden": 17292.75969620002,
+    "quantlib_engine": 17292.757589757104,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0034",
+    "golden": 17291.66304907749,
+    "quantlib_engine": 17291.66573991666,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0035",
+    "golden": 6447.16516664798,
+    "quantlib_engine": 6447.165167507359,
+    "counted": true
+   },
+   {
+    "case": "swaption_affine_g-0036",
+    "golden": 44270.07194780972,
+    "quantlib_engine": 44270.07194696651,
+    "counted": true
+   }
+  ]
+ },
+ "exposure_g": {
+  "counted": 6,
+  "total": 15,
+  "rows": [
+   {
+    "case": "exposure_g-0001",
+    "quantlib_engine_ee": [
+     352680.97726414085,
+     285620.69243393495,
+     204079.2915761633,
+     107026.7646671864
+    ],
+    "counted": true
+   },
+   {
+    "case": "exposure_g-0002",
+    "quantlib_engine_ee": [
+     53486.373079939236,
+     73281.87687186446,
+     66867.75256232213,
+     40535.81081990717
+    ],
+    "counted": true
+   },
+   {
+    "case": "exposure_g-0003",
+    "quantlib_engine_ee": [
+     25681.557719041786,
+     46001.2728889949,
+     45279.849130396506,
+     29162.776774517955
+    ],
+    "counted": true
+   },
+   {
+    "case": "exposure_g-0004",
+    "quantlib_engine_ee": [
+     251050.41766471104,
+     219415.9205837992,
+     160231.79577824735,
+     86314.92587524002
+    ],
+    "counted": true
+   },
+   {
+    "case": "exposure_g-0005",
+    "quantlib_engine_ee": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "counted": false
+   },
+   {
+    "case": "exposure_g-0006",
+    "quantlib_engine_ee": [
+     213829.47034261446,
+     169217.4591996093,
+     65677.97765455437
+    ],
+    "counted": true
+   },
+   {
+    "case": "exposure_g-0007",
+    "quantlib_engine_ee": [
+     100454.61017418372,
+     106152.71203087695,
+     88457.17628615584,
+     52292.395606809136
+    ],
+    "counted": true
+   }
+  ]
+ }
+}

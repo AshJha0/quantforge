@@ -2828,6 +2828,202 @@
     "synthetic"
    ],
    "description": "short_rate given"
+  },
+  {
+   "case_id": "swaption_g-0041",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": -0.002,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 144606.82781098215,
+     "forward_swap_rate": 0.03935061559268552,
+     "annuity": 3497089.7509755506
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "negative-strike",
+    "payer",
+    "synthetic"
+   ],
+   "description": "HW PAYER K=-0.2%: negative coupons, root still unique",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-9 relative"
+   }
+  },
+  {
+   "case_id": "swaption_g-0042",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0,
+     4.0,
+     5.0
+    ],
+    "fixed_rate": -0.002,
+    "swaption_type": "RECEIVER"
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "price": 0.013825271853764027,
+     "forward_swap_rate": 0.03935061559268552,
+     "annuity": 3497089.7509755506
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "quantlib-1.44"
+   ],
+   "tags": [
+    "shortrate",
+    "jamshidian",
+    "negative-strike",
+    "receiver",
+    "synthetic"
+   ],
+   "description": "HW RECEIVER K=-0.2%: negative coupons, root still unique",
+   "tolerance_limit": {
+    "absolute": 1e-06,
+    "relative": 1e-09,
+    "reason": "1e-9 relative"
+   }
+  },
+  {
+   "case_id": "swaption_g-0043",
+   "operation": "rates.shortrate.swaption",
+   "inputs": {
+    "mean_reversion": 0.05,
+    "sigma": 0.01,
+    "curve": {
+     "times": [
+      0.4986301369863014,
+      1.0,
+      2.0,
+      3.0,
+      5.002739726027397,
+      7.005479452054795,
+      10.005479452054795,
+      15.01095890410959,
+      20.013698630136986,
+      30.019178082191782
+     ],
+     "discount_factors": [
+      0.98085,
+      0.9619,
+      0.9254,
+      0.8906,
+      0.8242,
+      0.762,
+      0.6787,
+      0.561,
+      0.467,
+      0.332
+     ]
+    },
+    "notional": 1000000.0,
+    "expiry_years": 1.0,
+    "payment_times": [
+     2.0,
+     3.0
+    ],
+    "fixed_rate": -1.0,
+    "swaption_type": "PAYER"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "jamshidian",
+    "synthetic"
+   ],
+   "description": "1 + K tau_n = 0"
   }
  ]
 }
