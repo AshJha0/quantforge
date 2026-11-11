@@ -101,6 +101,13 @@ Questions read from the lanes' notes only: Java J-I1 to J-I5, Python I-Q1 to I-Q
 | I-51 | Rust 5: contract version | All four CLIs report `contract_version` 1.11.0 from the stage I release; the runner's contract check (`StubTests::test_contract_mismatch_stops` covers the mechanism) stops a mismatch. The lanes move together in the integration PR |
 | I-52 | Coordinator: Python import path for the tutorials | As tutorial 1: a tutorial's Python step imports the `quantforge_core` modules directly (for example `from quantforge_core import hedge_solvers`). No `quantforge.hedge` facade is added. The `python` column of `name-map.json` is a logical name, as for every earlier stage, not an import path. This amends the wave 1 to 4d follow-up note's item 2 |
 
+## After the builds, part 2 (2026-11-11)
+
+| # | Question | Ruling |
+|---|---|---|
+| I-53 | Coordinator, Rust open item: `hedge.select.solve` may need up to `2^20 - 1` solves at the I-35 limit | A size limit independent of the method: `E_LIMIT` when the number of candidate subsets `sum_{k=1..min(K,n)} C(n, k)` exceeds 100,000 (checked with the other size limits, before the rule checks). `n = 20, K = 6` (60,459 subsets) is allowed; `n = 20, K = 7` (137,979) is not, pinned by `hedgeselect_i-0018`. Within the limit a build may prune (branch and bound on the objective, which can only fall as instruments are added), but it must return the subset the exhaustive definition (I-34) picks |
+| I-54 | Rust note: wave 4a is accurate only to about 1e-6 at a hold/not-hold switch point | Not allowed: `hedge.qp.solve` with costs is exact to `root_finding` everywhere, switch points included. At a switch (`|g_j| = cost_weight h_j` with `x_j = 0`) both neighbouring sign states give the same `x`, so solving the smooth problem exactly on either state is exact. A regularised split problem may find the state, but its answer must then be re-solved exactly. Pinned by `hedgecost_i-0023` (instrument 1 exactly at its switch, `x = [0, 1.75]`). Rust changes its 4a final step; the other lanes run the new case |
+
 ## Wave 5, outside-checked value cases (2026-11-11)
 
 | # | Point | Ruling |

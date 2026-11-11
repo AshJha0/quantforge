@@ -704,7 +704,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** scipy 1.18 trust-constr and SLSQP on the split-variable QP.
 - **Monitoring thresholds:** a frontier that is not monotone, or a realised cost above the modelled cost by more than the desk's tolerance.
-- **Data lineage hash:** sha256 e1e2ea2afa1f9fbd695f553f26257ff8bdd0b78fadcdf4b8e7f1261856d8d54a (`hedgecost_i`); 7e4a0069d2d7eb68d4c4f2153ef2fdaff4a4e75b98f4e0ef368c4dfbb37246b7 (`hedgefrontier_i`)
+- **Data lineage hash:** sha256 fc651b04e30a976effc3cbcbe9bb84e2f858d422b1c201e482c1460689e74afc (`hedgecost_i`); 7e4a0069d2d7eb68d4c4f2153ef2fdaff4a4e75b98f4e0ef368c4dfbb37246b7 (`hedgefrontier_i`)
 - **Retirement trigger:** a need for square-root impact or portfolio margin.
 - **Validation report:** `specifications/08-hedging/hedge-costs-and-frontier.md`.
 
@@ -729,7 +729,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 - **Tier:** 2.
 - **Challenger:** the same enumeration with scipy solvers.
 - **Monitoring thresholds:** a selected hedge whose residual risk exceeds the full hedge's by more than the desk's tolerance.
-- **Data lineage hash:** sha256 00bfcdd41645756679f850673b867f1c04871e3e7e76b08fc05ca5c76b59731d (`hedgeselect_i`)
+- **Data lineage hash:** sha256 4d1d1d7168fd2628dfb2c2d1de57f39fc2885b19d5932f2b56397730ec128f02 (`hedgeselect_i`)
 - **Retirement trigger:** universes above 20 instruments or fixed costs per instrument.
 - **Validation report:** `specifications/08-hedging/instrument-selection.md`.
 

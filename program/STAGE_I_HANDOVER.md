@@ -278,3 +278,7 @@ Read: ruling I-55. Five new suites of existing operations, built in nothing new;
 | `hedgeqp5_i` | `hedge.qp.solve` | 30 | 29 (scipy BVLS, gelsd, SLSQP) |
 
 All 165 are value cases from seeded draws. Draws are rejected only by rules fixed before any outside check (3 rejected); every accepted draw is kept whether or not it counts. **Stage I outside share: 278 of 443 = 62.8%, above the 60% floor** (I-2 unchanged, error cases in the denominator; this total includes the two after-build cases of the next commit). Earlier suites are byte-identical. The uncounted cases still cannot have a free outside reference: integer lots (no free integer least-squares solver), beta futures, the residual report and slippage (arithmetic only), and every error case.
+
+## Rulings after the builds, part 2 (2026-11-11)
+
+I-53: `hedge.select.solve` returns `E_LIMIT` above 100,000 candidate subsets (`hedgeselect_i-0018`, `n = 20`, `K = 7`); all four lanes add the check. I-54: costs in `hedge.qp.solve` must be exact at a switch point (`hedgecost_i-0023`); Rust changes its final step, and the others run the case. Both cases are appended; earlier cases are byte-identical.
