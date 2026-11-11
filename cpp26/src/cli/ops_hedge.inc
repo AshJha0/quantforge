@@ -472,6 +472,45 @@ void op_hedge_crossasset_solve(const In& in, Out& out) {
     out.key_real("objective", r.objective);
 }
 
+// ---- stage I wave 4b: backtest and effectiveness (08-hedging/dynamic-hedge-and-effectiveness.md) ----
+
+constexpr std::size_t max_path = 100000;  // ruling I-32
+
+void write_effectiveness(Out& out, const hedging::Effectiveness& e) {
+    out.key_real("dollar_offset", e.dollar_offset);
+    out.key_real("regression_slope", e.regression_slope);
+    out.key_real("regression_r2", e.regression_r2);
+    out.key_real("variance_reduction", e.variance_reduction);
+}
+
+void op_hedge_effectiveness(const In& in, Out& out) {
+    const Vec x = in.reals("item_changes"), y = in.reals("hedge_changes");
+    limit_if(x.size() > max_path, "item_changes");
+    limit_if(y.size() > max_path, "hedge_changes");
+    in.ready();
+    write_effectiveness(out, hedging::effectiveness(x, y));
+}
+
+void op_hedge_backtest_delta(const In& in, Out& out) {
+    const Value& ov = in.need("option");
+    if (ov.kind != Kind::Object) schema("option", "expected an object");
+    const In o(ov);
+    const hedging::BacktestOption option{o.choice<bool>("type", {{"CALL", true}, {"PUT", false}}), o.real("strike"),
+                                         o.real("expiry_years")};
+    const double quantity = in.real("quantity"), rate = in.real("rate"), q = in.real("dividend_yield"),
+                 vol = in.real("hedge_volatility");
+    const Vec times = in.reals("times"), spots = in.reals("spots");
+    limit_if(times.size() > max_path, "times");
+    limit_if(spots.size() > max_path, "spots");
+    in.ready();
+    const hedging::DeltaBacktest r = hedging::backtest_delta(option, quantity, rate, q, vol, times, spots);
+    out.key_reals("option_values", r.option_values);
+    out.key_reals("shares", r.shares);
+    out.key_reals("portfolio_values", r.portfolio_values);
+    out.key_real("final_pnl", r.final_pnl);
+    write_effectiveness(out, r.stats);
+}
+
 constexpr Entry hedge_ops[] = {
     {"hedge.solve", op_hedge_solve},
     {"hedge.spread_cost", op_spread_cost},
@@ -485,4 +524,6 @@ constexpr Entry hedge_ops[] = {
     {"hedge.correlation.neutralise", op_hedge_correlation_neutralise},
     {"hedge.crossasset.solve", op_hedge_crossasset_solve},
     {"hedge.frontier.solve", op_hedge_frontier_solve},
+    {"hedge.backtest.delta", op_hedge_backtest_delta},
+    {"hedge.effectiveness", op_hedge_effectiveness},
 };

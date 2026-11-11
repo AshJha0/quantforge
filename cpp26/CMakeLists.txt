@@ -40,6 +40,7 @@ add_library(quantforge_core
   src/core/hedging.cpp
   src/core/hedging_w2.cpp
   src/core/hedging_w3.cpp
+  src/core/hedging_w4.cpp
   src/core/compounding.cpp
   src/core/cos.cpp
   src/core/data_checks.cpp

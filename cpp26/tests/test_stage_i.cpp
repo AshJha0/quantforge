@@ -758,3 +758,55 @@ TEST_CASE("I4a costs: the sign enumeration is capped at 20 free instruments") {
     p.lower = std::vector<hg::Bound>(n, 0.0);  // every sign fixed by a bound: nothing to enumerate
     CHECK(i_error([&] { hg::solve_qp(p); }) == "ok");
 }
+
+// ---- wave 4b: backtest and effectiveness ----
+
+TEST_CASE("I4b effectiveness: a perfect offset gives 1, -1, 1, 1; the I-31 domain") {
+    const hg::Effectiveness e = hg::effectiveness({100.0, -50.0, 30.0, -20.0}, {-100.0, 50.0, -30.0, 20.0});
+    CHECK(e.dollar_offset == 1.0);
+    CHECK(std::fabs(e.regression_slope + 1.0) < 1e-15);
+    CHECK(std::fabs(e.regression_r2 - 1.0) < 1e-15);
+    CHECK(e.variance_reduction == 1.0);
+    // Sums to 0 exactly, while left-to-right binary64 summation gives -1 (1 + 1e16 rounds to 1e16).
+    CHECK(i_error([] { hg::effectiveness({1.0, 1e16, -1e16, -1.0}, {1.0, 2.0, 0.5, 3.0}); }) == "E_DOMAIN");
+    CHECK(i_error([] { hg::effectiveness({0.1, 0.2, -0.3}, {1.0, 2.0, 0.5}); }) == "ok");  // binary sum is 2^-55
+    CHECK(i_error([] { hg::effectiveness({0.1, 0.1, 0.1}, {1.0, 2.0, 0.5}); }) == "E_DOMAIN");
+    CHECK(i_error([] { hg::effectiveness({0.1, 0.2, 0.4}, {1.0, 1.0, 1.0}); }) == "E_DOMAIN");
+    CHECK(i_error([] { hg::effectiveness({0.1, 0.2}, {1.0, 2.0}); }) == "E_INPUT");
+}
+
+TEST_CASE("I4b backtest: constant spot, zero carry: portfolio values end at quantity (V_last - V_0)") {
+    const hg::BacktestOption call{true, 100.0, 0.5};
+    const Vec times{0.0, 0.1, 0.2, 0.3, 0.5}, flat(5, 100.0);
+    // The hedge leg has zero variance on a constant path, so the operation itself stops at I-31.
+    CHECK(i_error([&] { hg::backtest_delta(call, -10.0, 0.0, 0.0, 0.2, times, flat); }) == "E_DOMAIN");
+    // The replay: on a constant path with zero rates and dividends the shares never earn anything, so
+    // Pi_{m-1} = quantity (V_{m-1} - V_0). A tiny last move keeps the hedge leg's variance above 0.
+    Vec path = flat;
+    path.back() = 100.0 + 1e-9;
+    const hg::DeltaBacktest r = hg::backtest_delta(call, -10.0, 0.0, 0.0, 0.2, times, path);
+    const double expected = -10.0 * (r.option_values.back() - r.option_values.front()) + r.shares.back() * 1e-9;
+    CHECK(std::fabs(r.final_pnl - expected) < 1e-12);
+    CHECK(r.portfolio_values.front() == 0.0);
+    CHECK(r.shares.size() == 4);
+}
+
+TEST_CASE("I4b backtest: self-financing and the check ladder") {
+    const hg::BacktestOption put{false, 95.0, 0.25};
+    const Vec times{0.0, 0.05, 0.1, 0.15, 0.2, 0.25};
+    const Vec spots{100.0, 97.0, 99.5, 94.0, 96.0, 93.0};
+    const hg::DeltaBacktest r = hg::backtest_delta(put, 50.0, 0.03, 0.01, 0.25, times, spots);
+    CHECK(r.option_values.back() == 2.0);  // payoff at expiry
+    for (const double h : r.shares) CHECK(h > 0.0);  // long puts are hedged with long shares
+    // The P&L of the hedged book against the unhedged option's change: the hedge offsets most of it.
+    CHECK(r.stats.regression_slope < 0.0);
+    CHECK(i_error([&] { hg::backtest_delta(put, 50.0, 0.03, 0.01, 0.25, {0.0, 0.1, 0.2, 0.3}, {100.0, 97.0, 99.5}); }) ==
+          "E_INPUT");
+    CHECK(i_error([&] { hg::backtest_delta(put, 50.0, 0.03, 0.01, 0.25, {0.0, 0.05, 0.1, 0.15}, {100.0, 97.0, 0.0, 99.0}); }) ==
+          "E_DOMAIN");
+    CHECK(i_error([&] { hg::backtest_delta(put, 0.0, 0.03, 0.01, 0.25, times, spots); }) == "E_DOMAIN");
+    CHECK(i_error([&] { hg::backtest_delta(put, 50.0, 0.03, 0.01, 0.25, {0.0, 0.05, 0.1, 0.15}, {100.0, 97.0, 99.5, 98.0}); }) ==
+          "ok");
+    CHECK(i_error([&] { hg::backtest_delta(put, 50.0, 0.03, 0.01, 0.25, {0.0, 0.1, 0.2, 0.3, 0.4}, Vec(5, 100.0)); }) ==
+          "E_INPUT");  // the path ends after expiry
+}

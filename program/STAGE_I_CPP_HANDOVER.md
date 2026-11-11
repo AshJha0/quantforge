@@ -36,6 +36,13 @@ Built: the new optional inputs of `hedge.qp.solve` and `hedge.frontier.solve` (`
 - Conformance: `hedgecost_i` 22 of 22, `hedgefrontier_i` 10 of 10, `hedgeqp_i` still 44 of 44, on the first build. Full run: 14,701 passed, 0 failures (only the 25 wave 4b cases not implemented at that point). ctest passed.
 - ctest: 4 new test cases (`cost_weight = 0` equals wave 1, no feasible perturbation does better, a costly instrument at exactly `+0.0`, an active margin equals its limit, spread against impact regularity, frontier monotonicity, the sign cap). `tests/test_cli.cpp` expects 270 operations.
 
+## Wave 4b, dynamic delta-hedge backtest and effectiveness
+
+Built: `hedge.backtest.delta`, `hedge.effectiveness` (`cpp26/src/core/hedging_w4.cpp`), the I-29 replay and one statistics routine for both. The hedge leg of each step is summed from its terms (`h dS`, interest, dividends), which equals `(Pi_{i+1} - Pi_i) - item_i` and is exactly 0 on a constant path without carry, so the I-31 test sees a zero variance there. The item sum for I-31 is compensated in extended precision.
+
+- Conformance: `hedgebt_i` 15 of 15, `hedgeeff_i` 10 of 10. Full run: 14,726 of 14,726, 0 failures. ctest passed.
+- ctest: 3 new test cases (perfect offset gives 1, -1, 1, 1; an exactly-zero sum that naive summation misses; the constant-path replay of the corrected property test; self-financing and the check ladder). `tests/test_cli.cpp` expects 272 operations.
+
 ## SPEC_QUESTIONS
 
 | # | Where | Question | What the C++ build does |

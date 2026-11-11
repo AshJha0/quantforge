@@ -198,4 +198,26 @@ CrossAssetHedge cross_asset_hedge(double spot, double dividend_yield, double vol
                                   const std::vector<CrossAssetPosition>& book,
                                   const std::vector<CrossAssetPosition>& hedges, const Vec& weights, double ridge);
 
+// ---- wave 4b: dynamic delta-hedge backtest and effectiveness (08-hedging/dynamic-hedge-and-effectiveness.md) ----
+
+struct Effectiveness {
+    double dollar_offset = 0.0, regression_slope = 0.0, regression_r2 = 0.0, variance_reduction = 0.0;
+};
+/// hedge.effectiveness (I-30, I-31): E_INPUT on unequal lengths or fewer than 3 values; E_DOMAIN when the item
+/// changes sum to zero or either series has zero sample variance.
+Effectiveness effectiveness(const Vec& item_changes, const Vec& hedge_changes);
+
+struct BacktestOption {
+    bool call = true;
+    double strike = 0.0, expiry_years = 0.0;
+};
+struct DeltaBacktest {
+    Vec option_values, shares, portfolio_values;
+    double final_pnl = 0.0;
+    Effectiveness stats;
+};
+/// hedge.backtest.delta: the self-financing replay of I-29 on the given path.
+DeltaBacktest backtest_delta(const BacktestOption& option, double quantity, double rate, double dividend_yield,
+                             double hedge_volatility, const Vec& times, const Vec& spots);
+
 }  // namespace quantforge::hedging
