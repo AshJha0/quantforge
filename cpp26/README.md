@@ -33,7 +33,9 @@ Property tests for these waves are in `tests/test_stage_g.cpp`: the acceptance c
 | File | Holds | Spec |
 |---|---|---|
 | `core/hedging.{hpp,cpp}` | Wave 1 hedge solvers. `hedge.qp.solve` works in the null space of the equalities (`x = E^+ e + Z y`, `Z` from a Householder QR of `E^T`); the reduced problem is solved by the Goldfarb-Idnani dual active-set method, which also proves infeasibility (I-14). `MIN_NORM` uses the pseudo-inverse of `Z^T H Z` with the I-3 threshold taken on `H`. Integer lots by ellipsoid enumeration around the free minimiser, clipped to the lot box, then the I-7 tie rule. Minimum variance in extended precision, so the sign of a near-zero hedged variance is right. Greek, beta and residual-risk reports | `08-hedging/hedge-solvers.md`, rulings I-1 to I-14 |
-| `cli/ops_hedge.inc` | CLI side of the hedge operations, with the I-4 limits and the I-12 `null` rule | `cli-contract.md`, "Stage I operations" |
+| `core/hedging_w2.cpp` | Wave 2. CDS hedges on the stage D legs: CS01 and bucket CS01s as the I-15 central differences of the piecewise-flat hazards (the survival curve rebuilt from the shifted hazards), JTD per I-16. Correlation hedges with Margrabe exchange options and single-asset vanillas (I-17, I-18) | `08-hedging/credit-and-correlation-hedges.md`, rulings I-15 to I-19 |
+| `core/hedging_w3.cpp` | Wave 3. Cross-asset equity and rates hedge: `EQ01` and `KR01_k` by repricing on the I-20 zero curve (I-21), then the wave 1 QP | `08-hedging/cross-asset-hedge.md`, rulings I-20 to I-23 |
+| `cli/ops_hedge.inc` | CLI side of the hedge operations, with the I-4, I-19 and I-23 limits, the I-12 `null` rule and the per-kind key sets (`E_INPUT`) | `cli-contract.md`, "Stage I operations" |
 
 Property tests are in `tests/test_stage_i.cpp`: the KKT conditions on random bounded and equality-constrained problems, `MIN_NORM` against the unique solution, integer optimality against every one-lot neighbour, minimum-variance effectiveness against the OLS `R^2`, and the residual contributions summing to the variance.
 

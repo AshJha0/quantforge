@@ -22,6 +22,13 @@ Built: `hedge.credit.cds`, `hedge.correlation.neutralise` (`cpp26/src/core/hedgi
 - Conformance: `hedgecredit_i` 19 of 19, `hedgecorr_i` 20 of 20, on the first build. Full run on the wave 2 tree: 14,653 passed, 0 failures in the suites built so far (the 21 `hedgecost_i` failures and 52 not-implemented cases are waves 4a and 4b, not built at that point).
 - ctest: 277 of 278 test cases passed; the one failure was the load-sensitive Q3b timing test (see Open), which passed when rerun. 4 new test cases (own contract hedges itself, targets zero after, bucket sum against the parallel CS01, zero risk past maturity, Margrabe delta against a price difference, the I-17 proportional rows, key sets). `tests/test_cli.cpp` expects 268 operations.
 
+## Wave 3, cross-asset hedge
+
+Built: `hedge.crossasset.solve` (`cpp26/src/core/hedging_w3.cpp`): the risk matrix by the I-21 half-differences on the I-20 curve, then the wave 1 `solve_qp`.
+
+- Conformance: `hedgexa_i` 17 of 17 on the first build.
+- ctest: 3 new test cases (square hedge leaves no residual, bonds have `EQ01 = 0` exactly, key-rate sharing between neighbours and before pillar 1, weight scaling, the check ladder). `tests/test_cli.cpp` expects 269 operations.
+
 ## SPEC_QUESTIONS
 
 | # | Where | Question | What the C++ build does |

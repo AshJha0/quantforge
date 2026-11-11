@@ -559,3 +559,89 @@ TEST_CASE("I2 correlation CLI: a key set other than the kind's is E_INPUT, after
     CHECK(i_code(i_case("hedge.correlation.neutralise",
                         head + R"({"instrument":"CALL_1","strike":"NaN"}]})")) == "E_DOMAIN");
 }
+
+// ---- wave 3: cross-asset hedge ----
+
+namespace {
+
+hg::ZeroCurve i_zero_curve() { return {{1.0, 2.0, 5.0, 10.0}, {0.030, 0.032, 0.035, 0.037}}; }
+
+hg::CrossAssetPosition i_xa(hg::CrossAssetKind kind, double strike, double expiry, double notional, double quantity) {
+    hg::CrossAssetPosition p;
+    p.kind = kind;
+    p.strike = strike;
+    p.expiry_years = expiry;
+    p.notional = notional;
+    p.quantity = quantity;
+    return p;
+}
+
+}  // namespace
+
+TEST_CASE("I3 cross-asset: a square regular hedge leaves no residual risk; bonds alone have EQ01 = 0") {
+    using K = hg::CrossAssetKind;
+    const hg::ZeroCurve c = i_zero_curve();
+    const std::vector<hg::CrossAssetPosition> book{i_xa(K::Call, 100.0, 3.0, 0.0, -1000.0),
+                                                   i_xa(K::Zcb, 0.0, 7.0, 1e5, 10.0)};
+    const std::vector<hg::CrossAssetPosition> hedges{
+        i_xa(K::Forward, 100.0, 4.0, 0.0, 0.0), i_xa(K::Zcb, 0.0, 1.0, 1e5, 0.0), i_xa(K::Zcb, 0.0, 2.0, 1e5, 0.0),
+        i_xa(K::Zcb, 0.0, 5.0, 1e5, 0.0), i_xa(K::Zcb, 0.0, 10.0, 1e5, 0.0)};
+    const Vec w(5, 1.0);
+    const hg::CrossAssetHedge r = hg::cross_asset_hedge(100.0, 0.01, 0.2, c, book, hedges, w, 0.0);
+    double scale = 0.0;
+    for (const double v : r.book_risk) scale = std::max(scale, std::fabs(v));
+    for (const double v : r.residual_risk) CHECK(std::fabs(v) < 1e-9 * scale);
+    const Vec bond = hg::cross_asset_risk(100.0, 0.01, 0.2, c, i_xa(K::Zcb, 0.0, 3.0, 1e5, 0.0));
+    CHECK(bond[0] == 0.0);
+    // Between pillars 2 and 5 the risk is shared by those two only; before pillar 1 it all sits on pillar 1.
+    CHECK(bond[1] == 0.0);
+    CHECK(bond[4] == 0.0);
+    CHECK(bond[2] < 0.0);
+    CHECK(bond[3] < 0.0);
+    const Vec early = hg::cross_asset_risk(100.0, 0.01, 0.2, c, i_xa(K::Zcb, 0.0, 0.5, 1e5, 0.0));
+    CHECK(early[1] < 0.0);
+    for (std::size_t k = 2; k < early.size(); ++k) CHECK(early[k] == 0.0);
+    const Vec spot = hg::cross_asset_risk(100.0, 0.01, 0.2, c, i_xa(K::Underlying, 0.0, 0.0, 0.0, 0.0));
+    CHECK(std::fabs(spot[0] - 1.0) < 1e-14);
+    for (std::size_t k = 1; k < spot.size(); ++k) CHECK(spot[k] == 0.0);
+}
+
+TEST_CASE("I3 cross-asset: scaling every weight leaves the positions unchanged when ridge = 0") {
+    using K = hg::CrossAssetKind;
+    const hg::ZeroCurve c = i_zero_curve();
+    const std::vector<hg::CrossAssetPosition> book{i_xa(K::Put, 95.0, 2.5, 0.0, 500.0),
+                                                   i_xa(K::Forward, 105.0, 6.0, 0.0, -200.0)};
+    const std::vector<hg::CrossAssetPosition> hedges{i_xa(K::Underlying, 0.0, 0.0, 0.0, 0.0),
+                                                     i_xa(K::Zcb, 0.0, 2.0, 1e4, 0.0), i_xa(K::Zcb, 0.0, 10.0, 1e4, 0.0)};
+    const Vec w{4.0, 1.0, 2.0, 0.5, 3.0};
+    Vec w7 = w;
+    for (double& v : w7) v *= 7.0;
+    const hg::CrossAssetHedge a = hg::cross_asset_hedge(100.0, 0.01, 0.2, c, book, hedges, w, 0.0);
+    const hg::CrossAssetHedge b = hg::cross_asset_hedge(100.0, 0.01, 0.2, c, book, hedges, w7, 0.0);
+    for (std::size_t j = 0; j < 3; ++j) CHECK(std::fabs(a.positions[j] - b.positions[j]) < 1e-10 * std::fabs(a.positions[j]));
+    CHECK(std::fabs(b.objective - 7.0 * a.objective) < 1e-10 * b.objective);
+}
+
+TEST_CASE("I3 cross-asset: the check ladder") {
+    using K = hg::CrossAssetKind;
+    const hg::ZeroCurve c = i_zero_curve();
+    const std::vector<hg::CrossAssetPosition> book{i_xa(K::Call, 100.0, 3.0, 0.0, 1.0)};
+    const std::vector<hg::CrossAssetPosition> one{i_xa(K::Underlying, 0.0, 0.0, 0.0, 0.0)};
+    const Vec w(5, 1.0);
+    CHECK(i_error([&] { hg::cross_asset_hedge(100.0, 0.0, 0.2, {{1.0, 1.0}, {0.03, 0.03}}, book, one, Vec(3, 1.0), 0.0); }) ==
+          "E_INPUT");
+    CHECK(i_error([&] { hg::cross_asset_hedge(100.0, 0.0, 0.2, c, book, one, Vec(4, 1.0), 0.0); }) == "E_INPUT");
+    CHECK(i_error([&] {
+              hg::cross_asset_hedge(100.0, 0.0, 0.2, c, {i_xa(K::Call, 100.0, 11.0, 0.0, 1.0)}, one, w, 0.0);
+          }) == "E_INPUT");
+    CHECK(i_error([&] { hg::cross_asset_hedge(100.0, 0.0, 0.0, c, book, one, w, 0.0); }) == "E_DOMAIN");
+    CHECK(i_error([&] { hg::cross_asset_hedge(100.0, 0.0, 0.2, c, book, {one[0], one[0]}, w, 0.0); }) == "E_SINGULAR");
+    const std::string head =
+        R"({"spot":100,"dividend_yield":0.01,"volatility":0.2,"curve":{"times":[1,2],"zero_rates":[0.03,0.032]},"weights":[1,1,1],"book":[{"instrument":"ZCB","expiry_years":1.5,"notional":100,"quantity":1}],"hedges":[)";
+    CHECK(i_code(i_case("hedge.crossasset.solve", head + R"({"instrument":"ZCB","expiry_years":2,"notional":100}]})")) ==
+          "ok");
+    CHECK(i_code(i_case("hedge.crossasset.solve", head + R"({"instrument":"ZCB","expiry_years":2}]})")) == "E_INPUT");
+    CHECK(i_code(i_case("hedge.crossasset.solve",
+                        R"({"spot":100,"dividend_yield":0.01,"volatility":0.2,"curve":{"times":[2,1],"zero_rates":[0.03,0.032]},"weights":[1,1,1],"book":[{"instrument":"ZCB","quantity":1}],"hedges":[{"instrument":"UNDERLYING"}]})")) ==
+          "E_INPUT");
+}

@@ -351,6 +351,80 @@ void op_hedge_correlation_neutralise(const In& in, Out& out) {
     write("greeks_after", r.after);
 }
 
+// ---- stage I wave 3: cross-asset hedge (08-hedging/cross-asset-hedge.md) ----
+
+constexpr std::size_t max_cross_asset_book = 1000, max_cross_asset_hedges = 200, max_curve_pillars = 100;  // I-23
+
+struct KeyedCrossAsset {
+    hedging::CrossAssetPosition p;
+    bool keys_ok = true;
+};
+
+KeyedCrossAsset cross_asset_position_of(const In& r, bool with_quantity) {
+    using K = hedging::CrossAssetKind;
+    KeyedCrossAsset k;
+    k.p.kind = r.choice<K>("instrument", {{"CALL", K::Call},
+                                          {"PUT", K::Put},
+                                          {"FORWARD", K::Forward},
+                                          {"ZCB", K::Zcb},
+                                          {"UNDERLYING", K::Underlying}});
+    std::vector<std::pair<string_view, double*>> wanted;
+    if (with_quantity) wanted.emplace_back("quantity", &k.p.quantity);
+    if (k.p.kind == K::Call || k.p.kind == K::Put || k.p.kind == K::Forward)
+        wanted.insert(wanted.end(), {{"strike", &k.p.strike}, {"expiry_years", &k.p.expiry_years}});
+    if (k.p.kind == K::Zcb) wanted.insert(wanted.end(), {{"expiry_years", &k.p.expiry_years}, {"notional", &k.p.notional}});
+    for (const auto& [key, value] : r.raw().members)
+        if (key != "instrument" && std::ranges::none_of(wanted, [&](const auto& w) { return w.first == key; }))
+            k.keys_ok = false;
+    for (const auto& [key, slot] : wanted) {
+        if (const Value* v = r.raw().find(key)) *slot = to_real(*v, key);
+        else k.keys_ok = false;
+    }
+    return k;
+}
+
+std::vector<KeyedCrossAsset> cross_asset_positions_of(const In& in, string_view key, bool with_quantity) {
+    const Value& a = in.need(key);
+    if (a.kind != Kind::Array) schema(key, "expected an array");
+    std::vector<KeyedCrossAsset> out;
+    for (const Value& item : a.items) {
+        if (item.kind != Kind::Object) schema(key, "expected an object");
+        out.push_back(cross_asset_position_of(In(item), with_quantity));
+    }
+    return out;
+}
+
+void op_hedge_crossasset_solve(const In& in, Out& out) {
+    const double spot = in.real("spot"), q = in.real("dividend_yield"), vol = in.real("volatility");
+    const Value& cv = in.need("curve");
+    if (cv.kind != Kind::Object) schema("curve", "expected an object");
+    const In cin(cv);
+    const hedging::ZeroCurve curve{cin.reals("times"), cin.reals("zero_rates")};
+    const auto book = cross_asset_positions_of(in, "book", true);
+    const auto hedges = cross_asset_positions_of(in, "hedges", false);
+    const Vec weights = in.reals("weights");
+    const double ridge = optional_real(in, "ridge", 0.0);
+    limit_if(book.size() > max_cross_asset_book, "book");
+    limit_if(hedges.size() > max_cross_asset_hedges, "hedges");
+    limit_if(curve.times.size() > max_curve_pillars, "curve");
+    in.ready();
+    hedging::check_zero_curve(curve);  // check 1, before the key sets of check 2
+    std::vector<hedging::CrossAssetPosition> b, h;
+    for (const KeyedCrossAsset& k : book) {
+        if (!k.keys_ok) throw Error("E_INPUT", "book: keys other than those of the instrument kind", "book");
+        b.push_back(k.p);
+    }
+    for (const KeyedCrossAsset& k : hedges) {
+        if (!k.keys_ok) throw Error("E_INPUT", "hedges: keys other than those of the instrument kind", "hedges");
+        h.push_back(k.p);
+    }
+    const hedging::CrossAssetHedge r = hedging::cross_asset_hedge(spot, q, vol, curve, b, h, weights, ridge);
+    out.key_reals("positions", r.positions);
+    out.key_reals("book_risk", r.book_risk);
+    out.key_reals("residual_risk", r.residual_risk);
+    out.key_real("objective", r.objective);
+}
+
 constexpr Entry hedge_ops[] = {
     {"hedge.solve", op_hedge_solve},
     {"hedge.spread_cost", op_spread_cost},
@@ -362,4 +436,5 @@ constexpr Entry hedge_ops[] = {
     {"hedge.residual.report", op_hedge_residual_report},
     {"hedge.credit.cds", op_hedge_credit_cds},
     {"hedge.correlation.neutralise", op_hedge_correlation_neutralise},
+    {"hedge.crossasset.solve", op_hedge_crossasset_solve},
 };

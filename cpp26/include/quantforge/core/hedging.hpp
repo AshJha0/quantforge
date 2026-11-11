@@ -160,4 +160,34 @@ CorrelationHedge correlation_hedge(const TwoAssetMarket& m, const std::vector<Tw
                                    const std::vector<TwoAssetPosition>& hedges,
                                    const std::vector<TwoAssetTarget>& targets);
 
+// ---- wave 3: cross-asset hedge, equity and rates (08-hedging/cross-asset-hedge.md, I-20 to I-23) ----
+
+/// Continuously compounded zero rates on ACT/365F pillar times: linear between pillars, flat before the
+/// first, undefined after the last (I-20).
+struct ZeroCurve {
+    Vec times, zero_rates;
+};
+/// Check 1 of hedge.crossasset.solve: E_INPUT on an empty, ragged or non-increasing curve.
+void check_zero_curve(const ZeroCurve& c);
+
+enum class CrossAssetKind { Call, Put, Forward, Zcb, Underlying };
+struct CrossAssetPosition {
+    CrossAssetKind kind = CrossAssetKind::Underlying;
+    double strike = 0.0, expiry_years = 0.0, notional = 0.0, quantity = 0.0;
+};
+/// Value of one unit, discounting on the curve.
+double cross_asset_value(double spot, double dividend_yield, double volatility, const ZeroCurve& c,
+                         const CrossAssetPosition& p);
+/// EQ01 then KR01_1..KR01_P of one unit, by the half-differences of I-21.
+Vec cross_asset_risk(double spot, double dividend_yield, double volatility, const ZeroCurve& c,
+                     const CrossAssetPosition& p);
+struct CrossAssetHedge {
+    Vec positions, book_risk, residual_risk;
+    double objective = 0.0;
+};
+/// Checks 1 and 2 (except key sets, the caller's), then 3 to 5 of hedge.crossasset.solve.
+CrossAssetHedge cross_asset_hedge(double spot, double dividend_yield, double volatility, const ZeroCurve& c,
+                                  const std::vector<CrossAssetPosition>& book,
+                                  const std::vector<CrossAssetPosition>& hedges, const Vec& weights, double ridge);
+
 }  // namespace quantforge::hedging
