@@ -55,7 +55,10 @@ final class OpsRatesG {
         in.limit(steps > 100_000, "grid");
         double total = 0.0;
         for (int k = 1; k < knots.length; k++) {
-            total += Math.max(1.0, Math.ceil(steps * (knots[k] - knots[k - 1])));
+            double span = knots[k] - knots[k - 1];
+            if (Double.isFinite(span)) { // a non-finite time is F-2's E_DOMAIN, not a limit
+                total += Math.max(1.0, Math.ceil(steps * span));
+            }
         }
         in.limit(nx * total > 5e8, "grid"); // ruling G-31, combined grid work
         return new RawGrid(nx, steps, width);
