@@ -114,6 +114,14 @@ def _fd_grid(raw: Raw) -> None:
         _cap(grid, "nt", 10_000)
 
 
+def _scheme_grid(raw: Raw) -> None:
+    """The G-18 scheme grid: nx at most 10,001, steps_per_year at most 100,000."""
+    grid = raw.get("grid")
+    if isinstance(grid, dict):
+        _cap(grid, "nx", 10_001)
+        _cap(grid, "steps_per_year", 100_000)
+
+
 def _slv_grid(raw: Raw) -> None:
     grid = raw.get("grid")
     if isinstance(grid, dict):
@@ -162,6 +170,11 @@ _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
     "exotic.american.fd": _fd_grid,
     "vol.sabr.arbfree": _caps(cells=20_000, steps=20_000),
     "risk.var.monte_carlo": _caps(paths=10_000_000),
+    # Stage G (ruling G-6 and the operation specs).
+    "exotic.barrier.price": _caps(monitoring_per_year=1_000_000),
+    "risk.mc.greeks": _caps(paths=10_000_000),
+    "rates.shortrate.bermudan_swaption": _scheme_grid,
+    "rates.shortrate.callable_bond": _scheme_grid,
 }
 OPTION_ARRAY = 100
 OPTION_PREFIXES = ("eq.", "vol.", "risk.vol.")
@@ -189,6 +202,17 @@ STAGE_F_ARRAYS: dict[str, dict[str, int]] = {
     "usecase.factor_attribution": {"portfolio_returns": 100_000, "factor_returns": 100_000,
                                    "factor_names": 50, "factor_returns#cols": 50},
 }
+
+
+# Stage G sizes (ruling G-6 and the operation specs): curve pillars, payment, exposure and
+# period times 10,000 each, wherever the key appears.
+_G_TIMES = {"times": 10_000, "discount_factors": 10_000, "payment_times": 10_000}
+for _name in ("rates.shortrate.zcb", "rates.shortrate.zcb_option", "rates.shortrate.swaption",
+              "rates.shortrate.capfloor", "rates.shortrate.hw_calibrate",
+              "rates.shortrate.bermudan_swaption", "rates.shortrate.callable_bond",
+              "rates.g2pp.zcb", "rates.g2pp.zcb_option"):
+    STAGE_F_ARRAYS[_name] = dict(_G_TIMES)
+STAGE_F_ARRAYS["xva.exposure.swap_ee_hw"] = {**_G_TIMES, "exposure_times": 10_000}
 
 
 def _check_stage_f(raw: Raw, limits: Mapping[str, int]) -> None:

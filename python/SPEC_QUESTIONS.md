@@ -235,3 +235,13 @@ readers, and `core.store.*` record `value`). F-Q5 by the amended `dR/dq` line of
 spline small-`z` series with its `z^2` terms), F-36 (`side` is `PAY` / `RECEIVE` in `risk_f3`), F-39
 (Monte Carlo `seed` a u64 string; `E_NOT_POSITIVE_DEFINITE`; duplicate opening position `E_INPUT`).
 F-Q1, F-Q2 and F-Q4 have no ruling yet.
+
+## Stage G (2026-11-11)
+
+- G-Q1 (G2e, `capfloor_g-0040`). The case is described as "1 + K tau <= 0" and expects `E_DOMAIN`, but its
+  inputs (`period_times` [1, 2, 3], `strike` -0.5) give `1 + K tau = 0.5 > 0` in both periods. The spec rule
+  (`1 + K tau_i > 0`, else `E_DOMAIN`) therefore prices it (0.9793 on unit notional). Python follows the
+  spec and fails this one case; asked: regenerate the case (for example `strike` -1.5) or amend the rule.
+- G-Q2 (G2c). `E_NO_CONVERGENCE` also covers an objective that is flat at the low end in rounding noise
+  (an in-the-money strip with zero targets): an interior minimum must lie below both ends by more than
+  1e-12 relative and bracket a sign change of `F'`. Not exercised by the goldens.

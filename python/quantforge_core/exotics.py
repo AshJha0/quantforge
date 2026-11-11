@@ -52,14 +52,26 @@ def digital(s: float, k: float, t: float, r: float, q: float, v: float, option_t
     return s * math.exp(-q * t) * big_n(phi * d1)
 
 
+BGK_BETA = 0.5826  # ruling G-7: pinned, not -zeta(1/2)/sqrt(2 pi)
+
+
 def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_type: str,
-            h: float, rebate: float, barrier_type: str) -> float:
+            h: float, rebate: float, barrier_type: str, monitoring: str | None = None,
+            monitoring_per_year: int | None = None) -> float:
+    """Continuous-barrier closed form; with `DISCRETE` monitoring, the Broadie-Glasserman-Kou
+    shift `H exp(+-beta v sqrt(1/m))` away from spot (stage G, R9). The domain rule uses the
+    unshifted barrier (G-8)."""
+    discrete = _monitoring(monitoring, monitoring_per_year)
     _positive(spot=s, strike=k, expiry_years=t, vol=v, barrier=h)
     if rebate < 0:
         raise _domain("rebate must not be negative", "rebate")
     down = barrier_type.startswith("DOWN")
     if (down and s <= h) or (not down and s >= h):
         raise _domain("spot is on or beyond the barrier", "barrier")
+    if discrete:
+        assert monitoring_per_year is not None
+        shift = math.exp(BGK_BETA * v * math.sqrt(1.0 / monitoring_per_year))
+        h = h / shift if down else h * shift
     phi, eta = _phi(option_type), 1.0 if down else -1.0
     b, sd = r - q, v * math.sqrt(t)
     mu = (b - v * v / 2) / (v * v)
@@ -95,6 +107,21 @@ def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_t
     }
     high, low = table[(barrier_type, phi)]
     return float(high if above else low)
+
+
+def _monitoring(monitoring: str | None, per_year: int | None) -> bool:
+    """Checks `monitoring` and `monitoring_per_year`; True for discrete monitoring."""
+    if monitoring not in (None, "CONTINUOUS", "DISCRETE"):
+        raise _input(f"{monitoring} is not a monitoring", "monitoring")
+    if monitoring == "DISCRETE":
+        if per_year is None:
+            raise _input("DISCRETE needs monitoring_per_year", "monitoring_per_year")
+        if per_year < 1:
+            raise _domain("monitoring_per_year must be at least 1", "monitoring_per_year")
+        return True
+    if per_year is not None:
+        raise _input("monitoring_per_year needs DISCRETE monitoring", "monitoring_per_year")
+    return False
 
 
 def asian_geometric(s: float, k: float, t: float, r: float, q: float, v: float,
