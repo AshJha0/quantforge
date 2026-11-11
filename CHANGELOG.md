@@ -6,7 +6,7 @@ Not yet tagged. Stage G is at Implemented, not Validated. No golden value of an 
 
 ### Verified on the integration tree (`stage-g-int`, 2026-11-11)
 - Each of the four builds passed 14,390 of 14,390 golden cases through the neutral runner (observed, one Windows machine): Java (JDK 25), Python (CPython 3.15.2), Rust (1.99.1) and C++ (WinLibs GCC 16.2, `-DQF_WERROR=ON`). Of these, 487 are stage G cases in 19 suites and 1,026 are E1 cases for the 20 stage G operations (`datasets/golden/stage_g/`, `stage_g_e1/`).
-- Unit tests (observed, same machine): Java `mvn verify` 395 tests, 0 failures; Rust `cargo test --release` 269 passed, clippy `-D warnings` and `fmt --check` clean; C++ ctest 258 test cases, 7,397 assertions, all passed; Python `ruff` and `mypy --strict` (102 files) clean. Fuzz, 60 s per language, seed 71: 0 findings for C++, Java and Rust.
+- Unit tests (observed, same machine): Java `mvn verify` 395 tests, 0 failures; Rust `cargo test --release` 269 passed, clippy `-D warnings` and `fmt --check` clean; C++ ctest 258 test cases, 7,397 assertions, all passed; Python `pytest` 1,559 passed and 2 skipped (two opt-in suites), `ruff` and `mypy --strict` (102 files) clean. Fuzz, 60 s per language, seed 71: 0 findings for C++, Java and Rust.
 - Gates: `quality_gate.py --check-specs --check-register` (0 new gaps, 10 baseline), `check_hygiene.py` (0 problems), `test_tools.py`, `build_gallery.py --check` (25 entries, 0 differences), the site build (290 pages, 0 broken links) and the banned-word check (no hits).
 
 ### Added
