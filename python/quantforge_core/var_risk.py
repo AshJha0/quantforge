@@ -2,7 +2,7 @@
 (specifications/06-risk/var-es-and-backtests.md, rulings F-31 and F-32)."""
 import itertools
 import math
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 
 from . import rng
 from .errors import QfError
@@ -257,111 +257,6 @@ def girr_delta(sensitivities: Sequence[tuple[str, str, str, float]], reduction: 
             "delta": delta, "alternative_used": alternative}
     binding = max(_SCENARIOS, key=lambda sc: (deltas[sc], -_SCENARIOS.index(sc)))
     return {"scenarios": scenarios, "capital": deltas[binding], "binding_scenario": binding}
-
-
-# --- FX and equity delta (G-48, frtb-sa-fx-equity.md); aggregation as GIRR (MAR21.4, 21.6) ---
-
-Factor = tuple[str, str]  # (issuer or pair, kind)
-_EQ_RW = {1: 0.55, 2: 0.60, 3: 0.45, 4: 0.55, 5: 0.30, 6: 0.35, 7: 0.40, 8: 0.50, 9: 0.70,
-          10: 0.50, 12: 0.15, 13: 0.25}
-
-
-def _frtb_aggregate(buckets: dict[str, list[tuple[Factor, float]]], order: Sequence[str],
-                    rho: Callable[[str, Factor, Factor], float],
-                    gamma: Callable[[str, str], float]) -> dict[str, object]:
-    scenarios: dict[str, object] = {}
-    deltas: dict[str, float] = {}
-    for sc in _SCENARIOS:
-        ks, ss = [], []
-        for name in order:
-            items = buckets[name]
-            total = sum(w * w for _, w in items)
-            for i, (fi, wi) in enumerate(items):
-                for j, (fj, wj) in enumerate(items):
-                    if i != j:
-                        total += _scaled(rho(name, fi, fj), sc) * wi * wj
-            ks.append(math.sqrt(max(0.0, total)))
-            ss.append(sum(w for _, w in items))
-
-        def under(s: Sequence[float], ks: Sequence[float] = ks, sc: str = sc) -> float:
-            total = sum(k * k for k in ks)
-            for b in range(len(s)):
-                for c in range(len(s)):
-                    if b != c:
-                        total += _scaled(gamma(order[b], order[c]), sc) * s[b] * s[c]
-            return total
-
-        used = list(ss)
-        value = under(ss)
-        alternative = False
-        if value < 0:
-            alternative = True
-            used = [max(min(s, k), -k) for s, k in zip(ss, ks, strict=True)]
-            value = under(used)
-        delta = math.sqrt(max(0.0, value))
-        deltas[sc] = delta
-        scenarios[sc] = {
-            "buckets": [{"bucket": c, "k": k, "s": s, "s_used": u}
-                        for c, k, s, u in zip(order, ks, ss, used, strict=True)],
-            "delta": delta, "alternative_used": alternative}
-    binding = max(_SCENARIOS, key=lambda sc: (deltas[sc], -_SCENARIOS.index(sc)))
-    return {"scenarios": scenarios, "capital": deltas[binding], "binding_scenario": binding}
-
-
-def frtb_fx_delta(sensitivities: Sequence[tuple[str, float]],
-                  specified: Sequence[str]) -> dict[str, object]:
-    """FX delta: RW 15% (over sqrt 2 for a specified pair), one factor per bucket, gamma 60%."""
-    if not sensitivities:
-        raise QfError("E_INPUT", "no sensitivities", "sensitivities")
-    pairs = [p for p, _ in sensitivities]
-    if len(set(pairs)) != len(pairs):
-        raise QfError("E_INPUT", "a pair appears twice", "sensitivities")
-    listed = set(specified)
-    buckets = {p: [((p, "FX"), (0.15 / math.sqrt(2) if p in listed else 0.15) * s)]
-               for p, s in sensitivities}
-    return _frtb_aggregate(buckets, sorted(buckets), lambda b, f, g: 1.0, lambda b, c: 0.6)
-
-
-def _eq_same_kind(bucket: int) -> float:
-    if bucket <= 4:
-        return 0.15
-    if bucket <= 8:
-        return 0.25
-    return {9: 0.075, 10: 0.125}.get(bucket, 0.80)
-
-
-def frtb_equity_delta(sensitivities: Sequence[tuple[str, int, str, float]]) -> dict[str, object]:
-    """Equity delta (spot and repo), buckets 1 to 10, 12, 13 (MAR21.77, 21.78, 21.80)."""
-    if not sensitivities:
-        raise QfError("E_INPUT", "no sensitivities", "sensitivities")
-    for _, bucket, kind, _ in sensitivities:
-        if bucket not in _EQ_RW:
-            raise QfError("E_INPUT", f"bucket {bucket} is not in this slice", "bucket")
-        if kind not in ("SPOT", "REPO"):
-            raise QfError("E_INPUT", f"{kind} is not SPOT or REPO", "kind")
-    keys = [(i, b, k) for i, b, k, _ in sensitivities]
-    if len(set(keys)) != len(keys):
-        raise QfError("E_INPUT", "the same factor appears twice", "sensitivities")
-    buckets: dict[str, list[tuple[Factor, float]]] = {}
-    for issuer, bucket, kind, s in sensitivities:
-        rw = _EQ_RW[bucket] * (0.01 if kind == "REPO" else 1.0)
-        buckets.setdefault(str(bucket), []).append(((issuer, kind), rw * s))
-
-    def rho(bucket: str, f: Factor, g: Factor) -> float:
-        if f[0] == g[0]:
-            return 0.999
-        base = _eq_same_kind(int(bucket))
-        return base if f[1] == g[1] else base * 0.999
-
-    def gamma(b: str, c: str) -> float:
-        x, y = int(b), int(c)
-        if x <= 10 and y <= 10:
-            return 0.15
-        if {x, y} == {12, 13}:
-            return 0.75
-        return 0.45
-
-    return _frtb_aggregate(buckets, sorted(buckets, key=int), rho, gamma)
 
 
 guard(globals())

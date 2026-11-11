@@ -183,11 +183,49 @@ def _correlation(i: Inputs) -> Any:
 def _fx_delta(i: Inputs) -> Any:
     rows = [(s.string("pair"), s.real("sensitivity")) for s in _items(i, "sensitivities")]
     listed = [str(p) for p in i.array("specified_pairs")] if i.has("specified_pairs") else []
-    return core.var_risk.frtb_fx_delta(rows, listed)
+    return core.frtb.fx_delta(rows, listed)
 
 
 @op("risk.frtb.equity_delta")
 def _equity_delta(i: Inputs) -> Any:
     rows = [(s.string("issuer"), s.integer("bucket"), s.string("kind"), s.real("sensitivity"))
             for s in _items(i, "sensitivities")]
-    return core.var_risk.frtb_equity_delta(rows)
+    return core.frtb.equity_delta(rows)
+
+
+@op("risk.frtb.csr_delta")
+def _csr_delta(i: Inputs) -> Any:
+    rows = [(s.string("issuer"), s.integer("bucket"), s.string("tenor"), s.string("curve"),
+             s.real("sensitivity")) for s in _items(i, "sensitivities")]
+    return core.frtb.csr_delta(rows)
+
+
+@op("risk.frtb.commodity_delta")
+def _commodity_delta(i: Inputs) -> Any:
+    rows = [(s.string("commodity"), s.integer("bucket"), s.string("tenor"), s.string("location"),
+             s.real("sensitivity")) for s in _items(i, "sensitivities")]
+    return core.frtb.commodity_delta(rows)
+
+
+def _bucket(s: Inputs) -> object:
+    value = s.raw.get("bucket")
+    if isinstance(value, bool) or not isinstance(value, (int, str)):
+        raise _schema("bucket", "not an integer or a string")
+    return value
+
+
+@op("risk.frtb.vega")
+def _vega(i: Inputs) -> Any:
+    rows = [(_bucket(s), s.opt_string("name"), s.real("option_maturity"),
+             s.opt_real("underlying_maturity"), s.real("vega")) for s in _items(i, "sensitivities")]
+    return core.frtb.vega(i.string("risk_class"), rows)
+
+
+@op("risk.frtb.curvature")
+def _curvature(i: Inputs) -> Any:
+    rows = [(_bucket(s), s.opt_string("name"), s.real("cvr_up"), s.real("cvr_down"))
+            for s in _items(i, "factors")]
+    given = i.has("fx_scalar")
+    scalar = i.boolean("fx_scalar") if given else False
+    return core.frtb.curvature(i.string("risk_class"), rows, scalar or (
+        given and i.string("risk_class") != "FX"))

@@ -251,3 +251,5 @@ F-Q1, F-Q2 and F-Q4 have no ruling yet.
   yet both expect `E_LIMIT`, which G-31 checks *after* `E_SCHEMA`. Python passes them by checking
   the stage G sizes on the raw document before the typed reads (`registry.EARLY_LIMITS`). Asked:
   either fix the two inputs, or amend G-31 to say the stage G sizes come first.
+- G-Q3 answered by G-50 (both goldens fixed); the `registry.EARLY_LIMITS` workaround is removed, so
+  `E_LIMIT` again comes after `E_SCHEMA` exactly as G-31 orders it.

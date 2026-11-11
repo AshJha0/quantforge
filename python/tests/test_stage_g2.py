@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from quantforge_core import aad_ladder, lmm, risk_tools, shortrate, var_risk, xva
+from quantforge_core import aad_ladder, frtb, lmm, risk_tools, shortrate, xva
 from quantforge_core.errors import QfError
 
 TIMES = [0.4986301369863014, 1.0, 2.0, 3.0, 5.002739726027397, 7.005479452054795,
@@ -205,9 +205,18 @@ def test_f3_analytic_sensitivities_match_bumps() -> None:
 
 
 def test_frtb_single_factor_is_weight_times_sensitivity() -> None:
-    fx = var_risk.frtb_fx_delta([("EURUSD", 1e6)], [])
+    fx = frtb.fx_delta([("EURUSD", 1e6)], [])
     assert fx["capital"] == pytest.approx(150_000)
-    eq = var_risk.frtb_equity_delta([("A", 12, "SPOT", 1e6)])
+    eq = frtb.equity_delta([("A", 12, "SPOT", 1e6)])
     assert eq["capital"] == pytest.approx(150_000)
     with pytest.raises(QfError):
-        var_risk.frtb_equity_delta([("A", 11, "SPOT", 1e6)])
+        frtb.equity_delta([("A", 14, "SPOT", 1e6)])
+
+
+def test_frtb_vega_one_factor_and_curvature_long_gamma() -> None:
+    v = frtb.vega("EQUITY", [(5, "A", 1.0, None, 1e6)])
+    assert v["capital"] == pytest.approx(0.7778 * 1e6)
+    c = frtb.curvature("EQUITY", [(5, "A", -3.0, 0.0)], False)
+    assert c["capital"] == 0.0
+    with pytest.raises(QfError):
+        frtb.curvature("GIRR", [("EUR", None, 1.0, 1.0)], True)
