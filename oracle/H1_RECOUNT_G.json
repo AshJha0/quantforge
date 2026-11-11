@@ -1,7 +1,7 @@
 {
  "swaption_g": {
   "counted": 28,
-  "total": 43,
+  "total": 44,
   "rows": [
    {
     "case": "swaption_g-0001",
@@ -439,7 +439,7 @@
  },
  "exposure_g": {
   "counted": 6,
-  "total": 15,
+  "total": 16,
   "rows": [
    {
     "case": "exposure_g-0001",

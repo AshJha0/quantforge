@@ -323,7 +323,7 @@ Stage G adds operations and no error code. `stage-g-rulings.md` is normative. Op
 | `xva.exposure.swap_ee_hw` | `06-risk/xva-exposure.md` | G5a (wave 4a) |
 | `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | `04-pricing/lmm.md` | G4a (wave 3b, LMM) |
 
-`E_LIMIT` sizes for the stage G operations: ruling G-6. `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
+`E_LIMIT` sizes for the stage G operations: ruling G-6 as amended by G-31 (full table and the combined grid-work bound). `rates.shortrate.hw_calibrate` iterates; a failed line returns `E_NO_CONVERGENCE` and the batch goes on.
 
 ## Versioning
 

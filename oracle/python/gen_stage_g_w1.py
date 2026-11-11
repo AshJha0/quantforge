@@ -102,6 +102,8 @@ def sigma_p(a, s, T, S, ho_lee=False):
 
 def ncx2_cdf(x, k, lam):
     x, k, lam = mp.mpf(x), mp.mpf(k), mp.mpf(lam)
+    if x <= 0:  # R5 M5: rbar < 0 (strike above A(T, S)) gives a non-positive argument; the CDF is 0
+        return mp.mpf(0)
     tot, j, w = mp.mpf(0), 0, mp.exp(-lam / 2)
     while True:
         term = w * mp.gammainc(k / 2 + j, 0, x / 2, regularized=True)

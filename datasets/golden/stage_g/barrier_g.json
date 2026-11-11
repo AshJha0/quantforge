@@ -1284,6 +1284,37 @@
     "synthetic"
    ],
    "description": "n = floor(m T + 0.5) = 0"
+  },
+  {
+   "case_id": "barrier_g-0038",
+   "operation": "exotic.barrier.price",
+   "inputs": {
+    "spot": 100.0,
+    "strike": 100.0,
+    "expiry_years": 1.0,
+    "rate": 0.05,
+    "dividend_yield": 0.02,
+    "vol": 0.25,
+    "rebate": 0.0,
+    "barrier": 90.0,
+    "barrier_type": "DOWN_OUT",
+    "option_type": "CALL",
+    "monitoring": "DISCRETE",
+    "monitoring_per_year": 1000001
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [],
+   "tags": [
+    "invalid",
+    "limit",
+    "r5",
+    "synthetic"
+   ],
+   "description": "monitoring_per_year 1,000,001"
   }
  ]
 }

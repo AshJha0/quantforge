@@ -249,3 +249,12 @@ Both tests restated against the scheme's own bounding value on the same grid (`s
 
 ### M3, discrete barrier (ruling G-30)
 `n = floor(m T + 0.5)`, `n >= 1` else `E_DOMAIN`, BGK step `dt = T/n`; rebates not BGK-corrected. `barrier_g` gains 5 cases (0033 to 0037: T = 0.3 with m = 252, the tie T = 0.5 with m = 3, UP_OUT and UP_IN with rebates, n = 0 error); original 32 unchanged byte for byte. Stage G: 252 of 413 = 61.0%.
+
+### M4 to M6 and LOW items (rulings G-31 to G-34)
+- M4 (G-31): full `E_LIMIT` table with the combined bound `nx x total steps <= 5e8`; 9 `E_LIMIT` goldens appended (tag `r5`) to shortrate, swaption, exposure, bermudan (2), callable, mcgreeks, barrier.
+- M5 (G-32): Poisson sum from the mode with log weights; CDF 0 for a non-positive argument. 3 CIR goldens appended to `shortrate_g` (0079 to 0081). QuantLib 1.44 itself underflows at `sigma = 0.005` (returns 0 for a call worth 16,898.80 per 1,000,000), so those two do not count; this is the bug the guard prevents.
+- M6 (G-33): `expm1` factors and the cross-term series; 6 G2++ goldens appended (a = 1e-4, a = b = 0.1), 5 count (QuantLib's small-a bond loses digits).
+- LOW (G-34): L1 to L10 and the citation note recorded; R9 power and the strict-count reading added to CHANGELOG known issues; `mc-greeks.md` check order fixed (seed first); Bermudan step count in binary64 as written.
+- Language sessions: new property and error cases only; no existing golden value changed (the appended cases keep every earlier case id).
+
+**Honest stage G outside share after the R5 fixes: 258 of 435 = 59.3%, below the 60% floor.** The drop comes from the H1 strict recount (-8), the new error and limit cases, and the 5 `aadladder_g` cases. ORE under WSL (G-23) is the route back above the floor in wave 4.
