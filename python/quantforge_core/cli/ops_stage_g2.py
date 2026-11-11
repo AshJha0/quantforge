@@ -229,3 +229,13 @@ def _curvature(i: Inputs) -> Any:
     scalar = i.boolean("fx_scalar") if given else False
     return core.frtb.curvature(i.string("risk_class"), rows, scalar or (
         given and i.string("risk_class") != "FX"))
+
+
+@op("xva.exposure.portfolio_hw")
+def _portfolio_hw(i: Inputs) -> Any:
+    times, dfs = _curve(i)
+    trades = [(t.real("notional"), t.real("fixed_rate"), t.string("side"), t.real("start_years"),
+               t.reals("payment_times")) for t in _items(i, "trades")]
+    return core.portfolio_exposure.portfolio_hw(
+        times, dfs, i.real("mean_reversion"), i.real("sigma"), trades, i.reals("exposure_times"),
+        i.reals("pfe_quantiles"), i.real("hazard_rate"), i.real("recovery"))
