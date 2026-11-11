@@ -541,6 +541,15 @@ void op_hedge_select_solve(const In& in, Out& out) {
     const bool forbidden = present(in, "eq_matrix") || present(in, "eq_rhs") || present(in, "singular");  // I-47
     limit_if(p.a.size() > max_factors, "a");
     limit_if(widest_row(p.a) > 20, "a");  // ruling I-35
+    {  // ruling I-53: sum over k = 1..min(K, n) of C(n, k) candidate subsets, at most 100,000
+        const long long n = (long long)widest_row(p.a);
+        double subsets = 0.0, c = 1.0;
+        for (long long size = 1; size <= std::min(k, n); ++size) {
+            c = c * double(n - size + 1) / double(size);
+            subsets += c;
+        }
+        limit_if(subsets > 100000.0, "max_instruments");
+    }
     in.ready();
     const hedging::SelectResult r = hedging::select_instruments(p, k, forbidden);
     out.values.key("selected");

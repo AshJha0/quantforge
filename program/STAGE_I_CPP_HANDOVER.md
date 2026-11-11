@@ -2,12 +2,21 @@
 
 From the C++26 session (branch `stage-i-lang-cpp`) to the spec lane and the coordinator. Append-only. Clean room: written from the specs, rulings and goldens only.
 
+## Session 1, extension to 00:05 (I-48, I-51, I-53, wave 5)
+
+- I-48: wave 4a no longer enumerates orthants. `SignStates` in `cpp26/src/core/hedging.cpp` solves one orthant QP per sign state with the dual active-set method, reads the multiplier of each sign row held at 0, and flips the worst sign whose subgradient test `nu <= 2 (k_j + mu m_j)` fails. If every test holds, the KKT conditions of the whole problem hold. A binding margin starts from the orthant of a margin-minimising point (penalty far above every gradient); if that point's margin is above the limit by more than the I-46 tolerance, the result is `E_INFEASIBLE`. A repeated sign state would be `E_NO_CONVERGENCE`; no test reaches it. There is no size limit below the I-4 200 instruments. The orthant enumeration is kept only as a test oracle (`hedging::detail::solve_qp_by_orthants`, capped at 20).
+  - Tests: KKT conditions (stationarity with the subgradient at zero coordinates, feasibility, bound and margin complementary slackness, tolerance 1e-8 of the gradient scale) at 21, 50 and 200 open-sign instruments, and with a binding margin at 21 and 50; agreement with the oracle on 60 random problems with `k` up to 12 (and once, by hand, on 600: all agreed). Every `hedgecost_i` and `hedgefrontier_i` golden passes.
+- I-51: `contract_version` is 1.11.0, with the runner at `CONTRACT = "1.11.0"`.
+- I-53: `hedge.select.solve` returns `E_LIMIT` (`max_instruments`) above 100,000 candidate subsets, with the other size limits.
+- `tests/gen_cli_cases.py` skips cases with `"status": "any"` (they carry no error code), and `tests/cli_cases.inc` is regenerated: 976 cases over 274 operations, so the in-process golden test now covers stage I.
+- Wave 5 (outside-checked value cases of existing operations) and I-54 (`hedgecost_i-0023`): run as part of the full gate; no code change was needed for them.
+
 ## Status at the end of session 1 (2026-11-11, 22:15)
 
 Waves 1, 2, 3, 4a, 4b, 4c, 4d and 4e are built (16 stage I operations), with one commit per wave on `stage-i-lang-cpp` (not pushed), plus the examples smoke test and the rulings I-41 to I-52 (below).
 
-- Conformance, full run on the final tree (`stage-i` at `aa2297e` merged): 14,768 of 14,768, 0 failures, 0 not implemented. The 16 stage I suites: 276 of 276.
-- ctest: 294 test cases, 12,587 assertions, all passed (260 before stage I). WERROR (GCC 16.2, `-DQF_WERROR=ON`) clean throughout.
+- Conformance, full run on the final tree (`stage-i` with wave 5 and I-51 merged): 14,935 of 14,935, 0 failures, 0 not implemented, runner contract 1.11.0.
+- ctest: 296 test cases, 14,884 assertions, all passed (260 before stage I) at the extension commit. WERROR (GCC 16.2, `-DQF_WERROR=ON`) clean throughout.
 - Line coverage of the new code before the rulings commit (gcov at `-O0`, unit tests plus the stage I conformance run): `hedging.cpp` 98.7% of 827 lines, `hedging_w2.cpp` 97.2% of 180, `hedging_w3.cpp` 97.7% of 86, `hedging_w4.cpp` 99.2% of 132, `ops_hedge.inc` 96.1% of 481. Not remeasured after the rulings commit, which removes more lines than it adds and has a unit test for each change.
 - Test files define no namespace-scope static objects (fixtures are functions).
 
@@ -22,10 +31,10 @@ Waves 1, 2, 3, 4a, 4b, 4c, 4d and 4e are built (16 stage I operations), with one
 | I-45 instruments are columns of `a` | already so (`lot_sizes` length is `E_INPUT`) | `hedgeint_i-0019` passes |
 | I-46 feasibility tolerance up to 1e-9 | already within it (relative 1e-12 slack tests) | goldens pass |
 | I-47 `null` optional key is `E_SCHEMA` | already so; `hedge.select.solve` now also treats `null` for `eq_matrix`, `eq_rhs` or `singular` as `E_SCHEMA` | |
-| I-48 no `E_LIMIT` below 200 instruments | **open**, see below | |
+| I-48 no `E_LIMIT` below 200 instruments | change: sign-state active-set method (extension section above) | KKT and oracle tests |
 | I-49 `E_LIMIT` for lot counts above `2^52` | change: tested on the relaxed solution (was a `2^53` test inside the search) | unit test |
 | I-50 per-order `fills` keep the 100,000 array limit | already so (the general array limit applies to every array) | |
-| I-51 `contract_version` 1.11.0 | **not changed tonight**: the runner on `stage-i` still requires `1.0.0` (`runner.py` `CONTRACT`) and stops on a mismatch, so the change would stop the conformance gate. To move with the runner in the integration PR (`version_json` in `cpp26/src/cli/dispatch.cpp`) | |
+| I-51 `contract_version` 1.11.0 | change: set after `I-51 RUNNER READY` (extension section above) | full conformance with the runner at 1.11.0 |
 | I-52 tutorial imports | none | |
 
 ## Baseline (2026-11-11, before any change)
@@ -100,8 +109,5 @@ C-I1 (minimum-variance sign at rounding level) was answered by I-44, and C-I2 (l
 
 ## Open
 
-- **I-48 (release blocker for C++):** wave 4a still enumerates sign orthants, `2^k` QPs for `k` instruments with a spread or margin term whose sign the bounds leave open, and returns `E_LIMIT` above `k = 20`. I-48 forbids that limit below 200 instruments. Not replaced tonight: a sign-state active-set method (start from the smooth solution; at each zero coordinate apply the subgradient test with the active-set multipliers; flip a sign when it fails; the margin as one more linear row) needs its own property tests against the enumeration on small problems, and could not be finished and checked well in the time left. No golden reaches 20 such instruments.
-- I-51: `contract_version` stays `1.0.0` until the runner moves (see the rulings table).
 - `Q3b AAD ladder ... costs at most 5 prices (G-9)` (stage G, `tests/test_stage_g.cpp:515`) is a wall-clock ratio. It failed once tonight at 5.09 against 5.0 while other lanes were compiling, and passed when rerun alone (2.80 earlier in the evening). Not touched by stage I.
 - ASan and UBSan need WSL; not run tonight (no WSL by the coordinator's rule).
-- `cpp26/tests/gen_cli_cases.py` fails on main: it reads `expected.error_code` for every non-ok case, and the stage F `e1_*` cases with `"status": "any"` have none (first: `e1_bond-0004`). `tests/cli_cases.inc` was not regenerated, so the in-process golden test has no stage I cases; conformance covers them.

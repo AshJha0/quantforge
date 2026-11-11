@@ -45,7 +45,7 @@ for op in sorted(per_op):
                     a, r = max(a, oc.get("absolute") or 0.0), max(r, oc.get("relative", 0.0))
             rows.append((text, "ok", json.dumps(e["outputs"], separators=(",", ":")),
                          float(a), float(r)))
-        elif e["error_code"] not in seen and len(seen) < 2:
+        elif e["status"] == "error" and e["error_code"] not in seen and len(seen) < 2:  # "any" has no code
             seen.add(e["error_code"])
             rows.append((text, e["error_code"], "", 0.0, 0.0))
 

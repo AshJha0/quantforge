@@ -474,7 +474,7 @@ string version_json() {
     w.key("implementation_version");
     w.string(QF_VERSION);
     w.key("contract_version");
-    w.string("1.0.0");
+    w.string("1.11.0");  // ruling I-51
     w.key("toolchain");
     #if defined(__clang__)
     w.string("Clang " __clang_version__);

@@ -50,8 +50,11 @@ struct QpResult {
 };
 /// Checks in the spec's order: E_INPUT, E_DOMAIN, E_SINGULAR, E_INFEASIBLE.
 QpResult solve_qp(const QpProblem& p);
-/// Instruments whose sign the 4a solve enumerates (a spread or margin term and a sign not fixed by bounds).
-inline constexpr std::size_t max_sign_free_instruments = 20;
+namespace detail {
+/// Test oracle for the wave 4a solve (ruling I-48): every closed sign orthant of at most 20 open-sign
+/// instruments, one QP each. Not used by the operation.
+QpResult solve_qp_by_orthants(const QpProblem& p);
+}  // namespace detail
 
 /// hedge.integer.solve: the same objective over x = lot_sizes * n, n integer within optional lot bounds.
 struct IntegerProblem {

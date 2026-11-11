@@ -295,6 +295,7 @@ public:
 
     const Vec& y() const { return y_; }
     const std::vector<std::size_t>& active() const { return active_; }
+    const Vec& multipliers() const { return u_; }  // of active(), for y'Gy/2 + g'y
 
 private:
     std::size_t iq() const { return active_.size(); }
@@ -389,10 +390,18 @@ struct BoundRow {
     double bound;
 };
 
+// Multipliers of the active rows, on the scale of x'Hx/2 + c'x (half of f): per instrument for its lower and
+// upper row, and for the general row.
+struct Multipliers {
+    Vec lower, upper;
+    double general = 0.0;
+};
+
 // Minimises the strictly convex quadratic y'Gy/2 + g'y over the bounds on x = xp + Z y and, when given, one
 // general row: general . x >= general_rhs (the 4a margin within an orthant). Throws E_INFEASIBLE.
 Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns, const std::vector<Bound>& lower,
-                      const std::vector<Bound>& upper, const Vec* general = nullptr, double general_rhs = 0.0) {
+                      const std::vector<Bound>& upper, const Vec* general = nullptr, double general_rhs = 0.0,
+                      Multipliers* mult = nullptr) {
     const std::size_t n = ns.xp.size(), r = reduced.size();
     std::vector<BoundRow> rows;
     for (std::size_t j = 0; j < n; ++j) {
@@ -406,6 +415,7 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
             if (gap < -1e-12 * (std::fabs(b.bound) + std::fabs(x[b.index])))
                 throw Error("E_INFEASIBLE", "the equalities fix x outside the bounds");
         }
+        if (mult) *mult = Multipliers{Vec(n, 0.0), Vec(n, 0.0), 0.0};
         if (general) {
             double lhs = 0.0, scale = std::fabs(general_rhs);
             for (std::size_t j = 0; j < n; ++j) {
@@ -442,6 +452,14 @@ Vec bounded_minimiser(const Matrix& reduced, const Vec& g0, const NullSpace& ns,
     if (r == n)  // Z = I: an active bound holds exactly
         for (const std::size_t i : qp.active())
             if (i < rows.size()) x[rows[i].index] = rows[i].bound;
+    if (mult) {
+        *mult = Multipliers{Vec(n, 0.0), Vec(n, 0.0), 0.0};
+        for (std::size_t a = 0; a < qp.active().size(); ++a) {
+            const std::size_t i = qp.active()[a];
+            if (i == rows.size()) mult->general = qp.multipliers()[a];
+            else (rows[i].lower ? mult->lower : mult->upper)[rows[i].index] = qp.multipliers()[a];
+        }
+    }
     return x;
 }
 
@@ -517,11 +535,155 @@ double margin_used(const QpProblem& p, const Vec& x) {
     return m;
 }
 
-// Wave 4a with a spread or margin term. In each closed orthant (a sign for every instrument with such a term)
+// Wave 4a with a spread or margin term, by sign states (ruling I-48). f = x'Hx + 2c'x + 2 sum k_j |x_j|, with
+// k = cost_weight half_spreads / 2, and optionally sum m_j |x_j| <= limit. A sign state fixes s_j = +1 or -1 for
+// each instrument whose sign is open; in its closed orthant |x_j| = s_j x_j, so f is a smooth strictly convex QP
+// and the margin one linear row, solved by the dual active-set method. At the orthant's minimiser, an instrument
+// held at 0 by its sign row has multiplier nu; the subgradient condition of the whole problem there is
+// nu <= 2 (k_j + mu m_j) (mu the margin multiplier). If every such test holds, the KKT conditions of the whole
+// (convex) problem hold and x is its minimiser. Otherwise the worst violator's sign flips: x (with x_j = 0) stays
+// feasible in the new orthant, so f does not rise. A repeated sign state is reported as E_NO_CONVERGENCE; the
+// property tests compare the result with the orthant enumeration.
+class SignStates {
+public:
+    SignStates(const QpProblem& p, const Normal& q, const Matrix& reduced, const NullSpace& ns,
+               const std::vector<Bound>& lower, const std::vector<Bound>& upper, double cost_weight)
+        : q_(q), reduced_(reduced), ns_(ns), lower_(lower), upper_(upper), n_(q.c.size()), k_(n_, 0.0), m_(n_, 0.0),
+          sign_(n_, 0) {
+        if (p.half_spreads)
+            for (std::size_t j = 0; j < n_; ++j) k_[j] = 0.5 * cost_weight * (*p.half_spreads)[j];
+        if (p.margin_rates) {
+            m_ = *p.margin_rates;
+            limit_ = *p.margin_limit;
+            margined_ = true;
+        }
+        for (std::size_t j = 0; j < n_; ++j) {
+            if (k_[j] == 0.0 && m_[j] == 0.0) continue;
+            if (!lower.empty() && lower[j] && *lower[j] >= 0.0) sign_[j] = 1;
+            else if (!upper.empty() && upper[j] && *upper[j] <= 0.0) sign_[j] = -1;
+            else free_.push_back(j);
+        }
+    }
+
+    Vec solve() {
+        if (reduced_.empty()) return fixed();
+        Vec x = run(k_, false, std::nullopt);
+        if (!margined_ || margin(x) <= limit_ + 1e-12 * (limit_ + margin(x))) return x;
+        // The margin binds. Start from the orthant of a margin-minimising point: the problem with a margin
+        // penalty far above every gradient. Its margin is the least possible to O(1/penalty); above the limit by
+        // more than the I-46 tolerance, no point is feasible.
+        double scale = 1.0, least = std::numeric_limits<double>::infinity();
+        for (std::size_t j = 0; j < n_; ++j) {
+            scale = std::max(scale, std::fabs(q_.c[j]) + std::fabs(dot(q_.h[j], x)));
+            if (m_[j] > 0.0) least = std::min(least, m_[j]);
+        }
+        Vec heavy = k_;
+        for (std::size_t j = 0; j < n_; ++j) heavy[j] += 1e9 * scale / least * m_[j];
+        const Vec start = run(heavy, false, std::nullopt);
+        if (margin(start) > limit_ + 1e-9 * std::max(1.0, limit_))
+            throw Error("E_INFEASIBLE", "no point satisfies the equalities, the bounds and the margin limit");
+        std::vector<int> from = sign_;
+        for (const std::size_t j : free_) from[j] = start[j] < 0.0 ? -1 : 1;
+        return run(k_, true, from);
+    }
+
+private:
+    double margin(const Vec& x) const {
+        double s = 0.0;
+        for (std::size_t j = 0; j < n_; ++j) s += m_[j] * std::fabs(x[j]);
+        return s;
+    }
+
+    // k = n: the equalities fix x; only feasibility is left.
+    Vec fixed() const {
+        Vec x = bounded_minimiser(reduced_, {}, ns_, lower_, upper_);
+        if (margined_ && margin(x) > limit_ + 1e-9 * std::max(1.0, limit_))
+            throw Error("E_INFEASIBLE", "the equalities break the margin limit");
+        return x;
+    }
+
+    // The orthant QP for the current signs: sign rows as bounds, the linear cost s_j k_j, the margin row.
+    Vec orthant(const Vec& k, bool with_margin, Multipliers& mult) const {
+        std::vector<Bound> lo(n_), up(n_);
+        Vec c = q_.c, row;
+        for (std::size_t j = 0; j < n_; ++j) {
+            if (!lower_.empty()) lo[j] = lower_[j];
+            if (!upper_.empty()) up[j] = upper_[j];
+            if (sign_[j] > 0) lo[j] = std::max(lo[j].value_or(0.0), 0.0);
+            if (sign_[j] < 0) up[j] = std::min(up[j].value_or(0.0), 0.0);
+            c[j] += k[j] * double(sign_[j]);
+        }
+        if (with_margin) {  // -sum m_j s_j x_j >= -limit
+            row.assign(n_, 0.0);
+            for (std::size_t j = 0; j < n_; ++j) row[j] = -m_[j] * double(sign_[j]);
+        }
+        Vec hxp(c);
+        for (std::size_t i = 0; i < n_; ++i) hxp[i] += dot(q_.h[i], ns_.xp);
+        return bounded_minimiser(reduced_, project(ns_.z, hxp), ns_, lo, up, with_margin ? &row : nullptr, -limit_,
+                                 &mult);
+    }
+
+    Vec run(const Vec& k, bool with_margin, std::optional<std::vector<int>> from) {
+        if (from) {
+            sign_ = *from;
+        } else {  // signs of the smooth minimiser, which lies in its own orthant
+            const Vec smooth = bounded_minimiser(reduced_, project(ns_.z, gradient_at_xp(q_.c)), ns_, lower_, upper_);
+            for (const std::size_t j : free_) sign_[j] = smooth[j] < 0.0 ? -1 : 1;
+        }
+        std::vector<std::vector<int>> seen;
+        for (;;) {
+            seen.push_back(sign_);
+            Multipliers mult;
+            Vec x = orthant(k, with_margin, mult);
+            const double mu = with_margin ? mult.general : 0.0;
+            double scale = 0.0;
+            for (std::size_t j = 0; j < n_; ++j)
+                scale = std::max(scale, std::fabs(q_.c[j] + dot(q_.h[j], x)) + k[j] + mu * m_[j]);
+            std::size_t worst = n_;
+            double excess = 1e-10 * scale;
+            for (const std::size_t j : free_) {
+                const double nu = sign_[j] > 0 ? mult.lower[j] : mult.upper[j];
+                const double over = nu - 2.0 * (k[j] + mu * m_[j]);
+                if (over > excess) {
+                    excess = over;
+                    worst = j;
+                }
+            }
+            if (worst == n_) {
+                for (const std::size_t j : free_)  // a coordinate held by its sign row is exactly 0
+                    if ((sign_[j] > 0 ? mult.lower[j] : mult.upper[j]) > 0.0) x[j] = 0.0;
+                return x;
+            }
+            sign_[worst] = -sign_[worst];
+            if (std::ranges::find(seen, sign_) != seen.end())
+                throw Error("E_NO_CONVERGENCE", "the sign-state method revisited a state");
+        }
+    }
+
+    Vec gradient_at_xp(const Vec& c) const {
+        Vec g(c);
+        for (std::size_t i = 0; i < n_; ++i) g[i] += dot(q_.h[i], ns_.xp);
+        return g;
+    }
+
+    const Normal& q_;
+    const Matrix& reduced_;
+    const NullSpace& ns_;
+    const std::vector<Bound>& lower_;
+    const std::vector<Bound>& upper_;
+    std::size_t n_;
+    Vec k_, m_;
+    double limit_ = 0.0;
+    bool margined_ = false;
+    std::vector<int> sign_;
+    std::vector<std::size_t> free_;
+};
+
+// Test oracle only (ruling I-48 retired it from the operation). In each closed orthant (a sign for every instrument with such a term)
 // |x_j| = s_j x_j, so the spread cost is linear and the margin one linear row: a strictly convex QP for the
 // dual active-set method. The orthants cover the space, so the least of their minima is the minimiser of the
 // whole problem, and no feasible orthant means no feasible point (E_INFEASIBLE, exactly). Signs fixed by the
-// bounds are not enumerated; the rest are, up to max_sign_free_instruments.
+// bounds are not enumerated; the rest are, up to 20 (the oracle's own cap).
 Vec orthant_minimiser(const QpProblem& p, const Normal& q, const Matrix& reduced, const NullSpace& ns,
                       const std::vector<Bound>& lower, const std::vector<Bound>& upper, double cost_weight) {
     const std::size_t n = q.c.size();
@@ -536,9 +698,7 @@ Vec orthant_minimiser(const QpProblem& p, const Normal& q, const Matrix& reduced
         else if (up_neg) sign[j] = -1;
         else free.push_back(j);
     }
-    if (free.size() > max_sign_free_instruments)
-        throw Error("E_LIMIT", "this build enumerates the signs of at most 20 instruments with a spread or margin",
-                    "half_spreads");
+    if (free.size() > 20) throw Error("E_LIMIT", "the test oracle enumerates at most 20 signs", "half_spreads");
     std::optional<Vec> best;
     double best_f = 0.0;
     for (std::size_t mask = 0; mask < (std::size_t{1} << free.size()); ++mask) {
@@ -583,7 +743,15 @@ Vec orthant_minimiser(const QpProblem& p, const Normal& q, const Matrix& reduced
 
 }  // namespace
 
-QpResult solve_qp(const QpProblem& p) {
+namespace {
+QpResult solve_qp_impl(const QpProblem& p, bool by_orthants);
+}  // namespace
+
+QpResult solve_qp(const QpProblem& p) { return solve_qp_impl(p, false); }
+QpResult detail::solve_qp_by_orthants(const QpProblem& p) { return solve_qp_impl(p, true); }
+
+namespace {
+QpResult solve_qp_impl(const QpProblem& p, bool by_orthants) {
     // Check 1: shapes.
     const std::size_t n = check_ls_shapes(p.a, p.b, p.weights);
     input_if(p.eq_matrix.has_value() != p.eq_rhs.has_value(), "eq_matrix", "eq_matrix and eq_rhs go together");
@@ -665,7 +833,8 @@ QpResult solve_qp(const QpProblem& p) {
         // Check 6 (feasibility) happens inside: E_INFEASIBLE when no point exists (I-14).
         x = bounded_minimiser(reduced, g0, ns, lower, upper);
     } else {
-        x = orthant_minimiser(p, q, reduced, ns, lower, upper, cost_weight);
+        x = by_orthants ? orthant_minimiser(p, q, reduced, ns, lower, upper, cost_weight)
+                        : SignStates(p, q, reduced, ns, lower, upper, cost_weight).solve();
     }
     for (double& v : x) v += 0.0;  // no negative zero in outputs (F-3)
     QpResult out;
@@ -680,6 +849,8 @@ QpResult solve_qp(const QpProblem& p) {
     out.rank = rank;
     return out;
 }
+
+}  // namespace
 
 // ---- hedge.integer.solve ----
 

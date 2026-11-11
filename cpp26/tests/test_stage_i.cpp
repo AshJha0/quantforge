@@ -747,7 +747,7 @@ TEST_CASE("I4a frontier: risk non-decreasing and cost non-increasing in the cost
           "E_INPUT");
 }
 
-TEST_CASE("I4a costs: the sign enumeration is capped at 20 free instruments") {
+TEST_CASE("I-48 costs: the oracle enumeration keeps its own cap; the operation has none below 200") {
     hg::QpProblem p;
     const std::size_t n = 21;
     p.a = Matrix(n, Vec(n, 0.0));
@@ -755,9 +755,132 @@ TEST_CASE("I4a costs: the sign enumeration is capped at 20 free instruments") {
     p.b = Vec(n, 1.0);
     p.weights = Vec(n, 1.0);
     p.half_spreads = Vec(n, 0.1);
-    CHECK(i_error([&] { hg::solve_qp(p); }) == "E_LIMIT");
-    p.lower = std::vector<hg::Bound>(n, 0.0);  // every sign fixed by a bound: nothing to enumerate
-    CHECK(i_error([&] { hg::solve_qp(p); }) == "ok");
+    CHECK(i_error([&] { hg::detail::solve_qp_by_orthants(p); }) == "E_LIMIT");
+    const hg::QpResult r = hg::solve_qp(p);
+    for (const double v : r.x) CHECK(std::fabs(v + 0.95) < 1e-14);  // 2(x + 1) + 0.1 sign(x) = 0
+}
+
+namespace {
+
+// Random problem for the sign-state tests: every instrument has a spread, most have open signs, some have box
+// bounds away from 0, and (when `margin` > 0) a margin limit at that fraction of the margin used without it.
+hg::QpProblem i_costed(std::mt19937_64& rng, std::size_t n, double margin, bool equality) {
+    hg::QpProblem p;
+    p.a = i_random(rng, n + 5, n);
+    p.b = i_vector(rng, n + 5, -3.0, 3.0);
+    p.weights = i_vector(rng, n + 5, 0.5, 2.0);
+    p.ridge = 0.01;
+    p.half_spreads = i_vector(rng, n, 0.0, 0.6);
+    p.impact = i_vector(rng, n, 0.0, 0.05);
+    p.lower = std::vector<hg::Bound>(n);
+    p.upper = std::vector<hg::Bound>(n);
+    std::uniform_real_distribution<double> u(0.0, 1.0);
+    for (std::size_t j = 0; j < n; ++j) {
+        if (j % 5 == 4) (*p.half_spreads)[j] = 50.0;  // costly: left out exactly, the subgradient branch
+        if (u(rng) < 0.3) (*p.lower)[j] = -0.3 - u(rng);
+        if (u(rng) < 0.3) (*p.upper)[j] = 0.3 + u(rng);
+    }
+    if (equality) {
+        p.eq_matrix = Matrix{Vec(n, 1.0)};
+        p.eq_rhs = Vec{0.1};
+    }
+    if (margin > 0.0) {
+        p.margin_rates = i_vector(rng, n, 0.05, 0.3);
+        const hg::QpResult free = hg::solve_qp(p.half_spreads ? [&] {
+            hg::QpProblem q = p;
+            q.margin_rates.reset();
+            return q;
+        }() : p);
+        double used = 0.0;
+        for (std::size_t j = 0; j < n; ++j) used += (*p.margin_rates)[j] * std::fabs(free.x[j]);
+        p.margin_limit = margin * used;
+    }
+    return p;
+}
+
+// KKT conditions of the whole problem at x, without equalities: stationarity with the subgradient at zero
+// coordinates, feasibility, complementary slackness of the bounds and of the margin. Tolerance 1e-8 of the
+// gradient scale.
+void i_kkt(const hg::QpProblem& p, const Vec& x) {
+    const std::size_t n = x.size();
+    const double cw = p.cost_weight.value_or(1.0);
+    Vec g = i_gradient(p.a, p.b, p.weights, p.ridge, x);
+    double scale = 1.0;
+    for (std::size_t j = 0; j < n; ++j) {
+        g[j] += 2.0 * cw * (*p.impact)[j] * x[j];
+        scale = std::max(scale, std::fabs(g[j]) + cw * (*p.half_spreads)[j]);
+    }
+    const double tol = 1e-8 * scale;
+    double mu = 0.0, used = 0.0;
+    if (p.margin_rates) {
+        for (std::size_t j = 0; j < n; ++j) used += (*p.margin_rates)[j] * std::fabs(x[j]);
+        REQUIRE(used <= *p.margin_limit * (1.0 + 1e-12) + 1e-14);
+        // mu from the free nonzero coordinate with the largest |x|: g + (cw hs + mu m) s = 0.
+        std::size_t best = n;
+        for (std::size_t j = 0; j < n; ++j) {
+            const bool at_bound = ((*p.lower)[j] && x[j] == *(*p.lower)[j]) || ((*p.upper)[j] && x[j] == *(*p.upper)[j]);
+            if (x[j] != 0.0 && !at_bound && (best == n || std::fabs(x[j]) > std::fabs(x[best]))) best = j;
+        }
+        if (best < n) {
+            const double s = x[best] > 0.0 ? 1.0 : -1.0;
+            mu = -(g[best] * s + cw * (*p.half_spreads)[best]) / (*p.margin_rates)[best];
+        }
+        CHECK(mu >= -tol);
+        if (mu > tol) CHECK(std::fabs(used - *p.margin_limit) <= 1e-10 * (1.0 + *p.margin_limit));
+    }
+    for (std::size_t j = 0; j < n; ++j) {
+        const double kj = cw * (*p.half_spreads)[j] + (p.margin_rates ? mu * (*p.margin_rates)[j] : 0.0);
+        const bool at_lower = (*p.lower)[j] && x[j] <= *(*p.lower)[j] + 1e-12;
+        const bool at_upper = (*p.upper)[j] && x[j] >= *(*p.upper)[j] - 1e-12;
+        if ((*p.lower)[j]) REQUIRE(x[j] >= *(*p.lower)[j] - 1e-12);
+        if ((*p.upper)[j]) REQUIRE(x[j] <= *(*p.upper)[j] + 1e-12);
+        const double s = x[j] > 0.0 ? 1.0 : -1.0;
+        if (x[j] == 0.0) CHECK(std::fabs(g[j]) <= kj + tol);         // 0 in g + k [-1, 1]
+        else if (at_lower) CHECK(g[j] + kj * s >= -tol);             // bound multiplier >= 0
+        else if (at_upper) CHECK(g[j] + kj * s <= tol);
+        else CHECK(std::fabs(g[j] + kj * s) <= tol);                 // stationarity
+    }
+}
+
+}  // namespace
+
+TEST_CASE("I-48 sign states: KKT conditions at 21, 50 and 200 open-sign instruments") {
+    std::mt19937_64 rng(4848);
+    for (const std::size_t n : {std::size_t{21}, std::size_t{50}, std::size_t{200}}) {
+        INFO(n);
+        const hg::QpProblem p = i_costed(rng, n, 0.0, false);
+        const hg::QpResult r = hg::solve_qp(p);
+        i_kkt(p, r.x);
+        std::size_t zeros = 0;
+        for (const double v : r.x) zeros += v == 0.0;
+        CHECK(zeros > 0);  // the spreads leave some instruments out exactly
+    }
+    for (const std::size_t n : {std::size_t{21}, std::size_t{50}}) {  // a binding margin
+        INFO(n);
+        const hg::QpProblem p = i_costed(rng, n, 0.6, false);
+        const hg::QpResult r = hg::solve_qp(p);
+        CHECK(std::fabs(r.margin - *p.margin_limit) <= 1e-10 * (1.0 + *p.margin_limit));
+        i_kkt(p, r.x);
+    }
+}
+
+TEST_CASE("I-48 sign states agree with the orthant enumeration on random problems with k up to 12") {
+    std::mt19937_64 rng(1248);
+    int agreed = 0;
+    for (int trial = 0; trial < 60; ++trial) {
+        const std::size_t n = 1 + std::size_t(trial % 12);
+        const double margin = trial % 3 == 0 ? 0.0 : (trial % 3 == 1 ? 0.7 : 1.5);
+        const hg::QpProblem p = i_costed(rng, n, margin, trial % 4 == 3 && n > 1);
+        const std::string a = i_error([&] { hg::detail::solve_qp_by_orthants(p); });
+        const std::string b = i_error([&] { hg::solve_qp(p); });
+        REQUIRE(a == b);
+        if (a != "ok") continue;
+        const hg::QpResult oracle = hg::detail::solve_qp_by_orthants(p), r = hg::solve_qp(p);
+        CHECK(std::fabs(r.objective - oracle.objective) <= 1e-12 * (1.0 + oracle.objective));
+        for (std::size_t j = 0; j < n; ++j) CHECK(std::fabs(r.x[j] - oracle.x[j]) <= 1e-9 * (1.0 + std::fabs(oracle.x[j])));
+        ++agreed;
+    }
+    CHECK(agreed > 40);
 }
 
 // ---- wave 4b: backtest and effectiveness ----
