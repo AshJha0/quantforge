@@ -5265,6 +5265,43 @@
     "loadings"
    ]
   },
+  "risk.frtb.equity_delta": {
+   "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
+   "rust": "quantforge::risk::frtb_equity_delta",
+   "python": "quantforge.risk.frtb_equity_delta",
+   "java": "Risk.frtbEquityDelta",
+   "cpp": "qf::risk::frtb_equity_delta",
+   "inputs": {
+    "sensitivities": {
+     "java": "sensitivities"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
+  "risk.frtb.fx_delta": {
+   "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
+   "rust": "quantforge::risk::frtb_fx_delta",
+   "python": "quantforge.risk.frtb_fx_delta",
+   "java": "Risk.frtbFxDelta",
+   "cpp": "qf::risk::frtb_fx_delta",
+   "inputs": {
+    "sensitivities": {
+     "java": "sensitivities"
+    },
+    "specified_pairs": {
+     "java": "specifiedPairs"
+    }
+   },
+   "outputs": [
+    "binding_scenario",
+    "capital",
+    "scenarios"
+   ]
+  },
   "risk.frtb.girr_delta": {
    "spec": "specifications/06-risk/frtb-sa-girr.md",
    "rust": "quantforge::risk::frtb_girr_delta",

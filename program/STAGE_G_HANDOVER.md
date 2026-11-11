@@ -293,3 +293,15 @@ Read: `specifications/06-risk/portfolio-risk-tools.md`; ruling G-46. Five operat
 ## Stage F carry-over wave 2b, part 4 READY (2026-11-11): F3 sensitivities
 
 Read: `specifications/06-risk/f3-sensitivities.md`; ruling G-47. Three operations, suite `stage_f/risk_f3b` (18 cases, 12 values, 6 errors); 9 count against QuantLib. G-45 confirmed by the coordinator (E1 outside the floor denominator).
+
+## Stage F carry-over wave 2b, part 5 READY (2026-11-11): FRTB FX and equity delta
+
+Read: `specifications/06-risk/frtb-sa-fx-equity.md` with `frtb-sa-girr.md`; ruling G-48. Suite `stage_f/frtb_f2b` (15 cases: 9 values, 6 errors). Not specified: bucket 11, vega, curvature, CSR, commodity (formulas are images on the BIS page; owner confirmation from the PDF needed).
+
+## Wave 4c plan (ORE-checked simulated exposure), for when WSL is back
+
+Target: at least 50 ORE-counted cases, so stage G (258 of 487 now) reaches 60% (needs 293 of 488+x; with x = 60 cases of which 55 count: 313 of 547 = 57.2%, so **about 90 counted cases** are needed if every new case counts; plan below gives 96).
+- New operation `xva.exposure.swap_sim_hw`: Hull-White simulated EE, PFE (95%, 99%), EPE and CVA of vanilla swaps and swap portfolios, `core.rng` paths; goldens are the closed form where one exists (EE at resets, the `exposure_g` anchor) and ORE's own run otherwise.
+- Counted check: ORE 1.8.17 under WSL, on the same model (LGM equals Hull-White), curve and trades, at a tolerance of 3 Monte Carlo SE on its own paths (both sides report SE).
+- Grid: 4 swaps (2y, 5y, 10y, 20y; payer and receiver) x 3 volatilities x 2 mean reversions = 48 single-trade cases; 24 netting-set cases (mixed portfolios, with and without CSA, MPoR 10 days, threshold 0 and 1 million); 24 CVA cases (3 hazard rates); about 96 counted cases, plus 6 error cases.
+- ORE scripts go under `oracle/ore/` and run through `wsl.exe -e bash -lc '~/ore-oracle/.venv/bin/python ...'`.
