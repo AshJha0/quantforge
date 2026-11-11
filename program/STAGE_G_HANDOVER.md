@@ -309,3 +309,6 @@ Target: at least 50 ORE-counted cases, so stage G (258 of 487 now) reaches 60% (
 ## Stage F carry-over wave 2b, part 6 READY (2026-11-11): FRTB CSR and commodity delta, equity bucket 11
 
 Ruling G-49. `frtb_f2b` now 25 cases (17 values, 8 errors); **ids from `frtb_f2b-0012` on renumber** (equity bucket 11 became a value case). New operations `risk.frtb.csr_delta`, `risk.frtb.commodity_delta`. Owner item: vega and curvature (formulas are images), and a spot check of MAR21.57 Table 5. Wave 4c waits for WSL.
+
+## G-J4, G-J5 fixed; error-case self-check (ruling G-50)
+`shortrate_g-0082` (now with `short_rate`) and `mcgreeks_g-0022` (seed `"1"`) fixed; builds rerun those two. `oracle/python/check_error_cases.py` checks the schema step of every hand-set error case in `stage_g` and `stage_f`: 0 mismatches now, and it flags both old cases. It does not re-derive the later validation steps.

@@ -765,7 +765,7 @@
     "dividend_yield": 0.0,
     "vol": 0.2,
     "paths": 10000001,
-    "seed": 1
+    "seed": "1"
    },
    "expected": {
     "status": "error",
