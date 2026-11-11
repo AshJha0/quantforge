@@ -231,4 +231,24 @@ struct SelectResult {
 /// eq_rhs or singular was given (E_INPUT, I-33).
 SelectResult select_instruments(const QpProblem& p, long long max_instruments, bool forbidden_keys);
 
+// ---- wave 4d: hedge slippage (08-hedging/hedge-slippage.md, I-36 to I-38) ----
+
+struct Fill {
+    double quantity = 0.0, price = 0.0;
+};
+struct Order {
+    double quantity = 0.0, decision_price = 0.0, final_price = 0.0, half_spread = 0.0, impact = 0.0;
+    std::vector<Fill> fills;
+};
+struct Slippage {
+    double filled_quantity = 0.0;
+    std::optional<double> average_price;  // null with no fills (I-37)
+    double execution_cost = 0.0, opportunity_cost = 0.0, shortfall = 0.0, model_cost = 0.0, slippage = 0.0;
+};
+struct SlippageReport {
+    std::vector<Slippage> orders;
+    Slippage total;  // sums of the five costs
+};
+SlippageReport slippage_report(const std::vector<Order>& orders);
+
 }  // namespace quantforge::hedging

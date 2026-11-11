@@ -534,6 +534,44 @@ void op_hedge_select_solve(const In& in, Out& out) {
     write_ls(out, r.x, r.residual, r.objective);
 }
 
+// ---- stage I wave 4d: slippage (08-hedging/hedge-slippage.md) ----
+
+void op_hedge_slippage_report(const In& in, Out& out) {
+    const auto orders = rows_of<hedging::Order>(in, "orders", [](const In& r) {
+        hedging::Order o{r.real("quantity"), r.real("decision_price"), r.real("final_price"), r.real("half_spread"),
+                         r.real("impact"), {}};
+        o.fills = rows_of<hedging::Fill>(r, "fills", [](const In& f) { return hedging::Fill{f.real("quantity"), f.real("price")}; });
+        return o;
+    });
+    std::size_t fills = 0;
+    for (const hedging::Order& o : orders) fills += o.fills.size();
+    limit_if(orders.size() > 10000, "orders");  // ruling I-38
+    limit_if(fills > 1000000, "fills");
+    in.ready();
+    const hedging::SlippageReport r = hedging::slippage_report(orders);
+    const auto costs = [&](const hedging::Slippage& s) {
+        out.key_real("execution_cost", s.execution_cost);
+        out.key_real("opportunity_cost", s.opportunity_cost);
+        out.key_real("shortfall", s.shortfall);
+        out.key_real("model_cost", s.model_cost);
+        out.key_real("slippage", s.slippage);
+    };
+    out.values.key("orders");
+    out.values.begin_array();
+    for (const hedging::Slippage& s : r.orders) {
+        out.values.begin_object();
+        out.key_real("filled_quantity", s.filled_quantity);
+        out.key_maybe("average_price", s.average_price);
+        costs(s);
+        out.values.end_object();
+    }
+    out.values.end_array();
+    out.values.key("total");
+    out.values.begin_object();
+    costs(r.total);
+    out.values.end_object();
+}
+
 constexpr Entry hedge_ops[] = {
     {"hedge.solve", op_hedge_solve},
     {"hedge.spread_cost", op_spread_cost},
@@ -550,4 +588,5 @@ constexpr Entry hedge_ops[] = {
     {"hedge.backtest.delta", op_hedge_backtest_delta},
     {"hedge.effectiveness", op_hedge_effectiveness},
     {"hedge.select.solve", op_hedge_select_solve},
+    {"hedge.slippage.report", op_hedge_slippage_report},
 };

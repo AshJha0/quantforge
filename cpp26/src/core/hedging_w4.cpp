@@ -122,4 +122,48 @@ DeltaBacktest backtest_delta(const BacktestOption& o, double quantity, double r,
     return out;
 }
 
+// ---- wave 4d: slippage (I-36, I-37) ----
+
+SlippageReport slippage_report(const std::vector<Order>& orders) {
+    input_if(orders.empty(), "orders", "needs at least one order");
+    for (const Order& o : orders) {
+        input_if(o.quantity == 0.0, "orders", "an order quantity is 0");
+        double filled = 0.0;
+        for (const Fill& f : o.fills) {
+            input_if(f.quantity == 0.0 || (f.quantity > 0.0) != (o.quantity > 0.0), "fills",
+                     "a fill is 0 or of the other sign");
+            filled += f.quantity;
+        }
+        input_if(std::fabs(filled) > std::fabs(o.quantity), "fills", "the fills add up to more than the order");
+    }
+    for (const Order& o : orders) {
+        domain_if(o.decision_price <= 0.0 || o.final_price <= 0.0, "orders", "prices must be above 0");
+        for (const Fill& f : o.fills) domain_if(f.price <= 0.0, "fills", "prices must be above 0");
+        domain_if(o.half_spread < 0.0, "orders", "half_spread must be at least 0");
+        domain_if(o.impact < 0.0, "orders", "impact must be at least 0");
+    }
+    SlippageReport out;
+    for (const Order& o : orders) {
+        Slippage s;
+        double notional = 0.0;
+        for (const Fill& f : o.fills) {
+            s.filled_quantity += f.quantity;
+            notional += f.quantity * f.price;
+            s.execution_cost += f.quantity * (f.price - o.decision_price);
+        }
+        if (!o.fills.empty()) s.average_price = notional / s.filled_quantity;
+        s.opportunity_cost = (o.quantity - s.filled_quantity) * (o.final_price - o.decision_price) + 0.0;
+        s.shortfall = s.execution_cost + s.opportunity_cost;
+        s.model_cost = o.half_spread * std::fabs(s.filled_quantity) + o.impact * s.filled_quantity * s.filled_quantity;
+        s.slippage = s.execution_cost - s.model_cost;
+        out.total.execution_cost += s.execution_cost;
+        out.total.opportunity_cost += s.opportunity_cost;
+        out.total.shortfall += s.shortfall;
+        out.total.model_cost += s.model_cost;
+        out.total.slippage += s.slippage;
+        out.orders.push_back(s);
+    }
+    return out;
+}
+
 }  // namespace quantforge::hedging

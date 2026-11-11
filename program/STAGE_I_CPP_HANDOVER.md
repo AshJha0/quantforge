@@ -50,6 +50,13 @@ Built: `hedge.select.solve` (`cpp26/src/core/hedging.cpp`): every subset of 1 to
 - Conformance: `hedgeselect_i` 17 of 17 on the first build. Full run on the 4c and 4d tree: 14,756 passed, 0 failures outside wave 4e (`hedgebtcost_i`, not built at that point). ctest passed.
 - ctest: 1 new test case (`K = n` equals the QP, the best objective never rises with `K`, the I-34 tie, the I-33 checks). `tests/test_cli.cpp` expects 273 operations at 4c.
 
+## Wave 4d, slippage
+
+Built: `hedge.slippage.report` (`cpp26/src/core/hedging_w4.cpp`), the I-36 arithmetic with the I-37 `null` average price.
+
+- Conformance: `hedgeslip_i` 12 of 12 on the first build; full run as for 4c.
+- ctest: 1 new test case (shortfall, slippage and totals identities, `null` price, sign of a sell's cost, the check ladder). `tests/test_cli.cpp` expects 274 operations.
+
 ## SPEC_QUESTIONS
 
 | # | Where | Question | What the C++ build does |

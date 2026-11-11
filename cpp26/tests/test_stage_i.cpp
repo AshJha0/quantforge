@@ -844,3 +844,30 @@ TEST_CASE("I4c selection: K = n gives the QP answer; the best objective never ri
     s.lower = std::vector<hg::Bound>{0.5, std::nullopt};
     CHECK(i_error([&] { hg::select_instruments(s, 1, false); }) == "E_DOMAIN");
 }
+
+TEST_CASE("I4d slippage: shortfall = execution + opportunity; slippage = execution - model; totals add") {
+    std::vector<hg::Order> orders{{1000.0, 100.0, 101.5, 0.02, 1e-4, {{400.0, 100.05}, {600.0, 100.12}}},
+                                  {-500.0, 50.0, 49.2, 0.01, 2e-4, {{-300.0, 49.97}}},
+                                  {200.0, 20.0, 21.0, 0.0, 0.0, {}}};
+    const hg::SlippageReport r = hg::slippage_report(orders);
+    double e = 0.0, o = 0.0, m = 0.0;
+    for (const hg::Slippage& s : r.orders) {
+        CHECK(std::fabs(s.shortfall - (s.execution_cost + s.opportunity_cost)) < 1e-12);
+        CHECK(std::fabs(s.slippage - (s.execution_cost - s.model_cost)) < 1e-12);
+        e += s.execution_cost;
+        o += s.opportunity_cost;
+        m += s.model_cost;
+    }
+    CHECK(r.total.execution_cost == e);
+    CHECK(r.total.opportunity_cost == o);
+    CHECK(r.total.model_cost == m);
+    CHECK(!r.orders[2].average_price.has_value());  // I-37
+    CHECK(r.orders[2].opportunity_cost == 200.0);
+    CHECK(r.orders[1].execution_cost > 0.0);  // selling below the decision price is a cost
+    orders[0].fills.push_back({1.0, 100.0});
+    CHECK(i_error([&] { hg::slippage_report(orders); }) == "E_INPUT");  // overfilled
+    orders[0].fills.pop_back();
+    orders[1].impact = -1.0;
+    CHECK(i_error([&] { hg::slippage_report(orders); }) == "E_DOMAIN");
+    CHECK(i_error([] { hg::slippage_report({}); }) == "E_INPUT");
+}
