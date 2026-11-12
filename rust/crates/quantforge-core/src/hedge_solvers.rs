@@ -886,6 +886,16 @@ pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
         for (x, s) in r.x.iter_mut().zip(&d) {
             *x *= s;
         }
+        // Undoing the scaling can put a position at an active bound one ulp outside it; the
+        // scaled answer met the scaled bound, so clamp to the caller's bound exactly.
+        for (j, x) in r.x.iter_mut().enumerate() {
+            if let Some(l) = p.lower.and_then(|b| b[j]) {
+                *x = x.max(l);
+            }
+            if let Some(u) = p.upper.and_then(|b| b[j]) {
+                *x = x.min(u);
+            }
+        }
         // half_spreads |x| and impact x^2 are invariant; recompute in the caller's units.
         return Ok(r);
     }
