@@ -590,7 +590,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MG-6 AAD ladder of the Bermudan scheme (Q3b)
 - **Purpose:** price plus the full curve, `a` and `sigma` ladder of the G-18 Hull-White Bermudan scheme by reverse-mode AAD.
 - **Inputs:** the `rates.shortrate.bermudan_swaption` inputs.
-- **Limitations:** derivative of the discrete scheme, undefined where a bump moves an exercise decision across a node (such cases are dropped); no performance number recorded by the spec session.
+- **Limitations:** derivative of the discrete scheme at the case grid, **not for hedging at the default grid 101/50** (curve entries 15% to 18% from the converged model; golden `aadladder_r6` at 501/250 is within 0.99% of 801/400; convergence not monotone; fix in stage K item K-8; `oracle/R6_LADDER_GRIDS.json`); undefined where a bump moves an exercise decision across a node (such cases are dropped); no performance number recorded by the spec session.
 - **Validation:** Richardson central differences, two pairs agreeing within 1e-9 relative (3 value cases). **Review:** 2026-11-11.
 - **Tier:** 1.
 - **Challenger:** bump-and-reprice with Richardson extrapolation (the golden reference itself).
