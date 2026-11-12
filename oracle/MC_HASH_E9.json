@@ -1,0 +1,20 @@
+{
+ "item": "E9",
+ "seed": "20261112",
+ "count": 4096,
+ "streams": [
+  0,
+  1,
+  7
+ ],
+ "serialisation": "integers as decimal strings, uniforms as Python float.hex(), one per line, LF, trailing LF",
+ "golden": "datasets/golden/core/mc_hash.json",
+ "sha256": {
+  "stream 0 next_u64": "b5626fc1c5664db67dc14b4524652e9fcae1bc32d24c1d6f761e6ccddfb2a658",
+  "stream 0 uniforms": "259a2a5bacba775d322994555315580e08e504aa942c39340ecfb2a088875c50",
+  "stream 1 next_u64": "c306e21b27e424366436bd1098fb5a469e23ec4476e4dea725fd84e02415fc00",
+  "stream 1 uniforms": "95736b1cb71878624aec4b32b48076d75173c5c32877b42031d5bd6384b28651",
+  "stream 7 next_u64": "9039fba12f482689801d6472d0809a2330a5b818d36ca7d2731dd3e2b1661124",
+  "stream 7 uniforms": "18863da57a5f0fd5bbf1df879b302f438689dbf1aed6af02924f73218e0cd366"
+ }
+}
