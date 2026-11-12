@@ -1160,12 +1160,84 @@
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
   {
+   "case_id": "risk_f3b-0006",
+   "operation": "risk.sens.dividend_borrow",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0007",
+   "operation": "risk.sens.dividend_borrow",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0008",
+   "operation": "risk.sens.dividend_borrow",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0009",
+   "operation": "risk.sens.dividend_borrow",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0010",
+   "operation": "risk.sens.dividend_borrow",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0013",
+   "operation": "risk.sens.correlation",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0014",
+   "operation": "risk.sens.correlation",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0015",
+   "operation": "risk.sens.correlation",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f3b-0016",
+   "operation": "risk.sens.correlation",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
    "case_id": "risk_f4-0001",
    "operation": "risk.var.historical",
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1175,7 +1247,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1185,7 +1257,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1195,7 +1267,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1205,7 +1277,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1215,7 +1287,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1225,7 +1297,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1235,7 +1307,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1245,7 +1317,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1255,7 +1327,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1265,7 +1337,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1275,7 +1347,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1285,7 +1357,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1295,7 +1367,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -1305,67 +1377,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
-   ],
-   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
-  },
-  {
-   "case_id": "risk_f4-0019",
-   "operation": "risk.var.filtered_historical",
-   "library": "arch",
-   "version": "7.2.0",
-   "convention_rows": [
-    "ARCH.GARCH"
-   ],
-   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
-  },
-  {
-   "case_id": "risk_f4-0020",
-   "operation": "risk.var.filtered_historical",
-   "library": "arch",
-   "version": "7.2.0",
-   "convention_rows": [
-    "ARCH.GARCH"
-   ],
-   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
-  },
-  {
-   "case_id": "risk_f4-0021",
-   "operation": "risk.var.filtered_historical",
-   "library": "arch",
-   "version": "7.2.0",
-   "convention_rows": [
-    "ARCH.GARCH"
-   ],
-   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
-  },
-  {
-   "case_id": "risk_f4-0022",
-   "operation": "risk.var.filtered_historical",
-   "library": "arch",
-   "version": "7.2.0",
-   "convention_rows": [
-    "ARCH.GARCH"
-   ],
-   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
-  },
-  {
-   "case_id": "risk_f4-0023",
-   "operation": "risk.var.filtered_historical",
-   "library": "arch",
-   "version": "7.2.0",
-   "convention_rows": [
-    "ARCH.GARCH"
-   ],
-   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
-  },
-  {
-   "case_id": "risk_f4-0024",
-   "operation": "risk.var.filtered_historical",
-   "library": "arch",
-   "version": "7.2.0",
-   "convention_rows": [
-    "ARCH.GARCH"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -2045,7 +2057,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -2055,7 +2067,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -2065,7 +2077,7 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
@@ -2075,7 +2087,97 @@
    "library": "QuantLib",
    "version": "1.44",
    "convention_rows": [
-    "NUMPY.QUANTILE"
+    "NUMPY.ACERBI_TASCHE"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4-0107",
+   "operation": "risk.var.historical",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "NUMPY.ACERBI_TASCHE"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0001",
+   "operation": "risk.stress.reverse",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.BRENTQ"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0002",
+   "operation": "risk.stress.reverse",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.BRENTQ"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0003",
+   "operation": "risk.stress.reverse",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.BRENTQ"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0004",
+   "operation": "risk.stress.reverse",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.BRENTQ"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0020",
+   "operation": "risk.vol.horizon",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.TOEPLITZ"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0021",
+   "operation": "risk.vol.horizon",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.TOEPLITZ"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0022",
+   "operation": "risk.vol.horizon",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.TOEPLITZ"
+   ],
+   "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
+  },
+  {
+   "case_id": "risk_f4b-0023",
+   "operation": "risk.vol.horizon",
+   "library": "QuantLib",
+   "version": "1.44",
+   "convention_rows": [
+    "SCIPY.TOEPLITZ"
    ],
    "map_review": "self-reviewed 2026-11-09 (spec session); second review by the R5 audit"
   },
