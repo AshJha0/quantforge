@@ -248,3 +248,19 @@ For the second oracle lane: count the `aadladder_g` price, `d_price_d_mean_rever
 
 - R6-27: spec text done (`5fa5d6c`). Grid table committed: `oracle/R6_LADDER_GRIDS.json` (101/50 to 801/400) and `oracle/R6_LADDER_GRIDS_EXTRA.json` (501/250, 601/300). No single grid meets 2% for all three cases (convergence is not monotone); chosen: `aadladder_g-0002` at 501/250 (worst 0.99%, 3.3 s per price). Golden generator `oracle/python/gen_r6_w4.py` was launched detached (`run_r6_w4.cmd`, log `oracle/python/gen_r6_w4.log`); the shutdown likely killed it. Rerun detached, check the log, commit `datasets/golden/r6/aadladder_r6.json`, then write `WAVE 4 READY` with TOTALS 15077 value 7441 error 5122 invariance 2514.
 - Blind re-derivation findings not yet ruled: traffic-light plus factors (1996 vs MAR32.9/MAR33.42), equity vega 77.78% vs 77.7817%, binding-scenario tie rule as a library choice, MAR21.44 root-2 scope for inflation and cross-currency basis.
+
+## Wave 4: R6-27 (Bermudan ladder on a finer grid; tag blocker)
+
+Read: `specifications/06-risk/aad-core.md` (R6-27 section). Generator `oracle/python/gen_r6_w4.py` (run detached, 218 s, log `oracle/python/gen_r6_w4.log`).
+
+| File | Cases | Value | Error | Notes |
+|---|---:|---:|---:|---|
+| `r6/aadladder_r6.json` (new) | 1 | 1 | 0 | `aadladder_g-0002`'s inputs at `nx = 501`, 250 steps a year; every ladder entry within 0.99% of the 801/400 ladder |
+
+**Convergence is not monotone.** No single grid meets 2% for all three `aadladder_g` cases (table in `oracle/R6_LADDER_GRIDS.json` and `R6_LADDER_GRIDS_EXTRA.json`); this golden is one case on one grid, chosen because it meets 2%. The ladder at the default grid (101/50) is a derivative of the discrete scheme and is not for hedging. Real fix: stage K item K-8.
+
+**Richardson gate.** The q3b gate (two Richardson pairs agree within 1e-9) is for the 101/50 grid. On 501/250 they agree to 1.9e-9; the accepted gate here is 2.5e-9, a quarter of the case tolerance (relative 1e-8), recorded in the case's `verified_by`.
+
+**What the languages must do.** No behaviour change: `rates.shortrate.bermudan_ladder` must accept `nx = 501`, `steps_per_year = 250` and pass the case at absolute 1e-10, relative 1e-8. Cost about 3.3 s per price in the Python oracle; a build that bumps every input sequentially at this grid should check its timeout. Docs lane: inventory entry and tutorial carry the three-grid table and "not for hedging at the default grid".
+
+TOTALS: 15077 value 7441 error 5122 invariance 2514
