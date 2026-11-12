@@ -440,7 +440,7 @@ public final class HedgeRatios {
     /**
      * Ruling R6-11.7 (with R6-6.2): Cholesky of the correlation form of the hedge block {@code S_hh}, lower triangle.
      * A negative pivot is {@code E_NOT_POSITIVE_DEFINITE}; a pivot in {@code [0, 1e-12]} is {@code E_SINGULAR}. A
-     * pivot in {@code [-1e-12, 0)} is taken as rounding of a singular block (see SPEC_QUESTIONS J-R6-1).
+     * pivot at or below -1e-12 is indefinite; one of absolute size below 1e-12 is singular (ruling on J-R6-1).
      */
     private static void scaledPivotCheck(double[][] s, int k) {
         double[] d = new double[k];
@@ -460,7 +460,7 @@ public final class HedgeRatios {
             for (int q = 0; q < j; q++) {
                 p -= l[j][q] * l[j][q];
             }
-            if (p < -1e-12) {
+            if (p <= -1e-12) {
                 throw new QfError("E_NOT_POSITIVE_DEFINITE", "the hedge covariance block is indefinite", "covariance");
             }
             if (p <= 1e-12) {

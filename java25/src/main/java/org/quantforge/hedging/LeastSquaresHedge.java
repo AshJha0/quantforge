@@ -60,7 +60,7 @@ public final class LeastSquaresHedge {
     /** Relative slack in the subgradient test at a kink before a sign is flipped. */
     private static final double KINK_TOL = 1e-11; // ruling R6-6.1: one kink tolerance for every build
 
-    /** Ruling R6-6.1: iteration cap {@code 10 n + 100}; a test may lower it (property test of the cap). */
+    /** Ruling R6-6.1: iteration cap {@code 10 (n + p) + 100}, {@code p} the constraints; a test may lower it (property test of the cap). */
     static int capOverride = -1;
 
     /** Ruling R6-6.1: at most 1,000,000 enumerated lattice points; a test may lower it. */
@@ -576,7 +576,7 @@ public final class LeastSquaresHedge {
         if (cur == null) {
             throw new QfError("E_INFEASIBLE", "no point satisfies the bounds, equalities and margin limit");
         }
-        for (int iter = 0; iter < iterationCap(n); iter++) {
+        for (int iter = 0; iter < iterationCap(n + rd.k()); iter++) { // 10 (n + p) + 100, p the equalities
             List<Integer> broken = new ArrayList<>();
             int worst = -1;
             double worstExcess = 0.0;
