@@ -6,7 +6,7 @@ Spec version 1.0.0. Status: Specified (stage I, wave 4b). Rulings: `stage-i-ruli
 
 Sources:
 - [H18] J. C. Hull, *Options, Futures, and Other Derivatives*, 10th ed., Pearson, 2018, chapter 19 (delta hedging, rebalancing) (not opened in this session).
-- [IAS39] IASB, *IAS 39 Financial Instruments: Recognition and Measurement*, application guidance AG105 (the 80% to 125% effectiveness range) and AG107 (dollar-offset and regression methods); superseded for most hedges by IFRS 9 (2014), which removed the bright line (not opened).
+- [IAS39] IASB, *IAS 39 Financial Instruments: Recognition and Measurement*, application guidance AG105 (the 80% to 125% effectiveness range); IAS 39 prescribes no single assessment method (dollar offset and regression are practice, not IAS 39 text; the earlier AG107 attribution is unverified, R6-11.11); superseded for most hedges by IFRS 9 (2014), which removed the bright line (not opened).
 - [FG02] J. D. Finnerty, D. Grant, "Alternative approaches to testing hedge effectiveness under SFAS No. 133", *Accounting Horizons* 16(2), 2002, 95-108 (the dollar-offset ratio's instability when the hedged item's change is small) (not opened).
 
 ## `hedge.backtest.delta`
