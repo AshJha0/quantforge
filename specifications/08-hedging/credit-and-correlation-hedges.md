@@ -118,4 +118,4 @@ A finite-difference stencil on QuantLib's Margrabe NPV was tried first for the o
 
 - `CS01` together with every bucket is a degenerate target set: CS01 is the sum of the buckets to first order, so the system is nearly dependent and the hedge notionals depend on the bump size. The scaled I-3 test decides; no special refusal.
 - A downward CS01 bump that makes any hazard `h_k - eps` negative is `E_DOMAIN`.
-- `hedge.correlation.neutralise`: a spread volatility `s <= 1e-12 (v1 + v2)` is `E_SINGULAR`.
+- `hedge.correlation.neutralise`: a spread volatility `s <= 1e-12 (v1 + v2)` is `E_DOMAIN`.
