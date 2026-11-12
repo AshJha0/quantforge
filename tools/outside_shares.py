@@ -195,11 +195,10 @@ def stage_report(stage, problems):
         for suite, cases in suites.items():
             for cid, op, st in cases:
                 cls, lib = reg.get(cid, ("none", ""))
-                if cid in red and cls not in COUNTED:
-                    if rederive_allowed(op):
-                        cls, lib = REDERIVED, red_src
-                    else:
-                        problems.append(f"stage {stage}: re-derivation for {cid} ({op}) is outside the four allowed classes")
+                if cid in red and not rederive_allowed(op):
+                    problems.append(f"stage {stage}: re-derivation for {cid} ({op}) is outside the four allowed classes")
+                elif cid in red and cls not in COUNTED:
+                    cls, lib = REDERIVED, red_src
                 rows.append((suite, op, cls, is_sweep(stage, suite), lib, st == "ok"))
     else:
         reg = load_suite_register(stage)
@@ -245,6 +244,7 @@ def share(rows):
     k = sum(c[x] for x in COUNTED)
     kr = k + c[REDERIVED]
     return {"cases": n, **{x: c[x] for x in CLASSES}, "counted": k, "share": round(k / n, 4) if n else None,
+            "rederived_book_spec_only": sum(1 for r in rows if r[2] == REDERIVED and r[1].startswith("book.")),
             "counted_with_rederivation": kr, "share_with_rederivation": round(kr / n, 4) if n else None}
 
 
@@ -284,6 +284,11 @@ def markdown(doc):
         L.append(f"| {st} | {w['cases']} | {w['library-object']} | {w['library-primitive']} | {w[REDERIVED]} | {w['reimplementation']} | "
                  f"{w['none']} | {w['share']:.1%} | {w['share_with_rederivation']:.1%} | {w['all_cases_share']:.1%} | {a['share']:.1%} ({a['counted']} of {a['cases']}) | "
                  f"{w['error_and_invariance_cases']} | {'met' if e['meets_floor'] else 'NOT MET'} |")
+    wf = doc["stages"]["F"]["without_sweeps"]
+    L += ["", f"Stage F re-derivation sub-count: {wf[REDERIVED]} cases, of which {wf['rederived_book_spec_only']} are spec-only book lifecycle and marks "
+          "(no source outside the spec, so the re-derivation checks the spec against itself; shown separately for that reason). "
+          f"Library plus re-derivation without them: {(wf['counted_with_rederivation'] - wf['rederived_book_spec_only'])} of {wf['cases']} = "
+          f"{(wf['counted_with_rederivation'] - wf['rederived_book_spec_only']) / wf['cases']:.1%}."]
     L += ["", "## Value classes with no free outside reference", "", "| Suite | Reason |", "|---|---|"]
     for e in doc["stages"].values():
         L += [f"| `{k}` | {v} |" for k, v in e["no_outside_reference"].items()]

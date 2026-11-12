@@ -65,6 +65,12 @@ jobs:
               sys.exit(1)
           EOF
           git checkout -- oracle/OUTSIDE_G_R6.json
+      - name: Stage F blind re-derivation judged at each golden's tolerance (four no-library classes only)
+        # oracle/rederivation/results.json is the frozen output of a model blind to the goldens; disagreements are
+        # printed (spec-lane findings), and the committed verdict register must equal a fresh judgement
+        run: |
+          python3 oracle/python/compare_rederivation.py oracle/rederivation/results.json --source "blind re-derivation, Sonnet 5.5, 2026-11-12" --write
+          git diff --exit-code -- oracle/REDERIVATION_REGISTER.json
       - name: D6 shares, floor and register-against-golden check (R6-13)
         run: |
           python3 tools/test_outside_shares.py
