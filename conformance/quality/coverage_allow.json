@@ -1,0 +1,7 @@
+{
+  "_note": "R6-26: library source files allowed below the 90% per-file line-coverage gate (tools/quality_gate.py --per-file). One entry per file, with a reason; an entry without a reason does not count. Keep this list short; the owner's instruction allows the entry-point files only.",
+  "python": [],
+  "java": [],
+  "rust": [],
+  "cpp": []
+}
