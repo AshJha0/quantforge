@@ -2196,7 +2196,10 @@
       ]
      ]
     }
-   ]
+   ],
+   "tolerance_limit": {
+    "per_unit_ruling": "R6-10.3"
+   }
   },
   {
    "case_id": "joint_f-0002",

@@ -1885,6 +1885,10 @@
     "absolute": 0.025,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
@@ -1985,6 +1989,10 @@
     "absolute": 0.001,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
@@ -2085,6 +2093,10 @@
     "absolute": 0.007500000000000001,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
@@ -2185,6 +2197,10 @@
     "absolute": 0.001,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
@@ -2285,6 +2301,10 @@
     "absolute": 0.025,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
@@ -2385,6 +2405,10 @@
     "absolute": 0.001,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
@@ -2485,6 +2509,10 @@
     "absolute": 0.007500000000000001,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
@@ -2585,6 +2613,10 @@
     "absolute": 0.001,
     "relative": 1e-09,
     "reason": "1e-9 per unit of notional on 1e6: the curve solve's tolerance carried through"
+   },
+   "output_classes": {
+    "annuity": "per_unit",
+    "par_rate": "per_unit"
    }
   },
   {
