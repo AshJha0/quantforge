@@ -107,7 +107,12 @@ class ShortRateTest {
                 var += (y - mean) * (y - mean);
             }
             double se = Math.sqrt(var / (paths - 1) / paths);
-            double bgk = Exotics.barrierDiscrete(c == 0 ? 1 : -1,
+            if (c != 0) { // a down-and-out put is a reverse barrier: outside the BGK envelope (ruling R6-2.1)
+                org.junit.jupiter.api.Assertions.assertThrows(org.quantforge.core.QfError.class, () ->
+                        Exotics.barrierDiscrete(-1, Exotics.BarrierType.DOWN_OUT, s0, k, 1.0, r, q, v, h, 0.0, steps));
+                continue;
+            }
+            double bgk = Exotics.barrierDiscrete(1,
                     Exotics.BarrierType.DOWN_OUT, s0, k, 1.0, r, q, v, h, 0.0, steps);
             assertTrue(Math.abs(bgk - mean) < 3 * se, "case " + c + " bgk " + bgk + " mc " + mean + " se " + se);
         }
