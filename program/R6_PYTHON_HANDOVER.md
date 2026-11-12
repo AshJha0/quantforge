@@ -36,3 +36,18 @@ See the "Final run" section at the end.
 4. G4: do `tests/test_stage_*.py` file names count for the R6-16 `git grep`? Renaming touches mutation configs and the stage E quality register.
 5. Unruled from earlier stages: E-Q7, E-Q11, F-Q1, F-Q4, G-Q2.
 6. Large-hedge speed: T6 is missed by about 8x in Python.
+
+## Session 2026-11-12 evening: five pytest failures fixed, r6 wave 4 merged
+
+| Test | Verdict | Change |
+|---|---|---|
+| `test_stage_g2.py::test_portfolio_single_swap_reproduces_wave_4a_and_pfe_order`, `::test_portfolio_offsetting_swaps_have_no_exposure` | stale test (R6-5.1 renamed `pfe_*` to `deflated_pfe_*`) | keys updated, assertions unchanged |
+| `test_stage_d2.py::test_cds_dates` | stale test (R6-7.3: trade date on an IMM date is priced, not `E_INPUT`) | now asserts periods are returned |
+| `test_hedge_solvers.py::test_property_qp_kkt_bounds_and_equalities` | **code bugs** (three) plus test-helper gaps | (a) `_Qp.multipliers`: with every position on a bound and an equality, lambda was never fitted, so a degenerate state cycled to `E_NO_CONVERGENCE`; lambda is now chosen from the admissible interval (one row) or least squares (more rows). (b) Multiplier signs judged against `max(1, max|g|)` (R6-11.4); a gradient near 1e-140 made a 1e-141 rounding sign drop a bound forever. (c) `ERROR` scaled solve: column norms 1e63 apart lost the scaled null space and `x = D x~` missed the equality by 1.2; if the unscaled equality residual exceeds 1e-9 relative, the unique minimiser is re-solved in caller units. Helper `kkt_residual` gets the same all-at-bound lambda rule; the sum check is relative to `max|x|` (rounding), not absolute 1e-12. 3,000 extra Hypothesis examples clean |
+| `test_hedge_solvers.py::test_property_min_norm_equals_the_unique_solution` | stale test (R6-6.2 / R6-6.2a: `ERROR` decides on scaled columns, `MIN_NORM` ranks unscaled; a 1e-50 column differs) | `assume(cond(A) < 1e5)` with that reason |
+
+Merged `r6` at `c7c6bd7` (wave 4). Final run on the merge: conformance **15,077 / 15,077**; pytest **1946 passed, 2 skipped, 0 failed** (775.9 s); coverage TOTAL **98%**.
+
+Files below 90% line coverage: **none** (lowest: `book_risk.py` 91%, `roots.py` 92%, `fitting.py`, `calibration.py`, `cli/ops_book.py`, `risk_tools.py` 93%). No tests needed for the 90% bar.
+
+Timing (local laptop, not evidence): `r6/hedgeqp_large_r6` 5/5 in **122.9 s** for the suite (n = 50 three cases, n = 200 two), about 25 s per case, still above T6's 20 s; `stage_g/expsim_g` 102/102 in 184.3 s.
