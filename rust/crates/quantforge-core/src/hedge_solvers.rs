@@ -240,14 +240,12 @@ struct Constraint {
 
 /// For the active set `N` (columns `normals`): `B = G^{-1} N` and `M^{-1}`, `M = N^T B`.
 fn active_factors(
-    ginv: &Matrix,
+    gn: &[Vec<f64>],
     cons: &[Constraint],
     active: &[usize],
 ) -> Result<(Matrix, Matrix)> {
-    let b: Matrix = active
-        .iter()
-        .map(|&j| mat_vec(ginv, &cons[j].normal))
-        .collect();
+    // `gn[j] = G^{-1} n_j`, computed once per solve.
+    let b: Matrix = active.iter().map(|&j| gn[j].clone()).collect();
     let q = active.len();
     let m: Matrix = (0..q)
         .map(|i| {
@@ -265,13 +263,48 @@ fn active_factors(
 }
 
 fn general_inverse(m: &Matrix) -> Result<Matrix> {
+    // One elimination with every unit column as right-hand side: the same arithmetic per column
+    // as `linalg::solve`, so the same bits, at O(q^3) instead of O(q^4) (R6-6.3 timing).
     let q = m.len();
+    let largest = m.iter().flatten().fold(0.0f64, |a, v| a.max(v.abs()));
+    let limit = 1e-14 * largest;
+    let mut a = m.clone();
+    let mut x: Matrix = (0..q)
+        .map(|i| (0..q).map(|j| f64::from(u8::from(i == j))).collect())
+        .collect();
+    for k in 0..q {
+        let mut p = k;
+        for i in k + 1..q {
+            if a[i][k].abs() > a[p][k].abs() {
+                p = i;
+            }
+        }
+        if a[p][k].abs() <= limit {
+            return fail("E_SINGULAR", "matrix is singular to working precision");
+        }
+        a.swap(k, p);
+        x.swap(k, p);
+        let (top, rest) = a.split_at_mut(k + 1);
+        let (xtop, xrest) = x.split_at_mut(k + 1);
+        let (pivot, xp) = (&top[k], &xtop[k]);
+        for (row, xr) in rest.iter_mut().zip(xrest.iter_mut()) {
+            let factor = row[k] / pivot[k];
+            for j in k..q {
+                row[j] -= factor * pivot[j];
+            }
+            for j in 0..q {
+                xr[j] -= factor * xp[j];
+            }
+        }
+    }
     let mut inv = vec![vec![0.0; q]; q];
-    for j in 0..q {
-        let e: Vec<f64> = (0..q).map(|i| f64::from(u8::from(i == j))).collect();
-        let col = solve(m, &e)?;
-        for i in 0..q {
-            inv[i][j] = col[i];
+    for c in 0..q {
+        for i in (0..q).rev() {
+            let mut s = x[i][c];
+            for j in i + 1..q {
+                s -= a[i][j] * inv[j][c];
+            }
+            inv[i][c] = s / a[i][i];
         }
     }
     Ok(inv)
@@ -295,6 +328,7 @@ fn dual_active_set(
     let mut y: Vec<f64> = mat_vec(&ginv, lin).iter().map(|v| -v).collect();
     let mut active: Vec<usize> = Vec::new();
     let mut u: Vec<f64> = Vec::new();
+    let gcols: Vec<Vec<f64>> = cons.iter().map(|c| mat_vec(&ginv, &c.normal)).collect();
     let limit = iteration_cap();
     for _ in 0..limit {
         let slack = |y: &[f64], j: usize| dot(&cons[j].normal, y) - cons[j].rhs;
@@ -305,7 +339,7 @@ fn dual_active_set(
             .min_by(|x, z| x.1.total_cmp(&z.1))
             .map(|(j, _)| j);
         let Some(p) = p else {
-            let (b, minv) = active_factors(&ginv, cons, &active)?;
+            let (b, minv) = active_factors(&gcols, cons, &active)?;
             // KKT on the active set: lambda = M^{-1} (d + B^T lin), y = B lambda - G^{-1} lin.
             let rhs: Vec<f64> = active
                 .iter()
@@ -328,7 +362,7 @@ fn dual_active_set(
         let normal = &cons[p].normal;
         let gn = dot(normal, &mat_vec(&ginv, normal));
         loop {
-            let (b, minv) = active_factors(&ginv, cons, &active)?;
+            let (b, minv) = active_factors(&gcols, cons, &active)?;
             let bt_n: Vec<f64> = b.iter().map(|bi| dot(bi, normal)).collect();
             let r = mat_vec(&minv, &bt_n);
             let mut z = mat_vec(&ginv, normal);
@@ -790,6 +824,82 @@ fn check_costs(c: &Costs, n: usize, min_norm: bool) -> Result<()> {
 /// (shapes, `MIN_NORM` with a bound), `E_DOMAIN` (weights, ridge, crossed bounds), `E_SINGULAR`
 /// (equality rank, reduced Hessian under `ERROR`), `E_INFEASIBLE`.
 pub fn qp_solve(p: &QpProblem) -> Result<QpSolution> {
+    check_finite(p)?;
+    // R6-6.2: solve in Jacobi-scaled variables x = D y (D_jj = 1/sqrt(H_jj)), which leaves the
+    // solution unchanged and keeps mixed-unit problems away from false E_SINGULAR. A scalar
+    // ridge is not invariant under column scaling, so a ridged problem is solved as given.
+    if let Some(d) = jacobi_for(p) {
+        let a: Matrix = p.a.iter().map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect()).collect();
+        let e: Option<Matrix> = p.eq_matrix.map(|e| {
+            e.iter().map(|r| r.iter().zip(&d).map(|(v, s)| v * s).collect()).collect()
+        });
+        let sb = |b: Option<&[Option<f64>]>| -> Option<Vec<Option<f64>>> {
+            b.map(|b| b.iter().zip(&d).map(|(v, s)| v.map(|v| v / s)).collect())
+        };
+        let (lo, hi) = (sb(p.lower), sb(p.upper));
+        let mul = |v: Option<&[f64]>, pow: i32| -> Option<Vec<f64>> {
+            v.map(|v| v.iter().zip(&d).map(|(x, s)| x * s.powi(pow)).collect())
+        };
+        let hs = mul(p.costs.half_spreads, 1);
+        let im = mul(p.costs.impact, 2);
+        let mr = mul(p.costs.margin_rates, 1);
+        let q = QpProblem {
+            a: &a,
+            eq_matrix: e.as_ref(),
+            lower: lo.as_deref(),
+            upper: hi.as_deref(),
+            costs: Costs {
+                half_spreads: hs.as_deref(),
+                impact: im.as_deref(),
+                margin_rates: mr.as_deref(),
+                ..p.costs
+            },
+            ..p.clone()
+        };
+        let mut r = qp_solve_unscaled(&q)?;
+        for (x, s) in r.x.iter_mut().zip(&d) {
+            *x *= s;
+        }
+        // half_spreads |x| and impact x^2 are invariant; recompute in the caller's units.
+        return Ok(r);
+    }
+    qp_solve_unscaled(p)
+}
+
+/// The Jacobi scaling of `hedge.qp.solve` when every shape is valid, no ridge, and every
+/// diagonal of `H` is positive; `None` otherwise (the unscaled path then reports any error).
+fn jacobi_for(p: &QpProblem) -> Option<Vec<f64>> {
+    let n = p.a.first()?.len();
+    let ok = |v: Option<&[f64]>| v.is_none_or(|v| v.len() == n);
+    let okb = |v: Option<&[Option<f64>]>| v.is_none_or(|v| v.len() == n);
+    if p.ridge != 0.0
+        || p.singular != Singular::Error
+        || n == 0
+        || p.a.iter().any(|r| r.len() != n)
+        || p.b.len() != p.a.len()
+        || p.weights.len() != p.a.len()
+        || p.weights.iter().any(|w| *w <= 0.0)
+        || !ok(p.costs.half_spreads)
+        || !ok(p.costs.impact)
+        || !ok(p.costs.margin_rates)
+        || !okb(p.lower)
+        || !okb(p.upper)
+        || p.eq_matrix.is_some_and(|e| e.iter().any(|r| r.len() != n))
+    {
+        return None;
+    }
+    let cw = p.costs.cost_weight.unwrap_or(1.0);
+    let d: Vec<f64> = (0..n)
+        .map(|j| {
+            let h: f64 = p.a.iter().zip(p.weights).map(|(r, w)| w * r[j] * r[j]).sum::<f64>()
+                + p.costs.impact.map_or(0.0, |v| cw * v[j]);
+            1.0 / h.sqrt()
+        })
+        .collect();
+    d.iter().all(|v| v.is_finite() && *v > 0.0).then_some(d)
+}
+
+fn qp_solve_unscaled(p: &QpProblem) -> Result<QpSolution> {
     check_finite(p)?;
     let (_, n) = check_system(p.a, p.b, p.weights)?;
     set_cap(n);
