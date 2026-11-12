@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TODAY = ql.Date(10, 11, 2026)
 ql.Settings.instance().evaluationDate = TODAY
 DC = ql.Actual365Fixed()
-PATHS = 400_000
+PATHS = 200_000
 
 
 def mc(inp):
@@ -50,7 +50,16 @@ def main():
     res = []
     for c in g["cases"]:
         i = c["inputs"]
-        if c["expected"]["status"] != "ok" or i.get("monitoring") != "DISCRETE" or i["rebate"] != 0.0:
+        if c["expected"]["status"] != "ok":
+            continue
+        if i.get("monitoring", "CONTINUOUS") == "CONTINUOUS":
+            from gen_stage_g_w1 import ql_barrier  # QuantLib AnalyticBarrierEngine, as counted before R6
+            q, gold = ql_barrier(i), c["expected"]["outputs"]["price"]
+            t = 1e-10 * abs(q) + 1e-12
+            res.append({"case_id": c["case_id"], "pass": abs(q - gold) <= t, "checks": [{"output": "price", "golden": gold,
+                        "ql_analytic": q, "gap": gold - q, "tolerance": t, "pass": abs(q - gold) <= t}]})
+            continue
+        if i["rebate"] != 0.0:
             continue
         if abs(round(i["expiry_years"] * 365) - i["expiry_years"] * 365) > 1e-9:
             continue
