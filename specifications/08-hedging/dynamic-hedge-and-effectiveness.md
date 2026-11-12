@@ -106,3 +106,8 @@ Suite `hedgebtcost_i` (5 value, 3 error), written by `oracle/python/gen_stage_i_
 ## Amendment after the builds
 
 Ruling I-43 replaces the exact tests of I-31 with relative ones: `E_DOMAIN` when `|sum(x)| <= 1e-12 sum|x|`, `var(x) <= 1e-20 var(y)` or `var(y) <= 1e-20 var(x)`. A constant-spot backtest with zero rates and dividends is therefore `E_DOMAIN` in every build (`hedgebt_i-0016`).
+
+## R6 amendments (R6-11.11, item 19)
+
+- IAS 39: AG105(b) sets the 80% to 125% range. IAS 39 does not prescribe one method of assessment; dollar offset and regression are common practice and are not cited here as IAS 39 text (the AG107 attribution could not be verified on 2026-11-12: the EUR-Lex copy returned an empty page).
+- Cost timing is a convention (Q-I14): each trade's cost is paid at the next recorded step, and `Pi_0 = -cost(h_0)` records the initial trade.
