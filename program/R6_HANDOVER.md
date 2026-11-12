@@ -207,3 +207,7 @@ Recomputed from the suite register (every counted case is a value case): **102 o
 ### R6-1 oracle side: met (plan row reworded to match R6-1.3)
 
 Per-case Richardson gaps, largest upper entry and the truncation explanation: `oracle/R6_JACOBIAN_RICHARDSON.json` (8 value cases of `r6/jacobian_r6`; smooth methods about 5e-6, piecewise SOFR `MONOTONE_CONVEX` and `HYBRID` 1.4e-3). No golden or build change. R6-11.9 and R6-11.16 stay open without goldens: each needs a new check in the language builds, beyond the rulings already implemented.
+
+### R6-1: cause of the 1.4e-3 gaps (follow-up)
+
+Not truncation in the usual small-`h` sense and not a kink: `oracle/R6_JACOBIAN_KINK.json` shows, for entry [10, 9] under SOFR `MONOTONE_CONVEX` and `HYBRID`, central quotients -0.237553 (1 bp), -0.236481 (0.5 bp), -0.236060 (0.1 bp), -0.2360156 (0.01 bp), and forward minus backward 0.0319, 0.0157, 0.00328, 0.000328, which shrinks in proportion to the bump. The zero rate is smooth but strongly curved in that quote, so 1 bp is outside the `h^2` range. Not a defect; documented as a known limit in `par-and-key-rate.md` and R6-1.3. No golden or build change.
