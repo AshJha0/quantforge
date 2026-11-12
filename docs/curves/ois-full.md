@@ -44,9 +44,9 @@ Each CLI built these numbers on its own, from the same input file. Agreement sho
 | Output | Values | Last value: Java | C++ | Python | Rust | Largest difference, any value |
 |---|---|---|---|---|---|---|
 | rates.ois.bootstrap: pillars | 13 | 0.5087217489424135 | 0.5087217489424133 | 0.5087217489424133 | 0.5087217489424135 | 3.89e-15 |
-| rates.ois.compound_dated: compounded_rate | 1 | not rerun | not rerun | 0.030413895735106715 | not rerun | Python only (2026-11-12); the four-language rerun is owed by `tools/build_gallery.py` with all four CLIs built |
-| rates.ois.compound_dated: accrual | 1 | not rerun | not rerun | 0.08055555555555556 | not rerun | Python only (2026-11-12); the four-language rerun is owed by `tools/build_gallery.py` with all four CLIs built |
-| rates.ois.compound_dated: interest | 1 | not rerun | not rerun | 0.0024500082675502632 | not rerun | Python only (2026-11-12); the four-language rerun is owed by `tools/build_gallery.py` with all four CLIs built |
+| rates.ois.compound_dated: compounded_rate | 1 | 0.030413895735106715 | 0.030413895735106715 | 0.030413895735106715 | 0.030413895735106715 | 0 |
+| rates.ois.compound_dated: accrual | 1 | 0.08055555555555556 | 0.08055555555555556 | 0.08055555555555556 | 0.08055555555555556 | 0 |
+| rates.ois.compound_dated: interest | 1 | 0.0024500082675502632 | 0.0024500082675502632 | 0.0024500082675502632 | 0.0024500082675502632 | 0 |
 
 ## Oracle evidence and limits
 

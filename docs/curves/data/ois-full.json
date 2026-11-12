@@ -42,7 +42,7 @@
   },
   "example_hashes": {
    "estr_ois_d.json": "sha256:21b5b669de245aab1898dc4dc8197b48e10b1591304b9208ec523fb7a5902a22",
-   "real_sofr_compound_2026_10.json": "sha256:edf27df4168b4b256721eac03bf1d685aff5033b77fb237af374ea8f8ff87d79"
+   "real_sofr_compound_2022_10.json": "sha256:b04c94921bf0927fc246a51aee682bb1e5b03486e01081280f6aa5d3ae0724f9"
   }
  },
  "inputs": {
@@ -322,25 +322,34 @@
   {
    "output": "rates.ois.compound_dated: compounded_rate",
    "count": 1,
-   "largest_difference": null,
+   "largest_difference": 0.0,
    "last": {
-    "python": 0.030413895735106715
+    "java": 0.030413895735106715,
+    "cpp": 0.030413895735106715,
+    "python": 0.030413895735106715,
+    "rust": 0.030413895735106715
    }
   },
   {
    "output": "rates.ois.compound_dated: accrual",
    "count": 1,
-   "largest_difference": null,
+   "largest_difference": 0.0,
    "last": {
-    "python": 0.08055555555555556
+    "java": 0.08055555555555556,
+    "cpp": 0.08055555555555556,
+    "python": 0.08055555555555556,
+    "rust": 0.08055555555555556
    }
   },
   {
    "output": "rates.ois.compound_dated: interest",
    "count": 1,
-   "largest_difference": null,
+   "largest_difference": 0.0,
    "last": {
-    "python": 0.0024500082675502632
+    "java": 0.0024500082675502632,
+    "cpp": 0.0024500082675502632,
+    "python": 0.0024500082675502632,
+    "rust": 0.0024500082675502632
    }
   }
  ],

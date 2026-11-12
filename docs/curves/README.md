@@ -24,7 +24,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Bond and sovereign fits](bond-fit.md) | Implemented, not Validated | D | 2 golden cases |
 | [Repo and special repo](repo.md) | Implemented, not Validated | D | 4 golden cases |
 | [Cross-currency](cross-currency.md) | Implemented, not Validated | D | 1 golden case |
-| [Credit and ISDA CDS](cds.md) | Implemented, not Validated | D | 5 golden cases |
+| [Credit and ISDA CDS](cds.md) | Implemented, not Validated | D | 6 golden cases |
 | [Dividend and borrow](dividend-borrow.md) | Implemented, not Validated | D | 4 golden cases |
 | [Inflation, with seasonality](inflation.md) | Implemented, not Validated | D | 2 golden cases |
 | [Caps and swaptions](caps-swaptions.md) | Implemented, not Validated | D | 22 golden cases |

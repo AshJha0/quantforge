@@ -1,5 +1,8 @@
 """R6 wave 3 hedge rulings: iteration caps (R6-6.1), Jacobi scaling (R6-6.2), minvar pivots
 (R6-11.7), empty eq_matrix (R6-11.13), use case 6 (R6-11.20). Expected values are hand-derived."""
+from collections.abc import Callable
+from typing import Any
+
 import pytest
 
 from quantforge_core import hedge_solvers as H
@@ -10,7 +13,7 @@ B = [-2.0, 1.5, -0.7]
 W = [1.0, 1.0, 1.0]
 
 
-def _code(f, *args, **kw):
+def _code(f: Callable[..., object], *args: Any, **kw: Any) -> str:
     with pytest.raises(QfError) as e:
         f(*args, **kw)
     return e.value.code
