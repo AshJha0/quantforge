@@ -59,6 +59,11 @@ jobs:
         run: |
           python3 oracle/python/compare_rederivation.py oracle/rederivation/results.json --source "blind re-derivation, Sonnet 5.5, 2026-11-12" --write
           git diff --exit-code -- oracle/REDERIVATION_REGISTER.json
+      - name: Show which oracle files this job rewrote (diagnostic)
+        run: |
+          git status --short -- oracle/
+          git diff --stat -- oracle/
+          git diff -U0 -- oracle/outside_register.json | head -60
       - name: D6 shares, floor and register-against-golden check (R6-13)
         run: |
           python3 tools/test_outside_shares.py
