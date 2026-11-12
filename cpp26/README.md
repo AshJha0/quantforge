@@ -28,6 +28,20 @@ with `#embed`, so no command reads a file.
 
 Property tests for these waves are in `tests/test_stage_g.cpp`: the acceptance checks of each spec (R9 barrier MC, G-10 report and G-10b gate, LMM caplets against simulation, Q3b ladder against Richardson bumps and its cost ratio), plus parity and limit cases. Bounds on the G-18 scheme compare with the scheme's own value of the bounding product (G-28).
 
+## Stage I modules
+
+| File | Holds | Spec |
+|---|---|---|
+| `core/hedging.{hpp,cpp}` | Wave 1 hedge solvers. `hedge.qp.solve` works in the null space of the equalities (`x = E^+ e + Z y`, `Z` from a Householder QR of `E^T`); the reduced problem is solved by the Goldfarb-Idnani dual active-set method, which also proves infeasibility (I-14). `MIN_NORM` uses the pseudo-inverse of `Z^T H Z` with the I-3 threshold taken on `H`. Integer lots by ellipsoid enumeration around the free minimiser, clipped to the lot box, then the I-7 tie rule. Minimum variance with the I-44 tolerance on the hedged variance. Greek, beta and residual-risk reports | `08-hedging/hedge-solvers.md`, rulings I-1 to I-14 |
+| `core/hedging_w2.cpp` | Wave 2. CDS hedges on the stage D legs: CS01 and bucket CS01s as the I-15 central differences of the piecewise-flat hazards (the survival curve rebuilt from the shifted hazards), JTD per I-16. Correlation hedges with Margrabe exchange options and single-asset vanillas (I-17, I-18) | `08-hedging/credit-and-correlation-hedges.md`, rulings I-15 to I-19 |
+| `core/hedging_w3.cpp` | Wave 3. Cross-asset equity and rates hedge: `EQ01` and `KR01_k` by repricing on the I-20 zero curve (I-21), then the wave 1 QP | `08-hedging/cross-asset-hedge.md`, rulings I-20 to I-23 |
+| `core/hedging.cpp` (wave 4a) | Costs, impact and margin in `hedge.qp.solve`, and the frontier. Impact enters `H`; spread and margin by enumerating the closed orthants of the instruments whose sign is open (each a smooth QP for the same active-set method), capped at 20 such instruments | `08-hedging/hedge-costs-and-frontier.md`, rulings I-24 to I-28 |
+| `core/hedging_w4.cpp` | Wave 4b: the self-financing delta-hedge replay of I-29 and the effectiveness statistics of I-30 and I-31. Wave 4d: the slippage report (I-36, I-37). Wave 4e: trading costs in the replay (I-39, I-40) | `08-hedging/dynamic-hedge-and-effectiveness.md`, rulings I-29 to I-32 |
+| `core/hedging.cpp` (wave 4c) | Instrument selection: every subset of at most `K` instruments through the wave 1 QP, with the I-34 tie rule | `08-hedging/instrument-selection.md`, rulings I-33 to I-35 |
+| `cli/ops_hedge.inc` | CLI side of the hedge operations, with the I-4, I-19 and I-23 limits, the I-12 `null` rule and the per-kind key sets (`E_INPUT`) | `cli-contract.md`, "Stage I operations" |
+
+Property tests are in `tests/test_stage_i.cpp`, one block per wave: the KKT conditions on random bounded and equality-constrained problems, `MIN_NORM` against the unique solution, integer optimality against every one-lot neighbour, minimum-variance effectiveness against the OLS `R^2`, residual contributions summing to the variance (wave 1); a contract hedging itself, bucket against parallel CS01, the I-17 proportional rows (wave 2); a square cross-asset hedge leaving no residual, weight scaling (wave 3); `cost_weight = 0` against wave 1, optimality against feasible perturbations, the frontier's monotonicity (4a); the perfect offset and the constant-path replay (4b); selection against the full QP as `K` grows (4c); the slippage identities (4d); costs against the cost-free replay (4e).
+
 ## Build
 
 ```bash
