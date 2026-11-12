@@ -4,10 +4,12 @@ Release facts come from tools/site_facts.json; the version and counts are read f
 release edits site_facts.json and nothing else on the home page. Used by tools/build_site.py.
 """
 import json
+import sys
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
 def home_figures(root=ROOT):
@@ -16,10 +18,12 @@ def home_figures(root=ROOT):
     version = re.search(r'^version\s*=\s*"([^"]+)"', (root / "python" / "pyproject.toml").read_text(encoding="utf-8"), re.M).group(1)
     suites = sorted((root / "datasets" / "golden").rglob("*.json"))
     cases = sum(len(json.loads(p.read_text(encoding="utf-8"))["cases"]) for p in suites)
+    import case_figures
+    by_class = case_figures.figures(root)
     sources = len(json.loads((root / "tools" / "recorder" / "sources.json").read_text(encoding="utf-8"))["sources"])
     stage_e = [c for p in sorted((root / "datasets" / "golden").glob("stage_e*/*.json")) for c in json.loads(p.read_text(encoding="utf-8"))["cases"]]
     counted = {"version": version, "stage_e_cases": f"{len(stage_e):,}", "stage_e_operations": str(len({c["operation"] for c in stage_e}))}
-    return {**counted, **facts, "golden_cases": f"{cases:,}", "suite_files": str(len(suites)), "sources": str(sources),
+    return {**counted, **facts, "golden_cases": f"{cases:,}", **by_class, "suite_files": str(len(suites)), "sources": str(sources),
             "stage_rows": stage_rows(roadmap_stages(root))}
 
 

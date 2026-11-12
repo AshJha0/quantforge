@@ -33,6 +33,10 @@ jobs:
         run: python3 tools/check_mc_hash.py --self-test
       - name: mutation stages map every stage (R6-14)
         run: python3 conformance/mutation/check_stages.py && python3 conformance/mutation/test_gates.py
+      - name: golden case figures by class (R6-12)
+        run: python3 tools/case_figures.py --check
+      - name: references page lists every spec source (R6-17)
+        run: python3 tools/build_references.py --check && python3 tools/test_build_references.py
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |
