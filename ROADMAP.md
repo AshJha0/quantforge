@@ -11,12 +11,12 @@ Eleven stages, one pull request and one tag each. Estimates are plan-weeks, 106 
 | E Full volatility and exotics | 11 | Arbitrage-free surfaces | v0.5 |
 | F Risk, portfolio, book | 10 | Use case 4 | v0.6 |
 | G Rates models and xVA | 8 | Exposure checked against ORE | v0.7 |
-| H Microstructure and execution | 8 | Use case 5 | v0.8 |
-| I Hedging | 5 | Use case 6 | v0.9 |
-| J Research and portfolio | 8 | Published study reports | v0.10 |
+| H Microstructure and execution | 8 | Use case 5 | v0.10 |
+| I Hedging | 5 | Use case 6 | v0.8 |
+| J Research and portfolio | 8 | Published study reports | v0.9 |
 | K Platform and release | 12 | Clean-machine run of all examples | v1.0.0 |
 
-Stage I (hedging) is built before stage H, to be tagged as v0.8.0 (`program/STAGE_I_HANDOVER.md`); the tags of H to K in the table above move accordingly when each starts.
+Tags follow the build order of the 2026-11-07 plan consolidation: I (v0.8), J (v0.9), H (v0.10), K (v1.0.0). Stage I (hedging) is built before stage H, to be tagged as v0.8.0 (`program/STAGE_I_HANDOVER.md`).
 
 A stage exits when all four languages conform, the oracle named for its scope passes, its minimum test set runs and its docs are reviewed.
 
