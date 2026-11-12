@@ -345,10 +345,27 @@ def scaling():
     return s
 
 
+# ---------------------------------------------------------------------------------- R6-11 audit rulings with goldens
+def audit_suite():
+    from pathlib import Path
+    gold = Path(__file__).resolve().parents[2] / "datasets" / "golden" / "stage_i"
+    sel = next(c for c in json.loads((gold / "hedgeselect_i.json").read_text(encoding="utf-8"))["cases"] if c["case_id"] == "hedgeselect_i-0018")["inputs"]
+    n = len(sel["a"][0])
+    s = Suite("hedgeaudit_r6", "specifications/08-hedging/hedge-solvers.md", G)
+    s.add("hedge.select.solve", dict(sel, max_instruments=n + 1), error="E_INPUT", cls=E, tags=["r6", "audit", "invalid", "synthetic"],
+          description=f"audit item 6: max_instruments {n + 1} > n = {n} is E_INPUT, checked before the subset-count E_LIMIT (R6-11.6)")
+    s.add("hedge.minvar.ratio", {"covariance": [[1.0, 0.1, 0.1], [0.1, 1.0, 1.2], [0.1, 1.2, 1.0]]}, error="E_NOT_POSITIVE_DEFINITE", cls=E,
+          tags=["r6", "audit", "invalid", "synthetic"], description="audit item 7: hedge block indefinite (correlation 1.2): negative pivot is E_NOT_POSITIVE_DEFINITE (R6-11.7)")
+    q = {"a": [[1.0, 0.5, 0.2], [0.3, 1.2, 0.4], [0.1, 0.6, 1.5], [0.8, 0.2, 0.9], [0.4, 0.9, 0.3]], "b": [-2.0, 1.5, -0.7, 0.9, -1.1], "weights": [1.0, 2.0, 0.5, 1.5, 1.0]}
+    s.add("hedge.qp.solve", dict(q, eq_matrix=[], eq_rhs=[]), error="E_INPUT", cls=E, tags=["r6", "audit", "invalid", "synthetic"],
+          description="audit item 13: an empty eq_matrix is E_INPUT; no equalities means both keys absent (R6-11.13)")
+    return s
+
+
 def main():
     keep = common.GOLDEN
     common.GOLDEN = keep.parent / "r6"
-    for fn in ([scaling] if "scale" in sys.argv else [qp_large, scaling]):
+    for fn in ([scaling] if "scale" in sys.argv else [audit_suite] if "audit" in sys.argv else [qp_large, scaling, audit_suite]):
         fn().write()
     common.GOLDEN = keep
     from pathlib import Path
