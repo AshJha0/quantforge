@@ -1,6 +1,6 @@
 # Rust implementation
 
-Stages A to G of QuantForge (stage G released as v0.7.0) and stage I, hedging (waves 1 to 5, target v0.8.0), in Rust 1.99.1, edition 2024, written from `specifications/` alone. The library and CLI use no third-party crates; `proptest` is a test-only dev-dependency for the property suites (G6).
+Stages A to G of QuantForge (stage G released as v0.7.0) and stage I, hedging (waves 1 to 5, built, to be tagged as v0.8.0), in Rust 1.99.1, edition 2024, written from `specifications/` alone. The library and CLI use no third-party crates; `proptest` is a test-only dev-dependency for the property suites (G6).
 
 - `crates/quantforge-core`: the library, one module per domain. Every public function that returns
   `Result` rejects NaN and infinity as `E_DOMAIN` (E1); infallible kernels such as `black()` are
