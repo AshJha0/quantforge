@@ -362,6 +362,10 @@ pub fn noncentral_chi2_cdf(x: f64, k: f64, lambda: f64) -> f64 {
     let j0 = h.floor().min(1e9) as u32;
     let jf0 = f64::from(j0);
     let w0 = (-h + jf0 * h.ln() - crate::garch_estimate::lgamma(jf0 + 1.0)).exp();
+    if !w0.is_finite() || !y.is_finite() || !s0.is_finite() {
+        // R6-8: an overflowed parameter yields NaN for the caller's E_NON_FINITE guard, at once.
+        return f64::NAN;
+    }
     let mut sum = w0 * gamma_p(s0 + jf0, y);
     let (mut w, mut j) = (w0, j0);
     loop {
@@ -379,7 +383,7 @@ pub fn noncentral_chi2_cdf(x: f64, k: f64, lambda: f64) -> f64 {
         j -= 1;
         let term = w * gamma_p(s0 + f64::from(j), y);
         sum += term;
-        if term <= sum * 1e-17 && w <= w0 * 1e-17 {
+        if (term <= sum * 1e-17 && w <= w0 * 1e-17) || j0 - j > 1_000_000 {
             break;
         }
     }
