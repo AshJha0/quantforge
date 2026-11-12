@@ -74,7 +74,7 @@ TEST_CASE("ISDA CDS: bootstrap reprices, price identities, checks") {
     CHECK(code_of([&] { cds_bootstrap(as_of, p, 0.4, {q[1], q[0]}); }) == "E_INPUT");
     CHECK(code_of([&] { cds_bootstrap(as_of, p, 0.4, {{{1, 'Y'}, 0.0}}); }) == "E_DOMAIN");
     const Curve p2(d("2026-12-21"), CurveInterpolation::LogLinearDf, {{d("2030-01-01"), 0.9}});
-    CHECK(code_of([&] { cds_bootstrap(d("2026-12-21"), p2, 0.4, q); }) == "E_INPUT");  // adjusted coupon date
+    CHECK(code_of([&] { cds_bootstrap(d("2026-12-21"), p2, 0.4, q); }) == "none");  // adjusted coupon date: priced (R6-7.3)
     CHECK(code_of([&] { HazardCurve{as_of, {d("2027-01-01")}, {0.0}}.check(); }) == "E_DOMAIN");
 }
 
@@ -155,8 +155,9 @@ TEST_CASE("CPI curve, ZCIS and linkers") {
     const std::vector<CpiFixing> fx{{month_index(d("2026-08-01")), 300.0}, {month_index(d("2026-09-01")), 303.0}};
     const Bond bond{d("2029-11-15"), 0.02, 2};
     const auto l = linker_price(bond, d("2026-11-16"), 0.015, 290.0, fx);
-    CHECK(l.ref_cpi == Approx(300.0 + 15.0 / 30.0 * 3.0).epsilon(1e-15));
-    CHECK(l.nominal_clean == Approx(l.real_clean * l.ref_cpi / 290.0).epsilon(1e-15));
+    CHECK(l.index_ratio == 1.03966);  // R6-7.5 hand value: 301.5 / 290 = 1.0396551..., trunc6 1.039655, round5 1.03966
+    CHECK(l.nominal_clean == Approx(l.real_clean * 1.03966).epsilon(1e-15));
+    CHECK(l.ref_cpi == 301.5);  // 300 + 15/30 * 3, exact at five decimals
     CHECK(code_of([&] { linker_price(bond, d("2026-12-16"), 0.015, 290.0, fx); }) == "E_INPUT");
     CHECK(linker_price_curve(bond, d("2026-11-16"), 300.0, c, disc) > 0.0);
     CHECK(code_of([&] { linker_price_curve(bond, d("2026-11-16"), 300.0, CpiCurve{b + 12, 300, {{1, 0.03}}, std::nullopt}, disc); }) == "E_OUT_OF_RANGE");

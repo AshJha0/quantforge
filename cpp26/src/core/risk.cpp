@@ -129,10 +129,13 @@ KeyRateRisk key_rate_risk(const Curve& curve, KeyRateMode mode, const std::vecto
 }
 
 ZeroJacobian zero_jacobian(const RateConvention& c, Date as_of, const std::vector<OisQuote>& quotes,
-                           CurveInterpolation interpolation, double bump_bp) {
+                           CurveInterpolation interpolation, double bump_bp, const CurveShape& shape) {
     require_finite_quotes(quotes, "quotes");
     require_finite(bump_bp, "bump_bp");
-    const Curve base = build(c, as_of, quotes, interpolation);
+    const auto make = [&](const std::vector<OisQuote>& q) {
+        return ois_bootstrap(c, as_of, q, interpolation, SolveMethod::Sequential, {}, shape).curve;
+    };
+    const Curve base = make(quotes);
     ZeroJacobian out;
     for (const Pillar& p : base.pillars()) {
         out.pillar_dates.push_back(p.date);
@@ -141,10 +144,10 @@ ZeroJacobian zero_jacobian(const RateConvention& c, Date as_of, const std::vecto
     const std::size_t n = out.pillar_dates.size();
     out.jacobian.assign(n, std::vector<double>(quotes.size(), 0.0));
     for (std::size_t j = 0; j < quotes.size(); ++j) {
-        const Curve up = build(c, as_of, moved(quotes, j, bump_bp), interpolation);
-        const Curve down = build(c, as_of, moved(quotes, j, -bump_bp), interpolation);
-        // Pillar i depends only on quotes up to its own, so entries above the diagonal stay exactly 0.
-        for (std::size_t i = j; i < n; ++i)
+        const Curve up = make(moved(quotes, j, bump_bp));
+        const Curve down = make(moved(quotes, j, -bump_bp));
+        // R6-1.1: every entry, above the diagonal too (a non-local interpolation moves earlier pillars).
+        for (std::size_t i = 0; i < n; ++i)
             out.jacobian[i][j] = (zero_rate(up, out.pillar_dates[i]) - zero_rate(down, out.pillar_dates[i])) / (2.0 * bump_bp * bp);
     }
     return out;

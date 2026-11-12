@@ -187,7 +187,7 @@
         "module": "frtb",
         "suite": "frtb_f*",
         "java": "org.quantforge.risk.Frtb*",
-        "cpp": "cpp26/src/core/risk_f4.cpp",
+        "cpp": "cpp26/src/core/var_frtb.cpp",
         "python": "quantforge_core.frtb*",
         "rust": "**/frtb*.rs"
       },
@@ -195,7 +195,7 @@
         "module": "var_backtest",
         "suite": "risk_f*",
         "java": "org.quantforge.risk.PortfolioRisk",
-        "cpp": "cpp26/src/core/risk_f3.cpp",
+        "cpp": "cpp26/src/core/book_sensitivity.cpp",
         "python": "quantforge_core.var_risk*",
         "rust": "**/var.rs"
       },
@@ -313,7 +313,7 @@
         "module": "hedge_cross",
         "suite": "hedge*_i",
         "java": "org.quantforge.hedging.CrossAssetHedge",
-        "cpp": "cpp26/src/core/hedging_w2.cpp",
+        "cpp": "cpp26/src/core/hedging_credit_correlation.cpp",
         "python": "quantforge_core.cross_asset_hedge*",
         "rust": "**/hedge_crossasset.rs"
       },
@@ -321,7 +321,7 @@
         "module": "hedge_credit_corr",
         "suite": "hedge*_i",
         "java": "org.quantforge.hedging.C*Hedge",
-        "cpp": "cpp26/src/core/hedging_w3.cpp",
+        "cpp": "cpp26/src/core/hedging_cross_asset.cpp",
         "python": "quantforge_core.credit_correlation_hedges*",
         "rust": "**/hedge_cross.rs"
       },
@@ -329,7 +329,7 @@
         "module": "hedge_dynamic",
         "suite": "hedge*_i",
         "java": "org.quantforge.hedging.DynamicHedge",
-        "cpp": "cpp26/src/core/hedging_w4.cpp",
+        "cpp": "cpp26/src/core/hedging_dynamic.cpp",
         "python": "quantforge_core.dynamic_hedge*",
         "rust": "**/hedge_dynamic.rs"
       },
@@ -337,7 +337,7 @@
         "module": "hedge_select_slip",
         "suite": "hedge*_i",
         "java": "org.quantforge.hedging.InstrumentSelection",
-        "cpp": "cpp26/src/core/hedging_w4.cpp",
+        "cpp": "cpp26/src/core/hedging_dynamic.cpp",
         "python": "quantforge_core.slippage*",
         "rust": "**/hedge.rs"
       }

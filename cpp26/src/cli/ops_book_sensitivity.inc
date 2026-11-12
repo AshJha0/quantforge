@@ -1,4 +1,4 @@
-#include "quantforge/core/risk_f3.hpp"
+#include "quantforge/core/book_sensitivity.hpp"
 // CLI handlers, stage F risk_f3 (06-risk/book-sensitivities.md). Included by dispatch.cpp inside its unnamed namespace.
 
 void f3_matrix(Out& out, string_view key, const Matrix& m) {

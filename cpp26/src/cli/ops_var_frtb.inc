@@ -1,5 +1,5 @@
-#include "quantforge/core/risk_f4.hpp"
-// CLI handlers, stage F risk_f4. Included by dispatch.cpp inside its unnamed namespace.
+#include "quantforge/core/var_frtb.hpp"
+// CLI handlers: VaR, ES, backtests and FRTB-SA GIRR delta. Included by dispatch.cpp inside its unnamed namespace.
 
 constexpr std::size_t max_f4_scenarios = 1000000;
 
@@ -152,11 +152,59 @@ void op_frtb_girr_delta(const In& in, Out& out) {
     out.key_string("binding_scenario", names[g.binding]);
 }
 
+// R6-4.1 (MAR21.7): the SBM total. Each class charge per scenario is summed within the scenario, then the largest
+// scenario total is the capital. 06-risk/frtb-sa-girr.md, section risk.frtb.sbm_total.
+struct SbmComponent {
+    int risk_class, measure;
+    std::array<double, 3> charge;  // high, medium, low
+};
+constexpr EnumTable<int> sbm_classes = {{"GIRR", 0}, {"CSR_NONSEC", 1}, {"EQ", 2}, {"COMM", 3}, {"FX", 4}};
+constexpr EnumTable<int> sbm_measures = {{"DELTA", 0}, {"VEGA", 1}, {"CURVATURE", 2}};
+
+void op_frtb_sbm_total(const In& in, Out& out) {
+    const auto rows = rows_of<SbmComponent>(in, "components", [](const In& r) {
+        SbmComponent c{r.choice("risk_class", sbm_classes), r.choice("measure", sbm_measures), {}};
+        const Value& s = r.need("scenarios");
+        if (s.kind != Kind::Object) schema("scenarios", "expected an object");
+        const In sc(s);
+        c.charge = {sc.real("high"), sc.real("medium"), sc.real("low")};
+        return c;
+    });
+    in.ready();
+    limit_if(rows.size() > 10000, "components");
+    if (rows.empty()) throw Error("E_INPUT", "components needs at least one entry", "components");
+    for (const SbmComponent& c : rows)
+        for (const double x : c.charge)
+            if (x < 0.0) throw Error("E_DOMAIN", "a scenario charge must be at least 0", "components");
+    for (std::size_t i = 0; i < rows.size(); ++i)
+        for (std::size_t j = 0; j < i; ++j)
+            if (rows[i].risk_class == rows[j].risk_class && rows[i].measure == rows[j].measure)
+                throw Error("E_INPUT", "a risk class and measure appear twice", "components");
+    std::array<double, 3> total{0.0, 0.0, 0.0};
+    double own = 0.0;
+    for (const SbmComponent& c : rows) {
+        for (std::size_t s = 0; s < 3; ++s) total[s] += c.charge[s];
+        own += std::max({c.charge[0], c.charge[1], c.charge[2]});
+    }
+    std::size_t binding = 0;
+    for (std::size_t s = 1; s < 3; ++s)
+        if (total[s] > total[binding]) binding = s;
+    constexpr std::string_view names[] = {"high", "medium", "low"};
+    out.values.key("scenario_totals");
+    out.values.begin_object();
+    for (std::size_t s = 0; s < 3; ++s) out.key_real(names[s], total[s]);
+    out.values.end_object();
+    out.key_real("capital", total[binding]);
+    out.key_string("binding_scenario", names[binding]);
+    out.key_real("sum_of_component_capitals", own);
+}
+
 constexpr Entry risk_f4_ops[] = {
     {"risk.backtest.christoffersen", op_backtest_christoffersen},
     {"risk.backtest.kupiec", op_backtest_kupiec},
     {"risk.backtest.traffic_light", op_backtest_traffic_light},
     {"risk.frtb.girr_delta", op_frtb_girr_delta},
+    {"risk.frtb.sbm_total", op_frtb_sbm_total},
     {"risk.var.filtered_historical", op_var_filtered_historical},
     {"risk.var.historical", op_var_historical},
     {"risk.var.monte_carlo", op_var_monte_carlo},

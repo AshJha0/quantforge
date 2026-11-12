@@ -1,4 +1,4 @@
-#include "quantforge/core/risk_f4.hpp"
+#include "quantforge/core/var_frtb.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -48,10 +48,16 @@ VarResult var_of_losses(std::vector<double> losses, double confidence) {
     const std::size_t n = losses.size();
     const double nc = double(n) * confidence;
     const std::size_t k = std::clamp<std::size_t>(std::size_t(std::ceil(nc)), 1, n);
+    // R6-3.1 (Acerbi-Tasche with a fractional tail weight): w = n - n c, the m = floor(w) largest losses in full and
+    // the next one with weight w - m, over w. w <= 0 gives the largest loss.
+    const double w = double(n) - nc;
+    if (!(w > 0.0)) return {losses[k - 1], losses[n - 1], 1};
+    const auto m = std::size_t(std::floor(w));
     double sum = 0.0;
-    for (std::size_t i = k - 1; i < n; ++i) sum += losses[i];
-    const std::size_t tail = n - k + 1;
-    return {losses[k - 1], sum / double(tail), tail};
+    for (std::size_t i = 0; i < m && i < n; ++i) sum += losses[n - 1 - i];
+    const double frac = w - double(m);
+    if (frac > 0.0 && m < n) sum += frac * losses[n - 1 - m];
+    return {losses[k - 1], sum / w, std::size_t(std::ceil(w))};
 }
 
 VarResult var_historical(const std::vector<double>& pnl, double confidence) {

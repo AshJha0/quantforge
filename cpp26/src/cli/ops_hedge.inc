@@ -90,6 +90,8 @@ void op_hedge_qp_solve(const In& in, Out& out) {
     hedging::QpProblem p = qp_problem_of(in);
     if (present(in, "cost_weight")) p.cost_weight = in.real("cost_weight");
     in.ready();
+    if (p.eq_matrix && p.eq_matrix->empty())  // R6-11.13: no equalities means the keys are absent
+        throw Error("E_INPUT", "eq_matrix is empty", "eq_matrix");
     const hedging::QpResult r = hedging::solve_qp(p);
     write_ls(out, r.x, r.residual, r.objective);
     key_int(out, "rank", r.rank);
@@ -232,6 +234,50 @@ void op_hedge_greeks_neutralise(const In& in, Out& out) {
     out.key_reals("quantities", r.quantities);
     write_greeks(out, "greeks_before", r.before);
     write_greeks(out, "greeks_after", r.after);
+}
+
+// Use case 6 (R6-11.20, 04-pricing/use-cases.md).
+void op_usecase_option_hedge_lots(const In& in, Out& out) {
+    const hedging::Market m{in.real("spot"), in.real("rate"), in.real("dividend_yield"), in.real("volatility")};
+    bool book_keys = true;
+    const std::vector<hedging::Position> book = positions_of(in, "portfolio", true, book_keys);
+    const Value& hv = in.need("hedges");
+    if (hv.kind != Kind::Array) schema("hedges", "expected an array");
+    std::vector<hedging::LotHedge> hedges;
+    for (const Value& item : hv.items) {
+        if (item.kind != Kind::Object) schema("hedges", "expected an object");
+        const In r(item);
+        hedging::LotHedge h;
+        h.position.instrument = r.choice<hedging::Instrument>(
+            "instrument",
+            {{"CALL", hedging::Instrument::Call}, {"PUT", hedging::Instrument::Put}, {"UNDERLYING", hedging::Instrument::Underlying}});
+        if (present(r, "strike")) h.position.strike = r.real("strike");
+        if (present(r, "expiry_years")) h.position.expiry_years = r.real("expiry_years");
+        h.lot_size = r.real("lot_size");
+        h.half_spread = r.real("half_spread");
+        hedges.push_back(h);
+    }
+    const Value& t = in.need("targets");
+    if (t.kind != Kind::Array) schema("targets", "expected an array");
+    std::vector<hedging::Greek> targets;
+    for (const Value& item : t.items)
+        targets.push_back(to_enum<hedging::Greek>(
+            item, "targets",
+            {{"DELTA", hedging::Greek::Delta}, {"GAMMA", hedging::Greek::Gamma}, {"VEGA", hedging::Greek::Vega}}));
+    const long long max_lots = in.integer("max_lots");
+    limit_if(book.size() > max_positions, "portfolio");
+    limit_if(hedges.size() > max_integer_instruments, "hedges");
+    in.ready();
+    if (!book_keys) throw Error("E_INPUT", "portfolio: keys other than those of the instrument (I-41)", "portfolio");
+    const hedging::LotHedgeResult r = hedging::option_hedge_lots(m, book, hedges, targets, max_lots);
+    write_greeks(out, "greeks_before", r.before);
+    write_greeks(out, "greeks_after", r.after);
+    out.values.key("lots");
+    out.values.begin_array();
+    for (const long long n : r.lots) out.values.integer(n);
+    out.values.end_array();
+    out.key_real("hedge_cost", r.hedge_cost);
+    out.key_real("rounding_cost", r.rounding_cost);
 }
 
 void op_hedge_beta_futures(const In& in, Out& out) {
@@ -541,6 +587,8 @@ void op_hedge_select_solve(const In& in, Out& out) {
     const bool forbidden = present(in, "eq_matrix") || present(in, "eq_rhs") || present(in, "singular");  // I-47
     limit_if(p.a.size() > max_factors, "a");
     limit_if(widest_row(p.a) > 20, "a");  // ruling I-35
+    if (k < 1 || k > (long long)widest_row(p.a))  // R6-11.6, before the I-53 subset count
+        throw Error("E_INPUT", "max_instruments must lie in 1..n", "max_instruments");
     {  // ruling I-53: sum over k = 1..min(K, n) of C(n, k) candidate subsets, at most 100,000
         const long long n = (long long)widest_row(p.a);
         double subsets = 0.0, c = 1.0;
@@ -614,4 +662,5 @@ constexpr Entry hedge_ops[] = {
     {"hedge.effectiveness", op_hedge_effectiveness},
     {"hedge.select.solve", op_hedge_select_solve},
     {"hedge.slippage.report", op_hedge_slippage_report},
+    {"usecase.option_hedge_lots", op_usecase_option_hedge_lots},
 };
