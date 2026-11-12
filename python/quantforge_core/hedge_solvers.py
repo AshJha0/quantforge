@@ -242,12 +242,33 @@ class _Qp:
         out[free] = x_p + z @ y
         return out
 
-    def multipliers(self, x: NDArray, free: list[int]) -> NDArray:
+    def multipliers(self, x: NDArray, free: list[int], work: dict[int, str]) -> NDArray:
         """g + E^T lambda at x, with lambda fitted on the free variables: on a bound in the working
-        set this is mu_L at a lower bound and -mu_U at an upper bound."""
+        set this is mu_L at a lower bound and -mu_U at an upper bound.
+
+        With no free variable the fit is empty, so lambda is chosen to make the bound multipliers
+        non-negative where one value can (one equality row: an interval of lambda; more rows: least
+        squares on every position). Without this a degenerate state with every position on a bound
+        and an equality never settles."""
         g = 2.0 * (self.big_b.T @ (self.big_b @ x + self.d))
-        if self.e_mat.shape[0] and free:
+        m = self.e_mat.shape[0]
+        if m and free:
             lam = np.linalg.lstsq(self.e_mat[:, free].T, -g[free], rcond=None)[0]
+            g = g + self.e_mat.T @ lam
+        elif m == 1:
+            lows: list[float] = []
+            ups: list[float] = []
+            for j, side in work.items():
+                coef = float(self.e_mat[0, j])
+                if side == "F" or coef == 0.0:
+                    continue
+                cut = -float(g[j]) / coef
+                (lows if (side == "L") == (coef > 0) else ups).append(cut)
+            lo, hi = max(lows, default=-math.inf), min(ups, default=math.inf)
+            lam1 = (lo + hi) / 2 if lows and ups else lo if lows else hi if ups else 0.0
+            g = g + self.e_mat[0] * lam1
+        elif m:
+            lam = np.linalg.lstsq(self.e_mat.T, -g, rcond=None)[0]
             g = g + self.e_mat.T @ lam
         return g
 
@@ -287,8 +308,9 @@ class _Qp:
                 x[blocking] = lower[blocking] if side == "L" else upper[blocking]
                 continue
             x = target
-            g = self.multipliers(x, free)
-            scale = max(grad_scale, float(np.abs(g).max(initial=0.0)),
+            g = self.multipliers(x, free, work)
+            # R6-11.4: multiplier signs are judged against max(1, max|g|), never a tiny gradient.
+            scale = max(1.0, grad_scale, float(np.abs(g).max(initial=0.0)),
                         float(np.abs(2.0 * (self.big_b.T @ (self.big_b @ x))).max(initial=0.0)))
             worst, drop = -1e-11 * scale, -1
             for j, s in work.items():
@@ -624,6 +646,13 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
         col, bs, xs_p, zs = scaled  # R6-6.2: solve in the scaled variables, x = D x~
         y, _ = _lstsq_min_norm(bs @ zs, bs @ xs_p + d, 0.0)
         x = col * (xs_p + zs @ y)
+        if k and np.abs(e_mat @ x - e_rhs).max() > 1e-9 * max(
+                1.0, float(np.abs(e_rhs).max()), float((np.abs(e_mat) @ np.abs(x)).max())):
+            # Column norms many decades apart lose the scaled null space in rounding, and
+            # x = D x~ then misses the equalities. The decision above stands (unique minimiser);
+            # solve it again in the caller's units, where the equalities hold by construction.
+            y, _ = _lstsq_min_norm(big_b @ z, big_b @ x_p + d, 0.0)
+            x = x_p + z @ y
     elif not bounded:
         y, _ = _lstsq_min_norm(big_b @ z, big_b @ x_p + d, cut_sq)
         x = x_p + z @ y
