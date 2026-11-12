@@ -668,10 +668,6 @@ private:
             if (worst == n_) {
                 for (const std::size_t j : free_)  // a coordinate held by its sign row is exactly 0
                     if ((sign_[j] > 0 ? mult.lower[j] : mult.upper[j]) > 0.0) x[j] = 0.0;
-                double xmax = 1.0;  // R6-6.1 kink: |x_j| <= 1e-11 max(1, max |x|) is at its kink
-                for (const double v : x) xmax = std::max(xmax, std::fabs(v));
-                for (const std::size_t j : free_)
-                    if (std::fabs(x[j]) <= 1e-11 * xmax) x[j] = 0.0;
                 return x;
             }
             sign_[worst] = -sign_[worst];
