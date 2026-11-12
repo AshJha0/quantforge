@@ -5,6 +5,7 @@ R6-10.2: every per-unit output that `tools/check_tolerance_units.py` flags gets 
 (policy.yaml: absolute 1e-10, relative 1e-8). Evidence: conformance/tolerances/R6_REJUDGE_{python,rust,cpp}.json, where
 the v0.8.0 builds were inside that class on every flagged output.
 R6-10.3: `joint_f-0001` keeps class `jacobian_piecewise` (ruling F-40, a kink-straddling stencil) under a named ruling.
+R6-10.4: `joint_f-0004` (monotonic log cubic) uses class `jacobian_piecewise`: its golden is known only to about 1e-9 (macOS Java 1.83e-9, QuantLib 6e-9).
 
 Each file is rewritten in the format it had (indent 1 or compact; checked by a round trip before any change).
 
@@ -20,7 +21,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from runner import load_policy  # noqa: E402
 from check_tolerance_units import scan  # noqa: E402
 
-KEEP = {"joint_f-0001": "R6-10.3"}
+KEEP = {"joint_f-0001": "R6-10.3", "joint_f-0004": "R6-10.4"}
 
 
 def dump(doc, compact, ascii_only):

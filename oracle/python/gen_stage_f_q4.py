@@ -451,7 +451,8 @@ def main():
               if v == 0.0 and sysm.curves[0]["type"] == "OIS_STEPS"]
         if tz:
             checks.append({"method": "exact_zero", "output": "turn_sensitivity", "positions": tz})
-        piece = desc.startswith("full")
+        # F-40: the four-curve system; R6-10.4: the monotonic log cubic system (golden known to a few 1e-9 only).
+        piece = desc.startswith("full") or "monotonic log cubic" in desc
         s.add(op, inp, out, cls=I, verified=["independent-replay newton 1e-14", f"bump-and-rebuild richardson h={h:.3e}, max |IFT - ref| {gapmax:.1e}",
                                              "reference stored in oracle/Q4_REFERENCE_F.json"], tags=["joint", "stage-f"],
               output_classes={"jacobian": "jacobian_piecewise", "turn_sensitivity": "jacobian_piecewise"} if piece else JL,
