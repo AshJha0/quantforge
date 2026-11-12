@@ -211,6 +211,19 @@ class Recorder(unittest.TestCase):
             self.assertEqual(sorted(obs["recorder/bill"]), ["2026-11-06|13 WEEKS COUPON EQUIVALENT"])
             self.assertEqual(obs["recorder/cpi"], {})
 
+    def test_nyfed_rates_are_parsed_and_rebuilt_from_the_log(self):
+        """R6-21: SOFR observations are kept in the log, so R3-02's input for a past day comes from the log alone."""
+        fx = ROOT / "tools/recorder/fixtures/nyfed-sofr.json"
+        with tempfile.TemporaryDirectory() as d:
+            p, log = self.run_with(d, [self.source(fx.as_uri(), id="sofr", parse={"format": "nyfed_json", "fields": ["percentRate"]})])
+            self.assertEqual(p.returncode, 0, p.stderr)
+            spec = importlib.util.spec_from_file_location("record", RECORD)
+            rec = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(rec)
+            state = rec.replay(log, "sofr")
+            want = {f"{r['effectiveDate']}|percentRate": float(r["percentRate"]) for r in json.loads(fx.read_text())["refRates"]}
+            self.assertEqual(state, want)
+
     def test_bad_feed_is_a_failure_row(self):
         with tempfile.TemporaryDirectory() as d:
             src = Path(d) / "x.csv"

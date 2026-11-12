@@ -89,7 +89,21 @@ def parse_bls_v1(raw, fields=None):
     return out
 
 
-PARSERS = {"treasury_csv": parse_treasury_csv, "bls_v1": parse_bls_v1}
+def parse_nyfed_json(raw, fields=None):
+    """NY Fed markets API rates JSON to {"YYYY-MM-DD|field": value}, default field percentRate (R6-21: SOFR, TGCR and
+    BGCR kept as observations, so R3-02's inputs can be rebuilt from the log)."""
+    out = {}
+    for r in json.loads(raw.decode("utf-8"))["refRates"]:
+        for f in fields or ["percentRate"]:
+            v = r.get(f)
+            if v not in (None, ""):
+                out[f"{r['effectiveDate']}|{f}"] = float(v)
+    if not out:
+        raise ValueError("parsed no values: the feed format may have changed")
+    return out
+
+
+PARSERS = {"treasury_csv": parse_treasury_csv, "bls_v1": parse_bls_v1, "nyfed_json": parse_nyfed_json}
 
 
 def forward_start(studies_path):

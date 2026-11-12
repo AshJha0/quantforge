@@ -53,7 +53,14 @@
       "attribution": "Federal Reserve Bank of New York",
       "redistribute_raw": "yes, with the notice and the same terms passed on; held back from git by the rule above",
       "notice": "The SOFR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of the SOFR data by QuantForge, does not sanction or endorse any particular republication, and has no liability for your use. QuantForge is not affiliated with the New York Fed. The New York Fed does not sanction, endorse, or recommend any products or services offered by QuantForge. The Secured Overnight Financing Rate (SOFR) Data are calculated using data provided under a license granted to the New York Fed by DTCC Solutions LLC (\"Solutions\"), an affiliate of The Depository Trust & Clearing Corporation. Solutions, its affiliates, and third parties from which they obtained data have no liability for the content of this material.",
-      "enabled": true
+      "enabled": true,
+      "parse": {
+        "format": "nyfed_json",
+        "fields": [
+          "percentRate",
+          "volumeInBillions"
+        ]
+      }
     },
     {
       "id": "ecb-estr",
@@ -86,7 +93,14 @@
       "attribution": "Federal Reserve Bank of New York",
       "redistribute_raw": "yes, with the notice and the same terms passed on; held back from git by the rule above",
       "notice": "The TGCR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of the TGCR data by QuantForge, does not sanction or endorse any particular republication, and has no liability for your use. QuantForge is not affiliated with the New York Fed. The New York Fed does not sanction, endorse, or recommend any products or services offered by QuantForge.",
-      "enabled": true
+      "enabled": true,
+      "parse": {
+        "format": "nyfed_json",
+        "fields": [
+          "percentRate",
+          "volumeInBillions"
+        ]
+      }
     },
     {
       "id": "nyfed-bgcr",
@@ -97,7 +111,14 @@
       "attribution": "Federal Reserve Bank of New York",
       "redistribute_raw": "yes, with the notice and the same terms passed on; held back from git by the rule above",
       "notice": "The BGCR data is subject to the Terms of Use posted at newyorkfed.org. The New York Fed is not responsible for publication of the BGCR data by QuantForge, does not sanction or endorse any particular republication, and has no liability for your use. QuantForge is not affiliated with the New York Fed. The New York Fed does not sanction, endorse, or recommend any products or services offered by QuantForge.",
-      "enabled": true
+      "enabled": true,
+      "parse": {
+        "format": "nyfed_json",
+        "fields": [
+          "percentRate",
+          "volumeInBillions"
+        ]
+      }
     },
     {
       "id": "ons-d7bt",
