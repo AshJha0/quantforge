@@ -36,8 +36,7 @@ CdsSchedule cds_schedule(Date t, Date maturity) {
     if (u > t) u = add_months(u, -3);
     std::vector<Date> dates{u};
     while (dates.back() < maturity) dates.push_back(std::min(add_months(dates.back(), 3), maturity));
-    for (std::size_t i = 0; i + 1 < dates.size(); ++i)
-        if (next_weekday(dates[i]) == t) throw Error("E_INPUT", "trade_date is on a coupon date (ruling D19)", "trade_date");
+    // R6-7.3 (D19 revisited): a trade date on an adjusted coupon date is priced; the first period starts at T itself.
     CdsSchedule s;
     for (std::size_t i = 1; i < dates.size(); ++i) {
         const bool last = i + 1 == dates.size();

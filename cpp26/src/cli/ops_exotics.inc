@@ -41,6 +41,13 @@ void op_barrier(const In& in, Out& out) {
     // G-30: n = floor(m T + 0.5) dates, n >= 1, step dt = T / n.
     const double n = std::floor(double(per_year) * m.expiry_years + 0.5);
     if (!(n >= 1)) throw Error("E_DOMAIN", "no monitoring date before expiry", "monitoring_per_year");
+    // R6-2.1: the BGK accuracy envelope. Only a regular knock-out with no rebate, away from the barrier.
+    const bool regular = (type == BarrierType::DownOut && m.type == OptionType::Call && h <= m.strike) ||
+                         (type == BarrierType::UpOut && m.type == OptionType::Put && h >= m.strike);
+    if (!regular) throw Error("E_DOMAIN", "outside the BGK envelope: only regular knock-outs (R6-2.1)", "barrier_type");
+    if (rebate != 0.0) throw Error("E_DOMAIN", "outside the BGK envelope: a discrete rebate (R6-2.1)", "rebate");
+    if (!(std::fabs(std::log(m.spot / h)) >= 1.25 * m.vol * std::sqrt(m.expiry_years / n)))
+        throw Error("E_DOMAIN", "outside the BGK envelope: the barrier is too close to spot (R6-2.1)", "barrier");
     const double shift = std::exp((down ? -beta : beta) * m.vol * std::sqrt(m.expiry_years / n));
     out.key_real("price", barrier_price(m, h * shift, rebate, type));  // rebate unchanged, priced at H' (a convention)
 }

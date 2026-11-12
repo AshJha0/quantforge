@@ -95,8 +95,12 @@ LinkerPrice linker_price(const Bond& bond, Date settlement, double real_yield, d
     });
     if (!(base_ref_cpi > 0.0)) throw Error("E_DOMAIN", "base_ref_cpi is not positive", "base_ref_cpi");
     const YieldPrice p = price_from_yield(bond, settlement, real_yield);
-    const double ratio = ref / base_ref_cpi;
-    return {ref, ratio, p.clean, p.accrued, p.clean * ratio, p.accrued * ratio};
+    // R6-7.5 (31 CFR 356 App. B): Ref CPI and index ratio truncated to six decimals, then rounded half up to five.
+    const auto trunc6 = [](double x) { return std::floor(x * 1e6) / 1e6; };
+    const auto round5 = [](double x) { return std::floor(x * 1e5 + 0.5) / 1e5; };
+    const double ref_r = round5(trunc6(ref));
+    const double ratio = round5(trunc6(ref_r / base_ref_cpi));
+    return {ref_r, ratio, p.clean, p.accrued, p.clean * ratio, p.accrued * ratio};
 }
 
 double linker_price_curve(const Bond& bond, Date settlement, double base_ref_cpi, const CpiCurve& curve, const Curve& discount) {

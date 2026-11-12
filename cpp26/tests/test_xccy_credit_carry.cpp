@@ -74,7 +74,7 @@ TEST_CASE("ISDA CDS: bootstrap reprices, price identities, checks") {
     CHECK(code_of([&] { cds_bootstrap(as_of, p, 0.4, {q[1], q[0]}); }) == "E_INPUT");
     CHECK(code_of([&] { cds_bootstrap(as_of, p, 0.4, {{{1, 'Y'}, 0.0}}); }) == "E_DOMAIN");
     const Curve p2(d("2026-12-21"), CurveInterpolation::LogLinearDf, {{d("2030-01-01"), 0.9}});
-    CHECK(code_of([&] { cds_bootstrap(d("2026-12-21"), p2, 0.4, q); }) == "E_INPUT");  // adjusted coupon date
+    CHECK(code_of([&] { cds_bootstrap(d("2026-12-21"), p2, 0.4, q); }) == "none");  // adjusted coupon date: priced (R6-7.3)
     CHECK(code_of([&] { HazardCurve{as_of, {d("2027-01-01")}, {0.0}}.check(); }) == "E_DOMAIN");
 }
 
