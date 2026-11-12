@@ -3,6 +3,7 @@ import json
 import math
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -11,11 +12,12 @@ from quantforge_core.cli import ops_rates
 from quantforge_core.cli.inputs import Inputs
 from quantforge_core.curves import CurveData
 from quantforge_core.ois import Quote
+from quantforge_core.steps import StepCurve
 
 GOLDEN = Path(__file__).resolve().parents[2] / "datasets/golden/stage_f/joint_f.json"
 
 
-def _case(n: int) -> dict:
+def _case(n: int) -> dict[str, Any]:
     """1: the steps-with-turn system; 2: SOFR + term log-linear (found by description, since
     case ids move when spec adds cases)."""
     words = {1: "meeting steps", 2: "log-linear"}[n]
@@ -23,7 +25,8 @@ def _case(n: int) -> dict:
     return next(c["inputs"] for c in cases if words in c.get("description", ""))
 
 
-def _solve(inputs: dict) -> dict:
+def _solve(inputs: dict[str, Any]) -> dict[str, Any]:
+    out: dict[str, Any]
     out, _ = ops_rates._joint_solve(Inputs(inputs))
     return out
 
@@ -66,7 +69,7 @@ def test_turn_factor_one_at_no_turn_par_rate() -> None:
     turn_inst = next(x for x in no_turn["instruments"] if x.get("turn"))
     no_turn["instruments"] = [x for x in no_turn["instruments"] if not x.get("turn")]
     flat = _solve(no_turn)["curves"][0]
-    curve = joint.StepCurve(date(2026, 11, 9), flat["base_rate"],
+    curve = StepCurve(date(2026, 11, 9), flat["base_rate"],
                             list(zip([date.fromisoformat(d) for d in inputs["curves"][0]["step_dates"]],
                                      flat["step_rates"], strict=True)), ())
     ps = ois.periods("SOFR", date(2026, 11, 9), turn_inst["tenor"])

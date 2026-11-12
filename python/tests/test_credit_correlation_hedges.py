@@ -149,11 +149,13 @@ def test_credit_cli_and_limits() -> None:
 
 # ----- hedge.correlation.neutralise -----
 
-MARKET = (100.0, 95.0, 0.03, 0.01, 0.02, 0.25, 0.2, 0.6)
+Market8 = tuple[float, float, float, float, float, float, float, float]
+MARKET: Market8 = (100.0, 95.0, 0.03, 0.01, 0.02, 0.25, 0.2, 0.6)
 EXCHANGE = {"quantity1": 1.0, "quantity2": 1.0, "expiry_years": 1.0}
 
 
-def neutralise(book: Any, hedges: Any, targets: Any, market: Any = MARKET) -> dict[str, Any]:
+def neutralise(book: Any, hedges: Any, targets: Any,
+               market: Market8 = MARKET) -> dict[str, Any]:
     return cch.correlation_neutralise(*market, book, hedges, targets)
 
 

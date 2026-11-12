@@ -3,6 +3,7 @@ VIX). Values come from the worked examples in the specs; the goldens run in test
 import json
 import math
 from datetime import date
+from typing import Any
 
 import pytest
 
@@ -30,14 +31,14 @@ def run(operation, inputs):
 
 # --- E7 GARCH ---
 
-def test_garch_worked_example():
+def test_garch_worked_example() -> None:
     loglik, variances, nxt = vmod.garch_loglik([0.01, -0.02], 1e-5, 0.1, 0.8, "SAMPLE")
     assert variances == pytest.approx([2.5e-4, 2.2e-4], rel=1e-14)
     assert nxt == pytest.approx(2.26e-4, rel=1e-14)
     assert loglik == pytest.approx(5.410998350356715, abs=1e-12)
 
 
-def test_garch_loglik_errors():
+def test_garch_loglik_errors() -> None:
     f = vmod.garch_loglik
     assert code(f, [0.1], 1e-5, 0.1, 0.8, "SAMPLE") == "E_INPUT"
     assert code(f, [0.1, 0.2], 1e-5, 0.1, 0.8, "FIRST") == "E_INPUT"
@@ -49,7 +50,7 @@ def test_garch_loglik_errors():
     assert f([0.1, 0.2], 1e-5, 0.5, 0.6, 0.01)[1][0] == 0.01  # alpha + beta >= 1 allowed
 
 
-def test_garch_forecast():
+def test_garch_forecast() -> None:
     variances, total, vol, long_run = vmod.garch_forecast(1e-5, 0.1, 0.8, 2.26e-4, 5, 252)
     assert long_run == pytest.approx(1e-4)
     assert variances == pytest.approx([1e-4 + 0.9**h * 1.26e-4 for h in range(5)], rel=1e-13)
@@ -73,7 +74,7 @@ def _series(n, seed=3):
     return out
 
 
-def test_garch_fit_beats_neighbours():
+def test_garch_fit_beats_neighbours() -> None:
     returns = _series(300)
     best = vmod.garch_fit(returns, "SAMPLE")
     for omega, alpha, beta in ((2e-6, 0.08, 0.9), (3e-6, 0.1, 0.85), (1e-6, 0.05, 0.94)):
@@ -86,7 +87,7 @@ def test_garch_fit_beats_neighbours():
 # --- E7 variance swaps ---
 
 def _fair(**over):
-    args = {"as_of": date(2026, 11, 6), "maturity": date(2027, 11, 6), "spot": 100.0, "rate": 0.04,
+    args: dict[str, Any] = {"as_of": date(2026, 11, 6), "maturity": date(2027, 11, 6), "spot": 100.0, "rate": 0.04,
                 "dividend_yield": 0.0, "put_strikes": [80.0, 90.0, 100.0],
                 "call_strikes": [100.0, 110.0, 120.0],
                 "vols": [(k, 0.2) for k in (80.0, 90.0, 100.0, 110.0, 120.0)], "extension_step": 10.0,
@@ -95,13 +96,13 @@ def _fair(**over):
     return vmod.varswap_fair_strike(**args)
 
 
-def test_varswap_weights_worked_example():
+def test_varswap_weights_worked_example() -> None:
     w = vmod._weights([100.0, 110.0, 120.0], 130.0, 100.0, 1.0)
     assert w[0] == pytest.approx(9.3796e-4, rel=1e-4)
     assert w[1] == pytest.approx(1.6598e-3, rel=1e-4)
 
 
-def test_varswap_fair_strike_and_errors():
+def test_varswap_fair_strike_and_errors() -> None:
     fair, vol, pv = _fair()
     assert vol == pytest.approx(math.sqrt(fair)) and fair > 0
     assert pv == pytest.approx(1e6 * math.exp(-0.04) * (fair - 0.04))
@@ -117,7 +118,7 @@ def test_varswap_fair_strike_and_errors():
     assert code(_fair, extension_step=80.0) == "E_DOMAIN"
 
 
-def test_varswap_realized_worked_example():
+def test_varswap_realized_worked_example() -> None:
     variance, _vol, payoff = vmod.varswap_realized([100, 101, 99.5, 100.25, 102, 101.5], 252,
                                                     0.04, 1e6)
     assert variance == pytest.approx(0.035427394095297673, rel=1e-12)
@@ -133,13 +134,14 @@ STRIP = [vmod.Quote(90, 10.5, 11.5, 0.5, 0.7), vmod.Quote(95, 6.0, 6.6, 1.4, 1.6
          vmod.Quote(110, 0.3, 0.5, 10.0, 11.0)]
 
 
-def test_vix_worked_example():
+def test_vix_worked_example() -> None:
     forward, k0, variance, used = vmod.vix_term_variance(43200, 0.0, STRIP)
-    assert (forward, k0, used) == (pytest.approx(99.9), 95, [90, 95, 100, 105, 110])
+    assert forward == pytest.approx(99.9)
+    assert (k0, used) == (95, [90, 95, 100, 105, 110])
     assert variance == pytest.approx(0.08188158767696967, rel=1e-12)
 
 
-def test_vix_zero_bids_skip_and_stop():
+def test_vix_zero_bids_skip_and_stop() -> None:
     strip = [vmod.Quote(k, max(100 - k, 0) + 1, max(100 - k, 0) + 1.2, 0.0 if k in (80, 70) else
                           max(k - 100, 0) + 1, max(k - 100, 0) + 1.2)
              for k in (60, 70, 80, 90, 100, 110, 120)]
@@ -149,7 +151,7 @@ def test_vix_zero_bids_skip_and_stop():
     assert code(vmod.vix_term_variance, 43200, 0.01, strip) == "E_INPUT"  # E-B15: no put
 
 
-def test_vix_errors():
+def test_vix_errors() -> None:
     f = vmod.vix_term_variance
     assert code(f, 0, 0.0, STRIP) == "E_INPUT"
     assert code(f, 10, 0.0, STRIP[:2]) == "E_INPUT"
@@ -160,7 +162,7 @@ def test_vix_errors():
     assert code(f, 10, 0.0, high) == "E_INPUT"
 
 
-def test_vix_index():
+def test_vix_index() -> None:
     index, v1, v2 = vmod.vix_index((40000, 0.0, STRIP), (50000, 0.0, STRIP))
     assert v1 > 0 and v2 > 0 and index > 0
     assert code(vmod.vix_index, (50000, 0.0, STRIP), (40000, 0.0, STRIP)) == "E_INPUT"
@@ -169,27 +171,28 @@ def test_vix_index():
 
 # --- E1 surfaces ---
 
-def test_surface_check_clean_and_flags():
+def test_surface_check_clean_and_flags() -> None:
     ks = [-0.6, -0.2, 0.0, 0.2, 0.6]
     assert arb_surface.surface_check(SLICES, ks, True)["arbitrage_free"] is True
     vogt = Svi(-0.0410, 0.1331, 0.3060, 0.3586, 0.4153)
-    report = arb_surface.surface_check([arb_surface.Slice(1.0, vogt)], [-0.2, 0.0, 0.4, 0.8, 0.9], False)
+    report: dict[str, Any] = arb_surface.surface_check([arb_surface.Slice(1.0, vogt)], [-0.2, 0.0, 0.4, 0.8, 0.9], False)
     assert report["butterfly_violations"]
     assert code(arb_surface.surface_check, [arb_surface.Slice(1.0, vogt)], [0.0, 0.8], True) \
         == "E_ARBITRAGE"
     steep = [arb_surface.Slice(1.0, Svi(0.04, 2.5, 0.0, 0.0, 0.1))]
-    wings = arb_surface.surface_check(steep, [0.0], False)["wing_violations"]
+    wings: Any = arb_surface.surface_check(steep, [0.0], False)["wing_violations"]
     assert [w["kind"] for w in wings] == ["LEE", "LEE"]
     low = [SLICES[1], arb_surface.Slice(2.0, Svi(0.01, 0.05, -0.35, 0.03, 0.25))]
-    report = arb_surface.surface_check(low, [0.0], False)
-    assert report["calendar_violations"] and len(report["wing_violations"]) == 2
+    report2: dict[str, Any] = arb_surface.surface_check(low, [0.0], False)
+    assert report2["calendar_violations"] and len(report2["wing_violations"]) == 2
     tie = [arb_surface.Slice(1.0, Svi(0.04, 0.5, 0.0, 0.0, 0.25)),
            arb_surface.Slice(2.0, Svi(0.0390625, 0.5, 0.0, 0.0, 0.5))]
-    sides = [w["side"] for w in arb_surface.surface_check(tie, [5.0], False)["wing_violations"]]
+    tie_report: dict[str, Any] = arb_surface.surface_check(tie, [5.0], False)
+    sides = [w["side"] for w in tie_report["wing_violations"]]
     assert sides == ["LEFT", "RIGHT"]
 
 
-def test_slices_and_grid_errors():
+def test_slices_and_grid_errors() -> None:
     f = arb_surface.surface_check
     assert code(f, [], [0.0], False) == "E_INPUT"
     assert code(f, SLICES[::-1], [0.0], False) == "E_INPUT"
@@ -199,7 +202,7 @@ def test_slices_and_grid_errors():
     assert code(f, SLICES, [0.1, 0.0], False) == "E_INPUT"
 
 
-def test_ssvi_to_svi_matches_ssvi():
+def test_ssvi_to_svi_matches_ssvi() -> None:
     p = arb_surface.ssvi_to_svi(-0.7, 1.2, 0.4, 0.04)
     assert p.a == pytest.approx(0.0102) and p.m > 0
     phi = 1.2 * 0.04**-0.4 * 1.04**-0.6
@@ -210,7 +213,7 @@ def test_ssvi_to_svi_matches_ssvi():
     assert code(arb_surface.ssvi_to_svi, -0.7, 1.2, 1.4, 0.04) == "E_DOMAIN"
 
 
-def test_fit_surface_recovers_truth():
+def test_fit_surface_recovers_truth() -> None:
     ks = [-0.5, -0.3, -0.15, 0.0, 0.15, 0.3, 0.5]
     rows = [[s.svi.total_variance(k) for k in ks] for s in SLICES]
     slices, rmse, report = arb_surface.fit_surface([0.25, 1.0, 2.0], ks, rows, True)
@@ -222,7 +225,7 @@ def test_fit_surface_recovers_truth():
 
 # --- E1 local and forward vol ---
 
-def test_dupire_flat_vol_is_flat():
+def test_dupire_flat_vol_is_flat() -> None:
     flat = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
     w, _vols, local = arb_surface.dupire(flat, [(0.5, 0.1), (2.0, -0.2)])
     assert w == pytest.approx([0.02, 0.08]) and local == pytest.approx([0.2, 0.2])
@@ -236,7 +239,7 @@ def test_dupire_flat_vol_is_flat():
     assert code(arb_surface.dupire, vogt, [(1.0, 0.9)]) == "E_ARBITRAGE"
 
 
-def test_forward_vols():
+def test_forward_vols() -> None:
     assert arb_surface.forward_vols([1.0, 2.0], [0.2, 0.2]) == pytest.approx([0.2, 0.2])
     assert arb_surface.forward_vols([1.0, 4.0], [0.5, 0.25])[1] == 0.0
     assert code(arb_surface.forward_vols, [], []) == "E_INPUT"
@@ -245,7 +248,7 @@ def test_forward_vols():
     assert code(arb_surface.forward_vols, [1.0, 2.0], [0.3, 0.1]) == "E_ARBITRAGE"
 
 
-def test_smile_dynamics_delta_matches_bump():
+def test_smile_dynamics_delta_matches_bump() -> None:
     args = (SVI, 0.5, 100.0, 103.0, 0.03, 0.01, [90.0, 100.0, 110.0])
     for option in ("CALL", "PUT"):
         sticky = arb_surface.smile_dynamics(*args, "STICKY_DELTA", option)
@@ -266,7 +269,7 @@ def test_smile_dynamics_delta_matches_bump():
         assert code(f, SVI, t, s, s1, 0.0, 0.0, ks, "STICKY_STRIKE", "CALL") == "E_DOMAIN"
 
 
-def test_vol_of_vol():
+def test_vol_of_vol() -> None:
     vov, mean = arb_surface.vol_of_vol([0.2, 0.21, 0.2], 252, "ABSOLUTE")
     assert mean == pytest.approx(0.0) and vov == pytest.approx(math.sqrt(252) * math.sqrt(0.0002))
     assert arb_surface.vol_of_vol([0.2, 0.22, 0.2], 252, "LOG")[1] == pytest.approx(0.0, abs=1e-15)
@@ -277,7 +280,7 @@ def test_vol_of_vol():
 
 # --- CLI wiring, schema and limits ---
 
-def test_cli_schema_and_limits():
+def test_cli_schema_and_limits() -> None:
     r = run("vol.garch.loglik", {"returns": [0.01, 0.02], "omega": 1e-5, "alpha": 0.1,
                                  "beta": 0.8, "initial_variance": [1]})
     assert r["error"]["code"] == "E_SCHEMA"
@@ -310,7 +313,7 @@ def test_cli_schema_and_limits():
     ("vol.garch.forecast", {"omega": 1e-5, "alpha": 0.1, "beta": 0.8, "next_variance": 2e-4,
                             "horizon": 3, "periods_per_year": 252}, "annualized_vol"),
 ])
-def test_cli_operations(operation, inputs, key):
+def test_cli_operations(operation, inputs, key) -> None:
     r = run(operation, inputs)
     assert r["status"] == "ok" and key in r["outputs"]
 
@@ -344,6 +347,6 @@ _STRIP_JSON = [dict(zip(("strike", "call_bid", "call_ask", "put_bid", "put_ask")
     ("vol.local.dupire", {"slices": [{"expiry_years": 1.0, "svi": _SVI_JSON}],
                           "points": [{"expiry_years": 0.5, "log_moneyness": 0.0}]}, "local_vol"),
 ])
-def test_cli_more_operations(operation, inputs, key):
+def test_cli_more_operations(operation, inputs, key) -> None:
     r = run(operation, inputs)
     assert r["status"] == "ok" and key in r["outputs"], r

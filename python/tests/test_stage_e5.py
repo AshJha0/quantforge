@@ -22,7 +22,7 @@ def vanilla(kind, s=S, k=K):
     return ex.gbs(1.0 if kind == "CALL" else -1.0, s, k, T, R, R - Q, V)
 
 
-def test_digitals_add_up():
+def test_digitals_add_up() -> None:
     for kind in ("CALL", "PUT"):
         cash = ex.digital(S, K, T, R, Q, V, kind, "CASH_OR_NOTHING", 1.0)
         asset = ex.digital(S, K, T, R, Q, V, kind, "ASSET_OR_NOTHING", 1.0)
@@ -34,20 +34,20 @@ def test_digitals_add_up():
 @pytest.mark.parametrize("kind", ["CALL", "PUT"])
 @pytest.mark.parametrize("k", [90.0, 110.0])
 @pytest.mark.parametrize("h,side", [(80.0, "DOWN"), (120.0, "UP")])
-def test_barrier_in_plus_out_is_vanilla(kind, k, h, side):
+def test_barrier_in_plus_out_is_vanilla(kind, k, h, side) -> None:
     knock_in = ex.barrier(S, k, T, R, Q, V, kind, h, 0.0, f"{side}_IN")
     knock_out = ex.barrier(S, k, T, R, Q, V, kind, h, 0.0, f"{side}_OUT")
     assert knock_in + knock_out == pytest.approx(vanilla(kind, k=k), abs=1e-10)
     assert ex.barrier(S, k, T, R, Q, V, kind, h, 2.0, f"{side}_OUT") > knock_out
 
 
-def test_barrier_errors():
+def test_barrier_errors() -> None:
     assert code(ex.barrier, S, K, T, R, Q, V, "CALL", 100.0, 0.0, "DOWN_IN") == "E_DOMAIN"
     assert code(ex.barrier, S, K, T, R, Q, V, "CALL", 90.0, -1.0, "DOWN_IN") == "E_DOMAIN"
     assert code(ex.barrier, S, K, T, R, Q, V, "CALL", 0.0, 0.0, "DOWN_IN") == "E_DOMAIN"
 
 
-def test_asian_geometric():
+def test_asian_geometric() -> None:
     cont = ex.asian_geometric(S, K, T, R, Q, V, "CALL", "CONTINUOUS", [])
     fine = ex.asian_geometric(S, K, T, R, Q, V, "CALL", "DISCRETE",
                               [i / 2000 for i in range(1, 2001)])
@@ -61,7 +61,7 @@ def test_asian_geometric():
     assert code(f, S, K, T, R, Q, V, "CALL", "DISCRETE", [0.5, 1.5]) == "E_INPUT"
 
 
-def test_lookback():
+def test_lookback() -> None:
     call = ex.lookback(S, T, R, Q, V, "CALL", S)
     put = ex.lookback(S, T, R, Q, V, "PUT", S)
     assert call > vanilla("CALL") and put > vanilla("PUT")
@@ -70,7 +70,7 @@ def test_lookback():
     assert code(ex.lookback, S, T, R, R, V, "CALL", 90.0) == "E_DOMAIN"
 
 
-def test_quanto_chooser_kirk_basket():
+def test_quanto_chooser_kirk_basket() -> None:
     assert ex.quanto(S, K, T, R, 0.03, Q, V, 0.1, 0.0, "CALL") == pytest.approx(
         ex.gbs(1.0, S, K, T, R, 0.03 - Q, V))
     assert code(ex.quanto, S, K, T, R, 0.03, Q, V, 0.1, 1.5, "CALL") == "E_DOMAIN"
@@ -97,7 +97,7 @@ def test_quanto_chooser_kirk_basket():
     assert code(f, [100.0], [1.0], [0.0], [[1.0]], K, T, R, "CALL") == "E_DOMAIN"
 
 
-def test_american_crr_baw_fd_agree():
+def test_american_crr_baw_fd_agree() -> None:
     tree = ex.crr(S, K, T, R, Q, V, "PUT", 500)
     assert tree["european"] == pytest.approx(vanilla("PUT"), abs=2e-2)
     assert tree["early_exercise_premium"] > 0
@@ -132,7 +132,7 @@ COMMON = {"spot": S, "strike": K, "expiry_years": T, "rate": R, "dividend_yield"
     ("exotic.american.baw", {}),
     ("exotic.american.fd", {"exercise": "AMERICAN", "grid": {"nx": 51, "nt": 20, "width": 4.0}}),
 ])
-def test_cli(operation, extra):
+def test_cli(operation, extra) -> None:
     r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
                              "inputs": {**COMMON, **extra}}))
     assert r["status"] == "ok", r
@@ -153,7 +153,7 @@ def test_cli(operation, extra):
                               "option_type": "CALL"}),
     ("exotic.american.crr", {**COMMON, "steps": 20_001}),
 ])
-def test_cli_other(operation, inputs):
+def test_cli_other(operation, inputs) -> None:
     r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
                              "inputs": inputs}))
     expected = "error" if inputs.get("steps") == 20_001 else "ok"

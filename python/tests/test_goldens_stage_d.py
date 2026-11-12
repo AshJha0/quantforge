@@ -16,7 +16,7 @@ ROOT = os.environ.get("QF_GOLDEN_ROOT")
 pytestmark = pytest.mark.skipif(not ROOT, reason="QF_GOLDEN_ROOT is not set")
 
 
-def test_stage_d_goldens():
+def test_stage_d_goldens() -> None:
     root = Path(str(ROOT))
     sys.path.insert(0, str(root / "conformance" / "runner"))
     from runner import judge, load_policy  # type: ignore[import-not-found]

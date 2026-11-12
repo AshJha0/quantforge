@@ -8,6 +8,7 @@ import json
 import math
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -57,20 +58,20 @@ DATES = (date(2026, 11, 6), date(2027, 3, 20), date(2032, 3, 20))
 MARKET = (*DATES, 0.035, 0.02, 0.4)
 
 
-def test_cds_payer_implied_deep_in_the_money():
+def test_cds_payer_implied_deep_in_the_money() -> None:
     # cds_option_implied 57: a payer's upper bound is scale * forward, not scale * strike
     price = ce.cds_option_price(*MARKET, "PAYER", 0.002, 1e7, 0.5, True)["price"]
     assert ce.cds_option_implied(*MARKET, "PAYER", 0.002, 1e7, price, True) == \
         pytest.approx(0.5, rel=1e-6)  # flat in vol deep in the money
 
 
-def test_cds_implied_premium_out_of_bounds_error():
+def test_cds_implied_premium_out_of_bounds_error() -> None:
     # cds_option_implied 66, 68
     assert err(ce.cds_option_implied, *MARKET, "RECEIVER", 0.0096, 1e7, -1.0, True) == \
         ("E_DOMAIN", "premium", "the premium has no implied vol")
 
 
-def test_tranche_and_pool_errors():
+def test_tranche_and_pool_errors() -> None:
     # tranche_loss 8, _check_pool 13
     assert err(ce.tranche_loss, 0.05, 0.3, 0.4, 0.1, 0.1) == \
         ("E_INPUT", "attachment", "need 0 <= attachment < detachment <= 1")
@@ -78,7 +79,7 @@ def test_tranche_and_pool_errors():
         ("E_DOMAIN", "default_probability", "default_probability must be in (0, 1)")
 
 
-def test_tranche_above_the_maximum_loss_is_empty():
+def test_tranche_above_the_maximum_loss_is_empty() -> None:
     # losses never pass 1 - R, so a tranche attaching above it loses nothing
     assert ce.tranche_loss(0.05, 0.3, 0.4, 0.7, 0.9) == pytest.approx(0.0, abs=1e-15)
 
@@ -88,7 +89,7 @@ def test_tranche_above_the_maximum_loss_is_empty():
 S, K, T, R, Q, V = 100.0, 100.0, 1.0, 0.05, 0.02, 0.25
 
 
-def test_exotics_error_messages_and_fields():
+def test_exotics_error_messages_and_fields() -> None:
     # _positive 4, barrier 19, asian_geometric 19, lookback 20 and 25
     assert err(ex.barrier, 0.0, K, T, R, Q, V, "CALL", 90.0, 0.0, "DOWN_OUT") == \
         ("E_DOMAIN", "spot", "spot must be above 0")
@@ -100,7 +101,7 @@ def test_exotics_error_messages_and_fields():
         ("E_DOMAIN", "running_extreme", "running_extreme is on the wrong side of spot")
 
 
-def test_quanto_checks_fx_vol_and_accepts_unit_correlation():
+def test_quanto_checks_fx_vol_and_accepts_unit_correlation() -> None:
     # quanto 10 (fx_vol check dropped), quanto 15 (rho = 1 refused)
     assert err(ex.quanto, S, K, T, R, 0.01, Q, V, 0.0, 0.3, "CALL") == \
         ("E_DOMAIN", "fx_vol", "fx_vol must be above 0")
@@ -108,7 +109,7 @@ def test_quanto_checks_fx_vol_and_accepts_unit_correlation():
     assert ex.quanto(S, K, T, R, 0.01, Q, V, 0.1, -1.0, "CALL") > 0
 
 
-def test_basket_crr_fd_errors():
+def test_basket_crr_fd_errors() -> None:
     # basket 42 and 54, crr 12 and 16, fd 18
     one = [[1.0]]
     assert err(ex.basket, [100.0], [1.0], [0.2], [[2.0]], K, T, R, "CALL") == \
@@ -121,7 +122,7 @@ def test_basket_crr_fd_errors():
         ("E_INPUT", "grid", "nx must be odd and at least 5")
 
 
-def test_fd_european_boundary_uses_the_step_end_time():
+def test_fd_european_boundary_uses_the_step_end_time() -> None:
     # fd 153: the boundary at step n is discounted over (n + 1) dt. A narrow grid makes the
     # boundary matter; one step can be checked against the Thomas solve done here.
     out = ex.fd(S, K, T, R, Q, V, "PUT", "EUROPEAN", 5, 1, 0.5)
@@ -152,7 +153,7 @@ def test_fd_european_boundary_uses_the_step_end_time():
 EUR = (1.10, 0.5, 0.03, 0.02)
 
 
-def test_fx_errors():
+def test_fx_errors() -> None:
     # _positive 6, delta_to_strike 46, 50 and 53, smile_from_quotes 37
     assert err(fx.delta_to_strike, 0.0, 0.5, 0.03, 0.02, 0.1, "CALL", 0.25, "SPOT") == \
         ("E_DOMAIN", "spot", "spot must be above 0")
@@ -162,13 +163,13 @@ def test_fx_errors():
         ("E_DOMAIN", "bf", "call_vol is not above 0")
 
 
-def test_bracket_up_doubles():
+def test_bracket_up_doubles() -> None:
     # _bracket_up 13: the steps are 1, 2, 4, 8, so the first sign change of x - 5 from 0 is 8
     assert fx._bracket_up(lambda x: x - 5.0, 0.0) == 8.0
     assert fx._bracket_up(lambda x: 5.0 - x, 0.0) == 8.0
 
 
-def test_pa_put_with_a_tiny_delta_walks_left(monkeypatch):
+def test_pa_put_with_a_tiny_delta_walks_left(monkeypatch: pytest.MonkeyPatch):
     # delta_to_strike 117: a small PA put delta needs the bracket walked several units left.
     # The mutant (low = 1.0) never leaves the loop, so cap the delta calls to fail fast.
     calls = [0]
@@ -191,7 +192,7 @@ def test_pa_put_with_a_tiny_delta_walks_left(monkeypatch):
 # --- garch_varswap_vix (variance) ---
 
 def _fair(**over):
-    args = {"as_of": date(2026, 11, 6), "maturity": date(2027, 11, 6), "spot": 100.0, "rate": 0.04,
+    args: dict[str, Any] = {"as_of": date(2026, 11, 6), "maturity": date(2027, 11, 6), "spot": 100.0, "rate": 0.04,
             "dividend_yield": 0.0, "put_strikes": [80.0, 90.0, 100.0],
             "call_strikes": [100.0, 110.0, 120.0],
             "vols": [(k, 0.2) for k in (80.0, 90.0, 100.0, 110.0, 120.0)],
@@ -200,7 +201,7 @@ def _fair(**over):
     return variance.varswap_fair_strike(**args)
 
 
-def test_garch_errors():
+def test_garch_errors() -> None:
     # _initial_variance 19, _check_initial_text 7 and 9, _check_weights 20 and 29
     r = [0.01, -0.02, 0.005]
     assert err(variance.garch_loglik, r, 1e-5, 0.1, 0.8, -1.0) == \
@@ -216,7 +217,7 @@ def test_garch_errors():
         ("E_INPUT", "returns", "at least 30 returns are needed")
 
 
-def test_garch_forecast_boundaries():
+def test_garch_forecast_boundaries() -> None:
     # garch_forecast 9, 42 and 46
     f = variance.garch_forecast
     assert err(f, 1e-5, 0.1, 0.8, 2e-4, 0, 252) == ("E_INPUT", "horizon", "horizon must be at least 1")
@@ -227,7 +228,7 @@ def test_garch_forecast_boundaries():
     assert variances == [2e-4, 1e-5] and vol == pytest.approx(math.sqrt(total / 2), rel=1e-15)
 
 
-def test_varswap_negative_spot_field():
+def test_varswap_negative_spot_field() -> None:
     # varswap_fair_strike 69: strikes on the right sides of a negative spot reach the spot check
     out = err(_fair, spot=-1.0, put_strikes=[-2.0], call_strikes=[-0.5],
               vols=[(-2.0, 0.2), (-0.5, 0.2)])
@@ -240,14 +241,14 @@ STRIP = [Quote(90, 10.5, 11.5, 0.5, 0.7), Quote(95, 6.0, 6.6, 1.4, 1.6),
          Quote(110, 0.3, 0.5, 10.0, 11.0)]
 
 
-def test_vix_terms_must_differ():
+def test_vix_terms_must_differ() -> None:
     # vix_index 6: two terms both exactly at 30 days bracket nothing
     n = variance.MINUTES_30D
     assert err(variance.vix_index, (n, 0.0, STRIP), (n, 0.0, STRIP)) == \
         ("E_INPUT", "near", "the terms must bracket 30 days with near before next")
 
 
-def test_vix_negative_interpolated_variance():
+def test_vix_negative_interpolated_variance() -> None:
     # vix_index 38 and 39: K0 = 102 sits far below the forward 129 with tiny prices, so the
     # (F / K0 - 1)^2 term wins and both term variances are negative
     strip = [Quote(101, 50, 50, 0.01, 0.01), Quote(102, 1.5, 1.5, 0, 0),
@@ -263,7 +264,7 @@ H = hm.Heston(0.04, 1.5, 0.04, 0.5, -0.7)
 FLAT = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
 
 
-def test_heston_errors():
+def test_heston_errors() -> None:
     # _input 5, _check_common 6, heston_cf 15
     assert err(hm.heston_cf, 1.0, H, []) == ("E_INPUT", "u", "u is empty")
     assert err(hm.heston_price, 100.0, [], 1.0, 0.0, 0.0, H, "CALL") == \
@@ -272,10 +273,10 @@ def test_heston_errors():
         ("E_DOMAIN", "expiry_years", "expiry_years must be above 0")
 
 
-def test_slv_errors_and_two_time_steps():
+def test_slv_errors_and_two_time_steps() -> None:
     # slv_leverage 8 (nt = 2 refused), 37, 53
     lo, hi = math.log(100) - 1.0, math.log(100) + 1.0
-    out = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, H, FLAT, hm.Grid(11, 5, 2, lo, hi, 0.25))
+    out: dict[str, Any] = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, H, FLAT, hm.Grid(11, 5, 2, lo, hi, 0.25))
     assert len(out["leverage"]) == 11
     grid = hm.Grid(11, 5, 4, lo, hi, 0.25)
     assert err(hm.slv_leverage, 0.0, 1.0, 0.0, 0.0, H, FLAT, grid) == \
@@ -293,7 +294,7 @@ SLV_REF = {"leverage": [0.7567192932516402, 0.694103940389056, 0.715974007324097
            "mass": 0.9719926197335328}
 
 
-def test_slv_reference_values():
+def test_slv_reference_values() -> None:
     # slv_leverage 272, 295 and 334
     lo, hi = math.log(100) - 1.0, math.log(100) + 1.0
     out = hm.slv_leverage(100.0, 1.0, 0.05, 0.01, H, FLAT, hm.Grid(11, 7, 6, lo, hi, 0.25))
@@ -301,19 +302,19 @@ def test_slv_reference_values():
     assert out["mass"] == pytest.approx(SLV_REF["mass"], rel=1e-12)
 
 
-def test_slv_start_density_uses_the_drifted_local_vol():
+def test_slv_start_density_uses_the_drifted_local_vol() -> None:
     # slv_leverage 151: the t = 0 local vol is read at ln S + (r - q) dt; a skewed slice makes
     # the point matter (a flat one does not)
     skew = [arb_surface.Slice(1.0, Svi(0.03, 0.1, -0.5, 0.0, 0.2))]
     lo, hi = math.log(100) - 1.0, math.log(100) + 1.0
-    out = hm.slv_leverage(100.0, 1.0, 0.05, 0.01, H, skew, hm.Grid(11, 7, 6, lo, hi, 0.25))
+    out: dict[str, Any] = hm.slv_leverage(100.0, 1.0, 0.05, 0.01, H, skew, hm.Grid(11, 7, 6, lo, hi, 0.25))
     assert out["leverage"][5] == pytest.approx(0.8221523246794936, rel=1e-12)
     assert out["mass"] == pytest.approx(0.8170518283911051, rel=1e-12)
 
 
 # --- rates_vol ---
 
-def test_cube_alpha_error():
+def test_cube_alpha_error() -> None:
     # price_cube 147
     inputs = _base("rates.swaption.price_cube")
     inputs["cube"]["alpha"][0][0] = 0.0
@@ -326,12 +327,12 @@ def test_cube_alpha_error():
     ({"flat_vols": [0.24]}, ("E_INPUT", "flat_vols", "one flat vol per cap tenor")),  # 35
     ({"start_months": 0}, ("E_INPUT", "start_months", "start_months must be at least 1")),  # 50
 ])
-def test_strip_errors(change, expected):
+def test_strip_errors(change, expected) -> None:
     inputs = dict(_base("rates.cap.strip"), **change)
     assert cli_err("rates.cap.strip", inputs) == expected
 
 
-def test_strip_black_search_bound_is_five():
+def test_strip_black_search_bound_is_five() -> None:
     # cap_strip 143 (Black bound 0.5) and 199 (field of the bound error)
     inputs = _base("rates.cap.strip")
     assert inputs["model"] == "BLACK_76"
@@ -341,14 +342,14 @@ def test_strip_black_search_bound_is_five():
     assert (code, field) == ("E_DOMAIN", "flat_vols")
 
 
-def test_strip_arbitrage_error_field():
+def test_strip_arbitrage_error_field() -> None:
     # cap_strip 199: a steep fall in flat vol needs a negative caplet vol
     inputs = _base("rates.cap.strip")
     n = len(inputs["flat_vols"])
     assert cli_err("rates.cap.strip", dict(inputs, flat_vols=[0.5] + [0.05] * (n - 1))) ==         ("E_ARBITRAGE", "flat_vols", "a caplet segment needs a vol at or below zero")
 
 
-def test_rates_option_errors():
+def test_rates_option_errors() -> None:
     # _futures_option 23 and 26, yoy_price 5, 19 and 21, zc_price 29
     assert err(rates_vol.bondfut_price, "PUT", 111.25, 0.0, 0.1, 0.9962, 0.055, 1e5) == \
         ("E_DOMAIN", "strike", "strike must be above 0")
@@ -361,7 +362,7 @@ def test_rates_option_errors():
         ("E_DOMAIN", "years", "years must be above 0")
 
 
-def test_yoy_black_refuses_a_negative_forward():
+def test_yoy_black_refuses_a_negative_forward() -> None:
     # yoy_price 16: the forward is the third field; the expiry (fourth) is positive here
     period = (1.0, 0.96, -0.005, 0.75, 0.35)
     assert err(rates_vol.yoy_price, "BLACK_76", "CAP", 0.03, 1e7, [period])[:2] == \
@@ -373,7 +374,7 @@ def test_yoy_black_refuses_a_negative_forward():
 SVI = Svi(0.02, 0.1, -0.4, 0.02, 0.2)
 
 
-def test_surface_errors():
+def test_surface_errors() -> None:
     # check_slices_input 3, check_slices 11, _check 108
     assert err(arb_surface.surface_check, [], [0.0], True) == ("E_INPUT", "slices", "slices is empty")
     assert err(arb_surface.surface_check, [arb_surface.Slice(-1.0, SVI)], [0.0], True) == \
@@ -383,14 +384,14 @@ def test_surface_errors():
         ("E_ARBITRAGE", "slices", "the surface has arbitrage")
 
 
-def test_dupire_forward_vol_errors():
+def test_dupire_forward_vol_errors() -> None:
     # dupire 4 and 10, forward_vols 14
     assert err(arb_surface.dupire, [arb_surface.Slice(1.0, SVI)], []) == ("E_INPUT", "points", "points is empty")
     assert err(arb_surface.forward_vols, [1.0, 0.5], [0.2, 0.2]) == \
         ("E_INPUT", "expiry_years", "expiry_years must be strictly increasing")
 
 
-def test_smile_dynamics_errors_and_call_delta():
+def test_smile_dynamics_errors_and_call_delta() -> None:
     # smile_dynamics 13, 26, 33 and 68
     f = arb_surface.smile_dynamics
     args = (SVI, 1.0, 100.0, 101.0, 0.02, 0.01, [100.0], "STICKY_STRIKE", "CALL")
@@ -406,7 +407,7 @@ def test_smile_dynamics_errors_and_call_delta():
     assert call["prices_base"][0] - put["prices_base"][0] == pytest.approx(parity, rel=1e-12)
 
 
-def test_vol_of_vol_by_hand():
+def test_vol_of_vol_by_hand() -> None:
     # vol_of_vol 51: changes 1, 2, 1 have mean 4/3 and sample variance 1/3
     vov, mean = arb_surface.vol_of_vol([1.0, 2.0, 4.0, 5.0], 4.0, "ABSOLUTE")
     assert mean == pytest.approx(4 / 3, rel=1e-15)

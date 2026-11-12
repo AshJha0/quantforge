@@ -1,5 +1,6 @@
 """Stage F waves 2 and 3: limit cases from the specs."""
 from datetime import date
+from typing import Any
 
 from quantforge_core import book, book_risk, var_risk
 from quantforge_core.ois import Quote
@@ -61,9 +62,9 @@ def test_reversal_opens_at_trade_price() -> None:
 def test_attribution_identity() -> None:
     f = [[0.01 * k, 0.003 * (k % 3)] for k in range(12)]
     y = [0.002 + 0.5 * a - 0.2 * b + 0.0001 * (k % 2) for k, (a, b) in enumerate(f)]
-    out = book.factor_attribution(y, f, ["A", "B"])
-    total = out["alpha"] + sum(out["contributions"])  # type: ignore[arg-type,operator]
-    assert abs(total - out["mean_return"]) < 1e-15  # type: ignore[operator]
+    out: dict[str, Any] = book.factor_attribution(y, f, ["A", "B"])
+    total = out["alpha"] + sum(out["contributions"])
+    assert abs(total - out["mean_return"]) < 1e-15
 
 
 def test_tokens_only_in_real_fields() -> None:

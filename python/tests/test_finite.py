@@ -4,7 +4,7 @@ import inspect
 import math
 import pkgutil
 from dataclasses import dataclass
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import numpy as np
 import pytest
@@ -36,29 +36,29 @@ def _public_functions():
 PUBLIC = sorted(_public_functions(), key=lambda t: (t[0], t[1]))
 
 
-def test_there_are_public_functions_to_check():
+def test_there_are_public_functions_to_check() -> None:
     assert len(PUBLIC) > 150
 
 
 @pytest.mark.parametrize(("module", "name", "f"), PUBLIC, ids=[f"{m}.{n}" for m, n, _ in PUBLIC])
-def test_every_public_function_is_guarded(module, name, f):
+def test_every_public_function_is_guarded(module, name, f) -> None:
     assert hasattr(f, "__wrapped__"), f"{module}.{name} is not guarded"
 
 
 @pytest.mark.parametrize(("module", "name", "f"), PUBLIC, ids=[f"{m}.{n}" for m, n, _ in PUBLIC])
-def test_each_input_rejects_nan_and_infinity_first(module, name, f):
+def test_each_input_rejects_nan_and_infinity_first(module, name, f) -> None:
     params = [p for p in inspect.signature(f).parameters.values()
               if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
     for k, p in enumerate(params):
         for bad in BAD:
-            args = [None] * len(params)
+            args: list[object] = [None] * len(params)
             args[k] = bad
             with pytest.raises(QfError) as e:
                 f(*args)
             assert (e.value.code, e.value.field) == ("E_DOMAIN", p.name)
 
 
-def test_nested_values_are_walked():
+def test_nested_values_are_walked() -> None:
     @dataclass
     class Box:
         x: float
@@ -87,14 +87,14 @@ def test_nested_values_are_walked():
     assert finite.bad_field([1.0, 2.0]) is None
 
 
-def test_negative_zero_is_a_number():
+def test_negative_zero_is_a_number() -> None:
     option = black.Option(black.BLACK_SCHOLES, "CALL", 100.0, 1.0, 100.0, 0.0, -0.0)
     assert black.price(option, 0.2) == black.price(
         black.Option(black.BLACK_SCHOLES, "CALL", 100.0, 1.0, 100.0, 0.0, 0.0), 0.2)
 
 
 @pytest.mark.parametrize("bad", BAD)
-def test_dataclass_input_field(bad):
+def test_dataclass_input_field(bad) -> None:
     option = black.Option(black.BLACK_SCHOLES, "CALL", bad, 1.0, 100.0)
     with pytest.raises(QfError) as e:
         black.price(option, 0.2)
@@ -106,7 +106,7 @@ def test_keyword_inputs_and_var_positional():
         return a
 
     f.__module__ = "m"
-    namespace = {"__name__": "m", "f": f, "_private": f}
+    namespace: dict[str, Any] = {"__name__": "m", "f": f, "_private": f}
     finite.guard(namespace)
     g = namespace["f"]
     assert namespace["_private"] is f
@@ -129,7 +129,7 @@ def test_inner_calls_are_not_checked_again():
         return namespace["inner"](math.inf) + x
 
     inner.__module__ = outer.__module__ = "m"
-    namespace = {"__name__": "m", "inner": inner, "outer": outer}
+    namespace: dict[str, Any] = {"__name__": "m", "inner": inner, "outer": outer}
     finite.guard(namespace)
     assert namespace["outer"](1.0) == math.inf
     assert seen == [math.inf]
@@ -137,12 +137,12 @@ def test_inner_calls_are_not_checked_again():
         namespace["inner"](math.nan)
 
 
-def test_flag_cleared_after_an_error():
-    def boom(x):
+def test_flag_cleared_after_an_error() -> None:
+    def boom(x) -> None:
         raise QfError("E_INPUT", "no")
 
     boom.__module__ = "m"
-    namespace = {"__name__": "m", "boom": boom}
+    namespace: dict[str, Any] = {"__name__": "m", "boom": boom}
     finite.guard(namespace)
     with pytest.raises(QfError):
         namespace["boom"](1.0)

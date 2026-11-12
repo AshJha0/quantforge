@@ -185,9 +185,10 @@ def split_reference(a: Any, b: Any, w: Any, spread: Any, impact: Any, weight: fl
             cons.append({"type": "ineq", "fun": lambda z, j=j: z[j] - z[n + j] - lower[j]})
         if upper is not None and upper[j] is not None:
             cons.append({"type": "ineq", "fun": lambda z, j=j: upper[j] - z[j] + z[n + j]})
-    res = minimize(f, np.zeros(2 * n), method="SLSQP", bounds=[(0, None)] * (2 * n),
+    res: Any = minimize(f, np.zeros(2 * n), method="SLSQP", bounds=[(0, None)] * (2 * n),  # type: ignore[call-overload]
                    constraints=cons, options={"ftol": 1e-15, "maxiter": 1000})
-    return res.x[:n] - res.x[n:]
+    x: np.ndarray = res.x[:n] - res.x[n:]
+    return x
 
 
 def test_costly_instrument_is_left_out_exactly() -> None:

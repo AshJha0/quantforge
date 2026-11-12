@@ -14,13 +14,13 @@ def _stepped(seed, stream, skip, count):
     return [g.next_u64() for _ in range(count)]
 
 
-def test_polynomial_advance_matches_stepping():
+def test_polynomial_advance_matches_stepping() -> None:
     for seed, stream, skip in [(1, 0, 0), (7, 0, 511), (7, 0, 512), (7, 3, 0), (2**64 - 1, 1023, 9999),
                                (42, 1, 70000)]:
         assert rng.next_u64(seed, stream, 4, skip) == _stepped(seed, stream, skip, 4)
 
 
-def test_batch_normals_match_single_draws():
+def test_batch_normals_match_single_draws() -> None:
     a, b = rng.Xoshiro256.seeded(3, 2), rng.Xoshiro256.seeded(3, 2)
     assert [a.normal() for _ in range(2000)] == b.normals(2000)
     assert a.s == b.s
@@ -45,7 +45,7 @@ def _old_depth_ok(text, limit):
     return True
 
 
-def test_depth_scan_matches_character_scan():
+def test_depth_scan_matches_character_scan() -> None:
     r = random.Random(5)
     for _ in range(50000):
         text = "".join(r.choice('[]{}"\a,') for _ in range(r.randint(0, 30)))
@@ -58,13 +58,13 @@ def test_depth_scan_matches_character_scan():
         assert ok == _old_depth_ok(text, limit), (text, limit)
 
 
-def test_int_parsing_and_overflow():
+def test_int_parsing_and_overflow() -> None:
     assert strictjson.parse("1" * 299) == (int("1" * 299), False)
     assert strictjson.parse("9" * 400)[1] is True
     assert strictjson.parse("-17") == (-17, False)
 
 
-def test_cal_shim_matches_stdlib():
+def test_cal_shim_matches_stdlib() -> None:
     import calendar
     for y in (1900, 2000, 2023, 2024, 2100):
         assert _cal.isleap(y) == calendar.isleap(y)

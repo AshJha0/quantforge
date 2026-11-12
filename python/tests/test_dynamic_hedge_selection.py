@@ -261,3 +261,23 @@ def test_weekly_rebalancing_pays_less_than_daily() -> None:
 @pytest.mark.parametrize("change", [{"half_spread": -0.01}, {"impact": -1.0}])
 def test_negative_costs_are_refused(change: dict[str, float]) -> None:
     assert code(run, **change) == "E_DOMAIN"
+
+
+def test_select_rejects_crossed_bounds_and_bad_counts() -> None:
+    a, b, w = [[1.0, 0.0], [0.0, 1.0]], [-1.0, -2.0], [1.0, 1.0]
+    with pytest.raises(QfError) as e:
+        hs.select_solve(a, b, w, 1, lower=[0.5, None], upper=[0.2, None])
+    assert (e.value.code, e.value.field) == ("E_DOMAIN", "lower")
+    for k in (0, 3):
+        with pytest.raises(QfError) as e:
+            hs.select_solve(a, b, w, k)
+        assert (e.value.code, e.value.field) == ("E_INPUT", "max_instruments")
+    with pytest.raises(QfError) as e:
+        hs.select_solve(a, b, w, 1, lower=[0.0])
+    assert (e.value.code, e.value.field) == ("E_INPUT", "lower")
+    # selection holds dropped instruments at 0, so every bound must admit 0 (ruling I-33)
+    with pytest.raises(QfError) as e:
+        hs.select_solve(a, b, w, 2, lower=[0.5, None], upper=[0.5, None])
+    assert (e.value.code, e.value.field) == ("E_DOMAIN", "lower")
+    out = hs.select_solve(a, b, w, 2, lower=[-0.5, None], upper=[0.5, None])
+    assert out["x"][0] == pytest.approx(0.5)  # unconstrained 1.0 clipped at the upper bound
