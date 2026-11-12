@@ -7,6 +7,7 @@
 
 #include "quantforge/core/error.hpp"
 #include "quantforge/core/var_frtb.hpp"
+#include "dispatch.hpp"
 #include "quantforge/core/rng.hpp"
 
 using namespace quantforge;
@@ -20,13 +21,17 @@ std::string f4_code_of(F f) {
 bool near(double a, double b, double tol) { return std::fabs(a - b) <= tol * std::max(1.0, std::fabs(b)); }
 }  // namespace
 
-TEST_CASE("historical VaR: third largest of 250 at 99%, ES includes it", "[f4]") {
+TEST_CASE("historical VaR: third largest of 250 at 99%; ES by R6-3.1 (Acerbi-Tasche, w = 2.5)", "[f4]") {
     std::vector<double> pnl(250);
     for (std::size_t i = 0; i < 250; ++i) pnl[i] = -double(i + 1);  // losses 1..250
     const VarResult r = var_historical(pnl, 0.99);
     CHECK(r.var == 248.0);
     CHECK(r.tail_count == 3);
-    CHECK(r.es == 249.0);
+    CHECK(near(r.es, (250.0 + 249.0 + 0.5 * 248.0) / 2.5, 1e-12));  // hand value 249.2
+    const VarResult r8 = var_historical({-1, -2, -3, -4, -5, -6, -7, -8}, 0.75);  // w = 2 exactly: an integer tail
+    CHECK(r8.tail_count == 2);
+    CHECK(r8.es == 7.5);
+    CHECK(var_historical({-7.0, -3.0}, 0.5).es == 7.0);  // w = 1: the largest loss
     CHECK(f4_code_of([] { var_historical({}, 0.99); }) == "E_INPUT");
     CHECK(f4_code_of([] { var_historical({1.0}, 1.0); }) == "E_DOMAIN");
     CHECK(f4_code_of([] { var_historical({1.0}, 0.4); }) == "E_DOMAIN");
@@ -106,4 +111,35 @@ TEST_CASE("GIRR delta: one tenor gives RW |s|, high binds", "[f4]") {
               frtb_girr_delta({{"USD", "S", GirrFactor::T5, 1}, {"USD", "S", GirrFactor::T5, 1}}, false, std::nullopt);
           }) == "E_INPUT");
     CHECK(f4_code_of([] { frtb_girr_delta({}, false, std::nullopt); }) == "E_INPUT");
+}
+
+TEST_CASE("R6-4.1 sbm_total sums classes within a scenario, then takes the worst (hand values)", "[r6]") {
+    const auto run = [](const std::string& components) {
+        return cli::run_case(R"({"schema_version":"1.0","case_id":"t","operation":"risk.frtb.sbm_total","inputs":{"components":)" +
+                             components + "}}")
+            .json;
+    };
+    // GIRR binds high (10 > 8 > 6), FX binds low (2 < 4 < 9). Totals: high 12, medium 12, low 15: low binds at 15,
+    // below the 10 + 9 = 19 that adding each class's own capital gives.
+    const std::string r = run(R"([{"risk_class":"GIRR","measure":"DELTA","scenarios":{"high":10,"medium":8,"low":6}},)"
+                              R"({"risk_class":"FX","measure":"DELTA","scenarios":{"high":2,"medium":4,"low":9}}])");
+    CHECK(r.find(R"("scenario_totals":{"high":12,"medium":12,"low":15})") != std::string::npos);
+    CHECK(r.find(R"("capital":15)") != std::string::npos);
+    CHECK(r.find(R"("binding_scenario":"low")") != std::string::npos);
+    CHECK(r.find(R"("sum_of_component_capitals":19)") != std::string::npos);
+    // Ties go to the first of high, medium, low.
+    CHECK(run(R"([{"risk_class":"EQ","measure":"VEGA","scenarios":{"high":3,"medium":3,"low":3}}])").find(R"("binding_scenario":"high")") !=
+          std::string::npos);
+    const auto code = [&](const std::string& c) {
+        const std::string j = run(c);
+        const auto p = j.find(R"("code":")");
+        return p == std::string::npos ? std::string("ok") : j.substr(p + 8, j.find('"', p + 8) - p - 8);
+    };
+    CHECK(code("[]") == "E_INPUT");
+    CHECK(code(R"([{"risk_class":"DRC","measure":"DELTA","scenarios":{"high":1,"medium":1,"low":1}}])") == "E_SCHEMA");
+    CHECK(code(R"([{"risk_class":"FX","measure":"DELTA","scenarios":{"high":1,"medium":1}}])") == "E_SCHEMA");
+    CHECK(code(R"([{"risk_class":"FX","measure":"DELTA","scenarios":{"high":-1,"medium":1,"low":1}}])") == "E_DOMAIN");
+    CHECK(code(R"([{"risk_class":"FX","measure":"DELTA","scenarios":{"high":"NaN","medium":1,"low":1}}])") == "E_DOMAIN");
+    CHECK(code(R"([{"risk_class":"FX","measure":"DELTA","scenarios":{"high":1,"medium":1,"low":1}},)"
+               R"({"risk_class":"FX","measure":"DELTA","scenarios":{"high":1,"medium":1,"low":1}}])") == "E_INPUT");
 }

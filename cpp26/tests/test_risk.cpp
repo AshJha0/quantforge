@@ -130,8 +130,8 @@ double zr(const Curve& c, Date x) { return -std::log(c.discount(x)) / c.time(x);
 }  // namespace
 
 // R6 finding 3 (review 2026-11-12): under a non-local interpolation a pillar's zero rate moves with later quotes, so
-// the Jacobian above the diagonal is not zero. Hidden reproducer, run with "[r6-repro]"; it fails while the mask stands.
-TEST_CASE("R6 finding 3 reproducer: Jacobian upper triangle against a central difference", "[.][r6-repro]") {
+// the Jacobian above the diagonal is not zero. Failed while the mask stood (reproduced 2026-11-12); fixed by R6-1.1.
+TEST_CASE("R6-1.1: Jacobian upper triangle matches a central difference under monotone convex", "[r6]") {
     const auto q = quotes();
     const ZeroJacobian j = zero_jacobian(sofr_conv(), as_of_date(), q, CurveInterpolation::MonotoneConvex, 1.0);
     double worst = 0.0;
@@ -148,5 +148,6 @@ TEST_CASE("R6 finding 3 reproducer: Jacobian upper triangle against a central di
             CHECK(std::fabs(j.jacobian[row][col] - fd) <= 1e-8);
         }
     }
+    CHECK(worst > 1e-3);  // the review saw 0.011 at row 0, column 1
     std::printf("R6 finding 3: largest upper-triangle central difference %.3e bp per bp\n", worst);
 }

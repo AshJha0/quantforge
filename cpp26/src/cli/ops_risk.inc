@@ -161,11 +161,12 @@ void op_risk_jacobian(const In& in, Out& out) {
     const auto raw = quotes_of(in);
     const auto interpolation = in.choice("interpolation", curve_interpolations);
     const double bump = bump_of(in);
+    const CurveShape shape = curve_shape_of(in);  // R6-1.2
     in.ready();
     const auto quotes = checked_quotes(raw);
     check_bump(bump);
     check_crossed(raw);
-    const ZeroJacobian j = zero_jacobian(*c, as_of, quotes, interpolation, bump);
+    const ZeroJacobian j = zero_jacobian(*c, as_of, quotes, interpolation, bump, shape);
     out.values.key("pillar_dates");
     out.values.begin_array();
     for (const Date d : j.pillar_dates) out.values.string(format_date(d));
