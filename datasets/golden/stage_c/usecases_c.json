@@ -324,6 +324,10 @@
     "absolute": 0.002,
     "relative": 1e-07,
     "reason": "SVI fit on quotes: 1e-6 in parameters carried through vega near 1400 by quantity 3"
+   },
+   "output_classes": {
+    "forwards": "per_unit",
+    "vol": "per_unit"
    }
   },
   {

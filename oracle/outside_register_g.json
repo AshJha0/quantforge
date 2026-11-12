@@ -6,7 +6,7 @@
  "rule": "11.2.5 and G-4: every output is a QuantLib value (discountBond, discountBondOption, the curve discount) or plain arithmetic on one (zero_rate)",
  "barrier_g": {
   "counted": 2,
-  "total": 38,
+  "total": 37,
   "rule": "continuous-monitoring rows only; the BGK rows have MC evidence, not an outside library value"
  },
  "swaption_g": {

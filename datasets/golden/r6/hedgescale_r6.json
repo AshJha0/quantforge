@@ -1,0 +1,301 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgescale_r6",
+ "spec": "specifications/08-hedging/hedge-solvers.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_r6_w3.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgescale_r6-0001",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      20000000.0
+     ],
+     [
+      0.3,
+      1.2,
+      40000000.0
+     ],
+     [
+      0.1,
+      0.6,
+      150000000.0
+     ],
+     [
+      0.8,
+      0.2,
+      90000000.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9
+    ],
+    "weights": [
+     1.0,
+     2.0,
+     0.5,
+     1.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      1.1388764542354965,
+      -0.991150277234918,
+      -5.71207574454616e-09
+     ],
+     "residual": [
+      -1.4709401992728857,
+      0.42379957380690103,
+      -2.037613882599325,
+      1.0987842909322594
+     ],
+     "objective": 6.409802771634788,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-40 normal equations"
+   ],
+   "tags": [
+    "r6",
+    "hedge",
+    "qp",
+    "scaling",
+    "synthetic"
+   ],
+   "description": "column 3 in units 1e8 times larger (bp against currency): unscaled eigenvalue ratio 3.8e-17 (was E_SINGULAR), scaled 1.5e-01 (R6-6.2)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "R6-6.2: positions differ by up to 1e10 in size; relative"
+   }
+  },
+  {
+   "case_id": "hedgescale_r6-0002",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1e-05,
+      0.5,
+      20000.0
+     ],
+     [
+      3e-06,
+      1.2,
+      40000.0
+     ],
+     [
+      1.0000000000000002e-06,
+      0.6,
+      150000.0
+     ],
+     [
+      8.000000000000001e-06,
+      0.2,
+      90000.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      98342.92119089929,
+      -0.840798340007925,
+      8.142468780412685e-07
+     ],
+     "residual": [
+      -1.4206850205341441,
+      0.8186406306848387,
+      -0.9839990511076653,
+      1.5918659205493237
+     ],
+     "objective": 6.190809651365304,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-40 normal equations"
+   ],
+   "tags": [
+    "r6",
+    "hedge",
+    "qp",
+    "scaling",
+    "synthetic"
+   ],
+   "description": "columns at 1e-5 and 1e5: unscaled eigenvalue ratio 3.5e-21 (was E_SINGULAR), scaled 1.7e-01 (R6-6.2)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "R6-6.2: positions differ by up to 1e10 in size; relative"
+   }
+  },
+  {
+   "case_id": "hedgescale_r6-0003",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      50000000.0,
+      0.2
+     ],
+     [
+      0.3,
+      120000000.0,
+      0.4
+     ],
+     [
+      0.1,
+      60000000.0,
+      1.5
+     ],
+     [
+      0.8,
+      20000000.0,
+      0.9
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9
+    ],
+    "weights": [
+     0.001,
+     1.0,
+     10.0,
+     1000.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "x": [
+      -2.018924814623502,
+      -1.0886891625196797e-08,
+      1.0365361833584805
+     ],
+     "residual": [
+      -4.3559621592116455,
+      0.002510033932726055,
+      -0.00030170393643720004,
+      4.880819894788787e-06
+     ],
+     "objective": 0.01898164067788268,
+     "rank": 3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-40 normal equations"
+   ],
+   "tags": [
+    "r6",
+    "hedge",
+    "qp",
+    "scaling",
+    "synthetic"
+   ],
+   "description": "weights 1e-3 to 1e3 and a column at 1e8: unscaled eigenvalue ratio 7.6e-18 (was E_SINGULAR), scaled 1.4e-03 (R6-6.2)",
+   "output_classes": {
+    "rank": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "reason": "R6-6.2: positions differ by up to 1e10 in size; relative"
+   }
+  },
+  {
+   "case_id": "hedgescale_r6-0004",
+   "operation": "hedge.qp.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.5,
+      1000000.0
+     ],
+     [
+      0.3,
+      1.2,
+      300000.0
+     ],
+     [
+      0.1,
+      0.6,
+      100000.0
+     ],
+     [
+      0.8,
+      0.2,
+      800000.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     1.5,
+     -0.7,
+     0.9
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "r6",
+    "hedge",
+    "qp",
+    "scaling",
+    "invalid",
+    "synthetic"
+   ],
+   "description": "column 3 is 1e6 times column 1: singular before and after scaling"
+  }
+ ]
+}
