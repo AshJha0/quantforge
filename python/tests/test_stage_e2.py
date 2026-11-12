@@ -2,6 +2,7 @@
 test_conformance.py."""
 import json
 import math
+from typing import Any
 
 import pytest
 
@@ -25,7 +26,7 @@ def _bs(phi, s, k, t, r, q, v):
     return hm._bs(phi, s, k, t, r, q, v)
 
 
-def test_cf_martingale_and_errors():
+def test_cf_martingale_and_errors() -> None:
     assert hm.heston_phi(H, 1.0)(-1j) == pytest.approx(1.0, abs=1e-14)
     re, im = hm.heston_cf(1.0, H, [0.0, 1.0])
     assert (re[0], im[0]) == (1.0, 0.0)
@@ -34,7 +35,7 @@ def test_cf_martingale_and_errors():
     assert code(hm.heston_cf, 1.0, H, [-1.0]) == "E_DOMAIN"
 
 
-def test_heston_parity_and_small_xi_limit():
+def test_heston_parity_and_small_xi_limit() -> None:
     calls = hm.heston_price(100.0, KS, 1.0, 0.03, 0.01, H, "CALL")
     puts = hm.heston_price(100.0, KS, 1.0, 0.03, 0.01, H, "PUT")
     for k, c, p in zip(KS, calls, puts, strict=True):
@@ -48,12 +49,12 @@ def test_heston_parity_and_small_xi_limit():
 
 @pytest.mark.parametrize("field,value", [("v0", 0.0), ("kappa", 0.0), ("theta", 0.0),
                                          ("xi", 0.0), ("rho", 1.0)])
-def test_heston_domain(field, value):
+def test_heston_domain(field, value) -> None:
     bad = hm.Heston(**{**H.__dict__, field: value})
     assert code(hm.heston_price, 100.0, KS, 1.0, 0.0, 0.0, bad, "CALL") == "E_DOMAIN"
 
 
-def test_common_checks():
+def test_common_checks() -> None:
     f = hm.heston_price
     assert code(f, 100.0, [], 1.0, 0.0, 0.0, H, "CALL") == "E_INPUT"
     assert code(f, 0.0, KS, 1.0, 0.0, 0.0, H, "CALL") == "E_DOMAIN"
@@ -87,16 +88,16 @@ FLAT = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
 GRID = hm.Grid(41, 20, 20, math.log(100) - 1.0, math.log(100) + 1.0, 0.25)
 
 
-def test_slv_flat_vol_zero_correlation_leverage_near_one():
+def test_slv_flat_vol_zero_correlation_leverage_near_one() -> None:
     h = hm.Heston(0.04, 2.0, 0.04, 0.3, 0.0)
-    out = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, h, FLAT, GRID)
+    out: dict[str, Any] = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, h, FLAT, GRID)
     lev, xs = out["leverage"], out["x"]
     i = min(range(len(xs)), key=lambda n: abs(xs[n] - math.log(100)))
     assert lev[i] == pytest.approx(1.0, abs=0.03)
     assert 0.95 < out["mass"] < 1.01
 
 
-def test_slv_errors():
+def test_slv_errors() -> None:
     h = hm.Heston(0.04, 2.0, 0.04, 0.3, -0.7)
     f = hm.slv_leverage
     assert code(f, 0.0, 1.0, 0, 0, h, FLAT, GRID) == "E_DOMAIN"
@@ -130,12 +131,12 @@ COMMON = {"spot": 100.0, "strikes": [100.0], "expiry_years": 1.0, "rate": 0.03,
                           "grid": {"nx": 11, "nv": 6, "nt": 3, "x_min": 4.0, "x_max": 5.2,
                                    "v_max": 0.2}}, "leverage"),
 ])
-def test_cli(operation, inputs, key):
+def test_cli(operation, inputs, key) -> None:
     r = _run(operation, inputs)
     assert r["status"] == "ok" and key in r["outputs"], r
 
 
-def test_cli_slv_limit():
+def test_cli_slv_limit() -> None:
     r = _run("vol.slv.leverage", {"spot": 100.0, "expiry_years": 1.0, "rate": 0.0,
                                   "dividend_yield": 0.0, "heston": HJ, "slices": [],
                                   "grid": {"nx": 1001, "nv": 6, "nt": 3, "x_min": 4.0,

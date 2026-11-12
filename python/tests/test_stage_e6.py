@@ -18,7 +18,7 @@ def code(f, *args):
     return e.value.code
 
 
-def test_validate_higham_example():
+def test_validate_higham_example() -> None:
     out = corr.validate(HIGHAM)
     assert out["min_eigenvalue"] == pytest.approx(1 - math.sqrt(2), abs=1e-12)
     assert (out["symmetric"], out["unit_diagonal"], out["in_range"]) == (True, True, True)
@@ -29,7 +29,7 @@ def test_validate_higham_example():
     assert code(corr.validate, [[1.0, 0.0]]) == "E_INPUT"
 
 
-def test_nearest_higham_example():
+def test_nearest_higham_example() -> None:
     x, distance = corr.nearest(HIGHAM)
     assert x[0][1] == pytest.approx(0.760690, abs=2e-6)
     assert x[0][2] == pytest.approx(0.157298, abs=2e-6)
@@ -41,7 +41,7 @@ def test_nearest_higham_example():
     assert code(corr.nearest, [[1.0, 0.5], [0.4, 1.0]]) == "E_INPUT"
 
 
-def test_implied_and_dispersion_examples():
+def test_implied_and_dispersion_examples() -> None:
     assert corr.implied([0.5, 0.5], [0.2, 0.3], 0.22) == pytest.approx(0.53, rel=1e-12)
     assert corr.implied([0.5, 0.5], [0.2, 0.3], 0.30) > 1  # not clipped (E-B20)
     assert code(corr.implied, [1.0], [0.2], 0.2) == "E_INPUT"
@@ -66,13 +66,13 @@ def test_implied_and_dispersion_examples():
                               "index_vol_strike": 0.24, "realized_vols": [0.28, 0.35],
                               "index_realized_vol": 0.22, "vega_notional": 1e5}, "pnl"),
 ])
-def test_cli(operation, inputs, key):
+def test_cli(operation, inputs, key) -> None:
     r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
                              "inputs": inputs}))
     assert r["status"] == "ok" and key in r["outputs"], r
 
 
-def test_implied_weights_rule():  # ruling E-B33
+def test_implied_weights_rule() -> None:  # ruling E-B33
     three = corr.implied([0.5, 0.0, 0.5], [0.2, 0.9, 0.3], 0.22)
     assert three == pytest.approx(corr.implied([0.5, 0.5], [0.2, 0.3], 0.22), rel=1e-15)
     assert code(corr.implied, [0.5, -0.1], [0.2, 0.3], 0.22) == "E_DOMAIN"

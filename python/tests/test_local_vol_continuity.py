@@ -28,7 +28,7 @@ def _point(slices, t, k):
 
 @pytest.mark.parametrize("slices", [SLICES, TWO], ids=["three", "two"])
 @pytest.mark.parametrize("k", KS)
-def test_w_and_vol_continuous_and_local_vol_jump(slices, k):
+def test_w_and_vol_continuous_and_local_vol_jump(slices, k) -> None:
     for j, s in enumerate(slices):
         t = s.expiry_years
         left, node, right = (_point(slices, t * f, k) for f in (1 - 1e-9, 1.0, 1 + 1e-9))
@@ -52,7 +52,7 @@ def test_w_and_vol_continuous_and_local_vol_jump(slices, k):
 
 
 @pytest.mark.parametrize("k", KS)
-def test_local_vol_smooth_inside_intervals(k):
+def test_local_vol_smooth_inside_intervals(k) -> None:
     edges = [0.0] + [s.expiry_years for s in SLICES] + [3.0]
     for a, b in itertools.pairwise(edges):
         for f in (0.1, 0.3, 0.5, 0.7, 0.9):

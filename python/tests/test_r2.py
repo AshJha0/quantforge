@@ -1,5 +1,6 @@
 """R2: par and key-rate risk, the Jacobian, P&L explain (06-risk/par-and-key-rate.md, pnl-explain.md)."""
 from datetime import date
+from typing import Any
 
 import pytest
 
@@ -26,9 +27,9 @@ def _code(f, *args):
     return e.value.code, e.value.field
 
 
-def test_par_signs_and_bucket_sum():
-    rec = R.par(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois(), 1.0, "CENTRAL")
-    pay = R.par(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois("PAY"), 1.0, "CENTRAL")
+def test_par_signs_and_bucket_sum() -> None:
+    rec: dict[str, Any] = R.par(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois(), 1.0, "CENTRAL")
+    pay: dict[str, Any] = R.par(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois("PAY"), 1.0, "CENTRAL")
     assert rec["par_dv01"] < 0 < pay["par_dv01"]
     assert rec["par_dv01"] == pytest.approx(-pay["par_dv01"], rel=1e-12)
     assert sum(rec["par_buckets"]) == pytest.approx(rec["par_dv01"], rel=1e-4)
@@ -39,10 +40,10 @@ def test_par_signs_and_bucket_sum():
     assert fwd["par_dv01"] == pytest.approx(rec["par_dv01"], rel=1e-3)
 
 
-def test_bond_risk_is_negative_and_scales_with_notional():
-    a = R.par(AS_OF, "SOFR", QUOTES, "LINEAR_ZERO", BOND, 1.0, "CENTRAL")
+def test_bond_risk_is_negative_and_scales_with_notional() -> None:
+    a: dict[str, Any] = R.par(AS_OF, "SOFR", QUOTES, "LINEAR_ZERO", BOND, 1.0, "CENTRAL")
     big = R.Product("BOND", bond=BOND.bond, settlement=AS_OF, notional=2e6)
-    b = R.par(AS_OF, "SOFR", QUOTES, "LINEAR_ZERO", big, 1.0, "CENTRAL")
+    b: dict[str, Any] = R.par(AS_OF, "SOFR", QUOTES, "LINEAR_ZERO", big, 1.0, "CENTRAL")
     assert a["par_dv01"] < 0
     assert b["value"] == pytest.approx(2 * a["value"], rel=1e-14)
     assert b["par_dv01"] == pytest.approx(2 * a["par_dv01"], rel=1e-12)
@@ -58,40 +59,40 @@ def _curve():
     ("TRIANGULAR", [date(2030, 1, 6)]),
     ("PILLAR", None),
 ])
-def test_key_rates_sum_to_zero_dv01(mode, keys):
-    out = R.key_rate(_curve(), mode, keys, _ois(), 1.0, "CENTRAL")
+def test_key_rates_sum_to_zero_dv01(mode, keys) -> None:
+    out: dict[str, Any] = R.key_rate(_curve(), mode, keys, _ois(), 1.0, "CENTRAL")
     assert sum(out["key_rates"]) == pytest.approx(out["zero_dv01"], rel=1e-6)
     assert len(out["key_rates"]) == (len(keys) if keys else 3)
 
 
-def test_triangle_weights_sum_to_one():
+def test_triangle_weights_sum_to_one() -> None:
     keys = [1.0, 3.0, 7.0]
     for t in (0.0, 0.5, 1.0, 2.2, 3.0, 5.0, 7.0, 30.0):
         assert sum(R._triangle(keys, i)(t) for i in range(3)) == pytest.approx(1.0, abs=1e-15)
 
 
-def test_jacobian_is_lower_triangular_with_unit_diagonal_scale():
-    out = R.jacobian(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", 1.0)
-    j = out["jacobian"]
+def test_jacobian_is_lower_triangular_with_unit_diagonal_scale() -> None:
+    out: dict[str, Any] = R.jacobian(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", 1.0)
+    j: Any = out["jacobian"]
     assert all(j[i][k] == 0.0 for i in range(4) for k in range(i + 1, 4))
     assert all(0.5 < j[i][i] < 2.0 for i in range(4))
     assert len(out["pillar_dates"]) == len(out["zero_rates"]) == 4
 
 
-def test_par_from_zero_chain_rule():
-    par = R.par(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois(), 1.0, "CENTRAL")
-    jac = R.jacobian(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", 1.0)
+def test_par_from_zero_chain_rule() -> None:
+    par: dict[str, Any] = R.par(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois(), 1.0, "CENTRAL")
+    jac: dict[str, Any] = R.jacobian(AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", 1.0)
     from quantforge_core.ois import bootstrap
     data = bootstrap("SOFR", AS_OF, QUOTES, "LOG_LINEAR_DF")[0]
-    keys = R.key_rate(data, "PILLAR", None, _ois(), 1.0, "CENTRAL")["key_rates"]
+    keys: Any = R.key_rate(data, "PILLAR", None, _ois(), 1.0, "CENTRAL")["key_rates"]
     for k in range(4):
         implied = sum(keys[i] * jac["jacobian"][i][k] for i in range(4))
         assert implied == pytest.approx(par["par_buckets"][k], abs=1e-3 * abs(par["par_dv01"]))
 
 
-def test_pnl_explain_small_and_zero_moves():
+def test_pnl_explain_small_and_zero_moves() -> None:
     end = [Quote(q.tenor, q.mid + 0.0001) for q in QUOTES]
-    out = R.pnl_explain(AS_OF, "SOFR", "LOG_LINEAR_DF", QUOTES, end, _ois(), 1.0)
+    out: dict[str, Any] = R.pnl_explain(AS_OF, "SOFR", "LOG_LINEAR_DF", QUOTES, end, _ois(), 1.0)
     assert out["explained"] is True
     assert out["full_pnl"] == pytest.approx(out["risk_pnl"], rel=1e-3)
     assert out["gross_risk_pnl"] >= abs(out["risk_pnl"])
@@ -102,15 +103,15 @@ def test_pnl_explain_small_and_zero_moves():
     assert still["threshold"] == pytest.approx(0.1) and still["explained"]
 
 
-def test_pnl_explain_large_move_on_long_bond_fails():
+def test_pnl_explain_large_move_on_long_bond_fails() -> None:
     end = [Quote(q.tenor, q.mid + 0.015) for q in QUOTES]
     long_bond = R.Product("BOND", bond=Bond(date(2035, 8, 15), 0.0425, 2), settlement=AS_OF,
                           notional=1e6)
-    out = R.pnl_explain(AS_OF, "SOFR", "LOG_LINEAR_DF", QUOTES, end, long_bond, 1.0)
+    out: dict[str, Any] = R.pnl_explain(AS_OF, "SOFR", "LOG_LINEAR_DF", QUOTES, end, long_bond, 1.0)
     assert out["full_pnl"] < 0 and abs(out["unexplained"]) > 0
 
 
-def test_checks_and_their_order():
+def test_checks_and_their_order() -> None:
     assert _code(R.par, AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois(), 0.0, "CENTRAL")[0] == "E_DOMAIN"
     assert _code(R.par, AS_OF, "SOFR", QUOTES, "LOG_LINEAR_DF", _ois(), 101.0, "CENTRAL")[0] == "E_DOMAIN"
     bad = R.Product("BOND", bond=BOND.bond, settlement=AS_OF, notional=0.0)
@@ -132,30 +133,30 @@ def test_checks_and_their_order():
 
 # Boundaries found by mutation testing that neither the unit tests nor the goldens covered
 
-def test_futures_convexity_allows_zero_volatility():
+def test_futures_convexity_allows_zero_volatility() -> None:
     from quantforge_core.futures import convexity
     rate, adj, fwd = convexity(96.0, 0.5, 0.75, 0.0, 0.03)
     assert adj == 0.0 and fwd == rate == pytest.approx(0.04)
 
 
-def test_repo_counts_a_coupon_paid_on_the_end_date():
+def test_repo_counts_a_coupon_paid_on_the_end_date() -> None:
     from quantforge_core.bonds import repo_forward
     bond = Bond(date(2030, 11, 15), 0.04, 2)
     start, end, r = date(2026, 3, 2), date(2026, 5, 15), 0.03  # 2026-05-15 is a coupon date
-    out = repo_forward(bond, start, end, 99.0, r, None)
+    out: dict[str, Any] = repo_forward(bond, start, end, 99.0, r, None)
     days = (end - start).days
     assert out["forward_dirty"] == pytest.approx(out["dirty"] * (1 + r * days / 360) - 2.0, abs=1e-12)
     assert out["forward_clean"] == pytest.approx(out["forward_dirty"], abs=1e-12)  # no accrual yet
 
 
-def test_conversion_factor_maturity_just_inside_the_delivery_month():
+def test_conversion_factor_maturity_just_inside_the_delivery_month() -> None:
     from quantforge_core.bonds import conversion_factor
     # maturity on day 2: after the first day of the delivery month, so priced (n = z = 0)
     assert conversion_factor(Bond(date(2026, 3, 2), 0.06, 2), 2026, 3, 0.06) == 1.0
     assert _code(conversion_factor, Bond(date(2026, 3, 1), 0.06, 2), 2026, 3, 0.06)[0] == "E_DATE_ORDER"
 
 
-def test_smooth_fit_rejects_repeated_knots():
+def test_smooth_fit_rejects_repeated_knots() -> None:
     from quantforge_core.curve_fits import smooth
     assert _code(smooth, [1.0, 2.0, 2.0, 5.0], [1.0, 3.0], [0.03, 0.035], 0.1)[0] == "E_INPUT"
 

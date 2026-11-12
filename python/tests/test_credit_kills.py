@@ -12,6 +12,7 @@ import importlib.util
 import json
 import math
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -26,6 +27,7 @@ SUITES = ["stage_d/credit_d", "stage_d/outside_d", "stage_d/rulings2_d", "stage_
 def _runner():
     spec = importlib.util.spec_from_file_location(
         "qf_runner_kills", ROOT / "conformance" / "runner" / "runner.py")
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -74,12 +76,13 @@ OPTION = {"as_of": "2026-11-06", "expiry": "2027-03-20", "maturity": "2032-03-20
           "notional": 10000000.0, "knock_out": True}
 
 
-def _run(operation: str, inputs: dict) -> dict:
+def _run(operation: str, inputs: dict[str, Any]) -> dict[str, Any]:
     doc = {"schema_version": "1.0", "case_id": "kill", "operation": operation, "inputs": inputs}
-    return json.loads(json.dumps(run_case(json.dumps(doc))))
+    result: dict[str, Any] = json.loads(json.dumps(run_case(json.dumps(doc))))
+    return result
 
 
-def _error(operation: str, inputs: dict) -> tuple[str, str | None]:
+def _error(operation: str, inputs: dict[str, Any]) -> tuple[str, str | None]:
     out = _run(operation, inputs)
     assert out["status"] == "error", out
     return out["error"]["code"], out["error"].get("field")

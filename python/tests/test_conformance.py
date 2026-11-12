@@ -15,6 +15,7 @@ def _load_runner():
     spec = importlib.util.spec_from_file_location(
         "qf_runner", ROOT / "conformance" / "runner" / "runner.py"
     )
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -25,7 +26,7 @@ CLASSES = RUNNER.load_policy(ROOT / "conformance" / "tolerances" / "policy.yaml"
 
 
 @pytest.mark.parametrize("path", GOLDEN, ids=lambda p: p.stem)
-def test_golden_suite(path):
+def test_golden_suite(path) -> None:
     failures, results = [], {}
     for case in json.loads(path.read_text(encoding="utf-8"))["cases"]:
         document = {

@@ -23,7 +23,8 @@ def _golden(name: str) -> dict[str, Any]:
     for p in here.parents:
         f = p / "datasets/golden/stage_f" / name
         if f.exists():
-            return json.loads(f.read_text())
+            golden: dict[str, Any] = json.loads(f.read_text())
+            return golden
     pytest.skip("goldens not found")
 
 

@@ -42,7 +42,7 @@ def code(f, *args):
     return e.value.code
 
 
-def test_cube_node_and_between():
+def test_cube_node_and_between() -> None:
     inputs = _base("rates.swaption.price_cube")
     out = run("rates.swaption.price_cube", inputs)["outputs"]
     assert out["sabr"]["rho"] == pytest.approx(-0.27)
@@ -66,18 +66,18 @@ def test_cube_node_and_between():
     (lambda i: i["trade"].update(strike=0.0), "E_DOMAIN"),
     (lambda i: i["cube"].update(alpha="x"), "E_SCHEMA"),
 ])
-def test_cube_errors(change, expected):
+def test_cube_errors(change, expected) -> None:
     inputs = _base("rates.swaption.price_cube")
     change(inputs)
     assert error("rates.swaption.price_cube", inputs) == expected
 
 
-def test_locate_single_node():
+def test_locate_single_node() -> None:
     assert rates_vol._locate([1.0], 1.0, "x") == (0, 0.0)
     assert code(rates_vol._locate, [1.0], 1.5, "x") == "E_INPUT"
 
 
-def test_strip_reprices_every_cap():
+def test_strip_reprices_every_cap() -> None:
     inputs = _base("rates.cap.strip")
     out = run("rates.cap.strip", inputs)["outputs"]
     vols = out["caplet_vols"]
@@ -98,11 +98,11 @@ def test_strip_reprices_every_cap():
     ({"strike": -0.01}, "E_DOMAIN"),
     ({"cap_tenors_months": [12.5]}, "E_SCHEMA"),
 ])
-def test_strip_errors(change, expected):
+def test_strip_errors(change, expected) -> None:
     assert error("rates.cap.strip", {**_base("rates.cap.strip"), **change}) == expected
 
 
-def test_bond_futures_round_trip():
+def test_bond_futures_round_trip() -> None:
     price, value = rates_vol.bondfut_price("PUT", 111.25, 112.0, 0.1, 0.9962, 0.055, 1e5)
     assert value == pytest.approx(price * 1000)
     vol, yield_vol = rates_vol.bondfut_implied("PUT", 111.25, 112.0, 0.1, 0.9962, price, 0.0425,
@@ -118,7 +118,7 @@ def test_bond_futures_round_trip():
         assert code(rates_vol.bondfut_price, "CALL", fp, k, t, df, 0.05, 1e5) == "E_DOMAIN"
 
 
-def test_yoy_and_zc():
+def test_yoy_and_zc() -> None:
     periods = [(1.0, 0.96, 0.0285, 0.75, 0.35), (1.0, 0.93, 0.0262, 1.75, 0.33)]
     caplets, price = rates_vol.yoy_price("BLACK_76", "CAP", 0.03, 1e7, periods)
     assert price == caplets[0] + caplets[1]
@@ -142,10 +142,10 @@ def test_yoy_and_zc():
 
 @pytest.mark.parametrize("operation", ["rates.bondfut.option_price", "rates.bondfut.implied_vol",
                                        "infl.cap.yoy_price", "infl.cap.zc_price"])
-def test_cli(operation):
+def test_cli(operation) -> None:
     assert run(operation, _base(operation))["status"] == "ok"
 
 
-def test_strip_root_above_search_bound():  # ruling E-B32
+def test_strip_root_above_search_bound() -> None:  # ruling E-B32
     inputs = {**_base("rates.cap.strip"), "flat_vols": [0.24, 0.235, 0.228, 0.222, 4.9]}
     assert error("rates.cap.strip", inputs) == "E_DOMAIN"
