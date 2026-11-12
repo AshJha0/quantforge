@@ -51,3 +51,9 @@ Exact. Once the sign state is found, the result is the orthant QP solved on that
 1. Closed by wave 3B: `edge_d-0015` to `-0017` and `e1_risk-0372` were stale goldens (J-R6-3); now pass.
 2. Closed by wave 3C: the stray `e1_risk_1.json`, `e1_risk_2.json` (842 cases) were counted once here (15,918, all passing); that run is void.
 3. R6-6.1 kink rule (answered by R6-6.1a for exact active sets): this build decides a kink by the sign-row multiplier test (`nu - 2 k_j > 1e-10 scale`), then the orthant solve is exact. Adding a separate zeroing of `|x_j| <= 1e-11 max(1, max|x|)` changed `hedgecost_i-0010` (a binding margin) to `E_INFEASIBLE`, so it was removed. Is the multiplier test an accepted "proven equivalent"?
+
+## Coordinator close-out 2026-11-12 21:55 (merged into r6)
+
+- WSL, head 87340ef, `-DQF_WERROR=ON` release: ctest 309 test cases / 16,229 assertions pass; conformance 15,077/15,077.
+- gcovr line coverage 96% (16,243 of 16,786); no file below 90%.
+- n=200 hedge re-time (`quantforge run`, 3 runs, load avg about 0.7): 0001 0.03 s, 0002 0.05 s, 0003 0.06 s, 0004 7.84 to 8.62 s, 0005 2.26 to 2.35 s. T6 (5 s per case) MISSED on case 0004. The 0.00 s figures in ~/r6all.log are void: that script called the CLI without `run`, so each call printed usage and exited.
