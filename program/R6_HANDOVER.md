@@ -237,3 +237,9 @@ New gate `python tools/check_case_total.py`: the committed totals and unique ids
 TOTALS: 15076 value 7440 error 5122 invariance 2514
 
 WAVE 3C READY fde2c4a (stray files removed; 15,076 cases: value 7,440, error 5,122, invariance 2,514)
+
+## `aadladder_g` gradient disagreement (second oracle lane): not a defect
+
+Recomputed from the oracle's own scheme (`gen_stage_g_berm.price`) by central differences, absolute bump 1e-6 on each discount factor: at the golden grid (101 points, 50 steps a year) the entries reproduce the golden to every digit (127, 191,964, 173,816, 147,510, -233,482, -343,473). The same derivative at finer grids: 401/200 gives 127, 220,895, 163,851, 132,970, -236,617, -347,516; 801/400 gives 127, 225,712, 158,174, 131,838, -234,410, -347,771. So the golden and the spec are right: the spec defines the ladder as the derivative of the discrete scheme at the case's grid (G-9, `aad-core.md`), and the discount-factor entries of that scheme are 15% to 18% away from the converged model's at the golden grid, while its price is only 0.24% away. The outside check compared against QuantLib's converged derivative with a tolerance sized from QuantLib's own grid behaviour, which converges faster in the curve inputs than the spec scheme: hence a gap of about 30,000 against a tolerance of about 2,100. No golden changes; no language build is affected. `aad-core.md` now states the convention (absolute change of each input discount factor, scheme derivative at the case grid, not the model derivative) with these numbers.
+
+For the second oracle lane: count the `aadladder_g` price, `d_price_d_mean_reversion` and `d_price_d_sigma` only if they pass with a tolerance measured on each derivative itself; leave the discount-factor entries uncounted (no outside library differentiates the spec's scheme, G-18), so the three cases do not count under "every compared output".
