@@ -452,7 +452,7 @@ Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On 
 
 ## Stage I: hedging
 
-Stage I is in progress (draft, 2026-11-11). Everything below is specified in `specifications/08-hedging/` and pinned by 276 golden cases in `datasets/golden/stage_i/`; the four builds' conformance results are recorded at release, and none is claimed here. Every input is synthetic.
+Stage I is built and is to be released as v0.8.0. Everything below is specified in `specifications/08-hedging/` (rulings I-1 to I-55) and pinned by 443 golden cases in 21 suites in `datasets/golden/stage_i/`. On the integration tree, at CLI contract 1.11.0, each of the four builds passed 14,935 of 14,935 golden cases, all stages included (2026-11-11, observed on one Windows machine through the neutral runner). Every input is synthetic.
 
 ### A hedge is a small least-squares problem
 
@@ -466,6 +466,14 @@ Stage I is in progress (draft, 2026-11-11). Everything below is specified in `sp
 
 **Worked example 3: rounding is not enough.** `hedgeint_i-0010` (`examples/hedge_integer_i.json`): two strongly correlated instruments, `A = [[1, 0.95], [0.95, 1]]`, `b = (-1.265, -1.27)`, lots of 1. The continuous answer is `(0.6, 0.7)`, objective 0. Rounding it gives `(1, 1)` and an objective of 0.9317; the best whole-number answer is `(0, 1)` with 0.172125, found by searching 756 points (computed: exact rational enumeration, an ellipsoid bound and a wide-box float search agree; no free integer least-squares library exists, so no outside check).
 
+### Trading costs make zero a real answer
+
+**Plain idea.** If every trade pays a spread, a small position in an instrument may cost more than the risk it removes. The best hedge then leaves that instrument out entirely, not at a tiny holding but at exactly zero. Where an instrument goes from "leave out" to "hold" is its switch point.
+
+**Formal statement.** With half-spreads `h_j` and cost weight `c`, the objective adds `c sum_j h_j |x_j|` to `f(x)` (`hedge-costs-and-frontier.md`). The absolute value has a kink at zero, so the solve fixes a sign for each instrument (positive, negative or held at zero), solves the smooth problem on that sign state exactly, and keeps `x_j = 0` while the risk gradient there satisfies `|g_j| <= c h_j`. Java and C++ first enumerated every sign state, which grows as `3^n` and was capped at 20 instruments; ruling I-48 allows no limit below the 200 instruments of I-4, so both now use a sign-state active-set method that changes a sign only where its subgradient test fails, and stops when the KKT conditions of the whole problem hold. At a switch point both neighbouring states give the same `x`, so the answer must be exact there too (I-54).
+
+**Worked example.** `hedgecost_i-0023`: two independent risks `b = (-1, -2)`, one instrument per risk, half-spreads 2 and 0.5, cost weight 1. For instrument 1 the risk gradient at zero is `2 (0 - 1) = -2`, exactly its cost of 2, so it sits on its switch point and is held at 0. Instrument 2 solves `2 (x_2 - 2) + 0.5 = 0`, so `x_2 = 1.75`. Risk is `1 + 0.0625 = 1.0625`, cost `0.5 x 1.75 = 0.875`, objective 1.9375 (computed: mpmath at 50 digits over the sign states; outside check scipy 1.18 SLSQP on the split problem).
+
 ### Judging a hedge after the fact
 
 **Plain idea.** A hedge chosen today drifts as prices move, so a delta hedge is rebalanced on dates. Replaying a path shows what the hedged position actually earned, and comparing the changes of the book with the changes of the hedge says how well it worked.
@@ -475,10 +483,10 @@ Stage I is in progress (draft, 2026-11-11). Everything below is specified in `sp
 **Worked example.** `hedgeeff_i-0001`: a close hedge gives a dollar offset of 0.9712, a slope of -0.9924, `R^2` 0.9964 and a variance reduction of 0.9964 (computed at 50 digits; outside check numpy 2.5 `polyfit`, `corrcoef` and `var`). A perfect offset would give 1, -1, 1 and 1.
 
 ### What stage I's evidence does and does not show
-- **Outside oracle: 113 of 276 cases (40.9%), below the 60% floor (I-2).** Error cases are in the denominator and never count. Integer lots, beta futures, residual reports and slippage have no outside library that solves a different way, so the floor needs an owner decision, not more cases (`program/STAGE_I_HANDOVER.md`).
+- **Outside oracle: 278 of 443 cases (62.8%), above the 60% floor (I-2).** Wave 5 (ruling I-55) added 165 value cases from seeded draws, checked against QuantLib, numpy and scipy; draws were rejected only by rules fixed before any outside check (3 in all), never for disagreeing. Error cases are in the denominator and never count, and integer lots, beta futures, residual reports and slippage still have no outside library that solves a different way (`program/STAGE_I_HANDOVER.md`, "WAVE 5 READY").
 - **Q6 (calibration on real noisy quotes) is blocked** by the data terms of the candidate sources; only its preregistration exists (`research/preregs/Q6-01-churn-bound.md`).
 - **The hedges are calculations.** Nothing is traded, and costs, impact and margin are inputs, not estimates from a market.
-- **I-48 is open at this draft:** two builds limit one cost form to 20 instruments, which the ruling does not allow.
+- **Tested on one machine.** The 14,935-case runs were on one Windows machine; CI on the stage I pull request is the cross-platform check.
 
 ## Appendix: stage history
 

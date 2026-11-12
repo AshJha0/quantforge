@@ -699,8 +699,8 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MI-4 Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a)
 - **Purpose:** weighted least-squares hedge with spread cost, linear market impact, liquidity bounds and a margin limit; frontier of risk against cost.
 - **Inputs:** the `hedge.qp.solve` inputs plus half-spreads, impact coefficients, cost weight(s), margin rates and limit.
-- **Limitations:** linear impact only (no square-root impact); the hedge starts from no position; margin is per instrument with no netting.
-- **Validation:** 50-digit state enumeration with subgradient checks; wave 1 goldens reproduced exactly; HiGHS infeasibility; scipy BVLS, trust-constr and SLSQP outside checks (14 of 32). **Review:** 2026-11-11.
+- **Limitations:** linear impact only (no square-root impact); the hedge starts from no position; margin is per instrument with no netting. No build caps the instrument count below the 200 of ruling I-4 (I-48: Java and C++ replaced their 20-instrument orthant enumeration with a sign-state active-set method), and costs are exact at a hold/not-hold switch point (I-54, `hedgecost_i-0023`).
+- **Validation:** 50-digit state enumeration with subgradient checks; wave 1 goldens reproduced exactly; HiGHS infeasibility; scipy BVLS, trust-constr and SLSQP outside checks (15 of 33). **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** scipy 1.18 trust-constr and SLSQP on the split-variable QP.
 - **Monitoring thresholds:** a frontier that is not monotone, or a realised cost above the modelled cost by more than the desk's tolerance.
@@ -724,7 +724,7 @@ Every entry carries the plan A2 fields. The data-lineage hash is the SHA-256 of 
 ### MI-6 Instrument selection (stage I wave 4c)
 - **Purpose:** the best weighted least-squares hedge using at most K of n instruments.
 - **Inputs:** the `hedge.qp.solve` inputs without equalities, and K.
-- **Limitations:** exhaustive search, at most 20 instruments; no fixed cost per instrument; bounds must admit zero.
+- **Limitations:** exhaustive search, at most 20 instruments and at most 100,000 candidate subsets (`E_LIMIT`, ruling I-53, `hedgeselect_i-0018`); no fixed cost per instrument; bounds must admit zero.
 - **Validation:** 50-digit solve of every subset; scipy per-subset outside check (10 of 17); greedy counterexample pinned. **Review:** 2026-11-11.
 - **Tier:** 2.
 - **Challenger:** the same enumeration with scipy solvers.

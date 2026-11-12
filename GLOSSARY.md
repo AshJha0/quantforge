@@ -193,6 +193,9 @@ Stage E is Implemented in all four languages (6,817 of 6,817 golden cases at mer
 | Dollar offset | Minus the sum of the hedge's value changes over the sum of the hedged item's changes; 1 is a perfect offset, and it swings widely when the item's total change is small (`hedge.effectiveness`, `08-hedging/dynamic-hedge-and-effectiveness.md`) |
 | Implementation shortfall | Execution cost against the decision price plus the opportunity cost of the unfilled quantity, `(Q − q_f)(final_price − d)` (`hedge.slippage.report`, ruling I-36) |
 | Slippage | Execution cost less the cost the model predicted (`hedge.slippage.report`) |
+| Switch point | The point where an instrument with a trading cost moves from being left out (`x_j = 0` exactly) to being held: the risk gradient there equals the cost weight times its half-spread (ruling I-54, `hedgecost_i-0023`) |
+| Sign-state active-set method | A solve of the cost problem that fixes each instrument's sign (long, short or zero), solves that smooth problem exactly, and changes a sign only where the subgradient test fails; it replaced enumeration of every sign state in Java and C++ (ruling I-48) |
+| Outside-oracle share | The fraction of a stage's golden cases, error cases included in the denominator, that an independent library reproduces within the case tolerance; the floor is 60% (rule 11.2.5, ruling I-2) |
 
 ## Tutorial terms
 

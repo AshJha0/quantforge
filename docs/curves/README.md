@@ -37,6 +37,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Swaption cube](swaption-cube.md) | Implemented, not Validated | E | 42 golden cases |
 | [Vol term structure](vol-term-structure.md) | Implemented, not Validated | E | 7 golden cases |
 | [Five interpolation methods](interpolation-methods.md) | Implemented, not Validated | F | 47 golden cases for `rates.curve.inspect`, 36 reproduced by an outside library |
+| [Hedging against trading costs](hedging-costs.md) | Implemented, not Validated | I | 33 golden cases for `hedge.qp.solve` with costs and `hedge.frontier.solve`, 15 reproduced by an outside library |
 | Financing term structures | Partly done | D | Repo financing is done (`repo.forward`, `repo.implied_rate` and the implied financing spread; see the repo row). Ruling D22 keeps borrow and financing as flat rates over the funding curve; financing term structures are not yet scheduled |
 | Liquidity curves | Planned | H | None yet |
 

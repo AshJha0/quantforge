@@ -543,7 +543,7 @@ Copy the inputs of the named case from `datasets/golden/stage_g/` and send them 
 To check a whole suite: `python conformance/runner/runner.py --impl rust --suite xvaadj_g`.
 
 
-## Stage I recipes (draft)
+## Stage I recipes
 
 Each file below is one case document copied verbatim from the named golden case, so its expected outputs are that case's `expected.outputs` in `datasets/golden/stage_i/` (`program/STAGE_I_HANDOVER.md`, follow-up note). Send it to a build's CLI, for example:
 
@@ -551,7 +551,7 @@ Each file below is one case document copied verbatim from the named golden case,
 rust/target/release/quantforge run < examples/hedge_greeks_i.json
 ```
 
-Stage I is a draft: the operations answer in a build only once that build's lane has passed the wave, and the release records which builds pass. Each lane adds a smoke test that runs every file through its CLI and checks `status: ok` and the golden values.
+All four builds answer every stage I operation: each passed 14,935 of 14,935 golden cases on the integration tree (2026-11-11, observed). Each language has a smoke test that runs every file below through its CLI and checks `status: ok` and the golden values.
 
 | Task | File | Operation | From golden |
 |---|---|---|---|
@@ -571,5 +571,7 @@ Stage I is a draft: the operations answer in a build only once that build's lane
 | Dollar offset, regression and variance reduction of a hedge | `hedge_effectiveness_i.json` | `hedge.effectiveness` | `hedgeeff_i-0001` |
 | Best pair of instruments where greedy selection fails | `hedge_select_i.json` | `hedge.select.solve` | `hedgeselect_i-0009` |
 | Implementation shortfall and slippage of a buy and a sell | `hedge_slippage_i.json` | `hedge.slippage.report` | `hedgeslip_i-0003` |
+
+The frontier of `hedge_frontier_i.json`, and a sweep through the switch point of golden `hedgecost_i-0023`, are drawn from all four CLIs on the gallery page [Hedging against trading costs](docs/curves/hedging-costs.md).
 
 The same backtest with costs: add `"half_spread"` to the inputs of `hedge_backtest_i.json` as in golden `hedgebtcost_i-0001`. To check a whole suite: `python conformance/runner/runner.py --impl python --suite hedgeqp_i`.

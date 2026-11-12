@@ -1,6 +1,6 @@
 # C++26 implementation
 
-Stages A to G of QuantForge (stage G released as v0.7.0): the specs in `specifications/` that `stage-b-followups.md` names, behind the CLI in
+Stages A to G of QuantForge (stage G released as v0.7.0) and stage I, hedging (waves 1 to 5, target v0.8.0): the specs in `specifications/` that `stage-b-followups.md` names, behind the CLI in
 `specifications/cli-contract.md`. It is written from the specs alone.
 
 ## Layout

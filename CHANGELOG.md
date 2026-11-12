@@ -1,34 +1,40 @@
 # Changelog
 
-## Unreleased
+## 0.8.0: stage I, hedging (Unreleased)
 
-### Added
+Stage I takes the hedging domain (plan section 4 row I, TRACEABILITY Domain 08) and plan item Q6, ahead of stage H (`program/STAGE_I_HANDOVER.md`). The date is set when the tag is made.
+
+### Added: hedging (`specifications/08-hedging/`, rulings I-1 to I-55 in `specifications/stage-i-rulings.md`, CLI contract block "Stage I operations", error code `E_INFEASIBLE`)
+- Hedge solvers (wave 1): constrained least squares with equalities, bounds, ridge and a `MIN_NORM` option for singular problems (`hedge.qp.solve`); integer lots by exact search (`hedge.integer.solve`); minimum-variance ratios (`hedge.minvar.ratio`); delta, gamma and vega neutralisation (`hedge.greeks.neutralise`); equity-beta futures (`hedge.beta.futures`); residual risk with per-factor contributions (`hedge.residual.report`). Spec `hedge-solvers.md`.
+- Credit and correlation hedges (wave 2): CS01, bucketed CS01 and jump-to-default hedges with CDS (`hedge.credit.cds`); correlation and vega hedges of exchange options with vanillas (`hedge.correlation.neutralise`). Spec `credit-and-correlation-hedges.md`.
+- Cross-asset hedge of equity and key-rate risk, the risk matrix built by repricing (`hedge.crossasset.solve`, wave 3; `cross-asset-hedge.md`).
+- Costs, impact, liquidity bounds and margin as optional inputs of `hedge.qp.solve`, and the risk-against-cost frontier (`hedge.frontier.solve`, wave 4a; `hedge-costs-and-frontier.md`). The cost solve scales to the 200-instrument limit of ruling I-4 in all four builds (I-48): Java and C++ replaced their orthant enumeration, capped at 20 sign-open instruments, with a sign-state active-set method that solves one orthant QP per sign state and flips a sign only when its subgradient test fails, so the result meets the KKT conditions of the whole problem. Costs are exact at a switch point between holding and not holding an instrument (I-54, `hedgecost_i-0023`).
+- Dynamic delta-hedge backtest on a given path, with optional spread and impact costs, and hedge effectiveness by dollar offset, regression and variance reduction (`hedge.backtest.delta`, `hedge.effectiveness`, waves 4b and 4e; `dynamic-hedge-and-effectiveness.md`).
+- Instrument selection by exhaustive subset search (`hedge.select.solve`, wave 4c; `instrument-selection.md`), with `E_LIMIT` above 100,000 candidate subsets (I-53, `hedgeselect_i-0018`), and execution slippage against a model cost (`hedge.slippage.report`, wave 4d; `hedge-slippage.md`).
+- Wave 5 (ruling I-55): five suites of existing operations, 165 value cases from seeded draws, checked against QuantLib, numpy and scipy (`hedgegreeks5_i`, `hedgecorr5_i`, `hedgemv5_i`, `hedgeeff5_i`, `hedgeqp5_i`, generator `oracle/python/gen_stage_i_w5.py`). Three draws were rejected, each by a rule fixed before any outside check; no draw was dropped for disagreeing.
+- 443 golden cases in 21 suites under `datasets/golden/stage_i/` (computed: 50-digit mpmath or exact rational references). Outside-oracle share 278 of 443 (62.8%), above the 60% floor of ruling I-2, error cases in the denominator (handover, "WAVE 5 READY").
+- Sixteen example inputs `examples/hedge_*_i.json`, each one case copied from a named golden; recipes in the COOKBOOK.
+- Q6: the churn bound is preregistered (`research/preregs/Q6-01-churn-bound.md`, hash-checked by `research/test_preregs.py`) before any data or fit.
+
+### Added: tutorials and tools
 - Tutorials 2 to 7 (`docs/getting-started/`): bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, with a [Tutorials](docs/getting-started/README.md) index and site navigation entry. Each runs one script in `examples/tutorials/` against all four builds; every printed number is checked in CI in Python, Rust, Java and C++.
 - Tutorials 8 to 16 (`docs/getting-started/`): multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk, and the LIBOR market model. Each runs one script, `examples/tutorials/t<N>_<topic>.py`, shown in full on its page, unchanged against all four builds through the shared helper `examples/tutorials/qf.py` (its new `runner`, the batch form of `connect`), and is checked in CI in all four languages. `tools/check_tutorial.py` now orders pages by number.
 - `tools/check_tutorial.py` checks every `tutorial-*.md` page by default, and checks that a script listed on a page equals the file (`tutorial:source`). `tutorial.yml` runs all pages and watches the new paths.
 - GLOSSARY: a section of tutorial terms.
 
-### Stage I, hedging (draft for 0.8.0)
+### Changed
+- CLI contract 1.11.0 (ruling I-51): `conformance/runner/runner.py` requires it, and every build reports it from `version`. Implementation version 0.8.0 in every build file.
+- Stage G PFE goldens: all 96 `expsim_g` value cases regenerated with the committed mpmath generator (`oracle/python/gen_stage_g_w4c.py`, 25 significant digits, tagged `mpmath-25-quadrature`); 1,683 of 4,104 values moved, the largest by 8.6e-5 absolute (9.2e-4 of the runner limit). All four builds pass 102 of 102 on the new goldens (observed, `program/STAGE_I_CARRY.md`, item 3). The `expsim_g` lineage hash in `docs/model-inventory.md` is updated.
+- Rust mutation CI: an 8 GiB address-space cap on every test binary and on the golden check, so a runaway mutant no longer kills the runner (`program/STAGE_I_CARRY.md`, item 1). The eight survivors of the stage F sample are killed by named tests.
 
-Stage I takes the hedging domain (plan section 4 row I, TRACEABILITY Domain 08) and plan item Q6, ahead of stage H, and is to be released as 0.8.0 (`program/STAGE_I_HANDOVER.md`). This draft records what is specified and generated; the conformance results of the four builds are added at release, and none is claimed here.
+### Verified
+- Conformance on the stage I integration tree, contract 1.11.0: 14,935 of 14,935 cases in each of Java, C++, Python and Rust, 0 failures, 0 not implemented (observed on one Windows machine through the neutral runner, 2026-11-11; C++ and Rust counts in `program/STAGE_I_CPP_HANDOVER.md` and `program/STAGE_I_RUST_HANDOVER.md`).
 
-Added (specified, with goldens; `specifications/08-hedging/`, rulings I-1 to I-52 in `specifications/stage-i-rulings.md`, CLI contract block "Stage I operations" and error code `E_INFEASIBLE`):
-- Hedge solvers (wave 1): constrained least squares with equalities, bounds, ridge and a `MIN_NORM` option for singular problems (`hedge.qp.solve`); integer lots by exact search (`hedge.integer.solve`); minimum-variance ratios (`hedge.minvar.ratio`); delta, gamma and vega neutralisation (`hedge.greeks.neutralise`); equity-beta futures (`hedge.beta.futures`); residual risk with per-factor contributions (`hedge.residual.report`). Spec `hedge-solvers.md`.
-- Credit and correlation hedges (wave 2): CS01, bucketed CS01 and jump-to-default hedges with CDS (`hedge.credit.cds`); correlation and vega hedges of exchange options with vanillas (`hedge.correlation.neutralise`). Spec `credit-and-correlation-hedges.md`.
-- Cross-asset hedge of equity and key-rate risk, the risk matrix built by repricing (`hedge.crossasset.solve`, wave 3; `cross-asset-hedge.md`).
-- Costs, impact, liquidity bounds and margin as optional inputs of `hedge.qp.solve`, and the risk-against-cost frontier (`hedge.frontier.solve`, wave 4a; `hedge-costs-and-frontier.md`).
-- Dynamic delta-hedge backtest on a given path, with optional spread and impact costs, and hedge effectiveness by dollar offset, regression and variance reduction (`hedge.backtest.delta`, `hedge.effectiveness`, waves 4b and 4e; `dynamic-hedge-and-effectiveness.md`).
-- Instrument selection by exhaustive subset search (`hedge.select.solve`, wave 4c; `instrument-selection.md`) and execution slippage against a model cost (`hedge.slippage.report`, wave 4d; `hedge-slippage.md`).
-- 276 golden cases in 16 suites under `datasets/golden/stage_i/` (computed: 50-digit mpmath or exact rational references, with outside checks where registered).
-- Sixteen example inputs `examples/hedge_*_i.json`, each one case copied from a named golden; recipes in the COOKBOOK.
-- Q6: the churn bound is preregistered (`research/preregs/Q6-01-churn-bound.md`, hash-checked by `research/test_preregs.py`) before any data or fit.
-
-Known issues (stage I, at this draft):
-- **Q6 is blocked by data terms.** The Cboe delayed-quote pages prohibit automated download, and the Cboe website terms (section 2) and the Deribit terms of service (clause 32.3) forbid publishing derived data without written consent. Q6 waits for an owner decision on the data source; no data were downloaded and nothing was fitted (handover, "Q6 status").
-- **Outside-oracle share 113 of 276 (40.9%), below the 60% floor of ruling I-2.** Error cases count in the denominator and never in the numerator. Integer lots have no free outside solver, and the beta, residual and slippage suites are arithmetic only, so even counting every value case would not close the gap without an owner decision (handover, "Stage I spec status after session 1").
-- **I-48:** Java and C++ return `E_LIMIT` above 20 instruments with a sign-open cost or margin term in `hedge.qp.solve`; the ruling allows no limit below 200 instruments, and both builds must replace the orthant enumeration before release. No golden reaches 20 such instruments. Open at this draft.
-- Tutorials 17 to 21 (hedging) are planned, not written: they need the integrated four-language tree (handover, "Tutorials").
-- Stage G carry-overs: G-42b (needs WSL) and the C++ sanitizer run on wave 4c are still open; the follow-up of the 0.7.0 PFE fix is done: all 96 `expsim_g` value cases were regenerated with the mpmath generator, 1,683 values moved by at most 8.6e-5 (9.2e-4 of the runner limit), and all four builds pass 102 of 102 on the new goldens (observed, `program/STAGE_I_CARRY.md`).
+### Known issues
+- **Q6 is blocked by data terms.** The Cboe delayed-quote pages prohibit automated download, and the Cboe website terms (section 2) and the Deribit terms of service (clause 32.3) forbid publishing derived data without written consent. No data were downloaded and nothing was fitted; tutorial 22 (Q6) is not shipped (handover, "Q6 status").
+- **Integer lots, beta futures, the residual report, slippage and every error case have no free outside reference**, so they stay outside the register's numerator (handover, "WAVE 5 READY").
+- **FRTB CSR securitisations are out of scope**, with the limit documented; a candidate for a later FRTB completion item together with DRC (`program/STAGE_I_CARRY.md`, item 6).
+- **Stage G carry-overs still open:** the G-42b ORE re-test (needs WSL with about 6 GB free), the C++ ASan/UBSan run on wave 4c (needs WSL), and the formal G-9 AAD timing (deferred until the machine is quiet). The Rust mutation verification run 43100924809 had not finished at the last check, so there are no per-module counts for it yet (`program/STAGE_I_CARRY.md`, items 1, 2, 4, 5).
 
 ## 0.7.0: stage G, rates models and xVA (2026-11-11)
 

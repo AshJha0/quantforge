@@ -1,0 +1,396 @@
+{
+ "meta": {
+  "commit": "5caedaa",
+  "date": "2026-11-12",
+  "reference_language": "python",
+  "tolerance": {
+   "curve": [
+    1e-10,
+    1e-08
+   ],
+   "risk": [
+    0.01,
+    1e-06
+   ]
+  },
+  "data": "synthetic",
+  "cli": {
+   "java": {
+    "language": "java",
+    "implementation_version": "0.8.0",
+    "contract_version": "1.11.0",
+    "toolchain": "JDK 25.0.5+8-LTS"
+   },
+   "cpp": {
+    "language": "cpp",
+    "implementation_version": "0.8.0",
+    "contract_version": "1.11.0",
+    "toolchain": "GCC 16.2.0"
+   },
+   "python": {
+    "language": "python",
+    "implementation_version": "0.8.0",
+    "contract_version": "1.11.0",
+    "toolchain": "CPython 3.15.2"
+   },
+   "rust": {
+    "language": "rust",
+    "implementation_version": "0.8.0",
+    "contract_version": "1.11.0",
+    "toolchain": "rustc 1.99.1"
+   }
+  },
+  "example_hashes": {
+   "hedge_frontier_i.json": "sha256:ecda0fcc20c20ef613f38a97a9271b88e9b626d8b39f451eb57bf84b1af6b88b"
+  }
+ },
+ "inputs": {
+  "a": [
+   [
+    1.0,
+    0.5,
+    0.2
+   ],
+   [
+    0.3,
+    1.2,
+    0.4
+   ],
+   [
+    0.1,
+    0.6,
+    1.5
+   ],
+   [
+    0.8,
+    0.2,
+    0.9
+   ],
+   [
+    0.4,
+    0.9,
+    0.3
+   ]
+  ],
+  "b": [
+   -2.0,
+   1.5,
+   -0.7,
+   0.9,
+   -1.1
+  ],
+  "weights": [
+   1.0,
+   2.0,
+   0.5,
+   1.5,
+   1.0
+  ],
+  "half_spreads": [
+   0.05,
+   0.1,
+   0.02
+  ],
+  "cost_weights": [
+   0.0,
+   0.5,
+   1.0,
+   2.0,
+   5.0,
+   10.0,
+   50.0
+  ]
+ },
+ "example_case": "hedgefrontier_i-0001",
+ "reference": {
+  "frontier": [
+   {
+    "cost_weight": 0.0,
+    "x": [
+     1.238948403954741,
+     -0.5791518875837521,
+     -0.751804710837165
+    ],
+    "risk": 8.717443423206426,
+    "cost": 0.13489870317285557
+   },
+   {
+    "cost_weight": 0.5,
+    "x": [
+     1.2208533278595097,
+     -0.5671835816889136,
+     -0.7476835536977736
+    ],
+    "risk": 8.717989425090684,
+    "cost": 0.13271469563582233
+   },
+   {
+    "cost_weight": 1.0,
+    "x": [
+     1.2027582517642788,
+     -0.5552152757940751,
+     -0.743562396558382
+    ],
+    "risk": 8.719627430743458,
+    "cost": 0.1305306880987891
+   },
+   {
+    "cost_weight": 2.0,
+    "x": [
+     1.1665680995738166,
+     -0.5312786640043982,
+     -0.7353200822795988
+    ],
+    "risk": 8.72617945335456,
+    "cost": 0.12616267302472262
+   },
+   {
+    "cost_weight": 5.0,
+    "x": [
+     1.0579976430024298,
+     -0.4594688286353674,
+     -0.7105931394432493
+    ],
+    "risk": 8.772043611632258,
+    "cost": 0.11305862780252322
+   },
+   {
+    "cost_weight": 10.0,
+    "x": [
+     0.8770468820501187,
+     -0.3397857696869826,
+     -0.6693815680493336
+    ],
+    "risk": 8.93584417690975,
+    "cost": 0.09121855243219087
+   },
+   {
+    "cost_weight": 50.0,
+    "x": [
+     0.0,
+     0.0,
+     -0.23655913978494644
+    ],
+    "risk": 10.77731182795699,
+    "cost": 0.004731182795698929
+   }
+  ],
+  "switch": [
+   {
+    "half_spread": 0.0,
+    "x": [
+     1.0,
+     1.75
+    ],
+    "residual": [
+     0.0,
+     -0.25
+    ],
+    "objective": 0.9375,
+    "rank": 2,
+    "risk": 0.0625,
+    "cost": 0.875
+   },
+   {
+    "half_spread": 0.25,
+    "x": [
+     0.875,
+     1.75
+    ],
+    "residual": [
+     -0.125,
+     -0.25
+    ],
+    "objective": 1.171875,
+    "rank": 2,
+    "risk": 0.078125,
+    "cost": 1.09375
+   },
+   {
+    "half_spread": 0.5,
+    "x": [
+     0.75,
+     1.75
+    ],
+    "residual": [
+     -0.25,
+     -0.25
+    ],
+    "objective": 1.375,
+    "rank": 2,
+    "risk": 0.125,
+    "cost": 1.25
+   },
+   {
+    "half_spread": 0.75,
+    "x": [
+     0.625,
+     1.75
+    ],
+    "residual": [
+     -0.375,
+     -0.25
+    ],
+    "objective": 1.546875,
+    "rank": 2,
+    "risk": 0.203125,
+    "cost": 1.34375
+   },
+   {
+    "half_spread": 1.0,
+    "x": [
+     0.5,
+     1.75
+    ],
+    "residual": [
+     -0.5,
+     -0.25
+    ],
+    "objective": 1.6875,
+    "rank": 2,
+    "risk": 0.3125,
+    "cost": 1.375
+   },
+   {
+    "half_spread": 1.25,
+    "x": [
+     0.375,
+     1.75
+    ],
+    "residual": [
+     -0.625,
+     -0.25
+    ],
+    "objective": 1.796875,
+    "rank": 2,
+    "risk": 0.453125,
+    "cost": 1.34375
+   },
+   {
+    "half_spread": 1.5,
+    "x": [
+     0.25,
+     1.75
+    ],
+    "residual": [
+     -0.75,
+     -0.25
+    ],
+    "objective": 1.875,
+    "rank": 2,
+    "risk": 0.625,
+    "cost": 1.25
+   },
+   {
+    "half_spread": 1.75,
+    "x": [
+     0.125,
+     1.75
+    ],
+    "residual": [
+     -0.875,
+     -0.25
+    ],
+    "objective": 1.921875,
+    "rank": 2,
+    "risk": 0.828125,
+    "cost": 1.09375
+   },
+   {
+    "half_spread": 2.0,
+    "x": [
+     0.0,
+     1.75
+    ],
+    "residual": [
+     -1.0,
+     -0.25
+    ],
+    "objective": 1.9375,
+    "rank": 2,
+    "risk": 1.0625,
+    "cost": 0.875
+   },
+   {
+    "half_spread": 2.25,
+    "x": [
+     0.0,
+     1.75
+    ],
+    "residual": [
+     -1.0,
+     -0.25
+    ],
+    "objective": 1.9375,
+    "rank": 2,
+    "risk": 1.0625,
+    "cost": 0.875
+   },
+   {
+    "half_spread": 2.5,
+    "x": [
+     0.0,
+     1.75
+    ],
+    "residual": [
+     -1.0,
+     -0.25
+    ],
+    "objective": 1.9375,
+    "rank": 2,
+    "risk": 1.0625,
+    "cost": 0.875
+   },
+   {
+    "half_spread": 3.0,
+    "x": [
+     0.0,
+     1.75
+    ],
+    "residual": [
+     -1.0,
+     -0.25
+    ],
+    "objective": 1.9375,
+    "rank": 2,
+    "risk": 1.0625,
+    "cost": 0.875
+   }
+  ]
+ },
+ "agreement": {
+  "values": 95,
+  "largest_difference": 1.7763568394002505e-15
+ },
+ "against_golden": [
+  {
+   "case": "hedgefrontier_i-0001",
+   "largest_difference": 1.7763568394002505e-15
+  },
+  {
+   "case": "hedgecost_i-0023",
+   "largest_difference": 0.0
+  }
+ ],
+ "evidence": {
+  "suites": [
+   {
+    "suite": "hedgecost_i",
+    "cases": 23,
+    "outside": 13
+   },
+   {
+    "suite": "hedgefrontier_i",
+    "cases": 10,
+    "outside": 2
+   },
+   {
+    "suite": "hedgeqp5_i",
+    "cases": 30,
+    "outside": 29
+   }
+  ],
+  "stage_cases": 443,
+  "stage_outside": 278
+ }
+}
