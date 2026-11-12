@@ -17,7 +17,7 @@ def code(f, *args):
     return e.value.code
 
 
-def test_price_parity_and_greeks():
+def test_price_parity_and_greeks() -> None:
     call = fx.option_price(*EUR[:1], 1.1, *EUR[1:], 0.075, "CALL", 1e6)
     put = fx.option_price(*EUR[:1], 1.1, *EUR[1:], 0.075, "PUT", 1e6)
     s, t, rd, rf = EUR
@@ -35,7 +35,7 @@ def test_price_parity_and_greeks():
 @pytest.mark.parametrize("bad", [(0.0, 1.1, 0.25, 0.075, 1.0), (1.0, 0.0, 0.25, 0.075, 1.0),
                                  (1.0, 1.1, 0.0, 0.075, 1.0), (1.0, 1.1, 0.25, 0.0, 1.0),
                                  (1.0, 1.1, 0.25, 0.075, 0.0)])
-def test_price_domain(bad):
+def test_price_domain(bad) -> None:
     s, k, t, v, n = bad
     assert code(fx.option_price, s, k, t, 0.0, 0.0, v, "CALL", n) == "E_DOMAIN"
 
@@ -43,7 +43,7 @@ def test_price_domain(bad):
 @pytest.mark.parametrize("market", [EUR, MXN])
 @pytest.mark.parametrize("option", ["CALL", "PUT"])
 @pytest.mark.parametrize("kind", fx.DELTA_TYPES)
-def test_to_strike_inverts_from_strike(market, option, kind):
+def test_to_strike_inverts_from_strike(market, option, kind) -> None:
     s, t, rd, rf = market
     strike = s * (1.04 if option == "CALL" else 0.96)
     delta = fx.delta_from_strike(s, strike, t, rd, rf, 0.16, option)[kind]
@@ -51,7 +51,7 @@ def test_to_strike_inverts_from_strike(market, option, kind):
     assert back == pytest.approx(strike, rel=1e-11)
 
 
-def test_pa_call_upper_root_and_maximum():
+def test_pa_call_upper_root_and_maximum() -> None:
     s, t, rd, rf = MXN
     m = fx._Market(s, t, rd, rf, 0.16)
     peak = m.forward * math.exp(fx._pa_call_peak(m))
@@ -66,7 +66,7 @@ def test_pa_call_upper_root_and_maximum():
                 "FORWARD_PA") == "E_DOMAIN"
 
 
-def test_to_strike_ranges():
+def test_to_strike_ranges() -> None:
     s, t, rd, rf = MXN
     f = fx.delta_to_strike
     assert code(f, s, t, rd, rf, 0.16, "CALL", -0.25, "SPOT") == "E_DOMAIN"
@@ -77,7 +77,7 @@ def test_to_strike_ranges():
     assert f(s, t, rd, rf, 0.16, "PUT", -3.0, "SPOT_PA") > s  # PA put: any negative delta
 
 
-def test_atm_strikes():
+def test_atm_strikes() -> None:
     s, t, rd, rf = EUR
     forward = s * math.exp((rd - rf) * t)
     assert fx.atm_strike(s, t, rd, rf, 0.1, "SPOT", "SPOT") == s
@@ -94,9 +94,10 @@ def test_atm_strikes():
     assert code(fx.atm_strike, s, t, rd, rf, 0.0, "DNS", "SPOT") == "E_DOMAIN"
 
 
-def test_smile_from_quotes():
+def test_smile_from_quotes() -> None:
     out = fx.smile_from_quotes(*EUR, 0.075, -0.0045, 0.002, 0.25, "SPOT", "DNS")
-    assert (out["call_vol"], out["put_vol"]) == (pytest.approx(0.07475), pytest.approx(0.07925))
+    assert out["call_vol"] == pytest.approx(0.07475)
+    assert out["put_vol"] == pytest.approx(0.07925)
     assert out["put_strike"] < out["atm_strike"] < out["call_strike"]
     f = fx.smile_from_quotes
     assert code(f, *EUR, 0.075, -0.0045, 0.002, 0.5, "SPOT", "DNS") == "E_DOMAIN"
@@ -117,7 +118,7 @@ _M = {"spot": 1.085, "expiry_years": 0.25, "domestic_rate": 0.043, "foreign_rate
     ("fx.smile.from_quotes", {"atm_vol": 0.075, "rr": -0.0045, "bf": 0.002, "delta": 0.25,
                               "delta_type": "FORWARD", "atm_type": "FORWARD"}, "call_strike"),
 ])
-def test_cli(operation, extra, key):
+def test_cli(operation, extra, key) -> None:
     import json
 
     from quantforge_core.cli.main import run_case

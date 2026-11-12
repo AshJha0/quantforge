@@ -33,7 +33,7 @@ def _code(operation, inputs):
     return out["error"]["code"] if out.get("status") == "error" else "ok"
 
 
-def test_d31_empty_steps_flat_and_empty_dates():
+def test_d31_empty_steps_flat_and_empty_dates() -> None:
     factors, forwards = steps.step_curve(AS_OF, 0.04, [], (), [date(2027, 11, 6)])
     assert factors[0] == pytest.approx(math.exp(-0.04)) and forwards == [0.04]
     assert _code_of(steps.step_curve, AS_OF, 0.04, [], (), []) == "E_INPUT"
@@ -42,18 +42,18 @@ def test_d31_empty_steps_flat_and_empty_dates():
 POOL = (1e6, 0.06, 0.055, 60, 0, "PSA", 100.0)
 
 
-def test_d33_d34_d44_mbs():
+def test_d33_d34_d44_mbs() -> None:
     assert _code_of(mbs.mbs_cashflows, (*POOL[:3], 1201, *POOL[4:])) == "E_INPUT"
     assert _code_of(mbs.mbs_price, POOL, -12.0, 0) == "E_DOMAIN"
     assert _code_of(mbs.mbs_cashflows, (1e6, 0.0, 0.06, 60, 0, "PSA", 1.0)) == "E_DOMAIN"
 
 
-def test_d35_conversion_factor_date_order():
+def test_d35_conversion_factor_date_order() -> None:
     bond = Bond(date(2026, 11, 15), 0.04, 2)
     assert _code_of(bonds.conversion_factor, bond, 2026, 12, 0.06) == "E_DATE_ORDER"
 
 
-def test_d36_cds_as_of():
+def test_d36_cds_as_of() -> None:
     hz = credit.check_hazard(AS_OF, [date(2031, 12, 20)], [0.9])
     late = credit.check_hazard(date(2026, 11, 5), [date(2031, 12, 20)], [0.9])
     args = (0.4, date(2031, 12, 20), 0.01, 1.0, "BUY_PROTECTION", "STANDARD")
@@ -65,7 +65,7 @@ def test_d36_cds_as_of():
                     [("1Y", 0.01)]) == "E_INPUT"
 
 
-def test_d37_weights():
+def test_d37_weights() -> None:
     hz = credit.check_hazard(AS_OF, [date(2031, 12, 20)], [0.9])
     assert _code_of(credit.index_intrinsic, AS_OF, _flat(), [(hz, 0.4, -1.0), (hz, 0.4, 2.0)],
                     date(2031, 12, 20), 0.01, 0.0) == "E_DOMAIN"
@@ -79,12 +79,12 @@ def test_d37_weights():
     assert _code_of(bonds.fit_nelson_siegel, s, 2.0, bs, [1.0, 1.0]) == "E_INPUT"
 
 
-def test_d38_robust_singular():
+def test_d38_robust_singular() -> None:
     assert _code_of(curve_fits.robust, [5.0] * 4, [0.03] * 4, 2.0, 1e-3) == "E_SINGULAR"
     assert _code_of(curve_fits.robust, [1.0, 5.0, 5.0], [0.03] * 3, 2.0, 1e-3) == "E_SINGULAR"
 
 
-def test_d39_xccy_start_before_as_of():
+def test_d39_xccy_start_before_as_of() -> None:
     early = date(2026, 11, 5)
     assert _code_of(xccy.bootstrap, _flat(), _flat(), "SOFR", "ESTR", early, [(12, 0.0)],
                     "LOG_LINEAR_DF") == "E_OUT_OF_RANGE"
@@ -93,20 +93,20 @@ def test_d39_xccy_start_before_as_of():
 
 
 @pytest.mark.parametrize("tenor", [0, 1201])
-def test_d40_tenor_months(tenor):
+def test_d40_tenor_months(tenor) -> None:
     assert _code_of(caps_swaptions.cap_price, _flat(), _flat(), "BLACK_76", 0.2, "CAP", 3, tenor, 0.03,
                     1.0) == "E_INPUT"
     assert _code_of(caps_swaptions.swaption_price, _flat(), _flat(), "BLACK_76", 0.2, "PAYER", 12,
                     tenor, 0.03, 1.0) == "E_INPUT"
 
 
-def test_d42_duplicate_cpi_fixings():
+def test_d42_duplicate_cpi_fixings() -> None:
     k = inflation.index(2026, 8)
     assert _code_of(inflation.linker_price, Bond(date(2029, 11, 15), 0.04, 2), date(2026, 11, 9),
                     0.02, 300.0, [(k, 300.0), (k, 301.0), (k + 1, 301.0)]) == "E_INPUT"
 
 
-def test_d45_convention_kinds():
+def test_d45_convention_kinds() -> None:
     base = {"as_of": "2026-11-06", "step_dates": [], "quotes": [{"tenor": "1M", "rate": 0.04}],
             "jumps": []}
     assert _code("rates.ois.fit_steps", {**base, "convention": "USD-TERM-3M"}) == "E_INPUT"
@@ -115,7 +115,7 @@ def test_d45_convention_kinds():
 
 # Second pass, D47 to D63
 
-def test_d52_hazard_and_maturity():
+def test_d52_hazard_and_maturity() -> None:
     assert _code_of(credit.check_hazard, AS_OF, [date(2027, 1, 1)], [1.01]) == "E_DOMAIN"
     hz = credit.check_hazard(AS_OF, [date(2031, 12, 20)], [0.9])
     assert _code_of(credit.price, AS_OF, _flat(), hz, 0.4, AS_OF, 0.01, 1.0, "BUY_PROTECTION",
@@ -124,22 +124,22 @@ def test_d52_hazard_and_maturity():
                     0.0) == "E_INPUT"
 
 
-def test_d54_years_limit():
+def test_d54_years_limit() -> None:
     from quantforge_core.inflation import CpiCurveData
     data = CpiCurveData(inflation.index(2026, 8), 300.0, ((101, 0.02),), None)
     assert _code_of(inflation.cpi, data, [data.base]) == "E_INPUT"
 
 
-def test_d59_xccy_months_limit():
+def test_d59_xccy_months_limit() -> None:
     assert _code_of(xccy.schedule, ("SOFR", "ESTR"), date(2026, 11, 10), 1203) == "E_INPUT"
 
 
-def test_d55_bachelier_negative_strike():
+def test_d55_bachelier_negative_strike() -> None:
     caplets, _ = caps_swaptions.cap_price(_flat(), _flat(), "BACHELIER", 0.01, "CAP", 3, 12, -0.01, 1.0)
     assert all(c > 0 for c in caplets)
 
 
-def test_d64_empty_step_dates_before_quote_count():
+def test_d64_empty_step_dates_before_quote_count() -> None:
     from quantforge_core.ois import Quote
     assert _code_of(steps.fit_steps, "SOFR", AS_OF, [], [Quote("1M", 0.04), Quote("2M", 0.04)],
                     ()) == "E_INPUT"

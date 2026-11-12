@@ -8,7 +8,7 @@ QuantForge has four equal implementations of the same maths, in Java, C++, Pytho
 
 Two ways in:
 
-- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Then read the topics below in order.
+- **New to quantitative finance, or to this project.** Work through the [tutorials](docs/getting-started/README.md), starting with [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md): quotes to curve to PV to DV01 in about 10 minutes, in Python, then the same in Rust, Java and C++. Tutorials 2 to 16 go on, 10 to 15 minutes each, to bonds and repo, options and volatility, credit, risk, interest rate models, counterparty risk, multi-curve building, cross-currency and FX, inflation and commodities, mortgage-backed securities, exotic options, time series and vol indices, the trading book, advanced risk and the LIBOR market model, with every number checked in all four languages. Tutorials 17 to 21 cover stage I, hedging: Greek and dynamic delta hedges, minimum-variance and constrained hedges, credit and correlation hedges, a cross-asset hedge with instrument selection, and what a hedge costs. Then read the topics below in order.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
 Sources: every model and convention cites its papers, books and standards in the `## Sources` section of its spec. [References](docs/references.md) collects them all by topic, with each one's status (read, not opened, or paywalled) and the specs that rely on it.
@@ -449,6 +449,46 @@ Stage G (released as v0.7.0 on 2026-11-11) is at Implemented, not Validated. On 
 - **18 PFE goldens were wrong and are fixed** (G-Q4): a grid scan missed level crossings near a flat peak. The four builds found it, because they solve for the crossings exactly.
 - **G-10 is inconclusive**; the powered test G-10b passed (`specifications/stage-g-rulings.md`). R9 acceptance has modest power (ruling G-34).
 - **All inputs are synthetic.** No market swaption, cap or CDS quotes are used.
+
+## Stage I: hedging
+
+Stage I is built and is to be released as v0.8.0. Everything below is specified in `specifications/08-hedging/` (rulings I-1 to I-55) and pinned by 443 golden cases in 21 suites in `datasets/golden/stage_i/`. On the integration tree, at CLI contract 1.11.0, each of the four builds passed 14,935 of 14,935 golden cases, all stages included (2026-11-11, observed on one Windows machine through the neutral runner). Every input is synthetic.
+
+Tutorials 17 to 21 work through this section with real outputs in all four languages: [17, delta hedges](docs/getting-started/tutorial-17-delta-hedge.md), [18, the QP solver](docs/getting-started/tutorial-18-minvar-qp.md), [19, credit and correlation](docs/getting-started/tutorial-19-credit-correlation.md), [20, equity and rates](docs/getting-started/tutorial-20-cross-asset.md) and [21, costs](docs/getting-started/tutorial-21-hedge-costs.md).
+
+### A hedge is a small least-squares problem
+
+**Plain idea.** A book has risks: delta, vega, key-rate DV01s, a CS01. Each hedge instrument has its own risks per unit. Choose how many units of each to hold so that the book's risks, plus the hedges' risks, come as close to zero as you can, perhaps with limits on positions, costs for trading or a whole number of contracts. With as many independent instruments as risks the answer is exact; with fewer it is the best fit, and what is left is the residual risk.
+
+**Formal statement.** With the instruments' risks as the columns of `A` (`m` risks by `n` instruments) and the book's risks `b`, `hedge.qp.solve` minimises `f(x) = sum_i w_i (A x + b)_i^2 + ridge sum_j x_j^2` subject to optional equalities `E x = e` and bounds `lower <= x <= upper` (`hedge-solvers.md`). The checks run in a fixed order, and a problem without a unique minimiser is `E_SINGULAR` unless `singular: MIN_NORM` asks for the least-norm minimiser (rulings I-3, I-5). Integer lots minimise the same `f` over whole numbers by exact search, with a fixed tie rule (I-7); costs, impact, liquidity bounds and margin extend the objective and the constraints (`hedge-costs-and-frontier.md`, I-24 to I-28). Greek, beta, credit, correlation and cross-asset hedges build `A` and `b` from their own pricing and then solve this problem.
+
+**Worked example 1: equity beta.** `hedgebeta_i-0001` is Hull's example (*Options, Futures, and Other Derivatives*, ch. 3): a portfolio of 5,050,000 with beta 1.5, hedged to beta 0 with index futures at 1,010 and a multiplier of 250. `contracts = (beta* - beta) V / (F m) = (0 - 1.5) x 5,050,000 / 252,500 = -30`, thirty contracts short, and `beta_after` is 0 (computed: mpmath at 50 digits; arithmetic only, so no outside library counts for this suite).
+
+**Worked example 2: delta, gamma and vega together.** `hedgegreeks_i-0003` (the input of `examples/hedge_greeks_i.json`): spot 100, rate 3%, dividend yield 1%, volatility 25%, a book short 1,000 six-month 100 calls and long 500 one-year 90 puts. Its Greeks are delta -686.21, gamma -15.760 and vega -11,508.4 (per unit volatility). Three targets need three instruments: hold 504.83 of the underlying, 502.76 three-month 105 calls and 38.27 two-year 95 puts, and all three Greeks are zero after the hedge (computed at 50 digits; outside check QuantLib 1.44 `AnalyticEuropeanEngine` Greeks with a numpy solve). The underlying alone could fix the delta, but only an option can fix gamma, and two options with different expiries are needed to fix gamma and vega at once.
+
+**Worked example 3: rounding is not enough.** `hedgeint_i-0010` (`examples/hedge_integer_i.json`): two strongly correlated instruments, `A = [[1, 0.95], [0.95, 1]]`, `b = (-1.265, -1.27)`, lots of 1. The continuous answer is `(0.6, 0.7)`, objective 0. Rounding it gives `(1, 1)` and an objective of 0.9317; the best whole-number answer is `(0, 1)` with 0.172125, found by searching 756 points (computed: exact rational enumeration, an ellipsoid bound and a wide-box float search agree; no free integer least-squares library exists, so no outside check).
+
+### Trading costs make zero a real answer
+
+**Plain idea.** If every trade pays a spread, a small position in an instrument may cost more than the risk it removes. The best hedge then leaves that instrument out entirely, not at a tiny holding but at exactly zero. Where an instrument goes from "leave out" to "hold" is its switch point.
+
+**Formal statement.** With half-spreads `h_j` and cost weight `c`, the objective adds `c sum_j h_j |x_j|` to `f(x)` (`hedge-costs-and-frontier.md`). The absolute value has a kink at zero, so the solve fixes a sign for each instrument (positive, negative or held at zero), solves the smooth problem on that sign state exactly, and keeps `x_j = 0` while the risk gradient there satisfies `|g_j| <= c h_j`. Java and C++ first enumerated every sign state, which grows as `3^n` and was capped at 20 instruments; ruling I-48 allows no limit below the 200 instruments of I-4, so both now use a sign-state active-set method that changes a sign only where its subgradient test fails, and stops when the KKT conditions of the whole problem hold. At a switch point both neighbouring states give the same `x`, so the answer must be exact there too (I-54).
+
+**Worked example.** `hedgecost_i-0023`: two independent risks `b = (-1, -2)`, one instrument per risk, half-spreads 2 and 0.5, cost weight 1. For instrument 1 the risk gradient at zero is `2 (0 - 1) = -2`, exactly its cost of 2, so it sits on its switch point and is held at 0. Instrument 2 solves `2 (x_2 - 2) + 0.5 = 0`, so `x_2 = 1.75`. Risk is `1 + 0.0625 = 1.0625`, cost `0.5 x 1.75 = 0.875`, objective 1.9375 (computed: mpmath at 50 digits over the sign states; outside check scipy 1.18 SLSQP on the split problem).
+
+### Judging a hedge after the fact
+
+**Plain idea.** A hedge chosen today drifts as prices move, so a delta hedge is rebalanced on dates. Replaying a path shows what the hedged position actually earned, and comparing the changes of the book with the changes of the hedge says how well it worked.
+
+**Formal statement.** `hedge.backtest.delta` replays a given path in a fixed order at each date: interest on cash, dividends on the shares held, the mark, then the rebalance (ruling I-29); optional spread and impact costs are paid on every trade, the first purchase included (I-39, I-40). `hedge.effectiveness` reports the dollar offset, the regression slope and `R^2` of hedge changes on book changes, and the variance reduction; a hedge leg with zero variance is `E_DOMAIN` (I-31, I-43).
+
+**Worked example.** `hedgeeff_i-0001`: a close hedge gives a dollar offset of 0.9712, a slope of -0.9924, `R^2` 0.9964 and a variance reduction of 0.9964 (computed at 50 digits; outside check numpy 2.5 `polyfit`, `corrcoef` and `var`). A perfect offset would give 1, -1, 1 and 1.
+
+### What stage I's evidence does and does not show
+- **Outside oracle: 278 of 443 cases (62.8%), above the 60% floor (I-2).** Wave 5 (ruling I-55) added 165 value cases from seeded draws, checked against QuantLib, numpy and scipy; draws were rejected only by rules fixed before any outside check (3 in all), never for disagreeing. Error cases are in the denominator and never count, and integer lots, beta futures, residual reports and slippage still have no outside library that solves a different way (`program/STAGE_I_HANDOVER.md`, "WAVE 5 READY").
+- **Q6 (calibration on real noisy quotes) is blocked** by the data terms of the candidate sources; only its preregistration exists (`research/preregs/Q6-01-churn-bound.md`).
+- **The hedges are calculations.** Nothing is traded, and costs, impact and margin are inputs, not estimates from a market.
+- **Tested on one machine.** The 14,935-case runs were on one Windows machine; CI on the stage I pull request is the cross-platform check.
 
 ## Appendix: stage history
 

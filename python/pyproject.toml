@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quantforge-core"
-version = "0.7.0"
+version = "0.8.0"
 description = "Quantitative analytics and trading infrastructure"
 requires-python = "==3.15.*"
 dependencies = ["numpy>=2.0"]
@@ -42,7 +42,11 @@ tests_dir = ["tests/test_core.py", "tests/test_cli.py", "tests/test_stage_b.py",
              "tests/test_stage_e_qa.py", "tests/test_limits_e.py",
              "tests/test_local_vol_continuity.py",
              "tests/test_curve_interp_f.py", "tests/test_waves_2_3.py",
-             "tests/test_stage_g_credit_mutants.py", "tests/test_stage_g.py"]
+             "tests/test_stage_g_credit_mutants.py", "tests/test_stage_g.py",
+             "tests/test_hedge_solvers.py", "tests/test_credit_correlation_hedges.py",
+             "tests/test_hedge_costs_cross_asset.py",
+             "tests/test_dynamic_hedge_selection.py", "tests/test_slippage.py",
+             "tests/test_stage_i_rulings.py", "tests/test_hedge_invariants.py"]
 pytest_add_cli_args = ["--deselect=tests/test_core.py::test_sobol_table_equals_the_spec_data"]
 do_not_mutate = ["quantforge_core/_sobol_data.py", "quantforge_core/_legendre_1024.py"]
 
@@ -54,3 +58,60 @@ config-settings = { editable_mode = "compat" }
 [tool.mypy]
 strict = true
 files = ["quantforge_core"]
+
+# Tests and benchmarks are type-checked too (`uv run mypy .`), but pytest helpers and
+# parametrised arguments need not carry full annotations. mypy names these modules by
+# file stem (there is no __init__.py), so add new test modules here.
+[[tool.mypy.overrides]]
+module = [
+    "conftest",
+    "test_cli",
+    "test_conformance",
+    "test_core",
+    "test_credit_correlation_hedges",
+    "test_credit_kills",
+    "test_curve_interp_f",
+    "test_dynamic_hedge_selection",
+    "test_examples_stage_i",
+    "test_fast_paths",
+    "test_finite",
+    "test_goldens_stage_d",
+    "test_hedge_costs_cross_asset",
+    "test_hedge_invariants",
+    "test_hedge_solvers",
+    "test_joint_f",
+    "test_limits_e",
+    "test_local_vol_continuity",
+    "test_micro",
+    "test_mutants_e",
+    "test_mutation_bonds",
+    "test_mutation_d",
+    "test_mutation_e",
+    "test_properties",
+    "test_r1",
+    "test_r2",
+    "test_slippage",
+    "test_stage_b",
+    "test_stage_c",
+    "test_stage_d",
+    "test_stage_d2",
+    "test_stage_d3",
+    "test_stage_d_rulings",
+    "test_stage_e",
+    "test_stage_e2",
+    "test_stage_e3",
+    "test_stage_e4",
+    "test_stage_e5",
+    "test_stage_e6",
+    "test_stage_e8",
+    "test_stage_e_qa",
+    "test_stage_g",
+    "test_stage_g2",
+    "test_stage_g_credit_mutants",
+    "test_stage_i_rulings",
+    "test_typing_paths",
+    "test_waves_2_3",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false

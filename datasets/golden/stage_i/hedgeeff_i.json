@@ -1,0 +1,432 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeeff_i",
+ "spec": "specifications/08-hedging/dynamic-hedge-and-effectiveness.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w4b.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeeff_i-0001",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -356.84,
+     1078.9,
+     149.98,
+     -1463.41,
+     -735.51,
+     -570.59,
+     -563.95,
+     -1644.65,
+     -624.5,
+     193.04,
+     2955.06,
+     -987.01,
+     535.57,
+     -511.42,
+     -236.57,
+     -518.84,
+     -1124.9,
+     -317.38,
+     1284.69,
+     -1355.42,
+     -181.06,
+     -887.53,
+     1028.3,
+     -1382.54
+    ],
+    "hedge_changes": [
+     308.24,
+     -1003.5,
+     -197.43,
+     1365.03,
+     707.53,
+     548.53,
+     592.2,
+     1572.47,
+     614.34,
+     -314.51,
+     -2953.29,
+     1071.62,
+     -510.27,
+     472.19,
+     255.07,
+     602.81,
+     1174.84,
+     326.22,
+     -1391.37,
+     1367.19,
+     272.06,
+     839.9,
+     -969.68,
+     1306.99
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 0.9712342341475616,
+     "regression_slope": -0.9923665081824435,
+     "regression_r2": 0.996418747958819,
+     "variance_reduction": 0.9964022682937798
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "a close hedge (offset near 1, R2 near 1)"
+  },
+  {
+   "case_id": "hedgeeff_i-0002",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     -356.84,
+     1078.9,
+     149.98,
+     -1463.41,
+     -735.51,
+     -570.59,
+     -563.95,
+     -1644.65,
+     -624.5,
+     193.04,
+     2955.06,
+     -987.01,
+     535.57,
+     -511.42,
+     -236.57,
+     -518.84,
+     -1124.9,
+     -317.38,
+     1284.69,
+     -1355.42,
+     -181.06,
+     -887.53,
+     1028.3,
+     -1382.54
+    ],
+    "hedge_changes": [
+     540.46,
+     -366.96,
+     -750.1,
+     267.16,
+     428.17,
+     360.4,
+     303.02,
+     1418.07,
+     -54.22,
+     -970.32,
+     -1168.9,
+     333.66,
+     -485.94,
+     -95.61,
+     -284.4,
+     -142.48,
+     989.68,
+     716.23,
+     -101.0,
+     1465.78,
+     -552.42,
+     705.41,
+     -784.14,
+     1459.26
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 0.5180419396528225,
+     "regression_slope": -0.5552955235381657,
+     "regression_r2": 0.6014735747406619,
+     "variance_reduction": 0.5979282611933796
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "a poor hedge"
+  },
+  {
+   "case_id": "hedgeeff_i-0003",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     100.0,
+     -50.0,
+     30.0,
+     -20.0
+    ],
+    "hedge_changes": [
+     -100.0,
+     50.0,
+     -30.0,
+     20.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.0,
+     "regression_slope": -1.0,
+     "regression_r2": 1.0,
+     "variance_reduction": 1.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "perfect hedge: changes cancel"
+  },
+  {
+   "case_id": "hedgeeff_i-0004",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     100.0,
+     -50.0,
+     30.0,
+     -20.0
+    ],
+    "hedge_changes": [
+     -125.0,
+     62.5,
+     -37.5,
+     25.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 1.25,
+     "regression_slope": -1.25,
+     "regression_r2": 1.0,
+     "variance_reduction": 0.9375
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "over-hedge by a quarter"
+  },
+  {
+   "case_id": "hedgeeff_i-0005",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     10.0,
+     -4.0,
+     7.0
+    ],
+    "hedge_changes": [
+     -9.0,
+     5.0,
+     -6.5
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "dollar_offset": 0.8076923076923077,
+     "regression_slope": -1.0122699386503067,
+     "regression_r2": 0.9986519574128587,
+     "variance_reduction": 0.9984662576687117
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50",
+    "numpy-2.5-polyfit-corrcoef-var"
+   ],
+   "tags": [
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "three observations"
+  },
+  {
+   "case_id": "hedgeeff_i-0006",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "hedge_changes": [
+     1.0,
+     2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "unequal lengths"
+  },
+  {
+   "case_id": "hedgeeff_i-0007",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1.0,
+     2.0
+    ],
+    "hedge_changes": [
+     -1.0,
+     -2.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "two observations"
+  },
+  {
+   "case_id": "hedgeeff_i-0008",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1.0,
+     -1.0,
+     2.0,
+     -2.0
+    ],
+    "hedge_changes": [
+     -1.0,
+     1.0,
+     -2.0,
+     2.5
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "hedged item sums to zero"
+  },
+  {
+   "case_id": "hedgeeff_i-0009",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "hedge_changes": [
+     -1.0,
+     -0.5,
+     -1.2
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "hedged item without variance"
+  },
+  {
+   "case_id": "hedgeeff_i-0010",
+   "operation": "hedge.effectiveness",
+   "inputs": {
+    "item_changes": [
+     1.0,
+     2.0,
+     3.0
+    ],
+    "hedge_changes": [
+     -1.0,
+     -1.0,
+     -1.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "effectiveness",
+    "synthetic"
+   ],
+   "description": "hedge without variance"
+  }
+ ]
+}

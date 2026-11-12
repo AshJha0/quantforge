@@ -55,7 +55,7 @@ class ContractTest {
 
     @Test
     void versionAndOperations() throws IOException {
-        assertTrue(run("", "version").out().contains("\"contract_version\":\"1.0.0\""));
+        assertTrue(run("", "version").out().contains("\"contract_version\":\"1.11.0\""));
         assertTrue(run("", "operations").out().contains("\"core.ts.ar1\""));
     }
 

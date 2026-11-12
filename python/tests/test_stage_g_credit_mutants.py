@@ -33,12 +33,12 @@ def _err(f, *args):
     (date(2026, 11, 6), "10Y", date(2036, 12, 20)),
     (date(2026, 11, 6), "18M", date(2028, 6, 20)),
 ])
-def test_maturity_roll_boundaries(trade, tenor, expected):
+def test_maturity_roll_boundaries(trade, tenor, expected) -> None:
     assert credit.maturity(trade, tenor) == expected
 
 
 @pytest.mark.parametrize("tenor", ["5W", "5D", "5y", "5m"])
-def test_maturity_rejects_other_units(tenor):
+def test_maturity_rejects_other_units(tenor) -> None:
     assert _err(credit.maturity, date(2026, 11, 6), tenor) == (
         "E_SCHEMA", "a CDS tenor is in months or years", "tenor")
 
@@ -46,7 +46,7 @@ def test_maturity_rejects_other_units(tenor):
 # credit_options._strike_hazard
 
 @pytest.mark.parametrize("strike,recovery", [(0.0001, 0.4), (0.01, 0.4), (0.05, 0.25), (0.3, 0.0)])
-def test_strike_hazard_solves_the_strike(strike, recovery):
+def test_strike_hazard_solves_the_strike(strike, recovery) -> None:
     expiry, mat = date(2027, 3, 20), date(2031, 12, 20)
     h_k, annuity = co._strike_hazard(expiry, mat, 0.03, recovery, strike)
     protection, a = co._legs(expiry, expiry, mat, 0.03, h_k, recovery)
@@ -59,7 +59,7 @@ def test_strike_hazard_solves_the_strike(strike, recovery):
 
 # credit_options.joint_default
 
-def test_joint_default_values_and_correlation():
+def test_joint_default_values_and_correlation() -> None:
     p1, p2 = 0.02, 0.03
     for copula, nu in (("GAUSSIAN", None), ("STUDENT_T", 4.0)):
         out = co.joint_default(copula, [p1, p2], 0.3, nu)
@@ -98,10 +98,10 @@ def test_joint_default_values_and_correlation():
     (("STUDENT_T", [0.1, 0.1], 0.3, -1.0),
      ("E_DOMAIN", "degrees_of_freedom must be above 0", "degrees_of_freedom")),
 ])
-def test_joint_default_errors(args, expected):
+def test_joint_default_errors(args, expected) -> None:
     assert _err(co.joint_default, *args) == expected
 
 
-def test_joint_default_edges_accepted():
+def test_joint_default_edges_accepted() -> None:
     co.joint_default("GAUSSIAN", [1e-9, 1 - 1e-9], 0.999, None)
     co.joint_default("STUDENT_T", [0.1, 0.1], -0.999, 0.5)

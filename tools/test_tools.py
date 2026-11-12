@@ -641,6 +641,101 @@ class QualityGate(unittest.TestCase):
         self.assertEqual(sorted(k for k in floors if not k.startswith("_")), ["cpp", "java", "python", "rust"])
 
 
+class QualityGateFailPaths(unittest.TestCase):
+    """Fail paths of tools/quality_gate.py on a synthetic tree, and its command line."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.qg = load("quality_gate", "tools/quality_gate.py")
+
+    def _tree(self, d):
+        root = Path(d)
+        for rel, text in {
+            "rust/Cargo.toml": 'members = ["crates/core"]\n',
+            "rust/crates/core/src/a.rs": "", "rust/crates/other/src/b.rs": "",
+            "cpp26/CMakeLists.txt": "src/core/listed.cpp\n",
+            "cpp26/src/core/listed.cpp": "", "cpp26/src/core/unlisted.cpp": "",
+            "python/pyproject.toml": 'source_paths = ["quantforge_core/"]\ntests_dir = ["tests/test_a.py"]\n',
+            "python/quantforge_core/x.py": "", "python/quantforge_extra/y.py": "", "python/other/z.py": "",
+            "python/tests/test_b.py": "",
+        }.items():
+            (root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / rel).write_text(text, encoding="utf-8")
+        return root
+
+    def test_config_check_reports_each_broken_path(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = self._tree(d)
+            cfg = {"modules": [{"module": "m", "rust": ["rust/crates/core/src/a.rs", "rust/crates/other/src/b.rs"],
+                                "cpp": "cpp26/src/core/*.cpp",
+                                "python": ["python/quantforge_core/x.py", "python/quantforge_extra/y.py", "python/other/z.py"],
+                                "java": "TODO later"}],
+                   "python_tests": ["python/tests/test_b.py", "python/tests/test_a.py", "TODO"]}
+            bad, todo, warn = self.qg.check_config(cfg, root)
+        self.assertEqual(sorted(bad), sorted([
+            "m/rust: rust/crates/other/src/b.rs is not in a workspace member crate",
+            "m/cpp: cpp26/src/core/unlisted.cpp is not listed in cpp26/CMakeLists.txt",
+            "m/python: package quantforge_extra is not in mutmut source_paths",
+            "m/python: python/other/z.py is outside the python/quantforge_* packages",
+            "m/python: package other is not in mutmut source_paths",
+            "python test python/tests/test_a.py does not exist"]))
+        self.assertEqual(todo, ["m/java", "python_tests"])
+        self.assertEqual(len(warn), 1)
+        self.assertIn("test_b.py is not in mutmut tests_dir", warn[0])
+
+    def test_filled_and_empty_lists(self):
+        self.assertFalse(self.qg.filled([]))
+        self.assertFalse(self.qg.filled(["a", "TODO"]))
+        self.assertFalse(self.qg.filled("  "))
+        self.assertTrue(self.qg.filled(["a", "b"]))
+
+    def test_cli_coverage_gate_and_floor_breach(self):
+        cfg = {"stage": "T", "coverage_min": 0.9, "modules": [{"module": "x", "python": "python/quantforge_core/heston.py"}]}
+        good = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": 95, "num_statements": 100}}}}
+        low = {"files": {"quantforge_core/heston.py": {"summary": {"covered_lines": 80, "num_statements": 100}}}}
+        with tempfile.TemporaryDirectory() as d:
+            c, g, lo = Path(d, "c.json"), Path(d, "g.json"), Path(d, "l.json")
+            c.write_text(json.dumps(cfg)); g.write_text(json.dumps(good)); lo.write_text(json.dumps(low))
+            run = lambda *a: self.qg.main(["--config", str(c), *a])  # noqa: E731
+            self.assertEqual(run("--coverage", str(g), "--lang", "python"), 0)
+            self.assertEqual(run("--coverage", str(lo), "--lang", "python"), 1)  # module below 90 %
+            self.assertEqual(run("--coverage", str(g), "--lang", "python", "--floor"), 0)
+            self.assertEqual(run("--coverage", str(lo), "--lang", "python", "--floor"), 1)
+            with self.assertRaises(SystemExit):
+                run("--coverage", str(g))  # --lang missing
+            self.assertEqual(run("--check-config"), 0)  # heston.py exists in the real tree
+            c.write_text("{not json")
+            with self.assertRaises(json.JSONDecodeError):
+                run("--check-config")
+
+    def test_cli_check_config_fails_on_broken_module(self):
+        cfg = {"stage": "T", "coverage_min": 0.9, "modules": [{"module": "x", "python": "python/nowhere.py"}]}
+        with tempfile.TemporaryDirectory() as d:
+            c = Path(d, "c.json")
+            c.write_text(json.dumps(cfg))
+            self.assertEqual(self.qg.main(["--config", str(c), "--check-config"]), 1)
+
+    def test_floor_breach_alone_fails(self):
+        rows = [("python/quantforge_core/x.py", 90, 100)]
+        line, ok = self.qg.floor_gate("python", rows, 0.95)
+        self.assertFalse(ok)
+        self.assertIn("(BELOW)", line)
+
+    def test_cli_dsr_needs_trials_and_baseline_round_trip(self):
+        with self.assertRaises(SystemExit):
+            self.qg.main(["--check-dsr"])
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d, "b.json")
+            self.assertEqual(self.qg.main(["--write-baseline", "--baseline", str(base)]), 0)
+            written = json.loads(base.read_text(encoding="utf-8"))
+            self.assertEqual(sorted(written), ["register", "specs"])
+            self.assertEqual(self.qg.main(["--check-register", "--check-specs", "--baseline", str(base)]), 0)
+            base.write_text(json.dumps({"register": [], "specs": []}))
+            expect = 1 if (written["register"] or written["specs"]) else 0
+            self.assertEqual(self.qg.main(["--check-register", "--baseline", str(base)])
+                             | self.qg.main(["--check-specs", "--baseline", str(base)]), expect)
+
+
 class Governance(unittest.TestCase):
     """Plan 12.2 A2 (model register) and Q5b (convergence rule)."""
 
@@ -897,9 +992,25 @@ class StageFInfra(unittest.TestCase):
         self.assertEqual([e["lang"] for e in inc], ["python"])
         self.assertEqual(list(frag["stages"]["PR"][0]), ["module", "suite", "python"])
         inc, _ = pm.plan(cfg, changed=["java25/src/main/java/org/q/vol/Surf.java", "rust/crates/c/src/m.rs"])
-        self.assertEqual(sorted(e["lang"] for e in inc), ["java", "rust"])
+        self.assertEqual(sorted(e["lang"] for e in inc), ["java"] + ["rust"] * pm.RUST_SHARDS)
+        self.assertEqual([e["shard"] for e in inc if e["lang"] == "rust"],
+                         [f"{k}/{pm.RUST_SHARDS}" for k in range(pm.RUST_SHARDS)])
         self.assertEqual(pm.plan(cfg, changed=["docs/x.md"])[0], [])
-        self.assertEqual(len(pm.plan(cfg, stage="E")[0]), 4)
+        self.assertEqual(len(pm.plan(cfg, stage="E")[0]), 3 + pm.RUST_SHARDS)
+
+    def test_mutation_report_merges_rust_shards(self):
+        sr = load("stage_report", "conformance/mutation/stage_report.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "rust--m.json"
+            for k, (sampled, either) in enumerate([(20, 18), (20, 15)]):
+                summary = {"mutants": 100, "unviable": 2, "unit_killed_all": either, "sampled": sampled,
+                           "sample_unit_killed": either, "sample_golden_killed": 5, "sample_either_killed": either,
+                           "sample_golden_timeouts": 0, "unit_verdicts": {"killed": either, "not run": 70}}
+                (Path(tmp) / f"rust--m--s{k}.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            self.assertEqual(len(sr.shard_files(base)), 2)
+            killed, survived, note = sr.score_file("rust", base)
+            self.assertEqual((killed, survived), (33, 7))
+            self.assertIn("sample 40 of 100", note)
 
 
 class DocsStatus(unittest.TestCase):

@@ -22,7 +22,7 @@ def code(f, *args):
     return e.value.code
 
 
-def test_cds_option_worked_example():
+def test_cds_option_worked_example() -> None:
     out = ce.cds_option_price(*MARKET, "PAYER", 0.012, 1e7, 0.5, True)
     assert out["forward_spread"] == pytest.approx(0.0118877, abs=1e-7)
     assert out["risky_annuity"] == pytest.approx(4.32865, abs=1e-5)
@@ -35,7 +35,7 @@ def test_cds_option_worked_example():
     assert out["price"] - receiver["price"] == pytest.approx(parity, abs=1e-6)
 
 
-def test_cds_option_implied_round_trip_and_errors():
+def test_cds_option_implied_round_trip_and_errors() -> None:
     price = ce.cds_option_price(*MARKET, "RECEIVER", 0.0096, 1e7, 0.4, True)["price"]
     assert ce.cds_option_implied(*MARKET, "RECEIVER", 0.0096, 1e7, price, True) == \
         pytest.approx(0.4, rel=1e-10)
@@ -54,7 +54,7 @@ def test_cds_option_implied_round_trip_and_errors():
 
 
 @pytest.mark.parametrize("x,nu", [(-3.0, 3.0), (-0.5, 4.0), (0.0, 5.0), (1.7, 2.5), (6.0, 10.0)])
-def test_t_distribution_against_scipy(x, nu):
+def test_t_distribution_against_scipy(x, nu) -> None:
     assert ce.t_cdf(x, nu) == pytest.approx(stats.t.cdf(x, nu), rel=1e-12, abs=1e-15)
     assert ce.t_pdf(x, nu) == pytest.approx(stats.t.pdf(x, nu), rel=1e-12)
     p = stats.t.cdf(x, nu)
@@ -63,13 +63,13 @@ def test_t_distribution_against_scipy(x, nu):
 
 @pytest.mark.parametrize("h,k,rho", [(-2.0, -1.8, 0.3), (0.5, -0.2, -0.6), (-1.0, 1.0, 0.9),
                                      (60.0, 0.3, 0.2)])
-def test_bivariate_normal_against_scipy(h, k, rho):
+def test_bivariate_normal_against_scipy(h, k, rho) -> None:
     ref = stats.multivariate_normal(mean=[0, 0], cov=[[1, rho], [rho, 1]]).cdf([min(h, 40), k])
     assert ce.bivariate_normal(h, k, rho) == pytest.approx(ref, rel=1e-6, abs=1e-12)
     assert ce.bivariate_normal(-50.0, k, rho) == 0.0
 
 
-def test_copulas():
+def test_copulas() -> None:
     g = ce.joint_default("GAUSSIAN", [0.02, 0.03], 0.3, None)
     assert g["joint_default_probability"] == pytest.approx(0.002288, abs=1e-6)
     t = ce.joint_default("STUDENT_T", [0.02, 0.03], 0.3, 4.0)
@@ -86,7 +86,7 @@ def test_copulas():
     assert code(f, "STUDENT_T", [0.02, 0.03], 0.3, 0.0) == "E_DOMAIN"
 
 
-def test_lhp_tranches_add_up_to_pool_loss():
+def test_lhp_tranches_add_up_to_pool_loss() -> None:
     points = [0.0, 0.03, 0.07, 0.10, 0.15, 0.30, 1.0]
     losses = [ce.tranche_loss(0.05, 0.3, 0.4, a, d) for a, d in itertools.pairwise(points)]
     assert losses[0] == pytest.approx(0.5411, abs=1e-4)
@@ -124,7 +124,7 @@ def test_lhp_tranches_add_up_to_pool_loss():
     ("credit.lhp.loss_cdf", {"default_probability": 0.05, "correlation": 0.3, "recovery": 0.4,
                              "losses": [0.01]}, "cdf"),
 ])
-def test_cli(operation, inputs, key):
+def test_cli(operation, inputs, key) -> None:
     r = run_case(json.dumps({"schema_version": "1.0", "case_id": "t", "operation": operation,
                              "inputs": inputs}))
     assert r["status"] == "ok" and key in r["outputs"], r

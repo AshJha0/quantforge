@@ -71,7 +71,7 @@ The Java score measures unit tests only, so a survivor there may still be caught
 
 ### Rust and Python against the golden cases
 
-`conformance/mutation/golden_mutants.py` takes the mutants cargo-mutants and mutmut generate, keeps their unit verdict, and runs a seeded sample through the neutral runner in a private copy. Each sampled mutant then has two verdicts. Use Linux or WSL; `mutation.yml` does the same with its `golden` input.
+`conformance/mutation/golden_mutants.py` takes the mutants cargo-mutants and mutmut generate and runs a seeded sample through the neutral runner in a private copy. Python keeps mutmut's unit verdict for every mutant; for Rust, cargo-mutants only lists the mutants and the script runs `cargo test -p quantforge-core` on the sampled ones alone, because testing every mutant took over three hours per module in CI. Each sampled mutant then has two verdicts. Use Linux or WSL; `mutation.yml` does the same with its `golden` input.
 
 ```bash
 python3 conformance/mutation/golden_mutants.py --impl rust --target '**/compounding.rs' --max 40

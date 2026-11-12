@@ -17,7 +17,7 @@ GOOD = (
 )
 
 
-def invoke(monkeypatch, args, data=b""):
+def invoke(monkeypatch: pytest.MonkeyPatch, args, data=b""):
     out = io.BytesIO()
     monkeypatch.setattr(sys, "argv", ["quantforge", *args])
     monkeypatch.setattr(sys, "stdin", SimpleNamespace(buffer=io.BytesIO(data)))
@@ -27,7 +27,7 @@ def invoke(monkeypatch, args, data=b""):
     return code, [json.loads(x) for x in text.splitlines()], text
 
 
-def test_batch_framing(monkeypatch):
+def test_batch_framing(monkeypatch: pytest.MonkeyPatch) -> None:
     data = (GOOD + "\r\n\n  \n\xef\xbb\xbf{}\n").encode("latin-1") + b"\xff\n" + GOOD.encode()
     code, rows, text = invoke(monkeypatch, ["batch"], data)
     assert code == 0
@@ -38,11 +38,11 @@ def test_batch_framing(monkeypatch):
     assert all("elapsed_ns" not in r["diagnostics"] for r in rows)
 
 
-def test_empty_stream(monkeypatch):
+def test_empty_stream(monkeypatch: pytest.MonkeyPatch) -> None:
     assert invoke(monkeypatch, ["--batch"], b"")[:2] == (0, [])
 
 
-def test_long_line_is_limit_and_stream_continues(monkeypatch):
+def test_long_line_is_limit_and_stream_continues(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(cli, "MAX_LINE_BYTES", 10)
     monkeypatch.setattr(cli, "_DRAIN_CHUNK", 3)
     long = b"x" * 40
@@ -53,7 +53,7 @@ def test_long_line_is_limit_and_stream_continues(monkeypatch):
     assert all(r["case_id"] == "unknown" for r in rows)
 
 
-def test_timings(monkeypatch):
+def test_timings(monkeypatch: pytest.MonkeyPatch) -> None:
     _, rows, _ = invoke(monkeypatch, ["--batch", "--timings"], (GOOD + "\nnope\n").encode())
     assert [type(r["diagnostics"]["elapsed_ns"]) for r in rows] == [int, int]
     assert all(r["diagnostics"]["elapsed_ns"] >= 0 for r in rows)
@@ -68,25 +68,25 @@ def test_timings(monkeypatch):
     [], ["--timings", "batch"], ["batch", "--fast"], ["version", "--timings"],
     ["--batch", "--batch"], ["batch", "--timings", "--timings"], ["operations", "x"],
 ])
-def test_bad_arguments(monkeypatch, args):
+def test_bad_arguments(monkeypatch: pytest.MonkeyPatch, args) -> None:
     code, rows, _ = invoke(monkeypatch, args)
     assert code == 64 and rows == []
 
 
-def test_version_and_operations(monkeypatch):
+def test_version_and_operations(monkeypatch: pytest.MonkeyPatch) -> None:
     _, rows, _ = invoke(monkeypatch, ["version"])
-    assert rows[0]["language"] == "python" and rows[0]["contract_version"] == "1.0.0"
+    assert rows[0]["language"] == "python" and rows[0]["contract_version"] == "1.11.0"
     _, rows, _ = invoke(monkeypatch, ["operations"])
     assert "bond.futures.conversion_factor" in rows[0] and rows[0] == sorted(rows[0])
 
 
-def test_run_exit_codes(monkeypatch):
+def test_run_exit_codes(monkeypatch: pytest.MonkeyPatch) -> None:
     assert invoke(monkeypatch, ["run"], GOOD.encode())[0] == 0
     assert invoke(monkeypatch, ["run"], b"\xff")[0] == 2
 
 
-def test_internal_fault_is_70(monkeypatch):
-    def boom():
+def test_internal_fault_is_70(monkeypatch: pytest.MonkeyPatch) -> None:
+    def boom() -> None:
         raise RuntimeError("x")
     monkeypatch.setitem(cli.COMMANDS, "version", boom)
     assert invoke(monkeypatch, ["version"])[0] == 70
@@ -101,7 +101,7 @@ def _old_cf(coupon, n, z):
                  - (coupon / 2) * (6 - v) / 6, 4)
 
 
-def test_conversion_factor_contracts():
+def test_conversion_factor_contracts() -> None:
     bond = Bond(date(2034, 2, 15), 0.04, 2)  # from 2026-03-01: n = 7, z = 11
     ten = conversion_factor(bond, 2026, 3, 0.06)
     assert ten == conversion_factor(bond, 2026, 3, 0.06, "BOND") == _old_cf(0.04, 7, 9)
@@ -112,7 +112,7 @@ def test_conversion_factor_contracts():
     assert five == expected and five != ten
 
 
-def test_conversion_factor_coupon_rounds_to_eighth():
+def test_conversion_factor_coupon_rounds_to_eighth() -> None:
     on_grid = conversion_factor(Bond(date(2034, 2, 15), 0.04, 2), 2026, 3, 0.06)
     assert conversion_factor(Bond(date(2034, 2, 15), 0.0406, 2), 2026, 3, 0.06) == on_grid
     up = conversion_factor(Bond(date(2034, 2, 15), 0.04125, 2), 2026, 3, 0.06)
@@ -127,7 +127,7 @@ def _cf_case(contract):
                                 "inputs": inputs}))
 
 
-def test_conversion_factor_contract_input():
+def test_conversion_factor_contract_input() -> None:
     assert _cf_case(None)["outputs"] == _cf_case("TEN_YEAR")["outputs"]
     assert _cf_case("ULTRA_BOND")["status"] == "ok"
     assert _cf_case("THIRTY_YEAR")["error"]["code"] == "E_SCHEMA"
@@ -147,7 +147,7 @@ def _bootstrap(interpolation, recovery):
                                 "operation": "credit.cds.bootstrap", "inputs": inputs}))
 
 
-def test_credit_needs_log_linear_df():
+def test_credit_needs_log_linear_df() -> None:
     assert _bootstrap("LOG_LINEAR_DF", 0.4)["status"] == "ok"
     bad = _bootstrap("LINEAR_ZERO", 0.4)["error"]
     assert bad["code"] == "E_INPUT" and bad["field"] == "discount.interpolation"
@@ -164,21 +164,21 @@ def _code(f, *args):
     return e.value.code, e.value.field
 
 
-def test_xccy_modified_following_rolls_back_at_month_end():
+def test_xccy_modified_following_rolls_back_at_month_end() -> None:
     from quantforge_core.xccy import _mod_following
     # 2025-05-31 is a Saturday; following would leave May, so it rolls back to Friday
     assert _mod_following(["EUTA"], date(2025, 5, 31)) == date(2025, 5, 30)
     assert _mod_following(["EUTA", "USGS"], date(2025, 3, 1)) == date(2025, 3, 3)
 
 
-def test_spread_cost_guards():
+def test_spread_cost_guards() -> None:
     from quantforge_core.hedging import spread_cost
     assert spread_cost([2.0, -3.0], [0.5, 0.25]) == 1.75
     assert _code(spread_cost, [1.0], [0.1, 0.2])[0] == "E_INPUT"
     assert _code(spread_cost, [1.0], [-0.1]) == ("E_DOMAIN", "half_spreads")
 
 
-def test_vol_surface_guards():
+def test_vol_surface_guards() -> None:
     from quantforge_core.curves import CurveData
     from quantforge_core.vol_usecase import vol_surface
     curve = CurveData(date(2026, 1, 2), "LOG_LINEAR_DF", (date(2027, 1, 2),), (0.97,))
@@ -193,7 +193,7 @@ def test_vol_surface_guards():
 
 # R1-6: USGS Good Friday early closes are business days; SOFR skips every Good Friday
 
-def test_usgs_good_friday_early_close_years():
+def test_usgs_good_friday_early_close_years() -> None:
     from quantforge_core.calendars import is_business_day
     for d in (date(2007, 4, 6), date(2021, 4, 2), date(2023, 4, 7), date(2026, 4, 3)):
         assert is_business_day("USGS", d)
@@ -201,7 +201,7 @@ def test_usgs_good_friday_early_close_years():
         assert not is_business_day("USGS", d)
 
 
-def test_sofr_skips_good_friday_in_open_years():
+def test_sofr_skips_good_friday_in_open_years() -> None:
     from quantforge_core.overnight import _back, _business_days
     days = _business_days("USGS", date(2026, 4, 1), date(2026, 4, 7), sofr=True)
     assert date(2026, 4, 3) not in days and len(days) == 4

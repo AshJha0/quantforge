@@ -1,0 +1,1859 @@
+{
+ "schema_version": "1.0",
+ "suite": "hedgeselect_i",
+ "spec": "specifications/08-hedging/instrument-selection.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_i_w4c.py",
+ "reviewer": "none: self-assessment until the end-of-project human review",
+ "cases": [
+  {
+   "case_id": "hedgeselect_i-0001",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      4
+     ],
+     "x": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      57.479674796747965
+     ],
+     "residual": [
+      5.24390243902439,
+      -2.008130081300812,
+      -5.134146341463414,
+      2.117886178861787,
+      3.995934959349594
+     ],
+     "objective": 78.34349593495934
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "best single bond for a key-rate book (5 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0002",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      1,
+      4
+     ],
+     "x": [
+      0.0,
+      13.099786891987884,
+      0.0,
+      0.0,
+      41.312620730050725
+     ],
+     "residual": [
+      1.7037649082140054,
+      2.6598671502099926,
+      -3.2394698470856547,
+      -0.9206253660846704,
+      1.024519883849903
+     ],
+     "objective": 22.369065066487213
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "best two of five (15 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0003",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      0,
+      1,
+      4
+     ],
+     "x": [
+      -8.269780060911025,
+      12.910256283794874,
+      0.0,
+      0.0,
+      45.27801536179268
+     ],
+     "residual": [
+      -0.8469707904926694,
+      1.6039899676694096,
+      -2.0012026915824324,
+      0.42935663338641294,
+      1.8138081980344345
+     ],
+     "objective": 10.7692028470185
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "best three of five (25 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0004",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     "x": [
+      -24.113679762447028,
+      3.7452907356961336,
+      -5.97448607256832,
+      -3.627513473991632,
+      75.32038846994305
+     ],
+     "residual": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "all five allowed: the full least-squares hedge (31 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0005",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2,
+    "lower": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      1,
+      4
+     ],
+     "x": [
+      0.0,
+      13.099786891987884,
+      0.0,
+      0.0,
+      41.312620730050725
+     ],
+     "residual": [
+      1.7037649082140054,
+      2.6598671502099926,
+      -3.2394698470856547,
+      -0.9206253660846704,
+      1.024519883849903
+     ],
+     "objective": 22.369065066487213
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "two of five, long-only (15 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0006",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2,
+    "ridge": 0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      1,
+      2
+     ],
+     "x": [
+      0.0,
+      21.704996195267295,
+      12.346268042746045,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      -9.58257501961835,
+      -4.6988130276108935,
+      -8.398741837665268,
+      -0.0781059139258905,
+      -0.2754526525843289
+     ],
+     "objective": 496.2940242383644
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "two of five with a ridge (15 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0007",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     0.01,
+     0.01,
+     0.01,
+     10.0,
+     10.0
+    ],
+    "max_instruments": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      2
+     ],
+     "x": [
+      0.0,
+      0.0,
+      15.829110104952603,
+      0.0,
+      0.0
+     ],
+     "residual": [
+      -11.683417797900947,
+      -22.62563348425711,
+      -21.50253393702844,
+      -0.5879788845521355,
+      1.2060105577239322
+     ],
+     "objective": 29.109611417380684
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "weights on the long key rates change the choice (bond 2, not bond 4) (5 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0008",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "max_instruments": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      0
+     ],
+     "x": [
+      1.0,
+      0.0
+     ],
+     "residual": [
+      0.0,
+      -1.0
+     ],
+     "objective": 1.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "exact tie: the lower index wins (2 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0009",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      1.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1.0,
+     0.0
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      1,
+      2
+     ],
+     "x": [
+      0.0,
+      1.0,
+      1.0
+     ],
+     "residual": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "greedy selection misses the best pair: the best single instrument is not in it (6 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0010",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     0.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "selected": [
+      0
+     ],
+     "x": [
+      2.0,
+      0.0
+     ],
+     "residual": [
+      0.0,
+      0.0
+     ],
+     "objective": 0.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath-50-subset-enumeration",
+    "scipy-1.18-lstsq-bvls-per-subset"
+   ],
+   "tags": [
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "fewer instruments win a tie with more (3 subsets)",
+   "output_classes": {
+    "selected": "date_and_convention"
+   }
+  },
+  {
+   "case_id": "hedgeselect_i-0011",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 0
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "max_instruments 0"
+  },
+  {
+   "case_id": "hedgeselect_i-0012",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 6
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "max_instruments above n"
+  },
+  {
+   "case_id": "hedgeselect_i-0013",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2,
+    "eq_matrix": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "eq_rhs": [
+     0.0
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "equalities not allowed in selection"
+  },
+  {
+   "case_id": "hedgeselect_i-0014",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2,
+    "lower": [
+     0.5,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "a lower bound above zero"
+  },
+  {
+   "case_id": "hedgeselect_i-0015",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      0.45,
+      0.1,
+      0.02,
+      0.0,
+      0.3
+     ],
+     [
+      0.3,
+      0.85,
+      0.15,
+      0.05,
+      0.4
+     ],
+     [
+      0.05,
+      0.7,
+      0.6,
+      0.2,
+      0.45
+     ],
+     [
+      0.0,
+      0.2,
+      1.1,
+      0.7,
+      0.35
+     ],
+     [
+      0.0,
+      0.02,
+      0.55,
+      1.2,
+      0.2
+     ]
+    ],
+    "b": [
+     -12.0,
+     -25.0,
+     -31.0,
+     -18.0,
+     -7.5
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     -1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 2
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "negative weight"
+  },
+  {
+   "case_id": "hedgeselect_i-0016",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      1.0
+     ]
+    ],
+    "b": [
+     -2.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0
+    ],
+    "max_instruments": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SINGULAR"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "duplicate instruments"
+  },
+  {
+   "case_id": "hedgeselect_i-0017",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0
+    ],
+    "weights": [
+     1.0
+    ],
+    "max_instruments": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "21 instruments (limit 20)"
+  },
+  {
+   "case_id": "hedgeselect_i-0018",
+   "operation": "hedge.select.solve",
+   "inputs": {
+    "a": [
+     [
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0,
+      0.1
+     ],
+     [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      1.0
+     ]
+    ],
+    "b": [
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0,
+     -1.0
+    ],
+    "weights": [
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "max_instruments": 7
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_LIMIT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "hedge",
+    "selection",
+    "synthetic"
+   ],
+   "description": "20 instruments, K = 7: 137,979 subsets, above 100,000 (I-53, after the builds)"
+  }
+ ]
+}

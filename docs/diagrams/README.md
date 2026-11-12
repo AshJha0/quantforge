@@ -147,3 +147,22 @@ flowchart LR
 ```
 
 The joint solve feeds both the prices and the Jacobian that AAD carries back to the quotes (ruling F-29). VaR and the backtests work on P&L scenarios; FRTB-SA works on sensitivities. Specs: `02-curves/joint-solve-and-funding.md`, `06-risk/book-sensitivities.md`, `06-risk/var-es-and-backtests.md`, `06-risk/frtb-sa-girr.md`, `07-portfolio/book-lifecycle.md`.
+
+## Stage I: hedging around one solver
+
+```mermaid
+flowchart LR
+  BK[book risks b] --> QP[hedge.qp.solve]
+  GR[Greeks of options] -->|A, b| GN[hedge.greeks.neutralise] --> QP
+  CDS[credit.cds.price legs] -->|CS01, JTD| CR[hedge.credit.cds] --> QP
+  RP[repricing on bumped curves] -->|A, b| XA[hedge.crossasset.solve] --> QP
+  CO[half-spreads, impact, liquidity, margin] --> QP
+  QP --> FR[hedge.frontier.solve]
+  QP --> SEL[hedge.select.solve]
+  BK -->|same objective, whole lots| INT[hedge.integer.solve]
+  QP -->|x| RES[hedge.residual.report]
+  PATH[spot path] --> BTD[hedge.backtest.delta] --> EFF[hedge.effectiveness]
+  FILLS[orders and fills] --> SLP[hedge.slippage.report]
+```
+
+Every hedge that builds a risk matrix passes it to one constrained least-squares solve; the frontier and instrument selection call that solve repeatedly. The checks run in a fixed order, so a bad problem returns the same error code in every build (rulings I-3, I-14). Costs are solved by sign state (long, short or held at zero), with no cap below 200 instruments (I-48) and exact answers at a switch point (I-54). Specs: `08-hedging/hedge-solvers.md`, `credit-and-correlation-hedges.md`, `cross-asset-hedge.md`, `hedge-costs-and-frontier.md`, `instrument-selection.md`, `dynamic-hedge-and-effectiveness.md`, `hedge-slippage.md`.

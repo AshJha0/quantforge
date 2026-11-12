@@ -3,6 +3,7 @@ outside source (plan section 12.1). Rust, Java and C++ carry the same checks; th
 calibration round trip on a Heston surface runs here only (it needs a Monte Carlo harness)."""
 import itertools
 import math
+from typing import Any
 
 import numpy as np
 
@@ -22,33 +23,33 @@ def _slv_gap(nx, nv, nt):
     """Largest |L - 1| within 0.3 of ln(spot) for a flat 20% surface and Heston with
     v0 = theta = 0.04 and vanishing vol of vol: SLV then reduces to Heston with L = 1."""
     flat = [arb_surface.Slice(1.0, Svi(0.04, 0.0, 0.0, 0.0, 0.1))]
-    out = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, hm.Heston(0.04, 2.0, 0.04, 0.01, -0.7), flat,
+    out: dict[str, Any] = hm.slv_leverage(100.0, 1.0, 0.0, 0.0, hm.Heston(0.04, 2.0, 0.04, 0.01, -0.7), flat,
                           hm.Grid(nx, nv, nt, X0 - 1.0, X0 + 1.0, 0.25))
     assert abs(out["mass"] - 1.0) < 1e-3
     return max(abs(lev - 1) for x, lev in zip(out["x"], out["leverage"]) if abs(x - X0) < 0.3)
 
 
-def test_slv_heston_limit_leverage_one_within_discretisation_error():
+def test_slv_heston_limit_leverage_one_within_discretisation_error() -> None:
     coarse, fine = _slv_gap(41, 20, 20), _slv_gap(81, 40, 40)
     assert coarse < 0.07
     assert fine < 0.6 * coarse  # discretisation error, about first order
 
 
-def test_fd_american_put_matches_fine_tree():
+def test_fd_american_put_matches_fine_tree() -> None:
     tree = ex.crr(100, 100, 1, 0.05, 0.0, 0.2, "PUT", 1000)["american"]
     fd = ex.fd(100, 100, 1, 0.05, 0.0, 0.2, "PUT", "AMERICAN", 401, 1600, 5.0)["price"]
     # Backward Euler error at this grid is about 2e-3; the tree's about 5e-4.
     assert abs(fd - tree) < 5e-3
 
 
-def test_fd_american_put_zero_rate_is_european():
+def test_fd_american_put_zero_rate_is_european() -> None:
     am = ex.fd(100, 100, 1, 0.0, 0.0, 0.2, "PUT", "AMERICAN", 401, 400, 5.0)["price"]
     eu = ex.fd(100, 100, 1, 0.0, 0.0, 0.2, "PUT", "EUROPEAN", 401, 400, 5.0)["price"]
     assert abs(am - eu) < 1e-12
     assert abs(am - ex.gbs(-1, 100, 100, 1, 0.0, 0.0, 0.2)) < 5e-3
 
 
-def test_crank_nicolson_second_order():
+def test_crank_nicolson_second_order() -> None:
     exact = ex.gbs(1, 100, 105, 1, 0.03, 0.02, 0.2)
     errs = [pde.bs_european("CALL", 100, 105, 0.03, 0.01, 0.2, 1, j, j // 2).price - exact
             for j in (100, 200, 400)]
@@ -68,7 +69,7 @@ def test_fd_reference_scheme_orders():
     assert all(0.8 <= p <= 1.2 for p in _order([a - b for a, b in itertools.pairwise(f)]))
 
 
-def test_crr_first_order():
+def test_crr_first_order() -> None:
     exact = ex.gbs(-1, 100, 100, 1, 0.05, 0.05, 0.2)
     errs = [ex.crr(100, 100, 1, 0.05, 0.0, 0.2, "PUT", n)["european"] - exact
             for n in (100, 200, 400)]
@@ -83,7 +84,7 @@ def _implied(price, strike, t):
     return (lo + hi) / 2
 
 
-def test_slv_calibrated_to_heston_surface_has_unit_leverage_and_reprices():
+def test_slv_calibrated_to_heston_surface_has_unit_leverage_and_reprices() -> None:
     """Heston prices -> SVI surface -> Dupire -> SLV leverage. Pure Heston has
     sigma_LV^2 = E[v | x], so the calibrated leverage must be near 1 and an SLV Monte Carlo
     must reprice the Heston vanillas."""
@@ -110,6 +111,7 @@ def test_slv_calibrated_to_heston_surface_has_unit_leverage_and_reprices():
     dt = 1.0 / steps
     x, v = np.full(n, X0), np.full(n, h.v0)
     for s in range(steps):
+        assert xs is not None
         lev = np.interp(x, xs, levs[int(np.searchsorted(times, s * dt + dt / 2))])
         z1 = rng.standard_normal(n)
         z2 = h.rho * z1 + math.sqrt(1 - h.rho**2) * rng.standard_normal(n)

@@ -29,13 +29,13 @@ def code(text):
     return run_case(text)["error"]["code"]
 
 
-def test_run_ok_exits_zero():
+def test_run_ok_exits_zero() -> None:
     p = call("run", data=GOOD.encode())
     assert p.returncode == 0
     assert json.loads(p.stdout)["outputs"] == {"year_fraction": 182 / 360}
 
 
-def test_run_error_exits_two_with_unknown_case_id():
+def test_run_error_exits_two_with_unknown_case_id() -> None:
     p = call("run", data=b"{not json")
     assert p.returncode == 2
     result = json.loads(p.stdout)
@@ -43,28 +43,28 @@ def test_run_error_exits_two_with_unknown_case_id():
     assert result["error"]["code"] == "E_PARSE"
 
 
-def test_batch_survives_a_bad_line_and_keeps_order():
+def test_batch_survives_a_bad_line_and_keeps_order() -> None:
     p = call("batch", data=GOOD.encode() + b"\nnonsense\n\xff\n" + GOOD.encode() + b"\n")
     assert p.returncode == 0
     statuses = [json.loads(line)["status"] for line in p.stdout.splitlines()]
     assert statuses == ["ok", "error", "error", "ok"]
 
 
-def test_unknown_command_exits_64_with_empty_stdout():
+def test_unknown_command_exits_64_with_empty_stdout() -> None:
     p = call("nope")
     assert p.returncode == 64
     assert p.stdout == b""
 
 
-def test_version_and_operations():
+def test_version_and_operations() -> None:
     version = json.loads(call("version").stdout)
-    assert version["contract_version"] == "1.0.0"
+    assert version["contract_version"] == "1.11.0"  # ruling I-51
     assert version["language"] == "python"
     names = json.loads(call("operations").stdout)
     assert names == sorted(OPERATIONS)
 
 
-def test_line_separators_in_output_stay_on_one_line():
+def test_line_separators_in_output_stay_on_one_line() -> None:
     text = envelope("core.snapshot.hash", {"document_text": '{"a":" \u0085"}'})
     p = call("batch", data=text.encode() + b"\n")
     assert len(p.stdout.decode().splitlines()) == 1
@@ -85,14 +85,14 @@ def test_line_separators_in_output_stay_on_one_line():
         (envelope("core.stats.summary", {"x": [1.0, None]}), "E_SCHEMA"),
     ],
 )
-def test_envelope_and_type_errors(text, expected):
+def test_envelope_and_type_errors(text, expected) -> None:
     assert code(text) == expected
 
 
-def test_overflowing_result_is_non_finite():
+def test_overflowing_result_is_non_finite() -> None:
     text = envelope("core.integrate.trapezoid", {"function": "exp", "a": 0, "b": 1000, "n": 2})
     assert code(text) == "E_NON_FINITE"
 
 
-def test_no_state_between_cases():
+def test_no_state_between_cases() -> None:
     assert run_case(GOOD) == run_case(GOOD)

@@ -1,10 +1,10 @@
 # Tutorials
 
-Sixteen guided tutorials, each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`).
+Twenty-one guided tutorials, each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`).
 
 Each tutorial explains its results in the same order: the plain idea, the formal statement from the spec, then a worked example with a check you can do in your head. Each ends with notes for practitioners, common mistakes, what you just did, and references.
 
-Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the four command-line programs the others use. After that the order is free, except that Tutorial 6 introduces the Hull-White model that Tutorials 5 and 7 also use.
+Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the four command-line programs the others use. After that the order is free, except that Tutorial 6 introduces the Hull-White model that Tutorials 5 and 7 also use, and Tutorial 21 reruns the backtest of Tutorial 17 with costs.
 
 | Tutorial | What you do | Operations | Stage |
 |---|---|---|---|
@@ -24,6 +24,11 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 | [14. The trading book](tutorial-14-book.md) | Trades, a fixing, a default and an expiry replayed into positions, end-of-day marks, P&L explain | `book.lifecycle.apply`, `book.marks.resolve`, `risk.pnl.explain` | F |
 | [15. Advanced risk](tutorial-15-advanced-risk.md) | An AAD ladder for a Bermudan, pathwise and likelihood-ratio Greeks, a model reserve, FRTB vega and curvature, SIMM-style margin | `rates.shortrate.bermudan_ladder`, `risk.mc.greeks`, `risk.model_reserve.dispersion`, `risk.frtb.vega`, `risk.frtb.curvature`, `xva.simm.ir_delta` | F, G |
 | [16. The LIBOR market model](tutorial-16-lmm.md) | Caps and floors from the abcd volatility, Rebonato swaption vols, a simulated-caplet check | `rates.lmm.capfloor`, `rates.lmm.swaption_rebonato` | G |
+| [17. Delta-hedge an option and watch the P&L](tutorial-17-delta-hedge.md) | A delta, gamma and vega hedge, a delta-hedge backtest daily and weekly, dollar-offset and regression effectiveness | `hedge.greeks.neutralise`, `hedge.backtest.delta`, `hedge.effectiveness` | I |
+| [18. A minimum-variance hedge with the QP solver](tutorial-18-minvar-qp.md) | A minimum-variance ratio, Hull's beta hedge, a bounded key-rate hedge, the minimum-norm answer, whole contracts, residual risk | `hedge.minvar.ratio`, `hedge.beta.futures`, `hedge.qp.solve`, `hedge.integer.solve`, `hedge.residual.report` | I |
+| [19. Hedging credit and correlation](tutorial-19-credit-correlation.md) | A CDS hedge in CS01 and jump to default, the bucket risk left, an exchange-option correlation hedge and why exchange options alone cannot do it | `hedge.credit.cds`, `hedge.correlation.neutralise` | I |
+| [20. One hedge for equity and rates](tutorial-20-cross-asset.md) | An equity book's equity and key-rate risks hedged together, and the best two instruments out of three | `hedge.crossasset.solve`, `hedge.select.solve` | I |
+| [21. What a hedge costs](tutorial-21-hedge-costs.md) | Spread, impact and margin in a hedge, the risk-against-cost frontier, a backtest with costs, slippage | `hedge.qp.solve`, `hedge.frontier.solve`, `hedge.backtest.delta`, `hedge.slippage.report` | I |
 
 ## How the scripts work
 
@@ -34,9 +39,9 @@ uv run --project python python examples/tutorials/t4_credit.py          # Python
 python examples/tutorials/t4_credit.py rust/target/release/quantforge   # Rust, Java or C++
 ```
 
-To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Pages 2 to 16 use the builds that page 1 makes, so check page 1 first in a fresh clone.
+To check a page yourself, as CI does: `python tools/check_tutorial.py --lang rust` (all pages) or add `--page docs/getting-started/tutorial-4-credit.md`. Pages 2 to 21 use the builds that page 1 makes, so check page 1 first in a fresh clone.
 
-Scripts that send several cases at once and read their diagnostics, as in Tutorials 8 to 16, use `runner` from the same helper, the batch form of `connect`. Tutorial 1 is the one exception: to show what the library looks like from Python, its page calls the `quantforge_core` package directly, and a standard-library script, `examples/tutorial_swap.py`, sends the same three operations to the Rust, Java or C++ `batch` command. CI runs all sixteen pages in all four languages.
+Scripts that send several cases at once and read their diagnostics, as in Tutorials 8 to 16, use `runner` from the same helper, the batch form of `connect`. Tutorial 1 is the first exception: to show what the library looks like from Python, its page calls the `quantforge_core` package directly, and a standard-library script, `examples/tutorial_swap.py`, sends the same three operations to the Rust, Java or C++ `batch` command. The hedging tutorials, 17 to 21, follow tutorial 1's form (ruling I-52): the page's Python block imports the `quantforge_core` modules, and `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py` send the same cases, built from the `examples/hedge_*_i.json` inputs, to the other builds. CI runs all twenty-one pages in all four languages.
 
 ## Where to go next
 

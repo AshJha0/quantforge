@@ -282,10 +282,81 @@ fn stage_f_above(op: &str, i: &Json) -> bool {
     }
 }
 
+/// Ruling I-53: more than `max` candidate subsets `sum_{k=1..min(K,n)} C(n, k)`, with `n` the
+/// columns of `a` (at most 20 here, so the sum fits easily).
+fn select_subsets_above(i: &Json, max: i128) -> bool {
+    let n = i
+        .get("a")
+        .and_then(Json::as_array)
+        .and_then(|a| a.first())
+        .and_then(Json::as_array)
+        .map_or(0, |r| r.len() as i128);
+    let k = int(i, "max_instruments").unwrap_or(0).min(n);
+    if n > 20 || k < 1 {
+        return false;
+    }
+    let (mut c, mut total) = (1i128, 0i128);
+    for j in 1..=k {
+        c = c * (n - j + 1) / j;
+        total += c;
+    }
+    total > max
+}
+
+/// Ruling I-4: stated sizes of the stage I wave 1 operations.
+fn stage_i_above(op: &str, i: &Json) -> bool {
+    let over = |k: &str, n: i128| len(i, k).is_some_and(|m| m > n);
+    let columns_over = |n: i128| {
+        i.get("a")
+            .and_then(Json::as_array)
+            .and_then(|a| a.first())
+            .and_then(Json::as_array)
+            .is_some_and(|r| r.len() as i128 > n)
+    };
+    match op {
+        "hedge.qp.solve" => over("a", 1_000) || columns_over(200) || over("eq_matrix", 200),
+        "hedge.frontier.solve" => {
+            over("a", 1_000)
+                || columns_over(200)
+                || over("eq_matrix", 200)
+                || over("cost_weights", 50)
+        }
+        "hedge.integer.solve" => over("a", 1_000) || columns_over(12),
+        "hedge.residual.report" => over("a", 1_000) || columns_over(200),
+        "hedge.minvar.ratio" => over("covariance", 201) || over("hedge_changes", 200),
+        "hedge.greeks.neutralise" => over("portfolio", 1_000) || over("hedges", 3),
+        // Ruling I-19.
+        "hedge.credit.cds" => over("book", 1_000) || over("hedges", 50),
+        "hedge.correlation.neutralise" => over("book", 1_000) || over("hedges", 5),
+        // Rulings I-35 and I-38.
+        "hedge.select.solve" => {
+            over("a", 1_000) || columns_over(20) || select_subsets_above(i, 100_000)
+        }
+        "hedge.slippage.report" => {
+            over("orders", 10_000)
+                || i.get("orders").and_then(Json::as_array).is_some_and(|os| {
+                    os.iter()
+                        .map(|o| len(o, "fills").unwrap_or(0))
+                        .sum::<i128>()
+                        > 1_000_000
+                })
+        }
+        // Ruling I-23.
+        "hedge.crossasset.solve" => {
+            over("book", 1_000)
+                || over("hedges", 200)
+                || i.get("curve")
+                    .is_some_and(|c| len(c, "times").is_some_and(|n| n > 100))
+        }
+        _ => false,
+    }
+}
+
 /// The `E_LIMIT` this case breaks, if any.
 pub fn check(op: &str, inputs: &Json) -> Option<QfError> {
     (too_long_stage_f(op, inputs)
         || stage_f_above(op, inputs)
+        || stage_i_above(op, inputs)
         || matrix_above(op, inputs)
         || curve_points_above(inputs)
         || value_too_deep(op, inputs)

@@ -5,13 +5,13 @@ N untimed calls, divided by N, measured with the cyclic GC disabled. CPython has
 cheap gross-allocation counter, so this counts blocks a call leaves alive (caches, interned
 objects, results kept by the caller), not every temporary it allocates and frees.
 """
-
 import gc
 import json
 import os
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -30,14 +30,14 @@ def _inject_ns() -> int:
 
 def _allocs_per_op(fn) -> float:
     fn()  # warm caches so one-time setup is not counted
-    keep = [None] * ALLOC_CALLS
+    keep: list[object] = [None] * ALLOC_CALLS
     gc.collect()
     gc.disable()
     try:
         before = sys.getallocatedblocks()
         for k in range(ALLOC_CALLS):
             keep[k] = fn()
-        keep = None
+        keep.clear()
         after = sys.getallocatedblocks()
     finally:
         gc.enable()
@@ -45,7 +45,7 @@ def _allocs_per_op(fn) -> float:
 
 
 @pytest.fixture
-def qf_bench(benchmark):
+def qf_bench(benchmark: Any):
     """Returns run(bench_id, fn): counts allocations, then times fn (plus any injected spin)."""
 
     def run(bench_id: str, fn) -> None:
@@ -67,7 +67,7 @@ def qf_bench(benchmark):
     return run
 
 
-def pytest_sessionfinish(session):
+def pytest_sessionfinish(session) -> None:
     bs = getattr(session.config, "_benchmarksession", None)
     if bs is None or not bs.benchmarks:
         return

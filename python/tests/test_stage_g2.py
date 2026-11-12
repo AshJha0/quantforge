@@ -5,6 +5,7 @@ import itertools
 import math
 import statistics
 import time
+from typing import Any
 
 import pytest
 
@@ -78,7 +79,7 @@ def _berm(times: list[float], dfs: list[float], a: float, sigma: float) -> float
 
 def _richardson(f, x: float) -> float:
     def d(h: float) -> float:
-        return (f(x * (1 + h)) - f(x * (1 - h))) / (2 * h * x)
+        return float((f(x * (1 + h)) - f(x * (1 - h))) / (2 * h * x))
 
     return (4 * d(5e-5) - d(1e-4)) / 3
 
@@ -163,7 +164,7 @@ def test_wwr_without_dependence_is_the_independent_cva() -> None:
     times = [0.25, 0.5, 0.75, 1.0]
     values = [p[1:] for p in PATHS]
     dfs = [0.995, 0.99, 0.985, 0.98]
-    out = xva.wwr_cva(times, values, dfs, 0.03, 0.4, 0.0)
+    out: dict[str, Any] = xva.wwr_cva(times, values, dfs, 0.03, 0.4, 0.0)
     ee = [sum(max(p[i], 0.0) for p in values) / 4 for i in range(4)]
     prev = [0.0, *times[:-1]]
     indep = 0.6 * sum(d * e * (math.exp(-0.03 * p) - math.exp(-0.03 * t))

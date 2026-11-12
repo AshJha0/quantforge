@@ -106,3 +106,17 @@ Rows `EA*` are added by the stage E spec A session (slices E1, E2, E3, E5). "Pin
 | G3 | Hull-White bond priced at a curve pillar time | Pinned | `stage_g/shortrate_g` `t = 2.0` case | Ruling G-3: right-hand forward |
 | G4 | Negative-rate Hull-White curve (discount factors above 1) | Pinned | `stage_g/shortrate_g` `NEG` curve cases | Spec rule: no positivity check on rates |
 | G5 | Discrete barrier: absent monitoring, monthly monitoring, spot near the barrier | Pinned | `stage_g/barrier_g` | Rulings G-7, G-8 |
+| I1 | Hedge instruments that duplicate each other (or a zero column) | Pinned | `stage_i/hedgeqp_i` `E_SINGULAR` under `ERROR`; `MIN_NORM` cases `-0018` to `-0022`; ridge `-0023`; `stage_i/hedgeint_i` `E_SINGULAR` | Rulings I-3, I-5, I-6 |
+| I2 | Constraints that no position can meet | Pinned | `stage_i/hedgeqp_i` `E_INFEASIBLE` cases (budget above the bounds, equality outside the box, fixed variable against an equality) | Ruling I-14; HiGHS confirms each |
+| I3 | Integer lots: exact ties and rounding that is not optimal | Pinned | `stage_i/hedgeint_i-0007` to `-0010` | Ruling I-7 |
+| I4 | Beta futures exactly half a contract | Pinned | `stage_i/hedgebeta_i-0006` (`-2.5 -> -3`) | Ruling I-10 |
+| I5 | Book already hedged, or nothing to hedge | Pinned | `hedgeqp_i-0026` (`b = 0` gives `x = 0`); `hedgeres_i` `E_DOMAIN` for `b^T S b = 0`; `hedgemv_i` zero exposure variance | Ruling I-11 |
+| I6 | Credit hedge instrument with no risk in the targeted hazard sections | Pinned | `stage_i/hedgecredit_i` `E_SINGULAR` (1Y and 3Y contracts against buckets 4 and 5) | Ruling I-15 |
+| I7 | Correlation 1 with unequal vols; exchange options that cannot separate vega from correlation | Pinned | `stage_i/hedgecorr_i` (`rho = 1`, `s = 0.05`; exchange-only `E_SINGULAR`; `s = 0` `E_DOMAIN`) | Ruling I-17 |
+| I8 | Cross-asset maturity outside the curve: before the first pillar, or after the last | Pinned | `stage_i/hedgexa_i-0008` (flat short end, pillar 1 only); `E_INPUT` case beyond the last pillar | Ruling I-20 |
+| I9 | Hedge instruments of very different unit sizes | Rule | `stage_i/hedgexa_i` uses `ZCB` notionals of 1e6 | Ruling I-22: the relative singularity test is not scale-invariant |
+| I10 | A hedge instrument too costly to use; a margin limit the constraints cannot meet | Pinned | `stage_i/hedgecost_i-0002` (`x_2 = 0.0` exactly); `hedgecost_i` `E_INFEASIBLE` cases | Rulings I-25, I-26 |
+| I11 | Backtest path that ends at expiry, or stops before it; zero position | Pinned | `stage_i/hedgebt_i` (payoff at expiry; value mark at day 30; `quantity = 0` is `E_DOMAIN`) | Rulings I-29, I-31 |
+| I12 | Effectiveness when the hedged item's total change is zero or small | Pinned | `stage_i/hedgeeff_i` `E_DOMAIN` (sum zero); `hedgebt_i-0001` (offset 1.31 at R² 0.996) | Ruling I-30; dollar-offset instability (Finnerty and Grant 2002) |
+| I13 | Instrument selection with ties, and a best pair that leaves out the best single instrument | Pinned | `stage_i/hedgeselect_i-0008` to `-0010` | Ruling I-34 |
+| I14 | Hedge order with no fills, or filled better than the decision price | Pinned | `stage_i/hedgeslip_i-0004` (`average_price` null), `-0005` (negative cost) | Rulings I-36, I-37 |

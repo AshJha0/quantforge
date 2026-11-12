@@ -24,6 +24,32 @@ LANGS = ("java", "cpp", "python", "rust")
 MIN_FOR_GATE = 10
 
 
+SUMMED = ("mutants", "unviable", "unit_killed_all", "sampled", "sample_unit_killed", "sample_golden_killed",
+          "sample_either_killed", "sample_golden_timeouts")
+
+
+def shard_files(path):
+    """<lang>--<module>.json, or its shards <lang>--<module>--s<K>.json (Rust, see plan_matrix.py)."""
+    path = Path(path)
+    return [path] if path.is_file() else sorted(path.parent.glob(path.stem + "--s*" + path.suffix))
+
+
+def merged_summary(path):
+    """One summary from the module file or its shards. Each shard lists every mutant, so `mutants` is not summed."""
+    parts = [json.loads(f.read_text(encoding="utf-8"))["summary"] for f in shard_files(path)]
+    if len(parts) == 1:
+        return parts[0]
+    s = {k: sum(p.get(k, 0) for p in parts) for k in SUMMED}
+    s["mutants"] = parts[0]["mutants"]
+    verdicts = {}
+    for p in parts:
+        for k, v in p.get("unit_verdicts", {}).items():
+            if k != "not run":
+                verdicts[k] = verdicts.get(k, 0) + v
+    s["unit_verdicts"] = verdicts
+    return s
+
+
 def score_file(lang, path):
     """Returns (killed, survived, note)."""
     if lang == "java":
@@ -32,8 +58,7 @@ def score_file(lang, path):
         killed = sum(s in ("KILLED", "TIMED_OUT", "MEMORY_ERROR") for s in status)
         survived = sum(s in ("SURVIVED", "NO_COVERAGE") for s in status)
         return killed, survived, f"PIT, {len(muts)} mutants, {status.count('NO_COVERAGE')} without coverage"
-    d = json.loads(Path(path).read_text(encoding="utf-8"))
-    s = d["summary"]
+    s = merged_summary(path)
     if lang == "cpp":
         basis = (f"unit or golden, golden {s.get('golden_killed', s['killed'])}, unit {s['unit_killed']}" if s.get("unit")
                  else "golden only")
@@ -68,7 +93,7 @@ def main():
                 rows.append([m["module"], lang, "not mapped", "", "", "no module for this language in stages.json"])
                 continue
             f = res / f"{lang}--{m['module']}.{'xml' if lang == 'java' else 'json'}"
-            if not f.is_file():
+            if not shard_files(f):
                 missing.append(f.name)
                 rows.append([m["module"], lang, "no result", "", "", f"`{m[lang]}`"])
                 continue

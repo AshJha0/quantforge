@@ -1,0 +1,174 @@
+// Stage I wave 4b: dynamic delta-hedge backtest and hedge effectiveness.
+// specifications/08-hedging/dynamic-hedge-and-effectiveness.md, rulings I-29 to I-32.
+#include <algorithm>
+#include <cmath>
+#include <string>
+
+#include "quantforge/core/error.hpp"
+#include "quantforge/core/hedging.hpp"
+#include "quantforge/core/stats.hpp"
+
+namespace quantforge::hedging {
+namespace {
+
+void input_if(bool bad, const char* field, const std::string& why) {
+    if (bad) throw Error("E_INPUT", std::string(field) + ": " + why, field);
+}
+void domain_if(bool bad, const char* field, const std::string& why) {
+    if (bad) throw Error("E_DOMAIN", std::string(field) + ": " + why, field);
+}
+
+// Black-Scholes-Merton value and delta at time to expiry tau; at tau = 0 the payoff and no delta.
+struct Mark {
+    double value, delta;
+};
+Mark mark(const BacktestOption& o, double s, double tau, double r, double q, double v) {
+    const bool call = o.call;
+    if (tau <= 0.0) return {call ? std::max(s - o.strike, 0.0) : std::max(o.strike - s, 0.0), 0.0};
+    const double sq = std::sqrt(tau);
+    const double d1 = (std::log(s / o.strike) + (r - q + 0.5 * v * v) * tau) / (v * sq), d2 = d1 - v * sq;
+    const double carry = std::exp(-q * tau), df = std::exp(-r * tau);
+    if (call) return {s * carry * normal_cdf(d1) - o.strike * df * normal_cdf(d2), carry * normal_cdf(d1)};
+    return {o.strike * df * normal_cdf(-d2) - s * carry * normal_cdf(-d1), -carry * normal_cdf(-d1)};
+}
+
+}  // namespace
+
+Effectiveness effectiveness(const Vec& x, const Vec& y) {
+    input_if(x.size() != y.size(), "hedge_changes", "length differs from item_changes");
+    input_if(x.size() < 3, "item_changes", "needs at least 3 values");
+    double sx = 0.0, sy = 0.0, ax = 0.0;
+    for (std::size_t i = 0; i < x.size(); ++i) {
+        sx += x[i];
+        sy += y[i];
+        ax += std::fabs(x[i]);
+    }
+    domain_if(std::fabs(sx) <= 1e-12 * ax, "item_changes", "sum to zero (I-31, I-43)");
+    const double n = double(x.size()), mx = sx / n, my = sy / n;
+    double vx = 0.0, vy = 0.0, cxy = 0.0, vs = 0.0;
+    const double ms = (sx + sy) / n;
+    for (std::size_t i = 0; i < x.size(); ++i) {
+        const double dx = x[i] - mx, dy = y[i] - my, ds = (x[i] + y[i]) - ms;
+        vx += dx * dx;
+        vy += dy * dy;
+        cxy += dx * dy;
+        vs += ds * ds;
+    }
+    // I-43: relative zero-variance tests (the ratio of the sums of squares equals that of the variances).
+    domain_if(vx <= 1e-20 * vy, "item_changes", "zero sample variance (I-31, I-43)");
+    domain_if(vy <= 1e-20 * vx, "hedge_changes", "zero sample variance (I-31, I-43)");
+    vx /= n - 1.0;
+    vy /= n - 1.0;
+    cxy /= n - 1.0;
+    vs /= n - 1.0;
+    Effectiveness e;
+    e.dollar_offset = -sy / sx;
+    e.regression_slope = cxy / vx;
+    e.regression_r2 = cxy * cxy / (vx * vy);
+    e.variance_reduction = 1.0 - vs / vx;
+    return e;
+}
+
+DeltaBacktest backtest_delta(const BacktestOption& o, double quantity, double r, double q, double vol,
+                             const Vec& times, const Vec& spots, const BacktestCosts& costs) {
+    // Check 1.
+    input_if(times.size() != spots.size(), "spots", "length differs from times");
+    input_if(times.size() < 4, "times", "needs at least 4 points");
+    input_if(times.front() != 0.0, "times", "must start at 0");
+    for (std::size_t i = 1; i < times.size(); ++i) input_if(times[i] <= times[i - 1], "times", "must increase strictly");
+    input_if(times.back() > o.expiry_years, "times", "the path ends after expiry");
+    // Check 2.
+    for (const double s : spots) domain_if(s <= 0.0, "spots", "must be above 0");
+    domain_if(o.strike <= 0.0, "option", "strike must be above 0");
+    domain_if(o.expiry_years <= 0.0, "option", "expiry_years must be above 0");
+    domain_if(vol <= 0.0, "hedge_volatility", "must be above 0");
+    // Wave 4e, after the wave 4b domain checks (I-39).
+    const double half_spread = costs.half_spread.value_or(0.0), impact = costs.impact.value_or(0.0);
+    domain_if(half_spread < 0.0, "half_spread", "must be at least 0");
+    domain_if(impact < 0.0, "impact", "must be at least 0");
+    const auto trade_cost = [&](double dq) { return half_spread * std::fabs(dq) + impact * dq * dq; };
+    // The replay (I-29).
+    const std::size_t m = times.size();
+    DeltaBacktest out;
+    Vec delta(m, 0.0);
+    for (std::size_t i = 0; i < m; ++i) {
+        const Mark k = mark(o, spots[i], o.expiry_years - times[i], r, q, vol);
+        out.option_values.push_back(k.value);
+        delta[i] = k.delta;
+    }
+    for (std::size_t i = 0; i + 1 < m; ++i) out.shares.push_back(-quantity * delta[i] + 0.0);
+    // The initial purchase is a trade (I-39): Pi_0 = -cost(h_0).
+    const double opening = trade_cost(out.shares[0]);
+    double cash = -quantity * out.option_values[0] - out.shares[0] * spots[0] - opening;
+    out.trading_cost = opening;
+    out.portfolio_values.push_back(-opening + 0.0);
+    double paid = 0.0;  // the rebalance cost paid at the start of the step, after the last Pi was recorded
+    Vec item, hedge;
+    for (std::size_t i = 0; i + 1 < m; ++i) {
+        const double dt = times[i + 1] - times[i];
+        const double interest = cash * std::expm1(r * dt), dividends = out.shares[i] * spots[i] * std::expm1(q * dt);
+        cash += interest + dividends;
+        const double pi = quantity * out.option_values[i + 1] + out.shares[i] * spots[i + 1] + cash;
+        item.push_back(quantity * (out.option_values[i + 1] - out.option_values[i]));
+        // hedge_i = (Pi_{i+1} - Pi_i) - item_i, summed from its terms (less rounding than the difference).
+        hedge.push_back(out.shares[i] * (spots[i + 1] - spots[i]) + interest + dividends - paid);
+        out.portfolio_values.push_back(pi);
+        paid = 0.0;
+        if (i + 2 < m) {  // rebalance, except on the last date; its cost shows in the next step (I-39)
+            const double dq = out.shares[i + 1] - out.shares[i];
+            paid = trade_cost(dq);
+            cash -= dq * spots[i + 1] + paid;
+            out.trading_cost += paid;
+        }
+    }
+    out.final_pnl = out.portfolio_values.back();
+    out.costed = costs.half_spread.has_value() || costs.impact.has_value();
+    out.stats = effectiveness(item, hedge);  // check 3 (I-31)
+    return out;
+}
+
+// ---- wave 4d: slippage (I-36, I-37) ----
+
+SlippageReport slippage_report(const std::vector<Order>& orders) {
+    input_if(orders.empty(), "orders", "needs at least one order");
+    for (const Order& o : orders) {
+        input_if(o.quantity == 0.0, "orders", "an order quantity is 0");
+        double filled = 0.0;
+        for (const Fill& f : o.fills) {
+            input_if(f.quantity == 0.0 || (f.quantity > 0.0) != (o.quantity > 0.0), "fills",
+                     "a fill is 0 or of the other sign");
+            filled += f.quantity;
+        }
+        input_if(std::fabs(filled) > std::fabs(o.quantity), "fills", "the fills add up to more than the order");
+    }
+    for (const Order& o : orders) {
+        domain_if(o.decision_price <= 0.0 || o.final_price <= 0.0, "orders", "prices must be above 0");
+        for (const Fill& f : o.fills) domain_if(f.price <= 0.0, "fills", "prices must be above 0");
+        domain_if(o.half_spread < 0.0, "orders", "half_spread must be at least 0");
+        domain_if(o.impact < 0.0, "orders", "impact must be at least 0");
+    }
+    SlippageReport out;
+    for (const Order& o : orders) {
+        Slippage s;
+        double notional = 0.0;
+        for (const Fill& f : o.fills) {
+            s.filled_quantity += f.quantity;
+            notional += f.quantity * f.price;
+            s.execution_cost += f.quantity * (f.price - o.decision_price);
+        }
+        if (!o.fills.empty()) s.average_price = notional / s.filled_quantity;
+        s.opportunity_cost = (o.quantity - s.filled_quantity) * (o.final_price - o.decision_price) + 0.0;
+        s.shortfall = s.execution_cost + s.opportunity_cost;
+        s.model_cost = o.half_spread * std::fabs(s.filled_quantity) + o.impact * s.filled_quantity * s.filled_quantity;
+        s.slippage = s.execution_cost - s.model_cost;
+        out.total.execution_cost += s.execution_cost;
+        out.total.opportunity_cost += s.opportunity_cost;
+        out.total.shortfall += s.shortfall;
+        out.total.model_cost += s.model_cost;
+        out.total.slippage += s.slippage;
+        out.orders.push_back(s);
+    }
+    return out;
+}
+
+}  // namespace quantforge::hedging

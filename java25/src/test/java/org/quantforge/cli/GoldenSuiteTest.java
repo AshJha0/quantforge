@@ -99,7 +99,7 @@ class GoldenSuiteTest {
     }
 
     /** Rule F-3 statuses: "any" passes on a well-formed result; "same_as" compares with an earlier peer case. */
-    private static String judge(Map<?, ?> c, Map<?, ?> result, Map<String, Map<?, ?>> peers) {
+    static String judge(Map<?, ?> c, Map<?, ?> result, Map<String, Map<?, ?>> peers) {
         Map<?, ?> expected = map(c.get("expected"));
         if ("any".equals(expected.get("status"))) {
             return "ok".equals(result.get("status")) || "error".equals(result.get("status")) ? null : "bad status";

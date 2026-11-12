@@ -28,7 +28,7 @@ def _option(model, kind, s, m, t, r, q):
 
 @SETTINGS
 @given(st.sampled_from(MODELS), spot, moneyness, expiry, rate, rate, vol)
-def test_put_call_parity(model, s, m, t, r, q, v):
+def test_put_call_parity(model, s, m, t, r, q, v) -> None:
     if model == black.BACHELIER:
         v *= s  # a normal vol is in price units
     call = black.price(_option(model, "CALL", s, m, t, r, q), v)
@@ -41,7 +41,7 @@ def test_put_call_parity(model, s, m, t, r, q, v):
 @SETTINGS
 @given(st.sampled_from(MODELS), st.sampled_from(("CALL", "PUT")), spot, moneyness, expiry, rate,
        rate, vol)
-def test_implied_vol_round_trip(model, kind, s, m, t, r, q, v):
+def test_implied_vol_round_trip(model, kind, s, m, t, r, q, v) -> None:
     if model == black.BACHELIER:
         v *= s
     o = _option(model, kind, s, m, t, r, q)
@@ -78,7 +78,7 @@ def _curve(rates, gaps, interpolation):
 @given(forwards, st.lists(st.integers(min_value=1, max_value=2000), min_size=12, max_size=12),
        st.just("LOG_LINEAR_DF"),
        st.lists(st.integers(min_value=0, max_value=20000), min_size=2, max_size=20))
-def test_discount_factors_never_rise_when_forwards_are_not_negative(rates, gaps, interp, offsets):
+def test_discount_factors_never_rise_when_forwards_are_not_negative(rates, gaps, interp, offsets) -> None:
     data = _curve(rates, gaps, interp)
     last = data.dates[-1]
     days = sorted({min(o, (last - AS_OF).days) for o in offsets})
@@ -92,7 +92,7 @@ def test_discount_factors_never_rise_when_forwards_are_not_negative(rates, gaps,
 @given(st.floats(min_value=0.0005, max_value=0.08), st.floats(min_value=0.0005, max_value=0.05),
        st.sampled_from((0.01, 0.05)), st.floats(min_value=0.0, max_value=1.2),
        st.floats(min_value=0.0, max_value=0.6), st.integers(min_value=30, max_value=360))
-def test_cds_index_option_parity(hazard, strike, coupon, v, recovery, days):
+def test_cds_index_option_parity(hazard, strike, coupon, v, recovery, days) -> None:
     from quantforge_core import credit_options
 
     as_of = date(2026, 11, 9)

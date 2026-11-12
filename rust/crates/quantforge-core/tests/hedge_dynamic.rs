@@ -1,0 +1,241 @@
+//! Stage I wave 4b backtest and effectiveness (`08-hedging/dynamic-hedge-and-effectiveness.md`):
+//! unit tests and the property tests the spec names (with the 2026-11-11 correction).
+#![allow(clippy::unwrap_used)] // tests may unwrap (G9)
+use proptest::prelude::*;
+use quantforge_core::hedge_dynamic::{
+    BacktestOption, BacktestSetup, backtest_delta, effectiveness, replay,
+};
+
+fn code<T: std::fmt::Debug>(r: quantforge_core::error::Result<T>) -> &'static str {
+    r.unwrap_err().code
+}
+
+const CALL: BacktestOption = BacktestOption {
+    call: true,
+    strike: 100.0,
+    expiry: 0.25,
+};
+
+const SETUP: BacktestSetup = BacktestSetup {
+    quantity: -100.0,
+    rate: 0.03,
+    dividend_yield: 0.01,
+    hedge_volatility: 0.2,
+    half_spread: None,
+    impact: None,
+};
+
+#[test]
+fn effectiveness_checks() {
+    let x = [1.0, -2.0, 3.0];
+    assert_eq!(code(effectiveness(&x, &[1.0, 2.0])), "E_INPUT");
+    assert_eq!(code(effectiveness(&x[..2], &[1.0, 2.0])), "E_INPUT");
+    assert_eq!(code(effectiveness(&[1.0, -1.0, 0.0], &x)), "E_DOMAIN");
+    assert_eq!(code(effectiveness(&[1.0, 1.0, 1.0], &x)), "E_DOMAIN");
+    assert_eq!(code(effectiveness(&x, &[2.0, 2.0, 2.0])), "E_DOMAIN");
+    assert_eq!(code(effectiveness(&x, &[1.0, f64::NAN, 2.0])), "E_DOMAIN");
+    // I-43: a hedge leg of rounding size against a real item is a zero-variance leg.
+    let tiny = [1e-15, -2e-15, 1.5e-15];
+    assert_eq!(code(effectiveness(&x, &tiny)), "E_DOMAIN");
+    assert_eq!(code(effectiveness(&[1.0, -1.0, 1e-13], &x)), "E_DOMAIN");
+    // Hedging half of the item: offset 0.5, slope -0.5, R^2 1, variance reduction 0.75.
+    let y: Vec<f64> = x.iter().map(|v| -0.5 * v).collect();
+    let e = effectiveness(&x, &y).unwrap();
+    assert!((e.dollar_offset - 0.5).abs() < 1e-15 && (e.regression_slope + 0.5).abs() < 1e-15);
+    assert!((e.regression_r2 - 1.0).abs() < 1e-15 && (e.variance_reduction - 0.75).abs() < 1e-15);
+}
+
+#[test]
+fn backtest_checks_and_expiry_payoff() {
+    let t = [0.0, 0.1, 0.2, 0.25];
+    let s = [100.0, 103.0, 98.0, 104.0];
+    let r = backtest_delta(&CALL, &SETUP, &t, &s).unwrap();
+    assert_eq!(r.option_values[3], 4.0);
+    assert_eq!(r.portfolio_values[0], 0.0);
+    assert_eq!(r.shares.len(), 3);
+    assert_eq!(r.final_pnl, r.portfolio_values[3]);
+    let put = BacktestOption {
+        call: false,
+        ..CALL
+    };
+    assert_eq!(
+        backtest_delta(&put, &SETUP, &t, &s).unwrap().option_values[3],
+        0.0
+    );
+    assert_eq!(
+        code(backtest_delta(&CALL, &SETUP, &[0.1, 0.2, 0.3, 0.4], &s)),
+        "E_INPUT"
+    );
+    assert_eq!(
+        code(backtest_delta(&CALL, &SETUP, &[0.0, 0.2, 0.2, 0.25], &s)),
+        "E_INPUT"
+    );
+    assert_eq!(code(backtest_delta(&CALL, &SETUP, &t, &s[..3])), "E_INPUT");
+    assert_eq!(
+        code(backtest_delta(&CALL, &SETUP, &t[..3], &s[..3])),
+        "E_INPUT"
+    );
+    assert_eq!(
+        code(backtest_delta(&CALL, &SETUP, &[0.0, 0.1, 0.2, 0.3], &s)),
+        "E_INPUT"
+    );
+    assert_eq!(
+        code(backtest_delta(
+            &CALL,
+            &SETUP,
+            &t,
+            &[100.0, 0.0, 98.0, 104.0]
+        )),
+        "E_DOMAIN"
+    );
+    let flat = BacktestSetup {
+        hedge_volatility: 0.0,
+        ..SETUP
+    };
+    assert_eq!(code(backtest_delta(&CALL, &flat, &t, &s)), "E_DOMAIN");
+    let none = BacktestSetup {
+        quantity: 0.0,
+        ..SETUP
+    };
+    assert_eq!(code(backtest_delta(&CALL, &none, &t, &s)), "E_DOMAIN");
+    let nan = BacktestSetup {
+        rate: f64::NAN,
+        ..SETUP
+    };
+    assert_eq!(code(backtest_delta(&CALL, &nan, &t, &s)), "E_DOMAIN");
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(128))]
+
+    #[test]
+    fn perfect_offset_scores_one(x in prop::collection::vec(-100.0..100.0_f64, 3..40)) {
+        let y: Vec<f64> = x.iter().map(|v| -v).collect();
+        if let Ok(e) = effectiveness(&x, &y) {
+            prop_assert!((e.dollar_offset - 1.0).abs() < 1e-12);
+            prop_assert!((e.regression_slope + 1.0).abs() < 1e-12);
+            prop_assert!((e.regression_r2 - 1.0).abs() < 1e-12);
+            prop_assert!((e.variance_reduction - 1.0).abs() < 1e-12);
+        }
+    }
+
+    #[test]
+    fn constant_spot_replay_ends_at_the_option_decay(
+        spot in 60.0..140.0_f64,
+        steps in 3usize..30,
+        quantity in -50.0..50.0_f64,
+        call in any::<bool>(),
+    ) {
+        #[allow(clippy::cast_precision_loss)]
+        let times: Vec<f64> = (0..=steps).map(|i| 0.2 * i as f64 / steps as f64).collect();
+        let spots = vec![spot; steps + 1];
+        let setup = BacktestSetup { quantity, rate: 0.0, dividend_yield: 0.0, hedge_volatility: 0.25, half_spread: None, impact: None };
+        let o = BacktestOption { call, strike: 100.0, expiry: 0.3 };
+        let r = replay(&o, &setup, &times, &spots).unwrap();
+        let v = &r.option_values;
+        let want = quantity * (v[steps] - v[0]);
+        let last = r.portfolio_values[steps];
+        prop_assert!((last - want).abs() < 1e-10 * want.abs().max(1.0), "{last} {want}");
+        prop_assert!(r.hedge.iter().all(|h| h.abs() < 1e-9 * quantity.abs().max(1.0) * spot));
+    }
+}
+
+mod slippage_and_costs {
+    use super::{CALL, SETUP, code};
+    use proptest::prelude::*;
+    use quantforge_core::hedge_dynamic::{BacktestSetup, Order, backtest_delta, slippage_report};
+
+    fn order(quantity: f64, fills: Vec<(f64, f64)>) -> Order {
+        Order {
+            quantity,
+            decision_price: 100.0,
+            final_price: 101.0,
+            half_spread: 0.02,
+            impact: 1e-4,
+            fills,
+        }
+    }
+
+    #[test]
+    fn slippage_checks() {
+        assert_eq!(code(slippage_report(&[])), "E_INPUT");
+        assert_eq!(code(slippage_report(&[order(0.0, vec![])])), "E_INPUT");
+        assert_eq!(
+            code(slippage_report(&[order(10.0, vec![(-1.0, 100.0)])])),
+            "E_INPUT"
+        );
+        assert_eq!(
+            code(slippage_report(&[order(10.0, vec![(0.0, 100.0)])])),
+            "E_INPUT"
+        );
+        assert_eq!(
+            code(slippage_report(&[order(10.0, vec![(11.0, 100.0)])])),
+            "E_INPUT"
+        );
+        assert_eq!(
+            code(slippage_report(&[order(10.0, vec![(1.0, 0.0)])])),
+            "E_DOMAIN"
+        );
+        let mut o = order(10.0, vec![]);
+        o.impact = -1.0;
+        assert_eq!(code(slippage_report(&[o])), "E_DOMAIN");
+        let (r, _) = slippage_report(&[order(10.0, vec![])]).unwrap();
+        assert_eq!(r[0].average_price, None);
+        assert_eq!(r[0].costs.opportunity_cost, 10.0);
+    }
+
+    #[test]
+    fn backtest_costs() {
+        let t = [0.0, 0.1, 0.2, 0.25];
+        let s = [100.0, 103.0, 98.0, 104.0];
+        let free = backtest_delta(&CALL, &SETUP, &t, &s).unwrap();
+        assert_eq!(free.trading_cost, None);
+        let zero = BacktestSetup {
+            half_spread: Some(0.0),
+            impact: Some(0.0),
+            ..SETUP
+        };
+        let z = backtest_delta(&CALL, &zero, &t, &s).unwrap();
+        assert_eq!(z.trading_cost, Some(0.0));
+        assert_eq!(z.portfolio_values, free.portfolio_values);
+        let costly = BacktestSetup {
+            half_spread: Some(0.02),
+            ..SETUP
+        };
+        let c = backtest_delta(&CALL, &costly, &t, &s).unwrap();
+        let first = 0.02 * c.shares[0].abs();
+        assert!((c.portfolio_values[0] + first).abs() < 1e-15);
+        assert!(c.trading_cost.unwrap() > first && c.final_pnl < free.final_pnl);
+        let negative = BacktestSetup {
+            impact: Some(-1.0),
+            ..SETUP
+        };
+        assert_eq!(code(backtest_delta(&CALL, &negative, &t, &s)), "E_DOMAIN");
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(96))]
+
+        #[test]
+        fn shortfall_and_slippage_identities(
+            orders in prop::collection::vec(
+                (prop_oneof![Just(1.0), Just(-1.0)], 1.0..1000.0_f64, 0.0..1.0_f64, 90.0..110.0_f64),
+                1..5,
+            ),
+        ) {
+            let os: Vec<Order> = orders
+                .iter()
+                .map(|(side, size, share, price)| order(side * size, vec![(side * size * share * 0.5 + side * 1e-3, *price), (side * size * share * 0.4, price + 0.1)]))
+                .collect();
+            let (r, total) = slippage_report(&os).unwrap();
+            let mut sum = 0.0;
+            for o in &r {
+                let c = o.costs;
+                prop_assert!((c.shortfall - c.execution_cost - c.opportunity_cost).abs() < 1e-9);
+                prop_assert!((c.slippage - (c.execution_cost - c.model_cost)).abs() < 1e-9);
+                sum += c.shortfall;
+            }
+            prop_assert!((total.shortfall - sum).abs() < 1e-9 * sum.abs().max(1.0));
+        }
+    }
+}
