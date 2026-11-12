@@ -101,19 +101,28 @@ class _Profile:
                 hi = mid
         return (lo + hi) / 2
 
+    def critical_cuts(self) -> list[float]:
+        """The scan ends and every critical point of `g` (cached: they do not depend on y)."""
+        cached: list[float] | None = getattr(self, "_cuts", None)
+        if cached is not None:
+            return cached
+        xs = _SCAN * self.sd
+        d = (-(self.a * self.b)[:, None] * np.exp(-self.b[:, None] * xs[None, :])).sum(axis=0)
+        cuts = [float(xs[0])]
+        for i in np.nonzero((d[:-1] == 0) | (d[:-1] * d[1:] < 0))[0]:
+            if d[i] == 0:
+                cuts.append(float(xs[i]))
+            else:
+                cuts.append(self._bisect(self.slope, float(xs[i]), float(xs[i + 1])))
+        cuts.append(float(xs[-1]))
+        self._cuts = cuts
+        return cuts
+
     def zeros(self, y: float = 0.0) -> list[float]:
         """Ruling R6-5.5: critical points of `g` bracketed from the analytic `g'` on 6,001
         points over +-12 sd and bisected; `g` is monotone between them, so each piece holds at
         most one root of `g - y`, found by bisection."""
-        xs = _SCAN * self.sd
-        d = (-(self.a * self.b)[:, None] * np.exp(-self.b[:, None] * xs[None, :])).sum(axis=0)
-        cuts = [float(xs[0])]
-        for i in range(len(xs) - 1):
-            if d[i] == 0:
-                cuts.append(float(xs[i]))
-            elif d[i] * d[i + 1] < 0:
-                cuts.append(self._bisect(self.slope, float(xs[i]), float(xs[i + 1])))
-        cuts.append(float(xs[-1]))
+        cuts = self.critical_cuts()
         out: list[float] = []
         for lo, hi in itertools.pairwise(cuts):
             if lo >= hi:

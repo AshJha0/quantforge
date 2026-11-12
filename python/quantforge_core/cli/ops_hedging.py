@@ -136,6 +136,30 @@ def hedge_greeks_neutralise(i: Inputs) -> Any:
                                                 unexpected)
 
 
+@op("usecase.option_hedge_lots")
+def usecase_option_hedge_lots(i: Inputs) -> Any:
+    """Use case 6 (ruling R6-11.20)."""
+    _no_nulls(i.raw)
+    market = (i.real("spot"), i.real("rate"), i.real("dividend_yield"), i.real("volatility"))
+    unexpected: list[str] = []
+    portfolio = _instruments(i, "portfolio", True, unexpected)
+    allowed = {"instrument", "strike", "expiry_years", "lot_size", "half_spread"}
+    hedges: list[tuple[Any, ...]] = []
+    for k, item in enumerate(i.array("hedges")):
+        if not isinstance(item, dict):
+            raise QfError("E_SCHEMA", f"hedges/{k}: not an object", "hedges")
+        p = Inputs(item, f"hedges/{k}.")
+        unexpected.extend(f"hedges/{k}.{name}" for name in item if name not in allowed)
+        hedges.append((p.enum("instrument", ("CALL", "PUT", "UNDERLYING")),
+                       p.opt_real("strike"), p.opt_real("expiry_years"),
+                       p.real("lot_size"), p.real("half_spread")))
+    targets = i.array("targets")
+    if not all(isinstance(t, str) and t in ("DELTA", "GAMMA", "VEGA") for t in targets):
+        raise QfError("E_SCHEMA", "targets: each must be DELTA, GAMMA or VEGA", "targets")
+    return core.hedge_solvers.option_hedge_lots(*market, portfolio, hedges, targets,
+                                                i.integer("max_lots"), unexpected)
+
+
 @op("hedge.beta.futures")
 def hedge_beta_futures(i: Inputs) -> Any:
     _no_nulls(i.raw)
