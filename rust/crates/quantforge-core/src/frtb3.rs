@@ -442,3 +442,113 @@ mod tests {
         assert_eq!(order("11", "9"), std::cmp::Ordering::Greater);
     }
 }
+
+/// One component of `risk.frtb.sbm_total`: a class operation's charges per scenario
+/// `[high, medium, low]`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct SbmComponent {
+    pub risk_class: String,
+    pub measure: String,
+    pub charges: [f64; 3],
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SbmTotal {
+    /// `[high, medium, low]`.
+    pub scenario_totals: [f64; 3],
+    pub capital: f64,
+    /// 0 high, 1 medium, 2 low.
+    pub binding: usize,
+    pub sum_of_component_capitals: f64,
+}
+
+/// `risk.frtb.sbm_total` (ruling R6-4.1, MAR21.7): per scenario the sum over components, then
+/// the largest scenario; ties go to the first of high, medium, low. Enum and key checks are
+/// the caller's (`E_SCHEMA`).
+pub fn sbm_total(components: &[SbmComponent]) -> Result<SbmTotal> {
+    for c in components {
+        crate::error::finite("scenarios", &c.charges.as_slice())?;
+    }
+    if components.is_empty() {
+        return fail("E_INPUT", "components is empty");
+    }
+    if components
+        .iter()
+        .any(|c| c.charges.iter().any(|x| *x < 0.0))
+    {
+        return fail("E_DOMAIN", "a scenario charge is negative");
+    }
+    for (k, c) in components.iter().enumerate() {
+        if components[..k]
+            .iter()
+            .any(|d| d.risk_class == c.risk_class && d.measure == c.measure)
+        {
+            return fail("E_INPUT", "the same risk_class and measure twice");
+        }
+    }
+    let mut totals = [0.0; 3];
+    let mut own = 0.0;
+    for c in components {
+        for (t, x) in totals.iter_mut().zip(c.charges) {
+            *t += x;
+        }
+        own += c.charges.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+    }
+    let mut binding = 0;
+    for s in 1..3 {
+        if totals[s] > totals[binding] {
+            binding = s;
+        }
+    }
+    Ok(SbmTotal {
+        scenario_totals: totals,
+        capital: totals[binding],
+        binding,
+        sum_of_component_capitals: own,
+    })
+}
+
+#[cfg(test)]
+mod sbm_total_tests {
+    use super::*;
+
+    fn comp(class: &str, m: &str, c: [f64; 3]) -> SbmComponent {
+        SbmComponent {
+            risk_class: class.into(),
+            measure: m.into(),
+            charges: c,
+        }
+    }
+
+    #[test]
+    fn total_by_scenario_is_below_sum_of_class_capitals() {
+        // by hand: totals 12, 10, 11 -> capital 12 (high); own capitals 10 + 9 = 19.
+        let r = sbm_total(&[
+            comp("GIRR", "DELTA", [10.0, 8.0, 2.0]),
+            comp("FX", "DELTA", [2.0, 2.0, 9.0]),
+        ])
+        .unwrap();
+        assert_eq!(r.scenario_totals, [12.0, 10.0, 11.0]);
+        assert_eq!(
+            (r.capital, r.binding, r.sum_of_component_capitals),
+            (12.0, 0, 19.0)
+        );
+        let tie = sbm_total(&[comp("EQ", "VEGA", [1.0, 3.0, 3.0])]).unwrap();
+        assert_eq!(tie.binding, 1);
+    }
+
+    #[test]
+    fn checks_in_order() {
+        assert_eq!(sbm_total(&[]).unwrap_err().code, "E_INPUT");
+        let neg = [
+            comp("EQ", "VEGA", [1.0, -1.0, 0.0]),
+            comp("EQ", "VEGA", [1.0, 1.0, 1.0]),
+        ];
+        assert_eq!(sbm_total(&neg).unwrap_err().code, "E_DOMAIN");
+        let dup = [
+            comp("EQ", "VEGA", [1.0, 1.0, 0.0]),
+            comp("EQ", "VEGA", [1.0, 1.0, 1.0]),
+        ];
+        assert_eq!(sbm_total(&dup).unwrap_err().code, "E_INPUT");
+    }
+}

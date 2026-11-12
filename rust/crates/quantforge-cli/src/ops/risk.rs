@@ -428,10 +428,20 @@ super::registry! {
         },
         "risk.curve.jacobian" => {
             let c = overnight(i, "convention")?;
-            let (t, q, m) = (i.date("as_of")?, ois_quotes(i)?, interpolation(i)?);
+            let (t, q) = (i.date("as_of")?, ois_quotes(i)?);
+            // R6-1.2: tension and step_end are checked as in the bootstrap, after bump_bp.
+            let m = interpolation(i);
+            if let Err(e) = &m
+                && e.code == "E_SCHEMA"
+            {
+                return Err(e.clone());
+            }
             let bp = i.f64_or("bump_bp", 1.0)?;
             i.gate()?;
-            let r = risk_curve::jacobian(&c, t, &q, m, bp)?;
+            if bp.is_finite() {
+                risk_curve::Bump::new(bp, risk_curve::Scheme::Central)?;
+            }
+            let r = risk_curve::jacobian(&c, t, &q, m?, bp)?;
             let dates: Vec<String> = r.pillar_dates.iter().map(ToString::to_string).collect();
             let rows: Vec<Json> = r.jacobian.into_iter().map(Json::from).collect();
             plain(obj([

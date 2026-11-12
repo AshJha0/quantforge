@@ -225,7 +225,7 @@ super::registry! {
         for (q, p) in qs.iter().zip(o.pfe) {
             let pct = q * 100.0;
             let label = if pct == pct.round() { format!("{pct:.0}") } else { format!("{pct}") };
-            out.push((format!("pfe_{label}"), p.into()));
+            out.push((format!("deflated_pfe_{label}"), p.into()));
         }
         out.push(("epe".to_string(), o.epe.into()));
         out.push(("cva".to_string(), o.cva.into()));

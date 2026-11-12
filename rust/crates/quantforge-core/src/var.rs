@@ -19,18 +19,31 @@ fn check_confidence(c: f64) -> Result<()> {
     Ok(())
 }
 
-/// Ruling F-31 on P&L scenarios: `k = ceil(n c)`, the `k`-th smallest loss, and the mean
-/// from the `k`-th up.
+/// Ruling F-31 on `P&L` scenarios for `VaR`: `k = ceil(n c)`, the `k`-th smallest loss. ES by
+/// ruling R6-3.1 (Acerbi-Tasche, fractional tail weight): `w = n - n c`, `m = floor(w)`,
+/// `es = (L_1 + ... + L_m + (w - m) L_(m+1)) / w` over losses sorted descending; `w <= 0`
+/// gives `L_1`; `tail_count = ceil(w)` (1 when `w <= 0`).
 fn order_statistic(pnl: &[f64], c: f64) -> VarEs {
     let mut losses: Vec<f64> = pnl.iter().map(|p| -p).collect();
     losses.sort_by(f64::total_cmp);
     let n = losses.len();
     let k = ((n as f64 * c).ceil() as usize).clamp(1, n);
-    let tail = &losses[k - 1..];
+    let nf = n as f64;
+    let w = nf - nf * c;
+    let (es, tail_count) = if w <= 0.0 {
+        (losses[n - 1], 1)
+    } else {
+        let m = (w.floor() as usize).min(n);
+        let mut sum: f64 = losses[n - m..].iter().rev().sum();
+        if m < n {
+            sum += (w - m as f64) * losses[n - 1 - m];
+        }
+        (sum / w, w.ceil() as i64)
+    };
     VarEs {
         var: losses[k - 1],
-        es: tail.iter().sum::<f64>() / tail.len() as f64,
-        tail_count: tail.len() as i64,
+        es,
+        tail_count,
     }
 }
 
@@ -288,7 +301,12 @@ mod tests {
         let r = historical(&pnl, 0.99).unwrap();
         assert_eq!(r.var, 247.0);
         assert_eq!(r.tail_count, 3);
-        assert_eq!(r.es, 248.0);
+        // R6-3.1 by hand: w = 2.5, es = (249 + 248 + 0.5 * 247) / 2.5 = 248.2.
+        assert!((r.es - 248.2).abs() < 1e-12, "{}", r.es);
+        // integer tail: n = 500 at 99%, w = 5, mean of the five largest losses 497 to 499 ... 495.
+        let pnl: Vec<f64> = (0..500).map(|i| -f64::from(i)).collect();
+        let r = historical(&pnl, 0.99).unwrap();
+        assert!((r.es - 497.0).abs() < 1e-9 && r.tail_count == 5, "{r:?}");
     }
 
     #[test]

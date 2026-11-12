@@ -29,17 +29,61 @@ fn fit_keeps_parameters_inside_the_stationary_region() {
     }
 }
 
+/// Independent GARCH(1,1) log-likelihood, written from `05-volatility/garch.md` in the test.
+fn hand_loglik(r: &[f64], omega: f64, alpha: f64, beta: f64) -> f64 {
+    let mut s2 = r.iter().map(|x| x * x).sum::<f64>() / r.len() as f64;
+    let mut l = 0.0;
+    for x in r {
+        l += -0.5 * ((2.0 * std::f64::consts::PI).ln() + s2.ln() + x * x / s2);
+        s2 = omega + alpha * x * x + beta * s2;
+    }
+    l
+}
+
 #[test]
-fn fit_reaches_the_known_likelihood_maximum() {
-    // reference maxima from the unmutated fit; a worse start grid (212 `/` -> `*`) lands lower
-    let f0 = fit(&series(false), Start::Sample).unwrap();
-    assert!(f0.loglik > 644.929_310_5, "{}", f0.loglik);
-    let f1 = fit(&series(true), Start::Sample).unwrap();
+fn loglik_matches_the_spec_worked_example() {
+    // garch.md worked example, hand-computed: sigma2 = 2.5e-4, 2.2e-4, next 2.26e-4.
+    let l = quantforge_core::garch::loglik(&[0.01, -0.02], 1e-5, 0.1, 0.8, Start::Sample).unwrap();
     assert!(
-        (f1.loglik - 301.295_913_568_263).abs() < 1e-6,
+        (l.loglik - 5.410_998_350_356_715).abs() < 1e-12,
         "{}",
-        f1.loglik
+        l.loglik
     );
+    assert!((l.variances[0] - 2.5e-4).abs() < 1e-18 && (l.variances[1] - 2.2e-4).abs() < 1e-18);
+    assert!((l.next_variance - 2.26e-4).abs() < 1e-18);
+}
+
+#[test]
+fn fit_is_a_local_maximum_of_an_independent_likelihood() {
+    // The fitted loglik equals the hand likelihood at the fitted point, and no nearby point
+    // in the stationary region does better by more than the spec's 1e-8 stopping gap.
+    for trend in [false, true] {
+        let r = series(trend);
+        let f = fit(&r, Start::Sample).unwrap();
+        let l0 = hand_loglik(&r, f.omega, f.alpha, f.beta);
+        assert!((f.loglik - l0).abs() < 1e-9, "{} vs {l0}", f.loglik);
+        for (dw, da, db) in [
+            (1.0, 0.0, 0.0),
+            (0.0, 1.0, 0.0),
+            (0.0, 0.0, 1.0),
+            (1.0, 1.0, -1.0),
+        ] {
+            for h in [1e-3, -1e-3] {
+                let (w, a, b) = (
+                    f.omega * (1.0 + h * dw),
+                    f.alpha + h * da * f.alpha.max(1e-3),
+                    f.beta + h * db * f.beta.max(1e-3),
+                );
+                if w <= 0.0 || a < 0.0 || b < 0.0 || a + b >= 1.0 {
+                    continue;
+                }
+                assert!(
+                    hand_loglik(&r, w, a, b) <= l0 + 1e-8,
+                    "trend {trend} dir {dw} {da} {db} h {h}"
+                );
+            }
+        }
+    }
 }
 
 #[test]
@@ -89,3 +133,15 @@ fn nelder_mead_stops_when_the_simplex_collapses() {
 // garch.rs:213:24 `/` -> `*` in fit: start point only (share odds); same maximum, slower locally.
 // garch.rs:213:31 `-` -> `+` in fit: start point only; loglik within 1e-12.
 // garch.rs:218:30 `-` -> `+` in fit: restarts run all 20 rounds; result is bit-identical.
+
+#[test]
+fn forecast_matches_the_closed_form() {
+    // V_L = 1e-5 / 0.1 = 1e-4; E[s2_{n+h}] = 1e-4 + 0.9^(h-1) (2e-4 - 1e-4), by hand.
+    let f = quantforge_core::garch::forecast(1e-5, 0.1, 0.8, 2e-4, 3, 252.0).unwrap();
+    let want = [2e-4, 1.9e-4, 1.81e-4];
+    for (g, w) in f.variances.iter().zip(want) {
+        assert!((g - w).abs() < 1e-18, "{g} vs {w}");
+    }
+    assert!((f.total_variance - 5.71e-4).abs() < 1e-18);
+    assert!((f.annualized_vol - (5.71e-4_f64 * 252.0 / 3.0).sqrt()).abs() < 1e-15);
+}

@@ -35,6 +35,7 @@ use quantforge_core::svi::Svi;
 
 super::registry! {
 (op, i)
+        "usecase.option_hedge_lots" => super::hedge::option_hedge_lots(i),
         "usecase.fx_hedge" => {
             let m = fx_market_input(i)?;
             let mut book = Vec::new();

@@ -164,11 +164,14 @@ pub fn linker_price(
             .copied()
             .ok_or_else(|| err("E_INPUT", "a needed CPI fixing is missing"))
     };
-    let ref_cpi = reference_cpi(settlement, &lookup)?;
+    let raw = reference_cpi(settlement, &lookup)?;
     if base_ref_cpi <= 0.0 {
         return fail("E_DOMAIN", "base_ref_cpi must be positive");
     }
-    let r = ref_cpi / base_ref_cpi;
+    // R6-7.5 (31 CFR 356 App. B): truncate to six decimals, then round half up to five.
+    let tips = |x: f64| ((x * 1e6).floor() / 1e6 * 1e5 + 0.5).floor() / 1e5;
+    let ref_cpi = tips(raw);
+    let r = tips(ref_cpi / base_ref_cpi);
     Ok(LinkerPrice {
         ref_cpi,
         index_ratio: r,

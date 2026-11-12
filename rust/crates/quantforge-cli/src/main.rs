@@ -16,7 +16,7 @@ use quantforge_core::json::{Flags, Json, nesting_exceeds, obj, parse};
 use std::io::{BufRead, Read, Write};
 use std::process::ExitCode;
 
-const CONTRACT: &str = "1.11.0";
+const CONTRACT: &str = "1.12.0";
 const SCHEMA: &str = "1.0";
 const MAX_CASE_NESTING: usize = 80;
 
@@ -648,7 +648,7 @@ mod stage_d_rulings2_tests {
     }
 
     #[test]
-    fn stage_i_null_keys_and_limits() {
+    fn hedge_null_keys_and_limits() {
         let qp = |extra: &str| {
             code(
                 "hedge.qp.solve",

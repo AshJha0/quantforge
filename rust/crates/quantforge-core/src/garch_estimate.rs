@@ -40,6 +40,10 @@ pub(crate) fn lgamma(x: f64) -> f64 {
 
 /// Digamma by recurrence to `x >= 10` and the asymptotic series.
 fn digamma(mut x: f64) -> f64 {
+    // R6-8: an overflowed argument would make the recurrence below never end (x + 1 == x).
+    if !x.is_finite() || x < -1e6 {
+        return f64::NAN;
+    }
     let mut r = 0.0;
     while x < 10.0 {
         r -= 1.0 / x;
@@ -305,6 +309,13 @@ pub fn estimate(returns: &[f64], start: Start, student: bool, demean: bool) -> R
     let e: Vec<f64> = returns.iter().map(|r| r - mean).collect();
     let s1 = start_variance(&e, start)?;
     let var = e.iter().map(|x| x * x).sum::<f64>() / n;
+    if !var.is_finite() || !s1.is_finite() {
+        // R6-8.1: finite returns whose mean or variance overflows binary64.
+        return fail(
+            "E_NON_FINITE",
+            "the sample variance of the returns overflows",
+        );
+    }
     let no = || fail("E_NO_CONVERGENCE", "no interior maximum of the likelihood");
     let Some(mut p) = search(&e, s1, var, student) else {
         return no();
