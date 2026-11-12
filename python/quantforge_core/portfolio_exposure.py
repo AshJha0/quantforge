@@ -13,12 +13,12 @@ dense scan and Brent refinement.
 """
 import itertools
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from decimal import Decimal
 
 import numpy as np
 
-from . import roots
 from .black import big_n
 from .errors import QfError
 from .finite import guard
@@ -26,7 +26,7 @@ from .numeric import ordered_sum
 from .shortrate import Curve, curve_model
 
 Floats = Sequence[float]
-_SCAN = np.linspace(-14.0, 14.0, 2801)  # standard deviations of x(t)
+_SCAN = np.linspace(-12.0, 12.0, 6001)  # standard deviations of x(t), ruling R6-5.5
 
 
 def _input(message: str, field: str) -> QfError:
@@ -81,17 +81,51 @@ class _Profile:
     def value(self, x: float, y: float = 0.0) -> float:
         return float(np.sum(self.a * np.exp(-self.b * x))) - y
 
-    def zeros(self, y: float = 0.0) -> list[float]:
-        xs = _SCAN * self.sd
-        vals = (self.a[:, None] * np.exp(-self.b[:, None] * xs[None, :])).sum(axis=0) - y
-        out = [float(x) for x in xs[vals == 0]]
-        for i in np.nonzero(vals[:-1] * vals[1:] < 0)[0]:
-            lo, hi = float(xs[i]), float(xs[i + 1])
-            out.append(roots.brent(lambda x: self.value(x, y), lo, hi,
-                                   x_tol=1e-15 * max(1.0, abs(lo)) + 1e-300,
-                                   max_iter=200).root)
-        return sorted(out)
+    def slope(self, x: float) -> float:
+        return float(-np.sum(self.a * self.b * np.exp(-self.b * x)))
 
+    @staticmethod
+    def _bisect(f: Callable[[float], float], lo: float, hi: float) -> float:
+        """Bisection to adjacent doubles (at least 1e-14 relative); `f(lo)`, `f(hi)` differ in sign."""
+        flo = f(lo)
+        for _ in range(2000):
+            mid = (lo + hi) / 2
+            if mid in (lo, hi) or hi - lo <= 1e-14 * max(abs(lo), abs(hi)):
+                break
+            fm = f(mid)
+            if fm == 0:
+                return mid
+            if (fm < 0) == (flo < 0):
+                lo, flo = mid, fm
+            else:
+                hi = mid
+        return (lo + hi) / 2
+
+    def zeros(self, y: float = 0.0) -> list[float]:
+        """Ruling R6-5.5: critical points of `g` bracketed from the analytic `g'` on 6,001
+        points over +-12 sd and bisected; `g` is monotone between them, so each piece holds at
+        most one root of `g - y`, found by bisection."""
+        xs = _SCAN * self.sd
+        d = (-(self.a * self.b)[:, None] * np.exp(-self.b[:, None] * xs[None, :])).sum(axis=0)
+        cuts = [float(xs[0])]
+        for i in range(len(xs) - 1):
+            if d[i] == 0:
+                cuts.append(float(xs[i]))
+            elif d[i] * d[i + 1] < 0:
+                cuts.append(self._bisect(self.slope, float(xs[i]), float(xs[i + 1])))
+        cuts.append(float(xs[-1]))
+        out: list[float] = []
+        for lo, hi in itertools.pairwise(cuts):
+            if lo >= hi:
+                continue
+            vlo, vhi = self.value(lo, y), self.value(hi, y)
+            if vlo == 0:
+                out.append(lo)
+            elif vlo * vhi < 0:
+                out.append(self._bisect(lambda x: self.value(x, y), lo, hi))
+        if self.value(cuts[-1], y) == 0:
+            out.append(cuts[-1])
+        return sorted(set(out))
     def _intervals(self, y: float, positive: bool) -> list[tuple[float, float]]:
         """Intervals where `g - y > 0` (positive) or `< 0`."""
         cuts = [-math.inf, *self.zeros(y), math.inf]
@@ -167,6 +201,11 @@ def _profile(curve: Curve, a: float, sigma: float, swaps: Sequence[Swap], t: flo
     return _Profile([coeffs[k] for k in keys], keys, zeta)
 
 
+def pfe_key(q: float) -> str:
+    """Ruling R6-5.6: `deflated_pfe_` and `100 q` with trailing zeros removed."""
+    return "deflated_pfe_" + format((Decimal(repr(q)) * 100).normalize(), "f")
+
+
 def portfolio_hw(times: Floats, discount_factors: Floats, a: float, sigma: float,
                  trades: Sequence[tuple[float, float, str, float, Floats]],
                  exposure_times: Floats, quantiles: Floats, hazard_rate: float,
@@ -210,7 +249,7 @@ def portfolio_hw(times: Floats, discount_factors: Floats, a: float, sigma: float
         for e, t, p in zip(ee, exposure_times, prev, strict=True))
     out: dict[str, object] = {"discounted_ee": ee, "discounted_ene": ene}
     for q in quantiles:
-        out[f"pfe_{round(q * 100):d}"] = pfe[q]
+        out[pfe_key(q)] = pfe[q]
     out["epe"] = epe
     out["cva"] = cva
     return out

@@ -24,14 +24,15 @@ def _flows(pool: Pool) -> Flows:
         raise QfError("E_INPUT", "net_coupon is above wac", "net_coupon")
     if balance <= 0 or (model == "CPR" and not 0 <= speed < 1) or (model == "PSA" and speed < 0):
         raise QfError("E_DOMAIN", "balance, rate or speed out of domain", "pool")
+    if model == "PSA" and any(min((age + k) / 30, 1) * 0.06 * speed / 100 >= 1
+                                for k in range(1, wam + 1)):  # ruling R6-7.1
+        raise QfError("E_DOMAIN", "PSA speed gives a monthly CPR of 100% or more", "pool")
     r = wac / 12
     b = balance
     bal, interest, sched, prepay = [], [], [], []
     for k in range(1, wam + 1):
         n = wam - k + 1
         cpr = speed if model == "CPR" else min((age + k) / 30, 1) * 0.06 * speed / 100
-        if cpr > 1:  # R6 finding 18: above ~1667% PSA the SMM would be complex
-            raise QfError("E_DOMAIN", "PSA speed gives a CPR above 100%", "pool")
         smm = 1 - (1 - cpr) ** (1 / 12)
         if k == wam:
             sp = b

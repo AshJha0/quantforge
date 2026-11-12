@@ -76,6 +76,14 @@ def _ref(d: date, get: Callable[[int], float]) -> float:
     return i3 + (d.day - 1) / days * (i2 - i3)
 
 
+def _trunc6(x: float) -> float:
+    return math.floor(x * 1e6) / 1e6
+
+
+def _round5(t: float) -> float:
+    return math.floor(t * 1e5 + 0.5) / 1e5
+
+
 def linker_price(bond: Bond, settlement: date, real_yield: float, base_ref: float,
                  fixings: Sequence[tuple[int, float]]) -> dict[str, float]:
     real = bonds.price_from_yield(bond, settlement, real_yield)
@@ -88,8 +96,9 @@ def linker_price(bond: Bond, settlement: date, real_yield: float, base_ref: floa
             raise QfError("E_INPUT", "a needed CPI fixing is missing", "cpi_fixings")
         return table[k]
 
-    ref = _ref(settlement, get)
-    ratio = ref / base_ref
+    # Ruling R6-7.5 (31 CFR 356 App. B): truncate to six decimals, round half up to five.
+    ref = _round5(_trunc6(_ref(settlement, get)))
+    ratio = _round5(_trunc6(ref / base_ref))
     return {"ref_cpi": ref, "index_ratio": ratio, "real_clean": real["clean"],
             "real_accrued": real["accrued"], "nominal_clean": real["clean"] * ratio,
             "nominal_accrued": real["accrued"] * ratio}
