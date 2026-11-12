@@ -50,7 +50,14 @@ def kkt_residual(a: Any, b: Any, w: Any, ridge: float, x: Any, e: Any = None, rh
     free = [j for j in range(n) if not at_lo[j] and not at_hi[j]]
     if e is not None and len(e):
         em = np.asarray(e, dtype=float)
-        lam = np.linalg.lstsq(em[:, free].T, -g[free], rcond=None)[0] if free else np.zeros(len(em))
+        if free:
+            lam = np.linalg.lstsq(em[:, free].T, -g[free], rcond=None)[0]
+        else:
+            # Every position on a bound: any lambda that makes the bound multipliers non-negative
+            # certifies optimality (single equality row; the interval of admissible lambda).
+            lows = [-g[j] / em[0, j] for j in range(n) if em[0, j] and at_lo[j] != (em[0, j] < 0)]
+            ups = [-g[j] / em[0, j] for j in range(n) if em[0, j] and at_lo[j] == (em[0, j] < 0)]
+            lam = np.array([max(lows) if lows else min(ups) if ups else 0.0])
         g = g + em.T @ lam
     worst = 0.0
     for j in range(n):
@@ -253,7 +260,8 @@ def test_property_qp_kkt_bounds_and_equalities(n: int, m: int, data: st.DataObje
         assert lo is None or x[j] >= lo
         assert hi is None or x[j] <= hi
     if e is not None and rhs is not None:
-        assert math.fsum(x) == pytest.approx(rhs[0], abs=1e-12)
+        # The equality holds to rounding relative to the size of x, not to an absolute 1e-12.
+        assert math.fsum(x) == pytest.approx(rhs[0], abs=1e-12 * (1 + max(map(abs, x))))
     assert kkt_residual(a, b, w, ridge, x, e, rhs, lower, upper) < 1e-8
 
 
@@ -264,6 +272,9 @@ def test_property_min_norm_equals_the_unique_solution(n: int, data: st.DataObjec
     a = [[data.draw(st.floats(-2.0, 2.0)) for _ in range(n)] for _ in range(m)]
     b = [data.draw(st.floats(-2.0, 2.0)) for _ in range(m)]
     w = [1.0] * m
+    # R6-6.2 / R6-6.2a: ERROR decides uniqueness on the column-scaled problem, MIN_NORM counts
+    # rank unscaled. They agree only when the unscaled problem is itself well conditioned.
+    assume(np.linalg.cond(np.asarray(a, dtype=float)) < 1e5)
     try:
         unique = hs.qp_solve(a, b, w)
     except QfError as err:

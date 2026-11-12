@@ -73,6 +73,12 @@ def barrier(s: float, k: float, t: float, r: float, q: float, v: float, option_t
         n = math.floor(monitoring_per_year * t + 0.5)  # G-30: ties round up
         if n < 1:
             raise _domain("the barrier is never observed (n = 0)", "monitoring_per_year")
+        # R6-2.1: BGK only for regular knock-outs away from the barrier, with no rebate.
+        regular = ((barrier_type == "DOWN_OUT" and option_type == "CALL" and h <= k)
+                   or (barrier_type == "UP_OUT" and option_type == "PUT" and h >= k))
+        if (not regular or rebate != 0
+                or abs(math.log(s / h)) < 1.25 * v * math.sqrt(t / n)):
+            raise _domain("outside the discrete-monitoring (BGK) envelope", "monitoring")
         shift = math.exp(BGK_BETA * v * math.sqrt(t / n))
         h = h / shift if down else h * shift
     phi, eta = _phi(option_type), 1.0 if down else -1.0

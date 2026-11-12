@@ -9,7 +9,7 @@ from typing import Any
 from .. import __version__, strictjson
 from ..errors import QfError
 
-CONTRACT_VERSION = "1.11.0"  # ruling I-51 (stage I)
+CONTRACT_VERSION = "1.12.0"  # ruling R6-0.1
 SCHEMA_VERSION = "1.0"
 MAX_CASE_DEPTH = 80
 MAX_LINE_BYTES = 16_777_216  # BT5
@@ -32,6 +32,8 @@ def _error(case_id: str, code: str, message: str, field: str | None = None) -> d
 def _all_finite(value: Any) -> bool:
     if isinstance(value, float):
         return math.isfinite(value)
+    if isinstance(value, complex):  # never a valid result; a crash in json.dumps otherwise
+        return False
     if isinstance(value, dict):
         return all(_all_finite(v) for v in value.values())
     if isinstance(value, list):

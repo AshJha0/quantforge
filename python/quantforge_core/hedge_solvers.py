@@ -24,7 +24,18 @@ Matrix = Sequence[Sequence[float]]
 Bounds = Sequence[float | None]
 NDArray = Any  # numpy arrays; numpy's own stubs would tie mypy to the numpy version
 THRESHOLD = 1e-12  # ruling I-3
-_MAX_ENUMERATED = 20_000_000  # integer search points before E_NO_CONVERGENCE (never near it)
+_MAX_ENUMERATED = 1_000_000  # integer search points or nodes before E_NO_CONVERGENCE (R6-6.1)
+_ITER_SLOPE, _ITER_BASE = 10, 100  # active-set and sign-state loops: 10 (n + p) + 100 (R6-6.1)
+
+
+def _cap(n: int, problem: object) -> int:
+    """R6-6.1 iteration cap `10 (n + p) + 100`, `p` the equality rows, finite bounds and
+    margin limit of the problem."""
+    e_mat = getattr(problem, "e_mat", None)
+    p = 0 if e_mat is None else int(e_mat.shape[0])
+    p += sum(v is not None for v in (*getattr(problem, "lower", ()), *getattr(problem, "upper", ())))
+    p += int(math.isfinite(getattr(problem, "limit", math.inf)))
+    return _ITER_SLOPE * (n + p) + _ITER_BASE
 
 
 def _z(v: float) -> float:
@@ -86,6 +97,31 @@ def _lstsq_min_norm(m: NDArray, r: NDArray, cut_sq: float) -> tuple[NDArray, int
     keep = s * s > cut_sq
     y = -vt[keep].T @ ((u[:, keep].T @ r) / s[keep])
     return y, int(keep.sum())
+
+
+def _scaled_form(big_b: NDArray, e_mat: NDArray,
+                 e_rhs: NDArray) -> tuple[NDArray, NDArray, NDArray, NDArray] | None:
+    """Ruling R6-6.2: Jacobi scaling `D_jj = 1/sqrt(H_jj)` (H = B^T B), equality rows at unit
+    norm, then the I-3 test on `Z^T D H D Z` against the largest eigenvalue of `D H D`.
+    Returns (D, B D, x~_p, Z) or None when singular."""
+    norms = np.sqrt((big_b * big_b).sum(axis=0))
+    if not np.all(norms > 0):
+        return None
+    col = 1.0 / norms
+    bs = big_b * col[None, :]
+    es, rs = e_mat * col[None, :], e_rhs
+    if es.shape[0]:
+        rows = np.sqrt((es * es).sum(axis=1))
+        es, rs = es / rows[:, None], e_rhs / rows
+        se = np.linalg.svd(es, compute_uv=False)
+        if se[-1] <= THRESHOLD * se[0]:
+            return None
+    xs_p, zs = _equality_split(es, rs, 0.0)
+    top = float(np.linalg.svd(bs, compute_uv=False)[0]) ** 2
+    sz = np.linalg.svd(bs @ zs, compute_uv=False)
+    if zs.shape[1] and (len(sz) < zs.shape[1] or float(sz[-1]) ** 2 <= THRESHOLD * top):
+        return None
+    return col, bs, xs_p, zs
 
 
 def _equality_split(e_mat: NDArray, rhs: NDArray, cut: float) -> tuple[NDArray, NDArray]:
@@ -206,12 +242,33 @@ class _Qp:
         out[free] = x_p + z @ y
         return out
 
-    def multipliers(self, x: NDArray, free: list[int]) -> NDArray:
+    def multipliers(self, x: NDArray, free: list[int], work: dict[int, str]) -> NDArray:
         """g + E^T lambda at x, with lambda fitted on the free variables: on a bound in the working
-        set this is mu_L at a lower bound and -mu_U at an upper bound."""
+        set this is mu_L at a lower bound and -mu_U at an upper bound.
+
+        With no free variable the fit is empty, so lambda is chosen to make the bound multipliers
+        non-negative where one value can (one equality row: an interval of lambda; more rows: least
+        squares on every position). Without this a degenerate state with every position on a bound
+        and an equality never settles."""
         g = 2.0 * (self.big_b.T @ (self.big_b @ x + self.d))
-        if self.e_mat.shape[0] and free:
+        m = self.e_mat.shape[0]
+        if m and free:
             lam = np.linalg.lstsq(self.e_mat[:, free].T, -g[free], rcond=None)[0]
+            g = g + self.e_mat.T @ lam
+        elif m == 1:
+            lows: list[float] = []
+            ups: list[float] = []
+            for j, side in work.items():
+                coef = float(self.e_mat[0, j])
+                if side == "F" or coef == 0.0:
+                    continue
+                cut = -float(g[j]) / coef
+                (lows if (side == "L") == (coef > 0) else ups).append(cut)
+            lo, hi = max(lows, default=-math.inf), min(ups, default=math.inf)
+            lam1 = (lo + hi) / 2 if lows and ups else lo if lows else hi if ups else 0.0
+            g = g + self.e_mat[0] * lam1
+        elif m:
+            lam = np.linalg.lstsq(self.e_mat.T, -g, rcond=None)[0]
             g = g + self.e_mat.T @ lam
         return g
 
@@ -230,7 +287,7 @@ class _Qp:
             bound = lower[j] if side in "FL" else upper[j]
             x[j] = bound
         grad_scale = float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0))
-        for _ in range(100 * (n + 1)):
+        for _ in range(_cap(n, self)):
             free = [j for j in range(n) if j not in work]
             target = self.subproblem(free, x)
             p = target - x
@@ -251,8 +308,9 @@ class _Qp:
                 x[blocking] = lower[blocking] if side == "L" else upper[blocking]
                 continue
             x = target
-            g = self.multipliers(x, free)
-            scale = max(grad_scale, float(np.abs(g).max(initial=0.0)),
+            g = self.multipliers(x, free, work)
+            # R6-11.4: multiplier signs are judged against max(1, max|g|), never a tiny gradient.
+            scale = max(1.0, grad_scale, float(np.abs(g).max(initial=0.0)),
                         float(np.abs(2.0 * (self.big_b.T @ (self.big_b @ x))).max(initial=0.0)))
             worst, drop = -1e-11 * scale, -1
             for j, s in work.items():
@@ -434,7 +492,7 @@ class _CostQp:
         scale0 = max(float(np.abs(2.0 * (self.big_b.T @ self.d)).max(initial=0.0)),
                      float(np.abs(lin).max(initial=0.0)), 1e-300)
         k = self.e_mat.shape[0]
-        for _ in range(200 * (self.n + 1)):
+        for _ in range(_cap(self.n, self)):
             free = [j for j in range(self.n) if j not in work]
             target = self._step(free, x, lin, a_row if margin_on else None)
             p = target - x
@@ -498,7 +556,7 @@ class _CostQp:
                 signs.append(1)
             else:
                 signs.append(-1)
-        for _ in range(4 * self.n + 10):
+        for _ in range(_cap(self.n, self)):
             x, smooth, mu = self._orthant(x, signs)
             scale = max(float(np.abs(smooth).max(initial=0.0)),
                         float(self.spread.max(initial=0.0)), 1e-300)
@@ -528,6 +586,8 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
     _, n = _shape(a, b, weights)
     if (eq_matrix is None) != (eq_rhs is None):
         raise QfError("E_INPUT", "eq_matrix and eq_rhs go together", "eq_matrix")
+    if eq_matrix is not None and not eq_matrix:  # R6-11.13
+        raise QfError("E_INPUT", "an empty eq_matrix: leave out both keys", "eq_matrix")
     e_rows: Matrix = eq_matrix or []
     e_vals: Floats = eq_rhs or []
     if any(len(row) != n for row in e_rows):
@@ -570,15 +630,29 @@ def _qp_core(a: Matrix, b: Floats, weights: Floats, ridge: float, eq_matrix: Mat
     cut_sq = THRESHOLD * h_largest_sq
     x_p, z = _equality_split(e_mat, e_rhs, e_cut)
     rank = 0
-    if k < n:
+    scaled = None
+    if k < n and singular == "ERROR":
+        scaled = _scaled_form(big_b, e_mat, e_rhs)
+        if scaled is None:
+            raise QfError("E_SINGULAR", "the hedge has no unique solution", "a")
+        rank = n - k
+    elif k < n:
         sz = np.linalg.svd(big_b @ z, compute_uv=False)
         rank = int((sz * sz > cut_sq).sum())
-        if rank < n - k and singular == "ERROR":
-            raise QfError("E_SINGULAR", "the hedge has no unique solution", "a")
-
     qp = _Qp(big_b, d, e_mat, e_rhs, lo, hi, h_largest_sq, e_cut)
     if costs is not None and costs.kinked():
         x = _costed(costs, big_b, d, e_mat, e_rhs, lo, hi, h_largest_sq, n)
+    elif not bounded and scaled is not None:
+        col, bs, xs_p, zs = scaled  # R6-6.2: solve in the scaled variables, x = D x~
+        y, _ = _lstsq_min_norm(bs @ zs, bs @ xs_p + d, 0.0)
+        x = col * (xs_p + zs @ y)
+        if k and np.abs(e_mat @ x - e_rhs).max() > 1e-9 * max(
+                1.0, float(np.abs(e_rhs).max()), float((np.abs(e_mat) @ np.abs(x)).max())):
+            # Column norms many decades apart lose the scaled null space in rounding, and
+            # x = D x~ then misses the equalities. The decision above stands (unique minimiser);
+            # solve it again in the caller's units, where the equalities hold by construction.
+            y, _ = _lstsq_min_norm(big_b @ z, big_b @ x_p + d, 0.0)
+            x = x_p + z @ y
     elif not bounded:
         y, _ = _lstsq_min_norm(big_b @ z, big_b @ x_p + d, cut_sq)
         x = x_p + z @ y
@@ -909,22 +983,33 @@ def minvar_ratio(covariance: Matrix | None = None, exposure_changes: Floats | No
     k = len(s) - 1
     s_hh = [[s[i][j] for j in range(1, k + 1)] for i in range(1, k + 1)]
     s_he = [s[i][0] for i in range(1, k + 1)]
-    # Cholesky with the pivot rule of check 3.
-    largest = max(s_hh[i][i] for i in range(k))
+    # Cholesky of the Jacobi-scaled (correlation) form, lower triangle (R6-6.2, R6-11.7):
+    # a negative pivot is E_NOT_POSITIVE_DEFINITE, one at or below 1e-12 is E_SINGULAR.
+    for j in range(k):
+        if s_hh[j][j] < 0:
+            raise QfError("E_NOT_POSITIVE_DEFINITE", "a hedge variance is negative", "covariance")
+        if s_hh[j][j] == 0:
+            raise QfError("E_SINGULAR", "the hedge instruments are dependent", "covariance")
+    scale = [1 / math.sqrt(s_hh[j][j]) for j in range(k)]
     low = [[0.0] * k for _ in range(k)]
     for j in range(k):
-        pivot = s_hh[j][j] - math.fsum(low[j][p] ** 2 for p in range(j))
-        if pivot <= THRESHOLD * largest:
+        pivot = s_hh[j][j] * scale[j] ** 2 - math.fsum(low[j][p] ** 2 for p in range(j))
+        if pivot <= -THRESHOLD:  # R6-11.7 as amended
+            raise QfError("E_NOT_POSITIVE_DEFINITE", "the hedge covariance is indefinite",
+                          "covariance")
+        if abs(pivot) < THRESHOLD:
             raise QfError("E_SINGULAR", "the hedge instruments are dependent", "covariance")
         low[j][j] = math.sqrt(pivot)
         for i in range(j + 1, k):
-            low[i][j] = (s_hh[i][j] - math.fsum(low[i][p] * low[j][p] for p in range(j))) / low[j][j]
+            low[i][j] = (s_hh[i][j] * scale[i] * scale[j]
+                         - math.fsum(low[i][p] * low[j][p] for p in range(j))) / low[j][j]
     fwd = [0.0] * k
     for i in range(k):
-        fwd[i] = (-s_he[i] - math.fsum(low[i][p] * fwd[p] for p in range(i))) / low[i][i]
-    hedge = [0.0] * k
+        fwd[i] = (-s_he[i] * scale[i] - math.fsum(low[i][p] * fwd[p] for p in range(i))) / low[i][i]
+    unit = [0.0] * k
     for i in reversed(range(k)):
-        hedge[i] = (fwd[i] - math.fsum(low[p][i] * hedge[p] for p in range(i + 1, k))) / low[i][i]
+        unit[i] = (fwd[i] - math.fsum(low[p][i] * unit[p] for p in range(i + 1, k))) / low[i][i]
+    hedge = [u * c for u, c in zip(unit, scale, strict=True)]
     before = s[0][0]
     after = before + math.fsum(u * v for u, v in zip(s_he, hedge))
     if after < -THRESHOLD * before:
@@ -1113,6 +1198,71 @@ def select_solve(a: Matrix, b: Floats, weights: Floats, max_instruments: int,
     residual, objective = _objective(a, b, weights, ridge, x)
     return {"selected": list(chosen), "x": x, "residual": _zs(residual),
             "objective": _z(objective)}
+
+
+def option_hedge_lots(spot: float, rate: float, dividend_yield: float, volatility: float,
+                      portfolio: Sequence[tuple[str, float | None, float | None, float | None]],
+                      hedges: Sequence[tuple[str, float | None, float | None, float, float]],
+                      targets: Sequence[str], max_lots: int,
+                      unexpected: Sequence[str] = ()) -> dict[str, Any]:
+    """`usecase.option_hedge_lots` (use case 6, ruling R6-11.20): the book's Greeks hedged in
+    whole lots by `hedge.integer.solve` with weights `1 / max(1, |b_t|)^2`."""
+    if unexpected:
+        raise QfError("E_INPUT", f"{unexpected[0]} is not a key of a Greek instrument (I-41)",
+                      unexpected[0])
+    if not hedges:
+        raise QfError("E_INPUT", "no hedge instruments", "hedges")
+    if not targets or len(set(targets)) != len(targets):
+        raise QfError("E_INPUT", "targets must be a non-empty set", "targets")
+    if any(q is None for *_, q in portfolio):
+        raise QfError("E_INPUT", "a portfolio position needs a quantity (ruling I-41)",
+                      "quantity")
+    every: list[Instrument] = ([(kind, k, t) for kind, k, t, _ in portfolio]
+                               + [(kind, k, t) for kind, k, t, _, _ in hedges])
+    for kind, strike, expiry in every:
+        if kind == "UNDERLYING" and (strike is not None or expiry is not None):
+            raise QfError("E_INPUT", "the underlying has no strike or expiry", "portfolio")
+        if kind != "UNDERLYING" and (strike is None or expiry is None):
+            raise QfError("E_INPUT", "an option needs a strike and an expiry", "portfolio")
+    if spot <= 0:
+        raise QfError("E_DOMAIN", "spot must be positive", "spot")
+    if volatility <= 0:
+        raise QfError("E_DOMAIN", "volatility must be positive", "volatility")
+    for kind, strike, expiry in every:
+        if kind != "UNDERLYING" and (strike is None or strike <= 0):
+            raise QfError("E_DOMAIN", "strikes must be positive", "strike")
+        if kind != "UNDERLYING" and (expiry is None or expiry <= 0):
+            raise QfError("E_DOMAIN", "expiries must be positive", "expiry_years")
+    for *_, lot, spread in hedges:
+        if lot <= 0:
+            raise QfError("E_DOMAIN", "lot_size must be positive", "lot_size")
+        if spread < 0:
+            raise QfError("E_DOMAIN", "half_spread must not be negative", "half_spread")
+    if max_lots < 1:
+        raise QfError("E_DOMAIN", "max_lots must be at least 1", "max_lots")
+
+    def greeks(kind: str, strike: float | None, expiry: float | None) -> tuple[float, ...]:
+        return _unit_greeks(spot, rate, dividend_yield, volatility, kind, strike, expiry)
+
+    before = [math.fsum((q or 0.0) * greeks(kind, k, t)[c] for kind, k, t, q in portfolio)
+              for c in range(3)]
+    per_lot = [[h[3] * g for g in greeks(h[0], h[1], h[2])] for h in hedges]
+    rows = [GREEKS.index(t) for t in targets]
+    a = [[per_lot[j][c] for j in range(len(hedges))] for c in rows]
+    b = [before[c] for c in rows]
+    weights = [1.0 / max(1.0, abs(v)) ** 2 for v in b]
+    solved = integer_solve(a, b, weights, [1.0] * len(hedges), 0.0,
+                           [-max_lots] * len(hedges), [max_lots] * len(hedges))
+    lots = solved["lots"]
+    after = [math.fsum([before[c], *(lots[j] * per_lot[j][c] for j in range(len(hedges)))])
+             for c in range(3)]
+    cost = math.fsum(abs(lots[j]) * h[3] * h[4] for j, h in enumerate(hedges))
+
+    def named(v: Sequence[float]) -> dict[str, float]:
+        return {"delta": _z(v[0]), "gamma": _z(v[1]), "vega": _z(v[2])}
+
+    return {"greeks_before": named(before), "lots": lots, "greeks_after": named(after),
+            "hedge_cost": _z(cost), "rounding_cost": solved["rounding_cost"]}
 
 
 guard(globals())

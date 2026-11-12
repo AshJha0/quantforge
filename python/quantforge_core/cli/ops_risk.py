@@ -116,7 +116,8 @@ def _risk_key_rate(i: Inputs) -> Any:
 def _risk_jacobian(i: Inputs) -> Any:
     as_of, convention, quotes = _ois_inputs(i)
     args = (as_of, convention, quotes, i.enum("interpolation", curves.INTERPOLATIONS), _bump(i))
-    return core.risk_curve.jacobian(*args)
+    tension = i.real("tension") if i.has("tension") else None  # ruling R6-1.2
+    return core.risk_curve.jacobian(*args, tension, i.opt_date("step_end"))
 
 
 @op("risk.pnl.explain")
