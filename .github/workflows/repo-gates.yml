@@ -43,3 +43,16 @@ jobs:
           for p in python/quantforge.egg-info/PKG-INFO python/.hypothesis/examples python/.benchmarks/x; do
             git check-ignore -q "$p" || { echo "::error::$p is not ignored"; exit 1; }
           done
+
+  preregs:
+    name: research-preregs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: fetch forward-log (the holdout scan reads origin/forward-log; without it the log part is skipped)
+        run: git fetch --no-tags --depth=1 origin forward-log:refs/remotes/origin/forward-log
+      - name: preregs, amendments and holdout scan (R6-19)
+        run: python3 research/test_preregs.py

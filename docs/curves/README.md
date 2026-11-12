@@ -45,8 +45,6 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 
 [US Treasury curve with sanity bands](real-usd-treasury.md): a page built from real public data, snapshot of 2026-11-06. The same bands run daily in workflow (a).
 
-[P&L explain and calibration stability](pnl-explain.md): full revaluation against key-rate explain over real daily Treasury moves, and day-to-day calibration diagnostics. Runs daily in `tools/workflows/keyrate_explain.py`.
-
 [Calibration stability](calib-stability.md): seven calibrations under seeded noise in four languages, synthetic inputs. [Rich/cheap screen](rich-cheap.md): workflow (b), blocked on data until a price source is cleared.
 
 ## How the gallery is built
