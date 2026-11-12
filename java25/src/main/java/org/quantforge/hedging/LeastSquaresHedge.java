@@ -58,7 +58,17 @@ public final class LeastSquaresHedge {
             Double marginLimit) {}
 
     /** Relative slack in the subgradient test at a kink before a sign is flipped. */
-    private static final double KINK_TOL = 1e-9;
+    private static final double KINK_TOL = 1e-11; // ruling R6-6.1: one kink tolerance for every build
+
+    /** Ruling R6-6.1: iteration cap {@code 10 (n + p) + 100}, {@code p} the constraints; a test may lower it (property test of the cap). */
+    static int capOverride = -1;
+
+    /** Ruling R6-6.1: at most 1,000,000 enumerated lattice points; a test may lower it. */
+    static long nodeCapOverride = -1;
+
+    static int iterationCap(int n) {
+        return capOverride >= 0 ? capOverride : 10 * n + 100;
+    }
 
     /**
      * A {@code hedge.integer.solve} answer.
@@ -195,6 +205,9 @@ public final class LeastSquaresHedge {
     private static Solution solve(double[][] a, double[] b, double[] weights, double ridge, double[][] eqMatrix,
             double[] eqRhs, double[] lower, double[] upper, boolean minNorm, Costs costs, boolean enumerate) {
         int n = checkShapes(a, b, weights);
+        if (eqMatrix != null && eqMatrix.length == 0) { // ruling R6-11.13: no equalities means both keys absent
+            throw input("eq_matrix");
+        }
         if ((eqMatrix == null) != (eqRhs == null)) {
             throw input(eqMatrix == null ? "eq_matrix" : "eq_rhs");
         }
@@ -305,7 +318,6 @@ public final class LeastSquaresHedge {
             wb[i] = weights[i] * b[i];
         }
         double[] c = Dense.mulT(a, wb, n);
-        double threshold = Dense.RANK_TOL * Dense.eigen(h).maxAbs();
         int r = n - k;
         double[][] z = new double[n][r];
         for (int j = 0; j < n; j++) {
@@ -314,13 +326,9 @@ public final class LeastSquaresHedge {
             }
         }
         double[][] hr = Dense.congruence(h, z, r);
-        Dense.Eigen reduced = Dense.eigen(hr);
-        int rank = 0;
-        for (double ev : reduced.values()) {
-            if (ev > threshold) {
-                rank++;
-            }
-        }
+        // Ruling R6-6.2: the singularity decision runs on the Jacobi-scaled form. MIN_NORM makes no decision and keeps
+        // the unscaled rank of its pseudo-inverse.
+        int rank = minNorm ? unscaledRank(h, hr) : scaledRank(h, eqMatrix, k, n);
         if (rank < r && !minNorm) {
             throw new QfError("E_SINGULAR", "the reduced Hessian is singular", "a");
         }
@@ -355,6 +363,8 @@ public final class LeastSquaresHedge {
         boolean[] activeLo = new boolean[n];
         boolean[] activeHi = new boolean[n];
         if (minNorm) {
+            Dense.Eigen reduced = Dense.eigen(hr); // the minimum-norm answer keeps the unscaled pseudo-inverse
+            double threshold = Dense.RANK_TOL * Dense.eigen(h).maxAbs();
             y = new double[r];
             double[][] v = reduced.vectors();
             for (int t = 0; t < r; t++) {
@@ -566,7 +576,7 @@ public final class LeastSquaresHedge {
         if (cur == null) {
             throw new QfError("E_INFEASIBLE", "no point satisfies the bounds, equalities and margin limit");
         }
-        for (int iter = 0; iter < 4 * n + 100; iter++) {
+        for (int iter = 0; iter < iterationCap(n + rd.k()); iter++) { // 10 (n + p) + 100, p the equalities
             List<Integer> broken = new ArrayList<>();
             int worst = -1;
             double worstExcess = 0.0;
@@ -634,12 +644,12 @@ public final class LeastSquaresHedge {
         }
         if (r == 0) {
             for (int j = 0; j < n; j++) {
-                double tol = 1e-10 * Math.max(1.0, Math.abs(xp[j]));
+                double tol = 1e-9 * Math.max(1.0, Math.abs(xp[j]));
                 if (xp[j] < lo[j] - tol || xp[j] > hi[j] + tol) {
                     throw new QfError("E_INFEASIBLE", "the equalities fix a point outside the bounds");
                 }
             }
-            if (row != null && Dense.dot(row, xp) > limit + 1e-10 * Math.max(1.0, limit)) {
+            if (row != null && Dense.dot(row, xp) > limit + 1e-9 * Math.max(1.0, limit)) {
                 throw new QfError("E_INFEASIBLE", "the equalities fix a point above the margin limit");
             }
             return new double[0];
@@ -764,7 +774,7 @@ public final class LeastSquaresHedge {
         for (int j = 0; j < n; j++) {
             hl[j][j] += ridge * lotSizes[j] * lotSizes[j];
         }
-        Dense.Eigen eh = Dense.eigen(hl);
+        Dense.Eigen eh = Dense.eigen(Dense.jacobiScaled(hl)); // ruling R6-6.2
         double minEv = Double.POSITIVE_INFINITY;
         for (double ev : eh.values()) {
             minEv = Math.min(minEv, ev);
@@ -933,7 +943,12 @@ public final class LeastSquaresHedge {
         }
 
         /** Fixes coordinates {@code i, i-1, ..., 0} given {@code nn[i+1..]} and their partial sum. */
+        private long nodes;
+
         void enumerate(int i, long[] nn, double partial) {
+            if (++nodes > (nodeCapOverride >= 0 ? nodeCapOverride : 1_000_000L)) {
+                throw new QfError("E_NO_CONVERGENCE", "integer search passed 1,000,000 points (ruling R6-6.1)");
+            }
             if (i < 0) {
                 offer(nn);
                 return;
@@ -960,5 +975,58 @@ public final class LeastSquaresHedge {
             }
             nn[i] = 0;
         }
+    }
+
+    /**
+     * Ruling R6-6.2: the rank of the reduced Hessian {@code Z^T D H D Z}, with {@code D_jj = 1 / sqrt(H_jj)}, the
+     * equality rows {@code E D} at unit norm and {@code Z} spanning their null space, against the largest eigenvalue
+     * of {@code D H D}. The decision no longer depends on the units of the instruments.
+     */
+    private static int unscaledRank(double[][] h, double[][] hr) {
+        double threshold = Dense.RANK_TOL * Dense.eigen(h).maxAbs();
+        int rank = 0;
+        for (double ev : Dense.eigen(hr).values()) {
+            if (ev > threshold) {
+                rank++;
+            }
+        }
+        return rank;
+    }
+
+    static int scaledRank(double[][] h, double[][] eq, int k, int n) {
+        double[] d = Dense.jacobiFactors(h);
+        double[][] hs = Dense.jacobiScaled(h);
+        double threshold = Dense.RANK_TOL * Dense.eigen(hs).maxAbs();
+        int r = n - k;
+        double[][] z = new double[n][r];
+        if (k > 0) {
+            double[][] et = new double[n][k];
+            for (int i = 0; i < k; i++) {
+                double norm = 0.0;
+                for (int j = 0; j < n; j++) {
+                    norm = Math.hypot(norm, eq[i][j] * d[j]);
+                }
+                for (int j = 0; j < n; j++) {
+                    et[j][i] = norm > 0.0 ? eq[i][j] * d[j] / norm : 0.0;
+                }
+            }
+            double[][] q = Dense.householderQr(et, n, k, new double[k][k]);
+            for (int j = 0; j < n; j++) {
+                for (int t = 0; t < r; t++) {
+                    z[j][t] = q[j][k + t];
+                }
+            }
+        } else {
+            for (int j = 0; j < n; j++) {
+                z[j][j] = 1.0;
+            }
+        }
+        int rank = 0;
+        for (double ev : Dense.eigen(Dense.congruence(hs, z, r)).values()) {
+            if (ev > threshold) {
+                rank++;
+            }
+        }
+        return rank;
     }
 }

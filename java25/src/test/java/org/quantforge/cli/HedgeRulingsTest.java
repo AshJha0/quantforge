@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.quantforge.core.Json;
 
 /** Stage I rulings checked at the CLI layer: I-41 fixed key sets, I-42 unknown targets, I-47 nulls, I-50 fills. */
-class StageIRulingsTest {
+class HedgeRulingsTest {
 
     private static String code(String operation, String inputs) {
         String request = "{\"schema_version\":\"1.0\",\"case_id\":\"t\",\"operation\":\"" + operation

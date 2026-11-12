@@ -261,4 +261,25 @@ final class Dense {
         }
         return l;
     }
+
+    /** Jacobi factors {@code 1 / sqrt(M_jj)} (ruling R6-6.2); a non-positive diagonal keeps factor 1. */
+    static double[] jacobiFactors(double[][] m) {
+        double[] d = new double[m.length];
+        for (int j = 0; j < m.length; j++) {
+            d[j] = m[j][j] > 0.0 ? 1.0 / Math.sqrt(m[j][j]) : 1.0;
+        }
+        return d;
+    }
+
+    /** {@code D M D} with the Jacobi factors of {@code m}. */
+    static double[][] jacobiScaled(double[][] m) {
+        double[] d = jacobiFactors(m);
+        double[][] out = new double[m.length][m.length];
+        for (int i = 0; i < m.length; i++) {
+            for (int j = 0; j < m.length; j++) {
+                out[i][j] = d[i] * m[i][j] * d[j];
+            }
+        }
+        return out;
+    }
 }

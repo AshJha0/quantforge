@@ -107,7 +107,12 @@ class ShortRateTest {
                 var += (y - mean) * (y - mean);
             }
             double se = Math.sqrt(var / (paths - 1) / paths);
-            double bgk = Exotics.barrierDiscrete(c == 0 ? 1 : -1,
+            if (c != 0) { // a down-and-out put is a reverse barrier: outside the BGK envelope (ruling R6-2.1)
+                org.junit.jupiter.api.Assertions.assertThrows(org.quantforge.core.QfError.class, () ->
+                        Exotics.barrierDiscrete(-1, Exotics.BarrierType.DOWN_OUT, s0, k, 1.0, r, q, v, h, 0.0, steps));
+                continue;
+            }
+            double bgk = Exotics.barrierDiscrete(1,
                     Exotics.BarrierType.DOWN_OUT, s0, k, 1.0, r, q, v, h, 0.0, steps);
             assertTrue(Math.abs(bgk - mean) < 3 * se, "case " + c + " bgk " + bgk + " mc " + mean + " se " + se);
         }
@@ -250,7 +255,8 @@ class ShortRateTest {
 
     /**
      * G-9 performance record on the inputs of {@code aadladder_g-0001}: median of 21 timed runs after 5 warm-ups
-     * of one price and of price plus ladder, same thread. Printed, not asserted (timing is machine-dependent).
+     * of one price and of price plus ladder, same thread. The ratio is printed for the record and asserted at the spec's
+     * bound, median(b) / median(a) <= 5 (aad-core.md, G-9); the Actions runner result is the one that counts.
      */
     @Test
     void aadCostRatioG9() {
@@ -281,5 +287,10 @@ class ShortRateTest {
         assertTrue(Double.isFinite(sink));
         System.out.printf("G-9 aadladder_g-0001: price %.3f ms, price+ladder %.3f ms, ratio %.3f%n", tp[10] / 1e6,
                 tl[10] / 1e6, tl[10] / tp[10]);
+        // A coverage agent distorts timing, so the bound is asserted only on an uninstrumented run.
+        boolean instrumented = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
+                .anyMatch(a -> a.contains("jacoco"));
+        org.junit.jupiter.api.Assumptions.assumeFalse(instrumented, "G-9 bound not asserted under a coverage agent");
+        assertTrue(tl[10] / tp[10] <= 5.0, "G-9 cost ratio " + tl[10] / tp[10] + " exceeds 5");
     }
 }

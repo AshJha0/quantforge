@@ -218,7 +218,9 @@ public final class CorrelationHedge {
                 exchange |= in.kind() == Kind.EXCHANGE;
             }
         }
-        if (exchange && !(mk.spreadVol() > 0.0)) {
+        // Golden hedgecorr_i-0015 (vol1 = vol2, correlation 1) expects E_DOMAIN, while R6-11.16 names E_SINGULAR for
+        // s <= 1e-12 (v1 + v2); the golden decides until the spec lane rules (SPEC_QUESTIONS J-R6-2).
+        if (exchange && !(mk.spreadVol() > 1e-12 * (mk.vol1() + mk.vol2()))) {
             throw domain("correlation");
         }
         double[] before = new double[5];

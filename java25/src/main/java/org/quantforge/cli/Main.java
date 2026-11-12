@@ -23,7 +23,7 @@ import org.quantforge.core.QfError;
 public final class Main {
     private Main() {}
 
-    private static final String CONTRACT = "1.11.0";
+    private static final String CONTRACT = "1.12.0";
     private static final String VERSION = "0.8.0"; // keep equal to <version> in java25/pom.xml
     private static final int MAX_CASE_DEPTH = 80;
     private static final Set<String> ENVELOPE = Set.of("schema_version", "case_id", "operation", "inputs");

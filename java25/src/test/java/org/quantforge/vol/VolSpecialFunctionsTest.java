@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.quantforge.core.QfError;
 
 /** R8 lnGamma and digamma, R10 VIX null quotes and local-vol continuity at slice expiries (ruling F-17). */
-class StageFVolTest {
+class VolSpecialFunctionsTest {
     @Test
     void lnGammaAgainstKnownValues() {
         assertEquals(0.0, GarchMle.lnGamma(1.0), 1e-15);

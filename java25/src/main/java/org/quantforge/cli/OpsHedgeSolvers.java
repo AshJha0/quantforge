@@ -13,8 +13,8 @@ import org.quantforge.hedging.LeastSquaresHedge;
  * Stage I wave 1: the hedge solvers ({@code 08-hedging/hedge-solvers.md}). Inputs are read first (E_SCHEMA), then the
  * size limits of ruling I-4 are raised, then the finite rule F-2, then each operation's own checks.
  */
-final class OpsHedgeI {
-    private OpsHedgeI() {}
+final class OpsHedgeSolvers {
+    private OpsHedgeSolvers() {}
 
     private static final int MAX_FACTORS = 1_000;
     private static final int MAX_INSTRUMENTS = 200;
@@ -29,13 +29,14 @@ final class OpsHedgeI {
     private enum Rounding { NEAREST, NONE }
 
     static void register(Map<String, Function<In, Out>> table) {
-        table.put("hedge.qp.solve", OpsHedgeI::qp);
-        table.put("hedge.integer.solve", OpsHedgeI::integer);
-        table.put("hedge.minvar.ratio", OpsHedgeI::minVariance);
-        table.put("hedge.greeks.neutralise", OpsHedgeI::greeks);
-        table.put("hedge.beta.futures", OpsHedgeI::beta);
-        table.put("hedge.residual.report", OpsHedgeI::residual);
-        table.put("hedge.frontier.solve", OpsHedgeI::frontier);
+        table.put("hedge.qp.solve", OpsHedgeSolvers::qp);
+        table.put("hedge.integer.solve", OpsHedgeSolvers::integer);
+        table.put("hedge.minvar.ratio", OpsHedgeSolvers::minVariance);
+        table.put("hedge.greeks.neutralise", OpsHedgeSolvers::greeks);
+        table.put("hedge.beta.futures", OpsHedgeSolvers::beta);
+        table.put("hedge.residual.report", OpsHedgeSolvers::residual);
+        table.put("hedge.frontier.solve", OpsHedgeSolvers::frontier);
+        table.put("usecase.option_hedge_lots", OpsHedgeSolvers::optionHedgeLots);
     }
 
     private static int width(double[][] m) {
@@ -295,5 +296,125 @@ final class OpsHedgeI {
         return Operations.out("residual", r.residual(), "variance_before", r.varianceBefore(), "variance_after",
                 r.varianceAfter(), "volatility_after", r.volatilityAfter(), "effectiveness", r.effectiveness(),
                 "contributions", r.contributions());
+    }
+
+    /** Use case 6 (ruling R6-11.20, {@code use-cases.md}): an options book hedged in whole lots with spread cost. */
+    private static Out optionHedgeLots(In in) {
+        HedgeRatios.Market mk = new HedgeRatios.Market(in.real("spot"), in.real("rate"), in.real("dividend_yield"),
+                in.real("volatility"));
+        List<In> book = in.objects("portfolio");
+        List<In> hedgeIn = in.objects("hedges");
+        boolean[] badKeys = new boolean[1];
+        List<HedgeRatios.Position> positions = new ArrayList<>();
+        for (In p : book) {
+            positions.add(position(p, true, badKeys));
+        }
+        List<HedgeRatios.Position> hedges = new ArrayList<>();
+        double[] lotSize = new double[hedgeIn.size()];
+        double[] spread = new double[hedgeIn.size()];
+        for (int j = 0; j < hedgeIn.size(); j++) {
+            In h = hedgeIn.get(j);
+            HedgeRatios.Instrument kind = h.choice("instrument", HedgeRatios.Instrument.class);
+            Double strike = h.has("strike") ? h.real("strike") : null;
+            Double expiry = h.has("expiry_years") ? h.real("expiry_years") : null;
+            lotSize[j] = h.real("lot_size");
+            spread[j] = h.real("half_spread");
+            hedges.add(new HedgeRatios.Position(kind, strike, expiry, 0.0));
+        }
+        List<HedgeRatios.Greek> targets = new ArrayList<>();
+        for (String t : in.strings("targets")) {
+            targets.add(In.parseEnum("targets", t, HedgeRatios.Greek.class));
+        }
+        long maxLots = in.integer("max_lots");
+        in.limit(book.size() > MAX_POSITIONS, "portfolio");
+        in.limit(hedgeIn.size() > MAX_INTEGER_INSTRUMENTS, "hedges");
+        in.gate();
+        if (badKeys[0]) {
+            throw new QfError("E_INPUT", "an instrument has a key outside its kind's set (ruling I-41)", "portfolio");
+        }
+        if (hedges.isEmpty()) {
+            throw new QfError("E_INPUT", "no hedge instruments", "hedges");
+        }
+        if (targets.isEmpty() || targets.stream().distinct().count() != targets.size()) {
+            throw new QfError("E_INPUT", "targets must be a non-empty set", "targets");
+        }
+        for (List<HedgeRatios.Position> list : List.of(positions, hedges)) {
+            for (HedgeRatios.Position p : list) {
+                boolean underlying = p.instrument() == HedgeRatios.Instrument.UNDERLYING;
+                if (underlying ? p.strike() != null || p.expiryYears() != null
+                        : p.strike() == null || p.expiryYears() == null) {
+                    throw new QfError("E_INPUT", "strike and expiry_years do not fit " + p.instrument(),
+                            list == positions ? "portfolio" : "hedges");
+                }
+            }
+        }
+        if (!(mk.spot() > 0.0)) {
+            throw new QfError("E_DOMAIN", "spot must be positive", "spot");
+        }
+        if (!(mk.volatility() > 0.0)) {
+            throw new QfError("E_DOMAIN", "volatility must be positive", "volatility");
+        }
+        for (List<HedgeRatios.Position> list : List.of(positions, hedges)) {
+            for (HedgeRatios.Position p : list) {
+                if (p.instrument() != HedgeRatios.Instrument.UNDERLYING
+                        && !(p.strike() > 0.0 && p.expiryYears() > 0.0)) {
+                    throw new QfError("E_DOMAIN", "strike and expiry_years must be positive",
+                            list == positions ? "portfolio" : "hedges");
+                }
+            }
+        }
+        for (int j = 0; j < lotSize.length; j++) {
+            if (!(lotSize[j] > 0.0) || !(spread[j] >= 0.0)) {
+                throw new QfError("E_DOMAIN", "lot_size must be positive and half_spread not negative", "hedges");
+            }
+        }
+        if (maxLots < 1) {
+            throw new QfError("E_DOMAIN", "max_lots must be at least 1", "max_lots");
+        }
+        double[] before = new double[3];
+        for (HedgeRatios.Position p : positions) {
+            double[] g = HedgeRatios.greeks(mk, p);
+            for (int i = 0; i < 3; i++) {
+                before[i] += p.quantity() * g[i];
+            }
+        }
+        int n = hedges.size();
+        double[][] unit = new double[n][];
+        for (int j = 0; j < n; j++) {
+            unit[j] = HedgeRatios.greeks(mk, hedges.get(j));
+        }
+        int m = targets.size();
+        double[][] a = new double[m][n];
+        double[] b = new double[m];
+        double[] w = new double[m];
+        for (int i = 0; i < m; i++) {
+            int t = targets.get(i).ordinal();
+            for (int j = 0; j < n; j++) {
+                a[i][j] = lotSize[j] * unit[j][t];
+            }
+            b[i] = before[t]; // the solver minimises |b + A x|^2 (hedge convention)
+            double scale = Math.max(1.0, Math.abs(before[t]));
+            w[i] = 1.0 / (scale * scale);
+        }
+        double[] ones = new double[n];
+        double[] lo = new double[n];
+        double[] hi = new double[n];
+        java.util.Arrays.fill(ones, 1.0);
+        java.util.Arrays.fill(lo, -maxLots);
+        java.util.Arrays.fill(hi, maxLots);
+        LeastSquaresHedge.IntegerSolution s = LeastSquaresHedge.solveLots(a, b, w, 0.0, ones, lo, hi);
+        double[] after = before.clone();
+        double cost = 0.0;
+        List<Long> lots = new ArrayList<>();
+        for (int j = 0; j < n; j++) {
+            long l = s.lots()[j];
+            lots.add(l);
+            for (int g = 0; g < 3; g++) {
+                after[g] += l * lotSize[j] * unit[j][g];
+            }
+            cost += Math.abs(l) * lotSize[j] * spread[j];
+        }
+        return Operations.out("greeks_before", greekObject(before), "lots", lots, "greeks_after", greekObject(after),
+                "hedge_cost", cost, "rounding_cost", s.roundingCost());
     }
 }

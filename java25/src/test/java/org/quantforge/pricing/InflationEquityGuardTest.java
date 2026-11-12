@@ -35,7 +35,8 @@ class InflationEquityGuardTest {
         nan("baseRef", () -> Inflation.linker(B, S, 0.01, NAN, fx));
         fails("E_DOMAIN", "base_ref_cpi", () -> Inflation.linker(B, S, 0.01, 0.0, fx));
         fails("E_DATE_ORDER", "settlement", () -> Inflation.linker(B, B.maturity(), 0.01, 290.0, fx));
-        assertEquals(300.0 + 1.0 / 31.0 * 1.0, Inflation.linker(B, S, 0.01, 290.0, fx).refCpi(), 1e-12);
+        // 300 + 1/31 = 300.0322580..., truncated to 300.032258, rounded half up to five places (ruling R6-7.5)
+        assertEquals(300.03226, Inflation.linker(B, S, 0.01, 290.0, fx).refCpi(), 1e-12);
         nan("baseRef", () -> Inflation.linkerCurve(B, S, NAN, CPI, C));
         fails("E_DOMAIN", "base_ref_cpi", () -> Inflation.linkerCurve(B, S, 0.0, CPI, C));
         fails("E_DATE_ORDER", "settlement", () -> Inflation.linkerCurve(B, B.maturity(), 290.0, CPI, C));

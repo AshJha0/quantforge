@@ -202,15 +202,26 @@ public final class CurveRisk {
 
     public static Jacobian jacobian(Conventions.RateIndex c, LocalDate asOf, List<Ois.Quote> quotes,
                                     Curve.Interpolation interp, double bumpBp) {
+        return jacobian(c, asOf, quotes, interp, bumpBp, Curve.Shape.NONE);
+    }
+
+    /**
+     * The full zero-rate Jacobian by central differences, every entry computed (ruling R6-1.1: no triangle mask, as
+     * the stage F methods are not local); {@code shape} carries {@code tension} and {@code step_end} (R6-1.2).
+     */
+    public static Jacobian jacobian(Conventions.RateIndex c, LocalDate asOf, List<Ois.Quote> quotes,
+                                    Curve.Interpolation interp, double bumpBp, Curve.Shape shape) {
         Finite.check("bumpBp", bumpBp);
-        Curve base = rebuilt(c, asOf, quotes, interp, null);
+        java.util.function.Function<double[], Curve> rebuilt = b -> Ois.bootstrap(c, asOf, quotes, interp,
+                CurveSolver.Method.SEQUENTIAL, b, org.quantforge.curves.Jumps.NONE, shape).curve();
+        Curve base = rebuilt.apply(null);
         int n = quotes.size();
         double h = bumpBp * BP;
         double[] z0 = zeros(base);
         double[][] jac = new double[z0.length][n];
         for (int j = 0; j < n; j++) {
-            double[] up = zeros(rebuilt(c, asOf, quotes, interp, bump(n, j, h)));
-            double[] down = zeros(rebuilt(c, asOf, quotes, interp, bump(n, j, -h)));
+            double[] up = zeros(rebuilt.apply(bump(n, j, h)));
+            double[] down = zeros(rebuilt.apply(bump(n, j, -h)));
             for (int i = 0; i < z0.length; i++) {
                 jac[i][j] = (up[i] - down[i]) / (2.0 * h);
             }

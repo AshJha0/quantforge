@@ -13,11 +13,11 @@ import org.quantforge.core.QfError;
 import org.quantforge.risk.FrtbGirr;
 import org.quantforge.risk.FrtbSbm;
 import org.quantforge.risk.FrtbVegaCurvature;
-import org.quantforge.risk.RiskToolsB;
+import org.quantforge.risk.PortfolioRiskTools;
 
 /** Stage F carry-over wave 2b: FRTB FX, equity, CSR and commodity delta; F3 sensitivities; F4 tools. */
-final class OpsWave2b {
-    private OpsWave2b() {}
+final class OpsFrtbSensitivities {
+    private OpsFrtbSensitivities() {}
 
     private static final int MAX = 100_000;
 
@@ -78,7 +78,66 @@ final class OpsWave2b {
         return out;
     }
 
+    private enum RiskClass { GIRR, CSR_NONSEC, EQ, COMM, FX }
+
+    private enum Measure { DELTA, VEGA, CURVATURE }
+
+    private static final String[] SCENARIOS = {"high", "medium", "low"};
+
+    /** MAR21.7 total over risk classes and measures within each scenario, then the worst scenario (R6-4.1). */
+    private static Out sbmTotal(In in) {
+        List<In> list = in.objects("components");
+        in.limit(list.size() > MAX, "components");
+        List<String> ids = new ArrayList<>();
+        double[][] charge = new double[list.size()][3];
+        for (int i = 0; i < list.size(); i++) {
+            In x = list.get(i);
+            RiskClass rc = x.choice("risk_class", RiskClass.class);
+            Measure m = x.choice("measure", Measure.class);
+            In sc = x.object("scenarios");
+            for (int k = 0; k < 3; k++) {
+                charge[i][k] = sc.real(SCENARIOS[k]);
+            }
+            ids.add(rc + "/" + m);
+        }
+        in.gate();
+        if (list.isEmpty()) {
+            throw new org.quantforge.core.QfError("E_INPUT", "at least one component is needed", "components");
+        }
+        for (double[] c : charge) {
+            for (double v : c) {
+                if (v < 0.0) {
+                    throw new org.quantforge.core.QfError("E_DOMAIN", "a charge is negative", "components");
+                }
+            }
+        }
+        if (new HashSet<>(ids).size() != ids.size()) {
+            throw new org.quantforge.core.QfError("E_INPUT", "a risk class and measure appear twice", "components");
+        }
+        double[] total = new double[3];
+        double sumOwn = 0.0;
+        for (double[] c : charge) {
+            for (int k = 0; k < 3; k++) {
+                total[k] += c[k];
+            }
+            sumOwn += Math.max(c[0], Math.max(c[1], c[2]));
+        }
+        int bind = 0;
+        for (int k = 1; k < 3; k++) {
+            if (total[k] > total[bind]) {
+                bind = k;
+            }
+        }
+        Map<String, Object> totals = new java.util.LinkedHashMap<>();
+        for (int k = 0; k < 3; k++) {
+            totals.put(SCENARIOS[k], total[k]);
+        }
+        return Operations.out("scenario_totals", totals, "capital", total[bind], "binding_scenario", SCENARIOS[bind],
+                "sum_of_component_capitals", sumOwn);
+    }
+
     static void register(Map<String, Function<In, Out>> table) {
+        table.put("risk.frtb.sbm_total", OpsFrtbSensitivities::sbmTotal);
         table.put("risk.frtb.fx_delta", in -> {
             Rows r = rows(in, false, "pair");
             Set<String> spec = in.has("specified_pairs") ? new HashSet<>(in.strings("specified_pairs")) : Set.of();
@@ -101,8 +160,8 @@ final class OpsWave2b {
             return frtbOut(FrtbSbm.commodity(col(r, 0), r.bucket(), col(r, 1), col(r, 2), r.s()));
         });
 
-        table.put("risk.frtb.vega", OpsWave2b::vega);
-        table.put("risk.frtb.curvature", OpsWave2b::curvature);
+        table.put("risk.frtb.vega", OpsFrtbSensitivities::vega);
+        table.put("risk.frtb.curvature", OpsFrtbSensitivities::curvature);
 
         table.put("risk.sens.inflation01", in -> {
             double n = in.real("notional");
@@ -120,9 +179,9 @@ final class OpsWave2b {
             if (!(p > 0.0)) {
                 throw domain("discount_factor");
             }
-            double pv = RiskToolsB.zcisPv(n, years, k, z, p);
-            return Operations.out("pv", pv, "inflation01", RiskToolsB.inflation01(n, years, z, p),
-                    "inflation01_bump", RiskToolsB.zcisPv(n, years, k, z + 1e-4, p) - pv);
+            double pv = PortfolioRiskTools.zcisPv(n, years, k, z, p);
+            return Operations.out("pv", pv, "inflation01", PortfolioRiskTools.inflation01(n, years, z, p),
+                    "inflation01_bump", PortfolioRiskTools.zcisPv(n, years, k, z + 1e-4, p) - pv);
         });
         table.put("risk.sens.dividend_borrow", in -> {
             double s = in.real("spot");
@@ -149,7 +208,7 @@ final class OpsWave2b {
             if (!type.equals("CALL") && !type.equals("PUT")) {
                 throw input("option_type");
             }
-            double[] pv = RiskToolsB.bsmYield(type.equals("CALL"), s, k, t, r, q + b, v);
+            double[] pv = PortfolioRiskTools.bsmYield(type.equals("CALL"), s, k, t, r, q + b, v);
             return Operations.out("price", pv[0], "dividend01", pv[1] * 1e-4, "borrow01", pv[1] * 1e-4);
         });
         table.put("risk.sens.correlation", in -> {
@@ -179,7 +238,7 @@ final class OpsWave2b {
             if (!(t > 0.0)) {
                 throw domain("expiry_years");
             }
-            double[] m = RiskToolsB.margrabe(q1 * s1 * Math.exp(-y1 * t), q2 * s2 * Math.exp(-y2 * t), v1, v2, rho, t);
+            double[] m = PortfolioRiskTools.margrabe(q1 * s1 * Math.exp(-y1 * t), q2 * s2 * Math.exp(-y2 * t), v1, v2, rho, t);
             return Operations.out("price", m[0], "correlation01", m[1], "spread_vol", m[2]);
         });
 
@@ -200,7 +259,7 @@ final class OpsWave2b {
             if (!(loss > 0.0)) {
                 throw domain("target_loss");
             }
-            double k = RiskToolsB.reverseScale(d, delta, gamma, loss);
+            double k = PortfolioRiskTools.reverseScale(d, delta, gamma, loss);
             double[] shocks = new double[d.length];
             double pnl = 0.0;
             for (int i = 0; i < d.length; i++) {
@@ -255,7 +314,7 @@ final class OpsWave2b {
             if (x.length == 0) {
                 throw domain("exposures");
             }
-            double[] w = RiskToolsB.weights(x);
+            double[] w = PortfolioRiskTools.weights(x);
             if (n < 1 || n > x.length) {
                 throw input("top_n");
             }
@@ -264,7 +323,7 @@ final class OpsWave2b {
                 hhi += v * v;
             }
             return Operations.out("hhi", hhi, "effective_number", 1.0 / hhi, "top_n_share",
-                    RiskToolsB.topShare(w, (int) n), "weights", w);
+                    PortfolioRiskTools.topShare(w, (int) n), "weights", w);
         });
         table.put("risk.var.liquidity_adjusted", in -> {
             double var = in.real("var");
@@ -305,7 +364,7 @@ final class OpsWave2b {
             if (h < 1) {
                 throw domain("horizon_days");
             }
-            double ratio = RiskToolsB.varianceRatio(rho, h);
+            double ratio = PortfolioRiskTools.varianceRatio(rho, h);
             double sq = sigma * Math.sqrt((double) h);
             return Operations.out("vol", sigma * Math.sqrt(h * ratio), "sqrt_rule_vol", sq, "variance_ratio", ratio);
         });

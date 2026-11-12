@@ -134,10 +134,19 @@ public final class Inflation {
         if (a == null || c == null) {
             throw new QfError("E_INPUT", "a needed CPI fixing is missing", "cpi_fixings");
         }
-        double ref = a + (settlement.getDayOfMonth() - 1) / (double) settlement.lengthOfMonth() * (c - a);
-        double ratio = ref / baseRef;
+        // 31 CFR 356 Appendix B (ruling R6-7.5): truncate to six decimals, then round half up to five.
+        double ref = round5(trunc6(a + (settlement.getDayOfMonth() - 1) / (double) settlement.lengthOfMonth() * (c - a)));
+        double ratio = round5(trunc6(ref / baseRef));
         Bonds.YieldPrice y = Bonds.fromYield(b, settlement, realYield);
         return new Linker(ref, ratio, y.clean(), y.accrued(), y.clean() * ratio, y.accrued() * ratio);
+    }
+
+    private static double trunc6(double x) {
+        return Math.floor(x * 1e6) / 1e6;
+    }
+
+    private static double round5(double x) {
+        return Math.floor(x * 1e5 + 0.5) / 1e5;
     }
 
     public static double linkerCurve(Bonds.Bond b, LocalDate settlement, double baseRef, CpiCurve c, Curve d) {

@@ -15,8 +15,8 @@ import org.quantforge.pricing.ShortRateFd;
 import org.quantforge.pricing.ShortRateProducts;
 
 /** Stage G waves 2c to 2g and 3b: calibration, Bermudans, caps and floors, callable bonds, LMM. */
-final class OpsRatesG {
-    private OpsRatesG() {}
+final class OpsRateModels {
+    private OpsRateModels() {}
 
     private static final int MAX = 10_000; // ruling G-6
 
@@ -133,8 +133,8 @@ final class OpsRatesG {
     }
 
     static void register(Map<String, Function<In, Out>> table) {
-        table.put("xva.exposure.portfolio_hw", OpsRatesG::portfolio);
-        table.put("risk.model_reserve.dispersion", OpsRatesG::reserve);
+        table.put("xva.exposure.portfolio_hw", OpsRateModels::portfolio);
+        table.put("risk.model_reserve.dispersion", OpsRateModels::reserve);
 
         table.put("rates.shortrate.hw_calibrate", in -> {
             In c = in.object("curve");
@@ -379,9 +379,10 @@ final class OpsRatesG {
                 "d_price_d_mean_reversion", l.dMeanReversion(), "d_price_d_sigma", l.dSigma());
     }
 
-    /** The output key of a PFE quantile: {@code pfe_} and the percentage, as {@code pfe_95}. */
+    /** The output key of a PFE quantile (ruling R6-5.1): {@code deflated_pfe_} and the percentage, as {@code deflated_pfe_95}. */
     static String pfeKey(double q) {
-        return "pfe_" + new java.math.BigDecimal(Double.toString(q)).movePointRight(2).stripTrailingZeros()
+        return "deflated_pfe_" + // ruling R6-5.1
+                new java.math.BigDecimal(Double.toString(q)).movePointRight(2).stripTrailingZeros()
                 .toPlainString();
     }
 

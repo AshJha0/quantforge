@@ -30,11 +30,27 @@ public final class PortfolioRisk {
         Arrays.sort(loss);
         int k = (int) Math.ceil(n * c);
         k = Math.max(1, Math.min(n, k));
-        double s = 0.0;
-        for (int i = k - 1; i < n; i++) {
-            s += loss[i];
+        // ES by the tail weight w = n - n c (ruling R6-3.1): the m = floor(w) largest losses in full and a fraction
+        // w - m of the next one, divided by w; w <= 0 gives the largest loss.
+        double w = n - n * c;
+        double es;
+        long tail;
+        if (w <= 0.0) {
+            es = loss[n - 1];
+            tail = 1;
+        } else {
+            int m = (int) Math.floor(w);
+            double s = 0.0;
+            for (int i = 0; i < m; i++) {
+                s += loss[n - 1 - i];
+            }
+            if (w > m && m < n) {
+                s += (w - m) * loss[n - 1 - m];
+            }
+            es = s / w;
+            tail = (long) Math.ceil(w);
         }
-        return new VarEs(loss[k - 1], s / (n - k + 1), n - k + 1, sigmaNext);
+        return new VarEs(loss[k - 1], es, tail, sigmaNext);
     }
 
     public static VarEs historical(double[] pnl, double c) {

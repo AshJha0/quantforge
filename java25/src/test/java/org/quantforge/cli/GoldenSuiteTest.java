@@ -36,7 +36,8 @@ class GoldenSuiteTest {
             Map.entry("numerical_scheme", new double[] {1e-8, 1e-8}),
             Map.entry("fourier", new double[] {1e-9, 1e-9}),
             Map.entry("common_rng", new double[] {1e-9, 1e-9}),
-            Map.entry("likelihood_sum", new double[] {1e-9, 1e-10}));
+            Map.entry("likelihood_sum", new double[] {1e-9, 1e-10}),
+            Map.entry("per_unit", new double[] {1e-10, 1e-8}));
 
     /** Cases held open in SPEC_QUESTIONS.md (golden and spec text disagree); the runner still reports them. */
     private static final java.util.Set<String> SUPERSEDED = java.util.Set.of();

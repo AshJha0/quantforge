@@ -7,7 +7,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /** Property tests of xva-framework.md, portfolio-risk-tools.md, f3-sensitivities.md and frtb-sa-fx-equity.md. */
-class WaveFourBTest {
+class PortfolioRiskToolsTest {
     private static final double[] T = {0.0, 0.25, 0.5, 0.75, 1.0};
     private static final double[][] V = {{0, 3, 5, 2, -1}, {0, -2, -4, -6, -3}, {0, 1, 6, 9, 4}, {0, 0.5, -1, 2.5, 7}};
 
@@ -72,29 +72,29 @@ class WaveFourBTest {
 
     @Test
     void reverseStressAndHorizonLimits() {
-        double k = RiskToolsB.reverseScale(new double[] {1}, new double[] {-1275}, new double[][] {{0}}, 50);
+        double k = PortfolioRiskTools.reverseScale(new double[] {1}, new double[] {-1275}, new double[][] {{0}}, 50);
         assertEquals(50.0 / 1275.0, k, 1e-15);
-        assertEquals(1.0, RiskToolsB.varianceRatio(0.0, 10), 0.0);
-        assertEquals(1.4375, RiskToolsB.varianceRatio(0.2, 10), 1e-4);
+        assertEquals(1.0, PortfolioRiskTools.varianceRatio(0.0, 10), 0.0);
+        assertEquals(1.4375, PortfolioRiskTools.varianceRatio(0.2, 10), 1e-4);
     }
 
     @Test
     void sensitivitiesAgreeWithBumps() {
         double h = 1e-6;
-        double[] up = RiskToolsB.bsmYield(true, 100, 100, 1, 0.03, 0.025 + h, 0.25);
-        double[] dn = RiskToolsB.bsmYield(true, 100, 100, 1, 0.03, 0.025 - h, 0.25);
-        double[] mid = RiskToolsB.bsmYield(true, 100, 100, 1, 0.03, 0.025, 0.25);
+        double[] up = PortfolioRiskTools.bsmYield(true, 100, 100, 1, 0.03, 0.025 + h, 0.25);
+        double[] dn = PortfolioRiskTools.bsmYield(true, 100, 100, 1, 0.03, 0.025 - h, 0.25);
+        double[] mid = PortfolioRiskTools.bsmYield(true, 100, 100, 1, 0.03, 0.025, 0.25);
         assertEquals((up[0] - dn[0]) / (2 * h), mid[1], 1e-6);
-        double[] c = RiskToolsB.bsmYield(true, 100, 90, 1, 0.03, 0.02, 0.25);
-        double[] p = RiskToolsB.bsmYield(false, 100, 90, 1, 0.03, 0.02, 0.25);
+        double[] c = PortfolioRiskTools.bsmYield(true, 100, 90, 1, 0.03, 0.02, 0.25);
+        double[] p = PortfolioRiskTools.bsmYield(false, 100, 90, 1, 0.03, 0.02, 0.25);
         assertEquals(100 * Math.exp(-0.02) - 90 * Math.exp(-0.03), c[0] - p[0], 1e-12);
-        double[] m0 = RiskToolsB.margrabe(100, 95, 0.3, 0.25, 0.5 - 1e-6, 1);
-        double[] m1 = RiskToolsB.margrabe(100, 95, 0.3, 0.25, 0.5 + 1e-6, 1);
-        double[] m = RiskToolsB.margrabe(100, 95, 0.3, 0.25, 0.5, 1);
+        double[] m0 = PortfolioRiskTools.margrabe(100, 95, 0.3, 0.25, 0.5 - 1e-6, 1);
+        double[] m1 = PortfolioRiskTools.margrabe(100, 95, 0.3, 0.25, 0.5 + 1e-6, 1);
+        double[] m = PortfolioRiskTools.margrabe(100, 95, 0.3, 0.25, 0.5, 1);
         assertEquals((m1[0] - m0[0]) / 2e-6 * 0.01, m[1], 1e-8);
-        assertEquals(RiskToolsB.inflation01(1e7, 10, 0.027, 0.75),
-                (RiskToolsB.zcisPv(1e7, 10, 0.025, 0.027 + 1e-6, 0.75)
-                        - RiskToolsB.zcisPv(1e7, 10, 0.025, 0.027 - 1e-6, 0.75)) / 2e-6 * 1e-4, 1e-4);
+        assertEquals(PortfolioRiskTools.inflation01(1e7, 10, 0.027, 0.75),
+                (PortfolioRiskTools.zcisPv(1e7, 10, 0.025, 0.027 + 1e-6, 0.75)
+                        - PortfolioRiskTools.zcisPv(1e7, 10, 0.025, 0.027 - 1e-6, 0.75)) / 2e-6 * 1e-4, 1e-4);
     }
 
     @Test

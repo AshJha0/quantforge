@@ -222,8 +222,9 @@ class CreditPropertiesTest {
 
         assertEquals("E_INPUT", code(() -> Credit.periods(T, T)));
         assertEquals("E_INPUT", code(() -> Credit.periods(T, T.minusDays(1))));
-        assertEquals("E_INPUT", code(() -> Credit.periods(LocalDate.of(2026, 3, 20), M5)));
-        assertEquals("E_INPUT", code(() -> Credit.periods(LocalDate.of(2025, 12, 22), M5)));
+        // Ruling R6-7.3: a trade date on a coupon date, adjusted or not, is priced; the first period starts at T.
+        assertEquals(LocalDate.of(2026, 3, 20), Credit.periods(LocalDate.of(2026, 3, 20), M5).getFirst().start());
+        assertEquals(LocalDate.of(2025, 12, 22), Credit.periods(LocalDate.of(2025, 12, 22), M5).getFirst().start());
         Credit.periods(LocalDate.of(2025, 12, 23), M5); // the day after is fine
     }
 
