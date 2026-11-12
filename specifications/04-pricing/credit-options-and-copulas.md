@@ -16,7 +16,7 @@ annuity A  = sum [ (b - a)/360 P(b) S(b) + (m - a)/360 P(m) (S(a) - S(b)) ]
 forward_spread F = protection / A
 ```
 
-Option, with `T = t(expiry)`: `price = N A Black(F, K, sigma, T)`, a call for payers and a put for receivers, plus, for a payer with `knock_out = false`, `front_end_protection = N (1 - R) (1 - S(expiry)) P(expiry)` (ruling E-B23). Receivers get no front-end term.
+Option, with `T = t(expiry)`: `price = N A Black(F, K, sigma, T)`, a call for payers and a put for receivers, plus, for a payer with `knock_out = false`, `front_end_protection = N (1 - R) (1 - S(expiry)) P(expiry)` (ruling E-B23). Receivers get no front-end term. Compute `1 - S(expiry)` as `-expm1(-h T)`: with small `h`, `1 - exp(-h T)` loses digits (R6-28.8).
 
 Outputs: `price`, `forward_spread`, `risky_annuity` (`A`, per unit notional), `front_end_protection` (always reported).
 

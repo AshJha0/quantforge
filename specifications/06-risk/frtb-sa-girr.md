@@ -16,7 +16,7 @@ All parameters are from the Basel Framework chapter MAR21 (in force 1 January 20
 ### Recipe
 
 - **Buckets:** one per currency (MAR21, GIRR buckets).
-- **Risk weights (MAR21.42 Table 1):** 1.7% at 0.25Y and 0.5Y, 1.6% at 1Y, 1.3% at 2Y, 1.2% at 3Y, 1.1% from 5Y to 30Y. Inflation and cross-currency basis: 1.6% (MAR21.43). With `specified_currency_reduction`, weights for EUR, USD, GBP, AUD, JPY, SEK, CAD and the `reporting_currency` are divided by `sqrt(2)` (MAR21.44 and its footnote). `WS_k = RW_k s_k`.
+- **Risk weights (MAR21.42 Table 1):** 1.7% at 0.25Y and 0.5Y, 1.6% at 1Y, 1.3% at 2Y, 1.2% at 3Y, 1.1% from 5Y to 30Y. Inflation and cross-currency basis: 1.6% (MAR21.43). With `specified_currency_reduction`, weights for EUR, USD, GBP, AUD, JPY, SEK, CAD and the `reporting_currency` are divided by `sqrt(2)` (MAR21.44 and its footnote); the reduction applies to every weight above, inflation and cross-currency basis included (R6-28.4). `WS_k = RW_k s_k`.
 - **Correlation within a bucket:**
   - Same curve, tenors `T_k`, `T_l` in years: `rho = max(exp(-theta |T_k - T_l| / min(T_k, T_l)), 40%)`, `theta = 3%` (MAR21.46 and footnote 13). Ruling F-33: the formula sits in an image on the BIS page; it is confirmed against Table 2 of MAR21.46, whose printed values it reproduces (for example 97.0% for 0.25Y against 0.5Y, 91.4% against 1Y, and the 40.0% floor).
   - Different curves: the same-curve value times 99.9% (MAR21.45, MAR21.47); same tenor on two curves is 99.9%.
