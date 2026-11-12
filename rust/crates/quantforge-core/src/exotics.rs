@@ -1039,7 +1039,14 @@ mod bgk_acceptance {
                 vol: v,
                 call,
             };
-            let bgk = barrier_discrete(&x, h, 0.0, BarrierType::DownOut, m.into()).unwrap();
+            let res = barrier_discrete(&x, h, 0.0, BarrierType::DownOut, m.into());
+            if !call {
+                // R6-2.1: a down-and-out put is not a regular knock-out, so it is outside the envelope.
+                assert_eq!(res.unwrap_err().code, "E_DOMAIN");
+                let _ = (mean, se);
+                continue;
+            }
+            let bgk = res.unwrap();
             assert!(
                 (bgk - mean).abs() < 3.0 * se,
                 "call={call} bgk={bgk} mc={mean} se={se}"
