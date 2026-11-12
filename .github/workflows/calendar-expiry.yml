@@ -1,7 +1,7 @@
 name: Calendar expiry
 # Plan 11.2.3: weekly check that no holiday calendar's confirmed coverage ends within 12 months, and that
-# each was checked within a year. Not a required PR check and not run on pull requests. Expected red until SIFMA
-# publishes the US calendar for 2028 (usually in December): a red run is the reminder to refresh
+# each was checked within a year. Not a required PR check and not run on pull requests. Amber (warning, passing) until SIFMA
+# publishes the US calendar for 2028 (usually in December): red only after the awaiting_publication_until date; the warning is the reminder to refresh
 # datasets/calendar_provenance.json from the source URL it prints.
 on:
   schedule:

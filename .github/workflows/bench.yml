@@ -70,7 +70,11 @@ jobs:
           cp "benchmarks/micro/out/$LANG_.json" injected/
       - name: gate against the stored baseline
         run: |
-          python3 tools/bench_gate.py --current clean --machine "$MACHINE" > gate.md || rc=$?
+          # Pushes to main, the weekly run and manual runs require a stored baseline from this runner class (R6-15);
+          # pull requests stay advisory until benchmarks/micro/baseline.json is recorded from a CI run.
+          REQ=""; [ "${{ github.event_name }}" != pull_request ] && REQ=--require-baseline
+          # shellcheck disable=SC2086
+          python3 tools/bench_gate.py --current clean --machine "$MACHINE" $REQ > gate.md || rc=$?
           cat gate.md >> "$GITHUB_STEP_SUMMARY"; cat gate.md
           exit "${rc:-0}"
       - name: the gate fails on an injected slowdown
