@@ -22,7 +22,7 @@ x = call("xva.exposure.portfolio_hw", {"curve": curve, "mean_reversion": 0.03, "
                                        "exposure_times": dates, "pfe_quantiles": [0.95],
                                        "hazard_rate": 0.02, "recovery": 0.4})
 print("  t    discounted EE   discounted ENE   PFE 95%")
-for t, ee, ene, pfe in zip(dates, x["discounted_ee"], x["discounted_ene"], x["pfe_95"]):
+for t, ee, ene, pfe in zip(dates, x["discounted_ee"], x["discounted_ene"], x["deflated_pfe_95"]):
     print(f"{t:4.1f} {ee:15.2f} {ene:16.2f} {pfe:10.2f}")
 print(f"EPE {x['epe']:.2f}  CVA {x['cva']:.2f}")
 

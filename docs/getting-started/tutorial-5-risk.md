@@ -87,7 +87,7 @@ Real output, 2026-11-11, Windows 11:
 Bermudan price 22697.8097
 AAD   dV/dsigma 2269594.61  dV/da -52528.10
 bump  dV/dsigma 2269594.61  dV/da -52528.10
-VaR 99% 4715737.90  ES 99% 5072473.60  tail days 3
+VaR 99% 4715737.90  ES 99% 5143820.74  tail days 3
 exceptions 4 of 250  Kupiec LR 0.7691  p-value 0.3805
 traffic light GREEN  cumulative probability 0.8922  plus factor 0.00
 GIRR sensitivities 1Y:4454 2Y:8616 3Y:19862 5Y:45944422
@@ -102,7 +102,7 @@ GIRR delta capital 505810.25  binding scenario high
 
 The agreement is not exact in principle. A central difference has an error of order `h²`, and a bump that moves an exercise decision across a grid node would break it; the golden reference therefore uses Richardson-extrapolated differences at two bump sizes, and the builds must match it within `1e-10 + 1e-8 × |ref|` per unit notional (spec `aad-core.md`, tolerance G-9).
 
-**Historical VaR and ES.** Plain idea: line up the last 250 days of P&L as if each could happen tomorrow. The 99% VaR is the loss exceeded on only 1% of those days; ES is the average loss on those worst days. Formally (spec `06-risk/var-es-and-backtests.md`): losses `L = −pnl` are sorted ascending, `k = ceil(n c)`, VaR is `L_(k)` and ES is the mean of `L_(k), ..., L_(n)`. Worked example: `n = 250`, `c = 0.99`, so `k = ceil(247.5) = 248`. VaR is the third-largest loss, 4,715,737.90, and ES is the mean of the three largest, 5,072,473.60 (`tail days 3`). ES is never below VaR, as it averages losses at least as large.
+**Historical VaR and ES.** Plain idea: line up the last 250 days of P&L as if each could happen tomorrow. The 99% VaR is the loss exceeded on only 1% of those days; ES is the average loss on those worst days. Formally (spec `06-risk/var-es-and-backtests.md`): losses `L = −pnl` are sorted ascending, `k = ceil(n c)`, VaR is `L_(k)`. ES is the Acerbi-Tasche estimator (ruling R6-3.1): with `w = n - n c` and `m = floor(w)`, the `m` largest losses get weight 1, the next gets weight `w - m`, and the sum is divided by `w`. Worked example: `n = 250`, `c = 0.99`, so `k = ceil(247.5) = 248`. VaR is the third-largest loss, 4,715,737.90, and with `w = 2.5`, `m = 2`, ES is (largest + second-largest + 0.5 x third-largest) / 2.5 = 5,143,820.74 (`tail days 3`). Before v0.8.1 ES was the plain mean of the three largest, 5,072,473.60. ES is never below VaR, as it averages losses at least as large.
 
 **Backtest.** The script applies that VaR to the next 250 days and counts the days whose loss was larger: 4. At 99% you expect 2.5.
 
