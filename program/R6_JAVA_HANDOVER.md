@@ -57,3 +57,9 @@ Results: conformance **15,918 of 15,918** pass on the goldens present after this
 ## Wave 3C (r6 merged at `a8a363e`)
 
 The stray files `stage_f/e1_risk_1.json` and `e1_risk_2.json` are gone. Conformance **15,076 of 15,076** (7,440 value, 5,122 error, 2,514 invariance). `mvn -o verify`: 526 tests, 0 failures, 0 skipped, BUILD SUCCESS.
+
+## Wave 4 (r6 merged at `c7c6bd7`)
+
+R6-28 checked against Java; no code change needed. Equity large-cap vega weight is the printed 0.7778 (`FrtbVegaCurvature`); `binding_scenario` loops `high`, `medium`, `low` with a strict `>`, so ties go to the first (`FrtbGirr`, `FrtbSbm`, `FrtbVegaCurvature`, `OpsFrtbSensitivities`); the MAR21.44 sqrt 2 reduction divides every GIRR delta weight, inflation and basis (0.016) included; R6-28.5 (`p` excludes `2 n` sign rows) matches the J-R6-5 cap already applied.
+
+Results: conformance **15,077 of 15,077** (new `aadladder_r6` passes). `mvn -o -Pcoverage verify` (detached, log `program/r6w4_java.log`, not committed): 527 tests, 0 failures, 1 skipped (G-9 under the agent), BUILD SUCCESS. Coverage line 98.21%, branch 91.91%; every file stays at or above 90%.
