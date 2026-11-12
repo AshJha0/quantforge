@@ -36,3 +36,15 @@ See the final section, written after the last run.
 ## Questions for the spec lane
 
 1. R6-6.1 counts `p` as the constraints of the problem as given; in the cost QP the split form has `2n` more sign rows. Rust uses the caller's `p` (equalities, finite bounds, margin row). Confirm.
+
+## Last measured results (stopped 2026-11-12 for shutdown)
+
+- Conformance, WSL release build, on the 3B tree that still held the two stray `e1_risk_1/_2` files: 15,918 of 15,918 pass (void count per coordinator; it includes the 842 stray cases). `hedgeqp_large_r6` 5 of 5 pass in 272.9 s for the suite.
+- Clean rerun on the 3C goldens (strays removed, WSL copy rebuilt from scratch): started, not finished; log `~/r6conf.log` in WSL (`/home/ashish/r6conf.log`).
+- cargo test: last full run (before waves 2-3) all passed except a clippy-only `if_not_else` fixed since; not re-run after waves 2-3. clippy: not re-run after waves 2-3.
+
+## Unfinished
+
+1. Final conformance on 3C (expect 15,076 = 7,440 / 5,122 / 2,514).
+2. `cargo clippy --workspace --all-targets -- -D warnings` and `cargo test --workspace` (run detached, `-j 2`) after waves 2-3.
+3. T6 timing target (5 s at n = 200) not met: 121 s and 158 s.
