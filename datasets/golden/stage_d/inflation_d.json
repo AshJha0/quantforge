@@ -488,6 +488,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ruling D60: per unit notional; a par swap's pv is rounding noise"
+   },
+   "output_classes": {
+    "index_ratio": "per_unit"
    }
   },
   {
@@ -627,6 +630,9 @@
     "absolute": 0.025,
     "relative": 1e-09,
     "reason": "ruling D60: per unit notional; a par swap's pv is rounding noise"
+   },
+   "output_classes": {
+    "index_ratio": "per_unit"
    }
   },
   {
@@ -766,6 +772,9 @@
     "absolute": 0.01,
     "relative": 1e-09,
     "reason": "ruling D60: per unit notional; a par swap's pv is rounding noise"
+   },
+   "output_classes": {
+    "index_ratio": "per_unit"
    }
   },
   {
@@ -806,12 +815,12 @@
    "expected": {
     "status": "ok",
     "outputs": {
-     "ref_cpi": 322.3446666666666,
-     "index_ratio": 1.0740402546574306,
+     "ref_cpi": 322.34467,
+     "index_ratio": 1.07404,
      "real_clean": 107.00907483165305,
      "real_accrued": 2.0557065217391304,
-     "nominal_clean": 114.93205398284469,
-     "nominal_accrued": 2.2079115561096363
+     "nominal_clean": 114.93202673218866,
+     "nominal_accrued": 2.207911032608696
     }
    },
    "tolerance_class": "simple_analytic",
@@ -863,11 +872,11 @@
     "status": "ok",
     "outputs": {
      "ref_cpi": 322.734,
-     "index_ratio": 1.1219676690422389,
+     "index_ratio": 1.12197,
      "real_clean": 121.00458258105418,
      "real_accrued": 1.247282608695652,
-     "nominal_clean": 135.76322946189447,
-     "nominal_accrued": 1.3994107611151838
+     "nominal_clean": 135.76351151846535,
+     "nominal_accrued": 1.3994136684782608
     }
    },
    "tolerance_class": "simple_analytic",
