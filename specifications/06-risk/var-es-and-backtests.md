@@ -62,7 +62,7 @@ p-values: chi-square with 1, 1 and 2 degrees of freedom. Ruling F-32 applies to 
 
 ## `risk.backtest.traffic_light`
 
-Inputs: `observations` (`>= 1`), `exceptions` (`0 <= x <= n`, else `E_DOMAIN`), `confidence`. `cumulative_probability = P(X <= x)`, `X ~ Binomial(n, 1 - c)`. Zone: `GREEN` below 0.95, `YELLOW` below 0.9999, else `RED` [S8]. At `n = 250` and `c = 0.99` this gives green for 0 to 4 exceptions, yellow for 5 to 9, red from 10, as Table 2 of [S8]; `plus_factor` is that table's value (0 for 0 to 4; 0.40, 0.50, 0.65, 0.75, 0.85 for 5 to 9; 1.00 from 10). For any other `n` or `c`, `plus_factor` is `null`.
+Inputs: `observations` (`>= 1`), `exceptions` (`0 <= x <= n`, else `E_DOMAIN`), `confidence`. `cumulative_probability = P(X <= x)`, `X ~ Binomial(n, 1 - c)`. Zone: `GREEN` below 0.95, `YELLOW` below 0.9999, else `RED` [S8]. At `n = 250` and `c = 0.99` this gives green for 0 to 4 exceptions, yellow for 5 to 9, red from 10, as Table 2 of [S8]; `plus_factor` is that table's value (0 for 0 to 4; 0.40, 0.50, 0.65, 0.75, 0.85 for 5 to 9; 1.00 from 10). Vintage (R6-28.1): this is the 1996 plus factor on the multiplier base 3; the FRTB backtesting table (multiplier base 1.5, plus factors 0.20 to 0.50) is a different test and is not implemented. For any other `n` or `c`, `plus_factor` is `null`.
 
 ## Convergence and limit cases
 
