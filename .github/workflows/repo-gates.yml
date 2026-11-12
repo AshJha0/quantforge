@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   gates:
+    name: repo-gates
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -26,6 +27,8 @@ jobs:
           persist-credentials: false
           fetch-tags: true  # the docs check reads release tags
       - run: python3 tools/check_hygiene.py
+      - name: mutation stages map every stage (R6-14)
+        run: python3 conformance/mutation/check_stages.py && python3 conformance/mutation/test_gates.py
       - run: python3 tools/quality_gate.py --check-register --check-specs --check-docs
       - name: ignores (G9)
         run: |

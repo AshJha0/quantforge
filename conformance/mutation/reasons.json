@@ -1,0 +1,4 @@
+{
+  "_note": "R6-14: module-language results allowed below the gate (point estimate 80%, 95% Wilson lower bound 65%). An entry counts only with a non-empty second_reviewer (name or role, date). Read by stage_report.py --gate. Empty at R6 start: no exception is granted.",
+  "exceptions": []
+}
