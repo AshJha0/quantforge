@@ -66,3 +66,14 @@ Measured 2026-11-07, after the targets above were written and with none of them 
 4. Peak RSS is read with `os.wait4`, which exists on Linux only.
 
 Misses to raise as issues, without moving the targets: Python on T1, T3 and T4; Java on T1, where the p99 is about 10 ms against a 5 ms target. Rerun Rust and C++ T1 natively before raising those.
+
+## R6 addition: hedge solver at size (ruling R6-6.4, written 2026-11-12 before any measurement)
+
+Written by the R6 spec and oracle lane before any language ran the `r6/hedgeqp_large_r6` goldens. Same conditions as above (one core, whole CLI path, median of 5 after one warm-up, machine named).
+
+| # | Measure | Workload | Target, every language | Stretch (Rust, C++) |
+|---|---|---|---:|---:|
+| T6 | One bounded cost QP, n = 200, wall time per case inside a warm batch | `hedge.qp.solve`, the `n = 200` cases of `r6/hedgeqp_large_r6` (250 factors, half-spreads, impact, margin, 3 equalities, bounds) | ≤ 5 s (≤ 20 s Python) | ≤ 0.5 s |
+| T7 | Same at n = 50 | the `n = 50` cases | ≤ 0.5 s (≤ 2 s Python) | ≤ 0.05 s |
+
+Why these numbers: the review measured one such solve at 46 s in Python on v0.8.0 (finding 7). A split-variable active-set method on a 200-variable QP needs a few hundred factorisation updates of a matrix this size, well under a second in a compiled language; 20 s for Python allows a pure-numpy active set without a compiled QP library. A miss is reported, not refitted.

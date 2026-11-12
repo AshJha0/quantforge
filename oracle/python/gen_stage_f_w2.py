@@ -375,8 +375,22 @@ def hist_ref(pnl, c):
     L = sorted(mp.mpf(-v) for v in pnl)
     n = len(L)
     k = math.ceil(n * c)  # binary64 product, then ceiling (ruling F-31)
-    tail = L[k - 1:]
-    return L[k - 1], mp.fsum(tail) / len(tail), len(tail)
+    es, m = es_at(L, n * c)
+    return L[k - 1], es, m
+
+
+def es_at(L, nc):
+    """Ruling R6-3.1 (amends F-31): Acerbi-Tasche estimator with a fractional tail weight. L ascending, nc the binary64
+    product n c. w = n - nc (binary64), m = floor(w): ES = (sum of the m largest + (w - m) x the next) / w. tail_count is the
+    number of losses with positive weight, ceil(w). w = 0 (nc rounds to n) gives ES = the largest loss, tail_count 1."""
+    n = len(L)
+    w = n - nc
+    if w <= 0:
+        return L[-1], 1
+    m = math.floor(w)
+    top = list(reversed(L))
+    num = mp.fsum(top[:m]) + (mp.mpf(w) - m) * (top[m] if m < n else 0)
+    return num / mp.mpf(w), math.ceil(w)
 
 
 def f4_hist(s):
@@ -397,7 +411,7 @@ def f4_hist(s):
         if n == 250 and c == .99:
             Ls = sorted(-v for v in pnl)
             caught("hist", "VaR at floor(n c) (one scenario too far)", abs(Ls[math.floor(n * c) - 1] - f(var)), 1e-10 * abs(f(var)))
-            caught("hist", "ES excludes the VaR scenario", abs(np.mean(Ls[math.ceil(n * c):]) - f(es)), 1e-10 * abs(f(es)))
+            caught("hist", "ES as the mean of n - k + 1 losses, VaR scenario included (old F-31)", abs(np.mean(Ls[math.ceil(n * c) - 1:]) - f(es)), 1e-10 * abs(f(es)))
     for d, inp, code in (("empty", {"pnl": [], "confidence": .99}, "E_INPUT"), ("confidence 1", {"pnl": [1.0, 2.0], "confidence": 1.0}, "E_DOMAIN"),
                          ("confidence below 0.5", {"pnl": [1.0, 2.0], "confidence": 0.4}, "E_DOMAIN")):
         s.add(op, inp, error=code, cls=E, tags=["invalid", "stage-f"], description=d)
@@ -421,7 +435,7 @@ def f4_fhs(s):
         pnl = [P * v * sn / mp.sqrt(s2[t]) for t, v in enumerate(R)]
         L = sorted(-v for v in pnl)
         k = math.ceil(T * c)
-        var, es, m = L[k - 1], mp.fsum(L[k - 1:]) / (T - k + 1), T - k + 1
+        (es, m), var = es_at(L, T * c), L[k - 1]
         s.add(op, {"returns": r, "position_value": P, "lambda": lam, "confidence": c},
               {"var": f(var), "es": f(es), "tail_count": m, "sigma_next": f(sn)}, cls=IP, output_classes={"tail_count": E},
               verified=["40-digit EWMA recursion"], tags=["var", "fhs", "stage-f"], description=f"T = {T}, lambda {lam}, confidence {c}")
@@ -470,9 +484,11 @@ def f4_mc(s):
             pnl.append(sum(wi * ri for wi, ri in zip(w, r)))
         Ls = sorted(-v for v in pnl)
         k = math.ceil(n * c)
-        var, es = Ls[k - 1], math.fsum(Ls[k - 1:]) / (n - k + 1)
+        var = Ls[k - 1]
+        es, tc = es_at([mp.mpf(v) for v in Ls], n * c)
+        es = f(es)
         s.add(op, {"mean": mu, "covariance": Sg, "weights": w, "paths": n, "seed": str(seed), "confidence": c},
-              {"var": var, "es": es, "tail_count": n - k + 1}, cls=RNG, output_classes={"tail_count": E}, verified=["core.rng replay"],
+              {"var": var, "es": es, "tail_count": tc}, cls=RNG, output_classes={"tail_count": E}, verified=["core.rng replay"],
               tags=["var", "mc", "stage-f"], description=f"{N} assets, {n} paths, confidence {c}")
     s.add(op, {"mean": [0.0, 0.0], "covariance": [[1e-4, 2e-4], [2e-4, 1e-4]], "weights": [1.0, 1.0], "paths": 100, "seed": "1", "confidence": .99},
           error="E_NOT_POSITIVE_DEFINITE", cls=E, tags=["invalid", "stage-f"], description="covariance not positive definite")
@@ -668,7 +684,7 @@ def f4_more(s):
     for n, c, d in ((100, .55, "n c = 55.00000000000001 in binary64: k = ceil = 56, not 55 (ruling F-31)"),
                     (100, .56, "n c = 56.00000000000001 in binary64: k = 57"),
                     (100, .999, "k = n: VaR is the largest loss and ES equals it"),
-                    (2, .5, "k = 1: ES is the mean of the whole sample")):
+                    (2, .5, "k = 1, n (1 - c) = 1: ES is the largest loss (R6-3.1; was the mean of the whole sample under F-31)")):
         pnl = [round(1e5 * ppnd16(g.uniform()), 2) for _ in range(n)]
         var, es, m_ = hist_ref(pnl, c)
         s.add(op, {"pnl": pnl, "confidence": c}, {"var": f(var), "es": f(es), "tail_count": m_}, cls=A, output_classes={"tail_count": E},

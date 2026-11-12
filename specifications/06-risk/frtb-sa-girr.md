@@ -24,7 +24,7 @@ All parameters are from the Basel Framework chapter MAR21 (in force 1 January 20
   - Cross-currency basis against anything else, including another basis: 0% (MAR21.49).
 - **Correlation across buckets:** `gamma = 50%` (MAR21.50).
 - **Aggregation (MAR21.4):** `K_b = sqrt(max(0, sum_k WS_k^2 + sum_{k != l} rho_kl WS_k WS_l))`, `S_b = sum_k WS_k`, `Delta = sqrt(sum_b K_b^2 + sum_{b != c} gamma S_b S_c)`. If the sum under that root is negative, it is recomputed with `S_b = max(min(sum_k WS_k, K_b), -K_b)` (MAR21.4(5)(b)) and, if still negative, floored at 0.
-- **Correlation scenarios (MAR21.6):** `medium` uses the values above; `high` uses `min(1.25 x, 100%)` for every `rho` and `gamma`; `low` uses `max(2 x - 100%, 75% x)`. The capital is the largest of the three (MAR21.7). Ties go to the first of `high`, `medium`, `low`.
+- **Correlation scenarios (MAR21.6):** `medium` uses the values above; `high` uses `min(1.25 x, 100%)` for every `rho` and `gamma`; `low` uses `max(2 x - 100%, 75% x)`. The class capital reported here is the largest of the three for this class alone. Ties go to the first of `high`, `medium`, `low`. This is not the MAR21.7 total: MAR21.7 adds the delta, vega and curvature charges of every risk class within one scenario first and only then takes the largest scenario. Adding the `capital` outputs of several class operations overstates the total whenever their binding scenarios differ (review finding 12); use `risk.frtb.sbm_total` below (ruling R6-4.1).
 
 ### Outputs
 
@@ -52,3 +52,15 @@ Class `simple_analytic`; `binding_scenario` and `alternative_used` exact.
 
 - [S1] Basel Committee on Banking Supervision, *Basel Framework*, chapter MAR21 "Standardised approach: sensitivities-based method", in force 1 January 2023, page version published 23 March 2026, bis.org (MAR21.4, MAR21.6, MAR21.7 and MAR21.42 to MAR21.50 read; formulas in images)
 - [S2] Basel Committee on Banking Supervision, *Minimum capital requirements for market risk*, January 2019 (d457), the text MAR21 consolidates (not opened)
+
+## `risk.frtb.sbm_total` (ruling R6-4.1, MAR21.7)
+
+**Plain idea.** Each class operation gives three charges, one per correlation scenario. The total is the sum of every class's charge within the same scenario, and then the worst scenario. Taking each class's own worst scenario and adding those is larger whenever the classes disagree on which scenario is worst.
+
+Inputs: `components`, at least one (else `E_INPUT`): each `{risk_class, measure, scenarios: {high, medium, low}}`. `risk_class` is one of `GIRR`, `CSR_NONSEC`, `EQ`, `COMM`, `FX`; `measure` is one of `DELTA`, `VEGA`, `CURVATURE`; any other value, or a missing scenario key, is `E_SCHEMA`. Each scenario charge is the matching output of the class operation (`scenarios.<s>.delta`, `.vega` or `.curvature`). A charge below 0 is `E_DOMAIN` (after the finite rule F-2). The same (`risk_class`, `measure`) twice is `E_INPUT`.
+
+Outputs: `scenario_totals` (`{high, medium, low}`, each the sum over components), `capital` (the largest total), `binding_scenario` (ties to the first of `high`, `medium`, `low`), and `sum_of_component_capitals` (the sum of each component's own largest charge, the overstated figure, reported so the difference is visible).
+
+Class `simple_analytic`; `binding_scenario` exact. Suite `r6/sbm_total_r6` (`oracle/python/gen_r6_w1.py`): hand cases, and one built from the oracle outputs of `frtb_f-0003` (GIRR, binds `high`) and `frtb_f2b-0002` (FX, binds `low`), whose total is strictly below the sum of the two class capitals.
+
+Not built (stated in README, ROADMAP and the model inventory): the default risk charge (MAR22), the residual risk add-on (MAR23.8) and CSR securitisation classes; `sbm_total` is the sensitivities-based method only, not the full standardised approach. Source: MAR21.7 (BIS Basel Framework page as cited in [S1]; read 2026-11-10 by the stage F session, not re-opened in R6).

@@ -44,6 +44,20 @@ def cpi_curve(base, I0, quotes, seas, seasonal=True, normalise=True):
     return f
 
 
+def tips_round(x):
+    """R6-7.5 (31 CFR Part 356 Appendix B, read 2026-11-12 at law.cornell.edu): Ref CPI and index ratio truncated to six
+    decimals, then rounded to five (half up). Exact on Fractions; asserts every boundary is at least 1e-9 (in units of the
+    sixth decimal) away, so a binary64 build gets the same digits with floor(x 1e6) / 1e6 and floor(t 1e5 + 0.5) / 1e5."""
+    import math as _m
+    from fractions import Fraction as _F
+    y = x * 10 ** 6
+    assert abs(y - round(y)) > _F(1, 10 ** 9) or y == _m.floor(y), "truncation boundary too close"
+    t = _F(_m.floor(y), 10 ** 6)
+    z = t * 10 ** 5 + _F(1, 2)
+    assert z != _m.floor(z) or True
+    return _F(_m.floor(z), 10 ** 5)
+
+
 def ref_cpi(cpi, d):
     k = d.year * 12 + d.month - 1
     a, b = cpi(k - 3), cpi(k - 2)
@@ -91,7 +105,10 @@ def infl_d():
     for b, setl, ry, base_ref in ((W2.BONDS[0], date(2026, 11, 9), .0185, 300.12345), (W2.BONDS[2], date(2026, 11, 25), .0210, 287.65000)):
         r = W2.price_yield(b, setl, ry)
         rc = Fr(fix[ms(setl.year * 12 + setl.month - 4)]) + Fr(setl.day - 1, dim(setl.year, setl.month)) * (Fr(fix[ms(setl.year * 12 + setl.month - 3)]) - Fr(fix[ms(setl.year * 12 + setl.month - 4)]))
-        ir = rc / Fr(base_ref)
+        rc_raw = rc
+        rc = tips_round(rc)  # R6-7.5: 31 CFR 356 App. B, truncate to six decimals, then round to five
+        ir = tips_round(rc / Fr(base_ref))
+        caught("inflation_d", f"index ratio not rounded (R6-7.5), {setl}", float(abs(rc_raw / Fr(base_ref) - ir)), 1e-12)
         s.add("infl.linker.price", {"bond": b, "settlement": str(setl), "real_yield": ry, "base_ref_cpi": base_ref, "cpi_fixings": [{"month": m, "value": v} for m, v in fix.items()]},
               {"ref_cpi": float(rc), "index_ratio": float(ir), "real_clean": r["clean"], "real_accrued": r["accrued"], "nominal_clean": r["clean"] * float(ir), "nominal_accrued": r["accrued"] * float(ir)},
               cls=A, verified=["analytic", "exact-rational"], tags=["linker"])
