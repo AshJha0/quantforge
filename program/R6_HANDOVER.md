@@ -215,3 +215,7 @@ Not truncation in the usual small-`h` sense and not a kink: `oracle/R6_JACOBIAN_
 ## Rulings on the Python lane questions (2026-11-12)
 
 See `r6-rulings.md`, section "Python lane questions": R6-6.2a (no scaling under `MIN_NORM`: confirmed), R6-6.1a (exact-zero kink test conforms for an exact active set; coverage gap: no golden distinguishes it), R6-16a (test file names are not G4 modules), E-Q7 and E-Q11 ruled as Python built them, F-Q1 and F-Q4 ruled (field text and method not normative), G-Q2 deferred to J-10, R6-6.4a (Python's large hedge solve missed T6/T7: 412.6 s against 46 s; target unchanged; `expsim_g` has no target). R6-1.3 wording now matches the corrected plan row: R6-1 met.
+
+### R6-6.1b: kink coverage closed by argument, no golden
+
+See `r6-rulings.md` R6-6.1b: a misclassified position within 1e-11 changes the answer by at most about cond x 1e-11, inside `root_finding`, so no golden can separate the two tests. The tolerance binds only builds whose final step is not an exact re-solve on the state. Python's exact-zero test conforms. Totals unchanged (15,076: value 7,440, error 5,122, invariance 2,514).
