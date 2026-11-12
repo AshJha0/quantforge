@@ -1,7 +1,7 @@
 name: Outside-oracle coverage
 # R6-13 (decision D6): every register (D, E, F; G and I hold suite counts) regenerated or checked here, with a
-# diff against the committed copy, and tools/outside_shares.py --check applies the D6 classes and the 60% floor
-# (a stage under it needs a dated plan) and fails when a golden suite is missing from its register.
+# diff against the committed copy, and tools/outside_shares.py --check applies the D6 classes and the 60% floor on
+# value-checked cases only (owner 2026-11-12; no dated-plan fallback) and fails when a golden suite is missing from its register.
 # Plan rule 11.2.5 and R1 item 1: stage D outside-oracle share must stay at or above 60%.
 # oracle/python/outside_d.py rebuilds every stage D case in QuantLib 1.44 (pinned in oracle/python/uv.lock,
 # installed from PyPI, free) and exits 1 below the floor. --frozen, not --locked: uv.lock still records the

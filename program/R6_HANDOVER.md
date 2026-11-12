@@ -160,3 +160,46 @@ New gates (both shown red on a planted fault): `python tools/check_e1_coverage.p
 Goldens from `oracle/python/gen_r6_w3.py` (large QP, scaling, audit, use case 6) and `gen_r6_e1.py`. Audit hand examples recomputed by the oracle: all agree (`oracle/python/r6_audit_examples.py`). Integer `E_NO_CONVERGENCE` has no golden (method-dependent stop); property tests only.
 
 WAVE 3 READY b877bc4
+
+## Findings reproduced (spec and oracle lane scope)
+
+Script: `oracle/python/r6_repro.py` (plus `tools/r6_judge.py` runs on the v0.8.0 builds named).
+
+| Finding | Result |
+|---|---|
+| 3 Jacobian mask | **Reproduced** in Python, Rust and C++ (v0.8.0 builds return 0.0 above the diagonal; up to 0.039 expected). **Not reproduced** in Java (no mask; Java lane) |
+| 4 Discrete barriers | **Reproduced**: `barrier_g-0006` (down-and-out put, monthly) BGK 0.2962 against exact-date MC 0.2478 +- 0.0012 (1M paths): +19.6% (review +19%); `barrier_g-0034` class reproduced on the grid (reverse barriers off by up to 120%) |
+| 11 ES estimator | **Reproduced**: n = 500, 99% (`risk_f4-0003`): v0.8.0 estimator 7,009,443 against Acerbi-Tasche 7,459,030, -6.0% |
+| 12 FRTB aggregation | **Reproduced**: `frtb_f-0003` (binds high) plus `frtb_f2b-0002` (binds low): sum of class capitals above the MAR21.7 total (`sbm_total_r6-0001`) |
+| 13 PFE label | **Reproduced** by reading: `pfe_q` is a quantile of the deflated exposure (spec line 19); renamed |
+| 14 Per-unit tolerances | **Reproduced in kind, not in count**: 460 loose per-unit outputs in 236 cases under my key list (review: 102 cases on a narrower list); no build fails the tightened class |
+| 15 Fuzz crash | Java crash **not run here** (no local jar); the code path (`Bonds.java:262`, `BigDecimal(-inf)`) throws; Java lane reproduced exit 70. Python, Rust, C++ return `E_NON_FINITE`: the crash is Java-only |
+| 17 G-34 L1 bias, G-10b | **Reproduced**: exact bias of the smoothed estimator -0.042% (review 0.04%); G-10c run: bump lower MSE |
+| 18 MBS PSA, basis, CDS IMM, ESTR | MBS **reproduced** (Python v0.8.0 crashes on PSA 5000: complex result); basis golden implied repo near -100% **reproduced**; CDS IMM `E_INPUT` **reproduced** (`credit_d-0017`, Python); ESTR "unopened sources" **reproduced** (Strata opened now, second source not found) |
+| 10 E1 gaps (53 operations) | **Reproduced in kind**: 51 operations lacked an E1 golden (not 53); 22 have no Real input, 29 now covered |
+| 21 Mixed-unit `E_SINGULAR` | **Reproduced**: v0.8.0 Python returns `E_SINGULAR` on `hedgescale_r6-0001` to `-0003` |
+| 7 Hedge solver at size | Largest stage I golden 6 x 4: **reproduced**. v0.8.0 Python solves the five large goldens correctly (timing not yet measured against T6/T7) |
+
+## Plan 14.1 acceptance: oracle-side evidence paths
+
+| Item | Acceptance | Evidence (oracle side) | Status |
+|---|---|---|---|
+| R6-1 | Goldens for the four non-local methods; entries within 1e-9 + 1e-7 rel of Richardson; an upper entry above 1e-3 | `datasets/golden/r6/jacobian_r6.json`, `oracle/python/gen_r6_w1.py` (gaps in `verified_by`) | Goldens and upper entry met; Richardson 1e-9 **not met by design** (R6-1.3: 1 bp truncation 5e-6) |
+| R6-2 | MC (exact dates, >= 4M antithetic, `core.rng`) for down-out puts and up-out calls at daily, weekly, monthly; every `ok` golden within max(3 SE, 0.5%); outside cases are errors; tutorial 12 | `oracle/R6_BARRIER_ACCEPTANCE.json` (13 of 13), `oracle/R6_BARRIER_GRID.json`, `qf_oracle/mc_barrier.py`, `barrier_g`, `barrier_r6` | Met; the named put/call types are outside the envelope (error goldens); tutorial 12: docs lane |
+| R6-3 | Goldens match an independent numpy estimator at integer and non-integer `n(1-c)` | `oracle/python/outside_f.py` `h_hist`; `stage_f/risk_f4.json` | Met (20 of 20) |
+| R6-4 | Hand case where class maxima come from different scenarios; total strictly below the sum | `r6/sbm_total_r6.json` (cases 1, 2) | Met |
+| R6-5 | G-42b recorded (evidence lane, ORE); G-10c recorded; G-34 L1 corrected; PFE renamed | `oracle/G10C_RESULT.json`, `oracle/python/run_g10c.py`, R6-5.1 to R6-5.4 | Met for this lane; G-42b is the evidence lane's |
+| R6-6 | Four languages agree on large goldens; KKT residual below 1e-9 checked with an outside solver on the split form; timing published; mixed-unit regular problem not `E_SINGULAR` | `r6/hedgeqp_large_r6.json`, `oracle/R6_HEDGE_LARGE.json`, `r6/hedgescale_r6.json`, `benchmarks/targets.md` T6/T7 | Oracle side met; agreement and timing: language lanes |
+| R6-7 | Goldens for each; ESTR ruling cites what was opened and when | `r6/mbs_r6`, `r6/basis_r6`, `r6/cds_imm_r6`, `stage_d/credit_d-0017`, `stage_d/inflation_d-0010/-0011`; R6-7.4 | Met, except ESTR second source not found |
+| R6-8 | Failing input as a golden | `r6/nonfinite_r6.json` | Met (fuzz green: language lanes and CI) |
+| R6-9 | Gate red on a new operation with no E1 case | `tools/check_e1_coverage.py --self-test`; `r6/e1_r6.json` | Met |
+| R6-10 | No per-unit output above 1e-8 absolute without a ruling; cases re-judged | `tools/check_tolerance_units.py` (and `--self-test`), `conformance/tolerances/R6_REJUDGE_*.json`, `apply_r6_per_unit.py` | Met |
+| R6-11 | Audit file; each disagreement ruled; use case 6 with goldens and tutorial link | `r6-rulings.md` R6-11 table; `r6/hedgeaudit_r6.json`; `r6/uc6_r6.json`; `oracle/python/r6_audit_examples.py` | Met; tutorial link: docs lane |
+
+### Stage I outside share under the owner's 2026-11-12 rule (value-checked cases only)
+
+Recomputed from the suite register (every counted case is a value case): **102 of 153 value cases = 66.7%** without wave 5 and without any R6 case added; with wave 5, 266 of 318 = 83.6%. Old all-case figure beside it: 102 of 278 = 36.7% (60.05% with wave 5). No case was added to reach this. Value classes with no free outside reference, named with the reason: integer lots `hedgeint_i` (12: no free library solves bounded integer least squares; HiGHS 1.16 does MILP and continuous QP only), beta futures `hedgebeta_i` (8: closed-form arithmetic; any check would restate the formula), residual report `hedgeres_i` (7: same), slippage `hedgeslip_i` (6: exact rational arithmetic is the oracle), backtests `hedgebt_i`/`hedgebtcost_i` (12: spec cash-account arithmetic on QuantLib values, classed reimplementation). The earlier "shortfall" paragraph applies to the old all-case rule only. Figures to be confirmed by the evidence lane's updated `tools/outside_shares.py` when `r6-evidence` lands (this lane does not edit the tool).
+
+### Stage I per-case register (replaces the suite-count assumption)
+
+`tools/stage_i_case_register.py` writes `oracle/outside_register_i_cases.json` from each case's own `verified_by` (a library is named there only when it agreed within the case tolerance, I-2). Real figures, no assumption: **102 of 153 value cases = 66.7%** without wave 5 and without added cases; 266 of 318 = 83.6% with wave 5; old all-case rule 102 of 278 = 36.7%. The per-case count equals the favourable suite-count reading exactly: every counted case is a value case. No R6 case is added to stage I. Uncounted value cases and reasons, confirmed: `hedgeint_i` 12 (no free bounded integer least-squares solver; HiGHS is MILP or continuous QP); `hedgebeta_i` 8 and `hedgeres_i` 7 (closed-form arithmetic; a check would restate the formula: correct); `hedgeslip_i` 6 (exact rational arithmetic is the oracle itself: correct); `hedgebt_i` 7 and `hedgebtcost_i` 5 (QuantLib values, then the spec's cash-account arithmetic: reimplementation); plus 1 in `hedgecost_i`, 2 in `hedgefrontier_i`, 1 in `hedgemv_i`, 2 in `hedgeqp_i` where no outside solver agreed within tolerance (left uncounted, as I-2 says). Merged `r6-evidence` at `b9b2b3c`.
