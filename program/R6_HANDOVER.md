@@ -92,3 +92,13 @@ Read: `specifications/r6-rulings.md` R6-2.1, R6-2.2, R6-5.1 to R6-5.6, R6-7.1 to
 Goldens from `oracle/python/gen_r6_w2.py`, `gen_stage_g_w1.py R9`, `gen_stage_d_credit.py`, `gen_stage_d_w3.py`; MC acceptance 13 of 13 (`oracle/R6_BARRIER_ACCEPTANCE.json`); QuantLib CDS within 1.3e-11; basis implied repo re-solved by brentq within 1e-12.
 
 WAVE 2 READY 3c5bcfe
+
+## Wave 1B: `r6/jacobian_r6`
+
+12 cases (8 value, 4 error): SOFR under `MONOTONE_CONVEX`, `MONOTONIC_LOG_CUBIC`, `TENSION_SPLINE` (`tension` 0.5), `HYBRID` (`step_end` the third pillar), `LOG_LINEAR_DF`, `LINEAR_ZERO`; SONIA and ESTR under `MONOTONE_CONVEX`; errors: `TENSION_SPLINE` without `tension`, `HYBRID` without `step_end` (`E_INPUT`), `tension` 0 (`E_DOMAIN`), `step_end` not a pillar (`E_INPUT`). Tolerance 1e-8 absolute plus 1e-6 relative. Largest entry above the diagonal: 0.039 (SOFR monotone convex). Ruling R6-1.3 records that the plan's Richardson test cannot hold for a 1 bp quotient (gap 5e-6 even for log-linear) and what is asserted instead.
+
+**Which builds had the mask (finding 3, for the release notes):** Python (`risk_curve.py:197`, reproduced: code and v0.8.0 build), Rust (`risk_curve.rs:404`; the v0.8.0 binary returns 0.0 above the diagonal on 6 of 8 value cases: reproduced), C++ (`core/risk.cpp`, loop from `i = j`; the v0.8.0 binary returns 0 on the same entries and also lacked `tension`/`step_end`: reproduced). Java: no mask (Java lane, phase 0; largest upper entry 0.038): not reproduced in Java.
+
+Totals with wave 1B: as stated under wave 2 (15,000 after waves 1 and 2).
+
+WAVE 1 READY 96f7a33 (1A and 1B: every wave 1 golden committed)
